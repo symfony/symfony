@@ -25,6 +25,15 @@ CHANGELOG
  * deprecated bind() and isBound() in Form
  * deprecated AlreadyBoundException in favor of AlreadySubmittedException
  * added support for PATCH requests
+ * [BC BREAK] added initialize() to FormInterface
+ * [BC BREAK] added getAutoInitialize() to FormConfigInterface
+ * [BC BREAK] added setAutoInitialize() to FormConfigBuilderInterface
+ * [BC BREAK] initialization for Form instances added to a form tree must be manually disabled
+ * PRE_SET_DATA is now guaranteed to be called after children were added by the form builder,
+   unless FormInterface::setData() is called manually
+ * fixed CSRF error message to be translated
+ * custom CSRF error messages can now be set through the "csrf_message" option
+ * fixed: expanded single-choice fields now show a radio button for the empty value
 
 2.2.0
 -----

@@ -14,7 +14,6 @@ namespace Symfony\Component\Form\Extension\Core\DataTransformer;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -23,14 +22,18 @@ class ChoiceToBooleanArrayTransformer implements DataTransformerInterface
 {
     private $choiceList;
 
+    private $placeholderPresent;
+
     /**
      * Constructor.
      *
      * @param ChoiceListInterface $choiceList
+     * @param Boolean             $placeholderPresent
      */
-    public function __construct(ChoiceListInterface $choiceList)
+    public function __construct(ChoiceListInterface $choiceList, $placeholderPresent)
     {
         $this->choiceList = $choiceList;
+        $this->placeholderPresent = $placeholderPresent;
     }
 
     /**
@@ -42,12 +45,12 @@ class ChoiceToBooleanArrayTransformer implements DataTransformerInterface
      * as select tag, the value is not modified.
      *
      * @param mixed $choice An array if "multiple" is set to true, a scalar
-     *                       value otherwise.
+     *                      value otherwise.
      *
      * @return mixed An array
      *
-     * @throws UnexpectedTypeException if the given value is not scalar
-     * @throws TransformationFailedException if the choices can not be retrieved
+     * @throws TransformationFailedException If the given value is not scalar or
+     *                                       if the choices can not be retrieved.
      */
     public function transform($choice)
     {
@@ -61,6 +64,10 @@ class ChoiceToBooleanArrayTransformer implements DataTransformerInterface
 
         foreach ($values as $i => $value) {
             $values[$i] = $i === $index;
+        }
+
+        if ($this->placeholderPresent) {
+            $values['placeholder'] = false === $index;
         }
 
         return $values;
@@ -77,14 +84,15 @@ class ChoiceToBooleanArrayTransformer implements DataTransformerInterface
      *
      * @return mixed A scalar value
      *
-     * @throws UnexpectedTypeException       if the given value is not an array
-     * @throws TransformationFailedException if the recuperation of the choices fails or
-     *                                       if some choice can't be found
+     * @throws TransformationFailedException If the given value is not an array,
+     *                                       if the recuperation of the choices
+     *                                       fails or if some choice can't be
+     *                                       found.
      */
     public function reverseTransform($values)
     {
         if (!is_array($values)) {
-            throw new UnexpectedTypeException($values, 'array');
+            throw new TransformationFailedException('Expected an array.');
         }
 
         try {
@@ -97,6 +105,8 @@ class ChoiceToBooleanArrayTransformer implements DataTransformerInterface
             if ($selected) {
                 if (isset($choices[$i])) {
                     return $choices[$i] === '' ? null : $choices[$i];
+                } elseif ($this->placeholderPresent && 'placeholder' === $i) {
+                    return null;
                 } else {
                     throw new TransformationFailedException(sprintf('The choice "%s" does not exist', $i));
                 }

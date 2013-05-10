@@ -28,6 +28,7 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\FragmentRenderer
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\SerializerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
+use Symfony\Component\DependencyInjection\Scope;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\DependencyInjection\RegisterListenersPass;
@@ -53,6 +54,10 @@ class FrameworkBundle extends Bundle
     public function build(ContainerBuilder $container)
     {
         parent::build($container);
+
+        // we need to add the request scope as early as possible so that
+        // the compilation can find scope widening issues
+        $container->addScope(new Scope('request'));
 
         $container->addCompilerPass(new RoutingResolverPass());
         $container->addCompilerPass(new ProfilerPass());

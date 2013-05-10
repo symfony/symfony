@@ -634,7 +634,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         );
     }
 
-    public function testMultipleChoiceSkipEmptyValue()
+    public function testMultipleChoiceSkipsEmptyValue()
     {
         $form = $this->factory->createNamed('name', 'choice', array('&a'), array(
             'choices' => array('&a' => 'Choice&A', '&b' => 'Choice&B'),
@@ -700,7 +700,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         );
     }
 
-    public function testSingleChoiceExpandedSkipEmptyValue()
+    public function testSingleChoiceExpandedWithEmptyValue()
     {
         $form = $this->factory->createNamed('name', 'choice', '&a', array(
             'choices' => array('&a' => 'Choice&A', '&b' => 'Choice&B'),
@@ -712,13 +712,15 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/div
     [
-        ./input[@type="radio"][@name="name"][@id="name_0"][@checked]
+        ./input[@type="radio"][@name="name"][@id="name_placeholder"][not(@checked)]
+        /following-sibling::label[@for="name_placeholder"][.="[trans]Test&Me[/trans]"]
+        /following-sibling::input[@type="radio"][@name="name"][@id="name_0"][@checked]
         /following-sibling::label[@for="name_0"][.="[trans]Choice&A[/trans]"]
         /following-sibling::input[@type="radio"][@name="name"][@id="name_1"][not(@checked)]
         /following-sibling::label[@for="name_1"][.="[trans]Choice&B[/trans]"]
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
-    [count(./input)=3]
+    [count(./input)=4]
 '
         );
     }
@@ -1152,9 +1154,10 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testDateErrorBubbling()
     {
-        $child = $this->factory->createNamed('date', 'date');
-        $form = $this->factory->createNamed('form', 'form')->add($child);
-        $child->addError(new FormError('[trans]Error![/trans]'));
+        $form = $this->factory->createNamedBuilder('form', 'form')
+            ->add('date', 'date')
+            ->getForm();
+        $form->get('date')->addError(new FormError('[trans]Error![/trans]'));
         $view = $form->createView();
 
         $this->assertEmpty($this->renderErrors($view));
@@ -1678,9 +1681,10 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testTimeErrorBubbling()
     {
-        $child = $this->factory->createNamed('time', 'time');
-        $form = $this->factory->createNamed('form', 'form')->add($child);
-        $child->addError(new FormError('[trans]Error![/trans]'));
+        $form = $this->factory->createNamedBuilder('form', 'form')
+            ->add('time', 'time')
+            ->getForm();
+        $form->get('time')->addError(new FormError('[trans]Error![/trans]'));
         $view = $form->createView();
 
         $this->assertEmpty($this->renderErrors($view));

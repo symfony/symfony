@@ -39,8 +39,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
      * @param integer $calendar       One of the \IntlDateFormatter calendar constants
      * @param string  $pattern        A pattern to pass to \IntlDateFormatter
      *
-     * @throws UnexpectedTypeException If a format is not supported
-     * @throws UnexpectedTypeException if a timezone is not a string
+     * @throws UnexpectedTypeException If a format is not supported or if a timezone is not a string
      */
     public function __construct($inputTimezone = null, $outputTimezone = null, $dateFormat = null, $timeFormat = null, $calendar = \IntlDateFormatter::GREGORIAN, $pattern = null)
     {
@@ -73,10 +72,11 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
      *
      * @param \DateTime $dateTime Normalized date.
      *
-     * @return string|array        Localized date string/array.
+     * @return string|array Localized date string/array.
      *
-     * @throws UnexpectedTypeException if the given value is not an instance of \DateTime
-     * @throws TransformationFailedException if the date could not be transformed
+     * @throws TransformationFailedException If the given value is not an instance
+     *                                       of \DateTime or if the date could not
+     *                                       be transformed.
      */
     public function transform($dateTime)
     {
@@ -85,7 +85,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
         }
 
         if (!$dateTime instanceof \DateTime) {
-            throw new UnexpectedTypeException($dateTime, '\DateTime');
+            throw new TransformationFailedException('Expected a \DateTime.');
         }
 
         // convert time to UTC before passing it to the formatter
@@ -110,14 +110,14 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
      *
      * @return \DateTime Normalized date
      *
-     * @throws UnexpectedTypeException if the given value is not a string
-     * @throws TransformationFailedException if the date could not be parsed
-     * @throws TransformationFailedException if the input timezone is not supported
+     * @throws TransformationFailedException if the given value is not a string,
+     *                                       if the date could not be parsed or
+     *                                       if the input timezone is not supported
      */
     public function reverseTransform($value)
     {
         if (!is_string($value)) {
-            throw new UnexpectedTypeException($value, 'string');
+            throw new TransformationFailedException('Expected a string.');
         }
 
         if ('' === $value) {

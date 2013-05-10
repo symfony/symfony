@@ -286,6 +286,32 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
         $this->assertEquals(0, $violationsList->count(), 'Violation is using custom repository method.');
     }
 
+    public function testValidateUniquenessWithUnrewoundArray()
+    {
+        $entity = new SingleIdentEntity(1, 'foo');
+
+        $entityManagerName = 'foo';
+        $repository = $this->createRepositoryMock();
+        $repository->expects($this->once())
+            ->method('findByCustom')
+            ->will(
+                $this->returnCallback(function() use ($entity) {
+                    $returnValue = array(
+                        $entity,
+                    );
+                    next($returnValue);
+
+                    return $returnValue;
+                })
+            )
+        ;
+        $em = $this->createEntityManagerMock($repository);
+        $validator = $this->createValidator($entityManagerName, $em, null, array(), null, 'findByCustom');
+
+        $violationsList = $validator->validate($entity);
+        $this->assertCount(0, $violationsList, 'Violation is using unrewound array as return value in the repository method.');
+    }
+
     /**
      * @group GH-1635
      */

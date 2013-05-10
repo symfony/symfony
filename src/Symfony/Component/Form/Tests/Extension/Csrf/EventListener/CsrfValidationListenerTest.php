@@ -69,7 +69,7 @@ class CsrfValidationListenerTest extends \PHPUnit_Framework_TestCase
         $data = "XP4HUzmHPi";
         $event = new FormEvent($this->form, $data);
 
-        $validation = new CsrfValidationListener('csrf', $this->csrfProvider, 'unknown');
+        $validation = new CsrfValidationListener('csrf', $this->csrfProvider, 'unknown', 'Invalid.');
         $validation->preSubmit($event);
 
         // Validate accordingly

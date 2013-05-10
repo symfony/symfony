@@ -221,7 +221,7 @@
             <trans-unit id="58">
                 <source>Unsupported card type or invalid card number.</source>
                 <target>Nem támogatott kártyatípus vagy érvénytelen kártyaszám.</target>
-            </trans-unit>            
+            </trans-unit>
             <trans-unit id="59">
                 <source>This is not a valid International Bank Account Number (IBAN).</source>
                 <target>Érvénytelen nemzetközi bankszámlaszám (IBAN).</target>
@@ -245,6 +245,38 @@
             <trans-unit id="64">
                 <source>This value is not a valid currency.</source>
                 <target>Ez az érték nem egy érvényes pénznem.</target>
+            </trans-unit>
+            <trans-unit id="65">
+                <source>This value should be equal to {{ compared_value }}.</source>
+                <target>Ez az érték legyen {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="66">
+                <source>This value should be greater than {{ compared_value }}.</source>
+                <target>Ez az érték nagyobb legyen mint {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="67">
+                <source>This value should be greater than or equal to {{ compared_value }}.</source>
+                <target>Ez az érték nagyobb vagy egyenlő legyen mint {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="68">
+                <source>This value should be identical to {{ compared_value_type }} {{ compared_value }}.</source>
+                <target>Ez az érték ugyanolyan legyen mint {{ compared_value_type }} {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="69">
+                <source>This value should be less than {{ compared_value }}.</source>
+                <target>Ez az érték kisebb legyen mint {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="70">
+                <source>This value should be less than or equal to {{ compared_value }}.</source>
+                <target>Ez az érték kisebb vagy egyenlő legyen mint {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="71">
+                <source>This value should not be equal to {{ compared_value }}.</source>
+                <target>Ez az érték ne legyen {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="72">
+                <source>This value should not be identical to {{ compared_value_type }} {{ compared_value }}.</source>
+                <target>Ez az érték ne legyen ugyanolyan mint {{ compared_value_type }} {{ compared_value }}.</target>
             </trans-unit>
         </body>
     </file>

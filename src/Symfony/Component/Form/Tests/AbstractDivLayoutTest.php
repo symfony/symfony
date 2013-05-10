@@ -143,18 +143,16 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
     {
         $child1 = $this->factory->createNamedBuilder('child1', 'form')
             ->add('field1', 'text')
-            ->add('field2', 'text')
-            ->getForm();
+            ->add('field2', 'text');
 
         $child2 = $this->factory->createNamedBuilder('child2', 'form')
             ->add('field1', 'text')
-            ->add('field2', 'text')
-            ->getForm();
+            ->add('field2', 'text');
 
         $view = $this->factory->createNamedBuilder('parent', 'form')
-            ->getForm()
             ->add($child1)
             ->add($child2)
+            ->getForm()
             ->createView();
 
         // Render child1.field1 row
@@ -627,13 +625,12 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
     public function testThemeInheritance($parentTheme, $childTheme)
     {
         $child = $this->factory->createNamedBuilder('child', 'form')
-            ->add('field', 'text')
-            ->getForm();
+            ->add('field', 'text');
 
         $view = $this->factory->createNamedBuilder('parent', 'form')
             ->add('field', 'text')
-            ->getForm()
             ->add($child)
+            ->getForm()
             ->createView()
         ;
 

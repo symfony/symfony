@@ -115,6 +115,8 @@ class Application
             $output = new ConsoleOutput();
         }
 
+        $this->configureIO($input, $output);
+
         try {
             $exitCode = $this->doRun($input, $output);
         } catch (\Exception $e) {
@@ -154,14 +156,13 @@ class Application
      */
     public function doRun(InputInterface $input, OutputInterface $output)
     {
-        $name = $this->getCommandName($input);
+        if (true === $input->hasParameterOption(array('--version', '-V'))) {
+            $output->writeln($this->getLongVersion());
 
-        if (true === $input->hasParameterOption(array('--ansi'))) {
-            $output->setDecorated(true);
-        } elseif (true === $input->hasParameterOption(array('--no-ansi'))) {
-            $output->setDecorated(false);
+            return 0;
         }
 
+        $name = $this->getCommandName($input);
         if (true === $input->hasParameterOption(array('--help', '-h'))) {
             if (!$name) {
                 $name = 'help';
@@ -169,35 +170,6 @@ class Application
             } else {
                 $this->wantHelps = true;
             }
-        }
-
-        if (true === $input->hasParameterOption(array('--no-interaction', '-n'))) {
-            $input->setInteractive(false);
-        }
-
-        if (function_exists('posix_isatty') && $this->getHelperSet()->has('dialog')) {
-            $inputStream = $this->getHelperSet()->get('dialog')->getInputStream();
-            if (!posix_isatty($inputStream)) {
-                $input->setInteractive(false);
-            }
-        }
-
-        if (true === $input->hasParameterOption(array('--quiet', '-q'))) {
-            $output->setVerbosity(OutputInterface::VERBOSITY_QUIET);
-        } else {
-            if ($input->hasParameterOption('-vvv') || $input->hasParameterOption('--verbose=3') || $input->getParameterOption('--verbose') === 3) {
-                $output->setVerbosity(OutputInterface::VERBOSITY_DEBUG);
-            } elseif ($input->hasParameterOption('-vv') || $input->hasParameterOption('--verbose=2') || $input->getParameterOption('--verbose') === 2) {
-                $output->setVerbosity(OutputInterface::VERBOSITY_VERY_VERBOSE);
-            } elseif ($input->hasParameterOption('-v') || $input->hasParameterOption('--verbose=1') || $input->hasParameterOption('--verbose') || $input->getParameterOption('--verbose')) {
-                $output->setVerbosity(OutputInterface::VERBOSITY_VERBOSE);
-            }
-        }
-
-        if (true === $input->hasParameterOption(array('--version', '-V'))) {
-            $output->writeln($this->getLongVersion());
-
-            return 0;
         }
 
         if (!$name) {
@@ -599,6 +571,10 @@ class Application
             return $this->get($abbrevs[$searchName][0]);
         }
 
+        if (isset($abbrevs[$searchName]) && in_array($searchName, $abbrevs[$searchName])) {
+            return $this->get($searchName);
+        }
+
         if (isset($abbrevs[$searchName]) && count($abbrevs[$searchName]) > 1) {
             $suggestions = $this->getAbbreviationSuggestions($abbrevs[$searchName]);
 
@@ -858,6 +834,44 @@ class Application
         }
 
         return array(null, null);
+    }
+
+    /**
+     * Configures the input and output instances based on the user arguments and options.
+     *
+     * @param InputInterface  $input  An InputInterface instance
+     * @param OutputInterface $output An OutputInterface instance
+     */
+    protected function configureIO(InputInterface $input, OutputInterface $output)
+    {
+        if (true === $input->hasParameterOption(array('--ansi'))) {
+            $output->setDecorated(true);
+        } elseif (true === $input->hasParameterOption(array('--no-ansi'))) {
+            $output->setDecorated(false);
+        }
+
+        if (true === $input->hasParameterOption(array('--no-interaction', '-n'))) {
+            $input->setInteractive(false);
+        }
+
+        if (function_exists('posix_isatty') && $this->getHelperSet()->has('dialog')) {
+            $inputStream = $this->getHelperSet()->get('dialog')->getInputStream();
+            if (!posix_isatty($inputStream)) {
+                $input->setInteractive(false);
+            }
+        }
+
+        if (true === $input->hasParameterOption(array('--quiet', '-q'))) {
+            $output->setVerbosity(OutputInterface::VERBOSITY_QUIET);
+        } else {
+            if ($input->hasParameterOption('-vvv') || $input->hasParameterOption('--verbose=3') || $input->getParameterOption('--verbose') === 3) {
+                $output->setVerbosity(OutputInterface::VERBOSITY_DEBUG);
+            } elseif ($input->hasParameterOption('-vv') || $input->hasParameterOption('--verbose=2') || $input->getParameterOption('--verbose') === 2) {
+                $output->setVerbosity(OutputInterface::VERBOSITY_VERY_VERBOSE);
+            } elseif ($input->hasParameterOption('-v') || $input->hasParameterOption('--verbose=1') || $input->hasParameterOption('--verbose') || $input->getParameterOption('--verbose')) {
+                $output->setVerbosity(OutputInterface::VERBOSITY_VERBOSE);
+            }
+        }
     }
 
     /**

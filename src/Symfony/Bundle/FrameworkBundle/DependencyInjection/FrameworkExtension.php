@@ -48,6 +48,8 @@ class FrameworkExtension extends Extension
         // will be used and everything will still work as expected.
         $loader->load('translation.xml');
 
+        $loader->load('debug_prod.xml');
+
         if ($container->getParameter('kernel.debug')) {
             $loader->load('debug.xml');
 

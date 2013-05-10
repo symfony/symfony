@@ -87,7 +87,7 @@ class Validator implements ValidatorInterface
         $visitor = $this->createVisitor($value);
 
         foreach ($this->resolveGroups($groups) as $group) {
-            $visitor->validate($value, $group, '');
+            $visitor->validate($value, $group, '', $traverse, $deep);
         }
 
         return $visitor->getViolations();
@@ -160,7 +160,7 @@ class Validator implements ValidatorInterface
      */
     public function validateValue($value, $constraints, $groups = null)
     {
-        $context = new ExecutionContext($this->createVisitor(null), $this->translator, $this->translationDomain);
+        $context = new ExecutionContext($this->createVisitor($value), $this->translator, $this->translationDomain);
 
         $constraints = is_array($constraints) ? $constraints : array($constraints);
 

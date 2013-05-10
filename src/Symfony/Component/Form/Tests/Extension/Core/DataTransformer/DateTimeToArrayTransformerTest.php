@@ -117,7 +117,7 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
     public function testTransformRequiresDateTime()
     {
@@ -326,7 +326,7 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
     public function testReverseTransformRequiresArray()
     {

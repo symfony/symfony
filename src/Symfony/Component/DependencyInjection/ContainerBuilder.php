@@ -22,6 +22,8 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Resource\ResourceInterface;
+use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\InstantiatorInterface;
+use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\RealServiceInstantiator;
 
 /**
  * ContainerBuilder is a DI container that provides an API to easily describe services.
@@ -72,6 +74,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     private $trackResources = true;
 
     /**
+     * @var InstantiatorInterface|null
+     */
+    private $proxyInstantiator;
+
+    /**
      * Sets the track resources flag.
      *
      * If you are not using the loaders and therefore don't want
@@ -92,6 +99,16 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     public function isTrackingResources()
     {
         return $this->trackResources;
+    }
+
+    /**
+     * Sets the instantiator to be used when fetching proxies.
+     *
+     * @param InstantiatorInterface $proxyInstantiator
+     */
+    public function setProxyInstantiator(InstantiatorInterface $proxyInstantiator)
+    {
+        $this->proxyInstantiator = $proxyInstantiator;
     }
 
     /**
@@ -223,14 +240,29 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function addObjectResource($object)
     {
+        if ($this->trackResources) {
+            $this->addClassResource(new \ReflectionClass($object));
+        }
+
+        return $this;
+    }
+
+    /**
+     * Adds the given class hierarchy as resources.
+     *
+     * @param \ReflectionClass $class
+     *
+     * @return ContainerBuilder The current instance
+     */
+    public function addClassResource(\ReflectionClass $class)
+    {
         if (!$this->trackResources) {
             return $this;
         }
 
-        $parent = new \ReflectionObject($object);
         do {
-            $this->addResource(new FileResource($parent->getFileName()));
-        } while ($parent = $parent->getParentClass());
+            $this->addResource(new FileResource($class->getFileName()));
+        } while ($class = $class->getParentClass());
 
         return $this;
     }
@@ -417,8 +449,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @return object The associated service
      *
-     * @throws InvalidArgumentException if the service is not defined
-     * @throws LogicException if the service has a circular reference to itself
+     * @throws InvalidArgumentException when no definitions are available
+     * @throws InactiveScopeException   when the current scope is not active
+     * @throws LogicException           when a circular dependency is detected
+     * @throws \Exception
      *
      * @see Reference
      *
@@ -583,6 +617,12 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         if ($this->trackResources) {
             foreach ($this->compiler->getPassConfig()->getPasses() as $pass) {
                 $this->addObjectResource($pass);
+            }
+
+            foreach ($this->definitions as $definition) {
+                if ($definition->isLazy() && ($class = $definition->getClass()) && class_exists($class)) {
+                    $this->addClassResource(new \ReflectionClass($class));
+                }
             }
         }
 
@@ -865,6 +905,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @param Definition $definition A service definition instance
      * @param string     $id         The service identifier
+     * @param Boolean    $tryProxy   Whether to try proxying the service with a lazy proxy
      *
      * @return object The service described by the service definition
      *
@@ -872,11 +913,30 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @throws RuntimeException When the factory definition is incomplete
      * @throws RuntimeException When the service is a synthetic service
      * @throws InvalidArgumentException When configure callable is not callable
+     *
+     * @internal this method is public because of PHP 5.3 limitations, do not use it explicitly in your code
      */
-    private function createService(Definition $definition, $id)
+    public function createService(Definition $definition, $id, $tryProxy = true)
     {
         if ($definition->isSynthetic()) {
             throw new RuntimeException(sprintf('You have requested a synthetic service ("%s"). The DIC does not know how to construct this service.', $id));
+        }
+
+        if ($tryProxy && $definition->isLazy()) {
+            $container = $this;
+
+            $proxy = $this
+                ->getProxyInstantiator()
+                ->instantiateProxy(
+                    $container,
+                    $definition,
+                    $id, function () use ($definition, $id, $container) {
+                        return $container->createService($definition, $id, false);
+                    }
+                );
+            $this->shareService($definition, $proxy, $id);
+
+            return $proxy;
         }
 
         $parameterBag = $this->getParameterBag();
@@ -903,16 +963,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             $service = null === $r->getConstructor() ? $r->newInstance() : $r->newInstanceArgs($arguments);
         }
 
-        if (self::SCOPE_PROTOTYPE !== $scope = $definition->getScope()) {
-            if (self::SCOPE_CONTAINER !== $scope && !isset($this->scopedServices[$scope])) {
-                throw new InactiveScopeException($id, $scope);
-            }
-
-            $this->services[$lowerId = strtolower($id)] = $service;
-
-            if (self::SCOPE_CONTAINER !== $scope) {
-                $this->scopedServices[$scope][$lowerId] = $service;
-            }
+        if ($tryProxy || !$definition->isLazy()) {
+            // share only if proxying failed, or if not a proxy
+            $this->shareService($definition, $service, $id);
         }
 
         foreach ($definition->getMethodCalls() as $call) {
@@ -964,9 +1017,20 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Returns service ids for a given tag.
      *
+     * Example:
+     *
+     * $container->register('foo')->addTag('my.tag', array('hello' => 'world'));
+     *
+     * $serviceIds = $container->findTaggedServiceIds('my.tag');
+     * foreach ($serviceIds as $serviceId => $tags) {
+     *     foreach ($tags as $tag) {
+     *         echo $tag['hello'];
+     *     }
+     * }
+     *
      * @param string $name The tag name
      *
-     * @return array An array of tags
+     * @return array An array of tags with the tagged service as key, holding a list of attribute arrays.
      *
      * @api
      */
@@ -974,7 +1038,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     {
         $tags = array();
         foreach ($this->getDefinitions() as $id => $definition) {
-            if ($definition->getTag($name)) {
+            if ($definition->hasTag($name)) {
                 $tags[$id] = $definition->getTag($name);
             }
         }
@@ -1020,6 +1084,20 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
+     * Retrieves the currently set proxy instantiator or instantiates one.
+     *
+     * @return InstantiatorInterface
+     */
+    private function getProxyInstantiator()
+    {
+        if (!$this->proxyInstantiator) {
+            $this->proxyInstantiator = new RealServiceInstantiator();
+        }
+
+        return $this->proxyInstantiator;
+    }
+
+    /**
      * Synchronizes a service change.
      *
      * This method updates all services that depend on the given
@@ -1056,5 +1134,29 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         call_user_func_array(array($service, $call[0]), $this->resolveServices($this->getParameterBag()->resolveValue($call[1])));
+    }
+
+    /**
+     * Shares a given service in the container
+     *
+     * @param Definition $definition
+     * @param mixed      $service
+     * @param string     $id
+     *
+     * @throws InactiveScopeException
+     */
+    private function shareService(Definition $definition, $service, $id)
+    {
+        if (self::SCOPE_PROTOTYPE !== $scope = $definition->getScope()) {
+            if (self::SCOPE_CONTAINER !== $scope && !isset($this->scopedServices[$scope])) {
+                throw new InactiveScopeException($id, $scope);
+            }
+
+            $this->services[$lowerId = strtolower($id)] = $service;
+
+            if (self::SCOPE_CONTAINER !== $scope) {
+                $this->scopedServices[$scope][$lowerId] = $service;
+            }
+        }
     }
 }

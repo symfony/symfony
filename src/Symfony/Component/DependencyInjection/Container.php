@@ -68,6 +68,7 @@ class Container implements IntrospectableContainerInterface
     protected $parameterBag;
 
     protected $services;
+    protected $methodMap;
     protected $scopes;
     protected $scopeChildren;
     protected $scopedServices;
@@ -260,33 +261,50 @@ class Container implements IntrospectableContainerInterface
             throw new ServiceCircularReferenceException($id, array_keys($this->loading));
         }
 
-        if (method_exists($this, $method = 'get'.strtr($id, array('_' => '', '.' => '_')).'Service')) {
-            $this->loading[$id] = true;
-
-            try {
-                $service = $this->$method();
-            } catch (\Exception $e) {
-                unset($this->loading[$id]);
-
-                if (array_key_exists($id, $this->services)) {
-                    unset($this->services[$id]);
+        if (isset($this->methodMap[$id])) {
+            $method = $this->methodMap[$id];
+        } elseif (method_exists($this, $method = 'get'.strtr($id, array('_' => '', '.' => '_')).'Service')) {
+        } else {
+            if (self::EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior) {
+                if (!$id) {
+                    throw new ServiceNotFoundException($id);
                 }
 
-                if ($e instanceof InactiveScopeException && self::EXCEPTION_ON_INVALID_REFERENCE !== $invalidBehavior) {
-                    return null;
+                $alternatives = array();
+                foreach (array_keys($this->services) as $key) {
+                    $lev = levenshtein($id, $key);
+                    if ($lev <= strlen($id) / 3 || false !== strpos($key, $id)) {
+                        $alternatives[] = $key;
+                    }
                 }
 
-                throw $e;
+                throw new ServiceNotFoundException($id, null, null, $alternatives);
             }
 
+            return null;
+        }
+
+        $this->loading[$id] = true;
+
+        try {
+            $service = $this->$method();
+        } catch (\Exception $e) {
             unset($this->loading[$id]);
 
-            return $service;
+            if (array_key_exists($id, $this->services)) {
+                unset($this->services[$id]);
+            }
+
+            if ($e instanceof InactiveScopeException && self::EXCEPTION_ON_INVALID_REFERENCE !== $invalidBehavior) {
+                return null;
+            }
+
+            throw $e;
         }
 
-        if (self::EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior) {
-            throw new ServiceNotFoundException($id);
-        }
+        unset($this->loading[$id]);
+
+        return $service;
     }
 
     /**

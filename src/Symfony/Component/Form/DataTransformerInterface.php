@@ -11,10 +11,12 @@
 
 namespace Symfony\Component\Form;
 
+use Symfony\Component\Form\Exception\TransformationFailedException;
+
 /**
  * Transforms a value between different representations.
  *
- * @author     Bernhard Schussek <bschussek@gmail.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 interface DataTransformerInterface
 {
@@ -43,8 +45,7 @@ interface DataTransformerInterface
      *
      * @return mixed The value in the transformed representation
      *
-     * @throws UnexpectedTypeException   when the argument is not a string
-     * @throws TransformationFailedException  when the transformation fails
+     * @throws TransformationFailedException When the transformation fails.
      */
     public function transform($value);
 
@@ -70,8 +71,7 @@ interface DataTransformerInterface
      *
      * @return mixed The value in the original representation
      *
-     * @throws UnexpectedTypeException   when the argument is not of the expected type
-     * @throws TransformationFailedException  when the transformation fails
+     * @throws TransformationFailedException When the transformation fails.
      */
     public function reverseTransform($value);
 }

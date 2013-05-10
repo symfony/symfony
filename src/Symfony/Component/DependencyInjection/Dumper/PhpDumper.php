@@ -21,6 +21,8 @@ use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
+use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface as ProxyDumper;
+use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\NullDumper;
 
 /**
  * PhpDumper dumps a service container as a PHP class.
@@ -51,6 +53,11 @@ class PhpDumper extends Dumper
     private $reservedVariables = array('instance', 'class');
 
     /**
+     * @var \Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface
+     */
+    private $proxyDumper;
+
+    /**
      * {@inheritDoc}
      *
      * @api
@@ -60,6 +67,16 @@ class PhpDumper extends Dumper
         parent::__construct($container);
 
         $this->inlinedDefinitions = new \SplObjectStorage;
+    }
+
+    /**
+     * Sets the dumper to be used when dumping proxies in the generated container.
+     *
+     * @param ProxyDumper $proxyDumper
+     */
+    public function setProxyDumper(ProxyDumper $proxyDumper)
+    {
+        $this->proxyDumper = $proxyDumper;
     }
 
     /**
@@ -94,10 +111,25 @@ class PhpDumper extends Dumper
         $code .=
             $this->addServices().
             $this->addDefaultParametersMethod().
-            $this->endClass()
+            $this->endClass().
+            $this->addProxyClasses()
         ;
 
         return $code;
+    }
+
+    /**
+     * Retrieves the currently set proxy dumper or instantiates one.
+     *
+     * @return ProxyDumper
+     */
+    private function getProxyDumper()
+    {
+        if (!$this->proxyDumper) {
+            $this->proxyDumper = new NullDumper();
+        }
+
+        return $this->proxyDumper;
     }
 
     /**
@@ -144,6 +176,27 @@ class PhpDumper extends Dumper
 
         if ('' !== $code) {
             $code .= "\n";
+        }
+
+        return $code;
+    }
+
+    /**
+     * Generates code for the proxies to be attached after the container class
+     *
+     * @return string
+     */
+    private function addProxyClasses()
+    {
+        /* @var $proxyDefinitions Definition[] */
+        $definitions = array_filter(
+            $this->container->getDefinitions(),
+            array($this->getProxyDumper(), 'isProxyCandidate')
+        );
+        $code = '';
+
+        foreach ($definitions as $definition) {
+            $code .= "\n" . $this->getProxyDumper()->getProxyCode($definition);
         }
 
         return $code;
@@ -280,12 +333,13 @@ class PhpDumper extends Dumper
             throw new InvalidArgumentException(sprintf('"%s" is not a valid class name for the "%s" service.', $class, $id));
         }
 
-        $simple = $this->isSimpleInstance($id, $definition);
+        $simple           = $this->isSimpleInstance($id, $definition);
+        $isProxyCandidate = $this->getProxyDumper()->isProxyCandidate($definition);
+        $instantiation    = '';
 
-        $instantiation = '';
-        if (ContainerInterface::SCOPE_CONTAINER === $definition->getScope()) {
+        if (!$isProxyCandidate && ContainerInterface::SCOPE_CONTAINER === $definition->getScope()) {
             $instantiation = "\$this->services['$id'] = ".($simple ? '' : '$instance');
-        } elseif (ContainerInterface::SCOPE_PROTOTYPE !== $scope = $definition->getScope()) {
+        } elseif (!$isProxyCandidate && ContainerInterface::SCOPE_PROTOTYPE !== $scope = $definition->getScope()) {
             $instantiation = "\$this->services['$id'] = \$this->scopedServices['$scope']['$id'] = ".($simple ? '' : '$instance');
         } elseif (!$simple) {
             $instantiation = '$instance';
@@ -483,17 +537,30 @@ EOF;
 EOF;
         }
 
-        $code = <<<EOF
+        if ($definition->isLazy()) {
+            $lazyInitialization    = '$lazyLoad = true';
+            $lazyInitializationDoc = "\n     * @param boolean \$lazyLoad whether to try lazy-loading the service with a proxy\n     *";
+        } else {
+            $lazyInitialization    = '';
+            $lazyInitializationDoc = '';
+        }
+
+        // with proxies, for 5.3.3 compatibility, the getter must be public to be accessible to the initializer
+        $isProxyCandidate = $this->getProxyDumper()->isProxyCandidate($definition);
+        $visibility       = $isProxyCandidate ? 'public' : 'protected';
+        $code             = <<<EOF
 
     /**
      * Gets the '$id' service.$doc
-     *
+     *$lazyInitializationDoc
      * $return
      */
-    protected function get{$name}Service()
+    {$visibility} function get{$name}Service($lazyInitialization)
     {
 
 EOF;
+
+        $code .= $isProxyCandidate ? $this->getProxyDumper()->getProxyFactoryCode($definition, $id) : '';
 
         if (!in_array($scope, array(ContainerInterface::SCOPE_CONTAINER, ContainerInterface::SCOPE_PROTOTYPE))) {
             $code .= <<<EOF
@@ -778,6 +845,20 @@ EOF;
             $code .= "        \$this->scopes = array();\n";
             $code .= "        \$this->scopeChildren = array();\n";
         }
+
+        // build method map
+        $code .= "        \$this->methodMap = array(\n";
+        $definitions = $this->container->getDefinitions();
+        ksort($definitions);
+        foreach ($definitions as $id => $definition) {
+            $code .= '            '.var_export($id, true).' => '.var_export('get'.Container::camelize($id).'Service', true).",\n";
+        }
+        $aliases = $this->container->getAliases();
+        ksort($aliases);
+        foreach ($aliases as $alias => $id) {
+            $code .= '            '.var_export($alias, true).' => '.var_export('get'.Container::camelize($id).'Service', true).",\n";
+        }
+        $code .= "        );\n";
 
         $code .= <<<EOF
     }

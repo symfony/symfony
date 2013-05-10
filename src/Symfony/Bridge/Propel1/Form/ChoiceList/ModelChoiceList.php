@@ -15,7 +15,6 @@ use \ModelCriteria;
 use \BaseObject;
 use \Persistent;
 
-use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\StringCastException;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ObjectChoiceList;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -379,8 +378,6 @@ class ModelChoiceList extends ObjectChoiceList
      * @param object $model The model for which to get the identifier
      *
      * @return array
-     *
-     * @throws FormException If the model does not exist
      */
     private function getIdentifierValues($model)
     {

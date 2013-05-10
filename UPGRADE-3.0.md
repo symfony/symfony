@@ -250,6 +250,26 @@ UPGRADE FROM 2.x to 3.0
     * `Locale::getDisplayLocales()` -> `Intl::getLocaleBundle()->getLocaleNames()`
     * `Locale::getLocales()` -> `array_keys(Intl::getLocaleBundle()->getLocaleNames())`
 
+### PropertyAccess
+
+ * Renamed `PropertyAccess::getPropertyAccessor` to `createPropertyAccessor`.
+
+   Before:
+
+   ```
+   use Symfony\Component\PropertyAccess\PropertyAccess;
+
+   $accessor = PropertyAccess::getPropertyAccessor();
+   ```
+
+   After:
+
+   ```
+   use Symfony\Component\PropertyAccess\PropertyAccess;
+
+   $accessor = PropertyAccess::createPropertyAccessor();
+   ```
+
 ### Routing
 
  * Some route settings have been renamed:

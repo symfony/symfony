@@ -256,11 +256,27 @@ interface FormConfigBuilderInterface extends FormConfigInterface
     public function setMethod($method);
 
     /**
+     * Sets the request handler used by the form.
+     *
      * @param RequestHandlerInterface $requestHandler
      *
      * @return self The configuration object.
      */
     public function setRequestHandler(RequestHandlerInterface $requestHandler);
+
+    /**
+     * Sets whether the form should be initialized automatically.
+     *
+     * Should be set to true only for root forms.
+     *
+     * @param Boolean $initialize True to initialize the form automatically,
+     *                            false to suppress automatic initialization.
+     *                            In the second case, you need to call
+     *                            {@link FormInterface::initialize()} manually.
+     *
+     * @return self The configuration object.
+     */
+    public function setAutoInitialize($initialize);
 
     /**
      * Builds and returns the form configuration.

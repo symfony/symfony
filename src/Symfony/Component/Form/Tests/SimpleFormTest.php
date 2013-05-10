@@ -902,13 +902,13 @@ class SimpleFormTest extends AbstractFormTest
 
     public function testHandleRequestForwardsToRequestHandler()
     {
-        $processor = $this->getMock('Symfony\Component\Form\RequestHandlerInterface');
+        $handler = $this->getMock('Symfony\Component\Form\RequestHandlerInterface');
 
         $form = $this->getBuilder()
-            ->setRequestHandler($processor)
+            ->setRequestHandler($handler)
             ->getForm();
 
-        $processor->expects($this->once())
+        $handler->expects($this->once())
             ->method('handleRequest')
             ->with($this->identicalTo($form), 'REQUEST');
 
@@ -1010,6 +1010,32 @@ class SimpleFormTest extends AbstractFormTest
             ->getForm();
 
         $form->submit('foo');
+    }
+
+    public function testInitializeSetsDefaultData()
+    {
+        $config = $this->getBuilder()->setData('DEFAULT')->getFormConfig();
+        $form = $this->getMock('Symfony\Component\Form\Form', array('setData'), array($config));
+
+        $form->expects($this->once())
+            ->method('setData')
+            ->with($this->identicalTo('DEFAULT'));
+
+        /* @var Form $form */
+        $form->initialize();
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\RuntimeException
+     */
+    public function testInitializeFailsIfParent()
+    {
+        $parent = $this->getBuilder()->setRequired(false)->getForm();
+        $child = $this->getBuilder()->setRequired(true)->getForm();
+
+        $child->setParent($parent);
+
+        $child->initialize();
     }
 
     protected function createForm()

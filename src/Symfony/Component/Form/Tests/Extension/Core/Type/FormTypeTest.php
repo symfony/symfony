@@ -100,29 +100,32 @@ class FormTypeTest extends BaseTypeTest
         $this->assertEquals('reverse[ a ]', $form->getData());
     }
 
-    public function testNonReadOnlyFormWithReadOnlyParentBeingReadOnly()
+    public function testNonReadOnlyFormWithReadOnlyParentIsReadOnly()
     {
-        $parent = $this->factory->createNamed('parent', 'form', null, array('read_only' => true));
-        $child  = $this->factory->createNamed('child', 'form');
-        $view   = $parent->add($child)->createView();
+        $view = $this->factory->createNamedBuilder('parent', 'form', null, array('read_only' => true))
+            ->add('child', 'form')
+            ->getForm()
+            ->createView();
 
         $this->assertTrue($view['child']->vars['read_only']);
     }
 
-    public function testReadOnlyFormWithNonReadOnlyParentBeingReadOnly()
+    public function testReadOnlyFormWithNonReadOnlyParentIsReadOnly()
     {
-        $parent = $this->factory->createNamed('parent', 'form');
-        $child  = $this->factory->createNamed('child', 'form', null, array('read_only' => true));
-        $view   = $parent->add($child)->createView();
+        $view = $this->factory->createNamedBuilder('parent', 'form')
+            ->add('child', 'form', array('read_only' => true))
+            ->getForm()
+            ->createView();
 
         $this->assertTrue($view['child']->vars['read_only']);
     }
 
-    public function testNonReadOnlyFormWithNonReadOnlyParentBeingNonReadOnly()
+    public function testNonReadOnlyFormWithNonReadOnlyParentIsNotReadOnly()
     {
-        $parent = $this->factory->createNamed('parent', 'form');
-        $child  = $this->factory->createNamed('child', 'form');
-        $view   = $parent->add($child)->createView();
+        $view = $this->factory->createNamedBuilder('parent', 'form')
+                ->add('child', 'form')
+                ->getForm()
+                ->createView();
 
         $this->assertFalse($view['child']->vars['read_only']);
     }
@@ -137,12 +140,13 @@ class FormTypeTest extends BaseTypeTest
 
     public function testSubmitWithEmptyDataCreatesObjectIfClassAvailable()
     {
-        $form = $this->factory->create('form', null, array(
+        $builder = $this->factory->createBuilder('form', null, array(
             'data_class' => 'Symfony\Component\Form\Tests\Fixtures\Author',
             'required' => false,
         ));
-        $form->add($this->factory->createNamed('firstName', 'text'));
-        $form->add($this->factory->createNamed('lastName', 'text'));
+        $builder->add('firstName', 'text');
+        $builder->add('lastName', 'text');
+        $form = $builder->getForm();
 
         $form->setData(null);
         // partially empty, still an object is created
@@ -157,13 +161,14 @@ class FormTypeTest extends BaseTypeTest
 
     public function testSubmitWithEmptyDataCreatesObjectIfInitiallySubmittedWithObject()
     {
-        $form = $this->factory->create('form', null, array(
+        $builder = $this->factory->createBuilder('form', null, array(
             // data class is inferred from the passed object
             'data' => new Author(),
             'required' => false,
         ));
-        $form->add($this->factory->createNamed('firstName', 'text'));
-        $form->add($this->factory->createNamed('lastName', 'text'));
+        $builder->add('firstName', 'text');
+        $builder->add('lastName', 'text');
+        $form = $builder->getForm();
 
         $form->setData(null);
         // partially empty, still an object is created
@@ -178,11 +183,12 @@ class FormTypeTest extends BaseTypeTest
 
     public function testSubmitWithEmptyDataCreatesArrayIfDataClassIsNull()
     {
-        $form = $this->factory->create('form', null, array(
+        $builder = $this->factory->createBuilder('form', null, array(
             'data_class' => null,
             'required' => false,
         ));
-        $form->add($this->factory->createNamed('firstName', 'text'));
+        $builder->add('firstName', 'text');
+        $form = $builder->getForm();
 
         $form->setData(null);
         $form->submit(array('firstName' => 'Bernhard'));
@@ -192,12 +198,13 @@ class FormTypeTest extends BaseTypeTest
 
     public function testSubmitEmptyWithEmptyDataCreatesNoObjectIfNotRequired()
     {
-        $form = $this->factory->create('form', null, array(
+        $builder = $this->factory->createBuilder('form', null, array(
             'data_class' => 'Symfony\Component\Form\Tests\Fixtures\Author',
             'required' => false,
         ));
-        $form->add($this->factory->createNamed('firstName', 'text'));
-        $form->add($this->factory->createNamed('lastName', 'text'));
+        $builder->add('firstName', 'text');
+        $builder->add('lastName', 'text');
+        $form = $builder->getForm();
 
         $form->setData(null);
         $form->submit(array('firstName' => '', 'lastName' => ''));
@@ -207,12 +214,13 @@ class FormTypeTest extends BaseTypeTest
 
     public function testSubmitEmptyWithEmptyDataCreatesObjectIfRequired()
     {
-        $form = $this->factory->create('form', null, array(
+        $builder = $this->factory->createBuilder('form', null, array(
             'data_class' => 'Symfony\Component\Form\Tests\Fixtures\Author',
             'required' => true,
         ));
-        $form->add($this->factory->createNamed('firstName', 'text'));
-        $form->add($this->factory->createNamed('lastName', 'text'));
+        $builder->add('firstName', 'text');
+        $builder->add('lastName', 'text');
+        $form = $builder->getForm();
 
         $form->setData(null);
         $form->submit(array('firstName' => '', 'lastName' => ''));
@@ -225,8 +233,9 @@ class FormTypeTest extends BaseTypeTest
      */
     public function testSubmitWithEmptyDataStoresArrayIfNoClassAvailable()
     {
-        $form = $this->factory->create('form');
-        $form->add($this->factory->createNamed('firstName', 'text'));
+        $form = $this->factory->createBuilder('form')
+            ->add('firstName', 'text')
+            ->getForm();
 
         $form->setData(null);
         $form->submit(array('firstName' => 'Bernhard'));
@@ -255,11 +264,12 @@ class FormTypeTest extends BaseTypeTest
     {
         $author = new Author();
 
-        $form = $this->factory->create('form', null, array(
+        $builder = $this->factory->createBuilder('form', null, array(
             'data_class' => 'Symfony\Component\Form\Tests\Fixtures\Author',
             'empty_data' => $author,
         ));
-        $form->add($this->factory->createNamed('firstName', 'text'));
+        $builder->add('firstName', 'text');
+        $form = $builder->getForm();
 
         $form->submit(array('firstName' => 'Bernhard'));
 
@@ -430,19 +440,21 @@ class FormTypeTest extends BaseTypeTest
 
     public function testPassMultipartTrueIfAnyChildIsMultipartToView()
     {
-        $form = $this->factory->create('form');
-        $form->add($this->factory->create('text'));
-        $form->add($this->factory->create('file'));
-        $view = $form->createView();
+        $view = $this->factory->createBuilder('form')
+            ->add('foo', 'text')
+            ->add('bar', 'file')
+            ->getForm()
+            ->createView();
 
         $this->assertTrue($view->vars['multipart']);
     }
 
-    public function testCreateViewDoNoMarkItAsRendered()
+    public function testViewIsNotRenderedByDefault()
     {
-        $form = $this->factory->create('form');
-        $form->add($this->factory->create('form'));
-        $view = $form->createView();
+        $view = $this->factory->createBuilder('form')
+                ->add('foo', 'form')
+                ->getForm()
+                ->createView();
 
         $this->assertFalse($view->isRendered());
     }

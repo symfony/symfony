@@ -67,6 +67,20 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foobar', $translator->trans('bar'));
     }
 
+    public function testAddResourceAfterTrans()
+    {
+        $translator = new Translator('fr', new MessageSelector());
+        $translator->addLoader('array', new ArrayLoader());
+
+        $translator->setFallbackLocale(array('en'));
+
+        $translator->addResource('array', array('foo' => 'foofoo'), 'en');
+        $this->assertEquals('foofoo', $translator->trans('foo'));
+
+        $translator->addResource('array', array('bar' => 'foobar'), 'en');
+        $this->assertEquals('foobar', $translator->trans('bar'));
+    }
+
     /**
      * @dataProvider      getTransFileTests
      * @expectedException \Symfony\Component\Translation\Exception\NotFoundResourceException

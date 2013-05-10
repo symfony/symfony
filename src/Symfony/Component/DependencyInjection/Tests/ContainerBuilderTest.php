@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Tests;
 require_once __DIR__.'/Fixtures/includes/classes.php';
 require_once __DIR__.'/Fixtures/includes/ProjectExtension.php';
 
+use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -266,6 +267,22 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers Symfony\Component\DependencyInjection\ContainerBuilder::createService
      */
+    public function testCreateProxyWithRealServiceInstantiator()
+    {
+        $builder = new ContainerBuilder();
+
+        $builder->register('foo1', 'FooClass')->setFile(__DIR__.'/Fixtures/includes/foo.php');
+        $builder->getDefinition('foo1')->setLazy(true);
+
+        $foo1 = $builder->get('foo1');
+
+        $this->assertSame($foo1, $builder->get('foo1'), 'The same proxy is retrieved on multiple subsequent calls');
+        $this->assertSame('FooClass', get_class($foo1));
+    }
+
+    /**
+     * @covers Symfony\Component\DependencyInjection\ContainerBuilder::createService
+     */
     public function testCreateServiceClass()
     {
         $builder = new ContainerBuilder();
@@ -463,6 +480,95 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $container->setAlias('bar', 'foo');
         $container->setAlias('foobar', 'bar');
         $this->assertEquals($definition, $container->findDefinition('foobar'), '->findDefinition() returns a Definition');
+    }
+
+    /**
+     * @covers Symfony\Component\DependencyInjection\ContainerBuilder::addObjectResource
+     */
+    public function testAddObjectResource()
+    {
+        if (!class_exists('Symfony\Component\Config\Resource\FileResource')) {
+            $this->markTestSkipped('The "Config" component is not available');
+        }
+
+        $container = new ContainerBuilder();
+
+        $container->setResourceTracking(false);
+        $container->addObjectResource(new \BarClass());
+
+        $this->assertEmpty($container->getResources(), 'No resources get registered without resource tracking');
+
+        $container->setResourceTracking(true);
+        $container->addObjectResource(new \BarClass());
+
+        $resources = $container->getResources();
+
+        $this->assertCount(1, $resources, '1 resource was registered');
+
+        /* @var $resource \Symfony\Component\Config\Resource\FileResource */
+        $resource = end($resources);
+
+        $this->assertInstanceOf('Symfony\Component\Config\Resource\FileResource', $resource);
+        $this->assertSame(realpath(__DIR__.'/Fixtures/includes/classes.php'), realpath($resource->getResource()));
+    }
+
+    /**
+     * @covers Symfony\Component\DependencyInjection\ContainerBuilder::addClassResource
+     */
+    public function testAddClassResource()
+    {
+        if (!class_exists('Symfony\Component\Config\Resource\FileResource')) {
+            $this->markTestSkipped('The "Config" component is not available');
+        }
+
+        $container = new ContainerBuilder();
+
+        $container->setResourceTracking(false);
+        $container->addClassResource(new \ReflectionClass('BarClass'));
+
+        $this->assertEmpty($container->getResources(), 'No resources get registered without resource tracking');
+
+        $container->setResourceTracking(true);
+        $container->addClassResource(new \ReflectionClass('BarClass'));
+
+        $resources = $container->getResources();
+
+        $this->assertCount(1, $resources, '1 resource was registered');
+
+        /* @var $resource \Symfony\Component\Config\Resource\FileResource */
+        $resource = end($resources);
+
+        $this->assertInstanceOf('Symfony\Component\Config\Resource\FileResource', $resource);
+        $this->assertSame(realpath(__DIR__.'/Fixtures/includes/classes.php'), realpath($resource->getResource()));
+    }
+
+    /**
+     * @covers Symfony\Component\DependencyInjection\ContainerBuilder::compile
+     */
+    public function testCompilesClassDefinitionsOfLazyServices()
+    {
+        if (!class_exists('Symfony\Component\Config\Resource\FileResource')) {
+            $this->markTestSkipped('The "Config" component is not available');
+        }
+
+        $container = new ContainerBuilder();
+
+        $this->assertEmpty($container->getResources(), 'No resources get registered without resource tracking');
+
+        $container->register('foo', 'BarClass');
+        $container->getDefinition('foo')->setLazy(true);
+
+        $container->compile();
+
+        $classesPath       = realpath(__DIR__.'/Fixtures/includes/classes.php');
+        $matchingResources = array_filter(
+            $container->getResources(),
+            function (ResourceInterface $resource) use ($classesPath) {
+                return $resource instanceof FileResource && $classesPath === realpath($resource->getResource());
+            }
+        );
+
+        $this->assertNotEmpty($matchingResources);
     }
 
     /**

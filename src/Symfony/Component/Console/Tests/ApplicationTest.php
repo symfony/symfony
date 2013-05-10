@@ -146,6 +146,18 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Symfony\Component\Console\Command\HelpCommand', $command, '->get() returns the help command if --help is provided as the input');
     }
 
+    public function testSilentHelp()
+    {
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->setCatchExceptions(false);
+
+        $tester = new ApplicationTester($application);
+        $tester->run(array('-h' => true, '-q' => true), array('decorated' => false));
+
+        $this->assertEmpty($tester->getDisplay(true));
+    }
+
     /**
      * @expectedException        \InvalidArgumentException
      * @expectedExceptionMessage The command "foofoo" does not exist.
@@ -230,6 +242,16 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
             array('a', 'Command "a" is ambiguous (afoobar, afoobar1 and 1 more).'),
             array('foo:b', 'Command "foo:b" is ambiguous (foo:bar, foo:bar1).')
         );
+    }
+
+    public function testFindCommandEqualNamespace()
+    {
+        $application = new Application();
+        $application->add(new \Foo3Command());
+        $application->add(new \Foo4Command());
+
+        $this->assertInstanceOf('Foo3Command', $application->find('foo3:bar'), '->find() returns the good command even if a namespace has same name');
+        $this->assertInstanceOf('Foo4Command', $application->find('foo3:bar:toh'), '->find() returns a command even if its namespace equals another command name');
     }
 
     /**

@@ -54,7 +54,7 @@ class IntegerToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCas
     }
 
     /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
     public function testReverseTransformExpectsString()
     {

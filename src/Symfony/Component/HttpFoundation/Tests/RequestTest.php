@@ -668,6 +668,41 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('www.host.com', $request->getHost(), '->getHost() value from Host header has priority over SERVER_NAME ');
     }
 
+    public function testGetPort()
+    {
+        $request = Request::create('http://example.com', 'GET', array(), array(), array(), array(
+            'HTTP_X_FORWARDED_PROTO' => 'https',
+            'HTTP_X_FORWARDED_PORT' => '443'
+        ));
+        $port = $request->getPort();
+
+        $this->assertEquals(80, $port, 'Without trusted proxies FORWARDED_PROTO and FORWARDED_PORT are ignored.');
+
+        Request::setTrustedProxies(array('1.1.1.1'));
+        $request = Request::create('http://example.com', 'GET', array(), array(), array(), array(
+            'HTTP_X_FORWARDED_PROTO' => 'https',
+            'HTTP_X_FORWARDED_PORT'  => '8443'
+        ));
+        $port = $request->getPort();
+
+        $this->assertEquals(8443, $port, 'With PROTO and PORT set PORT takes precedence.');
+
+        $request = Request::create('http://example.com', 'GET', array(), array(), array(), array(
+            'HTTP_X_FORWARDED_PROTO' => 'https'
+        ));
+        $port = $request->getPort();
+
+        $this->assertEquals(443, $port, 'With only PROTO set getPort() defaults to 443.');
+
+        $request = Request::create('http://example.com', 'GET', array(), array(), array(), array(
+            'HTTP_X_FORWARDED_PROTO' => 'http'
+        ));
+        $port = $request->getPort();
+
+        $this->assertEquals(80, $port, 'If X_FORWARDED_PROTO is set to http return 80.');
+        Request::setTrustedProxies(array());
+    }
+
     /**
      * @expectedException RuntimeException
      */

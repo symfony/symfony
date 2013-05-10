@@ -52,20 +52,23 @@ abstract class AbstractDriver implements DriverInterface
         if ($data instanceof CollectionInterface) {
             $raw = array();
             foreach ($data->all() as $item) {
-                $raw[$item->getKey()] = $item->getData();
+                if ($item->isValid()) {
+                    $raw[$item->getKey()] = $item->getData();
+                }
             }
 
-            if ($this->storeMany($raw)) {
-                return new Collection(array_map(function (ItemInterface $item) {
-                    return CachedItem::createFromItem($item);
-                }, $data->all()));
+            $keys = $this->storeMany($raw);
+            $result = new Collection();
+            foreach ($data->all() as $item) {
+                $result->add(in_array($item->getKey(), $keys) ? CachedItem::createFromItem($item) : $item);
             }
 
             return $data;
         }
 
         if ($data instanceof ValidItem) {
-            if ($this->storeOne($data->getKey(), $data->getData())) {
+            $keys = $this->storeOne($data->getKey(), $data->getData());
+            if (reset($keys) === $data->getKey()) {
                 return CachedItem::createFromItem($data);
             }
 
@@ -117,7 +120,7 @@ abstract class AbstractDriver implements DriverInterface
      * @param string $key
      * @param mixed  $data
      *
-     * @return boolean
+     * @return array An array of stored keys
      */
     abstract protected function storeOne($key, $data);
 
@@ -126,7 +129,7 @@ abstract class AbstractDriver implements DriverInterface
      *
      * @param mixed[] $data
      *
-     * @return boolean
+     * @return array An array of stored keys
      */
     abstract protected function storeMany(array $data);
 

@@ -94,10 +94,10 @@ class ExtensionStack implements ExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsQuery(array $query, array $options = array())
+    public function supportsQuery(array $query, array $options)
     {
         foreach ($this->all() as $extension) {
-            if ($extension->supportsQuery($query)) {
+            if ($extension->supportsQuery($query, $options)) {
                 return true;
             }
         }
@@ -110,7 +110,9 @@ class ExtensionStack implements ExtensionInterface
      */
     public function resolveFetch(array $query, array $options)
     {
-        return $this->find($query)->resolveFetch($query, $options);
+        return $this
+            ->find($query, $options)
+            ->resolveFetch($query, $options);
     }
 
     /**
@@ -143,7 +145,9 @@ class ExtensionStack implements ExtensionInterface
      */
     public function resolveDeletion(array $query, array $options)
     {
-        return $this->find($query)->resolveDeletion($query, $options);
+        return $this
+            ->find($query, $options)
+            ->resolveDeletion($query, $options);
     }
 
     /**
@@ -185,15 +189,16 @@ class ExtensionStack implements ExtensionInterface
 
     /**
      * @param string $query
-     *
-     * @return ExtensionInterface
+     * @param array $options
      *
      * @throws \InvalidArgumentException
+     *
+     * @return ExtensionInterface
      */
-    private function find($query)
+    private function find($query, array $options)
     {
         foreach ($this->all() as $extension) {
-            if ($extension->supportsQuery($query)) {
+            if ($extension->supportsQuery($query, $options)) {
                 return $extension;
             }
         }

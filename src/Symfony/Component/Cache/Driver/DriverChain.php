@@ -41,6 +41,22 @@ class DriverChain implements DriverInterface
     }
 
     /**
+     * @param string $name
+     *
+     * @return DriverInterface
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function get($name)
+    {
+        if (!isset($this->drivers[$name])) {
+            throw new \InvalidArgumentException('Driver not found.');
+        }
+
+        return $this->drivers[$name]['extension'];
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function fetch(DataInterface $data)

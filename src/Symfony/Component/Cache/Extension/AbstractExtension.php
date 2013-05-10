@@ -37,7 +37,7 @@ abstract class AbstractExtension implements ExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsQuery(array $query, array $options = array())
+    public function supportsQuery(array $query, array $options)
     {
         return false;
     }

@@ -62,12 +62,19 @@ class Cache
      * @param string|array $query
      * @param array        $options
      *
+     * @throws \InvalidArgumentException
+     *
      * @return DataInterface
      */
     public function fetch($query, array $options = array())
     {
         $options = $this->options->resolve($options);
         $query = $this->resolveQuery($query);
+
+        if (!$this->extension->supportsQuery($query, $options)) {
+            throw new \InvalidArgumentException('Given query is not supported.');
+        }
+
         $keys = $this->extension->resolveFetch($query, $options);
 
         if ($keys->isEmpty()) {
@@ -101,12 +108,19 @@ class Cache
      * @param string|array $query
      * @param array        $options
      *
+     * @throws \InvalidArgumentException
+     *
      * @return KeyCollection
      */
     public function delete($query, array $options = array())
     {
         $options = $this->options->resolve($options);
         $query = $this->resolveQuery($query);
+
+        if (!$this->extension->supportsQuery($query, $options)) {
+            throw new \InvalidArgumentException('Given query is not supported.');
+        }
+
         $keys = $this->extension->resolveDeletion($query, $options);
 
         if ($keys->isEmpty()) {

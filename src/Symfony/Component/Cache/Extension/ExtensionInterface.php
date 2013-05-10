@@ -38,7 +38,7 @@ interface ExtensionInterface
      *
      * @return boolean
      */
-    public function supportsQuery(array $query, array $options = array());
+    public function supportsQuery(array $query, array $options);
 
     /**
      * Resolves query and return keys to fetch.

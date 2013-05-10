@@ -54,7 +54,7 @@ class ArrayDriver extends AbstractDriver
     {
         $this->data[$key] = $data;
 
-        return true;
+        return array($key);
     }
 
     /**
@@ -64,7 +64,7 @@ class ArrayDriver extends AbstractDriver
     {
         $this->data = array_merge($this->data, $data);
 
-        return true;
+        return array_keys($data);
     }
 
     /**

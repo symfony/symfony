@@ -3,11 +3,15 @@
 namespace Symfony\Component\Cache\Data;
 
 /**
+ * Interface for unordered item collections.
+ *
  * @author Jean-François Simon <contact@jfsimon.fr>
  */
 interface CollectionInterface extends DataInterface
 {
     /**
+     * Returns an item by its name.
+     *
      * @param string $key
      *
      * @return ItemInterface
@@ -17,11 +21,22 @@ interface CollectionInterface extends DataInterface
     public function get($key);
 
     /**
+     * Returns an array of all items present in the collection.
+     *
      * @return ItemInterface[]
      */
     public function all();
 
     /**
+     * Returns an array of all keys present in the collection.
+     *
+     * @return string[]
+     */
+    public function getKeys();
+
+    /**
+     * Adds an item in the collection.
+     *
      * @param ItemInterface $item
      *
      * @return Collection
@@ -29,6 +44,8 @@ interface CollectionInterface extends DataInterface
     public function add(ItemInterface $item);
 
     /**
+     * Merges another collection to this one.
+     *
      * @param CollectionInterface $collection
      *
      * @return Collection
@@ -36,11 +53,8 @@ interface CollectionInterface extends DataInterface
     public function merge(CollectionInterface $collection);
 
     /**
-     * @return string[]
-     */
-    public function getKeys();
-
-    /**
+     * Tests if collection is empty (ie. contains no item).
+     *
      * @return boolean
      */
     public function isEmpty();

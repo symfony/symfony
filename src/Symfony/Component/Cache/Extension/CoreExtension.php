@@ -29,7 +29,7 @@ class CoreExtension extends AbstractExtension
     /**
      * {@inheritdoc}
      */
-    public function supportsQuery(array $query, array $options = array())
+    public function supportsQuery(array $query, array $options)
     {
         return array('key') === array_keys($query);
     }

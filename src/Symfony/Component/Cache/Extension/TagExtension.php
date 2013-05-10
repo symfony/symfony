@@ -33,7 +33,7 @@ class TagExtension extends AbstractExtension
     /**
      * {@inheritdoc}
      */
-    public function supportsQuery(array $query, array $options = array())
+    public function supportsQuery(array $query, array $options)
     {
         return array('tag') === array_keys($query);
     }

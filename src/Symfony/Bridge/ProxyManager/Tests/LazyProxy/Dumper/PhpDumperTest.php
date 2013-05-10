@@ -58,7 +58,6 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
 
         /* @var $proxy \stdClass_c1d194250ee2e2b7d2eab8b8212368a8 */
         $proxy = $container->get('foo');
-/*
         $this->assertInstanceOf('stdClass_c1d194250ee2e2b7d2eab8b8212368a8', $proxy);
         $this->assertSame($proxy, $container->get('foo'));
 
@@ -68,6 +67,5 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($proxy->isProxyInitialized());
         $this->assertSame($proxy, $container->get('foo'));
-*/
     }
 }

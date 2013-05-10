@@ -499,7 +499,7 @@ class Crawler extends \SplObjectStorage
 
         $html = '';
         foreach ($this->getNode(0)->childNodes as $child) {
-            $html .= $child->ownerDocument->saveXML($child);
+            $html .= $child->ownerDocument->saveHTML($child);
         }
 
         return $html;

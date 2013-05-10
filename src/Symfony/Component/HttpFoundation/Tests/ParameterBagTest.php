@@ -125,6 +125,14 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('default', $bag->get('bar[moo][foo]', 'default', true));
     }
 
+    public function testGetWithUtf8Key()
+    {
+        $bag = new ParameterBag(array('foö' => 'bar', 'bäz' => array('büz' => 'boo')));
+
+        $this->assertEquals('bar', $bag->get('foö'));
+        $this->assertEquals('boo', $bag->get('bäz[büz]', null, true));
+    }
+
     /**
      * @covers Symfony\Component\HttpFoundation\ParameterBag::set
      */

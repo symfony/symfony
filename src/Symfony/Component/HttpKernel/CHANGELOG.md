@@ -10,6 +10,8 @@ CHANGELOG
  * deprecated `Symfony\Component\HttpKernel\Kernel::init()``
  * added the possibility to specify an id an extra attributes to hinclude tags
  * added the collect of data if a controller is a Closure in the Request collector
+ * pass exceptions from the ExceptionListener to the logger using the logging context to allow for more
+   detailed messages
 
 2.2.0
 -----

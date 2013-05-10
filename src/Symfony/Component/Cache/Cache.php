@@ -41,22 +41,6 @@ class Cache
     }
 
     /**
-     * @return DriverInterface
-     */
-    public function getDriver()
-    {
-        return $this->driver;
-    }
-
-    /**
-     * @return ExtensionInterface
-     */
-    public function getExtension()
-    {
-        return $this->extension;
-    }
-
-    /**
      * Fetches item matching given query from cache.
      *
      * @param string|array $query

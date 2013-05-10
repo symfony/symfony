@@ -2,9 +2,9 @@
 
 namespace Symfony\Component\Cache\Extension;
 
-use Symfony\Component\Cache\Cache;
 use Symfony\Component\Cache\Data\KeyCollection;
 use Symfony\Component\Cache\Rewriting;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
@@ -19,10 +19,14 @@ class CoreExtension extends AbstractExtension
     {
         $resolver->setDefaults(array(
             'namespace' => '',
-            'rewriting' => new Rewriting(),
+            'rewriting' => null,
         ))->addAllowedTypes(array(
             'namespace' => 'string',
             'rewriting' => 'Symfony\Component\Cache\Rewriting',
+        ))->setNormalizers(array(
+            'rewriting' => function ($value) {
+                return $value instanceof Rewriting ? $value : new Rewriting();
+            },
         ));
     }
 

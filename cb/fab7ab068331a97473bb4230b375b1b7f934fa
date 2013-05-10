@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-05-07T18:34:10Z
+
+As this is a new method in 2.3, I would rather add an argument to the `html()` method to be able to switch from HTML to XML. What do you think?
+
+Perhaps that we should then find another name for the method itself (instead of `html`).

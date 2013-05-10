@@ -46,7 +46,17 @@ class BCryptPasswordEncoder extends BasePasswordEncoder
     }
 
     /**
-     * {@inheritdoc}
+     * Encodes the raw password.
+     *
+     * It doesn't work with PHP versions lower than 5.3.7, since
+     * the password compat library uses CRYPT_BLOWFISH hash type with
+     * the "$2y$" salt prefix (which is not available in the early PHP versions).
+     * @see https://github.com/ircmaxell/password_compat/issues/10#issuecomment-11203833
+     *
+     * @param string $raw  The password to encode
+     * @param string $salt The salt
+     *
+     * @return string The encoded password
      */
     public function encodePassword($raw, $salt)
     {

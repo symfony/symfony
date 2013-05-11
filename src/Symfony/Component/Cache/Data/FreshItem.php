@@ -10,7 +10,7 @@ class FreshItem extends ValidItem
     /**
      * {@inheritdoc}
      */
-    public function isCached()
+    public function isHit()
     {
         return false;
     }

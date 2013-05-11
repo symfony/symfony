@@ -41,12 +41,12 @@ class TagExtension extends AbstractExtension
     /**
      * {@inheritdoc}
      */
-    public function resolveFetch(array $query, array $options)
+    public function resolveQuery(array $query, array $options)
     {
         $item = $this->findTag($query['tag'], $options);
 
         if ($item instanceof CachedItem) {
-            return new KeyCollection($item->getData());
+            return new KeyCollection($item->getValue());
         }
 
         return new NullResult();
@@ -75,9 +75,9 @@ class TagExtension extends AbstractExtension
     /**
      * {@inheritdoc}
      */
-    public function resolveDeletion(array $query, array $options)
+    public function resolveRemoval(array $query, array $options)
     {
-        $data = $this->getCache()->fetch($query, array('with_metadata' => true));
+        $data = $this->getCache()->get($query, array('with_metadata' => true));
 
         if ($data instanceof ValidItem) {
             return $this->unregisterItem($data, $options);
@@ -106,7 +106,7 @@ class TagExtension extends AbstractExtension
 
         foreach ($item->metadata->get($options['tags_metadata_key'], array()) as $tag) {
             $tagItem = $this->findTag($tag, $options);
-            $tagData = $tagItem instanceof CachedItem ? $tagItem->getData() : array();
+            $tagData = $tagItem instanceof CachedItem ? $tagItem->getValue() : array();
 
             if (!in_array($tag, $tagData)) {
                 $tagData[] = $item->getKey();
@@ -115,7 +115,7 @@ class TagExtension extends AbstractExtension
         }
 
         if (count($dataToStore)) {
-            $this->getCache()->store(new Collection($dataToStore), $options);
+            $this->getCache()->set(new Collection($dataToStore), $options);
         }
     }
 
@@ -134,7 +134,7 @@ class TagExtension extends AbstractExtension
             $tagItem = $this->findTag($tag, $options);
 
             if ($tagItem instanceof CachedItem) {
-                $tagData = $tagItem->getData();
+                $tagData = $tagItem->getValue();
 
                 if ($key = array_search($tag, $tagData)) {
                     unset($tagData[$key]);
@@ -144,7 +144,7 @@ class TagExtension extends AbstractExtension
         }
 
         if (count($dataToStore)) {
-            $this->getCache()->store(new Collection($dataToStore), $options);
+            $this->getCache()->set(new Collection($dataToStore), $options);
         }
 
         return $keysToDelete;
@@ -160,6 +160,6 @@ class TagExtension extends AbstractExtension
     {
         $options['with_metadata'] = false;
 
-        return $this->getCache()->fetch(array('key' => sprintf($options['tags_pattern'], $tag)), $options);
+        return $this->getCache()->get(array('key' => sprintf($options['tags_pattern'], $tag)), $options);
     }
 }

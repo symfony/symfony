@@ -49,9 +49,17 @@ class KeyCollection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
+    public function getValues()
+    {
+        throw new \BadMethodCallException('Key collection has no value.');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function get($key)
     {
-        throw new \BadMethodCallException('Key collection has no item.');
+        throw new \BadMethodCallException('Key collection has no value.');
     }
 
     /**
@@ -59,7 +67,7 @@ class KeyCollection implements CollectionInterface
      */
     public function all()
     {
-        throw new \BadMethodCallException('Key collection has no item.');
+        throw new \BadMethodCallException('Key collection has no value.');
     }
 
     /**
@@ -74,24 +82,8 @@ class KeyCollection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function isValid()
+    public function isHit()
     {
         return false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isCached()
-    {
-        return false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isCollection()
-    {
-        return true;
     }
 }

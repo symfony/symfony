@@ -15,8 +15,8 @@ class MetadataTest extends AcceptanceTest
         $item->metadata->set('metakey1', 'metadata1');
         $item->metadata->set('metakey2', 'metadata2');
 
-        $cache->store($item);
-        $fetchedItem = $cache->fetch('key');
+        $cache->set($item);
+        $fetchedItem = $cache->get('key');
 
         $this->assertTrue($fetchedItem instanceof CachedItem);
         $this->assertTrue($fetchedItem->metadata instanceof Metadata);

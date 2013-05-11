@@ -10,9 +10,9 @@ class NullResult implements ItemInterface
     /**
      * {@inheritdoc}
      */
-    public function getData()
+    public function getValue()
     {
-        throw new \BadMethodCallException('A null result contains no data.');
+        throw new \BadMethodCallException('A null result contains no value.');
     }
 
     /**
@@ -26,23 +26,7 @@ class NullResult implements ItemInterface
     /**
      * {@inheritdoc}
      */
-    public function isValid()
-    {
-        return false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isCached()
-    {
-        return false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isCollection()
+    public function isHit()
     {
         return false;
     }

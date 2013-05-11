@@ -13,8 +13,8 @@ class TagTest extends AcceptanceTest
         $item = new FreshItem('key', 'data');
         $item->metadata->set('tags', array('tag1', 'tag2'));
 
-        $cache->store($item);
-        $fetchedItem = $cache->fetch('key');
+        $cache->set($item);
+        $fetchedItem = $cache->get('key');
 
         $this->assertEquals(array('tag1', 'tag2'),  $fetchedItem->metadata->get('tags'));
     }
@@ -25,35 +25,35 @@ class TagTest extends AcceptanceTest
 
         $item = new FreshItem('key1', 'data1');
         $item->metadata->set('tags', array('tag1', 'tag2'));
-        $cache->store($item);
+        $cache->set($item);
 
         $item = new FreshItem('key2', 'data2');
         $item->metadata->set('tags', array('tag1', 'tag3'));
-        $cache->store($item);
+        $cache->set($item);
 
         $item = new FreshItem('key3', 'data3');
         $item->metadata->set('tags', array('tag2', 'tag3'));
-        $cache->store($item);
+        $cache->set($item);
 
-        $fetchedCollection = $cache->fetch(array('tag' => 'tag1'));
+        $fetchedCollection = $cache->get(array('tag' => 'tag1'));
 
         $this->assertTrue($fetchedCollection instanceof Collection);
-        $this->assertEquals('data1', $fetchedCollection->get('key1')->getData());
-        $this->assertEquals('data2', $fetchedCollection->get('key2')->getData());
+        $this->assertEquals('data1', $fetchedCollection->get('key1')->getValue());
+        $this->assertEquals('data2', $fetchedCollection->get('key2')->getValue());
         $this->assertEquals(2, count($fetchedCollection->all()));
 
-        $fetchedCollection = $cache->fetch(array('tag' => 'tag2'));
+        $fetchedCollection = $cache->get(array('tag' => 'tag2'));
 
         $this->assertTrue($fetchedCollection instanceof Collection);
-        $this->assertEquals('data1', $fetchedCollection->get('key1')->getData());
-        $this->assertEquals('data3', $fetchedCollection->get('key3')->getData());
+        $this->assertEquals('data1', $fetchedCollection->get('key1')->getValue());
+        $this->assertEquals('data3', $fetchedCollection->get('key3')->getValue());
         $this->assertEquals(2, count($fetchedCollection->all()));
 
-        $fetchedCollection = $cache->fetch(array('tag' => 'tag3'));
+        $fetchedCollection = $cache->get(array('tag' => 'tag3'));
 
         $this->assertTrue($fetchedCollection instanceof Collection);
-        $this->assertEquals('data2', $fetchedCollection->get('key2')->getData());
-        $this->assertEquals('data3', $fetchedCollection->get('key3')->getData());
+        $this->assertEquals('data2', $fetchedCollection->get('key2')->getValue());
+        $this->assertEquals('data3', $fetchedCollection->get('key3')->getValue());
         $this->assertEquals(2, count($fetchedCollection->all()));
     }
 }

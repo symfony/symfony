@@ -45,7 +45,7 @@ abstract class AbstractExtension implements ExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function resolveFetch(array $query, array $options)
+    public function resolveQuery(array $query, array $options)
     {
         return new KeyCollection();
     }
@@ -69,7 +69,7 @@ abstract class AbstractExtension implements ExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function resolveDeletion(array $query, array $options)
+    public function resolveRemoval(array $query, array $options)
     {
         return new KeyCollection();
     }
@@ -77,7 +77,7 @@ abstract class AbstractExtension implements ExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function propagateDeletion(KeyCollection $keys, array $options)
+    public function propagateRemoval(KeyCollection $keys, array $options)
     {
         return $keys;
     }
@@ -85,7 +85,7 @@ abstract class AbstractExtension implements ExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function prepareFlush(array $options)
+    public function prepareClear(array $options)
     {
     }
 

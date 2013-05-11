@@ -2,10 +2,6 @@
 
 namespace Symfony\Component\Cache\Driver;
 
-use Symfony\Component\Cache\Data\DataInterface;
-use Symfony\Component\Cache\Data\KeyCollection;
-use Symfony\Component\Cache\Data\NullResult;
-
 /**
  * @author Jean-François Simon <contact@jfsimon.fr>
  */
@@ -47,7 +43,7 @@ class DriverChain implements DriverInterface
      *
      * @throws \InvalidArgumentException
      */
-    public function get($name)
+    public function getDriver($name)
     {
         if (!isset($this->drivers[$name])) {
             throw new \InvalidArgumentException('Driver not found.');
@@ -59,42 +55,72 @@ class DriverChain implements DriverInterface
     /**
      * {@inheritdoc}
      */
-    public function fetch(DataInterface $data)
+    public function get($key)
     {
         $missed = array();
-        $fetched = null;
+        $value = null;
 
         foreach ($this->all() as $driver) {
-            $fetched = $driver->fetch($data);
+            $value = $driver->get($key);
 
-            if (null !== $fetched) {
+            if (null !== $value) {
                 break;
             }
 
             $missed[] = $driver;
         }
 
-        if (null === $fetched) {
-            return new NullResult();
+        if (null === $value) {
+            return false;
         }
 
         /** @var DriverInterface $driver */
         foreach ($missed as $driver) {
-            $driver->store($fetched);
+            $driver->set($key, $value);
         }
 
-        return $fetched;
+        return $value;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function store(DataInterface $data)
+    public function getMultiple($keys)
     {
-        $success = false;
+        $missed = array();
+        $values = false;
+
         foreach ($this->all() as $driver) {
-            if ($driver->store($data)) {
-                $success = true;
+            $values = $driver->getMultiple($keys);
+
+            if (false !== $values) {
+                break;
+            }
+
+            $missed[] = $driver;
+        }
+
+        if (false === $values) {
+            return false;
+        }
+
+        /** @var DriverInterface $driver */
+        foreach ($missed as $driver) {
+            $driver->setMultiple($values);
+        }
+
+        return $values;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function set($key, $value, $ttl = null)
+    {
+        $success = true;
+        foreach ($this->all() as $driver) {
+            if (!$driver->set($key, $value, $ttl)) {
+                $success = false;
             }
         }
 
@@ -104,29 +130,61 @@ class DriverChain implements DriverInterface
     /**
      * {@inheritdoc}
      */
-    public function delete(KeyCollection $data)
+    public function setMultiple($values, $ttl = null)
     {
-        $keys = new KeyCollection();
+        $success = true;
         foreach ($this->all() as $driver) {
-            $keys->merge($driver->delete($data));
+            if (!$driver->set($values, $ttl)) {
+                $success = false;
+            }
         }
 
-        return $keys;
+        return $success;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function flush()
+    public function remove($key)
     {
-        $done = true;
+        $success = true;
         foreach ($this->all() as $driver) {
-            if (!$driver->flush()) {
-                $done = false;
+            if (!$driver->remove($key)) {
+                $success = false;
             }
         }
 
-        return $done;
+        return $success;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function removeMultiple($keys)
+    {
+        $success = true;
+        foreach ($this->all() as $driver) {
+            if (!$driver->removeMultiple($keys)) {
+                $success = false;
+            }
+        }
+
+        return $success;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function clear()
+    {
+        $success = true;
+        foreach ($this->all() as $driver) {
+            if (!$driver->clear()) {
+                $success = false;
+            }
+        }
+
+        return $success;
     }
 
     /**

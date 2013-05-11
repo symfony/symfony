@@ -41,7 +41,7 @@ class CoreExtension extends AbstractExtension
     /**
      * {@inheritdoc}
      */
-    public function resolveFetch(array $query, array $options)
+    public function resolveQuery(array $query, array $options)
     {
         return $this->getKey($query['key'], $options);
     }
@@ -49,7 +49,7 @@ class CoreExtension extends AbstractExtension
     /**
      * {@inheritdoc}
      */
-    public function resolveDeletion(array $query, array $options)
+    public function resolveRemoval(array $query, array $options)
     {
         return $this->getKey($query['key'], $options);
     }

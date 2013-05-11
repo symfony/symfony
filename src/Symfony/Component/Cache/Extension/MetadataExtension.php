@@ -2,6 +2,7 @@
 
 namespace Symfony\Component\Cache\Extension;
 
+use Symfony\Component\Cache\Data\CachedItem;
 use Symfony\Component\Cache\Data\Collection;
 use Symfony\Component\Cache\Data\FreshItem;
 use Symfony\Component\Cache\Data\ValidItem;
@@ -42,23 +43,24 @@ class MetadataExtension extends AbstractExtension
         $pattern = $options['metadata_pattern'];
 
         if ($data instanceof ValidItem) {
-            $metadata = $this->getCache()->fetch(array('key' => sprintf($pattern, $data->getKey())));
+            $metadata = $this->getCache()->get(array('key' => sprintf($pattern, $data->getKey())));
             /** @var ItemInterface $metadata */
-            if ($metadata->isValid()) {
-                $data->metadata = $metadata->getData();
+            if ($metadata instanceof CachedItem) {
+                $data->metadata = $metadata->getValue();
             }
         }
 
         if ($data instanceof CollectionInterface) {
-            $metadata = $this->getCache()->fetch(array('key' => array_map(function ($key) use ($pattern) {
+            $metadata = $this->getCache()->get(array('key' => array_map(function ($key) use ($pattern) {
                 return sprintf($pattern, $key);
             }, $data->getKeys())));
             /** @var CollectionInterface $metadata */
-            if ($metadata->isValid()) {
+            if ($metadata instanceof Collection) {
+                /** @var ItemInterface $metadataItem */
                 foreach ($metadata->all() as $metadataKey => $metadataItem) {
                     $item = $data->get(preg_replace('~^'.str_replace('%s', '(.*)', preg_quote($pattern, '~')).'$~', '$1', $metadataKey));
-                    if ($item instanceof ValidItem) {
-                        $item->metadata = $metadataItem->getData();
+                    if ($item instanceof CachedItem) {
+                        $item->metadata = $metadataItem->getValue();
                     }
                 }
             }
@@ -80,11 +82,11 @@ class MetadataExtension extends AbstractExtension
         $options['with_metadata'] = false;
 
         if ($data instanceof ValidItem && !$data->metadata->isEmpty()) {
-            $this->getCache()->store(new Collection(array($data, new FreshItem(sprintf($pattern, $data->getKey()), $data->metadata))), $options);
+            $this->getCache()->set(new Collection(array($data, new FreshItem(sprintf($pattern, $data->getKey()), $data->metadata))), $options);
         }
 
         if ($data instanceof CollectionInterface) {
-            $this->getCache()->store(new Collection(array_map(function (ValidItem $item) use ($pattern) {
+            $this->getCache()->set(new Collection(array_map(function (ValidItem $item) use ($pattern) {
                 return new FreshItem(sprintf($pattern, $item->getKey()), $item->metadata);
             }, array_filter($data->all(), function (ItemInterface $item) {
                 return $item instanceof ValidItem && !$item->metadata->isEmpty();
@@ -97,7 +99,7 @@ class MetadataExtension extends AbstractExtension
     /**
      * {@inheritdoc}
      */
-    public function propagateDeletion(KeyCollection $keys, array $options)
+    public function propagateRemoval(KeyCollection $keys, array $options)
     {
         if (!$options['with_metadata']) {
             return $keys;

@@ -48,7 +48,7 @@ interface ExtensionInterface
      *
      * @return KeyCollection
      */
-    public function resolveFetch(array $query, array $options);
+    public function resolveQuery(array $query, array $options);
 
     /**
      * Builds fetched data before returning
@@ -78,7 +78,7 @@ interface ExtensionInterface
      *
      * @return KeyCollection
      */
-    public function resolveDeletion(array $query, array $options);
+    public function resolveRemoval(array $query, array $options);
 
     /**
      * Prepares data to be stored by driver.
@@ -88,12 +88,12 @@ interface ExtensionInterface
      *
      * @return KeyCollection
      */
-    public function propagateDeletion(KeyCollection $keys, array $options);
+    public function propagateRemoval(KeyCollection $keys, array $options);
 
     /**
      * Prepares data before flush.
      *
      * @param array $options
      */
-    public function prepareFlush(array $options);
+    public function prepareClear(array $options);
 }

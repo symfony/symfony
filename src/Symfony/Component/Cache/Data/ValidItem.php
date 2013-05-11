@@ -13,9 +13,9 @@ abstract class ValidItem implements ItemInterface
     private $key;
 
     /**
-     * @var string
+     * @var mixed
      */
-    private $data;
+    private $value;
 
     /**
      * @var Metadata
@@ -24,12 +24,12 @@ abstract class ValidItem implements ItemInterface
 
     /**
      * @param string $key
-     * @param mixed  $data
+     * @param mixed  $value
      */
-    public function __construct($key, $data)
+    public function __construct($key, $value)
     {
         $this->key = $key;
-        $this->data = $data;
+        $this->value = $value;
         $this->metadata = new Metadata();
     }
 
@@ -40,7 +40,7 @@ abstract class ValidItem implements ItemInterface
      */
     public static function createFromItem(ValidItem $item)
     {
-        $createdItem = new static($item->getKey(), $item->getData());
+        $createdItem = new static($item->getKey(), $item->getValue());
         $createdItem->metadata = $item->metadata;
 
         return $createdItem;
@@ -57,24 +57,8 @@ abstract class ValidItem implements ItemInterface
     /**
      * {@inheritdoc}
      */
-    public function getData()
+    public function getValue()
     {
-        return $this->data;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isValid()
-    {
-        return true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isCollection()
-    {
-        return false;
+        return $this->value;
     }
 }

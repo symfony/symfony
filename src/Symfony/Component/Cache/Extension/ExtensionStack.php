@@ -108,11 +108,11 @@ class ExtensionStack implements ExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function resolveFetch(array $query, array $options)
+    public function resolveQuery(array $query, array $options)
     {
         return $this
             ->find($query, $options)
-            ->resolveFetch($query, $options);
+            ->resolveQuery($query, $options);
     }
 
     /**
@@ -143,20 +143,20 @@ class ExtensionStack implements ExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function resolveDeletion(array $query, array $options)
+    public function resolveRemoval(array $query, array $options)
     {
         return $this
             ->find($query, $options)
-            ->resolveDeletion($query, $options);
+            ->resolveRemoval($query, $options);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function propagateDeletion(KeyCollection $keys, array $options)
+    public function propagateRemoval(KeyCollection $keys, array $options)
     {
         foreach ($this->all() as $extension) {
-            $keys->merge($extension->propagateDeletion($keys, $options));
+            $keys->merge($extension->propagateRemoval($keys, $options));
         }
 
         return $keys;
@@ -165,10 +165,10 @@ class ExtensionStack implements ExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function prepareFlush(array $options)
+    public function prepareClear(array $options)
     {
         foreach ($this->all() as $extension) {
-            $extension->prepareFlush($options);
+            $extension->prepareClear($options);
         }
     }
 

@@ -35,6 +35,13 @@ interface CollectionInterface extends DataInterface
     public function getKeys();
 
     /**
+     * Returns an associative array of all key => value present in the collection.
+     *
+     * @return array
+     */
+    public function getValues();
+
+    /**
      * Adds an item in the collection.
      *
      * @param ItemInterface $item
@@ -58,4 +65,11 @@ interface CollectionInterface extends DataInterface
      * @return boolean
      */
     public function isEmpty();
+
+    /**
+     * Tests if all items are currently in the cache.
+     *
+     * @return boolean
+     */
+    public function isHit();
 }

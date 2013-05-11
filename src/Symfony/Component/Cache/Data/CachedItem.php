@@ -10,7 +10,7 @@ class CachedItem extends ValidItem
     /**
      * {@inheritdoc}
      */
-    public function isCached()
+    public function isHit()
     {
         return true;
     }

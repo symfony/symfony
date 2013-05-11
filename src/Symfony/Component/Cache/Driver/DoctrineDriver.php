@@ -7,7 +7,7 @@ use Doctrine\Common\Cache\Cache as DoctrineDriverInterface;
 /**
  * @author Jean-François Simon <contact@jfsimon.fr>
  */
-class DoctrineDriver extends AbstractDriver
+class DoctrineDriver implements DriverInterface
 {
     /**
      * @var DoctrineDriverInterface
@@ -25,24 +25,21 @@ class DoctrineDriver extends AbstractDriver
     /**
      * {@inheritdoc}
      */
-    protected function fetchOne($key)
+    public function get($key)
     {
-        $fetchedData = $this->driver->fetch($key);
-
-        return false === $fetchedData ? array() : array($key => $fetchedData);
+        return $this->driver->fetch($key);
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function fetchMany(array $keys)
+    public function getMultiple($keys)
     {
         $result = array();
         foreach ($keys as $key) {
-            $fetchedData = $this->driver->fetch($key);
-
-            if (false !== $fetchedData) {
-                $result[$key] = $fetchedData;
+            $value = $this->driver->fetch($key);
+            if (false !== $value) {
+                $result[$key] = $value;
             }
         }
 
@@ -52,58 +49,54 @@ class DoctrineDriver extends AbstractDriver
     /**
      * {@inheritdoc}
      */
-    protected function storeOne($key, $data)
+    public function set($key, $value, $ttl = null)
     {
-        if ($this->driver->save($key, $data)) {
-            return array($key => $data);
-        }
-
-        return array();
+        return $this->driver->save($key, $value, $ttl ?: 0);
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function storeMany(array $data)
+    public function setMultiple($values, $ttl = null)
     {
-        $storedData = array();
-        foreach ($data as $key => $value) {
-            if ($this->driver->save($key, $value)) {
-                $storedData[$key] = $value;
+        $success = true;
+        foreach ($values as $key => $value) {
+            if (!$this->driver->save($key, $value)) {
+                $success = false;
             }
         }
 
-        return $storedData;
+        return $success;
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function deleteOne($key)
+    public function remove($key)
     {
-        return $this->driver->delete($key) ? array($key) : array();
+        return $this->driver->delete($key);
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function deleteMany(array $keys)
+    public function removeMultiple($keys)
     {
-        $deletedKeys = array();
+        $success = true;
         foreach ($keys as $key) {
-            if ($this->driver->delete($key)) {
-                $deletedKeys[] = $key;
+            if (!$this->driver->delete($key)) {
+                $success = false;
             }
         }
 
-        return $deletedKeys;
+        return $success;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function flush()
+    public function clear()
     {
-        // TODO: Implement flush() method.
+        return false;
     }
 }

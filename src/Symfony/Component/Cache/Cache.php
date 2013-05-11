@@ -2,9 +2,12 @@
 
 namespace Symfony\Component\Cache;
 
+use Symfony\Component\Cache\Data\CachedItem;
+use Symfony\Component\Cache\Data\Collection;
 use Symfony\Component\Cache\Data\DataInterface;
 use Symfony\Component\Cache\Data\KeyCollection;
 use Symfony\Component\Cache\Data\NullResult;
+use Symfony\Component\Cache\Data\ValidItem;
 use Symfony\Component\Cache\Driver\DriverInterface;
 use Symfony\Component\Cache\Extension\ExtensionInterface;
 
@@ -50,7 +53,7 @@ class Cache
      *
      * @return DataInterface
      */
-    public function fetch($query, array $options = array())
+    public function get($query, array $options = array())
     {
         $options = $this->options->resolve($options);
         $query = $this->resolveQuery($query);
@@ -59,13 +62,26 @@ class Cache
             throw new \InvalidArgumentException('Given query is not supported.');
         }
 
-        $keys = $this->extension->resolveFetch($query, $options);
+        $keyCollection = $this->extension->resolveQuery($query, $options);
 
-        if ($keys->isEmpty()) {
+        if ($keyCollection->isEmpty()) {
             return new NullResult();
         }
 
-        $result = $this->driver->fetch($keys);
+        $keys = $keyCollection->getKeys();
+        if (1 === count($keys)) {
+            $result = $this->driver->get($key = reset($keys));
+            if (false === $result) {
+                return new NullResult();
+            }
+            $result = new CachedItem($key, $result);
+        } else {
+            $result = $this->driver->getMultiple($keys);
+            if (empty($result)) {
+                return new NullResult();
+            }
+            $result = Collection::fromCachedValues($result);
+        }
 
         return $this->extension->buildResult($result, $options);
     }
@@ -78,16 +94,24 @@ class Cache
      *
      * @return DataInterface
      */
-    public function store(DataInterface $data, array $options = array())
+    public function set(DataInterface $data, array $options = array())
     {
         $options = $this->options->resolve($options);
         $data = $this->extension->prepareStorage($data, $options);
 
-        return $this->driver->store($data);
+        if ($data instanceof ValidItem && $this->driver->set($data->getKey(), $data->getValue())) {
+            return new CachedItem($data->getKey(), $data->getValue());
+        }
+
+        if ($data instanceof Collection && $this->driver->setMultiple($data->getValues())) {
+            return Collection::fromCachedValues($data->getValues());
+        }
+
+        return new NullResult();
     }
 
     /**
-     * Deletes item matching given query from cache.
+     * Removes item matching given query from cache.
      *
      * @param string|array $query
      * @param array        $options
@@ -96,7 +120,7 @@ class Cache
      *
      * @return KeyCollection
      */
-    public function delete($query, array $options = array())
+    public function remove($query, array $options = array())
     {
         $options = $this->options->resolve($options);
         $query = $this->resolveQuery($query);
@@ -105,15 +129,20 @@ class Cache
             throw new \InvalidArgumentException('Given query is not supported.');
         }
 
-        $keys = $this->extension->resolveDeletion($query, $options);
+        $keyCollection = $this->extension->resolveRemoval($query, $options);
 
-        if ($keys->isEmpty()) {
-            return $keys;
+        if ($keyCollection->isEmpty()) {
+            return $keyCollection;
         }
 
-        $keys->merge($this->extension->propagateDeletion($keys, $options));
+        $keyCollection->merge($this->extension->propagateRemoval($keyCollection, $options));
 
-        return $this->driver->delete($keys);
+        $keys = $keyCollection->getKeys();
+        if ((1 === count($keys) && $this->driver->remove(reset($keys))) || $this->driver->removeMultiple($keys)) {
+            return new KeyCollection($keys);
+        }
+
+        return new KeyCollection();
     }
 
     /**
@@ -123,12 +152,12 @@ class Cache
      *
      * @return boolean
      */
-    public function flush(array $options = array())
+    public function clear(array $options = array())
     {
         $options = $this->options->resolve($options);
-        $this->extension->prepareFlush($options);
+        $this->extension->prepareClear($options);
 
-        return $this->driver->flush();
+        return $this->driver->clear();
     }
 
     /**

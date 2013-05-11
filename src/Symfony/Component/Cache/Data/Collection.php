@@ -13,14 +13,9 @@ class Collection implements CollectionInterface
     private $items = array();
 
     /**
-     * @var boolean
-     */
-    private $valid = true;
-
-    /**
      * @var bool
      */
-    private $cached = true;
+    private $hit = true;
 
     /**
      * @param ItemInterface[] $items
@@ -30,6 +25,21 @@ class Collection implements CollectionInterface
         foreach ($items as $item) {
             $this->add($item);
         }
+    }
+
+    /**
+     * @param array $values
+     *
+     * @return Collection
+     */
+    public static function fromCachedValues(array $values)
+    {
+        $collection = new self();
+        foreach ($values as $key => $value) {
+            $collection->add(new CachedItem($key, $value));
+        }
+
+        return $collection;
     }
 
     /**
@@ -63,11 +73,23 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
+    public function getValues()
+    {
+        $values = array();
+        foreach ($this->items as $item) {
+            $values[$item->getKey()] = $item->getValue();
+        }
+
+        return $values;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function add(ItemInterface $item)
     {
         $this->items[$item->getKey()] = $item;
-        $this->valid = $this->valid && $item->isValid();
-        $this->cached = $this->cached && $item->isCached();
+        $this->hit = $item->isHit() && $this->hit;
 
         return $this;
     }
@@ -95,24 +117,8 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function isValid()
+    public function isHit()
     {
-        return $this->valid;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isCached()
-    {
-        return $this->cached;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isCollection()
-    {
-        return true;
+        return $this->hit;
     }
 }

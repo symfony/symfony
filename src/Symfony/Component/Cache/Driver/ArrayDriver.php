@@ -5,42 +5,34 @@ namespace Symfony\Component\Cache\Driver;
 /**
  * @author Jean-François Simon <contact@jfsimon.fr>
  */
-class ArrayDriver extends AbstractDriver
+class ArrayDriver implements DriverInterface
 {
     /**
      * @var array
      */
-    private $data = array();
+    private $values = array();
 
     /**
      * {@inheritdoc}
      */
-    public function flush()
+    public function get($key)
     {
-        $this->data = array();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function fetchOne($key)
-    {
-        if (!isset($this->data[$key])) {
-            return array();
+        if (!isset($this->values[$key])) {
+            return false;
         }
 
-        return array($key => $this->data[$key]);
+        return $this->values[$key];
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function fetchMany(array $keys)
+    public function getMultiple($keys)
     {
         $result = array();
         foreach ($keys as $key) {
-            if (isset($this->data[$key])) {
-                $result[$key] = $this->data[$key];
+            if (isset($this->values[$key])) {
+                $result[$key] = $this->values[$key];
             }
         }
 
@@ -50,50 +42,56 @@ class ArrayDriver extends AbstractDriver
     /**
      * {@inheritdoc}
      */
-    protected function storeOne($key, $data)
+    public function set($key, $value, $ttl = null)
     {
-        $this->data[$key] = $data;
+        $this->values[$key] = $value;
 
-        return array($key);
+        return true;
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function storeMany(array $data)
+    public function setMultiple($values, $ttl = null)
     {
-        $this->data = array_merge($this->data, $data);
+        $this->values = array_merge($this->values, $values);
 
-        return array_keys($data);
+        return true;
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function deleteOne($key)
+    public function remove($key)
     {
-        if (isset($this->data[$key])) {
-            unset($this->data[$key]);
+        if (isset($this->values[$key])) {
+            unset($this->values[$key]);
 
-            return array($key);
+            return true;
         }
 
-        return array();
+        return false;
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function deleteMany(array $keys)
+    public function removeMultiple($keys)
     {
-        $deleted = array();
         foreach ($keys as $key) {
-            if (isset($this->data[$key])) {
-                unset($this->data[$key]);
-                $deleted[] = $key;
-            }
+            unset($this->values[$key]);
         }
 
-        return $deleted;
+        return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function clear()
+    {
+        $this->values = array();
+
+        return true;
     }
 }

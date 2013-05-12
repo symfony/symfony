@@ -2,6 +2,9 @@
 
 namespace Symfony\Component\Cache\Data;
 
+use Symfony\Component\Cache\Exception\InvalidArgumentException;
+use Symfony\Component\Cache\Exception\ObjectNotFoundException;
+
 /**
  * @author Jean-François Simon <contact@jfsimon.fr>
  */
@@ -48,7 +51,10 @@ class Collection implements CollectionInterface
     public function get($key)
     {
         if (!isset($this->items[$key])) {
-            throw new \InvalidArgumentException('Item not found.');
+            throw new ObjectNotFoundException(sprintf(
+                'Collection does not contain item with "%s" key, presents keys are "%s".',
+                $key, implode('", "', array_keys($this->items))
+            ));
         }
 
         return $this->items[$key];
@@ -88,6 +94,10 @@ class Collection implements CollectionInterface
      */
     public function add(ItemInterface $item)
     {
+        if (!$item instanceof ValidItem) {
+            throw new InvalidArgumentException('You can not add a non valid item in a collection.');
+        }
+
         $this->items[$item->getKey()] = $item;
         $this->hit = $item->isHit() && $this->hit;
 

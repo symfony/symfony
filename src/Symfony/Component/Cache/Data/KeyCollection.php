@@ -2,6 +2,8 @@
 
 namespace Symfony\Component\Cache\Data;
 
+use Symfony\Component\Cache\Exception\BadMethodCallException;
+
 /**
  * @author Jean-François Simon <contact@jfsimon.fr>
  */
@@ -25,7 +27,9 @@ class KeyCollection implements CollectionInterface
      */
     public function add(ItemInterface $item)
     {
-        throw new \BadMethodCallException('Can not add item to key collection.');
+        $this->keys[] = $item->getKey();
+
+        return $this;
     }
 
     /**
@@ -51,7 +55,7 @@ class KeyCollection implements CollectionInterface
      */
     public function getValues()
     {
-        throw new \BadMethodCallException('Key collection has no value.');
+        throw new BadMethodCallException('Key collection does not contain values.');
     }
 
     /**
@@ -59,7 +63,7 @@ class KeyCollection implements CollectionInterface
      */
     public function get($key)
     {
-        throw new \BadMethodCallException('Key collection has no value.');
+        throw new BadMethodCallException('Key collection does not contain values.');
     }
 
     /**
@@ -67,7 +71,7 @@ class KeyCollection implements CollectionInterface
      */
     public function all()
     {
-        throw new \BadMethodCallException('Key collection has no value.');
+        throw new BadMethodCallException('Key collection does not contain values.');
     }
 
     /**

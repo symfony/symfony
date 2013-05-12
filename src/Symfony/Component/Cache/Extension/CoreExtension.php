@@ -3,6 +3,7 @@
 namespace Symfony\Component\Cache\Extension;
 
 use Symfony\Component\Cache\Data\KeyCollection;
+use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\Rewriting;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -58,7 +59,7 @@ class CoreExtension extends AbstractExtension
      * @param string|array $query
      * @param array        $options
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      *
      * @return KeyCollection
      */
@@ -80,6 +81,6 @@ class CoreExtension extends AbstractExtension
             return new KeyCollection(array($query));
         }
 
-        throw new \InvalidArgumentException('ID query must be string or array.');
+        throw new InvalidArgumentException(sprintf('Query must be string or array, "%s" given.', var_export($query, true)));
     }
 }

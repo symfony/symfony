@@ -5,6 +5,8 @@ namespace Symfony\Component\Cache\Extension;
 use Symfony\Component\Cache\Cache;
 use Symfony\Component\Cache\Data\DataInterface;
 use Symfony\Component\Cache\Data\KeyCollection;
+use Symfony\Component\Cache\Exception\InvalidQueryException;
+use Symfony\Component\Cache\Exception\ObjectNotFoundException;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
@@ -56,12 +58,15 @@ class ExtensionStack implements ExtensionInterface
      *
      * @return ExtensionInterface
      *
-     * @throws \InvalidArgumentException
+     * @throws ObjectNotFoundException
      */
-    public function get($name)
+    public function getExtension($name)
     {
         if (!isset($this->extensions[$name])) {
-            throw new \InvalidArgumentException('Extension not found.');
+            throw new ObjectNotFoundException(sprintf(
+                'Extension stack does not contain extension named "%s", present ones are "%s".',
+                $name, implode('", "', array_keys($this->extensions))
+            ));
         }
 
         return $this->extensions[$name]['extension'];
@@ -191,7 +196,7 @@ class ExtensionStack implements ExtensionInterface
      * @param string $query
      * @param array $options
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidQueryException
      *
      * @return ExtensionInterface
      */
@@ -203,7 +208,7 @@ class ExtensionStack implements ExtensionInterface
             }
         }
 
-        throw new \InvalidArgumentException(sprintf('Unsupported query "%s".', $query));
+        throw InvalidQueryException::unsupported('None of the stacked extensions supports "%s" query.', $query);
     }
 
     private function sort()

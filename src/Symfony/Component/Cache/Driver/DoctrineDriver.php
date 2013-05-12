@@ -2,7 +2,7 @@
 
 namespace Symfony\Component\Cache\Driver;
 
-use Doctrine\Common\Cache\Cache as DoctrineDriverInterface;
+use Doctrine\Common\Cache\Cache as DoctrineCacheInterface;
 
 /**
  * @author Jean-François Simon <contact@jfsimon.fr>
@@ -10,14 +10,14 @@ use Doctrine\Common\Cache\Cache as DoctrineDriverInterface;
 class DoctrineDriver implements DriverInterface
 {
     /**
-     * @var DoctrineDriverInterface
+     * @var DoctrineCacheInterface
      */
     private $driver;
 
     /**
-     * @param DoctrineDriverInterface $driver
+     * @param DoctrineCacheInterface $driver
      */
-    public function __construct(DoctrineDriverInterface $driver)
+    public function __construct(DoctrineCacheInterface $driver)
     {
         $this->driver = $driver;
     }

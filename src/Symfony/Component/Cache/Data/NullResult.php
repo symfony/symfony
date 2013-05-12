@@ -2,6 +2,8 @@
 
 namespace Symfony\Component\Cache\Data;
 
+use Symfony\Component\Cache\Exception\BadMethodCallException;
+
 /**
  * @author Jean-François Simon <contact@jfsimon.fr>
  */
@@ -12,7 +14,7 @@ class NullResult implements ItemInterface
      */
     public function getValue()
     {
-        throw new \BadMethodCallException('A null result contains no value.');
+        throw new BadMethodCallException('A null result has no value.');
     }
 
     /**
@@ -20,7 +22,7 @@ class NullResult implements ItemInterface
      */
     public function getKey()
     {
-        throw new \BadMethodCallException('A null result has no key.');
+        throw new BadMethodCallException('A null result has no key.');
     }
 
     /**

@@ -5,6 +5,7 @@ namespace Symfony\Component\Cache\Extension;
 use Symfony\Component\Cache\Cache;
 use Symfony\Component\Cache\Data\DataInterface;
 use Symfony\Component\Cache\Data\KeyCollection;
+use Symfony\Component\Cache\Exception\WorkflowException;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
@@ -92,12 +93,12 @@ abstract class AbstractExtension implements ExtensionInterface
     /**
      * @return Cache
      *
-     * @throws \LogicException
+     * @throws WorkflowException
      */
     protected function getCache()
     {
         if (null === $this->cache) {
-            throw new \LogicException('Cache has not been set to extension.');
+            throw new WorkflowException('Cache has not been set to extension.');
         }
 
         return $this->cache;

@@ -2,6 +2,8 @@
 
 namespace Symfony\Component\Cache\Driver;
 
+use Symfony\Component\Cache\Exception\ObjectNotFoundException;
+
 /**
  * @author Jean-François Simon <contact@jfsimon.fr>
  */
@@ -41,12 +43,15 @@ class DriverChain implements DriverInterface
      *
      * @return DriverInterface
      *
-     * @throws \InvalidArgumentException
+     * @throws ObjectNotFoundException
      */
     public function getDriver($name)
     {
         if (!isset($this->drivers[$name])) {
-            throw new \InvalidArgumentException('Driver not found.');
+            throw new ObjectNotFoundException(sprintf(
+                'Driver chain does not contain driver named "%s", presents ones are "%s".',
+                $name, implode('", "', array_keys($this->drivers))
+            ));
         }
 
         return $this->drivers[$name]['extension'];

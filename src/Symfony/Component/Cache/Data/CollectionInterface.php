@@ -2,6 +2,9 @@
 
 namespace Symfony\Component\Cache\Data;
 
+use Symfony\Component\Cache\Exception\InvalidArgumentException;
+use Symfony\Component\Cache\Exception\ObjectNotFoundException;
+
 /**
  * Interface for unordered item collections.
  *
@@ -16,7 +19,7 @@ interface CollectionInterface extends DataInterface
      *
      * @return ItemInterface
      *
-     * @throws \InvalidArgumentException
+     * @throws ObjectNotFoundException
      */
     public function get($key);
 
@@ -45,6 +48,8 @@ interface CollectionInterface extends DataInterface
      * Adds an item in the collection.
      *
      * @param ItemInterface $item
+     *
+     * @throws InvalidArgumentException If given item is not accepted by the collection
      *
      * @return Collection
      */

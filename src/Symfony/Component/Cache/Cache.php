@@ -9,6 +9,7 @@ use Symfony\Component\Cache\Data\KeyCollection;
 use Symfony\Component\Cache\Data\NullResult;
 use Symfony\Component\Cache\Data\ValidItem;
 use Symfony\Component\Cache\Driver\DriverInterface;
+use Symfony\Component\Cache\Exception\InvalidQueryException;
 use Symfony\Component\Cache\Extension\ExtensionInterface;
 
 /**
@@ -49,7 +50,7 @@ class Cache
      * @param string|array $query
      * @param array        $options
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidQueryException
      *
      * @return DataInterface
      */
@@ -59,7 +60,7 @@ class Cache
         $query = $this->resolveQuery($query);
 
         if (!$this->extension->supportsQuery($query, $options)) {
-            throw new \InvalidArgumentException('Given query is not supported.');
+            throw InvalidQueryException::unsupported('Registered extension does not support "%s" query.', $query);
         }
 
         $keyCollection = $this->extension->resolveQuery($query, $options);
@@ -116,7 +117,7 @@ class Cache
      * @param string|array $query
      * @param array        $options
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidQueryException
      *
      * @return KeyCollection
      */
@@ -126,7 +127,7 @@ class Cache
         $query = $this->resolveQuery($query);
 
         if (!$this->extension->supportsQuery($query, $options)) {
-            throw new \InvalidArgumentException('Given query is not supported.');
+            throw InvalidQueryException::unsupported('Registered extension does not support "%s" query.', $query);
         }
 
         $keyCollection = $this->extension->resolveRemoval($query, $options);
@@ -165,7 +166,7 @@ class Cache
      *
      * @return array
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidQueryException
      */
     private function resolveQuery($query)
     {
@@ -181,6 +182,6 @@ class Cache
             return $query;
         }
 
-        throw new \InvalidArgumentException('Query must be string or array.');
+        throw InvalidQueryException::wrongType('Query must be string or array, "%s" given.', $query);
     }
 }

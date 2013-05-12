@@ -2,15 +2,16 @@
 
 namespace Symfony\Component\Cache\Tests\Acceptance;
 
+use Symfony\Component\Cache\Cache;
 use Symfony\Component\Cache\Data\CachedItem;
 use Symfony\Component\Cache\Data\FreshItem;
 use Symfony\Component\Cache\Data\Metadata;
 
-class MetadataTest extends AcceptanceTest
+class MetadataTest extends \PHPUnit_Framework_TestCase
 {
-    public function testWhenIStoreAnItemWithMetadataIFetchThem()
+    /** @dataProvider Symfony\Component\Cache\Tests\Acceptance\DataProvider::provideCaches */
+    public function testWhenIStoreAnItemWithMetadataIFetchThem(Cache $cache)
     {
-        $cache = $this->createCache();
         $item = new FreshItem('key', 'data');
         $item->metadata->set('metakey1', 'metadata1');
         $item->metadata->set('metakey2', 'metadata2');

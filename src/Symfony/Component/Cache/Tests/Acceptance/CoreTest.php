@@ -2,15 +2,16 @@
 
 namespace Symfony\Component\Cache\Tests\Acceptance;
 
+use Symfony\Component\Cache\Cache;
 use Symfony\Component\Cache\Data\CachedItem;
 use Symfony\Component\Cache\Data\FreshItem;
 use Symfony\Component\Cache\Data\NullResult;
 
-class CoreTest extends AcceptanceTest
+class CoreTest extends \PHPUnit_Framework_TestCase
 {
-    public function testWhenIStoreAnItemIGetInfoAboutIt()
+    /** @dataProvider Symfony\Component\Cache\Tests\Acceptance\DataProvider::provideCaches */
+    public function testWhenIStoreAnItemIGetInfoAboutIt(Cache $cache)
     {
-        $cache = $this->createCache();
         $item = new FreshItem('key', 'value');
 
         $storedItem = $cache->set($item);
@@ -21,9 +22,9 @@ class CoreTest extends AcceptanceTest
         $this->assertTrue($storedItem->isHit());
     }
 
-    public function testWhenAnItemIsStoredICanFetchIt()
+    /** @dataProvider Symfony\Component\Cache\Tests\Acceptance\DataProvider::provideCaches */
+    public function testWhenAnItemIsStoredICanFetchIt(Cache $cache)
     {
-        $cache = $this->createCache();
         $item = new FreshItem('key', 'value');
 
         $cache->set($item);
@@ -35,10 +36,10 @@ class CoreTest extends AcceptanceTest
         $this->assertTrue($fetchedItem->isHit());
     }
 
-    public function testWhenAnItemIsStoredAndDeletedICantFetchIt()
+    /** @dataProvider Symfony\Component\Cache\Tests\Acceptance\DataProvider::provideCaches */
+    public function testWhenAnItemIsStoredAndDeletedICantFetchIt(Cache $cache)
     {
         $item = new FreshItem('key', 'data');
-        $cache = $this->createCache();
 
         $cache->set($item);
         $cache->remove('key');

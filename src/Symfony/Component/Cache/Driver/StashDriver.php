@@ -2,22 +2,22 @@
 
 namespace Symfony\Component\Cache\Driver;
 
-use Doctrine\Common\Cache\Cache as DoctrineCacheInterface;
+use Stash\Driver\DriverInterface as StashDriverInterface;
 
 /**
  * @author Jean-François Simon <contact@jfsimon.fr>
  */
-class DoctrineDriver implements DriverInterface
+class StashDriver implements DriverInterface
 {
     /**
-     * @var DoctrineCacheInterface
+     * @var StashDriverInterface
      */
     private $driver;
 
     /**
-     * @param DoctrineCacheInterface $driver
+     * @param StashDriverInterface $driver
      */
-    public function __construct(DoctrineCacheInterface $driver)
+    public function __construct(StashDriverInterface $driver)
     {
         $this->driver = $driver;
     }
@@ -27,7 +27,9 @@ class DoctrineDriver implements DriverInterface
      */
     public function get($key)
     {
-        return $this->driver->fetch($key);
+        $data = $this->driver->getData(array($key));
+
+        return empty($data) ? false : reset($data);
     }
 
     /**
@@ -37,9 +39,9 @@ class DoctrineDriver implements DriverInterface
     {
         $result = array();
         foreach ($keys as $key) {
-            $value = $this->driver->fetch($key);
-            if (false !== $value) {
-                $result[$key] = $value;
+            $data = $this->driver->getData(array($key));
+            if (!empty($data)) {
+                $result[$key] = reset($data);
             }
         }
 
@@ -51,7 +53,7 @@ class DoctrineDriver implements DriverInterface
      */
     public function set($key, $value, $ttl = null)
     {
-        return $this->driver->save($key, $value, $ttl ?: 0);
+        return $this->driver->storeData(array($key), $value, $ttl ?: 0);
     }
 
     /**
@@ -61,7 +63,7 @@ class DoctrineDriver implements DriverInterface
     {
         $success = true;
         foreach ($values as $key => $value) {
-            if (!$this->driver->save($key, $value, $ttl)) {
+            if (!$this->driver->storeData(array($key), $value, $ttl)) {
                 $success = false;
             }
         }
@@ -74,7 +76,7 @@ class DoctrineDriver implements DriverInterface
      */
     public function remove($key)
     {
-        return $this->driver->delete($key);
+        return $this->driver->clear(array($key));
     }
 
     /**
@@ -84,7 +86,7 @@ class DoctrineDriver implements DriverInterface
     {
         $success = true;
         foreach ($keys as $key) {
-            if (!$this->driver->delete($key)) {
+            if (!$this->driver->clear(array($key))) {
                 $success = false;
             }
         }
@@ -97,6 +99,6 @@ class DoctrineDriver implements DriverInterface
      */
     public function clear()
     {
-        return false;
+        return $this->driver->clear();
     }
 }

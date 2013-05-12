@@ -2,14 +2,15 @@
 
 namespace Symfony\Component\Cache\Tests\Acceptance;
 
+use Symfony\Component\Cache\Cache;
 use Symfony\Component\Cache\Data\Collection;
 use Symfony\Component\Cache\Data\FreshItem;
 
-class TagTest extends AcceptanceTest
+class TagTest extends \PHPUnit_Framework_TestCase
 {
-    public function testWhenIStoreAnItemWithTagsIFetchThem()
+    /** @dataProvider Symfony\Component\Cache\Tests\Acceptance\DataProvider::provideCaches */
+    public function testWhenIStoreAnItemWithTagsIFetchThem(Cache $cache)
     {
-        $cache = $this->createCache();
         $item = new FreshItem('key', 'data');
         $item->metadata->set('tags', array('tag1', 'tag2'));
 
@@ -19,10 +20,9 @@ class TagTest extends AcceptanceTest
         $this->assertEquals(array('tag1', 'tag2'),  $fetchedItem->metadata->get('tags'));
     }
 
-    public function testWhenIStoreItemsWithTagICanFetchThemByTag()
+    /** @dataProvider Symfony\Component\Cache\Tests\Acceptance\DataProvider::provideCaches */
+    public function testWhenIStoreItemsWithTagICanFetchThemByTag(Cache $cache)
     {
-        $cache = $this->createCache();
-
         $item = new FreshItem('key1', 'data1');
         $item->metadata->set('tags', array('tag1', 'tag2'));
         $cache->set($item);

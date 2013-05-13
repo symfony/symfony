@@ -328,7 +328,10 @@ abstract class Client
 
         $this->cookieJar->updateFromResponse($this->internalResponse, $uri);
 
-        $this->redirect = $this->internalResponse->getHeader('Location');
+        $status = $this->internalResponse->getStatus();
+        $location = $this->internalResponse->getHeader('Location');
+
+        $this->redirect = $status >= 300 && $status < 400 ? $location : null;
 
         if ($this->followRedirects && $this->redirect) {
             return $this->crawler = $this->followRedirect();
@@ -470,13 +473,15 @@ abstract class Client
      *
      * @return Crawler
      *
+     * @param boolean $force Do not check Status Code and follow if Location header present (default: false)
+     *
      * @throws \LogicException If request was not a redirect
      *
      * @api
      */
-    public function followRedirect()
+    public function followRedirect($force = false)
     {
-        if (empty($this->redirect)) {
+        if (!$force && empty($this->redirect)) {
             throw new \LogicException('The request was not redirected.');
         }
 
@@ -488,7 +493,10 @@ abstract class Client
 
         $this->isMainRequest = false;
 
-        $response = $this->request('get', $this->redirect);
+        $response = $this->request('get', $force 
+            ? $this->internalResponse->getHeader('Location') 
+            : $this->redirect
+        );
 
         $this->isMainRequest = true;
 

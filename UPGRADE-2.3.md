@@ -263,3 +263,19 @@ Console
    ```
    if (OutputInterface::VERBOSITY_VERBOSE <= $output->getVerbosity()) { ... }
    ```
+
+BrowserKit
+----------
+
+ * If you are receiving responses with non-30x Status Code and Location header
+   please be aware that you won't be able to use auto-redirects on these kind
+   of responses. To force redirection even if the response is not HTTP 30x,
+   call `Client::followRedirect(true)` to force-redirect if `Location` header
+   is present.
+
+   If you are correctly passing 30x Status Code with Location header, you
+   don't have to worry about the change.
+
+   If you were using responses with Location header and non-30x Status Code,
+   you have to update your code to forcely follow the redirect with
+   `Client::followRedirect(true)`.

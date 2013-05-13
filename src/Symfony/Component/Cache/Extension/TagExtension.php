@@ -10,6 +10,7 @@ use Symfony\Component\Cache\Data\KeyCollection;
 use Symfony\Component\Cache\Data\NullResult;
 use Symfony\Component\Cache\Data\ValidItem;
 use Symfony\Component\Cache\Exception\LockException;
+use Symfony\Component\Cache\Lock\Lock;
 use Symfony\Component\Cache\Lock\LockFactory;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
@@ -18,19 +19,6 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  */
 class TagExtension extends AbstractExtension
 {
-    /**
-     * @var LockFactory
-     */
-    private $lockFactory;
-
-    /**
-     * @param LockFactory $lockFactory
-     */
-    public function __construct(LockFactory $lockFactory)
-    {
-        $this->lockFactory = $lockFactory;
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -124,7 +112,7 @@ class TagExtension extends AbstractExtension
      */
     public function getRequiredExtensions()
     {
-        return array('metadata');
+        return array('metadata', 'lock');
     }
 
     /**
@@ -141,7 +129,8 @@ class TagExtension extends AbstractExtension
             return;
         }
 
-        $lock = $this->lockFactory->create($tagKeys);
+        /** @var Lock $lock */
+        $lock = $options['lock_factory']->create($tagKeys);
 
         if (!$lock->acquire($this->getCache())) {
             throw new LockException(sprintf('Could not acquire lock for "%s" keys.', implode('", "', $lock->getFreeKeys())));
@@ -184,7 +173,8 @@ class TagExtension extends AbstractExtension
             return new KeyCollection();
         }
 
-        $lock = $this->lockFactory->create($tagKeys);
+        /** @var Lock $lock */
+        $lock = $options['lock_factory']->create($tagKeys);
 
         if (!$lock->acquire($this->getCache())) {
             throw new LockException(sprintf('Could not acquire lock for "%s" keys.', implode('", "', $lock->getFreeKeys())));

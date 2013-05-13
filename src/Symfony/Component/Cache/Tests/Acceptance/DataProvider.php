@@ -10,9 +10,9 @@ use Symfony\Component\Cache\Driver\DoctrineDriver;
 use Symfony\Component\Cache\Driver\StashDriver;
 use Symfony\Component\Cache\Extension\CoreExtension;
 use Symfony\Component\Cache\Extension\ExtensionStack;
+use Symfony\Component\Cache\Extension\LockExtension;
 use Symfony\Component\Cache\Extension\MetadataExtension;
 use Symfony\Component\Cache\Extension\TagExtension;
-use Symfony\Component\Cache\Lock\LockFactory;
 
 class DataProvider
 {
@@ -21,7 +21,8 @@ class DataProvider
         $extension = new ExtensionStack();
         $extension->register(new CoreExtension(), 50);
         $extension->register(new MetadataExtension(), 25);
-        $extension->register(new TagExtension(new LockFactory(1000, 50)), -25);
+        $extension->register(new LockExtension(), 0);
+        $extension->register(new TagExtension(), -25);
 
         $drivers = array(
             new ArrayDriver(),

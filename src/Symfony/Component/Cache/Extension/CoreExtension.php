@@ -20,14 +20,12 @@ class CoreExtension extends AbstractExtension
     {
         $resolver->setDefaults(array(
             'namespace' => '',
-            'rewriting' => null,
+            'rewriting' => function (Options $options) {
+                return new Rewriting();
+            },
         ))->addAllowedTypes(array(
             'namespace' => 'string',
             'rewriting' => 'Symfony\Component\Cache\Rewriting',
-        ))->setNormalizers(array(
-            'rewriting' => function ($value) {
-                return $value instanceof Rewriting ? $value : new Rewriting();
-            },
         ));
     }
 

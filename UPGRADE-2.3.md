@@ -267,13 +267,13 @@ Console
 BrowserKit
 ----------
 
- * If you are receiving responses with non-30x Status Code and Location header
+ * If you are receiving responses with non-3xx Status Code and Location header
    please be aware that you won't be able to use auto-redirects on these kind
    of responses.
 
-   If you are correctly passing 30x Status Code with Location header, you
+   If you are correctly passing 3xx Status Code with Location header, you
    don't have to worry about the change.
 
-   If you were using responses with Location header and non-30x Status Code,
+   If you were using responses with Location header and non-3xx Status Code,
    you have to update your code to manually create another request to URL
    grabbed from the Location header.

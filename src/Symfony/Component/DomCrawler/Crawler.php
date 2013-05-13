@@ -499,7 +499,15 @@ class Crawler extends \SplObjectStorage
 
         $html = '';
         foreach ($this->getNode(0)->childNodes as $child) {
-            $html .= $child->ownerDocument->saveHTML($child);
+            if (version_compare(PHP_VERSION, '5.3.6', '>=')) {
+                // node parameter was added to the saveHTML() method in PHP 5.3.6
+                // @see http://php.net/manual/en/domdocument.savehtml.php
+                $html .= $child->ownerDocument->saveHTML($child);
+            } else {
+                $document = new \DOMDocument('1.0', 'UTF-8');
+                $document->appendChild($document->importNode($child, true));
+                $html .= rtrim($document->saveHTML());
+            }
         }
 
         return $html;

@@ -329,9 +329,12 @@ abstract class Client
         $this->cookieJar->updateFromResponse($this->internalResponse, $uri);
 
         $status = $this->internalResponse->getStatus();
-        $location = $this->internalResponse->getHeader('Location');
-
-        $this->redirect = $status >= 300 && $status < 400 ? $location : null;
+        
+        if ($status >= 300 && $status < 400) {
+            $this->redirect = $this->internalResponse->getHeader('Location');
+        } else {
+            $this->redirect = null;
+        }
 
         if ($this->followRedirects && $this->redirect) {
             return $this->crawler = $this->followRedirect();

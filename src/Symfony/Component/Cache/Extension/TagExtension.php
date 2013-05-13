@@ -9,6 +9,8 @@ use Symfony\Component\Cache\Data\FreshItem;
 use Symfony\Component\Cache\Data\KeyCollection;
 use Symfony\Component\Cache\Data\NullResult;
 use Symfony\Component\Cache\Data\ValidItem;
+use Symfony\Component\Cache\Exception\LockException;
+use Symfony\Component\Cache\Lock\LockFactory;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
@@ -16,6 +18,19 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  */
 class TagExtension extends AbstractExtension
 {
+    /**
+     * @var LockFactory
+     */
+    private $lockFactory;
+
+    /**
+     * @param LockFactory $lockFactory
+     */
+    public function __construct(LockFactory $lockFactory)
+    {
+        $this->lockFactory = $lockFactory;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -99,23 +114,41 @@ class TagExtension extends AbstractExtension
     /**
      * @param ValidItem $item
      * @param array     $options
+     *
+     * @throws LockException
      */
     private function registerItem(ValidItem $item, array $options)
     {
+        $tagKeys = $item->metadata->get($options['tags_metadata_key'], array());
+
+        if (empty($tagKeys)) {
+            return;
+        }
+
+        $lock = $this->lockFactory->create($tagKeys);
+
+        if (!$lock->acquire($this->getCache())) {
+            throw new LockException(sprintf('Could not acquire lock for "%s" keys.', implode('", "', $lock->getFreeKeys())));
+        }
+
         $dataToStore = array();
 
-        foreach ($item->metadata->get($options['tags_metadata_key'], array()) as $tag) {
-            $tagItem = $this->findTag($tag, $options);
+        foreach ($tagKeys as $tagKey) {
+            $tagItem = $this->findTag($tagKey, $options);
             $tagData = $tagItem instanceof CachedItem ? $tagItem->getValue() : array();
 
-            if (!in_array($tag, $tagData)) {
+            if (!in_array($tagKey, $tagData)) {
                 $tagData[] = $item->getKey();
-                $dataToStore[] = new FreshItem(sprintf($options['tags_pattern'], $tag), $tagData);
+                $dataToStore[] = new FreshItem(sprintf($options['tags_pattern'], $tagKey), $tagData);
             }
         }
 
         if (count($dataToStore)) {
             $this->getCache()->set(new Collection($dataToStore), $options);
+        }
+
+        if (!$lock->release($this->getCache())) {
+            throw new LockException(sprintf('Could not release lock for "%s" keys.', implode('", "', $lock->getAcquiredKeys())));
         }
     }
 
@@ -124,27 +157,45 @@ class TagExtension extends AbstractExtension
      * @param array     $options
      *
      * @return KeyCollection
+     *
+     * @throws LockException
      */
     private function unregisterItem(ValidItem $item, array $options)
     {
+        $tagKeys = $item->metadata->get($options['tags_metadata_key'], array());
+
+        if (empty($tagKeys)) {
+            return new KeyCollection();
+        }
+
+        $lock = $this->lockFactory->create($tagKeys);
+
+        if (!$lock->acquire($this->getCache())) {
+            throw new LockException(sprintf('Could not acquire lock for "%s" keys.', implode('", "', $lock->getFreeKeys())));
+        }
+
         $dataToStore = array();
         $keysToDelete = new KeyCollection();
 
-        foreach ($item->metadata->get($options['tags_metadata_key'], array()) as $tag) {
-            $tagItem = $this->findTag($tag, $options);
+        foreach ($tagKeys as $tagKey) {
+            $tagItem = $this->findTag($tagKey, $options);
 
             if ($tagItem instanceof CachedItem) {
                 $tagData = $tagItem->getValue();
 
-                if ($key = array_search($tag, $tagData)) {
+                if ($key = array_search($tagKey, $tagData)) {
                     unset($tagData[$key]);
-                    $dataToStore[] = new FreshItem(sprintf($options['tags_pattern'], $tag), $tagData);
+                    $dataToStore[] = new FreshItem(sprintf($options['tags_pattern'], $tagKey), $tagData);
                 }
             }
         }
 
         if (count($dataToStore)) {
             $this->getCache()->set(new Collection($dataToStore), $options);
+        }
+
+        if (!$lock->release($this->getCache())) {
+            throw new LockException(sprintf('Could not release lock for "%s" keys.', implode('", "', $lock->getAcquiredKeys())));
         }
 
         return $keysToDelete;

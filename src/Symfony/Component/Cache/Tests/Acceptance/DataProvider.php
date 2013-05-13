@@ -12,6 +12,7 @@ use Symfony\Component\Cache\Extension\CoreExtension;
 use Symfony\Component\Cache\Extension\ExtensionStack;
 use Symfony\Component\Cache\Extension\MetadataExtension;
 use Symfony\Component\Cache\Extension\TagExtension;
+use Symfony\Component\Cache\Lock\LockFactory;
 
 class DataProvider
 {
@@ -20,12 +21,12 @@ class DataProvider
         $extension = new ExtensionStack();
         $extension->register('core', new CoreExtension(), 50);
         $extension->register('metadata', new MetadataExtension(), 25);
-        $extension->register('tags', new TagExtension(), -25);
+        $extension->register('tags', new TagExtension(new LockFactory(1000, 50)), -25);
 
         $drivers = array(
             new ArrayDriver(),
-            new StashDriver(new StashArrayCache),
-            new DoctrineDriver(new DoctrineArrayCache()),
+//            new StashDriver(new StashArrayCache),
+//            new DoctrineDriver(new DoctrineArrayCache()),
         );
 
         $caches = array();

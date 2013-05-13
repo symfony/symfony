@@ -23,9 +23,9 @@
         "symfony/http-foundation": "~2.1"
     },
     "suggest": {
-        "symfony/http-foundation": "~2.1",
-        "symfony/http-kernel": "~2.1",
-        "symfony/class-loader": "~2.1"
+        "symfony/http-foundation": "",
+        "symfony/http-kernel": "",
+        "symfony/class-loader": ""
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\Debug\\": "" }

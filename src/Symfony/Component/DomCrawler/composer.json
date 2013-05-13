@@ -22,7 +22,7 @@
         "symfony/css-selector": "~2.0"
     },
     "suggest": {
-        "symfony/css-selector": "2.2.*"
+        "symfony/css-selector": ""
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\DomCrawler\\": "" }

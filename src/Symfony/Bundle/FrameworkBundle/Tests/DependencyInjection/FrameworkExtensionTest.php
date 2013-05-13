@@ -172,20 +172,22 @@ abstract class FrameworkExtensionTest extends TestCase
             }
         }
 
-        $rootDirectory = str_replace('/', DIRECTORY_SEPARATOR, realpath(__DIR__.'/../../../../..').'/');
-        $files = array_map(function($resource) use ($rootDirectory, $resources) { return str_replace($rootDirectory, '', realpath($resource[1])); }, $resources);
+        $files = array_map(function($resource) { return realpath($resource[1]); }, $resources);
+        $ref = new \ReflectionClass('Symfony\Component\Validator\Validator');
         $this->assertContains(
-            str_replace('/', DIRECTORY_SEPARATOR, 'Symfony/Component/Validator/Resources/translations/validators.en.xlf'),
+            strtr(dirname($ref->getFileName()) . '/Resources/translations/validators.en.xlf', '/', DIRECTORY_SEPARATOR),
             $files,
             '->registerTranslatorConfiguration() finds Validator translation resources'
         );
+        $ref = new \ReflectionClass('Symfony\Component\Form\Form');
         $this->assertContains(
-            str_replace('/', DIRECTORY_SEPARATOR, 'Symfony/Component/Form/Resources/translations/validators.en.xlf'),
+            strtr(dirname($ref->getFileName()) . '/Resources/translations/validators.en.xlf', '/', DIRECTORY_SEPARATOR),
             $files,
             '->registerTranslatorConfiguration() finds Form translation resources'
         );
+        $ref = new \ReflectionClass('Symfony\Component\Security\Core\SecurityContext');
         $this->assertContains(
-            str_replace('/', DIRECTORY_SEPARATOR, 'Symfony/Component/Security/Resources/translations/security.en.xlf'),
+            strtr(dirname(dirname($ref->getFileName())) . '/Resources/translations/security.en.xlf', '/', DIRECTORY_SEPARATOR),
             $files,
             '->registerTranslatorConfiguration() finds Security translation resources'
         );
@@ -213,8 +215,9 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('validator.mapping.loader.yaml_files_loader'), '->registerValidationConfiguration() defines the YAML loader');
 
         $xmlFiles = $container->getParameter('validator.mapping.loader.xml_files_loader.mapping_files');
+        $ref = new \ReflectionClass('Symfony\Component\Form\Form');
         $this->assertContains(
-            realpath(__DIR__.'/../../../../Component/Form/Resources/config/validation.xml'),
+            realpath(dirname($ref->getFileName()).'/Resources/config/validation.xml'),
             array_map('realpath', $xmlFiles),
             '->registerValidationConfiguration() adds Form validation.xml to XML loader'
         );

@@ -23,8 +23,8 @@
         "symfony/config": "~2.2"
     },
     "suggest": {
-        "symfony/yaml": "2.2.*",
-        "symfony/config": "2.2.*",
+        "symfony/yaml": "",
+        "symfony/config": "",
         "symfony/proxy-manager-bridge": "Generate service proxies to lazy load them"
     },
     "autoload": {

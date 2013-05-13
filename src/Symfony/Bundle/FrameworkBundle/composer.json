@@ -33,10 +33,10 @@
         "symfony/security": "~2.2"
     },
     "suggest": {
-        "symfony/console": "2.2.*",
-        "symfony/finder": "2.2.*",
-        "symfony/form": "2.2.*",
-        "symfony/validator": "2.2.*"
+        "symfony/console": "",
+        "symfony/finder": "",
+        "symfony/form": "",
+        "symfony/validator": ""
     },
     "autoload": {
         "psr-0": { "Symfony\\Bundle\\FrameworkBundle\\": "" }

@@ -34,12 +34,12 @@
         "symfony/stopwatch": "~2.2"
     },
     "suggest": {
-        "symfony/browser-kit": "2.2.*",
-        "symfony/class-loader": "2.2.*",
-        "symfony/config": "2.2.*",
-        "symfony/console": "2.2.*",
-        "symfony/dependency-injection": "2.2.*",
-        "symfony/finder": "2.2.*"
+        "symfony/browser-kit": "",
+        "symfony/class-loader": "",
+        "symfony/config": "",
+        "symfony/console": "",
+        "symfony/dependency-injection": "",
+        "symfony/finder": ""
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\HttpKernel\\": "" }

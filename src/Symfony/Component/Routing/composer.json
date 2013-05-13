@@ -25,9 +25,9 @@
         "psr/log": "~1.0"
     },
     "suggest": {
-        "symfony/config": "2.2.*",
-        "symfony/yaml": "2.2.*",
-        "doctrine/common": "~2.2"
+        "symfony/config": "",
+        "symfony/yaml": "",
+        "doctrine/common": ""
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\Routing\\": "" }

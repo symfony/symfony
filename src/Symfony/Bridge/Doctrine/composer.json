@@ -31,11 +31,11 @@
         "doctrine/orm": "~2.2,>=2.2.3"
     },
     "suggest": {
-        "symfony/form": "2.2.*",
-        "symfony/validator": "2.2.*",
-        "doctrine/data-fixtures": "1.0.*",
-        "doctrine/dbal": "~2.2",
-        "doctrine/orm": "~2.2,>=2.2.3"
+        "symfony/form": "",
+        "symfony/validator": "",
+        "doctrine/data-fixtures": "",
+        "doctrine/dbal": "",
+        "doctrine/orm": ""
     },
     "autoload": {
         "psr-0": { "Symfony\\Bridge\\Doctrine\\": "" }

@@ -31,13 +31,13 @@
         "ircmaxell/password-compat": "1.0.*"
     },
     "suggest": {
-        "symfony/class-loader": "2.2.*",
-        "symfony/finder": "2.2.*",
-        "symfony/form": "2.2.*",
-        "symfony/validator": "2.2.*",
-        "symfony/routing": "2.2.*",
+        "symfony/class-loader": "",
+        "symfony/finder": "",
+        "symfony/form": "",
+        "symfony/validator": "",
+        "symfony/routing": "",
         "doctrine/dbal": "to use the built-in ACL implementation",
-        "ircmaxell/password-compat": "1.0.*"
+        "ircmaxell/password-compat": ""
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\Security\\": "" }

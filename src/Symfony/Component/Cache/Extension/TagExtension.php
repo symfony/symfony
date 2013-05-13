@@ -112,6 +112,22 @@ class TagExtension extends AbstractExtension
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return 'tag';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRequiredExtensions()
+    {
+        return array('metadata');
+    }
+
+    /**
      * @param ValidItem $item
      * @param array     $options
      *

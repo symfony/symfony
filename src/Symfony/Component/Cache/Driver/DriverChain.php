@@ -20,16 +20,16 @@ class DriverChain implements DriverInterface
     private $sorted = true;
 
     /**
-     * @param string          $name
      * @param DriverInterface $driver
      * @param int             $priority
      *
      * @return DriverChain
      */
-    public function register($name, DriverInterface $driver, $priority = 0)
+    public function register(DriverInterface $driver, $priority = 0)
     {
         $this->sorted = false;
-        $this->drivers[$name] = array(
+
+        $this->drivers[$driver->getName()] = array(
             'index'    => count($this->drivers),
             'driver'   => $driver,
             'priority' => $priority,
@@ -205,6 +205,14 @@ class DriverChain implements DriverInterface
         }
 
         return $drivers;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return 'chain';
     }
 
     private function sort()

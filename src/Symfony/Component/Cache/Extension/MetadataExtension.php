@@ -111,4 +111,20 @@ class MetadataExtension extends AbstractExtension
             return sprintf($pattern, $key);
         }, $keys->getKeys())));
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return 'metadata';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRequiredExtensions()
+    {
+        return array('core');
+    }
 }

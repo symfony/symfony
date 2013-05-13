@@ -94,4 +94,12 @@ class ArrayDriver implements DriverInterface
 
         return true;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return 'array';
+    }
 }

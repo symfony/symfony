@@ -5,6 +5,7 @@ namespace Symfony\Component\Cache\Extension;
 use Symfony\Component\Cache\Cache;
 use Symfony\Component\Cache\Data\DataInterface;
 use Symfony\Component\Cache\Data\KeyCollection;
+use Symfony\Component\Cache\Exception\ExtensionDependencyException;
 use Symfony\Component\Cache\Exception\InvalidQueryException;
 use Symfony\Component\Cache\Exception\ObjectNotFoundException;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -12,7 +13,7 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 /**
  * @author Jean-François Simon <contact@jfsimon.fr>
  */
-class ExtensionStack implements ExtensionInterface
+class ExtensionStack extends AbstractExtension
 {
     /**
      * @var Cache|null
@@ -30,21 +31,26 @@ class ExtensionStack implements ExtensionInterface
     private $sorted = true;
 
     /**
-     * @param string             $name
+     * @var boolean
+     */
+    private $validated = true;
+
+    /**
      * @param ExtensionInterface $extension
      * @param int                $priority
      *
      * @return ExtensionStack
      */
-    public function register($name, ExtensionInterface $extension, $priority = 0)
+    public function register(ExtensionInterface $extension, $priority = 0)
     {
         $this->sorted = false;
+        $this->validated = false;
 
         if (null !== $this->cache) {
             $extension->setCache($this->cache);
         }
 
-        $this->extensions[$name] = array(
+        $this->extensions[$extension->getName()] = array(
             'index'     => count($this->extensions),
             'extension' => $extension,
             'priority'  => $priority,
@@ -178,10 +184,19 @@ class ExtensionStack implements ExtensionInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return 'stack';
+    }
+
+    /**
      * @return ExtensionInterface[]
      */
     public function all()
     {
+        $this->validate();
         $this->sort();
 
         $extensions = array();
@@ -222,5 +237,26 @@ class ExtensionStack implements ExtensionInterface
                 ? ($b['index'] - $a['index'])
                 : $b['priority'] - $a['priority'];
         });
+    }
+
+    private function validate()
+    {
+        if ($this->validated) {
+            return;
+        }
+
+        $extensions = array_keys($this->extensions);
+        foreach ($this->extensions as $name => $extension) {
+            $unsatisfiedDependencies = array_diff($extension['extension']->getRequiredExtensions(), $extensions);
+
+            if (!empty($unsatisfiedDependencies)) {
+                throw new ExtensionDependencyException(sprintf(
+                    'Extension "%s" have unsatisfied dependencies: "%s".',
+                    $name, implode('", "', $unsatisfiedDependencies)
+                ));
+            }
+        }
+
+        $this->validated = true;
     }
 }

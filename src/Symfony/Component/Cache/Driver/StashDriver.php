@@ -101,4 +101,12 @@ class StashDriver implements DriverInterface
     {
         return $this->driver->clear();
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return 'stash';
+    }
 }

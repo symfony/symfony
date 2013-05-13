@@ -9,4 +9,10 @@ use Symfony\Component\Cache\Psr\CacheInterface;
  */
 interface DriverInterface extends CacheInterface
 {
+    /**
+     * Returns driver name.
+     *
+     * @return string
+     */
+    public function getName();
 }

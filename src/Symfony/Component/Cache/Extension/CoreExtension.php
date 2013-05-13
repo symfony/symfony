@@ -56,6 +56,14 @@ class CoreExtension extends AbstractExtension
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return 'core';
+    }
+
+    /**
      * @param string|array $query
      * @param array        $options
      *

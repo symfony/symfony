@@ -11,6 +11,7 @@ use Symfony\Component\Cache\Data\ValidItem;
 use Symfony\Component\Cache\Driver\DriverInterface;
 use Symfony\Component\Cache\Exception\InvalidQueryException;
 use Symfony\Component\Cache\Extension\ExtensionInterface;
+use Symfony\Component\Cache\Exception\ExtensionDependencyException;
 
 /**
  * @author Jean-François Simon <contact@jfsimon.fr>
@@ -36,9 +37,15 @@ class Cache
      * @param DriverInterface    $driver
      * @param ExtensionInterface $extension
      * @param array              $options
+     *
+     * @throws ExtensionDependencyException
      */
     public function __construct(DriverInterface $driver, ExtensionInterface $extension, array $options = array())
     {
+        if (0 < count($extension->getRequiredExtensions())) {
+            throw new ExtensionDependencyException('Provided extension requires other extensions, you should use an extension stack to include dependencies.');
+        }
+
         $this->driver = $driver;
         $this->extension = $extension->setCache($this);
         $this->options = new Options($extension, $options);

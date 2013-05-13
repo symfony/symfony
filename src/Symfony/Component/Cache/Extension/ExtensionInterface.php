@@ -96,4 +96,18 @@ interface ExtensionInterface
      * @param array $options
      */
     public function prepareClear(array $options);
+
+    /**
+     * Returns extension name.
+     *
+     * @return string
+     */
+    public function getName();
+
+    /**
+     * Returns required extension names.
+     *
+     * @return string
+     */
+    public function getRequiredExtensions();
 }

@@ -99,4 +99,12 @@ class DoctrineDriver implements DriverInterface
     {
         return false;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return 'doctrine';
+    }
 }

@@ -91,6 +91,14 @@ abstract class AbstractExtension implements ExtensionInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getRequiredExtensions()
+    {
+        return array();
+    }
+
+    /**
      * @return Cache
      *
      * @throws WorkflowException

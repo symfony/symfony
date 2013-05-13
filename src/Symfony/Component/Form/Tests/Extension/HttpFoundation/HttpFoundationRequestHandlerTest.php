@@ -51,4 +51,15 @@ class HttpFoundationRequestHandlerTest extends AbstractRequestHandlerTest
             ->disableOriginalConstructor()
             ->getMock();
     }
+
+    public function testProcessorHandlesJSON()
+    {
+        $data = array('test_field1' => 'value1', 'test_field2' => 'value2');
+        $this->request = Request::create('http://localhost', 'POST', array(), array(), array(), array('CONTENT_TYPE' => 'application/json'), json_encode(array('test_form' => $data)));
+        $form = $this->getMockForm('testForm', 'POST', false);
+
+        $form->expects($this->once())->method('submit')->with(array('testField1' => 'value1', 'testField2' => 'value2'));
+
+        $this->requestHandler->handleRequest($form, $this->request);
+    }
 }

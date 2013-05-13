@@ -21,6 +21,9 @@
     "require-dev": {
         "symfony/event-dispatcher": "~2.1"
     },
+    "suggest": {
+        "symfony/event-dispatcher": "~2.1"
+    },
     "autoload": {
         "psr-0": { "Symfony\\Component\\Console\\": "" }
     },

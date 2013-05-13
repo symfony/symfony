@@ -473,15 +473,13 @@ abstract class Client
      *
      * @return Crawler
      *
-     * @param boolean $force Do not check Status Code and follow if Location header present (default: false)
-     *
      * @throws \LogicException If request was not a redirect
      *
      * @api
      */
-    public function followRedirect($force = false)
+    public function followRedirect()
     {
-        if (!$force && empty($this->redirect)) {
+        if (empty($this->redirect)) {
             throw new \LogicException('The request was not redirected.');
         }
 
@@ -493,10 +491,7 @@ abstract class Client
 
         $this->isMainRequest = false;
 
-        $response = $this->request('get', $force 
-            ? $this->internalResponse->getHeader('Location') 
-            : $this->redirect
-        );
+        $response = $this->request('get', $this->redirect);
 
         $this->isMainRequest = true;
 

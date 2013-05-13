@@ -366,12 +366,6 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         } catch (\Exception $e) {
             $this->assertInstanceof('LogicException', $e, '->followRedirect() throws a \LogicException if the request did not respond with 30x HTTP Code');
         }
-
-        $client->setNextResponse(new Response('', 201, array('Location' => 'http://www.example.com/redirected')));
-        $client->request('GET', 'http://www.example.com/foo/foobar');
-        $client->followRedirect(true);
-
-        $this->assertEquals('http://www.example.com/redirected', $client->getRequest()->getUri(), '->followRedirect(true) follows a redirect even if HTTP Code differs from 30x');
     }
     
     public function testFollowRedirectWithMaxRedirects()

@@ -743,7 +743,7 @@ class Crawler extends \SplObjectStorage
         return sprintf("concat(%s)", implode($parts, ', '));
     }
 
-    protected function getNode($position)
+    public function getNode($position)
     {
         foreach ($this as $i => $node) {
             if ($i == $position) {

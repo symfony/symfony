@@ -17,10 +17,12 @@ use Symfony\Component\Console\Formatter\OutputFormatter;
 /**
  * Base class for output classes.
  *
- * There are three levels of verbosity:
+ * There are five levels of verbosity:
  *
- *  * normal: no option passed (normal output - information)
- *  * verbose: -v (more output - debug)
+ *  * normal: no option passed (normal output)
+ *  * verbose: -v (more output)
+ *  * very verbose: -vv (highly extended output)
+ *  * debug: -vvv (all debug output)
  *  * quiet: -q (no output)
  *
  * @author Fabien Potencier <fabien@symfony.com>
@@ -35,9 +37,9 @@ abstract class Output implements OutputInterface
     /**
      * Constructor.
      *
-     * @param integer                  $verbosity The verbosity level (self::VERBOSITY_QUIET, self::VERBOSITY_NORMAL, self::VERBOSITY_VERBOSE)
-     * @param Boolean                  $decorated Whether to decorate messages or not
-     * @param OutputFormatterInterface $formatter Output formatter instance
+     * @param integer                       $verbosity The verbosity level (one of the VERBOSITY constants in OutputInterface)
+     * @param Boolean                       $decorated Whether to decorate messages
+     * @param OutputFormatterInterface|null $formatter Output formatter instance (null to use default OutputFormatter)
      *
      * @api
      */
@@ -137,7 +139,7 @@ abstract class Output implements OutputInterface
      * Writes a message to the output.
      *
      * @param string|array $messages The message as an array of lines or a single string
-     * @param Boolean      $newline  Whether to add a newline or not
+     * @param Boolean      $newline  Whether to add a newline
      * @param integer      $type     The type of output
      *
      * @throws \InvalidArgumentException When unknown output type is given

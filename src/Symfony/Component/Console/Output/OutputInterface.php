@@ -36,8 +36,8 @@ interface OutputInterface
      * Writes a message to the output.
      *
      * @param string|array $messages The message as an array of lines or a single string
-     * @param Boolean      $newline  Whether to add a newline or not
-     * @param integer      $type     The type of output (0: normal, 1: raw, 2: plain)
+     * @param Boolean      $newline  Whether to add a newline
+     * @param integer      $type     The type of output (one of the OUTPUT constants)
      *
      * @throws \InvalidArgumentException When unknown output type is given
      *
@@ -49,7 +49,9 @@ interface OutputInterface
      * Writes a message to the output and adds a newline at the end.
      *
      * @param string|array $messages The message as an array of lines of a single string
-     * @param integer      $type     The type of output (0: normal, 1: raw, 2: plain)
+     * @param integer      $type     The type of output (one of the OUTPUT constants)
+     *
+     * @throws \InvalidArgumentException When unknown output type is given
      *
      * @api
      */
@@ -58,7 +60,7 @@ interface OutputInterface
     /**
      * Sets the verbosity of the output.
      *
-     * @param integer $level The level of verbosity
+     * @param integer $level The level of verbosity (one of the VERBOSITY constants)
      *
      * @api
      */
@@ -67,7 +69,7 @@ interface OutputInterface
     /**
      * Gets the current verbosity of the output.
      *
-     * @return integer The current level of verbosity
+     * @return integer The current level of verbosity (one of the VERBOSITY constants)
      *
      * @api
      */
@@ -76,7 +78,7 @@ interface OutputInterface
     /**
      * Sets the decorated flag.
      *
-     * @param Boolean $decorated Whether to decorate the messages or not
+     * @param Boolean $decorated Whether to decorate the messages
      *
      * @api
      */

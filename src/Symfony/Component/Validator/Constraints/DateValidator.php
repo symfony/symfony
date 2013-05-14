@@ -29,18 +29,41 @@ class DateValidator extends ConstraintValidator
      */
     public function validate($value, Constraint $constraint)
     {
-        if (null === $value || '' === $value || $value instanceof \DateTime) {
+        if (null === $value || '' === $value) {
             return;
         }
 
-        if (!is_scalar($value) && !(is_object($value) && method_exists($value, '__toString'))) {
-            throw new UnexpectedTypeException($value, 'string');
+        if($value instanceof \DateTime) {
+            $dateTime = $value;
+        } else {
+
+            if (!is_scalar($value) && !(is_object($value) && method_exists($value, '__toString'))) {
+                throw new UnexpectedTypeException($value, 'string');
+            }
+
+            $value = (string) $value;
+
+            if (!preg_match(static::PATTERN, $value, $matches) || !checkdate($matches[2], $matches[3], $matches[1])) {
+                $this->context->addViolation($constraint->message, array('{{ value }}' => $value));
+
+                return;
+            }
+
+            $dateTime = new \DateTime($matches[1].'-'.$matches[2].'-'.$matches[3]);
         }
 
-        $value = (string) $value;
+        if (null !== $constraint->before && $dateTime >= $constraint->before) {
+            $formattedBeforeDate = $constraint->dateFormatter->format($constraint->before);
+            $this->context->addViolation($constraint->messageBeforeDate, array('{{ value }}' => $value, '{{ before }}' => $formattedBeforeDate));
 
-        if (!preg_match(static::PATTERN, $value, $matches) || !checkdate($matches[2], $matches[3], $matches[1])) {
-            $this->context->addViolation($constraint->message, array('{{ value }}' => $value));
+            return;
+        }
+
+        if (null !== $constraint->after && $dateTime <= $constraint->after) {
+            $formattedAfterDate = $constraint->dateFormatter->format($constraint->after);
+            $this->context->addViolation($constraint->messageAfterDate, array('{{ value }}' => $value, '{{ after }}' => $formattedAfterDate));
+
+            return;
         }
     }
 }

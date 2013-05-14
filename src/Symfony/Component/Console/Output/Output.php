@@ -36,16 +36,16 @@ abstract class Output implements OutputInterface
      * Constructor.
      *
      * @param integer                  $verbosity The verbosity level (self::VERBOSITY_QUIET, self::VERBOSITY_NORMAL, self::VERBOSITY_VERBOSE)
-     * @param Boolean                  $decorated Whether to decorate messages or not (null for auto-guessing)
+     * @param Boolean                  $decorated Whether to decorate messages or not
      * @param OutputFormatterInterface $formatter Output formatter instance
      *
      * @api
      */
-    public function __construct($verbosity = self::VERBOSITY_NORMAL, $decorated = null, OutputFormatterInterface $formatter = null)
+    public function __construct($verbosity = self::VERBOSITY_NORMAL, $decorated = false, OutputFormatterInterface $formatter = null)
     {
         $this->verbosity = null === $verbosity ? self::VERBOSITY_NORMAL : $verbosity;
         $this->formatter = null === $formatter ? new OutputFormatter() : $formatter;
-        $this->formatter->setDecorated((Boolean) $decorated);
+        $this->formatter->setDecorated($decorated);
     }
 
     /**
@@ -81,7 +81,7 @@ abstract class Output implements OutputInterface
      */
     public function setDecorated($decorated)
     {
-        $this->formatter->setDecorated((Boolean) $decorated);
+        $this->formatter->setDecorated($decorated);
     }
 
     /**

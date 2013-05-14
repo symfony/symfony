@@ -128,7 +128,7 @@ abstract class Output implements OutputInterface
      *
      * @api
      */
-    public function writeln($messages, $type = 0)
+    public function writeln($messages, $type = self::OUTPUT_NORMAL)
     {
         $this->write($messages, true, $type);
     }
@@ -144,7 +144,7 @@ abstract class Output implements OutputInterface
      *
      * @api
      */
-    public function write($messages, $newline = false, $type = 0)
+    public function write($messages, $newline = false, $type = self::OUTPUT_NORMAL)
     {
         if (self::VERBOSITY_QUIET === $this->verbosity) {
             return;

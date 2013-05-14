@@ -78,7 +78,7 @@ class NullOutput implements OutputInterface
     /**
      * {@inheritdoc}
      */
-    public function writeln($messages, $type = 0)
+    public function writeln($messages, $type = self::OUTPUT_NORMAL)
     {
         // do nothing
     }
@@ -86,7 +86,7 @@ class NullOutput implements OutputInterface
     /**
      * {@inheritdoc}
      */
-    public function write($messages, $newline = false, $type = 0)
+    public function write($messages, $newline = false, $type = self::OUTPUT_NORMAL)
     {
         // do nothing
     }

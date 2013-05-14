@@ -43,7 +43,7 @@ interface OutputInterface
      *
      * @api
      */
-    public function write($messages, $newline = false, $type = 0);
+    public function write($messages, $newline = false, $type = self::OUTPUT_NORMAL);
 
     /**
      * Writes a message to the output and adds a newline at the end.
@@ -53,7 +53,7 @@ interface OutputInterface
      *
      * @api
      */
-    public function writeln($messages, $type = 0);
+    public function writeln($messages, $type = self::OUTPUT_NORMAL);
 
     /**
      * Sets the verbosity of the output.

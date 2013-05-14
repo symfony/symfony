@@ -54,13 +54,32 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
                 $data = $request->query->get($name);
             }
         } else {
-            if ('' === $name) {
-                $params = $request->request->all();
-                $files = $request->files->all();
-            } else {
-                $default = $form->getConfig()->getCompound() ? array() : null;
-                $params = $request->request->get($name, $default);
-                $files = $request->files->get($name, $default);
+            $contentType = $request->getContentType();
+
+            $default = $form->getConfig()->getCompound() ? array() : null;
+            switch($contentType) {
+                case 'json':
+                    $data = json_decode($request->getContent(), true);
+                    if (!is_array($data)) {
+                        $data = array();
+                    }
+                    $data = $this->camelCaseArrayKeys($data);
+                    if ('' == $name) {
+                        $params = $data;
+                    } else {
+                        $params = isset($data[$name]) ? $data[$name] : $default;
+                    }
+                    $files = array();
+                    break;
+                default:
+                    if ('' === $name) {
+                        $params = $request->request->all();
+                        $files = $request->files->all();
+                    } else {
+                        $params = $request->request->get($name, $default);
+                        $files = $request->files->get($name, $default);
+                    }
+                    break;
             }
 
             if (is_array($params) && is_array($files)) {
@@ -76,5 +95,16 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
         }
 
         $form->submit($data, 'PATCH' !== $method);
+    }
+
+    private function camelCaseArrayKeys(array $array) {
+        $return = array();
+        foreach($array as $key => $value) {
+            $key = preg_replace_callback('/_(\w)/', function($m) {
+                return strtoupper($m[1]);
+            }, $key);
+            $return[$key] = is_array($value) ? $this->camelCaseArrayKeys($value) : $value;
+        }
+        return $return;
     }
 }

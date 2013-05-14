@@ -29,11 +29,13 @@ class CoreExtension extends AbstractExtension
     {
         $resolver->setDefaults(array(
             'namespace' => '',
+            'lifetime'  => null,
             'rewriting' => function (Options $options) {
                 return new Rewriting();
             },
         ))->addAllowedTypes(array(
             'namespace' => 'string',
+            'lifetime'  => array('null', 'int'),
             'rewriting' => 'Symfony\Component\Cache\Extension\Core\Rewriting',
         ));
     }

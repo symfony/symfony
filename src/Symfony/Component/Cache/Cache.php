@@ -116,7 +116,7 @@ class Cache
         $options = $this->options->resolve($options);
         $data = $this->extension->prepareStorage($data, $options);
 
-        if ($data instanceof ValidItem && $this->driver->set($data->getKey(), $data->getValue())) {
+        if ($data instanceof ValidItem && $this->driver->set($data->getKey(), $data->getValue(), $options['lifetime'])) {
             return new CachedItem($data->getKey(), $data->getValue());
         }
 

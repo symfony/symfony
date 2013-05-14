@@ -22,11 +22,22 @@ class ArrayDriver implements DriverInterface
     private $values = array();
 
     /**
+     * @var int[]
+     */
+    private $expiration = array();
+
+    /**
      * {@inheritdoc}
      */
     public function get($key)
     {
         if (!isset($this->values[$key])) {
+            return false;
+        }
+
+        if (0 < $this->expiration[$key] && time() < $this->expiration[$key]) {
+            $this->remove($key);
+
             return false;
         }
 
@@ -40,9 +51,7 @@ class ArrayDriver implements DriverInterface
     {
         $result = array();
         foreach ($keys as $key) {
-            if (isset($this->values[$key])) {
-                $result[$key] = $this->values[$key];
-            }
+            $result[$key] = $this->get($key);
         }
 
         return $result;
@@ -54,6 +63,7 @@ class ArrayDriver implements DriverInterface
     public function set($key, $value, $ttl = null)
     {
         $this->values[$key] = $value;
+        $this->expiration[$key] = $ttl ? time() + $ttl : 0;
 
         return true;
     }
@@ -63,7 +73,9 @@ class ArrayDriver implements DriverInterface
      */
     public function setMultiple($values, $ttl = null)
     {
-        $this->values = array_merge($this->values, $values);
+        foreach ($this->values as $key => $value) {
+            $this->set($key, $value, $ttl);
+        }
 
         return true;
     }

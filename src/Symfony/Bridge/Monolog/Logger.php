@@ -62,6 +62,8 @@ class Logger extends BaseLogger implements LoggerInterface, DebugLoggerInterface
         if ($logger = $this->getDebugLogger()) {
             return $logger->getLogs();
         }
+
+        return array();
     }
 
     /**
@@ -72,12 +74,14 @@ class Logger extends BaseLogger implements LoggerInterface, DebugLoggerInterface
         if ($logger = $this->getDebugLogger()) {
             return $logger->countErrors();
         }
+
+        return 0;
     }
 
     /**
      * Returns a DebugLoggerInterface instance if one is registered with this logger.
      *
-     * @return DebugLoggerInterface A DebugLoggerInterface instance or null if none is registered
+     * @return DebugLoggerInterface|null A DebugLoggerInterface instance or null if none is registered
      */
     private function getDebugLogger()
     {

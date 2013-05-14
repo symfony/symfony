@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Cache\Extension;
 
-use Symfony\Component\Cache\Lock\LockFactory;
+use Symfony\Component\Cache\Extension\Lock\LockFactory;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
@@ -36,7 +36,7 @@ class LockExtension extends AbstractExtension
             'lock_sleep'   => 'int',
             'lock_timeout' => 'int',
             'lock_pattern' => 'string',
-            'lock_factory' => 'Symfony\Component\Cache\Lock\LockFactory',
+            'lock_factory' => 'Symfony\Component\Cache\Extension\Lock\LockFactory',
         ));
     }
 

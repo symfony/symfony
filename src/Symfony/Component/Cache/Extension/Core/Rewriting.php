@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Cache;
+namespace Symfony\Component\Cache\Extension\Core;
 
 /**
  * @author Jean-François Simon <contact@jfsimon.fr>

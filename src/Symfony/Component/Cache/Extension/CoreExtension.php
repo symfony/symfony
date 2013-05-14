@@ -13,7 +13,7 @@ namespace Symfony\Component\Cache\Extension;
 
 use Symfony\Component\Cache\Data\KeyCollection;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
-use Symfony\Component\Cache\Rewriting;
+use Symfony\Component\Cache\Extension\Core\Rewriting;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
@@ -34,7 +34,7 @@ class CoreExtension extends AbstractExtension
             },
         ))->addAllowedTypes(array(
             'namespace' => 'string',
-            'rewriting' => 'Symfony\Component\Cache\Rewriting',
+            'rewriting' => 'Symfony\Component\Cache\Extension\Core\Rewriting',
         ));
     }
 

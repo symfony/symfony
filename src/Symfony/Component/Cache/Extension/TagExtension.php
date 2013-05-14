@@ -19,8 +19,8 @@ use Symfony\Component\Cache\Data\KeyCollection;
 use Symfony\Component\Cache\Data\NullResult;
 use Symfony\Component\Cache\Data\ValidItem;
 use Symfony\Component\Cache\Exception\LockException;
-use Symfony\Component\Cache\Lock\Lock;
-use Symfony\Component\Cache\Lock\LockFactory;
+use Symfony\Component\Cache\Extension\Lock\Lock;
+use Symfony\Component\Cache\Extension\Lock\LockFactory;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**

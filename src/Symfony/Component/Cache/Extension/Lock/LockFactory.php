@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Cache\Lock;
+namespace Symfony\Component\Cache\Extension\Lock;
 
 /**
  * @author Jean-François Simon <contact@jfsimon.fr>

@@ -25,6 +25,7 @@ class NullOutputTest extends \PHPUnit_Framework_TestCase
         $buffer = ob_get_clean();
 
         $this->assertSame('', $buffer, '->write() does nothing (at least nothing is printed)');
+        $this->assertFalse($output->isDecorated(), '->isDecorated() returns false');
     }
 
     public function testVerbosity()

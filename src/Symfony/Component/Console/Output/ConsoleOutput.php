@@ -54,18 +54,27 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
         $this->stderr = new StreamOutput(fopen('php://stderr', 'w'), $verbosity, $decorated, $formatter);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function setDecorated($decorated)
     {
         parent::setDecorated($decorated);
         $this->stderr->setDecorated($decorated);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function setFormatter(OutputFormatterInterface $formatter)
     {
         parent::setFormatter($formatter);
         $this->stderr->setFormatter($formatter);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function setVerbosity($level)
     {
         parent::setVerbosity($level);
@@ -73,13 +82,16 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
     }
 
     /**
-     * @return OutputInterface
+     * {@inheritdoc}
      */
     public function getErrorOutput()
     {
         return $this->stderr;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function setErrorOutput(OutputInterface $error)
     {
         $this->stderr = $error;

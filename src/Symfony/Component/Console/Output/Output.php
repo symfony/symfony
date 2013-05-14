@@ -51,11 +51,7 @@ abstract class Output implements OutputInterface
     }
 
     /**
-     * Sets output formatter.
-     *
-     * @param OutputFormatterInterface $formatter
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function setFormatter(OutputFormatterInterface $formatter)
     {
@@ -63,11 +59,7 @@ abstract class Output implements OutputInterface
     }
 
     /**
-     * Returns current output formatter instance.
-     *
-     * @return  OutputFormatterInterface
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function getFormatter()
     {
@@ -75,11 +67,7 @@ abstract class Output implements OutputInterface
     }
 
     /**
-     * Sets the decorated flag.
-     *
-     * @param Boolean $decorated Whether to decorate the messages or not
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function setDecorated($decorated)
     {
@@ -87,11 +75,7 @@ abstract class Output implements OutputInterface
     }
 
     /**
-     * Gets the decorated flag.
-     *
-     * @return Boolean true if the output will decorate messages, false otherwise
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function isDecorated()
     {
@@ -99,11 +83,7 @@ abstract class Output implements OutputInterface
     }
 
     /**
-     * Sets the verbosity of the output.
-     *
-     * @param integer $level The level of verbosity
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function setVerbosity($level)
     {
@@ -111,11 +91,7 @@ abstract class Output implements OutputInterface
     }
 
     /**
-     * Gets the current verbosity of the output.
-     *
-     * @return integer The current level of verbosity
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function getVerbosity()
     {
@@ -123,12 +99,7 @@ abstract class Output implements OutputInterface
     }
 
     /**
-     * Writes a message to the output and adds a newline at the end.
-     *
-     * @param string|array $messages The message as an array of lines or a single string
-     * @param integer      $type     The type of output
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function writeln($messages, $type = self::OUTPUT_NORMAL)
     {
@@ -136,15 +107,7 @@ abstract class Output implements OutputInterface
     }
 
     /**
-     * Writes a message to the output.
-     *
-     * @param string|array $messages The message as an array of lines or a single string
-     * @param Boolean      $newline  Whether to add a newline
-     * @param integer      $type     The type of output
-     *
-     * @throws \InvalidArgumentException When unknown output type is given
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function write($messages, $newline = false, $type = self::OUTPUT_NORMAL)
     {

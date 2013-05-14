@@ -1121,6 +1121,16 @@ class Process
     }
 
     /**
+     * Retrieves the process information array from the process.
+     *
+     * @return array Process information
+     */
+    protected function getProcessInformation()
+    {
+        return proc_get_status($this->process);
+    }
+
+    /**
      * Builds up the callback used by wait().
      *
      * The callbacks adds all occurred output to the specific buffer and calls
@@ -1159,7 +1169,8 @@ class Process
             return;
         }
 
-        $this->processInformation = proc_get_status($this->process);
+        $this->processInformation = $this->getProcessInformation();
+
         if (!$this->processInformation['running']) {
             $this->status = self::STATUS_TERMINATED;
             if (-1 !== $this->processInformation['exitcode']) {

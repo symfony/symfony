@@ -1,0 +1,6 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-05-13T13:57:26Z
+
+This is definitely "just" a bug. So, we need to fix it in 2.1 (no need to create PRs for other branches).
+You need to remove the new argument for `followRedirect()` as we should not provide workarounds for misbehaving apps.

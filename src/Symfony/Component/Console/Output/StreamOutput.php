@@ -35,11 +35,10 @@ class StreamOutput extends Output
     /**
      * Constructor.
      *
-     * @param mixed                    $stream    A stream resource
-     * @param integer                  $verbosity The verbosity level (self::VERBOSITY_QUIET, self::VERBOSITY_NORMAL,
-     *                                                                 self::VERBOSITY_VERBOSE)
-     * @param Boolean                  $decorated Whether to decorate messages or not (null for auto-guessing)
-     * @param OutputFormatterInterface $formatter Output formatter instance
+     * @param mixed                         $stream    A stream resource
+     * @param integer                       $verbosity The verbosity level (one of the VERBOSITY constants in OutputInterface)
+     * @param Boolean|null                  $decorated Whether to decorate messages (null for auto-guessing)
+     * @param OutputFormatterInterface|null $formatter Output formatter instance (null to use default OutputFormatter)
      *
      * @throws \InvalidArgumentException When first argument is not a real stream
      *
@@ -71,12 +70,7 @@ class StreamOutput extends Output
     }
 
     /**
-     * Writes a message to the output.
-     *
-     * @param string  $message A message to write to the output
-     * @param Boolean $newline Whether to add a newline or not
-     *
-     * @throws \RuntimeException When unable to write output (should never happen)
+     * {@inheritdoc}
      */
     protected function doWrite($message, $newline)
     {

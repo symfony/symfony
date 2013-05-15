@@ -34,9 +34,9 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
     /**
      * Construct an ORM Query Builder Loader
      *
-     * @param QueryBuilder|\Closure     $queryBuilder
-     * @param EntityManagerInterface    $manager
-     * @param string                    $class
+     * @param QueryBuilder|\Closure  $queryBuilder
+     * @param EntityManagerInterface $manager
+     * @param string                 $class
      *
      * @throws UnexpectedTypeException
      */

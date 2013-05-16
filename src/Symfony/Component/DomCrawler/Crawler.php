@@ -430,7 +430,9 @@ class Crawler extends \SplObjectStorage
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
-        return new static($this->sibling($this->getNode(0)->firstChild), $this->uri);
+        $node = $this->getNode(0)->firstChild;
+
+        return new static($node ? $this->sibling($node) : array(), $this->uri);
     }
 
     /**

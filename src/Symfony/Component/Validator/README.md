@@ -107,7 +107,7 @@ https://github.com/fabpot/Silex/blob/master/src/Silex/Provider/ValidatorServiceP
 
 Documentation:
 
-http://symfony.com/doc/2.3/book/validation.html
+http://symfony.com/doc/2.4/book/validation.html
 
 JSR-303 Specification:
 

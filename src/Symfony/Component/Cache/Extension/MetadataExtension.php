@@ -22,6 +22,12 @@ use Symfony\Component\Cache\Data\KeyCollection;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
+ * Metadata extension.
+ *
+ * This extension introduces item metadata:
+ * * retrieves metadata attached to items
+ * * stores metadata with item
+ *
  * @author Jean-François Simon <contact@jfsimon.fr>
  */
 class MetadataExtension extends AbstractExtension
@@ -50,9 +56,10 @@ class MetadataExtension extends AbstractExtension
         }
 
         $pattern = $options['metadata_pattern'];
+        $options['with_metadata'] = false;
 
         if ($data instanceof ValidItem) {
-            $metadata = $this->getCache()->get(array('key' => sprintf($pattern, $data->getKey())));
+            $metadata = $this->getCache()->get(array('key' => sprintf($pattern, $data->getKey())), $options);
             /** @var ItemInterface $metadata */
             if ($metadata instanceof CachedItem) {
                 $data->metadata = $metadata->getValue();
@@ -62,7 +69,7 @@ class MetadataExtension extends AbstractExtension
         if ($data instanceof CollectionInterface) {
             $metadata = $this->getCache()->get(array('key' => array_map(function ($key) use ($pattern) {
                 return sprintf($pattern, $key);
-            }, $data->getKeys())));
+            }, $data->getKeys())), $options);
             /** @var CollectionInterface $metadata */
             if ($metadata instanceof Collection) {
                 /** @var ItemInterface $metadataItem */
@@ -88,18 +95,17 @@ class MetadataExtension extends AbstractExtension
         }
 
         $pattern = $options['metadata_pattern'];
-        $options['with_metadata'] = false;
 
         if ($data instanceof ValidItem && !$data->metadata->isEmpty()) {
-            $this->getCache()->set(new Collection(array($data, new FreshItem(sprintf($pattern, $data->getKey()), $data->metadata))), $options);
+            return new Collection(array($data, new FreshItem(sprintf($pattern, $data->getKey()), $data->metadata)));
         }
 
         if ($data instanceof CollectionInterface) {
-            $this->getCache()->set(new Collection(array_map(function (ValidItem $item) use ($pattern) {
+            return $data->merge(new Collection(array_map(function (ValidItem $item) use ($pattern) {
                 return new FreshItem(sprintf($pattern, $item->getKey()), $item->metadata);
             }, array_filter($data->all(), function (ItemInterface $item) {
                 return $item instanceof ValidItem && !$item->metadata->isEmpty();
-            }))), $options);
+            }))));
         }
 
         return $data;
@@ -108,7 +114,7 @@ class MetadataExtension extends AbstractExtension
     /**
      * {@inheritdoc}
      */
-    public function propagateRemoval(KeyCollection $keys, array $options)
+    public function prepareRemoval(KeyCollection $keys, array $options)
     {
         if (!$options['with_metadata']) {
             return $keys;

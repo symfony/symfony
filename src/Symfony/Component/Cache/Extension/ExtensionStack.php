@@ -173,10 +173,10 @@ class ExtensionStack extends AbstractExtension
     /**
      * {@inheritdoc}
      */
-    public function propagateRemoval(KeyCollection $keys, array $options)
+    public function prepareRemoval(KeyCollection $keys, array $options)
     {
         foreach ($this->all() as $extension) {
-            $keys->merge($extension->propagateRemoval($keys, $options));
+            $keys = $extension->prepareRemoval($keys, $options);
         }
 
         return $keys;

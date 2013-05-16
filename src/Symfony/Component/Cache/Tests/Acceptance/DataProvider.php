@@ -28,9 +28,9 @@ class DataProvider
     public static function provideCaches()
     {
         $extension = new ExtensionStack();
+        $extension->register(new LockExtension(), 75);
         $extension->register(new CoreExtension(), 50);
         $extension->register(new MetadataExtension(), 25);
-        $extension->register(new LockExtension(), 0);
         $extension->register(new TagExtension(), -25);
 
         $drivers = array(
@@ -41,7 +41,7 @@ class DataProvider
 
         $caches = array();
         foreach ($drivers as $driver) {
-            $caches[] = array(new Cache($driver, clone $extension));
+            $caches[] = array(new Cache($driver, $extension));
         }
 
         return $caches;

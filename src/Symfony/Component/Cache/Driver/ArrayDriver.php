@@ -73,7 +73,7 @@ class ArrayDriver implements DriverInterface
      */
     public function setMultiple($values, $ttl = null)
     {
-        foreach ($this->values as $key => $value) {
+        foreach ($values as $key => $value) {
             $this->set($key, $value, $ttl);
         }
 
@@ -87,6 +87,7 @@ class ArrayDriver implements DriverInterface
     {
         if (isset($this->values[$key])) {
             unset($this->values[$key]);
+            unset($this->expiration[$key]);
 
             return true;
         }
@@ -100,7 +101,7 @@ class ArrayDriver implements DriverInterface
     public function removeMultiple($keys)
     {
         foreach ($keys as $key) {
-            unset($this->values[$key]);
+            $this->remove($key);
         }
 
         return true;

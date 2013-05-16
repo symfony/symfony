@@ -94,6 +94,18 @@ class KeyLock
     }
 
     /**
+     * @param Cache $cache
+     *
+     * @return boolean
+     */
+    public function test(Cache $cache)
+    {
+        $result = $cache->get(array('key' => $this->key));
+
+        return !($result instanceof CachedItem && $this->id !== $result->getValue());
+    }
+
+    /**
      * @return boolean
      */
     public function isAcquired()

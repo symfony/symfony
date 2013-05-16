@@ -90,14 +90,16 @@ interface ExtensionInterface
     public function resolveRemoval(array $query, array $options);
 
     /**
-     * Prepares data to be stored by driver.
+     * Prepares data to be removed by driver.
+     *
+     * This method is used to add or remove keys to remove.
      *
      * @param KeyCollection $keys
      * @param array         $options
      *
      * @return KeyCollection
      */
-    public function propagateRemoval(KeyCollection $keys, array $options);
+    public function prepareRemoval(KeyCollection $keys, array $options);
 
     /**
      * Prepares data before flush.

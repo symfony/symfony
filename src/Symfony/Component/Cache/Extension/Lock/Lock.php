@@ -36,7 +36,7 @@ class Lock
     /**
      * @var KeyLock[]
      */
-    private $free = array();
+    private $locked = array();
 
     /**
      * @param int $timeout
@@ -56,7 +56,7 @@ class Lock
      */
     public function add($key, KeyLock $keyLock)
     {
-        $this->free[$key] = $keyLock;
+        $this->locked[$key] = $keyLock;
 
         return $this;
     }
@@ -73,10 +73,10 @@ class Lock
         $start = microtime(true) * 10e6;
 
         while (microtime(true) * 10e6 - $start < $this->timeout * 10e3) {
-            foreach ($this->free as $key => $keyLock) {
+            foreach ($this->locked as $key => $keyLock) {
                 if ($keyLock->acquire($cache)) {
                     $this->acquired[$key] = $keyLock;
-                    unset($this->free[$key]);
+                    unset($this->locked[$key]);
                 }
             }
 
@@ -111,6 +111,24 @@ class Lock
     }
 
     /**
+     * @param Cache $cache
+     *
+     * @return boolean
+     */
+    public function test(Cache $cache)
+    {
+        $free = true;
+
+        foreach ($this->locked as $key) {
+            if (!$key->test($cache)) {
+                $free = false;
+            }
+        }
+
+        return $free;
+    }
+
+    /**
      * @return boolean
      */
     public function isAcquired()
@@ -121,9 +139,9 @@ class Lock
     /**
      * @return string[]
      */
-    public function getFreeKeys()
+    public function getLockedKeys()
     {
-        return array_keys($this->free);
+        return array_keys($this->locked);
     }
 
     /**

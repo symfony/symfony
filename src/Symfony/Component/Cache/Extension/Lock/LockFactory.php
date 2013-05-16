@@ -44,14 +44,15 @@ class LockFactory
     }
 
     /**
-     * @param string[] $keys
+     * @param string[]    $keys
+     * @param string|null $id
      *
      * @return Lock
      */
-    public function create(array $keys)
+    public function create(array $keys, $id = null)
     {
         $lock = new Lock($this->timeout, $this->sleep);
-        $id = md5(uniqid(mt_rand(), true));
+        $id = $id ?: md5(uniqid(mt_rand(), true));
 
         foreach ($keys as $key) {
             $lock->add($key, new KeyLock(sprintf($this->pattern, $key), $id));

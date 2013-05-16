@@ -56,7 +56,7 @@ class Cache
         }
 
         $this->driver = $driver;
-        $this->extension = $extension->setCache($this);
+        $this->extension = $extension;
         $this->options = new Options($extension, $options);
     }
 
@@ -73,6 +73,7 @@ class Cache
     public function get($query, array $options = array())
     {
         $options = $this->options->resolve($options);
+        $this->extension->setCache($this);
         $query = $this->resolveQuery($query);
 
         if (!$this->extension->supportsQuery($query, $options)) {
@@ -114,6 +115,7 @@ class Cache
     public function set(DataInterface $data, array $options = array())
     {
         $options = $this->options->resolve($options);
+        $this->extension->setCache($this);
         $data = $this->extension->prepareStorage($data, $options);
 
         if ($data instanceof ValidItem && $this->driver->set($data->getKey(), $data->getValue(), $options['lifetime'])) {
@@ -140,6 +142,7 @@ class Cache
     public function remove($query, array $options = array())
     {
         $options = $this->options->resolve($options);
+        $this->extension->setCache($this);
         $query = $this->resolveQuery($query);
 
         if (!$this->extension->supportsQuery($query, $options)) {
@@ -152,7 +155,7 @@ class Cache
             return $keyCollection;
         }
 
-        $keyCollection->merge($this->extension->propagateRemoval($keyCollection, $options));
+        $keyCollection = $this->extension->prepareRemoval($keyCollection, $options);
 
         $keys = $keyCollection->getKeys();
         if ((1 === count($keys) && $this->driver->remove(reset($keys))) || $this->driver->removeMultiple($keys)) {
@@ -172,6 +175,7 @@ class Cache
     public function clear(array $options = array())
     {
         $options = $this->options->resolve($options);
+        $this->extension->setCache($this);
         $this->extension->prepareClear($options);
 
         return $this->driver->clear();

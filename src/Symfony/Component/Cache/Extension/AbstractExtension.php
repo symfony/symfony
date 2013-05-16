@@ -87,7 +87,7 @@ abstract class AbstractExtension implements ExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function propagateRemoval(KeyCollection $keys, array $options)
+    public function prepareRemoval(KeyCollection $keys, array $options)
     {
         return $keys;
     }

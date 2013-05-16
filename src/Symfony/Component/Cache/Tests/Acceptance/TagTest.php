@@ -18,7 +18,7 @@ use Symfony\Component\Cache\Data\FreshItem;
 class TagTest extends \PHPUnit_Framework_TestCase
 {
     /** @dataProvider Symfony\Component\Cache\Tests\Acceptance\DataProvider::provideCaches */
-    public function testWhenIStoreAnItemWithTagsIFetchThem(Cache $cache)
+    public function testWhenIStoreAnItemWithTagsIGetTheTags(Cache $cache)
     {
         $item = new FreshItem('key', 'data');
         $item->metadata->set('tags', array('tag1', 'tag2'));
@@ -30,7 +30,7 @@ class TagTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @dataProvider Symfony\Component\Cache\Tests\Acceptance\DataProvider::provideCaches */
-    public function testWhenIStoreItemsWithTagICanFetchThemByTag(Cache $cache)
+    public function testWhenIStoreItemsWithTagICanGetThemByTag(Cache $cache)
     {
         $item = new FreshItem('key1', 'data1');
         $item->metadata->set('tags', array('tag1', 'tag2'));

@@ -18,6 +18,13 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
+ * Core extension.
+ *
+ * This extensions introduces item key resolution:
+ * * permits to add a global namespace to stored items key
+ * * permits to add a key rewriting
+ * * adds a `lifetime` option
+ *
  * @author Jean-François Simon <contact@jfsimon.fr>
  */
 class CoreExtension extends AbstractExtension

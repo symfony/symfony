@@ -164,10 +164,6 @@ class ClassLoader
      */
     public function findFile($class)
     {
-        if ('\\' == $class[0]) {
-            $class = substr($class, 1);
-        }
-
         if (false !== $pos = strrpos($class, '\\')) {
             // namespaced class name
             $classPath = str_replace('\\', DIRECTORY_SEPARATOR, substr($class, 0, $pos)).DIRECTORY_SEPARATOR;

@@ -54,8 +54,6 @@ class ClassLoaderTest extends \PHPUnit_Framework_TestCase
         return array(
             array('\\Namespaced2\\Foo', 'Namespaced2\\Foo',   '->loadClass() loads Namespaced2\Foo class'),
             array('\\Pearlike2_Foo',    'Pearlike2_Foo',      '->loadClass() loads Pearlike2_Foo class'),
-            array('\\Namespaced2\\Bar', '\\Namespaced2\\Bar', '->loadClass() loads Namespaced2\Bar class with a leading slash'),
-            array('\\Pearlike2_Bar',    '\\Pearlike2_Bar',    '->loadClass() loads Pearlike2_Bar class with a leading slash'),
         );
     }
 

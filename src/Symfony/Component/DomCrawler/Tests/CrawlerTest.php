@@ -536,6 +536,14 @@ EOF
         } catch (\InvalidArgumentException $e) {
             $this->assertTrue(true, '->children() throws an \InvalidArgumentException if the node list is empty');
         }
+
+        try {
+            $crawler = new Crawler('<p></p>');
+            $crawler->filter('p')->children();
+            $this->assertTrue(true, '->children() does not trigger a notice if the node has no children');
+        } catch (\PHPUnit_Framework_Error_Notice $e) {
+            $this->fail('->children() does not trigger a notice if the node has no children');
+        }
     }
 
     public function testParents()

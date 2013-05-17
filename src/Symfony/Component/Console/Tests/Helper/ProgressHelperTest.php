@@ -151,6 +151,20 @@ class ProgressHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->generateOutput('    3 [■■■>------------------------]'), stream_get_contents($output->getStream()));
     }
 
+    public function testClear()
+    {
+        $progress = new ProgressHelper();
+        $progress->start($output = $this->getOutputStream(), 50);
+        $progress->setCurrent(25);
+        $progress->clear();
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            $this->generateOutput(' 25/50 [==============>-------------]  50%') . $this->generateOutput(''),
+            stream_get_contents($output->getStream())
+        );
+    }
+
     protected function getOutputStream()
     {
         return new StreamOutput(fopen('php://memory', 'r+', false));

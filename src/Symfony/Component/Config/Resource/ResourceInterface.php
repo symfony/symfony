@@ -16,7 +16,7 @@ namespace Symfony\Component\Config\Resource;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-interface ResourceInterface
+interface ResourceInterface extends \Serializable
 {
     /**
      * Returns a string representation of the Resource.
@@ -35,9 +35,30 @@ interface ResourceInterface
     public function isFresh($timestamp);
 
     /**
+     * Returns resource mtime.
+     *
+     * @return integer
+     */
+    public function getModificationTime();
+
+    /**
+     * Returns true if the resource exists in the filesystem.
+     *
+     * @return Boolean
+     */
+    public function exists();
+
+    /**
      * Returns the resource tied to this Resource.
      *
      * @return mixed The resource
      */
     public function getResource();
+
+    /**
+     * Returns unique resource ID.
+     *
+     * @return string
+     */
+    public function getId();
 }

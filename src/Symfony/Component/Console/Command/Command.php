@@ -238,7 +238,7 @@ class Command
             $statusCode = $this->execute($input, $output);
         }
 
-        return is_numeric($statusCode) ? $statusCode : 0;
+        return is_numeric($statusCode) ? (int) $statusCode : 0;
     }
 
     /**

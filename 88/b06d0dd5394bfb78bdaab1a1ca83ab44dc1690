@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by kriswallsmith at 2013-05-19T02:30:07Z
+
+Only comment is to get rid of string concatenation and only use sprintf. Looks great otherwise.

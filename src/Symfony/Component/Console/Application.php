@@ -131,7 +131,7 @@ class Application
             }
             $exitCode = $e->getCode();
 
-            $exitCode = is_numeric($exitCode) && $exitCode ? $exitCode : 1;
+            $exitCode = $exitCode ? (is_numeric($exitCode) ? (int) $exitCode : 1) : 0;
         }
 
         if ($this->autoExit) {
@@ -184,7 +184,7 @@ class Application
         $exitCode = $this->doRunCommand($command, $input, $output);
         $this->runningCommand = null;
 
-        return is_numeric($exitCode) ? $exitCode : 0;
+        return $exitCode;
     }
 
     /**

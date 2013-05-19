@@ -514,6 +514,21 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('called'.PHP_EOL, $tester->getDisplay(), '->run() does not call interact() if -n is passed');
     }
 
+    public function testRunReturnsIntegerExitCode()
+    {
+        $exception = new \Exception('', 4);
+
+        $application = $this->getMock('Symfony\Component\Console\Application', array('doRun'));
+        $application->setAutoExit(false);
+        $application->expects($this->once())
+             ->method('doRun')
+             ->will($this->throwException($exception));
+
+        $exitCode = $application->run(new ArrayInput(array()), new NullOutput());
+
+        $this->assertSame(4, $exitCode, '->run() returns integer exit code extracted from raised exception');
+    }
+
     /**
      * @expectedException \LogicException
      * @dataProvider getAddingAlreadySetDefinitionElementData

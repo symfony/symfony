@@ -62,26 +62,32 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
             return $a > $b ? -1 : 1;
         };
 
-        $subscribersPerCon = $this->groupByConnection($container->findTaggedServiceIds($this->tagPrefix.'.event_subscriber'));
-        foreach ($subscribersPerCon as $con => $subscribers) {
-            $em = $this->getEventManager($con);
+        $taggedSubscribers = $container->findTaggedServiceIds($this->tagPrefix.'.event_subscriber');
+        if (!empty($taggedSubscribers)) {
+            $subscribersPerCon = $this->groupByConnection($taggedSubscribers);
+            foreach ($subscribersPerCon as $con => $subscribers) {
+                $em = $this->getEventManager($con);
 
-            uasort($subscribers, $sortFunc);
-            foreach ($subscribers as $id => $instance) {
-                $em->addMethodCall('addEventSubscriber', array(new Reference($id)));
+                uasort($subscribers, $sortFunc);
+                foreach ($subscribers as $id => $instance) {
+                    $em->addMethodCall('addEventSubscriber', array(new Reference($id)));
+                }
             }
         }
 
-        $listenersPerCon = $this->groupByConnection($container->findTaggedServiceIds($this->tagPrefix.'.event_listener'), true);
-        foreach ($listenersPerCon as $con => $listeners) {
-            $em = $this->getEventManager($con);
+        $taggedListeners = $container->findTaggedServiceIds($this->tagPrefix.'.event_listener');
+        if (!empty($taggedListeners)) {
+            $listenersPerCon = $this->groupByConnection($taggedListeners, true);
+            foreach ($listenersPerCon as $con => $listeners) {
+                $em = $this->getEventManager($con);
 
-            uasort($listeners, $sortFunc);
-            foreach ($listeners as $id => $instance) {
-                $em->addMethodCall('addEventListener', array(
-                    array_unique($instance['event']),
-                    isset($instance['lazy']) && $instance['lazy'] ? $id : new Reference($id),
-                ));
+                uasort($listeners, $sortFunc);
+                foreach ($listeners as $id => $instance) {
+                    $em->addMethodCall('addEventListener', array(
+                        array_unique($instance['event']),
+                        isset($instance['lazy']) && $instance['lazy'] ? $id : new Reference($id),
+                    ));
+                }
             }
         }
     }

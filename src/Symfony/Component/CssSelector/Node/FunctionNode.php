@@ -100,43 +100,46 @@ class FunctionNode implements NodeInterface
         $xpath->addStarPrefix();
         if ($a == 0) {
             if ($last) {
-                $b = sprintf('last() - %s', $b);
+                $b = sprintf('last() - %s', $b - 1);
             }
             $xpath->addCondition(sprintf('position() = %s', $b));
 
             return $xpath;
         }
 
+        if ($a < 0) {
+            if ($b < 1) {
+                $xpath->addCondition('false()');
+
+                return $xpath;
+            }
+
+            $sign = '<=';
+        } else {
+            $sign = '>=';
+        }
+
+        $expr = 'position()';
+
         if ($last) {
-            // FIXME: I'm not sure if this is right
-            $a = -$a;
-            $b = -$b;
+            $expr = 'last() - '.$expr;
+            $b--;
         }
 
-        if ($b > 0) {
-            $bNeg = -$b;
-        } else {
-            $bNeg = sprintf('+%s', -$b);
+        if (0 !== $b) {
+            $expr .= ' - '.$b;
+        }
+        
+        $conditions = array(sprintf('%s %s 0', $expr, $sign));
+
+        if (1 !== $a && -1 !== $a) {
+            $conditions[] = sprintf('(%s) mod %d = 0', $expr, $a);
         }
 
-        if ($a != 1) {
-            $expr = array(sprintf('(position() %s) mod %s = 0', $bNeg, $a));
-        } else {
-            $expr = array();
-        }
-
-        if ($b >= 0) {
-            $expr[] = sprintf('position() >= %s', $b);
-        } elseif ($b < 0 && $last) {
-            $expr[] = sprintf('position() < (last() %s)', $b);
-        }
-        $expr = implode($expr, ' and ');
-
-        if ($expr) {
-            $xpath->addCondition($expr);
-        }
+        $xpath->addCondition(implode(' and ', $conditions));
 
         return $xpath;
+
         /* FIXME: handle an+b, odd, even
              an+b means every-a, plus b, e.g., 2n+1 means odd
              0n+b means b

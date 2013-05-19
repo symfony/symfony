@@ -128,7 +128,7 @@ EOF
         // sort so that it reads like an index of services
         asort($serviceIds);
 
-        $name = $name = $input->getArgument('name');
+        $name = $input->getArgument('name');
         if ($name) {
             $this->outputService($output, $name);
         } else {

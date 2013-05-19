@@ -9,7 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\CssSelector;
+namespace Symfony\Component\CssSelector\Tests;
+
+use Symfony\Component\CssSelector\CssSelector;
 
 class CssSelectorTest extends \PHPUnit_Framework_TestCase
 {

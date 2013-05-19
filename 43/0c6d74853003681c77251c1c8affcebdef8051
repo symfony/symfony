@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by Seldaek at 2013-05-15T00:20:00Z
+
+Seems reasonable to me.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-05-15T14:37:41Z
+
+Looks good to me. We probably need to add tests for the edge cases and I think it should be done on the 2.1 branch instead.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2013-05-17T22:06:18Z
+
+@fabpot I've split the things for 2.1 into #8080 and added tests as good as possible.
+This PR only has events stuff that was introduced in 2.3. So please merge this into 2.3 instead of master.

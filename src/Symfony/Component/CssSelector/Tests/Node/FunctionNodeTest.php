@@ -36,12 +36,12 @@ class FunctionNodeTest extends \PHPUnit_Framework_TestCase
         // h1:nth-child(odd)
         $element2 = new ElementNode('*', new Token('Symbol', 'odd', -1));
         $function = new FunctionNode($element, ':', 'nth-child', $element2);
-        $this->assertEquals("*/*[name() = 'h1' and ((position() -1) mod 2 = 0 and position() >= 1)]", (string) $function->toXpath(), '->toXpath() returns the xpath representation of the node');
+        $this->assertEquals("*/*[name() = 'h1' and (position() - 1 >= 0 and (position() - 1) mod 2 = 0)]", (string) $function->toXpath(), '->toXpath() returns the xpath representation of the node');
 
         // h1:nth-child(even)
         $element2 = new ElementNode('*', new Token('Symbol', 'even', -1));
         $function = new FunctionNode($element, ':', 'nth-child', $element2);
-        $this->assertEquals("*/*[name() = 'h1' and ((position() +0) mod 2 = 0 and position() >= 0)]", (string) $function->toXpath(), '->toXpath() returns the xpath representation of the node');
+        $this->assertEquals("*/*[name() = 'h1' and (position() >= 0 and (position()) mod 2 = 0)]", (string) $function->toXpath(), '->toXpath() returns the xpath representation of the node');
 
         // h1:nth-child(n)
         $element2 = new ElementNode('*', new Token('Symbol', 'n', -1));
@@ -51,12 +51,12 @@ class FunctionNodeTest extends \PHPUnit_Framework_TestCase
         // h1:nth-child(3n+1)
         $element2 = new ElementNode('*', new Token('Symbol', '3n+1', -1));
         $function = new FunctionNode($element, ':', 'nth-child', $element2);
-        $this->assertEquals("*/*[name() = 'h1' and ((position() -1) mod 3 = 0 and position() >= 1)]", (string) $function->toXpath(), '->toXpath() returns the xpath representation of the node');
+        $this->assertEquals("*/*[name() = 'h1' and (position() - 1 >= 0 and (position() - 1) mod 3 = 0)]", (string) $function->toXpath(), '->toXpath() returns the xpath representation of the node');
 
         // h1:nth-child(n+1)
         $element2 = new ElementNode('*', new Token('Symbol', 'n+1', -1));
         $function = new FunctionNode($element, ':', 'nth-child', $element2);
-        $this->assertEquals("*/*[name() = 'h1' and (position() >= 1)]", (string) $function->toXpath(), '->toXpath() returns the xpath representation of the node');
+        $this->assertEquals("*/*[name() = 'h1' and (position() - 1 >= 0)]", (string) $function->toXpath(), '->toXpath() returns the xpath representation of the node');
 
         // h1:nth-child(1)
         $element2 = new ElementNode('*', new Token('Symbol', '2', -1));
@@ -66,16 +66,16 @@ class FunctionNodeTest extends \PHPUnit_Framework_TestCase
         // h1:nth-child(2n)
         $element2 = new ElementNode('*', new Token('Symbol', '2n', -1));
         $function = new FunctionNode($element, ':', 'nth-child', $element2);
-        $this->assertEquals("*/*[name() = 'h1' and ((position() +0) mod 2 = 0 and position() >= 0)]", (string) $function->toXpath(), '->toXpath() returns the xpath representation of the node');
+        $this->assertEquals("*/*[name() = 'h1' and (position() >= 0 and (position()) mod 2 = 0)]", (string) $function->toXpath(), '->toXpath() returns the xpath representation of the node');
 
         // h1:nth-child(-n)
         $element2 = new ElementNode('*', new Token('Symbol', '-n', -1));
         $function = new FunctionNode($element, ':', 'nth-child', $element2);
-        $this->assertEquals("*/*[name() = 'h1' and ((position() +0) mod -1 = 0 and position() >= 0)]", (string) $function->toXpath(), '->toXpath() returns the xpath representation of the node');
+        $this->assertEquals("*/*[name() = 'h1' and (false())]", (string) $function->toXpath(), '->toXpath() returns the xpath representation of the node');
 
         // h1:nth-last-child(2)
         $function = new FunctionNode($element, ':', 'nth-last-child', 2);
-        $this->assertEquals("*/*[name() = 'h1' and (position() = last() - 2)]", (string) $function->toXpath(), '->toXpath() returns the xpath representation of the node');
+        $this->assertEquals("*/*[name() = 'h1' and (position() = last() - 1)]", (string) $function->toXpath(), '->toXpath() returns the xpath representation of the node');
 
         // h1:nth-of-type(2)
         $function = new FunctionNode($element, ':', 'nth-of-type', 2);
@@ -83,7 +83,7 @@ class FunctionNodeTest extends \PHPUnit_Framework_TestCase
 
         // h1:nth-last-of-type(2)
         $function = new FunctionNode($element, ':', 'nth-last-of-type', 2);
-        $this->assertEquals("*/h1[position() = last() - 2]", (string) $function->toXpath(), '->toXpath() returns the xpath representation of the node');
+        $this->assertEquals("*/h1[position() = last() - 1]", (string) $function->toXpath(), '->toXpath() returns the xpath representation of the node');
 
         /*
         // h1:not(p)

@@ -17,20 +17,23 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "symfony/dependency-injection" : "~2.0",
+        "symfony/dependency-injection" : "~2.2",
         "symfony/config" : "~2.2",
         "symfony/event-dispatcher": "~2.1",
-        "symfony/http-kernel": "~2.2",
-        "symfony/filesystem": "~2.1",
+        "symfony/http-kernel": "~2.3",
+        "symfony/filesystem": "~2.3",
         "symfony/routing": "~2.2",
-        "symfony/stopwatch": "~2.2",
+        "symfony/stopwatch": "~2.3",
         "symfony/templating": "~2.1",
-        "symfony/translation": "~2.2",
+        "symfony/translation": "~2.3",
         "doctrine/common": "~2.2"
     },
     "require-dev": {
         "symfony/finder": "~2.0",
-        "symfony/security": "~2.2"
+        "symfony/security": "~2.3",
+        "symfony/form": "~2.3",
+        "symfony/class-loader": "~2.1",
+        "symfony/validator": "~2.1"
     },
     "suggest": {
         "symfony/console": "",

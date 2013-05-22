@@ -73,7 +73,7 @@ EOF
         }
 
         $helper = new DescriptorHelper();
-        $helper->describe($output, $this->getApplication(), $input->getOption('format'), $input->getOption('raw'));
+        $helper->describe($output, $this->getApplication(), $input->getOption('format'), $input->getOption('raw'), $input->getArgument('namespace'));
     }
 
     /**

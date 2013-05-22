@@ -335,4 +335,22 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $tester->execute(array('command' => $command->getName()));
         $this->assertXmlStringEqualsXmlFile(self::$fixturesPath.'/command_asxml.txt', $command->asXml(), '->asXml() returns an XML representation of the command');
     }
+
+    public function testGetNameExceptionWhenNameNotSet()
+    {
+        $this->setExpectedException('\LogicException', 'Command name not found. You must call parent::__construct($name) in Foo5Command constructor');
+        $this->createFixtureCommand()->getName();
+    }
+
+    public function testGetDefinitionExceptionWhenNameNotSet()
+    {
+        $this->setExpectedException('\LogicException', 'InputDefinition not found. You must call parent::__construct($name) in Foo5Command constructor');
+        $this->createFixtureCommand()->getDefinition();
+    }
+
+    protected function createFixtureCommand()
+    {
+        require_once self::$fixturesPath.'/Foo5Command.php';
+        return new \Foo5Command;
+    }
 }

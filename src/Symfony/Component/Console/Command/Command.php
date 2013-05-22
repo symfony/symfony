@@ -32,13 +32,13 @@ class Command
 {
     private $application;
     private $name;
-    private $aliases;
+    private $aliases = array();
     private $definition;
     private $help;
     private $description;
-    private $ignoreValidationErrors;
-    private $applicationDefinitionMerged;
-    private $applicationDefinitionMergedWithArgs;
+    private $ignoreValidationErrors = false;
+    private $applicationDefinitionMerged = false;
+    private $applicationDefinitionMergedWithArgs = false;
     private $code;
     private $synopsis;
     private $helperSet;
@@ -55,10 +55,6 @@ class Command
     public function __construct($name = null)
     {
         $this->definition = new InputDefinition();
-        $this->ignoreValidationErrors = false;
-        $this->applicationDefinitionMerged = false;
-        $this->applicationDefinitionMergedWithArgs = false;
-        $this->aliases = array();
 
         if (null !== $name) {
             $this->setName($name);
@@ -223,7 +219,7 @@ class Command
 
         // bind the input against the command specific arguments/options
         try {
-            $input->bind($this->definition);
+            $input->bind($this->getDefinition());
         } catch (\Exception $e) {
             if (!$this->ignoreValidationErrors) {
                 throw $e;
@@ -288,12 +284,12 @@ class Command
         }
 
         if ($mergeArgs) {
-            $currentArguments = $this->definition->getArguments();
-            $this->definition->setArguments($this->application->getDefinition()->getArguments());
-            $this->definition->addArguments($currentArguments);
+            $currentArguments = $this->getDefinition()->getArguments();
+            $this->getDefinition()->setArguments($this->application->getDefinition()->getArguments());
+            $this->getDefinition()->addArguments($currentArguments);
         }
 
-        $this->definition->addOptions($this->application->getDefinition()->getOptions());
+        $this->getDefinition()->addOptions($this->application->getDefinition()->getOptions());
 
         $this->applicationDefinitionMerged = true;
         if ($mergeArgs) {
@@ -315,7 +311,7 @@ class Command
         if ($definition instanceof InputDefinition) {
             $this->definition = $definition;
         } else {
-            $this->definition->setDefinition($definition);
+            $this->getDefinition()->setDefinition($definition);
         }
 
         $this->applicationDefinitionMerged = false;
@@ -327,11 +323,14 @@ class Command
      * Gets the InputDefinition attached to this Command.
      *
      * @return InputDefinition An InputDefinition instance
-     *
+     * @throws \LogicException When InputDefinition not set
      * @api
      */
     public function getDefinition()
     {
+        if (is_null($this->definition)) {
+            throw new \LogicException(sprintf('InputDefinition not found. You must call parent::__construct($name) in %s constructor', get_class($this)));
+        }
         return $this->definition;
     }
 
@@ -364,7 +363,7 @@ class Command
      */
     public function addArgument($name, $mode = null, $description = '', $default = null)
     {
-        $this->definition->addArgument(new InputArgument($name, $mode, $description, $default));
+        $this->getDefinition()->addArgument(new InputArgument($name, $mode, $description, $default));
 
         return $this;
     }
@@ -384,7 +383,7 @@ class Command
      */
     public function addOption($name, $shortcut = null, $mode = null, $description = '', $default = null)
     {
-        $this->definition->addOption(new InputOption($name, $shortcut, $mode, $description, $default));
+        $this->getDefinition()->addOption(new InputOption($name, $shortcut, $mode, $description, $default));
 
         return $this;
     }
@@ -418,11 +417,15 @@ class Command
      * Returns the command name.
      *
      * @return string The command name
+     * @throws \LogicException When name not set
      *
      * @api
      */
     public function getName()
     {
+        if (is_null($this->name)) {
+            throw new \LogicException(sprintf('Command name not found. You must call parent::__construct($name) in %s constructor', get_class($this)));
+        }
         return $this->name;
     }
 
@@ -490,7 +493,7 @@ class Command
      */
     public function getProcessedHelp()
     {
-        $name = $this->name;
+        $name = $this->getName();
 
         $placeholders = array(
             '%command.name%',
@@ -544,7 +547,7 @@ class Command
     public function getSynopsis()
     {
         if (null === $this->synopsis) {
-            $this->synopsis = trim(sprintf('%s %s', $this->name, $this->definition->getSynopsis()));
+            $this->synopsis = trim(sprintf('%s %s', $this->getName(), $this->getDefinition()->getSynopsis()));
         }
 
         return $this->synopsis;

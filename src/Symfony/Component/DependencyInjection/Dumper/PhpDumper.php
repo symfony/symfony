@@ -86,6 +86,7 @@ class PhpDumper extends Dumper
      *
      *  * class:      The class name
      *  * base_class: The base class name
+     *  * namespace:  The class namespace
      *
      * @param array $options An array of options
      *
@@ -98,9 +99,10 @@ class PhpDumper extends Dumper
         $options = array_merge(array(
             'class'      => 'ProjectServiceContainer',
             'base_class' => 'Container',
+            'namespace' => '',
         ), $options);
 
-        $code = $this->startClass($options['class'], $options['base_class']);
+        $code = $this->startClass($options['class'], $options['base_class'], $options['namespace']);
 
         if ($this->container->isFrozen()) {
             $code .= $this->addFrozenConstructor();
@@ -703,16 +705,18 @@ EOF;
      *
      * @param string $class     Class name
      * @param string $baseClass The name of the base class
+     * @param string $namespace The class namespace
      *
      * @return string
      */
-    private function startClass($class, $baseClass)
+    private function startClass($class, $baseClass, $namespace)
     {
         $bagClass = $this->container->isFrozen() ? 'use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;' : 'use Symfony\Component\DependencyInjection\ParameterBag\\ParameterBag;';
+        $namespaceLine = $namespace ? "namespace $namespace;\n" : '';
 
         return <<<EOF
 <?php
-
+$namespaceLine
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\Exception\InactiveScopeException;

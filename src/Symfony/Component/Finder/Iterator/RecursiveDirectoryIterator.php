@@ -38,4 +38,12 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
     {
         return new SplFileInfo(parent::current()->getPathname(), $this->getSubPath(), $this->getSubPathname());
     }
+
+    public function rewind()
+    {
+        // @see https://bugs.php.net/bug.php?id=49104
+        parent::next();
+
+        parent::rewind();
+    }
 }

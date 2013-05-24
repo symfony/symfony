@@ -62,7 +62,6 @@ class FormTypeValidatorExtension extends BaseValidatorExtension
 
         $resolver->setDefaults(array(
             'error_mapping'              => array(),
-            'validation_constraint'      => null,
             'constraints'                => array(),
             'cascade_validation'         => false,
             'invalid_message'            => 'This value is not valid.',

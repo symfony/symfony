@@ -39,11 +39,15 @@ class DefaultAuthenticationFailureHandlerTest extends \PHPUnit_Framework_TestCas
             $this->markTestSkipped('The "HttpFoundation" component is not available');
         }
 
+        if (!class_exists('Psr\Log\LoggerInterface')) {
+            $this->markTestSkipped('The "LoggerInterface" is not available');
+        }
+
         $this->httpKernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
         $this->httpUtils = $this->getMock('Symfony\Component\Security\Http\HttpUtils');
         $this->logger = $this->getMock('Psr\Log\LoggerInterface');
 
-        $this->session = $this->getMock('Symfony\Component\HttpFoundation\Session\Session');
+        $this->session = $this->getMock('Symfony\Component\HttpFoundation\Session\SessionInterface');
         $this->request = $this->getMock('Symfony\Component\HttpFoundation\Request');
         $this->request->expects($this->any())->method('getSession')->will($this->returnValue($this->session));
         $this->exception = $this->getMock('Symfony\Component\Security\Core\Exception\AuthenticationException');

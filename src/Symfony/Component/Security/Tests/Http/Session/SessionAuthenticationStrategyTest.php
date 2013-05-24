@@ -66,7 +66,7 @@ class SessionAuthenticationStrategyTest extends \PHPUnit_Framework_TestCase
     {
         $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
 
-        if (!is_null($session)) {
+        if (null !== $session) {
             $request->expects($this->any())->method('getSession')->will($this->returnValue($session));
         }
 

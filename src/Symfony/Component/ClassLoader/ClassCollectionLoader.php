@@ -63,7 +63,7 @@ class ClassCollectionLoader
         // auto-reload
         $reload = false;
         if ($autoReload) {
-            $metadata = $cacheDir.'/'.$name.$extension.'.meta';
+            $metadata = $cache.'.meta';
             if (!is_file($metadata) || !is_file($cache)) {
                 $reload = true;
             } else {

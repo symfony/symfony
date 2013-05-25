@@ -17,8 +17,8 @@ use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
- * Converts a string with multiple values separated by a delimiter to an array of values.
- * 
+ * Converts an array of values to a string with multiple values separated by a delimiter.
+ *
  * @author Bilal Amarni <bilal.amarni@gmail.com>
  */
 class ValuesToStringTransformer implements DataTransformerInterface
@@ -57,8 +57,7 @@ class ValuesToStringTransformer implements DataTransformerInterface
      *
      * @return array
      *
-     * @throws UnexpectedTypeException       if the given value is not a string
-     * @throws TransformationFailedException if could not find all matching choices for the given labels
+     * @throws UnexpectedTypeException if the given value is not a string
      */
     public function reverseTransform($string)
     {

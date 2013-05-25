@@ -99,7 +99,6 @@ class ChoiceType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        var_dump($options['multiple']);
         $view->vars = array_replace($view->vars, array(
             'widget'            => $options['widget'],
             'multiple'          => $options['multiple'],

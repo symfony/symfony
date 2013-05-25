@@ -85,6 +85,13 @@ class EntityChoiceList extends ObjectChoiceList
     private $preferredEntities = array();
 
     /**
+     * Whether or not the choice list shoud be loaded.
+     *
+     * @var Boolean
+     */
+    private $lazy;
+
+    /**
      * Creates a new entity choice list.
      *
      * @param ObjectManager             $manager           An EntityManager instance
@@ -97,22 +104,27 @@ class EntityChoiceList extends ObjectChoiceList
      *                                                     to group the choices. Only allowed if
      *                                                     the choices are given as flat array.
      * @param PropertyAccessorInterface $propertyAccessor  The reflection graph for reading property paths.
+     * @param Boolean                   $lazy              Whether or not the choice list shoud be loaded.
      */
-    public function __construct(ObjectManager $manager, $class, $labelPath = null, EntityLoaderInterface $entityLoader = null, $entities = null,  array $preferredEntities = array(), $groupPath = null, PropertyAccessorInterface $propertyAccessor = null)
+    public function __construct(ObjectManager $manager, $class, $labelPath = null, EntityLoaderInterface $entityLoader = null, $entities = null,  array $preferredEntities = array(), $groupPath = null, PropertyAccessorInterface $propertyAccessor = null, $lazy = false)
     {
         $this->em = $manager;
         $this->entityLoader = $entityLoader;
         $this->classMetadata = $manager->getClassMetadata($class);
         $this->class = $this->classMetadata->getName();
         $this->loaded = is_array($entities) || $entities instanceof \Traversable;
+        $this->lazy = $lazy;
         $this->preferredEntities = $preferredEntities;
 
         $identifier = $this->classMetadata->getIdentifierFieldNames();
 
         if (1 === count($identifier)) {
-            $this->idField = $identifier[0];
-            $this->idAsValue = true;
-
+            if (!$lazy) {
+                $this->idField = $identifier[0];
+                $this->idAsValue = true;
+            } else {
+                $this->idField = (string) $labelPath;
+            }
             if (in_array($this->classMetadata->getTypeOfField($this->idField), array('integer', 'smallint', 'bigint'))) {
                 $this->idAsIndex = true;
             }
@@ -124,7 +136,7 @@ class EntityChoiceList extends ObjectChoiceList
             $entities = array();
         }
 
-        parent::__construct($entities, $labelPath, $preferredEntities, $groupPath, null, $propertyAccessor);
+        parent::__construct($entities, $labelPath, $preferredEntities, $groupPath, $labelPath, $propertyAccessor);
     }
 
     /**
@@ -215,6 +227,10 @@ class EntityChoiceList extends ObjectChoiceList
                 return $this->entityLoader->getEntitiesByIds($this->idField, $values);
             }
 
+            if ($this->lazy) {
+                return $this->em->getRepository($this->class)->findBy(array($this->idField => $values));
+            }
+
             $this->load();
         }
 
@@ -237,13 +253,13 @@ class EntityChoiceList extends ObjectChoiceList
             // know that the IDs are used as values
 
             // Attention: This optimization does not check choices for existence
-            if ($this->idAsValue) {
+            if ($this->idAsValue || $this->lazy) {
                 $values = array();
 
                 foreach ($entities as $entity) {
                     if ($entity instanceof $this->class) {
                         // Make sure to convert to the right format
-                        $values[] = $this->fixValue(current($this->getIdentifierValues($entity)));
+                        $values[] = $this->fixValue($this->createValue($entity));
                     }
                 }
 
@@ -379,6 +395,10 @@ class EntityChoiceList extends ObjectChoiceList
      */
     private function load()
     {
+        if ($this->lazy) {
+            return;
+        }
+
         if ($this->entityLoader) {
             $entities = $this->entityLoader->getEntities();
         } else {

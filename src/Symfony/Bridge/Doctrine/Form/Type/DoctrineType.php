@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Doctrine\Form\Type;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\Exception\RuntimeException;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -50,6 +51,9 @@ abstract class DoctrineType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        if ('text' === $options['widget'] && !$options['property']) {
+            throw new LogicException('When using a text widget, the "property" option must be defined.');
+        }
         if ($options['multiple']) {
             $builder
                 ->addEventSubscriber(new MergeDoctrineCollectionListener())
@@ -116,7 +120,8 @@ abstract class DoctrineType extends AbstractType
                 $loaderHash,
                 $choiceHashes,
                 $preferredChoiceHashes,
-                $groupByHash
+                $groupByHash,
+                'text' === $options['widget']
             )));
 
             if (!isset($choiceListCache[$hash])) {
@@ -128,7 +133,8 @@ abstract class DoctrineType extends AbstractType
                     $options['choices'],
                     $options['preferred_choices'],
                     $options['group_by'],
-                    $propertyAccessor
+                    $propertyAccessor,
+                    'text' === $options['widget']
                 );
             }
 

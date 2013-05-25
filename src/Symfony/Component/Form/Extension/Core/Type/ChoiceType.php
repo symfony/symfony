@@ -25,6 +25,7 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\ChoiceToValueTransform
 use Symfony\Component\Form\Extension\Core\DataTransformer\ChoiceToBooleanArrayTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\ChoicesToValuesTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\ChoicesToBooleanArrayTransformer;
+use Symfony\Component\Form\Extension\Core\DataTransformer\ValuesToStringTransformer;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
@@ -45,7 +46,7 @@ class ChoiceType extends AbstractType
             throw new LogicException('Either the option "choices" or "choice_list" must be set.');
         }
 
-        if ($options['expanded']) {
+        if (in_array($options['widget'], array('radio', 'checkbox'))) {
             // Initialize all choices before doing the index check below.
             // This helps in cases where index checks are optimized for non
             // initialized choice lists. For example, when using an SQL driver,
@@ -68,7 +69,7 @@ class ChoiceType extends AbstractType
             $this->addSubForms($builder, $preferredViews, $options);
             $this->addSubForms($builder, $remainingViews, $options);
 
-            if ($options['multiple']) {
+            if ('checkbox' === $options['widget']) {
                 $builder->addViewTransformer(new ChoicesToBooleanArrayTransformer($options['choice_list']));
                 $builder->addEventSubscriber(new FixCheckboxInputListener($options['choice_list']), 10);
             } else {
@@ -78,6 +79,9 @@ class ChoiceType extends AbstractType
         } else {
             if ($options['multiple']) {
                 $builder->addViewTransformer(new ChoicesToValuesTransformer($options['choice_list']));
+                if ('text' === $options['widget']) {
+                    $builder->addViewTransformer(new ValuesToStringTransformer($options['delimiter'], $options['trim']));
+                }
             } else {
                 $builder->addViewTransformer(new ChoiceToValueTransformer($options['choice_list']));
             }
@@ -95,7 +99,9 @@ class ChoiceType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
+        var_dump($options['multiple']);
         $view->vars = array_replace($view->vars, array(
+            'widget'            => $options['widget'],
             'multiple'          => $options['multiple'],
             'expanded'          => $options['expanded'],
             'preferred_choices' => $options['choice_list']->getPreferredViews(),
@@ -124,7 +130,7 @@ class ChoiceType extends AbstractType
             $view->vars['empty_value'] = $options['empty_value'];
         }
 
-        if ($options['multiple'] && !$options['expanded']) {
+        if ($options['multiple'] && 'select' === $options['widget']) {
             // Add "[]" to the name in case a select tag with multiple options is
             // displayed. Otherwise only one of the selected options is sent in the
             // POST request.
@@ -137,12 +143,12 @@ class ChoiceType extends AbstractType
      */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
-        if ($options['expanded']) {
+        if (in_array($options['widget'], array('radio', 'checkbox'))) {
             // Radio buttons should have the same name as the parent
             $childName = $view->vars['full_name'];
 
             // Checkboxes should append "[]" to allow multiple selection
-            if ($options['multiple']) {
+            if ('checkbox' === $options['widget']) {
                 $childName .= '[]';
             }
 
@@ -174,7 +180,7 @@ class ChoiceType extends AbstractType
         };
 
         $emptyData = function (Options $options) {
-            if ($options['multiple'] || $options['expanded']) {
+            if ($options['multiple'] || 'radio' === $options['widget']) {
                 return array();
             }
 
@@ -192,7 +198,7 @@ class ChoiceType extends AbstractType
             } elseif (false === $emptyValue) {
                 // an empty value should be added but the user decided otherwise
                 return null;
-            } elseif ($options['expanded'] && '' === $emptyValue) {
+            } elseif ('radio' === $options['widget'] && '' === $emptyValue) {
                 // never use an empty label for radio buttons
                 return 'None';
             }
@@ -201,13 +207,38 @@ class ChoiceType extends AbstractType
             return $emptyValue;
         };
 
+        $widgetDefault = function (Options $options) {
+            if ($options['expanded']) {
+                if ($options['multiple']) {
+                    return 'checkbox';
+                }
+
+                return 'radio';
+            }
+
+            return 'select';
+        };
+
+        $multipleNormalizer = function (Options $options, $multiple) {
+            if (in_array($options['widget'], array('radio', 'checkbox'))) {
+                return ('checkbox' === $options['widget']);
+            }
+
+            return $multiple;
+        };
+
+        $expandedNormalizer = function (Options $options) {
+            return in_array($options['widget'], array('radio', 'checkbox'));
+        };
+
         $compound = function (Options $options) {
-            return $options['expanded'];
+            return in_array($options['widget'], array('radio', 'checkbox'));
         };
 
         $resolver->setDefaults(array(
+            'widget'            => $widgetDefault,
+            'delimiter'         => ',',
             'multiple'          => false,
-            'expanded'          => false,
             'choice_list'       => $choiceList,
             'choices'           => array(),
             'preferred_choices' => array(),
@@ -219,14 +250,22 @@ class ChoiceType extends AbstractType
             // is manually set to an object.
             // See https://github.com/symfony/symfony/pull/5582
             'data_class'        => null,
+            // Deprecated, to be removed in 3.0
+            'expanded'          => false,
         ));
 
         $resolver->setNormalizers(array(
             'empty_value' => $emptyValueNormalizer,
+            'multiple' => $multipleNormalizer,
+            'expanded' => $expandedNormalizer, // For BC
         ));
 
         $resolver->setAllowedTypes(array(
             'choice_list' => array('null', 'Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface'),
+        ));
+
+        $resolver->setAllowedValues(array(
+            'widget' => array('select', 'checkbox', 'radio', 'text')
         ));
     }
 
@@ -258,16 +297,13 @@ class ChoiceType extends AbstractType
                     'translation_domain' => $options['translation_domain'],
                 );
 
-                if ($options['multiple']) {
-                    $choiceType = 'checkbox';
+                if ('checkbox' === $options['widget']) {
                     // The user can check 0 or more checkboxes. If required
                     // is true, he is required to check all of them.
                     $choiceOpts['required'] = false;
-                } else {
-                    $choiceType = 'radio';
                 }
 
-                $builder->add($i, $choiceType, $choiceOpts);
+                $builder->add($i, $options['widget'], $choiceOpts);
             }
         }
     }

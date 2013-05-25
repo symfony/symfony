@@ -56,9 +56,9 @@ class DescriptorHelper extends Helper
      * @param string          $format
      * @param boolean         $raw
      */
-    public function describe(OutputInterface $output, $object, $format = null, $raw = false)
+    public function describe(OutputInterface $output, $object, $format = null, $raw = false, $namespace = null)
     {
-        $options = array('raw_text' => $raw, 'format' => $format ?: 'txt');
+        $options = array('raw_text' => $raw, 'format' => $format ?: 'txt', 'namespace' => $namespace);
         $type = !$raw && 'txt' === $options['format'] ? OutputInterface::OUTPUT_NORMAL : OutputInterface::OUTPUT_RAW;
 
         if (!isset($this->descriptors[$options['format']])) {

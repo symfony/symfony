@@ -46,4 +46,20 @@ EOF;
 
         $this->assertEquals($output, $commandTester->getDisplay(true));
     }
+
+    public function testExecuteListsCommandsWithNamespaceArgument()
+    {
+
+        require_once(realpath(__DIR__.'/../Fixtures/FooCommand.php'));
+        $application = new Application();
+        $application->add(new \FooCommand());
+        $commandTester = new CommandTester($command = $application->get('list'));
+        $commandTester->execute(array('command' => $command->getName(), 'namespace' => 'foo', '--raw' => true));
+        $output = <<<EOF
+foo:bar   The foo:bar command
+
+EOF;
+
+        $this->assertEquals($output, $commandTester->getDisplay(true));
+    }
 }

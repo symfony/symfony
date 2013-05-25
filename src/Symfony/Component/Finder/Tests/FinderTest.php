@@ -485,4 +485,21 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $this->assertIterator($expected, $finder);
         $this->assertIteratorInForeach($expected, $finder);
     }
+
+    public function testNonSeekableStream()
+    {
+        try {
+            $i = Finder::create()->in('ftp://ftp.mozilla.org/')->depth(0)->getIterator();
+        } catch (\UnexpectedValueException $e) {
+            $this->markTestSkipped(sprintf('Unsupported stream "%s".', 'ftp'));
+        }
+
+        $contains = array(
+            'ftp://ftp.mozilla.org'.DIRECTORY_SEPARATOR.'README',
+            'ftp://ftp.mozilla.org'.DIRECTORY_SEPARATOR.'index.html',
+            'ftp://ftp.mozilla.org'.DIRECTORY_SEPARATOR.'pub',
+        );
+
+        $this->assertIteratorInForeach($contains, $i);
+    }
 }

@@ -241,7 +241,7 @@ class Store implements StoreInterface
      * @param array  $env1 A Request HTTP header array
      * @param array  $env2 A Request HTTP header array
      *
-     * @return Boolean true if the the two environments match, false otherwise
+     * @return Boolean true if the two environments match, false otherwise
      */
     private function requestsMatch($vary, $env1, $env2)
     {

@@ -39,7 +39,7 @@ class DefaultAuthenticationFailureHandlerTest extends \PHPUnit_Framework_TestCas
             $this->markTestSkipped('The "HttpFoundation" component is not available');
         }
 
-        if (!class_exists('Psr\Log\LoggerInterface')) {
+        if (!interface_exists('Psr\Log\LoggerInterface')) {
             $this->markTestSkipped('The "LoggerInterface" is not available');
         }
 

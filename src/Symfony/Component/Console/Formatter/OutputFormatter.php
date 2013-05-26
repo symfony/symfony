@@ -239,7 +239,7 @@ class OutputFormatter implements OutputFormatterInterface
      *
      * @param string $text Input text
      *
-     * @return string string Styled text
+     * @return string Styled text
      */
     private function applyCurrentStyle($text)
     {

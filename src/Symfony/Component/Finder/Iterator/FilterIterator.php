@@ -30,7 +30,14 @@ abstract class FilterIterator extends \FilterIterator
     {
         $iterator = $this;
         while ($iterator instanceof \OuterIterator) {
-            if ($iterator->getInnerIterator() instanceof \FilesystemIterator) {
+            $innerIterator = $iterator->getInnerIterator();
+
+            if ($innerIterator instanceof RecursiveDirectoryIterator) {
+                if ($innerIterator->isRewindable()) {
+                    $innerIterator->next();
+                    $innerIterator->rewind();
+                }
+            } elseif ($iterator->getInnerIterator() instanceof \FilesystemIterator) {
                 $iterator->getInnerIterator()->next();
                 $iterator->getInnerIterator()->rewind();
             }

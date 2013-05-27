@@ -20,6 +20,11 @@ use Symfony\Component\Finder\SplFileInfo;
  */
 class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
 {
+    /**
+     * @var Boolean
+     */
+    private $rewindable;
+
     public function __construct($path, $flags)
     {
         if ($flags & (self::CURRENT_AS_PATHNAME | self::CURRENT_AS_SELF)) {
@@ -37,5 +42,43 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
     public function current()
     {
         return new SplFileInfo(parent::current()->getPathname(), $this->getSubPath(), $this->getSubPathname());
+    }
+
+    /**
+     * Do nothing for non rewindable stream
+     */
+    public function rewind()
+    {
+        if (false === $this->isRewindable()) {
+            return;
+        }
+
+        // @see https://bugs.php.net/bug.php?id=49104
+        parent::next();
+
+        parent::rewind();
+    }
+
+    /**
+     * Checks if the stream is rewindable.
+     *
+     * @return Boolean true when the stream is rewindable, false otherwise
+     */
+    public function isRewindable()
+    {
+        if (null !== $this->rewindable) {
+            return $this->rewindable;
+        }
+
+        if (false !== $stream = @opendir($this->getPath())) {
+            $infos = stream_get_meta_data($stream);
+            closedir($stream);
+
+            if ($infos['seekable']) {
+                return $this->rewindable = true;
+            }
+        }
+
+        return $this->rewindable = false;
     }
 }

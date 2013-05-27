@@ -520,6 +520,7 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
             array(1024, '1K', 0, null),
             array(null, '1K', 0, null),
             array(1024, '', 0, null),
+            array(1024, 0, 0, null),
         );
     }
 

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2013-05-27T20:39:52Z
+
+The build has failed because of [a timing issue](https://travis-ci.org/symfony/symfony/jobs/7543929#L242) (it happens when travis is overloaded).

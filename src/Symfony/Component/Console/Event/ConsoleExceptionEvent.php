@@ -20,7 +20,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ConsoleForExceptionEvent extends ConsoleEvent
+class ConsoleExceptionEvent extends ConsoleEvent
 {
     private $exception;
     private $exitCode;

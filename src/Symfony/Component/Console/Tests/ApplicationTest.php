@@ -24,7 +24,7 @@ use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\ApplicationTester;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
-use Symfony\Component\Console\Event\ConsoleForExceptionEvent;
+use Symfony\Component\Console\Event\ConsoleExceptionEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
@@ -788,7 +788,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
             $event->setExitCode(128);
         });
-        $dispatcher->addListener('console.exception', function (ConsoleForExceptionEvent $event) {
+        $dispatcher->addListener('console.exception', function (ConsoleExceptionEvent $event) {
             $event->getOutput()->writeln('caught.');
 
             $event->setException(new \LogicException('caught.', $event->getExitCode(), $event->getException()));

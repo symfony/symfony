@@ -107,14 +107,6 @@ class FrameworkExtension extends Extension
         }
 
         $this->addClassesToCompile(array(
-            'Symfony\\Component\\HttpFoundation\\ParameterBag',
-            'Symfony\\Component\\HttpFoundation\\HeaderBag',
-            'Symfony\\Component\\HttpFoundation\\FileBag',
-            'Symfony\\Component\\HttpFoundation\\ServerBag',
-            'Symfony\\Component\\HttpFoundation\\Request',
-            'Symfony\\Component\\HttpFoundation\\Response',
-            'Symfony\\Component\\HttpFoundation\\ResponseHeaderBag',
-
             'Symfony\\Component\\Config\\FileLocator',
 
             'Symfony\\Component\\EventDispatcher\\Event',

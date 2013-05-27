@@ -37,6 +37,9 @@ class FileLoaderLoadException extends \Exception
             $parts = explode(DIRECTORY_SEPARATOR, $resource);
             $bundle = substr($parts[0], 1);
             $message .= ' '.sprintf('Make sure the "%s" bundle is correctly registered and loaded in the application kernel class.', $bundle);
+        } elseif ($previous) {
+            // include the previous exception, to help the user see what might be the underlying cause
+            $message .= ' '.sprintf('(%s)', $previous->getMessage());
         }
 
         parent::__construct($message, $code, $previous);

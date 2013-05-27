@@ -31,7 +31,7 @@ use Symfony\Component\Console\Helper\DialogHelper;
 use Symfony\Component\Console\Helper\ProgressHelper;
 use Symfony\Component\Console\Helper\TableHelper;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
-use Symfony\Component\Console\Event\ConsoleForExceptionEvent;
+use Symfony\Component\Console\Event\ConsoleExceptionEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
@@ -131,7 +131,7 @@ class Application
             }
             $exitCode = $e->getCode();
 
-            $exitCode = is_numeric($exitCode) && $exitCode ? $exitCode : 1;
+            $exitCode = $exitCode ? (is_numeric($exitCode) ? (int) $exitCode : 1) : 0;
         }
 
         if ($this->autoExit) {
@@ -184,7 +184,7 @@ class Application
         $exitCode = $this->doRunCommand($command, $input, $output);
         $this->runningCommand = null;
 
-        return is_numeric($exitCode) ? $exitCode : 0;
+        return $exitCode;
     }
 
     /**
@@ -901,7 +901,7 @@ class Application
             $event = new ConsoleTerminateEvent($command, $input, $output, $e->getCode());
             $this->dispatcher->dispatch(ConsoleEvents::TERMINATE, $event);
 
-            $event = new ConsoleForExceptionEvent($command, $input, $output, $e, $event->getExitCode());
+            $event = new ConsoleExceptionEvent($command, $input, $output, $e, $event->getExitCode());
             $this->dispatcher->dispatch(ConsoleEvents::EXCEPTION, $event);
 
             throw $event->getException();

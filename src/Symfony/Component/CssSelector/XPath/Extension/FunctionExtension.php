@@ -67,25 +67,38 @@ class FunctionExtension extends AbstractExtension
         }
 
         if (0 === $a) {
-            return $xpath->addCondition('position() = '.($last ? 'last() - '.$b : $b));
+            return $xpath->addCondition('position() = '.($last ? 'last() - '.($b - 1) : $b));
         }
+
+        if ($a < 0) {
+            if ($b < 1) {
+                return $xpath->addCondition('false()');
+            }
+
+            $sign = '<=';
+        } else {
+            $sign = '>=';
+        }
+
+        $expr = 'position()';
 
         if ($last) {
-            // todo: verify if this is right
-            $a = - $a;
-            $b = - $b;
+            $expr = 'last() - '.$expr;
+            $b--;
         }
 
-        $conditions = 1 === $a
-            ? array()
-            : array(sprintf('(position() %s) mod %s = 0', $b > 0 ? (string) (- $b) : '+'.(- $b), $a));
+        if (0 !== $b) {
+            $expr .= ' - '.$b;
+        }
+        
+        $conditions = array(sprintf('%s %s 0', $expr, $sign));
 
-        if ($b >= 0) {
-            $conditions[] = 'position() >= '.$b;
-        } elseif ($last) {
-            $conditions[] = sprintf('position() < (last() %s)', $b);
+        if (1 !== $a && -1 !== $a) {
+            $conditions[] = sprintf('(%s) mod %d = 0', $expr, $a);
         }
 
+        return $xpath->addCondition(implode(' and ', $conditions));
+        
         // todo: handle an+b, odd, even
         // an+b means every-a, plus b, e.g., 2n+1 means odd
         // 0n+b means b
@@ -93,8 +106,6 @@ class FunctionExtension extends AbstractExtension
         // an means every a elements, i.e., 2n means even
         // -n means -1n
         // -1n+6 means elements 6 and previous
-
-        return empty($conditions) ? $xpath : $xpath->addCondition(implode(' and ', $conditions));
     }
 
     /**

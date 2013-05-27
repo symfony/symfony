@@ -7,6 +7,14 @@ in 2.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.3.0...v2.3.1
 
+* 2.3.0-RC1 (2013-05-16)
+
+ * 95f356b: remove check for PHP bug #50731
+ * 8f54da7: [BrowserKit] should not follow redirects if status code is not 30x
+ * f41ac06: changed all version deps to accepts all upcoming Symfony versions
+ * a4e3ebf: [DomCrawler] Fixed the Crawler::html() method for PHP versions earlier than 5.3.6.
+ * 3beaf52: [Security] Disabled the BCryptPasswordEncoder tests for PHP versions lower than 5.3.7.
+
 * 2.3.0-BETA2 (2013-05-10)
 
  * 97bee20: Pass exceptions from the ExceptionListener to Monolog

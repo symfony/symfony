@@ -11,9 +11,11 @@
 
 namespace Symfony\Component\Debug;
 
-use Symfony\Component\Debug\Exception\FatalErrorException;
-use Symfony\Component\Debug\Exception\ContextErrorException;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Debug\Exception\ClassNotFoundException;
+use Symfony\Component\Debug\Exception\ContextErrorException;
+use Symfony\Component\Debug\Exception\FatalErrorException;
+use Symfony\Component\Debug\Exception\UndefinedFunctionException;
 
 /**
  * ErrorHandler.
@@ -39,6 +41,11 @@ class ErrorHandler
         E_CORE_ERROR        => 'Core Error',
         E_COMPILE_ERROR     => 'Compile Error',
         E_PARSE             => 'Parse',
+    );
+
+    private $classNameToUseStatementSuggestions = array(
+        'Request' => 'Symfony\Component\HttpFoundation\Request',
+        'Response' => 'Symfony\Component\HttpFoundation\Response',
     );
 
     private $level;
@@ -152,15 +159,158 @@ class ErrorHandler
             return;
         }
 
+        $this->handleFatalError($error);
+    }
+
+    public function handleFatalError($error)
+    {
         // get current exception handler
         $exceptionHandler = set_exception_handler(function() {});
         restore_exception_handler();
 
         if (is_array($exceptionHandler) && $exceptionHandler[0] instanceof ExceptionHandler) {
-            $level = isset($this->levels[$type]) ? $this->levels[$type] : $type;
+            $level = isset($this->levels[$error['type']]) ? $this->levels[$error['type']] : $error['type'];
             $message = sprintf('%s: %s in %s line %d', $level, $error['message'], $error['file'], $error['line']);
-            $exception = new FatalErrorException($message, 0, $type, $error['file'], $error['line']);
+            $exception = new FatalErrorException($message, 0, $error['type'], $error['file'], $error['line']);
+
+            if ($this->handleUndefinedFunctionError($exceptionHandler[0], $error, $exception)) {
+                return;
+            }
+
+            if ($this->handleClassNotFoundError($exceptionHandler[0], $error, $exception)) {
+                return;
+            }
+
             $exceptionHandler[0]->handle($exception);
+        }
+    }
+
+    private function handleUndefinedFunctionError($exceptionHandler, $error, $exception)
+    {
+        $messageLen = strlen($error['message']);
+        $notFoundSuffix = "()";
+        $notFoundSuffixLen = strlen($notFoundSuffix);
+        if ($notFoundSuffixLen > $messageLen) {
+            return false;
+        }
+
+        if (0 !== substr_compare($error['message'], $notFoundSuffix, -$notFoundSuffixLen)) {
+            return false;
+        }
+
+        $prefix = "Call to undefined function ";
+        $prefixLen = strlen($prefix);
+        if (0 !== strpos($error['message'], $prefix)) {
+            return false;
+        }
+
+        $fullyQualifiedFunctionName = substr($error['message'], $prefixLen, -$notFoundSuffixLen);
+        if (false !== $namespaceSeparatorIndex = strrpos($fullyQualifiedFunctionName, '\\')) {
+            $functionName = substr($fullyQualifiedFunctionName, $namespaceSeparatorIndex + 1);
+            $namespacePrefix = substr($fullyQualifiedFunctionName, 0, $namespaceSeparatorIndex);
+            $message = sprintf(
+                "Attempted to call function '%s' from namespace '%s' in %s line %d.",
+                $functionName,
+                $namespacePrefix,
+                $error['file'],
+                $error['line']
+            );
+        } else {
+            $functionName = $fullyQualifiedFunctionName;
+            $message = sprintf(
+                "Attempted to call function '%s' from the global namespace in %s line %d.",
+                $functionName,
+                $error['file'],
+                $error['line']
+            );
+        }
+
+        $candidates = array();
+        foreach (get_defined_functions() as $type => $definedFunctionNames) {
+            foreach ($definedFunctionNames as $definedFunctionName) {
+                if (false !== $namespaceSeparatorIndex = strrpos($definedFunctionName, '\\')) {
+                    $definedFunctionNameBasename = substr($definedFunctionName, $namespaceSeparatorIndex + 1);
+                } else {
+                    $definedFunctionNameBasename = $definedFunctionName;
+                }
+
+                if ($definedFunctionNameBasename === $functionName) {
+                    $candidates[] = '\\'.$definedFunctionName;
+                }
+            }
+        }
+
+        if ($candidates) {
+            $message .= " Did you mean to call: " . implode(", ", array_map(function ($val) {
+                return "'".$val."'";
+            }, $candidates)). "?";
+        }
+
+        $exceptionHandler->handle(new UndefinedFunctionException(
+            $message,
+            $exception
+        ));
+
+        return true;
+    }
+
+    private function handleClassNotFoundError($exceptionHandler, $error, $exception)
+    {
+        $messageLen = strlen($error['message']);
+        $notFoundSuffix = "' not found";
+        $notFoundSuffixLen = strlen($notFoundSuffix);
+        if ($notFoundSuffixLen > $messageLen) {
+            return false;
+        }
+
+        if (0 !== substr_compare($error['message'], $notFoundSuffix, -$notFoundSuffixLen)) {
+            return false;
+        }
+
+        foreach (array("class", "interface", "trait") as $typeName) {
+            $prefix = ucfirst($typeName)." '";
+            $prefixLen = strlen($prefix);
+            if (0 !== strpos($error['message'], $prefix)) {
+                continue;
+            }
+
+            $fullyQualifiedClassName = substr($error['message'], $prefixLen, -$notFoundSuffixLen);
+            if (false !== $namespaceSeparatorIndex = strrpos($fullyQualifiedClassName, '\\')) {
+                $className = substr($fullyQualifiedClassName, $namespaceSeparatorIndex + 1);
+                $namespacePrefix = substr($fullyQualifiedClassName, 0, $namespaceSeparatorIndex);
+                $message = sprintf(
+                    "Attempted to load %s '%s' from namespace '%s' in %s line %d. Do you need to 'use' it from another namespace?",
+                    $typeName,
+                    $className,
+                    $namespacePrefix,
+                    $error['file'],
+                    $error['line']
+                );
+            } else {
+                $className = $fullyQualifiedClassName;
+                $message = sprintf(
+                    "Attempted to load %s '%s' from the global namespace in %s line %d. Did you forget a use statement for this %s?",
+                    $typeName,
+                    $className,
+                    $error['file'],
+                    $error['line'],
+                    $typeName
+                );
+            }
+
+            if (isset($this->classNameToUseStatementSuggestions[$className])) {
+                $message .= sprintf(
+                    " Perhaps you need to add 'use %s' at the top of this file?",
+                    $this->classNameToUseStatementSuggestions[$className]
+                );
+            }
+
+            $exceptionHandler->handle(new ClassNotFoundException(
+                $message,
+                $exception
+            ));
+
+            return true;
         }
     }
 }

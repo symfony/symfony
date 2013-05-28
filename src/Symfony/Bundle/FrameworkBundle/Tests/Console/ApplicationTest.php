@@ -20,7 +20,7 @@ class ApplicationTest extends TestCase
 {
     public function testBundleInterfaceImplementation()
     {
-        $bundle = $this->getMock("Symfony\Component\HttpKernel\Bundle\BundleInterface");
+        $bundle = $this->getMock('Symfony\Component\HttpKernel\Bundle\BundleInterface');
 
         $kernel = $this->getKernel(array($bundle));
 
@@ -30,7 +30,7 @@ class ApplicationTest extends TestCase
 
     public function testBundleCommandsAreRegistered()
     {
-        $bundle = $this->getMock("Symfony\Component\HttpKernel\Bundle\Bundle");
+        $bundle = $this->getMock('Symfony\Component\HttpKernel\Bundle\Bundle');
         $bundle->expects($this->once())->method('registerCommands');
 
         $kernel = $this->getKernel(array($bundle));
@@ -41,11 +41,30 @@ class ApplicationTest extends TestCase
 
     private function getKernel(array $bundles)
     {
-        $kernel = $this->getMock("Symfony\Component\HttpKernel\KernelInterface");
+        $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $dispatcher
+            ->expects($this->atLeastOnce())
+            ->method('dispatch')
+        ;
+
+        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container
+            ->expects($this->once())
+            ->method('get')
+            ->with($this->equalTo('event_dispatcher'))
+            ->will($this->returnValue($dispatcher))
+        ;
+
+        $kernel = $this->getMock('Symfony\Component\HttpKernel\KernelInterface');
         $kernel
             ->expects($this->any())
             ->method('getBundles')
             ->will($this->returnValue($bundles))
+        ;
+        $kernel
+            ->expects($this->any())
+            ->method('getContainer')
+            ->will($this->returnValue($container))
         ;
 
         return $kernel;

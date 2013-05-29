@@ -67,6 +67,8 @@ class Application extends BaseApplication
     {
         $this->registerCommands();
 
+        $this->setDispatcher($this->kernel->getContainer()->get('event_dispatcher'));
+
         if (true === $input->hasParameterOption(array('--shell', '-s'))) {
             $shell = new Shell($this);
             $shell->setProcessIsolation($input->hasParameterOption(array('--process-isolation')));

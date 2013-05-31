@@ -220,7 +220,7 @@ class TextDescriptor extends Descriptor
     protected function describeContainerService(Definition $definition, array $options = array())
     {
         $description = array(
-            sprintf('<comment>Service Id</comment>       %s', $options['id'] ?: '-'),
+            sprintf('<comment>Service Id</comment>       %s', isset($options['id']) ? $options['id'] : '-'),
             sprintf('<comment>Class</comment>            %s', $definition->getClass() ?: "-"),
         );
 
@@ -228,10 +228,10 @@ class TextDescriptor extends Descriptor
         if (count($tags)) {
             $description[] = '<comment>Tags</comment>';
             foreach ($tags as $tagName => $tagData) {
-                foreach ($tagData as $singleTagData) {
+                foreach ($tagData as $parameters) {
                     $description[] = sprintf('    - %-30s (%s)', $tagName, implode(', ', array_map(function($key, $value) {
                         return sprintf('<info>%s</info>: %s', $key, $value);
-                    }, array_keys($singleTagData), array_values($singleTagData))));
+                    }, array_keys($parameters), array_values($parameters))));
                 }
             }
         } else {

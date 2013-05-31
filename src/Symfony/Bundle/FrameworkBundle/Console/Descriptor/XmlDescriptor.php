@@ -105,7 +105,43 @@ class XmlDescriptor extends Descriptor
      */
     protected function describeContainerService(Definition $definition, array $options = array())
     {
-        // TODO: Implement describeContainerService() method.
+        $dom = new \DOMDocument('1.0', 'UTF-8');
+        $dom->appendChild($serviceXML = $dom->createElement('service'));
+
+        if (isset($options['id'])) {
+            $serviceXML->setAttribute('id', $options['id']);
+        }
+
+        $serviceXML->setAttribute('class', $definition->getClass());
+        $serviceXML->setAttribute('scope', $definition->getScope());
+        $serviceXML->setAttribute('public', $definition->isPublic() ? 'true' : 'false');
+        $serviceXML->setAttribute('synthetic', $definition->isSynthetic() ? 'true' : 'false');
+        $serviceXML->setAttribute('file', $definition->getFile());
+
+        $tags = $definition->getTags();
+        foreach ($tags as $tagName => $tagData) {
+            foreach ($tagData as $parameters) {
+                $tags[] = array('name' => $tagName, 'parameters' => $parameters);
+            }
+        }
+
+        $tags = $definition->getTags();
+        if (count($tags) > 0) {
+            $serviceXML->appendChild($tagsXML = $dom->createElement('tags'));
+            foreach ($tags as $tagName => $tagData) {
+                foreach ($tagData as $parameters) {
+                    $tagsXML->appendChild($tagXML = $dom->createElement('tag'));
+                    $tagXML->setAttribute('name', $tagName);
+                    foreach ($parameters as $name => $value) {
+                        $tagXML->appendChild($parameterXML = $dom->createElement('parameter'));
+                        $parameterXML->setAttribute('name', $name);
+                        $parameterXML->textContent = $value;
+                    }
+                }
+            }
+        }
+
+        return $this->output($dom, $options);
     }
 
     /**
@@ -113,7 +149,17 @@ class XmlDescriptor extends Descriptor
      */
     protected function describeContainerAlias(Alias $alias, array $options = array())
     {
-        // TODO: Implement describeContainerAlias() method.
+        $dom = new \DOMDocument('1.0', 'UTF-8');
+        $dom->appendChild($aliasXML = $dom->createElement('alias'));
+
+        if (isset($options['id'])) {
+            $aliasXML->setAttribute('id', $options['id']);
+        }
+
+        $aliasXML->setAttribute('service', (string) $alias);
+        $aliasXML->setAttribute('public', $alias->isPublic() ? 'true' : 'false');
+
+        return $this->output($dom, $options);
     }
 
     /**

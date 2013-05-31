@@ -2,6 +2,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor;
 
+use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -40,6 +42,35 @@ class ObjectsProvider
                 array('http', 'https'),
                 array('put', 'post')
             ),
+        );
+    }
+
+    /** @return Alias[][] */
+    public static function getContainerServices()
+    {
+        $service1 = new Definition('Full\\Qualified\\Class1');
+        $service2 = new Definition('Full\\Qualified\\Class2');
+
+        return array(
+            'service_1' => $service1
+                ->setPublic(true)
+                ->setSynthetic(false),
+            'service_2' => $service2
+                ->setPublic(false)
+                ->setSynthetic(true)
+                ->setFile('/path/to/file')
+                ->addTag('tag1', array('attr1' => 'val1', 'attr2' => 'val2'))
+                ->addTag('tag1', array('attr3' => 'val3'))
+                ->addTag('tag2'),
+        );
+    }
+
+    /** @return Alias[][] */
+    public static function getContainerAliases()
+    {
+        return array(
+            'alias_1' => new Alias('service_1', true),
+            'alias_2' => new Alias('service_2', false),
         );
     }
 }

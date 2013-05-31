@@ -40,7 +40,7 @@ class MarkdownDescriptor extends Descriptor
             ."\n".'- Method: '.($route->getMethods() ? implode('|', $route->getMethods()) : 'ANY')
             ."\n".'- Class: '.get_class($route)
             ."\n".'- Defaults: '.$this->formatRouterConfig($route->getDefaults())
-            ."\n".'- Requirements: '.$this->formatRouterConfig($requirements) ?: 'NO CUSTOM'
+            ."\n".'- Requirements: '.$this->formatRouterConfig($requirements) ?: 'NONE'
             ."\n".'- Options: '.$this->formatRouterConfig($route->getOptions())
             ."\n".'- Path-Regex: '.$route->compile()->getRegex();
 
@@ -62,7 +62,25 @@ class MarkdownDescriptor extends Descriptor
      */
     protected function describeContainerService(Definition $definition, array $options = array())
     {
-        // TODO: Implement describeContainerService() method.
+        $output = '- Class: `'.$definition->getClass().'`'
+            ."\n".'- Scope: `'.$definition->getScope().'`'
+            ."\n".'- Public: '.($definition->isPublic() ? 'yes' : 'no')
+            ."\n".'- Synthetic: '.($definition->isSynthetic() ? 'yes' : 'no');
+
+        if ($definition->getFile()) {
+            $output .= "\n".'- File: `'.$definition->getFile().'`';
+        }
+
+        foreach ($definition->getTags() as $tagName => $tagData) {
+            foreach ($tagData as $parameters) {
+                $output .= "\n".'- Tag: `'.$tagName.'`';
+                foreach ($parameters as $name => $value) {
+                    $output .= "\n".'    - '.ucfirst($name).': '.$value;
+                }
+            }
+        }
+
+        return isset($options['id']) ? sprintf("**%s:**\n%s", $options['id'], $output) : $output;
     }
 
     /**
@@ -70,7 +88,10 @@ class MarkdownDescriptor extends Descriptor
      */
     protected function describeContainerAlias(Alias $alias, array $options = array())
     {
-        // TODO: Implement describeContainerAlias() method.
+        $output = '- Service: `'.$alias.'`'
+            ."\n".'- Public: '.($alias->isPublic() ? 'yes' : 'no');
+
+        return isset($options['id']) ? sprintf("**%s:**\n%s", $options['id'], $output) : $output;
     }
 
     private function formatRouterConfig(array $array)

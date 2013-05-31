@@ -12,6 +12,8 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor;
 
 use Symfony\Component\Console\Descriptor\DescriptorInterface;
+use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -23,20 +25,42 @@ abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(trim($expectedDescription), trim($descriptor->describe($routes)));
     }
 
+    public function getDescribeRouteCollectionTestData()
+    {
+        return $this->getDescriptionTestData(ObjectsProvider::getRouteCollections());
+    }
+
     /** @dataProvider getDescribeRouteTestData */
     public function testDescribeRoute(DescriptorInterface $descriptor, Route $route, $expectedDescription)
     {
         $this->assertEquals(trim($expectedDescription), trim($descriptor->describe($route)));
     }
 
-    public function getDescribeRouteCollectionTestData()
-    {
-        return $this->getDescriptionTestData(ObjectsProvider::getRouteCollections());
-    }
-
     public function getDescribeRouteTestData()
     {
         return $this->getDescriptionTestData(ObjectsProvider::getRoutes());
+    }
+
+    /** @dataProvider getDescribeContainerServiceTestData */
+    public function testDescribeContainerService(DescriptorInterface $descriptor, Definition $definition, $expectedDescription)
+    {
+        $this->assertEquals(trim($expectedDescription), trim($descriptor->describe($definition)));
+    }
+
+    public function getDescribeContainerServiceTestData()
+    {
+        return $this->getDescriptionTestData(ObjectsProvider::getContainerServices());
+    }
+
+    /** @dataProvider getDescribeContainerAliasTestData */
+    public function testDescribeContainerAlias(DescriptorInterface $descriptor, Alias $alias, $expectedDescription)
+    {
+        $this->assertEquals(trim($expectedDescription), trim($descriptor->describe($alias)));
+    }
+
+    public function getDescribeContainerAliasTestData()
+    {
+        return $this->getDescriptionTestData(ObjectsProvider::getContainerAliases());
     }
 
     abstract protected function getDescriptor();

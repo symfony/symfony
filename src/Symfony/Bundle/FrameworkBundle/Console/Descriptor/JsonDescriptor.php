@@ -60,7 +60,23 @@ class JsonDescriptor extends Descriptor
      */
     protected function describeContainerService(Definition $definition, array $options = array())
     {
-        // TODO: Implement describeContainerService() method.
+        $output = isset($options['id']) ? array('id' => $options['id']) : array();
+        $output['class'] = (string) $definition->getClass();
+        $output['tags'] = array();
+        $output['scope'] = $definition->getScope();
+        $output['public'] = $definition->isPublic();
+        $output['synthetic'] = $definition->isSynthetic();
+        $output['file'] = $definition->getFile();
+
+        if (count($definition->getTags())) {
+            foreach ($definition->getTags() as $tagName => $tagData) {
+                foreach ($tagData as $parameters) {
+                    $output['tags'][] = array('name' => $tagName, 'parameters' => $parameters);
+                }
+            }
+        }
+
+        return $this->output($output, $options);
     }
 
     /**
@@ -68,7 +84,11 @@ class JsonDescriptor extends Descriptor
      */
     protected function describeContainerAlias(Alias $alias, array $options = array())
     {
-        // TODO: Implement describeContainerAlias() method.
+        $output = isset($options['id']) ? array('id' => $options['id']) : array();
+        $output['service'] = (string) $alias;
+        $output['public'] = $alias->isPublic();
+
+        return $this->output($output, $options);
     }
 
     /**

@@ -20,15 +20,14 @@ class ContextErrorException extends \ErrorException
 {
     private $context = array();
     
-    public function __construct($message, $code, $severity, $filename, $lineno, $context=array())
+    public function __construct($message, $code, $severity, $filename, $lineno, $context = array())
     {
         $this->context = $context;
         parent::__construct($message, $code, $severity, $filename, $lineno);
     }
     
     /**
-     * Returns an array of variables that existed when the exception occurred.
-     * @return array Array of variable name=>value pairs.
+     * @return array Array of variables that existed when the exception occured
      */
     public function getContext(){
         return $this->context;

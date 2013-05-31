@@ -4,7 +4,7 @@
         <body>
             <trans-unit id="1">
                 <source>This value should be false.</source>
-                <target>هذه القيمة يجب أن تكون كاذبة.</target>
+                <target>هذه القيمة يجب أن تكون خاطئة.</target>
             </trans-unit>
             <trans-unit id="2">
                 <source>This value should be true.</source>

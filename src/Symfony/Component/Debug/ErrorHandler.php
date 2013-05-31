@@ -92,7 +92,7 @@ class ErrorHandler
     /**
      * @throws \ContextErrorException When error_reporting returns error
      */
-    public function handle($level, $message, $file='unknown', $line=0, $context=array())
+    public function handle($level, $message, $file = 'unknown', $line = 0, $context = array())
     {
         if (0 === $this->level) {
             return false;
@@ -119,7 +119,7 @@ class ErrorHandler
         }
 
         if ($this->displayErrors && error_reporting() & $level && $this->level & $level) {
-            throw new \ContextErrorException(sprintf('%s: %s in %s line %d', isset($this->levels[$level]) ? $this->levels[$level] : $level, $message, $file, $line), 0, $level, $file, $line, $context);
+            throw new ContextErrorException(sprintf('%s: %s in %s line %d', isset($this->levels[$level]) ? $this->levels[$level] : $level, $message, $file, $line), 0, $level, $file, $line, $context);
         }
 
         return false;

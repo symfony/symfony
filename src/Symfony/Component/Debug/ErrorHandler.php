@@ -90,7 +90,7 @@ class ErrorHandler
     }
 
     /**
-     * @throws \ContextErrorException When error_reporting returns error
+     * @throws ContextErrorException When error_reporting returns error
      */
     public function handle($level, $message, $file = 'unknown', $line = 0, $context = array())
     {

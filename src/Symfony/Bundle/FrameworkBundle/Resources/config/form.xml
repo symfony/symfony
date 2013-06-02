@@ -58,9 +58,6 @@
         <service id="property_accessor" class="%property_accessor.class%" />
 
         <!-- CoreExtension -->
-        <service id="form.type.field" class="Symfony\Component\Form\Extension\Core\Type\FieldType">
-            <tag name="form.type" alias="field" />
-        </service>
         <service id="form.type.form" class="Symfony\Component\Form\Extension\Core\Type\FormType">
             <argument type="service" id="property_accessor"/>
             <tag name="form.type" alias="form" />

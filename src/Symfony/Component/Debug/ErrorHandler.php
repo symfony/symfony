@@ -12,6 +12,7 @@
 namespace Symfony\Component\Debug;
 
 use Symfony\Component\Debug\Exception\FatalErrorException;
+use Symfony\Component\Debug\Exception\ContextErrorException;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -89,9 +90,9 @@ class ErrorHandler
     }
 
     /**
-     * @throws \ErrorException When error_reporting returns error
+     * @throws ContextErrorException When error_reporting returns error
      */
-    public function handle($level, $message, $file, $line, $context)
+    public function handle($level, $message, $file = 'unknown', $line = 0, $context = array())
     {
         if (0 === $this->level) {
             return false;
@@ -118,7 +119,7 @@ class ErrorHandler
         }
 
         if ($this->displayErrors && error_reporting() & $level && $this->level & $level) {
-            throw new \ErrorException(sprintf('%s: %s in %s line %d', isset($this->levels[$level]) ? $this->levels[$level] : $level, $message, $file, $line), 0, $level, $file, $line);
+            throw new ContextErrorException(sprintf('%s: %s in %s line %d', isset($this->levels[$level]) ? $this->levels[$level] : $level, $message, $file, $line), 0, $level, $file, $line, $context);
         }
 
         return false;

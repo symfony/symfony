@@ -97,16 +97,39 @@ class XmlDescriptor extends Descriptor
      */
     protected function describeContainerBuilder(ContainerBuilder $builder, array $options = array())
     {
-        // TODO: Implement describeContainerBuilder() method.
+        $dom = new \DOMDocument('1.0', 'UTF-8');
+        $dom->appendChild($containerXML = $dom->createElement('container'));
+
+        $serviceIds = isset($options['tag']) && $options['tag'] ? $builder->findTaggedServiceIds($options['tag']) : $builder->getServiceIds();
+        $showPrivate = isset($options['show_private']) && $options['show_private'];
+
+        foreach ($serviceIds as $serviceId) {
+            $service = $this->resolveServiceDefinition($builder, $serviceId);
+            $childOptions = array('id' => $serviceId, 'as_dom' => true);
+
+            if ($service instanceof Alias) {
+                $containerXML->appendChild($containerXML->ownerDocument->importNode($this->describeContainerAlias($service, $childOptions)->childNodes->item(0), true));
+            } elseif ($service instanceof Definition) {
+                if (($showPrivate || $service->isPublic())) {
+                    $containerXML->appendChild($containerXML->ownerDocument->importNode($this->describeContainerDefinition($service, $childOptions)->childNodes->item(0), true));
+                }
+            } else {
+                $containerXML->appendChild($serviceXML = $dom->createElement('service'));
+                $serviceXML->setAttribute('id', $serviceId);
+                $serviceXML->setAttribute('class', get_class($service));
+            }
+        }
+
+        return $this->output($dom, $options);
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function describeContainerService(Definition $definition, array $options = array())
+    protected function describeContainerDefinition(Definition $definition, array $options = array())
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
-        $dom->appendChild($serviceXML = $dom->createElement('service'));
+        $dom->appendChild($serviceXML = $dom->createElement('definition'));
 
         if (isset($options['id'])) {
             $serviceXML->setAttribute('id', $options['id']);

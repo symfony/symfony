@@ -3,13 +3,13 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor;
 
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
 class ObjectsProvider
 {
-    /** @return RouteCollection[] */
     public static function getRouteCollections()
     {
         $collection1 = new RouteCollection();
@@ -20,7 +20,6 @@ class ObjectsProvider
         return array('route_collection_1' => $collection1);
     }
 
-    /** @return Route[] */
     public static function getRoutes()
     {
         return array(
@@ -45,17 +44,25 @@ class ObjectsProvider
         );
     }
 
-    /** @return Alias[][] */
-    public static function getContainerServices()
+    public static function getContainerBuilders()
     {
-        $service1 = new Definition('Full\\Qualified\\Class1');
-        $service2 = new Definition('Full\\Qualified\\Class2');
+        $builder1 = new ContainerBuilder();
+        $builder1->setDefinitions(self::getContainerDefinitions());
+        $builder1->setAliases(self::getContainerAliases());
+
+        return array('container_builder_1' => $builder1);
+    }
+
+    public static function getContainerDefinitions()
+    {
+        $definition1 = new Definition('Full\\Qualified\\Class1');
+        $definition2 = new Definition('Full\\Qualified\\Class2');
 
         return array(
-            'service_1' => $service1
+            'definition_1' => $definition1
                 ->setPublic(true)
                 ->setSynthetic(false),
-            'service_2' => $service2
+            'definition_2' => $definition2
                 ->setPublic(false)
                 ->setSynthetic(true)
                 ->setFile('/path/to/file')
@@ -65,7 +72,6 @@ class ObjectsProvider
         );
     }
 
-    /** @return Alias[][] */
     public static function getContainerAliases()
     {
         return array(

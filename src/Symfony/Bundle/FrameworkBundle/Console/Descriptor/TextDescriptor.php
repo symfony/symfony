@@ -86,28 +86,26 @@ class TextDescriptor extends Descriptor
     protected function describeContainerBuilder(ContainerBuilder $builder, array $options = array())
     {
         if (isset($options['type']) && 'tags' === $options['type']) {
-            return $this->output(implode("\n", $this->getContainerBuilderTagsDescription($builder)), $options);
+            return $this->output(implode("\n", $this->describeContainerBuilderTags($builder)), $options);
         }
 
         if (isset($options['type']) && 'parameters' === $options['type']) {
-            return $this->output(implode("\n", $this->getContainerBuilderParametersDescription($builder)), $options);
+            return $this->output(implode("\n", $this->describeContainerBuilderParameters($builder)), $options);
         }
 
         $showPrivate = isset($options['show_private']) && $options['show_private'];
-        $showTagAttributes = isset($options['show_tag_attributes']) && $options['show_tag_attributes'];
-
         if ($showPrivate) {
             $label = '<comment>Public</comment> and <comment>private</comment> services';
         } else {
             $label = '<comment>Public</comment> services';
         }
 
-        if ($showTagAttributes) {
-            $label .= ' with tag <info>'.$options['tag_attributes'].'</info>';
+        if (isset($options['tag'])) {
+            $label .= ' with tag <info>'.$options['tag'].'</info>';
         }
 
         $serviceIds = isset($options['tag']) && $options['tag'] ? $builder->findTaggedServiceIds($options['tag']) : $builder->getServiceIds();
-        $description = $this->getContainerBuilderServicesDescription($builder, $serviceIds, $showPrivate, $showTagAttributes);
+        $description = $this->describeContainerBuilderServices($builder, $serviceIds, $showPrivate, isset($options['tag']) ? $options['tag'] : null);
 
         return $this->output($label."\n".implode("\n", $description), $options);
     }
@@ -116,11 +114,11 @@ class TextDescriptor extends Descriptor
      * @param ContainerBuilder $builder
      * @param array            $serviceIds
      * @param boolean          $showPrivate
-     * @param boolean          $showTagAttributes
+     * @param boolean          $showTag
      *
      * @return array
      */
-    public function getContainerBuilderServicesDescription(ContainerBuilder $builder, array $serviceIds, $showPrivate, $showTagAttributes)
+    public function describeContainerBuilderServices(ContainerBuilder $builder, array $serviceIds, $showPrivate, $showTag)
     {
         // loop through to get space needed and filter private services
         $maxName = 4;
@@ -141,8 +139,8 @@ class TextDescriptor extends Descriptor
                     $maxScope = strlen($definition->getScope());
                 }
 
-                if (null !== $showTagAttributes) {
-                    $tags = $definition->getTag($showTagAttributes);
+                if (null !== $showTag) {
+                    $tags = $definition->getTag($showTag);
                     foreach ($tags as $tag) {
                         foreach ($tag as $key => $value) {
                             if (!isset($maxTags[$key])) {
@@ -162,10 +160,10 @@ class TextDescriptor extends Descriptor
         }
 
         $format  = '%-'.$maxName.'s ';
-        $format .= implode("", array_map(function($length) { return "%-{$length}s "; }, $maxTags));
+        $format .= implode('', array_map(function($length) { return "%-{$length}s "; }, $maxTags));
         $format .= '%-'.$maxScope.'s %s';
 
-        $formatter = function ($serviceId, $scope, $className, array $tagAttributes = array()) use ($format) {
+        $formatter = function ($format, $serviceId, $scope, $className, array $tagAttributes = array()) use ($format) {
             $arguments = array($serviceId);
             foreach ($tagAttributes as $tagAttribute) {
                 $arguments[] = $tagAttribute;
@@ -177,37 +175,57 @@ class TextDescriptor extends Descriptor
         };
 
         $tags = array();
-        foreach ($maxTags as $tagName => $length) {
+        foreach (array_keys($maxTags) as $tagName) {
             $tags[] = '<comment>'.$tagName.'</comment>';
         }
 
-        $description = $formatter('%-'.($maxName + 19).'s '.implode('', array_map(function($length) { return '%-'.($length + 19).'s '; }, $maxTags)).'%-'.($maxScope + 19).'s %s', '<comment>Service Id</comment>', '<comment>Scope</comment>', '<comment>Class Name</comment>', $tags);
+        $description = array($formatter(
+            '%-'.($maxName + 19).'s '.implode('', array_map(function($length) {
+                return '%-'.($length + 19).'s ';
+            }, $maxTags)).'%-'.($maxScope + 19).'s %s',
+            '<comment>Service Id</comment>',
+            '<comment>Scope</comment>',
+            '<comment>Class Name</comment>',
+            $tags
+        ));
 
         foreach ($serviceIds as $serviceId) {
             $definition = $this->resolveServiceDefinition($builder, $serviceId);
             if ($definition instanceof Definition) {
-                if (null !== $showTagAttributes) {
-                    foreach ($definition->getTag($showTagAttributes) as $key => $tag) {
+                if (null !== $showTag) {
+                    foreach ($definition->getTag($showTag) as $key => $tag) {
                         $tagValues = array();
                         foreach (array_keys($maxTags) as $tagName) {
                             $tagValues[] = isset($tag[$tagName]) ? $tag[$tagName] : "";
                         }
                         if (0 === $key) {
-                            $description[] = vsprintf($format, $serviceId, $definition->getScope(), $definition->getClass(), $tagValues);
+                            $description[] = sprintf($format, $serviceId, $definition->getScope(), $definition->getClass(), $tagValues);
                         } else {
-                            $description[] = vsprintf($format, '  "', '', '', $tagValues);
+                            $description[] = sprintf($format, '  "', '', '', $tagValues);
                         }
                     }
                 } else {
-                    $description[] = vsprintf($format, $serviceId, $definition->getScope(), $definition->getClass());
+                    $description[] = sprintf($format, $serviceId, $definition->getScope(), $definition->getClass());
                 }
             } elseif ($definition instanceof Alias) {
                 $alias = $definition;
-                $description[] = $formatter($format, $serviceId, 'n/a', sprintf('<comment>alias for</comment> <info>%s</info>', (string) $alias), count($maxTags) ? array_fill(0, count($maxTags), "") : array());
+                $description[] = $formatter(
+                    $format,
+                    $serviceId,
+                    'n/a',
+                    sprintf('<comment>alias for</comment> <info>%s</info>', $alias),
+                    count($maxTags) ? array_fill(0, count($maxTags), "") : array()
+                );
             } else {
                 // we have no information (happens with "service_container")
                 $service = $definition;
-                $description[] = $formatter($format, $serviceId, '', get_class($service), count($maxTags) ? array_fill(0, count($maxTags), "") : array());
+                $description[] = $formatter(
+                    $format,
+                    $serviceId,
+                    '',
+                    get_class($service),
+                    count($maxTags) ? array_fill(0, count($maxTags), "") : array()
+                );
             }
         }
 
@@ -217,7 +235,7 @@ class TextDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeContainerService(Definition $definition, array $options = array())
+    protected function describeContainerDefinition(Definition $definition, array $options = array())
     {
         $description = array(
             sprintf('<comment>Service Id</comment>       %s', isset($options['id']) ? $options['id'] : '-'),
@@ -268,27 +286,6 @@ class TextDescriptor extends Descriptor
         }
 
         return $string;
-    }
-
-    /**
-     * @param ContainerBuilder $builder
-     * @param string           $serviceId
-     *
-     * @return mixed
-     */
-    private function resolveServiceDefinition(ContainerBuilder $builder, $serviceId)
-    {
-        if ($builder->hasDefinition($serviceId)) {
-            return $builder->getDefinition($serviceId);
-        }
-
-        // Some service IDs don't have a Definition, they're simply an Alias
-        if ($builder->hasAlias($serviceId)) {
-            return $builder->getAlias($serviceId);
-        }
-
-        // the service has been injected in some special way, just return the service
-        return $builder->get($serviceId);
     }
 
     /**

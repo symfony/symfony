@@ -52,21 +52,41 @@ class JsonDescriptor extends Descriptor
      */
     protected function describeContainerBuilder(ContainerBuilder $builder, array $options = array())
     {
-        // TODO: Implement describeContainerBuilder() method.
+        $serviceIds = isset($options['tag']) && $options['tag'] ? $builder->findTaggedServiceIds($options['tag']) : $builder->getServiceIds();
+        $showPrivate = isset($options['show_private']) && $options['show_private'];
+        $output = array('definitions' => array(), 'aliases' => array(), 'services' => array());
+
+        foreach ($serviceIds as $serviceId) {
+            $service = $this->resolveServiceDefinition($builder, $serviceId);
+            $childOptions = array('as_array' => true);
+
+            if ($service instanceof Alias) {
+                $output['aliases'][$serviceId] = $this->describeContainerAlias($service, $childOptions);
+            } elseif ($service instanceof Definition) {
+                if (($showPrivate || $service->isPublic())) {
+                    $output['definitions'][$serviceId] = $this->describeContainerDefinition($service, $childOptions);
+                }
+            } else {
+                $output['services'][$serviceId] = get_class($service);
+            }
+        }
+
+        return $this->output($output, $options);
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function describeContainerService(Definition $definition, array $options = array())
+    protected function describeContainerDefinition(Definition $definition, array $options = array())
     {
-        $output = isset($options['id']) ? array('id' => $options['id']) : array();
-        $output['class'] = (string) $definition->getClass();
-        $output['tags'] = array();
-        $output['scope'] = $definition->getScope();
-        $output['public'] = $definition->isPublic();
-        $output['synthetic'] = $definition->isSynthetic();
-        $output['file'] = $definition->getFile();
+        $output = array(
+            'class'     => (string) $definition->getClass(),
+            'tags'      => array(),
+            'scope'     => $definition->getScope(),
+            'public'    => $definition->isPublic(),
+            'synthetic' => $definition->isSynthetic(),
+            'file'      => $definition->getFile(),
+        );
 
         if (count($definition->getTags())) {
             foreach ($definition->getTags() as $tagName => $tagData) {
@@ -84,11 +104,10 @@ class JsonDescriptor extends Descriptor
      */
     protected function describeContainerAlias(Alias $alias, array $options = array())
     {
-        $output = isset($options['id']) ? array('id' => $options['id']) : array();
-        $output['service'] = (string) $alias;
-        $output['public'] = $alias->isPublic();
-
-        return $this->output($output, $options);
+        return $this->output(array(
+            'service' => (string) $alias,
+            'public'  => $alias->isPublic(),
+        ), $options);
     }
 
     /**

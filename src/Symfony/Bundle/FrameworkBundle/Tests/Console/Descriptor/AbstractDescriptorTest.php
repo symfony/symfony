@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor;
 
 use Symfony\Component\Console\Descriptor\DescriptorInterface;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -41,15 +42,26 @@ abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
         return $this->getDescriptionTestData(ObjectsProvider::getRoutes());
     }
 
-    /** @dataProvider getDescribeContainerServiceTestData */
-    public function testDescribeContainerService(DescriptorInterface $descriptor, Definition $definition, $expectedDescription)
+    /** @dataProvider getDescribeContainerBuilderTestData */
+    public function testDescribeContainerBuilder(DescriptorInterface $descriptor, ContainerBuilder $builder, array $options, $expectedDescription)
+    {
+        $this->assertEquals(trim($expectedDescription), trim($descriptor->describe($builder, $options)));
+    }
+
+    public function getDescribeContainerBuilderTestData()
+    {
+        return $this->getContainerBuilderDescriptionTestData(ObjectsProvider::getContainerBuilders());
+    }
+
+    /** @dataProvider getDescribeContainerDefinitionTestData */
+    public function testDescribeContainerDefinition(DescriptorInterface $descriptor, Definition $definition, $expectedDescription)
     {
         $this->assertEquals(trim($expectedDescription), trim($descriptor->describe($definition)));
     }
 
-    public function getDescribeContainerServiceTestData()
+    public function getDescribeContainerDefinitionTestData()
     {
-        return $this->getDescriptionTestData(ObjectsProvider::getContainerServices());
+        return $this->getDescriptionTestData(ObjectsProvider::getContainerDefinitions());
     }
 
     /** @dataProvider getDescribeContainerAliasTestData */
@@ -72,6 +84,24 @@ abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
         foreach ($objects as $name => $object) {
             $description = file_get_contents(sprintf('%s/../../Fixtures/Descriptor/%s.%s', __DIR__, $name, $this->getFormat()));
             $data[] = array($this->getDescriptor(), $object, $description);
+        }
+
+        return $data;
+    }
+
+    private function getContainerBuilderDescriptionTestData(array $objects)
+    {
+        $variations = array(
+            'services' => array('type' => 'services', 'show_private' => true),
+            'public_services' => array('type' => 'services', 'show_private' => false),
+        );
+
+        $data = array();
+        foreach ($objects as $name => $object) {
+            foreach ($variations as $suffix => $options) {
+                $description = file_get_contents(sprintf('%s/../../Fixtures/Descriptor/%s_%s.%s', __DIR__, $name, $suffix, $this->getFormat()));
+                $data[] = array($this->getDescriptor(), $object, $options, $description);
+            }
         }
 
         return $data;

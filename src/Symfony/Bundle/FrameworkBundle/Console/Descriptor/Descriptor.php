@@ -36,7 +36,7 @@ abstract class Descriptor implements DescriptorInterface
             case $object instanceof ContainerBuilder:
                 return $this->describeContainerBuilder($object, $options);
             case $object instanceof Definition:
-                return $this->describeContainerService($object, $options);
+                return $this->describeContainerDefinition($object, $options);
             case $object instanceof Alias:
                 return $this->describeContainerAlias($object, $options);
         }
@@ -88,7 +88,7 @@ abstract class Descriptor implements DescriptorInterface
      *
      * @return string|mixed
      */
-    abstract protected function describeContainerService(Definition $definition, array $options = array());
+    abstract protected function describeContainerDefinition(Definition $definition, array $options = array());
 
     /**
      * Describes a service alias.
@@ -118,5 +118,26 @@ abstract class Descriptor implements DescriptorInterface
         }
 
         return preg_replace("/\n\s*/s", '', var_export($value, true));
+    }
+
+    /**
+     * @param ContainerBuilder $builder
+     * @param string           $serviceId
+     *
+     * @return mixed
+     */
+    protected function resolveServiceDefinition(ContainerBuilder $builder, $serviceId)
+    {
+        if ($builder->hasDefinition($serviceId)) {
+            return $builder->getDefinition($serviceId);
+        }
+
+        // Some service IDs don't have a Definition, they're simply an Alias
+        if ($builder->hasAlias($serviceId)) {
+            return $builder->getAlias($serviceId);
+        }
+
+        // the service has been injected in some special way, just return the service
+        return $builder->get($serviceId);
     }
 }

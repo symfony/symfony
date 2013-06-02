@@ -54,13 +54,47 @@ class MarkdownDescriptor extends Descriptor
      */
     protected function describeContainerBuilder(ContainerBuilder $builder, array $options = array())
     {
-        // TODO: Implement describeContainerBuilder() method.
+        $showPrivate = isset($options['show_private']) && $options['show_private'];
+
+        $title = $showPrivate ? 'Public and private services' : 'Public services';
+        if (isset($options['tag'])) {
+            $title .= ' with tag `'.$options['tag'].'`';
+        }
+        $title .= "\n".str_repeat('=', strlen($title));
+
+        $serviceIds = isset($options['tag']) && $options['tag'] ? $builder->findTaggedServiceIds($options['tag']) : $builder->getServiceIds();
+        $showPrivate = isset($options['show_private']) && $options['show_private'];
+        $output = array('definitions' => array(), 'aliases' => array(), 'services' => array());
+
+        foreach ($serviceIds as $serviceId) {
+            $service = $this->resolveServiceDefinition($builder, $serviceId);
+            $childOptions = array('id' => $serviceId);
+
+            if ($service instanceof Alias) {
+                $output['aliases'][] = $this->describeContainerAlias($service, $childOptions);
+            } elseif ($service instanceof Definition) {
+                if (($showPrivate || $service->isPublic())) {
+                    $output['definitions'][] = $this->describeContainerDefinition($service, $childOptions);
+                }
+            } else {
+                $output['services'][] = sprintf('- `%s`: `%s`', $serviceId, get_class($service));
+            }
+        }
+
+        $format = function ($items, $title) {
+            return empty($items) ? '' : "\n\n".$title."\n".str_repeat('-', strlen($title))."\n\n".implode("\n\n", $items);
+        };
+
+        return $title
+            .$format($output['definitions'], 'Definitions')
+            .$format($output['aliases'], 'Aliases')
+            .$format($output['services'], 'Services');
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function describeContainerService(Definition $definition, array $options = array())
+    protected function describeContainerDefinition(Definition $definition, array $options = array())
     {
         $output = '- Class: `'.$definition->getClass().'`'
             ."\n".'- Scope: `'.$definition->getScope().'`'
@@ -80,7 +114,7 @@ class MarkdownDescriptor extends Descriptor
             }
         }
 
-        return isset($options['id']) ? sprintf("**%s:**\n%s", $options['id'], $output) : $output;
+        return isset($options['id']) ? sprintf("**`%s`:**\n%s", $options['id'], $output) : $output;
     }
 
     /**
@@ -91,7 +125,7 @@ class MarkdownDescriptor extends Descriptor
         $output = '- Service: `'.$alias.'`'
             ."\n".'- Public: '.($alias->isPublic() ? 'yes' : 'no');
 
-        return isset($options['id']) ? sprintf("**%s:**\n%s", $options['id'], $output) : $output;
+        return isset($options['id']) ? sprintf("**`%s`:**\n%s", $options['id'], $output) : $output;
     }
 
     private function formatRouterConfig(array $array)

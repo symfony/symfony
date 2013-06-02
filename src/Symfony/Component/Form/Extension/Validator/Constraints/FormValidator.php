@@ -121,7 +121,7 @@ class FormValidator extends ConstraintValidator
         if ($form->isRoot() && null !== $length) {
             $max = $this->serverParams->getPostMaxSize();
 
-            if (null !== $max && $length > $max) {
+            if (!empty($max) && $length > $max) {
                 $this->context->addViolation(
                     $config->getOption('post_max_size_message'),
                     array('{{ max }}' => $this->serverParams->getNormalizedIniPostMaxSize()),

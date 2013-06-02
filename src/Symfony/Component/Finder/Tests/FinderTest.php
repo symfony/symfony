@@ -808,7 +808,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     {
         $locations = array(
             __DIR__.'/Fixtures/one',
-            self::$files[8],
+            self::$tmpDir.DIRECTORY_SEPARATOR.'toto',
         );
 
         $finder = new Finder();

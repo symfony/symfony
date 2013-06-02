@@ -7,6 +7,20 @@ in 2.1 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.1.0...v2.1.1
 
+* 2.1.11 (2013-06-02)
+
+ * 2038329: [Form] [Validator] Fixed post_max_size = 0 bug (Issue #8065)
+ * 169c0b9: [Finder] Fix iteration fails with non-rewindable streams
+ * 45b68e0: [Finder] Fix unexpected duplicate sub path related AppendIterator issue
+ * 5321600: Fixed two bugs in HttpCache
+ * 5c317b7: [Console] fix and refactor exit code handling
+ * 1469953: [CssSelector] Fix :nth-last-child() translation
+ * 91b8490: Fix Crawler::children() to not trigger a notice for childless node
+ * 0a4837d: Fixed XML syntax.
+ * a5441b2: Fixed parsing of leading blank lines in folded scalars. Closes #7989.
+ * e8d5d16: Fixed Loader import
+ * 37af771: [Console] Added dedicated testcase for HelperSet class
+
 * 2.1.10 (2013-05-06)
 
  * 5b7e1e6: added a missing check for the provider key

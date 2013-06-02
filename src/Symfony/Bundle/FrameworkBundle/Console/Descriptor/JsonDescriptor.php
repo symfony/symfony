@@ -5,6 +5,7 @@ namespace Symfony\Bundle\FrameworkBundle\Console\Descriptor;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -45,6 +46,14 @@ class JsonDescriptor extends Descriptor
             'options'      => $route->getOptions(),
             'pathRegex'    => $route->compile()->getRegex(),
         ), $options);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function describeContainerParameters(ParameterBag $parameters, array $options = array())
+    {
+        return $this->output($parameters->all(), $options);
     }
 
     /**

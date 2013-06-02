@@ -15,6 +15,7 @@ use Symfony\Component\Console\Descriptor\DescriptorInterface;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -40,6 +41,17 @@ abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
     public function getDescribeRouteTestData()
     {
         return $this->getDescriptionTestData(ObjectsProvider::getRoutes());
+    }
+
+    /** @dataProvider getDescribeContainerParametersTestData */
+    public function testDescribeContainerParameters(DescriptorInterface $descriptor, ParameterBag $parameters, $expectedDescription)
+    {
+        $this->assertEquals(trim($expectedDescription), trim($descriptor->describe($parameters)));
+    }
+
+    public function getDescribeContainerParametersTestData()
+    {
+        return $this->getDescriptionTestData(ObjectsProvider::getContainerParameters());
     }
 
     /** @dataProvider getDescribeContainerBuilderTestData */

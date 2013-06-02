@@ -15,6 +15,7 @@ use Symfony\Component\Console\Descriptor\DescriptorInterface;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -33,6 +34,8 @@ abstract class Descriptor implements DescriptorInterface
                 return $this->describeRouteCollection($object, $options);
             case $object instanceof Route:
                 return $this->describeRoute($object, $options);
+            case $object instanceof ParameterBag:
+                return $this->describeContainerParameters($object, $options);
             case $object instanceof ContainerBuilder:
                 return $this->describeContainerBuilder($object, $options);
             case $object instanceof Definition:
@@ -65,13 +68,20 @@ abstract class Descriptor implements DescriptorInterface
     abstract protected function describeRoute(Route $route, array $options = array());
 
     /**
+     * Describes container parameters.
+     *
+     * @param ParameterBag $parameters
+     * @param array        $options
+     *
+     * @return string|mixed
+     */
+    abstract protected function describeContainerParameters(ParameterBag $parameters, array $options = array());
+
+    /**
      * Describes a container.
      *
      * Common options are:
-     * * services:   boolean (default true) adds services to description
-     * * parameters: boolean (default true) adds parameters to description
-     * * tags:       only describe tagged services, grouped by tag
-     * * tag:        filters described services by given tag
+     * * tag: filters described services by given tag
      *
      * @param ContainerBuilder $builder
      * @param array            $options
@@ -118,6 +128,22 @@ abstract class Descriptor implements DescriptorInterface
         }
 
         return preg_replace("/\n\s*/s", '', var_export($value, true));
+    }
+
+    /**
+     * Formats a parameter.
+     *
+     * @param mixed $value
+     *
+     * @return string
+     */
+    protected function formatParameter($value)
+    {
+        if (is_bool($value) || is_array($value) || (null === $value)) {
+            return json_encode($value);
+        }
+
+        return (string) $value;
     }
 
     /**

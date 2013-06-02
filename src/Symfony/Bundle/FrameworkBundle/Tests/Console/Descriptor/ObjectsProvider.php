@@ -5,6 +5,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -41,6 +42,18 @@ class ObjectsProvider
                 array('http', 'https'),
                 array('put', 'post')
             ),
+        );
+    }
+
+    public static function getContainerParameters()
+    {
+        return array(
+            'parameters_1' => new ParameterBag(array(
+                'integer' => 12,
+                'string'  => 'Hello world!',
+                'boolean' => true,
+                'array'   => array(12, 'Hello world!', true),
+            )),
         );
     }
 

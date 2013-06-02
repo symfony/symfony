@@ -5,6 +5,7 @@ namespace Symfony\Bundle\FrameworkBundle\Console\Descriptor;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -47,6 +48,19 @@ class MarkdownDescriptor extends Descriptor
         return isset($options['name'])
             ? $options['name']."\n".str_repeat('-', strlen($options['name']))."\n".$output
             : $output;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function describeContainerParameters(ParameterBag $parameters, array $options = array())
+    {
+        $output  = "Container parameters\n====================\n";
+        foreach ($parameters->all() as $key => $value) {
+            $output .= sprintf("\n- `%s`: `%s`", $key, $this->formatParameter($value));
+        }
+
+        return $output;
     }
 
     /**

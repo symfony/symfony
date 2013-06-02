@@ -5,6 +5,7 @@ namespace Symfony\Bundle\FrameworkBundle\Console\Descriptor;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -87,6 +88,23 @@ class XmlDescriptor extends Descriptor
                 $optionXML->setAttribute('name', $name);
                 $optionXML->appendChild(new \DOMText($this->formatValue($value)));
             }
+        }
+
+        return $this->output($dom, $options);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function describeContainerParameters(ParameterBag $parameters, array $options = array())
+    {
+        $dom = new \DOMDocument('1.0', 'UTF-8');
+        $dom->appendChild($parametersXML = $dom->createElement('parameters'));
+
+        foreach ($parameters->all() as $key => $value) {
+            $parametersXML->appendChild($parameterXML = $dom->createElement('parameter'));
+            $parameterXML->setAttribute('key', $key);
+            $parameterXML->appendChild(new \DOMText($this->formatParameter($value)));
         }
 
         return $this->output($dom, $options);

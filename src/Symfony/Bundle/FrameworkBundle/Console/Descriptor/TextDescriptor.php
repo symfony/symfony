@@ -5,6 +5,7 @@ namespace Symfony\Bundle\FrameworkBundle\Console\Descriptor;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -83,16 +84,51 @@ class TextDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
+    protected function describeContainerParameters(ParameterBag $parameters, array $options = array())
+    {
+        $maxParameterWidth = 0;
+        $maxValueWidth = 0;
+
+        // Determine max parameter & value length
+        foreach ($parameters->all() as $parameter => $value) {
+            $parameterWidth = strlen($parameter);
+            if ($parameterWidth > $maxParameterWidth) {
+                $maxParameterWidth = $parameterWidth;
+            }
+
+            $valueWith = strlen($this->formatParameter($value));
+            if ($valueWith > $maxValueWidth) {
+                $maxValueWidth = $valueWith;
+            }
+        }
+
+        $maxValueWidth = min($maxValueWidth, (isset($options['max_width']) ? $options['max_width'] : PHP_INT_MAX) - $maxParameterWidth - 1);
+
+        $formatTitle = '%-'.($maxParameterWidth + 19).'s %s';
+        $format = '%-'.$maxParameterWidth.'s %s';
+
+        $output = array(sprintf($formatTitle, '<comment>Parameter</comment>', '<comment>Value</comment>'));
+
+        foreach ($parameters->all() as $parameter => $value) {
+            $splits = str_split($this->formatParameter($value), $maxValueWidth);
+
+            foreach ($splits as $index => $split) {
+                if (0 === $index) {
+                    $output[] = sprintf($format, $parameter, $split);
+                } else {
+                    $output[] = sprintf($format, ' ', $split);
+                }
+            }
+        }
+
+        return implode("\n", $output);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function describeContainerBuilder(ContainerBuilder $builder, array $options = array())
     {
-        if (isset($options['type']) && 'tags' === $options['type']) {
-            return $this->output(implode("\n", $this->describeContainerBuilderTags($builder)), $options);
-        }
-
-        if (isset($options['type']) && 'parameters' === $options['type']) {
-            return $this->output(implode("\n", $this->describeContainerBuilderParameters($builder)), $options);
-        }
-
         $showPrivate = isset($options['show_private']) && $options['show_private'];
         if ($showPrivate) {
             $label = '<comment>Public</comment> and <comment>private</comment> services';

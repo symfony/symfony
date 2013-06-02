@@ -52,7 +52,7 @@ class JsonDescriptor extends Descriptor
      */
     protected function describeContainerBuilder(ContainerBuilder $builder, array $options = array())
     {
-        $serviceIds = isset($options['tag']) && $options['tag'] ? $builder->findTaggedServiceIds($options['tag']) : $builder->getServiceIds();
+        $serviceIds = isset($options['tag']) && $options['tag'] ? array_keys($builder->findTaggedServiceIds($options['tag'])) : $builder->getServiceIds();
         $showPrivate = isset($options['show_private']) && $options['show_private'];
         $output = array('definitions' => array(), 'aliases' => array(), 'services' => array());
 

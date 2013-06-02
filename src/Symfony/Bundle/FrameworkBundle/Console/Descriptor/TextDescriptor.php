@@ -104,7 +104,7 @@ class TextDescriptor extends Descriptor
             $label .= ' with tag <info>'.$options['tag'].'</info>';
         }
 
-        $serviceIds = isset($options['tag']) && $options['tag'] ? $builder->findTaggedServiceIds($options['tag']) : $builder->getServiceIds();
+        $serviceIds = isset($options['tag']) && $options['tag'] ? array_keys($builder->findTaggedServiceIds($options['tag'])) : $builder->getServiceIds();
         $description = $this->describeContainerBuilderServices($builder, $serviceIds, $showPrivate, isset($options['tag']) ? $options['tag'] : null);
 
         return $this->output($label."\n".implode("\n", $description), $options);
@@ -160,7 +160,7 @@ class TextDescriptor extends Descriptor
         }
 
         $format  = '%-'.$maxName.'s ';
-        $format .= implode('', array_map(function($length) { return "%-{$length}s "; }, $maxTags));
+        $format .= implode('', array_map(function($length) { return '%-'.$length.'s '; }, $maxTags));
         $format .= '%-'.$maxScope.'s %s';
 
         $formatter = function ($format, $serviceId, $scope, $className, array $tagAttributes = array()) use ($format) {
@@ -199,9 +199,9 @@ class TextDescriptor extends Descriptor
                             $tagValues[] = isset($tag[$tagName]) ? $tag[$tagName] : "";
                         }
                         if (0 === $key) {
-                            $description[] = sprintf($format, $serviceId, $definition->getScope(), $definition->getClass(), $tagValues);
+                            $description[] = vsprintf($format, array_merge(array($serviceId), $tagValues, array($definition->getScope(), $definition->getClass())));
                         } else {
-                            $description[] = sprintf($format, '  "', '', '', $tagValues);
+                            $description[] = vsprintf($format, array_merge(array('  "'), $tagValues, array('', '')));
                         }
                     }
                 } else {

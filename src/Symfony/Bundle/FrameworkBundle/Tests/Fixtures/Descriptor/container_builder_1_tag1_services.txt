@@ -1,0 +1,4 @@
+<comment>Public</comment> and <comment>private</comment> services with tag <info>tag1</info>
+<comment>Service Id</comment> <comment>attr1</comment> <comment>attr2</comment> <comment>attr3</comment> <comment>Scope</comment> <comment>Class Name</comment>
+definition_2 val1  val2        container Full\Qualified\Class2
+  "                      val3

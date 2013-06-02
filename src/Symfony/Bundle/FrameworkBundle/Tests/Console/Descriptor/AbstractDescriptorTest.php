@@ -94,6 +94,7 @@ abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
         $variations = array(
             'services' => array('type' => 'services', 'show_private' => true),
             'public_services' => array('type' => 'services', 'show_private' => false),
+            'tag1_services' => array('type' => 'services', 'show_private' => true, 'tag' => 'tag1'),
         );
 
         $data = array();

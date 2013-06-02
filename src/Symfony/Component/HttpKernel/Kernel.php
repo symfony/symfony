@@ -63,7 +63,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     const MAJOR_VERSION   = '2';
     const MINOR_VERSION   = '1';
     const RELEASE_VERSION = '11';
-    const EXTRA_VERSION   = 'DEV';
+    const EXTRA_VERSION   = '';
 
     /**
      * Constructor.

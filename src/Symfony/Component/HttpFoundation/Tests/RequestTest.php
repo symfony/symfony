@@ -1122,6 +1122,22 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('ISO-8859-1', 'utf-8', '*'), $request->getCharsets());
     }
 
+    public function testGetEncodings()
+    {
+        $request = new Request();
+        $this->assertEquals(array(), $request->getEncodings());
+        $request->headers->set('Accept-Encoding', 'gzip,deflate,sdch');
+        $this->assertEquals(array(), $request->getEncodings()); // testing caching
+
+        $request = new Request();
+        $request->headers->set('Accept-Encoding', 'gzip,deflate,sdch');
+        $this->assertEquals(array('gzip', 'deflate', 'sdch'), $request->getEncodings());
+
+        $request = new Request();
+        $request->headers->set('Accept-Encoding', 'gzip;q=0.4,deflate;q=0.9,compress;q=0.7');
+        $this->assertEquals(array('deflate', 'compress', 'gzip'), $request->getEncodings());
+    }
+
     public function testGetAcceptableContentTypes()
     {
         $request = new Request();

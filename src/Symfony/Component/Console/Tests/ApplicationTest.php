@@ -529,6 +529,21 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(4, $exitCode, '->run() returns integer exit code extracted from raised exception');
     }
 
+    public function testRunReturnsExitCodeOneForExceptionCodeZero()
+    {
+        $exception = new \Exception('', 0);
+
+        $application = $this->getMock('Symfony\Component\Console\Application', array('doRun'));
+        $application->setAutoExit(false);
+        $application->expects($this->once())
+             ->method('doRun')
+             ->will($this->throwException($exception));
+
+        $exitCode = $application->run(new ArrayInput(array()), new NullOutput());
+
+        $this->assertSame(1, $exitCode, '->run() returns exit code 1 when exception code is 0');
+    }
+
     /**
      * @expectedException \LogicException
      * @dataProvider getAddingAlreadySetDefinitionElementData

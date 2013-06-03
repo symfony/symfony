@@ -116,7 +116,7 @@ class Application
             }
             $statusCode = $e->getCode();
 
-            $statusCode = $statusCode ? (is_numeric($statusCode) ? (int) $statusCode : 1) : 0;
+            $statusCode = $statusCode ? (is_numeric($statusCode) ? (int) $statusCode : 1) : 1;
         }
 
         if ($this->autoExit) {

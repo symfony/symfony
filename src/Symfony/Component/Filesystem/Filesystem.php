@@ -234,13 +234,13 @@ class Filesystem
     }
 
     /**
-     * Renames a file.
+     * Renames a file or a directory.
      *
-     * @param string  $origin    The origin filename
-     * @param string  $target    The new filename
+     * @param string  $origin    The origin filename or directory
+     * @param string  $target    The new filename or directory
      * @param Boolean $overwrite Whether to overwrite the target if it already exists
      *
-     * @throws IOException When target file already exists
+     * @throws IOException When target file or directory already exists
      * @throws IOException When origin cannot be renamed
      */
     public function rename($origin, $target, $overwrite = false)

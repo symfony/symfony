@@ -1,3 +1,4 @@
+<info>[container]</info> List of parameters
 <comment>Parameter</comment> <comment>Value</comment>
 integer 12
 string  Hello world!

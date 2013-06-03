@@ -37,7 +37,9 @@ abstract class Descriptor implements DescriptorInterface
             case $object instanceof ParameterBag:
                 return $this->describeContainerParameters($object, $options);
             case $object instanceof ContainerBuilder:
-                return $this->describeContainerBuilder($object, $options);
+                return isset($options['group_by']) && 'tags' === $options['group_by']
+                    ? $this->describeContainerTags($object, $options)
+                    : $this->describeContainerServices($object, $options);
             case $object instanceof Definition:
                 return $this->describeContainerDefinition($object, $options);
             case $object instanceof Alias:
@@ -78,7 +80,17 @@ abstract class Descriptor implements DescriptorInterface
     abstract protected function describeContainerParameters(ParameterBag $parameters, array $options = array());
 
     /**
-     * Describes a container.
+     * Describes container tags.
+     *
+     * @param ContainerBuilder $builder
+     * @param array            $options
+     *
+     * @return string|mixed
+     */
+    abstract protected function describeContainerTags(ContainerBuilder $builder, array $options = array());
+
+    /**
+     * Describes container services.
      *
      * Common options are:
      * * tag: filters described services by given tag
@@ -88,7 +100,7 @@ abstract class Descriptor implements DescriptorInterface
      *
      * @return string|mixed
      */
-    abstract protected function describeContainerBuilder(ContainerBuilder $builder, array $options = array());
+    abstract protected function describeContainerServices(ContainerBuilder $builder, array $options = array());
 
     /**
      * Describes a service definition.
@@ -165,5 +177,36 @@ abstract class Descriptor implements DescriptorInterface
 
         // the service has been injected in some special way, just return the service
         return $builder->get($serviceId);
+    }
+
+    /**
+     * @param ContainerBuilder $builder
+     * @param boolean          $showPrivate
+     *
+     * @return array
+     */
+    protected function findDefinitionsByTag(ContainerBuilder $builder, $showPrivate)
+    {
+        $definitions = array();
+        $tags = $builder->findTags();
+        asort($tags);
+
+        foreach ($tags as $tag) {
+            foreach ($builder->findTaggedServiceIds($tag) as $serviceId => $attributes) {
+                $definition = $this->resolveServiceDefinition($builder, $serviceId);
+
+                if (!$definition instanceof Definition || !$showPrivate && !$definition->isPublic()) {
+                    continue;
+                }
+
+                if (!isset($definitions[$tag])) {
+                    $definitions[$tag] = array();
+                }
+
+                $definitions[$tag][$serviceId] = $definition;
+            }
+        }
+
+        return $definitions;
     }
 }

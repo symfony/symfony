@@ -63,7 +63,7 @@ class ObjectsProvider
         $builder1->setDefinitions(self::getContainerDefinitions());
         $builder1->setAliases(self::getContainerAliases());
 
-        return array('container_builder_1' => $builder1);
+        return array('builder_1' => $builder1);
     }
 
     public static function getContainerDefinitions()

@@ -113,7 +113,30 @@ class XmlDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeContainerBuilder(ContainerBuilder $builder, array $options = array())
+    protected function describeContainerTags(ContainerBuilder $builder, array $options = array())
+    {
+        $dom = new \DOMDocument('1.0', 'UTF-8');
+        $dom->appendChild($containerXML = $dom->createElement('container'));
+
+        $showPrivate = isset($options['show_private']) && $options['show_private'];
+
+        foreach ($this->findDefinitionsByTag($builder, $showPrivate) as $tag => $definitions) {
+            $containerXML->appendChild($tagXML = $dom->createElement('tag'));
+            $tagXML->setAttribute('name', $tag);
+
+            foreach ($definitions as $serviceId => $definition) {
+                $definitionXML = $this->describeContainerDefinition($definition, array('as_dom' => true, 'id' => $serviceId, 'omit_tags' => true));
+                $tagXML->appendChild($dom->importNode($definitionXML->childNodes->item(0), true));
+            }
+        }
+
+        return $this->output($dom, $options);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function describeContainerServices(ContainerBuilder $builder, array $options = array())
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->appendChild($containerXML = $dom->createElement('container'));
@@ -159,24 +182,26 @@ class XmlDescriptor extends Descriptor
         $serviceXML->setAttribute('synthetic', $definition->isSynthetic() ? 'true' : 'false');
         $serviceXML->setAttribute('file', $definition->getFile());
 
-        $tags = $definition->getTags();
-        foreach ($tags as $tagName => $tagData) {
-            foreach ($tagData as $parameters) {
-                $tags[] = array('name' => $tagName, 'parameters' => $parameters);
-            }
-        }
-
-        $tags = $definition->getTags();
-        if (count($tags) > 0) {
-            $serviceXML->appendChild($tagsXML = $dom->createElement('tags'));
+        if (!(isset($options['omit_tags']) && $options['omit_tags'])) {
+            $tags = $definition->getTags();
             foreach ($tags as $tagName => $tagData) {
                 foreach ($tagData as $parameters) {
-                    $tagsXML->appendChild($tagXML = $dom->createElement('tag'));
-                    $tagXML->setAttribute('name', $tagName);
-                    foreach ($parameters as $name => $value) {
-                        $tagXML->appendChild($parameterXML = $dom->createElement('parameter'));
-                        $parameterXML->setAttribute('name', $name);
-                        $parameterXML->textContent = $value;
+                    $tags[] = array('name' => $tagName, 'parameters' => $parameters);
+                }
+            }
+
+            $tags = $definition->getTags();
+            if (count($tags) > 0) {
+                $serviceXML->appendChild($tagsXML = $dom->createElement('tags'));
+                foreach ($tags as $tagName => $tagData) {
+                    foreach ($tagData as $parameters) {
+                        $tagsXML->appendChild($tagXML = $dom->createElement('tag'));
+                        $tagXML->setAttribute('name', $tagName);
+                        foreach ($parameters as $name => $value) {
+                            $tagXML->appendChild($parameterXML = $dom->createElement('parameter'));
+                            $parameterXML->setAttribute('name', $name);
+                            $parameterXML->textContent = $value;
+                        }
                     }
                 }
             }

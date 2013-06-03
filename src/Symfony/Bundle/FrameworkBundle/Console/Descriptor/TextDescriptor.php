@@ -121,13 +121,30 @@ class TextDescriptor extends Descriptor
             }
         }
 
-        return implode("\n", $output);
+        return $this->output($this->formatSection('container', 'List of parameters')."\n".implode("\n", $output));
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function describeContainerBuilder(ContainerBuilder $builder, array $options = array())
+    protected function describeContainerTags(ContainerBuilder $builder, array $options = array())
+    {
+        $showPrivate = isset($options['show_private']) && $options['show_private'];
+        $description = array($this->formatSection('container', 'Tagged services'));
+
+        foreach ($this->findDefinitionsByTag($builder, $showPrivate) as $tag => $definitions) {
+            $description[] = $this->formatSection('tag', $tag);
+            $description = array_merge($description, array_keys($definitions));
+            $description[] = '';
+        }
+
+        return $this->output(implode("\n", $description), $options);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function describeContainerServices(ContainerBuilder $builder, array $options = array())
     {
         $showPrivate = isset($options['show_private']) && $options['show_private'];
         if ($showPrivate) {
@@ -143,7 +160,7 @@ class TextDescriptor extends Descriptor
         $serviceIds = isset($options['tag']) && $options['tag'] ? array_keys($builder->findTaggedServiceIds($options['tag'])) : $builder->getServiceIds();
         $description = $this->describeContainerBuilderServices($builder, $serviceIds, $showPrivate, isset($options['tag']) ? $options['tag'] : null);
 
-        return $this->output($label."\n".implode("\n", $description), $options);
+        return $this->output($this->formatSection('container', $label)."\n".implode("\n", $description), $options);
     }
 
     /**
@@ -273,10 +290,12 @@ class TextDescriptor extends Descriptor
      */
     protected function describeContainerDefinition(Definition $definition, array $options = array())
     {
-        $description = array(
-            sprintf('<comment>Service Id</comment>       %s', isset($options['id']) ? $options['id'] : '-'),
-            sprintf('<comment>Class</comment>            %s', $definition->getClass() ?: "-"),
-        );
+        $description = isset($options['id'])
+            ? array($this->formatSection('container', sprintf('Information for service <info>%s</info>', $options['id'])))
+            : array();
+
+        $description[] = sprintf('<comment>Service Id</comment>       %s', isset($options['id']) ? $options['id'] : '-');
+        $description[] = sprintf('<comment>Class</comment>            %s', $definition->getClass() ?: "-");
 
         $tags = $definition->getTags();
         if (count($tags)) {
@@ -322,6 +341,17 @@ class TextDescriptor extends Descriptor
         }
 
         return $string;
+    }
+
+    /**
+     * @param string $section
+     * @param string $message
+     *
+     * @return string
+     */
+    private function formatSection($section, $message)
+    {
+        return sprintf('<info>[%s]</info> %s', $section, $message);
     }
 
     /**

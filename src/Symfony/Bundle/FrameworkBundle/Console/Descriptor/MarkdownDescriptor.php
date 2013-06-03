@@ -55,7 +55,7 @@ class MarkdownDescriptor extends Descriptor
      */
     protected function describeContainerParameters(ParameterBag $parameters, array $options = array())
     {
-        $output  = "Container parameters\n====================\n";
+        $output = "Container parameters\n====================\n";
         foreach ($parameters->all() as $key => $value) {
             $output .= sprintf("\n- `%s`: `%s`", $key, $this->formatParameter($value));
         }
@@ -66,7 +66,26 @@ class MarkdownDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeContainerBuilder(ContainerBuilder $builder, array $options = array())
+    protected function describeContainerTags(ContainerBuilder $builder, array $options = array())
+    {
+        $showPrivate = isset($options['show_private']) && $options['show_private'];
+        $output = "Container tags\n==============";
+
+        foreach ($this->findDefinitionsByTag($builder, $showPrivate) as $tag => $definitions) {
+            $output .= "\n\n".$tag."\n".str_repeat('-', strlen($tag));
+            foreach ($definitions as $serviceId => $definition) {
+                $output .= "\n\n";
+                $output .= $this->describeContainerDefinition($definition, array('omit_tags' => true, 'id' => $serviceId));
+            }
+        }
+
+        return $output;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function describeContainerServices(ContainerBuilder $builder, array $options = array())
     {
         $showPrivate = isset($options['show_private']) && $options['show_private'];
 
@@ -119,11 +138,13 @@ class MarkdownDescriptor extends Descriptor
             $output .= "\n".'- File: `'.$definition->getFile().'`';
         }
 
-        foreach ($definition->getTags() as $tagName => $tagData) {
-            foreach ($tagData as $parameters) {
-                $output .= "\n".'- Tag: `'.$tagName.'`';
-                foreach ($parameters as $name => $value) {
-                    $output .= "\n".'    - '.ucfirst($name).': '.$value;
+        if (!(isset($options['omit_tags']) && $options['omit_tags'])) {
+            foreach ($definition->getTags() as $tagName => $tagData) {
+                foreach ($tagData as $parameters) {
+                    $output .= "\n".'- Tag: `'.$tagName.'`';
+                    foreach ($parameters as $name => $value) {
+                        $output .= "\n".'    - '.ucfirst($name).': '.$value;
+                    }
                 }
             }
         }

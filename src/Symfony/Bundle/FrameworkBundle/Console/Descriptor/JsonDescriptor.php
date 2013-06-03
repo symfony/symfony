@@ -59,7 +59,25 @@ class JsonDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeContainerBuilder(ContainerBuilder $builder, array $options = array())
+    protected function describeContainerTags(ContainerBuilder $builder, array $options = array())
+    {
+        $showPrivate = isset($options['show_private']) && $options['show_private'];
+        $output = array();
+
+        foreach ($this->findDefinitionsByTag($builder, $showPrivate) as $tag => $definitions) {
+            $output[$tag] = array();
+            foreach ($definitions as $serviceId => $definition) {
+                $output[$tag][] = $this->describeContainerDefinition($definition, array('as_array' => true, 'omit_tags' => true, 'id' => $serviceId));
+            }
+        }
+
+        return $this->output($output, $options);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function describeContainerServices(ContainerBuilder $builder, array $options = array())
     {
         $serviceIds = isset($options['tag']) && $options['tag'] ? array_keys($builder->findTaggedServiceIds($options['tag'])) : $builder->getServiceIds();
         $showPrivate = isset($options['show_private']) && $options['show_private'];
@@ -90,17 +108,19 @@ class JsonDescriptor extends Descriptor
     {
         $output = array(
             'class'     => (string) $definition->getClass(),
-            'tags'      => array(),
             'scope'     => $definition->getScope(),
             'public'    => $definition->isPublic(),
             'synthetic' => $definition->isSynthetic(),
             'file'      => $definition->getFile(),
         );
 
-        if (count($definition->getTags())) {
-            foreach ($definition->getTags() as $tagName => $tagData) {
-                foreach ($tagData as $parameters) {
-                    $output['tags'][] = array('name' => $tagName, 'parameters' => $parameters);
+        if (!(isset($options['omit_tags']) && $options['omit_tags'])) {
+            $output['tags'] = array();
+            if (count($definition->getTags())) {
+                foreach ($definition->getTags() as $tagName => $tagData) {
+                    foreach ($tagData as $parameters) {
+                        $output['tags'][] = array('name' => $tagName, 'parameters' => $parameters);
+                    }
                 }
             }
         }

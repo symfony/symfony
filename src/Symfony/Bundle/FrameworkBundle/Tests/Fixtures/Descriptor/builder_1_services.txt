@@ -1,6 +1,7 @@
-<comment>Public</comment> services
+<info>[container]</info> <comment>Public</comment> and <comment>private</comment> services
 <comment>Service Id</comment> <comment>Scope</comment> <comment>Class Name</comment>
 definition_1      container Full\Qualified\Class1
+definition_2      container Full\Qualified\Class2
 alias_1           n/a       <comment>alias for</comment> <info>service_1</info>
 alias_2           n/a       <comment>alias for</comment> <info>service_2</info>
 service_container           Symfony\Component\DependencyInjection\ContainerBuilder

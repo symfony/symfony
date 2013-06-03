@@ -104,9 +104,10 @@ abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
     private function getContainerBuilderDescriptionTestData(array $objects)
     {
         $variations = array(
-            'services' => array('type' => 'services', 'show_private' => true),
-            'public_services' => array('type' => 'services', 'show_private' => false),
-            'tag1_services' => array('type' => 'services', 'show_private' => true, 'tag' => 'tag1'),
+            'services' => array('show_private' => true),
+            'public'   => array('show_private' => false),
+            'tag1'     => array('show_private' => true, 'tag' => 'tag1'),
+            'tags'     => array('group_by' => 'tags', 'show_private' => true)
         );
 
         $data = array();

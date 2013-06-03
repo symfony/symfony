@@ -865,7 +865,15 @@ class Request
             }
         }
 
-        return $this->server->get('SERVER_PORT');
+        if ($host = $this->headers->get('HOST')) {
+            if ($port = HostHeader::fromString($host)->getPort()) {
+                return $port;
+            } else {
+                return 'https' === $this->getScheme() ? 443 : 80;
+            }
+        } else {
+            return $this->server->get('SERVER_PORT');
+        }
     }
 
     /**
@@ -1051,24 +1059,14 @@ class Request
         if (self::$trustedProxies && self::$trustedHeaders[self::HEADER_CLIENT_HOST] && $host = $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_HOST])) {
             $elements = explode(',', $host);
 
-            $host = $elements[count($elements) - 1];
+            $host = trim($elements[count($elements) - 1]);
         } elseif (!$host = $this->headers->get('HOST')) {
             if (!$host = $this->server->get('SERVER_NAME')) {
                 $host = $this->server->get('SERVER_ADDR', '');
             }
         }
 
-        // trim and remove port number from host
-        // host is lowercase as per RFC 952/2181
-        $host = strtolower(preg_replace('/:\d+$/', '', trim($host)));
-
-        // as the host can come from the user (HTTP_HOST and depending on the configuration, SERVER_NAME too can come from the user)
-        // check that it does not contain forbidden characters (see RFC 952 and RFC 2181)
-        if ($host && !preg_match('/^\[?(?:[a-zA-Z0-9-:\]_]+\.?)+$/', $host)) {
-            throw new \UnexpectedValueException('Invalid Host');
-        }
-
-        return $host;
+        return HostHeader::fromString($host)->getHost();
     }
 
     /**

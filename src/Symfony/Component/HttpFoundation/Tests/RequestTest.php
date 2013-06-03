@@ -335,7 +335,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         $server['HTTP_HOST'] = 'host:8080';
         $server['SERVER_NAME'] = 'servername';
-        $server['SERVER_PORT'] = '8080';
+        $server['SERVER_PORT'] = '8888'; // Port in HTTP_HOST takes preference
 
         $server['QUERY_STRING'] = 'query=string';
         $server['REQUEST_URI'] = '/index.php/path/info?query=string';
@@ -578,22 +578,21 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     {
         $request = new Request();
 
-        $server['SERVER_NAME'] = 'servername';
-        $server['SERVER_PORT'] = '90';
+        $server['HTTP_HOST'] = 'host:90';
         $request->initialize(array(), array(), array(), array(), array(), $server);
-        $this->assertEquals('http://servername:90', $request->getSchemeAndHttpHost());
+        $this->assertEquals('http://host:90', $request->getSchemeAndHttpHost());
 
         $server['PHP_AUTH_USER'] = 'fabien';
         $request->initialize(array(), array(), array(), array(), array(), $server);
-        $this->assertEquals('http://servername:90', $request->getSchemeAndHttpHost());
+        $this->assertEquals('http://host:90', $request->getSchemeAndHttpHost());
 
         $server['PHP_AUTH_USER'] = '0';
         $request->initialize(array(), array(), array(), array(), array(), $server);
-        $this->assertEquals('http://servername:90', $request->getSchemeAndHttpHost());
+        $this->assertEquals('http://host:90', $request->getSchemeAndHttpHost());
 
         $server['PHP_AUTH_PW'] = '0';
         $request->initialize(array(), array(), array(), array(), array(), $server);
-        $this->assertEquals('http://servername:90', $request->getSchemeAndHttpHost());
+        $this->assertEquals('http://host:90', $request->getSchemeAndHttpHost());
     }
 
     /**
@@ -701,6 +700,13 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(80, $port, 'If X_FORWARDED_PROTO is set to http return 80.');
         Request::setTrustedProxies(array());
+
+        $request = Request::create('http://example.com:90', 'GET', array(), array(), array(), array(
+            'SERVER_PORT' => 1234
+        ));
+        $port = $request->getPort();
+
+        $this->assertEquals(90, $port, 'If server is running on a different port (eg load balancer) prefer port in HTTP_HOST');
     }
 
     /**

@@ -106,6 +106,15 @@ class ArgvInputTest extends \PHPUnit_Framework_TestCase
         }
 
         try {
+            $input = new ArgvInput(array('cli.php', '--foo=bar'));
+            $input->bind(new InputDefinition(array(new InputOption('foo', 'f', InputOption::VALUE_NONE))));
+            $this->fail('->parse() throws a \RuntimeException if a value is passed to an option which does not take one');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('\RuntimeException', $e, '->parse() throws a \RuntimeException if a value is passed to an option which does not take one');
+            $this->assertEquals('The "--foo" option does not accept a value.', $e->getMessage(), '->parse() throws a \RuntimeException if a value is passed to an option which does not take one');
+        }
+
+        try {
             $input = new ArgvInput(array('cli.php', 'foo', 'bar'));
             $input->bind(new InputDefinition());
             $this->fail('->parse() throws a \RuntimeException if too many arguments are passed');

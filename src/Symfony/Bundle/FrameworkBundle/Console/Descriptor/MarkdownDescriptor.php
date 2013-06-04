@@ -85,6 +85,28 @@ class MarkdownDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
+    protected function describeContainerService($service, array $options = array())
+    {
+        if (!isset($options['id'])) {
+            throw new \InvalidArgumentException('An "id" option must be provided.');
+        }
+
+        $childOptions = array('id' => $options['id'], 'as_array' => true);
+
+        if ($service instanceof Alias) {
+            return $this->describeContainerAlias($service, $childOptions);
+        }
+
+        if ($service instanceof Definition) {
+            return $this->describeContainerDefinition($service, $childOptions);
+        }
+
+        return sprintf("**`%s`:** `%s`", $options['id'], get_class($service));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function describeContainerServices(ContainerBuilder $builder, array $options = array())
     {
         $showPrivate = isset($options['show_private']) && $options['show_private'];

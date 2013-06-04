@@ -178,6 +178,30 @@ class TextDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
+    protected function describeContainerService($service, array $options = array())
+    {
+        if (!isset($options['id'])) {
+            throw new \InvalidArgumentException('An "id" option must be provided.');
+        }
+
+        if ($service instanceof Alias) {
+            return $this->describeContainerAlias($service, $options);
+        }
+
+        if ($service instanceof Definition) {
+            return $this->describeContainerDefinition($service, $options);
+        }
+
+        $description = $this->formatSection('container', sprintf('Information for service <info>%s</info>', $options['id']))
+            ."\n".sprintf('<comment>Service Id</comment>       %s', isset($options['id']) ? $options['id'] : '-')
+            ."\n".sprintf('<comment>Class</comment>            %s', get_class($service));
+
+        return $this->output($description, $options);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function describeContainerServices(ContainerBuilder $builder, array $options = array())
     {
         $showPrivate = isset($options['show_private']) && $options['show_private'];

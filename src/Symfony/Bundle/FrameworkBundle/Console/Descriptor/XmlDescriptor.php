@@ -136,6 +136,32 @@ class XmlDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
+    protected function describeContainerService($service, array $options = array())
+    {
+        if (!isset($options['id'])) {
+            throw new \InvalidArgumentException('An "id" option must be provided.');
+        }
+
+        $dom = new \DOMDocument('1.0', 'UTF-8');
+
+        $childOptions = array('id' => $options['id'], 'as_dom' => true);
+
+        if ($service instanceof Alias) {
+            $dom->appendChild($dom->importNode($this->describeContainerAlias($service, $childOptions)->childNodes->item(0), true));
+        } elseif ($service instanceof Definition) {
+            $dom->appendChild($dom->importNode($this->describeContainerDefinition($service, $childOptions)->childNodes->item(0), true));
+        } else {
+            $dom->appendChild($serviceXML = $dom->createElement('service'));
+            $serviceXML->setAttribute('id', $options['id']);
+            $serviceXML->setAttribute('class', get_class($service));
+        }
+
+        return $this->output($dom, $options);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function describeContainerServices(ContainerBuilder $builder, array $options = array())
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
@@ -146,19 +172,13 @@ class XmlDescriptor extends Descriptor
 
         foreach ($this->sortServiceIds($serviceIds) as $serviceId) {
             $service = $this->resolveServiceDefinition($builder, $serviceId);
-            $childOptions = array('id' => $serviceId, 'as_dom' => true);
 
-            if ($service instanceof Alias) {
-                $containerXML->appendChild($containerXML->ownerDocument->importNode($this->describeContainerAlias($service, $childOptions)->childNodes->item(0), true));
-            } elseif ($service instanceof Definition) {
-                if (($showPrivate || $service->isPublic())) {
-                    $containerXML->appendChild($containerXML->ownerDocument->importNode($this->describeContainerDefinition($service, $childOptions)->childNodes->item(0), true));
-                }
-            } else {
-                $containerXML->appendChild($serviceXML = $dom->createElement('service'));
-                $serviceXML->setAttribute('id', $serviceId);
-                $serviceXML->setAttribute('class', get_class($service));
+            if ($service instanceof Definition && !($showPrivate || $service->isPublic())) {
+                continue;
             }
+
+            $serviceXML = $this->describeContainerService($service, array_merge($options, array('id' => $serviceId, 'as_dom' => true)));
+            $containerXML->appendChild($containerXML->ownerDocument->importNode($serviceXML->childNodes->item(0), true));
         }
 
         return $this->output($dom, $options);

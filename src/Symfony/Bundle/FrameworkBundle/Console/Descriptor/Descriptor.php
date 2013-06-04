@@ -36,10 +36,12 @@ abstract class Descriptor implements DescriptorInterface
                 return $this->describeRoute($object, $options);
             case $object instanceof ParameterBag:
                 return $this->describeContainerParameters($object, $options);
+            case $object instanceof ContainerBuilder && isset($options['group_by']) && 'tags' === $options['group_by']:
+                return $this->describeContainerTags($object, $options);
+            case $object instanceof ContainerBuilder && isset($options['id']):
+                return $this->describeContainerService($this->resolveServiceDefinition($object, $options['id']), $options);
             case $object instanceof ContainerBuilder:
-                return isset($options['group_by']) && 'tags' === $options['group_by']
-                    ? $this->describeContainerTags($object, $options)
-                    : $this->describeContainerServices($object, $options);
+                return $this->describeContainerServices($object, $options);
             case $object instanceof Definition:
                 return $this->describeContainerDefinition($object, $options);
             case $object instanceof Alias:
@@ -88,6 +90,19 @@ abstract class Descriptor implements DescriptorInterface
      * @return string|mixed
      */
     abstract protected function describeContainerTags(ContainerBuilder $builder, array $options = array());
+
+    /**
+     * Describes a container service by its name.
+     *
+     * Common options are:
+     * * name: name of described service
+     *
+     * @param Definition|Alias|object $service
+     * @param array                   $options
+     *
+     * @return string|mixed
+     */
+    abstract protected function describeContainerService($service, array $options = array());
 
     /**
      * Describes container services.

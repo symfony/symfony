@@ -77,6 +77,28 @@ class JsonDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
+    protected function describeContainerService($service, array $options = array())
+    {
+        if (!isset($options['id'])) {
+            throw new \InvalidArgumentException('An "id" option must be provided.');
+        }
+
+        $childOptions = array('id' => $options['id'], 'as_array' => true);
+
+        if ($service instanceof Alias) {
+            return $this->output($this->describeContainerAlias($service, $childOptions), $options);
+        }
+
+        if ($service instanceof Definition) {
+            return $this->output($this->describeContainerDefinition($service, $childOptions), $options);
+        }
+
+        return $this->output(get_class($service), $options);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function describeContainerServices(ContainerBuilder $builder, array $options = array())
     {
         $serviceIds = isset($options['tag']) && $options['tag'] ? array_keys($builder->findTaggedServiceIds($options['tag'])) : $builder->getServiceIds();

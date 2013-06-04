@@ -176,6 +176,11 @@ class ArgvInputTest extends \PHPUnit_Framework_TestCase
                 'The "-o" option does not exist.'
             ),
             array(
+                array('cli.php', '--foo=bar'),
+                new InputDefinition(array(new InputOption('foo', 'f', InputOption::VALUE_NONE))),
+                'The "--foo" option does not accept a value.'
+            ),
+            array(
                 array('cli.php', 'foo', 'bar'),
                 new InputDefinition(),
                 'Too many arguments.'

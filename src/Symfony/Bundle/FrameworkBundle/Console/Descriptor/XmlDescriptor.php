@@ -204,13 +204,7 @@ class XmlDescriptor extends Descriptor
 
         if (!(isset($options['omit_tags']) && $options['omit_tags'])) {
             $tags = $definition->getTags();
-            foreach ($tags as $tagName => $tagData) {
-                foreach ($tagData as $parameters) {
-                    $tags[] = array('name' => $tagName, 'parameters' => $parameters);
-                }
-            }
-
-            $tags = $definition->getTags();
+            
             if (count($tags) > 0) {
                 $serviceXML->appendChild($tagsXML = $dom->createElement('tags'));
                 foreach ($tags as $tagName => $tagData) {

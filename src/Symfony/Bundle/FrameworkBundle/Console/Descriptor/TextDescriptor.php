@@ -318,6 +318,8 @@ class TextDescriptor extends Descriptor
         $format .= implode('', array_map(function($length) { return '%-'.$length.'s '; }, $maxTags));
         $format .= '%-'.$maxScope.'s %s';
 
+        $maxTagsCount = count($maxTags);
+
         $formatter = function ($format, $serviceId, $scope, $className, array $tagAttributes = array()) use ($format) {
             $arguments = array($serviceId);
             foreach ($tagAttributes as $tagAttribute) {
@@ -369,7 +371,7 @@ class TextDescriptor extends Descriptor
                     $serviceId,
                     'n/a',
                     sprintf('<comment>alias for</comment> <info>%s</info>', $alias),
-                    count($maxTags) ? array_fill(0, count($maxTags), "") : array()
+                    $maxTagsCount ? array_fill(0, $maxTagsCount, "") : array()
                 );
             } else {
                 // we have no information (happens with "service_container")
@@ -379,7 +381,7 @@ class TextDescriptor extends Descriptor
                     $serviceId,
                     '',
                     get_class($service),
-                    count($maxTags) ? array_fill(0, count($maxTags), "") : array()
+                    $maxTagsCount ? array_fill(0, $maxTagsCount, "") : array()
                 );
             }
         }

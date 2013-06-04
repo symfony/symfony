@@ -258,9 +258,9 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
             if ($key === 'item') {
                 if (isset($value['@key'])) {
                     if (isset($value['#'])) {
-                        $data[(string) $value['@key']] = $value['#'];
+                        $data[$value['@key']] = $value['#'];
                     } else {
-                        $data[(string) $value['@key']] = $value;
+                        $data[$value['@key']] = $value;
                     }
                 } else {
                     $data['item'][] = $value;

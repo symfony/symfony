@@ -18,7 +18,7 @@ use Symfony\Component\Config\Exception\FileLoaderImportCircularReferenceExceptio
 class FileLoaderTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @covers Symfony\Component\Config\Loader\FileLoader::import
+     * @covers Symfony\Component\Config\Loader\FileLoader
      */
     public function testImport()
     {

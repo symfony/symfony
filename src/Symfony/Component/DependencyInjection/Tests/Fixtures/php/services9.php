@@ -215,16 +215,6 @@ class ProjectServiceContainer extends Container
     }
 
     /**
-     * Gets the alias_for_foo service alias.
-     *
-     * @return FooClass An instance of the foo service
-     */
-    protected function getAliasForFooService()
-    {
-        return $this->get('foo');
-    }
-
-    /**
      * Updates the 'request' service.
      */
     protected function synchronizeRequestService()

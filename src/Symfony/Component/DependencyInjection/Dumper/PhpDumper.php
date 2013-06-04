@@ -595,46 +595,13 @@ EOF;
     }
 
     /**
-     * Adds a service alias.
-     *
-     * @param string $alias
-     * @param string $id
-     *
-     * @return string
-     */
-    private function addServiceAlias($alias, $id)
-    {
-        $name = Container::camelize($alias);
-        $type = 'Object';
-
-        if ($this->container->hasDefinition($id)) {
-            $class = $this->container->getDefinition($id)->getClass();
-            $type = 0 === strpos($class, '%') ? 'Object' : $class;
-        }
-
-        return <<<EOF
-
-    /**
-     * Gets the $alias service alias.
-     *
-     * @return $type An instance of the $id service
-     */
-    protected function get{$name}Service()
-    {
-        return {$this->getServiceCall($id)};
-    }
-
-EOF;
-    }
-
-    /**
      * Adds multiple services
      *
      * @return string
      */
     private function addServices()
     {
-        $publicServices = $privateServices = $aliasServices = $synchronizers = '';
+        $publicServices = $privateServices = $synchronizers = '';
         $definitions = $this->container->getDefinitions();
         ksort($definitions);
         foreach ($definitions as $id => $definition) {
@@ -647,13 +614,7 @@ EOF;
             $synchronizers .= $this->addServiceSynchronizer($id, $definition);
         }
 
-        $aliases = $this->container->getAliases();
-        ksort($aliases);
-        foreach ($aliases as $alias => $id) {
-            $aliasServices .= $this->addServiceAlias($alias, $id);
-        }
-
-        return $publicServices.$aliasServices.$synchronizers.$privateServices;
+        return $publicServices.$synchronizers.$privateServices;
     }
 
     /**

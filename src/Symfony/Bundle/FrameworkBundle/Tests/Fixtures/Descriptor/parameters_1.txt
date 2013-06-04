@@ -1,6 +1,6 @@
 <info>[container]</info> List of parameters
 <comment>Parameter</comment> <comment>Value</comment>
+array   [12,"Hello world!",true]
+boolean true
 integer 12
 string  Hello world!
-boolean true
-array   [12,"Hello world!",true]

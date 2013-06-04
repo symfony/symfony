@@ -56,7 +56,7 @@ class MarkdownDescriptor extends Descriptor
     protected function describeContainerParameters(ParameterBag $parameters, array $options = array())
     {
         $output = "Container parameters\n====================\n";
-        foreach ($parameters->all() as $key => $value) {
+        foreach ($this->sortParameters($parameters) as $key => $value) {
             $output .= sprintf("\n- `%s`: `%s`", $key, $this->formatParameter($value));
         }
 

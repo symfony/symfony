@@ -101,7 +101,7 @@ class XmlDescriptor extends Descriptor
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->appendChild($parametersXML = $dom->createElement('parameters'));
 
-        foreach ($parameters->all() as $key => $value) {
+        foreach ($this->sortParameters($parameters) as $key => $value) {
             $parametersXML->appendChild($parameterXML = $dom->createElement('parameter'));
             $parameterXML->setAttribute('key', $key);
             $parameterXML->appendChild(new \DOMText($this->formatParameter($value)));

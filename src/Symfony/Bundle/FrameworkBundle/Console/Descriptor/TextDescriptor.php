@@ -143,7 +143,7 @@ class TextDescriptor extends Descriptor
 
         $output = array(sprintf($formatTitle, '<comment>Parameter</comment>', '<comment>Value</comment>'));
 
-        foreach ($parameters->all() as $parameter => $value) {
+        foreach ($this->sortParameters($parameters) as $parameter => $value) {
             $splits = str_split($this->formatParameter($value), $maxValueWidth);
 
             foreach ($splits as $index => $split) {

@@ -209,4 +209,12 @@ abstract class Descriptor implements DescriptorInterface
 
         return $definitions;
     }
+
+    protected function sortParameters(ParameterBag $parameters)
+    {
+        $parameters = $parameters->all();
+        ksort($parameters);
+
+        return $parameters;
+    }
 }

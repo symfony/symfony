@@ -53,7 +53,7 @@ class JsonDescriptor extends Descriptor
      */
     protected function describeContainerParameters(ParameterBag $parameters, array $options = array())
     {
-        return $this->output($parameters->all(), $options);
+        return $this->output($this->sortParameters($parameters), $options);
     }
 
     /**

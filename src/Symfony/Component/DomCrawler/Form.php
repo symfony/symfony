@@ -418,7 +418,7 @@ class Form extends Link implements \ArrayAccess
             $fieldNodes = $xpath->query('descendant::input | descendant::button | descendant::textarea | descendant::select', $root);
             foreach ($fieldNodes as $node) {
                 // if the descendant element has an HTML5 form attribute, it should match the parent form id
-                if (!$node->hasAttribute('form') || ($this->node->hasAttribute('id') && $this->node->getAttribute('id') == $node->getAttribute('form'))) {
+                if (!$node->hasAttribute('form') || $node->getAttribute('form') == $this->node->getAttribute('id')) {
                     $this->addField($node, $button);
                 }
             }

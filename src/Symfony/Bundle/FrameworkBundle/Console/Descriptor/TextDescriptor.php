@@ -192,10 +192,53 @@ class TextDescriptor extends Descriptor
         }
 
         $serviceIds = isset($options['tag']) && $options['tag'] ? array_keys($builder->findTaggedServiceIds($options['tag'])) : $builder->getServiceIds();
-        $description = $this->describeContainerBuilderServices($builder, $serviceIds, $showPrivate, isset($options['tag']) ? $options['tag'] : null);
+        $description = $this->describeServices($builder, $serviceIds, $showPrivate, isset($options['tag']) ? $options['tag'] : null);
 
         return $this->output($this->formatSection('container', $label)."\n".implode("\n", $description), $options);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function describeContainerDefinition(Definition $definition, array $options = array())
+    {
+        $description = isset($options['id'])
+            ? array($this->formatSection('container', sprintf('Information for service <info>%s</info>', $options['id'])))
+            : array();
+
+        $description[] = sprintf('<comment>Service Id</comment>       %s', isset($options['id']) ? $options['id'] : '-');
+        $description[] = sprintf('<comment>Class</comment>            %s', $definition->getClass() ?: "-");
+
+        $tags = $definition->getTags();
+        if (count($tags)) {
+            $description[] = '<comment>Tags</comment>';
+            foreach ($tags as $tagName => $tagData) {
+                foreach ($tagData as $parameters) {
+                    $description[] = sprintf('    - %-30s (%s)', $tagName, implode(', ', array_map(function($key, $value) {
+                        return sprintf('<info>%s</info>: %s', $key, $value);
+                    }, array_keys($parameters), array_values($parameters))));
+                }
+            }
+        } else {
+            $description[] = '<comment>Tags</comment>             -';
+        }
+
+        $description[] = sprintf('<comment>Scope</comment>            %s', $definition->getScope());
+        $description[] = sprintf('<comment>Public</comment>           %s', $definition->isPublic() ? 'yes' : 'no');
+        $description[] = sprintf('<comment>Synthetic</comment>        %s', $definition->isSynthetic() ? 'yes' : 'no');
+        $description[] = sprintf('<comment>Required File</comment>    %s', $definition->getFile() ? $definition->getFile() : '-');
+
+        return $this->output(implode("\n", $description), $options);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function describeContainerAlias(Alias $alias, array $options = array())
+    {
+        return $this->output(sprintf('This service is an alias for the service <info>%s</info>', (string) $alias), $options);
+    }
+
 
     /**
      * @param ContainerBuilder $builder
@@ -205,12 +248,13 @@ class TextDescriptor extends Descriptor
      *
      * @return array
      */
-    public function describeContainerBuilderServices(ContainerBuilder $builder, array $serviceIds, $showPrivate, $showTag)
+    private function describeServices(ContainerBuilder $builder, array $serviceIds, $showPrivate, $showTag)
     {
         // loop through to get space needed and filter private services
         $maxName = 4;
         $maxScope = 6;
         $maxTags = array();
+        $serviceIds = $this->sortServiceIds($serviceIds);
 
         foreach ($serviceIds as $key => $serviceId) {
             $definition = $this->resolveServiceDefinition($builder, $serviceId);
@@ -317,48 +361,6 @@ class TextDescriptor extends Descriptor
         }
 
         return $description;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function describeContainerDefinition(Definition $definition, array $options = array())
-    {
-        $description = isset($options['id'])
-            ? array($this->formatSection('container', sprintf('Information for service <info>%s</info>', $options['id'])))
-            : array();
-
-        $description[] = sprintf('<comment>Service Id</comment>       %s', isset($options['id']) ? $options['id'] : '-');
-        $description[] = sprintf('<comment>Class</comment>            %s', $definition->getClass() ?: "-");
-
-        $tags = $definition->getTags();
-        if (count($tags)) {
-            $description[] = '<comment>Tags</comment>';
-            foreach ($tags as $tagName => $tagData) {
-                foreach ($tagData as $parameters) {
-                    $description[] = sprintf('    - %-30s (%s)', $tagName, implode(', ', array_map(function($key, $value) {
-                        return sprintf('<info>%s</info>: %s', $key, $value);
-                    }, array_keys($parameters), array_values($parameters))));
-                }
-            }
-        } else {
-            $description[] = '<comment>Tags</comment>             -';
-        }
-
-        $description[] = sprintf('<comment>Scope</comment>            %s', $definition->getScope());
-        $description[] = sprintf('<comment>Public</comment>           %s', $definition->isPublic() ? 'yes' : 'no');
-        $description[] = sprintf('<comment>Synthetic</comment>        %s', $definition->isSynthetic() ? 'yes' : 'no');
-        $description[] = sprintf('<comment>Required File</comment>    %s', $definition->getFile() ? $definition->getFile() : '-');
-
-        return $this->output(implode("\n", $description), $options);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function describeContainerAlias(Alias $alias, array $options = array())
-    {
-        return $this->output(sprintf('This service is an alias for the service <info>%s</info>', (string) $alias), $options);
     }
 
     /**

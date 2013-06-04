@@ -217,4 +217,11 @@ abstract class Descriptor implements DescriptorInterface
 
         return $parameters;
     }
+
+    protected function sortServiceIds(array $serviceIds)
+    {
+        asort($serviceIds);
+
+        return $serviceIds;
+    }
 }

@@ -83,7 +83,7 @@ class JsonDescriptor extends Descriptor
         $showPrivate = isset($options['show_private']) && $options['show_private'];
         $output = array('definitions' => array(), 'aliases' => array(), 'services' => array());
 
-        foreach ($serviceIds as $serviceId) {
+        foreach ($this->sortServiceIds($serviceIds) as $serviceId) {
             $service = $this->resolveServiceDefinition($builder, $serviceId);
             $childOptions = array('as_array' => true);
 

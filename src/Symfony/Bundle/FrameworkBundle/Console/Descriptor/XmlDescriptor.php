@@ -144,7 +144,7 @@ class XmlDescriptor extends Descriptor
         $serviceIds = isset($options['tag']) && $options['tag'] ? array_keys($builder->findTaggedServiceIds($options['tag'])) : $builder->getServiceIds();
         $showPrivate = isset($options['show_private']) && $options['show_private'];
 
-        foreach ($serviceIds as $serviceId) {
+        foreach ($this->sortServiceIds($serviceIds) as $serviceId) {
             $service = $this->resolveServiceDefinition($builder, $serviceId);
             $childOptions = array('id' => $serviceId, 'as_dom' => true);
 

@@ -366,31 +366,61 @@ class Form extends Link implements \ArrayAccess
         $this->node = $node;
     }
 
+    /**
+     * Adds form elements related to this form.
+     *
+     * Creates an internal copy of the submitted 'button' element and
+     * the form node or the entire document depending on whether we need
+     * to find non-descendant elements through HTML5 'form' attribute.
+     */
     private function initialize()
     {
         $this->fields = new FormFieldRegistry();
 
         $document = new \DOMDocument('1.0', 'UTF-8');
-        $node = $document->importNode($this->node, true);
+        $xpath = new \DOMXPath($document);
         $button = $document->importNode($this->button, true);
         $root = $document->appendChild($document->createElement('_root'));
-        $root->appendChild($node);
         $root->appendChild($button);
-        $xpath = new \DOMXPath($document);
 
-        // add descendant elements to the form
-        $fieldNodes = $xpath->query('descendant::input | descendant::button | descendant::textarea | descendant::select', $root);
-        foreach ($fieldNodes as $node) {
-            $this->addField($node, $button);
-        }
-
-        // find form elements corresponding to the current form by the HTML5 form attribute
+        // find form elements corresponding to the current form
         if ($this->node->hasAttribute('id')) {
-            $formId = Crawler::xpathLiteral($this->node->getAttribute('id'));
-            $xpath = new \DOMXPath($this->node->ownerDocument);
-            $fieldNodes = $xpath->query(sprintf('descendant::input[@form=%s] | descendant::button[@form=%s] | descendant::textarea[@form=%s] | descendant::select[@form=%s]', $formId, $formId, $formId, $formId));
+            // traverse through the whole document
+            $node = $document->importNode($this->node->ownerDocument->documentElement, true);
+            $root->appendChild($node);
+            $formNode = $xpath->query(sprintf("//form[@id=%s]", Crawler::xpathLiteral($this->node->getAttribute('id'))))->item(0);
+            $fieldNodes = $xpath->query('descendant::input | descendant::button | descendant::textarea | descendant::select', $root);
+
+            // corresponding elements are either descendants or have a matching HTML5 form attribute
             foreach ($fieldNodes as $node) {
-                $this->addField($node, $button);
+                if (($node->hasAttribute('form') && $this->node->getAttribute('id') == $node->getAttribute('form'))) {
+                    // if the element has an HTML5 form attribute, it should match the form id
+                    $this->addField($node, $button);
+                } elseif($node->isSameNode($button)) {
+                    // this is the button used for submission
+                    $this->addField($node, $button);
+                } elseif (!$node->hasAttribute('form')) {
+                    // find parent form node to check whether this is a descendant element or not
+                    $parentForms = $xpath->query('ancestor::form', $node);
+
+                    if ($parentForms->length > 0) {
+                        if ($parentForms->item(0)->isSameNode($formNode)) {
+                            $this->addField($node, $button);
+                        }
+                    }
+                }
+            }
+        } else {
+            // parent form has no id, add descendant elements only
+            $node = $document->importNode($this->node, true);
+            $root->appendChild($node);
+
+            $fieldNodes = $xpath->query('descendant::input | descendant::button | descendant::textarea | descendant::select', $root);
+            foreach ($fieldNodes as $node) {
+                // if the descendant element has an HTML5 form attribute, it should match the parent form id
+                if (!$node->hasAttribute('form') || ($this->node->hasAttribute('id') && $this->node->getAttribute('id') == $node->getAttribute('form'))) {
+                    $this->addField($node, $button);
+                }
             }
         }
     }
@@ -402,8 +432,7 @@ class Form extends Link implements \ArrayAccess
         }
 
         $nodeName = $node->nodeName;
-
-        if ($node === $button) {
+        if ($node->isSameNode($button)) {
             $this->set(new Field\InputFormField($node));
         } elseif ('select' == $nodeName || 'input' == $nodeName && 'checkbox' == $node->getAttribute('type')) {
             $this->set(new Field\ChoiceFormField($node));

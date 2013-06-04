@@ -24,6 +24,22 @@ class ProjectServiceContainer extends Container
     public function __construct()
     {
         parent::__construct(new ParameterBag($this->getDefaultParameters()));
+        $this->methodMap = array(
+            'bar' => 'getBarService',
+            'baz' => 'getBazService',
+            'depends_on_request' => 'getDependsOnRequestService',
+            'factory_service' => 'getFactoryServiceService',
+            'foo' => 'getFooService',
+            'foo.baz' => 'getFoo_BazService',
+            'foo_bar' => 'getFooBarService',
+            'foo_with_inline' => 'getFooWithInlineService',
+            'inlined' => 'getInlinedService',
+            'method_call1' => 'getMethodCall1Service',
+            'request' => 'getRequestService',
+        );
+        $this->aliases = array(
+            'alias_for_foo' => 'foo',
+        );
     }
 
     /**

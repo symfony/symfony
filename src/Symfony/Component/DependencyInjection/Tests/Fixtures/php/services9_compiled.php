@@ -44,7 +44,9 @@ class ProjectServiceContainer extends Container
             'foo_with_inline' => 'getFooWithInlineService',
             'method_call1' => 'getMethodCall1Service',
             'request' => 'getRequestService',
-            'alias_for_foo' => 'getFooService',
+        );
+        $this->aliases = array(
+            'alias_for_foo' => 'foo',
         );
     }
 

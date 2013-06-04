@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
+use Symfony\Bundle\FrameworkBundle\Console\Helper\DescriptorHelper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -50,7 +51,9 @@ class RouterDebugCommand extends ContainerAwareCommand
             ->setName('router:debug')
             ->setDefinition(array(
                 new InputArgument('name', InputArgument::OPTIONAL, 'A route name'),
-                new InputOption('show-controllers', null,  InputOption::VALUE_NONE, 'Show assigned controllers in overview')
+                new InputOption('show-controllers', null,  InputOption::VALUE_NONE, 'Show assigned controllers in overview'),
+                new InputOption('format', null, InputOption::VALUE_REQUIRED, 'To output route(s) in other formats'),
+                new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw route(s)'),
             ))
             ->setDescription('Displays current routes for an application')
             ->setHelp(<<<EOF
@@ -70,151 +73,21 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $name = $input->getArgument('name');
+        $helper = new DescriptorHelper();
 
         if ($name) {
-            $this->outputRoute($output, $name);
-        } else {
-            $this->outputRoutes($output, null, $input->getOption('show-controllers'));
-        }
-    }
-
-    protected function outputRoutes(OutputInterface $output, $routes = null, $showControllers = false)
-    {
-        if (null === $routes) {
-            $routes = $this->getContainer()->get('router')->getRouteCollection()->all();
-        }
-
-        $output->writeln($this->getHelper('formatter')->formatSection('router', 'Current routes'));
-
-        $maxName = strlen('name');
-        $maxMethod = strlen('method');
-        $maxScheme = strlen('scheme');
-        $maxHost = strlen('host');
-        $maxPath = strlen('path');
-
-        foreach ($routes as $name => $route) {
-            $method = $route->getMethods() ? implode('|', $route->getMethods()) : 'ANY';
-            $scheme = $route->getSchemes() ? implode('|', $route->getSchemes()) : 'ANY';
-            $host = '' !== $route->getHost() ? $route->getHost() : 'ANY';
-            $path = $route->getPath();
-            $maxName = max($maxName, strlen($name));
-            $maxMethod = max($maxMethod, strlen($method));
-            $maxScheme = max($maxScheme, strlen($scheme));
-            $maxHost = max($maxHost, strlen($host));
-            $maxPath = max($maxPath, strlen($path));
-        }
-
-        $format  = '%-'.$maxName.'s %-'.$maxMethod.'s %-'.$maxScheme.'s %-'.$maxHost.'s %s';
-        $formatHeader  = '%-'.($maxName + 19).'s %-'.($maxMethod + 19).'s %-'.($maxScheme + 19).'s %-'.($maxHost + 19).'s %-'.($maxPath + 19).'s';
-
-        if ($showControllers) {
-            $format = str_replace('s %s', 's %-'.$maxPath.'s %s', $format);
-            $formatHeader = $formatHeader . ' %s';
-        }
-
-        if ($showControllers) {
-            $output->writeln(sprintf($formatHeader, '<comment>Name</comment>', '<comment>Method</comment>',  '<comment>Scheme</comment>', '<comment>Host</comment>', '<comment>Path</comment>', '<comment>Controller</comment>'));
-        } else {
-            $output->writeln(sprintf($formatHeader, '<comment>Name</comment>', '<comment>Method</comment>',  '<comment>Scheme</comment>', '<comment>Host</comment>', '<comment>Path</comment>'));
-        }
-
-        foreach ($routes as $name => $route) {
-            $method = $route->getMethods() ? implode('|', $route->getMethods()) : 'ANY';
-            $scheme = $route->getSchemes() ? implode('|', $route->getSchemes()) : 'ANY';
-            $host = '' !== $route->getHost() ? $route->getHost() : 'ANY';
-            if ($showControllers) {
-                $defaultData = $route->getDefaults();
-                $controller = $defaultData['_controller'] ? $defaultData['_controller'] : '';
-                if ($controller instanceof \Closure) {
-                    $controller = 'Closure';
-                } else {
-                    if (is_object($controller)) {
-                        $controller = get_class($controller);
-                    }
-                }
-                $output->writeln(sprintf($format, $name, $method, $scheme, $host, $route->getPath(), $controller), OutputInterface::OUTPUT_RAW);
-            } else {
-                $output->writeln(sprintf($format, $name, $method, $scheme, $host, $route->getPath()), OutputInterface::OUTPUT_RAW);
+            $route = $this->getContainer()->get('router')->getRouteCollection()->get($name);
+            if (!$route) {
+                throw new \InvalidArgumentException(sprintf('The route "%s" does not exist.', $name));
             }
+            $helper->describe($output, $route, $input->getOption('format'), $input->getOption('raw'), array('name' => $name));
+        } else {
+            $routes = $this->getContainer()->get('router')->getRouteCollection();
+            $helper->describe($output, $routes, array(
+                'format'           => $input->getOption('format'),
+                'raw_text'         => $input->getOption('raw'),
+                'show_controllers' => $input->getOption('show-controllers'),
+            ));
         }
-    }
-
-    /**
-     * @throws \InvalidArgumentException When route does not exist
-     */
-    protected function outputRoute(OutputInterface $output, $name)
-    {
-        $route = $this->getContainer()->get('router')->getRouteCollection()->get($name);
-        if (!$route) {
-            throw new \InvalidArgumentException(sprintf('The route "%s" does not exist.', $name));
-        }
-
-        $output->writeln($this->getHelper('formatter')->formatSection('router', sprintf('Route "%s"', $name)));
-
-        $method = $route->getMethods() ? implode('|', $route->getMethods()) : 'ANY';
-        $scheme = $route->getSchemes() ? implode('|', $route->getSchemes()) : 'ANY';
-        $host = '' !== $route->getHost() ? $route->getHost() : 'ANY';
-
-        $output->write('<comment>Name</comment>         ');
-        $output->writeln($name, OutputInterface::OUTPUT_RAW);
-
-        $output->write('<comment>Path</comment>         ');
-        $output->writeln($route->getPath(), OutputInterface::OUTPUT_RAW);
-
-        $output->write('<comment>Host</comment>         ');
-        $output->writeln($host, OutputInterface::OUTPUT_RAW);
-
-        $output->write('<comment>Scheme</comment>       ');
-        $output->writeln($scheme, OutputInterface::OUTPUT_RAW);
-
-        $output->write('<comment>Method</comment>       ');
-        $output->writeln($method, OutputInterface::OUTPUT_RAW);
-
-        $output->write('<comment>Class</comment>        ');
-        $output->writeln(get_class($route), OutputInterface::OUTPUT_RAW);
-
-        $output->write('<comment>Defaults</comment>     ');
-        $output->writeln($this->formatConfigs($route->getDefaults()), OutputInterface::OUTPUT_RAW);
-
-        $output->write('<comment>Requirements</comment> ');
-        // we do not want to show the schemes and methods again that are also in the requirements for BC
-        $requirements = $route->getRequirements();
-        unset($requirements['_scheme'], $requirements['_method']);
-        $output->writeln($this->formatConfigs($requirements) ?: 'NO CUSTOM', OutputInterface::OUTPUT_RAW);
-
-        $output->write('<comment>Options</comment>      ');
-        $output->writeln($this->formatConfigs($route->getOptions()), OutputInterface::OUTPUT_RAW);
-
-        $output->write('<comment>Path-Regex</comment>   ');
-        $output->writeln($route->compile()->getRegex(), OutputInterface::OUTPUT_RAW);
-
-        if (null !== $route->compile()->getHostRegex()) {
-            $output->write('<comment>Host-Regex</comment>   ');
-            $output->writeln($route->compile()->getHostRegex(), OutputInterface::OUTPUT_RAW);
-        }
-    }
-
-    protected function formatValue($value)
-    {
-        if (is_object($value)) {
-            return sprintf('object(%s)', get_class($value));
-        }
-
-        if (is_string($value)) {
-            return $value;
-        }
-
-        return preg_replace("/\n\s*/s", '', var_export($value, true));
-    }
-
-    private function formatConfigs(array $array)
-    {
-        $string = '';
-        ksort($array);
-        foreach ($array as $name => $value) {
-            $string .= ($string ? "\n".str_repeat(' ', 13) : '').$name.': '.$this->formatValue($value);
-        }
-
-        return $string;
     }
 }

@@ -23,27 +23,60 @@ class TextDescriptor extends Descriptor
         $maxMethod = strlen('method');
         $maxScheme = strlen('scheme');
         $maxHost = strlen('host');
+        $maxPath = strlen('path');
 
         foreach ($routes->all() as $name => $route) {
             $method = $route->getMethods() ? implode('|', $route->getMethods()) : 'ANY';
             $scheme = $route->getSchemes() ? implode('|', $route->getSchemes()) : 'ANY';
             $host = '' !== $route->getHost() ? $route->getHost() : 'ANY';
+            $path = $route->getPath();
             $maxName = max($maxName, strlen($name));
             $maxMethod = max($maxMethod, strlen($method));
             $maxScheme = max($maxScheme, strlen($scheme));
             $maxHost = max($maxHost, strlen($host));
+            $maxPath = max($maxPath, strlen($path));
         }
 
-        $format  = '%-'.$maxName.'s %-'.$maxMethod.'s %-'.$maxScheme.'s %-'.$maxHost.'s %s';
-        $formatHeader  = '%-'.($maxName + 19).'s %-'.($maxMethod + 19).'s %-'.($maxScheme + 19).'s %-'.($maxHost + 19).'s %s';
-        $description = array(sprintf($formatHeader, '<comment>Name</comment>', '<comment>Method</comment>',  '<comment>Scheme</comment>', '<comment>Host</comment>', '<comment>Path</comment>'));
+        $format = '%-'.$maxName.'s %-'.$maxMethod.'s %-'.$maxScheme.'s %-'.$maxHost.'s %s';
+        $headerFormat = '%-'.($maxName + 19).'s %-'.($maxMethod + 19).'s %-'.($maxScheme + 19).'s %-'.($maxHost + 19).'s %s';
+        $headerArgs = array('<comment>Name</comment>', '<comment>Method</comment>', '<comment>Scheme</comment>', '<comment>Host</comment>', '<comment>Path</comment>');
+
+        if ($showControllers = isset($options['show_controllers']) && $options['show_controllers']) {
+            $format = str_replace('s %s', 's %-'.$maxPath.'s %s', $format);
+            $headerFormat = $headerFormat.' %s';
+            $headerArgs[] = '<comment>Controller</comment>';
+        }
+
+        $description = array(
+            $this->formatSection('router', 'Current routes'),
+            vsprintf($headerFormat, $headerArgs),
+        );
 
         foreach ($routes->all() as $name => $route) {
-            $method = $route->getMethods() ? implode('|', $route->getMethods()) : 'ANY';
-            $scheme = $route->getSchemes() ? implode('|', $route->getSchemes()) : 'ANY';
-            $host = '' !== $route->getHost() ? $route->getHost() : 'ANY';
+            $args = array(
+                $name,
+                $route->getMethods() ? implode('|', $route->getMethods()) : 'ANY',
+                $route->getSchemes() ? implode('|', $route->getSchemes()) : 'ANY',
+                '' !== $route->getHost() ? $route->getHost() : 'ANY',
+                $route->getPath(),
+            );
+
+            if ($showControllers) {
+                $defaultData = $route->getDefaults();
+                $controller = $defaultData['_controller'] ? $defaultData['_controller'] : '';
+                if ($controller instanceof \Closure) {
+                    $controller = 'Closure';
+                } else {
+                    if (is_object($controller)) {
+                        $controller = get_class($controller);
+                    }
+                }
+
+                $args[] = $controller;
+            }
+
             // fixme: this line was originally written as raw
-            $description[] = sprintf($format, $name, $method, $scheme, $host, $route->getPath());
+            $description[] = vsprintf($format, $args);
         }
 
         return $this->output(implode("\n", $description), $options);
@@ -72,6 +105,7 @@ class TextDescriptor extends Descriptor
 
         if (isset($options['name'])) {
             array_unshift($description, '<comment>Name</comment>         '.$options['name']);
+            array_unshift($description, $this->formatSection('router', sprintf('Route "%s"', $options['name'])));
         }
 
         if (null !== $route->compile()->getHostRegex()) {

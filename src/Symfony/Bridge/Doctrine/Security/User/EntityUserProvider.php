@@ -34,7 +34,10 @@ class EntityUserProvider implements UserProviderInterface
 
     public function __construct(ManagerRegistry $registry, $class, $property = null, $managerName = null)
     {
-        $em = $registry->getManager($managerName);
+        $em = null === $managerName 
+            ? $registry->getManagerForClass($class) 
+            : $registry->getManager($managerName);
+
         $this->class = $class;
         $this->metadata = $em->getClassMetadata($class);
 

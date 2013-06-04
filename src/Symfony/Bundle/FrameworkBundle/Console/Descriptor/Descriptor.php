@@ -40,6 +40,8 @@ abstract class Descriptor implements DescriptorInterface
                 return $this->describeContainerTags($object, $options);
             case $object instanceof ContainerBuilder && isset($options['id']):
                 return $this->describeContainerService($this->resolveServiceDefinition($object, $options['id']), $options);
+            case $object instanceof ContainerBuilder && isset($options['parameter']):
+                return $this->formatParameter($object->getParameter($options['parameter']));
             case $object instanceof ContainerBuilder:
                 return $this->describeContainerServices($object, $options);
             case $object instanceof Definition:

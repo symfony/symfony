@@ -1,0 +1,40 @@
+{
+    "name": "symfony/cache",
+    "type": "library",
+    "description": "Symfony Cache Component",
+    "keywords": [],
+    "homepage": "http://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Jean-François Simon",
+            "email": "jeanfrancois.simon@sensiolabs.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "http://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3",
+        "symfony/options-resolver": ">=2.1,<2.4-dev"
+    },
+    "require-dev": {
+        "doctrine/cache": "1.0.*",
+        "tedivm/stash": "0.10.*"
+    },
+    "autoload": {
+        "psr-0": { "Symfony\\Component\\Cache\\": "" }
+    },
+    "target-dir": "Symfony/Component/Cache",
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.3-dev"
+        }
+    }
+}

@@ -595,46 +595,13 @@ EOF;
     }
 
     /**
-     * Adds a service alias.
-     *
-     * @param string $alias
-     * @param string $id
-     *
-     * @return string
-     */
-    private function addServiceAlias($alias, $id)
-    {
-        $name = Container::camelize($alias);
-        $type = 'Object';
-
-        if ($this->container->hasDefinition($id)) {
-            $class = $this->container->getDefinition($id)->getClass();
-            $type = 0 === strpos($class, '%') ? 'Object' : $class;
-        }
-
-        return <<<EOF
-
-    /**
-     * Gets the $alias service alias.
-     *
-     * @return $type An instance of the $id service
-     */
-    protected function get{$name}Service()
-    {
-        return {$this->getServiceCall($id)};
-    }
-
-EOF;
-    }
-
-    /**
      * Adds multiple services
      *
      * @return string
      */
     private function addServices()
     {
-        $publicServices = $privateServices = $aliasServices = $synchronizers = '';
+        $publicServices = $privateServices = $synchronizers = '';
         $definitions = $this->container->getDefinitions();
         ksort($definitions);
         foreach ($definitions as $id => $definition) {
@@ -647,13 +614,7 @@ EOF;
             $synchronizers .= $this->addServiceSynchronizer($id, $definition);
         }
 
-        $aliases = $this->container->getAliases();
-        ksort($aliases);
-        foreach ($aliases as $alias => $id) {
-            $aliasServices .= $this->addServiceAlias($alias, $id);
-        }
-
-        return $publicServices.$aliasServices.$synchronizers.$privateServices;
+        return $publicServices.$synchronizers.$privateServices;
     }
 
     /**
@@ -799,6 +760,9 @@ EOF;
             $code .= "        \$this->scopeChildren = ".$this->dumpValue($this->container->getScopeChildren()).";\n";
         }
 
+        $code .= $this->addMethodMap();
+        $code .= $this->addAliases();
+
         $code .= <<<EOF
     }
 
@@ -846,19 +810,8 @@ EOF;
             $code .= "        \$this->scopeChildren = array();\n";
         }
 
-        // build method map
-        $code .= "        \$this->methodMap = array(\n";
-        $definitions = $this->container->getDefinitions();
-        ksort($definitions);
-        foreach ($definitions as $id => $definition) {
-            $code .= '            '.var_export($id, true).' => '.var_export('get'.Container::camelize($id).'Service', true).",\n";
-        }
-        $aliases = $this->container->getAliases();
-        ksort($aliases);
-        foreach ($aliases as $alias => $id) {
-            $code .= '            '.var_export($alias, true).' => '.var_export('get'.Container::camelize($id).'Service', true).",\n";
-        }
-        $code .= "        );\n";
+        $code .= $this->addMethodMap();
+        $code .= $this->addAliases();
 
         $code .= <<<EOF
     }
@@ -866,6 +819,50 @@ EOF;
 EOF;
 
         return $code;
+    }
+
+    /**
+     * Adds the methodMap property definition
+     *
+     * @return string
+     */
+    private function addMethodMap()
+    {
+        if (!$definitions = $this->container->getDefinitions()) {
+            return '';
+        }
+
+        $code = "        \$this->methodMap = array(\n";
+        ksort($definitions);
+        foreach ($definitions as $id => $definition) {
+            $code .= '            '.var_export($id, true).' => '.var_export('get'.Container::camelize($id).'Service', true).",\n";
+        }
+
+        return $code . "        );\n";
+    }
+
+    /**
+     * Adds the aliases property definition
+     *
+     * @return string
+     */
+    private function addAliases()
+    {
+        if (!$aliases = $this->container->getAliases()) {
+            return '';
+        }
+
+        $code = "        \$this->aliases = array(\n";
+        ksort($aliases);
+        foreach ($aliases as $alias => $id) {
+            $id = (string) $id;
+            while (isset($aliases[$id])) {
+                $id = (string) $aliases[$id];
+            }
+            $code .= '            '.var_export($alias, true).' => '.var_export($id, true).",\n";
+        }
+
+        return $code . "        );\n";
     }
 
     /**

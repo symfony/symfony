@@ -126,11 +126,9 @@ class Application
         }
 
         if ($this->autoExit) {
-            if ($statusCode > 255) {
-                $statusCode = 255;
-            }
+            // ensure exit code is between 0-254 (255 is reserved by PHP and should not be used)
             // @codeCoverageIgnoreStart
-            exit($statusCode);
+            exit(max(0, min(254, $statusCode)));
             // @codeCoverageIgnoreEnd
         }
 

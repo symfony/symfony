@@ -17,6 +17,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\DataTransformer\MoneyToLocalizedStringTransformer;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Intl\Intl;
 
 class MoneyType extends AbstractType
 {
@@ -86,24 +87,7 @@ class MoneyType extends AbstractType
         }
 
         if (!isset(self::$patterns[$locale][$currency])) {
-            $format = new \NumberFormatter($locale, \NumberFormatter::CURRENCY);
-            $pattern = $format->formatCurrency('123', $currency);
-
-            // the spacings between currency symbol and number are ignored, because
-            // a single space leads to better readability in combination with input
-            // fields
-
-            // the regex also considers non-break spaces (0xC2 or 0xA0 in UTF-8)
-
-            preg_match('/^([^\s\xc2\xa0]*)[\s\xc2\xa0]*123(?:[,.]0+)?[\s\xc2\xa0]*([^\s\xc2\xa0]*)$/u', $pattern, $matches);
-
-            if (!empty($matches[1])) {
-                self::$patterns[$locale][$currency] = $matches[1].' {{ widget }}';
-            } elseif (!empty($matches[2])) {
-                self::$patterns[$locale][$currency] = '{{ widget }} '.$matches[2];
-            } else {
-                self::$patterns[$locale][$currency] = '{{ widget }}';
-            }
+            self::$patterns[$locale][$currency] = '{{ widget }} '.Intl::getCurrencyBundle()->getCurrencySymbol($currency);
         }
 
         return self::$patterns[$locale][$currency];

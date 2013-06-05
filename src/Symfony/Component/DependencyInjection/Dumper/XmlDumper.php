@@ -15,6 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 /**
@@ -182,10 +183,10 @@ class XmlDumper extends Dumper
      * Adds a service alias.
      *
      * @param string      $alias
-     * @param string      $id
+     * @param Alias       $id
      * @param \DOMElement $parent
      */
-    private function addServiceAlias($alias, $id, \DOMElement $parent)
+    private function addServiceAlias($alias, Alias $id, \DOMElement $parent)
     {
         $service = $this->document->createElement('service');
         $service->setAttribute('id', $alias);
@@ -213,7 +214,11 @@ class XmlDumper extends Dumper
             $this->addService($definition, $id, $services);
         }
 
-        foreach ($this->container->getAliases() as $alias => $id) {
+        $aliases = $this->container->getAliases();
+        foreach ($aliases as $alias => $id) {
+            while (isset($aliases[(string) $id])) {
+                $id = $aliases[(string) $id];
+            }
             $this->addServiceAlias($alias, $id, $services);
         }
         $parent->appendChild($services);

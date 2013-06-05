@@ -44,7 +44,10 @@ class ProjectServiceContainer extends Container
             'foo_with_inline' => 'getFooWithInlineService',
             'method_call1' => 'getMethodCall1Service',
             'request' => 'getRequestService',
-            'alias_for_foo' => 'getFooService',
+        );
+        $this->aliases = array(
+            'alias_for_alias' => 'foo',
+            'alias_for_foo' => 'foo',
         );
     }
 
@@ -215,16 +218,6 @@ class ProjectServiceContainer extends Container
     protected function getRequestService()
     {
         throw new RuntimeException('You have requested a synthetic service ("request"). The DIC does not know how to construct this service.');
-    }
-
-    /**
-     * Gets the alias_for_foo service alias.
-     *
-     * @return FooClass An instance of the foo service
-     */
-    protected function getAliasForFooService()
-    {
-        return $this->get('foo');
     }
 
     /**

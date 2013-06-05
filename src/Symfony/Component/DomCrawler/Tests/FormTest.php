@@ -134,8 +134,8 @@ class FormTest extends \PHPUnit_Framework_TestCase
             'form_name' => 'form_2',
             'button_2' => '',
         );
-        $this->assertEquals($values1, $form1->getPhpValues(), '->getPhpValues() should return all form field values');
-        $this->assertEquals($values2, $form2->getPhpValues(), '->getPhpValues() should return all form field values');
+        $this->assertEquals($values1, $form1->getPhpValues(), 'HTML5-compliant form attribute handled incorrectly');
+        $this->assertEquals($values2, $form2->getPhpValues(), 'HTML5-compliant form attribute handled incorrectly');
 
     }
 

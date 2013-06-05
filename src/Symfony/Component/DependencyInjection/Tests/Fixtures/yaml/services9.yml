@@ -69,3 +69,4 @@ services:
             - [setRequest, ['@?request']]
 
     alias_for_foo: @foo
+    alias_for_alias: @foo

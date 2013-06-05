@@ -38,6 +38,7 @@ class ProjectServiceContainer extends Container
             'request' => 'getRequestService',
         );
         $this->aliases = array(
+            'alias_for_alias' => 'foo',
             'alias_for_foo' => 'foo',
         );
     }

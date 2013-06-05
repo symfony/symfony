@@ -855,7 +855,11 @@ EOF;
         $code = "        \$this->aliases = array(\n";
         ksort($aliases);
         foreach ($aliases as $alias => $id) {
-            $code .= '            '.var_export($alias, true).' => '.var_export((string) $id, true).",\n";
+            $id = (string) $id;
+            while (isset($aliases[$id])) {
+                $id = (string) $aliases[$id];
+            }
+            $code .= '            '.var_export($alias, true).' => '.var_export($id, true).",\n";
         }
 
         return $code . "        );\n";

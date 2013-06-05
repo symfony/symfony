@@ -43,6 +43,7 @@ $container->getParameterBag()->add(array(
     'foo' => 'bar',
 ));
 $container->setAlias('alias_for_foo', 'foo');
+$container->setAlias('alias_for_alias', 'alias_for_foo');
 $container->
     register('method_call1', 'FooClass')->
     setFile(realpath(__DIR__.'/../includes/foo.php'))->

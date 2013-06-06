@@ -113,15 +113,11 @@ class Application
             } else {
                 $this->renderException($e, $output);
             }
-            $statusCode = $e->getCode();
 
-            $statusCode = is_numeric($statusCode) && $statusCode ? (int) $statusCode : 1;
+            $statusCode = max(1, min(254, intval($e->getCode())));
         }
 
         if ($this->autoExit) {
-            if ($statusCode > 255) {
-                $statusCode = 255;
-            }
             // @codeCoverageIgnoreStart
             exit($statusCode);
             // @codeCoverageIgnoreEnd

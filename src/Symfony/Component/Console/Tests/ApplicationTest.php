@@ -531,6 +531,51 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(1, $exitCode, '->run() returns exit code 1 when exception code is 0');
     }
 
+    public function testRunReturnsExitCodeOneForExceptionCodeNegative()
+    {
+        $exception = new \Exception('', -20);
+
+        $application = $this->getMock('Symfony\Component\Console\Application', array('doRun'));
+        $application->setAutoExit(false);
+        $application->expects($this->once())
+             ->method('doRun')
+             ->will($this->throwException($exception));
+
+        $exitCode = $application->run(new ArrayInput(array()), new NullOutput());
+
+        $this->assertSame(1, $exitCode, '->run() returns exit code 1 when exception code is negative');
+    }
+
+    public function testRunReturnsExitCodeOneForExceptionCodeNonInteger()
+    {
+        $exception = new \Exception('', false);
+
+        $application = $this->getMock('Symfony\Component\Console\Application', array('doRun'));
+        $application->setAutoExit(false);
+        $application->expects($this->once())
+             ->method('doRun')
+             ->will($this->throwException($exception));
+
+        $exitCode = $application->run(new ArrayInput(array()), new NullOutput());
+
+        $this->assertSame(1, $exitCode, '->run() returns exit code 1 when exception code is not integer');
+    }
+
+    public function testRunReturnsExitCode254ForExceptionCodeHigher254()
+    {
+        $exception = new \Exception('', 404);
+
+        $application = $this->getMock('Symfony\Component\Console\Application', array('doRun'));
+        $application->setAutoExit(false);
+        $application->expects($this->once())
+             ->method('doRun')
+             ->will($this->throwException($exception));
+
+        $exitCode = $application->run(new ArrayInput(array()), new NullOutput());
+
+        $this->assertSame(254, $exitCode, '->run() returns exit code 254 when exception code is 254+');
+    }
+
     /**
      * @expectedException \LogicException
      * @dataProvider getAddingAlreadySetDefinitionElementData

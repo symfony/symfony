@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Form\Extension\Validator\Type;
 
-use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapper;
 use Symfony\Component\Form\Extension\Validator\EventListener\ValidationListener;

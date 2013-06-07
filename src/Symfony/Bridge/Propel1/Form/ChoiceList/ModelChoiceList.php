@@ -256,14 +256,14 @@ class ModelChoiceList extends ObjectChoiceList
      */
     public function getIndicesForChoices(array $models)
     {
+        $indices = array();
+
         if (!$this->loaded) {
             // Optimize performance for single-field identifiers. We already
             // know that the IDs are used as indices
 
             // Attention: This optimization does not check choices for existence
             if ($this->identifierAsIndex) {
-                $indices = array();
-
                 foreach ($models as $model) {
                     if ($model instanceof $this->class) {
                         // Make sure to convert to the right format
@@ -277,7 +277,30 @@ class ModelChoiceList extends ObjectChoiceList
             $this->load();
         }
 
-        return parent::getIndicesForChoices($models);
+        /*
+         * Overwriting default implementation.
+         *
+         * The two objects may represent the same entry in the database,
+         * but if they originated from different queries, there are not the same object within the code.
+         *
+         * This happens when using m:n relations with either sides model as data_class of the form.
+         * The choicelist will retrieve the list of available related models with a different query, resulting in different objects.
+         */
+        $choices = $this->fixChoices($models);
+        foreach ($this->getChoices() as $i => $choice) {
+            foreach ($choices as $j => $givenChoice) {
+                if ($this->getIdentifierValues($choice) === $this->getIdentifierValues($givenChoice)) {
+                    $indices[] = $i;
+                    unset($choices[$j]);
+
+                    if (0 === count($choices)) {
+                        break 2;
+                    }
+                }
+            }
+        }
+
+        return $indices;
     }
 
     /**

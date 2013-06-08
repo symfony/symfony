@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by pylebecq at 2013-06-08T11:29:04Z
+
+Finally I reworked the patch because the first one was way too complicated to handle such a case.

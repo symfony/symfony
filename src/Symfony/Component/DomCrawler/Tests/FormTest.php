@@ -247,6 +247,18 @@ class FormTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testSetValueOnMultiValuedFieldsWithMalformedName()
+    {
+        $form = $this->createForm('<form><input type="text" name="foo[bar]" value="bar" /><input type="text" name="foo[baz]" value="baz" /><input type="submit" /></form>');
+
+        try {
+            $form['foo[bar'] = 'bar';
+            $this->fail('->offsetSet() throws an \InvalidArgumentException exception if the name is malformed.');
+        } catch (\InvalidArgumentException $e) {
+            $this->assertTrue(true, '->offsetSet() throws an \InvalidArgumentException exception if the name is malformed.');
+        }
+    }
+
     public function testOffsetUnset()
     {
         $form = $this->createForm('<form><input type="text" name="foo" value="foo" /><input type="submit" /></form>');

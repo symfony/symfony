@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\Config\FileLocator;
 
 /**
- * A console command for retrieving information about services
+ * A console command for retrieving information about events
  *
  * @author Florian Semm <floriansemm@googlemail.com>
  */
@@ -78,9 +78,7 @@ class EventDispatcherDebugCommand extends ContainerAwareCommand
         $table = $this->getHelperSet()->get('table');
         $table
             ->setHeaders(array('Class', 'Event'))
-            ->setCrossingChar('')
-            ->setVerticalBorderChar('')
-            ->setHorizontalBorderChar('');
+            ->setLayout(TableHelper::LAYOUT_BORDERLESS);
 
         return $table;
     }

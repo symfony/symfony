@@ -236,7 +236,7 @@
             </trans-unit>
             <trans-unit id="62">
                 <source>This value is neither a valid ISBN-10 nor a valid ISBN-13.</source>
-                <target>Este valor non é ni un ISBN-10 válido nin un ISBN-13 válido.</target>
+                <target>Este valor non é nin un ISBN-10 válido nin un ISBN-13 válido.</target>
             </trans-unit>
             <trans-unit id="63">
                 <source>This value is not a valid ISSN.</source>

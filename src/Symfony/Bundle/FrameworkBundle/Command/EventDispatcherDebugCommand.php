@@ -64,23 +64,12 @@ class EventDispatcherDebugCommand extends ContainerAwareCommand
             $output->writeln('<info>[event_dispatcher]</info> Listeners');
         }
 
-        $table = $this->setupTableNoBorders();
-        $table
-            ->setRows($listeners)
-            ->render($output);
-    }
-
-    /**
-     * @return TableHelper
-     */
-    private function setupTableNoBorders()
-    {
         $table = $this->getHelperSet()->get('table');
         $table
             ->setHeaders(array('Class', 'Event'))
-            ->setLayout(TableHelper::LAYOUT_BORDERLESS);
-
-        return $table;
+            ->setLayout(TableHelper::LAYOUT_BORDERLESS)
+            ->setRows($listeners)
+            ->render($output);
     }
 
     /**
@@ -109,12 +98,11 @@ class EventDispatcherDebugCommand extends ContainerAwareCommand
      */
     private function getEventSubscriber(ContainerBuilder $containerBuilder, array $listeners)
     {
+        $interface = 'Symfony\Component\EventDispatcher\EventSubscriberInterface';
         foreach ($containerBuilder->findTaggedServiceIds('kernel.event_subscriber') as $id => $attributes) {
             $class = $containerBuilder->getDefinition($id)->getClass();
 
             $refClass = new \ReflectionClass($class);
-            $interface = 'Symfony\Component\EventDispatcher\EventSubscriberInterface';
-
             if (!$refClass->implementsInterface($interface)) {
                 continue;
             }

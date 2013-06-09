@@ -21,12 +21,6 @@ class EventDispatcherDebugCommand extends ContainerAwareCommand
             ->setDescription('Displays current event-listeners and event-subscribers for an application');
     }
 
-    /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return void
-     * @throws \InvalidArgumentException if the event does not exists
-     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $containerBuilder = $this->getContainerBuilder();

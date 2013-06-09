@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Component\Console\Helper\TableHelper;
@@ -11,6 +20,11 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\Config\FileLocator;
 
+/**
+ * A console command for retrieving information about services
+ *
+ * @author Florian Semm <floriansemm@googlemail.com>
+ */
 class EventDispatcherDebugCommand extends ContainerAwareCommand
 {
     protected function configure()

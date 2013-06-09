@@ -394,6 +394,12 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
             $this->record($request, 'invalid');
         }
 
+        if ($this->isPrivateRequest($request) && !$response->headers->hasCacheControlDirective('public')) {
+            $response->setPrivate(true);
+        } elseif ($this->options['default_ttl'] > 0 && null === $response->getTtl() && !$response->headers->getCacheControlDirective('must-revalidate')) {
+            $response->setTtl($this->options['default_ttl']);
+        }
+
         if ($response->isCacheable()) {
             $this->store($request, $response);
         }

@@ -66,7 +66,7 @@ class Application extends BaseApplication
      */
     public function doRun(InputInterface $input, OutputInterface $output)
     {
-        if(!$this->commandsRegistered){
+        if (!$this->commandsRegistered) {
             $this->registerCommands();
         }
 

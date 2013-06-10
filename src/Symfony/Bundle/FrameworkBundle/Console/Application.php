@@ -27,6 +27,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 class Application extends BaseApplication
 {
     private $kernel;
+    private $commandsRegistered = false;
 
     /**
      * Constructor.
@@ -65,7 +66,9 @@ class Application extends BaseApplication
      */
     public function doRun(InputInterface $input, OutputInterface $output)
     {
-        $this->registerCommands();
+        if (!$this->commandsRegistered) {
+            $this->registerCommands();
+        }
 
         if (true === $input->hasParameterOption(array('--shell', '-s'))) {
             $shell = new Shell($this);
@@ -87,5 +90,7 @@ class Application extends BaseApplication
                 $bundle->registerCommands($this);
             }
         }
+
+        $this->commandsRegistered = true;
     }
 }

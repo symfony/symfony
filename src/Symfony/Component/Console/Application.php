@@ -114,9 +114,16 @@ class Application
             } else {
                 $this->renderException($e, $output);
             }
-            $statusCode = $e->getCode();
 
-            $statusCode = $statusCode ? (is_numeric($statusCode) ? (int) $statusCode : 1) : 0;
+            $statusCode = $e->getCode();
+            if (is_numeric($statusCode)) {
+                $statusCode = (int) $statusCode;
+                if (0 === $statusCode) {
+                    $statusCode = 1;
+                }
+            } else {
+                $statusCode = 1;
+            }
         }
 
         if ($this->autoExit) {

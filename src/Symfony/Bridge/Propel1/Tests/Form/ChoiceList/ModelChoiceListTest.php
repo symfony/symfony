@@ -185,4 +185,18 @@ class ModelChoiceListTest extends Propel1TestCase
         $this->assertEquals(array(1, 2), $choiceList->getValuesForChoices(array($item1, $item2)));
         $this->assertEquals(array(1, 2), $choiceList->getIndicesForChoices(array($item1, $item2)));
     }
+
+    public function testDifferentEqualObjectsAreChoosen()
+    {
+        $item = new Item(1, 'Foo');
+        $choiceList = new ModelChoiceList(
+            self::ITEM_CLASS,
+            'value',
+            array($item)
+        );
+
+        $choosenItem = new Item(1, 'Foo');
+
+        $this->assertEquals(array(1), $choiceList->getIndicesForChoices(array($choosenItem)));
+    }
 }

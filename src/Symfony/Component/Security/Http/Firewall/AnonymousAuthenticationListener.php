@@ -49,7 +49,7 @@ class AnonymousAuthenticationListener implements ListenerInterface
         $this->context->setToken(new AnonymousToken($this->key, 'anon.', array()));
 
         if (null !== $this->logger) {
-            $this->logger->info(sprintf('Populated SecurityContext with an anonymous Token'));
+            $this->logger->info('Populated SecurityContext with an anonymous Token');
         }
     }
 }

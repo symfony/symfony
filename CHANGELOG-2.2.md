@@ -7,6 +7,71 @@ in 2.2 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.2.0...v2.2.1
 
+* 2.2.2 (2013-06-02)
+
+ * 2038329: [Form] [Validator] Fixed post_max_size = 0 bug (Issue #8065)
+ * 169c0b9: [Finder] Fix iteration fails with non-rewindable streams
+ * 45b68e0: [Finder] Fix unexpected duplicate sub path related AppendIterator issue
+ * 5321600: Fixed two bugs in HttpCache
+ * 5c317b7: [Console] fix and refactor exit code handling
+ * 1469953: [CssSelector] Fix :nth-last-child() translation
+ * 91b8490: Fix Crawler::children() to not trigger a notice for childless node
+ * 0a4837d: Fixed XML syntax.
+ * a5441b2: Fixed parsing of leading blank lines in folded scalars. Closes #7989.
+ * ef87ba7: [Form] Fixed a method name.
+ * e8d5d16: Fixed Loader import
+ * 60edc58: Fixed fatal error in normalize/denormalizeObject.
+ * 05b987f: [Process] Cleanup tests & prevent assertion that kills randomly Travis-CI
+ * e4913f8: [Filesystem] Fix regression introduced in 10dea948
+ * 5b7e1e6: added a missing check for the provider key
+ * b0e3ea5: [Validator] fixed wrong URL for XSD
+ * 59b78c7: [Validator] Fixed: $traverse and $deep is passed to the visitor from Validator::validate()
+ * bcb5400: [Form] Fixed transform()/reverseTransform() to always throw TransformationFailedExceptions
+ * 7b2ebbf: [Form] Fixed: String validation groups are never interpreted as callbacks
+ * 0610750: if the repository method returns an array ensure that it's internal poin...
+ * dcced01: [Form] Improved multi-byte handling of NumberToLocalizedStringTransformer
+ * 2b554d7: remove validation related headers when needed
+ * 2a531d7: Fix getPort() returning 80 instead of 443 when X-FORWARDED-PROTO is set to https
+ * 10dea94: [Filesystem] copy() is not working when open_basedir is set
+ * 8757ad4: [Process] Fix #5594 : `termsig` must be used instead of `stopsig` in exceptions when a process is signaled
+ * be34917: [Console] find command even if its name is a namespace too (closes #7860)
+ * 3c97004: Reset all catalogues when adding resource to fallback locale (#7715, #7819)
+ * 0fb35a4: Added reloading of fallback catalogues when calling addResource() (#7715)
+ * 9e49bc8: Re-added context information to log list
+ * 06e21ff: Filesystem::touch() not working with different owners (utime/atime issue)
+ * d98118a: [Config] #7644 add tests for passing number looking attributes as strings
+ * 36d057b: [HttpFoundation][BrowserKit] fixed path when converting a cookie to a string
+ * 495d0e3: [HttpFoundation] fixed empty domain= in Cookie::__toString()
+ * c2bc707: fixed detection of secure cookies received over https
+ * af819a7: [2.2] Pass ESI header to subrequests
+ * 54bcf5c: [Translator] added additional conversion for encodings other than utf-8
+ * 67b5797: fixed source messages to accept pluralized messages [Validator][translation][japanese] add messages for new validator
+ * 8a434ed: fix a DI circular reference recognition bug
+ * 22bf965: [DependencyInjection] fixed wrong exception class
+ * 5abf887: Fix default value handling for multi-value options
+ * da156d3: fix overwriting of request's locale if attribute _locale is missing
+ * 1adbe3c: [HttpKernel] truncate profiler token to 6 chars (see #7665)
+ * d552e4c: [HttpFoundation] do not use server variable PATH_INFO because it is already decoded and thus symfony is fragile to double encoding of the path
+ * 4c51ec7: Fix download over SSL using IE < 8 and binary file response
+ * 46909fa: [Console] Fix merging of application definition, fixes #7068, replaces #7158
+ * 972bde7: [HttpKernel] fixed the Kernel when the ClassLoader component is not available (closes #7406)
+ * f163226: fixed output of bag values
+ * 047212a: [Yaml] fixed handling an empty value
+ * 94a9cdc: [Routing][XML Loader] Add a possibility to set a default value to null
+ * 302d44f: [Console] fixed handling of "0" input on ask
+ * 383a84b: fixed handling of "0" input on ask
+ * 0f0c29c: [HttpFoundation] Fixed bug in key searching for NamespacedAttributeBag
+ * 7fc429f: [Form] DateTimeToRfc3339Transformer use proper transformation exteption in reverse transformation
+ * 9fcd2f6: [HttpFoundation] fixed the creation of sub-requests under some circumstances for IIS
+ * 8a9e898: Fix finding ACLs from ObjectIdentity's with different types
+ * a3826ab: #7531: [HttpKernel][Config] FileLocator adds NULL as global resource path
+ * 9d71ebe: Fix autocompletion of command names when namespaces conflict
+ * bec8ff1: Fix timeout in Process::stop method
+ * 3780fdb: Fix Process timeout
+ * 99256e4: [HttpKernel] Remove args from 5.3 stack traces to avoid filling log files, fixes #7259
+ * e8cae94: fix overwriting of request's locale if attribute _locale is missing
+ * c4da2d9: [HttpFoundation] getClientIp is fixed.
+
 * 2.2.1 (2013-04-06)
 
  * 751abe1: Doctrine cannot handle bare random non-utf8 strings

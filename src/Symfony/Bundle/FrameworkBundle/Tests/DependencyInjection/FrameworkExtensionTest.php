@@ -114,6 +114,15 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals('/path/to/sessions', $container->getParameter('session.save_path'));
     }
 
+    public function testNullSessionHandler()
+    {
+        $container = $this->createContainerFromFile('session');
+
+        $this->assertTrue($container->hasDefinition('session'), '->registerSessionConfiguration() loads session.xml');
+        $this->assertNull($container->getDefinition('session.storage.native')->getArgument(1));
+        $this->assertNull($container->getDefinition('session.storage.php_bridge')->getArgument(0));
+    }
+
     public function testTemplating()
     {
         $container = $this->createContainerFromFile('full');

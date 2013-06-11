@@ -7,6 +7,25 @@ in 2.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.3.0...v2.3.1
 
+* 2.3.0 (2013-06-03)
+
+ * e93fc7a: [FrameworkBundle] set the dispatcher in the console application
+ * 2038329: [Form] [Validator] Fixed post_max_size = 0 bug (Issue #8065)
+ * 554ab9f: [Console] renamed ConsoleForExceptionEvent into ConsoleExceptionEvent
+ * fd151fd: [Security] Fixed the check if an interface exists.
+ * c8e5503: [FrameworkBundle] removed HttpFoundation classes from HttpKernel cache
+ * 169c0b9: [Finder] Fix iteration fails with non-rewindable streams
+ * 45b68e0: [Finder] Fix unexpected duplicate sub path related AppendIterator issue
+ * 13ba4ea: fix logger in regards to DebugLoggerInterface
+ * 97b38ed: Added type of return value in VoterInterface.
+ * 79a842a: [Console] Add namespace support back in to list command
+ * 5321600: Fixed two bugs in HttpCache
+ * 435012f: [Config] Adding the previous exception message into the FileLoaderLoadException so it's more easily seen
+ * 5c317b7: [Console] fix and refactor exit code handling
+ * 1469953: [CssSelector] Fix :nth-last-child() translation
+ * 2d9027d: [CssSelector] Fix :nth-last-child() translation
+ * 91b8490: Fix Crawler::children() to not trigger a notice for childless node
+
 * 2.3.0-RC1 (2013-05-16)
 
  * 95f356b: remove check for PHP bug #50731

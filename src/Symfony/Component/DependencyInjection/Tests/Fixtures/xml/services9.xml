@@ -74,5 +74,6 @@
       </call>
     </service>
     <service id="alias_for_foo" alias="foo"/>
+    <service id="alias_for_alias" alias="foo"/>
   </services>
 </container>

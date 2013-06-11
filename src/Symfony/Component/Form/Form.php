@@ -649,11 +649,11 @@ class Form implements \IteratorAggregate, FormInterface
      * @throws FormException if the method of the request is not one of GET, POST or PUT
      *
      * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
-     *             {@link FormConfigInterface::bind()} instead.
+     *             {@link FormInterface::bind()} instead.
      */
     public function bindRequest(Request $request)
     {
-        trigger_error('bindRequest() is deprecated since version 2.1 and will be removed in 2.3. Use FormConfigInterface::bind() instead.', E_USER_DEPRECATED);
+        trigger_error('bindRequest() is deprecated since version 2.1 and will be removed in 2.3. Use FormInterface::bind() instead.', E_USER_DEPRECATED);
 
         return $this->bind($request);
     }

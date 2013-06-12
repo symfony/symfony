@@ -47,7 +47,7 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
         $reference = null;
         if ($uri instanceof ControllerReference) {
             $reference = $uri;
-            $uri = $this->generateFragmentUri($uri, $request);
+            $uri = $this->generateFragmentUri($uri, $request, false);
         }
 
         $subRequest = $this->createSubRequest($uri, $request);
@@ -55,6 +55,8 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
         // override Request attributes as they can be objects (which are not supported by the generated URI)
         if (null !== $reference) {
             $subRequest->attributes->add($reference->attributes);
+            $subRequest->attributes->set('_format', isset($reference->attributes['_format']) ? $reference->attributes['_format'] : $request->getRequestFormat());
+            $subRequest->attributes->set('_controller', $reference->controller);
         }
 
         $level = ob_get_level();

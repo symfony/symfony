@@ -45,6 +45,15 @@ class RoutableFragmentRendererTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('http://localhost/_fragment?_path=_format%3Djson%26_controller%3Dcontroller', $this->getRenderer()->doGenerateFragmentUri($controller, $request));
     }
 
+    public function testFailGenerateFragmentUriWithObject()
+    {
+        $object     = new \SplObjectStorage(); // using any non-anonymous instance
+        $controller = new ControllerReference('controller', array('foo' => $object), array());
+
+        $this->setExpectedException('LogicException');
+        $this->getRenderer()->doGenerateFragmentUri($controller, Request::create('/'));
+    }
+
     private function getRenderer()
     {
         return new Renderer();

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.4.0
+-----
+
+ * added simpler customization options
+
 2.3.0
 -----
 

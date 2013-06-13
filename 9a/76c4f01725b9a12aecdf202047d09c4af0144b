@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2013-06-05T00:26:44Z
+
+Why not go the other way round and do not throw an exception for both cases? It would also make it consistent but at the same time reduce the bc break and make it more user-friendly. It should just ignore the value.
+
+---------------------------------------------------------------------------
+
+by tiagojsag at 2013-06-05T01:01:51Z
+
+I believe there's a design problem with the short syntax, tbh.
+
+Consider the following example: app/console some:command -fo
+This can be interpreted in several ways:
+-f is the option short name, and 'o' the value passed to it
+-f and -o are both options with no value
+
+The current implementation always falls back to the second scenario, which is also reflected on the current tests. Changing the short syntax parser to accommodate this change would require significant changes, as the parser would need to look in all possible inputs, check if they admit or not arguments, and so on and so on.
+
+And then you have the cases where -fo can actually be either things (-f is an input which admits a value and a -o option exists). And last but not least, this is my first PR to the main symfony project, so I don't mind doing the implementation, but I'd like some ideas from you guys on how this should be addressed.
+
+edit: sorry, it's a bit late, and I just noticed i misread your post. If no exceptions are thrown, there's no point in declaring a VALUE_NONE. Also, I don't believe it would be user friendly. A user could (and can) do --foo=bar, the actual bar value is ignored, and the user is not notified.

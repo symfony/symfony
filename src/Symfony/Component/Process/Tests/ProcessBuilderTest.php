@@ -45,6 +45,22 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
         $_ENV = $snapshot;
     }
 
+    public function testProcessBuilderShouldNotPassEnvArrays()
+    {
+        $snapshot = $_ENV;
+        $_ENV = array('a' => array('b', 'c'), 'd' => 'e', 'f' => 'g');
+        $expected = array('d' => 'e', 'f' => 'g');
+
+        $pb = new ProcessBuilder();
+        $pb->add('a')->inheritEnvironmentVariables()
+            ->setEnv('d', 'e');
+        $proc = $pb->getProcess();
+
+        $this->assertEquals($expected, $proc->getEnv(), '->inheritEnvironmentVariables() removes array values from $_ENV');
+
+        $_ENV = $snapshot;
+    }
+
     public function testInheritEnvironmentVarsByDefault()
     {
         $pb = new ProcessBuilder();

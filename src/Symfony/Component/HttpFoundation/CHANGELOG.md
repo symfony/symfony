@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.4.0
+-----
+
+ * added Request::getEncodings()
+
 2.3.0
 -----
 

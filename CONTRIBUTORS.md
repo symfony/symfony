@@ -419,7 +419,7 @@ Symfony2 is the result of the work of many people who made the code better
  - Adam Monsen (meonkeys)
  - LOUARDI Abdeltif (ouardisoft)
  - Robert Gruendler (pulse00)
- - ragtek (ragtek)
+ - Daniel Fatkic (ragtek)
  - Simon Terrien (sterrien)
  - Benoît Merlet (trompette)
  - Jan Behrens

@@ -156,4 +156,24 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     {
         return count($this->children);
     }
+
+    /**
+     * Checks if the form or any of
+     * its children contain errors.
+     *
+     * @return boolean
+     */
+    public function hasErrors()
+    {
+        if(count($this->vars['errors'])) {
+            return true;
+        }
+
+        foreach($this->children as $child) {
+            if($child->hasErrors()) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

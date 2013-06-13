@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by WouterJ at 2013-06-12T10:22:42Z
+
+IIRC this is fixed in 2.3.1 (which is released yesterday)
+
+See also #8239
+
+Edit: The PR fixing this is: #8193
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2013-06-12T10:43:17Z
+
+still doesnt work for me with the latest checkout of the 2.3 branch
+
+---------------------------------------------------------------------------
+
+by Burgov at 2013-06-12T12:25:53Z
+
+Probably a stupid question, but did you clear your cache after updating? I had the same problem, and while composer clears the dev cache, it doesn't clear the test cache, so after updating while the dev environment worked fine, the tests kept on failing
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2013-06-12T12:53:42Z
+
+if i clear my cache, check out 2.3 and run ``app/console | grep router`` i get nothing. if i then switch to this branch here. i get the 3 expected commands.
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2013-06-13T10:45:42Z
+
+@fabpot this is quite urgent for the CMF (and any one else using the ChainRouter), as right now the router commands are broken with 2.3.
+
+---------------------------------------------------------------------------
+
+by stof at 2013-06-13T10:49:02Z
+
+this is indeed needed. #8193 is fixing ``get`` but not ``has``

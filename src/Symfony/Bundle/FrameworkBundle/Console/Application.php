@@ -68,6 +68,8 @@ class Application extends BaseApplication
     {
         if (!$this->commandsRegistered) {
             $this->registerCommands();
+
+            $this->commandsRegistered = true;
         }
 
         if (true === $input->hasParameterOption(array('--shell', '-s'))) {
@@ -90,7 +92,5 @@ class Application extends BaseApplication
                 $bundle->registerCommands($this);
             }
         }
-
-        $this->commandsRegistered = true;
     }
 }

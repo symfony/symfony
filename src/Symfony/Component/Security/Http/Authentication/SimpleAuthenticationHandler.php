@@ -26,8 +26,6 @@ use Symfony\Component\Security\Core\Authentication\SimpleAuthenticatorInterface;
  * the default handlers are triggered.
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
- *
- * @experimental This feature is experimental in 2.3 and might change in future versions
  */
 class SimpleAuthenticationHandler implements AuthenticationFailureHandlerInterface, AuthenticationSuccessHandlerInterface
 {

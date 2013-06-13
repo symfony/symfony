@@ -15,8 +15,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @author Jordi Boggiano <j.boggiano@seld.be>
- *
- * @experimental This feature is experimental in 2.3 and might change in future versions
  */
 interface SimplePreAuthenticatorInterface extends SimpleAuthenticatorInterface
 {

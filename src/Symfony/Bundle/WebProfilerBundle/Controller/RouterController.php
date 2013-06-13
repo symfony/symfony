@@ -53,7 +53,7 @@ class RouterController
         $this->profiler->disable();
 
         if (null === $this->matcher || null === $this->routes) {
-            return new Response('The Router is not enabled.');
+            return new Response('The Router is not enabled.', 200, array('Content-Type' => 'text/html'));
         }
 
         $profile = $this->profiler->loadProfile($token);
@@ -68,6 +68,6 @@ class RouterController
             'request' => $request,
             'router'  => $profile->getCollector('router'),
             'traces'  => $matcher->getTraces($request->getPathInfo()),
-        )));
+        )), 200, array('Content-Type' => 'text/html'));
     }
 }

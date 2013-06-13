@@ -147,10 +147,7 @@ class Process
             $this->cwd = getcwd();
         }
         if (null !== $env) {
-            $this->env = array();
-            foreach ($env as $key => $value) {
-                $this->env[(binary) $key] = (binary) $value;
-            }
+            $this->setEnv($env);
         } else {
             $this->env = null;
         }
@@ -942,13 +939,25 @@ class Process
     /**
      * Sets the environment variables.
      *
+     * An environment variable value should be a string.
+     * If it is an array, the variable is ignored.
+     *
+     * That happens in PHP when 'argv' is registered into
+     * the $_ENV array for instance.
+     *
      * @param array $env The new environment variables
      *
      * @return self The current Process instance
      */
     public function setEnv(array $env)
     {
-        $this->env = $env;
+        // Process can not handle env values that are arrays
+        $env = array_filter($env, function ($value) { if (!is_array($value)) { return true; } });
+
+        $this->env = array();
+        foreach ($env as $key => $value) {
+            $this->env[(binary) $key] = (binary) $value;
+        }
 
         return $this;
     }

@@ -151,9 +151,6 @@ class ProcessBuilder
             $env = $this->env;
         }
 
-        // Process can not handle env values that are arrays
-        $env = $env ? array_filter($env, function ($value) { if (!is_array($value)) { return true; } }) : $env;
-
         return new Process($script, $this->cwd, $env, $this->stdin, $this->timeout, $options);
     }
 }

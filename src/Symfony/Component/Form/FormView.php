@@ -158,8 +158,8 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     }
 
     /**
-     * Checks if the form or any of
-     * its children contain errors.
+     * Checks if the form and all
+     * of its children are valid.
      *
      * @return boolean
      */

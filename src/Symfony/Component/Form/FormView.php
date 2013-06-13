@@ -163,17 +163,17 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      *
      * @return boolean
      */
-    public function hasErrors()
+    public function isValid()
     {
-        if (count($this->vars['errors'])) {
-            return true;
+        if (isset($this->vars['errors']) && count($this->vars['errors'])) {
+            return false;
         }
 
         foreach ($this->children as $child) {
-            if ($child->hasErrors()) {
-                return true;
+            if (!$child->isValid()) {
+                return false;
             }
         }
-        return false;
+        return true;
     }
 }

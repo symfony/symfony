@@ -78,6 +78,10 @@ class Crawler extends \SplObjectStorage
     /**
      * Adds HTML/XML content.
      *
+     * If the charset is not set via the content type, it is assumed
+     * to be ISO-8859-1, which is the default charset defined by the
+     * HTTP 1.1 specification.
+     *
      * @param string      $content A string to parse as HTML/XML
      * @param null|string $type    The content type of the string
      *

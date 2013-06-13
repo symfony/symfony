@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-06-04T15:06:56Z
+
+What is the use case? As you can already choose your class name, I don't see the need to namespace the class.
+
+---------------------------------------------------------------------------
+
+by zakharovvi at 2013-06-04T17:18:07Z
+
+I use DependencyInjection component separately, with another cache warmup mechanism. Namespace needed for access to class by default app autoloader, e.g. Vendor\DependencyInjection\Dump\Container
+
+If new parameter inappropriate, let's leave it in a fork.

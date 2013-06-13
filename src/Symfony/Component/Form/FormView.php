@@ -165,12 +165,12 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      */
     public function hasErrors()
     {
-        if(count($this->vars['errors'])) {
+        if (count($this->vars['errors'])) {
             return true;
         }
 
-        foreach($this->children as $child) {
-            if($child->hasErrors()) {
+        foreach ($this->children as $child) {
+            if ($child->hasErrors()) {
                 return true;
             }
         }

@@ -104,6 +104,29 @@ class DelegatingEngineTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($delegatingEngine->supports('template.php'));
     }
 
+    public function testGetExistingEngine()
+    {
+        $firstEngine = $this->getEngineMock('template.php', false);
+        $secondEngine = $this->getEngineMock('template.php', true);
+
+        $delegatingEngine = new DelegatingEngine(array($firstEngine, $secondEngine));
+
+        $this->assertSame($secondEngine, $delegatingEngine->getEngine('template.php', array('foo' => 'bar')));
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage No engine is able to work with the template "template.php"
+     */
+    public function testGetInvalidEngine()
+    {
+        $firstEngine = $this->getEngineMock('template.php', false);
+        $secondEngine = $this->getEngineMock('template.php', false);
+
+        $delegatingEngine = new DelegatingEngine(array($firstEngine, $secondEngine));
+        $delegatingEngine->getEngine('template.php', array('foo' => 'bar'));
+    }
+
     private function getEngineMock($template, $supports)
     {
         $engine = $this->getMock('Symfony\Component\Templating\EngineInterface');

@@ -60,7 +60,9 @@ abstract class RoutableFragmentRenderer implements FragmentRendererInterface
         $renderedQuery = array_merge($reference->query, array('_path' => http_build_query($renderedAttributes, '', '&')));
 
         // make sure that logic entities do not end up haphazardly serialized
+        // using non-strict comparison to allow stringified integers to still match
         parse_str($renderedQuery['_path'], $serializedAttributes);
+
         if ($serializedAttributes != $renderedAttributes) {
             throw new \LogicException('controller attributes with objects are not supported');
         }

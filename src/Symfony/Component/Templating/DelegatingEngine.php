@@ -114,7 +114,7 @@ class DelegatingEngine implements EngineInterface, StreamingEngineInterface
      *
      * @api
      */
-    protected function getEngine($name)
+    public function getEngine($name)
     {
         foreach ($this->engines as $engine) {
             if ($engine->supports($name)) {

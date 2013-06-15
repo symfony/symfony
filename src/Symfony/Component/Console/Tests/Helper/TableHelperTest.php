@@ -174,6 +174,33 @@ TABLE
         );
     }
 
+    public function testRenderMultiByte()
+    {
+        if (!function_exists('mb_strlen')) {
+            $this->markTestSkipped('The "mbstring" extension is not available');
+        }
+
+        $table = new TableHelper();
+        $table
+            ->setHeaders(array('■■'))
+            ->setRows(array(array(1234)))
+            ->setLayout(TableHelper::LAYOUT_DEFAULT)
+        ;
+        $table->render($output = $this->getOutputStream());
+
+        $expected =
+<<<TABLE
++------+
+| ■■   |
++------+
+| 1234 |
++------+
+
+TABLE;
+
+        $this->assertEquals($expected, $this->getOutputContent($output));
+    }
+
     protected function getOutputStream()
     {
         return new StreamOutput($this->stream, StreamOutput::VERBOSITY_NORMAL, false);

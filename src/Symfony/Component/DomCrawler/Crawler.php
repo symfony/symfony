@@ -257,6 +257,48 @@ class Crawler extends \SplObjectStorage
     }
 
     /**
+     * Removes DomElements from the DomDocument.
+     *
+     * Example:
+     *
+     *     // Filter out the #content element block.
+     *     $crawler = $crawler->filter('#content');
+     *
+     *     // Remove all instances of <script> and <tag class="element">
+     *     $crawler->remove(array('script', '.element'));
+     *
+     *     // Remove instaces of <script> directly descended <tag class="element">
+     *     $crawler->remove(array('.element > script'));
+     *
+     * @param Array $jquerySelectors List of jQuery Selectors for removal.
+     *
+     * @api
+     */
+    public function remove($jquerySelectors)
+    {
+        if (!class_exists('Symfony\\Component\\CssSelector\\CssSelector')) {
+            // @codeCoverageIgnoreStart
+            throw new \RuntimeException('Unable to remove with a CSS selector as the Symfony CssSelector is not installed.');
+            // @codeCoverageIgnoreEnd
+        }
+
+        $document = new \DOMDocument('1.0', 'UTF-8');
+        $root = $document->appendChild($document->createElement('_root'));
+        $this->rewind();
+        $root->appendChild($document->importNode($this->current(), true));
+        $domxpath = new \DOMXPath($document);
+
+        foreach ($jquerySelectors as $selector) {
+            $crawlerInverse = $domxpath->query(CssSelector::toXPath($selector));
+            foreach ($crawlerInverse as $elementToRemove) {
+                $elementToRemove->parentNode->removeChild($elementToRemove);
+            }
+        }
+        $this->clear();
+        $this->add($document);
+    }
+
+    /**
      * Returns a node given its position in the node list.
      *
      * @param integer $position The position

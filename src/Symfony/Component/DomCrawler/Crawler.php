@@ -282,9 +282,7 @@ class Crawler extends \SplObjectStorage
     public function remove($jquerySelectors)
     {
         $actions = array(
-            'CheckForCssSelectorClass' => array(
-                'ExceptionMessage' => 'Unable to remove with a CSS selector as the Symfony CssSelector is not installed.',
-            ),
+            'CheckForCssSelectorClass' => array(),
             'DomDocumentRootReconstruct' => array(),
         );
         $document = $this->domcrawlerHelper($actions);
@@ -324,9 +322,7 @@ class Crawler extends \SplObjectStorage
     public function setAttribute($jquerySelectors, $attributeValues)
     {
         $actions = array(
-            'CheckForCssSelectorClass' => array(
-                'ExceptionMessage' => 'Unable to remove with a CSS selector as the Symfony CssSelector is not installed.',
-            ),
+            'CheckForCssSelectorClass' => array(),
             'DomDocumentRootReconstruct' => array(),
         );
         $document = $this->domcrawlerHelper($actions);
@@ -334,8 +330,10 @@ class Crawler extends \SplObjectStorage
         foreach ($jquerySelectors as $selector) {
             $crawlerInverse = $document['domxpath']->query(CssSelector::toXPath($selector));
             foreach ($crawlerInverse as $elementToRemove) {
-                foreach ($attributeValues as $attrName => $attrValue) {
-                    $elementToRemove->setAttribute($attrName, $attrValue);
+                if ($elementToRemove instanceof \DOMElement) {
+                    foreach ($attributeValues as $attrName => $attrValue) {
+                        $elementToRemove->setAttribute($attrName, $attrValue);
+                    }
                 }
             }
         }
@@ -380,7 +378,11 @@ class Crawler extends \SplObjectStorage
                 case 'CheckForCssSelectorClass':
                     if (!class_exists('Symfony\\Component\\CssSelector\\CssSelector')) {
                         // @codeCoverageIgnoreStart
-                        throw new \RuntimeException($action_parameters['ExceptionMessage']);
+                        $message = 'Unable to remove with a CSS selector as the Symfony CssSelector is not installed.';
+                        if (isset($action_parameters['ExceptionMessage'])) {
+                            $message = $action_parameters['ExceptionMessage'];
+                        }
+                        throw new \RuntimeException($message);
                         // @codeCoverageIgnoreEnd
                     }
                 break;

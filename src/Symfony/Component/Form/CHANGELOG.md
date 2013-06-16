@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+2.6.0
+-----
+* added allow_html5 option to Date, Time and DateTimeFormType to disable HTML5 input date when widget option is single_text
+
 2.5.0
 ------
 

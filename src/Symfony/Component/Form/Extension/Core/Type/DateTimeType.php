@@ -117,6 +117,7 @@ class DateTimeType extends AbstractType
                 'empty_value',
                 'required',
                 'translation_domain',
+                'allow_html5',
             )));
 
             $timeOptions = array_intersect_key($options, array_flip(array(
@@ -128,6 +129,7 @@ class DateTimeType extends AbstractType
                 'empty_value',
                 'required',
                 'translation_domain',
+                'allow_html5',
             )));
 
             if (null !== $options['date_widget']) {
@@ -180,10 +182,11 @@ class DateTimeType extends AbstractType
     {
         $view->vars['widget'] = $options['widget'];
 
-        // Change the input to a HTML5 date input if
+        // Change the input to a HTML5 datetime input if
         //  * the widget is set to "single_text"
         //  * the format matches the one expected by HTML5
-        if ('single_text' === $options['widget'] && self::HTML5_FORMAT === $options['format']) {
+        //  * the allow_html5 is set to true
+        if ($options['allow_html5'] && 'single_text' === $options['widget'] && self::HTML5_FORMAT === $options['format']) {
             $view->vars['type'] = 'datetime';
         }
     }
@@ -218,6 +221,7 @@ class DateTimeType extends AbstractType
             'time_widget'    => $timeWidget,
             'with_minutes'   => true,
             'with_seconds'   => false,
+            'allow_html5'    => true,
             // Don't modify \DateTime classes by reference, we treat
             // them like immutable value objects
             'by_reference'   => false,

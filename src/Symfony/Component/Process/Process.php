@@ -533,6 +533,19 @@ class Process
     }
 
     /**
+     * Clears the process output.
+     *
+     * @return Process
+     */
+    public function flushOutput()
+    {
+        $this->stdout = '';
+        $this->incrementalOutputOffset = 0;
+
+        return $this;
+    }
+
+    /**
      * Returns the current error output of the process (STDERR).
      *
      * @return string The process error output
@@ -563,6 +576,19 @@ class Process
         $this->incrementalErrorOutputOffset = strlen($data);
 
         return $latest;
+    }
+
+    /**
+     * Clears the process output.
+     *
+     * @return Process
+     */
+    public function flushErrorOutput()
+    {
+        $this->stderr = '';
+        $this->incrementalErrorOutputOffset = 0;
+
+        return $this;
     }
 
     /**

@@ -156,6 +156,36 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testFlushErrorOutput()
+    {
+        $p = new Process(sprintf('php -r %s', escapeshellarg('$n = 0; while ($n < 3) { file_put_contents(\'php://stderr\', \'ERROR\'); $n++; }')));
+
+        $p->run();
+        $p->flushErrorOutput();
+        $this->assertEquals('', $p->getErrorOutput());
+    }
+
+    public function testGetAndFlushErrorOutput()
+    {
+        $p = new Process(sprintf('php -r %s', escapeshellarg('$n = 0; while ($n < 3) { file_put_contents(\'php://stderr\', \'ERROR\'); $n++; }')));
+
+        $p->run();
+        $this->assertEquals(3, preg_match_all('/ERROR/', $p->getAndFlushErrorOutput(), $matches));
+        $this->assertEquals('', $p->getErrorOutput());
+    }
+
+    public function testGetAndFlushIncrementalErrorOutput()
+    {
+        $p = new Process(sprintf('php -r %s', escapeshellarg('$n = 0; while ($n < 3) { usleep(50000); file_put_contents(\'php://stderr\', \'ERROR\'); $n++; }')));
+
+        $p->start();
+        while ($p->isRunning()) {
+            $this->assertLessThanOrEqual(1, preg_match_all('/ERROR/', $p->getandFlushIncrementalErrorOutput(), $matches));
+            $this->assertEquals('', $p->getErrorOutput());
+            usleep(20000);
+        }
+    }
+
     public function testGetOutput()
     {
         $p = new Process(sprintf('php -r %s', escapeshellarg('$n=0;while ($n<3) {echo \' foo \';$n++;}')));
@@ -171,6 +201,36 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $p->start();
         while ($p->isRunning()) {
             $this->assertLessThanOrEqual(1, preg_match_all('/foo/', $p->getIncrementalOutput(), $matches));
+            usleep(20000);
+        }
+    }
+
+    public function testFlushOutput()
+    {
+        $p = new Process(sprintf('php -r %s', escapeshellarg('$n=0;while ($n<3) {echo \' foo \';$n++;}')));
+
+        $p->run();
+        $p->flushOutput();
+        $this->assertEquals('', $p->getOutput());
+    }
+
+    public function testGetAndFlushOutput()
+    {
+        $p = new Process(sprintf('php -r %s', escapeshellarg('$n=0;while ($n<3) {echo \' foo \';$n++;}')));
+
+        $p->run();
+        $this->assertEquals(3, preg_match_all('/foo/', $p->getAndFlushOutput(), $matches));
+        $this->assertEquals('', $p->getOutput());
+    }
+
+    public function testGetAndFlushIncrementalOutput()
+    {
+        $p = new Process(sprintf('php -r %s', escapeshellarg('$n=0;while ($n<3) { echo \' foo \'; usleep(50000); $n++; }')));
+
+        $p->start();
+        while ($p->isRunning()) {
+            $this->assertLessThanOrEqual(1, preg_match_all('/foo/', $p->getAndFlushIncrementalOutput(), $matches));
+            $this->assertEquals('', $p->getOutput());
             usleep(20000);
         }
     }

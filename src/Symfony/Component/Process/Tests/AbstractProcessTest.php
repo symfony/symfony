@@ -181,9 +181,10 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $p->start();
         while ($p->isRunning()) {
             $this->assertLessThanOrEqual(1, preg_match_all('/ERROR/', $p->getandFlushIncrementalErrorOutput(), $matches));
-            $this->assertEquals('', $p->getErrorOutput());
             usleep(20000);
         }
+        $this->assertLessThanOrEqual(1, preg_match_all('/ERROR/', $p->getandFlushIncrementalErrorOutput(), $matches));
+        $this->assertEquals('', $p->getErrorOutput());
     }
 
     public function testGetOutput()
@@ -230,9 +231,10 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $p->start();
         while ($p->isRunning()) {
             $this->assertLessThanOrEqual(1, preg_match_all('/foo/', $p->getAndFlushIncrementalOutput(), $matches));
-            $this->assertEquals('', $p->getOutput());
             usleep(20000);
         }
+        $this->assertLessThanOrEqual(1, preg_match_all('/foo/', $p->getAndFlushIncrementalOutput(), $matches));
+        $this->assertEquals('', $p->getOutput());
     }
 
     public function testExitCodeCommandFailed()

@@ -378,7 +378,7 @@ class Crawler extends \SplObjectStorage
                 case 'CheckForCssSelectorClass':
                     if (!class_exists('Symfony\\Component\\CssSelector\\CssSelector')) {
                         // @codeCoverageIgnoreStart
-                        $message = 'Unable to remove with a CSS selector as the Symfony CssSelector is not installed.';
+                        $message = 'Unable to convert CSS selector to XPath as the Symfony CssSelector is not installed.';
                         if (isset($action_parameters['ExceptionMessage'])) {
                             $message = $action_parameters['ExceptionMessage'];
                         }

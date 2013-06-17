@@ -13,24 +13,21 @@ equivalents:
 HTML and XML are different
 --------------------------
 
-- The `CssSelector` component comes with an `HTML` extension which is enabled by default.
-- If you need to use this component with `XML` documents, you have to disable `HTML` extension.
-- `HTML` tag & attribute names are always lower-cased, with `XML` they are case-sensistive.
-
-Disable & enable `HTML` extension:
+The `CssSelector` component comes with an `HTML` extension which is enabled by
+default. If you need to use this component with `XML` documents, you have to
+disable this `HTML` extension. That's because, `HTML` tag & attribute names
+are always lower-cased, but case-sensitive in `XML`:
 
     // disable `HTML` extension:
     CssSelector::disableHtmlExtension();
+
     // re-enable `HTML` extension:
     CssSelector::enableHtmlExtension();
 
-What brings `HTML` extension?
-- Tag names are lower-cased
-- Attribute names are lower-cased
-- Adds following pseudo-classes:
-    - `checked`, `link`, `disabled`, `enabled`, `selected`: used with form tags
-    - `invalid`, `hover`, `visited`: always select nothing
-- Adds `lang()` function
+When the `HTML` extension is enabled, tag names are lower-cased, attribute
+names are lower-cased, the following extra pseudo-classes are supported:
+`checked`, `link`, `disabled`, `enabled`, `selected`, `invalid`, `hover`,
+`visited`, and the `lang()` function is also added.
 
 Resources
 ---------

@@ -31,6 +31,12 @@ class HostHeader
      */
     private $port;
 
+    /**
+     * Pattern to validate Host header value
+     * @var string
+     */
+    private static $pattern;
+
     public function __construct($host, $port)
     {
         $this->host = $host;
@@ -66,7 +72,7 @@ class HostHeader
      */
     public static function fromString($headerValue)
     {
-        if (preg_match(self::_pattern(), $headerValue, $matches)) {
+        if (preg_match(self::pattern(), $headerValue, $matches)) {
             $port = isset($matches['port']) ? $matches['port'] : null;
             return new self($matches['host'], $port);
         } else {
@@ -74,7 +80,6 @@ class HostHeader
         }
     }
 
-    private static $_pattern;
 
     /**
      * Builds a regex pattern to parse a HTTP Host header
@@ -82,10 +87,10 @@ class HostHeader
      *
      * @return string
      */
-    private static function _pattern()
+    private static function pattern()
     {
-        if (isset(self::$_pattern))
-            return self::$_pattern;
+        if (isset(self::$pattern))
+            return self::$pattern;
 
         $h16 = '[[:xdigit:]]{1,4}';
         $h16c = "(?: $h16 : )"; // A h16 followed by a colon
@@ -150,6 +155,6 @@ EOS;
         $port = '(?: : (?P<port> [0-9]* ) )?';
         $pattern = "/ \A $host $port \Z /x";
 
-        return self::$_pattern = $pattern;
+        return self::$pattern = $pattern;
     }
 }

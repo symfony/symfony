@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2013-06-15T10:13:36Z
+
+what is the use case for making it public ?
+
+---------------------------------------------------------------------------
+
+by jrobeson at 2013-06-15T11:04:19Z
+
+see the linked ticket. The PHP engine is crippled compared to the twig engine without this change.

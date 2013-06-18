@@ -283,7 +283,7 @@ abstract class BaseNode implements NodeInterface
     /**
      * Returns parent node for this node
      *
-     * @return NodeInterface
+     * @return NodeInterface|null
      */
     public function getParent()
     {

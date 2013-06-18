@@ -109,6 +109,18 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
     }
 
     /**
+     * Deletes the security identity from the database.
+     * ACL entries have the CASCADE option on their foreign key so they will also get deleted
+     *
+     * @param SecurityIdentityInterface $sid
+     * @throws \InvalidArgumentException
+     */
+    public function deleteSecurityIdentity(SecurityIdentityInterface $sid)
+    {
+        $this->connection->executeQuery($this->getDeleteSecurityIdentityIdSql($sid));
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function findAcls(array $oids, array $sids = array())
@@ -593,6 +605,21 @@ QUERY;
             $this->connection->quote($identifier),
             $this->connection->getDatabasePlatform()->convertBooleans($username)
         );
+    }
+
+    /**
+     * Constructs the SQL to delete a security identity.
+     *
+     * @param SecurityIdentityInterface $sid
+     * @throws \InvalidArgumentException
+     * @return string
+     */
+    protected function getDeleteSecurityIdentityIdSql(SecurityIdentityInterface $sid)
+    {
+        $select = $this->getSelectSecurityIdentityIdSql($sid);
+        $delete = preg_replace('/^SELECT id FROM/', 'DELETE FROM', $select);
+
+        return $delete;
     }
 
     /**

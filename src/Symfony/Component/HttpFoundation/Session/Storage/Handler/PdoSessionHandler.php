@@ -246,7 +246,7 @@ class PdoSessionHandler implements \SessionHandlerInterface
      *
      * @return \PDO
      */
-    public function getConnection()
+    protected function getConnection()
     {
         return $this->pdo;
     }

@@ -119,6 +119,9 @@ class MemcachedSessionHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetConnection()
     {
-        $this->assertInstanceOf(get_class($this->memcached), $this->storage->getConnection());
+        $method = new \ReflectionMethod($this->storage, 'getConnection');
+        $method->setAccessible(true);
+ 
+        $this->assertInstanceOf('\Memcached', $method->invoke($this->storage));
     }
 }

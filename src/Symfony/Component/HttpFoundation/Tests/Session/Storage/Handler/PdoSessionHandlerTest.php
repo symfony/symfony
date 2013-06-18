@@ -102,6 +102,10 @@ class PdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
     public function testGetConnection()
     {
         $storage = new PdoSessionHandler($this->pdo, array('db_table' => 'sessions'), array());
-        $this->assertInstanceOf(get_class($this->pdo), $storage->getConnection());
+
+        $method = new \ReflectionMethod($storage, 'getConnection');
+        $method->setAccessible(true);
+ 
+        $this->assertInstanceOf('\PDO', $method->invoke($storage));
     }
 }

@@ -171,6 +171,9 @@ class MongoDbSessionHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetConnection()
     {
-        $this->assertInstanceOf(get_class($this->mongo), $this->storage->getConnection());
+        $method = new \ReflectionMethod($this->storage, 'getConnection');
+        $method->setAccessible(true);
+ 
+        $this->assertInstanceOf('\Mongo', $method->invoke($this->storage));
     }
 }

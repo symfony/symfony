@@ -166,7 +166,7 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
      *
      * @return \Mongo
      */
-    public function getConnection()
+    protected function getConnection()
     {
         return $this->mongo;
     }

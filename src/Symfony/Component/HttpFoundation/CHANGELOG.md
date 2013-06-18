@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * added Request::getEncodings()
+ * added getConnection method to session handlers
 
 2.3.0
 -----

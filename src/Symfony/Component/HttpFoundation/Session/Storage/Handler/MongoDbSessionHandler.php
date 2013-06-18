@@ -160,4 +160,14 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
 
         return $this->collection;
     }
+
+    /**
+     * Return a Mongo instance
+     *
+     * @return \Mongo
+     */
+    public function getConnection()
+    {
+        return $this->mongo;
+    }
 }

@@ -116,4 +116,9 @@ class MemcachedSessionHandlerTest extends \PHPUnit_Framework_TestCase
             array(array('expiretime' => 100, 'foo' => 'bar'), false),
         );
     }
+
+    public function testGetConnection()
+    {
+        $this->assertInstanceOf(get_class($this->memcached), $this->storage->getConnection());
+    }
 }

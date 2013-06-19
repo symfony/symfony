@@ -1,6 +1,9 @@
 README
 ======
 
+[![Total Downloads](https://poser.pugx.org/symfony/symfony/downloads.png)](https://packagist.org/packages/symfony/symfony)
+[![Latest Stable Version](https://poser.pugx.org/symfony/symfony/v/stable.png)](https://packagist.org/packages/symfony/symfony)
+
 What is Symfony2?
 -----------------
 

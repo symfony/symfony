@@ -7,6 +7,26 @@ in 2.2 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.2.0...v2.2.1
 
+* 2.2.3 (2013-06-19)
+
+ * c0da3ae: [Process] Disable exception on stream_select timeout
+ * 77f2aa8: [HttpFoundation] fixed issue with session_regenerate_id (closes #7380)
+ * bcbbb28: Throw exception if value is passed to VALUE_NONE input, long syntax
+ * 6b71513: fixed date type format pattern regex
+ * 842f3fa: do not re-register commands each time a Console\Application is run
+ * 0991cd0: [Process] moved env check to the Process class (refs #8227)
+ * 8764944: fix issue where $_ENV contains array vals
+ * 4139936: [DomCrawler] Fix handling file:// without a host
+ * de289d2: [Form] corrected interface bind() method defined against in deprecation notice
+ * 0c0a3e9: [Console] fixed regression when calling a command foo:bar if there is another one like foo:bar:baz (closes #8245)
+ * 849f3ed: [Finder] Fix SplFileInfo::getContents isn't working with ssh2 protocol
+ * 25e3abd: fix many-to-many Propel1 ModelChoiceList
+ * bce6bd2: [DomCrawler] Fixed a fatal error when setting a value in a malformed field name.
+ * 445b2e3: [Console] fix status code when Exception::getCode returns something like 0.1
+ * bbfde62: Fixed exit code for exceptions with error code 0
+ * afad9c7: instantiate valid commands only
+ * 6d2135b: force the Content-Type to html in the web profiler controllers
+
 * 2.2.2 (2013-06-02)
 
  * 2038329: [Form] [Validator] Fixed post_max_size = 0 bug (Issue #8065)

@@ -112,7 +112,7 @@ class MemcacheSessionHandler implements \SessionHandlerInterface
      *
      * @return \Memcache
      */
-    protected function getConnection()
+    protected function getMemcache()
     {
         return $this->memcache;
     }

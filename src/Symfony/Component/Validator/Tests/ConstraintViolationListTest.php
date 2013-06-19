@@ -127,6 +127,45 @@ EOF;
         $this->assertEquals($expected, (string) $this->list);
     }
 
+    public function testToArray()
+    {
+        $this->list = new ConstraintViolationList(array(
+            $this->getViolation('Error 1', 'Root', 'foo'),
+            $this->getViolation('Error 2', 'Root', 'foo'),
+            $this->getViolation('Error 3', 'Root', 'bar'),
+            $this->getViolation('Error 4', 'Root 2', 'foo'),
+            $this->getViolation('Error 5', 'Root 3', 'baz'),
+        ));
+
+        $expectedNoFilters = array(
+            'Root'   => array('foo' => array('Error 1', 'Error 2'), 'bar' => array('Error 3')),
+            'Root 2' => array('foo' => array('Error 4')),
+            'Root 3' => array('baz' => array('Error 5'))
+        );
+        $this->assertEquals($expectedNoFilters, $this->list->toArray());
+
+        $expectedFilterRoot = array(
+            'Root'   => array('foo' => array('Error 1', 'Error 2'), 'bar' => array('Error 3')),
+        );
+        $this->assertEquals($expectedFilterRoot, $this->list->toArray(null, 'Root'));
+
+        $expectedFilterProperty = array(
+            'Root'   => array('foo' => array('Error 1', 'Error 2')),
+            'Root 2' => array('foo' => array('Error 4')),
+        );
+        $this->assertEquals($expectedFilterProperty, $this->list->toArray('foo'));
+
+        $expectedFilterBoth = array('Root' => array('foo' => array('Error 1', 'Error 2')));
+        $this->assertEquals($expectedFilterBoth, $this->list->toArray('foo', 'Root'));
+
+        //Wrong values causes to return empty array
+        $this->assertEquals(array(), $this->list->toArray(null, 'wrong'));
+        $this->assertEquals(array(), $this->list->toArray('bar', 'wrong'));
+        $this->assertEquals(array(), $this->list->toArray('wrong', null));
+        $this->assertEquals(array(), $this->list->toArray('wrong', 'Root'));
+        $this->assertEquals(array(), $this->list->toArray('wrong', 'wrong'));
+    }
+
     protected function getViolation($message, $root = null, $propertyPath = null)
     {
         return new ConstraintViolation($message, $message, array(), $root, $propertyPath, null);

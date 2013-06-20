@@ -160,7 +160,7 @@ EOF
     private function getCatalogueSuffix($locale)
     {
         $suffix = str_replace(array('-', '_'), ' ', $locale);
-        $suffix = mb_convert_case($suffix, MB_CASE_TITLE);
+        $suffix = ucwords(strtolower($suffix));
         $suffix = str_replace(' ', '', $suffix);
 
         return $suffix;

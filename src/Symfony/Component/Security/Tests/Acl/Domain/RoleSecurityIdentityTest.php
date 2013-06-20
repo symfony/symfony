@@ -51,7 +51,6 @@ class RoleSecurityIdentityTest extends \PHPUnit_Framework_TestCase
             array(new RoleSecurityIdentity('ROLE_FOO'), new RoleSecurityIdentity(new Role('ROLE_FOO')), true),
             array(new RoleSecurityIdentity('ROLE_USER'), new RoleSecurityIdentity('ROLE_FOO'), false),
             array(new RoleSecurityIdentity('ROLE_FOO'), new UserSecurityIdentity('ROLE_FOO', 'Foo'), false),
-            array(new RoleSecurityIdentity('ROLE_FOO'), new UserSecurityIdentity('ROLE_FOO', 'Foo'), false),
             array(new RoleSecurityIdentity('ROLE_FOO'), new RoleSecurityIdentity(new MyRole('ROLE_FOO')), true),
             array(new RoleSecurityIdentity('ROLE_USER'), new RoleSecurityIdentity(new MyRole('ROLE_FOO')), false),
         );

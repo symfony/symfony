@@ -1,6 +1,6 @@
 <?php
 
-namespace Decathlon\ePlanningBundle\Validator\Constraints;
+namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;

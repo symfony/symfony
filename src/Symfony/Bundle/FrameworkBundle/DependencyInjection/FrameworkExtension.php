@@ -73,6 +73,8 @@ class FrameworkExtension extends Extension
         $container->setParameter('kernel.trusted_proxies', $config['trusted_proxies']);
         $container->setParameter('kernel.default_locale', $config['default_locale']);
 
+        $container->setParameter('kernel.resources_dir', $config['resources_dir']);
+
         if (!empty($config['test'])) {
             $loader->load('test.xml');
         }

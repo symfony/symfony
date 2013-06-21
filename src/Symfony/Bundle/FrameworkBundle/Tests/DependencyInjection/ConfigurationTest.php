@@ -128,8 +128,9 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'debug'          => '%kernel.debug%',
             ),
             'serializer'          => array(
-                'enabled' => false           
-            )
+                'enabled' => false
+            ),
+            'resources_dir' => '%kernel.root_dir%/Resources',
         );
     }
 }

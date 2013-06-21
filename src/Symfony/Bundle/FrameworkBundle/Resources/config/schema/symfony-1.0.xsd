@@ -20,6 +20,7 @@
             <xsd:element name="translator" type="translator" minOccurs="0" maxOccurs="1" />
             <xsd:element name="validation" type="validation" minOccurs="0" maxOccurs="1" />
             <xsd:element name="annotations" type="annotations" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="resources-dir" type="xsd:string" minOccurs="0" maxOccurs="1" />
         </xsd:all>
 
         <xsd:attribute name="http-method-override" type="xsd:boolean" />

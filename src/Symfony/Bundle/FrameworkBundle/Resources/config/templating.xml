@@ -36,7 +36,7 @@
         <service id="templating.finder" class="%templating.finder.class%" public="false">
             <argument type="service" id="kernel" />
             <argument type="service" id="templating.filename_parser" />
-            <argument>%kernel.root_dir%/Resources</argument>
+            <argument>%kernel.resources_dir%</argument>
         </service>
 
         <service id="templating.cache_warmer.template_paths" class="%templating.cache_warmer.template_paths.class%" public="false">

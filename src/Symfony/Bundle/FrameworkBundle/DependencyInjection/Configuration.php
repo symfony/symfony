@@ -68,6 +68,7 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('ide')->defaultNull()->end()
                 ->booleanNode('test')->end()
                 ->scalarNode('default_locale')->defaultValue('en')->end()
+                ->scalarNode('resources_dir')->defaultValue('%kernel.root_dir%/Resources')->end()
             ->end()
         ;
 

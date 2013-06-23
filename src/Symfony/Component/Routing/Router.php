@@ -233,7 +233,7 @@ class Router implements RouterInterface
         $class = $this->options['matcher_cache_class'];
         $cache = new ConfigCache($this->options['cache_dir'].'/'.$class.'.php', $this->options['debug']);
         if (!$cache->isFresh($class)) {
-            $dumper = new $this->options['matcher_dumper_class']($this->getRouteCollection());
+            $dumper = $this->getMatcherDumperInstance($this->options['matcher_dumper_class']);
 
             $options = array(
                 'class'      => $class,
@@ -265,7 +265,7 @@ class Router implements RouterInterface
             $class = $this->options['generator_cache_class'];
             $cache = new ConfigCache($this->options['cache_dir'].'/'.$class.'.php', $this->options['debug']);
             if (!$cache->isFresh($class)) {
-                $dumper = new $this->options['generator_dumper_class']($this->getRouteCollection());
+                $dumper = $this->getGeneratorDumperInstance($this->options['generator_dumper_class']);
 
                 $options = array(
                     'class'      => $class,
@@ -285,5 +285,25 @@ class Router implements RouterInterface
         }
 
         return $this->generator;
+    }
+
+    /**
+     * @param string $generatorDumperClass The generator dumper class
+     *
+     * @return \Symfony\Component\Routing\Generator\Dumper\GeneratorDumperInterface
+     */
+    public function getGeneratorDumperInstance($generatorDumperClass)
+    {
+        return new $generatorDumperClass($this->getRouteCollection());
+    }
+
+    /**
+     * @param string $matcherDumperClass The matcher dumper class
+     *
+     * @return \Symfony\Component\Routing\Matcher\Dumper\MatcherDumperInterface
+     */
+    public function getMatcherDumperInstance($matcherDumperClass)
+    {
+        return new $matcherDumperClass($this->getRouteCollection());
     }
 }

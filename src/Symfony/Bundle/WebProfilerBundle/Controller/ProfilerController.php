@@ -65,7 +65,7 @@ class ProfilerController
 
         $this->profiler->disable();
 
-        return new RedirectResponse($this->generator->generate('_profiler_search_results', array('token' => 'empty', 'limit' => 10)));
+        return new RedirectResponse($this->generator->generate('_profiler_search_results', array('token' => 'empty', 'limit' => 10)), 302, array('Content-Type' => 'text/html'));
     }
 
     /**
@@ -90,7 +90,7 @@ class ProfilerController
         $page = $request->query->get('page', 'home');
 
         if (!$profile = $this->profiler->loadProfile($token)) {
-            return new Response($this->twig->render('@WebProfiler/Profiler/info.html.twig', array('about' => 'no_token', 'token' => $token)));
+            return new Response($this->twig->render('@WebProfiler/Profiler/info.html.twig', array('about' => 'no_token', 'token' => $token)), 200, array('Content-Type' => 'text/html'));
         }
 
         if (!$profile->hasCollector($panel)) {
@@ -106,7 +106,7 @@ class ProfilerController
             'request'   => $request,
             'templates' => $this->getTemplateManager()->getTemplates($profile),
             'is_ajax'   => $request->isXmlHttpRequest(),
-        )));
+        )), 200, array('Content-Type' => 'text/html'));
     }
 
     /**
@@ -150,7 +150,7 @@ class ProfilerController
         $this->profiler->disable();
         $this->profiler->purge();
 
-        return new RedirectResponse($this->generator->generate('_profiler_info', array('about' => 'purge')));
+        return new RedirectResponse($this->generator->generate('_profiler_info', array('about' => 'purge')), 302, array('Content-Type' => 'text/html'));
     }
 
     /**
@@ -171,14 +171,14 @@ class ProfilerController
         $file = $request->files->get('file');
 
         if (empty($file) || !$file->isValid()) {
-            return new RedirectResponse($this->generator->generate('_profiler_info', array('about' => 'upload_error')));
+            return new RedirectResponse($this->generator->generate('_profiler_info', array('about' => 'upload_error')), 302, array('Content-Type' => 'text/html'));
         }
 
         if (!$profile = $this->profiler->import(file_get_contents($file->getPathname()))) {
-            return new RedirectResponse($this->generator->generate('_profiler_info', array('about' => 'already_exists')));
+            return new RedirectResponse($this->generator->generate('_profiler_info', array('about' => 'already_exists')), 302, array('Content-Type' => 'text/html'));
         }
 
-        return new RedirectResponse($this->generator->generate('_profiler', array('token' => $profile->getToken())));
+        return new RedirectResponse($this->generator->generate('_profiler', array('token' => $profile->getToken())), 302, array('Content-Type' => 'text/html'));
     }
 
     /**
@@ -198,7 +198,7 @@ class ProfilerController
 
         return new Response($this->twig->render('@WebProfiler/Profiler/info.html.twig', array(
             'about' => $about
-        )));
+        )), 200, array('Content-Type' => 'text/html'));
     }
 
     /**
@@ -223,13 +223,13 @@ class ProfilerController
         }
 
         if (null === $token) {
-            return new Response();
+            return new Response('', 200, array('Content-Type' => 'text/html'));
         }
 
         $this->profiler->disable();
 
         if (!$profile = $this->profiler->loadProfile($token)) {
-            return new Response();
+            return new Response('', 200, array('Content-Type' => 'text/html'));
         }
 
         // the toolbar position (top, bottom, normal, or null -- use the configuration)
@@ -250,7 +250,7 @@ class ProfilerController
             'templates'    => $this->getTemplateManager()->getTemplates($profile),
             'profiler_url' => $url,
             'token'        => $token,
-        )));
+        )), 200, array('Content-Type' => 'text/html'));
     }
 
     /**
@@ -294,7 +294,7 @@ class ProfilerController
             'start'  => $start,
             'end'    => $end,
             'limit'  => $limit,
-        )));
+        )), 200, array('Content-Type' => 'text/html'));
     }
 
     /**
@@ -333,7 +333,7 @@ class ProfilerController
             'end'       => $end,
             'limit'     => $limit,
             'panel'     => null,
-        )));
+        )), 200, array('Content-Type' => 'text/html'));
     }
 
     /**
@@ -370,7 +370,7 @@ class ProfilerController
         }
 
         if (!empty($token)) {
-            return new RedirectResponse($this->generator->generate('_profiler', array('token' => $token)));
+            return new RedirectResponse($this->generator->generate('_profiler', array('token' => $token)), 302, array('Content-Type' => 'text/html'));
         }
 
         $tokens = $this->profiler->find($ip, $url, $limit, $method, $start, $end);
@@ -383,7 +383,7 @@ class ProfilerController
             'start'  => $start,
             'end'    => $end,
             'limit'  => $limit,
-        )));
+        )), 302, array('Content-Type' => 'text/html'));
     }
 
     /**
@@ -403,7 +403,7 @@ class ProfilerController
         phpinfo();
         $phpinfo = ob_get_clean();
 
-        return new Response($phpinfo);
+        return new Response($phpinfo, 200, array('Content-Type' => 'text/html'));
     }
 
     /**

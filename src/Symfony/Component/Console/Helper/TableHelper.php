@@ -359,12 +359,18 @@ class TableHelper extends Helper
     private function renderCell(array $row, $column, $cellFormat)
     {
         $cell = isset($row[$column]) ? $row[$column] : '';
+        $width = $this->getColumnWidth($column);
+
+        // str_pad won't work properly with multi-byte strings, we need to fix the padding
+        if (function_exists('mb_strlen') && false !== $encoding = mb_detect_encoding($cell)) {
+            $width += strlen($cell) - mb_strlen($cell, $encoding);
+        }
 
         $this->output->write(sprintf(
             $cellFormat,
             str_pad(
                 $this->paddingChar.$cell.$this->paddingChar,
-                $this->getColumnWidth($column),
+                $width,
                 $this->paddingChar,
                 $this->padType
             )

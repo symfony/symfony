@@ -7,6 +7,19 @@ in 2.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.3.0...v2.3.1
 
+* 2.3.1 (2013-06-11)
+
+ * 25e3abd: fix many-to-many Propel1 ModelChoiceList
+ * bce6bd2: [DomCrawler] Fixed a fatal error when setting a value in a malformed field name.
+ * e3561ce: [FrameworkBundle] Fixed OutOfBoundException when session handler_id is null
+ * 81b122d: [DependencyInjection] Add support for aliases of aliases + regression test
+ * 445b2e3: [Console] fix status code when Exception::getCode returns something like 0.1
+ * bbfde62: Fixed exit code for exceptions with error code 0
+ * d8c0ef7: [DependencyInjection] Rename ContainerBuilder::$aliases to avoid conflicting with the parent class
+ * bb797ee: [DependencyInjection] Remove get*Alias*Service methods from compiled containers
+ * 379f5e0: [DependencyInjection] Fix aliased access of shared services, fixes #8096
+ * afad9c7: instantiate valid commands only
+
 * 2.3.0 (2013-06-03)
 
  * e93fc7a: [FrameworkBundle] set the dispatcher in the console application

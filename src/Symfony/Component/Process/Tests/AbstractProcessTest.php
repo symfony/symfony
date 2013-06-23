@@ -47,9 +47,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testStopWithTimeoutIsActuallyWorking()
     {
-        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
-            $this->markTestSkipped('Stop with timeout does not work on windows, it requires posix signals');
-        }
+        $this->verifyPosixIsEnabled();
 
         // exec is mandatory here since we send a signal to the process
         // see https://github.com/symfony/symfony/issues/5030 about prepending
@@ -454,9 +452,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testSignal()
     {
-        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
-            $this->markTestSkipped('POSIX signals do not work on windows');
-        }
+        $this->verifyPosixIsEnabled();
 
         $process = $this->getProcess('exec php -f ' . __DIR__ . '/SignalListener.php');
         $process->start();
@@ -475,12 +471,19 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
      */
     public function testSignalProcessNotRunning()
     {
+        $this->verifyPosixIsEnabled();
+        $process = $this->getProcess('php -m');
+        $process->signal(SIGHUP);
+    }
+
+    private function verifyPosixIsEnabled()
+    {
         if (defined('PHP_WINDOWS_VERSION_BUILD')) {
             $this->markTestSkipped('POSIX signals do not work on windows');
         }
-
-        $process = $this->getProcess('php -m');
-        $process->signal(SIGHUP);
+        if (!defined('SIGUSR1')) {
+            $this->markTestSkipped('The pcntl extension is not enabled');
+        }
     }
 
     /**

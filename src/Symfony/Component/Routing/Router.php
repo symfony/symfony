@@ -292,7 +292,7 @@ class Router implements RouterInterface
      *
      * @return \Symfony\Component\Routing\Generator\Dumper\GeneratorDumperInterface
      */
-    public function getGeneratorDumperInstance($generatorDumperClass)
+    protected function getGeneratorDumperInstance($generatorDumperClass)
     {
         return new $generatorDumperClass($this->getRouteCollection());
     }
@@ -302,7 +302,7 @@ class Router implements RouterInterface
      *
      * @return \Symfony\Component\Routing\Matcher\Dumper\MatcherDumperInterface
      */
-    public function getMatcherDumperInstance($matcherDumperClass)
+    protected function getMatcherDumperInstance($matcherDumperClass)
     {
         return new $matcherDumperClass($this->getRouteCollection());
     }

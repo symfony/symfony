@@ -33,6 +33,7 @@ abstract class BaseType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->setDisabled($options['disabled']);
+        $builder->setAutoInitialize($options['auto_initialize']);
     }
 
     /**
@@ -112,6 +113,7 @@ abstract class BaseType extends AbstractType
             'label'              => null,
             'attr'               => array(),
             'translation_domain' => null,
+            'auto_initialize'    => true,
         ));
 
         $resolver->setAllowedTypes(array(

@@ -16,7 +16,9 @@ use Symfony\Component\Config\ConfigCache;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\Generator\ConfigurableRequirementsInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\Generator\Dumper\GeneratorDumperInterface;
 use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
+use Symfony\Component\Routing\Matcher\Dumper\MatcherDumperInterface;
 
 /**
  * The Router class is an example of the integration of all pieces of the
@@ -288,7 +290,7 @@ class Router implements RouterInterface
     }
 
     /**
-     * @return \Symfony\Component\Routing\Generator\Dumper\GeneratorDumperInterface
+     * @return GeneratorDumperInterface
      */
     protected function getGeneratorDumperInstance()
     {
@@ -296,7 +298,7 @@ class Router implements RouterInterface
     }
 
     /**
-     * @return \Symfony\Component\Routing\Matcher\Dumper\MatcherDumperInterface
+     * @return MatcherDumperInterface
      */
     protected function getMatcherDumperInstance()
     {

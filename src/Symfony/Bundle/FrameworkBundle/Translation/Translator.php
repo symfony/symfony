@@ -98,7 +98,7 @@ class Translator extends BaseTranslator
             $fallbackContent = '';
             $current = '';
             foreach ($this->computeFallbackLocales($locale) as $fallback) {
-                $fallbackSuffix = $this->getCatalogueSuffix($fallback);
+                $fallbackSuffix = ucfirst(str_replace('-', '_', $fallback));
 
                 $fallbackContent .= sprintf(<<<EOF
 \$catalogue%s = new MessageCatalogue('%s', %s);
@@ -110,7 +110,7 @@ EOF
                     $fallbackSuffix,
                     $fallback,
                     var_export($this->catalogues[$fallback]->all(), true),
-                    $this->getCatalogueSuffix($current),
+                    ucfirst(str_replace('-', '_', $current)),
                     $fallbackSuffix
                 );
                 $current = $fallback;
@@ -148,21 +148,5 @@ EOF
                 $this->addLoader($alias, $this->container->get($id));
             }
         }
-    }
-
-    /**
-     * Returns a catalogue suffix from the given locale for variables used in cache.
-     *
-     * @param string $locale
-     *
-     * @return string
-     */
-    private function getCatalogueSuffix($locale)
-    {
-        $suffix = str_replace(array('-', '_'), ' ', $locale);
-        $suffix = ucwords(strtolower($suffix));
-        $suffix = str_replace(' ', '', $suffix);
-
-        return $suffix;
     }
 }

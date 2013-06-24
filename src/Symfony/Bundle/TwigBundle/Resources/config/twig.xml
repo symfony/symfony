@@ -121,7 +121,7 @@
 
         <service id="twig.controller.exception" class="%twig.controller.exception.class%">
             <argument type="service" id="twig" />
-            <argument>%kernel.debug%</argument>
+            <argument>%twig.options%</argument>
         </service>
     </services>
 </container>

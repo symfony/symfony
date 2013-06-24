@@ -8,6 +8,7 @@ CHANGELOG
  * added support for multiple loaders via the "twig.loader" tag.
  * added automatic registration of namespaced paths for registered bundles
  * added support for namespaced paths
+ * ExceptionController's `debug` is now twig.options.debug, not kernel.debug
 
 2.1.0
 -----

@@ -16,7 +16,9 @@ use Symfony\Component\Config\ConfigCache;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\Generator\ConfigurableRequirementsInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\Generator\Dumper\GeneratorDumperInterface;
 use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
+use Symfony\Component\Routing\Matcher\Dumper\MatcherDumperInterface;
 
 /**
  * The Router class is an example of the integration of all pieces of the
@@ -233,7 +235,7 @@ class Router implements RouterInterface
         $class = $this->options['matcher_cache_class'];
         $cache = new ConfigCache($this->options['cache_dir'].'/'.$class.'.php', $this->options['debug']);
         if (!$cache->isFresh($class)) {
-            $dumper = new $this->options['matcher_dumper_class']($this->getRouteCollection());
+            $dumper = $this->getMatcherDumperInstance();
 
             $options = array(
                 'class'      => $class,
@@ -265,7 +267,7 @@ class Router implements RouterInterface
             $class = $this->options['generator_cache_class'];
             $cache = new ConfigCache($this->options['cache_dir'].'/'.$class.'.php', $this->options['debug']);
             if (!$cache->isFresh($class)) {
-                $dumper = new $this->options['generator_dumper_class']($this->getRouteCollection());
+                $dumper = $this->getGeneratorDumperInstance();
 
                 $options = array(
                     'class'      => $class,
@@ -285,5 +287,21 @@ class Router implements RouterInterface
         }
 
         return $this->generator;
+    }
+
+    /**
+     * @return GeneratorDumperInterface
+     */
+    protected function getGeneratorDumperInstance()
+    {
+        return new $this->options['generator_dumper_class']($this->getRouteCollection());
+    }
+
+    /**
+     * @return MatcherDumperInterface
+     */
+    protected function getMatcherDumperInstance()
+    {
+        return new $this->options['matcher_dumper_class']($this->getRouteCollection());
     }
 }

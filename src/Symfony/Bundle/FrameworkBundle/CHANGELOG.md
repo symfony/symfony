@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.4.0
+-----
+
+ * allowed multiple IP addresses in profiler matcher settings
+
 2.3.0
 -----
 

@@ -160,6 +160,14 @@ class DialogHelperTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testNoInteraction()
+    {
+        $dialog = new DialogHelper();
+        $input = new ArrayInput(array());
+        $input->setInteractive(false);
+        $this->assertEquals('not yet', $dialog->ask($input, $this->getOutputStream(), 'Do you have a job?', 'not yet'));
+    }
+
     protected function getInputStream($input)
     {
         $stream = fopen('php://memory', 'r+', false);

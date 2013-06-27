@@ -354,7 +354,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testFindCommandOnlyOptionAcrossNamespaceAndCommandNameWhenAbbreviated()
+    public function testCannotDisambiguateAbbreviatedCommonNamespacedCommands()
     {
         $application = new Application();
 

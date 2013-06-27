@@ -54,7 +54,7 @@ class AcceptHeader
     {
         $index = 0;
 
-        return new self(array_map(function ($itemValue) use (&$index) {
+        return new static(array_map(function ($itemValue) use (&$index) {
             $item = AcceptHeaderItem::fromString($itemValue);
             $item->setIndex($index++);
 
@@ -132,7 +132,7 @@ class AcceptHeader
      */
     public function filter($pattern)
     {
-        return new self(array_filter($this->items, function (AcceptHeaderItem $item) use ($pattern) {
+        return new static(array_filter($this->items, function (AcceptHeaderItem $item) use ($pattern) {
             return preg_match($pattern, $item->getValue());
         }));
     }

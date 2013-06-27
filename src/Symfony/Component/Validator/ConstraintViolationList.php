@@ -52,6 +52,53 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
     }
 
     /**
+     * Converts the violation list into an associative array as follow:
+     * <code>
+     *     array(
+     *         'root1' => array (
+     *                        'property1.1' => array('message1.1', 'message1.2'),
+     *                        'property1.2' => array('message2')
+     *                    ),
+     *         ........
+     *     )
+     * </code>
+     * with the possibility to filter a given root or a given property.
+     *
+     * @param string $property The name of the property to filter
+     * @param string $root The name of the root to filter
+     *
+     * @return array
+     */
+    public function toArray($property = null, $root = null)
+    {
+        $output = array();
+
+        foreach ($this->violations as $violation) {
+            $output[$violation->getRoot()][$violation->getPropertyPath()][] = $violation->getMessage();
+        }
+
+        if (null !== $root) {
+            if (array_key_exists($root, $output)) {
+                $output = array_intersect_key($output, array($root => 0));
+            } else {
+                return array();
+            }
+        }
+
+        if (null !== $property) {
+            foreach ($output as $key => $value) {
+                if (array_key_exists($property, $value)) {
+                    $output[$key] = array_intersect_key($output[$key], array($property => 0));
+                } else {
+                    unset($output[$key]);
+                }
+            }
+        }
+
+        return $output;
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function add(ConstraintViolationInterface $violation)

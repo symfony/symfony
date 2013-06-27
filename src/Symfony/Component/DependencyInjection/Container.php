@@ -75,6 +75,24 @@ class Container implements IntrospectableContainerInterface
     protected $scopedServices;
     protected $scopeStacks;
     protected $loading = array();
+    
+    /**
+     * Normalizes id and resolve it alias
+     * 
+     * @param string $id An original id
+     * @return string A final id
+     */
+    private function resolve($id)
+    {
+        $id = strtolower($id);
+
+        // resolve aliases
+        if (isset($this->aliases[$id])) {
+            $id = $this->aliases[$id];
+        }
+        
+        return $id;
+    }
 
     /**
      * Constructor.
@@ -227,7 +245,7 @@ class Container implements IntrospectableContainerInterface
      */
     public function has($id)
     {
-        $id = strtolower($id);
+        $id = $this->resolve($id);
 
         return array_key_exists($id, $this->services)
             || array_key_exists($id, $this->aliases)
@@ -256,12 +274,7 @@ class Container implements IntrospectableContainerInterface
      */
     public function get($id, $invalidBehavior = self::EXCEPTION_ON_INVALID_REFERENCE)
     {
-        $id = strtolower($id);
-
-        // resolve aliases
-        if (isset($this->aliases[$id])) {
-            $id = $this->aliases[$id];
-        }
+        $id = $this->resolve($id);
 
         // re-use shared service instance if it exists
         if (array_key_exists($id, $this->services)) {

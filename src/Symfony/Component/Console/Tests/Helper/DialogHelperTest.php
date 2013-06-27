@@ -14,6 +14,7 @@ namespace Symfony\Component\Console\Tests\Helper;
 use Symfony\Component\Console\Helper\DialogHelper;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\FormatterHelper;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\StreamOutput;
 
 class DialogHelperTest extends \PHPUnit_Framework_TestCase
@@ -26,28 +27,29 @@ class DialogHelperTest extends \PHPUnit_Framework_TestCase
         $dialog->setHelperSet($helperSet);
 
         $heroes = array('Superman', 'Batman', 'Spiderman');
-
         $dialog->setInputStream($this->getInputStream("\n1\n  1  \nFabien\n1\nFabien\n1\n0,2\n 0 , 2  \n\n\n"));
-        $this->assertEquals('2', $dialog->select($this->getOutputStream(), 'What is your favorite superhero?', $heroes, '2'));
-        $this->assertEquals('1', $dialog->select($this->getOutputStream(), 'What is your favorite superhero?', $heroes));
-        $this->assertEquals('1', $dialog->select($this->getOutputStream(), 'What is your favorite superhero?', $heroes));
-        $this->assertEquals('1', $dialog->select($output = $this->getOutputStream(), 'What is your favorite superhero?', $heroes, null, false, 'Input "%s" is not a superhero!', false));
+        $input = new ArrayInput(array());
+
+        $this->assertEquals('2', $dialog->select($input, $this->getOutputStream(), 'What is your favorite superhero?', $heroes, '2'));
+        $this->assertEquals('1', $dialog->select($input, $this->getOutputStream(), 'What is your favorite superhero?', $heroes));
+        $this->assertEquals('1', $dialog->select($input, $this->getOutputStream(), 'What is your favorite superhero?', $heroes));
+        $this->assertEquals('1', $dialog->select($input, $output = $this->getOutputStream(), 'What is your favorite superhero?', $heroes, null, false, 'Input "%s" is not a superhero!', false));
 
         rewind($output->getStream());
         $this->assertContains('Input "Fabien" is not a superhero!', stream_get_contents($output->getStream()));
 
         try {
-            $this->assertEquals('1', $dialog->select($output = $this->getOutputStream(), 'What is your favorite superhero?', $heroes, null, 1));
+            $this->assertEquals('1', $dialog->select($input, $output = $this->getOutputStream(), 'What is your favorite superhero?', $heroes, null, 1));
             $this->fail();
         } catch (\InvalidArgumentException $e) {
             $this->assertEquals('Value "Fabien" is invalid', $e->getMessage());
         }
 
-        $this->assertEquals(array('1'), $dialog->select($this->getOutputStream(), 'What is your favorite superhero?', $heroes, null, false, 'Input "%s" is not a superhero!', true));
-        $this->assertEquals(array('0', '2'), $dialog->select($this->getOutputStream(), 'What is your favorite superhero?', $heroes, null, false, 'Input "%s" is not a superhero!', true));
-        $this->assertEquals(array('0', '2'), $dialog->select($this->getOutputStream(), 'What is your favorite superhero?', $heroes, null, false, 'Input "%s" is not a superhero!', true));
-        $this->assertEquals(array('0', '1'), $dialog->select($this->getOutputStream(), 'What is your favorite superhero?', $heroes, '0,1', false, 'Input "%s" is not a superhero!', true));
-        $this->assertEquals(array('0', '1'), $dialog->select($this->getOutputStream(), 'What is your favorite superhero?', $heroes, ' 0 , 1 ', false, 'Input "%s" is not a superhero!', true));
+        $this->assertEquals(array('1'), $dialog->select($input, $this->getOutputStream(), 'What is your favorite superhero?', $heroes, null, false, 'Input "%s" is not a superhero!', true));
+        $this->assertEquals(array('0', '2'), $dialog->select($input, $this->getOutputStream(), 'What is your favorite superhero?', $heroes, null, false, 'Input "%s" is not a superhero!', true));
+        $this->assertEquals(array('0', '2'), $dialog->select($input, $this->getOutputStream(), 'What is your favorite superhero?', $heroes, null, false, 'Input "%s" is not a superhero!', true));
+        $this->assertEquals(array('0', '1'), $dialog->select($input, $this->getOutputStream(), 'What is your favorite superhero?', $heroes, '0,1', false, 'Input "%s" is not a superhero!', true));
+        $this->assertEquals(array('0', '1'), $dialog->select($input, $this->getOutputStream(), 'What is your favorite superhero?', $heroes, ' 0 , 1 ', false, 'Input "%s" is not a superhero!', true));
     }
 
     public function testAsk()
@@ -55,9 +57,10 @@ class DialogHelperTest extends \PHPUnit_Framework_TestCase
         $dialog = new DialogHelper();
 
         $dialog->setInputStream($this->getInputStream("\n8AM\n"));
+        $input = new ArrayInput(array());
 
-        $this->assertEquals('2PM', $dialog->ask($this->getOutputStream(), 'What time is it?', '2PM'));
-        $this->assertEquals('8AM', $dialog->ask($output = $this->getOutputStream(), 'What time is it?', '2PM'));
+        $this->assertEquals('2PM', $dialog->ask($input, $this->getOutputStream(), 'What time is it?', '2PM'));
+        $this->assertEquals('8AM', $dialog->ask($input, $output = $this->getOutputStream(), 'What time is it?', '2PM'));
 
         rewind($output->getStream());
         $this->assertEquals('What time is it?', stream_get_contents($output->getStream()));
@@ -83,15 +86,16 @@ class DialogHelperTest extends \PHPUnit_Framework_TestCase
         $dialog->setInputStream($inputStream);
 
         $bundles = array('AcmeDemoBundle', 'AsseticBundle', 'SecurityBundle', 'FooBundle');
+        $input = new ArrayInput(array());
 
-        $this->assertEquals('AcmeDemoBundle', $dialog->ask($this->getOutputStream(), 'Please select a bundle', 'FrameworkBundle', $bundles));
-        $this->assertEquals('AsseticBundleTest', $dialog->ask($this->getOutputStream(), 'Please select a bundle', 'FrameworkBundle', $bundles));
-        $this->assertEquals('FrameworkBundle', $dialog->ask($this->getOutputStream(), 'Please select a bundle', 'FrameworkBundle', $bundles));
-        $this->assertEquals('SecurityBundle', $dialog->ask($this->getOutputStream(), 'Please select a bundle', 'FrameworkBundle', $bundles));
-        $this->assertEquals('FooBundleTest', $dialog->ask($this->getOutputStream(), 'Please select a bundle', 'FrameworkBundle', $bundles));
-        $this->assertEquals('AcmeDemoBundle', $dialog->ask($this->getOutputStream(), 'Please select a bundle', 'FrameworkBundle', $bundles));
-        $this->assertEquals('AsseticBundle', $dialog->ask($this->getOutputStream(), 'Please select a bundle', 'FrameworkBundle', $bundles));
-        $this->assertEquals('FooBundle', $dialog->ask($this->getOutputStream(), 'Please select a bundle', 'FrameworkBundle', $bundles));
+        $this->assertEquals('AcmeDemoBundle', $dialog->ask($input, $this->getOutputStream(), 'Please select a bundle', 'FrameworkBundle', $bundles));
+        $this->assertEquals('AsseticBundleTest', $dialog->ask($input, $this->getOutputStream(), 'Please select a bundle', 'FrameworkBundle', $bundles));
+        $this->assertEquals('FrameworkBundle', $dialog->ask($input, $this->getOutputStream(), 'Please select a bundle', 'FrameworkBundle', $bundles));
+        $this->assertEquals('SecurityBundle', $dialog->ask($input, $this->getOutputStream(), 'Please select a bundle', 'FrameworkBundle', $bundles));
+        $this->assertEquals('FooBundleTest', $dialog->ask($input, $this->getOutputStream(), 'Please select a bundle', 'FrameworkBundle', $bundles));
+        $this->assertEquals('AcmeDemoBundle', $dialog->ask($input, $this->getOutputStream(), 'Please select a bundle', 'FrameworkBundle', $bundles));
+        $this->assertEquals('AsseticBundle', $dialog->ask($input, $this->getOutputStream(), 'Please select a bundle', 'FrameworkBundle', $bundles));
+        $this->assertEquals('FooBundle', $dialog->ask($input, $this->getOutputStream(), 'Please select a bundle', 'FrameworkBundle', $bundles));
     }
 
     public function testAskHiddenResponse()
@@ -103,8 +107,9 @@ class DialogHelperTest extends \PHPUnit_Framework_TestCase
         $dialog = new DialogHelper();
 
         $dialog->setInputStream($this->getInputStream("8AM\n"));
+        $input = new ArrayInput(array());
 
-        $this->assertEquals('8AM', $dialog->askHiddenResponse($this->getOutputStream(), 'What time is it?'));
+        $this->assertEquals('8AM', $dialog->askHiddenResponse($input, $this->getOutputStream(), 'What time is it?'));
     }
 
     public function testAskConfirmation()
@@ -112,16 +117,17 @@ class DialogHelperTest extends \PHPUnit_Framework_TestCase
         $dialog = new DialogHelper();
 
         $dialog->setInputStream($this->getInputStream("\n\n"));
-        $this->assertTrue($dialog->askConfirmation($this->getOutputStream(), 'Do you like French fries?'));
-        $this->assertFalse($dialog->askConfirmation($this->getOutputStream(), 'Do you like French fries?', false));
+        $input = new ArrayInput(array());
+        $this->assertTrue($dialog->askConfirmation($input, $this->getOutputStream(), 'Do you like French fries?'));
+        $this->assertFalse($dialog->askConfirmation($input, $this->getOutputStream(), 'Do you like French fries?', false));
 
         $dialog->setInputStream($this->getInputStream("y\nyes\n"));
-        $this->assertTrue($dialog->askConfirmation($this->getOutputStream(), 'Do you like French fries?', false));
-        $this->assertTrue($dialog->askConfirmation($this->getOutputStream(), 'Do you like French fries?', false));
+        $this->assertTrue($dialog->askConfirmation($input, $this->getOutputStream(), 'Do you like French fries?', false));
+        $this->assertTrue($dialog->askConfirmation($input, $this->getOutputStream(), 'Do you like French fries?', false));
 
         $dialog->setInputStream($this->getInputStream("n\nno\n"));
-        $this->assertFalse($dialog->askConfirmation($this->getOutputStream(), 'Do you like French fries?', true));
-        $this->assertFalse($dialog->askConfirmation($this->getOutputStream(), 'Do you like French fries?', true));
+        $this->assertFalse($dialog->askConfirmation($input, $this->getOutputStream(), 'Do you like French fries?', true));
+        $this->assertFalse($dialog->askConfirmation($input, $this->getOutputStream(), 'Do you like French fries?', true));
     }
 
     public function testAskAndValidate()
@@ -141,12 +147,13 @@ class DialogHelperTest extends \PHPUnit_Framework_TestCase
         };
 
         $dialog->setInputStream($this->getInputStream("\nblack\n"));
-        $this->assertEquals('white', $dialog->askAndValidate($this->getOutputStream(), $question, $validator, 2, 'white'));
-        $this->assertEquals('black', $dialog->askAndValidate($this->getOutputStream(), $question, $validator, 2, 'white'));
+        $input = new ArrayInput(array());
+        $this->assertEquals('white', $dialog->askAndValidate($input, $this->getOutputStream(), $question, $validator, 2, 'white'));
+        $this->assertEquals('black', $dialog->askAndValidate($input, $this->getOutputStream(), $question, $validator, 2, 'white'));
 
         $dialog->setInputStream($this->getInputStream("green\nyellow\norange\n"));
         try {
-            $this->assertEquals('white', $dialog->askAndValidate($this->getOutputStream(), $question, $validator, 2, 'white'));
+            $this->assertEquals('white', $dialog->askAndValidate($input, $this->getOutputStream(), $question, $validator, 2, 'white'));
             $this->fail();
         } catch (\InvalidArgumentException $e) {
             $this->assertEquals($error, $e->getMessage());

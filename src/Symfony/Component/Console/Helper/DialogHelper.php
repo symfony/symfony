@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Helper;
 
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 
@@ -28,6 +29,7 @@ class DialogHelper extends Helper
     /**
      * Asks the user to select a value.
      *
+     * @param InputInterface  $input        An Input instance
      * @param OutputInterface $output       An Output instance
      * @param string|array    $question     The question to ask
      * @param array           $choices      List of choices to pick from
@@ -40,7 +42,7 @@ class DialogHelper extends Helper
      *
      * @throws \InvalidArgumentException
      */
-    public function select(OutputInterface $output, $question, $choices, $default = null, $attempts = false, $errorMessage = 'Value "%s" is invalid', $multiselect = false)
+    public function select(InputInterface $input, OutputInterface $output, $question, $choices, $default = null, $attempts = false, $errorMessage = 'Value "%s" is invalid', $multiselect = false)
     {
         $width = max(array_map('strlen', array_keys($choices)));
 
@@ -51,7 +53,7 @@ class DialogHelper extends Helper
 
         $output->writeln($messages);
 
-        $result = $this->askAndValidate($output, '> ', function ($picked) use ($choices, $errorMessage, $multiselect) {
+        $result = $this->askAndValidate($input, $output, '> ', function ($picked) use ($choices, $errorMessage, $multiselect) {
             // Collapse all spaces.
             $selectedChoices = str_replace(" ", "", $picked);
 
@@ -87,6 +89,7 @@ class DialogHelper extends Helper
     /**
      * Asks a question to the user.
      *
+     * @param InputInterface  $input        An Input instance
      * @param OutputInterface $output       An Output instance
      * @param string|array    $question     The question to ask
      * @param string          $default      The default answer if none is given by the user
@@ -96,9 +99,13 @@ class DialogHelper extends Helper
      *
      * @throws \RuntimeException If there is no data to read in the input stream
      */
-    public function ask(OutputInterface $output, $question, $default = null, array $autocomplete = null)
+    public function ask(InputInterface $input, OutputInterface $output, $question, $default = null, array $autocomplete = null)
     {
         $output->write($question);
+
+        if (!$input->isInteractive()) {
+            return $default;
+        }
 
         $inputStream = $this->inputStream ?: STDIN;
 
@@ -221,17 +228,18 @@ class DialogHelper extends Helper
      *
      * The question will be asked until the user answers by nothing, yes, or no.
      *
+     * @param InputInterface  $input    An Input instance
      * @param OutputInterface $output   An Output instance
      * @param string|array    $question The question to ask
      * @param Boolean         $default  The default answer if the user enters nothing
      *
      * @return Boolean true if the user has confirmed, false otherwise
      */
-    public function askConfirmation(OutputInterface $output, $question, $default = true)
+    public function askConfirmation(InputInterface $input, OutputInterface $output, $question, $default = true)
     {
         $answer = 'z';
         while ($answer && !in_array(strtolower($answer[0]), array('y', 'n'))) {
-            $answer = $this->ask($output, $question);
+            $answer = $this->ask($input, $output, $question);
         }
 
         if (false === $default) {
@@ -252,7 +260,7 @@ class DialogHelper extends Helper
      *
      * @throws \RuntimeException In case the fallback is deactivated and the response can not be hidden
      */
-    public function askHiddenResponse(OutputInterface $output, $question, $fallback = true)
+    public function askHiddenResponse(InputInterface $input, OutputInterface $output, $question, $fallback = true)
     {
         if (defined('PHP_WINDOWS_VERSION_BUILD')) {
             $exe = __DIR__.'/../Resources/bin/hiddeninput.exe';
@@ -305,7 +313,7 @@ class DialogHelper extends Helper
         }
 
         if ($fallback) {
-            return $this->ask($output, $question);
+            return $this->ask($input, $output, $question);
         }
 
         throw new \RuntimeException('Unable to hide the response');
@@ -318,6 +326,7 @@ class DialogHelper extends Helper
      * validated data when the data is valid and throw an exception
      * otherwise.
      *
+     * @param InputInterface  $input        An Input instance
      * @param OutputInterface $output       An Output instance
      * @param string|array    $question     The question to ask
      * @param callable        $validator    A PHP callback
@@ -329,12 +338,12 @@ class DialogHelper extends Helper
      *
      * @throws \Exception When any of the validators return an error
      */
-    public function askAndValidate(OutputInterface $output, $question, $validator, $attempts = false, $default = null, array $autocomplete = null)
+    public function askAndValidate(InputInterface $input, OutputInterface $output, $question, $validator, $attempts = false, $default = null, array $autocomplete = null)
     {
         $that = $this;
 
-        $interviewer = function() use ($output, $question, $default, $autocomplete, $that) {
-            return $that->ask($output, $question, $default, $autocomplete);
+        $interviewer = function() use ($input, $output, $question, $default, $autocomplete, $that) {
+            return $that->ask($input, $output, $question, $default, $autocomplete);
         };
 
         return $this->validateAttempts($interviewer, $output, $validator, $attempts);
@@ -347,6 +356,7 @@ class DialogHelper extends Helper
      * validated data when the data is valid and throw an exception
      * otherwise.
      *
+     * @param InputInterface  $input     An Input instance
      * @param OutputInterface $output    An Output instance
      * @param string|array    $question  The question to ask
      * @param callable        $validator A PHP callback
@@ -359,12 +369,12 @@ class DialogHelper extends Helper
      * @throws \RuntimeException In case the fallback is deactivated and the response can not be hidden
      *
      */
-    public function askHiddenResponseAndValidate(OutputInterface $output, $question, $validator, $attempts = false, $fallback = true)
+    public function askHiddenResponseAndValidate(InputInterface $input, OutputInterface $output, $question, $validator, $attempts = false, $fallback = true)
     {
         $that = $this;
 
-        $interviewer = function() use ($output, $question, $fallback, $that) {
-            return $that->askHiddenResponse($output, $question, $fallback);
+        $interviewer = function() use ($input, $output, $question, $fallback, $that) {
+            return $that->askHiddenResponse($input, $output, $question, $fallback);
         };
 
         return $this->validateAttempts($interviewer, $output, $validator, $attempts);

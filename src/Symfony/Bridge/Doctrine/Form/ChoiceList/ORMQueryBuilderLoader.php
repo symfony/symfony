@@ -29,6 +29,13 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
      * @var QueryBuilder
      */
     private $queryBuilder;
+    
+    /**
+     * Contains the query hints to be used with the query builder
+     *
+     * @var array
+     */
+    private $queryHints;
 
     /**
      * Construct an ORM Query Builder Loader
@@ -39,7 +46,7 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
      *
      * @throws UnexpectedTypeException
      */
-    public function __construct($queryBuilder, $manager = null, $class = null)
+    public function __construct($queryBuilder, $manager = null, $class = null, array $hints = array())
     {
         // If a query builder was passed, it must be a closure or QueryBuilder
         // instance
@@ -56,6 +63,7 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
         }
 
         $this->queryBuilder = $queryBuilder;
+        $this->hints = $hints;
     }
 
     /**
@@ -63,7 +71,13 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
      */
     public function getEntities()
     {
-        return $this->queryBuilder->getQuery()->execute();
+        $query = $this->queryBuilder->getQuery();
+
+        foreach ($this->hints as $name => $value) {
+            $query->setHint($name, $value);
+        }
+
+        return $query->execute();
     }
 
     /**
@@ -76,9 +90,14 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
         $parameter = 'ORMQueryBuilderLoader_getEntitiesByIds_'.$identifier;
         $where = $qb->expr()->in($alias.'.'.$identifier, ':'.$parameter);
 
-        return $qb->andWhere($where)
+        $query = $qb->andWhere($where)
                   ->getQuery()
-                  ->setParameter($parameter, $values, Connection::PARAM_STR_ARRAY)
-                  ->getResult();
+                  ->setParameter($parameter, $values, Connection::PARAM_STR_ARRAY);
+
+        foreach ($this->hints as $name => $value) {
+            $query->setHint($name, $value);
+        }
+
+        return $query->getResult();
     }
 }

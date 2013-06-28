@@ -67,7 +67,7 @@ abstract class DoctrineType extends AbstractType
 
         $loader = function (Options $options) use ($type) {
             if (null !== $options['query_builder']) {
-                return $type->getLoader($options['em'], $options['query_builder'], $options['class']);
+                return $type->getLoader($options['em'], $options['query_builder'], $options['class'], $options['query_hints']);
             }
 
             return null;
@@ -158,6 +158,7 @@ abstract class DoctrineType extends AbstractType
             'em'                => null,
             'property'          => null,
             'query_builder'     => null,
+            'query_hints'       => array(),
             'loader'            => $loader,
             'choices'           => null,
             'choice_list'       => $choiceList,
@@ -184,7 +185,7 @@ abstract class DoctrineType extends AbstractType
      *
      * @return EntityLoaderInterface
      */
-    abstract public function getLoader(ObjectManager $manager, $queryBuilder, $class);
+    abstract public function getLoader(ObjectManager $manager, $queryBuilder, $class, $hints);
 
     public function getParent()
     {

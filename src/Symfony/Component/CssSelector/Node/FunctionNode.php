@@ -129,7 +129,7 @@ class FunctionNode implements NodeInterface
         if (0 !== $b) {
             $expr .= ' - '.$b;
         }
-        
+
         $conditions = array(sprintf('%s %s 0', $expr, $sign));
 
         if (1 !== $a && -1 !== $a) {

@@ -13,10 +13,8 @@ namespace Symfony\Bridge\ProxyManager\LazyProxy\Tests;
 
 require_once __DIR__ . '/Fixtures/includes/foo.php';
 
-use ProxyManager\Configuration;
 use Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Integration tests for {@see \Symfony\Component\DependencyInjection\ContainerBuilder} combined

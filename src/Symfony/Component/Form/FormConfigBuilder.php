@@ -358,7 +358,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     {
         // Uncomment this as soon as the deprecation note should be shown
         // trigger_error('getVirtual() is deprecated since version 2.3 and will be removed in 3.0. Use getInheritData() instead.', E_USER_DEPRECATED);
-
         return $this->getInheritData();
     }
 

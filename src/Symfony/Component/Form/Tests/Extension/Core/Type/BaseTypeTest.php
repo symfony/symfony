@@ -130,6 +130,6 @@ abstract class BaseTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
         $this->assertFalse($view->vars['multipart']);
     }
-    
+
     abstract protected function getTestedType();
 }

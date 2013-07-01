@@ -367,7 +367,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             $this->assertInstanceof('LogicException', $e, '->followRedirect() throws a \LogicException if the request did not respond with 30x HTTP Code');
         }
     }
-    
+
     public function testFollowRedirectWithMaxRedirects()
     {
         $client = new TestClient();

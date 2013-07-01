@@ -14,8 +14,6 @@ namespace Symfony\Component\Intl\Tests\DateFormatter;
 use Symfony\Component\Intl\DateFormatter\IntlDateFormatter;
 use Symfony\Component\Intl\Globals\IntlGlobals;
 use Symfony\Component\Intl\Intl;
-use Symfony\Component\Intl\Util\IcuVersion;
-use Symfony\Component\Intl\Util\Version;
 
 /**
  * Test case for IntlDateFormatter implementations.

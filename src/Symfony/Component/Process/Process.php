@@ -259,9 +259,9 @@ class Process
             stream_set_blocking($pipe, false);
         }
 
-
         if ($this->tty) {
             $this->status = self::STATUS_TERMINATED;
+
             return;
         }
 
@@ -1102,9 +1102,9 @@ class Process
             $this->readBytes = array(
                 self::STDOUT => 0,
             );
-            
+
             return array(array('pipe', 'r'), $this->fileHandles[self::STDOUT], array('pipe', 'w'));
-        } 
+        }
 
         if ($this->tty) {
             $descriptors = array(

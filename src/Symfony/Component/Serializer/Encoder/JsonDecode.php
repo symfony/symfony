@@ -44,7 +44,7 @@ class JsonDecode implements DecoderInterface
     public function __construct($associative = false, $depth = 512)
     {
         $this->associative = $associative;
-        $this->recursionDepth = (int)$depth;
+        $this->recursionDepth = (int) $depth;
     }
 
     /**

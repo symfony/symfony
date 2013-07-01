@@ -52,7 +52,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
 
     /**
      * {@inheritdoc}
-     * 
+     *
      * @api
      */
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)

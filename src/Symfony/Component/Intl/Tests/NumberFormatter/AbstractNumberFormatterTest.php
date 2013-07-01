@@ -15,7 +15,6 @@ use Symfony\Component\Intl\Globals\IntlGlobals;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\Intl\Locale;
 use Symfony\Component\Intl\NumberFormatter\NumberFormatter;
-use Symfony\Component\Intl\Util\IcuVersion;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
 /**

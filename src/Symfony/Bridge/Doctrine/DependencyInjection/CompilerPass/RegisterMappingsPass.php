@@ -12,7 +12,6 @@
 namespace Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass;
 
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
-use Symfony\Component\HttpKernel\Kernel;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;

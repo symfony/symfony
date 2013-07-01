@@ -12,7 +12,6 @@
 namespace Symfony\Component\Locale\Tests;
 
 use Symfony\Component\Intl\Intl;
-use Symfony\Component\Intl\Util\IcuVersion;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 use Symfony\Component\Locale\Locale;
 

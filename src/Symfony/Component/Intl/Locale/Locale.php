@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Intl\Locale;
 
-use Symfony\Component\Intl\Exception\NotImplementedException;
 use Symfony\Component\Intl\Exception\MethodNotImplementedException;
 
 /**

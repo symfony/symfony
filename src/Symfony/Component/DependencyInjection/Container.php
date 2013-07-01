@@ -229,8 +229,8 @@ class Container implements IntrospectableContainerInterface
     {
         $id = strtolower($id);
 
-        return array_key_exists($id, $this->services)
-            || array_key_exists($id, $this->aliases)
+        return isset($this->services[$id])
+            || isset($this->aliases[$id])
             || method_exists($this, 'get'.strtr($id, array('_' => '', '.' => '_')).'Service')
         ;
     }
@@ -303,7 +303,7 @@ class Container implements IntrospectableContainerInterface
         } catch (\Exception $e) {
             unset($this->loading[$id]);
 
-            if (array_key_exists($id, $this->services)) {
+            if (isset($this->services[$id])) {
                 unset($this->services[$id]);
             }
 
@@ -328,7 +328,7 @@ class Container implements IntrospectableContainerInterface
      */
     public function initialized($id)
     {
-        return array_key_exists(strtolower($id), $this->services);
+        return isset($this->services[strtolower($id)]);
     }
 
     /**

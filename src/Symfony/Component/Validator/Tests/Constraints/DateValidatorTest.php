@@ -78,6 +78,7 @@ class DateValidatorTest extends \PHPUnit_Framework_TestCase
     public function getValidDates()
     {
         return array(
+            array(''),
             array('2010-01-01'),
             array('1955-12-12'),
             array('2030-05-31'),
@@ -111,6 +112,230 @@ class DateValidatorTest extends \PHPUnit_Framework_TestCase
             array('2010-13-01'),
             array('2010-04-32'),
             array('2010-02-29'),
+        );
+    }
+
+    /**
+     * @dataProvider getValidBeforeDates
+     */
+    public function testValidBeforeDates($date)
+    {
+        $constraint = new Date(array(
+            'before' => '2015-01-01'
+        ));
+
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
+        $this->validator->validate($date, $constraint);
+    }
+
+    public function getValidBeforeDates()
+    {
+        return array(
+            array('2014-12-31'),
+            array('2000-01-01'),
+            array('1980-01-01'),
+        );
+    }
+
+    /**
+     * @dataProvider getInvalidBeforeDates
+     */
+    public function testInvalidBeforeDates($date)
+    {
+        $constraint = new Date(array(
+            'messageBeforeDate' => 'myMessage',
+            'before' => '2015-01-01'
+        ));
+
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('myMessage', array(
+                '{{ value }}'  => $date,
+                '{{ before }}' => '2015-01-01',
+            ));
+
+        $this->validator->validate($date, $constraint);
+    }
+
+    public function getInvalidBeforeDates()
+    {
+        return array(
+            array('2015-01-01'),
+            array('2018-12-20'),
+            array('2016-02-29'),
+        );
+    }
+
+    /**
+     * @dataProvider getValidAfterDates
+     */
+    public function testValidAfterDates($date)
+    {
+        $constraint = new Date(array(
+            'after' => '2015-01-01'
+        ));
+
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
+        $this->validator->validate($date, $constraint);
+    }
+
+    public function getValidAfterDates()
+    {
+        return array(
+            array('2015-01-02'),
+            array('2016-02-29'),
+            array('2100-12-31'),
+        );
+    }
+
+    /**
+     * @dataProvider getInvalidAfterDates
+     */
+    public function testInvalidAfterDates($date)
+    {
+        $constraint = new Date(array(
+            'messageAfterDate' => 'myMessage',
+            'after' => '2015-01-01'
+        ));
+
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('myMessage', array(
+                '{{ value }}' => $date,
+                '{{ after }}' => '2015-01-01',
+            ));
+
+        $this->validator->validate($date, $constraint);
+    }
+
+    public function getInvalidAfterDates()
+    {
+        return array(
+            array('2015-01-01'),
+            array('2014-12-31'),
+            array('1980-01-01'),
+        );
+    }
+
+
+    /**
+     * @dataProvider getValidInBetweenDates
+     */
+    public function testValidInBetweenDates($date)
+    {
+        $constraint = new Date(array(
+            'after'  => '2014-12-31',
+            'before' => '2017-01-01'
+        ));
+
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
+        $this->validator->validate($date, $constraint);
+    }
+
+    public function getValidInBetweenDates()
+    {
+        return array(
+            array('2015-01-01'),
+            array('2015-12-31'),
+            array('2016-12-31'),
+        );
+    }
+
+    /**
+     * @dataProvider getTooLateInBetweenDates
+     */
+    public function testTooLateInBetweenDates($date)
+    {
+        $constraint = new Date(array(
+            'messageAfterDate'  => 'myMessage',
+            'messageBeforeDate' => 'myMessage',
+            'after'  => '2014-12-31',
+            'before' => '2017-01-01'
+        ));
+
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('myMessage', array(
+                '{{ value }}' => $date,
+                '{{ before }}' => '2017-01-01',
+            ));
+
+        $this->validator->validate($date, $constraint);
+    }
+
+    public function getTooLateInBetweenDates()
+    {
+        return array(
+            array('2017-01-01'),
+            array('2020-06-06'),
+        );
+    }
+
+    /**
+     * @dataProvider getTooEarlyInBetweenDates
+     */
+    public function testTooEarlyInBetweenDates($date)
+    {
+        $constraint = new Date(array(
+            'messageAfterDate'  => 'myMessage',
+            'messageBeforeDate' => 'myMessage',
+            'after'  => '2014-12-31',
+            'before' => '2017-01-01'
+        ));
+
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('myMessage', array(
+                '{{ value }}' => $date,
+                '{{ after }}' => '2014-12-31',
+            ));
+
+        $this->validator->validate($date, $constraint);
+    }
+
+    public function getTooEarlyInBetweenDates()
+    {
+        return array(
+            array('2014-12-31'),
+            array('2000-06-06'),
+        );
+    }
+
+    /**
+     * @dataProvider getDateFormatMessages
+     */
+    public function testDateFormatMessagesFormatter($format, $expected)
+    {
+        $constraint = new Date(array(
+            'messageAfterDate'   => 'myMessage',
+            'after'              => '2014-12-31',
+            'dateFormatMessages' => $format,
+        ));
+
+        $date = '2000-01-01';
+
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('myMessage', array(
+                '{{ value }}' => $date,
+                '{{ after }}' => $expected,
+            ));
+
+        $this->validator->validate($date, $constraint);
+    }
+
+    public function getDateFormatMessages()
+    {
+        return array(
+            array('dd/MM/yy',   '31/12/14'),
+            array('yyyy-MM-dd', '2014-12-31'),
+            array('yyyyMMdd HH:mm:ss', '20141231 00:00:00'),
         );
     }
 }

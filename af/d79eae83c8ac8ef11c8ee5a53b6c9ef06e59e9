@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-06-23T06:58:05Z
+
+If I understand correctly, you want to reuse some of the logic of the Symfony tests in your own tests, correct?
+
+---------------------------------------------------------------------------
+
+by zakharovvi at 2013-06-23T07:19:08Z
+
+Yes, I want to use FilesystemTestCase in my own tests.

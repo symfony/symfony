@@ -372,10 +372,10 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
         $listeners = $this->dispatcher->getListeners($eventName);
 
         foreach ($listeners as $listener) {
-            $this->dispatcher->removeListener($eventName, $listener);
+            $priority = $this->dispatcher->removeListener($eventName, $listener);
             $wrapped = $this->wrapListener($eventName, $listener);
             $this->wrappedListeners[$this->id][$wrapped] = $listener;
-            $this->dispatcher->addListener($eventName, $wrapped);
+            $this->dispatcher->addListener($eventName, $wrapped, $priority);
         }
 
         switch ($eventName) {
@@ -433,8 +433,8 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
         }
 
         foreach ($this->wrappedListeners[$this->id] as $wrapped) {
-            $this->dispatcher->removeListener($eventName, $wrapped);
-            $this->dispatcher->addListener($eventName, $this->wrappedListeners[$this->id][$wrapped]);
+            $priority = $this->dispatcher->removeListener($eventName, $wrapped);
+            $this->dispatcher->addListener($eventName, $this->wrappedListeners[$this->id][$wrapped], $priority);
         }
 
         unset($this->wrappedListeners[$this->id]);

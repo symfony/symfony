@@ -66,6 +66,8 @@ interface EventDispatcherInterface
      *
      * @param string|array $eventName The event(s) to remove a listener from
      * @param callable     $listener  The listener to remove
+     *
+     * @return integer The listener's priority value
      */
     public function removeListener($eventName, $listener);
 

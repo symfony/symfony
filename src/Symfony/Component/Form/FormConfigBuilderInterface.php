@@ -256,6 +256,15 @@ interface FormConfigBuilderInterface extends FormConfigInterface
     public function setMethod($method);
 
     /**
+     * Sets the enctype of the form
+     *
+     * @param string $enctype The type enctype
+     *
+     * @return self The configuration object.
+     */
+    public function setEnctype($enctype);
+
+    /**
      * Sets the request handler used by the form.
      *
      * @param RequestHandlerInterface $requestHandler

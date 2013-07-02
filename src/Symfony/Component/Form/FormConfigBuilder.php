@@ -48,6 +48,16 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     );
 
     /**
+     * The accepted enctype types.
+     *
+     * @var array
+     */
+    private static $allowedEnctypes = array(
+        'application/x-www-form-urlencoded',
+        'multipart/form-data'
+    );
+
+    /**
      * @var Boolean
      */
     protected $locked = false;
@@ -161,6 +171,11 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      * @var string
      */
     private $method = 'POST';
+
+    /**
+     * @var string
+     */
+    private $enctype = 'application/x-www-form-urlencoded';
 
     /**
      * @var RequestHandlerInterface
@@ -833,6 +848,28 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         }
 
         $this->method = $upperCaseMethod;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setEnctype($enctype)
+    {
+        if ($this->locked) {
+            throw new BadMethodCallException('The config builder cannot be modified anymore.');
+        }
+
+        if (!in_array($enctype, self::$allowedEnctypes)) {
+            throw new InvalidArgumentException(sprintf(
+                'The enctype is: "%s", but should be one of %s',
+                $enctype,
+                implode('", "', self::$allowedEnctypes)
+            );
+        }
+
+        $this->enctype = $enctype;
 
         return $this;
     }

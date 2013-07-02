@@ -22,6 +22,7 @@ CHANGELOG
  * added an optional PropertyAccessorInterface parameter to FormType,
    ObjectChoiceList and PropertyPathMapper
  * [BC BREAK] PropertyPathMapper and FormType now have a constructor
+ * [BC BREAK] the validator guesser guesses fields for unmapped properties to not be required now
 
 2.1.0
 -----

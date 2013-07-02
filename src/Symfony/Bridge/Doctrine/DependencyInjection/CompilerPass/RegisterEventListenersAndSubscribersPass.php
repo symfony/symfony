@@ -63,6 +63,12 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
         };
 
         $taggedSubscribers = $container->findTaggedServiceIds($this->tagPrefix.'.event_subscriber');
+        $taggedListeners = $container->findTaggedServiceIds($this->tagPrefix.'.event_listener');
+
+        if (empty($taggedSubscribers) && empty($taggedListeners)) {
+            return;
+        }
+
         if (!empty($taggedSubscribers)) {
             $subscribersPerCon = $this->groupByConnection($taggedSubscribers);
             foreach ($subscribersPerCon as $con => $subscribers) {
@@ -75,7 +81,6 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
             }
         }
 
-        $taggedListeners = $container->findTaggedServiceIds($this->tagPrefix.'.event_listener');
         if (!empty($taggedListeners)) {
             $listenersPerCon = $this->groupByConnection($taggedListeners, true);
             foreach ($listenersPerCon as $con => $listeners) {

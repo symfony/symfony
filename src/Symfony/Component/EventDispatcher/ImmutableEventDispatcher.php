@@ -89,4 +89,12 @@ class ImmutableEventDispatcher implements EventDispatcherInterface
     {
         return $this->dispatcher->hasListeners($eventName);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getListenerPriority($eventName, $listener)
+    {
+        return $this->dispatcher->getListenerPriority($eventName, $listener);
+    }
 }

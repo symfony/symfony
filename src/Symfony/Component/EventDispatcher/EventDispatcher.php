@@ -113,6 +113,23 @@ class EventDispatcher implements EventDispatcherInterface
     }
 
     /**
+     * @see EventDispatcherInterface::getListenerPriority
+     */
+     public function getListenerPriority($eventName, $listener) {
+        if (!isset($this->listeners[$eventName])) {
+            return null;
+        }
+
+        foreach ($this->listeners[$eventName] as $priority => $listeners) {
+            if (false !== ($key = array_search($listener, $listeners, true))) {
+                return $priority;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * @see EventDispatcherInterface::addSubscriber
      *
      * @api

@@ -72,6 +72,15 @@ class TraceableEventDispatcherTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($tdispatcher->hasListeners('foo'));
     }
 
+    public function testGetListenerPriority()
+    {
+        $dispatcher = new EventDispatcher();
+        $tdispatcher = new TraceableEventDispatcher($dispatcher, new Stopwatch());
+
+        $tdispatcher->addListener('foo', $listener = function () { ; }, 10);
+        $this->assertSame($dispatcher->getListenerPriority('foo', $listener), $tdispatcher->getListenerPriority('foo', $listener));
+    }
+
     public function testAddRemoveSubscriber()
     {
         $dispatcher = new EventDispatcher();
@@ -160,6 +169,26 @@ class TraceableEventDispatcherTest extends \PHPUnit_Framework_TestCase
         });
 
         $dispatcher->dispatch('foo');
+    }
+
+    public function testDispatchByPriority()
+    {
+        $invoked = array();
+        $listener1 = function () use (&$invoked) {
+            $invoked[] = '1';
+        };
+        $listener2 = function () use (&$invoked) {
+            $invoked[] = '2';
+        };
+        $listener3 = function () use (&$invoked) {
+            $invoked[] = '3';
+        };
+        $dispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
+        $dispatcher->addListener('pre.foo', $listener1, -10);
+        $dispatcher->addListener('pre.foo', $listener2);
+        $dispatcher->addListener('pre.foo', $listener3, 10);
+        $dispatcher->dispatch('pre.foo');
+        $this->assertEquals(array('3', '2', '1'), $invoked);
     }
 
     public function testStopwatchSections()

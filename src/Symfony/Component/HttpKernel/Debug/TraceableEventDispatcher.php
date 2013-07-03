@@ -118,6 +118,14 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
     /**
      * {@inheritdoc}
      */
+    public function getListenerPriority($eventName, $listener)
+    {
+        return $this->dispatcher->getListenerPriority($eventName, $listener);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function dispatch($eventName, Event $event = null)
     {
         if (null === $event) {
@@ -372,10 +380,11 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
         $listeners = $this->dispatcher->getListeners($eventName);
 
         foreach ($listeners as $listener) {
+            $priority = $this->dispatcher->getListenerPriority($eventName, $listener);
             $this->dispatcher->removeListener($eventName, $listener);
             $wrapped = $this->wrapListener($eventName, $listener);
             $this->wrappedListeners[$this->id][$wrapped] = $listener;
-            $this->dispatcher->addListener($eventName, $wrapped);
+            $this->dispatcher->addListener($eventName, $wrapped, $priority);
         }
 
         switch ($eventName) {
@@ -433,8 +442,9 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
         }
 
         foreach ($this->wrappedListeners[$this->id] as $wrapped) {
+            $priority = $this->dispatcher->getListenerPriority($eventName, $wrapped);
             $this->dispatcher->removeListener($eventName, $wrapped);
-            $this->dispatcher->addListener($eventName, $this->wrappedListeners[$this->id][$wrapped]);
+            $this->dispatcher->addListener($eventName, $this->wrappedListeners[$this->id][$wrapped], $priority);
         }
 
         unset($this->wrappedListeners[$this->id]);

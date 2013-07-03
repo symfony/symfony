@@ -96,7 +96,7 @@ class ContainerAwareEventDispatcher extends EventDispatcher
             }
         }
 
-        parent::removeListener($eventName, $listener);
+        return parent::removeListener($eventName, $listener);
     }
 
     /**

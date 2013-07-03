@@ -93,4 +93,14 @@ interface EventDispatcherInterface
      * @return Boolean true if the specified event has any listeners, false otherwise
      */
     public function hasListeners($eventName = null);
+
+    /**
+     * Returns the priority of the given listener.
+     *
+     * @param string   $eventName The event to get the listener's priority
+     * @param callable $listener  The listener for which the priority is returned
+     *
+     * @return integer|null The listener's priority value, null if the listener wasn't found
+     */
+    public function getListenerPriority($eventName, $listener);
 }

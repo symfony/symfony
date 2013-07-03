@@ -163,6 +163,19 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('3', '2', '1'), $invoked);
     }
 
+    public function testGetListenerPriorty()
+    {
+        $listener1 = new TestEventListener();
+        $listener2 = new TestEventListener();
+        $listener3 = new TestEventListener();
+        $this->dispatcher->addListener('pre.foo', $listener1, -10);
+        $this->dispatcher->addListener('pre.foo', $listener2);
+        $this->assertEquals(-10, $this->dispatcher->getListenerPriority('pre.foo', $listener1));
+        $this->assertEquals(0, $this->dispatcher->getListenerPriority('pre.foo', $listener2));
+        $this->assertNull($this->dispatcher->getListenerPriority('pre.bar', $listener1));
+        $this->assertNull($this->dispatcher->getListenerPriority('pre.foo', $listener3));
+    }
+
     public function testRemoveListener()
     {
         $this->dispatcher->addListener('pre.bar', $this->listener);

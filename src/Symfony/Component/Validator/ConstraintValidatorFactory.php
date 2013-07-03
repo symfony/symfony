@@ -32,7 +32,7 @@ class ConstraintValidatorFactory implements ConstraintValidatorFactoryInterface
     {
         $className = $constraint->validatedBy();
 
-        if (!isset($this->validators[$className])) {
+        if (!isset($this->validators[$className]) || $className === 'Symfony\Component\Validator\Constraints\CollectionValidator') {
             $this->validators[$className] = new $className();
         }
 

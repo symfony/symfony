@@ -168,9 +168,7 @@ class FrameworkExtension extends Extension
      */
     private function registerEsiConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
-        if (!$this->isConfigEnabled($container, $config)) {
-            return;
-        }
+        $container->setParameter('esi.enabled', $config['enabled']);
 
         $loader->load('esi.xml');
     }

@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Tests\Acl\Domain;
 
 use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
 use Symfony\Component\Security\Core\Role\Role;
+use Symfony\Component\Security\Core\Role\RoleInterface;
 use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
 
 class RoleSecurityIdentityTest extends \PHPUnit_Framework_TestCase
@@ -50,6 +51,31 @@ class RoleSecurityIdentityTest extends \PHPUnit_Framework_TestCase
             array(new RoleSecurityIdentity('ROLE_FOO'), new RoleSecurityIdentity(new Role('ROLE_FOO')), true),
             array(new RoleSecurityIdentity('ROLE_USER'), new RoleSecurityIdentity('ROLE_FOO'), false),
             array(new RoleSecurityIdentity('ROLE_FOO'), new UserSecurityIdentity('ROLE_FOO', 'Foo'), false),
+            array(new RoleSecurityIdentity('ROLE_FOO'), new RoleSecurityIdentity(new MyRole('ROLE_FOO')), true),
+            array(new RoleSecurityIdentity('ROLE_USER'), new RoleSecurityIdentity(new MyRole('ROLE_FOO')), false),
         );
+    }
+}
+
+class MyRole implements RoleInterface
+{
+    private $role;
+
+    /**
+     * Constructor.
+     *
+     * @param string $role The role name
+     */
+    public function __construct($role)
+    {
+        $this->role = (string) $role;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRole()
+    {
+        return $this->role;
     }
 }

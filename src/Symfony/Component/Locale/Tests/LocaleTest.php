@@ -38,20 +38,19 @@ class LocaleTest extends \PHPUnit_Framework_TestCase
     public function testGetDisplayCountriesForSwitzerland()
     {
         $countries = Locale::getDisplayCountries('de_CH');
-        $this->assertTrue(in_array('CH', $countries));
         $this->assertEquals('Schweiz', $countries['CH']);
     }
 
     public function testGetCountries()
     {
         $countries = Locale::getCountries();
-        $this->assertTrue(in_array('BR', $countries));
+        $this->assertContains('BR', $countries);
     }
 
     public function testGetCountriesForSwitzerland()
     {
         $countries = Locale::getCountries();
-        $this->assertTrue(in_array('CH', $countries));
+        $this->assertContains('CH', $countries);
     }
 
     public function testGetDisplayLanguages()
@@ -63,7 +62,7 @@ class LocaleTest extends \PHPUnit_Framework_TestCase
     public function testGetLanguages()
     {
         $languages = Locale::getLanguages();
-        $this->assertTrue(in_array('pt_BR', $languages));
+        $this->assertContains('pt_BR', $languages);
     }
 
     public function testGetDisplayLocales()
@@ -75,6 +74,6 @@ class LocaleTest extends \PHPUnit_Framework_TestCase
     public function testGetLocales()
     {
         $locales = Locale::getLocales();
-        $this->assertTrue(in_array('pt', $locales));
+        $this->assertContains('pt', $locales);
     }
 }

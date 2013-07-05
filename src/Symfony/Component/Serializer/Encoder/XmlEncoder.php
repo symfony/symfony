@@ -47,7 +47,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
 
         $xmlRootNodeName = $this->resolveXmlRootName($context);
 
-        $this->dom = new \DOMDocument();
+        $this->dom = $this->createDomDocument($context);
         $this->format = $format;
 
         if (null !== $data && !is_scalar($data)) {
@@ -426,4 +426,23 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
             : $this->rootNodeName;
     }
 
+    /**
+     * Create DomDocument with encoding specified within context.
+     */
+    private function createDomDocument(array $context = array())
+    {
+        $version = isset($context['xml_version'])
+            ? $context['xml_version']
+            : '1.0';
+
+        $encoding = isset($context['xml_encoding'])
+            ? $context['xml_encoding']
+            : null;
+
+        if (null !== $encoding) {
+            return new \DOMDocument($version, $encoding);
+        }
+
+        return new \DOMDocument();
+    }
 }

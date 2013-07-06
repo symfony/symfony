@@ -108,6 +108,14 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
     /**
      * {@inheritDoc}
      */
+    public function isEmpty()
+    {
+        return $this->violations == array();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getIterator()
     {
         return new \ArrayIterator($this->violations);

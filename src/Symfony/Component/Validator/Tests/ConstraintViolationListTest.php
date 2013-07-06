@@ -16,6 +16,9 @@ use Symfony\Component\Validator\ConstraintViolationList;
 
 class ConstraintViolationListTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var ConstraintViolationList
+     */
     protected $list;
 
     protected function setUp()
@@ -66,6 +69,20 @@ class ConstraintViolationListTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($violations[10], $this->list[0]);
         $this->assertSame($violations[20], $this->list[1]);
         $this->assertSame($violations[30], $this->list[2]);
+    }
+
+    public function testIsEmpty()
+    {
+        $this->assertTrue($this->list->isEmpty());
+
+        $violation = $this->getViolation('Error');
+        $this->list = new ConstraintViolationList(array($violation));
+
+        $this->assertFalse($this->list->isEmpty());
+
+        unset($this->list[0]);
+
+        $this->assertTrue($this->list->isEmpty());
     }
 
     public function testIterator()

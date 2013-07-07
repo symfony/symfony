@@ -1,7 +1,7 @@
 README
 ======
 
-What is Symfony2?
+What is Symfony2? [![Latest Unstable Version](https://poser.pugx.org/symfony/symfony/v/unstable.png)](https://packagist.org/packages/symfony/symfony) [![Latest Stable Version](https://poser.pugx.org/symfony/symfony/v/stable.png)](https://packagist.org/packages/symfony/symfony) [![Total Downloads](https://poser.pugx.org/symfony/symfony/downloads.png)](https://packagist.org/packages/symfony/symfony)
 -----------------
 
 Symfony2 is a PHP 5.3 full-stack web framework. It is written with speed and

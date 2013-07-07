@@ -362,7 +362,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $application->add(new \Foo6Command());
 
         $command = $application->find('x:f:z');
-        $this->assertEquals($command, $application->get('xxx:faa:zoo'), '->get() returns a command by name');
+        $this->assertEquals($application->get('xxx:faa:zoo'), $command, '->get() returns a command by name');
     }
 
     public function testFindAlternativeNamespace()

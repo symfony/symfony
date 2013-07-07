@@ -151,11 +151,10 @@ class ValidationListenerTest extends \PHPUnit_Framework_TestCase
             ->method('isRoot')
             ->will($this->returnValue(true));
 
-        $violations = new ConstraintViolationList();
         $this->validator
             ->expects($this->once())
             ->method('validate')
-            ->will($this->returnValue($violations));
+            ->will($this->returnValue(new ConstraintViolationList()));
 
         $this->violationMapper
             ->expects($this->never())

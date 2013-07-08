@@ -167,7 +167,7 @@ class ProgressHelper extends Helper
     /**
      * Sets the redraw frequency.
      *
-     * @param int $freq The frequency in seconds
+     * @param int $freq The frequency in steps
      */
     public function setRedrawFrequency($freq)
     {

@@ -52,7 +52,7 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
         $reference = null;
         if ($uri instanceof ControllerReference) {
             $reference = $uri;
-            $uri = $this->generateFragmentUri($uri, $request);
+            $uri = $this->generateFragmentUri($uri, $request, false);
         }
 
         $subRequest = $this->createSubRequest($uri, $request);

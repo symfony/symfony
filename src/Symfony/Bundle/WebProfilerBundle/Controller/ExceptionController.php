@@ -96,7 +96,7 @@ class ExceptionController
             return new Response($handler->getStylesheet($exception));
         }
 
-        return new Response($this->twig->render('@WebProfiler/Collector/exception.css.twig'), 200, 'text/css');
+        return new Response($this->twig->render('@WebProfiler/Collector/exception.css.twig'), 200, array('Content-Type' => 'text/css'));
     }
 
     protected function getTemplate()

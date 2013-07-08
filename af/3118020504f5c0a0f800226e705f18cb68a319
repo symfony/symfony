@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-07-04T09:59:53Z
+
+`JSON_NUMERIC_CHECK` has been available since PHP 5.3.3, so looks good to me.
+
+---------------------------------------------------------------------------
+
+by stloyd at 2013-07-04T11:38:28Z
+
+Shouldn't this be backported to `2.2` ?

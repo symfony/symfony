@@ -74,6 +74,18 @@ class ProgressHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->generateOutput('  0/50 [>---------------------------]   0%').$this->generateOutput('  1/50 [>---------------------------]   2%').$this->generateOutput('  2/50 [=>--------------------------]   4%'), stream_get_contents($output->getStream()));
     }
 
+    public function testPercentNotHundredBeforeComplete()
+    {
+        $progress = new ProgressHelper();
+        $progress->start($output = $this->getOutputStream(), 200);
+        $progress->display();
+        $progress->advance(199);
+        $progress->advance();
+
+        rewind($output->getStream());
+        $this->assertEquals($this->generateOutput('   0/200 [>---------------------------]   0%').$this->generateOutput(' 199/200 [===========================>]  99%').$this->generateOutput(' 200/200 [============================] 100%'), stream_get_contents($output->getStream()));
+    }
+
     protected function getOutputStream()
     {
         return new StreamOutput(fopen('php://memory', 'r+', false));

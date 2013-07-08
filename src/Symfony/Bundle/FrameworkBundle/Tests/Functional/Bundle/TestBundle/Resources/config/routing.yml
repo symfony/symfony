@@ -21,3 +21,11 @@ session_showflash:
 profiler:
     path:     /profiler
     defaults: { _controller: TestBundle:Profiler:index }
+
+fragment_home:
+    path:     /fragment_home
+    defaults: { _controller: TestBundle:Fragment:index, _format: txt }
+
+fragment_inlined:
+    path:     /fragment_inlined
+    defaults: { _controller: TestBundle:Fragment:inlined }

@@ -93,10 +93,10 @@ class ExceptionController
         if (!$this->templateExists($template)) {
             $handler = new ExceptionHandler();
 
-            return new Response($handler->getStylesheet($exception));
+            return new Response($handler->getStylesheet($exception), 200, array('Content-Type' => 'text/css'));
         }
 
-        return new Response($this->twig->render('@WebProfiler/Collector/exception.css.twig'), 200, 'text/css');
+        return new Response($this->twig->render('@WebProfiler/Collector/exception.css.twig'), 200, array('Content-Type' => 'text/css'));
     }
 
     protected function getTemplate()

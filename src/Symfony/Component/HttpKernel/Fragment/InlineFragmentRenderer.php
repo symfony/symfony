@@ -52,7 +52,15 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
         $reference = null;
         if ($uri instanceof ControllerReference) {
             $reference = $uri;
+
+            // Remove attributes from the genereated URI because if not, the Symfony
+            // routing system will use them to populate the Request attributes. We don't
+            // want that as we want to preserve objects (so we manually set Request attributes
+            // below instead)
+            $attributes = $reference->attributes;
+            $reference->attributes = array();
             $uri = $this->generateFragmentUri($uri, $request);
+            $reference->attributes = $attributes;
         }
 
         $subRequest = $this->createSubRequest($uri, $request);

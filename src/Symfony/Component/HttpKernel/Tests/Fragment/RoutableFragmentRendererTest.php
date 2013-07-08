@@ -47,12 +47,19 @@ class RoutableFragmentRendererTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException LogicException
+     * @dataProvider      getGenerateFragmentUriDataWithNonScalar
      */
-    public function testGenerateFragmentUriWithObject()
+    public function testGenerateFragmentUriWithNonScalar($controller)
     {
-        $controller = new ControllerReference('controller', array('foo' => new Foo(), 'bar' => 'bar'), array());
-
         $this->callGenerateFragmentUriMethod($controller, Request::create('/'));
+    }
+
+    public function getGenerateFragmentUriDataWithNonScalar()
+    {
+        return array(
+            array(new ControllerReference('controller', array('foo' => new Foo(), 'bar' => 'bar'), array())),
+            array(new ControllerReference('controller', array('foo' => array('foo' => 'foo'), 'bar' => array('bar' => new Foo())), array())),
+        );
     }
 
     private function callGenerateFragmentUriMethod(ControllerReference $reference, Request $request)

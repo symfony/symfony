@@ -64,13 +64,11 @@ abstract class RoutableFragmentRenderer implements FragmentRendererInterface
 
     private function checkNonScalar($values)
     {
-        foreach ($values as $value) {
+        foreach ($values as $key => $value) {
             if (is_array($value)) {
                 $this->checkNonScalar($value);
-            }
-
-            if (!is_scalar($value)) {
-                throw new \LogicException('Controller attributes cannot contain non-scalar values.');
+            } elseif (!is_scalar($value)) {
+                throw new \LogicException(sprintf('Controller attributes cannot contain non-scalar values (value for key "%s" is not a scalar).', $key));
             }
         }
     }

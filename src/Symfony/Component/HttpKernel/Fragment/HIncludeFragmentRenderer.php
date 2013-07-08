@@ -99,7 +99,11 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
     private function templateExists($template)
     {
         if ($this->templating instanceof EngineInterface) {
-            return $this->templating->exists($template);
+            try {
+                return $this->templating->exists($template);
+            } catch (\InvalidArgumentException $e) {
+                return false;
+            }
         }
 
         $loader = $this->templating->getLoader();

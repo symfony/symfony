@@ -57,7 +57,7 @@ class DialogHelper extends Helper
 
             if ($multiselect) {
                 // Check for a separated comma values
-                if(!preg_match('/^[a-zA-Z0-9_-]+(?:,[a-zA-Z0-9_-]+)*$/', $selectedChoices, $matches)) {
+                if (!preg_match('/^[a-zA-Z0-9_-]+(?:,[a-zA-Z0-9_-]+)*$/', $selectedChoices, $matches)) {
                     throw new \InvalidArgumentException(sprintf($errorMessage, $picked));
                 }
                 $selectedChoices = explode(",", $selectedChoices);
@@ -74,10 +74,10 @@ class DialogHelper extends Helper
                 array_push($multiselectChoices, $value);
             }
 
-            if ($multiselect){
+            if ($multiselect) {
                 return $multiselectChoices;
-            } 
-            
+            }
+
             return $picked;
         }, $attempts, $default);
 

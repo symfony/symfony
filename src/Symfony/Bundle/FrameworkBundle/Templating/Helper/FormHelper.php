@@ -138,7 +138,6 @@ class FormHelper extends Helper
     {
         // Uncomment this as soon as the deprecation note should be shown
         // trigger_error('The form helper $view[\'form\']->enctype() is deprecated since version 2.3 and will be removed in 3.0. Use $view[\'form\']->start() instead.', E_USER_DEPRECATED);
-
         return $this->renderer->searchAndRenderBlock($view, 'enctype');
     }
 

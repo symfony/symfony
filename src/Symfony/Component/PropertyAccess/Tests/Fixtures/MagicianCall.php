@@ -19,7 +19,6 @@ class MagicianCall
     {
         $property = lcfirst(substr($name, 3));
         if ('get' === substr($name, 0, 3)) {
-
             return isset($this->$property) ? $this->$property : null;
         } elseif ('set' === substr($name, 0, 3)) {
             $value = 1 == count($args) ? $args[0] : null;

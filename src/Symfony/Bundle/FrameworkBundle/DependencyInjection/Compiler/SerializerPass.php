@@ -41,11 +41,11 @@ class SerializerPass implements CompilerPassInterface
     private function findAndSortTaggedServices($tagName, ContainerBuilder $container)
     {
         $services = $container->findTaggedServiceIds($tagName);
-        
+
         if (empty($services)) {
-            throw new \RuntimeException(sprintf('You must tag at least one service as "%s" to use the Serializer service', $tagName));    
+            throw new \RuntimeException(sprintf('You must tag at least one service as "%s" to use the Serializer service', $tagName));
         }
-        
+
         $sortedServices = array();
         foreach ($services as $serviceId => $tags) {
             foreach ($tags as $tag) {

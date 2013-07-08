@@ -58,7 +58,6 @@ class RegionBundleTest extends \PHPUnit_Framework_TestCase
             ->with(self::RES_DIR, 'en', array('Countries'))
             ->will($this->returnValue($sortedCountries));
 
-
         $this->assertSame($sortedCountries, $this->bundle->getCountryNames('en'));
     }
 }

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection\LazyProxy\PhpDumper;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 
 /**

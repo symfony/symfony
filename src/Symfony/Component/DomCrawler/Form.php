@@ -351,6 +351,7 @@ class Form extends Link implements \ArrayAccess
                     throw new \LogicException(sprintf('The selected node has an invalid form attribute (%s).', $formId));
                 }
                 $this->node = $form;
+
                 return;
             }
             // we loop until we find a form ancestor

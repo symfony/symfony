@@ -104,6 +104,7 @@ class ErrorHandler
                     $stack = array_map(
                         function ($row) {
                             unset($row['args']);
+
                             return $row;
                         },
                         array_slice(debug_backtrace(false), 0, 10)

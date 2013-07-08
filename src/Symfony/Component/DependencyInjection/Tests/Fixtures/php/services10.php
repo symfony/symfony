@@ -36,6 +36,8 @@ class ProjectServiceContainer extends Container
         $this->methodMap = array(
             'test' => 'getTestService',
         );
+
+        $this->aliases = array();
     }
 
     /**

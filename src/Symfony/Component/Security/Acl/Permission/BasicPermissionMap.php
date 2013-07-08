@@ -40,46 +40,46 @@ class BasicPermissionMap implements PermissionMapInterface
                 MaskBuilder::MASK_MASTER,
                 MaskBuilder::MASK_OWNER,
             ),
-    
+
             self::PERMISSION_EDIT => array(
                 MaskBuilder::MASK_EDIT,
                 MaskBuilder::MASK_OPERATOR,
                 MaskBuilder::MASK_MASTER,
                 MaskBuilder::MASK_OWNER,
             ),
-    
+
             self::PERMISSION_CREATE => array(
                 MaskBuilder::MASK_CREATE,
                 MaskBuilder::MASK_OPERATOR,
                 MaskBuilder::MASK_MASTER,
                 MaskBuilder::MASK_OWNER,
             ),
-    
+
             self::PERMISSION_DELETE => array(
                 MaskBuilder::MASK_DELETE,
                 MaskBuilder::MASK_OPERATOR,
                 MaskBuilder::MASK_MASTER,
                 MaskBuilder::MASK_OWNER,
             ),
-    
+
             self::PERMISSION_UNDELETE => array(
                 MaskBuilder::MASK_UNDELETE,
                 MaskBuilder::MASK_OPERATOR,
                 MaskBuilder::MASK_MASTER,
                 MaskBuilder::MASK_OWNER,
             ),
-    
+
             self::PERMISSION_OPERATOR => array(
                 MaskBuilder::MASK_OPERATOR,
                 MaskBuilder::MASK_MASTER,
                 MaskBuilder::MASK_OWNER,
             ),
-    
+
             self::PERMISSION_MASTER => array(
                 MaskBuilder::MASK_MASTER,
                 MaskBuilder::MASK_OWNER,
             ),
-    
+
             self::PERMISSION_OWNER => array(
                 MaskBuilder::MASK_OWNER,
             ),

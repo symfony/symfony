@@ -16,15 +16,8 @@ use Symfony\Component\Icu\IcuData;
 use Symfony\Component\Icu\IcuLanguageBundle;
 use Symfony\Component\Icu\IcuLocaleBundle;
 use Symfony\Component\Icu\IcuRegionBundle;
-use Symfony\Component\Intl\Exception\InvalidArgumentException;
-use Symfony\Component\Intl\ResourceBundle\Reader\BinaryBundleReader;
 use Symfony\Component\Intl\ResourceBundle\Reader\BufferedBundleReader;
-use Symfony\Component\Intl\ResourceBundle\Reader\PhpBundleReader;
 use Symfony\Component\Intl\ResourceBundle\Reader\StructuredBundleReader;
-use Symfony\Component\Intl\ResourceBundle\Stub\StubCurrencyBundle;
-use Symfony\Component\Intl\ResourceBundle\Stub\StubLanguageBundle;
-use Symfony\Component\Intl\ResourceBundle\Stub\StubLocaleBundle;
-use Symfony\Component\Intl\ResourceBundle\Stub\StubRegionBundle;
 
 /**
  * Gives access to internationalization data.

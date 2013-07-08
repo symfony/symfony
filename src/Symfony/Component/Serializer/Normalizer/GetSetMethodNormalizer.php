@@ -165,8 +165,8 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
     {
         if (in_array($attributeName, $this->camelizedAttributes)) {
             return preg_replace_callback(
-                '/(^|_|\.)+(.)/', function ($match) { 
-                    return ('.' === $match[1] ? '_' : '').strtoupper($match[2]); 
+                '/(^|_|\.)+(.)/', function ($match) {
+                    return ('.' === $match[1] ? '_' : '').strtoupper($match[2]);
                 }, $attributeName
             );
         }

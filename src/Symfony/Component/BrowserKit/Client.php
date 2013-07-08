@@ -78,7 +78,7 @@ abstract class Client
     {
         $this->followRedirects = (Boolean) $followRedirect;
     }
-    
+
     /**
      * Sets the maximum number of requests that crawler can follow.
      *
@@ -329,7 +329,7 @@ abstract class Client
         $this->cookieJar->updateFromResponse($this->internalResponse, $uri);
 
         $status = $this->internalResponse->getStatus();
-        
+
         if ($status >= 300 && $status < 400) {
             $this->redirect = $this->internalResponse->getHeader('Location');
         } else {

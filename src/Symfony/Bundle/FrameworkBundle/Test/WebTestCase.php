@@ -22,7 +22,18 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  */
 abstract class WebTestCase extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * Class of the Kernel
+     *
+     * @var string
+     */
     protected static $class;
+
+    /**
+     * The Kernel
+     *
+     * @var \Symfony\Component\HttpKernel\Kernel
+     */
     protected static $kernel;
 
     /**

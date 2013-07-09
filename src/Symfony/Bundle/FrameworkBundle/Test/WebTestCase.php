@@ -32,7 +32,7 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
     /**
      * The Kernel
      *
-     * @var \Symfony\Component\HttpKernel\Kernel
+     * @var \Symfony\Component\HttpKernel\KernelInterface
      */
     protected static $kernel;
 

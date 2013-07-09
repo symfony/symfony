@@ -158,7 +158,7 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
      *
      * @param array $options An array of options
      *
-     * @return HttpKernelInterface A HttpKernelInterface instance
+     * @return \Symfony\Component\HttpKernel\KernelInterface A HttpKernelInterface instance
      */
     protected static function createKernel(array $options = array())
     {

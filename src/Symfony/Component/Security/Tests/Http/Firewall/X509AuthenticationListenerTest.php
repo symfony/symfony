@@ -60,9 +60,30 @@ class X509AuthenticationListenerTest extends \PHPUnit_Framework_TestCase
         return array(
             'validValues' => array('TheUser', 'TheCredentials'),
             'noCredentials' => array('TheUser', ''),
-            'noUser' => array('', 'TheCredentials'),
-            'noValues' => array('', '')
         );
+    }
+
+    /**
+     * @expectedException Symfony\Component\Security\Core\Exception\BadCredentialsException
+     */
+    public function testGetPreAuthenticatedDataNoUser()
+    {
+        $request = new Request(array(), array(), array(), array(), array(), array());
+
+        $context = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
+
+        $authenticationManager = $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface');
+
+        $listener = new X509AuthenticationListener(
+            $context,
+            $authenticationManager,
+            'TheProviderKey'
+        );
+
+        $method = new \ReflectionMethod($listener, 'getPreAuthenticatedData');
+        $method->setAccessible(true);
+
+        $result = $method->invokeArgs($listener, array($request));
     }
 
     public function testGetPreAuthenticatedDataWithDifferentKeys()

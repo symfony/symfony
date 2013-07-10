@@ -50,7 +50,7 @@ class InlineFragmentRendererTest extends \PHPUnit_Framework_TestCase
         $object = new \stdClass();
 
         $subRequest = Request::create('/_fragment?_path=_format%3Dhtml%26_controller%3Dmain_controller');
-        $subRequest->attributes->replace(array('object' => $object));
+        $subRequest->attributes->replace(array('object' => $object, '_format' => 'html', '_controller' => 'main_controller'));
 
         $kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
         $kernel

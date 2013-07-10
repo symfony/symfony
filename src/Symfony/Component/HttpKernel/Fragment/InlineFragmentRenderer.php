@@ -55,7 +55,7 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
             $attributes = $reference->attributes;
             $reference->attributes = array();
             $uri = $this->generateFragmentUri($uri, $request);
-            $reference->attributes = $attributes;
+            $reference->attributes = array_merge($attributes, $reference->attributes);
         }
 
         $subRequest = $this->createSubRequest($uri, $request);

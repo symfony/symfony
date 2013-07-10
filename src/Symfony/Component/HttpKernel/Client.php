@@ -20,6 +20,8 @@ use Symfony\Component\BrowserKit\Response as DomResponse;
 use Symfony\Component\BrowserKit\Cookie as DomCookie;
 use Symfony\Component\BrowserKit\History;
 use Symfony\Component\BrowserKit\CookieJar;
+use Symfony\Component\HttpFoundation\Factory\RequestFactory;
+use Symfony\Component\HttpFoundation\Factory\RequestFactoryInterface;
 use Symfony\Component\HttpKernel\TerminableInterface;
 
 /**
@@ -32,18 +34,21 @@ use Symfony\Component\HttpKernel\TerminableInterface;
 class Client extends BaseClient
 {
     protected $kernel;
+    private $requestFactory;
 
     /**
      * Constructor.
      *
-     * @param HttpKernelInterface $kernel    An HttpKernel instance
-     * @param array               $server    The server parameters (equivalent of $_SERVER)
-     * @param History             $history   A History instance to store the browser history
-     * @param CookieJar           $cookieJar A CookieJar instance to store the cookies
+     * @param HttpKernelInterface          $kernel         An HttpKernel instance
+     * @param array                        $server         The server parameters (equivalent of $_SERVER)
+     * @param History                      $history        A History instance to store the browser history
+     * @param CookieJar                    $cookieJar      A CookieJar instance to store the cookies
+     * @param RequestFactoryInterface|null $requestFactory The class used to create a request (must extend 'Symfony\Component\HttpFoundation\Request')
      */
-    public function __construct(HttpKernelInterface $kernel, array $server = array(), History $history = null, CookieJar $cookieJar = null)
+    public function __construct(HttpKernelInterface $kernel, array $server = array(), History $history = null, CookieJar $cookieJar = null, RequestFactoryInterface $requestFactory = null)
     {
         $this->kernel = $kernel;
+        $this->requestFactory = $requestFactory ?: new RequestFactory();
 
         parent::__construct($server, $history, $cookieJar);
 
@@ -127,7 +132,7 @@ EOF;
      */
     protected function filterRequest(DomRequest $request)
     {
-        $httpRequest = Request::create($request->getUri(), $request->getMethod(), $request->getParameters(), $request->getCookies(), $request->getFiles(), $request->getServer(), $request->getContent());
+        $httpRequest = $this->requestFactory->create($request->getUri(), $request->getMethod(), $request->getParameters(), $request->getCookies(), $request->getFiles(), $request->getServer(), $request->getContent());
 
         $httpRequest->files->replace($this->filterFiles($httpRequest->files->all()));
 

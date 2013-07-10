@@ -17,6 +17,7 @@ use Symfony\Component\HttpKernel\HttpCache\Esi;
 use Symfony\Component\HttpKernel\HttpCache\Store;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Factory\RequestFactoryInterface;
 
 /**
  * Manages HTTP cache objects in a Container.
@@ -32,7 +33,7 @@ abstract class HttpCache extends BaseHttpCache
      * Constructor.
      *
      * @param HttpKernelInterface $kernel   An HttpKernelInterface instance
-     * @param string              $cacheDir The cache directory (default used if null)
+     * @param string|null         $cacheDir The cache directory (default used if null)
      */
     public function __construct(HttpKernelInterface $kernel, $cacheDir = null)
     {
@@ -72,11 +73,14 @@ abstract class HttpCache extends BaseHttpCache
 
     protected function createEsi()
     {
-        return new Esi();
+        return new Esi($this->getKernel()->getContainer()->get('request_factory'));
     }
 
     protected function createStore()
     {
-        return new Store($this->cacheDir ?: $this->kernel->getCacheDir().'/http_cache');
+        return new Store(
+            $this->cacheDir ?: $this->kernel->getCacheDir().'/http_cache',
+            $this->getKernel()->getContainer()->get('request_factory')
+        );
     }
 }

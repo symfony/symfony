@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\BrowserKit\History;
 use Symfony\Component\BrowserKit\CookieJar;
+use Symfony\Component\HttpFoundation\Factory\RequestFactoryInterface;
 
 /**
  * Client simulates a browser and makes requests to a Kernel object.
@@ -33,9 +34,9 @@ class Client extends BaseClient
     /**
      * @inheritdoc
      */
-    public function __construct(KernelInterface $kernel, array $server = array(), History $history = null, CookieJar $cookieJar = null)
+    public function __construct(KernelInterface $kernel, array $server = array(), History $history = null, CookieJar $cookieJar = null, RequestFactoryInterface $requestFactory = null)
     {
-        parent::__construct($kernel, $server, $history, $cookieJar);
+        parent::__construct($kernel, $server, $history, $cookieJar, $requestFactory);
     }
 
     /**

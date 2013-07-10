@@ -43,9 +43,7 @@
         -->
         <service id="request" scope="request" synthetic="true" synchronized="true" />
 
-        <service id="request_factory" class="%request_factory.class%">
-            <argument>%kernel.request_class%</argument>
-        </service>
+        <service id="request_factory" class="%request_factory.class%" />
 
         <service id="service_container" synthetic="true" />
 

@@ -90,7 +90,6 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             'http_method_override' => true,
-            'request_class'       => 'Symfony\Component\HttpFoundation\Request',
             'trusted_proxies'     => array(),
             'ide'                 => null,
             'default_locale'      => 'en',

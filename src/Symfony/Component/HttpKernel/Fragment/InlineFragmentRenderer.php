@@ -130,6 +130,9 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
             $subRequest->setSession($session);
         }
 
+        // add this request to subRequest
+        $subRequest->attributes->set('_parent', $request);
+
         return $subRequest;
     }
 

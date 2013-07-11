@@ -304,14 +304,16 @@ class Parser
 
         $isItUnindentedCollection = $this->isStringUnIndentedCollectionItem($this->currentLine);
 
-        while ($this->moveToNextLine()) {
+        // We are in string block (ie. after a line ending with "|")
+        $removeComments = !preg_match('~(.*)\|[\s]*$~', $this->currentLine);
 
+        while ($this->moveToNextLine()) {
             if ($isItUnindentedCollection && !$this->isStringUnIndentedCollectionItem($this->currentLine)) {
                 $this->moveToPreviousLine();
                 break;
             }
 
-            if ($this->isCurrentLineEmpty()) {
+            if ($removeComments && $this->isCurrentLineEmpty() || $this->isCurrentLineBlank()) {
                 if ($this->isCurrentLineBlank()) {
                     $data[] = substr($this->currentLine, $newIndent);
                 }

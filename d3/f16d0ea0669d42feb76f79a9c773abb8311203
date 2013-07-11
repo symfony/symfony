@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by genexp at 2013-07-11T19:06:20Z
+
+References #8420
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2013-07-11T19:33:04Z
+
+More info:
+
+```
+php > echo json_encode(array('phone_number' => '0033123456789'), JSON_NUMERIC_CHECK);
+{"phone_number":33123456789}
+php > echo json_encode(array('phone_number' => '0033123456789'));
+{"phone_number":"0033123456789"}
+```

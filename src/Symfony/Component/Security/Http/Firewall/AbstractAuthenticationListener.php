@@ -156,7 +156,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
     /**
      * Whether this request requires authentication.
      *
-     * The default implementation only processed requests to a specific path,
+     * The default implementation only processes requests to a specific path,
      * but a subclass could change this to only authenticate requests where a
      * certain parameters is present.
      *

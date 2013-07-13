@@ -50,6 +50,10 @@ abstract class RoutableFragmentRenderer implements FragmentRendererInterface
             $reference->attributes['_format'] = $request->getRequestFormat();
         }
 
+        if (!isset($reference->attributes['_locale'])) {
+            $reference->attributes['_locale'] = $request->getLocale();
+        }
+
         $reference->attributes['_controller'] = $reference->controller;
 
         $reference->query['_path'] = http_build_query($reference->attributes, '', '&');

@@ -288,6 +288,119 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('10 things', $translator->transChoice('some_message2', 10, array('%count%' => 10)));
     }
+
+    /**
+     * @dataProvider getTransCascadingTests()
+     */
+    public function testTransCascading($expected, $id, $domains, $locale)
+    {
+        $translator = new Translator('en', new MessageSelector());
+        $translator->addLoader('array', new ArrayLoader());
+        $this->addTransCascadingData($translator);
+
+        $this->assertEquals($expected, $translator->trans($id, array(), $domains, $locale));
+    }
+
+    /**
+     * @dataProvider getTransChoiceCascadingTests()
+     */
+    public function testTransChoiceCascading($expected, $id, $count, $domains, $locale)
+    {
+        $translator = new Translator('en', new MessageSelector());
+        $translator->addLoader('array', new ArrayLoader());
+        $this->addTransCascadingData($translator);
+
+        $this->assertEquals($expected, $translator->transChoice($id, $count, array('%count%' => $count), $domains, $locale));
+    }
+
+
+    public function addTransCascadingData(Translator $translator)
+    {
+        $items = array(
+            'generic_domain' => array(
+                'element_create' => array(
+                    'fr' => 'Nouvel élément',
+                ),
+                'element_delete' => array(
+                    'en' => 'Delete element',
+                ),
+                'element_count' => array(
+                    'en' => '{0} There is no element|{1} There is one element|]1,Inf] There are %count% elements',
+                    'fr' => '{0} Pas d\'élément|{1} Il y a un élément|]1,Inf] Il y a %count% éléments',
+                ),
+            ),
+            'task_domain' => array(
+                'element_create' => array(
+                    'en' => 'New task',
+                    'fr' => 'Nouvelle tâche',
+                ),
+                'element_delete' => array(
+                    'en' => 'Delete task',
+                ),
+                'element_count' => array(
+                    'fr' => '{0} Pas de tâche|{1} Il y a une tâche|]1,Inf] Il y a %count% tâches',
+                ),
+            ),
+            'update_task_domain' => array(
+                'element_create' => array(
+                    'fr' => 'Nouvelle tâche de mise à jour',                        
+                ),
+                'element_delete' => array(
+                    'en' => 'Delete update task'
+                ),
+                'element_count' => array(
+                    'en' => '{0} No update task|{1} There is one update task|]1,Inf] There are %count% update tasks',
+                ),
+            ),
+        );
+
+        foreach ($items as $domain => $data) {
+            foreach ($data as $id => $translations) {
+                foreach ($translations as $locale => $message) {
+                    $translator->addResource('array', array($id => $message), $locale, $domain);
+                }
+            }
+        }
+    }
+
+    public function getTransChoiceCascadingTests()
+    {
+        return array(
+            // Classic domain usage
+            array('Pas d\'élément', 'element_count', 0, 'generic_domain', 'fr'),
+            array('Il y a une tâche', 'element_count', 1, 'task_domain', 'fr'),
+            array('There are 10 update tasks', 'element_count', 10, 'update_task_domain', 'en'),
+            // Single element array domains
+            array('Pas d\'élément', 'element_count', 0, array('generic_domain'), 'fr'),
+            array('Il y a une tâche', 'element_count', 1, array('task_domain'), 'fr'),
+            array('There are 10 update tasks', 'element_count', 10, array('update_task_domain'), 'en'),
+            // Fallback: Cascading domain in the right order
+            array('There is no element', 'element_count', 0, array('task_domain', 'generic_domain'), 'en'),
+            array('Il y a une tâche', 'element_count', 1, array('update_task_domain', 'task_domain', 'generic_domain'), 'fr'),
+            array('There are 10 elements', 'element_count', 10, array('generic_domain', 'update_task_domain', 'task_domain'), 'en'),
+        );
+    }
+
+    public function getTransCascadingTests()
+    {
+        return array(
+            // Classic domain usage
+            array('Nouvel élément', 'element_create', 'generic_domain', 'fr'),
+            array('Delete task', 'element_delete', 'task_domain', 'en'),
+            array('Nouvelle tâche de mise à jour', 'element_create', 'update_task_domain', 'fr'),
+            // Single element array domains
+            array('Nouvel élément', 'element_create', array('generic_domain'), 'fr'),
+            array('Delete task', 'element_delete', array('task_domain'), 'en'),
+            array('Nouvelle tâche de mise à jour', 'element_create', array('update_task_domain'), 'fr'),
+            // Fallback: Cascading domain in the right order
+            array('Nouvelle tâche', 'element_create', array('task_domain', 'generic_domain'), 'fr'),
+            array('Delete update task', 'element_delete', array('update_task_domain', 'generic_domain'), 'en'),
+            array('Nouvelle tâche de mise à jour', 'element_create', array('update_task_domain', 'task_domain', 'generic_domain'), 'fr'),
+            array('New task', 'element_create', array('update_task_domain', 'task_domain', 'generic_domain'), 'en'),
+            array('element_delete', 'element_delete', array('update_task_domain', 'task_domain', 'generic_domain'), 'fr'),
+            array('New task', 'element_create', array('generic_domain', 'task_domain', 'update_task_domain'), 'en'),
+        );
+    }
 }
 
 class String

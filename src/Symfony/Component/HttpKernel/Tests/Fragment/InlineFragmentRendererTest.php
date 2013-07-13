@@ -50,8 +50,8 @@ class InlineFragmentRendererTest extends \PHPUnit_Framework_TestCase
     {
         $object = new \stdClass();
 
-        $subRequest = Request::create('/_fragment?_path=_format%3Dhtml%26_controller%3Dmain_controller');
-        $subRequest->attributes->replace(array('object' => $object, '_format' => 'html', '_controller' => 'main_controller'));
+        $subRequest = Request::create('/_fragment?_path=_format%3Dhtml%26_locale%3Den%26_controller%3Dmain_controller');
+        $subRequest->attributes->replace(array('object' => $object, '_format' => 'html', '_controller' => 'main_controller', '_locale' => 'en'));
         $subRequest->headers->set('x-forwarded-for', array('127.0.0.1'));
         $subRequest->server->set('HTTP_X_FORWARDED_FOR', '127.0.0.1');
 

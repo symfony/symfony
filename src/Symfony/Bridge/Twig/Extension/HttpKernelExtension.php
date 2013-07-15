@@ -38,7 +38,7 @@ class HttpKernelExtension extends \Twig_Extension
         return array(
             'render'     => new \Twig_Function_Method($this, 'renderFragment', array('is_safe' => array('html'))),
             'render_*'   => new \Twig_Function_Method($this, 'renderFragmentStrategy', array('is_safe' => array('html'))),
-            'controller' => new \Twig_Function_Method($this, 'controller'),
+            'controller' => new \Twig_Function_Method($this, 'controller', array('needs_context' => true)),
         );
     }
 
@@ -76,8 +76,12 @@ class HttpKernelExtension extends \Twig_Extension
         return $this->handler->render($uri, $strategy, $options);
     }
 
-    public function controller($controller, $attributes = array(), $query = array())
+    public function controller(array $context, $controller, $attributes = array(), $query = array())
     {
+        if (isset($context['app'])) {
+            $attributes['_locale'] = $context['app']->getRequest()->getLocale();
+        }
+
         return new ControllerReference($controller, $attributes, $query);
     }
 

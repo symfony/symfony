@@ -170,6 +170,8 @@ Form
    $form = $builder->getForm();
    ```
 
+ * `virtual` element field property transformed to `mapped` and has opposite meaning.
+
 PropertyAccess
 --------------
 

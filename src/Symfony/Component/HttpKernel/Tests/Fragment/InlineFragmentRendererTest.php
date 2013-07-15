@@ -67,6 +67,24 @@ class InlineFragmentRendererTest extends \PHPUnit_Framework_TestCase
         $strategy->render(new ControllerReference('main_controller', array('object' => $object), array()), Request::create('/'));
     }
 
+    public function testRenderWithObjectsAsAttributesPassedAsObjectsInTheController()
+    {
+        $resolver = $this->getMock('Symfony\\Component\\HttpKernel\\Controller\\ControllerResolver', array('getController'));
+        $resolver
+            ->expects($this->once())
+            ->method('getController')
+            ->will($this->returnValue(function (\stdClass $object, Bar $object1) {
+                return new Response($object1->getBar());
+            }))
+        ;
+
+        $kernel = new HttpKernel(new EventDispatcher(), $resolver);
+        $renderer = new InlineFragmentRenderer($kernel);
+
+        $response = $renderer->render(new ControllerReference('main_controller', array('object' => new \stdClass(), 'object1' => new Bar()), array()), Request::create('/'));
+        $this->assertEquals('bar', $response->getContent());
+    }
+
     /**
      * @expectedException \RuntimeException
      */
@@ -162,5 +180,14 @@ class InlineFragmentRendererTest extends \PHPUnit_Framework_TestCase
         $request = Request::create('/');
         $request->headers->set('Surrogate-Capability', 'abc="ESI/1.0"');
         $strategy->render('/', $request);
+    }
+}
+
+class Bar {
+    public $bar = 'bar';
+
+    public function getBar()
+    {
+        return $this->bar;
     }
 }

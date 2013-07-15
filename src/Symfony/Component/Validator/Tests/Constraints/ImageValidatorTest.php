@@ -20,8 +20,8 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
     protected $validator;
     protected $path;
     protected $image;
-    protected $image_landscape;
-    protected $image_portrait;
+    protected $imageLandscape;
+    protected $imagePortrait;
 
     protected function setUp()
     {
@@ -29,8 +29,8 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator = new ImageValidator();
         $this->validator->initialize($this->context);
         $this->image = __DIR__.'/Fixtures/test.gif';
-        $this->image_landscape = __DIR__.'/Fixtures/test_landscape.gif';
-        $this->image_portrait = __DIR__.'/Fixtures/test_portrait.gif';
+        $this->imageLandscape = __DIR__.'/Fixtures/test_landscape.gif';
+        $this->imagePortrait = __DIR__.'/Fixtures/test_portrait.gif';
     }
 
     public function testNullIsValid()
@@ -341,7 +341,7 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
                 '{{ height }}' => 1,
             ));
 
-        $this->validator->validate($this->image_landscape, $constraint);
+        $this->validator->validate($this->imageLandscape, $constraint);
     }
 
     public function testPortraitNotAllowed()
@@ -362,6 +362,6 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
                 '{{ height }}' => 2,
             ));
 
-        $this->validator->validate($this->image_portrait, $constraint);
+        $this->validator->validate($this->imagePortrait, $constraint);
     }
 }

@@ -21,6 +21,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 
 /**
  * AbstractPreAuthenticatedListener is the base class for all listener that
@@ -59,7 +60,11 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
             $this->logger->debug(sprintf('Checking secure context token: %s', $this->securityContext->getToken()));
         }
 
-        list($user, $credentials) = $this->getPreAuthenticatedData($request);
+        try {
+            list($user, $credentials) = $this->getPreAuthenticatedData($request);
+        } catch(BadCredentialsException $e) {
+            return;
+        }
 
         if (null !== $token = $this->securityContext->getToken()) {
             if ($token instanceof PreAuthenticatedToken && $this->providerKey == $token->getProviderKey() && $token->isAuthenticated() && $token->getUsername() === $user) {

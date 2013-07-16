@@ -258,4 +258,14 @@ class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
            array($rootprefixCollection, 'url_matcher3.php', array())
         );
     }
+
+    public function testOptimizedRouteDump()
+    {
+        $collection = new RouteCollection();
+        $collection->add('name', new Route('/test/{param}', array(), array('param' => 'static')));
+        $dumper = new PhpMatcherDumper($collection);
+        $fixture = __DIR__.'/../../Fixtures/dumper/optimized_route_matcher.php';
+
+        $this->assertStringEqualsFile($fixture, $dumper->dump());
+    }
 }

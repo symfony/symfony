@@ -193,6 +193,8 @@ EOF;
      */
     private function compileRoute(Route $route, $name, $supportsRedirections, $parentPrefix = null)
     {
+        $route = $this->optimizeRoute($route);
+
         $code = '';
         $compiledRoute = $route->compile();
         $conditions = array();
@@ -374,5 +376,35 @@ EOF;
         $tree->mergeSlashNodes();
 
         return $tree;
+    }
+
+    /**
+     * Optimizes route before the dump.
+     *
+     * @param Route $route
+     *
+     * @return Route
+     */
+    private function optimizeRoute(Route $route)
+    {
+        $optimizedRoute = clone $route;
+        $optimized = false;
+
+        foreach ($route->getRequirements() as $parameter => $pattern) {
+            $placeholder = sprintf('{%s}', $parameter);
+
+            if (false !== strpos($optimizedRoute->getPath(), $placeholder) && preg_match('~^[\w]+$~i', $pattern)) {
+                $optimizedRoute->setPath(str_replace($placeholder, $pattern, $optimizedRoute->getPath()));
+
+                $requirements = $optimizedRoute->getRequirements();
+                unset($requirements[$parameter]);
+                $optimizedRoute->setRequirements($requirements);
+                $optimizedRoute->setDefault($parameter, $pattern);
+
+                $optimized = true;
+            }
+        }
+
+        return $optimized ? $optimizedRoute : $route;
     }
 }

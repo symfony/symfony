@@ -7,6 +7,36 @@ in 2.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.3.0...v2.3.1
 
+* 2.3.2 (2013-07-17)
+
+ * bb59f40: Reverts JSON_NUMERIC_CHECK
+ * 9c5f8c6: [Yaml] removed wrong comment removal inside a string block
+ * 2dc1ee0: [HtppKernel] fixed inline fragment renderer
+ * 06b69b8: fixed inline fragment renderer
+ * 91bb757: ProgressHelper shows percentage complete.
+ * 9d1004b: fix handling of a default 'template' as a string
+ * 82dbaee: [HttpKernel] fixed the inline renderer when passing objects as attributes (closes #7124)
+ * 8bb4e4d: [DI] Fixed bug requesting non existing service from dumped frozen container
+ * 6dbd1e1: [WebProfiler] fix content-type parameter
+ * a830001: Passed the config when building the Configuration in ConfigurableExtension
+ * c875d0a: [Form] fixed INF usage which does not work on Solaris (closes #8246)
+ * ab1439e: [Console] Fixed the table rendering with multi-byte strings.
+ * c0da3ae: [Process] Disable exception on stream_select timeout
+ * 77f2aa8: [HttpFoundation] fixed issue with session_regenerate_id (closes #7380)
+ * bcbbb28: Throw exception if value is passed to VALUE_NONE input, long syntax
+ * 6b71513: fixed date type format pattern regex
+ * b5ded81: [Security] fixed usage of the salt for the bcrypt encoder (refs #8210)
+ * 842f3fa: do not re-register commands each time a Console\Application is run
+ * 0991cd0: [Process] moved env check to the Process class (refs #8227)
+ * 8764944: fix issue where $_ENV contains array vals
+ * 4139936: [DomCrawler] Fix handling file:// without a host
+ * e65723c: fix-progressbar-start
+ * aa79393: also consider alias in Container::has()
+ * de289d2: [Form] corrected interface bind() method defined against in deprecation notice
+ * 0c0a3e9: [Console] fixed regression when calling a command foo:bar if there is another one like foo:bar:baz (closes #8245)
+ * 849f3ed: [Finder] Fix SplFileInfo::getContents isn't working with ssh2 protocol
+ * 6d2135b: force the Content-Type to html in the web profiler controllers
+
 * 2.3.1 (2013-06-11)
 
  * 25e3abd: fix many-to-many Propel1 ModelChoiceList

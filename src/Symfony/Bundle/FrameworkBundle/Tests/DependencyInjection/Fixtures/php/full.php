@@ -70,5 +70,11 @@ $container->loadFromExtension('framework', array(
         'debug' => true,
         'file_cache_dir' => '%kernel.cache_dir%/annotations',
     ),
-    'ide' => 'file%%link%%format'
+    'ide' => 'file%%link%%format',
+    'response' => array(
+        'default_headers' => array(
+            'X-Foo' => 'Bar',
+            'X-Bar' => 'Foo',
+        ),
+    ),
 ));

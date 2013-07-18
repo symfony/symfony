@@ -36,5 +36,9 @@
         <framework:translator enabled="true" fallback="fr" />
         <framework:validation enabled="true" cache="apc" />
         <framework:annotations cache="file" debug="true" file-cache-dir="%kernel.cache_dir%/annotations" />
+        <framework:response>
+            <framework:default-header name="X-Foo">Bar</framework:default-header>
+            <framework:default-header name="X-Bar">Foo</framework:default-header>
+        </framework:response>
     </framework:config>
 </container>

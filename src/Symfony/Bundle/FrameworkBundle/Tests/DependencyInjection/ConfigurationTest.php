@@ -129,7 +129,12 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             ),
             'serializer'          => array(
                 'enabled' => false
-            )
+            ),
+            'response'            => array(
+                'default_headers' => array(
+                    'X-Content-Type-Options' => 'nosniff',
+                ),
+            ),
         );
     }
 }

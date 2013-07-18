@@ -25,9 +25,12 @@ class ResponseListener implements EventSubscriberInterface
 {
     private $charset;
 
-    public function __construct($charset)
+    private $defaultHeaders = array();
+
+    public function __construct($charset, $defaultHeaders = array())
     {
         $this->charset = $charset;
+        $this->defaultHeaders = $defaultHeaders;
     }
 
     /**
@@ -42,6 +45,9 @@ class ResponseListener implements EventSubscriberInterface
         }
 
         $response = $event->getResponse();
+        foreach ($this->defaultHeaders as $key => $value) {
+            $response->headers->set($key, $value, false);
+        }
 
         if (null === $response->getCharset()) {
             $response->setCharset($this->charset);

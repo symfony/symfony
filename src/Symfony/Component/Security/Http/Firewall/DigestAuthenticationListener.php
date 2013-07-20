@@ -124,7 +124,10 @@ class DigestAuthenticationListener implements ListenerInterface
 
     private function fail(GetResponseEvent $event, Request $request, AuthenticationException $authException)
     {
-        $this->securityContext->setToken(null);
+        $token = $this->securityContext->getToken();
+        if ($token instanceof UsernamePasswordToken && $this->providerKey === $token->getProviderKey()) {
+            $this->securityContext->setToken(null);
+        }
 
         if (null !== $this->logger) {
             $this->logger->info($authException);

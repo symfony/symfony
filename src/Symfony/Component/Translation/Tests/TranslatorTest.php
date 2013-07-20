@@ -199,6 +199,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             array('ts', 'QtFileLoader'),
             array('xlf', 'XliffFileLoader'),
             array('yml', 'YamlFileLoader'),
+            array('json', 'JsonFileLoader'),
         );
     }
 

@@ -492,7 +492,6 @@ class PhpDumper extends Dumper
      */
     private function addService($id, $definition)
     {
-        $name = Container::camelize($id);
         $this->definitionVariables = new \SplObjectStorage();
         $this->referenceVariables = array();
         $this->variableCount = 0;
@@ -557,7 +556,7 @@ EOF;
      *$lazyInitializationDoc
      * $return
      */
-    {$visibility} function get{$name}Service($lazyInitialization)
+    {$visibility} function get{$this->camelize($id)}Service($lazyInitialization)
     {
 
 EOF;
@@ -658,14 +657,12 @@ EOF;
             return;
         }
 
-        $name = Container::camelize($id);
-
         return <<<EOF
 
     /**
      * Updates the '$id' service.
      */
-    protected function synchronize{$name}Service()
+    protected function synchronize{$this->camelize($id)}Service()
     {
 $code    }
 
@@ -839,7 +836,7 @@ EOF;
         $code = "        \$this->methodMap = array(\n";
         ksort($definitions);
         foreach ($definitions as $id => $definition) {
-            $code .= '            '.var_export($id, true).' => '.var_export('get'.Container::camelize($id).'Service', true).",\n";
+            $code .= '            '.var_export($id, true).' => '.var_export('get'.$this->camelize($id).'Service', true).",\n";
         }
 
         return $code . "        );\n";
@@ -1262,6 +1259,26 @@ EOF;
 
             return sprintf('$this->get(\'%s\')', $id);
         }
+    }
+
+    /**
+     * Convert a service id to a valid PHP method name.
+     *
+     * @param string $id
+     *
+     * @return string
+     *
+     * @throws InvalidArgumentException
+     */
+    private function camelize($id)
+    {
+        $name = Container::camelize($id);
+
+        if (!preg_match('/^[a-zA-Z0-9_\x7f-\xff]+$/', $name)) {
+            throw new InvalidArgumentException(sprintf('Service id "%s" cannot be converted to a valid PHP method name.', $id));
+        }
+
+        return $name;
     }
 
     /**

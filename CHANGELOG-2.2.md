@@ -7,6 +7,20 @@ in 2.2 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.2.0...v2.2.1
 
+* 2.2.4 (2013-07-15)
+
+ * 52e530d: Fixed NativeSessionStorage:regenerate when does not exists
+ * bb59f40: Reverts JSON_NUMERIC_CHECK
+ * 9c5f8c6: [Yaml] removed wrong comment removal inside a string block
+ * 2dc1ee0: [HtppKernel] fixed inline fragment renderer
+ * 06b69b8: fixed inline fragment renderer
+ * 91bb757: ProgressHelper shows percentage complete.
+ * 9d1004b: fix handling of a default 'template' as a string
+ * 82dbaee: [HttpKernel] fixed the inline renderer when passing objects as attributes (closes #7124)
+ * 6dbd1e1: [WebProfiler] fix content-type parameter
+ * a830001: Passed the config when building the Configuration in ConfigurableExtension
+ * c875d0a: [Form] fixed INF usage which does not work on Solaris (closes #8246)
+
 * 2.2.3 (2013-06-19)
 
  * c0da3ae: [Process] Disable exception on stream_select timeout

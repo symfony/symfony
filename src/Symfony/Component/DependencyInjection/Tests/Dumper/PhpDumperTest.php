@@ -120,6 +120,18 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage Service id "bar$" cannot be converted to a valid PHP method name.
+     */
+    public function testAddServiceInvalidServiceId()
+    {
+        $container = new ContainerBuilder();
+        $container->register('bar$', 'FooClass');
+        $dumper = new PhpDumper($container);
+        $dumper->dump();
+    }
+
     public function testAliases()
     {
         $container = include self::$fixturesPath.'/containers/container9.php';

@@ -288,7 +288,7 @@ class ModelChoiceList extends ObjectChoiceList
         $choices = $this->fixChoices($models);
         foreach ($this->getChoices() as $i => $choice) {
             foreach ($choices as $j => $givenChoice) {
-                if ($this->getIdentifierValues($choice) === $this->getIdentifierValues($givenChoice)) {
+                if (null !== $givenChoice && $this->getIdentifierValues($choice) === $this->getIdentifierValues($givenChoice)) {
                     $indices[] = $i;
                     unset($choices[$j]);
 
@@ -411,6 +411,10 @@ class ModelChoiceList extends ObjectChoiceList
         // readonly="true" models do not implement Persistent.
         if ($model instanceof BaseObject && method_exists($model, 'getPrimaryKey')) {
             return array($model->getPrimaryKey());
+        }
+
+        if (null === $model) {
+            return array();
         }
 
         return $model->getPrimaryKeys();

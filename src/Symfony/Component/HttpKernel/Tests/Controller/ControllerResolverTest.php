@@ -99,6 +99,17 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('foo'), $resolver->getArguments($request, $controller), '->getArguments() returns an array of arguments for the controller method');
 
         $request = Request::create('/');
+        $request->query->set('foo', 'foo');
+        $controller = array(new self(), 'controllerMethod1');
+        $this->assertEquals(array('foo'), $resolver->getArguments($request, $controller), '->getArguments() uses query parameters if just the parameter on query is specified.');
+
+        $request = Request::create('/');
+        $request->query->set('foo', 'bar');
+        $request->attributes->set('foo', 'foo');
+        $controller = array(new self(), 'controllerMethod1');
+        $this->assertEquals(array('foo'), $resolver->getArguments($request, $controller), '->getArguments() uses attributes if the parameter on both query and attributes are specified.');
+
+        $request = Request::create('/');
         $request->attributes->set('foo', 'foo');
         $controller = array(new self(), 'controllerMethod2');
         $this->assertEquals(array('foo', null), $resolver->getArguments($request, $controller), '->getArguments() uses default values if present');

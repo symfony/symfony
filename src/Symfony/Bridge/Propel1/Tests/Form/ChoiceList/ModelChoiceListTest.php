@@ -199,4 +199,16 @@ class ModelChoiceListTest extends Propel1TestCase
 
         $this->assertEquals(array(1), $choiceList->getIndicesForChoices(array($choosenItem)));
     }
+
+    public function testGetIndicesForNullChoices()
+    {
+        $item = new Item(1, 'Foo');
+        $choiceList = new ModelChoiceList(
+            self::ITEM_CLASS,
+            'value',
+            array($item)
+        );
+
+        $this->assertEquals(array(), $choiceList->getIndicesForChoices(array(null)));
+    }
 }

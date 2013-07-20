@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Tests\Http\Firewall;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\Firewall\BasicAuthenticationListener;
@@ -96,9 +97,8 @@ class BasicAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(null))
         ;
         $context
-            ->expects($this->once())
+            ->expects($this->never())
             ->method('setToken')
-            ->with($this->equalTo(null))
         ;
 
         $response = new Response();
@@ -208,5 +208,57 @@ class BasicAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
             '',
             $this->getMock('Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface')
         );
+    }
+
+    public function testHandleWithADifferentAuthenticatedToken()
+    {
+        $request = new Request(array(), array(), array(), array(), array(), array(
+            'PHP_AUTH_USER' => 'TheUsername',
+            'PHP_AUTH_PW'   => 'ThePassword'
+        ));
+
+        $token = new PreAuthenticatedToken('TheUser', 'TheCredentials', 'TheProviderKey', array('ROLE_FOO'));
+
+        $context = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
+        $context
+            ->expects($this->any())
+            ->method('getToken')
+            ->will($this->returnValue($token))
+        ;
+        $context
+            ->expects($this->never())
+            ->method('setToken')
+        ;
+
+        $response = new Response();
+
+        $authenticationEntryPoint = $this->getMock('Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface');
+        $authenticationEntryPoint
+            ->expects($this->any())
+            ->method('start')
+            ->with($this->equalTo($request), $this->isInstanceOf('Symfony\Component\Security\Core\Exception\AuthenticationException'))
+            ->will($this->returnValue($response))
+        ;
+
+        $listener = new BasicAuthenticationListener(
+            $context,
+            new AuthenticationProviderManager(array($this->getMock('Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface'))),
+            'TheProviderKey',
+            $authenticationEntryPoint
+        );
+
+        $event = $this->getMock('Symfony\Component\HttpKernel\Event\GetResponseEvent', array(), array(), '', false);
+        $event
+            ->expects($this->any())
+            ->method('getRequest')
+            ->will($this->returnValue($request))
+        ;
+        $event
+            ->expects($this->once())
+            ->method('setResponse')
+            ->with($this->equalTo($response))
+        ;
+
+        $listener->handle($event);
     }
 }

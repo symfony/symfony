@@ -78,7 +78,7 @@ class ContainerAwareHttpKernelTest extends \PHPUnit_Framework_TestCase
         $resolver = $this->getMock('Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface');
         $kernel = new ContainerAwareHttpKernel($dispatcher, $container, $resolver);
 
-        $controller = function() use ($expected) {
+        $controller = function () use ($expected) {
             return $expected;
         };
 
@@ -136,7 +136,7 @@ class ContainerAwareHttpKernelTest extends \PHPUnit_Framework_TestCase
         $resolver = $this->getMock('Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface');
         $kernel = new ContainerAwareHttpKernel($dispatcher, $container, $resolver);
 
-        $controller = function() use ($expected) {
+        $controller = function () use ($expected) {
             throw $expected;
         };
 

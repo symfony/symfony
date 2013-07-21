@@ -58,14 +58,17 @@ class CompoundFormTest extends AbstractFormTest
         $this->form->submit(array());
     }
 
-    public function testSubmitDoesNotForwardNullIfNotClearMissing()
+    public function testSubmitDoesNotSaveNullIfNotClearMissing()
     {
         $child = $this->getMockForm('firstName');
 
         $this->form->add($child);
 
-        $child->expects($this->never())
+        $child->expects($this->once())
             ->method('submit');
+
+        $child->expects($this->never())
+            ->method('setData');
 
         $this->form->submit(array(), false);
     }
@@ -545,6 +548,74 @@ class CompoundFormTest extends AbstractFormTest
         $this->assertEquals($file, $form['image']->getData());
 
         unlink($path);
+    }
+
+    public function testSubmitPatchRequest()
+    {
+        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
+            $this->markTestSkipped('The "HttpFoundation" component is not available');
+        }
+
+        $object = new \stdClass();
+        $object->name = 'Bernhard';
+        $object->name2 = 'Me';
+
+        //$values = array();
+        $values = array(
+            'author' => array(
+                'name2' => 'Artem',
+            ),
+        );
+
+        $request = new Request(array(), $values, array(), array(), array(), array(
+            'REQUEST_METHOD' => 'PATCH',
+        ));
+
+        $mapper = $this->getDataMapper();
+        $mapper->expects($this->any())
+            ->method('mapDataToForms')
+            ->will($this->returnCallback(function($data, $forms){
+                foreach ($forms as $form) {
+                    $propertyPath = $form->getPropertyPath();
+
+                    if (null !== $propertyPath) {
+                        $form->setData($data->{$propertyPath});
+                    }
+                }
+            }));
+
+
+        $mapper->expects($this->any())
+            ->method('mapFormsToData')
+            ->will($this->returnCallback(function($forms, &$data){
+                foreach ($forms as $form) {
+                    $propertyPath = $form->getPropertyPath();
+
+                    if (null !== $propertyPath) {
+                        if (!is_object($data) || $form->getData() !== $data->{$propertyPath}) {
+                            $data->{$propertyPath} = $form->getData();
+                        }
+                    }
+                }
+            }));
+
+        /** @var Form $form */
+        $form = $this->getBuilder('author', null, 'stdClass')
+            ->setMethod('PATCH')
+            ->setData($object)
+            ->setCompound(true)
+            ->setDataMapper($mapper)
+            ->setRequestHandler(new HttpFoundationRequestHandler())
+            ->getForm();
+        $form->add($this->getBuilder('name')->getForm());
+        $form->add($this->getBuilder('name2')->getForm());
+
+        $form->handleRequest($request);
+
+        $this->assertTrue($form->isValid());
+
+        $this->assertEquals('Bernhard', $form['name']->getData());
+        $this->assertEquals('Artem', $form['name2']->getData());
     }
 
     /**

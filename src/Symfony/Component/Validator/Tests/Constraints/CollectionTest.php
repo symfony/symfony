@@ -14,6 +14,7 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Component\Validator\Constraints\Required;
 use Symfony\Component\Validator\Constraints\Optional;
+use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\Valid;
 
 /**
@@ -69,5 +70,43 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
         new Collection(array(
             'foo' => new Required(new Valid()),
         ));
+    }
+
+    public function testAcceptOptionalConstraintAsOneElementArray()
+    {
+        $collection1 = new Collection(array(
+            "fields" => array(
+                "alternate_email" => array(
+                    new Optional(new Email()),
+                ),
+            ),
+        ));
+
+        $collection2 = new Collection(array(
+            "fields" => array(
+                "alternate_email" => new Optional(new Email()),
+            ),
+        ));
+
+        $this->assertEquals($collection1, $collection2);
+    }
+
+    public function testAcceptRequiredConstraintAsOneElementArray()
+    {
+        $collection1 = new Collection(array(
+            "fields" => array(
+                "alternate_email" => array(
+                    new Required(new Email()),
+                ),
+            ),
+        ));
+
+        $collection2 = new Collection(array(
+            "fields" => array(
+                "alternate_email" => new Required(new Email()),
+            ),
+        ));
+
+        $this->assertEquals($collection1, $collection2);
     }
 }

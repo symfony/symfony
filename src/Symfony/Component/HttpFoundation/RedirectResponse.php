@@ -21,6 +21,7 @@ namespace Symfony\Component\HttpFoundation;
 class RedirectResponse extends Response
 {
     protected $targetUrl;
+    protected $refreshTimeout;
 
     /**
      * Creates a redirect response so that it conforms to the rules defined for a redirect status code.
@@ -28,6 +29,7 @@ class RedirectResponse extends Response
      * @param string  $url     The URL to redirect to
      * @param integer $status  The status code (302 by default)
      * @param array   $headers The headers (Location is always set to the given url)
+     * @param integer $timeout Refresh timeout (1 by default)
      *
      * @throws \InvalidArgumentException
      *
@@ -35,7 +37,7 @@ class RedirectResponse extends Response
      *
      * @api
      */
-    public function __construct($url, $status = 302, $headers = array())
+    public function __construct($url, $status = 302, $headers = array(), $timeout = 1)
     {
         if (empty($url)) {
             throw new \InvalidArgumentException('Cannot redirect to an empty URL.');
@@ -43,6 +45,7 @@ class RedirectResponse extends Response
 
         parent::__construct('', $status, $headers);
 
+        $this->setRefreshTimeout($timeout);
         $this->setTargetUrl($url);
 
         if (!$this->isRedirect()) {
@@ -53,9 +56,9 @@ class RedirectResponse extends Response
     /**
      * {@inheritDoc}
      */
-    public static function create($url = '', $status = 302, $headers = array())
+    public static function create($url = '', $status = 302, $headers = array(), $timeout = 1)
     {
-        return new static($url, $status, $headers);
+        return new static($url, $status, $headers, $timeout);
     }
 
     /**
@@ -71,7 +74,7 @@ class RedirectResponse extends Response
     /**
      * Sets the redirect target of this response.
      *
-     * @param string  $url     The URL to redirect to
+     * @param string $url The URL to redirect to
      *
      * @return RedirectResponse The current response.
      *
@@ -90,16 +93,40 @@ class RedirectResponse extends Response
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-        <meta http-equiv="refresh" content="1;url=%1$s" />
+        <meta http-equiv="refresh" content="%2$d;url=%1$s" />
 
         <title>Redirecting to %1$s</title>
     </head>
     <body>
         Redirecting to <a href="%1$s">%1$s</a>.
     </body>
-</html>', htmlspecialchars($url, ENT_QUOTES, 'UTF-8')));
+</html>', htmlspecialchars($url, ENT_QUOTES, 'UTF-8'), $this->getRefreshTimeout()));
 
         $this->headers->set('Location', $url);
+
+        return $this;
+    }
+
+    /**
+     * Returns the refresh timeout.
+     *
+     * @return integer refresh timeout
+     */
+    public function getRefreshTimeout()
+    {
+        return $this->refreshTimeout;
+    }
+
+    /**
+     * Sets the redirect refresh timeout of this response.
+     *
+     * @param integer $timeout Refresh timeout (1 by default)
+     *
+     * @return RedirectResponse The current response.
+     */
+    public function setRefreshTimeout($timeout)
+    {
+        $this->refreshTimeout = max(1, (int) $timeout);
 
         return $this;
     }

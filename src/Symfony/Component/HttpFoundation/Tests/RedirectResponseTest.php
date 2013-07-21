@@ -80,4 +80,43 @@ class RedirectResponseTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\RedirectResponse', $response);
         $this->assertEquals(301, $response->getStatusCode());
     }
+
+    public function testRefreshTimeoutCanBeSetViaConstructor()
+    {
+        $response = new RedirectResponse('/foo', 301, array(), 3);
+
+        $this->assertEquals(3, $response->getRefreshTimeout());
+        $this->assertContains('<meta http-equiv="refresh" content="3;url=/foo" />', $response->getContent());
+    }
+
+    public function testRefreshTimeoutCanBeSetViaSetter()
+    {
+        $response = new RedirectResponse('foo');
+        $response->setRefreshTimeout(5);
+
+        $this->assertEquals(5, $response->getRefreshTimeout());
+    }
+
+    /**
+     * @dataProvider provideRefreshTimeoutValues
+     */
+    public function testRefreshTimeoutShouldBeAPositiveInteger($given, $expected)
+    {
+        $response = new RedirectResponse('foo');
+        $response->setRefreshTimeout($given);
+
+        $this->assertEquals($expected, $response->getRefreshTimeout());
+    }
+
+    public function provideRefreshTimeoutValues()
+    {
+        return array(
+            array(-1, 1),
+            array(0, 1),
+            array(5, 5),
+            array(null, 1),
+            array('baz', 1),
+            array('77', 77)
+        );
+    }
 }

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by stof at 2013-07-09T08:18:10Z
+
+@WouterJ sorry, no infinite loop. I missed the fact that ``$default`` was not forwarded to ``ask()``

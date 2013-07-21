@@ -471,7 +471,7 @@ class Container implements IntrospectableContainerInterface
      */
     public static function camelize($id)
     {
-        return preg_replace_callback('/(^|_|\.)+(.)/', function ($match) { return ('.' === $match[1] ? '_' : '').strtoupper($match[2]); }, $id);
+        return strtr(ucwords(strtr($id, array('_' => ' ', '.' => '_ '))), array(' ' => ''));
     }
 
     /**

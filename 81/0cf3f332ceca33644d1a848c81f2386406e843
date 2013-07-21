@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by stof at 2013-07-05T00:30:19Z
+
+Can you add a unit test to avoid regressions ?
+
+---------------------------------------------------------------------------
+
+by venu at 2013-07-05T04:40:29Z
+
+I have checked the code, this is what I am guessing.
+
+Finding constraints for a group is MetadataInterface implemented class job. But this is not been used in validatorValue method.
+
+So I guess may be its partially implemented or providing groups option for validatorValue is not there in specification or whenever there is a group option for validateValue method its intended to be added as subPath.
+
+If its in last 2 cases, we can close this. otherwise may be we have to fix that part. While I was fixing another bug, I come across this. So I thought this is a bug and posted here.

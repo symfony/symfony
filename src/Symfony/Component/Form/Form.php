@@ -500,6 +500,14 @@ class Form implements \IteratorAggregate, FormInterface
             return $this;
         }
 
+        // In order to process patch requests we need to "submit" null values
+        // Later this value will be mapped via DataMapper and InheritDataAwareIterator
+        if ($submittedData === null && !$clearMissing) {
+            $this->submitted = true;
+
+            return $this;
+        }
+
         // The data must be initialized if it was not initialized yet.
         // This is necessary to guarantee that the *_SET_DATA listeners
         // are always invoked before submit() takes place.
@@ -537,10 +545,12 @@ class Form implements \IteratorAggregate, FormInterface
             }
 
             foreach ($this->children as $name => $child) {
-                if (isset($submittedData[$name]) || $clearMissing) {
-                    $child->submit(isset($submittedData[$name]) ? $submittedData[$name] : null, $clearMissing);
+                $fieldValue = null;
+                if (isset($submittedData[$name])) {
+                    $fieldValue = $submittedData[$name];
                     unset($submittedData[$name]);
                 }
+                $child->submit($fieldValue, $clearMissing);
             }
 
             $this->extraData = $submittedData;

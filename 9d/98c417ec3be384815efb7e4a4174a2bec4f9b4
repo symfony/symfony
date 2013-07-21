@@ -1,0 +1,38 @@
+---------------------------------------------------------------------------
+
+by Zeichen32 at 2013-06-27T10:33:26Z
+
+The same bug appears when using the PUT method...
+
+---------------------------------------------------------------------------
+
+by stof at 2013-06-27T19:17:17Z
+
+@Zeichen32 no, it cannot be the same bug. A PUT request is not doing a partial binding of the form, and this bug is about partial binding.
+I think your issue is #8261, and the solution is given: https://github.com/symfony/symfony/issues/8261?source=cc#issuecomment-19882153
+
+---------------------------------------------------------------------------
+
+by ramon at 2013-06-28T00:52:30Z
+
+:+1:
+
+i lost lot of hours because this bug. :{
+
+---------------------------------------------------------------------------
+
+by Zeichen32 at 2013-06-28T07:57:31Z
+
+@stof Thanks, the solution in #8261 works for me.
+
+---------------------------------------------------------------------------
+
+by Burgov at 2013-07-03T14:31:38Z
+
+ping @bschussek @fabpot
+
+---------------------------------------------------------------------------
+
+by franckschneider at 2013-07-10T09:02:31Z
+
+ping @bschussek @fabpot

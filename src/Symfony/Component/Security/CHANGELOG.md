@@ -4,6 +4,7 @@ CHANGELOG
 2.4.0
 -----
 
+ * The remember-me cookie hashes now use HMAC, which means that current cookies will be invalidated
  * added simpler customization options
 
 2.3.0

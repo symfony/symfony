@@ -186,7 +186,7 @@ class Validator implements ValidatorInterface
                 );
             }
 
-            $context->validateValue($value, $constraint, $groups);
+            $context->validateValue($value, $constraint, '', $groups);
         }
 
         return $context->getViolations();

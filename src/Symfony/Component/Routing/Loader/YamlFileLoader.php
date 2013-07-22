@@ -27,9 +27,6 @@ use Symfony\Component\Config\Loader\FileLoader;
  */
 class YamlFileLoader extends FileLoader
 {
-    private static $availableKeys = array(
-        'resource', 'type', 'prefix', 'pattern', 'path', 'host', 'schemes', 'methods', 'defaults', 'requirements', 'options',
-    );
     private $yamlParser;
 
     /**
@@ -184,10 +181,11 @@ class YamlFileLoader extends FileLoader
         if (!is_array($config)) {
             throw new \InvalidArgumentException(sprintf('The definition of "%s" in "%s" must be a YAML array.', $name, $path));
         }
-        if ($extraKeys = array_diff(array_keys($config), self::$availableKeys)) {
+        $availableKeys = $this->getAvailableKeys();
+        if ($extraKeys = array_diff(array_keys($config), $availableKeys)) {
             throw new \InvalidArgumentException(sprintf(
                 'The routing file "%s" contains unsupported keys for "%s": "%s". Expected one of: "%s".',
-                $path, $name, implode('", "', $extraKeys), implode('", "', self::$availableKeys)
+                $path, $name, implode('", "', $extraKeys), implode('", "', $availableKeys)
             ));
         }
         if (isset($config['resource']) && isset($config['path'])) {
@@ -208,5 +206,17 @@ class YamlFileLoader extends FileLoader
                 $name, $path
             ));
         }
+    }
+
+    /**
+     * Returns valid keys for yaml
+     *
+     * @return array
+     */
+    protected function getAvailableKeys()
+    {
+        return array(
+            'resource', 'type', 'prefix', 'pattern', 'path', 'host', 'schemes', 'methods', 'defaults', 'requirements', 'options',
+        );
     }
 }

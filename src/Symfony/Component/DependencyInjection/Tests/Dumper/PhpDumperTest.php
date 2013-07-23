@@ -189,11 +189,11 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         require_once self::$fixturesPath.'/php/services15.php';
 
         $container = new \AnotherProjectServiceContainer();
-        $dependentService = $container->get('dependsOnSynchronized');
+        $dependentService = $container->get('depends_on_synchronized');
         $this->assertNull($dependentService->bar);
 
         $container->enterScope('request');
-        $synchronizedService = $container->get('synchronizedService');
+        $synchronizedService = $container->get('synchronized_service');
 
         $this->assertEquals($dependentService->bar, $synchronizedService);
 

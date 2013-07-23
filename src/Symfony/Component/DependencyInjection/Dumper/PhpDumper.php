@@ -378,7 +378,7 @@ class PhpDumper extends Dumper
                 continue;
             }
 
-            if ($sDefinition->getMethodCalls() || $sDefinition->getProperties() || $sDefinition->getConfigurator()) {
+            if ($sDefinition->getMethodCalls() || $sDefinition->getProperties() || $sDefinition->getConfigurator() || $sDefinition->isSynchronized()) {
                 return false;
             }
         }
@@ -427,7 +427,7 @@ class PhpDumper extends Dumper
         }
 
         $name = 'synchronize'.$this->camelize($id).'Service';
-        $code = sprintf("\n        \$this->%s();\n", $name);
+        $code = sprintf("        \$this->%s();\n", $name);
 
         return $code;
     }

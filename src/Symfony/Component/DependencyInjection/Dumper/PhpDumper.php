@@ -420,6 +420,18 @@ class PhpDumper extends Dumper
         return $code;
     }
 
+    private function addServiceSynchronizeCall($id, $definition)
+    {
+        if (!$definition->isSynchronized()) {
+            return '';
+        }
+
+        $name = 'synchronize'.$this->camelize($id).'Service';
+        $code = sprintf("\n        \$this->%s();\n", $name);
+
+        return $code;
+    }
+
     /**
      * Generates the inline definition setup.
      *
@@ -585,6 +597,7 @@ EOF;
                 $this->addServiceMethodCalls($id, $definition).
                 $this->addServiceProperties($id, $definition).
                 $this->addServiceConfigurator($id, $definition).
+                $this->addServiceSynchronizeCall($id, $definition).
                 $this->addServiceReturn($id, $definition)
             ;
         }

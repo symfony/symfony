@@ -10,13 +10,13 @@ use Symfony\Component\DependencyInjection\Parameter;
 $container = new ContainerBuilder();
 $container->addScope(new \Symfony\Component\DependencyInjection\Scope('request'));
 $container
-    ->register('synchronizedService', 'BarClass')
+    ->register('synchronized_service', 'BarClass')
     ->setSynchronized(true)
     ->setScope('request')
 ;
 $container
-    ->register('dependsOnSynchronized', 'FooClass')
-    ->addMethodCall('setBar', array(new Reference('synchronizedService', ContainerInterface::NULL_ON_INVALID_REFERENCE, false)))
+    ->register('depends_on_synchronized', 'FooClass')
+    ->addMethodCall('setBar', array(new Reference('synchronized_service', ContainerInterface::NULL_ON_INVALID_REFERENCE, false)))
 ;
 
 return $container;

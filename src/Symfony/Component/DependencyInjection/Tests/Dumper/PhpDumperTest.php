@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Dumper;
 
-use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -183,7 +182,8 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($bar, $container->get('foo')->bar, '->set() overrides an already defined service');
     }
 
-    public function testSynchronizedServiceUpdatesDependencies() {
+    public function testSynchronizedServiceUpdatesDependencies()
+    {
         require_once self::$fixturesPath.'/includes/foo.php';
         require_once self::$fixturesPath.'/includes/classes.php';
         require_once self::$fixturesPath.'/php/services15.php';

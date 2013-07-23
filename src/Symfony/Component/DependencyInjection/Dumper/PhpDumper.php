@@ -420,7 +420,7 @@ class PhpDumper extends Dumper
         return $code;
     }
 
-    private function addServiceSynchronizeCall($id, $definition)
+    private function addServiceSynchronizeCall($id, Definition $definition)
     {
         if (!$definition->isSynchronized()) {
             return '';

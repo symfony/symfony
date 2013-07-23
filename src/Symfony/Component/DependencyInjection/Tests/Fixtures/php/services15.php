@@ -32,8 +32,8 @@ class AnotherProjectServiceContainer extends Container
         $this->scopes = array('request' => 'container');
         $this->scopeChildren = array('request' => array());
         $this->methodMap = array(
-            'dependsonsynchronized' => 'getDependsonsynchronizedService',
-            'synchronizedservice' => 'getSynchronizedserviceService',
+            'depends_on_synchronized' => 'getDependsonsynchronizedService',
+            'synchronized_service' => 'getSynchronizedserviceService',
         );
 
         $this->aliases = array();
@@ -49,9 +49,9 @@ class AnotherProjectServiceContainer extends Container
      */
     protected function getDependsonsynchronizedService()
     {
-        $this->services['dependsonsynchronized'] = $instance = new \FooClass();
+        $this->services['depends_on_synchronized'] = $instance = new \FooClass();
 
-        $instance->setBar($this->get('synchronizedservice', ContainerInterface::NULL_ON_INVALID_REFERENCE));
+        $instance->setBar($this->get('synchronized_service', ContainerInterface::NULL_ON_INVALID_REFERENCE));
 
         return $instance;
     }
@@ -69,10 +69,10 @@ class AnotherProjectServiceContainer extends Container
     protected function getSynchronizedserviceService()
     {
         if (!isset($this->scopedServices['request'])) {
-            throw new InactiveScopeException('synchronizedservice', 'request');
+            throw new InactiveScopeException('synchronized_service', 'request');
         }
 
-        $this->services['synchronizedservice'] = $this->scopedServices['request']['synchronizedservice'] = $instance = new \BarClass();
+        $this->services['synchronized_service'] = $this->scopedServices['request']['synchronized_service'] = $instance = new \BarClass();
 
         $this->synchronizeSynchronizedserviceService();
 
@@ -84,8 +84,8 @@ class AnotherProjectServiceContainer extends Container
      */
     protected function synchronizeSynchronizedserviceService()
     {
-        if ($this->initialized('dependsonsynchronized')) {
-            $this->get('dependsonsynchronized')->setBar($this->get('synchronizedservice', ContainerInterface::NULL_ON_INVALID_REFERENCE));
+        if ($this->initialized('depends_on_synchronized')) {
+            $this->get('depends_on_synchronized')->setBar($this->get('synchronized_service', ContainerInterface::NULL_ON_INVALID_REFERENCE));
         }
     }
 }

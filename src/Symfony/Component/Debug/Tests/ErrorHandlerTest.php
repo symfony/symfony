@@ -101,54 +101,36 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
                     'type' => 1,
                     'line' => 12,
                     'file' => 'foo.php',
-                    'message' => "Class 'WhizBangFactory' not found",
+                    'message' => 'Class "WhizBangFactory" not found',
                 ),
-                "Attempted to load class 'WhizBangFactory' from the global namespace in foo.php line 12. Did you forget a use statement for this class?",
+                'Attempted to load class "WhizBangFactory" from the global namespace in foo.php line 12. Did you forget a use statement for this class?',
             ),
             array(
                 array(
                     'type' => 1,
                     'line' => 12,
                     'file' => 'foo.php',
-                    'message' => "Class 'Foo\\Bar\\WhizBangFactory' not found",
+                    'message' => 'Class "Foo\\Bar\\WhizBangFactory" not found',
                 ),
-                "Attempted to load class 'WhizBangFactory' from namespace 'Foo\\Bar' in foo.php line 12. Do you need to 'use' it from another namespace?",
+                'Attempted to load class "WhizBangFactory" from namespace "Foo\\Bar" in foo.php line 12. Do you need to "use" it from another namespace?',
             ),
             array(
                 array(
                     'type' => 1,
                     'line' => 12,
                     'file' => 'foo.php',
-                    'message' => "Class 'Request' not found",
+                    'message' => 'Class "Request" not found',
                 ),
-                "Attempted to load class 'Request' from the global namespace in foo.php line 12. Did you forget a use statement for this class? Perhaps you need to add 'use Symfony\\Component\\HttpFoundation\\Request' at the top of this file?",
+                'Attempted to load class "Request" from the global namespace in foo.php line 12. Did you forget a use statement for this class? Perhaps you need to add "use Symfony\\Component\\HttpFoundation\\Request" at the top of this file?',
             ),
             array(
                 array(
                     'type' => 1,
                     'line' => 12,
                     'file' => 'foo.php',
-                    'message' => "Class 'Foo\\Bar\\Request' not found",
+                    'message' => 'Class "Foo\\Bar\\Request" not found',
                 ),
-                "Attempted to load class 'Request' from namespace 'Foo\\Bar' in foo.php line 12. Do you need to 'use' it from another namespace? Perhaps you need to add 'use Symfony\\Component\\HttpFoundation\\Request' at the top of this file?",
-            ),
-            array(
-                array(
-                    'type' => 1,
-                    'line' => 12,
-                    'file' => 'foo.php',
-                    'message' => "Class 'Response' not found",
-                ),
-                "Attempted to load class 'Response' from the global namespace in foo.php line 12. Did you forget a use statement for this class? Perhaps you need to add 'use Symfony\\Component\\HttpFoundation\\Response' at the top of this file?",
-            ),
-            array(
-                array(
-                    'type' => 1,
-                    'line' => 12,
-                    'file' => 'foo.php',
-                    'message' => "Class 'Foo\\Bar\\Response' not found",
-                ),
-                "Attempted to load class 'Response' from namespace 'Foo\\Bar' in foo.php line 12. Do you need to 'use' it from another namespace? Perhaps you need to add 'use Symfony\\Component\\HttpFoundation\\Response' at the top of this file?",
+                'Attempted to load class "Request" from namespace "Foo\\Bar" in foo.php line 12. Do you need to "use" it from another namespace? Perhaps you need to add "use Symfony\\Component\\HttpFoundation\\Request" at the top of this file?',
             ),
         );
     }
@@ -159,11 +141,13 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
     public function testClassNotFound($error, $translatedMessage)
     {
         $handler = ErrorHandler::register(3);
+        $m = new \ReflectionMethod($handler, 'handleFatalError');
+        $m->setAccessible(true);
 
         $exceptionHandler = new MockExceptionHandler;
         set_exception_handler(array($exceptionHandler, 'handle'));
 
-        $handler->handleFatalError($error);
+        $m->invoke($handler, $error);
 
         $this->assertNotNull($exceptionHandler->e);
         $this->assertSame($translatedMessage, $exceptionHandler->e->getMessage());
@@ -183,36 +167,36 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
                     'type' => 1,
                     'line' => 12,
                     'file' => 'foo.php',
-                    'message' => "Call to undefined function test_namespaced_function()",
+                    'message' => 'Call to undefined function test_namespaced_function()',
                 ),
-                "Attempted to call function 'test_namespaced_function' from the global namespace in foo.php line 12. Did you mean to call: '\\symfony\\component\\debug\\tests\\test_namespaced_function'?",
+                'Attempted to call function "test_namespaced_function" from the global namespace in foo.php line 12. Did you mean to call: "\\symfony\\component\\debug\\tests\\test_namespaced_function"?',
             ),
             array(
                 array(
                     'type' => 1,
                     'line' => 12,
                     'file' => 'foo.php',
-                    'message' => "Call to undefined function Foo\\Bar\\Baz\\test_namespaced_function()",
+                    'message' => 'Call to undefined function Foo\\Bar\\Baz\\test_namespaced_function()',
                 ),
-                "Attempted to call function 'test_namespaced_function' from namespace 'Foo\\Bar\\Baz' in foo.php line 12. Did you mean to call: '\\symfony\\component\\debug\\tests\\test_namespaced_function'?",
+                'Attempted to call function "test_namespaced_function" from namespace "Foo\\Bar\\Baz" in foo.php line 12. Did you mean to call: "\\symfony\\component\\debug\\tests\\test_namespaced_function"?',
             ),
             array(
                 array(
                     'type' => 1,
                     'line' => 12,
                     'file' => 'foo.php',
-                    'message' => "Call to undefined function foo()",
+                    'message' => 'Call to undefined function foo()',
                 ),
-                "Attempted to call function 'foo' from the global namespace in foo.php line 12.",
+                'Attempted to call function "foo" from the global namespace in foo.php line 12.',
             ),
             array(
                 array(
                     'type' => 1,
                     'line' => 12,
                     'file' => 'foo.php',
-                    'message' => "Call to undefined function Foo\\Bar\\Baz\\foo()",
+                    'message' => 'Call to undefined function Foo\\Bar\\Baz\\foo()',
                 ),
-                "Attempted to call function 'foo' from namespace 'Foo\Bar\Baz' in foo.php line 12.",
+                'Attempted to call function "foo" from namespace "Foo\Bar\Baz" in foo.php line 12.',
             ),
         );
     }
@@ -223,11 +207,13 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
     public function testUndefinedFunction($error, $translatedMessage)
     {
         $handler = ErrorHandler::register(3);
+        $m = new \ReflectionMethod($handler, 'handleFatalError');
+        $m->setAccessible(true);
 
         $exceptionHandler = new MockExceptionHandler;
         set_exception_handler(array($exceptionHandler, 'handle'));
 
-        $handler->handleFatalError($error);
+        $m->invoke($handler, $error);
 
         $this->assertNotNull($exceptionHandler->e);
         $this->assertSame($translatedMessage, $exceptionHandler->e->getMessage());

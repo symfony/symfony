@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.4.0
+-----
+
+  * added `minRatio`, `maxRatio`, `allowSquare`, `allowLandscape`, and `allowPortrait` to Image validator
+
 2.3.0
 -----
 
@@ -9,7 +14,6 @@ CHANGELOG
    `Symfony\Component\Validator\Constraints\` namespace and deprecated the original
    classes.
  * added comparison validators (EqualTo, NotEqualTo, LessThan, LessThanOrEqualTo, GreaterThan, GreaterThanOrEqualTo, IdenticalTo, NotIdenticalTo)
- * added minRatio, maxRatio, allowSquare, allowLandscape, and allowPortrait to Image validator
 
 2.2.0
 -----

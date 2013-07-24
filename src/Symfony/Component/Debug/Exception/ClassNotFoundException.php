@@ -16,7 +16,7 @@ namespace Symfony\Component\Debug\Exception;
  *
  * @author Konstanton Myakshin <koc-dp@yandex.ru>
  */
-class ClassNotFoundException extends \ErrorException
+class ClassNotFoundException extends FatalErrorException
 {
     public function __construct($message, \ErrorException $previous)
     {

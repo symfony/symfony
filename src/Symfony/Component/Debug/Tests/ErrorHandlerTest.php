@@ -121,7 +121,7 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
                     'file' => 'foo.php',
                     'message' => 'Class "Request" not found',
                 ),
-                'Attempted to load class "Request" from the global namespace in foo.php line 12. Did you forget a use statement for this class? Perhaps you need to add "use Symfony\\Component\\HttpFoundation\\Request" at the top of this file?',
+                'Attempted to load class "Request" from the global namespace in foo.php line 12. Did you forget a use statement for this class? Perhaps you need to add a use statement for one of the following class: Symfony\Component\HttpFoundation\Request.',
             ),
             array(
                 array(
@@ -130,7 +130,7 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
                     'file' => 'foo.php',
                     'message' => 'Class "Foo\\Bar\\Request" not found',
                 ),
-                'Attempted to load class "Request" from namespace "Foo\\Bar" in foo.php line 12. Do you need to "use" it from another namespace? Perhaps you need to add "use Symfony\\Component\\HttpFoundation\\Request" at the top of this file?',
+                'Attempted to load class "Request" from namespace "Foo\Bar" in foo.php line 12. Do you need to "use" it from another namespace? Perhaps you need to add a use statement for one of the following class: Symfony\Component\HttpFoundation\Request.',
             ),
         );
     }

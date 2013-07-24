@@ -43,11 +43,6 @@ class ErrorHandler
         E_PARSE             => 'Parse',
     );
 
-    private $classNameToUseStatementSuggestions = array(
-        'Request' => 'Symfony\Component\HttpFoundation\Request',
-        'Response' => 'Symfony\Component\HttpFoundation\Response',
-    );
-
     private $level;
 
     private $reservedMemory;
@@ -293,11 +288,23 @@ class ErrorHandler
                 );
             }
 
-            if (isset($this->classNameToUseStatementSuggestions[$className])) {
-                $message .= sprintf(' Perhaps you need to add "use %s" at the top of this file?', $this->classNameToUseStatementSuggestions[$className]);
+            if ($classes = $this->getUseStatementSuggestions($className)) {
+                $message .= sprintf(' Perhaps you need to add a use statement for one of the following class: %s.', implode(', ', $classes));
             }
 
             return new ClassNotFoundException($message, $exception);
+        }
+    }
+
+    protected function getUseStatementSuggestions($class)
+    {
+        $classNameToUseStatementSuggestions = array(
+            'Request'  => array('Symfony\Component\HttpFoundation\Request'),
+            'Response' => array('Symfony\Component\HttpFoundation\Response'),
+        );
+
+        if (isset($classNameToUseStatementSuggestions[$class])) {
+            return $classNameToUseStatementSuggestions[$class];
         }
     }
 }

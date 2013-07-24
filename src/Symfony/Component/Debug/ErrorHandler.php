@@ -154,7 +154,13 @@ class ErrorHandler
             return;
         }
 
-        $this->handleFatalError($error);
+        // get current exception handler
+        $exceptionHandler = set_exception_handler(function() {});
+        restore_exception_handler();
+
+        if (is_array($exceptionHandler) && $exceptionHandler[0] instanceof ExceptionHandler) {
+            $this->handleFatalError($exceptionHandler[0], $error);
+        }
     }
 
     public function getFatalErrorHandlers()
@@ -165,22 +171,18 @@ class ErrorHandler
         );
     }
 
-    private function handleFatalError($error)
+    private function handleFatalError(ExceptionHandler $exceptionHandler, array $error)
     {
-        // get current exception handler
-        $exceptionHandler = set_exception_handler(function() {});
-        restore_exception_handler();
+        $level = isset($this->levels[$error['type']]) ? $this->levels[$error['type']] : $error['type'];
+        $message = sprintf('%s: %s in %s line %d', $level, $error['message'], $error['file'], $error['line']);
+        $exception = new FatalErrorException($message, 0, $error['type'], $error['file'], $error['line']);
 
-        if (is_array($exceptionHandler) && $exceptionHandler[0] instanceof ExceptionHandler) {
-            $level = isset($this->levels[$error['type']]) ? $this->levels[$error['type']] : $error['type'];
-            $message = sprintf('%s: %s in %s line %d', $level, $error['message'], $error['file'], $error['line']);
-            $exception = new FatalErrorException($message, 0, $error['type'], $error['file'], $error['line']);
-
-            foreach ($this->getFatalErrorHandlers() as $handler) {
-                if ($ex = $handler->handleError($error, $exception)) {
-                    return $exceptionHandler[0]->handle($ex);
-                }
+        foreach ($this->getFatalErrorHandlers() as $handler) {
+            if ($ex = $handler->handleError($error, $exception)) {
+                return $exceptionHandler->handle($ex);
             }
         }
+
+        $exceptionHandler->handle($exception);
     }
 }

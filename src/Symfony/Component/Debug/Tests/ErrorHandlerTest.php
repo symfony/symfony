@@ -12,8 +12,6 @@
 namespace Symfony\Component\Debug\Tests;
 
 use Symfony\Component\Debug\ErrorHandler;
-use Symfony\Component\Debug\Exception\ClassNotFoundException;
-use Symfony\Component\Debug\ExceptionHandler;
 
 /**
  * ErrorHandlerTest
@@ -22,7 +20,6 @@ use Symfony\Component\Debug\ExceptionHandler;
  */
 class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
 {
-
     public function testConstruct()
     {
         $handler = ErrorHandler::register(3);
@@ -93,84 +90,29 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
         restore_error_handler();
     }
 
-    public function provideClassNotFoundData()
-    {
-        return array(
-            array(
-                array(
-                    'type' => 1,
-                    'line' => 12,
-                    'file' => 'foo.php',
-                    'message' => 'Class "WhizBangFactory" not found',
-                ),
-                'Attempted to load class "WhizBangFactory" from the global namespace in foo.php line 12. Did you forget a use statement for this class?',
-            ),
-            array(
-                array(
-                    'type' => 1,
-                    'line' => 12,
-                    'file' => 'foo.php',
-                    'message' => 'Class "Foo\\Bar\\WhizBangFactory" not found',
-                ),
-                'Attempted to load class "WhizBangFactory" from namespace "Foo\\Bar" in foo.php line 12. Do you need to "use" it from another namespace?',
-            ),
-            array(
-                array(
-                    'type' => 1,
-                    'line' => 12,
-                    'file' => 'foo.php',
-                    'message' => 'Class "UndefinedFunctionException" not found',
-                ),
-                'Attempted to load class "UndefinedFunctionException" from the global namespace in foo.php line 12. Did you forget a use statement for this class? Perhaps you need to add a use statement for one of the following class: Symfony\Component\Debug\Exception\UndefinedFunctionException.',
-            ),
-            array(
-                array(
-                    'type' => 1,
-                    'line' => 12,
-                    'file' => 'foo.php',
-                    'message' => 'Class "PEARClass" not found',
-                ),
-                'Attempted to load class "PEARClass" from the global namespace in foo.php line 12. Did you forget a use statement for this class? Perhaps you need to add a use statement for one of the following class: Symfony_Component_Debug_Tests_Fixtures_PEARClass.',
-            ),
-            array(
-                array(
-                    'type' => 1,
-                    'line' => 12,
-                    'file' => 'foo.php',
-                    'message' => 'Class "Foo\\Bar\\UndefinedFunctionException" not found',
-                ),
-                'Attempted to load class "UndefinedFunctionException" from namespace "Foo\Bar" in foo.php line 12. Do you need to "use" it from another namespace? Perhaps you need to add a use statement for one of the following class: Symfony\Component\Debug\Exception\UndefinedFunctionException.',
-            ),
-        );
-    }
-
     /**
-     * @dataProvider provideClassNotFoundData
+     * @dataProvider provideFatalErrorHandlersData
      */
-    public function testClassNotFound($error, $translatedMessage)
+    public function testFatalErrorHandlers($error, $class, $translatedMessage)
     {
-        $handler = ErrorHandler::register(3);
+        $handler = new ErrorHandler();
+        $exceptionHandler = new MockExceptionHandler();
+
         $m = new \ReflectionMethod($handler, 'handleFatalError');
         $m->setAccessible(true);
+        $m->invoke($handler, $exceptionHandler, $error);
 
-        $exceptionHandler = new MockExceptionHandler;
-        set_exception_handler(array($exceptionHandler, 'handle'));
-
-        $m->invoke($handler, $error);
-
-        $this->assertNotNull($exceptionHandler->e);
+        $this->assertInstanceof($class, $exceptionHandler->e);
         $this->assertSame($translatedMessage, $exceptionHandler->e->getMessage());
         $this->assertSame($error['type'], $exceptionHandler->e->getSeverity());
         $this->assertSame($error['file'], $exceptionHandler->e->getFile());
         $this->assertSame($error['line'], $exceptionHandler->e->getLine());
-
-        restore_exception_handler();
-        restore_error_handler();
     }
 
-    public function provideUndefinedFunctionData()
+    public function provideFatalErrorHandlersData()
     {
         return array(
+            // undefined function
             array(
                 array(
                     'type' => 1,
@@ -178,63 +120,20 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
                     'file' => 'foo.php',
                     'message' => 'Call to undefined function test_namespaced_function()',
                 ),
-                'Attempted to call function "test_namespaced_function" from the global namespace in foo.php line 12. Did you mean to call: "\\symfony\\component\\debug\\tests\\test_namespaced_function"?',
+                'Symfony\Component\Debug\Exception\UndefinedFunctionException',
+                'Attempted to call function "test_namespaced_function" from the global namespace in foo.php line 12. Did you mean to call: "\\symfony\\component\\debug\\tests\\fatalerrorhandler\\test_namespaced_function"?',
             ),
+            // class not found
             array(
                 array(
                     'type' => 1,
                     'line' => 12,
                     'file' => 'foo.php',
-                    'message' => 'Call to undefined function Foo\\Bar\\Baz\\test_namespaced_function()',
+                    'message' => 'Class "WhizBangFactory" not found',
                 ),
-                'Attempted to call function "test_namespaced_function" from namespace "Foo\\Bar\\Baz" in foo.php line 12. Did you mean to call: "\\symfony\\component\\debug\\tests\\test_namespaced_function"?',
-            ),
-            array(
-                array(
-                    'type' => 1,
-                    'line' => 12,
-                    'file' => 'foo.php',
-                    'message' => 'Call to undefined function foo()',
-                ),
-                'Attempted to call function "foo" from the global namespace in foo.php line 12.',
-            ),
-            array(
-                array(
-                    'type' => 1,
-                    'line' => 12,
-                    'file' => 'foo.php',
-                    'message' => 'Call to undefined function Foo\\Bar\\Baz\\foo()',
-                ),
-                'Attempted to call function "foo" from namespace "Foo\Bar\Baz" in foo.php line 12.',
+                'Symfony\Component\Debug\Exception\ClassNotFoundException',
+                'Attempted to load class "WhizBangFactory" from the global namespace in foo.php line 12. Did you forget a use statement for this class?',
             ),
         );
     }
-
-    /**
-     * @dataProvider provideUndefinedFunctionData
-     */
-    public function testUndefinedFunction($error, $translatedMessage)
-    {
-        $handler = ErrorHandler::register(3);
-        $m = new \ReflectionMethod($handler, 'handleFatalError');
-        $m->setAccessible(true);
-
-        $exceptionHandler = new MockExceptionHandler;
-        set_exception_handler(array($exceptionHandler, 'handle'));
-
-        $m->invoke($handler, $error);
-
-        $this->assertNotNull($exceptionHandler->e);
-        $this->assertSame($translatedMessage, $exceptionHandler->e->getMessage());
-        $this->assertSame($error['type'], $exceptionHandler->e->getSeverity());
-        $this->assertSame($error['file'], $exceptionHandler->e->getFile());
-        $this->assertSame($error['line'], $exceptionHandler->e->getLine());
-
-        restore_exception_handler();
-        restore_error_handler();
-    }
-}
-
-function test_namespaced_function()
-{
 }

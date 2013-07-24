@@ -27,7 +27,7 @@ class LanguageBundle extends AbstractBundle implements LanguageBundleInterface
             $locale = \Locale::getDefault();
         }
 
-        if (null === ($languages = $this->readEntry($locale, array('Languages')))) {
+        if (null === ($languages = $this->readEntry($locale, array('Languages'), true))) {
             return null;
         }
 
@@ -49,7 +49,7 @@ class LanguageBundle extends AbstractBundle implements LanguageBundleInterface
             $locale = \Locale::getDefault();
         }
 
-        if (null === ($languages = $this->readEntry($locale, array('Languages')))) {
+        if (null === ($languages = $this->readEntry($locale, array('Languages'), true))) {
             return array();
         }
 
@@ -102,7 +102,7 @@ class LanguageBundle extends AbstractBundle implements LanguageBundleInterface
             $locale = \Locale::getDefault();
         }
 
-        if (null === ($scripts = $this->readEntry($locale, array('Scripts')))) {
+        if (null === ($scripts = $this->readEntry($locale, array('Scripts'), true))) {
             return array();
         }
 

@@ -40,7 +40,7 @@ class RegionBundleTest extends \PHPUnit_Framework_TestCase
     {
         $this->reader->expects($this->once())
             ->method('readEntry')
-            ->with(self::RES_DIR, 'en', array('Countries', 'AT'))
+            ->with(self::RES_DIR, 'en', array('Countries', 'AT'), true)
             ->will($this->returnValue('Austria'));
 
         $this->assertSame('Austria', $this->bundle->getCountryName('AT', 'en'));
@@ -55,7 +55,7 @@ class RegionBundleTest extends \PHPUnit_Framework_TestCase
 
         $this->reader->expects($this->once())
             ->method('readEntry')
-            ->with(self::RES_DIR, 'en', array('Countries'))
+            ->with(self::RES_DIR, 'en', array('Countries'), true)
             ->will($this->returnValue($sortedCountries));
 
         $this->assertSame($sortedCountries, $this->bundle->getCountryNames('en'));

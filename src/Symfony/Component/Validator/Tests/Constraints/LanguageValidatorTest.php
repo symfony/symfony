@@ -104,4 +104,16 @@ class LanguageValidatorTest extends \PHPUnit_Framework_TestCase
             array('foobar'),
         );
     }
+
+    public function testValidateUsingCountrySpecificLocale()
+    {
+        \Locale::setDefault('fr_FR');
+        $existingLanguage = 'en';
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
+        $this->validator->validate($existingLanguage, new Language(array(
+            'message' => 'aMessage'
+        )));
+    }
 }

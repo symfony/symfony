@@ -113,6 +113,16 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Symfony\Component\DependencyInjection\Container::set
+     */
+    public function testSetWithNullResetTheService()
+    {
+        $sc = new Container();
+        $sc->set('foo', null);
+        $this->assertFalse($sc->has('foo'));
+    }
+
+    /**
      * @expectedException \InvalidArgumentException
      */
     public function testSetDoesNotAllowPrototypeScope()

@@ -184,6 +184,9 @@ class Container implements IntrospectableContainerInterface
     /**
      * Sets a service.
      *
+     * Setting a service to null resets the service: has() returns false and get()
+     * behaves in the same way as if the service was never created.
+     *
      * @param string $id      The service identifier
      * @param object $service The service instance
      * @param string $scope   The scope of the service
@@ -213,6 +216,14 @@ class Container implements IntrospectableContainerInterface
 
         if (method_exists($this, $method = 'synchronize'.strtr($id, array('_' => '', '.' => '_')).'Service')) {
             $this->$method();
+        }
+
+        if (self::SCOPE_CONTAINER !== $scope && null === $service) {
+            unset($this->scopedServices[$scope][$id]);
+        }
+
+        if (null === $service) {
+            unset($this->services[$id]);
         }
     }
 

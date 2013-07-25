@@ -24,6 +24,7 @@ class Inline
 
     private static $exceptionOnInvalidType = false;
     private static $objectSupport = false;
+    private static $parseDates = true;
 
     /**
      * Converts a YAML string to a PHP array.
@@ -31,15 +32,17 @@ class Inline
      * @param string  $value                  A YAML string
      * @param Boolean $exceptionOnInvalidType true if an exception must be thrown on invalid types (a PHP resource or object), false otherwise
      * @param Boolean $objectSupport          true if object support is enabled, false otherwise
+     * @param Boolean $parseDates             true if dates should be autodetected and parsed into seconds
      *
      * @return array A PHP array representing the YAML string
      *
      * @throws ParseException
      */
-    public static function parse($value, $exceptionOnInvalidType = false, $objectSupport = false)
+    public static function parse($value, $exceptionOnInvalidType = false, $objectSupport = false, $parseDates = true)
     {
         self::$exceptionOnInvalidType = $exceptionOnInvalidType;
         self::$objectSupport = $objectSupport;
+        self::$parseDates = $parseDates;
 
         $value = trim($value);
 
@@ -429,7 +432,9 @@ class Inline
             case preg_match('/^(-|\+)?[0-9,]+(\.[0-9]+)?$/', $scalar):
                 return floatval(str_replace(',', '', $scalar));
             case preg_match(self::getTimestampRegex(), $scalar):
-                return strtotime($scalar);
+                if (self::$parseDates === true) {
+                    return strtotime($scalar);
+                }
             default:
                 return (string) $scalar;
         }

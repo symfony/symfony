@@ -37,7 +37,8 @@ class LessThanValidatorTest extends AbstractComparisonValidatorTestCase
         return array(
             array(1, 2),
             array(new \DateTime('2000-01-01'), new \DateTime('2010-01-01')),
-            array('22', '333')
+            array('22', '333'),
+            array(null, 1),
         );
     }
 

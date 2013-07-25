@@ -143,6 +143,36 @@ class ResolveDefinitionTemplatesPassTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $def->getClass());
     }
 
+    public function testSetLazyOnServiceHasParent()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('parent','stdClass');
+
+        $container->setDefinition('child1',new DefinitionDecorator('parent'))
+            ->setLazy(true)
+        ;
+
+        $this->process($container);
+
+        $this->assertTrue($container->getDefinition('child1')->isLazy());
+    }
+
+    public function testSetLazyOnServiceIsParent()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('parent','stdClass')
+            ->setLazy(true)
+        ;
+
+        $container->setDefinition('child1',new DefinitionDecorator('parent'));
+
+        $this->process($container);
+
+        $this->assertTrue($container->getDefinition('child1')->isLazy());
+    }
+
     protected function process(ContainerBuilder $container)
     {
         $pass = new ResolveDefinitionTemplatesPass();

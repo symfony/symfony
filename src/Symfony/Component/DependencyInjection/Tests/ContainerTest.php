@@ -216,7 +216,6 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetCircularReference()
     {
-
         $sc = new ProjectServiceContainer();
         try {
             $sc->get('circular');
@@ -233,7 +232,13 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     public function testGetReturnsNullOnInactiveScope()
     {
         $sc = new ProjectServiceContainer();
-        $this->assertNull($sc->get('inactive', ContainerInterface::NULL_ON_INVALID_REFERENCE));
+        $this->assertNull($sc->get('inactive', ContainerInterface::NULL_ON_INVALID_REFERENCE), '->get() returns null if service not exists and ContainerInterface::NULL_ON_INVALID_REFERENCE is used');
+
+        $sc->set('foo', $foo = new \stdClass());
+        $this->assertEquals($foo, $sc->get('foo'), '->get() returns the service for the given id if it exists');
+
+        $sc->set('foo', null);
+        $this->assertNull($sc->get('foo', ContainerInterface::NULL_ON_INVALID_REFERENCE), '->get() returns null if service is null and ContainerInterface::NULL_ON_INVALID_REFERENCE is used');
     }
 
     /**
@@ -243,11 +248,16 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     {
         $sc = new ProjectServiceContainer();
         $sc->set('foo', new \stdClass());
+        $sc->set('foo2', new \stdClass());
         $this->assertFalse($sc->has('foo1'), '->has() returns false if the service does not exist');
+        $this->assertTrue($sc->has('foo2'), '->has() returns true if the service exists');
         $this->assertTrue($sc->has('foo'), '->has() returns true if the service exists');
         $this->assertTrue($sc->has('bar'), '->has() returns true if a get*Method() is defined');
         $this->assertTrue($sc->has('foo_bar'), '->has() returns true if a get*Method() is defined');
         $this->assertTrue($sc->has('foo.baz'), '->has() returns true if a get*Method() is defined');
+
+        $sc->set('foo', null);
+        $this->assertFalse($sc->has('foo'), '->has() returns false if the service was set to null');
     }
 
     /**
@@ -260,6 +270,9 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($sc->initialized('foo'), '->initialized() returns true if service is loaded');
         $this->assertFalse($sc->initialized('foo1'), '->initialized() returns false if service is not loaded');
         $this->assertFalse($sc->initialized('bar'), '->initialized() returns false if a service is defined, but not currently loaded');
+
+        $sc->set('foo', null);
+        $this->assertFalse($sc->initialized('foo'), '->initialized() returns false if the service was set to null');
     }
 
     public function testEnterLeaveCurrentScope()

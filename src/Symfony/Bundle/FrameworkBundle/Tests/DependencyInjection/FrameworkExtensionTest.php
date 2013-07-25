@@ -284,6 +284,17 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertStringEndsWith('TestBundle'.DIRECTORY_SEPARATOR.'Resources'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'validation.xml', $xmlArgs[1]);
     }
 
+    public function testDefaultResponseHeader()
+    {
+        $container = $this->createContainerFromFile('full');
+
+        $this->assertTrue($container->hasParameter('kernel.default_response_headers'), '->registerValidationConfiguration() loads validator.xml');
+        $this->assertEquals(array(
+            'X-Foo' => 'Bar',
+            'X-Bar' => 'Foo',
+        ), $container->getParameter('kernel.default_response_headers'), '->registerValidationConfiguration() loads validator.xml');
+    }
+
     protected function createContainer(array $data = array())
     {
         return new ContainerBuilder(new ParameterBag(array_merge(array(

@@ -96,4 +96,23 @@ class ResponseListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('ISO-8859-15', $response->getCharset());
     }
+
+    public function testFiltersSetsDefaultHeaders()
+    {
+        $listener = new ResponseListener('UTF-8', array(
+            'X-Add'     => 'default-value',
+            'X-Not-Add' => 'default-value',
+        ));
+        $this->dispatcher->addListener(KernelEvents::RESPONSE, array($listener, 'onKernelResponse'), 1);
+
+        $response = new Response();
+        $response->headers->set('X-Not-Add', 'user-value');
+
+        $request = Request::create('/');
+        $event = new FilterResponseEvent($this->kernel, $request, HttpKernelInterface::MASTER_REQUEST, $response);
+        $this->dispatcher->dispatch(KernelEvents::RESPONSE, $event);
+
+        $this->assertEquals('default-value', $response->headers->get('X-Add'));
+        $this->assertEquals('user-value', $response->headers->get('X-Not-Add'));
+    }
 }

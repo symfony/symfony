@@ -28,6 +28,7 @@
         <service id="response_listener" class="%response_listener.class%">
             <tag name="kernel.event_subscriber" />
             <argument>%kernel.charset%</argument>
+            <argument>%kernel.default_response_headers%</argument>
         </service>
 
         <service id="streamed_response_listener" class="%streamed_response_listener.class%">

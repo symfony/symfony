@@ -82,6 +82,7 @@ class Configuration implements ConfigurationInterface
         $this->addValidationSection($rootNode);
         $this->addAnnotationsSection($rootNode);
         $this->addSerializerSection($rootNode);
+        $this->addResponseSection($rootNode);
 
         return $treeBuilder;
     }
@@ -410,6 +411,42 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('serializer')
                     ->info('serializer configuration')
                     ->canBeEnabled()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addResponseSection(ArrayNodeDefinition $rootNode)
+    {
+        $default = array(
+            'X-Content-Type-Options' => 'nosniff',
+        );
+
+        $example = array(
+            'X-Content-Type-Options' => 'nosniff',
+            'X-XSS-Protection'       => '1; mode=block',
+            'X-Frame-Options'        => 'SAMEORIGIN',
+        );
+
+        $rootNode
+            ->children()
+                ->arrayNode('response')
+                    ->info('response configuration')
+                    ->addDefaultsIfNotSet()
+                    ->fixXmlConfig('default_header')
+                    ->children()
+                        ->arrayNode('default_headers')
+                            ->normalizeKeys(false)
+                            ->useAttributeAsKey('name')
+                            ->example($example)
+                            ->defaultValue($default)
+                            ->beforeNormalization()
+                                ->ifNull()
+                                ->then(function($v) use ($default) { return $default; })
+                            ->end()
+                            ->prototype('scalar')->end()
+                        ->end()
+                    ->end()
                 ->end()
             ->end()
         ;

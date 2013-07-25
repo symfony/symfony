@@ -546,7 +546,7 @@ class Form implements \IteratorAggregate, FormInterface
 
             foreach ($this->children as $name => $child) {
                 $fieldValue = null;
-                if (isset($submittedData[$name])) {
+                if (array_key_exists($name, $submittedData)) {
                     $fieldValue = $submittedData[$name];
                     unset($submittedData[$name]);
                 }

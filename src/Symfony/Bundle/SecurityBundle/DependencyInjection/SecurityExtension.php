@@ -240,7 +240,6 @@ class SecurityExtension extends Extension
     private function createFirewall(ContainerBuilder $container, $id, $firewall, &$authenticationProviders, $providerIds)
     {
         // Matcher
-        $i = 0;
         $matcher = null;
         if (isset($firewall['request_matcher'])) {
             $matcher = new Reference($firewall['request_matcher']);

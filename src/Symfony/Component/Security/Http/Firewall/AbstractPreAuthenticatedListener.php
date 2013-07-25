@@ -64,6 +64,7 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
             list($user, $credentials) = $this->getPreAuthenticatedData($request);
         } catch (BadCredentialsException $exception) {
             $this->clearToken();
+
             return;
         }
 

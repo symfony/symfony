@@ -101,7 +101,7 @@ class UploadedFile extends File
         $this->test = (Boolean) $test;
 
         parent::__construct($path, UPLOAD_ERR_OK === $this->error);
-        $this->size = $size ?: filesize($path);
+        $this->size = $size ?: $this->getSize();
     }
 
     /**

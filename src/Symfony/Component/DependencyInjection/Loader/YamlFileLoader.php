@@ -113,10 +113,10 @@ class YamlFileLoader extends FileLoader
         }
 
         foreach ($content['scopes'] as $name => $parent) {
-        $parentName = !empty($parent) ? $parent : ContainerInterface::SCOPE_CONTAINER;
-        if (!$this->container->hasScope($name)) {
-            $this->container->addScope(new Scope($name, $parentName));
-        }
+            if (!$this->container->hasScope($name)) {
+                $parentName = !empty($parent) ? $parent : ContainerInterface::SCOPE_CONTAINER;
+                $this->container->addScope(new Scope($name, $parentName));
+            }
         }
 
     }

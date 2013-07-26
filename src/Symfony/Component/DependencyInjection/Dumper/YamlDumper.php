@@ -56,7 +56,7 @@ class YamlDumper extends Dumper
      */
     public function dump(array $options = array())
     {
-        return $this->addParameters()."\n".$this->addServices();
+        return $this->addParameters()."\n".$this->addScopes().$this->addServices();
     }
 
     /**
@@ -207,6 +207,23 @@ class YamlDumper extends Dumper
         $parameters = $this->prepareParameters($this->container->getParameterBag()->all(), $this->container->isFrozen());
 
         return $this->dumper->dump(array('parameters' => $parameters), 2);
+    }
+
+    /**
+     * Adds Scopes
+     *
+     * @return string
+     */
+    private function addScopes()
+    {
+        $scopes = $this->container->getScopes();
+        if (empty($scopes)) {
+            return '';
+        }
+
+        $parameters = $this->prepareParameters($scopes, false);
+
+        return $this->dumper->dump(array('scopes' => $parameters), 2)."\n";
     }
 
     /**

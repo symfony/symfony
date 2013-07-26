@@ -47,6 +47,13 @@ class YamlDumperTest extends \PHPUnit_Framework_TestCase
         $this->assertStringEqualsFile(self::$fixturesPath.'/yaml/services8.yml', $dumper->dump(), '->dump() dumps parameters');
     }
 
+    public function testAddScopes()
+    {
+        $container = include self::$fixturesPath.'/containers/container16.php';
+        $dumper = new YamlDumper($container);
+        $this->assertStringEqualsFile(self::$fixturesPath.'/yaml/services16.yml', $dumper->dump(), '->dump() dumps parameters');
+    }
+
     public function testAddService()
     {
         $container = include self::$fixturesPath.'/containers/container9.php';

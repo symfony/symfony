@@ -40,11 +40,11 @@ class XmlDumperTest extends \PHPUnit_Framework_TestCase
         $this->assertXmlStringEqualsXmlFile(self::$fixturesPath.'/xml/services8.xml', $dumper->dump(), '->dump() dumps parameters');
     }
 
-    public function testAddParameters()
+    public function testAddScopes()
     {
-        $container = include self::$fixturesPath.'//containers/container8.php';
+        $container = include self::$fixturesPath.'//containers/container16.php';
         $dumper = new XmlDumper($container);
-        $this->assertXmlStringEqualsXmlFile(self::$fixturesPath.'/xml/services8.xml', $dumper->dump(), '->dump() dumps parameters');
+        $this->assertXmlStringEqualsXmlFile(self::$fixturesPath.'/xml/services16.xml', $dumper->dump(), '->dump() dumps parameters');
     }
 
     public function testAddService()

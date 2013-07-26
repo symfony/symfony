@@ -52,6 +52,7 @@ class XmlDumper extends Dumper
         $container->setAttribute('xsi:schemaLocation', 'http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd');
 
         $this->addParameters($container);
+        $this->addScopes($container);
         $this->addServices($container);
 
         $this->document->appendChild($container);
@@ -81,6 +82,34 @@ class XmlDumper extends Dumper
         $parent->appendChild($parameters);
         $this->convertParameters($data, 'parameter', $parameters);
     }
+
+    /**
+     * Adds Scopes.
+     *
+     * @param \DOMElement $parent
+     */
+    private function addScopes(\DOMElement $parent)
+    {
+        $data = $this->container->getScopes();
+        if (!$data) {
+            return;
+        }
+
+        if ($this->container->isFrozen()) {
+            $data = $this->escape($data);
+        }
+
+        $scopes = $this->document->createElement('scopes');
+        $parent->appendChild($scopes);
+        foreach ($data as $name => $parent) {
+            $scope = $this->document->createElement('scope');
+            $scope->setAttribute('name', $name);
+            $scope->setAttribute('parent', $parent);
+            $scopes->appendChild($scope);
+        }
+    }
+
+
 
     /**
      * Adds method calls.

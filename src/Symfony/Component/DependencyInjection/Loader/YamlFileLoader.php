@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Scope;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Yaml\Parser as YamlParser;
@@ -60,6 +61,9 @@ class YamlFileLoader extends FileLoader
             }
         }
 
+        // scopes
+        $this->parseScopes($content);
+
         // extensions
         $this->loadFromExtensions($content);
 
@@ -96,6 +100,25 @@ class YamlFileLoader extends FileLoader
             $this->setCurrentDir(dirname($file));
             $this->import($import['resource'], null, isset($import['ignore_errors']) ? (Boolean) $import['ignore_errors'] : false, $file);
         }
+    }
+    /**
+     * Parses all scopes
+     *
+     * @param array  $content
+     */
+    private function parseScopes($content)
+    {
+        if (!isset($content['scopes'])) {
+            return;
+        }
+
+        foreach ($content['scopes'] as $name => $parent) {
+        $parentName = !empty($parent) ? $parent : ContainerInterface::SCOPE_CONTAINER;
+        if (!$this->container->hasScope($name)) {
+            $this->container->addScope(new Scope($name, $parentName));
+        }
+        }
+
     }
 
     /**
@@ -281,7 +304,7 @@ class YamlFileLoader extends FileLoader
         }
 
         foreach (array_keys($content) as $namespace) {
-            if (in_array($namespace, array('imports', 'parameters', 'services'))) {
+            if (in_array($namespace, array('imports', 'parameters', 'services', 'scopes'))) {
                 continue;
             }
 
@@ -346,7 +369,7 @@ class YamlFileLoader extends FileLoader
     private function loadFromExtensions($content)
     {
         foreach ($content as $namespace => $values) {
-            if (in_array($namespace, array('imports', 'parameters', 'services'))) {
+            if (in_array($namespace, array('imports', 'parameters', 'services', 'scopes'))) {
                 continue;
             }
 

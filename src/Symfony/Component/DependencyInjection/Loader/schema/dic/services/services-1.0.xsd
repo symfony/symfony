@@ -27,6 +27,7 @@
       <xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="imports" type="imports" minOccurs="0" maxOccurs="1" />
       <xsd:element name="parameters" type="parameters" minOccurs="0" maxOccurs="1" />
+      <xsd:element name="scopes" type="scopes" minOccurs="0" maxOccurs="1" />
       <xsd:element name="services" type="services" minOccurs="0" maxOccurs="1" />
       <xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded" />
     </xsd:sequence>
@@ -149,6 +150,17 @@
       <xsd:element name="service" type="service" />
     </xsd:choice>
     <xsd:attribute name="method" type="xsd:string" />
+  </xsd:complexType>
+
+  <xsd:complexType name="scopes" mixed="true">
+      <xsd:choice minOccurs="1" maxOccurs="unbounded">
+          <xsd:element name="scope" type="scope" />
+      </xsd:choice>
+  </xsd:complexType>
+
+  <xsd:complexType name="scope">
+    <xsd:attribute name="name" type="xsd:string" use="required" />
+    <xsd:attribute name="parent" type="xsd:string" />
   </xsd:complexType>
 
   <xsd:simpleType name="parameter_type">

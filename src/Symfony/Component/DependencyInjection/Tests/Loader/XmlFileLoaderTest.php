@@ -104,6 +104,30 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $actual, '->load() converts XML values to PHP ones');
     }
 
+    public function testLoadScopes()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('services16.xml');
+
+        $actual = $container->getScopes();
+        $expected = array('request' => 'container');
+
+        $this->assertEquals($expected, $actual, '->load() adds Scopes to Container');
+    }
+
+    public function testLoadScopesWithoutDuplicates()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('services16_double_scope.xml');
+
+        $actual = $container->getScopes();
+        $expected = array('request' => 'container');
+
+        $this->assertEquals($expected, $actual, '->load() adds Scopes only once to Container');
+    }
+
     public function testLoadImports()
     {
         if (!class_exists('Symfony\Component\Yaml\Yaml')) {

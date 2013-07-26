@@ -1811,7 +1811,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
         $html = $this->renderStart($form->createView());
 
-        $this->assertSame('<form method="get" action="http://example.com/directory">', $html);
+        $this->assertSame('<form name="form" method="get" action="http://example.com/directory">', $html);
     }
 
     public function testStartTagForPutRequest()
@@ -1843,7 +1843,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
             'action' => 'http://foo.com/directory'
         ));
 
-        $this->assertSame('<form method="post" action="http://foo.com/directory">', $html);
+        $this->assertSame('<form name="form" method="post" action="http://foo.com/directory">', $html);
     }
 
     public function testStartTagForMultipartForm()
@@ -1857,7 +1857,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
         $html = $this->renderStart($form->createView());
 
-        $this->assertSame('<form method="get" action="http://example.com/directory" enctype="multipart/form-data">', $html);
+        $this->assertSame('<form name="form" method="get" action="http://example.com/directory" enctype="multipart/form-data">', $html);
     }
 
     public function testStartTagWithExtraAttributes()
@@ -1871,6 +1871,6 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
             'attr' => array('class' => 'foobar'),
         ));
 
-        $this->assertSame('<form method="get" action="http://example.com/directory" class="foobar">', $html);
+        $this->assertSame('<form name="form" method="get" action="http://example.com/directory" class="foobar">', $html);
     }
 }

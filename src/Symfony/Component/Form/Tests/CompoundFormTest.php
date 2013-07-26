@@ -13,6 +13,7 @@ namespace Symfony\Component\Form\Tests;
 
 use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationRequestHandler;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\Forms;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Form\Tests\Fixtures\FixedDataTransformer;
@@ -71,6 +72,19 @@ class CompoundFormTest extends AbstractFormTest
             ->method('setData');
 
         $this->form->submit(array(), false);
+    }
+
+    public function testSubmitDoesNotAddExtraFieldForNullValues()
+    {
+        $factory = Forms::createFormFactoryBuilder()
+            ->getFormFactory();
+
+        $child = $factory->create('file', null, array('auto_initialize' => false));
+
+        $this->form->add($child);
+        $this->form->submit(array('file' => null));
+
+        $this->assertCount(0, $this->form->getExtraData());
     }
 
     public function testClearMissingFlagIsForwarded()

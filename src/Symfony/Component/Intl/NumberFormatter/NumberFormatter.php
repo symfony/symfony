@@ -460,7 +460,7 @@ class NumberFormatter
     {
         // Need a minimum implementation to make the "en" locale work
         // when the "intl" extension is not installed (Issue #6045)
-        switch($attr) {
+        switch ($attr) {
             case self::DECIMAL_SEPARATOR_SYMBOL:
                 return '.';
             case self::GROUPING_SEPARATOR_SYMBOL:

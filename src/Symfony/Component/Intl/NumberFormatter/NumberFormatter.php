@@ -458,23 +458,25 @@ class NumberFormatter
      */
     public function getSymbol($attr)
     {
-        // Just a minimum implementation to make the "en" locale work
+        // Need a minimum implementation to make the "en" locale work
         // when the "intl" extension is not installed (Issue #6045)
         switch($attr) {
-        case self::DECIMAL_SEPARATOR_SYMBOL:
-            return '.';
-        case self::GROUPING_SEPARATOR_SYMBOL:
-            return ',';
-        case self::DIGIT_SYMBOL:
-            return '#';
-        case self::CURRENCY_SYMBOL:
-            return '$';
-        case self::EXPONENTIAL_SYMBOL:
-            return 'E';
-        default:
-            ;
+            case self::DECIMAL_SEPARATOR_SYMBOL:
+                return '.';
+            case self::GROUPING_SEPARATOR_SYMBOL:
+                return ',';
+            case self::DIGIT_SYMBOL:
+                return '#';
+            case self::CURRENCY_SYMBOL:
+                return '$';
+            case self::EXPONENTIAL_SYMBOL:
+                return 'E';
+            default:
+                ;
         }
 
+        // Apart from what is implemented above
+        // this function is to be consiered as not implemented
         throw new MethodNotImplementedException(__METHOD__);
     }
 

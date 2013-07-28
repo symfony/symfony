@@ -12,7 +12,6 @@
 namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\BadMethodCallException;
-use Symfony\Component\Form\Exception\Exception;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;

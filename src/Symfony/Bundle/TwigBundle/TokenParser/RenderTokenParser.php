@@ -35,9 +35,7 @@ class RenderTokenParser extends \Twig_TokenParser
         // @deprecated in 2.2 and will be removed in 2.3
         if ($this->parser->getStream()->test(\Twig_Token::NAME_TYPE, 'with')) {
             $this->parser->getStream()->next();
-            $attributes = $this->parser->getExpressionParser()->parseExpression();
-        } else {
-            $attributes = new \Twig_Node_Expression_Array(array(), $token->getLine());
+            $this->parser->getExpressionParser()->parseExpression();
         }
 
         // options

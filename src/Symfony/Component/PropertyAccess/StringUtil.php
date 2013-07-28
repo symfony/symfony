@@ -77,7 +77,7 @@ class StringUtil
 
         // moves (move)
         array('sevom', 5, true, true, 'move'),
-        
+
         // hooves (hoof), dwarves (dwarf), elves (elf), leaves (leaf)
         array('sev', 3, true, true, 'f'),
 

@@ -151,7 +151,7 @@ class ApacheMatcherDumper extends MatcherDumper
                 $allow[] = 'E=_ROUTING_allow_'.$method.':1';
             }
 
-            if ($hostRegex = $compiledRoute->getHostRegex()) {
+            if ($compiledRoute->getHostRegex()) {
                 $rule[] = sprintf("RewriteCond %%{ENV:__ROUTING_host_%s} =1", $hostRegexUnique);
             }
 
@@ -162,8 +162,7 @@ class ApacheMatcherDumper extends MatcherDumper
 
         // redirect with trailing slash appended
         if ($hasTrailingSlash) {
-
-            if ($hostRegex = $compiledRoute->getHostRegex()) {
+            if ($compiledRoute->getHostRegex()) {
                 $rule[] = sprintf("RewriteCond %%{ENV:__ROUTING_host_%s} =1", $hostRegexUnique);
             }
 
@@ -173,7 +172,7 @@ class ApacheMatcherDumper extends MatcherDumper
 
         // the main rule
 
-        if ($hostRegex = $compiledRoute->getHostRegex()) {
+        if ($compiledRoute->getHostRegex()) {
             $rule[] = sprintf("RewriteCond %%{ENV:__ROUTING_host_%s} =1", $hostRegexUnique);
         }
 

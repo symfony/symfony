@@ -60,7 +60,7 @@ class ClassNotFoundFatalErrorHandlerTest extends \PHPUnit_Framework_TestCase
                     'file' => 'foo.php',
                     'message' => 'Class "UndefinedFunctionException" not found',
                 ),
-                'Attempted to load class "UndefinedFunctionException" from the global namespace in foo.php line 12. Did you forget a use statement for this class? Perhaps you need to add a use statement for one of the following class: Symfony\Component\Debug\Exception\UndefinedFunctionException.',
+                'Attempted to load class "UndefinedFunctionException" from the global namespace in foo.php line 12. Did you forget a use statement for this class? Perhaps you need to add a use statement for one of the following: Symfony\Component\Debug\Exception\UndefinedFunctionException.',
             ),
             array(
                 array(
@@ -69,7 +69,7 @@ class ClassNotFoundFatalErrorHandlerTest extends \PHPUnit_Framework_TestCase
                     'file' => 'foo.php',
                     'message' => 'Class "PEARClass" not found',
                 ),
-                'Attempted to load class "PEARClass" from the global namespace in foo.php line 12. Did you forget a use statement for this class? Perhaps you need to add a use statement for one of the following class: Symfony_Component_Debug_Tests_Fixtures_PEARClass.',
+                'Attempted to load class "PEARClass" from the global namespace in foo.php line 12. Did you forget a use statement for this class? Perhaps you need to add a use statement for one of the following: Symfony_Component_Debug_Tests_Fixtures_PEARClass.',
             ),
             array(
                 array(
@@ -78,7 +78,7 @@ class ClassNotFoundFatalErrorHandlerTest extends \PHPUnit_Framework_TestCase
                     'file' => 'foo.php',
                     'message' => 'Class "Foo\\Bar\\UndefinedFunctionException" not found',
                 ),
-                'Attempted to load class "UndefinedFunctionException" from namespace "Foo\Bar" in foo.php line 12. Do you need to "use" it from another namespace? Perhaps you need to add a use statement for one of the following class: Symfony\Component\Debug\Exception\UndefinedFunctionException.',
+                'Attempted to load class "UndefinedFunctionException" from namespace "Foo\Bar" in foo.php line 12. Do you need to "use" it from another namespace? Perhaps you need to add a use statement for one of the following: Symfony\Component\Debug\Exception\UndefinedFunctionException.',
             ),
         );
     }

@@ -72,7 +72,7 @@ class ClassNotFoundFatalErrorHandler implements FatalErrorHandlerInterface
             }
 
             if ($classes = $this->getClassCandidates($className)) {
-                $message .= sprintf(' Perhaps you need to add a use statement for one of the following class: %s.', implode(', ', $classes));
+                $message .= sprintf(' Perhaps you need to add a use statement for one of the following: %s.', implode(', ', $classes));
             }
 
             return new ClassNotFoundException($message, $exception);

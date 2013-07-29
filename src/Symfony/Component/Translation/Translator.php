@@ -222,6 +222,56 @@ class Translator implements TranslatorInterface
         return strtr($this->selector->choose($catalogue->get($id, $domain), (int) $number, $locale), $parameters);
     }
 
+    /**
+     * Messages exposing
+     *
+     * Collects all messages for corresponded domains and locale,
+     * takes in account fallback of locales.
+     * Method is used for exposing of collected messages.
+     *
+     * @param array       $domains list of required domains, by default empty, means all domains
+     * @param string|null $locale  locale of translations, by default is current locale
+     *
+     * @return array
+     *
+     * @api
+     */
+    public function exposeMessages(array $domains = array(), $locale = null)
+    {
+        if (null === $locale) {
+            $locale = $this->getLocale();
+        }
+
+        if (!isset($this->catalogues[$locale])) {
+            $this->loadCatalogue($locale);
+        }
+
+        $catalogues = array();
+        $catalogues[] = $catalogue = $this->catalogues[$locale];
+        while ($catalogue = $catalogue->getFallbackCatalogue()) {
+            $catalogues[] = $catalogue;
+        }
+
+        $domains = array_flip($domains);
+        $messages = array();
+        for ($i = count($catalogues) - 1; $i >= 0; $i--) {
+            $localeMessages = $catalogues[$i]->all();
+            // if there are domains -> filter only their messages
+            if ($domains) {
+                $localeMessages = array_intersect_key($localeMessages, $domains);
+            }
+            foreach ($localeMessages as $domain => $domainMessages) {
+                if (!empty($messages[$domain])) {
+                    $messages[$domain] = array_merge($messages[$domain], $domainMessages);
+                } else {
+                    $messages[$domain] = $domainMessages;
+                }
+            }
+        }
+
+        return $messages;
+    }
+
     protected function loadCatalogue($locale)
     {
         try {

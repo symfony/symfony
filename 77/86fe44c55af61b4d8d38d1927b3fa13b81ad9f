@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-07-24T05:26:31Z
+
+The biggest different with the original PR is that there is no hardcoded class map anymore. Instead, we use the well-known autoloaders to find class candidates.
+
+I have also refactored the code to make more flexible and easily testable.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-07-24T05:28:02Z
+
+This makes #8281 a little bit more difficult as everything added in this PR really only belongs to the dev environement.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-07-24T05:32:14Z
+
+One proposal (related to what we are doing here -- but can be done in another PR) would be to move the `DebugClassLoader` class from the ClassLoader component to the Debug component. Of course, we would keep the one in ClassLoader for BC but it would be removed in 3.0.
+
+Beside being more consistent in terms of where the features belongs, it also makes sense as the Symfony ClassLoader component is less used than before as autoloading is now mostly done by Composer.
+
+What do you think about that?
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2013-07-24T05:51:30Z
+
+How does it works with Interfaces and Traits? Does the message is contextualized?
+
+Edit: It's perfect. https://github.com/fabpot/symfony/commit/667194574dd3253b58bad05f97b87aa84de9b87f#L0R270
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-07-24T06:41:10Z
+
+Interfaces and traits are supported and the message is contextualized.
+
+---------------------------------------------------------------------------
+
+by stof at 2013-07-24T09:01:15Z
+
++1 for moving the debug class loader to the Debug component. It would also remove the optional dependency from the debug component

@@ -11,9 +11,12 @@
 
 namespace Symfony\Component\Debug;
 
-use Symfony\Component\Debug\Exception\FatalErrorException;
-use Symfony\Component\Debug\Exception\ContextErrorException;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Debug\Exception\ContextErrorException;
+use Symfony\Component\Debug\Exception\FatalErrorException;
+use Symfony\Component\Debug\FatalErrorHandler\UndefinedFunctionFatalErrorHandler;
+use Symfony\Component\Debug\FatalErrorHandler\ClassNotFoundFatalErrorHandler;
+use Symfony\Component\Debug\FatalErrorHandler\FatalErrorHandlerInterface;
 
 /**
  * ErrorHandler.
@@ -55,7 +58,7 @@ class ErrorHandler
     /**
      * Registers the error handler.
      *
-     * @param integer $level The level at which the conversion to Exception is done (null to use the error_reporting() value and 0 to disable)
+     * @param integer $level         The level at which the conversion to Exception is done (null to use the error_reporting() value and 0 to disable)
      * @param Boolean $displayErrors Display errors (for dev environment) or just log they (production usage)
      *
      * @return The registered error handler
@@ -74,16 +77,32 @@ class ErrorHandler
         return $handler;
     }
 
+    /**
+     * Sets the level at which the conversion to Exception is done.
+     *
+     * @param integer|null $level The level (null to use the error_reporting() value and 0 to disable)
+     */
     public function setLevel($level)
     {
         $this->level = null === $level ? error_reporting() : $level;
     }
 
+    /**
+     * Sets the display_errors flag value.
+     *
+     * @param integer $displayErrors The display_errors flag value
+     */
     public function setDisplayErrors($displayErrors)
     {
         $this->displayErrors = $displayErrors;
     }
 
+    /**
+     * Sets a logger for the given channel.
+     *
+     * @param LoggerInterface $logger  A logger interface
+     * @param string          $channel The channel associated with the logger (deprecation or emergency)
+     */
     public static function setLogger(LoggerInterface $logger, $channel = 'deprecation')
     {
         self::$loggers[$channel] = $logger;
@@ -157,10 +176,37 @@ class ErrorHandler
         restore_exception_handler();
 
         if (is_array($exceptionHandler) && $exceptionHandler[0] instanceof ExceptionHandler) {
-            $level = isset($this->levels[$type]) ? $this->levels[$type] : $type;
-            $message = sprintf('%s: %s in %s line %d', $level, $error['message'], $error['file'], $error['line']);
-            $exception = new FatalErrorException($message, 0, $type, $error['file'], $error['line']);
-            $exceptionHandler[0]->handle($exception);
+            $this->handleFatalError($exceptionHandler[0], $error);
         }
+    }
+
+    /**
+     * Gets the fatal error handlers.
+     *
+     * Override this method if you want to define more fatal error handlers.
+     *
+     * @return FatalErrorHandlerInterface[] An array of FatalErrorHandlerInterface
+     */
+    protected function getFatalErrorHandlers()
+    {
+        return array(
+            new UndefinedFunctionFatalErrorHandler(),
+            new ClassNotFoundFatalErrorHandler(),
+        );
+    }
+
+    private function handleFatalError(ExceptionHandler $exceptionHandler, array $error)
+    {
+        $level = isset($this->levels[$error['type']]) ? $this->levels[$error['type']] : $error['type'];
+        $message = sprintf('%s: %s in %s line %d', $level, $error['message'], $error['file'], $error['line']);
+        $exception = new FatalErrorException($message, 0, $error['type'], $error['file'], $error['line']);
+
+        foreach ($this->getFatalErrorHandlers() as $handler) {
+            if ($ex = $handler->handleError($error, $exception)) {
+                return $exceptionHandler->handle($ex);
+            }
+        }
+
+        $exceptionHandler->handle($exception);
     }
 }

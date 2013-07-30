@@ -624,7 +624,7 @@ class FrameworkExtension extends Extension
                 ->replaceArgument(1, new Reference('validator.mapping.cache.'.$config['cache']));
             $container->setParameter(
                 'validator.mapping.cache.prefix',
-                'validator_'.md5($container->getParameter('kernel.root_dir'))
+                'validator_'.hash('sha256', $container->getParameter('kernel.root_dir'))
             );
         }
     }

@@ -42,7 +42,7 @@ class DefaultCsrfProviderTest extends \PHPUnit_Framework_TestCase
 
         $token = $this->provider->generateCsrfToken('foo');
 
-        $this->assertEquals(sha1('SECRET'.'foo'.session_id()), $token);
+        $this->assertEquals(hash('sha256', 'SECRET'.'foo'.session_id()), $token);
     }
 
     public function testGenerateCsrfTokenOnUnstartedSession()
@@ -57,7 +57,7 @@ class DefaultCsrfProviderTest extends \PHPUnit_Framework_TestCase
 
         $token = $this->provider->generateCsrfToken('foo');
 
-        $this->assertEquals(sha1('SECRET'.'foo'.session_id()), $token);
+        $this->assertEquals(hash('sha256', 'SECRET'.'foo'.session_id()), $token);
         $this->assertSame(PHP_SESSION_ACTIVE, session_status());
     }
 
@@ -65,7 +65,7 @@ class DefaultCsrfProviderTest extends \PHPUnit_Framework_TestCase
     {
         session_start();
 
-        $token = sha1('SECRET'.'foo'.session_id());
+        $token = hash('sha256', 'SECRET'.'foo'.session_id());
 
         $this->assertTrue($this->provider->isCsrfTokenValid('foo', $token));
     }
@@ -74,7 +74,7 @@ class DefaultCsrfProviderTest extends \PHPUnit_Framework_TestCase
     {
         session_start();
 
-        $token = sha1('SECRET'.'bar'.session_id());
+        $token = hash('sha256', 'SECRET'.'bar'.session_id());
 
         $this->assertFalse($this->provider->isCsrfTokenValid('foo', $token));
     }

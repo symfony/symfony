@@ -45,7 +45,7 @@ class DefaultCsrfProvider implements CsrfProviderInterface
      */
     public function generateCsrfToken($intention)
     {
-        return sha1($this->secret.$intention.$this->getSessionId());
+        return hash('sha256', $this->secret.$intention.$this->getSessionId());
     }
 
     /**

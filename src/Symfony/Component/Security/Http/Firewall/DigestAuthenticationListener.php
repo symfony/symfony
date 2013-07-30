@@ -193,15 +193,15 @@ class DigestData
 
         $this->nonceExpiryTime = $nonceTokens[0];
 
-        if (md5($this->nonceExpiryTime.':'.$entryPointKey) !== $nonceTokens[1]) {
+        if (hash('sha256', $this->nonceExpiryTime.':'.$entryPointKey) !== $nonceTokens[1]) {
             throw new BadCredentialsException(sprintf('Nonce token compromised "%s".', $nonceAsPlainText));
         }
     }
 
     public function calculateServerDigest($password, $httpMethod)
     {
-        $a2Md5 = md5(strtoupper($httpMethod).':'.$this->elements['uri']);
-        $a1Md5 = md5($this->elements['username'].':'.$this->elements['realm'].':'.$password);
+        $a2Md5 = hash('sha256', strtoupper($httpMethod).':'.$this->elements['uri']);
+        $a1Md5 = hash('sha256', $this->elements['username'].':'.$this->elements['realm'].':'.$password);
 
         $digest = $a1Md5.':'.$this->elements['nonce'];
         if (!isset($this->elements['qop'])) {
@@ -212,7 +212,7 @@ class DigestData
         }
         $digest .= ':'.$a2Md5;
 
-        return md5($digest);
+        return hash('sha256', $digest);
     }
 
     public function isNonceExpired()

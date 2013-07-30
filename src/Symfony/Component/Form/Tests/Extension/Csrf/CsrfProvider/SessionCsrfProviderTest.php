@@ -44,7 +44,7 @@ class SessionCsrfProviderTest extends \PHPUnit_Framework_TestCase
 
         $token = $this->provider->generateCsrfToken('foo');
 
-        $this->assertEquals(sha1('SECRET'.'foo'.'ABCDEF'), $token);
+        $this->assertEquals(hash('sha256', 'SECRET'.'foo'.'ABCDEF'), $token);
     }
 
     public function testIsCsrfTokenValidSucceeds()
@@ -53,7 +53,7 @@ class SessionCsrfProviderTest extends \PHPUnit_Framework_TestCase
                 ->method('getId')
                 ->will($this->returnValue('ABCDEF'));
 
-        $token = sha1('SECRET'.'foo'.'ABCDEF');
+        $token = hash('sha256', 'SECRET'.'foo'.'ABCDEF');
 
         $this->assertTrue($this->provider->isCsrfTokenValid('foo', $token));
     }
@@ -64,7 +64,7 @@ class SessionCsrfProviderTest extends \PHPUnit_Framework_TestCase
                 ->method('getId')
                 ->will($this->returnValue('ABCDEF'));
 
-        $token = sha1('SECRET'.'bar'.'ABCDEF');
+        $token = hash('sha256', 'SECRET'.'bar'.'ABCDEF');
 
         $this->assertFalse($this->provider->isCsrfTokenValid('foo', $token));
     }

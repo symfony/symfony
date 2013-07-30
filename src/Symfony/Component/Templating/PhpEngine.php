@@ -86,7 +86,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     public function render($name, array $parameters = array())
     {
         $storage = $this->load($name);
-        $key = md5(serialize($storage));
+        $key = hash('sha256', serialize($storage));
         $this->current = $key;
         $this->parents[$key] = null;
 

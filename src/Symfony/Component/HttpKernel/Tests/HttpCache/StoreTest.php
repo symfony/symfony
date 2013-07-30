@@ -89,7 +89,7 @@ class StoreTest extends \PHPUnit_Framework_TestCase
         $entries = $this->getStoreMetadata($cacheKey);
         list ($req, $res) = $entries[0];
 
-        $this->assertEquals('ena94a8fe5ccb19ba61c4c0873d391e987982fbbd3', $res['x-content-digest'][0]);
+        $this->assertEquals('en9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08', $res['x-content-digest'][0]);
     }
 
     public function testFindsAStoredEntryWithLookup()

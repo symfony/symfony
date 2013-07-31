@@ -834,6 +834,72 @@ class CompoundFormTest extends AbstractFormTest
         $this->assertEquals("name:\n    ERROR: Error!\nfoo:\n    No errors\n", $parent->getErrorsAsString());
     }
 
+    public function testGetErrorsAsArrayDeep()
+    {
+        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
+            $this->markTestSkipped('The "HttpFoundation" component is not available');
+        }
+
+        $request = new Request(array(), array(), array(), array(), array(), array(
+            'REQUEST_METHOD' => 'GET',
+        ));
+
+        $form = $this->getBuilder('')
+            ->setCompound(true)
+            ->setDataMapper($this->getDataMapper())
+            ->addEventSubscriber(new BindRequestListener())
+            ->getForm();
+
+        $firstName = $this->getBuilder('firstName')->getForm();
+
+        $form->add($firstName);
+        $form->add($this->getBuilder('lastName')->getForm());
+
+        $form->bind($request);
+
+        $firstName->addError(new FormError('Error 1'));
+        $firstName->addError(new FormError('Error 2'));
+
+        $expected = array(
+            'firstName' => array('Error 1', 'Error 2'),
+        );
+
+        $this->assertEquals($expected, $form->getErrorsAsArray());
+    }
+
+    public function testGetErrorsAsArrayWithTemplate()
+    {
+        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
+            $this->markTestSkipped('The "HttpFoundation" component is not available');
+        }
+
+        $request = new Request(array(), array(), array(), array(), array(), array(
+            'REQUEST_METHOD' => 'GET',
+        ));
+
+        $form = $this->getBuilder('')
+            ->setCompound(true)
+            ->setDataMapper($this->getDataMapper())
+            ->addEventSubscriber(new BindRequestListener())
+            ->getForm();
+
+        $firstName = $this->getBuilder('firstName')->getForm();
+
+        $form->add($firstName);
+        $form->add($this->getBuilder('lastName')->getForm());
+
+        $form->bind($request);
+
+        $firstName->addError(new FormError('Error 1', 'Error {{ replacementTag }}', array('{{ replacementTag }}' => 'foo')));
+        $firstName->addError(new FormError('Error 2'));
+
+        $expected = array(
+            'firstName' => array('Error foo', 'Error 2'),
+        );
+
+        $this->assertEquals($expected, $form->getErrorsAsArray());
+    }
+
     protected function createForm()
     {
         return $this->getBuilder()

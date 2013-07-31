@@ -724,6 +724,13 @@ class SimpleFormTest extends AbstractFormTest
         $this->assertEquals("ERROR: Error!\n", $this->form->getErrorsAsString());
     }
 
+    public function testGetErrorsAsArray()
+    {
+        $this->form->addError(new FormError('Error!'));
+
+        $this->assertEquals(array("Error!"), $this->form->getErrorsAsArray());
+    }
+
     public function testFormCanHaveEmptyName()
     {
         $form = $this->getBuilder('')->getForm();

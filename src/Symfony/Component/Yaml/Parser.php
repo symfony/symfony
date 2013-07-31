@@ -111,6 +111,7 @@ class Parser
                         $data[] = $this->parseValue($values['value'], $exceptionOnInvalidType, $objectSupport);
                     }
                 }
+                $context = null;
             } elseif (preg_match('#^(?P<key>'.Inline::REGEX_QUOTED_STRING.'|[^ \'"\[\{].*?) *\:(\s+(?P<value>.+?))?\s*$#u', $this->currentLine, $values)) {
                 if ($context && 'sequence' == $context) {
                     throw new ParseException('You cannot define a mapping item when in a sequence');
@@ -189,6 +190,7 @@ class Parser
                         $data[$key] = $this->parseValue($values['value'], $exceptionOnInvalidType, $objectSupport);
                     }
                 }
+                $context = null;
             } else {
                 // 1-liner optionally followed by newline
                 $lineCount = count($this->lines);

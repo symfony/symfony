@@ -32,7 +32,8 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
     /**
      * Constructor.
      *
-     * @param HttpKernelInterface $kernel A HttpKernelInterface instance
+     * @param HttpKernelInterface      $kernel     A HttpKernelInterface instance
+     * @param EventDispatcherInterface $dispatcher A EventDispatcherInterface instance
      */
     public function __construct(HttpKernelInterface $kernel, EventDispatcherInterface $dispatcher = null)
     {
@@ -53,13 +54,13 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
         if ($uri instanceof ControllerReference) {
             $reference = $uri;
 
-            // Remove attributes from the genereated URI because if not, the Symfony
+            // Remove attributes from the generated URI because if not, the Symfony
             // routing system will use them to populate the Request attributes. We don't
             // want that as we want to preserve objects (so we manually set Request attributes
             // below instead)
             $attributes = $reference->attributes;
             $reference->attributes = array();
-            $uri = $this->generateFragmentUri($uri, $request);
+            $uri = $this->generateFragmentUri($uri, $request, false);
             $reference->attributes = array_merge($attributes, $reference->attributes);
         }
 

@@ -120,6 +120,11 @@ class Request
     /**
      * @var array
      */
+    protected $encodings;
+
+    /**
+     * @var array
+     */
     protected $acceptableContentTypes;
 
     /**
@@ -218,6 +223,7 @@ class Request
         $this->content = $content;
         $this->languages = null;
         $this->charsets = null;
+        $this->encodings = null;
         $this->acceptableContentTypes = null;
         $this->pathInfo = null;
         $this->requestUri = null;
@@ -386,6 +392,7 @@ class Request
         }
         $dup->languages = null;
         $dup->charsets = null;
+        $dup->encodings = null;
         $dup->acceptableContentTypes = null;
         $dup->pathInfo = null;
         $dup->requestUri = null;
@@ -856,16 +863,18 @@ class Request
     public function getPort()
     {
         if (self::$trustedProxies) {
-            if (self::$trustedHeaders[self::HEADER_CLIENT_PORT] && $port = $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_PORT])) {
-                return $port;
-            }
+		    if (self::$trustedHeaders[self::HEADER_CLIENT_PORT] && $port = $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_PORT])) {
+			    return $port;
+		    }
 
-            if (self::$trustedHeaders[self::HEADER_CLIENT_PROTO] && 'https' === $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_PROTO], 'http')) {
-                return 443;
-            }
-        }
+		    if (self::$trustedHeaders[self::HEADER_CLIENT_PROTO] && $proto = $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_PROTO], 'http')) {
+			    if(in_array(strtolower($proto), array('https', 'on', '1'))) {
+				    return 443;
+			    }
+		    }
+	    }
 
-        return $this->server->get('SERVER_PORT');
+	    return $this->server->get('SERVER_PORT');
     }
 
     /**
@@ -899,7 +908,7 @@ class Request
 
         $pass = $this->getPassword();
         if ('' != $pass) {
-           $userinfo .= ":$pass";
+            $userinfo .= ":$pass";
         }
 
         return $userinfo;
@@ -1442,6 +1451,20 @@ class Request
         }
 
         return $this->charsets = array_keys(AcceptHeader::fromString($this->headers->get('Accept-Charset'))->all());
+    }
+
+    /**
+     * Gets a list of encodings acceptable by the client browser.
+     *
+     * @return array List of encodings in preferable order
+     */
+    public function getEncodings()
+    {
+        if (null !== $this->encodings) {
+            return $this->encodings;
+        }
+
+        return $this->encodings = array_keys(AcceptHeader::fromString($this->headers->get('Accept-Encoding'))->all());
     }
 
     /**

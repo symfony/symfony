@@ -51,7 +51,7 @@ class CookieTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidExpiration()
     {
-        $cookie = new Cookie('MyCookie', 'foo','bar');
+        $cookie = new Cookie('MyCookie', 'foo', 'bar');
     }
 
     /**

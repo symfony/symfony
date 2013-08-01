@@ -19,6 +19,8 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputAwareInterface;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
@@ -684,8 +686,10 @@ class Application
     public function asText($namespace = null, $raw = false)
     {
         $descriptor = new TextDescriptor();
+        $output = new BufferedOutput(BufferedOutput::VERBOSITY_NORMAL, !$raw);
+        $descriptor->describe($output, $this, array('namespace' => $namespace, 'raw_output' => true));
 
-        return $descriptor->describe($this, array('namespace' => $namespace, 'raw_text' => $raw));
+        return $output->fetch();
     }
 
     /**
@@ -702,7 +706,14 @@ class Application
     {
         $descriptor = new XmlDescriptor();
 
-        return $descriptor->describe($this, array('namespace' => $namespace, 'as_dom' => $asDom));
+        if ($asDom) {
+            return $descriptor->getApplicationDocument($this, $namespace);
+        }
+
+        $output = new BufferedOutput();
+        $descriptor->describe($output, $this, array('namespace' => $namespace));
+
+        return $output->fetch();
     }
 
     /**
@@ -893,6 +904,12 @@ class Application
      */
     protected function doRunCommand(Command $command, InputInterface $input, OutputInterface $output)
     {
+        foreach ($command->getHelperSet() as $helper) {
+            if ($helper instanceof InputAwareInterface) {
+                $helper->setInput($input);
+            }
+        }
+
         if (null === $this->dispatcher) {
             return $command->run($input, $output);
         }

@@ -710,11 +710,13 @@ class Form implements \IteratorAggregate, FormInterface
             return false;
         }
 
-        if (!$this->isDisabled()) {
-            foreach ($this->children as $child) {
-                if (!$child->isValid()) {
-                    return false;
-                }
+        if ($this->isDisabled()) {
+            return true;
+        }
+
+        foreach ($this->children as $child) {
+            if ($child->isSubmitted() && !$child->isValid()) {
+                return false;
             }
         }
 

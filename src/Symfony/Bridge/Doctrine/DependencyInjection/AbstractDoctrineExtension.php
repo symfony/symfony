@@ -295,8 +295,8 @@ abstract class AbstractDoctrineExtension extends Extension
     /**
      * Loads a configured object manager metadata, query or result cache driver.
      *
-     * @param array            $objectManager A configured object manager.
-     * @param ContainerBuilder $container     A ContainerBuilder instance.
+     * @param array            $objectManager  A configured object manager.
+     * @param ContainerBuilder $container      A ContainerBuilder instance.
      * @param string           $cacheName
      *
      * @throws \InvalidArgumentException In case of unknown driver type.
@@ -362,9 +362,13 @@ abstract class AbstractDoctrineExtension extends Extension
         }
 
         $cacheDef->setPublic(false);
-        // generate a unique namespace for the given application
-        $namespace = 'sf2'.$this->getMappingResourceExtension().'_'.$objectManager['name'].'_'.md5($container->getParameter('kernel.root_dir').$container->getParameter('kernel.environment'));
-        $cacheDef->addMethodCall('setNamespace', array($namespace));
+
+        if (!isset($objectManager['namespace'])) {
+            // generate a unique namespace for the given application
+            $objectManager['namespace'] = 'sf2'.$this->getMappingResourceExtension().'_'.$objectManager['name'].'_'.md5($container->getParameter('kernel.root_dir').$container->getParameter('kernel.environment'));
+        }
+
+        $cacheDef->addMethodCall('setNamespace', array($objectManager['namespace']));
 
         $container->setDefinition($cacheDriverService, $cacheDef);
     }

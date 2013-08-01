@@ -863,16 +863,18 @@ class Request
     public function getPort()
     {
         if (self::$trustedProxies) {
-            if (self::$trustedHeaders[self::HEADER_CLIENT_PORT] && $port = $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_PORT])) {
-                return $port;
-            }
+		    if (self::$trustedHeaders[self::HEADER_CLIENT_PORT] && $port = $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_PORT])) {
+			    return $port;
+		    }
 
-            if (self::$trustedHeaders[self::HEADER_CLIENT_PROTO] && 'https' === $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_PROTO], 'http')) {
-                return 443;
-            }
-        }
+		    if (self::$trustedHeaders[self::HEADER_CLIENT_PROTO] && $proto = $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_PROTO], 'http')) {
+			    if(in_array(strtolower($proto), array('https', 'on', '1'))) {
+				    return 443;
+			    }
+		    }
+	    }
 
-        return $this->server->get('SERVER_PORT');
+	    return $this->server->get('SERVER_PORT');
     }
 
     /**

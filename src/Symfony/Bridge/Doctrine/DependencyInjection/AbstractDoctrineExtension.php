@@ -295,8 +295,8 @@ abstract class AbstractDoctrineExtension extends Extension
     /**
      * Loads a configured object manager metadata, query or result cache driver.
      *
-     * @param array            $objectManager  A configured object manager.
-     * @param ContainerBuilder $container      A ContainerBuilder instance.
+     * @param array            $objectManager A configured object manager.
+     * @param ContainerBuilder $container     A ContainerBuilder instance.
      * @param string           $cacheName
      *
      * @throws \InvalidArgumentException In case of unknown driver type.

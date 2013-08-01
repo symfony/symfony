@@ -34,6 +34,10 @@ class ChoiceFormField extends FormField
      * @var array
      */
     private $options;
+    /**
+     * @var boolean
+     */
+    private $validationDisabled = false;
 
     /**
      * Returns true if the field should be included in the submitted values.
@@ -132,11 +136,11 @@ class ChoiceFormField extends FormField
                 }
 
                 foreach ($value as $v) {
-                    if (!$this->containsOption($v, $this->options)) {
+                    if (!$this->validationDisabled && !$this->containsOption($v, $this->options)) {
                         throw new \InvalidArgumentException(sprintf('Input "%s" cannot take "%s" as a value (possible values: %s).', $this->name, $v, implode(', ', $this->availableOptionValues())));
                     }
                 }
-            } elseif (!$this->containsOption($value, $this->options)) {
+            } elseif (!$this->validationDisabled && !$this->containsOption($value, $this->options)) {
                 throw new \InvalidArgumentException(sprintf('Input "%s" cannot take "%s" as a value (possible values: %s).', $this->name, $value, implode(', ', $this->availableOptionValues())));
             }
 
@@ -303,5 +307,17 @@ class ChoiceFormField extends FormField
         }
 
         return $values;
+    }
+
+    /**
+     * Disable the internal validation of the field.
+     *
+     * @return self
+     */
+    public function disableValidation()
+    {
+        $this->validationDisabled = true;
+
+        return $this;
     }
 }

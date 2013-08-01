@@ -703,6 +703,44 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         Request::setTrustedProxies(array());
     }
 
+    public function testPortDefaultValueWithVariousProxyProtocolHeaders()
+	{
+		//On
+		$request = Request::create('http://example.com', 'GET', array(), array(), array(), array(
+			'HTTP_X_FORWARDED_PROTO' => 'On'
+		));
+		$port = $request->getPort();
+		$this->assertEquals(443, $port, 'With only PROTO set and value is On, getPort() defaults to 443.');
+
+		//1
+		$request = Request::create('http://example.com', 'GET', array(), array(), array(), array(
+			'HTTP_X_FORWARDED_PROTO' => '1'
+		));
+		$port = $request->getPort();
+		$this->assertEquals(443, $port, 'With only PROTO set and value is 1, getPort() defaults to 443.');
+
+		//https
+		$request = Request::create('http://example.com', 'GET', array(), array(), array(), array(
+			'HTTP_X_FORWARDED_PROTO' => 'https'
+		));
+		$port = $request->getPort();
+		$this->assertEquals(443, $port, 'With only PROTO set and value is https, getPort() defaults to 443.');
+
+		//http
+		$request = Request::create('http://example.com', 'GET', array(), array(), array(), array(
+			'HTTP_X_FORWARDED_PROTO' => 'http'
+		));
+		$port = $request->getPort();
+		$this->assertEquals(80, $port, 'With only PROTO set and value is http, getPort() defaults to 80.');
+
+		//something-else
+		$request = Request::create('http://example.com', 'GET', array(), array(), array(), array(
+			'HTTP_X_FORWARDED_PROTO' => 'something-else'
+		));
+		$port = $request->getPort();
+		$this->assertEquals(80, $port, 'With only PROTO set and value is not recognized, getPort() defaults to 80.');
+	}
+
     /**
      * @expectedException RuntimeException
      */

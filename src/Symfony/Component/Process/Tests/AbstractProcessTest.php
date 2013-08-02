@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Process\Tests;
 
+use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\RuntimeException;
 
@@ -427,6 +428,45 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $duration = microtime(true) - $start;
 
         $this->assertLessThan($timeout + $precision, $duration);
+    }
+
+    /**
+     * @group idle-timeout
+     */
+    public function testIdleTimeout()
+    {
+        $process = $this->getProcess('sleep 3');
+        $process->setTimeout(10);
+        $process->setIdleTimeout(1);
+
+        try {
+            $process->run();
+
+            $this->fail('A timeout exception was expected.');
+        } catch (ProcessTimedOutException $ex) {
+            $this->assertTrue($ex->isIdleTimeout());
+            $this->assertFalse($ex->isGeneralTimeout());
+            $this->assertEquals(1.0, $ex->getExceededTimeout());
+        }
+    }
+
+    /**
+     * @group idle-timeout
+     */
+    public function testIdleTimeoutNotExceededWhenOutputIsSent()
+    {
+        $process = $this->getProcess('echo "foo"; sleep 1; echo "foo"; sleep 1; echo "foo"; sleep 1; echo "foo"; sleep 5;');
+        $process->setTimeout(5);
+        $process->setIdleTimeout(3);
+
+        try {
+            $process->run();
+            $this->fail('A timeout exception was expected.');
+        } catch (ProcessTimedOutException $ex) {
+            $this->assertTrue($ex->isGeneralTimeout());
+            $this->assertFalse($ex->isIdleTimeout());
+            $this->assertEquals(5.0, $ex->getExceededTimeout());
+        }
     }
 
     public function testGetPid()

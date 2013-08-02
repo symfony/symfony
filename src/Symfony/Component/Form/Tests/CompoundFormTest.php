@@ -22,8 +22,8 @@ class CompoundFormTest extends AbstractFormTest
 {
     public function testValidIfAllChildrenAreValid()
     {
-        $this->form->add($this->getValidForm('firstName'));
-        $this->form->add($this->getValidForm('lastName'));
+        $this->form->add($this->getBuilder('firstName')->getForm());
+        $this->form->add($this->getBuilder('lastName')->getForm());
 
         $this->form->submit(array(
             'firstName' => 'Bernhard',
@@ -35,15 +35,49 @@ class CompoundFormTest extends AbstractFormTest
 
     public function testInvalidIfChildIsInvalid()
     {
-        $this->form->add($this->getValidForm('firstName'));
-        $this->form->add($this->getInvalidForm('lastName'));
+        $this->form->add($this->getBuilder('firstName')->getForm());
+        $this->form->add($this->getBuilder('lastName')->getForm());
 
         $this->form->submit(array(
             'firstName' => 'Bernhard',
             'lastName' => 'Schussek',
         ));
 
+        $this->form->get('lastName')->addError(new FormError('Invalid'));
+
         $this->assertFalse($this->form->isValid());
+    }
+
+    public function testValidIfChildIsNotSubmitted()
+    {
+        $this->form->add($this->getBuilder('firstName')->getForm());
+        $this->form->add($this->getBuilder('lastName')->getForm());
+
+        $this->form->submit(array(
+            'firstName' => 'Bernhard',
+        ));
+
+        // "lastName" is not "valid" because it was not submitted. This happens
+        // for example in PATCH requests. The parent form should still be
+        // considered valid.
+
+        $this->assertTrue($this->form->isValid());
+    }
+
+    public function testDisabledFormsValidEvenIfChildrenInvalid()
+    {
+        $form = $this->getBuilder('person')
+            ->setDisabled(true)
+            ->setCompound(true)
+            ->setDataMapper($this->getDataMapper())
+            ->add($this->getBuilder('name'))
+            ->getForm();
+
+        $form->submit(array('name' => 'Jacques Doe'));
+
+        $form->get('name')->addError(new FormError('Invalid'));
+
+        $this->assertTrue($form->isValid());
     }
 
     public function testSubmitForwardsNullIfValueIsMissing()
@@ -59,17 +93,14 @@ class CompoundFormTest extends AbstractFormTest
         $this->form->submit(array());
     }
 
-    public function testSubmitDoesNotSaveNullIfNotClearMissing()
+    public function testSubmitDoesNotForwardNullIfNotClearMissing()
     {
         $child = $this->getMockForm('firstName');
 
         $this->form->add($child);
 
-        $child->expects($this->once())
-            ->method('submit');
-
         $child->expects($this->never())
-            ->method('setData');
+            ->method('submit');
 
         $this->form->submit(array(), false);
     }
@@ -122,37 +153,6 @@ class CompoundFormTest extends AbstractFormTest
         $this->form->add($child);
 
         $this->assertFalse($this->form->isEmpty());
-    }
-
-    public function testValidIfSubmittedAndDisabledWithChildren()
-    {
-        $this->factory->expects($this->once())
-            ->method('createNamedBuilder')
-            ->with('name', 'text', null, array())
-            ->will($this->returnValue($this->getBuilder('name')));
-
-        $form = $this->getBuilder('person')
-            ->setDisabled(true)
-            ->setCompound(true)
-            ->setDataMapper($this->getDataMapper())
-            ->add('name', 'text')
-            ->getForm();
-        $form->submit(array('name' => 'Jacques Doe'));
-
-        $this->assertTrue($form->isValid());
-    }
-
-    public function testNotValidIfChildNotValid()
-    {
-        $child = $this->getMockForm();
-        $child->expects($this->once())
-            ->method('isValid')
-            ->will($this->returnValue(false));
-
-        $this->form->add($child);
-        $this->form->submit(array());
-
-        $this->assertFalse($this->form->isValid());
     }
 
     public function testAdd()
@@ -562,74 +562,6 @@ class CompoundFormTest extends AbstractFormTest
         $this->assertEquals($file, $form['image']->getData());
 
         unlink($path);
-    }
-
-    public function testSubmitPatchRequest()
-    {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
-        $object = new \stdClass();
-        $object->name = 'Bernhard';
-        $object->name2 = 'Me';
-
-        //$values = array();
-        $values = array(
-            'author' => array(
-                'name2' => 'Artem',
-            ),
-        );
-
-        $request = new Request(array(), $values, array(), array(), array(), array(
-            'REQUEST_METHOD' => 'PATCH',
-        ));
-
-        $mapper = $this->getDataMapper();
-        $mapper->expects($this->any())
-            ->method('mapDataToForms')
-            ->will($this->returnCallback(function($data, $forms){
-                foreach ($forms as $form) {
-                    $propertyPath = $form->getPropertyPath();
-
-                    if (null !== $propertyPath) {
-                        $form->setData($data->{$propertyPath});
-                    }
-                }
-            }));
-
-
-        $mapper->expects($this->any())
-            ->method('mapFormsToData')
-            ->will($this->returnCallback(function($forms, &$data){
-                foreach ($forms as $form) {
-                    $propertyPath = $form->getPropertyPath();
-
-                    if (null !== $propertyPath) {
-                        if (!is_object($data) || $form->getData() !== $data->{$propertyPath}) {
-                            $data->{$propertyPath} = $form->getData();
-                        }
-                    }
-                }
-            }));
-
-        /** @var Form $form */
-        $form = $this->getBuilder('author', null, 'stdClass')
-            ->setMethod('PATCH')
-            ->setData($object)
-            ->setCompound(true)
-            ->setDataMapper($mapper)
-            ->setRequestHandler(new HttpFoundationRequestHandler())
-            ->getForm();
-        $form->add($this->getBuilder('name')->getForm());
-        $form->add($this->getBuilder('name2')->getForm());
-
-        $form->handleRequest($request);
-
-        $this->assertTrue($form->isValid());
-
-        $this->assertEquals('Bernhard', $form['name']->getData());
-        $this->assertEquals('Artem', $form['name2']->getData());
     }
 
     /**

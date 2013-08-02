@@ -551,7 +551,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
     [@name="name"]
     [@required="required"]
     [
-        ./option[not(@value)][not(@selected)][@disabled][.="[trans]Test&Me[/trans]"]
+        ./option[@value=""][not(@selected)][@disabled][.="[trans]Test&Me[/trans]"]
         /following-sibling::option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
         /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
@@ -574,7 +574,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
     [@name="name"]
     [@required="required"]
     [
-        ./option[not(@value)][not(@selected)][@disabled][.="[trans][/trans]"]
+        ./option[@value=""][not(@selected)][@disabled][.="[trans][/trans]"]
         /following-sibling::option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
         /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]

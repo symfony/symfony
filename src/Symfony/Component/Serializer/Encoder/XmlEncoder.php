@@ -24,6 +24,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
 {
     private $dom;
     private $format;
+    private $context;
     private $rootNodeName = 'response';
 
     /**
@@ -49,6 +50,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
 
         $this->dom = $this->createDomDocument($context);
         $this->format = $format;
+        $this->context = $context;
 
         if (null !== $data && !is_scalar($data)) {
             $root = $this->dom->createElement($xmlRootNodeName);
@@ -325,7 +327,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
         }
 
         if (is_object($data)) {
-            $data = $this->serializer->normalize($data, $this->format);
+            $data = $this->serializer->normalize($data, $this->format, $this->context);
             if (null !== $data && !is_scalar($data)) {
                 return $this->buildXml($parentNode, $data, $xmlRootNodeName);
             }
@@ -399,7 +401,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
         } elseif ($val instanceof \Traversable) {
             $this->buildXml($node, $val);
         } elseif (is_object($val)) {
-            return $this->buildXml($node, $this->serializer->normalize($val, $this->format));
+            return $this->buildXml($node, $this->serializer->normalize($val, $this->format, $this->context));
         } elseif (is_numeric($val)) {
             return $this->appendText($node, (string) $val);
         } elseif (is_string($val) && $this->needsCdataWrapping($val)) {

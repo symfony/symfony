@@ -248,7 +248,7 @@ class DateType extends AbstractType
         $timezone = $formatter->getTimezoneId();
 
         if (version_compare(\PHP_VERSION, '5.5.0-dev', '>=')) {
-            $formatter->setTimeZone(\DateTimeZone::UTC);
+            $formatter->setTimeZone(new \DateTimeZone('UTC'));
         } else {
             $formatter->setTimeZoneId(\DateTimeZone::UTC);
         }

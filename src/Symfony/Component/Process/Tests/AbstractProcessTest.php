@@ -62,7 +62,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         }
         $duration = microtime(true) - $start;
 
-        $this->assertLessThan(1.3, $duration);
+        $this->assertLessThan(1.8, $duration);
     }
 
     /**

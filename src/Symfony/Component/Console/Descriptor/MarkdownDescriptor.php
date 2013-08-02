@@ -126,9 +126,9 @@ class MarkdownDescriptor extends Descriptor
             }
 
             $this->write("\n\n");
-            $this->write(array_map(function ($commandName) {
+            $this->write(implode("\n", array_map(function ($commandName) {
                 return '* '.$commandName;
-            } , $namespace['commands']));
+            } , $namespace['commands'])));
         }
 
         foreach ($description->getCommands() as $command) {

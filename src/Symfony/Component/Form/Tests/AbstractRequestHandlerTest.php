@@ -86,7 +86,7 @@ abstract class AbstractRequestHandlerTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider methodExceptGetProvider
      */
-    public function testSubmitSimpleFormWithNullIfNameNotInRequestAndNotGetRequest($method)
+    public function testDoNoSubmitSimpleFormIfNameNotInRequestAndNotGetRequest($method)
     {
         $form = $this->getMockForm('param1', $method, false);
 
@@ -94,9 +94,8 @@ abstract class AbstractRequestHandlerTest extends \PHPUnit_Framework_TestCase
             'paramx' => array(),
         ));
 
-        $form->expects($this->once())
-            ->method('submit')
-            ->with($this->identicalTo(null), 'PATCH' !== $method);
+        $form->expects($this->never())
+            ->method('submit');
 
         $this->requestHandler->handleRequest($form, $this->request);
     }
@@ -104,7 +103,7 @@ abstract class AbstractRequestHandlerTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider methodExceptGetProvider
      */
-    public function testSubmitCompoundFormWithArrayIfNameNotInRequestAndNotGetRequest($method)
+    public function testDoNotSubmitCompoundFormIfNameNotInRequestAndNotGetRequest($method)
     {
         $form = $this->getMockForm('param1', $method, true);
 
@@ -112,9 +111,8 @@ abstract class AbstractRequestHandlerTest extends \PHPUnit_Framework_TestCase
             'paramx' => array(),
         ));
 
-        $form->expects($this->once())
-            ->method('submit')
-            ->with($this->identicalTo(array()), 'PATCH' !== $method);
+        $form->expects($this->never())
+            ->method('submit');
 
         $this->requestHandler->handleRequest($form, $this->request);
     }

@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-07-08T13:20:13Z
+
+ping @lsmith77, @linclark
+
+---------------------------------------------------------------------------
+
+by linclark at 2013-07-08T14:14:12Z
+
+I don't know what the custom is as far as test coverage, but the test seems like overkill to me.
+
+The other relevant classes, such as GetSetMethodNormalizer, don't include a test for the context parameter. If the test is added for XmlEncoder, it should probably be added consistently so other classes are tested as well. But, as stated above, I think this is overkill.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-08-02T13:53:31Z
+
+@benji07 Can you remove the test?
+
+---------------------------------------------------------------------------
+
+by benji07 at 2013-08-02T13:58:53Z
+
+yes and done
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-08-02T14:01:38Z
+
+oh, and I forgot to ask you to add a note in the component CHANGELOG file.
+
+---------------------------------------------------------------------------
+
+by benji07 at 2013-08-02T14:04:15Z
+
+Where ? inside the 2.3 or the 2.2 version (the context was added in 2.2)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-08-02T14:07:46Z
+
+As this PR is going to be merged in master/2.4, it should be in the 2.4 section.
+
+---------------------------------------------------------------------------
+
+by benji07 at 2013-08-02T14:11:27Z
+
+ok, I could change the base branch for this PR, and use 2.3 instead ?

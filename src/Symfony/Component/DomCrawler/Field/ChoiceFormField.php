@@ -136,11 +136,11 @@ class ChoiceFormField extends FormField
                 }
 
                 foreach ($value as $v) {
-                    if (!$this->validationDisabled && !$this->containsOption($v, $this->options)) {
+                    if (!$this->containsOption($v, $this->options)) {
                         throw new \InvalidArgumentException(sprintf('Input "%s" cannot take "%s" as a value (possible values: %s).', $this->name, $v, implode(', ', $this->availableOptionValues())));
                     }
                 }
-            } elseif (!$this->validationDisabled && !$this->containsOption($value, $this->options)) {
+            } elseif (!$this->containsOption($value, $this->options)) {
                 throw new \InvalidArgumentException(sprintf('Input "%s" cannot take "%s" as a value (possible values: %s).', $this->name, $value, implode(', ', $this->availableOptionValues())));
             }
 
@@ -284,6 +284,10 @@ class ChoiceFormField extends FormField
      */
     public function containsOption($optionValue, $options)
     {
+        if ($this->validationDisabled) {
+            return true;
+        }
+
         foreach ($options as $option) {
             if ($option['value'] == $optionValue) {
                 return true;
@@ -310,7 +314,7 @@ class ChoiceFormField extends FormField
     }
 
     /**
-     * Disable the internal validation of the field.
+     * Disables the internal validation of the field.
      *
      * @return self
      */

@@ -331,6 +331,22 @@ class Form extends Link implements \ArrayAccess
     }
 
     /**
+     * Disables validation
+     *
+     * @return self
+     */
+    public function disableValidation()
+    {
+        foreach ($this->fields->all() as $field) {
+            if ($field instanceof Field\ChoiceFormField) {
+                $field->disableValidation();
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * Sets the node for the form.
      *
      * Expects a 'submit' button \DOMNode and finds the corresponding form element.

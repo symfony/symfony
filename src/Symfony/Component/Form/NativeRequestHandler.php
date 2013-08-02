@@ -72,10 +72,13 @@ class NativeRequestHandler implements RequestHandlerInterface
             if ('' === $name) {
                 $params = $_POST;
                 $files = $fixedFiles;
-            } else {
+            } elseif (array_key_exists($name, $_POST) || array_key_exists($name, $fixedFiles)) {
                 $default = $form->getConfig()->getCompound() ? array() : null;
-                $params = isset($_POST[$name]) ? $_POST[$name] : $default;
-                $files = isset($fixedFiles[$name]) ? $fixedFiles[$name] : $default;
+                $params = array_key_exists($name, $_POST) ? $_POST[$name] : $default;
+                $files = array_key_exists($name, $fixedFiles) ? $fixedFiles[$name] : $default;
+            } else {
+                // Don't submit the form if it is not present in the request
+                return;
             }
 
             if (is_array($params) && is_array($files)) {

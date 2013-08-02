@@ -64,16 +64,20 @@ class PropertyPathMapperTest extends \PHPUnit_Framework_TestCase
      * @param Boolean $synchronized
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    private function getForm(FormConfigInterface $config, $synchronized = true)
+    private function getForm(FormConfigInterface $config, $synchronized = true, $submitted = true)
     {
         $form = $this->getMockBuilder('Symfony\Component\Form\Form')
             ->setConstructorArgs(array($config))
-            ->setMethods(array('isSynchronized'))
+            ->setMethods(array('isSynchronized', 'isSubmitted'))
             ->getMock();
 
         $form->expects($this->any())
             ->method('isSynchronized')
             ->will($this->returnValue($synchronized));
+
+        $form->expects($this->any())
+            ->method('isSubmitted')
+            ->will($this->returnValue($submitted));
 
         return $form;
     }
@@ -259,6 +263,24 @@ class PropertyPathMapperTest extends \PHPUnit_Framework_TestCase
         $config->setData($engine);
         $config->setMapped(false);
         $form = $this->getForm($config);
+
+        $this->mapper->mapFormsToData(array($form), $car);
+    }
+
+    public function testMapFormsToDataIgnoresUnsubmittedForms()
+    {
+        $car = new \stdClass();
+        $engine = new \stdClass();
+        $propertyPath = $this->getPropertyPath('engine');
+
+        $this->propertyAccessor->expects($this->never())
+            ->method('setValue');
+
+        $config = new FormConfigBuilder('name', '\stdClass', $this->dispatcher);
+        $config->setByReference(true);
+        $config->setPropertyPath($propertyPath);
+        $config->setData($engine);
+        $form = $this->getForm($config, true, false);
 
         $this->mapper->mapFormsToData(array($form), $car);
     }

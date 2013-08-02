@@ -276,7 +276,7 @@ class ExecutionContextTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('bam.baz', $this->context->getPropertyPath('bam.baz'));
     }
-    
+
     public function testGetPropertyPathWithNestedCollectionsMixed()
     {
         $constraints = new Collection(array(
@@ -286,13 +286,13 @@ class ExecutionContextTest extends \PHPUnit_Framework_TestCase
              )),
             'name' => new ConstraintA()
         ));
-     
+
         $visitor = new ValidationVisitor('Root', $this->metadataFactory, new ConstraintValidatorFactory(), $this->translator);
         $context = new ExecutionContext($visitor, $this->translator, self::TRANS_DOMAIN);
         $context->validateValue(array('foo' => array('foo' => 'VALID')), $constraints);
         $violations = $context->getViolations();
-        
-        $this->assertEquals('[name]', $violations[1]->getPropertyPath());        
+
+        $this->assertEquals('[name]', $violations[1]->getPropertyPath());
     }
 }
 

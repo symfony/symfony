@@ -41,7 +41,7 @@ class DigestAuthenticationEntryPoint implements AuthenticationEntryPointInterfac
     public function start(Request $request, AuthenticationException $authException = null)
     {
         $expiryTime = microtime(true) + $this->nonceValiditySeconds * 1000;
-        $signatureValue = hash('sha256', $expiryTime.':'.$this->key);
+        $signatureValue = md5($expiryTime.':'.$this->key);
         $nonceValue = $expiryTime.':'.$signatureValue;
         $nonceValueBase64 = base64_encode($nonceValue);
 

@@ -193,7 +193,7 @@ class DigestData
 
         $this->nonceExpiryTime = $nonceTokens[0];
 
-        if (hash('sha256', $this->nonceExpiryTime.':'.$entryPointKey) !== $nonceTokens[1]) {
+        if (md5($this->nonceExpiryTime.':'.$entryPointKey) !== $nonceTokens[1]) {
             throw new BadCredentialsException(sprintf('Nonce token compromised "%s".', $nonceAsPlainText));
         }
     }

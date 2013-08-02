@@ -543,12 +543,15 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
             'empty_value' => 'Test&Me'
         ));
 
+        // The "disabled" attribute was removed again due to a bug in the
+        // BlackBerry 10 browser.
+        // See https://github.com/symfony/symfony/pull/7678
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/select
     [@name="name"]
     [@required="required"]
     [
-        ./option[@value=""][not(@selected)][@disabled][.="[trans]Test&Me[/trans]"]
+        ./option[@value=""][not(@selected)][not(@disabled)][.="[trans]Test&Me[/trans]"]
         /following-sibling::option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
         /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
@@ -566,12 +569,15 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
             'expanded' => false,
         ));
 
+        // The "disabled" attribute was removed again due to a bug in the
+        // BlackBerry 10 browser.
+        // See https://github.com/symfony/symfony/pull/7678
         $this->assertWidgetMatchesXpath($form->createView(), array('empty_value' => ''),
 '/select
     [@name="name"]
     [@required="required"]
     [
-        ./option[@value=""][not(@selected)][@disabled][.="[trans][/trans]"]
+        ./option[@value=""][not(@selected)][not(@disabled)][.="[trans][/trans]"]
         /following-sibling::option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
         /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]

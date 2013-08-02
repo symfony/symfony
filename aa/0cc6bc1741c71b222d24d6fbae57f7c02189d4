@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by stof at 2013-07-31T17:38:37Z
+
+this should not be needed. ``Output::write()`` accepts strings
+
+---------------------------------------------------------------------------
+
+by stof at 2013-07-31T17:49:26Z
+
+ah no, it is indeed not putting a newline because you use ``write``, not ``writeln`` here
+
+---------------------------------------------------------------------------
+
+by jfsimon at 2013-07-31T18:43:17Z
+
+@stof the strange thing is that I'm pretty sure tests where okay some weeks ago...

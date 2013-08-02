@@ -90,38 +90,6 @@ abstract class AbstractFormTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param  string $name
-     *
-     * @return \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected function getValidForm($name)
-    {
-        $form = $this->getMockForm($name);
-
-        $form->expects($this->any())
-            ->method('isValid')
-            ->will($this->returnValue(true));
-
-        return $form;
-    }
-
-    /**
-     * @param  string $name
-     *
-     * @return \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected function getInvalidForm($name)
-    {
-        $form = $this->getMockForm($name);
-
-        $form->expects($this->any())
-            ->method('isValid')
-            ->will($this->returnValue(false));
-
-        return $form;
-    }
-
-    /**
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
     protected function getDataMapper()

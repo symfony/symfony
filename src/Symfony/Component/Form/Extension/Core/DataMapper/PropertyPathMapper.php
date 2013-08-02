@@ -78,9 +78,9 @@ class PropertyPathMapper implements DataMapperInterface
             $propertyPath = $form->getPropertyPath();
             $config = $form->getConfig();
 
-            // Write-back is disabled if the form is not synchronized (transformation failed)
-            // and if the form is disabled (modification not allowed)
-            if (null !== $propertyPath && $config->getMapped() && $form->isSynchronized() && !$form->isDisabled()) {
+            // Write-back is disabled if the form is not synchronized (transformation failed),
+            // if the form was not submitted and if the form is disabled (modification not allowed)
+            if (null !== $propertyPath && $config->getMapped() && $form->isSubmitted() && $form->isSynchronized() && !$form->isDisabled()) {
                 // If the data is identical to the value in $data, we are
                 // dealing with a reference
                 if (!is_object($data) || !$config->getByReference() || $form->getData() !== $this->propertyAccessor->getValue($data, $propertyPath)) {

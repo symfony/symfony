@@ -158,6 +158,10 @@ UPGRADE FROM 2.x to 3.0
 
  * The `FormItegrationTestCase` and `FormPerformanceTestCase` classes were moved form the `Symfony\Component\Form\Tests` namespace to the `Symfony\Component\Form\Test` namespace.
 
+ * The constants `ROUND_HALFEVEN`, `ROUND_HALFUP` and `ROUND_HALFDOWN` in class
+   `NumberToLocalizedStringTransformer` were renamed to `ROUND_HALF_EVEN`,
+   `ROUND_HALF_UP` and `ROUND_HALF_DOWN`.
+
 
 ### FrameworkBundle
 

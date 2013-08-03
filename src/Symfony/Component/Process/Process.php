@@ -13,6 +13,7 @@ namespace Symfony\Component\Process;
 
 use Symfony\Component\Process\Exception\InvalidArgumentException;
 use Symfony\Component\Process\Exception\LogicException;
+use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Exception\RuntimeException;
 
 /**
@@ -44,7 +45,9 @@ class Process
     private $env;
     private $stdin;
     private $starttime;
+    private $lastOutputTime;
     private $timeout;
+    private $idleTimeout;
     private $options;
     private $exitcode;
     private $fallbackExitcode;
@@ -231,7 +234,7 @@ class Process
             throw new RuntimeException('Process is already running');
         }
 
-        $this->starttime = microtime(true);
+        $this->starttime = $this->lastOutputTime = microtime(true);
         $this->stdout = '';
         $this->stderr = '';
         $this->incrementalOutputOffset = 0;
@@ -795,6 +798,7 @@ class Process
      */
     public function addOutput($line)
     {
+        $this->lastOutputTime = microtime(true);
         $this->stdout .= $line;
     }
 
@@ -805,6 +809,7 @@ class Process
      */
     public function addErrorOutput($line)
     {
+        $this->lastOutputTime = microtime(true);
         $this->stderr .= $line;
     }
 
@@ -835,7 +840,7 @@ class Process
     /**
      * Gets the process timeout.
      *
-     * @return integer|null The timeout in seconds or null if it's disabled
+     * @return float|null The timeout in seconds or null if it's disabled
      */
     public function getTimeout()
     {
@@ -843,11 +848,21 @@ class Process
     }
 
     /**
+     * Gets the process idle timeout.
+     *
+     * @return float|null
+     */
+    public function getIdleTimeout()
+    {
+        return $this->idleTimeout;
+    }
+
+    /**
      * Sets the process timeout.
      *
      * To disable the timeout, set this value to null.
      *
-     * @param float|null $timeout The timeout in seconds
+     * @param integer|float|null $timeout The timeout in seconds
      *
      * @return self The current Process instance
      *
@@ -855,19 +870,23 @@ class Process
      */
     public function setTimeout($timeout)
     {
-        if (null === $timeout) {
-            $this->timeout = null;
+        $this->timeout = $this->validateTimeout($timeout);
 
-            return $this;
-        }
+        return $this;
+    }
 
-        $timeout = (float) $timeout;
-
-        if ($timeout < 0) {
-            throw new InvalidArgumentException('The timeout value must be a valid positive integer or float number.');
-        }
-
-        $this->timeout = $timeout;
+    /**
+     * Sets the process idle timeout.
+     *
+     * @param integer|float|null $timeout
+     *
+     * @return self The current Process instance.
+     *
+     * @throws InvalidArgumentException if the timeout is negative
+     */
+    public function setIdleTimeout($timeout)
+    {
+        $this->idleTimeout = $this->validateTimeout($timeout);
 
         return $this;
     }
@@ -1078,7 +1097,13 @@ class Process
         if (0 < $this->timeout && $this->timeout < microtime(true) - $this->starttime) {
             $this->stop(0);
 
-            throw new RuntimeException('The process timed-out.');
+            throw new ProcessTimedOutException($this, ProcessTimedOutException::TYPE_GENERAL);
+        }
+
+        if (0 < $this->idleTimeout && $this->idleTimeout < microtime(true) - $this->lastOutputTime) {
+            $this->stop(0);
+
+            throw new ProcessTimedOutException($this, ProcessTimedOutException::TYPE_IDLE);
         }
     }
 
@@ -1252,5 +1277,27 @@ class Process
 
         // stream_select returns false when the `select` system call is interrupted by an incoming signal
         return isset($lastError['message']) && false !== stripos($lastError['message'], 'interrupted system call');
+    }
+
+    /**
+     * Validates and returns the filtered timeout.
+     *
+     * @param integer|float|null $timeout
+     *
+     * @return float|null
+     */
+    private function validateTimeout($timeout)
+    {
+        if (null === $timeout) {
+            return null;
+        }
+
+        $timeout = (float) $timeout;
+
+        if ($timeout < 0) {
+            throw new InvalidArgumentException('The timeout value must be a valid positive integer or float number.');
+        }
+
+        return $timeout;
     }
 }

@@ -372,4 +372,20 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
             $this->assertSame('Document types are not allowed.', $e->getMessage(), '->load() throws an InvalidArgumentException if the configuration contains a document type');
         }
     }
+
+    public function testConstants()
+    {
+        $container = new ContainerBuilder();
+
+        $loader1 = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader1->load('constants.xml');
+
+        $actual = $container->getParameterBag()->all();
+        $expected = array(
+            'simple_constant' => PHP_EOL,
+            'indented_constant' => PHP_EOL,
+        );
+
+        $this->assertEquals($expected, $actual, '->load() parses PHP constants');
+    }
 }

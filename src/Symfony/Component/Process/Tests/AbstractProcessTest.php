@@ -205,8 +205,8 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
      */
     public function testPTYCommand()
     {
-        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
-            $this->markTestSkipped('Windows does not have PTY support.');
+        if ( ! Process::isPtySupported()) {
+            $this->markTestSkipped('PTY is not supported on this operating system.');
         }
 
         $process = $this->getProcess('echo "foo"');

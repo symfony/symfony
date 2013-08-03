@@ -121,6 +121,27 @@ class Process
     );
 
     /**
+     * Returns whether PTY is supported on the current operating system.
+     *
+     * @return Boolean
+     */
+    public static function isPtySupported()
+    {
+        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+            return false;
+        }
+
+        $proc = @proc_open('echo 1', array(array('pty'), array('pty'), array('pty')), $pipes);
+        if (is_resource($proc)) {
+            proc_close($proc);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Constructor.
      *
      * @param string  $commandline The command line to run
@@ -1183,7 +1204,7 @@ class Process
                 array('file', '/dev/tty', 'w'),
                 array('file', '/dev/tty', 'w'),
             );
-        } elseif ($this->pty) {
+        } elseif ($this->pty && self::isPtySupported()) {
             $descriptors = array(
                 array('pty'),
                 array('pty'),

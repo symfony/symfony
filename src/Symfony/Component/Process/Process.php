@@ -127,18 +127,24 @@ class Process
      */
     public static function isPtySupported()
     {
+        static $result;
+
+        if (null !== $result) {
+            return $result;
+        }
+
         if (defined('PHP_WINDOWS_VERSION_BUILD')) {
-            return false;
+            return $result = false;
         }
 
         $proc = @proc_open('echo 1', array(array('pty'), array('pty'), array('pty')), $pipes);
         if (is_resource($proc)) {
             proc_close($proc);
 
-            return true;
+            return $result = true;
         }
 
-        return false;
+        return $result = false;
     }
 
     /**

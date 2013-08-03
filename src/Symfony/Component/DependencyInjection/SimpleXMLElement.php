@@ -84,7 +84,7 @@ class SimpleXMLElement extends \SimpleXMLElement
                     $arguments[$key] = (string) $arg;
                     break;
                 case 'constant':
-                    $arguments[$key] = constant((string) $arg);
+                    $arguments[$key] = constant(trim((string) $arg));
                     break;
                 default:
                     $arguments[$key] = self::phpize($arg);

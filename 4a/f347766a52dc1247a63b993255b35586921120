@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by hacfi at 2013-08-02T22:03:59Z
+
++1
+
+We’ll see if 1.8 is enough..not sure when travis is busiest but it was enough for passing on Friday night (which I guess is busy).
+
+Travis errors are related to the FragmentHandler.

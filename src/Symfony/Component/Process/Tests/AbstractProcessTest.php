@@ -217,6 +217,28 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("foo\r\n", $process->getOutput());
     }
 
+    /**
+     * @group mustRun
+     */
+    public function testMustRun()
+    {
+        $process = $this->getProcess('echo "foo"');
+
+        $this->assertSame($process, $process->mustRun());
+        $this->assertEquals("foo\n", $process->getOutput());
+        $this->assertEquals(0, $process->getExitCode());
+    }
+
+    /**
+     * @expectedException Symfony\Component\Process\Exception\ProcessFailedException
+     * @group mustRun
+     */
+    public function testMustRunThrowsException()
+    {
+        $process = $this->getProcess('exit 1');
+        $process->mustRun();
+    }
+
     public function testExitCodeText()
     {
         $process = $this->getProcess('');

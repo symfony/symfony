@@ -31,6 +31,24 @@ class SigchildDisabledProcessTest extends AbstractProcessTest
 
     /**
      * @expectedException \Symfony\Component\Process\Exception\RuntimeException
+     * @group mustRun
+     */
+    public function testMustRun()
+    {
+        parent::testMustRun();
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Process\Exception\RuntimeException
+     * @group mustRun
+     */
+    public function testMustRunThrowsException()
+    {
+        parent::testMustRunThrowsException();
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Process\Exception\RuntimeException
      */
     public function testProcessIsSignaledIfStopped()
     {

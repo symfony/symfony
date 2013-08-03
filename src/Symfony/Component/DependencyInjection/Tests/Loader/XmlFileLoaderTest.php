@@ -383,6 +383,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $actual = $container->getParameterBag()->all();
         $expected = array(
             'simple_constant' => PHP_EOL,
+            'indented_constant' => PHP_EOL,
         );
 
         $this->assertEquals($expected, $actual, '->load() parses PHP constants');

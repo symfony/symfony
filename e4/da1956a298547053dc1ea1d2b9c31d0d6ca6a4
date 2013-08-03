@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by hacfi at 2013-08-02T20:02:38Z
+
+Nice addition!
+
+The failing testing on 5.3 seems to be due to server overload. We could just increase the tolerance value from 1.3 to 2 !?
+
+---------------------------------------------------------------------------
+
+by jakzal at 2013-08-02T21:55:25Z
+
+@hacfi I was thinking about the same since that test fails quite often (PR is here: #8652).

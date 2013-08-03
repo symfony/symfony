@@ -200,6 +200,23 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(Process::STATUS_TERMINATED, $process->getStatus());
     }
 
+    /**
+     * @group pty
+     */
+    public function testPTYCommand()
+    {
+        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+            $this->markTestSkipped('Windows does not have PTY support.');
+        }
+
+        $process = $this->getProcess('echo "foo"');
+        $process->setPty(true);
+        $process->run();
+
+        $this->assertSame(Process::STATUS_TERMINATED, $process->getStatus());
+        $this->assertEquals("foo\r\n", $process->getOutput());
+    }
+
     public function testExitCodeText()
     {
         $process = $this->getProcess('');

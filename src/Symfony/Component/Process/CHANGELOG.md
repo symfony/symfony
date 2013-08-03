@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * added the ability to define an idle timeout
+ * added support for PTY mode
 
 2.3.0
 -----

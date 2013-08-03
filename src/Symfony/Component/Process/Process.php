@@ -62,6 +62,7 @@ class Process
     private $incrementalOutputOffset;
     private $incrementalErrorOutputOffset;
     private $tty;
+    private $pty;
 
     private $fileHandles;
     private $readBytes;
@@ -156,6 +157,7 @@ class Process
         }
         $this->stdin = $stdin;
         $this->setTimeout($timeout);
+        $this->pty = false;
         $this->enhanceWindowsCompatibility = true;
         $this->enhanceSigchildCompatibility = !defined('PHP_WINDOWS_VERSION_BUILD') && $this->isSigchildEnabled();
         $this->options = array_replace(array('suppress_errors' => true, 'binary_pipes' => true), $options);
@@ -916,6 +918,30 @@ class Process
     }
 
     /**
+     * Sets PTY mode.
+     *
+     * @param Boolean $bool
+     *
+     * @return self
+     */
+    public function setPty($bool)
+    {
+        $this->pty = (Boolean) $bool;
+
+        return $this;
+    }
+
+    /**
+     * Returns PTY state.
+     *
+     * @return Boolean
+     */
+    public function isPty()
+    {
+        return $this->pty;
+    }
+
+    /**
      * Gets the working directory.
      *
      * @return string The current working directory
@@ -1136,6 +1162,12 @@ class Process
                 array('file', '/dev/tty', 'r'),
                 array('file', '/dev/tty', 'w'),
                 array('file', '/dev/tty', 'w'),
+            );
+        } elseif ($this->pty) {
+            $descriptors = array(
+                array('pty'),
+                array('pty'),
+                array('pty'),
             );
         } else {
            $descriptors = array(

@@ -118,6 +118,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
             ),
             'foo_bar' => new Reference('foo_bar'),
             'mixedcase' => array('MixedCaseKey' => 'value'),
+            'constant' => PHP_EOL,
         );
 
         $this->assertEquals($expected, $actual, '->load() converts XML values to PHP ones');
@@ -158,6 +159,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
             ),
             'foo_bar' => new Reference('foo_bar'),
             'mixedcase' => array('MixedCaseKey' => 'value'),
+            'constant' => PHP_EOL,
             'bar' => '%foo%',
             'imported_from_ini' => true,
             'imported_from_yaml' => true

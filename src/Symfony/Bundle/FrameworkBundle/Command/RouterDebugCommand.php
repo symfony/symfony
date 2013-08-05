@@ -124,9 +124,13 @@ EOF
             $host = '' !== $route->getHost() ? $route->getHost() : 'ANY';
             if ($showControllers) {
                 $defaultData = $route->getDefaults();
-                $controller = $defaultData['controller'] ? $defaultData['controller'] : '';
-                if (is_callable($controller)) {
+                $controller = $defaultData['_controller'] ? $defaultData['_controller'] : '';
+                if ($controller instanceof \Closure) {
                     $controller = 'Closure';
+                } else {
+                    if (is_object($controller)) {
+                        get_class($controller);
+                    }
                 }
                 $output->writeln(sprintf($format, $name, $method, $scheme, $host, $route->getPath(), $controller), OutputInterface::OUTPUT_RAW);
             } else {

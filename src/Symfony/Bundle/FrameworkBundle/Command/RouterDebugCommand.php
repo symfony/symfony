@@ -123,7 +123,11 @@ EOF
             $scheme = $route->getSchemes() ? implode('|', $route->getSchemes()) : 'ANY';
             $host = '' !== $route->getHost() ? $route->getHost() : 'ANY';
             if ($showControllers) {
-                $controller = $route->getDefaults()['_controller'] ? $route->getDefaults()['_controller'] : '';
+                $defaultData = $route->getDefaults();
+                $controller = $defaultData['controller'] ? $defaultData['controller'] : '';
+                if (is_callable($controller)) {
+                    $controller = 'Closure';
+                }
                 $output->writeln(sprintf($format, $name, $method, $scheme, $host, $route->getPath(), $controller), OutputInterface::OUTPUT_RAW);
             } else {
                 $output->writeln(sprintf($format, $name, $method, $scheme, $host, $route->getPath()), OutputInterface::OUTPUT_RAW);

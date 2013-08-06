@@ -11,6 +11,10 @@
 
 namespace Symfony\Component\Validator\Mapping;
 
+use Symfony\Component\Validator\ValidationVisitorInterface;
+use Symfony\Component\Validator\PropertyMetadataContainerInterface;
+use Symfony\Component\Validator\ClassBasedInterface;
+use Symfony\Component\Validator\MetadataInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\GroupDefinitionException;
@@ -21,15 +25,46 @@ use Symfony\Component\Validator\Exception\GroupDefinitionException;
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ClassMetadata extends ElementMetadata
+class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassBasedInterface, PropertyMetadataContainerInterface
 {
+    /**
+     * @var string
+     */
     public $name;
+
+    /**
+     * @var string
+     */
     public $defaultGroup;
+
+    /**
+     * @var MemberMetadata[]
+     */
     public $members = array();
+
+    /**
+     * @var PropertyMetadata[]
+     */
     public $properties = array();
+
+    /**
+     * @var GetterMetadata[]
+     */
     public $getters = array();
+
+    /**
+     * @var array
+     */
     public $groupSequence = array();
+
+    /**
+     * @var Boolean
+     */
     public $groupSequenceProvider = false;
+
+    /**
+     * @var \ReflectionClass
+     */
     private $reflClass;
 
     /**
@@ -45,6 +80,40 @@ class ClassMetadata extends ElementMetadata
             $this->defaultGroup = substr($class, $nsSep + 1);
         } else {
             $this->defaultGroup = $class;
+        }
+    }
+
+    public function accept(ValidationVisitorInterface $visitor, $value, $group, $propertyPath, $propagatedGroup = null)
+    {
+        if (null === $propagatedGroup && Constraint::DEFAULT_GROUP === $group
+                && ($this->hasGroupSequence() || $this->isGroupSequenceProvider())) {
+            if ($this->hasGroupSequence()) {
+                $groups = $this->getGroupSequence();
+            } else {
+                $groups = $value->getGroupSequence();
+            }
+
+            foreach ($groups as $group) {
+                $this->accept($visitor, $value, $group, $propertyPath, Constraint::DEFAULT_GROUP);
+
+                if (count($visitor->getViolations()) > 0) {
+                    break;
+                }
+            }
+
+            return;
+        }
+
+        $visitor->visit($this, $value, $group, $propertyPath);
+
+        if (null !== $value) {
+            $pathPrefix = empty($propertyPath) ? '' : $propertyPath.'.';
+
+            foreach ($this->getConstrainedProperties() as $property) {
+                foreach ($this->getMemberMetadatas($property) as $member) {
+                    $member->accept($visitor, $member->getPropertyValue($value), $group, $pathPrefix.$property, $propagatedGroup);
+                }
+            }
         }
     }
 
@@ -119,7 +188,7 @@ class ClassMetadata extends ElementMetadata
      * @param string     $property   The name of the property
      * @param Constraint $constraint The constraint
      *
-     * @return ClassMetadata           This object
+     * @return ClassMetadata This object
      */
     public function addPropertyConstraint($property, Constraint $constraint)
     {
@@ -183,7 +252,7 @@ class ClassMetadata extends ElementMetadata
 
                 $this->addMemberMetadata($member);
 
-                if (!$member->isPrivate()) {
+                if (!$member->isPrivate($this->name)) {
                     $property = $member->getPropertyName();
 
                     if ($member instanceof PropertyMetadata && !isset($this->properties[$property])) {
@@ -197,7 +266,7 @@ class ClassMetadata extends ElementMetadata
     }
 
     /**
-     * Adds a member metadata
+     * Adds a member metadata.
      *
      * @param MemberMetadata $metadata
      */
@@ -221,13 +290,29 @@ class ClassMetadata extends ElementMetadata
     }
 
     /**
-     * Returns all metadatas of members describing the given property
+     * Returns all metadatas of members describing the given property.
      *
      * @param string $property The name of the property
      *
-     * @return array An array of MemberMetadata
+     * @return MemberMetadata[] An array of MemberMetadata
      */
     public function getMemberMetadatas($property)
+    {
+        return $this->members[$property];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasPropertyMetadata($property)
+    {
+        return array_key_exists($property, $this->members);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPropertyMetadata($property)
     {
         return $this->members[$property];
     }
@@ -246,6 +331,10 @@ class ClassMetadata extends ElementMetadata
      * Sets the default group sequence for this class.
      *
      * @param array $groups An array of group names
+     *
+     * @return ClassMetadata
+     *
+     * @throws GroupDefinitionException
      */
     public function setGroupSequence(array $groups)
     {
@@ -289,7 +378,7 @@ class ClassMetadata extends ElementMetadata
     /**
      * Returns a ReflectionClass instance for this class.
      *
-     * @return ReflectionClass
+     * @return \ReflectionClass
      */
     public function getReflectionClass()
     {
@@ -301,9 +390,11 @@ class ClassMetadata extends ElementMetadata
     }
 
     /**
-     * Sets whether a group sequence provider should be used
+     * Sets whether a group sequence provider should be used.
      *
-     * @param boolean $active
+     * @param Boolean $active
+     *
+     * @throws GroupDefinitionException
      */
     public function setGroupSequenceProvider($active)
     {
@@ -321,7 +412,7 @@ class ClassMetadata extends ElementMetadata
     /**
      * Returns whether the class is a group sequence provider.
      *
-     * @return boolean
+     * @return Boolean
      */
     public function isGroupSequenceProvider()
     {

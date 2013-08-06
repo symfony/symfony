@@ -96,7 +96,7 @@ class InputArgument
     public function setDefault($default = null)
     {
         if (self::REQUIRED === $this->mode && null !== $default) {
-            throw new \LogicException('Cannot set a default value except for Parameter::OPTIONAL mode.');
+            throw new \LogicException('Cannot set a default value except for InputArgument::OPTIONAL mode.');
         }
 
         if ($this->isArray()) {

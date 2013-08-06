@@ -27,7 +27,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('fr', $translator->getLocale());
     }
 
-    public function testSetFallbackLocale()
+    public function testSetFallbackLocales()
     {
         $translator = new Translator('en', new MessageSelector());
         $translator->addLoader('array', new ArrayLoader());
@@ -37,11 +37,11 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         // force catalogue loading
         $translator->trans('bar');
 
-        $translator->setFallbackLocale('fr');
+        $translator->setFallbackLocales(array('fr'));
         $this->assertEquals('foobar', $translator->trans('bar'));
     }
 
-    public function testSetFallbackLocaleMultiple()
+    public function testSetFallbackLocalesMultiple()
     {
         $translator = new Translator('en', new MessageSelector());
         $translator->addLoader('array', new ArrayLoader());
@@ -51,7 +51,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         // force catalogue loading
         $translator->trans('bar');
 
-        $translator->setFallbackLocale(array('fr_FR', 'fr'));
+        $translator->setFallbackLocales(array('fr_FR', 'fr'));
         $this->assertEquals('bar (fr)', $translator->trans('bar'));
     }
 
@@ -62,9 +62,53 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $translator->addResource('array', array('foo' => 'foofoo'), 'en_US');
         $translator->addResource('array', array('bar' => 'foobar'), 'en');
 
-        $translator->setFallbackLocale('en');
+        $translator->setFallbackLocales(array('en'));
 
         $this->assertEquals('foobar', $translator->trans('bar'));
+    }
+
+    public function testAddResourceAfterTrans()
+    {
+        $translator = new Translator('fr', new MessageSelector());
+        $translator->addLoader('array', new ArrayLoader());
+
+        $translator->setFallbackLocale(array('en'));
+
+        $translator->addResource('array', array('foo' => 'foofoo'), 'en');
+        $this->assertEquals('foofoo', $translator->trans('foo'));
+
+        $translator->addResource('array', array('bar' => 'foobar'), 'en');
+        $this->assertEquals('foobar', $translator->trans('bar'));
+    }
+
+    /**
+     * @dataProvider      getTransFileTests
+     * @expectedException \Symfony\Component\Translation\Exception\NotFoundResourceException
+     */
+    public function testTransWithoutFallbackLocaleFile($format, $loader)
+    {
+        $loaderClass = 'Symfony\\Component\\Translation\\Loader\\'.$loader;
+        $translator = new Translator('en', new MessageSelector());
+        $translator->addLoader($format, new $loaderClass());
+        $translator->addResource($format, __DIR__.'/fixtures/non-existing', 'en');
+        $translator->addResource($format, __DIR__.'/fixtures/resources.'.$format, 'en');
+
+        // force catalogue loading
+        $translator->trans('foo');
+    }
+
+    /**
+     * @dataProvider getTransFileTests
+     */
+    public function testTransWithFallbackLocaleFile($format, $loader)
+    {
+        $loaderClass = 'Symfony\\Component\\Translation\\Loader\\'.$loader;
+        $translator = new Translator('en_GB', new MessageSelector());
+        $translator->addLoader($format, new $loaderClass());
+        $translator->addResource($format, __DIR__.'/fixtures/non-existing', 'en_GB');
+        $translator->addResource($format, __DIR__.'/fixtures/resources.'.$format, 'en', 'resources');
+
+        $this->assertEquals('bar', $translator->trans('foo', array(), 'resources'));
     }
 
     public function testTransWithFallbackLocaleBis()
@@ -83,7 +127,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $translator->addResource('array', array('foo' => 'foo (en_US)'), 'en_US');
         $translator->addResource('array', array('bar' => 'bar (en)'), 'en');
 
-        $translator->setFallbackLocale(array('en_US', 'en'));
+        $translator->setFallbackLocales(array('en_US', 'en'));
 
         $this->assertEquals('foo (en_US)', $translator->trans('foo'));
         $this->assertEquals('bar (en)', $translator->trans('bar'));
@@ -92,7 +136,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     public function testTransNonExistentWithFallback()
     {
         $translator = new Translator('fr', new MessageSelector());
-        $translator->setFallbackLocale('en');
+        $translator->setFallbackLocales(array('en'));
         $translator->addLoader('array', new ArrayLoader());
         $this->assertEquals('non-existent', $translator->trans('non-existent'));
     }
@@ -142,6 +186,20 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $translator->addResource('array', array((string) $id => $translation), $locale, $domain);
 
         $this->assertEquals($expected, $translator->transChoice($id, $number, $parameters, $domain, $locale));
+    }
+
+    public function getTransFileTests()
+    {
+        return array(
+            array('csv', 'CsvFileLoader'),
+            array('ini', 'IniFileLoader'),
+            array('mo', 'MoFileLoader'),
+            array('po', 'PoFileLoader'),
+            array('php', 'PhpFileLoader'),
+            array('ts', 'QtFileLoader'),
+            array('xlf', 'XliffFileLoader'),
+            array('yml', 'YamlFileLoader'),
+        );
     }
 
     public function getTransTests()
@@ -202,7 +260,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     public function testTransChoiceFallback()
     {
         $translator = new Translator('ru', new MessageSelector());
-        $translator->setFallbackLocale('en');
+        $translator->setFallbackLocales(array('en'));
         $translator->addLoader('array', new ArrayLoader());
         $translator->addResource('array', array('some_message2' => 'one thing|%count% things'), 'en');
 
@@ -212,7 +270,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     public function testTransChoiceFallbackBis()
     {
         $translator = new Translator('ru', new MessageSelector());
-        $translator->setFallbackLocale(array('en_US', 'en'));
+        $translator->setFallbackLocales(array('en_US', 'en'));
         $translator->addLoader('array', new ArrayLoader());
         $translator->addResource('array', array('some_message2' => 'one thing|%count% things'), 'en_US');
 
@@ -225,7 +283,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     public function testTransChoiceFallbackWithNoTranslation()
     {
         $translator = new Translator('ru', new MessageSelector());
-        $translator->setFallbackLocale('en');
+        $translator->setFallbackLocales(array('en'));
         $translator->addLoader('array', new ArrayLoader());
 
         $this->assertEquals('10 things', $translator->transChoice('some_message2', 10, array('%count%' => 10)));

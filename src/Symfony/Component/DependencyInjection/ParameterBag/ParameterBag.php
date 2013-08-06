@@ -84,7 +84,7 @@ class ParameterBag implements ParameterBagInterface
      *
      * @return mixed  The parameter value
      *
-     * @throws  ParameterNotFoundException if the parameter is not defined
+     * @throws ParameterNotFoundException if the parameter is not defined
      *
      * @api
      */
@@ -93,7 +93,19 @@ class ParameterBag implements ParameterBagInterface
         $name = strtolower($name);
 
         if (!array_key_exists($name, $this->parameters)) {
-            throw new ParameterNotFoundException($name);
+            if (!$name) {
+                throw new ParameterNotFoundException($name);
+            }
+
+            $alternatives = array();
+            foreach (array_keys($this->parameters) as $key) {
+                $lev = levenshtein($name, $key);
+                if ($lev <= strlen($name) / 3 || false !== strpos($key, $name)) {
+                    $alternatives[] = $key;
+                }
+            }
+
+            throw new ParameterNotFoundException($name, null, null, null, $alternatives);
         }
 
         return $this->parameters[$name];
@@ -129,13 +141,13 @@ class ParameterBag implements ParameterBagInterface
     /**
      * Removes a parameter.
      *
-     * @param string $key The key
+     * @param string $name The parameter name
      *
      * @api
      */
-    public function remove($key)
+    public function remove($name)
     {
-        unset($this->parameters[$key]);
+        unset($this->parameters[strtolower($name)]);
     }
 
     /**

@@ -12,7 +12,7 @@
 namespace Symfony\Component\Form;
 
 /**
- * A form group bundling multiple form forms
+ * A form group bundling multiple forms in a hierarchical structure.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
@@ -21,34 +21,37 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Sets the parent form.
      *
-     * @param  FormInterface $parent The parent form
+     * @param  FormInterface|null $parent The parent form or null if it's the root.
      *
      * @return FormInterface The form instance
+     *
+     * @throws Exception\AlreadySubmittedException If the form has already been submitted.
+     * @throws Exception\LogicException        When trying to set a parent for a form with
+     *                                         an empty name.
      */
     public function setParent(FormInterface $parent = null);
 
     /**
      * Returns the parent form.
      *
-     * @return FormInterface The parent form
+     * @return FormInterface|null The parent form or null if there is none.
      */
     public function getParent();
 
     /**
-     * Returns whether the form has a parent.
-     *
-     * @return Boolean
-     */
-    public function hasParent();
-
-    /**
      * Adds a child to the form.
      *
-     * @param  FormInterface $child The FormInterface to add as a child
+     * @param FormInterface|string|integer $child   The FormInterface instance or the name of the child.
+     * @param string|null                  $type    The child's type, if a name was passed.
+     * @param array                        $options The child's options, if a name was passed.
      *
      * @return FormInterface The form instance
+     *
+     * @throws Exception\AlreadySubmittedException   If the form has already been submitted.
+     * @throws Exception\LogicException          When trying to add a child to a non-compound form.
+     * @throws Exception\UnexpectedTypeException If $child or $type has an unexpected type.
      */
-    public function add(FormInterface $child);
+    public function add($child, $type = null, array $options = array());
 
     /**
      * Returns the child with the given name.
@@ -56,6 +59,8 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      * @param string $name The name of the child
      *
      * @return FormInterface The child form
+     *
+     * @throws \OutOfBoundsException If the named child does not exist.
      */
     public function get($name);
 
@@ -74,29 +79,36 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      * @param  string $name The name of the child to remove
      *
      * @return FormInterface The form instance
+     *
+     * @throws Exception\AlreadySubmittedException If the form has already been submitted.
      */
     public function remove($name);
 
     /**
      * Returns all children in this group.
      *
-     * @return array An array of FormInterface instances
+     * @return FormInterface[] An array of FormInterface instances
      */
     public function all();
 
     /**
      * Returns all errors.
      *
-     * @return array An array of FormError instances that occurred during binding
+     * @return FormError[] An array of FormError instances that occurred during validation
      */
     public function getErrors();
 
     /**
-     * Updates the field with default data.
+     * Updates the form with default data.
      *
-     * @param  array $modelData The data formatted as expected for the underlying object
+     * @param  mixed $modelData The data formatted as expected for the underlying object
      *
      * @return FormInterface The form instance
+     *
+     * @throws Exception\AlreadySubmittedException If the form has already been submitted.
+     * @throws Exception\LogicException        If listeners try to call setData in a cycle. Or if
+     *                                         the view data does not match the expected type
+     *                                         according to {@link FormConfigInterface::getDataClass}.
      */
     public function setData($modelData);
 
@@ -110,23 +122,23 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns the normalized data of the field.
      *
-     * @return mixed When the field is not bound, the default data is returned.
-     *                When the field is bound, the normalized bound data is
-     *                returned if the field is valid, null otherwise.
+     * @return mixed When the field is not submitted, the default data is returned.
+     *               When the field is submitted, the normalized submitted data is
+     *               returned if the field is valid, null otherwise.
      */
     public function getNormData();
 
     /**
      * Returns the data transformed by the value transformer.
      *
-     * @return string
+     * @return mixed
      */
     public function getViewData();
 
     /**
      * Returns the extra data.
      *
-     * @return array The bound data which do not belong to a child
+     * @return array The submitted data which do not belong to a child
      */
     public function getExtraData();
 
@@ -138,11 +150,11 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     public function getConfig();
 
     /**
-     * Returns whether the field is bound.
+     * Returns whether the form is submitted.
      *
-     * @return Boolean true if the form is bound to input values, false otherwise
+     * @return Boolean true if the form is submitted, false otherwise
      */
-    public function isBound();
+    public function isSubmitted();
 
     /**
      * Returns the name by which the form is identified in forms.
@@ -154,7 +166,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns the property path that the form is mapped to.
      *
-     * @return Util\PropertyPath The property path.
+     * @return \Symfony\Component\PropertyAccess\PropertyPathInterface The property path.
      */
     public function getPropertyPath();
 
@@ -168,7 +180,9 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     public function addError(FormError $error);
 
     /**
-     * Returns whether the form is valid.
+     * Returns whether the form and all children are valid.
+     *
+     * If the form is not submitted, this method always returns false.
      *
      * @return Boolean
      */
@@ -213,13 +227,41 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     public function isSynchronized();
 
     /**
-     * Writes data into the form.
+     * Initializes the form tree.
      *
-     * @param  mixed $data The data
+     * Should be called on the root form after constructing the tree.
+     *
+     * @return FormInterface The form instance.
+     */
+    public function initialize();
+
+    /**
+     * Inspects the given request and calls {@link submit()} if the form was
+     * submitted.
+     *
+     * Internally, the request is forwarded to the configured
+     * {@link RequestHandlerInterface} instance, which determines whether to
+     * submit the form or not.
+     *
+     * @param mixed $request The request to handle.
+     *
+     * @return FormInterface The form instance.
+     */
+    public function handleRequest($request = null);
+
+    /**
+     * Submits data to the form, transforms and validates it.
+     *
+     * @param null|string|array $submittedData The submitted data.
+     * @param Boolean           $clearMissing  Whether to set fields to NULL
+     *                                         when they are missing in the
+     *                                         submitted data.
      *
      * @return FormInterface The form instance
+     *
+     * @throws Exception\AlreadySubmittedException If the form has already been submitted.
      */
-    public function bind($data);
+    public function submit($submittedData, $clearMissing = true);
 
     /**
      * Returns the root of the form tree.

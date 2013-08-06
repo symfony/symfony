@@ -11,17 +11,16 @@
 
 namespace Symfony\Component\Validator\Constraints\Collection;
 
-use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Constraints\Optional as BaseOptional;
 
 /**
  * @Annotation
+ *
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated Deprecated in 2.3, to be removed in 3.0. Use
+ *             {@link \Symfony\Component\Validator\Constraints\Optional} instead.
  */
-class Optional extends Constraint
+class Optional extends BaseOptional
 {
-    public $constraints = array();
-
-    public function getDefaultOption()
-    {
-        return 'constraints';
-    }
 }

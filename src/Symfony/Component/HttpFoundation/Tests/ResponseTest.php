@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpFoundation\Tests;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class ResponseTest extends \PHPUnit_Framework_TestCase
+class ResponseTest extends ResponseTestCase
 {
     public function testCreate()
     {
@@ -23,6 +23,99 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
         $this->assertEquals(301, $response->getStatusCode());
         $this->assertEquals('bar', $response->headers->get('foo'));
+    }
+
+    public function testToString()
+    {
+        $response = new Response();
+        $response = explode("\r\n", $response);
+        $this->assertEquals("HTTP/1.0 200 OK", $response[0]);
+        $this->assertEquals("Cache-Control: no-cache", $response[1]);
+    }
+
+    public function testClone()
+    {
+        $response = new Response();
+        $responseClone = clone $response;
+        $this->assertEquals($response, $responseClone);
+    }
+
+    public function testSendHeaders()
+    {
+        $response = new Response();
+        $headers = $response->sendHeaders();
+        $this->assertObjectHasAttribute('headers', $headers);
+        $this->assertObjectHasAttribute('content', $headers);
+        $this->assertObjectHasAttribute('version', $headers);
+        $this->assertObjectHasAttribute('statusCode', $headers);
+        $this->assertObjectHasAttribute('statusText', $headers);
+        $this->assertObjectHasAttribute('charset', $headers);
+    }
+
+    public function testSend()
+    {
+        $response = new Response();
+        $responseSend = $response->send();
+        $this->assertObjectHasAttribute('headers', $responseSend);
+        $this->assertObjectHasAttribute('content', $responseSend);
+        $this->assertObjectHasAttribute('version', $responseSend);
+        $this->assertObjectHasAttribute('statusCode', $responseSend);
+        $this->assertObjectHasAttribute('statusText', $responseSend);
+        $this->assertObjectHasAttribute('charset', $responseSend);
+    }
+
+    public function testGetCharset()
+    {
+        $response = new Response();
+        $charsetOrigin = 'UTF-8';
+        $response->setCharset($charsetOrigin);
+        $charset = $response->getCharset();
+        $this->assertEquals($charsetOrigin, $charset);
+    }
+
+    public function testIsCacheable()
+    {
+        $response = new Response();
+        $this->assertFalse($response->isCacheable());
+    }
+
+    public function testIsCacheableWithSetTtl()
+    {
+        $response = new Response();
+        $response->setTtl(10);
+        $this->assertTrue($response->isCacheable());
+    }
+
+    public function testMustRevalidate()
+    {
+        $response = new Response();
+        $this->assertFalse($response->mustRevalidate());
+    }
+
+    public function testSetNotModified()
+    {
+        $response = new Response();
+        $modified = $response->setNotModified();
+        $this->assertObjectHasAttribute('headers', $modified);
+        $this->assertObjectHasAttribute('content', $modified);
+        $this->assertObjectHasAttribute('version', $modified);
+        $this->assertObjectHasAttribute('statusCode', $modified);
+        $this->assertObjectHasAttribute('statusText', $modified);
+        $this->assertObjectHasAttribute('charset', $modified);
+        $this->assertEquals(304, $modified->getStatusCode());
+    }
+
+    public function testIsSuccessful()
+    {
+        $response = new Response();
+        $this->assertTrue($response->isSuccessful());
+    }
+
+    public function testIsNotModified()
+    {
+        $response = new Response();
+        $modified = $response->isNotModified(new Request());
+        $this->assertFalse($modified);
     }
 
     public function testIsValidateable()
@@ -50,6 +143,10 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $now = $this->createDateTimeNow();
         $response->headers->set('Date', $now->format(DATE_RFC2822));
         $this->assertEquals(0, $now->diff($response->getDate())->format('%s'), '->getDate() returns the date when the header has been modified');
+
+        $response = new Response('', 200);
+        $response->headers->remove('Date');
+        $this->assertInstanceOf('\DateTime', $response->getDate());
     }
 
     public function testGetMaxAge()
@@ -66,6 +163,11 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $response->headers->set('Cache-Control', 'must-revalidate');
         $response->headers->set('Expires', $this->createDateTimeOneHourLater()->format(DATE_RFC2822));
         $this->assertEquals(3600, $response->getMaxAge(), '->getMaxAge() falls back to Expires when no max-age or s-maxage directive present');
+
+        $response = new Response();
+        $response->headers->set('Cache-Control', 'must-revalidate');
+        $response->headers->set('Expires', -1);
+        $this->assertEquals('Sat, 01 Jan 00 00:00:00 +0000', $response->getExpires()->format(DATE_RFC822));
 
         $response = new Response();
         $this->assertNull($response->getMaxAge(), '->getMaxAge() returns null if no freshness information available');
@@ -117,6 +219,11 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $response = new Response();
         $response->expire();
         $this->assertFalse($response->headers->has('Age'), '->expire() does nothing when the response does not include freshness information');
+
+        $response = new Response();
+        $response->headers->set('Expires', -1);
+        $response->expire();
+        $this->assertNull($response->headers->get('Age'), '->expire() does not set the Age when the response is expired');
     }
 
     public function testGetTtl()
@@ -130,7 +237,12 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
 
         $response = new Response();
         $response->headers->set('Expires', $this->createDateTimeOneHourAgo()->format(DATE_RFC2822));
-        $this->assertLessThan(0, $response->getTtl(), '->getTtl() returns negative values when Expires is in part');
+        $this->assertLessThan(0, $response->getTtl(), '->getTtl() returns negative values when Expires is in past');
+
+        $response = new Response();
+        $response->headers->set('Expires', $response->getDate()->format(DATE_RFC2822));
+        $response->headers->set('Age', 0);
+        $this->assertSame(0, $response->getTtl(), '->getTtl() correctly handles zero');
 
         $response = new Response();
         $response->headers->set('Cache-Control', 'max-age=60');
@@ -252,6 +364,23 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $response->prepare($request);
 
         $this->assertEquals('', $response->getContent());
+    }
+
+    public function testPrepareSetsPragmaOnHttp10Only()
+    {
+        $request = Request::create('/', 'GET');
+        $request->server->set('SERVER_PROTOCOL', 'HTTP/1.0');
+
+        $response = new Response('foo');
+        $response->prepare($request);
+        $this->assertEquals('no-cache', $response->headers->get('pragma'));
+        $this->assertEquals('-1', $response->headers->get('expires'));
+
+        $request->server->set('SERVER_PROTOCOL', 'HTTP/1.1');
+        $response = new Response('foo');
+        $response->prepare($request);
+        $this->assertFalse($response->headers->has('pragma'));
+        $this->assertFalse($response->headers->has('expires'));
     }
 
     public function testSetCache()
@@ -571,6 +700,11 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
     protected function createDateTimeNow()
     {
         return new \DateTime();
+    }
+
+    protected function provideResponse()
+    {
+        return new Response();
     }
 }
 

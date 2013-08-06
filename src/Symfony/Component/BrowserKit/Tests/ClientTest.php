@@ -9,13 +9,17 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Tests\BrowserKit;
+namespace Symfony\Component\BrowserKit\Tests;
 
 use Symfony\Component\BrowserKit\Client;
 use Symfony\Component\BrowserKit\History;
 use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\BrowserKit\Request;
 use Symfony\Component\BrowserKit\Response;
+
+class SpecialResponse extends Response
+{
+}
 
 class TestClient extends Client
 {
@@ -40,6 +44,15 @@ class TestClient extends Client
 
         $response = $this->nextResponse;
         $this->nextResponse = null;
+
+        return $response;
+    }
+
+    protected function filterResponse($response)
+    {
+        if ($response instanceof SpecialResponse) {
+            return new Response($response->getContent(), $response->getStatus(), $response->getHeaders());
+        }
 
         return $response;
     }
@@ -90,9 +103,6 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('http://example.com/', $client->getRequest()->getUri(), '->getCrawler() returns the Request of the last request');
     }
 
-    /**
-     * @covers Symfony\Component\BrowserKit\Client::getResponse
-     */
     public function testGetResponse()
     {
         $client = new TestClient();
@@ -100,6 +110,18 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $client->request('GET', 'http://example.com/');
 
         $this->assertEquals('foo', $client->getResponse()->getContent(), '->getCrawler() returns the Response of the last request');
+        $this->assertInstanceOf('Symfony\Component\BrowserKit\Response', $client->getResponse(), '->getCrawler() returns the Response of the last request');
+    }
+
+    public function testGetInternalResponse()
+    {
+        $client = new TestClient();
+        $client->setNextResponse(new SpecialResponse('foo'));
+        $client->request('GET', 'http://example.com/');
+
+        $this->assertInstanceOf('Symfony\Component\BrowserKit\Response', $client->getInternalResponse());
+        $this->assertNotInstanceOf('Symfony\Component\BrowserKit\Tests\SpecialResponse', $client->getInternalResponse());
+        $this->assertInstanceOf('Symfony\Component\BrowserKit\Tests\SpecialResponse', $client->getResponse());
     }
 
     public function testGetContent()
@@ -205,6 +227,15 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('foo' => 'bar'), $client->getCookieJar()->allValues('http://www.example.com/foo/foobar'), '->request() updates the CookieJar');
     }
 
+    public function testRequestSecureCookies()
+    {
+        $client = new TestClient();
+        $client->setNextResponse(new Response('<html><a href="/foo">foo</a></html>', 200, array('Set-Cookie' => 'foo=bar; path=/; secure')));
+        $client->request('GET', 'https://www.example.com/foo/foobar');
+
+        $this->assertTrue($client->getCookieJar()->get('foo', '/', 'www.example.com')->isSecure());
+    }
+
     public function testClick()
     {
         if (!class_exists('Symfony\Component\DomCrawler\Crawler')) {
@@ -224,6 +255,25 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('http://www.example.com/foo', $client->getRequest()->getUri(), '->click() clicks on links');
     }
 
+    public function testClickForm()
+    {
+        if (!class_exists('Symfony\Component\DomCrawler\Crawler')) {
+            $this->markTestSkipped('The "DomCrawler" component is not available');
+        }
+
+        if (!class_exists('Symfony\Component\CssSelector\CssSelector')) {
+            $this->markTestSkipped('The "CssSelector" component is not available');
+        }
+
+        $client = new TestClient();
+        $client->setNextResponse(new Response('<html><form action="/foo"><input type="submit" /></form></html>'));
+        $crawler = $client->request('GET', 'http://www.example.com/foo/foobar');
+
+        $client->click($crawler->filter('input')->form());
+
+        $this->assertEquals('http://www.example.com/foo', $client->getRequest()->getUri(), '->click() Form submit forms');
+    }
+
     public function testSubmit()
     {
         if (!class_exists('Symfony\Component\DomCrawler\Crawler')) {
@@ -241,6 +291,37 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $client->submit($crawler->filter('input')->form());
 
         $this->assertEquals('http://www.example.com/foo', $client->getRequest()->getUri(), '->submit() submit forms');
+    }
+
+    public function testSubmitPreserveAuth()
+    {
+        if (!class_exists('Symfony\Component\DomCrawler\Crawler')) {
+            $this->markTestSkipped('The "DomCrawler" component is not available');
+        }
+
+        if (!class_exists('Symfony\Component\CssSelector\CssSelector')) {
+            $this->markTestSkipped('The "CssSelector" component is not available');
+        }
+
+        $client = new TestClient(array('PHP_AUTH_USER' => 'foo', 'PHP_AUTH_PW' => 'bar'));
+        $client->setNextResponse(new Response('<html><form action="/foo"><input type="submit" /></form></html>'));
+        $crawler = $client->request('GET', 'http://www.example.com/foo/foobar');
+
+        $server = $client->getRequest()->getServer();
+        $this->assertArrayHasKey('PHP_AUTH_USER', $server);
+        $this->assertEquals('foo', $server['PHP_AUTH_USER']);
+        $this->assertArrayHasKey('PHP_AUTH_PW', $server);
+        $this->assertEquals('bar', $server['PHP_AUTH_PW']);
+
+        $client->submit($crawler->filter('input')->form());
+
+        $this->assertEquals('http://www.example.com/foo', $client->getRequest()->getUri(), '->submit() submit forms');
+
+        $server = $client->getRequest()->getServer();
+        $this->assertArrayHasKey('PHP_AUTH_USER', $server);
+        $this->assertEquals('foo', $server['PHP_AUTH_USER']);
+        $this->assertArrayHasKey('PHP_AUTH_PW', $server);
+        $this->assertEquals('bar', $server['PHP_AUTH_PW']);
     }
 
     public function testFollowRedirect()
@@ -267,6 +348,45 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $client->request('GET', 'http://www.example.com/foo/foobar');
 
         $this->assertEquals('http://www.example.com/redirected', $client->getRequest()->getUri(), '->followRedirect() automatically follows redirects if followRedirects is true');
+
+        $client = new TestClient();
+        $client->setNextResponse(new Response('', 201, array('Location' => 'http://www.example.com/redirected')));
+        $client->request('GET', 'http://www.example.com/foo/foobar');
+
+        $this->assertEquals('http://www.example.com/foo/foobar', $client->getRequest()->getUri(), '->followRedirect() does not follow redirect if HTTP Code is not 30x');
+
+        $client = new TestClient();
+        $client->setNextResponse(new Response('', 201, array('Location' => 'http://www.example.com/redirected')));
+        $client->followRedirects(false);
+        $client->request('GET', 'http://www.example.com/foo/foobar');
+
+        try {
+            $client->followRedirect();
+            $this->fail('->followRedirect() throws a \LogicException if the request did not respond with 30x HTTP Code');
+        } catch (\Exception $e) {
+            $this->assertInstanceof('LogicException', $e, '->followRedirect() throws a \LogicException if the request did not respond with 30x HTTP Code');
+        }
+    }
+
+    public function testFollowRedirectWithMaxRedirects()
+    {
+        $client = new TestClient();
+        $client->setMaxRedirects(1);
+        $client->setNextResponse(new Response('', 302, array('Location' => 'http://www.example.com/redirected')));
+        $client->request('GET', 'http://www.example.com/foo/foobar');
+        $this->assertEquals('http://www.example.com/redirected', $client->getRequest()->getUri(), '->followRedirect() follows a redirect if any');
+
+        $client->setNextResponse(new Response('', 302, array('Location' => 'http://www.example.com/redirected2')));
+        try {
+            $client->followRedirect();
+            $this->fail('->followRedirect() throws a \LogicException if the request was redirected and limit of redirections was reached');
+        } catch (\Exception $e) {
+            $this->assertInstanceof('LogicException', $e, '->followRedirect() throws a \LogicException if the request was redirected and limit of redirections was reached');
+        }
+
+        $client->setNextResponse(new Response('', 302, array('Location' => 'http://www.example.com/redirected')));
+        $client->request('GET', 'http://www.example.com/foo/foobar');
+        $this->assertEquals('http://www.example.com/redirected', $client->getRequest()->getUri(), '->followRedirect() follows a redirect if any');
     }
 
     public function testFollowRedirectWithCookies()

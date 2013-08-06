@@ -27,6 +27,7 @@ class UniqueEntity extends Constraint
     public $repositoryMethod = 'findBy';
     public $fields = array();
     public $errorPath = null;
+    public $ignoreNull = true;
 
     public function getRequiredOptions()
     {

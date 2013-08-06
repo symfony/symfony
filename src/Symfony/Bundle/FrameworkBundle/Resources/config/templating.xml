@@ -19,7 +19,7 @@
     <services>
         <service id="templating.engine.delegating" class="%templating.engine.delegating.class%" public="false">
             <argument type="service" id="service_container" />
-            <argument /> <!-- engines -->
+            <argument type="collection" /> <!-- engines -->
         </service>
 
         <service id="templating.name_parser" class="%templating.name_parser.class%">

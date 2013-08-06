@@ -1,0 +1,7 @@
+digraph sc {
+  ratio="compress"
+  node [fontsize="11" fontname="Arial" shape="record"];
+  edge [fontsize="9" fontname="Arial" color="grey" arrowhead="open" arrowsize="0.5"];
+
+  node_service_container [label="service_container\nContainer14\\ProjectServiceContainer\n", shape=record, fillcolor="#9999ff", style="filled"];
+}

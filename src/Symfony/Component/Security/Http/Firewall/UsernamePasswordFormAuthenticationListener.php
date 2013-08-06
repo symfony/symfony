@@ -13,7 +13,7 @@ namespace Symfony\Component\Security\Http\Firewall;
 
 use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface;
@@ -55,7 +55,7 @@ class UsernamePasswordFormAuthenticationListener extends AbstractAuthenticationL
      */
     protected function requiresAuthentication(Request $request)
     {
-        if ($this->options['post_only'] && !$request->isMethod('post')) {
+        if ($this->options['post_only'] && !$request->isMethod('POST')) {
             return false;
         }
 
@@ -67,14 +67,6 @@ class UsernamePasswordFormAuthenticationListener extends AbstractAuthenticationL
      */
     protected function attemptAuthentication(Request $request)
     {
-        if ($this->options['post_only'] && 'post' !== strtolower($request->getMethod())) {
-            if (null !== $this->logger) {
-                $this->logger->debug(sprintf('Authentication method not supported: %s.', $request->getMethod()));
-            }
-
-            return null;
-        }
-
         if (null !== $this->csrfProvider) {
             $csrfToken = $request->get($this->options['csrf_parameter'], null, true);
 
@@ -83,8 +75,13 @@ class UsernamePasswordFormAuthenticationListener extends AbstractAuthenticationL
             }
         }
 
-        $username = trim($request->get($this->options['username_parameter'], null, true));
-        $password = $request->get($this->options['password_parameter'], null, true);
+        if ($this->options['post_only']) {
+            $username = trim($request->request->get($this->options['username_parameter'], null, true));
+            $password = $request->request->get($this->options['password_parameter'], null, true);
+        } else {
+            $username = trim($request->get($this->options['username_parameter'], null, true));
+            $password = $request->get($this->options['password_parameter'], null, true);
+        }
 
         $request->getSession()->set(SecurityContextInterface::LAST_USERNAME, $username);
 

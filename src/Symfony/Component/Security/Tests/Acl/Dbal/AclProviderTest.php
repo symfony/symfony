@@ -27,7 +27,7 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
     protected $insertSidStmt;
 
     /**
-     * @expectedException Symfony\Component\Security\Acl\Exception\AclNotFoundException
+     * @expectedException \Symfony\Component\Security\Acl\Exception\AclNotFoundException
      * @expectedMessage There is no ACL for the given object identity.
      */
     public function testFindAclThrowsExceptionWhenNoAclExists()
@@ -60,6 +60,23 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
         $oids = array();
         $oids[] = new ObjectIdentity('1', 'foo');
         $oids[] = new ObjectIdentity('2', 'foo');
+
+        $provider = $this->getProvider();
+
+        $acls = $provider->findAcls($oids);
+        $this->assertInstanceOf('SplObjectStorage', $acls);
+        $this->assertCount(2, $acls);
+        $this->assertInstanceOf('Symfony\Component\Security\Acl\Domain\Acl', $acl0 = $acls->offsetGet($oids[0]));
+        $this->assertInstanceOf('Symfony\Component\Security\Acl\Domain\Acl', $acl1 = $acls->offsetGet($oids[1]));
+        $this->assertTrue($oids[0]->equals($acl0->getObjectIdentity()));
+        $this->assertTrue($oids[1]->equals($acl1->getObjectIdentity()));
+    }
+
+    public function testFindAclsWithDifferentTypes()
+    {
+        $oids = array();
+        $oids[] = new ObjectIdentity('123', 'Bundle\SomeVendor\MyBundle\Entity\SomeEntity');
+        $oids[] = new ObjectIdentity('123', 'Bundle\MyBundle\Entity\AnotherEntity');
 
         $provider = $this->getProvider();
 

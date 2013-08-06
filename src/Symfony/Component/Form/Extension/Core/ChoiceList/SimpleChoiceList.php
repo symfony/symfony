@@ -11,14 +11,14 @@
 
 namespace Symfony\Component\Form\Extension\Core\ChoiceList;
 
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
-
 /**
  * A choice list for choices of type string or integer.
  *
  * Choices and their associated labels can be passed in a single array. Since
  * choices are passed as array keys, only strings or integer choices are
- * allowed.
+ * allowed. Choices may also be given as hierarchy of unlimited depth by
+ * creating nested arrays. The title of the sub-hierarchy can be stored in the
+ * array key pointing to the nested array.
  *
  * <code>
  * $choiceList = new SimpleChoiceList(array(
@@ -35,13 +35,12 @@ class SimpleChoiceList extends ChoiceList
      * Creates a new simple choice list.
      *
      * @param array $choices The array of choices with the choices as keys and
-     *                                  the labels as values. Choices may also be given
-     *                                  as hierarchy of unlimited depth. Hierarchies are
-     *                                  created by creating nested arrays. The title of
-     *                                  the sub-hierarchy is stored in the array
-     *                                  key pointing to the nested array.
+     *                       the labels as values. Choices may also be given
+     *                       as hierarchy of unlimited depth by creating nested
+     *                       arrays. The title of the sub-hierarchy is stored
+     *                       in the array key pointing to the nested array.
      * @param array $preferredChoices A flat array of choices that should be
-     *                                  presented to the user with priority.
+     *                                presented to the user with priority.
      */
     public function __construct(array $choices, array $preferredChoices = array())
     {
@@ -79,17 +78,15 @@ class SimpleChoiceList extends ChoiceList
      * Takes care of splitting the single $choices array passed in the
      * constructor into choices and labels.
      *
-     * @param array $bucketForPreferred
-     * @param array $bucketForRemaining
-     * @param array $choices
-     * @param array $labels
-     * @param array $preferredChoices
-     *
-     * @throws UnexpectedTypeException
-     *
-     * @see parent::addChoices
+     * @param array              $bucketForPreferred The bucket where to store the preferred
+     *                                               view objects.
+     * @param array              $bucketForRemaining The bucket where to store the
+     *                                               non-preferred view objects.
+     * @param array|\Traversable $choices            The list of choices.
+     * @param array              $labels             Ignored.
+     * @param array              $preferredChoices   The preferred choices.
      */
-    protected function addChoices(&$bucketForPreferred, &$bucketForRemaining, array $choices, array $labels, array $preferredChoices)
+    protected function addChoices(array &$bucketForPreferred, array &$bucketForRemaining, $choices, array $labels, array $preferredChoices)
     {
         // Add choices to the nested buckets
         foreach ($choices as $choice => $label) {

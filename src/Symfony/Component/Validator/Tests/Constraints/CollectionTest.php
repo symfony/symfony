@@ -9,11 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Collectionator\Tests\Constraints;
+namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Collection;
-use Symfony\Component\Validator\Constraints\Collection\Required;
-use Symfony\Component\Validator\Constraints\Collection\Optional;
+use Symfony\Component\Validator\Constraints\Required;
+use Symfony\Component\Validator\Constraints\Optional;
+use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\Valid;
 
 /**
@@ -22,7 +23,7 @@ use Symfony\Component\Validator\Constraints\Valid;
 class CollectionTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @expectedException Symfony\Component\Validator\Exception\ConstraintDefinitionException
+     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      */
     public function testRejectInvalidFieldsOption()
     {
@@ -32,7 +33,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Validator\Exception\ConstraintDefinitionException
+     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      */
     public function testRejectNonConstraints()
     {
@@ -42,7 +43,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Validator\Exception\ConstraintDefinitionException
+     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      */
     public function testRejectValidConstraint()
     {
@@ -52,7 +53,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Validator\Exception\ConstraintDefinitionException
+     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      */
     public function testRejectValidConstraintWithinOptional()
     {
@@ -62,12 +63,50 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Validator\Exception\ConstraintDefinitionException
+     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      */
     public function testRejectValidConstraintWithinRequired()
     {
         new Collection(array(
             'foo' => new Required(new Valid()),
         ));
+    }
+
+    public function testAcceptOptionalConstraintAsOneElementArray()
+    {
+        $collection1 = new Collection(array(
+            "fields" => array(
+                "alternate_email" => array(
+                    new Optional(new Email()),
+                ),
+            ),
+        ));
+
+        $collection2 = new Collection(array(
+            "fields" => array(
+                "alternate_email" => new Optional(new Email()),
+            ),
+        ));
+
+        $this->assertEquals($collection1, $collection2);
+    }
+
+    public function testAcceptRequiredConstraintAsOneElementArray()
+    {
+        $collection1 = new Collection(array(
+            "fields" => array(
+                "alternate_email" => array(
+                    new Required(new Email()),
+                ),
+            ),
+        ));
+
+        $collection2 = new Collection(array(
+            "fields" => array(
+                "alternate_email" => new Required(new Email()),
+            ),
+        ));
+
+        $this->assertEquals($collection1, $collection2);
     }
 }

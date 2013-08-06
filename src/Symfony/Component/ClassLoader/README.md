@@ -64,9 +64,6 @@ Resources
 
 You can run the unit tests with the following command:
 
-    phpunit
-
-If you also want to run the unit tests that depend on other Symfony
-Components, install dev dependencies before running PHPUnit:
-
-    php composer.phar install --dev
+    $ cd path/to/Symfony/Component/ClassLoader/
+    $ composer.phar install --dev
+    $ phpunit

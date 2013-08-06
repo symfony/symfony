@@ -30,7 +30,10 @@ class Cookie
         'D, d M Y H:i:s T',
         'D, d-M-y H:i:s T',
         'D, d-M-Y H:i:s T',
+        'D, d-m-y H:i:s T',
+        'D, d-m-Y H:i:s T',
         'D M j G:i:s Y',
+        'D M d H:i:s Y T',
     );
 
     protected $name;
@@ -92,7 +95,7 @@ class Cookie
             $cookie .= '; domain='.$this->domain;
         }
 
-        if ('/' !== $this->path) {
+        if ($this->path) {
             $cookie .= '; path='.$this->path;
         }
 
@@ -114,6 +117,8 @@ class Cookie
      * @param string $url    The base URL
      *
      * @return Cookie A Cookie instance
+     *
+     * @throws \InvalidArgumentException
      *
      * @api
      */
@@ -142,10 +147,9 @@ class Cookie
             if ((false === $urlParts = parse_url($url)) || !isset($urlParts['host']) || !isset($urlParts['path'])) {
                 throw new \InvalidArgumentException(sprintf('The URL "%s" is not valid.', $url));
             }
-            $parts = array_merge($urlParts, $parts);
 
-            $values['domain'] = $parts['host'];
-            $values['path'] = substr($parts['path'], 0, strrpos($parts['path'], '/'));
+            $values['domain'] = $urlParts['host'];
+            $values['path'] = substr($urlParts['path'], 0, strrpos($urlParts['path'], '/'));
         }
 
         foreach ($parts as $part) {
@@ -200,6 +204,11 @@ class Cookie
             if (false !== $date = \DateTime::createFromFormat($dateFormat, $dateValue, new \DateTimeZone('GMT'))) {
                 return $date->getTimestamp();
             }
+        }
+
+        // attempt a fallback for unusual formatting
+        if (false !== $date = date_create($dateValue, new \DateTimeZone('GMT'))) {
+            return $date->getTimestamp();
         }
 
         throw new \InvalidArgumentException(sprintf('Could not parse date "%s".', $dateValue));

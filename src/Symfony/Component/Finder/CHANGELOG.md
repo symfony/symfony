@@ -1,6 +1,20 @@
 CHANGELOG
 =========
 
+2.3.0
+-----
+
+ * added a way to ignore unreadable directories (via Finder::ignoreUnreadableDirs())
+ * unified the way subfolders that are not executable are handled by always throwing an AccessDeniedException exception
+
+2.2.0
+-----
+
+ * added Finder::path() and Finder::notPath() methods
+ * added finder adapters to improve performance on specific platforms
+ * added support for wildcard characters (glob patterns) in the paths passed
+   to Finder::in()
+
 2.1.0
 -----
 

@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+2.3.0
+-----
+
+ * added the dumpFile() method to atomically write files
+ 
+2.2.0
+-----
+
+ * added a delete option for the mirror() method
+
 2.1.0
 -----
 

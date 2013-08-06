@@ -27,14 +27,18 @@ class Filesystem
      *
      * By default, if the target already exists, it is not overridden.
      *
-     * @param string $originFile The original filename
-     * @param string $targetFile The target filename
-     * @param array  $override   Whether to override an existing file or not
+     * @param string  $originFile The original filename
+     * @param string  $targetFile The target filename
+     * @param boolean $override   Whether to override an existing file or not
      *
      * @throws IOException When copy fails
      */
     public function copy($originFile, $targetFile, $override = false)
     {
+        if (stream_is_local($originFile) && !is_file($originFile)) {
+            throw new IOException(sprintf('Failed to copy %s because file not exists', $originFile));
+        }
+
         $this->mkdir(dirname($targetFile));
 
         if (!$override && is_file($targetFile)) {
@@ -44,7 +48,15 @@ class Filesystem
         }
 
         if ($doCopy) {
-            if (true !== @copy($originFile, $targetFile)) {
+            // https://bugs.php.net/bug.php?id=64634
+            $source = fopen($originFile, 'r');
+            $target = fopen($targetFile, 'w+');
+            stream_copy_to_stream($source, $target);
+            fclose($source);
+            fclose($target);
+            unset($source, $target);
+
+            if (!is_file($targetFile)) {
                 throw new IOException(sprintf('Failed to copy %s to %s', $originFile, $targetFile));
             }
         }
@@ -100,12 +112,9 @@ class Filesystem
      */
     public function touch($files, $time = null, $atime = null)
     {
-        if (null === $time) {
-            $time = time();
-        }
-
         foreach ($this->toIterator($files) as $file) {
-            if (true !== @touch($file, $time, $atime)) {
+            $touch = $time ? @touch($file, $time, $atime) : @touch($file);
+            if (true !== $touch) {
                 throw new IOException(sprintf('Failed to touch %s', $file));
             }
         }
@@ -225,18 +234,19 @@ class Filesystem
     }
 
     /**
-     * Renames a file.
+     * Renames a file or a directory.
      *
-     * @param string $origin The origin filename
-     * @param string $target The new filename
+     * @param string  $origin    The origin filename or directory
+     * @param string  $target    The new filename or directory
+     * @param Boolean $overwrite Whether to overwrite the target if it already exists
      *
-     * @throws IOException When target file already exists
+     * @throws IOException When target file or directory already exists
      * @throws IOException When origin cannot be renamed
      */
-    public function rename($origin, $target)
+    public function rename($origin, $target, $overwrite = false)
     {
         // we check that target does not exist
-        if (is_readable($target)) {
+        if (!$overwrite && is_readable($target)) {
             throw new IOException(sprintf('Cannot rename because the target "%s" already exist.', $target));
         }
 
@@ -321,7 +331,7 @@ class Filesystem
         $endPathRemainder = implode('/', array_slice($endPathArr, $index));
 
         // Construct $endPath from traversing to the common path, then to the remaining $endPath
-        $relativePath = $traverser . (strlen($endPathRemainder) > 0 ? $endPathRemainder . '/' : '');
+        $relativePath = $traverser.(strlen($endPathRemainder) > 0 ? $endPathRemainder.'/' : '');
 
         return (strlen($relativePath) === 0) ? './' : $relativePath;
     }
@@ -336,11 +346,30 @@ class Filesystem
      *                               Valid options are:
      *                                 - $options['override'] Whether to override an existing file on copy or not (see copy())
      *                                 - $options['copy_on_windows'] Whether to copy files instead of links on Windows (see symlink())
+     *                                 - $options['delete'] Whether to delete files that are not in the source directory (defaults to false)
      *
      * @throws IOException When file type is unknown
      */
     public function mirror($originDir, $targetDir, \Traversable $iterator = null, $options = array())
     {
+        $targetDir = rtrim($targetDir, '/\\');
+        $originDir = rtrim($originDir, '/\\');
+
+        // Iterate in destination folder to remove obsolete entries
+        if ($this->exists($targetDir) && isset($options['delete']) && $options['delete']) {
+            $deleteIterator = $iterator;
+            if (null === $deleteIterator) {
+                $flags = \FilesystemIterator::SKIP_DOTS;
+                $deleteIterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($targetDir, $flags), \RecursiveIteratorIterator::CHILD_FIRST);
+            }
+            foreach ($deleteIterator as $file) {
+                $origin = str_replace($targetDir, $originDir, $file->getPathname());
+                if (!$this->exists($origin)) {
+                    $this->remove($file);
+                }
+            }
+        }
+
         $copyOnWindows = false;
         if (isset($options['copy_on_windows']) && !function_exists('symlink')) {
             $copyOnWindows = $options['copy_on_windows'];
@@ -351,20 +380,27 @@ class Filesystem
             $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($originDir, $flags), \RecursiveIteratorIterator::SELF_FIRST);
         }
 
-        $targetDir = rtrim($targetDir, '/\\');
-        $originDir = rtrim($originDir, '/\\');
-
         foreach ($iterator as $file) {
             $target = str_replace($originDir, $targetDir, $file->getPathname());
 
-            if (is_dir($file)) {
-                $this->mkdir($target);
-            } elseif (!$copyOnWindows && is_link($file)) {
-                $this->symlink($file, $target);
-            } elseif (is_file($file) || ($copyOnWindows && is_link($file))) {
-                $this->copy($file, $target, isset($options['override']) ? $options['override'] : false);
+            if ($copyOnWindows) {
+                if (is_link($file) || is_file($file)) {
+                    $this->copy($file, $target, isset($options['override']) ? $options['override'] : false);
+                } elseif (is_dir($file)) {
+                    $this->mkdir($target);
+                } else {
+                    throw new IOException(sprintf('Unable to guess "%s" file type.', $file));
+                }
             } else {
-                throw new IOException(sprintf('Unable to guess "%s" file type.', $file));
+                if (is_link($file)) {
+                    $this->symlink($file, $target);
+                } elseif (is_dir($file)) {
+                    $this->mkdir($target);
+                } elseif (is_file($file)) {
+                    $this->copy($file, $target, isset($options['override']) ? $options['override'] : false);
+                } else {
+                    throw new IOException(sprintf('Unable to guess "%s" file type.', $file));
+                }
             }
         }
     }
@@ -403,5 +439,33 @@ class Filesystem
         }
 
         return $files;
+    }
+
+    /**
+     * Atomically dumps content into a file.
+     *
+     * @param  string  $filename The file to be written to.
+     * @param  string  $content  The data to write into the file.
+     * @param  integer $mode     The file mode (octal).
+     * @throws IOException       If the file cannot be written to.
+     */
+    public function dumpFile($filename, $content, $mode = 0666)
+    {
+        $dir = dirname($filename);
+
+        if (!is_dir($dir)) {
+            $this->mkdir($dir);
+        } elseif (!is_writable($dir)) {
+            throw new IOException(sprintf('Unable to write in the %s directory\n', $dir));
+        }
+
+        $tmpFile = tempnam($dir, basename($filename));
+
+        if (false === @file_put_contents($tmpFile, $content)) {
+            throw new IOException(sprintf('Failed to write file "%s".', $filename));
+        }
+
+        $this->rename($tmpFile, $filename, true);
+        $this->chmod($filename, $mode);
     }
 }

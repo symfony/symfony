@@ -54,6 +54,29 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->assertNotEquals('', $this->session->getId());
     }
 
+    public function testIsStarted()
+    {
+        $this->assertFalse($this->session->isStarted());
+        $this->session->start();
+        $this->assertTrue($this->session->isStarted());
+    }
+
+    public function testSetId()
+    {
+        $this->assertEquals('', $this->session->getId());
+        $this->session->setId('0123456789abcdef');
+        $this->session->start();
+        $this->assertEquals('0123456789abcdef', $this->session->getId());
+    }
+
+    public function testSetName()
+    {
+        $this->assertEquals('MOCKSESSID', $this->session->getName());
+        $this->session->setName('session.test.com');
+        $this->session->start();
+        $this->assertEquals('session.test.com', $this->session->getName());
+    }
+
     public function testGet()
     {
         // tests defaults
@@ -151,6 +174,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 
     public function testSave()
     {
+        $this->session->start();
         $this->session->save();
     }
 
@@ -164,79 +188,6 @@ class SessionTest extends \PHPUnit_Framework_TestCase
     public function testGetFlashBag()
     {
         $this->assertInstanceOf('Symfony\\Component\\HttpFoundation\\Session\\Flash\\FlashBagInterface', $this->session->getFlashBag());
-    }
-
-    // deprecated since 2.1, will be removed from 2.3
-
-    public function testGetSetFlashes()
-    {
-        $array = array('notice' => 'hello', 'error' => 'none');
-        $this->assertEquals(array(), $this->session->getFlashes());
-        $this->session->setFlashes($array);
-        $this->assertEquals($array, $this->session->getFlashes());
-        $this->assertEquals(array(), $this->session->getFlashes());
-        $this->session->getFlashBag()->add('notice', 'foo');
-
-        // test that BC works by only retrieving the first added.
-        $this->session->getFlashBag()->add('notice', 'foo2');
-        $this->assertEquals(array('notice' => 'foo'), $this->session->getFlashes());
-    }
-
-    public function testGetFlashesWithArray()
-    {
-        $array = array('notice' => 'hello', 'error' => 'none');
-        $this->assertEquals(array(), $this->session->getFlashes());
-        $this->session->setFlash('foo', $array);
-        $this->assertEquals(array('foo' => $array), $this->session->getFlashes());
-        $this->assertEquals(array(), $this->session->getFlashes());
-
-        $array = array('hello', 'foo');
-        $this->assertEquals(array(), $this->session->getFlashes());
-        $this->session->setFlash('foo', $array);
-        $this->assertEquals(array('foo' => 'hello'), $this->session->getFlashes());
-        $this->assertEquals(array(), $this->session->getFlashes());
-    }
-
-    public function testGetSetFlash()
-    {
-        $this->assertNull($this->session->getFlash('notice'));
-        $this->assertEquals('default', $this->session->getFlash('notice', 'default'));
-        $this->session->getFlashBag()->add('notice', 'foo');
-        $this->session->getFlashBag()->add('notice', 'foo2');
-
-        // test that BC works by only retrieving the first added.
-        $this->assertEquals('foo', $this->session->getFlash('notice'));
-        $this->assertNull($this->session->getFlash('notice'));
-    }
-
-    public function testHasFlash()
-    {
-        $this->assertFalse($this->session->hasFlash('notice'));
-        $this->session->setFlash('notice', 'foo');
-        $this->assertTrue($this->session->hasFlash('notice'));
-    }
-
-    public function testRemoveFlash()
-    {
-        $this->session->setFlash('notice', 'foo');
-        $this->session->setFlash('error', 'bar');
-        $this->assertTrue($this->session->hasFlash('notice'));
-        $this->session->removeFlash('error');
-        $this->assertTrue($this->session->hasFlash('notice'));
-        $this->assertFalse($this->session->hasFlash('error'));
-    }
-
-    public function testClearFlashes()
-    {
-        $this->assertFalse($this->session->hasFlash('notice'));
-        $this->assertFalse($this->session->hasFlash('error'));
-        $this->session->setFlash('notice', 'foo');
-        $this->session->setFlash('error', 'bar');
-        $this->assertTrue($this->session->hasFlash('notice'));
-        $this->assertTrue($this->session->hasFlash('error'));
-        $this->session->clearFlashes();
-        $this->assertFalse($this->session->hasFlash('notice'));
-        $this->assertFalse($this->session->hasFlash('error'));
     }
 
     /**

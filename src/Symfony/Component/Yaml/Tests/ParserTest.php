@@ -13,7 +13,6 @@ namespace Symfony\Component\Yaml\Tests;
 
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Yaml\Parser;
-use Symfony\Component\Yaml\Exception\ParseException;
 
 class ParserTest extends \PHPUnit_Framework_TestCase
 {
@@ -106,14 +105,343 @@ EOF;
         $this->assertEquals('foo', $this->parser->parse($yaml));
     }
 
-    public function testObjectsSupport()
+    public function getBlockChompingTests()
     {
-        $b = array('foo' => new B(), 'bar' => 1);
-        $this->assertEquals($this->parser->parse(<<<EOF
+        $tests = array();
+
+        $yaml = <<<'EOF'
+foo: |-
+    one
+    two
+bar: |-
+    one
+    two
+
+EOF;
+        $expected = array(
+            'foo' => "one\ntwo",
+            'bar' => "one\ntwo",
+        );
+        $tests['Literal block chomping strip with single trailing newline'] = array($expected, $yaml);
+
+        $yaml = <<<'EOF'
+foo: |-
+    one
+    two
+
+bar: |-
+    one
+    two
+
+
+EOF;
+        $expected = array(
+            'foo' => "one\ntwo",
+            'bar' => "one\ntwo",
+        );
+        $tests['Literal block chomping strip with multiple trailing newlines'] = array($expected, $yaml);
+
+        $yaml = <<<'EOF'
+foo: |-
+    one
+    two
+bar: |-
+    one
+    two
+EOF;
+        $expected = array(
+            'foo' => "one\ntwo",
+            'bar' => "one\ntwo",
+        );
+        $tests['Literal block chomping strip without trailing newline'] = array($expected, $yaml);
+
+        $yaml = <<<'EOF'
+foo: |
+    one
+    two
+bar: |
+    one
+    two
+
+EOF;
+        $expected = array(
+            'foo' => "one\ntwo\n",
+            'bar' => "one\ntwo\n",
+        );
+        $tests['Literal block chomping clip with single trailing newline'] = array($expected, $yaml);
+
+        $yaml = <<<'EOF'
+foo: |
+    one
+    two
+
+bar: |
+    one
+    two
+
+
+EOF;
+        $expected = array(
+            'foo' => "one\ntwo\n",
+            'bar' => "one\ntwo\n",
+        );
+        $tests['Literal block chomping clip with multiple trailing newlines'] = array($expected, $yaml);
+
+        $yaml = <<<'EOF'
+foo: |
+    one
+    two
+bar: |
+    one
+    two
+EOF;
+        $expected = array(
+            'foo' => "one\ntwo\n",
+            'bar' => "one\ntwo",
+        );
+        $tests['Literal block chomping clip without trailing newline'] = array($expected, $yaml);
+
+        $yaml = <<<'EOF'
+foo: |+
+    one
+    two
+bar: |+
+    one
+    two
+
+EOF;
+        $expected = array(
+            'foo' => "one\ntwo\n",
+            'bar' => "one\ntwo\n",
+        );
+        $tests['Literal block chomping keep with single trailing newline'] = array($expected, $yaml);
+
+        $yaml = <<<'EOF'
+foo: |+
+    one
+    two
+
+bar: |+
+    one
+    two
+
+
+EOF;
+        $expected = array(
+            'foo' => "one\ntwo\n\n",
+            'bar' => "one\ntwo\n\n",
+        );
+        $tests['Literal block chomping keep with multiple trailing newlines'] = array($expected, $yaml);
+
+        $yaml = <<<'EOF'
+foo: |+
+    one
+    two
+bar: |+
+    one
+    two
+EOF;
+        $expected = array(
+            'foo' => "one\ntwo\n",
+            'bar' => "one\ntwo",
+        );
+        $tests['Literal block chomping keep without trailing newline'] = array($expected, $yaml);
+
+        $yaml = <<<'EOF'
+foo: >-
+    one
+    two
+bar: >-
+    one
+    two
+
+EOF;
+        $expected = array(
+            'foo' => "one two",
+            'bar' => "one two",
+        );
+        $tests['Folded block chomping strip with single trailing newline'] = array($expected, $yaml);
+
+        $yaml = <<<'EOF'
+foo: >-
+    one
+    two
+
+bar: >-
+    one
+    two
+
+
+EOF;
+        $expected = array(
+            'foo' => "one two",
+            'bar' => "one two",
+        );
+        $tests['Folded block chomping strip with multiple trailing newlines'] = array($expected, $yaml);
+
+        $yaml = <<<'EOF'
+foo: >-
+    one
+    two
+bar: >-
+    one
+    two
+EOF;
+        $expected = array(
+            'foo' => "one two",
+            'bar' => "one two",
+        );
+        $tests['Folded block chomping strip without trailing newline'] = array($expected, $yaml);
+
+        $yaml = <<<'EOF'
+foo: >
+    one
+    two
+bar: >
+    one
+    two
+
+EOF;
+        $expected = array(
+            'foo' => "one two\n",
+            'bar' => "one two\n",
+        );
+        $tests['Folded block chomping clip with single trailing newline'] = array($expected, $yaml);
+
+        $yaml = <<<'EOF'
+foo: >
+    one
+    two
+
+bar: >
+    one
+    two
+
+
+EOF;
+        $expected = array(
+            'foo' => "one two\n",
+            'bar' => "one two\n",
+        );
+        $tests['Folded block chomping clip with multiple trailing newlines'] = array($expected, $yaml);
+
+        $yaml = <<<'EOF'
+foo: >
+    one
+    two
+bar: >
+    one
+    two
+EOF;
+        $expected = array(
+            'foo' => "one two\n",
+            'bar' => "one two",
+        );
+        $tests['Folded block chomping clip without trailing newline'] = array($expected, $yaml);
+
+        $yaml = <<<'EOF'
+foo: >+
+    one
+    two
+bar: >+
+    one
+    two
+
+EOF;
+        $expected = array(
+            'foo' => "one two\n",
+            'bar' => "one two\n",
+        );
+        $tests['Folded block chomping keep with single trailing newline'] = array($expected, $yaml);
+
+        $yaml = <<<'EOF'
+foo: >+
+    one
+    two
+
+bar: >+
+    one
+    two
+
+
+EOF;
+        $expected = array(
+            'foo' => "one two\n\n",
+            'bar' => "one two\n\n",
+        );
+        $tests['Folded block chomping keep with multiple trailing newlines'] = array($expected, $yaml);
+
+        $yaml = <<<'EOF'
+foo: >+
+    one
+    two
+bar: >+
+    one
+    two
+EOF;
+        $expected = array(
+            'foo' => "one two\n",
+            'bar' => "one two",
+        );
+        $tests['Folded block chomping keep without trailing newline'] = array($expected, $yaml);
+
+        return $tests;
+    }
+
+    /**
+     * @dataProvider getBlockChompingTests
+     */
+    public function testBlockChomping($expected, $yaml)
+    {
+        $this->assertSame($expected, $this->parser->parse($yaml));
+    }
+
+    /**
+     * Regression test for issue #7989.
+     *
+     * @see https://github.com/symfony/symfony/issues/7989
+     */
+    public function testBlockLiteralWithLeadingNewlines()
+    {
+        $yaml = <<<'EOF'
+foo: |-
+
+
+    bar
+
+EOF;
+        $expected = array(
+            'foo' => "\n\nbar"
+        );
+
+        $this->assertSame($expected, $this->parser->parse($yaml));
+    }
+
+    public function testObjectSupportEnabled()
+    {
+        $input = <<<EOF
 foo: !!php/object:O:30:"Symfony\Component\Yaml\Tests\B":1:{s:1:"b";s:3:"foo";}
 bar: 1
-EOF
-        ), $b, '->parse() is able to dump objects');
+EOF;
+        $this->assertEquals(array('foo' => new B(), 'bar' => 1), $this->parser->parse($input, false, true), '->parse() is able to parse objects');
+    }
+
+    public function testObjectSupportDisabledButNoExceptions()
+    {
+        $input = <<<EOF
+foo: !!php/object:O:30:"Symfony\Tests\Component\Yaml\B":1:{s:1:"b";s:3:"foo";}
+bar: 1
+EOF;
+
+        $this->assertEquals(array('foo' => null, 'bar' => 1), $this->parser->parse($input), '->parse() does not parse objects');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     */
+    public function testObjectsSupportDisabledWithExceptions()
+    {
+        $this->parser->parse('foo: !!php/object:O:30:"Symfony\Tests\Component\Yaml\B":1:{s:1:"b";s:3:"foo";}', true, false);
     }
 
     public function testNonUtf8Exception()
@@ -143,7 +471,7 @@ EOF
 
     /**
      *
-     * @expectedException Symfony\Component\Yaml\Exception\ParseException
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
      *
      */
     public function testUnindentedCollectionException()
@@ -161,7 +489,7 @@ EOF;
     }
 
     /**
-     * @expectedException Symfony\Component\Yaml\Exception\ParseException
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
      */
     public function testSequenceInAMapping()
     {
@@ -174,7 +502,7 @@ EOF
     }
 
     /**
-     * @expectedException Symfony\Component\Yaml\Exception\ParseException
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
      */
     public function testMappingInASequence()
     {
@@ -184,6 +512,72 @@ yaml:
   hash: me
 EOF
         );
+    }
+
+    public function testEmptyValue()
+    {
+        $input = <<<EOF
+hash:
+EOF;
+
+        $this->assertEquals(array('hash' => null), Yaml::parse($input));
+    }
+
+    public function testStringBlockWithComments()
+    {
+        $this->assertEquals(array('content' => <<<EOT
+# comment 1
+header
+
+    # comment 2
+    <body>
+        <h1>title</h1>
+    </body>
+
+footer # comment3
+EOT
+        ), Yaml::parse(<<<EOF
+content: |
+    # comment 1
+    header
+
+        # comment 2
+        <body>
+            <h1>title</h1>
+        </body>
+
+    footer # comment3
+EOF
+        ));
+    }
+
+    public function testNestedStringBlockWithComments()
+    {
+        $this->assertEquals(array(array('content' => <<<EOT
+# comment 1
+header
+
+    # comment 2
+    <body>
+        <h1>title</h1>
+    </body>
+
+footer # comment3
+EOT
+        )), Yaml::parse(<<<EOF
+-
+    content: |
+        # comment 1
+        header
+
+            # comment 2
+            <body>
+                <h1>title</h1>
+            </body>
+
+        footer # comment3
+EOF
+        ));
     }
 }
 

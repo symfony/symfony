@@ -23,7 +23,7 @@ interface EncoderFactoryInterface
     /**
      * Returns the password encoder to use for the given account.
      *
-     * @param UserInterface|string $user A UserInterface instance of a class name
+     * @param UserInterface|string $user A UserInterface instance or a class name
      *
      * @return PasswordEncoderInterface
      *

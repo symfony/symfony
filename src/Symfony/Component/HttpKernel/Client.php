@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel;
 
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\BrowserKit\Client as BaseClient;
 use Symfony\Component\BrowserKit\Request as DomRequest;
 use Symfony\Component\BrowserKit\Response as DomResponse;
@@ -50,6 +51,26 @@ class Client extends BaseClient
     }
 
     /**
+     * {@inheritdoc}
+     *
+     * @return Request|null A Request instance
+     */
+    public function getRequest()
+    {
+        return parent::getRequest();
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return Response|null A Response instance
+     */
+    public function getResponse()
+    {
+        return parent::getResponse();
+    }
+
+    /**
      * Makes a request.
      *
      * @param Request $request A Request instance
@@ -71,15 +92,16 @@ class Client extends BaseClient
      * Returns the script to execute when the request must be insulated.
      *
      * @param Request $request A Request instance
+     *
+     * @return string
      */
     protected function getScript($request)
     {
         $kernel = str_replace("'", "\\'", serialize($this->kernel));
         $request = str_replace("'", "\\'", serialize($request));
 
-        $r = new \ReflectionClass('\\Symfony\\Component\\ClassLoader\\UniversalClassLoader');
+        $r = new \ReflectionClass('\\Symfony\\Component\\ClassLoader\\ClassLoader');
         $requirePath = str_replace("'", "\\'", $r->getFileName());
-
         $symfonyPath = str_replace("'", "\\'", realpath(__DIR__.'/../../..'));
 
         return <<<EOF
@@ -87,8 +109,8 @@ class Client extends BaseClient
 
 require_once '$requirePath';
 
-\$loader = new Symfony\Component\ClassLoader\UniversalClassLoader();
-\$loader->registerNamespaces(array('Symfony' => '$symfonyPath'));
+\$loader = new Symfony\Component\ClassLoader\ClassLoader();
+\$loader->addPrefix('Symfony', '$symfonyPath');
 \$loader->register();
 
 \$kernel = unserialize('$kernel');
@@ -99,7 +121,7 @@ EOF;
     /**
      * Converts the BrowserKit request to a HttpKernel request.
      *
-     * @param DomRequest $request A Request instance
+     * @param DomRequest $request A DomRequest instance
      *
      * @return Request A Request instance
      */
@@ -166,7 +188,7 @@ EOF;
      *
      * @param Response $response A Response instance
      *
-     * @return Response A Response instance
+     * @return DomResponse A DomResponse instance
      */
     protected function filterResponse($response)
     {
@@ -179,6 +201,11 @@ EOF;
             $headers['Set-Cookie'] = $cookies;
         }
 
-        return new DomResponse($response->getContent(), $response->getStatusCode(), $headers);
+        // this is needed to support StreamedResponse
+        ob_start();
+        $response->sendContent();
+        $content = ob_get_clean();
+
+        return new DomResponse($content, $response->getStatusCode(), $headers);
     }
 }

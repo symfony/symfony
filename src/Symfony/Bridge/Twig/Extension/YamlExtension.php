@@ -31,7 +31,7 @@ class YamlExtension extends \Twig_Extension
         );
     }
 
-    public function encode($input, $inline = 0)
+    public function encode($input, $inline = 0, $dumpObjects = false)
     {
         static $dumper;
 
@@ -39,20 +39,20 @@ class YamlExtension extends \Twig_Extension
             $dumper = new YamlDumper();
         }
 
-        return $dumper->dump($input, $inline);
+        return $dumper->dump($input, $inline, false, $dumpObjects);
     }
 
-    public function dump($value)
+    public function dump($value, $inline = 0, $dumpObjects = false)
     {
         if (is_resource($value)) {
             return '%Resource%';
         }
 
         if (is_array($value) || is_object($value)) {
-            return '%'.gettype($value).'% '.$this->encode($value);
+            return '%'.gettype($value).'% '.$this->encode($value, $inline, $dumpObjects);
         }
 
-        return $this->encode($value);
+        return $this->encode($value, $inline, $dumpObjects);
     }
 
     /**

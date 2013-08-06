@@ -31,7 +31,7 @@ class AccessListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Security\Core\Exception\AccessDeniedException
+     * @expectedException \Symfony\Component\Security\Core\Exception\AccessDeniedException
      */
     public function testHandleWhenTheAccessDecisionManagerDecidesToRefuseAccess()
     {
@@ -198,7 +198,7 @@ class AccessListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException
+     * @expectedException \Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException
      */
     public function testHandleWhenTheSecurityContextHasNoToken()
     {

@@ -33,7 +33,7 @@ class UserAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Security\Core\Exception\UsernameNotFoundException
+     * @expectedException \Symfony\Component\Security\Core\Exception\UsernameNotFoundException
      */
     public function testAuthenticateWhenUsernameIsNotFound()
     {
@@ -47,7 +47,7 @@ class UserAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Security\Core\Exception\BadCredentialsException
+     * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
      */
     public function testAuthenticateWhenUsernameIsNotFoundAndHideIsTrue()
     {
@@ -61,7 +61,7 @@ class UserAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Security\Core\Exception\AuthenticationServiceException
+     * @expectedException \Symfony\Component\Security\Core\Exception\AuthenticationServiceException
      */
     public function testAuthenticateWhenProviderDoesNotReturnAnUserInterface()
     {
@@ -75,7 +75,7 @@ class UserAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Security\Core\Exception\CredentialsExpiredException
+     * @expectedException \Symfony\Component\Security\Core\Exception\CredentialsExpiredException
      */
     public function testAuthenticateWhenPreChecksFails()
     {
@@ -95,7 +95,7 @@ class UserAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Security\Core\Exception\AccountExpiredException
+     * @expectedException \Symfony\Component\Security\Core\Exception\AccountExpiredException
      */
     public function testAuthenticateWhenPostChecksFails()
     {
@@ -115,7 +115,7 @@ class UserAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Security\Core\Exception\BadCredentialsException
+     * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
      * @expectedExceptionMessage Bad credentials
      */
     public function testAuthenticateWhenPostCheckAuthenticationFails()
@@ -134,7 +134,7 @@ class UserAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Security\Core\Exception\BadCredentialsException
+     * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
      * @expectedExceptionMessage Foo
      */
     public function testAuthenticateWhenPostCheckAuthenticationFailsWithHideFalse()

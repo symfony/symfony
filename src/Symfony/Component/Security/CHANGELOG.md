@@ -1,6 +1,30 @@
 CHANGELOG
 =========
 
+2.4.0
+-----
+
+ * The remember-me cookie hashes now use HMAC, which means that current cookies will be invalidated
+ * added simpler customization options
+
+2.3.0
+-----
+
+ * [BC BREAK] the BCrypt encoder constructor signature has changed (the first argument was removed)
+   To use the BCrypt encoder, you now need PHP 5.5 or "ircmaxell/password-compat" as a composer dependency
+ * [BC BREAK] return 401 instead of 500 when using use_forward during for form authentication
+ * added a `require_previous_session` option to `AbstractAuthenticationListener`
+
+2.2.0
+-----
+
+ * `Symfony\Component\Security\Http\Firewall` and
+   `Symfony\Component\Security\Http\RememberMe\ResponseListener` now
+   implements EventSubscriberInterface
+ * added secure random number generator
+ * added PBKDF2 Password encoder
+ * added BCrypt password encoder
+
 2.1.0
 -----
 
@@ -21,7 +45,12 @@ CHANGELOG
    `UserSecurityIdentity::fromToken` now return correct identities for proxies
    objects (e.g. Doctrine proxies)
  * [BC BREAK] moved the default authentication success and failure handling to
-   seperate classes. The order of arguments in the constructor of the
+   separate classes. The order of arguments in the constructor of the
    `AbstractAuthenticationListener` has changed.
- * [BC BREAK] moved the default logout sucess handling to a seperate class. The
+ * [BC BREAK] moved the default logout success handling to a separate class. The
    order of arguments in the constructor of `LogoutListener` has changed.
+ * [BC BREAK] The constructor of `AuthenticationException` and all child
+   classes now matches the constructor of `\Exception`. The extra information
+   getters and setters are removed. There are now dedicated getters/setters for
+   token (`AuthenticationException'), user (`AccountStatusException`) and
+   username (`UsernameNotFoundException`).

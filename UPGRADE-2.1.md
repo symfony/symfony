@@ -14,7 +14,7 @@
     for multiple environments.
 
   * The priorities for the built-in listeners have changed.
- 
+
     ```
                                             2.0         2.1
         security.firewall   kernel.request  64          8
@@ -29,6 +29,7 @@
     Therefore you should change the namespace of this bundle in your AppKernel.php:
 
     Before: `new Symfony\Bundle\DoctrineBundle\DoctrineBundle()`
+
     After: `new Doctrine\Bundle\DoctrineBundle\DoctrineBundle()`
 
 ### HttpFoundation
@@ -52,11 +53,6 @@
         default_locale: fr
     ```
 
-  * The methods `getPathInfo()`, `getBaseUrl()` and `getBasePath()` of
-    a `Request` now all return a raw value (vs a urldecoded value before). Any call
-    to one of these methods must be checked and wrapped in a `rawurldecode()` if
-    needed.
-
     ##### Retrieving the locale from a Twig template
 
     Before: `{{ app.request.session.locale }}` or `{{ app.session.locale }}`
@@ -75,11 +71,11 @@
 
     After: `$request->getLocale()`
 
-### HttpFoundation
+    ##### Simulate old behavior
 
- * The current locale for the user is not stored anymore in the session
-
-   You can simulate the old behavior by registering a listener that looks like the following, if the paramater which handle locale value in the request is `_locale`:
+    You can simulate that the locale for the user is still stored in the session by
+    registering a listener that looks like the following if the parameter which 
+    handles the locale value in the request is `_locale`:
 
    ```
    namespace XXX;
@@ -121,6 +117,11 @@
    }
    ```
 
+  * The methods `getPathInfo()`, `getBaseUrl()` and `getBasePath()` of
+    a `Request` now all return a raw value (vs a urldecoded value before). Any call
+    to one of these methods must be checked and wrapped in a `rawurldecode()` if
+    needed.
+
 ### Security
 
   * `Symfony\Component\Security\Core\User\UserInterface::equals()` has moved to
@@ -159,12 +160,52 @@
 
   * The custom factories for the firewall configuration are now
     registered during the build method of bundles instead of being registered
-    by the end-user. This means that you will you need to remove the 'factories'
+    by the end-user. This means that you will need to remove the 'factories'
     keys in your security configuration.
+
+    Before:
+
+     ``` yaml
+     security:
+       factories:
+         - "%kernel.root_dir%/../src/Acme/DemoBundle/Resources/config/security_factories.yml"
+     ```
+
+     ``` yaml
+     # src/Acme/DemoBundle/Resources/config/security_factories.yml
+     services:
+         security.authentication.factory.custom:
+             class:  Acme\DemoBundle\DependencyInjection\Security\Factory\CustomFactory
+             tags:
+                 - { name: security.listener.factory }
+     ```
+
+     After:
+
+      ```
+      namespace Acme\DemoBundle;
+
+      use Symfony\Component\HttpKernel\Bundle\Bundle;
+      use Symfony\Component\DependencyInjection\ContainerBuilder;
+      use Acme\DemoBundle\DependencyInjection\Security\Factory\CustomFactory;
+
+      class AcmeDemoBundle extends Bundle
+      {
+          public function build(ContainerBuilder $container)
+          {
+              parent::build($container);
+
+              $extension = $container->getExtension('security');
+              $extension->addSecurityListenerFactory(new CustomFactory());
+          }
+      }
+      ```
 
   * The Firewall listener is now registered after the Router listener. This
     means that specific Firewall URLs (like /login_check and /logout) must now
-    have proper routes defined in your routing configuration.
+    have proper routes defined in your routing configuration. Also, if you have
+    a custom 404 error page, make sure that you do not use any security related
+    features such as `is_granted` on it.
 
   * The user provider configuration has been refactored. The configuration
     for the chain provider and the memory provider has been changed:
@@ -208,9 +249,9 @@
      use Symfony\Bundle\SecurityBundle\Validator\Constraint\UserPassword;
      use Symfony\Bundle\SecurityBundle\Validator\Constraint as SecurityAssert;
      ```
-     
+
      After:
-     
+
      ```
      use Symfony\Component\Security\Core\Validator\Constraint\UserPassword;
      use Symfony\Component\Security\Core\Validator\Constraint as SecurityAssert;
@@ -247,11 +288,10 @@
     reasons. It is now not possible anymore to use custom implementations of
     `FormBuilderInterface` for specific form types.
 
-    If you are in such a situation, you can subclass `FormRegistry` instead and override
-    `resolveType` to return a custom `ResolvedFormTypeInterface` implementation, within
-    which you can create your own `FormBuilderInterface` implementation. You should
-    register this custom registry class under the service name "form.registry" in order
-    to replace the default implementation.
+    If you are in such a situation, you can implement a custom `ResolvedFormTypeInterface`
+    where you create your own `FormBuilderInterface` implementation. You also need to
+    register a custom `ResolvedFormTypeFactoryInterface` implementation under the service
+    name "form.resolved_type_factory" in order to replace the default implementation.
 
   * If you previously inherited from `FieldType`, you should now inherit from
     `FormType`. You should also set the option `compound` to `false` if your field
@@ -382,22 +422,13 @@
   * In the collection type's template, the default name of the prototype field
     has changed from `$$name$$` to `__name__`.
 
-    For custom names, dollar signs are no longer prepended and appended. You are
-    advised to prepend and append two underscores wherever you specify a value
-    for the field's "prototype_name" option.
-
-    Before:
-
-    ```
-    $builder->add('tags', 'collection', array('prototype' => 'proto'));
-
-    // results in the name "$$proto$$" in the template
-    ```
-
-    After:
+    You can now customize the name of the prototype field by changin the
+    "prototype_name" option. You are advised to prepend and append two
+    underscores wherever you specify a value for the field's "prototype_name"
+    option.
 
     ```
-    $builder->add('tags', 'collection', array('prototype' => '__proto__'));
+    $builder->add('tags', 'collection', array('prototype_name' => '__proto__'));
 
     // results in the name "__proto__" in the template
     ```
@@ -493,29 +524,45 @@
     by default. Take care if your JavaScript relies on that. If you want to
     read the actual choice value, read the `value` attribute instead.
 
-  * In the choice field type's template, the structure of the `choices` variable
-    has changed.
-
-    The `choices` variable now contains `ChoiceView` objects with two getters,
-    `getValue()` and `getLabel()`, to access the choice data.
+  * In the choice field type's template, the `_form_is_choice_selected` method
+    used to identify a selected choice has been replaced with the `selectedchoice`
+    filter. Similarly, the `_form_is_choice_group` method used to check if a 
+    choice is grouped has been removed and can be checked with the `iterable` 
+    test.
 
     Before:
 
     ```
     {% for choice, label in choices %}
-        <option value="{{ choice }}"{% if _form_is_choice_selected(form, choice) %} selected="selected"{% endif %}>
-            {{ label }}
-        </option>
+        {% if _form_is_choice_group(label) %}
+            <optgroup label="{{ choice|trans }}">
+                {% for nestedChoice, nestedLabel in label %}
+                    ... options tags ...
+                {% endfor %}
+            </optgroup>
+        {% else %}
+            <option value="{{ choice }}"{% if _form_is_choice_selected(form, choice) %} selected="selected"{% endif %}>
+                {{ label }}
+            </option>
+        {% endif %}
     {% endfor %}
     ```
 
     After:
 
     ```
-    {% for choice in choices %}
-        <option value="{{ choice.value }}"{% if _form_is_choice_selected(form, choice) %} selected="selected"{% endif %}>
-            {{ choice.label }}
-        </option>
+    {% for label, choice in choices %}
+        {% if choice is iterable %}
+            <optgroup label="{{ label|trans({}, translation_domain) }}">
+                {% for nestedChoice, nestedLabel in choice %}
+                    ... options tags ...
+                {% endfor %}
+            </optgroup>
+        {% else %}
+            <option value="{{ choice.value }}"{% if choice is selectedchoice(value) %} selected="selected"{% endif %}>
+                {{ label }}
+            </option>
+        {% endif %}
     {% endfor %}
     ```
 
@@ -537,7 +584,7 @@
 
   * Custom styling of individual rows of a collection form has been removed for
     performance reasons. Instead, all rows now have the same block name, where
-    the word "entry" replaces the previous occurence of the row index.
+    the word "entry" replaces the previous occurrence of the row index.
 
     Before:
 
@@ -854,7 +901,7 @@
     public function guessPattern($class, $property)
     {
         if (/* condition */) {
-            return new ValueGuess('.{' . $minLength . ',}', Guess::LOW_CONFIDENCE);
+            return new ValueGuess('.{'.$minLength.',}', Guess::LOW_CONFIDENCE);
         }
     }
     ```
@@ -1142,7 +1189,7 @@
     public function isPropertyValid(ExecutionContext $context)
     {
         // ...
-        $propertyPath = $context->getPropertyPath() . '.property';
+        $propertyPath = $context->getPropertyPath().'.property';
         $context->setPropertyPath($propertyPath);
         $context->addViolation('Error Message', array(), null);
     }
@@ -1272,10 +1319,31 @@
     private $password;
     ```
 
+  * The classes `ValidatorContext` and `ValidatorFactory` were deprecated and
+    will be removed in Symfony 2.3. You should use the new entry point
+    `Validation` instead.
+
+    Before:
+
+    ```
+    $validator = ValidatorFactory::buildDefault(array('path/to/mapping.xml'))
+        ->getValidator();
+    ```
+
+    After:
+
+    ```
+    $validator = Validation::createValidatorBuilder()
+        ->addXmlMapping('path/to/mapping.xml')
+        ->getValidator();
+    ```
+
 ### Session
 
-  * Flash messages now return an array based on their type. The old method is
-    still available but is now deprecated.
+  * The namespace of the Session class changed from `Symfony\Component\HttpFoundation\Session`
+    to `Symfony\Component\HttpFoundation\Session\Session`.
+
+  * Using `get` to retrieve flash messages now returns an array.
 
     ##### Retrieving the flash messages from a Twig template
 
@@ -1352,6 +1420,11 @@
   * The UrlMatcher urldecodes the route parameters only once, they were
     decoded twice before. Note that the `urldecode()` calls have been changed for a
     single `rawurldecode()` in order to support `+` for input paths.
+
+  * Two new parameters have been added to the DIC: `router.request_context.host`
+    and `router.request_context.scheme`.  You can customize them for your
+    functional tests or for generating urls with the right host and scheme
+    when your are in the cli context.
 
 ### FrameworkBundle
 

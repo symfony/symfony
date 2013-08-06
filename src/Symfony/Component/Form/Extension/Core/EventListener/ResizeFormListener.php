@@ -13,7 +13,6 @@ namespace Symfony\Component\Form\Extension\Core\EventListener;
 
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -24,11 +23,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class ResizeFormListener implements EventSubscriberInterface
 {
-    /**
-     * @var FormFactoryInterface
-     */
-    protected $factory;
-
     /**
      * @var string
      */
@@ -51,9 +45,8 @@ class ResizeFormListener implements EventSubscriberInterface
      */
     protected $allowDelete;
 
-    public function __construct(FormFactoryInterface $factory, $type, array $options = array(), $allowAdd = false, $allowDelete = false)
+    public function __construct($type, array $options = array(), $allowAdd = false, $allowDelete = false)
     {
-        $this->factory = $factory;
         $this->type = $type;
         $this->allowAdd = $allowAdd;
         $this->allowDelete = $allowDelete;
@@ -64,9 +57,9 @@ class ResizeFormListener implements EventSubscriberInterface
     {
         return array(
             FormEvents::PRE_SET_DATA => 'preSetData',
-            FormEvents::PRE_BIND => 'preBind',
+            FormEvents::PRE_SUBMIT => 'preSubmit',
             // (MergeCollectionListener, MergeDoctrineCollectionListener)
-            FormEvents::BIND => array('onBind', 50),
+            FormEvents::SUBMIT => array('onSubmit', 50),
         );
     }
 
@@ -90,13 +83,13 @@ class ResizeFormListener implements EventSubscriberInterface
 
         // Then add all rows again in the correct order
         foreach ($data as $name => $value) {
-            $form->add($this->factory->createNamed($name, $this->type, null, array_replace(array(
+            $form->add($name, $this->type, array_replace(array(
                 'property_path' => '['.$name.']',
-            ), $this->options)));
+            ), $this->options));
         }
     }
 
-    public function preBind(FormEvent $event)
+    public function preSubmit(FormEvent $event)
     {
         $form = $event->getForm();
         $data = $event->getData();
@@ -122,15 +115,15 @@ class ResizeFormListener implements EventSubscriberInterface
         if ($this->allowAdd) {
             foreach ($data as $name => $value) {
                 if (!$form->has($name)) {
-                    $form->add($this->factory->createNamed($name, $this->type, null, array_replace(array(
+                    $form->add($name, $this->type, array_replace(array(
                         'property_path' => '['.$name.']',
-                    ), $this->options)));
+                    ), $this->options));
                 }
             }
         }
     }
 
-    public function onBind(FormEvent $event)
+    public function onSubmit(FormEvent $event)
     {
         $form = $event->getForm();
         $data = $event->getData();
@@ -154,5 +147,27 @@ class ResizeFormListener implements EventSubscriberInterface
         }
 
         $event->setData($data);
+    }
+
+    /**
+     * Alias of {@link preSubmit()}.
+     *
+     * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
+     *             {@link preSubmit()} instead.
+     */
+    public function preBind(FormEvent $event)
+    {
+        $this->preSubmit($event);
+    }
+
+    /**
+     * Alias of {@link onSubmit()}.
+     *
+     * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
+     *             {@link onSubmit()} instead.
+     */
+    public function onBind(FormEvent $event)
+    {
+        $this->onSubmit($event);
     }
 }

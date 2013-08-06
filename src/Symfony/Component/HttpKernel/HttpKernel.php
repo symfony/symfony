@@ -51,19 +51,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
     }
 
     /**
-     * Handles a Request to convert it to a Response.
-     *
-     * When $catch is true, the implementation must catch all exceptions
-     * and do its best to convert them to a Response instance.
-     *
-     * @param Request $request A Request instance
-     * @param integer $type    The type of the request
-     *                          (one of HttpKernelInterface::MASTER_REQUEST or HttpKernelInterface::SUB_REQUEST)
-     * @param Boolean $catch Whether to catch exceptions or not
-     *
-     * @return Response A Response instance
-     *
-     * @throws \Exception When an Exception occurs during processing
+     * {@inheritdoc}
      *
      * @api
      */
@@ -155,7 +143,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
      * Filters a response object.
      *
      * @param Response $response A Response instance
-     * @param Request  $request  A error message in case the response is not a Response object
+     * @param Request  $request  An error message in case the response is not a Response object
      * @param integer  $type     The type of the request (one of HttpKernelInterface::MASTER_REQUEST or HttpKernelInterface::SUB_REQUEST)
      *
      * @return Response The filtered Response instance
@@ -172,13 +160,15 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
     }
 
     /**
-     * Handles and exception by trying to convert it to a Response.
+     * Handles an exception by trying to convert it to a Response.
      *
      * @param \Exception $e       An \Exception instance
      * @param Request    $request A Request instance
      * @param integer    $type    The type of the request
      *
      * @return Response A Response instance
+     *
+     * @throws \Exception
      */
     private function handleException(\Exception $e, $request, $type)
     {
@@ -194,8 +184,13 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
 
         $response = $event->getResponse();
 
-        // ensure that we actually have an error response
-        if (!$response->isClientError() && !$response->isServerError() && !$response->isRedirect()) {
+        // the developer asked for a specific status code
+        if ($response->headers->has('X-Status-Code')) {
+            $response->setStatusCode($response->headers->get('X-Status-Code'));
+
+            $response->headers->remove('X-Status-Code');
+        } elseif (!$response->isClientError() && !$response->isServerError() && !$response->isRedirect()) {
+            // ensure that we actually have an error response
             if ($e instanceof HttpExceptionInterface) {
                 // keep the HTTP status code and headers
                 $response->setStatusCode($e->getStatusCode());

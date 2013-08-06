@@ -27,6 +27,7 @@ interface StreamingEngineInterface
      * @param array $parameters An array of parameters to pass to the template
      *
      * @throws \RuntimeException if the template cannot be rendered
+     * @throws \LogicException   if the template cannot be streamed
      */
     public function stream($name, array $parameters = array());
 }

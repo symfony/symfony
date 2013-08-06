@@ -43,7 +43,7 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
             $user = $this->getUserProvider($class)->loadUserByUsername($username);
         } catch (\Exception $ex) {
             if (!$ex instanceof AuthenticationException) {
-                $ex = new AuthenticationException($ex->getMessage(), null, $ex->getCode(), $ex);
+                $ex = new AuthenticationException($ex->getMessage(), $ex->getCode(), $ex);
             }
 
             throw $ex;
@@ -147,6 +147,6 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
      */
     protected function generateCookieHash($class, $username, $expires, $password)
     {
-        return hash('sha256', $class.$username.$expires.$password.$this->getKey());
+        return hash_hmac('sha256', $class.$username.$expires.$password, $this->getKey());
     }
 }

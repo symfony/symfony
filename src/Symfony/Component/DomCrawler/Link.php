@@ -46,7 +46,7 @@ class Link
      */
     public function __construct(\DOMNode $node, $currentUri, $method = 'GET')
     {
-        if (!in_array(substr($currentUri, 0, 4), array('http', 'file'))) {
+        if (!in_array(strtolower(substr($currentUri, 0, 4)), array('http', 'file'))) {
             throw new \InvalidArgumentException(sprintf('Current URI must be an absolute URL ("%s").', $currentUri));
         }
 
@@ -89,7 +89,7 @@ class Link
         $uri = trim($this->getRawUri());
 
         // absolute URL?
-        if (0 === strpos($uri, 'http')) {
+        if (null !== parse_url($uri, PHP_URL_SCHEME)) {
             return $uri;
         }
 
@@ -120,17 +120,27 @@ class Link
             return $baseUri.$uri;
         }
 
+        // absolute URL with relative schema
+        if (0 === strpos($uri, '//')) {
+            return preg_replace('#^([^/]*)//.*$#', '$1', $this->currentUri).$uri;
+        }
+
+        $baseUri = preg_replace('#^(.*?//[^/]*)(?:\/.*)?$#', '$1', $this->currentUri);
+
         // absolute path
         if ('/' === $uri[0]) {
-            return preg_replace('#^(.*?//[^/]+)(?:\/.*)?$#', '$1', $this->currentUri).$uri;
+            return $baseUri.$uri;
         }
 
         // relative path
-        return substr($this->currentUri, 0, strrpos($this->currentUri, '/') + 1).$uri;
+        $path = parse_url(substr($this->currentUri, strlen($baseUri)), PHP_URL_PATH);
+        $path = $this->canonicalizePath(substr($path, 0, strrpos($path, '/')).'/'.$uri);
+
+        return $baseUri.('' === $path || '/' !== $path[0] ? '/' : '').$path;
     }
 
     /**
-     * Returns raw uri data
+     * Returns raw uri data.
      *
      * @return string
      */
@@ -140,7 +150,37 @@ class Link
     }
 
     /**
-     * Sets current \DOMNode instance
+     * Returns the canonicalized URI path (see RFC 3986, section 5.2.4)
+     *
+     * @param string $path URI path
+     *
+     * @return string
+     */
+    protected function canonicalizePath($path)
+    {
+        if ('' === $path || '/' === $path) {
+            return $path;
+        }
+
+        if ('.' === substr($path, -1)) {
+            $path = $path.'/';
+        }
+
+        $output = array();
+
+        foreach (explode('/', $path) as $segment) {
+            if ('..' === $segment) {
+                array_pop($output);
+            } elseif ('.' !== $segment) {
+                array_push($output, $segment);
+            }
+        }
+
+        return implode('/', $output);
+    }
+
+    /**
+     * Sets current \DOMNode instance.
      *
      * @param \DOMNode $node A \DOMNode instance
      *

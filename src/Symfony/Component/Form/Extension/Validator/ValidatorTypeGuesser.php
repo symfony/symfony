@@ -15,14 +15,14 @@ use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\Form\Guess\ValueGuess;
-use Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface;
+use Symfony\Component\Validator\MetadataFactoryInterface;
 use Symfony\Component\Validator\Constraint;
 
 class ValidatorTypeGuesser implements FormTypeGuesserInterface
 {
     private $metadataFactory;
 
-    public function __construct(ClassMetadataFactoryInterface $metadataFactory)
+    public function __construct(MetadataFactoryInterface $metadataFactory)
     {
         $this->metadataFactory = $metadataFactory;
     }
@@ -63,13 +63,6 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
         return $this->guess($class, $property, function (Constraint $constraint) use ($guesser) {
             return $guesser->guessMaxLengthForConstraint($constraint);
         });
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function guessMinLength($class, $property)
-    {
     }
 
     /**
@@ -157,7 +150,6 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
             case 'Symfony\Component\Validator\Constraints\Regex':
                 return new TypeGuess('text', array(), Guess::LOW_CONFIDENCE);
 
-            case 'Symfony\Component\Validator\Constraints\Size':
             case 'Symfony\Component\Validator\Constraints\Min':
             case 'Symfony\Component\Validator\Constraints\Max':
                 return new TypeGuess('number', array(), Guess::LOW_CONFIDENCE);
@@ -165,12 +157,6 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
             case 'Symfony\Component\Validator\Constraints\MinCount':
             case 'Symfony\Component\Validator\Constraints\MaxCount':
                 return new TypeGuess('collection', array(), Guess::LOW_CONFIDENCE);
-
-            case 'Symfony\Component\Validator\Constraints\Time':
-                return new TypeGuess('time', array('input'=>'string'), Guess::HIGH_CONFIDENCE);
-
-            case 'Symfony\Component\Validator\Constraints\Url':
-                return new TypeGuess('url', array(), Guess::HIGH_CONFIDENCE);
 
             case 'Symfony\Component\Validator\Constraints\True':
             case 'Symfony\Component\Validator\Constraints\False':
@@ -220,9 +206,6 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
 
             case 'Symfony\Component\Validator\Constraints\Max':
                 return new ValueGuess(strlen((string) $constraint->limit), Guess::LOW_CONFIDENCE);
-
-            case 'Symfony\Component\Validator\Constraints\Size':
-                return new ValueGuess(strlen((string) $constraint->max), Guess::LOW_CONFIDENCE);
         }
 
         return null;
@@ -252,9 +235,6 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
             case 'Symfony\Component\Validator\Constraints\Min':
                 return new ValueGuess(sprintf('.{%s,}', strlen((string) $constraint->limit)), Guess::LOW_CONFIDENCE);
 
-            case 'Symfony\Component\Validator\Constraints\Size':
-                return new ValueGuess(sprintf('.{%s,%s}', strlen((string) $constraint->min), strlen((string) $constraint->max)), Guess::LOW_CONFIDENCE);
-
             case 'Symfony\Component\Validator\Constraints\Type':
                 if (in_array($constraint->type, array('double', 'float', 'numeric', 'real'))) {
                     return new ValueGuess(null, Guess::MEDIUM_CONFIDENCE);
@@ -269,19 +249,19 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
      * Iterates over the constraints of a property, executes a constraints on
      * them and returns the best guess
      *
-     * @param string   $class    The class to read the constraints from
-     * @param string   $property The property for which to find constraints
-     * @param \Closure $closure  The closure that returns a guess
-     *                             for a given constraint
-     * @param mixed $default The default value assumed if no other value
-     *                             can be guessed.
+     * @param string   $class        The class to read the constraints from
+     * @param string   $property     The property for which to find constraints
+     * @param \Closure $closure      The closure that returns a guess
+     *                               for a given constraint
+     * @param mixed    $defaultValue The default value assumed if no other value
+     *                               can be guessed.
      *
      * @return Guess The guessed value with the highest confidence
      */
     protected function guess($class, $property, \Closure $closure, $defaultValue = null)
     {
         $guesses = array();
-        $classMetadata = $this->metadataFactory->getClassMetadata($class);
+        $classMetadata = $this->metadataFactory->getMetadataFor($class);
 
         if ($classMetadata->hasMemberMetadatas($property)) {
             $memberMetadatas = $classMetadata->getMemberMetadatas($property);

@@ -58,7 +58,6 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
         return $this->httpUtils->createRedirectResponse($request, $this->determineTargetUrl($request));
     }
 
-
     /**
      * Get the provider key.
      *

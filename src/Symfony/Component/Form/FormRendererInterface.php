@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\Extension\Core\View\ChoiceView;
-
 /**
  * Renders a form into HTML.
  *

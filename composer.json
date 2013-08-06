@@ -17,60 +17,71 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "doctrine/common": ">2.2,<2.4-dev",
-        "twig/twig": ">=1.9.1,<2.0-dev"
+        "symfony/icu": "~1.0",
+        "doctrine/common": "~2.2",
+        "twig/twig": "~1.11",
+        "psr/log": "~1.0"
     },
     "replace": {
-        "symfony/doctrine-bridge": "self.version",
-        "symfony/monolog-bridge": "self.version",
-        "symfony/propel1-bridge": "self.version",
-        "symfony/swiftmailer-bridge": "self.version",
-        "symfony/twig-bridge": "self.version",
-        "symfony/framework-bundle": "self.version",
-        "symfony/security-bundle": "self.version",
-        "symfony/twig-bundle": "self.version",
-        "symfony/web-profiler-bundle": "self.version",
         "symfony/browser-kit": "self.version",
         "symfony/class-loader": "self.version",
         "symfony/config": "self.version",
         "symfony/console": "self.version",
         "symfony/css-selector": "self.version",
         "symfony/dependency-injection": "self.version",
+        "symfony/debug": "self.version",
+        "symfony/doctrine-bridge": "self.version",
         "symfony/dom-crawler": "self.version",
         "symfony/event-dispatcher": "self.version",
         "symfony/filesystem": "self.version",
         "symfony/finder": "self.version",
         "symfony/form": "self.version",
+        "symfony/framework-bundle": "self.version",
         "symfony/http-foundation": "self.version",
         "symfony/http-kernel": "self.version",
+        "symfony/intl": "self.version",
         "symfony/locale": "self.version",
+        "symfony/monolog-bridge": "self.version",
         "symfony/options-resolver": "self.version",
         "symfony/process": "self.version",
+        "symfony/propel1-bridge": "self.version",
+        "symfony/property-access": "self.version",
+        "symfony/proxy-manager-bridge": "self.version",
         "symfony/routing": "self.version",
         "symfony/security": "self.version",
+        "symfony/security-bundle": "self.version",
         "symfony/serializer": "self.version",
+        "symfony/stopwatch": "self.version",
+        "symfony/swiftmailer-bridge": "self.version",
         "symfony/templating": "self.version",
         "symfony/translation": "self.version",
+        "symfony/twig-bridge": "self.version",
+        "symfony/twig-bundle": "self.version",
         "symfony/validator": "self.version",
+        "symfony/web-profiler-bundle": "self.version",
         "symfony/yaml": "self.version"
     },
     "require-dev": {
-        "doctrine/dbal": ">=2.2,<2.4-dev",
-        "doctrine/orm": ">=2.2,<2.4-dev",
         "doctrine/data-fixtures": "1.0.*",
-        "propel/propel1": "dev-master",
-        "monolog/monolog": "dev-master"
+        "doctrine/dbal": "~2.2",
+        "doctrine/orm": "~2.2,>=2.2.3",
+        "monolog/monolog": "~1.3",
+        "propel/propel1": "1.6.*",
+        "ircmaxell/password-compat": "1.0.*",
+        "ocramius/proxy-manager": ">=0.3.1,<0.5-dev"
     },
     "autoload": {
-        "psr-0": {
-            "Symfony": "src/",
-            "SessionHandlerInterface": "src/Symfony/Component/HttpFoundation/Resources/stubs"
-        }
+        "psr-0": { "Symfony\\": "src/" },
+        "classmap": [
+            "src/Symfony/Component/HttpFoundation/Resources/stubs",
+            "src/Symfony/Component/Intl/Resources/stubs"
+        ],
+        "files": [ "src/Symfony/Component/Intl/Resources/stubs/functions.php" ]
     },
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.1-dev"
+            "dev-master": "2.4-dev"
         }
     }
 }

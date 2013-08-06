@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Form;
 
+use Symfony\Component\Form\Exception\BadMethodCallException;
+
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
@@ -54,110 +56,6 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     }
 
     /**
-     * Returns the name of the form.
-     *
-     * @return string The form name.
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Access
-     *             the public property {@link vars} instead which contains an
-     *             entry named "name".
-     */
-    public function getName()
-    {
-        return $this->vars['name'];
-    }
-
-    /**
-     * @param string $name
-     * @param mixed  $value
-     *
-     * @return FormView The current view
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Access
-     *             the public property {@link vars} instead.
-     */
-    public function set($name, $value)
-    {
-        $this->vars[$name] = $value;
-
-        return $this;
-    }
-
-    /**
-     * @param $name
-     *
-     * @return Boolean
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Access
-     *             the public property {@link vars} instead.
-     */
-    public function has($name)
-    {
-        return array_key_exists($name, $this->vars);
-    }
-
-    /**
-     * @param $name
-     * @param $default
-     *
-     * @return mixed
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Access
-     *             the public property {@link vars} instead.
-     */
-    public function get($name, $default = null)
-    {
-        if (false === $this->has($name)) {
-            return $default;
-        }
-
-        return $this->vars[$name];
-    }
-
-    /**
-     * @return array
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Access
-     *             the public property {@link vars} instead.
-     */
-    public function all()
-    {
-        return $this->vars;
-    }
-
-    /**
-     * Returns the values of all view variables.
-     *
-     * @return array The values of all variables.
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Access
-     *             the public property {@link vars} instead.
-     */
-    public function getVars()
-    {
-        return $this->vars;
-    }
-
-    /**
-     * Sets the value for an attribute.
-     *
-     * @param string $name  The name of the attribute
-     * @param string $value The value
-     *
-     * @return FormView The current view
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Access
-     *             the public property {@link vars} instead which contains an
-     *             entry named "attr".
-     */
-    public function setAttribute($name, $value)
-    {
-        $this->vars['attr'][$name] = $value;
-
-        return $this;
-    }
-
-    /**
      * Returns whether the view was already rendered.
      *
      * @return Boolean Whether this view's widget is rendered.
@@ -196,107 +94,6 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     }
 
     /**
-     * Sets the parent view.
-     *
-     * @param FormView $parent The parent view.
-     *
-     * @return FormView The view object.
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Access
-     *             the public property {@link parent} instead.
-     */
-    public function setParent(FormView $parent = null)
-    {
-        $this->parent = $parent;
-
-        return $this;
-    }
-
-    /**
-     * Returns the parent view.
-     *
-     * @return FormView The parent view.
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Access
-     *             the public property {@link parent} instead.
-     */
-    public function getParent()
-    {
-        return $this->parent;
-    }
-
-    /**
-     * Returns whether this view has a parent.
-     *
-     * @return Boolean Whether this view has a parent
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Access
-     *             the public property {@link parent} instead.
-     */
-    public function hasParent()
-    {
-        return null !== $this->parent;
-    }
-
-    /**
-     * Sets the children view.
-     *
-     * @param array $children The children as instances of FormView
-     *
-     * @return FormView The current view
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Access
-     *             the public property {@link children} instead.
-     */
-    public function setChildren(array $children)
-    {
-        $this->children = $children;
-
-        return $this;
-    }
-
-    /**
-     * Returns the children.
-     *
-     * @return array The children as instances of FormView
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Access
-     *             the public property {@link children} instead.
-     */
-    public function getChildren()
-    {
-        return $this->children;
-    }
-
-    /**
-     * Returns a given child.
-     *
-     * @param string $name The name of the child
-     *
-     * @return FormView The child view
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Access
-     *             the public property {@link children} instead.
-     */
-    public function getChild($name)
-    {
-        return $this->children[$name];
-    }
-
-    /**
-     * Returns whether this view has any children.
-     *
-     * @return Boolean Whether the view has children.
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
-     *             {@link count()} instead.
-     */
-    public function hasChildren()
-    {
-        return count($this->children) > 0;
-    }
-
-    /**
      * Returns a child by name (implements \ArrayAccess).
      *
      * @param string $name The child name
@@ -323,11 +120,11 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * Implements \ArrayAccess.
      *
-     * @throws \BadMethodCallException always as setting a child by name is not allowed
+     * @throws BadMethodCallException always as setting a child by name is not allowed
      */
     public function offsetSet($name, $value)
     {
-        throw new \BadMethodCallException('Not supported');
+        throw new BadMethodCallException('Not supported');
     }
 
     /**

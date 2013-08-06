@@ -17,106 +17,58 @@ use Symfony\Component\HttpFoundation\Request;
 class RequestMatcherTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @dataProvider testIpv4Provider
+     * @dataProvider testMethodFixtures
      */
-    public function testIpv4($matches, $remoteAddr, $cidr)
+    public function testMethod($requestMethod, $matcherMethod, $isMatch)
     {
-        $request = Request::create('', 'get', array(), array(), array(), array('REMOTE_ADDR' => $remoteAddr));
-
         $matcher = new RequestMatcher();
-        $matcher->matchIp($cidr);
+        $matcher->matchMethod($matcherMethod);
+        $request = Request::create('', $requestMethod);
+        $this->assertSame($isMatch, $matcher->matches($request));
 
-        $this->assertEquals($matches, $matcher->matches($request));
+        $matcher = new RequestMatcher(null, null, $matcherMethod);
+        $request = Request::create('', $requestMethod);
+        $this->assertSame($isMatch, $matcher->matches($request));
     }
 
-    public function testIpv4Provider()
+    public function testMethodFixtures()
     {
         return array(
-            array(true, '192.168.1.1', '192.168.1.1'),
-            array(true, '192.168.1.1', '192.168.1.1/1'),
-            array(true, '192.168.1.1', '192.168.1.0/24'),
-            array(false, '192.168.1.1', '1.2.3.4/1'),
-            array(false, '192.168.1.1', '192.168.1/33'),
+            array('get', 'get', true),
+            array('get', array('get', 'post'), true),
+            array('get', 'post', false),
+            array('get', 'GET', true),
+            array('get', array('GET', 'POST'), true),
+            array('get', 'POST', false),
         );
     }
 
     /**
-     * @dataProvider testIpv6Provider
+     * @dataProvider testHostFixture
      */
-    public function testIpv6($matches, $remoteAddr, $cidr)
-    {
-        if (!defined('AF_INET6')) {
-            $this->markTestSkipped('Only works when PHP is compiled without the option "disable-ipv6".');
-        }
-
-        $request = Request::create('', 'get', array(), array(), array(), array('REMOTE_ADDR' => $remoteAddr));
-
-        $matcher = new RequestMatcher();
-        $matcher->matchIp($cidr);
-
-        $this->assertEquals($matches, $matcher->matches($request));
-    }
-
-    public function testIpv6Provider()
-    {
-        return array(
-            array(true, '2a01:198:603:0:396e:4789:8e99:890f', '2a01:198:603:0::/65'),
-            array(false, '2a00:198:603:0:396e:4789:8e99:890f', '2a01:198:603:0::/65'),
-        );
-    }
-
-    public function testAnIpv6WithOptionDisabledIpv6()
-    {
-        if (defined('AF_INET6')) {
-            $this->markTestSkipped('Only works when PHP is compiled with the option "disable-ipv6".');
-        }
-
-        $request = Request::create('', 'get', array(), array(), array(), array('REMOTE_ADDR' => '2a01:198:603:0:396e:4789:8e99:890f'));
-
-        $matcher = new RequestMatcher();
-        $matcher->matchIp('2a01:198:603:0::/65');
-
-        try {
-            $matcher->matches($request);
-
-            $this->fail('An expected RuntimeException has not been raised.');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\RuntimeException', $e);
-        }
-    }
-
-    public function testMethod()
+    public function testHost($pattern, $isMatch)
     {
         $matcher = new RequestMatcher();
-
-        $matcher->matchMethod('get');
-        $request = Request::create('', 'get');
-        $this->assertTrue($matcher->matches($request));
-
-        $matcher->matchMethod('post');
-        $this->assertFalse($matcher->matches($request));
-
-        $matcher->matchMethod(array('get', 'post'));
-        $this->assertTrue($matcher->matches($request));
-    }
-
-    public function testHost()
-    {
-        $matcher = new RequestMatcher();
-
         $request = Request::create('', 'get', array(), array(), array(), array('HTTP_HOST' => 'foo.example.com'));
 
-        $matcher->matchHost('.*\.example\.com');
-        $this->assertTrue($matcher->matches($request));
+        $matcher->matchHost($pattern);
+        $this->assertSame($isMatch, $matcher->matches($request));
 
-        $matcher->matchHost('\.example\.com$');
-        $this->assertTrue($matcher->matches($request));
+        $matcher= new RequestMatcher(null, $pattern);
+        $this->assertSame($isMatch, $matcher->matches($request));
+    }
 
-        $matcher->matchHost('^.*\.example\.com$');
-        $this->assertTrue($matcher->matches($request));
-
-        $matcher->matchMethod('.*\.sensio\.com');
-        $this->assertFalse($matcher->matches($request));
+    public function testHostFixture()
+    {
+        return array(
+            array('.*\.example\.com', true),
+            array('\.example\.com$', true),
+            array('^.*\.example\.com$', true),
+            array('.*\.sensio\.com', false),
+            array('.*\.example\.COM', true),
+            array('\.example\.COM$', true),
+            array('^.*\.example\.COM$', true),
+            array('.*\.sensio\.COM', false),        );
     }
 
     public function testPath()

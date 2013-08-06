@@ -145,7 +145,7 @@ class HttpCacheTest extends HttpCacheTestCase
 
         $this->assertHttpKernelIsCalled();
         $this->assertEquals(304, $this->response->getStatusCode());
-        $this->assertEquals('text/html; charset=UTF-8', $this->response->headers->get('Content-Type'));
+        $this->assertEquals('', $this->response->headers->get('Content-Type'));
         $this->assertEmpty($this->response->getContent());
         $this->assertTraceContains('miss');
         $this->assertTraceContains('store');
@@ -158,7 +158,7 @@ class HttpCacheTest extends HttpCacheTestCase
 
         $this->assertHttpKernelIsCalled();
         $this->assertEquals(304, $this->response->getStatusCode());
-        $this->assertEquals('text/html; charset=UTF-8', $this->response->headers->get('Content-Type'));
+        $this->assertEquals('', $this->response->headers->get('Content-Type'));
         $this->assertTrue($this->response->headers->has('ETag'));
         $this->assertEmpty($this->response->getContent());
         $this->assertTraceContains('miss');
@@ -845,7 +845,7 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertTraceContains('fresh');
 
         // now POST to same URL
-        $this->request('POST', '/');
+        $this->request('POST', '/helloworld');
         $this->assertHttpKernelIsCalled();
         $this->assertEquals('/', $this->response->headers->get('Location'));
         $this->assertTraceContains('invalidate');
@@ -1033,5 +1033,74 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->request('GET', '/', array(), array(), true);
         $this->assertEquals('Hello World!', $this->response->getContent());
         $this->assertEquals(12, $this->response->headers->get('Content-Length'));
+    }
+
+    public function testClientIpIsAlwaysLocalhostForForwardedRequests()
+    {
+        $this->setNextResponse();
+        $this->request('GET', '/', array('REMOTE_ADDR' => '10.0.0.1'));
+
+        $this->assertEquals('127.0.0.1', $this->kernel->getBackendRequest()->server->get('REMOTE_ADDR'));
+    }
+
+    /**
+     * @dataProvider getXForwardedForData
+     */
+    public function testXForwarderForHeaderForForwardedRequests($xForwardedFor, $expected)
+    {
+        $this->setNextResponse();
+        $server = array('REMOTE_ADDR' => '10.0.0.1');
+        if (false !== $xForwardedFor) {
+            $server['HTTP_X_FORWARDED_FOR'] = $xForwardedFor;
+        }
+        $this->request('GET', '/', $server);
+
+        $this->assertEquals($expected, $this->kernel->getBackendRequest()->headers->get('X-Forwarded-For'));
+    }
+
+    public function getXForwardedForData()
+    {
+        return array(
+            array(false, '10.0.0.1'),
+            array('10.0.0.2', '10.0.0.2, 10.0.0.1'),
+            array('10.0.0.2, 10.0.0.3', '10.0.0.2, 10.0.0.3, 10.0.0.1'),
+        );
+    }
+
+    public function testXForwarderForHeaderForPassRequests()
+    {
+        $this->setNextResponse();
+        $server = array('REMOTE_ADDR' => '10.0.0.1');
+        $this->request('POST', '/', $server);
+
+        $this->assertEquals('10.0.0.1', $this->kernel->getBackendRequest()->headers->get('X-Forwarded-For'));
+    }
+
+    public function testEsiCacheRemoveValidationHeadersIfEmbeddedResponses()
+    {
+        $time = new \DateTime;
+
+        $responses = array(
+            array(
+                'status'  => 200,
+                'body'    => '<esi:include src="/hey" />',
+                'headers' => array(
+                    'Surrogate-Control' => 'content="ESI/1.0"',
+                    'ETag' => 'hey',
+                    'Last-Modified' => $time->format(DATE_RFC2822),
+                ),
+            ),
+            array(
+                'status'  => 200,
+                'body'    => 'Hey!',
+                'headers' => array(),
+            ),
+        );
+
+        $this->setNextResponses($responses);
+
+        $this->request('GET', '/', array(), array(), true);
+        $this->assertNull($this->response->getETag());
+        $this->assertNull($this->response->getLastModified());
     }
 }

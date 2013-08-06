@@ -23,7 +23,7 @@ class PasswordType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        if ($options['always_empty'] || !$form->isBound()) {
+        if ($options['always_empty'] || !$form->isSubmitted()) {
             $view->vars['value'] = '';
         }
     }
@@ -35,6 +35,7 @@ class PasswordType extends AbstractType
     {
         $resolver->setDefaults(array(
             'always_empty' => true,
+            'trim'         => false,
         ));
     }
 

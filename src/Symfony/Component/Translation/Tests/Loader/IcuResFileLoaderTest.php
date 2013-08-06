@@ -25,7 +25,6 @@ class IcuResFileLoaderTest extends LocalizedTestCase
         if (!extension_loaded('intl')) {
             $this->markTestSkipped('This test requires intl extension to work.');
         }
-
     }
 
     public function testLoad()
@@ -41,11 +40,20 @@ class IcuResFileLoaderTest extends LocalizedTestCase
     }
 
     /**
-     * @expectedException \RuntimeException
+     * @expectedException \Symfony\Component\Translation\Exception\NotFoundResourceException
+     */
+    public function testLoadNonExistingResource()
+    {
+        $loader = new IcuResFileLoader();
+        $loader->load(__DIR__.'/../fixtures/non-existing.txt', 'en', 'domain1');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Translation\Exception\InvalidResourceException
      */
     public function testLoadInvalidResource()
     {
         $loader = new IcuResFileLoader();
-        $catalogue = $loader->load(__DIR__.'/../fixtures/resourcebundle/res/en.txt', 'en', 'domain1');
+        $loader->load(__DIR__.'/../fixtures/resourcebundle/corrupted', 'en', 'domain1');
     }
 }

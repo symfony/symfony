@@ -27,7 +27,7 @@ class IcuResFileDumperTest extends \PHPUnit_Framework_TestCase
 
         $tempDir = sys_get_temp_dir();
         $dumper = new IcuResFileDumper();
-        $dumperString = $dumper->dump($catalogue, array('path' => $tempDir));
+        $dumper->dump($catalogue, array('path' => $tempDir));
 
         $this->assertEquals(file_get_contents(__DIR__.'/../fixtures/resourcebundle/res/en.res'), file_get_contents($tempDir.'/messages/en.res'));
 

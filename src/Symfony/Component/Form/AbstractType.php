@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
@@ -19,13 +18,6 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  */
 abstract class AbstractType implements FormTypeInterface
 {
-    /**
-     * @var array
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3.
-     */
-    private $extensions = array();
-
     /**
      * {@inheritdoc}
      */
@@ -52,38 +44,6 @@ abstract class AbstractType implements FormTypeInterface
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setDefaults($this->getDefaultOptions(array()));
-        $resolver->addAllowedValues($this->getAllowedOptionValues(array()));
-    }
-
-    /**
-     * Returns the default options for this type.
-     *
-     * @param array $options Unsupported as of Symfony 2.1.
-     *
-     * @return array The default options
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3.
-     *             Use {@link setDefaultOptions()} instead.
-     */
-    public function getDefaultOptions(array $options)
-    {
-        return array();
-    }
-
-    /**
-     * Returns the allowed option values for each option (if any).
-     *
-     * @param array $options Unsupported as of Symfony 2.1.
-     *
-     * @return array The allowed option values
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3.
-     *             Use {@link setDefaultOptions()} instead.
-     */
-    public function getAllowedOptionValues(array $options)
-    {
-        return array();
     }
 
     /**
@@ -92,32 +52,5 @@ abstract class AbstractType implements FormTypeInterface
     public function getParent()
     {
         return 'form';
-    }
-
-    /**
-     * Sets the extensions for this type.
-     *
-     * @param array $extensions An array of FormTypeExtensionInterface
-     *
-     * @throws Exception\UnexpectedTypeException if any extension does not implement FormTypeExtensionInterface
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3.
-     */
-    public function setExtensions(array $extensions)
-    {
-        $this->extensions = $extensions;
-    }
-
-    /**
-     * Returns the extensions associated with this type.
-     *
-     * @return array An array of FormTypeExtensionInterface
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
-     *             {@link ResolvedFormTypeInterface::getTypeExtensions()} instead.
-     */
-    public function getExtensions()
-    {
-        return $this->extensions;
     }
 }

@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -71,6 +71,8 @@ class SwitchUserListener implements ListenerInterface
      * Handles digest authentication.
      *
      * @param GetResponseEvent $event A GetResponseEvent instance
+     *
+     * @throws \LogicException
      */
     public function handle(GetResponseEvent $event)
     {
@@ -102,6 +104,9 @@ class SwitchUserListener implements ListenerInterface
      * @param Request $request A Request instance
      *
      * @return TokenInterface|null The new TokenInterface if successfully switched, null otherwise
+     *
+     * @throws \LogicException
+     * @throws AccessDeniedException
      */
     private function attemptSwitchUser(Request $request)
     {
@@ -148,6 +153,8 @@ class SwitchUserListener implements ListenerInterface
      * @param Request $request A Request instance
      *
      * @return TokenInterface The original TokenInterface instance
+     *
+     * @throws AuthenticationCredentialsNotFoundException
      */
     private function attemptExitUser(Request $request)
     {

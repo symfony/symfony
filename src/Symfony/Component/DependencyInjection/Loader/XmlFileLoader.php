@@ -11,13 +11,14 @@
 
 namespace Symfony\Component\DependencyInjection\Loader;
 
+use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Config\Util\XmlUtils;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\SimpleXMLElement;
-use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
@@ -147,7 +148,7 @@ class XmlFileLoader extends FileLoader
             $definition = new Definition();
         }
 
-        foreach (array('class', 'scope', 'public', 'factory-class', 'factory-method', 'factory-service', 'synthetic', 'abstract') as $key) {
+        foreach (array('class', 'scope', 'public', 'factory-class', 'factory-method', 'factory-service', 'synthetic', 'synchronized', 'lazy', 'abstract') as $key) {
             if (isset($service[$key])) {
                 $method = 'set'.str_replace('-', '', $key);
                 $definition->$method((string) $service->getAttributeAsPhp($key));
@@ -200,19 +201,19 @@ class XmlFileLoader extends FileLoader
      *
      * @param string $file Path to a file
      *
+     * @return SimpleXMLElement
+     *
      * @throws InvalidArgumentException When loading of XML file returns error
      */
-    private function parseFile($file)
+    protected function parseFile($file)
     {
-        $dom = new \DOMDocument();
-        libxml_use_internal_errors(true);
-        if (!$dom->load($file, defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0)) {
-            throw new InvalidArgumentException(implode("\n", $this->getXmlErrors()));
+        try {
+            $dom = XmlUtils::loadFile($file, array($this, 'validateSchema'));
+        } catch (\InvalidArgumentException $e) {
+            throw new InvalidArgumentException(sprintf('Unable to parse file "%s".', $file), $e->getCode(), $e);
         }
-        $dom->validateOnParse = true;
-        $dom->normalizeDocument();
-        libxml_use_internal_errors(false);
-        $this->validate($dom, $file);
+
+        $this->validateExtensions($dom, $file);
 
         return simplexml_import_dom($dom, 'Symfony\\Component\\DependencyInjection\\SimpleXMLElement');
     }
@@ -270,27 +271,15 @@ class XmlFileLoader extends FileLoader
     }
 
     /**
-     * Validates an XML document.
-     *
-     * @param DOMDocument $dom
-     * @param string      $file
-     */
-    private function validate(\DOMDocument $dom, $file)
-    {
-        $this->validateSchema($dom, $file);
-        $this->validateExtensions($dom, $file);
-    }
-
-    /**
      * Validates a documents XML schema.
      *
      * @param \DOMDocument $dom
-     * @param string       $file
      *
-     * @throws RuntimeException         When extension references a non-existent XSD file
-     * @throws InvalidArgumentException When XML doesn't validate its XSD schema
+     * @return Boolean
+     *
+     * @throws RuntimeException When extension references a non-existent XSD file
      */
-    private function validateSchema(\DOMDocument $dom, $file)
+    public function validateSchema(\DOMDocument $dom)
     {
         $schemaLocations = array('http://symfony.com/schema/dic/services' => str_replace('\\', '/', __DIR__.'/schema/dic/services/services-1.0.xsd'));
 
@@ -344,15 +333,13 @@ $imports
 EOF
         ;
 
-        $current = libxml_use_internal_errors(true);
         $valid = @$dom->schemaValidateSource($source);
+
         foreach ($tmpfiles as $tmpfile) {
             @unlink($tmpfile);
         }
-        if (!$valid) {
-            throw new InvalidArgumentException(implode("\n", $this->getXmlErrors()));
-        }
-        libxml_use_internal_errors($current);
+
+        return $valid;
     }
 
     /**
@@ -382,30 +369,6 @@ EOF
                 ));
             }
         }
-    }
-
-    /**
-     * Returns an array of XML errors.
-     *
-     * @return array
-     */
-    private function getXmlErrors()
-    {
-        $errors = array();
-        foreach (libxml_get_errors() as $error) {
-            $errors[] = sprintf('[%s %s] %s (in %s - line %d, column %d)',
-                LIBXML_ERR_WARNING == $error->level ? 'WARNING' : 'ERROR',
-                $error->code,
-                trim($error->message),
-                $error->file ? $error->file : 'n/a',
-                $error->line,
-                $error->column
-            );
-        }
-
-        libxml_clear_errors();
-
-        return $errors;
     }
 
     /**
@@ -450,50 +413,6 @@ EOF
      */
     public static function convertDomElementToArray(\DomElement $element)
     {
-        $empty = true;
-        $config = array();
-        foreach ($element->attributes as $name => $node) {
-            $config[$name] = SimpleXMLElement::phpize($node->value);
-            $empty = false;
-        }
-
-        $nodeValue = false;
-        foreach ($element->childNodes as $node) {
-            if ($node instanceof \DOMText) {
-                if (trim($node->nodeValue)) {
-                    $nodeValue = trim($node->nodeValue);
-                    $empty = false;
-                }
-            } elseif (!$node instanceof \DOMComment) {
-                if ($node instanceof \DOMElement && '_services' === $node->nodeName) {
-                    $value = new Reference($node->getAttribute('id'));
-                } else {
-                    $value = static::convertDomElementToArray($node);
-                }
-
-                $key = $node->localName;
-                if (isset($config[$key])) {
-                    if (!is_array($config[$key]) || !is_int(key($config[$key]))) {
-                        $config[$key] = array($config[$key]);
-                    }
-                    $config[$key][] = $value;
-                } else {
-                    $config[$key] = $value;
-                }
-
-                $empty = false;
-            }
-        }
-
-        if (false !== $nodeValue) {
-            $value = SimpleXMLElement::phpize($nodeValue);
-            if (count($config)) {
-                $config['value'] = $value;
-            } else {
-                $config = $value;
-            }
-        }
-
-        return !$empty ? $config : null;
+        return XmlUtils::convertDomElementToArray($element);
     }
 }

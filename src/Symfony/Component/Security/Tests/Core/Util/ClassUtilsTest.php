@@ -1,12 +1,21 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Security\Tests\Core\Util
 {
     use Symfony\Component\Security\Core\Util\ClassUtils;
 
     class ClassUtilsTest extends \PHPUnit_Framework_TestCase
     {
-        static public function dataGetClass()
+        public static function dataGetClass()
         {
             return array(
                 array('stdClass', 'stdClass'),

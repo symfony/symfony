@@ -59,7 +59,7 @@ class IdentityTranslator implements TranslatorInterface
      */
     public function trans($id, array $parameters = array(), $domain = 'messages', $locale = null)
     {
-        return strtr($id, $parameters);
+        return strtr((string) $id, $parameters);
     }
 
     /**
@@ -69,6 +69,6 @@ class IdentityTranslator implements TranslatorInterface
      */
     public function transChoice($id, $number, array $parameters = array(), $domain = 'messages', $locale = null)
     {
-        return strtr($this->selector->choose($id, (int) $number, $locale), $parameters);
+        return strtr($this->selector->choose((string) $id, (int) $number, $locale), $parameters);
     }
 }

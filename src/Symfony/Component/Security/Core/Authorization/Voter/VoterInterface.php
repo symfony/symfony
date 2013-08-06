@@ -38,7 +38,7 @@ interface VoterInterface
      *
      * @param string $class A class name
      *
-     * @return true if this Voter can process the class
+     * @return Boolean true if this Voter can process the class
      */
     public function supportsClass($class);
 

@@ -27,7 +27,7 @@ class InMemoryTokenProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Security\Core\Exception\TokenNotFoundException
+     * @expectedException \Symfony\Component\Security\Core\Exception\TokenNotFoundException
      */
     public function testLoadTokenBySeriesThrowsNotFoundException()
     {
@@ -49,7 +49,7 @@ class InMemoryTokenProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Security\Core\Exception\TokenNotFoundException
+     * @expectedException \Symfony\Component\Security\Core\Exception\TokenNotFoundException
      */
     public function testDeleteToken()
     {

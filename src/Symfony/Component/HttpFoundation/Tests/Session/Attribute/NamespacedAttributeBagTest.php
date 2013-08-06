@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpFoundation\Tests;
+namespace Symfony\Component\HttpFoundation\Tests\Session\Attribute;
 
 use Symfony\Component\HttpFoundation\Session\Attribute\NamespacedAttributeBag;
 
@@ -160,8 +160,10 @@ class NamespacedAttributeBagTest extends \PHPUnit_Framework_TestCase
             array('csrf.token/b', '4321', true),
             array('category', array('fishing' => array('first' => 'cod', 'second' => 'sole')), true),
             array('category/fishing', array('first' => 'cod', 'second' => 'sole'), true),
+            array('category/fishing/missing/first', null, false),
             array('category/fishing/first', 'cod', true),
             array('category/fishing/second', 'sole', true),
+            array('category/fishing/missing/second', null, false),
             array('user2.login', null, false),
             array('never', null, false),
             array('bye', null, false),

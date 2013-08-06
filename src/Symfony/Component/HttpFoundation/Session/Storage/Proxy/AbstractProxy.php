@@ -72,16 +72,31 @@ abstract class AbstractProxy
      */
     public function isActive()
     {
+        if (version_compare(phpversion(), '5.4.0', '>=')) {
+            return $this->active = \PHP_SESSION_ACTIVE === session_status();
+        }
+
         return $this->active;
     }
 
     /**
      * Sets the active flag.
      *
+     * Has no effect under PHP 5.4+ as status is detected
+     * automatically in isActive()
+     *
+     * @internal
+     *
      * @param Boolean $flag
+     *
+     * @throws \LogicException
      */
     public function setActive($flag)
     {
+        if (version_compare(phpversion(), '5.4.0', '>=')) {
+            throw new \LogicException('This method is disabled in PHP 5.4.0+');
+        }
+
         $this->active = (bool) $flag;
     }
 
@@ -99,6 +114,8 @@ abstract class AbstractProxy
      * Sets the session ID.
      *
      * @param string $id
+     *
+     * @throws \LogicException
      */
     public function setId($id)
     {
@@ -123,6 +140,8 @@ abstract class AbstractProxy
      * Sets the session name.
      *
      * @param string $name
+     *
+     * @throws \LogicException
      */
     public function setName($name)
     {

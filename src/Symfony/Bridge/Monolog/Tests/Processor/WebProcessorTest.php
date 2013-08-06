@@ -60,6 +60,9 @@ class WebProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param integer $level
+     * @param string  $message
+     *
      * @return array Record
      */
     protected function getRecord($level = Logger::WARNING, $message = 'test')

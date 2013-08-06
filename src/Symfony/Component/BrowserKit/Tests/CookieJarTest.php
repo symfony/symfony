@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Tests\BrowserKit;
+namespace Symfony\Component\BrowserKit\Tests;
 
 use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\BrowserKit\Cookie;
@@ -82,6 +82,13 @@ class CookieJarTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $cookieJar->get('bar')->getValue(), '->updateFromSetCookie() keeps existing cookies');
     }
 
+    public function testUpdateFromEmptySetCookie()
+    {
+        $cookieJar = new CookieJar();
+        $cookieJar->updateFromSetCookie(array(''));
+        $this->assertEquals(array(), $cookieJar->all());
+    }
+
     public function testUpdateFromSetCookieWithMultipleCookies()
     {
         $timestamp = time() + 3600;
@@ -142,6 +149,29 @@ class CookieJarTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(array('foo' => 'bar=baz'), $cookieJar->allValues('/'));
         $this->assertEquals(array('foo' => 'bar%3Dbaz'), $cookieJar->allRawValues('/'));
+    }
+
+    public function testCookieExpireWithSameNameButDifferentPaths()
+    {
+        $cookieJar = new CookieJar();
+        $cookieJar->set($cookie1 = new Cookie('foo', 'bar1', null, '/foo'));
+        $cookieJar->set($cookie2 = new Cookie('foo', 'bar2', null, '/bar'));
+        $cookieJar->expire('foo', '/foo');
+
+        $this->assertNull($cookieJar->get('foo'), '->get() returns null if the cookie is expired');
+        $this->assertEquals(array(), array_keys($cookieJar->allValues('http://example.com/')));
+        $this->assertEquals(array(), $cookieJar->allValues('http://example.com/foo'));
+        $this->assertEquals(array('foo' => 'bar2'), $cookieJar->allValues('http://example.com/bar'));
+    }
+
+    public function testCookieExpireWithNullPaths()
+    {
+        $cookieJar = new CookieJar();
+        $cookieJar->set($cookie1 = new Cookie('foo', 'bar1', null, '/'));
+        $cookieJar->expire('foo', null);
+
+        $this->assertNull($cookieJar->get('foo'), '->get() returns null if the cookie is expired');
+        $this->assertEquals(array(), array_keys($cookieJar->allValues('http://example.com/')));
     }
 
     public function testCookieWithSameNameButDifferentPaths()

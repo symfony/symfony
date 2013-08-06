@@ -22,17 +22,34 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class TrimListener implements EventSubscriberInterface
 {
-    public function preBind(FormEvent $event)
+    public function preSubmit(FormEvent $event)
     {
         $data = $event->getData();
 
-        if (is_string($data)) {
+        if (!is_string($data)) {
+            return;
+        }
+
+        if (null !== $result = @preg_replace('/^[\pZ\p{Cc}]+|[\pZ\p{Cc}]+$/u', '', $data)) {
+            $event->setData($result);
+        } else {
             $event->setData(trim($data));
         }
     }
 
+    /**
+     * Alias of {@link preSubmit()}.
+     *
+     * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
+     *             {@link preSubmit()} instead.
+     */
+    public function preBind(FormEvent $event)
+    {
+        $this->preSubmit($event);
+    }
+
     public static function getSubscribedEvents()
     {
-        return array(FormEvents::PRE_BIND => 'preBind');
+        return array(FormEvents::PRE_SUBMIT => 'preSubmit');
     }
 }

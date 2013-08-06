@@ -157,6 +157,8 @@ class DbalSessionHandler implements \SessionHandlerInterface
     *
     * @param string $id
     * @param string $data
+    *
+    * @return Boolean
     */
     private function createNewSession($id, $data = '')
     {

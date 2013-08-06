@@ -19,18 +19,19 @@
         "php": ">=5.3.3"
     },
     "require-dev": {
-        "symfony/css-selector": "2.1.*"
+        "symfony/css-selector": "~2.0"
     },
     "suggest": {
-        "symfony/css-selector": "self.version"
+        "symfony/css-selector": ""
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\DomCrawler": "" }
+        "psr-0": { "Symfony\\Component\\DomCrawler\\": "" }
     },
     "target-dir": "Symfony/Component/DomCrawler",
+    "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.1-dev"
+            "dev-master": "2.4-dev"
         }
     }
 }

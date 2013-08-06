@@ -16,25 +16,30 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3"
+        "php": ">=5.3.3",
+        "symfony/translation": "~2.0"
     },
     "require-dev": {
-        "symfony/http-foundation": "2.1.*",
-        "symfony/locale": "2.1.*",
-        "symfony/yaml": "2.1.*"
+        "symfony/http-foundation": "~2.1",
+        "symfony/intl": "~2.3",
+        "symfony/yaml": "~2.0",
+        "symfony/config": "~2.2"
     },
     "suggest": {
-        "doctrine/common": ">=2.1,<2.4-dev",
-        "symfony/http-foundation": "self.version",
-        "symfony/yaml": "self.version"
+        "doctrine/common": "",
+        "symfony/http-foundation": "",
+        "symfony/intl": "",
+        "symfony/yaml": "",
+        "symfony/config": ""
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\Validator": "" }
+        "psr-0": { "Symfony\\Component\\Validator\\": "" }
     },
     "target-dir": "Symfony/Component/Validator",
+    "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.1-dev"
+            "dev-master": "2.4-dev"
         }
     }
 }

@@ -1,5 +1,5 @@
 Usage:
- help [--xml] [command_name]
+ help [--xml] [--format="..."] [--raw] [command_name]
 
 Arguments:
  command               The command to execute
@@ -7,9 +7,11 @@ Arguments:
 
 Options:
  --xml                 To output help as XML
+ --format              To output help in other formats (default: "txt")
+ --raw                 To output raw command help
  --help (-h)           Display this help message.
  --quiet (-q)          Do not output any message.
- --verbose (-v)        Increase verbosity of messages.
+ --verbose (-v|vv|vvv) Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
  --version (-V)        Display this application version.
  --ansi                Force ANSI output.
  --no-ansi             Disable ANSI output.
@@ -20,7 +22,8 @@ Help:
  
    php app/console help list
  
- You can also output the help as XML by using the --xml option:
+ You can also output the help in other formats by using the --format option:
  
-   php app/console help --xml list
-
+   php app/console help --format=xml list
+ 
+ To display the list of available commands, please use the list command.

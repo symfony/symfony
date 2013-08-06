@@ -11,49 +11,65 @@
 
 namespace Symfony\Component\CssSelector\Node;
 
-use Symfony\Component\CssSelector\XPathExpr;
-
 /**
- * ClassNode represents a "selector.className" node.
+ * Represents a "<selector>.<name>" node.
  *
- * This component is a port of the Python lxml library,
- * which is copyright Infrae and distributed under the BSD license.
+ * This component is a port of the Python cssselector library,
+ * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+ * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
  */
-class ClassNode implements NodeInterface
+class ClassNode extends AbstractNode
 {
-    protected $selector;
-    protected $className;
+    /**
+     * @var NodeInterface
+     */
+    private $selector;
 
     /**
-     * The constructor.
-     *
-     * @param NodeInterface $selector  The XPath Selector
-     * @param string        $className The class name
+     * @var string
      */
-    public function __construct($selector, $className)
+    private $name;
+
+    /**
+     * @param NodeInterface $selector
+     * @param string        $name
+     */
+    public function __construct(NodeInterface $selector, $name)
     {
         $this->selector = $selector;
-        $this->className = $className;
+        $this->name = $name;
     }
 
     /**
-     * {@inheritDoc}
+     * @return NodeInterface
+     */
+    public function getSelector()
+    {
+        return $this->selector;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSpecificity()
+    {
+        return $this->selector->getSpecificity()->plus(new Specificity(0, 1, 0));
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function __toString()
     {
-        return sprintf('%s[%s.%s]', __CLASS__, $this->selector, $this->className);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function toXpath()
-    {
-        $selXpath = $this->selector->toXpath();
-        $selXpath->addCondition(sprintf("contains(concat(' ', normalize-space(@class), ' '), %s)", XPathExpr::xpathLiteral(' '.$this->className.' ')));
-
-        return $selXpath;
+        return sprintf('%s[%s.%s]', $this->getNodeName(), $this->selector, $this->name);
     }
 }

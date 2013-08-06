@@ -95,4 +95,12 @@ class MockArraySessionStorageTest extends \PHPUnit_Framework_TestCase
         $this->storage->start();
         $this->assertNotEquals('', $this->storage->getId());
     }
+
+    /**
+     * @expectedException RuntimeException
+     */
+    public function testUnstartedSave()
+    {
+        $this->storage->save();
+    }
 }

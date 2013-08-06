@@ -13,18 +13,23 @@ namespace Symfony\Component\CssSelector\Tests\Node;
 
 use Symfony\Component\CssSelector\Node\ElementNode;
 
-class ElementNodeTest extends \PHPUnit_Framework_TestCase
+class ElementNodeTest extends AbstractNodeTest
 {
-    public function testToXpath()
+    public function getToStringConversionTestData()
     {
-        // h1
-        $element = new ElementNode('*', 'h1');
+        return array(
+            array(new ElementNode(), 'Element[*]'),
+            array(new ElementNode(null, 'element'), 'Element[element]'),
+            array(new ElementNode('namespace', 'element'), 'Element[namespace|element]'),
+        );
+    }
 
-        $this->assertEquals('h1', (string) $element->toXpath(), '->toXpath() returns the xpath representation of the node');
-
-        // foo|h1
-        $element = new ElementNode('foo', 'h1');
-
-        $this->assertEquals('foo:h1', (string) $element->toXpath(), '->toXpath() returns the xpath representation of the node');
+    public function getSpecificityValueTestData()
+    {
+        return array(
+            array(new ElementNode(), 0),
+            array(new ElementNode(null, 'element'), 1),
+            array(new ElementNode('namespace', 'element'),1),
+        );
     }
 }

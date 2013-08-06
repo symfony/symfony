@@ -242,11 +242,15 @@ class UniversalClassLoader
      * Loads the given class or interface.
      *
      * @param string $class The name of the class
+     *
+     * @return Boolean|null True, if loaded
      */
     public function loadClass($class)
     {
         if ($file = $this->findFile($class)) {
             require $file;
+
+            return true;
         }
     }
 
@@ -259,10 +263,6 @@ class UniversalClassLoader
      */
     public function findFile($class)
     {
-        if ('\\' == $class[0]) {
-            $class = substr($class, 1);
-        }
-
         if (false !== $pos = strrpos($class, '\\')) {
             // namespaced class name
             $namespace = substr($class, 0, $pos);

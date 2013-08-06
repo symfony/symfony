@@ -37,6 +37,8 @@ abstract class Input implements InputInterface
     public function __construct(InputDefinition $definition = null)
     {
         if (null === $definition) {
+            $this->arguments = array();
+            $this->options = array();
             $this->definition = new InputDefinition();
         } else {
             $this->bind($definition);
@@ -207,5 +209,17 @@ abstract class Input implements InputInterface
     public function hasOption($name)
     {
         return $this->definition->hasOption($name);
+    }
+
+    /**
+     * Escapes a token through escapeshellarg if it contains unsafe chars
+     *
+     * @param string $token
+     *
+     * @return string
+     */
+    public function escapeToken($token)
+    {
+        return preg_match('{^[\w-]+$}', $token) ? $token : escapeshellarg($token);
     }
 }

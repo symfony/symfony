@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Extension\Validator\Constraints;
 
+use Symfony\Component\Form\ClickableInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Extension\Validator\Util\ServerParams;
 use Symfony\Component\Validator\Constraint;
@@ -51,18 +52,12 @@ class FormValidator extends ConstraintValidator
 
         if ($form->isSynchronized()) {
             // Validate the form data only if transformation succeeded
-            $path = $this->context->getPropertyPath();
-            $graphWalker = $this->context->getGraphWalker();
-            $groups = $this->getValidationGroups($form);
-
-            if (!empty($path)) {
-                $path .= '.';
-            }
+            $groups = self::getValidationGroups($form);
 
             // Validate the data against its own constraints
             if (self::allowDataWalking($form)) {
                 foreach ($groups as $group) {
-                    $graphWalker->walkReference($form->getData(), $group, $path . 'data', true);
+                    $this->context->validate($form->getData(), 'data', $group, true);
                 }
             }
 
@@ -72,7 +67,7 @@ class FormValidator extends ConstraintValidator
             foreach ($constraints as $constraint) {
                 foreach ($groups as $group) {
                     if (in_array($group, $constraint->groups)) {
-                        $graphWalker->walkConstraint($constraint, $form->getData(), $group, $path . 'data');
+                        $this->context->validateValue($form->getData(), $constraint, 'data', $group);
 
                         // Prevent duplicate validation
                         continue 2;
@@ -80,18 +75,35 @@ class FormValidator extends ConstraintValidator
                 }
             }
         } else {
-            $clientDataAsString = is_scalar($form->getViewData())
-                ? (string) $form->getViewData()
-                : gettype($form->getViewData());
+            $childrenSynchronized = true;
 
-            // Mark the form with an error if it is not synchronized
-            $this->context->addViolation(
-                $config->getOption('invalid_message'),
-                array('{{ value }}' => $clientDataAsString),
-                $form->getViewData(),
-                null,
-                Form::ERR_INVALID
-            );
+            foreach ($form as $child) {
+                if (!$child->isSynchronized()) {
+                    $childrenSynchronized = false;
+                    break;
+                }
+            }
+
+            // Mark the form with an error if it is not synchronized BUT all
+            // of its children are synchronized. If any child is not
+            // synchronized, an error is displayed there already and showing
+            // a second error in its parent form is pointless, or worse, may
+            // lead to duplicate errors if error bubbling is enabled on the
+            // child.
+            // See also https://github.com/symfony/symfony/issues/4359
+            if ($childrenSynchronized) {
+                $clientDataAsString = is_scalar($form->getViewData())
+                    ? (string) $form->getViewData()
+                    : gettype($form->getViewData());
+
+                $this->context->addViolation(
+                    $config->getOption('invalid_message'),
+                    array_replace(array('{{ value }}' => $clientDataAsString), $config->getOption('invalid_message_parameters')),
+                    $form->getViewData(),
+                    null,
+                    Form::ERR_INVALID
+                );
+            }
         }
 
         // Mark the form with an error if it contains extra fields
@@ -109,7 +121,7 @@ class FormValidator extends ConstraintValidator
         if ($form->isRoot() && null !== $length) {
             $max = $this->serverParams->getPostMaxSize();
 
-            if (null !== $max && $length > $max) {
+            if (!empty($max) && $length > $max) {
                 $this->context->addViolation(
                     $config->getOption('post_max_size_message'),
                     array('{{ max }}' => $this->serverParams->getNormalizedIniPostMaxSize()),
@@ -126,7 +138,7 @@ class FormValidator extends ConstraintValidator
      *
      * @return Boolean Whether the graph walker may walk the data.
      */
-    private function allowDataWalking(FormInterface $form)
+    private static function allowDataWalking(FormInterface $form)
     {
         $data = $form->getData();
 
@@ -158,22 +170,67 @@ class FormValidator extends ConstraintValidator
      *
      * @return array The validation groups.
      */
-    private function getValidationGroups(FormInterface $form)
+    private static function getValidationGroups(FormInterface $form)
     {
+        $button = self::findClickedButton($form->getRoot());
+
+        if (null !== $button) {
+            $groups = $button->getConfig()->getOption('validation_groups');
+
+            if (null !== $groups) {
+                return self::resolveValidationGroups($groups, $form);
+            }
+        }
+
         do {
             $groups = $form->getConfig()->getOption('validation_groups');
 
             if (null !== $groups) {
-                if (is_callable($groups)) {
-                    $groups = call_user_func($groups, $form);
-                }
-
-                return (array) $groups;
+                return self::resolveValidationGroups($groups, $form);
             }
 
             $form = $form->getParent();
         } while (null !== $form);
 
         return array(Constraint::DEFAULT_GROUP);
+    }
+
+    /**
+     * Extracts a clicked button from a form tree, if one exists.
+     *
+     * @param FormInterface $form The root form.
+     *
+     * @return ClickableInterface|null The clicked button or null.
+     */
+    private static function findClickedButton(FormInterface $form)
+    {
+        if ($form instanceof ClickableInterface && $form->isClicked()) {
+            return $form;
+        }
+
+        foreach ($form as $child) {
+            if (null !== ($button = self::findClickedButton($child))) {
+                return $button;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Post-processes the validation groups option for a given form.
+     *
+     * @param array|callable $groups The validation groups.
+     * @param FormInterface  $form   The validated form.
+     *
+     * @return array The validation groups.
+     */
+    private static function resolveValidationGroups($groups, FormInterface $form)
+    {
+        if (!is_string($groups) && is_callable($groups)) {
+            $groups = call_user_func($groups, $form);
+        }
+
+        return (array) $groups;
     }
 }

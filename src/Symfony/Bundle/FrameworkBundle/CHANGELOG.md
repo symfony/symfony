@@ -1,6 +1,51 @@
 CHANGELOG
 =========
 
+2.4.0
+-----
+
+ * allowed multiple IP addresses in profiler matcher settings
+
+2.3.0
+-----
+
+ * [BC BREAK] added a way to disable the profiler (when disabling the profiler, it is now completely removed)
+   To get the same "disabled" behavior as before, set `enabled` to `true` and `collect` to `false`
+ * [BC BREAK] the `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RegisterKernelListenersPass` was moved
+   to `Component\HttpKernel\DependencyInjection\RegisterListenersPass`
+ * added ControllerNameParser::build() which converts a controller short notation (a:b:c) to a class::method notation
+ * added possibility to run PHP built-in server in production environment
+ * added possibility to load the serializer component in the service container
+ * added route debug information when using the `router:match` command
+ * added `TimedPhpEngine`
+ * added `--clean` option to the `translation:update` command
+ * added `http_method_override` option
+ * added support for default templates per render tag
+ * added FormHelper::form(), FormHelper::start() and FormHelper::end()
+ * deprecated FormHelper::enctype() in favor of FormHelper::start()
+ * RedirectController actions now receive the Request instance via the method signature.
+
+2.2.0
+-----
+
+ * added a new `uri_signer` service to help sign URIs
+ * deprecated `Symfony\Bundle\FrameworkBundle\HttpKernel::render()` and `Symfony\Bundle\FrameworkBundle\HttpKernel::forward()`
+ * deprecated the `Symfony\Bundle\FrameworkBundle\HttpKernel` class in favor of `Symfony\Component\HttpKernel\DependencyInjection\ContainerAwareHttpKernel`
+ * added support for adding new HTTP content rendering strategies (like ESI and Hinclude)
+   in the DIC via the `kernel.fragment_renderer` tag
+ * [BC BREAK] restricted the `Symfony\Bundle\FrameworkBundle\HttpKernel::render()` method to only accept URIs or ControllerReference instances
+   * `Symfony\Bundle\FrameworkBundle\HttpKernel::render()` method signature changed and the first argument
+     must now be a URI or a ControllerReference instance (the `generateInternalUri()` method was removed)
+   * The internal routes (`Resources/config/routing/internal.xml`) have been removed and replaced with a listener (`Symfony\Component\HttpKernel\EventListener\FragmentListener`)
+   * The `render` method of the `actions` templating helper signature and arguments changed
+ * replaced Symfony\Bundle\FrameworkBundle\Controller\TraceableControllerResolver by Symfony\Component\HttpKernel\Controller\TraceableControllerResolver
+ * replaced Symfony\Component\HttpKernel\Debug\ContainerAwareTraceableEventDispatcher by Symfony\Component\HttpKernel\Debug\TraceableEventDispatcher
+ * added Client::enableProfiler()
+ * a new parameter has been added to the DIC: `router.request_context.base_url`
+   You can customize it for your functional tests or for generating urls with
+   the right base url when your are in the cli context.
+ * added support for default templates per render tag
+
 2.1.0
 -----
 

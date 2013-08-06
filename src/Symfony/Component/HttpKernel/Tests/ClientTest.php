@@ -15,6 +15,7 @@ use Symfony\Component\HttpKernel\Client;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpKernel\Tests\Fixtures\TestClient;
@@ -34,6 +35,10 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
         $client->request('GET', '/');
         $this->assertEquals('Request: /', $client->getResponse()->getContent(), '->doRequest() uses the request handler to make the request');
+        $this->assertInstanceOf('Symfony\Component\BrowserKit\Request', $client->getInternalRequest());
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Request', $client->getRequest());
+        $this->assertInstanceOf('Symfony\Component\BrowserKit\Response', $client->getInternalResponse());
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $client->getResponse());
 
         $client->request('GET', 'http://www.example.com/');
         $this->assertEquals('Request: /', $client->getResponse()->getContent(), '->doRequest() uses the request handler to make the request');
@@ -49,7 +54,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('The "Process" component is not available');
         }
 
-        if (!class_exists('Symfony\Component\ClassLoader\UniversalClassLoader')) {
+        if (!class_exists('Symfony\Component\ClassLoader\ClassLoader')) {
             $this->markTestSkipped('The "ClassLoader" component is not available');
         }
 
@@ -86,6 +91,22 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $domResponse->getHeader('Set-Cookie', false));
     }
 
+    public function testFilterResponseSupportsStreamedResponses()
+    {
+        $client = new Client(new TestHttpKernel());
+
+        $r = new \ReflectionObject($client);
+        $m = $r->getMethod('filterResponse');
+        $m->setAccessible(true);
+
+        $response = new StreamedResponse(function () {
+            echo 'foo';
+        });
+
+        $domResponse = $m->invoke($client, $response);
+        $this->assertEquals('foo', $domResponse->getContent());
+    }
+
     public function testUploadedFile()
     {
         $source = tempnam(sys_get_temp_dir(), 'source');
@@ -97,7 +118,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
         $files = array(
             array('tmp_name' => $source, 'name' => 'original', 'type' => 'mime/original', 'size' => 123, 'error' => UPLOAD_ERR_OK),
-            new UploadedFile($source, 'original', 'mime/original', 123, UPLOAD_ERR_OK),
+            new UploadedFile($source, 'original', 'mime/original', 123, UPLOAD_ERR_OK, true),
         );
 
         foreach ($files as $file) {
@@ -130,7 +151,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
         $file = $this
             ->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')
-            ->setConstructorArgs(array($source, 'original', 'mime/original', 123, UPLOAD_ERR_OK))
+            ->setConstructorArgs(array($source, 'original', 'mime/original', 123, UPLOAD_ERR_OK, true))
             ->setMethods(array('getSize'))
             ->getMock()
         ;

@@ -1,33 +1,39 @@
 form_login:
-    pattern: /login
+    path:     /login
     defaults: { _controller: FormLoginBundle:Login:login }
 
 form_login_check:
-    pattern: /login_check
+    path:     /login_check
     defaults: { _controller: FormLoginBundle:Login:loginCheck }
 
 form_login_homepage:
-    pattern: /
+    path:     /
     defaults: { _controller: FormLoginBundle:Login:afterLogin }
 
 form_login_custom_target_path:
-    pattern: /foo
+    path:     /foo
     defaults: { _controller: FormLoginBundle:Login:afterLogin }
 
 form_login_default_target_path:
-    pattern: /profile
+    path:     /profile
     defaults: { _controller: FormLoginBundle:Login:afterLogin }
 
 form_login_redirect_to_protected_resource_after_login:
-    pattern: /protected_resource
+    path:     /protected_resource
     defaults: { _controller: FormLoginBundle:Login:afterLogin }
 
 highly_protected_resource:
-    pattern: /highly_protected_resource
+    path:     /highly_protected_resource
+
+secured-by-one-ip:
+    path:     /secured-by-one-ip
+
+secured-by-two-ips:
+    path:     /secured-by-two-ips
 
 form_logout:
-    pattern: /logout_path
+    path:     /logout_path
 
 form_secure_action:
-    pattern: /secure-but-not-covered-by-access-control
+    path:     /secure-but-not-covered-by-access-control
     defaults: { _controller: FormLoginBundle:Login:secure }

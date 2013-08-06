@@ -50,10 +50,10 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse(method_exists($this->builder, 'setName'));
     }
 
-    public function testAddNameNoString()
+    public function testAddNameNoStringAndNoInteger()
     {
         $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
-        $this->builder->add(1234);
+        $this->builder->add(true);
     }
 
     public function testAddTypeNoString()
@@ -80,6 +80,13 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->builder->has('foo'));
         $this->builder->add('foo', 'text');
         $this->assertTrue($this->builder->has('foo'));
+    }
+
+    public function testAddIntegerName()
+    {
+        $this->assertFalse($this->builder->has(0));
+        $this->builder->add(0, 'text');
+        $this->assertTrue($this->builder->has(0));
     }
 
     public function testAll()
@@ -155,7 +162,7 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetUnknown()
     {
-        $this->setExpectedException('Symfony\Component\Form\Exception\FormException', 'The child with the name "foo" does not exist.');
+        $this->setExpectedException('Symfony\Component\Form\Exception\InvalidArgumentException', 'The child with the name "foo" does not exist.');
         $this->builder->get('foo');
     }
 
@@ -193,43 +200,21 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertNotSame($builder, $this->builder);
     }
 
-    public function testGetParent()
-    {
-        $this->assertNull($this->builder->getParent());
-    }
-
-    public function testGetParentForAddedBuilder()
+    public function testGetFormConfigErasesReferences()
     {
         $builder = new FormBuilder('name', null, $this->dispatcher, $this->factory);
-        $this->builder->add($builder);
-        $this->assertSame($this->builder, $builder->getParent());
-    }
+        $builder->add(new FormBuilder('child', null, $this->dispatcher, $this->factory));
 
-    public function testGetParentForRemovedBuilder()
-    {
-        $builder = new FormBuilder('name', null, $this->dispatcher, $this->factory);
-        $this->builder->add($builder);
-        $this->builder->remove('name');
-        $this->assertNull($builder->getParent());
-    }
+        $config = $builder->getFormConfig();
+        $reflClass = new \ReflectionClass($config);
+        $children = $reflClass->getProperty('children');
+        $unresolvedChildren = $reflClass->getProperty('unresolvedChildren');
 
-    public function testGetParentForCreatedBuilder()
-    {
-        $this->builder = new FormBuilder('name', 'stdClass', $this->dispatcher, $this->factory);
-        $this->factory
-            ->expects($this->once())
-            ->method('createNamedBuilder')
-            ->with('bar', 'text', null, array(), $this->builder)
-        ;
+        $children->setAccessible(true);
+        $unresolvedChildren->setAccessible(true);
 
-        $this->factory
-            ->expects($this->once())
-            ->method('createBuilderForProperty')
-            ->with('stdClass', 'foo', null, array(), $this->builder)
-        ;
-
-        $this->builder->create('foo');
-        $this->builder->create('bar', 'text');
+        $this->assertEmpty($children->getValue($config));
+        $this->assertEmpty($unresolvedChildren->getValue($config));
     }
 
     private function getFormBuilder($name = 'name')

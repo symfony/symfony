@@ -53,7 +53,12 @@ class FormAuthenticationEntryPoint implements AuthenticationEntryPointInterface
         if ($this->useForward) {
             $subRequest = $this->httpUtils->createRequest($request, $this->loginPath);
 
-            return $this->httpKernel->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
+            $response = $this->httpKernel->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
+            if (200 === $response->getStatusCode()) {
+                $response->headers->set('X-Status-Code', 401);
+            }
+
+            return $response;
         }
 
         return $this->httpUtils->createRedirectResponse($request, $this->loginPath);

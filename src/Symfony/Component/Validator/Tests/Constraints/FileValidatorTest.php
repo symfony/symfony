@@ -31,7 +31,7 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
         $this->validator = new FileValidator();
         $this->validator->initialize($this->context);
-        $this->path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'FileValidatorTest';
+        $this->path = sys_get_temp_dir().DIRECTORY_SEPARATOR.'FileValidatorTest';
         $this->file = fopen($this->path, 'w');
     }
 
@@ -62,7 +62,7 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Validator\Exception\UnexpectedTypeException
+     * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
      */
     public function testExpectsStringCompatibleTypeOrFile()
     {
@@ -82,7 +82,7 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $file = new UploadedFile($this->path, 'originalName');
+        $file = new UploadedFile($this->path, 'originalName', null, null, null, true);
         $this->validator->validate($file, new File());
     }
 
@@ -150,7 +150,7 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Validator\Exception\ConstraintDefinitionException
+     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      */
     public function testInvalidMaxSize()
     {
@@ -288,12 +288,13 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider uploadedFileErrorProvider
      */
-    public function testUploadedFileError($error, $message, array $params = array())
+    public function testUploadedFileError($error, $message, array $params = array(), $maxSize = null)
     {
         $file = new UploadedFile('/path/to/file', 'originalName', 'mime', 0, $error);
 
         $constraint = new File(array(
             $message => 'myMessage',
+            'maxSize' => $maxSize
         ));
 
         $this->context->expects($this->once())
@@ -316,10 +317,24 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
         );
 
         if (class_exists('Symfony\Component\HttpFoundation\File\UploadedFile')) {
+            // when no maxSize is specified on constraint, it should use the ini value
             $tests[] = array(UPLOAD_ERR_INI_SIZE, 'uploadIniSizeErrorMessage', array(
                 '{{ limit }}' => UploadedFile::getMaxFilesize(),
                 '{{ suffix }}' => 'bytes',
             ));
+
+            // it should use the smaller limitation (maxSize option in this case)
+            $tests[] = array(UPLOAD_ERR_INI_SIZE, 'uploadIniSizeErrorMessage', array(
+                '{{ limit }}' => 1,
+                '{{ suffix }}' => 'bytes',
+            ), '1');
+
+            // it correctly parses the maxSize option and not only uses simple string comparison
+            // 1000M should be bigger than the ini value
+            $tests[] = array(UPLOAD_ERR_INI_SIZE, 'uploadIniSizeErrorMessage', array(
+                '{{ limit }}' => UploadedFile::getMaxFilesize(),
+                '{{ suffix }}' => 'bytes',
+            ), '1000M');
         }
 
         return $tests;

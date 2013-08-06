@@ -21,20 +21,20 @@ class Entity extends EntityParent implements EntityInterface
 {
     /**
      * @Assert\NotNull
-     * @Assert\Min(3)
-     * @Assert\All({@Assert\NotNull, @Assert\Min(3)}),
-     * @Assert\All(constraints={@Assert\NotNull, @Assert\Min(3)})
+     * @Assert\Range(min=3)
+     * @Assert\All({@Assert\NotNull, @Assert\Range(min=3)}),
+     * @Assert\All(constraints={@Assert\NotNull, @Assert\Range(min=3)})
      * @Assert\Collection(fields={
-     *   "foo" = {@Assert\NotNull, @Assert\Min(3)},
-     *   "bar" = @Assert\Min(5)
+     *   "foo" = {@Assert\NotNull, @Assert\Range(min=3)},
+     *   "bar" = @Assert\Range(min=5)
      * })
      * @Assert\Choice(choices={"A", "B"}, message="Must be one of %choices%")
      */
     protected $firstName;
     protected $lastName;
     public $reference;
-
     private $internal;
+    public $data = 'Overridden data';
 
     public function __construct($internal = null)
     {
@@ -43,7 +43,7 @@ class Entity extends EntityParent implements EntityInterface
 
     public function getInternal()
     {
-        return $this->internal . ' from getter';
+        return $this->internal.' from getter';
     }
 
     /**
@@ -52,5 +52,10 @@ class Entity extends EntityParent implements EntityInterface
     public function getLastName()
     {
         return $this->lastName;
+    }
+
+    public function getData()
+    {
+        return 'Overridden data';
     }
 }

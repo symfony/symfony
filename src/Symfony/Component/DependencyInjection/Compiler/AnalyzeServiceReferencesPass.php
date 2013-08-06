@@ -116,7 +116,7 @@ class AnalyzeServiceReferencesPass implements RepeatablePassInterface
      *
      * @param string $id A full id or alias for a service definition.
      *
-     * @return Definition The definition related to the supplied id
+     * @return Definition|null The definition related to the supplied id
      */
     private function getDefinition($id)
     {

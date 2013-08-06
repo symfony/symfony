@@ -23,7 +23,7 @@ class UniversalClassLoaderTest extends \PHPUnit_Framework_TestCase
         $loader = new UniversalClassLoader();
         $loader->registerNamespace('Namespaced', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
         $loader->registerPrefix('Pearlike_', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
-        $loader->loadClass($testClassName);
+        $this->assertTrue($loader->loadClass($testClassName));
         $this->assertTrue(class_exists($className), $message);
     }
 
@@ -32,8 +32,6 @@ class UniversalClassLoaderTest extends \PHPUnit_Framework_TestCase
         return array(
             array('\\Namespaced\\Foo', 'Namespaced\\Foo',   '->loadClass() loads Namespaced\Foo class'),
             array('\\Pearlike_Foo',    'Pearlike_Foo',      '->loadClass() loads Pearlike_Foo class'),
-            array('\\Namespaced\\Bar', '\\Namespaced\\Bar', '->loadClass() loads Namespaced\Bar class with a leading slash'),
-            array('\\Pearlike_Bar',    '\\Pearlike_Bar',    '->loadClass() loads Pearlike_Bar class with a leading slash'),
         );
     }
 
@@ -49,11 +47,37 @@ class UniversalClassLoaderTest extends \PHPUnit_Framework_TestCase
         $loader->useIncludePath(true);
         $this->assertTrue($loader->getUseIncludePath());
 
-        set_include_path(__DIR__.'/Fixtures/includepath' . PATH_SEPARATOR . $includePath);
+        set_include_path(__DIR__.'/Fixtures/includepath'.PATH_SEPARATOR.$includePath);
 
         $this->assertEquals(__DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'includepath'.DIRECTORY_SEPARATOR.'Foo.php', $loader->findFile('Foo'));
 
         set_include_path($includePath);
+    }
+
+    public function testGetNamespaces()
+    {
+        $loader = new UniversalClassLoader();
+        $loader->registerNamespace('Foo', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
+        $loader->registerNamespace('Bar', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
+        $loader->registerNamespace('Bas', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
+        $namespaces = $loader->getNamespaces();
+        $this->assertArrayHasKey('Foo', $namespaces);
+        $this->assertArrayNotHasKey('Foo1', $namespaces);
+        $this->assertArrayHasKey('Bar', $namespaces);
+        $this->assertArrayHasKey('Bas', $namespaces);
+    }
+
+    public function testGetPrefixes()
+    {
+        $loader = new UniversalClassLoader();
+        $loader->registerPrefix('Foo', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
+        $loader->registerPrefix('Bar', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
+        $loader->registerPrefix('Bas', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
+        $prefixes = $loader->getPrefixes();
+        $this->assertArrayHasKey('Foo', $prefixes);
+        $this->assertArrayNotHasKey('Foo1', $prefixes);
+        $this->assertArrayHasKey('Bar', $prefixes);
+        $this->assertArrayHasKey('Bas', $prefixes);
     }
 
     /**
@@ -66,7 +90,7 @@ class UniversalClassLoaderTest extends \PHPUnit_Framework_TestCase
         $loader->registerPrefix('Pearlike_', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
         $loader->registerNamespaceFallbacks(array(__DIR__.DIRECTORY_SEPARATOR.'Fixtures/fallback'));
         $loader->registerPrefixFallbacks(array(__DIR__.DIRECTORY_SEPARATOR.'Fixtures/fallback'));
-        $loader->loadClass($testClassName);
+        $this->assertTrue($loader->loadClass($testClassName));
         $this->assertTrue(class_exists($className), $message);
     }
 
@@ -102,7 +126,7 @@ class UniversalClassLoaderTest extends \PHPUnit_Framework_TestCase
         $loader = new UniversalClassLoader();
         $loader->registerNamespaces($namespaces);
 
-        $loader->loadClass($className);
+        $this->assertTrue($loader->loadClass($className));
         $this->assertTrue(class_exists($className), $message);
     }
 
@@ -152,7 +176,7 @@ class UniversalClassLoaderTest extends \PHPUnit_Framework_TestCase
         $loader = new UniversalClassLoader();
         $loader->registerPrefixes($prefixes);
 
-        $loader->loadClass($className);
+        $this->assertTrue($loader->loadClass($className));
         $this->assertTrue(class_exists($className), $message);
     }
 

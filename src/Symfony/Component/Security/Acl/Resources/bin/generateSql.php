@@ -9,14 +9,14 @@
  * file that was distributed with this source code.
  */
 
-require_once __DIR__.'/../../../../ClassLoader/UniversalClassLoader.php';
+require_once __DIR__.'/../../../../ClassLoader/ClassLoader.php';
 
-use Symfony\Component\ClassLoader\UniversalClassLoader;
+use Symfony\Component\ClassLoader\ClassLoader;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Security\Acl\Dbal\Schema;
 
-$loader = new UniversalClassLoader();
-$loader->registerNamespaces(array(
+$loader = new ClassLoader();
+$loader->addPrefixes(array(
     'Symfony'                    => __DIR__.'/../../../../../..',
     'Doctrine\\Common'           => __DIR__.'/../../../../../../../vendor/doctrine-common/lib',
     'Doctrine\\DBAL\\Migrations' => __DIR__.'/../../../../../../../vendor/doctrine-migrations/lib',

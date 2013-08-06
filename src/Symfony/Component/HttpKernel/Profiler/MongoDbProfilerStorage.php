@@ -32,18 +32,11 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
     }
 
     /**
-     * Finds profiler tokens for the given criteria.
-     *
-     * @param string $ip     The IP
-     * @param string $url    The URL
-     * @param string $limit  The maximum number of tokens to return
-     * @param string $method The request method
-     *
-     * @return array An array of tokens
+     * {@inheritdoc}
      */
-    public function find($ip, $url, $limit, $method)
+    public function find($ip, $url, $limit, $method, $start = null, $end = null)
     {
-        $cursor = $this->getMongo()->find($this->buildQuery($ip, $url, $method), array('_id', 'parent', 'ip', 'method', 'url', 'time'))->sort(array('time' => -1))->limit($limit);
+        $cursor = $this->getMongo()->find($this->buildQuery($ip, $url, $method, $start, $end), array('_id', 'parent', 'ip', 'method', 'url', 'time'))->sort(array('time' => -1))->limit($limit);
 
         $tokens = array();
         foreach ($cursor as $profile) {
@@ -54,7 +47,7 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
     }
 
     /**
-     * Purges all data from the database.
+     * {@inheritdoc}
      */
     public function purge()
     {
@@ -62,13 +55,7 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
     }
 
     /**
-     * Reads data associated with the given token.
-     *
-     * The method returns false if the token does not exists in the storage.
-     *
-     * @param string $token A token
-     *
-     * @return Profile The profile associated with token
+     * {@inheritdoc}
      */
     public function read($token)
     {
@@ -82,11 +69,7 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
     }
 
     /**
-     * Saves a Profile.
-     *
-     * @param Profile $profile A Profile instance
-     *
-     * @return Boolean Write operation successful
+     * {@inheritdoc}
      */
     public function write(Profile $profile)
     {
@@ -95,31 +78,38 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
         $record = array(
             '_id' => $profile->getToken(),
             'parent' => $profile->getParentToken(),
-            'data' => serialize($profile->getCollectors()),
+            'data' => base64_encode(serialize($profile->getCollectors())),
             'ip' => $profile->getIp(),
             'method' => $profile->getMethod(),
             'url' => $profile->getUrl(),
             'time' => $profile->getTime()
         );
 
-        return $this->getMongo()->update(array('_id' => $profile->getToken()), array_filter($record, function ($v) { return !empty($v); }), array('upsert' => true));
+        $result = $this->getMongo()->update(array('_id' => $profile->getToken()), array_filter($record, function ($v) { return !empty($v); }), array('upsert' => true));
+
+        return (boolean) (isset($result['ok']) ? $result['ok'] : $result);
     }
 
     /**
      * Internal convenience method that returns the instance of the MongoDB Collection
      *
      * @return \MongoCollection
+     *
+     * @throws \RuntimeException
      */
     protected function getMongo()
     {
         if ($this->mongo === null) {
             if (preg_match('#^(mongodb://.*)/(.*)/(.*)$#', $this->dsn, $matches)) {
-                $mongo = new \Mongo($matches[1] . (!empty($matches[2]) ? '/' . $matches[2] : ''));
+                $server = $matches[1].(!empty($matches[2]) ? '/'.$matches[2] : '');
                 $database = $matches[2];
                 $collection = $matches[3];
+
+                $mongoClass = (version_compare(phpversion('mongo'), '1.3.0', '<')) ? '\Mongo' : '\MongoClient';
+                $mongo = new $mongoClass($server);
                 $this->mongo = $mongo->selectCollection($database, $collection);
             } else {
-                throw new \RuntimeException(sprintf('Please check your configuration. You are trying to use MongoDB with an invalid dsn "%s". The expected format is "mongodb://user:pass@location/database/collection"', $this->dsn));
+                throw new \RuntimeException(sprintf('Please check your configuration. You are trying to use MongoDB with an invalid dsn "%s". The expected format is "mongodb://[user:pass@]host/database/collection"', $this->dsn));
             }
         }
 
@@ -128,6 +118,7 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
 
     /**
      * @param array $data
+     *
      * @return Profile
      */
     protected function createProfileFromData(array $data)
@@ -148,7 +139,8 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
 
     /**
      * @param string $token
-     * @return array
+     *
+     * @return Profile[] An array of Profile instances
      */
     protected function readChildren($token)
     {
@@ -171,9 +163,12 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
      * @param string $ip
      * @param string $url
      * @param string $method
+     * @param int    $start
+     * @param int    $end
+     *
      * @return array
      */
-    private function buildQuery($ip, $url, $method)
+    private function buildQuery($ip, $url, $method, $start, $end)
     {
         $query = array();
 
@@ -189,11 +184,24 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
             $query['method'] = $method;
         }
 
+        if (!empty($start) || !empty($end)) {
+            $query['time'] = array();
+        }
+
+        if (!empty($start)) {
+            $query['time']['$gte'] = $start;
+        }
+
+        if (!empty($end)) {
+            $query['time']['$lte'] = $end;
+        }
+
         return $query;
     }
 
     /**
      * @param array $data
+     *
      * @return array
      */
     private function getData(array $data)
@@ -211,6 +219,7 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
 
     /**
      * @param array $data
+     *
      * @return Profile
      */
     private function getProfile(array $data)
@@ -220,7 +229,7 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
         $profile->setMethod($data['method']);
         $profile->setUrl($data['url']);
         $profile->setTime($data['time']);
-        $profile->setCollectors(unserialize($data['data']));
+        $profile->setCollectors(unserialize(base64_decode($data['data'])));
 
         return $profile;
     }

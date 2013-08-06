@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bridge\Doctrine\HttpFoundation;
+namespace Symfony\Bridge\Doctrine\Tests\HttpFoundation;
 
 use Symfony\Bridge\Doctrine\HttpFoundation\DbalSessionHandler;
 

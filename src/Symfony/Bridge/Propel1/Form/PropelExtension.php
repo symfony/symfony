@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Propel1\Form;
 
 use Symfony\Component\Form\AbstractExtension;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 /**
  * Represents the Propel form extension, which loads the Propel functionality.
@@ -23,7 +24,9 @@ class PropelExtension extends AbstractExtension
     protected function loadTypes()
     {
         return array(
-            new Type\ModelType(),
+            new Type\ModelType(PropertyAccess::getPropertyAccessor()),
+            new Type\TranslationCollectionType(),
+            new Type\TranslationType()
         );
     }
 

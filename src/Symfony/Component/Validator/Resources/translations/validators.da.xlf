@@ -23,11 +23,11 @@
                 <target>Værdien skal være en af de givne muligheder.</target>
             </trans-unit>
             <trans-unit id="6">
-                <source>You must select at least {{ limit }} choices.</source>
+                <source>You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.</source>
                 <target>Du skal vælge mindst {{ limit }} muligheder.</target>
             </trans-unit>
             <trans-unit id="7">
-                <source>You must select at most {{ limit }} choices.</source>
+                <source>You must select at most {{ limit }} choice.|You must select at most {{ limit }} choices.</source>
                 <target>Du kan højest vælge {{ limit }} muligheder.</target>
             </trans-unit>
             <trans-unit id="8">
@@ -75,7 +75,7 @@
                 <target>Værdien skal være {{ limit }} eller mindre.</target>
             </trans-unit>
             <trans-unit id="19">
-                <source>This value is too long. It should have {{ limit }} characters or less.</source>
+                <source>This value is too long. It should have {{ limit }} character or less.|This value is too long. It should have {{ limit }} characters or less.</source>
                 <target>Værdien er for lang. Den skal have {{ limit }} bogstaver eller mindre.</target>
             </trans-unit>
             <trans-unit id="20">
@@ -83,7 +83,7 @@
                 <target>Værdien skal være {{ limit }} eller mere.</target>
             </trans-unit>
             <trans-unit id="21">
-                <source>This value is too short. It should have {{ limit }} characters or more.</source>
+                <source>This value is too short. It should have {{ limit }} character or more.|This value is too short. It should have {{ limit }} characters or more.</source>
                 <target>Værdien er for kort. Den skal have {{ limit }} tegn eller flere.</target>
             </trans-unit>
             <trans-unit id="22">
@@ -179,7 +179,7 @@
                 <target>Værdien skal være brugerens nuværende password.</target>
             </trans-unit>
             <trans-unit id="48">
-                <source>This value should have exactly {{ limit }} characters.</source>
+                <source>This value should have exactly {{ limit }} character.|This value should have exactly {{ limit }} characters.</source>
                 <target>Værdien skal have præcis {{ limit }} tegn.</target>
             </trans-unit>
             <trans-unit id="49">
@@ -201,6 +201,46 @@
             <trans-unit id="53">
                 <source>A PHP extension caused the upload to fail.</source>
                 <target>En PHP udvidelse forårsagede fejl i upload.</target>
+            </trans-unit>
+            <trans-unit id="54">
+                <source>This collection should contain {{ limit }} element or more.|This collection should contain {{ limit }} elements or more.</source>
+                <target>Denne samling skal indeholde {{ limit }} element eller flere.|Denne samling skal indeholde {{ limit }} elementer eller flere.</target>
+            </trans-unit>
+            <trans-unit id="55">
+                <source>This collection should contain {{ limit }} element or less.|This collection should contain {{ limit }} elements or less.</source>
+                <target>Denne samling skal indeholde {{ limit }} element eller mindre.|Denne samling skal indeholde {{ limit }} elementer eller mindre.</target>
+            </trans-unit>
+            <trans-unit id="56">
+                <source>This collection should contain exactly {{ limit }} element.|This collection should contain exactly {{ limit }} elements.</source>
+                <target>Denne samling skal indeholde præcis {{ limit }} element.|Denne samling skal indeholde præcis {{ limit }} elementer.</target>
+            </trans-unit>
+            <trans-unit id="57">
+                <source>Invalid card number.</source>
+                <target>Ugyldigt kortnummer.</target>
+            </trans-unit>
+            <trans-unit id="58">
+                <source>Unsupported card type or invalid card number.</source>
+                <target>Ikke-understøttet korttype eller ugyldigt kortnummer.</target>
+            </trans-unit>
+            <trans-unit id="59">
+                <source>This is not a valid International Bank Account Number (IBAN).</source>
+                <target>Det er ikke en gyldig International Bank Account Number (IBAN).</target>
+            </trans-unit>
+            <trans-unit id="60">
+                <source>This value is not a valid ISBN-10.</source>
+                <target>Værdien er ikke en gyldig ISBN-10.</target>
+            </trans-unit>
+            <trans-unit id="61">
+                <source>This value is not a valid ISBN-13.</source>
+                <target>Værdien er ikke en gyldig ISBN-13.</target>
+            </trans-unit>
+            <trans-unit id="62">
+                <source>This value is neither a valid ISBN-10 nor a valid ISBN-13.</source>
+                <target>Værdien er hverken en gyldig ISBN-10 eller en gyldig ISBN-13.</target>
+            </trans-unit>
+            <trans-unit id="63">
+                <source>This value is not a valid ISSN.</source>
+                <target>Værdien er ikke en gyldig ISSN.</target>
             </trans-unit>
         </body>
     </file>

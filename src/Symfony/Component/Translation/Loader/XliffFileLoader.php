@@ -12,6 +12,8 @@
 namespace Symfony\Component\Translation\Loader;
 
 use Symfony\Component\Translation\MessageCatalogue;
+use Symfony\Component\Translation\Exception\InvalidResourceException;
+use Symfony\Component\Translation\Exception\NotFoundResourceException;
 use Symfony\Component\Config\Resource\FileResource;
 
 /**
@@ -31,18 +33,40 @@ class XliffFileLoader implements LoaderInterface
     public function load($resource, $locale, $domain = 'messages')
     {
         if (!stream_is_local($resource)) {
-            throw new \InvalidArgumentException(sprintf('This is not a local file "%s".', $resource));
+            throw new InvalidResourceException(sprintf('This is not a local file "%s".', $resource));
         }
 
-        $xml = $this->parseFile($resource);
+        if (!file_exists($resource)) {
+            throw new NotFoundResourceException(sprintf('File "%s" not found.', $resource));
+        }
+
+        list($xml, $encoding) = $this->parseFile($resource);
         $xml->registerXPathNamespace('xliff', 'urn:oasis:names:tc:xliff:document:1.2');
 
         $catalogue = new MessageCatalogue($locale);
         foreach ($xml->xpath('//xliff:trans-unit') as $translation) {
-            if (2 !== count($translation)) {
+            $attributes = $translation->attributes();
+
+            if (!(isset($attributes['resname']) || isset($translation->source)) || !isset($translation->target)) {
                 continue;
             }
-            $catalogue->set((string) $translation->source, (string) $translation->target, $domain);
+
+            $source = isset($attributes['resname']) && $attributes['resname'] ? $attributes['resname'] : $translation->source;
+            $target = (string) $translation->target;
+
+            // If the xlf file has another encoding specified, try to convert it because
+            // simple_xml will always return utf-8 encoded values
+            if ('UTF-8' !== $encoding && !empty($encoding)) {
+                if (function_exists('mb_convert_encoding')) {
+                    $target = mb_convert_encoding($target, $encoding, 'UTF-8');
+                } elseif (function_exists('iconv')) {
+                    $target = iconv('UTF-8', $encoding, $target);
+                } else {
+                    throw new \RuntimeException('No suitable convert encoding function (use UTF-8 as your encoding or install the iconv or mbstring extension).');
+                }
+            }
+
+            $catalogue->set((string) $source, $target, $domain);
         }
         $catalogue->addResource(new FileResource($resource));
 
@@ -54,14 +78,34 @@ class XliffFileLoader implements LoaderInterface
      *
      * @param string $file
      *
-     * @return SimpleXMLElement
+     * @throws \RuntimeException
+     *
+     * @return \SimpleXMLElement
+     *
+     * @throws InvalidResourceException
      */
     private function parseFile($file)
     {
+        $internalErrors = libxml_use_internal_errors(true);
+        $disableEntities = libxml_disable_entity_loader(true);
+        libxml_clear_errors();
+
         $dom = new \DOMDocument();
-        $current = libxml_use_internal_errors(true);
-        if (!@$dom->load($file, defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0)) {
-            throw new \RuntimeException(implode("\n", $this->getXmlErrors()));
+        $dom->validateOnParse = true;
+        if (!@$dom->loadXML(file_get_contents($file), LIBXML_NONET | (defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0))) {
+            libxml_disable_entity_loader($disableEntities);
+
+            throw new InvalidResourceException(implode("\n", $this->getXmlErrors($internalErrors)));
+        }
+
+        libxml_disable_entity_loader($disableEntities);
+
+        foreach ($dom->childNodes as $child) {
+            if ($child->nodeType === XML_DOCUMENT_TYPE_NODE) {
+                libxml_use_internal_errors($internalErrors);
+
+                throw new InvalidResourceException('Document types are not allowed.');
+            }
         }
 
         $location = str_replace('\\', '/', __DIR__).'/schema/dic/xliff-core/xml.xsd';
@@ -80,21 +124,24 @@ class XliffFileLoader implements LoaderInterface
         $source = str_replace('http://www.w3.org/2001/xml.xsd', $location, $source);
 
         if (!@$dom->schemaValidateSource($source)) {
-            throw new \RuntimeException(implode("\n", $this->getXmlErrors()));
+            throw new InvalidResourceException(implode("\n", $this->getXmlErrors($internalErrors)));
         }
-        $dom->validateOnParse = true;
-        $dom->normalizeDocument();
-        libxml_use_internal_errors($current);
 
-        return simplexml_import_dom($dom);
+        $dom->normalizeDocument();
+
+        libxml_use_internal_errors($internalErrors);
+
+        return array(simplexml_import_dom($dom), strtoupper($dom->encoding));
     }
 
     /**
      * Returns the XML errors of the internal XML parser
      *
-     * @return array  An array of errors
+     * @param Boolean $internalErrors
+     *
+     * @return array An array of errors
      */
-    private function getXmlErrors()
+    private function getXmlErrors($internalErrors)
     {
         $errors = array();
         foreach (libxml_get_errors() as $error) {
@@ -109,7 +156,7 @@ class XliffFileLoader implements LoaderInterface
         }
 
         libxml_clear_errors();
-        libxml_use_internal_errors(false);
+        libxml_use_internal_errors($internalErrors);
 
         return $errors;
     }

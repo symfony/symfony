@@ -11,18 +11,18 @@
 
 namespace Symfony\Component\Form\Tests;
 
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\FormConfigBuilder;
+use Symfony\Component\Form\Exception\InvalidArgumentException;
+
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-use Symfony\Component\Form\FormConfig;
-
 class FormConfigTest extends \PHPUnit_Framework_TestCase
 {
     public function getHtml4Ids()
     {
         return array(
-            array('a0', true),
-            array('a9', true),
             array('z0', true),
             array('A0', true),
             array('A9', true),
@@ -53,6 +53,16 @@ class FormConfigTest extends \PHPUnit_Framework_TestCase
             // For root forms, leading underscores will be stripped from the
             // "id" attribute to produce valid HTML4.
             array('_', true),
+            // Integers are allowed
+            array(0, true),
+            array(123, true),
+            // NULL is allowed
+            array(null, true),
+            // Other types are not
+            array(1.23, false),
+            array(5., false),
+            array(true, false),
+            array(new \stdClass(), false),
         );
     }
 
@@ -64,15 +74,75 @@ class FormConfigTest extends \PHPUnit_Framework_TestCase
         $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
         try {
-            new FormConfig($name, null, $dispatcher);
+            new FormConfigBuilder($name, null, $dispatcher);
             if (!$accepted) {
                 $this->fail(sprintf('The value "%s" should not be accepted', $name));
             }
-        } catch (\InvalidArgumentException $e) {
+        } catch (UnexpectedTypeException $e) {
+            // if the value was not accepted, but should be, rethrow exception
+            if ($accepted) {
+                throw $e;
+            }
+        } catch (InvalidArgumentException $e) {
             // if the value was not accepted, but should be, rethrow exception
             if ($accepted) {
                 throw $e;
             }
         }
+    }
+
+    public function testGetRequestHandlerCreatesNativeRequestHandlerIfNotSet()
+    {
+        $config = $this->getConfigBuilder()->getFormConfig();
+
+        $this->assertInstanceOf('Symfony\Component\Form\NativeRequestHandler', $config->getRequestHandler());
+    }
+
+    public function testGetRequestHandlerReusesNativeRequestHandlerInstance()
+    {
+        $config1 = $this->getConfigBuilder()->getFormConfig();
+        $config2 = $this->getConfigBuilder()->getFormConfig();
+
+        $this->assertSame($config1->getRequestHandler(), $config2->getRequestHandler());
+    }
+
+    public function testSetMethodAllowsGet()
+    {
+        $this->getConfigBuilder()->setMethod('GET');
+    }
+
+    public function testSetMethodAllowsPost()
+    {
+        $this->getConfigBuilder()->setMethod('POST');
+    }
+
+    public function testSetMethodAllowsPut()
+    {
+        $this->getConfigBuilder()->setMethod('PUT');
+    }
+
+    public function testSetMethodAllowsDelete()
+    {
+        $this->getConfigBuilder()->setMethod('DELETE');
+    }
+
+    public function testSetMethodAllowsPatch()
+    {
+        $this->getConfigBuilder()->setMethod('PATCH');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\InvalidArgumentException
+     */
+    public function testSetMethodDoesNotAllowOtherValues()
+    {
+        $this->getConfigBuilder()->setMethod('foo');
+    }
+
+    private function getConfigBuilder($name = 'name')
+    {
+        $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+
+        return new FormConfigBuilder($name, null, $dispatcher);
     }
 }

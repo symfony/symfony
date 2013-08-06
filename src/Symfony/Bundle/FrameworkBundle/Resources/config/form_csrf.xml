@@ -19,6 +19,8 @@
             <argument type="service" id="form.csrf_provider" />
             <argument>%form.type_extension.csrf.enabled%</argument>
             <argument>%form.type_extension.csrf.field_name%</argument>
+            <argument type="service" id="translator.default" />
+            <argument>%validator.translation_domain%</argument>
         </service>
     </services>
 </container>

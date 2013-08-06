@@ -11,20 +11,22 @@
 
 namespace Symfony\Component\Finder\Iterator;
 
+use Symfony\Component\Finder\Comparator\NumberComparator;
+
 /**
  * SizeRangeFilterIterator filters out files that are not in the given size range.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class SizeRangeFilterIterator extends \FilterIterator
+class SizeRangeFilterIterator extends FilterIterator
 {
     private $comparators = array();
 
     /**
      * Constructor.
      *
-     * @param \Iterator $iterator    The Iterator to filter
-     * @param array     $comparators An array of \NumberComparator instances
+     * @param \Iterator          $iterator    The Iterator to filter
+     * @param NumberComparator[] $comparators An array of NumberComparator instances
      */
     public function __construct(\Iterator $iterator, array $comparators)
     {

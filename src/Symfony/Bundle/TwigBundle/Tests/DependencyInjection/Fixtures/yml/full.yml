@@ -13,4 +13,8 @@ twig:
     charset:             ISO-8859-1
     debug:               true
     strict_variables:    true
-    paths:               [path1, path2]
+    paths:
+        path1: ''
+        path2: ''
+        namespaced_path1: namespace
+        namespaced_path2: namespace

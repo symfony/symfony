@@ -57,13 +57,31 @@ class TwigExtension extends Extension
 
         $container->setParameter('twig.form.resources', $config['form']['resources']);
 
-        $reflClass = new \ReflectionClass('Symfony\Bridge\Twig\Extension\FormExtension');
-        $container->getDefinition('twig.loader')->addMethodCall('addPath', array(dirname(dirname($reflClass->getFileName())).'/Resources/views/Form'));
+        $twigFilesystemLoaderDefinition = $container->getDefinition('twig.loader.filesystem');
 
-        if (!empty($config['paths'])) {
-            foreach ($config['paths'] as $path) {
-                $container->getDefinition('twig.loader')->addMethodCall('addPath', array($path));
+        // register user-configured paths
+        foreach ($config['paths'] as $path => $namespace) {
+            if (!$namespace) {
+                $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($path));
+            } else {
+                $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($path, $namespace));
             }
+        }
+
+        // register bundles as Twig namespaces
+        foreach ($container->getParameter('kernel.bundles') as $bundle => $class) {
+            if (is_dir($dir = $container->getParameter('kernel.root_dir').'/Resources/'.$bundle.'/views')) {
+                $this->addTwigPath($twigFilesystemLoaderDefinition, $dir, $bundle);
+            }
+
+            $reflection = new \ReflectionClass($class);
+            if (is_dir($dir = dirname($reflection->getFilename()).'/Resources/views')) {
+                $this->addTwigPath($twigFilesystemLoaderDefinition, $dir, $bundle);
+            }
+        }
+
+        if (is_dir($dir = $container->getParameter('kernel.root_dir').'/Resources/views')) {
+            $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($dir));
         }
 
         if (!empty($config['globals'])) {
@@ -83,8 +101,6 @@ class TwigExtension extends Extension
             $config['extensions']
         );
 
-        $container->setParameter('twig.options', $config);
-
         if ($container->getParameter('kernel.debug')) {
             $loader->load('debug.xml');
 
@@ -92,9 +108,15 @@ class TwigExtension extends Extension
             $container->setAlias('debug.templating.engine.twig', 'templating.engine.twig');
         }
 
-        if (!isset($config['autoescape'])) {
+        if (isset($config['autoescape_service']) && isset($config['autoescape_service_method'])) {
+            $container->findDefinition('templating.engine.twig')->addMethodCall('setDefaultEscapingStrategy', array(array(new Reference($config['autoescape_service']), $config['autoescape_service_method'])));
+
+            unset($config['autoescape_service'], $config['autoescape_service_method']);
+        } elseif (!isset($config['autoescape'])) {
             $container->findDefinition('templating.engine.twig')->addMethodCall('setDefaultEscapingStrategy', array(array(new Reference('templating.engine.twig'), 'guessDefaultEscapingStrategy')));
         }
+
+        $container->setParameter('twig.options', $config);
 
         $this->addClassesToCompile(array(
             'Twig_Environment',
@@ -106,6 +128,15 @@ class TwigExtension extends Extension
             'Twig_Markup',
             'Twig_Template',
         ));
+    }
+
+    private function addTwigPath($twigFilesystemLoaderDefinition, $dir, $bundle)
+    {
+        $name = $bundle;
+        if ('Bundle' === substr($name, -6)) {
+            $name = substr($name, 0, -6);
+        }
+        $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($dir, $name));
     }
 
     /**

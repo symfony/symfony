@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\Config\Resource\FileResource;
-use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\Yaml\Parser as YamlParser;
 
 /**
  * YamlFileLoader loads YAML files service definitions.
@@ -29,6 +29,8 @@ use Symfony\Component\Yaml\Yaml;
  */
 class YamlFileLoader extends FileLoader
 {
+    private $yamlParser;
+
     /**
      * Loads a Yaml file.
      *
@@ -119,6 +121,8 @@ class YamlFileLoader extends FileLoader
      * @param string $id
      * @param array  $service
      * @param string $file
+     *
+     * @throws InvalidArgumentException When tags are invalid
      */
     private function parseDefinition($id, $service, $file)
     {
@@ -149,6 +153,14 @@ class YamlFileLoader extends FileLoader
 
         if (isset($service['synthetic'])) {
             $definition->setSynthetic($service['synthetic']);
+        }
+
+        if (isset($service['synchronized'])) {
+            $definition->setSynchronized($service['synchronized']);
+        }
+
+        if (isset($service['lazy'])) {
+            $definition->setLazy($service['lazy']);
         }
 
         if (isset($service['public'])) {
@@ -231,9 +243,21 @@ class YamlFileLoader extends FileLoader
      *
      * @return array The file content
      */
-    private function loadFile($file)
+    protected function loadFile($file)
     {
-        return $this->validate(Yaml::parse($file), $file);
+        if (!stream_is_local($file)) {
+            throw new InvalidArgumentException(sprintf('This is not a local file "%s".', $file));
+        }
+
+        if (!file_exists($file)) {
+            throw new InvalidArgumentException(sprintf('The service file "%s" is not valid.', $file));
+        }
+
+        if (null === $this->yamlParser) {
+            $this->yamlParser = new YamlParser();
+        }
+
+        return $this->validate($this->yamlParser->parse(file_get_contents($file)), $file);
     }
 
     /**
@@ -288,7 +312,10 @@ class YamlFileLoader extends FileLoader
         if (is_array($value)) {
             $value = array_map(array($this, 'resolveServices'), $value);
         } elseif (is_string($value) &&  0 === strpos($value, '@')) {
-            if (0 === strpos($value, '@?')) {
+            if (0 === strpos($value, '@@')) {
+                $value = substr($value, 1);
+                $invalidBehavior = null;
+            } elseif (0 === strpos($value, '@?')) {
                 $value = substr($value, 2);
                 $invalidBehavior = ContainerInterface::IGNORE_ON_INVALID_REFERENCE;
             } else {
@@ -303,7 +330,9 @@ class YamlFileLoader extends FileLoader
                 $strict = true;
             }
 
-            $value = new Reference($value, $invalidBehavior, $strict);
+            if (null !== $invalidBehavior) {
+                $value = new Reference($value, $invalidBehavior, $strict);
+            }
         }
 
         return $value;

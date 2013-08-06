@@ -30,11 +30,6 @@ class MockFileSessionStorage extends MockArraySessionStorage
     private $savePath;
 
     /**
-     * @var array
-     */
-    private $sessionData;
-
-    /**
      * Constructor.
      *
      * @param string      $savePath Path of directory to save session files.
@@ -97,6 +92,10 @@ class MockFileSessionStorage extends MockArraySessionStorage
      */
     public function save()
     {
+        if (!$this->started) {
+            throw new \RuntimeException("Trying to save a session that was not started yet or was already closed");
+        }
+
         file_put_contents($this->getFilePath(), serialize($this->data));
 
         // this is needed for Silex, where the session object is re-used across requests

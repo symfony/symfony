@@ -1,6 +1,64 @@
 CHANGELOG
 =========
 
+
+2.3.0
+------
+
+ * deprecated FormPerformanceTestCase and FormIntegrationTestCase in the Symfony\Component\Form\Tests namespace and moved them to the Symfony\Component\Form\Test namespace
+ * deprecated TypeTestCase in the Symfony\Component\Form\Tests\Extension\Core\Type namespace and moved it to the Symfony\Component\Form\Test namespace
+ * changed FormRenderer::humanize() to humanize also camel cased field name
+ * added RequestHandlerInterface and FormInterface::handleRequest()
+ * deprecated passing a Request instance to FormInterface::bind()
+ * added options "method" and "action" to FormType
+ * deprecated option "virtual" in favor "inherit_data"
+ * deprecated VirtualFormAwareIterator in favor of InheritDataAwareIterator
+ * [BC BREAK] removed the "array" type hint from DataMapperInterface
+ * improved forms inheriting their parent data to actually return that data from getData(), getNormData() and getViewData()
+ * added component-level exceptions for various SPL exceptions
+   changed all uses of the deprecated Exception class to use more specialized exceptions instead
+   removed NotInitializedException, NotValidException, TypeDefinitionException, TypeLoaderException, CreationException
+ * added events PRE_SUBMIT, SUBMIT and POST_SUBMIT
+ * deprecated events PRE_BIND, BIND and POST_BIND
+ * [BC BREAK] renamed bind() and isBound() in FormInterface to submit() and isSubmitted()
+ * added methods submit() and isSubmitted() to Form
+ * deprecated bind() and isBound() in Form
+ * deprecated AlreadyBoundException in favor of AlreadySubmittedException
+ * added support for PATCH requests
+ * [BC BREAK] added initialize() to FormInterface
+ * [BC BREAK] added getAutoInitialize() to FormConfigInterface
+ * [BC BREAK] added setAutoInitialize() to FormConfigBuilderInterface
+ * [BC BREAK] initialization for Form instances added to a form tree must be manually disabled
+ * PRE_SET_DATA is now guaranteed to be called after children were added by the form builder,
+   unless FormInterface::setData() is called manually
+ * fixed CSRF error message to be translated
+ * custom CSRF error messages can now be set through the "csrf_message" option
+ * fixed: expanded single-choice fields now show a radio button for the empty value
+
+2.2.0
+-----
+
+ * TrimListener now removes unicode whitespaces
+ * deprecated getParent(), setParent() and hasParent() in FormBuilderInterface
+ * FormInterface::add() now accepts a FormInterface instance OR a field's name, type and options
+ * removed special characters between the choice or text fields of DateType unless
+   the option "format" is set to a custom value
+ * deprecated FormException and introduced ExceptionInterface instead
+ * [BC BREAK] FormException is now an interface
+ * protected FormBuilder methods from being called when it is turned into a FormConfigInterface with getFormConfig()
+ * [BC BREAK] inserted argument `$message` in the constructor of `FormError`
+ * the PropertyPath class and related classes were moved to a dedicated
+   PropertyAccess component. During the move, InvalidPropertyException was
+   renamed to NoSuchPropertyException. FormUtil was split: FormUtil::singularify()
+   can now be found in Symfony\Component\PropertyAccess\StringUtil. The methods
+   getValue() and setValue() from PropertyPath were extracted into a new class
+   PropertyAccessor.
+ * added an optional PropertyAccessorInterface parameter to FormType,
+   ObjectChoiceList and PropertyPathMapper
+ * [BC BREAK] PropertyPathMapper and FormType now have a constructor
+ * [BC BREAK] setting the option "validation_groups" to ``false`` now disables validation
+   instead of assuming group "Default"
+
 2.1.0
 -----
 
@@ -152,12 +210,12 @@ CHANGELOG
  * deprecated the options "data_timezone" and "user_timezone" in DateType, DateTimeType and TimeType
    and renamed them to "model_timezone" and "view_timezone"
  * fixed: TransformationFailedExceptions thrown in the model transformer are now caught by the form
- * added FormRegistry and ResolvedFormTypeInterface
+ * added FormRegistryInterface, ResolvedFormTypeInterface and ResolvedFormTypeFactoryInterface
  * deprecated FormFactory methods
    * `addType`
    * `hasType`
    * `getType`
- * [BC BREAK] FormFactory now expects a FormRegistryInterface as constructor argument
+ * [BC BREAK] FormFactory now expects a FormRegistryInterface and a ResolvedFormTypeFactoryInterface as constructor argument
  * [BC BREAK] The method `createBuilder` in FormTypeInterface is not supported anymore for performance reasons
  * [BC BREAK] Removed `setTypes` from FormBuilder
  * deprecated AbstractType methods
@@ -177,3 +235,4 @@ CHANGELOG
  * made FormView properties public and deprecated their accessor methods
  * made the normalized data of a form accessible in the template through the variable "form.vars.data"
  * made the original data of a choice accessible in the template through the property "choice.data"
+ * added convenience class Forms and FormFactoryBuilderInterface

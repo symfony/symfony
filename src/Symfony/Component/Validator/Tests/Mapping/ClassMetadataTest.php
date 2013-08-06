@@ -188,7 +188,7 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Validator\Exception\GroupDefinitionException
+     * @expectedException \Symfony\Component\Validator\Exception\GroupDefinitionException
      */
     public function testGroupSequenceFailsIfGroupSequenceProviderIsSet()
     {
@@ -198,7 +198,7 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Validator\Exception\GroupDefinitionException
+     * @expectedException \Symfony\Component\Validator\Exception\GroupDefinitionException
      */
     public function testGroupSequenceProviderFailsIfGroupSequenceIsSet()
     {
@@ -208,7 +208,7 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Validator\Exception\GroupDefinitionException
+     * @expectedException \Symfony\Component\Validator\Exception\GroupDefinitionException
      */
     public function testGroupSequenceProviderFailsIfDomainClassIsInvalid()
     {

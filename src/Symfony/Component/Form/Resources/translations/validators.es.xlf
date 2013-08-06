@@ -11,8 +11,8 @@
                 <target>El archivo subido es demasiado grande. Por favor, suba un archivo más pequeño.</target>
             </trans-unit>
             <trans-unit id="30">
-                <source>The CSRF token is invalid.</source>
-                <target>El token CSRF no es válido.</target>
+                <source>The CSRF token is invalid. Please try to resubmit the form.</source>
+                <target>El token CSRF no es válido. Por favor, pruebe de enviar nuevamente el formulario</target>
             </trans-unit>
         </body>
     </file>

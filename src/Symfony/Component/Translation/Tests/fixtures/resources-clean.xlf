@@ -2,11 +2,11 @@
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
   <file source-language="en" datatype="plaintext" original="file.ext">
     <body>
-      <trans-unit id="1">
+      <trans-unit id="acbd18db4cc2f85cedef654fccc4a4d8" resname="foo">
         <source>foo</source>
         <target>bar</target>
       </trans-unit>
-      <trans-unit id="2">
+      <trans-unit id="3c6e0b8a9c15224a8228b9a98ca1531d" resname="key">
         <source>key</source>
         <target></target>
       </trans-unit>

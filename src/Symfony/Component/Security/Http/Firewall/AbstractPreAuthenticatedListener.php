@@ -18,9 +18,10 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 
 /**
  * AbstractPreAuthenticatedListener is the base class for all listener that
@@ -47,7 +48,7 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
     }
 
     /**
-     * Handles X509 authentication.
+     * Handles pre-authentication.
      *
      * @param GetResponseEvent $event A GetResponseEvent instance
      */
@@ -59,10 +60,16 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
             $this->logger->debug(sprintf('Checking secure context token: %s', $this->securityContext->getToken()));
         }
 
-        list($user, $credentials) = $this->getPreAuthenticatedData($request);
+        try {
+            list($user, $credentials) = $this->getPreAuthenticatedData($request);
+        } catch (BadCredentialsException $exception) {
+            $this->clearToken();
+
+            return;
+        }
 
         if (null !== $token = $this->securityContext->getToken()) {
-            if ($token instanceof PreAuthenticatedToken && $token->isAuthenticated() && $token->getUsername() === $user) {
+            if ($token instanceof PreAuthenticatedToken && $this->providerKey == $token->getProviderKey() && $token->isAuthenticated() && $token->getUsername() === $user) {
                 return;
             }
         }
@@ -84,6 +91,17 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
                 $this->dispatcher->dispatch(SecurityEvents::INTERACTIVE_LOGIN, $loginEvent);
             }
         } catch (AuthenticationException $failed) {
+            $this->clearToken();
+        }
+    }
+
+    /**
+     * Clears a PreAuthenticatedToken for this provider (if present)
+     */
+    protected function clearToken()
+    {
+        $token = $this->securityContext->getToken();
+        if ($token instanceof PreAuthenticatedToken && $this->providerKey === $token->getProviderKey()) {
             $this->securityContext->setToken(null);
 
             if (null !== $this->logger) {

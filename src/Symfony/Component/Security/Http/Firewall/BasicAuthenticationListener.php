@@ -14,7 +14,7 @@ namespace Symfony\Component\Security\Http\Firewall;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -74,7 +74,10 @@ class BasicAuthenticationListener implements ListenerInterface
             $token = $this->authenticationManager->authenticate(new UsernamePasswordToken($username, $request->headers->get('PHP_AUTH_PW'), $this->providerKey));
             $this->securityContext->setToken($token);
         } catch (AuthenticationException $failed) {
-            $this->securityContext->setToken(null);
+            $token = $this->securityContext->getToken();
+            if ($token instanceof UsernamePasswordToken && $this->providerKey === $token->getProviderKey()) {
+                $this->securityContext->setToken(null);
+            }
 
             if (null !== $this->logger) {
                 $this->logger->info(sprintf('Authentication request failed for user "%s": %s', $username, $failed->getMessage()));

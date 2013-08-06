@@ -38,9 +38,9 @@ abstract class AbstractFormTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('The "EventDispatcher" component is not available');
         }
 
-        // We need an actual dispatcher to bind the deprecated
+        // We need an actual dispatcher to use the deprecated
         // bindRequest() method
-        $this->dispatcher = new EventDispatcher();;
+        $this->dispatcher = new EventDispatcher();
         $this->factory = $this->getMock('Symfony\Component\Form\FormFactoryInterface');
         $this->form = $this->createForm();
     }
@@ -76,43 +76,15 @@ abstract class AbstractFormTest extends \PHPUnit_Framework_TestCase
      */
     protected function getMockForm($name = 'name')
     {
-        $form = $this->getMock('Symfony\Component\Form\Tests\FormInterface');
+        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+        $config = $this->getMock('Symfony\Component\Form\FormConfigInterface');
 
         $form->expects($this->any())
             ->method('getName')
             ->will($this->returnValue($name));
-
-        return $form;
-    }
-
-    /**
-     * @param  string $name
-     *
-     * @return \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected function getValidForm($name)
-    {
-        $form = $this->getMockForm($name);
-
         $form->expects($this->any())
-            ->method('isValid')
-            ->will($this->returnValue(true));
-
-        return $form;
-    }
-
-    /**
-     * @param  string $name
-     *
-     * @return \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected function getInvalidForm($name)
-    {
-        $form = $this->getMockForm($name);
-
-        $form->expects($this->any())
-            ->method('isValid')
-            ->will($this->returnValue(false));
+            ->method('getConfig')
+            ->will($this->returnValue($config));
 
         return $form;
     }

@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Doctrine\Form\Type;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Symfony\Component\Form\Exception\RuntimeException;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityChoiceList;
@@ -21,6 +22,8 @@ use Symfony\Bridge\Doctrine\Form\DataTransformer\CollectionToArrayTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 abstract class DoctrineType extends AbstractType
 {
@@ -34,9 +37,15 @@ abstract class DoctrineType extends AbstractType
      */
     private $choiceListCache = array();
 
-    public function __construct(ManagerRegistry $registry)
+    /**
+     * @var PropertyAccessorInterface
+     */
+    private $propertyAccessor;
+
+    public function __construct(ManagerRegistry $registry, PropertyAccessorInterface $propertyAccessor = null)
     {
         $this->registry = $registry;
+        $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::getPropertyAccessor();
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -53,6 +62,7 @@ abstract class DoctrineType extends AbstractType
     {
         $choiceListCache =& $this->choiceListCache;
         $registry = $this->registry;
+        $propertyAccessor = $this->propertyAccessor;
         $type = $this;
 
         $loader = function (Options $options) use ($type) {
@@ -63,7 +73,7 @@ abstract class DoctrineType extends AbstractType
             return null;
         };
 
-        $choiceList = function (Options $options) use (&$choiceListCache, &$time) {
+        $choiceList = function (Options $options) use (&$choiceListCache, $propertyAccessor) {
             // Support for closures
             $propertyHash = is_object($options['property'])
                 ? spl_object_hash($options['property'])
@@ -76,8 +86,16 @@ abstract class DoctrineType extends AbstractType
                 // A second parameter ($key) is passed, so we cannot use
                 // spl_object_hash() directly (which strictly requires
                 // one parameter)
-                array_walk_recursive($choiceHashes, function ($value) {
-                    return spl_object_hash($value);
+                array_walk_recursive($choiceHashes, function (&$value) {
+                    $value = spl_object_hash($value);
+                });
+            }
+
+            $preferredChoiceHashes = $options['preferred_choices'];
+
+            if (is_array($preferredChoiceHashes)) {
+                array_walk_recursive($preferredChoiceHashes, function (&$value) {
+                    $value = spl_object_hash($value);
                 });
             }
 
@@ -97,6 +115,7 @@ abstract class DoctrineType extends AbstractType
                 $propertyHash,
                 $loaderHash,
                 $choiceHashes,
+                $preferredChoiceHashes,
                 $groupByHash
             )));
 
@@ -107,7 +126,9 @@ abstract class DoctrineType extends AbstractType
                     $options['property'],
                     $options['loader'],
                     $options['choices'],
-                    $options['group_by']
+                    $options['preferred_choices'],
+                    $options['group_by'],
+                    $propertyAccessor
                 );
             }
 
@@ -120,12 +141,21 @@ abstract class DoctrineType extends AbstractType
                 return $registry->getManager($em);
             }
 
-            return $registry->getManagerForClass($options['class']);
+            $em = $registry->getManagerForClass($options['class']);
+
+            if (null === $em) {
+                throw new RuntimeException(sprintf(
+                    'Class "%s" seems not to be a managed Doctrine entity. ' .
+                    'Did you forget to map it?',
+                    $options['class']
+                ));
+            }
+
+            return $em;
         };
 
         $resolver->setDefaults(array(
             'em'                => null,
-            'class'             => null,
             'property'          => null,
             'query_builder'     => null,
             'loader'            => $loader,
@@ -134,8 +164,14 @@ abstract class DoctrineType extends AbstractType
             'group_by'          => null,
         ));
 
+        $resolver->setRequired(array('class'));
+
         $resolver->setNormalizers(array(
             'em' => $emNormalizer,
+        ));
+
+        $resolver->setAllowedTypes(array(
+            'loader' => array('null', 'Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface'),
         ));
     }
 
@@ -145,6 +181,7 @@ abstract class DoctrineType extends AbstractType
      * @param ObjectManager $manager
      * @param mixed         $queryBuilder
      * @param string        $class
+     *
      * @return EntityLoaderInterface
      */
     abstract public function getLoader(ObjectManager $manager, $queryBuilder, $class);

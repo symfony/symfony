@@ -63,9 +63,19 @@ class TwigExtractorTest extends TestCase
             array('{{ "new key" | transchoice(1) | upper }}', array('new key' => 'messages')),
             array('{{ "new key" | transchoice(1, {}, "domain") }}', array('new key' => 'domain')),
             array('{% trans %}new key{% endtrans %}', array('new key' => 'messages')),
+            array('{% trans %}  new key  {% endtrans %}', array('new key' => 'messages')),
             array('{% trans from "domain" %}new key{% endtrans %}', array('new key' => 'domain')),
             array('{% set foo = "new key" | trans %}', array('new key' => 'messages')),
             array('{{ 1 ? "new key" | trans : "another key" | trans }}', array('new key' => 'messages', 'another key' => 'messages')),
+
+            // make sure 'trans_default_domain' tag is supported
+            array('{% trans_default_domain "domain" %}{{ "new key"|trans }}', array('new key' => 'domain')),
+            array('{% trans_default_domain "domain" %}{{ "new key"|transchoice }}', array('new key' => 'domain')),
+            array('{% trans_default_domain "domain" %}{% trans %}new key{% endtrans %}', array('new key' => 'domain')),
+
+            // make sure this works with twig's named arguments
+            array('{{ "new key" | trans(domain="domain") }}', array('new key' => 'domain')),
+            array('{{ "new key" | transchoice(domain="domain", count=1) }}', array('new key' => 'domain')),
         );
     }
 }

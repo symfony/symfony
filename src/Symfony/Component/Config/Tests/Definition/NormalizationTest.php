@@ -169,7 +169,7 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
      * @expectedExceptionMessage The attribute "id" must be set for path "root.thing".
      */
     public function testNonAssociativeArrayThrowsExceptionIfAttributeNotSet()
@@ -181,6 +181,25 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertNormalized($this->getNumericKeysTestTree(), $denormalized, array());
+    }
+
+    public function testAssociativeArrayPreserveKeys()
+    {
+        $tb = new TreeBuilder();
+        $tree = $tb
+            ->root('root', 'array')
+                ->prototype('array')
+                    ->children()
+                        ->node('foo', 'scalar')->end()
+                    ->end()
+                ->end()
+            ->end()
+            ->buildTree()
+        ;
+
+        $data = array('first' => array('foo' => 'bar'));
+
+        $this->assertNormalized($tree, $data, $data);
     }
 
     public static function assertNormalized(NodeInterface $tree, $denormalized, $normalized)

@@ -1,4 +1,6 @@
-{% extends 'WebProfilerBundle:Profiler:layout.html.twig' %}
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+
+{% from _self import display_timeline, dump_request_data %}
 
 {% if colors is not defined %}
     {% set colors = {
@@ -14,23 +16,23 @@
 {% endif %}
 
 {% block toolbar %}
-    {% set total_time = collector.events|length ? '%.0f ms'|format(collector.totaltime) : 'n/a' %}
+    {% set duration = collector.events|length ? '%.0f ms'|format(collector.duration) : 'n/a' %}
     {% set icon %}
-        <img width="16" height="28" alt="Time" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAcCAYAAABoMT8aAAABqUlEQVR42t2Vv0sCYRyHX9OmEhsMx/YKGlwLQ69DTEUSBJEQEy5J3FRc/BsuiFqEIIcQIRo6ysUhoaBBWhoaGoJwiMJLglRKrs8bXgienmkQdPDAwX2f57j3fhFJkkbiPwTK5bIiFoul3kmPud8MqKMewDXpwuGww+12n9hsNhFnlijYf/Z4PDmO45Yxo+10ZFGTyWRMEItU6AdCx7lczkgd6n7J2Wx2xm63P6jJMk6n80YQBBN1aUDv9XqvlAbbm2LE7/cLODRB0un0VveAeoDC8/waCQQC18MGQqHQOcEKvw8bcLlcL6TfYnVtCrGRAlartUUYhmn1jKg/E3USjUYfhw3E4/F7ks/nz4YNFIvFQ/ogbUYikdefyqlU6gnuOg2YK5XKvs/n+xhUDgaDTVEUt+HO04ABOBA5isViDTU5kUi81Wq1AzhWMEkDGmAEq2C3UCjcYXGauDvfEsuyUjKZbJRKpVvM8IABU9SVX+cxYABmwIE9cFqtVi9xtgvsC2AHbIAFoKey0gdlHEyDObAEWLACFsEsMALdIJ80+dK0bTS95v7+v/AJnis0eO906QwAAAAASUVORK5CYII="/>
-        <span>{{ total_time }}</span>
+        <img width="16" height="28" alt="Time" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAcCAYAAABoMT8aAAABqUlEQVR42t2Vv0sCYRyHX9OmEhsMx/YKGlwLQ69DTEUSBJEQEy5J3FRc/BsuiFqEIIcQIRo6ysUhoaBBWhoaGoJwiMJLglRKrs8bXgienmkQdPDAwX2f57j3fhFJkkbiPwTK5bIiFoul3kmPud8MqKMewDXpwuGww+12n9hsNhFnlijYf/Z4PDmO45Yxo+10ZFGTyWRMEItU6AdCx7lczkgd6n7J2Wx2xm63P6jJMk6n80YQBBN1aUDv9XqvlAbbm2LE7/cLODRB0un0VveAeoDC8/waCQQC18MGQqHQOcEKvw8bcLlcL6TfYnVtCrGRAlartUUYhmn1jKg/E3USjUYfhw3E4/F7ks/nz4YNFIvFQ/ogbUYikdefyqlU6gnuOg2YK5XKvs/n+xhUDgaDTVEUt+HO04ABOBA5isViDTU5kUi81Wq1AzhWMEkDGmAEq2C3UCjcYXGauDvfEsuyUjKZbJRKpVvM8IABU9SVX+cxYABmwIE9cFqtVi9xtgvsC2AHbIAFoKey0gdlHEyDObAEWLACFsEsMALdIJ80+dK0bTS95v7+v/AJnis0eO906QwAAAAASUVORK5CYII=">
+        <span>{{ duration }}</span>
     {% endset %}
     {% set text %}
         <div class="sf-toolbar-info-piece">
             <b>Total time</b>
-            <span>{{ total_time }}</span>
+            <span>{{ duration }}</span>
         </div>
     {% endset %}
-    {% include 'WebProfilerBundle:Profiler:toolbar_item.html.twig' with { 'link': profiler_url } %}
+    {% include '@WebProfiler/Profiler/toolbar_item.html.twig' with { 'link': profiler_url } %}
 {% endblock %}
 
 {% block menu %}
 <span class="label">
-    <span class="icon"><img src="{{ asset('bundles/webprofiler/images/profiler/time.png') }}" alt="Timeline" /></span>
+    <span class="icon"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAhCAYAAADOHBvaAAACz0lEQVR42t2XXWhSYRjHc+pyWrC10e66qKggiGoF0Qh1SBPFDxCcX00yrG6EImFsRhAuvUjwQgZB1EUICYEkgRJGB0QmKMNGEYx1URYEg2w6amWY/YUXXH7Ms9M5RAk/PByf8/58P573ec+2Wq32V/g3xFKpdB3UQBV8JVTJvXUuxbXN+P96TODNzMzsNJvNo3UCgYCYszmmKKrPYrE4NBrNU7lcvtY8xGNjYyWtVvvEZrPZES9kQyy02+3nx8fH3xFJV5RK5RuHw2GqP8tInEgk+g0GwyN6wlZMJtPdfD6/Y0viVCo1iKHLMpM20Ov1FNqT0BWLsWhiXdImDyiQ7ybHVN1HnKibWHgNHxr5egXI6t90ej49PX0BsYKO4qWlpT1qtXqFhlhGnpHREWPaPiB2dydxL/7ZTRLMnpjg8/lcpNct4mGr1fqSK7HT6UwhfleLuFwuH1EoFBWuxDqd7jPiDzSLe+Lx+AQJYl9MKBQKZ+pb7kaxKBKJXGUgPgqCgGrQOc3S6fQEfuNvFEtisdgUA3E/kcsadE6zhYUFG9lKG2LcvMxA3EKnKUBx+bm6uqptFvcCtUql+kECWcdoNH6BQw56fltcYNTtdr/nSuzxeJbhONkujw9Fo9EYV+JkMvkAjv3txEOVSuUSytk3tqWoz2to/xwYaCcWgtPI5+dsSrGo6mn0GG2PtG6ZDYbBRb/f/5EtcSgUeos2J8HgpmURHMaQz6JglP5U6vV6P6G962Sr5HcUE/rAKXB7bm5uhenwhsPheim8BUa6HwQaSMjSv5HNZl+gstDOb5fL9X1xcTGLZ6fAMSDe6ilTBA4CO7iXyWReB4PBMo5F1WYZymkVc1nK5XKvEHsHWMA+sJ3p8VYAhkjvJ4EPRMCzYrE4XyqV5nGdBA/BLLCC46Tu8tl4kxCAAdKLE0AGzhKkZB73kqIh4PI1lQf4BB6TNn4B8KR3FN9bp4MAAAAASUVORK5CYII=" alt="Timeline"></span>
     <strong>Timeline</strong>
 </span>
 {% endblock %}
@@ -41,18 +43,18 @@
         {{ block('panelContent') }}
     {% else %}
         <p>
-            <em>No timing events have been recorded. Are you sure that debugging is enabled in the kernel ?</em>
+            <em>No timing events have been recorded. Are you sure that debugging is enabled in the kernel?</em>
         </p>
     {% endif %}
 {% endblock %}
 
 {% block panelContent %}
     <form id="timeline-control" action="" method="get">
-        <input type="hidden" name="panel" value="time" />
+        <input type="hidden" name="panel" value="time">
         <table>
             <tr>
                 <th style="width: 20%">Total time</th>
-                <td>{{ '%.0f'|format(collector.totaltime) }} ms</td>
+                <td>{{ '%.0f'|format(collector.duration) }} ms</td>
             </tr>
             <tr>
                 <th>Initialization time</th>
@@ -60,7 +62,7 @@
             </tr>
             <tr>
                 <th>Threshold</th>
-                <td><input type="number" size="3" name="threshold" value="1" min="0" /> ms</td>
+                <td><input type="number" size="3" name="threshold" value="1" min="0"> ms</td>
             </tr>
         </table>
     </form>
@@ -68,30 +70,28 @@
     <h3>
         {{ profile.parent ? "Request" : "Main Request" }}
         <small>
-            - {{ collector.events.__section__.totaltime }} ms
+            - {{ collector.events.__section__.duration }} ms
             {% if profile.parent %}
                 - <a href="{{ path('_profiler', { 'token': profile.parent.token, 'panel': 'time' }) }}">parent</a>
             {% endif %}
         </small>
     </h3>
 
-    {% set max = collector.events.__section__.endtime %}
-
-    {{ _self.display_timeline('timeline_' ~ token, collector.events, colors) }}
+    {{ display_timeline('timeline_' ~ token, collector.events, colors) }}
 
     {% if profile.children|length %}
         {% for child in profile.children %}
             {% set events = child.getcollector('time').events %}
             <h3>
                 Sub-request "<a href="{{ path('_profiler', { 'token': child.token, 'panel': 'time' }) }}">{{ child.getcollector('request').requestattributes.get('_controller') }}</a>"
-                <small> - {{ events.__section__.totaltime }} ms</small>
+                <small> - {{ events.__section__.duration }} ms</small>
             </h3>
 
-            {{ _self.display_timeline('timeline_' ~ child.token, events, colors) }}
+            {{ display_timeline('timeline_' ~ child.token, events, colors) }}
         {% endfor %}
     {% endif %}
 
-    <script type="text/javascript">//<![CDATA[
+    <script>//<![CDATA[
         /**
          * In-memory key-value cache manager
          */
@@ -134,7 +134,7 @@
             "use strict";
 
             var _drawingColors  = {{ colors|json_encode|raw }},
-                _storagePrefix  = 'sf2/profiler/timeline',
+                _storagePrefix  = 'timeline/',
                 _threshold      = 1,
                 _requests       = requests,
                 _maxRequestTime = maxRequestTime;
@@ -164,7 +164,7 @@
              */
             function getContainerWidth()
             {
-                return query('#collector_content h2').clientWidth;
+                return query('#collector-content h2').clientWidth;
             }
 
             /**
@@ -172,7 +172,7 @@
              *
              * @param request   the request object
              * @param max       <subjected for removal>
-             * @param threshold the threshold (lower bound) of the length of the timeline (in miliseconds).
+             * @param threshold the threshold (lower bound) of the length of the timeline (in milliseconds).
              * @param width     the width of the canvas.
              */
             this.drawOne = function(request, max, threshold, width)
@@ -192,17 +192,32 @@
                     h = space,
                     x = request.left * ratio + space, // position
                     canvas = cache.get(elementId) || cache.set(elementId, document.getElementById(elementId)),
-                    ctx    = canvas.getContext("2d");
+                    ctx    = canvas.getContext("2d"),
+                    backingStoreRatio,
+                    scaleRatio,
+                    devicePixelRatio;
 
                 // Filter events whose total time is below the threshold.
                 drawableEvents = request.events.filter(function(event) {
-                    return event.totaltime >= threshold;
+                    return event.duration >= threshold;
                 });
 
                 canvasHeight += gapPerEvent * drawableEvents.length;
 
-                canvas.width  = width;
-                canvas.height = canvasHeight;
+                // For retina displays so text and boxes will be crisp
+                devicePixelRatio  = window.devicePixelRatio          == "undefined" ? 1 : window.devicePixelRatio;
+                backingStoreRatio = ctx.webkitBackingStorePixelRatio == "undefined" ? 1 : ctx.webkitBackingStorePixelRatio;
+                scaleRatio        = devicePixelRatio / 1;
+
+                canvasHeight += gapPerEvent * drawableEvents.length;
+
+                canvas.width  = width * scaleRatio;
+                canvas.height = canvasHeight * scaleRatio;
+
+                canvas.style.width = width + 'px';
+                canvas.style.height = canvasHeight + 'px';
+
+                ctx.scale(scaleRatio, scaleRatio);
 
                 ctx.textBaseline = "middle";
                 ctx.lineWidth = 0;
@@ -212,11 +227,11 @@
 
                 drawableEvents.forEach(function(event) {
                     event.periods.forEach(function(period) {
-                        var timelineHeadPosition = x + period.begin * ratio;
+                        var timelineHeadPosition = x + period.start * ratio;
 
                         if (isChildEvent(event)) {
                             ctx.fillStyle = colors.child_sections;
-                            ctx.fillRect(timelineHeadPosition, 0, (period.end - period.begin) * ratio, canvasHeight);
+                            ctx.fillRect(timelineHeadPosition, 0, (period.end - period.start) * ratio, canvasHeight);
                         } else if (isSectionEvent(event)) {
                             var timelineTailPosition = x + period.end * ratio;
 
@@ -234,7 +249,7 @@
 
                 // Filter for main events.
                 mainEvents = drawableEvents.filter(function(event) {
-                    return ! isChildEvent(event)
+                    return !isChildEvent(event)
                 });
 
                 // For each main event, draw the visual presentation of timelines.
@@ -257,11 +272,11 @@
                         }
 
                         // Draw the timeline
-                        var timelineHeadPosition = x + period.begin * ratio;
+                        var timelineHeadPosition = x + period.start * ratio;
 
-                        if ( ! isSectionEvent(event)) {
+                        if (!isSectionEvent(event)) {
                             ctx.fillRect(timelineHeadPosition, h + 3, 2, 6);
-                            ctx.fillRect(timelineHeadPosition, h, (period.end - period.begin) * ratio || 2, 6);
+                            ctx.fillRect(timelineHeadPosition, h, (period.end - period.start) * ratio || 2, 6);
                         } else {
                             var timelineTailPosition = x + period.end * ratio;
 
@@ -313,7 +328,7 @@
                     ctx.fillStyle = "#444";
                     ctx.font = "12px sans-serif";
                     text = event.name;
-                    ms = " ~ " + (event.totaltime < 1 ? event.totaltime : parseInt(event.totaltime, 10)) + " ms";
+                    ms = " ~ " + (event.duration < 1 ? event.duration : parseInt(event.duration, 10)) + " ms / ~ " + event.memory + " MB";
                     if (x + event.starttime * ratio + ctx.measureText(text + ms).width > width) {
                         ctx.textAlign = "end";
                         ctx.font = "10px sans-serif";
@@ -353,7 +368,7 @@
             };
 
             this.getThreshold = function() {
-                var threshold = localStorage.getItem(_storagePrefix + '/threshold');
+                var threshold = Sfjs.getPreference(_storagePrefix + 'threshold');
 
                 if (threshold === null) {
                     return _threshold;
@@ -368,7 +383,7 @@
             {
                 _threshold = threshold;
 
-                localStorage.setItem(_storagePrefix + '/threshold', threshold);
+                Sfjs.setPreference(_storagePrefix + 'threshold', threshold);
 
                 return this;
             };
@@ -388,12 +403,12 @@
         var requests_data = {
             "max": {{ "%F"|format(collector.events.__section__.endtime) }},
             "requests": [
-{{ _self.dump_request_data(token, profile, collector.events, collector.events.__section__.origin) }}
+{{ dump_request_data(token, profile, collector.events, collector.events.__section__.origin) }}
 
 {% if profile.children|length %}
                 ,
 {% for child in profile.children %}
-{{ _self.dump_request_data(child.token, child, child.getcollector('time').events, collector.events.__section__.origin) }}{{ loop.last ? '' : ',' }}
+{{ dump_request_data(child.token, child, child.getcollector('time').events, collector.events.__section__.origin) }}{{ loop.last ? '' : ',' }}
 {% endfor %}
 {% endif %}
             ]
@@ -423,15 +438,21 @@
         elementThresholdControl.onclick  = canvasAutoUpdateOnThresholdChange;
         elementThresholdControl.onchange = canvasAutoUpdateOnThresholdChange;
         elementThresholdControl.onkeyup  = canvasAutoUpdateOnThresholdChange;
+
+        window.setTimeout(function() {
+            canvasAutoUpdateOnThresholdChange(null);
+        }, 50);
+
     //]]></script>
 {% endblock %}
 
 {% macro dump_request_data(token, profile, events, origin) %}
+{% from _self import dump_events %}
                 {
                     "id": "{{ token }}",
                     "left": {{ "%F"|format(events.__section__.origin - origin) }},
                     "events": [
-{{ _self.dump_events(events) }}
+{{ dump_events(events) }}
                     ]
                 }
 {% endmacro %}
@@ -440,15 +461,16 @@
 {% for name, event in events %}
 {% if '__section__' != name %}
                         {
-                            "name": "{{ name }}",
+                            "name": "{{ name|replace({"\\": "\\\\"}) }}",
                             "category": "{{ event.category }}",
                             "origin": {{ "%F"|format(event.origin) }},
                             "starttime": {{ "%F"|format(event.starttime) }},
                             "endtime": {{ "%F"|format(event.endtime) }},
-                            "totaltime": {{ "%F"|format(event.totaltime) }},
+                            "duration": {{ "%F"|format(event.duration) }},
+                            "memory": {{ "%.1F"|format(event.memory / 1024 / 1024) }},
                             "periods": [
                                 {%- for period in event.periods -%}
-                                    {"begin": {{ "%F"|format(period.0) }}, "end": {{ "%F"|format(period.1) }}}{{ loop.last ? '' : ', ' }}
+                                    {"start": {{ "%F"|format(period.starttime) }}, "end": {{ "%F"|format(period.endtime) }}}{{ loop.last ? '' : ', ' }}
                                 {%- endfor -%}
                             ]
                         }{{ loop.last ? '' : ',' }}

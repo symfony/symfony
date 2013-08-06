@@ -12,7 +12,9 @@
 namespace Symfony\Component\DependencyInjection\Dumper;
 
 use Symfony\Component\Yaml\Dumper as YmlDumper;
+use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -92,6 +94,22 @@ class YamlDumper extends Dumper
             $code .= sprintf("        file: %s\n", $definition->getFile());
         }
 
+        if ($definition->isSynthetic()) {
+            $code .= sprintf("        synthetic: true\n");
+        }
+
+        if ($definition->isSynchronized()) {
+            $code .= sprintf("        synchronized: true\n");
+        }
+
+        if ($definition->getFactoryClass()) {
+            $code .= sprintf("        factory_class: %s\n", $definition->getFactoryClass());
+        }
+
+        if ($definition->isLazy()) {
+            $code .= sprintf("        lazy: true\n");
+        }
+
         if ($definition->getFactoryMethod()) {
             $code .= sprintf("        factory_method: %s\n", $definition->getFactoryMethod());
         }
@@ -118,7 +136,7 @@ class YamlDumper extends Dumper
 
         if ($callable = $definition->getConfigurator()) {
             if (is_array($callable)) {
-                if (is_object($callable[0]) && $callable[0] instanceof Reference) {
+                if ($callable[0] instanceof Reference) {
                     $callable = array($this->getServiceCall((string) $callable[0], $callable[0]), $callable[1]);
                 } else {
                     $callable = array($callable[0], $callable[1]);
@@ -135,7 +153,7 @@ class YamlDumper extends Dumper
      * Adds a service alias
      *
      * @param string $alias
-     * @param string $id
+     * @param Alias  $id
      *
      * @return string
      */
@@ -164,7 +182,11 @@ class YamlDumper extends Dumper
             $code .= $this->addService($id, $definition);
         }
 
-        foreach ($this->container->getAliases() as $alias => $id) {
+        $aliases = $this->container->getAliases();
+        foreach ($aliases as $alias => $id) {
+            while (isset($aliases[(string) $id])) {
+                $id = $aliases[(string) $id];
+            }
             $code .= $this->addServiceAlias($alias, $id);
         }
 
@@ -182,11 +204,7 @@ class YamlDumper extends Dumper
             return '';
         }
 
-        if ($this->container->isFrozen()) {
-            $parameters = $this->prepareParameters($this->container->getParameterBag()->all());
-        } else {
-            $parameters = $this->container->getParameterBag()->all();
-        }
+        $parameters = $this->prepareParameters($this->container->getParameterBag()->all(), $this->container->isFrozen());
 
         return $this->dumper->dump(array('parameters' => $parameters), 2);
     }
@@ -195,6 +213,8 @@ class YamlDumper extends Dumper
      * Dumps the value to YAML format
      *
      * @param mixed $value
+     *
+     * @return mixed
      *
      * @throws RuntimeException When trying to dump object or resource
      */
@@ -207,9 +227,9 @@ class YamlDumper extends Dumper
             }
 
             return $code;
-        } elseif (is_object($value) && $value instanceof Reference) {
+        } elseif ($value instanceof Reference) {
             return $this->getServiceCall((string) $value, $value);
-        } elseif (is_object($value) && $value instanceof Parameter) {
+        } elseif ($value instanceof Parameter) {
             return $this->getParameterCall((string) $value);
         } elseif (is_object($value) || is_resource($value)) {
             throw new RuntimeException('Unable to dump a service container if a parameter is an object or a resource.');
@@ -248,26 +268,27 @@ class YamlDumper extends Dumper
     }
 
     /**
-     * Prepares parameters
+     * Prepares parameters.
      *
-     * @param array $parameters
+     * @param array   $parameters
+     * @param Boolean $escape
      *
      * @return array
      */
-    private function prepareParameters($parameters)
+    private function prepareParameters($parameters, $escape = true)
     {
         $filtered = array();
         foreach ($parameters as $key => $value) {
             if (is_array($value)) {
-                $value = $this->prepareParameters($value);
-            } elseif ($value instanceof Reference) {
+                $value = $this->prepareParameters($value, $escape);
+            } elseif ($value instanceof Reference || is_string($value) && 0 === strpos($value, '@')) {
                 $value = '@'.$value;
             }
 
             $filtered[$key] = $value;
         }
 
-        return $this->escape($filtered);
+        return $escape ? $this->escape($filtered) : $filtered;
     }
 
     /**

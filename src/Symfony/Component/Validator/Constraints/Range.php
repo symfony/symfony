@@ -17,13 +17,15 @@ use Symfony\Component\Validator\Exception\MissingOptionsException;
 /**
  * @Annotation
  *
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ *
  * @api
  */
 class Range extends Constraint
 {
-    public $minMessage = 'This value should be {{ limit }} or more';
-    public $maxMessage = 'This value should be {{ limit }} or less';
-    public $invalidMessage = 'This value should be a valid number';
+    public $minMessage = 'This value should be {{ limit }} or more.';
+    public $maxMessage = 'This value should be {{ limit }} or less.';
+    public $invalidMessage = 'This value should be a valid number.';
     public $min;
     public $max;
 
@@ -32,7 +34,7 @@ class Range extends Constraint
         parent::__construct($options);
 
         if (null === $this->min && null === $this->max) {
-            throw new MissingOptionsException('Either option "min" or "max" must be given for constraint ' . __CLASS__, array('min', 'max'));
+            throw new MissingOptionsException(sprintf('Either option "min" or "max" must be given for constraint %s', __CLASS__), array('min', 'max'));
         }
     }
 }

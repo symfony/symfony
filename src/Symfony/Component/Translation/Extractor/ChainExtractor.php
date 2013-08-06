@@ -23,7 +23,7 @@ class ChainExtractor implements ExtractorInterface
     /**
      * The extractors.
      *
-     * @var array
+     * @var ExtractorInterface[]
      */
     private $extractors = array();
 

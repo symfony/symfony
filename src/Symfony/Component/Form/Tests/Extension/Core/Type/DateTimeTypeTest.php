@@ -11,9 +11,19 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-class DateTimeTypeTest extends LocalizedTestCase
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Intl\Util\IntlTestHelper;
+
+class DateTimeTypeTest extends TypeTestCase
 {
-    public function testSubmit_dateTime()
+    protected function setUp()
+    {
+        IntlTestHelper::requireIntl($this);
+
+        parent::setUp();
+    }
+
+    public function testSubmitDateTime()
     {
         $form = $this->factory->create('datetime', null, array(
             'model_timezone' => 'UTC',
@@ -23,7 +33,7 @@ class DateTimeTypeTest extends LocalizedTestCase
             'input' => 'datetime',
         ));
 
-        $form->bind(array(
+        $form->submit(array(
             'date' => array(
                 'day' => '2',
                 'month' => '6',
@@ -40,7 +50,7 @@ class DateTimeTypeTest extends LocalizedTestCase
         $this->assertDateTimeEquals($dateTime, $form->getData());
     }
 
-    public function testSubmit_string()
+    public function testSubmitString()
     {
         $form = $this->factory->create('datetime', null, array(
             'model_timezone' => 'UTC',
@@ -50,7 +60,7 @@ class DateTimeTypeTest extends LocalizedTestCase
             'time_widget' => 'choice',
         ));
 
-        $form->bind(array(
+        $form->submit(array(
             'date' => array(
                 'day' => '2',
                 'month' => '6',
@@ -65,7 +75,7 @@ class DateTimeTypeTest extends LocalizedTestCase
         $this->assertEquals('2010-06-02 03:04:00', $form->getData());
     }
 
-    public function testSubmit_timestamp()
+    public function testSubmitTimestamp()
     {
         $form = $this->factory->create('datetime', null, array(
             'model_timezone' => 'UTC',
@@ -75,7 +85,7 @@ class DateTimeTypeTest extends LocalizedTestCase
             'time_widget' => 'choice',
         ));
 
-        $form->bind(array(
+        $form->submit(array(
             'date' => array(
                 'day' => '2',
                 'month' => '6',
@@ -92,7 +102,36 @@ class DateTimeTypeTest extends LocalizedTestCase
         $this->assertEquals($dateTime->format('U'), $form->getData());
     }
 
-    public function testSubmit_withSeconds()
+    public function testSubmitWithoutMinutes()
+    {
+        $form = $this->factory->create('datetime', null, array(
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
+            'date_widget' => 'choice',
+            'time_widget' => 'choice',
+            'input' => 'datetime',
+            'with_minutes' => false,
+        ));
+
+        $form->setData(new \DateTime('2010-06-02 03:04:05 UTC'));
+
+        $input = array(
+            'date' => array(
+                'day' => '2',
+                'month' => '6',
+                'year' => '2010',
+            ),
+            'time' => array(
+                'hour' => '3',
+            ),
+        );
+
+        $form->submit($input);
+
+        $this->assertDateTimeEquals(new \DateTime('2010-06-02 03:00:00 UTC'), $form->getData());
+    }
+
+    public function testSubmitWithSeconds()
     {
         $form = $this->factory->create('datetime', null, array(
             'model_timezone' => 'UTC',
@@ -118,12 +157,12 @@ class DateTimeTypeTest extends LocalizedTestCase
             ),
         );
 
-        $form->bind($input);
+        $form->submit($input);
 
         $this->assertDateTimeEquals(new \DateTime('2010-06-02 03:04:05 UTC'), $form->getData());
     }
 
-    public function testSubmit_differentTimezones()
+    public function testSubmitDifferentTimezones()
     {
         $form = $this->factory->create('datetime', null, array(
             'model_timezone' => 'America/New_York',
@@ -136,7 +175,7 @@ class DateTimeTypeTest extends LocalizedTestCase
 
         $dateTime = new \DateTime('2010-06-02 03:04:05 Pacific/Tahiti');
 
-        $form->bind(array(
+        $form->submit(array(
             'date' => array(
                 'day' => (int) $dateTime->format('d'),
                 'month' => (int) $dateTime->format('m'),
@@ -154,7 +193,7 @@ class DateTimeTypeTest extends LocalizedTestCase
         $this->assertEquals($dateTime->format('Y-m-d H:i:s'), $form->getData());
     }
 
-    public function testSubmit_differentTimezonesDateTime()
+    public function testSubmitDifferentTimezonesDateTime()
     {
         $form = $this->factory->create('datetime', null, array(
             'model_timezone' => 'America/New_York',
@@ -165,7 +204,7 @@ class DateTimeTypeTest extends LocalizedTestCase
 
         $outputTime = new \DateTime('2010-06-02 03:04:00 Pacific/Tahiti');
 
-        $form->bind('2010-06-02T03:04:00-10:00');
+        $form->submit('2010-06-02T03:04:00-10:00');
 
         $outputTime->setTimezone(new \DateTimeZone('America/New_York'));
 
@@ -173,7 +212,7 @@ class DateTimeTypeTest extends LocalizedTestCase
         $this->assertEquals('2010-06-02T03:04:00-10:00', $form->getViewData());
     }
 
-    public function testSubmit_stringSingleText()
+    public function testSubmitStringSingleText()
     {
         $form = $this->factory->create('datetime', null, array(
             'model_timezone' => 'UTC',
@@ -182,13 +221,13 @@ class DateTimeTypeTest extends LocalizedTestCase
             'widget' => 'single_text',
         ));
 
-        $form->bind('2010-06-02T03:04:00Z');
+        $form->submit('2010-06-02T03:04:00Z');
 
         $this->assertEquals('2010-06-02 03:04:00', $form->getData());
         $this->assertEquals('2010-06-02T03:04:00Z', $form->getViewData());
     }
 
-    public function testSubmit_stringSingleText_withSeconds()
+    public function testSubmitStringSingleTextWithSeconds()
     {
         $form = $this->factory->create('datetime', null, array(
             'model_timezone' => 'UTC',
@@ -198,13 +237,13 @@ class DateTimeTypeTest extends LocalizedTestCase
             'with_seconds' => true,
         ));
 
-        $form->bind('2010-06-02T03:04:05Z');
+        $form->submit('2010-06-02T03:04:05Z');
 
         $this->assertEquals('2010-06-02 03:04:05', $form->getData());
         $this->assertEquals('2010-06-02T03:04:05Z', $form->getViewData());
     }
 
-    public function testSubmit_differentPattern()
+    public function testSubmitDifferentPattern()
     {
         $form = $this->factory->create('datetime', null, array(
             'date_format' => 'MM*yyyy*dd',
@@ -215,7 +254,7 @@ class DateTimeTypeTest extends LocalizedTestCase
 
         $dateTime = new \DateTime('2010-06-02 03:04');
 
-        $form->bind(array(
+        $form->submit(array(
             'date' => '06*2010*02',
             'time' => '03:04',
         ));
@@ -312,7 +351,7 @@ class DateTimeTypeTest extends LocalizedTestCase
         $this->assertSame('Empty second', $view['time']['second']->vars['empty_value']);
     }
 
-    public function testPassEmptyValueAsPartialArray_addEmptyIfNotRequired()
+    public function testPassEmptyValueAsPartialArrayAddEmptyIfNotRequired()
     {
         $form = $this->factory->create('datetime', null, array(
             'required' => false,
@@ -334,7 +373,7 @@ class DateTimeTypeTest extends LocalizedTestCase
         $this->assertSame('Empty second', $view['time']['second']->vars['empty_value']);
     }
 
-    public function testPassEmptyValueAsPartialArray_addNullIfRequired()
+    public function testPassEmptyValueAsPartialArrayAddNullIfRequired()
     {
         $form = $this->factory->create('datetime', null, array(
             'required' => true,
@@ -386,4 +425,53 @@ class DateTimeTypeTest extends LocalizedTestCase
         $view = $form->createView();
         $this->assertFalse(isset($view->vars['type']));
     }
+
+    public function testDateTypeChoiceErrorsBubbleUp()
+    {
+        $error = new FormError('Invalid!');
+        $form = $this->factory->create('datetime', null);
+
+        $form['date']->addError($error);
+
+        $this->assertSame(array(), $form['date']->getErrors());
+        $this->assertSame(array($error), $form->getErrors());
+    }
+
+    public function testDateTypeSingleTextErrorsBubbleUp()
+    {
+        $error = new FormError('Invalid!');
+        $form = $this->factory->create('datetime', null, array(
+            'date_widget' => 'single_text'
+        ));
+
+        $form['date']->addError($error);
+
+        $this->assertSame(array(), $form['date']->getErrors());
+        $this->assertSame(array($error), $form->getErrors());
+    }
+
+    public function testTimeTypeChoiceErrorsBubbleUp()
+    {
+        $error = new FormError('Invalid!');
+        $form = $this->factory->create('datetime', null);
+
+        $form['time']->addError($error);
+
+        $this->assertSame(array(), $form['time']->getErrors());
+        $this->assertSame(array($error), $form->getErrors());
+    }
+
+    public function testTimeTypeSingleTextErrorsBubbleUp()
+    {
+        $error = new FormError('Invalid!');
+        $form = $this->factory->create('datetime', null, array(
+            'time_widget' => 'single_text'
+        ));
+
+        $form['time']->addError($error);
+
+        $this->assertSame(array(), $form['time']->getErrors());
+        $this->assertSame(array($error), $form->getErrors());
+    }
+
 }

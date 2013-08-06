@@ -16,7 +16,7 @@ namespace Symfony\Component\Finder\Iterator;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ExcludeDirectoryFilterIterator extends \FilterIterator
+class ExcludeDirectoryFilterIterator extends FilterIterator
 {
     private $patterns;
 

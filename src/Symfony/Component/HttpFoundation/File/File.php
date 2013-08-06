@@ -49,9 +49,15 @@ class File extends \SplFileInfo
      *
      * If the mime type is unknown, returns null.
      *
+     * This method uses the mime type as guessed by getMimeType()
+     * to guess the file extension.
+     *
      * @return string|null The guessed extension or null if it cannot be guessed
      *
      * @api
+     *
+     * @see ExtensionGuesser
+     * @see getMimeType()
      */
     public function guessExtension()
     {
@@ -64,11 +70,13 @@ class File extends \SplFileInfo
     /**
      * Returns the mime type of the file.
      *
-     * The mime type is guessed using the functions finfo(), mime_content_type()
-     * and the system binary "file" (in this order), depending on which of those
-     * is available on the current operating system.
+     * The mime type is guessed using a MimeTypeGuesser instance, which uses finfo(),
+     * mime_content_type() and the system binary "file" (in this order), depending on
+     * which of those are available.
      *
      * @return string|null The guessed mime type (i.e. "application/pdf")
+     *
+     * @see MimeTypeGuesser
      *
      * @api
      */
@@ -107,15 +115,7 @@ class File extends \SplFileInfo
      */
     public function move($directory, $name = null)
     {
-        if (!is_dir($directory)) {
-            if (false === @mkdir($directory, 0777, true)) {
-                throw new FileException(sprintf('Unable to create the "%s" directory', $directory));
-            }
-        } elseif (!is_writable($directory)) {
-            throw new FileException(sprintf('Unable to write in the "%s" directory', $directory));
-        }
-
-        $target = $directory.DIRECTORY_SEPARATOR.(null === $name ? $this->getBasename() : basename($name));
+        $target = $this->getTargetFile($directory, $name);
 
         if (!@rename($this->getPathname(), $target)) {
             $error = error_get_last();
@@ -124,6 +124,37 @@ class File extends \SplFileInfo
 
         @chmod($target, 0666 & ~umask());
 
-        return new File($target);
+        return $target;
+    }
+
+    protected function getTargetFile($directory, $name = null)
+    {
+        if (!is_dir($directory)) {
+            if (false === @mkdir($directory, 0777, true)) {
+                throw new FileException(sprintf('Unable to create the "%s" directory', $directory));
+            }
+        } elseif (!is_writable($directory)) {
+            throw new FileException(sprintf('Unable to write in the "%s" directory', $directory));
+        }
+
+        $target = $directory.DIRECTORY_SEPARATOR.(null === $name ? $this->getBasename() : $this->getName($name));
+
+        return new File($target, false);
+    }
+
+    /**
+     * Returns locale independent base name of the given path.
+     *
+     * @param string $name The new file name
+     *
+     * @return string containing
+     */
+    protected function getName($name)
+    {
+        $originalName = str_replace('\\', '/', $name);
+        $pos = strrpos($originalName, '/');
+        $originalName = false === $pos ? $originalName : substr($originalName, $pos + 1);
+
+        return $originalName;
     }
 }

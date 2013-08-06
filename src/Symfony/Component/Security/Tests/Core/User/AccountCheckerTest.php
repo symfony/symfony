@@ -33,7 +33,7 @@ class UserCheckerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Security\Core\Exception\CredentialsExpiredException
+     * @expectedException \Symfony\Component\Security\Core\Exception\CredentialsExpiredException
      */
     public function testCheckPreAuthCredentialsExpired()
     {
@@ -65,7 +65,7 @@ class UserCheckerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Security\Core\Exception\LockedException
+     * @expectedException \Symfony\Component\Security\Core\Exception\LockedException
      */
     public function testCheckPostAuthAccountLocked()
     {
@@ -78,7 +78,7 @@ class UserCheckerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Security\Core\Exception\DisabledException
+     * @expectedException \Symfony\Component\Security\Core\Exception\DisabledException
      */
     public function testCheckPostAuthDisabled()
     {
@@ -92,7 +92,7 @@ class UserCheckerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Security\Core\Exception\AccountExpiredException
+     * @expectedException \Symfony\Component\Security\Core\Exception\AccountExpiredException
      */
     public function testCheckPostAuthAccountExpired()
     {

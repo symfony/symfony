@@ -31,7 +31,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($strategy->isGranted($acl, array(1), array($sid)));
     }
 
-    public function testIsGrantedFallsbackToClassAcesIfNoApplicableObjectAceWasFound()
+    public function testIsGrantedFallsBackToClassAcesIfNoApplicableObjectAceWasFound()
     {
         $strategy = new PermissionGrantingStrategy();
         $acl = $this->getAcl($strategy);
@@ -73,7 +73,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Security\Acl\Exception\NoAceFoundException
+     * @expectedException \Symfony\Component\Security\Acl\Exception\NoAceFoundException
      */
     public function testIsGrantedReturnsExceptionIfNoAceIsFound()
     {

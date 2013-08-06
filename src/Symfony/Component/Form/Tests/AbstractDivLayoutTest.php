@@ -19,7 +19,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
     public function testRow()
     {
         $form = $this->factory->createNamed('name', 'text');
-        $form->addError(new FormError('Error!'));
+        $form->addError(new FormError('[trans]Error![/trans]'));
         $view = $form->createView();
         $html = $this->renderRow($view);
 
@@ -58,7 +58,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
     public function testRepeatedRow()
     {
         $form = $this->factory->createNamed('name', 'repeated');
-        $form->addError(new FormError('Error!'));
+        $form->addError(new FormError('[trans]Error![/trans]'));
         $view = $form->createView();
         $html = $this->renderRow($view);
 
@@ -78,6 +78,22 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         ./label[@for="name_second"]
         /following-sibling::input[@id="name_second"]
     ]
+'
+        );
+    }
+
+    public function testButtonRow()
+    {
+        $form = $this->factory->createNamed('name', 'button');
+        $view = $form->createView();
+        $html = $this->renderRow($view);
+
+        $this->assertMatchesXpath($html,
+'/div
+    [
+        ./button[@type="button"][@name="name"]
+    ]
+    [count(//label)=0]
 '
         );
     }
@@ -127,18 +143,16 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
     {
         $child1 = $this->factory->createNamedBuilder('child1', 'form')
             ->add('field1', 'text')
-            ->add('field2', 'text')
-            ->getForm();
+            ->add('field2', 'text');
 
         $child2 = $this->factory->createNamedBuilder('child2', 'form')
             ->add('field1', 'text')
-            ->add('field2', 'text')
-            ->getForm();
+            ->add('field2', 'text');
 
         $view = $this->factory->createNamedBuilder('parent', 'form')
-            ->getForm()
             ->add($child1)
             ->add($child2)
+            ->getForm()
             ->createView();
 
         // Render child1.field1 row
@@ -364,6 +378,50 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
     public function testForm()
     {
         $form = $this->factory->createNamedBuilder('name', 'form')
+            ->setMethod('PUT')
+            ->setAction('http://example.com')
+            ->add('firstName', 'text')
+            ->add('lastName', 'text')
+            ->getForm();
+
+        // include ampersands everywhere to validate escaping
+        $html = $this->renderForm($form->createView(), array(
+            'id' => 'my&id',
+            'attr' => array('class' => 'my&class'),
+        ));
+
+        $this->assertMatchesXpath($html,
+'/form
+    [
+        ./input[@type="hidden"][@name="_method"][@value="PUT"]
+        /following-sibling::div
+            [
+                ./div
+                    [
+                        ./label[@for="name_firstName"]
+                        /following-sibling::input[@type="text"][@id="name_firstName"]
+                    ]
+                /following-sibling::div
+                    [
+                        ./label[@for="name_lastName"]
+                        /following-sibling::input[@type="text"][@id="name_lastName"]
+                    ]
+                /following-sibling::input[@type="hidden"][@id="name__token"]
+            ]
+            [count(.//input)=3]
+            [@id="my&id"]
+            [@class="my&class"]
+    ]
+    [@method="post"]
+    [@action="http://example.com"]
+    [@class="my&class"]
+'
+        );
+    }
+
+    public function testFormWidget()
+    {
+        $form = $this->factory->createNamedBuilder('name', 'form')
             ->add('firstName', 'text')
             ->add('lastName', 'text')
             ->getForm();
@@ -398,7 +456,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
             )
             ->getForm();
 
-        $form->get('child')->addError(new FormError('Error!'));
+        $form->get('child')->addError(new FormError('[trans]Error![/trans]'));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/div
@@ -465,7 +523,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
     public function testRepeatedWithCustomOptions()
     {
         $form = $this->factory->createNamed('name', 'repeated', null, array(
-            // the global required value cannot be overriden
+            // the global required value cannot be overridden
             'first_options'  => array('label' => 'Test', 'required' => false),
             'second_options' => array('label' => 'Test2')
         ));
@@ -526,6 +584,23 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         );
     }
 
+    public function testLabelIsNotRenderedWhenSetToFalse()
+    {
+        $form = $this->factory->createNamed('name', 'text', null, array(
+            'label' => false
+        ));
+        $html = $this->renderRow($form->createView());
+
+        $this->assertMatchesXpath($html,
+'/div
+    [
+        ./input[@id="name"]
+    ]
+    [count(//label)=0]
+'
+        );
+    }
+
     /**
      * @dataProvider themeBlockInheritanceProvider
      */
@@ -550,13 +625,12 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
     public function testThemeInheritance($parentTheme, $childTheme)
     {
         $child = $this->factory->createNamedBuilder('child', 'form')
-            ->add('field', 'text')
-            ->getForm();
+            ->add('field', 'text');
 
         $view = $this->factory->createNamedBuilder('parent', 'form')
             ->add('field', 'text')
-            ->getForm()
             ->add($child)
+            ->getForm()
             ->createView()
         ;
 
@@ -608,5 +682,51 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
     ]
 '
         );
+    }
+
+    public function testFormEndWithRest()
+    {
+        $view = $this->factory->createNamedBuilder('name', 'form')
+            ->add('field1', 'text')
+            ->add('field2', 'text')
+            ->getForm()
+            ->createView();
+
+        $this->renderWidget($view['field1']);
+
+        // Rest should only contain field2
+        $html = $this->renderEnd($view);
+
+        // Insert the start tag, the end tag should be rendered by the helper
+        $this->assertMatchesXpath('<form>' . $html,
+'/form
+    [
+        ./div
+            [
+                ./label[@for="name_field2"]
+                /following-sibling::input[@type="text"][@id="name_field2"]
+            ]
+        /following-sibling::input
+            [@type="hidden"]
+            [@id="name__token"]
+    ]
+'
+        );
+    }
+
+    public function testFormEndWithoutRest()
+    {
+        $view = $this->factory->createNamedBuilder('name', 'form')
+            ->add('field1', 'text')
+            ->add('field2', 'text')
+            ->getForm()
+            ->createView();
+
+        $this->renderWidget($view['field1']);
+
+        // Rest should only contain field2, but isn't rendered
+        $html = $this->renderEnd($view, array('render_rest' => false));
+
+        $this->assertEquals('</form>', $html);
     }
 }

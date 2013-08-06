@@ -28,7 +28,7 @@ class StreamedResponseTest extends \PHPUnit_Framework_TestCase
     {
         $response = new StreamedResponse(function () { echo 'foo'; });
         $request = Request::create('/');
-        $request->server->set('SERVER_PROTOCOL', '1.1');
+        $request->server->set('SERVER_PROTOCOL', 'HTTP/1.1');
 
         $response->prepare($request);
 
@@ -41,7 +41,7 @@ class StreamedResponseTest extends \PHPUnit_Framework_TestCase
     {
         $response = new StreamedResponse(function () { echo 'foo'; });
         $request = Request::create('/');
-        $request->server->set('SERVER_PROTOCOL', '1.0');
+        $request->server->set('SERVER_PROTOCOL', 'HTTP/1.0');
 
         $response->prepare($request);
 
@@ -76,8 +76,17 @@ class StreamedResponseTest extends \PHPUnit_Framework_TestCase
      */
     public function testSendContentWithNonCallable()
     {
-        $response = new StreamedResponse('foobar');
+        $response = new StreamedResponse(null);
         $response->sendContent();
+    }
+
+    /**
+     * @expectedException \LogicException
+     */
+    public function testSetCallbackNonCallable()
+    {
+        $response = new StreamedResponse(null);
+        $response->setCallback(null);
     }
 
     /**

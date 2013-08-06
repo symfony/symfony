@@ -11,17 +11,37 @@
 
 namespace Symfony\Bundle\WebProfilerBundle\Controller;
 
-use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
 use Symfony\Component\Routing\Matcher\TraceableUrlMatcher;
+use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\HttpKernel\Profiler\Profiler;
 
 /**
  * RouterController.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class RouterController extends ContainerAware
+class RouterController
 {
+    private $profiler;
+    private $twig;
+    private $matcher;
+    private $routes;
+
+    public function __construct(Profiler $profiler = null, \Twig_Environment $twig, UrlMatcherInterface $matcher = null, RouteCollection $routes = null)
+    {
+        $this->profiler = $profiler;
+        $this->twig = $twig;
+        $this->matcher = $matcher;
+        $this->routes = $routes;
+
+        if (null === $this->routes && $this->matcher instanceof RouterInterface) {
+            $this->routes = $matcher->getRouteCollection();
+        }
+    }
+
     /**
      * Renders the profiler panel for the given token.
      *
@@ -31,26 +51,28 @@ class RouterController extends ContainerAware
      */
     public function panelAction($token)
     {
-        $profiler = $this->container->get('profiler');
-        $profiler->disable();
-
-        if (!$this->container->has('router')) {
-            return new Response('The Router is not enabled.');
+        if (null === $this->profiler) {
+            throw new NotFoundHttpException('The profiler must be enabled.');
         }
-        $router = $this->container->get('router');
 
-        $profile = $profiler->loadProfile($token);
+        $this->profiler->disable();
 
-        $context = $router->getContext();
+        if (null === $this->matcher || null === $this->routes) {
+            return new Response('The Router is not enabled.', 200, array('Content-Type' => 'text/html'));
+        }
+
+        $profile = $this->profiler->loadProfile($token);
+
+        $context = $this->matcher->getContext();
         $context->setMethod($profile->getMethod());
-        $matcher = new TraceableUrlMatcher($router->getRouteCollection(), $context);
+        $matcher = new TraceableUrlMatcher($this->routes, $context);
 
         $request = $profile->getCollector('request');
 
-        return $this->container->get('templating')->renderResponse('WebProfilerBundle:Router:panel.html.twig', array(
+        return new Response($this->twig->render('@WebProfiler/Router/panel.html.twig', array(
             'request' => $request,
             'router'  => $profile->getCollector('router'),
             'traces'  => $matcher->getTraces($request->getPathInfo()),
-        ));
+        )), 200, array('Content-Type' => 'text/html'));
     }
 }

@@ -17,25 +17,27 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "symfony/event-dispatcher": "2.1.*",
-        "symfony/locale": "2.1.*",
-        "symfony/options-resolver": "2.1.*"
+        "symfony/event-dispatcher": "~2.1",
+        "symfony/intl": "~2.3",
+        "symfony/options-resolver": "~2.1",
+        "symfony/property-access": "~2.2"
     },
     "require-dev": {
-        "symfony/validator": "2.1.*",
-        "symfony/http-foundation": "2.1.*"
+        "symfony/validator": "~2.2",
+        "symfony/http-foundation": "~2.2"
     },
     "suggest": {
-        "symfony/validator": "self.version",
-        "symfony/http-foundation": "self.version"
+        "symfony/validator": "",
+        "symfony/http-foundation": ""
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\Form": "" }
+        "psr-0": { "Symfony\\Component\\Form\\": "" }
     },
     "target-dir": "Symfony/Component/Form",
+    "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.1-dev"
+            "dev-master": "2.4-dev"
         }
     }
 }

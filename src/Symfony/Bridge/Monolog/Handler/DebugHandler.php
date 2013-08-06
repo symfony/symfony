@@ -47,7 +47,8 @@ class DebugHandler extends TestHandler implements DebugLoggerInterface
     public function countErrors()
     {
         $cnt = 0;
-        foreach (array(Logger::ERROR, Logger::CRITICAL, Logger::ALERT) as $level) {
+        $levels = array(Logger::ERROR, Logger::CRITICAL, Logger::ALERT, Logger::EMERGENCY);
+        foreach ($levels as $level) {
             if (isset($this->recordsByLevel[$level])) {
                 $cnt += count($this->recordsByLevel[$level]);
             }

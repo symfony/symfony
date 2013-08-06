@@ -31,7 +31,7 @@ class LoaderChain implements LoaderInterface
     /**
      * Accepts a list of LoaderInterface instances
      *
-     * @param array $loaders An array of LoaderInterface instances
+     * @param LoaderInterface[] $loaders An array of LoaderInterface instances
      *
      * @throws MappingException If any of the loaders does not implement LoaderInterface
      */

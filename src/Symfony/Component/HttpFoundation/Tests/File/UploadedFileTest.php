@@ -63,6 +63,32 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('application/octet-stream', $file->getClientMimeType());
     }
 
+    public function testGuessClientExtension()
+    {
+        $file = new UploadedFile(
+            __DIR__.'/Fixtures/test.gif',
+            'original.gif',
+            'image/gif',
+            filesize(__DIR__.'/Fixtures/test.gif'),
+            null
+        );
+
+        $this->assertEquals('gif', $file->guessClientExtension());
+    }
+
+    public function testGuessClientExtensionWithIncorrectMimeType()
+    {
+        $file = new UploadedFile(
+            __DIR__.'/Fixtures/test.gif',
+            'original.gif',
+            'image/jpeg',
+            filesize(__DIR__.'/Fixtures/test.gif'),
+            null
+        );
+
+        $this->assertEquals('jpeg', $file->guessClientExtension());
+    }
+
     public function testErrorIsOkByDefault()
     {
         $file = new UploadedFile(
@@ -89,8 +115,21 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('original.gif', $file->getClientOriginalName());
     }
 
+    public function testGetClientOriginalExtension()
+    {
+        $file = new UploadedFile(
+            __DIR__.'/Fixtures/test.gif',
+            'original.gif',
+            'image/gif',
+            filesize(__DIR__.'/Fixtures/test.gif'),
+            null
+        );
+
+        $this->assertEquals('gif', $file->getClientOriginalExtension());
+    }
+
     /**
-     * @expectedException Symfony\Component\HttpFoundation\File\Exception\FileException
+     * @expectedException \Symfony\Component\HttpFoundation\File\Exception\FileException
      */
     public function testMoveLocalFileIsNotAllowed()
     {
@@ -184,7 +223,8 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
             'original.gif',
             null,
             filesize(__DIR__.'/Fixtures/test.gif'),
-            UPLOAD_ERR_OK
+            UPLOAD_ERR_OK,
+            true
         );
 
         $this->assertTrue($file->isValid());
@@ -215,5 +255,18 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
             array(UPLOAD_ERR_NO_TMP_DIR),
             array(UPLOAD_ERR_EXTENSION),
         );
+    }
+
+    public function testIsInvalidIfNotHttpUpload()
+    {
+        $file = new UploadedFile(
+            __DIR__.'/Fixtures/test.gif',
+            'original.gif',
+            null,
+            filesize(__DIR__.'/Fixtures/test.gif'),
+            UPLOAD_ERR_OK
+        );
+
+        $this->assertFalse($file->isValid());
     }
 }

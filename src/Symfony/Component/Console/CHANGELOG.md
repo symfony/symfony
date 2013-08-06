@@ -1,6 +1,30 @@
 CHANGELOG
 =========
 
+2.4.0
+-----
+
+ * [BC BREAK] made descriptors use output instead of returning a string
+
+2.3.0
+-----
+
+ * added multiselect support to the select dialog helper
+ * added Table Helper for tabular data rendering
+ * added support for events in `Application`
+ * added a way to normalize EOLs in `ApplicationTester::getDisplay()` and `CommandTester::getDisplay()`
+ * added a way to set the progress bar progress via the `setCurrent` method
+ * added support for multiple InputOption shortcuts, written as `'-a|-b|-c'`
+ * added two additional verbosity levels, VERBOSITY_VERY_VERBOSE and VERBOSITY_DEBUG
+
+2.2.0
+-----
+
+ * added support for colorization on Windows via ConEmu
+ * add a method to Dialog Helper to ask for a question and hide the response
+ * added support for interactive selections in console (DialogHelper::select())
+ * added support for autocompletion as you type in Dialog Helper
+
 2.1.0
 -----
 

@@ -13,7 +13,6 @@ namespace Symfony\Component\Routing\Tests\Loader;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Routing\Loader\YamlFileLoader;
-use Symfony\Component\Routing\Route;
 use Symfony\Component\Config\Resource\FileResource;
 
 class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
@@ -29,9 +28,6 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    /**
-     * @covers Symfony\Component\Routing\Loader\YamlFileLoader::supports
-     */
     public function testSupports()
     {
         $loader = new YamlFileLoader($this->getMock('Symfony\Component\Config\FileLocator'));
@@ -54,41 +50,47 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \InvalidArgumentException
+     * @dataProvider getPathsToInvalidFiles
      */
-    public function testLoadThrowsExceptionIfNotAnArray()
+    public function testLoadThrowsExceptionWithInvalidFile($filePath)
     {
         $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
-        $loader->load('nonvalid.yml');
+        $loader->load($filePath);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testLoadThrowsExceptionIfArrayHasUnsupportedKeys()
+    public function getPathsToInvalidFiles()
+    {
+        return array(array('nonvalid.yml'), array('nonvalid2.yml'), array('incomplete.yml'), array('nonvalidkeys.yml'), array('nonesense_resource_plus_path.yml'), array('nonesense_type_without_resource.yml'));
+    }
+
+    public function testLoadSpecialRouteName()
     {
         $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
-        $loader->load('nonvalidkeys.yml');
+        $routeCollection = $loader->load('special_route_name.yml');
+        $route = $routeCollection->get('#$péß^a|');
+
+        $this->assertInstanceOf('Symfony\Component\Routing\Route', $route);
+        $this->assertSame('/true', $route->getPath());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testLoadThrowsExceptionWhenIncomplete()
-    {
-        $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
-        $loader->load('incomplete.yml');
-    }
-
-    public function testLoadWithPattern()
+    public function testLoadWithRoute()
     {
         $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
         $routeCollection = $loader->load('validpattern.yml');
         $routes = $routeCollection->all();
 
-        $this->assertEquals(1, count($routes), 'One route is loaded');
+        $this->assertCount(2, $routes, 'Two routes are loaded');
         $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
-        $route = $routes['blog_show'];
-        $this->assertEquals('RouteCompiler', $route->getOption('compiler_class'));
+
+        foreach ($routes as $route) {
+            $this->assertSame('/blog/{slug}', $route->getPath());
+            $this->assertSame('{locale}.example.com', $route->getHost());
+            $this->assertSame('MyBundle:Blog:show', $route->getDefault('_controller'));
+            $this->assertSame('\w+', $route->getRequirement('locale'));
+            $this->assertSame('RouteCompiler', $route->getOption('compiler_class'));
+            $this->assertEquals(array('GET', 'POST', 'PUT', 'OPTIONS'), $route->getMethods());
+            $this->assertEquals(array('https'), $route->getSchemes());
+        }
     }
 
     public function testLoadWithResource()
@@ -97,19 +99,15 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $routeCollection = $loader->load('validresource.yml');
         $routes = $routeCollection->all();
 
-        $this->assertEquals(1, count($routes), 'One route is loaded');
+        $this->assertCount(2, $routes, 'Two routes are loaded');
         $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
-        $this->assertEquals('foo', $routes['blog_show']->getDefault('foo'));
-        $this->assertEquals('\d+', $routes['blog_show']->getRequirement('foo'));
-        $this->assertEquals('bar', $routes['blog_show']->getOption('foo'));
-    }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testParseRouteThrowsExceptionWithMissingPattern()
-    {
-        $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
-        $loader->load('incomplete.yml');
+        foreach ($routes as $route) {
+            $this->assertSame('/{foo}/blog/{slug}', $route->getPath());
+            $this->assertSame('123', $route->getDefault('foo'));
+            $this->assertSame('\d+', $route->getRequirement('foo'));
+            $this->assertSame('bar', $route->getOption('foo'));
+            $this->assertSame('', $route->getHost());
+        }
     }
 }

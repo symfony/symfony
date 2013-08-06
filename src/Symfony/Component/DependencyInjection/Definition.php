@@ -36,6 +36,8 @@ class Definition
     private $public;
     private $synthetic;
     private $abstract;
+    private $synchronized;
+    private $lazy;
 
     protected $arguments;
 
@@ -56,6 +58,8 @@ class Definition
         $this->tags = array();
         $this->public = true;
         $this->synthetic = false;
+        $this->synchronized = false;
+        $this->lazy = false;
         $this->abstract = false;
         $this->properties = array();
     }
@@ -241,6 +245,8 @@ class Definition
      *
      * @return Definition The current instance
      *
+     * @throws OutOfBoundsException When the replaced argument does not exist
+     *
      * @api
      */
     public function replaceArgument($index, $argument)
@@ -272,6 +278,8 @@ class Definition
      * @param integer $index
      *
      * @return mixed The argument value
+     *
+     * @throws OutOfBoundsException When the argument does not exist
      *
      * @api
      */
@@ -369,7 +377,7 @@ class Definition
     /**
      * Gets the methods to call after service initialization.
      *
-     * @return  array An array of method calls
+     * @return array An array of method calls
      *
      * @api
      */
@@ -566,6 +574,58 @@ class Definition
     }
 
     /**
+     * Sets the synchronized flag of this service.
+     *
+     * @param Boolean $boolean
+     *
+     * @return Definition The current instance
+     *
+     * @api
+     */
+    public function setSynchronized($boolean)
+    {
+        $this->synchronized = (Boolean) $boolean;
+
+        return $this;
+    }
+
+    /**
+     * Whether this service is synchronized.
+     *
+     * @return Boolean
+     *
+     * @api
+     */
+    public function isSynchronized()
+    {
+        return $this->synchronized;
+    }
+
+    /**
+     * Sets the lazy flag of this service.
+     *
+     * @param Boolean $lazy
+     *
+     * @return Definition The current instance
+     */
+    public function setLazy($lazy)
+    {
+        $this->lazy = (Boolean) $lazy;
+
+        return $this;
+    }
+
+    /**
+     * Whether this service is lazy.
+     *
+     * @return Boolean
+     */
+    public function isLazy()
+    {
+        return $this->lazy;
+    }
+
+    /**
      * Sets whether this definition is synthetic, that is not constructed by the
      * container, but dynamically injected.
      *
@@ -628,7 +688,7 @@ class Definition
     /**
      * Sets a configurator to call after the service is fully initialized.
      *
-     * @param mixed $callable A PHP callable
+     * @param callable $callable A PHP callable
      *
      * @return Definition The current instance
      *
@@ -644,7 +704,7 @@ class Definition
     /**
      * Gets the configurator to call after the service is fully initialized.
      *
-     * @return mixed The PHP callable to call
+     * @return callable The PHP callable to call
      *
      * @api
      */

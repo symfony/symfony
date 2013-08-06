@@ -14,7 +14,7 @@ namespace Symfony\Bundle\TwigBundle\Debug;
 use Symfony\Bundle\TwigBundle\TwigEngine;
 use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
 use Symfony\Component\Templating\TemplateNameParserInterface;
-use Symfony\Component\HttpKernel\Debug\Stopwatch;
+use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\Config\FileLocatorInterface;
 
 /**

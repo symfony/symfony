@@ -48,7 +48,9 @@ class PdoSessionHandler implements \SessionHandlerInterface
         if (!array_key_exists('db_table', $dbOptions)) {
             throw new \InvalidArgumentException('You must provide the "db_table" option for a PdoSessionStorage.');
         }
-
+        if (\PDO::ERRMODE_EXCEPTION !== $pdo->getAttribute(\PDO::ATTR_ERRMODE)) {
+            throw new \InvalidArgumentException(sprintf('"%s" requires PDO error mode attribute be set to throw Exceptions (i.e. $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION))', __CLASS__));
+        }
         $this->pdo = $pdo;
         $this->dbOptions = array_merge(array(
             'db_id_col'   => 'sess_id',
@@ -168,7 +170,9 @@ class PdoSessionHandler implements \SessionHandlerInterface
         $encoded = base64_encode($data);
 
         try {
-            if ('mysql' === $this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME)) {
+            $driver = $this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME);
+
+            if ('mysql' === $driver) {
                 // MySQL would report $stmt->rowCount() = 0 on UPDATE when the data is left unchanged
                 // it could result in calling createNewSession() whereas the session already exists in
                 // the DB which would fail as the id is unique
@@ -179,6 +183,14 @@ class PdoSessionHandler implements \SessionHandlerInterface
                 $stmt->bindParam(':id', $id, \PDO::PARAM_STR);
                 $stmt->bindParam(':data', $encoded, \PDO::PARAM_STR);
                 $stmt->bindValue(':time', time(), \PDO::PARAM_INT);
+                $stmt->execute();
+            } elseif ('oci' === $driver) {
+                $stmt = $this->pdo->prepare("MERGE INTO $dbTable USING DUAL ON($dbIdCol = :id) ".
+                       "WHEN NOT MATCHED THEN INSERT ($dbIdCol, $dbDataCol, $dbTimeCol) VALUES (:id, :data, sysdate) " .
+                       "WHEN MATCHED THEN UPDATE SET $dbDataCol = :data WHERE $dbIdCol = :id");
+
+                $stmt->bindParam(':id', $id, \PDO::PARAM_STR);
+                $stmt->bindParam(':data', $encoded, \PDO::PARAM_STR);
                 $stmt->execute();
             } else {
                 $stmt = $this->pdo->prepare("UPDATE $dbTable SET $dbDataCol = :data, $dbTimeCol = :time WHERE $dbIdCol = :id");
@@ -227,5 +239,15 @@ class PdoSessionHandler implements \SessionHandlerInterface
         $stmt->execute();
 
         return true;
+    }
+
+    /**
+     * Return a PDO instance
+     *
+     * @return \PDO
+     */
+    protected function getConnection()
+    {
+        return $this->pdo;
     }
 }

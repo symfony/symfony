@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Config;
 
+use Symfony\Component\Config\Resource\ResourceInterface;
+use Symfony\Component\Filesystem\Filesystem;
+
 /**
  * ConfigCache manages PHP cache files.
  *
@@ -64,7 +67,7 @@ class ConfigCache
             return true;
         }
 
-        $metadata = $this->file.'.meta';
+        $metadata = $this->getMetaFile();
         if (!is_file($metadata)) {
             return false;
         }
@@ -83,35 +86,30 @@ class ConfigCache
     /**
      * Writes cache.
      *
-     * @param string $content  The content to write in the cache
-     * @param array  $metadata An array of ResourceInterface instances
+     * @param string              $content  The content to write in the cache
+     * @param ResourceInterface[] $metadata An array of ResourceInterface instances
      *
      * @throws \RuntimeException When cache file can't be wrote
      */
     public function write($content, array $metadata = null)
     {
-        $dir = dirname($this->file);
-        if (!is_dir($dir)) {
-            if (false === @mkdir($dir, 0777, true)) {
-                throw new \RuntimeException(sprintf('Unable to create the %s directory', $dir));
-            }
-        } elseif (!is_writable($dir)) {
-            throw new \RuntimeException(sprintf('Unable to write in the %s directory', $dir));
-        }
-
-        $tmpFile = tempnam(dirname($this->file), basename($this->file));
-        if (false !== @file_put_contents($tmpFile, $content) && @rename($tmpFile, $this->file)) {
-            @chmod($this->file, 0666 & ~umask());
-        } else {
-            throw new \RuntimeException(sprintf('Failed to write cache file "%s".', $this->file));
-        }
+        $mode = 0666 & ~umask();
+        $filesystem = new Filesystem();
+        $filesystem->dumpFile($this->file, $content, $mode);
 
         if (null !== $metadata && true === $this->debug) {
-            $file = $this->file.'.meta';
-            $tmpFile = tempnam(dirname($file), basename($file));
-            if (false !== @file_put_contents($tmpFile, serialize($metadata)) && @rename($tmpFile, $file)) {
-                @chmod($file, 0666 & ~umask());
-            }
+            $filesystem->dumpFile($this->getMetaFile(), serialize($metadata), $mode);
         }
     }
+
+    /**
+     * Gets the meta file path.
+     *
+     * @return string The meta file path
+     */
+    private function getMetaFile()
+    {
+        return $this->file.'.meta';
+    }
+
 }

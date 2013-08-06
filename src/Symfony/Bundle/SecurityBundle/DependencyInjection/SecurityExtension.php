@@ -13,6 +13,7 @@ namespace Symfony\Bundle\SecurityBundle\DependencyInjection;
 
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\UserProviderFactoryInterface;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
@@ -182,8 +183,8 @@ class SecurityExtension extends Extension
                 $container,
                 $access['path'],
                 $access['host'],
-                count($access['methods']) === 0 ? null : $access['methods'],
-                $access['ip']
+                $access['methods'],
+                $access['ips']
             );
 
             $container->getDefinition('security.access_map')
@@ -239,7 +240,6 @@ class SecurityExtension extends Extension
     private function createFirewall(ContainerBuilder $container, $id, $firewall, &$authenticationProviders, $providerIds)
     {
         // Matcher
-        $i = 0;
         $matcher = null;
         if (isset($firewall['request_matcher'])) {
             $matcher = new Reference($firewall['request_matcher']);
@@ -449,16 +449,35 @@ class SecurityExtension extends Extension
             );
         }
 
-        // message digest encoder
-        $arguments = array(
-            $config['algorithm'],
-            $config['encode_as_base64'],
-            $config['iterations'],
-        );
+        // pbkdf2 encoder
+        if ('pbkdf2' === $config['algorithm']) {
+            return array(
+                'class'     => new Parameter('security.encoder.pbkdf2.class'),
+                'arguments' => array(
+                    $config['hash_algorithm'],
+                    $config['encode_as_base64'],
+                    $config['iterations'],
+                    $config['key_length'],
+                ),
+            );
+        }
 
+        // bcrypt encoder
+        if ('bcrypt' === $config['algorithm']) {
+            return array(
+                'class'     => new Parameter('security.encoder.bcrypt.class'),
+                'arguments' => array($config['cost']),
+            );
+        }
+
+        // message digest encoder
         return array(
-            'class' => new Parameter('security.encoder.digest.class'),
-            'arguments' => $arguments,
+            'class'     => new Parameter('security.encoder.digest.class'),
+            'arguments' => array(
+                $config['algorithm'],
+                $config['encode_as_base64'],
+                $config['iterations'],
+            ),
         );
     }
 
@@ -574,13 +593,17 @@ class SecurityExtension extends Extension
         return $switchUserListenerId;
     }
 
-    private function createRequestMatcher($container, $path = null, $host = null, $methods = null, $ip = null, array $attributes = array())
+    private function createRequestMatcher($container, $path = null, $host = null, $methods = array(), $ip = null, array $attributes = array())
     {
         $serialized = serialize(array($path, $host, $methods, $ip, $attributes));
         $id = 'security.request_matcher.'.md5($serialized).sha1($serialized);
 
         if (isset($this->requestMatchers[$id])) {
             return $this->requestMatchers[$id];
+        }
+
+        if ($methods) {
+            $methods = array_map('strtoupper', (array) $methods);
         }
 
         // only add arguments that are necessary

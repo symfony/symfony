@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection;
 
+use Symfony\Component\DependencyInjection\Exception\InactiveScopeException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
@@ -61,8 +62,14 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  */
 class Container implements IntrospectableContainerInterface
 {
+    /**
+     * @var ParameterBagInterface
+     */
     protected $parameterBag;
+
     protected $services;
+    protected $methodMap;
+    protected $aliases;
     protected $scopes;
     protected $scopeChildren;
     protected $scopedServices;
@@ -81,6 +88,7 @@ class Container implements IntrospectableContainerInterface
         $this->parameterBag = null === $parameterBag ? new ParameterBag() : $parameterBag;
 
         $this->services       = array();
+        $this->aliases        = array();
         $this->scopes         = array();
         $this->scopeChildren  = array();
         $this->scopedServices = array();
@@ -176,29 +184,47 @@ class Container implements IntrospectableContainerInterface
     /**
      * Sets a service.
      *
+     * Setting a service to null resets the service: has() returns false and get()
+     * behaves in the same way as if the service was never created.
+     *
      * @param string $id      The service identifier
      * @param object $service The service instance
      * @param string $scope   The scope of the service
+     *
+     * @throws RuntimeException When trying to set a service in an inactive scope
+     * @throws InvalidArgumentException When trying to set a service in the prototype scope
      *
      * @api
      */
     public function set($id, $service, $scope = self::SCOPE_CONTAINER)
     {
         if (self::SCOPE_PROTOTYPE === $scope) {
-            throw new InvalidArgumentException('You cannot set services of scope "prototype".');
+            throw new InvalidArgumentException(sprintf('You cannot set service "%s" of scope "prototype".', $id));
         }
 
         $id = strtolower($id);
 
         if (self::SCOPE_CONTAINER !== $scope) {
             if (!isset($this->scopedServices[$scope])) {
-                throw new RuntimeException('You cannot set services of inactive scopes.');
+                throw new RuntimeException(sprintf('You cannot set service "%s" of inactive scope.', $id));
             }
 
             $this->scopedServices[$scope][$id] = $service;
         }
 
         $this->services[$id] = $service;
+
+        if (method_exists($this, $method = 'synchronize'.strtr($id, array('_' => '', '.' => '_')).'Service')) {
+            $this->$method();
+        }
+
+        if (self::SCOPE_CONTAINER !== $scope && null === $service) {
+            unset($this->scopedServices[$scope][$id]);
+        }
+
+        if (null === $service) {
+            unset($this->services[$id]);
+        }
     }
 
     /**
@@ -214,7 +240,10 @@ class Container implements IntrospectableContainerInterface
     {
         $id = strtolower($id);
 
-        return isset($this->services[$id]) || method_exists($this, 'get'.strtr($id, array('_' => '', '.' => '_')).'Service');
+        return array_key_exists($id, $this->services)
+            || array_key_exists($id, $this->aliases)
+            || method_exists($this, 'get'.strtr($id, array('_' => '', '.' => '_')).'Service')
+        ;
     }
 
     /**
@@ -229,6 +258,8 @@ class Container implements IntrospectableContainerInterface
      * @return object The associated service
      *
      * @throws InvalidArgumentException if the service is not defined
+     * @throws ServiceCircularReferenceException When a circular reference is detected
+     * @throws ServiceNotFoundException When the service is not defined
      *
      * @see Reference
      *
@@ -238,7 +269,13 @@ class Container implements IntrospectableContainerInterface
     {
         $id = strtolower($id);
 
-        if (isset($this->services[$id])) {
+        // resolve aliases
+        if (isset($this->aliases[$id])) {
+            $id = $this->aliases[$id];
+        }
+
+        // re-use shared service instance if it exists
+        if (array_key_exists($id, $this->services)) {
             return $this->services[$id];
         }
 
@@ -246,24 +283,51 @@ class Container implements IntrospectableContainerInterface
             throw new ServiceCircularReferenceException($id, array_keys($this->loading));
         }
 
-        if (method_exists($this, $method = 'get'.strtr($id, array('_' => '', '.' => '_')).'Service')) {
-            $this->loading[$id] = true;
+        if (isset($this->methodMap[$id])) {
+            $method = $this->methodMap[$id];
+        } elseif (method_exists($this, $method = 'get'.strtr($id, array('_' => '', '.' => '_')).'Service')) {
+            // $method is set to the right value, proceed
+        } else {
+            if (self::EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior) {
+                if (!$id) {
+                    throw new ServiceNotFoundException($id);
+                }
 
-            try {
-                $service = $this->$method();
-            } catch (\Exception $e) {
-                unset($this->loading[$id]);
-                throw $e;
+                $alternatives = array();
+                foreach (array_keys($this->services) as $key) {
+                    $lev = levenshtein($id, $key);
+                    if ($lev <= strlen($id) / 3 || false !== strpos($key, $id)) {
+                        $alternatives[] = $key;
+                    }
+                }
+
+                throw new ServiceNotFoundException($id, null, null, $alternatives);
             }
 
+            return null;
+        }
+
+        $this->loading[$id] = true;
+
+        try {
+            $service = $this->$method();
+        } catch (\Exception $e) {
             unset($this->loading[$id]);
 
-            return $service;
+            if (array_key_exists($id, $this->services)) {
+                unset($this->services[$id]);
+            }
+
+            if ($e instanceof InactiveScopeException && self::EXCEPTION_ON_INVALID_REFERENCE !== $invalidBehavior) {
+                return null;
+            }
+
+            throw $e;
         }
 
-        if (self::EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior) {
-            throw new ServiceNotFoundException($id);
-        }
+        unset($this->loading[$id]);
+
+        return $service;
     }
 
     /**
@@ -275,7 +339,7 @@ class Container implements IntrospectableContainerInterface
      */
     public function initialized($id)
     {
-        return isset($this->services[strtolower($id)]);
+        return array_key_exists(strtolower($id), $this->services);
     }
 
     /**
@@ -301,6 +365,9 @@ class Container implements IntrospectableContainerInterface
      *
      * @param string $name
      *
+     * @throws RuntimeException         When the parent scope is inactive
+     * @throws InvalidArgumentException When the scope does not exist
+     *
      * @api
      */
     public function enterScope($name)
@@ -321,8 +388,10 @@ class Container implements IntrospectableContainerInterface
             unset($this->scopedServices[$name]);
 
             foreach ($this->scopeChildren[$name] as $child) {
-                $services[$child] = $this->scopedServices[$child];
-                unset($this->scopedServices[$child]);
+                if (isset($this->scopedServices[$child])) {
+                    $services[$child] = $this->scopedServices[$child];
+                    unset($this->scopedServices[$child]);
+                }
             }
 
             // update global map
@@ -374,8 +443,11 @@ class Container implements IntrospectableContainerInterface
             $services = $this->scopeStacks[$name]->pop();
             $this->scopedServices += $services;
 
-            array_unshift($services, $this->services);
-            $this->services = call_user_func_array('array_merge', $services);
+            foreach ($services as $array) {
+                foreach ($array as $id => $service) {
+                    $this->set($id, $service, $name);
+                }
+            }
         }
     }
 
@@ -383,6 +455,8 @@ class Container implements IntrospectableContainerInterface
      * Adds a scope to the container.
      *
      * @param ScopeInterface $scope
+     *
+     * @throws InvalidArgumentException
      *
      * @api
      */
@@ -450,7 +524,7 @@ class Container implements IntrospectableContainerInterface
      */
     public static function camelize($id)
     {
-        return preg_replace_callback('/(^|_|\.)+(.)/', function ($match) { return ('.' === $match[1] ? '_' : '').strtoupper($match[2]); }, $id);
+        return strtr(ucwords(strtr($id, array('_' => ' ', '.' => '_ '))), array(' ' => ''));
     }
 
     /**

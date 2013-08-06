@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Validator;
 
-use Symfony\Component\Validator\Exception\ValidatorException;
-
 /**
  * Base class for constraint validators
  *
@@ -23,89 +21,15 @@ use Symfony\Component\Validator\Exception\ValidatorException;
 abstract class ConstraintValidator implements ConstraintValidatorInterface
 {
     /**
-     * @var ExecutionContext
+     * @var ExecutionContextInterface
      */
     protected $context;
 
     /**
-     * @var string
-     *
-     * @deprecated
-     */
-    private $messageTemplate;
-
-    /**
-     * @var array
-     *
-     * @deprecated
-     */
-    private $messageParameters;
-
-    /**
      * {@inheritDoc}
      */
-    public function initialize(ExecutionContext $context)
+    public function initialize(ExecutionContextInterface $context)
     {
         $this->context = $context;
-        $this->messageTemplate = '';
-        $this->messageParameters = array();
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3.
-     */
-    public function getMessageTemplate()
-    {
-        return $this->messageTemplate;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3.
-     */
-    public function getMessageParameters()
-    {
-        return $this->messageParameters;
-    }
-
-    /**
-     * Wrapper for $this->context->addViolation()
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3.
-     */
-    protected function setMessage($template, array $parameters = array())
-    {
-        $this->messageTemplate = $template;
-        $this->messageParameters = $parameters;
-
-        if (!$this->context instanceof ExecutionContext) {
-            throw new ValidatorException('ConstraintValidator::initialize() must be called before setting violation messages');
-        }
-
-        $this->context->addViolation($template, $parameters);
-    }
-
-    /**
-     * Stub implementation delegating to the deprecated isValid method.
-     *
-     * This stub exists for BC and will be dropped in Symfony 2.3.
-     *
-     * @see ConstraintValidatorInterface::validate
-     */
-    public function validate($value, Constraint $constraint)
-    {
-        return $this->isValid($value, $constraint);
-    }
-
-    /**
-     * BC variant of validate.
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3.
-     */
-    protected function isValid($value, Constraint $constraint)
-    {
     }
 }

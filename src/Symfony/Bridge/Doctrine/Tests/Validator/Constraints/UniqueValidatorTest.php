@@ -12,7 +12,10 @@
 namespace Symfony\Bridge\Doctrine\Tests\Validator\Constraints;
 
 use Symfony\Bridge\Doctrine\Tests\DoctrineOrmTestCase;
+use Symfony\Component\Validator\DefaultTranslator;
+use Symfony\Component\Validator\Tests\Fixtures\FakeMetadataFactory;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIdentEntity;
+use Symfony\Bridge\Doctrine\Tests\Fixtures\DoubleIdentEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeIdentEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\AssociationEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -75,6 +78,7 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
         ;
         $refl = $this->getMockBuilder('Doctrine\Common\Reflection\StaticReflectionProperty')
             ->disableOriginalConstructor()
+            ->setMethods(array('getValue'))
             ->getMock()
         ;
         $refl
@@ -91,17 +95,6 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
         return $em;
     }
 
-    protected function createMetadataFactoryMock($metadata)
-    {
-        $metadataFactory = $this->getMock('Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface');
-        $metadataFactory->expects($this->any())
-                        ->method('getClassMetadata')
-                        ->with($this->equalTo($metadata->name))
-                        ->will($this->returnValue($metadata));
-
-        return $metadataFactory;
-    }
-
     protected function createValidatorFactory($uniqueValidator)
     {
         $validatorFactory = $this->getMock('Symfony\Component\Validator\ConstraintValidatorFactoryInterface');
@@ -113,7 +106,7 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
         return $validatorFactory;
     }
 
-    public function createValidator($entityManagerName, $em, $validateClass = null, $uniqueFields = null, $errorPath = null, $repositoryMethod = 'findBy')
+    public function createValidator($entityManagerName, $em, $validateClass = null, $uniqueFields = null, $errorPath = null, $repositoryMethod = 'findBy', $ignoreNull = true)
     {
         if (!$validateClass) {
             $validateClass = 'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIdentEntity';
@@ -131,14 +124,16 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
             'fields' => $uniqueFields,
             'em' => $entityManagerName,
             'errorPath' => $errorPath,
-            'repositoryMethod' => $repositoryMethod
+            'repositoryMethod' => $repositoryMethod,
+            'ignoreNull' => $ignoreNull
         ));
         $metadata->addConstraint($constraint);
 
-        $metadataFactory = $this->createMetadataFactoryMock($metadata);
+        $metadataFactory = new FakeMetadataFactory();
+        $metadataFactory->addMetadata($metadata);
         $validatorFactory = $this->createValidatorFactory($uniqueValidator);
 
-        return new Validator($metadataFactory, $validatorFactory);
+        return new Validator($metadataFactory, $validatorFactory, new DefaultTranslator());
     }
 
     private function createSchema($em)
@@ -146,6 +141,7 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
         $schemaTool = new SchemaTool($em);
         $schemaTool->createSchema(array(
             $em->getClassMetadata('Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIdentEntity'),
+            $em->getClassMetadata('Symfony\Bridge\Doctrine\Tests\Fixtures\DoubleIdentEntity'),
             $em->getClassMetadata('Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeIdentEntity'),
             $em->getClassMetadata('Symfony\Bridge\Doctrine\Tests\Fixtures\AssociationEntity'),
         ));
@@ -174,7 +170,7 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
         $entity2 = new SingleIdentEntity(2, 'Foo');
 
         $violationsList = $validator->validate($entity2);
-        $this->assertEquals(1, $violationsList->count(), "No violations found on entity after it was saved to the database.");
+        $this->assertEquals(1, $violationsList->count(), "Violation found on entity with conflicting entity existing in the database.");
 
         $violation = $violationsList[0];
         $this->assertEquals('This value is already used.', $violation->getMessage());
@@ -197,7 +193,7 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
         $entity2 = new SingleIdentEntity(2, 'Foo');
 
         $violationsList = $validator->validate($entity2);
-        $this->assertEquals(1, $violationsList->count(), "No violations found on entity after it was saved to the database.");
+        $this->assertEquals(1, $violationsList->count(), "Violation found on entity with conflicting entity existing in the database.");
 
         $violation = $violationsList[0];
         $this->assertEquals('This value is already used.', $violation->getMessage());
@@ -221,6 +217,35 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
 
         $violationsList = $validator->validate($entity1);
         $this->assertEquals(0, $violationsList->count(), "No violations found on entity having a null value.");
+    }
+
+    public function testValidateUniquenessWithIgnoreNull()
+    {
+        $entityManagerName = "foo";
+        $validateClass = 'Symfony\Bridge\Doctrine\Tests\Fixtures\DoubleIdentEntity';
+        $em = $this->createTestEntityManager();
+        $this->createSchema($em);
+        $validator = $this->createValidator($entityManagerName, $em, $validateClass, array('name', 'name2'), 'bar', 'findby', false);
+
+        $entity1 = new DoubleIdentEntity(1, 'Foo', null);
+        $violationsList = $validator->validate($entity1);
+        $this->assertEquals(0, $violationsList->count(), "No violations found on entity before it is saved to the database.");
+
+        $em->persist($entity1);
+        $em->flush();
+
+        $violationsList = $validator->validate($entity1);
+        $this->assertEquals(0, $violationsList->count(), "No violations found on entity after it was saved to the database.");
+
+        $entity2 = new DoubleIdentEntity(2, 'Foo', null);
+
+        $violationsList = $validator->validate($entity2);
+        $this->assertEquals(1, $violationsList->count(), "Violation found on entity with conflicting entity existing in the database.");
+
+        $violation = $violationsList[0];
+        $this->assertEquals('This value is already used.', $violation->getMessage());
+        $this->assertEquals('bar', $violation->getPropertyPath());
+        $this->assertEquals('Foo', $violation->getInvalidValue());
     }
 
     public function testValidateUniquenessAfterConsideringMultipleQueryResults()
@@ -259,6 +284,32 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
 
         $violationsList = $validator->validate($entity1);
         $this->assertEquals(0, $violationsList->count(), 'Violation is using custom repository method.');
+    }
+
+    public function testValidateUniquenessWithUnrewoundArray()
+    {
+        $entity = new SingleIdentEntity(1, 'foo');
+
+        $entityManagerName = 'foo';
+        $repository = $this->createRepositoryMock();
+        $repository->expects($this->once())
+            ->method('findByCustom')
+            ->will(
+                $this->returnCallback(function() use ($entity) {
+                    $returnValue = array(
+                        $entity,
+                    );
+                    next($returnValue);
+
+                    return $returnValue;
+                })
+            )
+        ;
+        $em = $this->createEntityManagerMock($repository);
+        $validator = $this->createValidator($entityManagerName, $em, null, array(), null, 'findByCustom');
+
+        $violationsList = $validator->validate($entity);
+        $this->assertCount(0, $violationsList, 'Violation is using unrewound array as return value in the repository method.');
     }
 
     /**

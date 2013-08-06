@@ -164,13 +164,9 @@ class ClassLoader
      */
     public function findFile($class)
     {
-        if ('\\' == $class[0]) {
-            $class = substr($class, 1);
-        }
-
         if (false !== $pos = strrpos($class, '\\')) {
             // namespaced class name
-            $classPath = str_replace('\\', DIRECTORY_SEPARATOR, substr($class, 0, $pos)) . DIRECTORY_SEPARATOR;
+            $classPath = str_replace('\\', DIRECTORY_SEPARATOR, substr($class, 0, $pos)).DIRECTORY_SEPARATOR;
             $className = substr($class, $pos + 1);
         } else {
             // PEAR-like class name
@@ -178,21 +174,21 @@ class ClassLoader
             $className = $class;
         }
 
-        $classPath .= str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
+        $classPath .= str_replace('_', DIRECTORY_SEPARATOR, $className).'.php';
 
         foreach ($this->prefixes as $prefix => $dirs) {
             if (0 === strpos($class, $prefix)) {
                 foreach ($dirs as $dir) {
-                    if (file_exists($dir . DIRECTORY_SEPARATOR . $classPath)) {
-                        return $dir . DIRECTORY_SEPARATOR . $classPath;
+                    if (file_exists($dir.DIRECTORY_SEPARATOR.$classPath)) {
+                        return $dir.DIRECTORY_SEPARATOR.$classPath;
                     }
                 }
             }
         }
 
         foreach ($this->fallbackDirs as $dir) {
-            if (file_exists($dir . DIRECTORY_SEPARATOR . $classPath)) {
-                return $dir . DIRECTORY_SEPARATOR . $classPath;
+            if (file_exists($dir.DIRECTORY_SEPARATOR.$classPath)) {
+                return $dir.DIRECTORY_SEPARATOR.$classPath;
             }
         }
 

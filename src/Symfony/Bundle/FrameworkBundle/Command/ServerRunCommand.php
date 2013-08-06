@@ -25,7 +25,7 @@ use Symfony\Component\Process\ProcessBuilder;
 class ServerRunCommand extends ContainerAwareCommand
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function isEnabled()
     {
@@ -37,7 +37,7 @@ class ServerRunCommand extends ContainerAwareCommand
     }
 
     /**
-     * @see Command
+     * {@inheritdoc}
      */
     protected function configure()
     {
@@ -74,14 +74,20 @@ EOF
     }
 
     /**
-     * @see Command
+     * {@inheritdoc}
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $env = $this->getContainer()->getParameter('kernel.environment');
+
+        if ('prod' === $env) {
+            $output->writeln('<error>Running PHP built-in server in production environment is NOT recommended!</error>');
+        }
+
         $router = $input->getOption('router') ?: $this
             ->getContainer()
             ->get('kernel')
-            ->locateResource('@FrameworkBundle/Resources/config/router.php')
+            ->locateResource(sprintf('@FrameworkBundle/Resources/config/router_%s.php', $env))
         ;
 
         $output->writeln(sprintf("Server running on <info>%s</info>\n", $input->getArgument('address')));
@@ -90,7 +96,7 @@ EOF
         $builder->setWorkingDirectory($input->getOption('docroot'));
         $builder->setTimeout(null);
         $builder->getProcess()->run(function ($type, $buffer) use ($output) {
-            if (OutputInterface::VERBOSITY_VERBOSE === $output->getVerbosity()) {
+            if (OutputInterface::VERBOSITY_VERBOSE <= $output->getVerbosity()) {
                 $output->write($buffer);
             }
         });

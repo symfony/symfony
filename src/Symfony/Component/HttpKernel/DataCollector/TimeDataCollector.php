@@ -35,8 +35,14 @@ class TimeDataCollector extends DataCollector
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
+        if (null !== $this->kernel) {
+            $startTime = $this->kernel->getStartTime();
+        } else {
+            $startTime = $request->server->get('REQUEST_TIME_FLOAT', $request->server->get('REQUEST_TIME'));
+        }
+
         $this->data = array(
-            'start_time' => (null !== $this->kernel ? $this->kernel->getStartTime() : $_SERVER['REQUEST_TIME']) * 1000,
+            'start_time' => $startTime * 1000,
             'events'     => array(),
         );
     }
@@ -70,11 +76,15 @@ class TimeDataCollector extends DataCollector
      *
      * @return float The elapsed time
      */
-    public function getTotalTime()
+    public function getDuration()
     {
+        if (!isset($this->data['events']['__section__'])) {
+            return 0;
+        }
+
         $lastEvent = $this->data['events']['__section__'];
 
-        return $lastEvent->getOrigin() + $lastEvent->getTotalTime() - $this->getStartTime();
+        return $lastEvent->getOrigin() + $lastEvent->getDuration() - $this->getStartTime();
     }
 
     /**
@@ -86,6 +96,10 @@ class TimeDataCollector extends DataCollector
      */
     public function getInitTime()
     {
+        if (!isset($this->data['events']['__section__'])) {
+            return 0;
+        }
+
         return $this->data['events']['__section__']->getOrigin() - $this->getStartTime();
     }
 

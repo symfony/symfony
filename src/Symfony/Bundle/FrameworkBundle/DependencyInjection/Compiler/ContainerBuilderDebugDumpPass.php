@@ -14,7 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\XmlDumper;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\Config\ConfigCache;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * Dumps the ContainerBuilder to a cache file so that it can be used by
@@ -28,7 +28,11 @@ class ContainerBuilderDebugDumpPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         $dumper = new XmlDumper($container);
-        $cache = new ConfigCache($container->getParameter('debug.container.dump'), false);
-        $cache->write($dumper->dump());
+        $filesystem = new Filesystem();
+        $filesystem->dumpFile(
+            $container->getParameter('debug.container.dump'),
+            $dumper->dump(),
+            0666 & ~umask()
+        );
     }
 }

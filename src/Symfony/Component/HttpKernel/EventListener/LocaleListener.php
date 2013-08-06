@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel\EventListener;
 
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RequestContextAwareInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -32,11 +33,11 @@ class LocaleListener implements EventSubscriberInterface
         $this->router = $router;
     }
 
-    public function onKernelRequest(GetResponseEvent $event)
+    public function setRequest(Request $request = null)
     {
-        $request = $event->getRequest();
-
-        $request->setDefaultLocale($this->defaultLocale);
+        if (null === $request) {
+            return;
+        }
 
         if ($locale = $request->attributes->get('_locale')) {
             $request->setLocale($locale);
@@ -45,6 +46,14 @@ class LocaleListener implements EventSubscriberInterface
         if (null !== $this->router) {
             $this->router->getContext()->setParameter('_locale', $request->getLocale());
         }
+    }
+
+    public function onKernelRequest(GetResponseEvent $event)
+    {
+        $request = $event->getRequest();
+        $request->setDefaultLocale($this->defaultLocale);
+
+        $this->setRequest($request);
     }
 
     public static function getSubscribedEvents()

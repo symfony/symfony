@@ -42,7 +42,7 @@ class PreAuthenticatedAuthenticationProviderTest extends \PHPUnit_Framework_Test
     }
 
     /**
-     * @expectedException Symfony\Component\Security\Core\Exception\BadCredentialsException
+     * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
      */
     public function testAuthenticateWhenNoUserIsSet()
     {
@@ -70,7 +70,7 @@ class PreAuthenticatedAuthenticationProviderTest extends \PHPUnit_Framework_Test
     }
 
     /**
-     * @expectedException Symfony\Component\Security\Core\Exception\LockedException
+     * @expectedException \Symfony\Component\Security\Core\Exception\LockedException
      */
     public function testAuthenticateWhenUserCheckerThrowsException()
     {

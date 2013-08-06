@@ -25,7 +25,7 @@ class Crawler extends \SplObjectStorage
     /**
      * @var string The current URI or the base href value
      */
-    private $uri;
+    protected $uri;
 
     /**
      * Constructor.
@@ -58,7 +58,9 @@ class Crawler extends \SplObjectStorage
      * This method uses the appropriate specialized add*() method based
      * on the type of the argument.
      *
-     * @param null|\DOMNodeList|array|\DOMNode $node A node
+     * @param \DOMNodeList|\DOMNode|array|string|null $node A node
+     *
+     * @throws \InvalidArgumentException When node is not the expected type.
      *
      * @api
      */
@@ -66,17 +68,23 @@ class Crawler extends \SplObjectStorage
     {
         if ($node instanceof \DOMNodeList) {
             $this->addNodeList($node);
+        } elseif ($node instanceof \DOMNode) {
+            $this->addNode($node);
         } elseif (is_array($node)) {
             $this->addNodes($node);
         } elseif (is_string($node)) {
             $this->addContent($node);
-        } elseif (is_object($node)) {
-            $this->addNode($node);
+        } elseif (null !== $node) {
+            throw new \InvalidArgumentException(sprintf('Expecting a DOMNodeList or DOMNode instance, an array, a string, or null, but got "%s".', is_object($node) ? get_class($node) : gettype($node)));
         }
     }
 
     /**
      * Adds HTML/XML content.
+     *
+     * If the charset is not set via the content type, it is assumed
+     * to be ISO-8859-1, which is the default charset defined by the
+     * HTTP 1.1 specification.
      *
      * @param string      $content A string to parse as HTML/XML
      * @param null|string $type    The content type of the string
@@ -126,23 +134,35 @@ class Crawler extends \SplObjectStorage
      */
     public function addHtmlContent($content, $charset = 'UTF-8')
     {
+        $current = libxml_use_internal_errors(true);
+        $disableEntities = libxml_disable_entity_loader(true);
+
         $dom = new \DOMDocument('1.0', $charset);
         $dom->validateOnParse = true;
 
-        if (function_exists('mb_convert_encoding')) {
+        if (function_exists('mb_convert_encoding') && in_array(strtolower($charset), array_map('strtolower', mb_list_encodings()))) {
             $content = mb_convert_encoding($content, 'HTML-ENTITIES', $charset);
         }
 
-        $current = libxml_use_internal_errors(true);
         @$dom->loadHTML($content);
+
         libxml_use_internal_errors($current);
+        libxml_disable_entity_loader($disableEntities);
 
         $this->addDocument($dom);
 
         $base = $this->filterXPath('descendant-or-self::base')->extract(array('href'));
 
-        if (count($base)) {
-            $this->uri = current($base);
+        $baseHref = current($base);
+        if (count($base) && !empty($baseHref)) {
+            if ($this->uri) {
+                $linkNode = $dom->createElement('a');
+                $linkNode->setAttribute('href', $baseHref);
+                $link = new Link($linkNode, $this->uri);
+                $this->uri = $link->getUri();
+            } else {
+                $this->uri = $baseHref;
+            }
         }
     }
 
@@ -163,13 +183,17 @@ class Crawler extends \SplObjectStorage
      */
     public function addXmlContent($content, $charset = 'UTF-8')
     {
+        $current = libxml_use_internal_errors(true);
+        $disableEntities = libxml_disable_entity_loader(true);
+
         $dom = new \DOMDocument('1.0', $charset);
         $dom->validateOnParse = true;
 
         // remove the default namespace to make XPath expressions simpler
-        $current = libxml_use_internal_errors(true);
-        @$dom->loadXML(str_replace('xmlns', 'ns', $content));
+        @$dom->loadXML(str_replace('xmlns', 'ns', $content), LIBXML_NONET);
+
         libxml_use_internal_errors($current);
+        libxml_disable_entity_loader($disableEntities);
 
         $this->addDocument($dom);
     }
@@ -205,7 +229,7 @@ class Crawler extends \SplObjectStorage
     /**
      * Adds an array of \DOMNode instances to the list of nodes.
      *
-     * @param array $nodes An array of \DOMNode instances
+     * @param \DOMNode[] $nodes An array of \DOMNode instances
      *
      * @api
      */
@@ -255,13 +279,13 @@ class Crawler extends \SplObjectStorage
     /**
      * Calls an anonymous function on each node of the list.
      *
-     * The anonymous function receives the position and the node as arguments.
+     * The anonymous function receives the position and the node wrapped
+     * in a Crawler instance as arguments.
      *
      * Example:
      *
-     *     $crawler->filter('h1')->each(function ($node, $i)
-     *     {
-     *       return $node->nodeValue;
+     *     $crawler->filter('h1')->each(function ($node, $i) {
+     *         return $node->text();
      *     });
      *
      * @param \Closure $closure An anonymous function
@@ -274,7 +298,7 @@ class Crawler extends \SplObjectStorage
     {
         $data = array();
         foreach ($this as $i => $node) {
-            $data[] = $closure($node, $i);
+            $data[] = $closure(new static($node, $this->uri), $i);
         }
 
         return $data;
@@ -295,7 +319,7 @@ class Crawler extends \SplObjectStorage
     {
         $nodes = array();
         foreach ($this as $i => $node) {
-            if (false !== $closure($node, $i)) {
+            if (false !== $closure(new static($node, $this->uri), $i)) {
                 $nodes[] = $node;
             }
         }
@@ -368,6 +392,8 @@ class Crawler extends \SplObjectStorage
      *
      * @return Crawler A Crawler instance with the previous sibling nodes
      *
+     * @throws \InvalidArgumentException
+     *
      * @api
      */
     public function previousAll()
@@ -421,7 +447,9 @@ class Crawler extends \SplObjectStorage
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
-        return new static($this->sibling($this->getNode(0)->firstChild), $this->uri);
+        $node = $this->getNode(0)->firstChild;
+
+        return new static($node ? $this->sibling($node) : array(), $this->uri);
     }
 
     /**
@@ -460,6 +488,35 @@ class Crawler extends \SplObjectStorage
         }
 
         return $this->getNode(0)->nodeValue;
+    }
+
+    /**
+     * Returns the first node of the list as HTML.
+     *
+     * @return string The node html
+     *
+     * @throws \InvalidArgumentException When current node is empty
+     */
+    public function html()
+    {
+        if (!count($this)) {
+            throw new \InvalidArgumentException('The current node list is empty.');
+        }
+
+        $html = '';
+        foreach ($this->getNode(0)->childNodes as $child) {
+            if (version_compare(PHP_VERSION, '5.3.6', '>=')) {
+                // node parameter was added to the saveHTML() method in PHP 5.3.6
+                // @see http://php.net/manual/en/domdocument.savehtml.php
+                $html .= $child->ownerDocument->saveHTML($child);
+            } else {
+                $document = new \DOMDocument('1.0', 'UTF-8');
+                $document->appendChild($document->importNode($child, true));
+                $html .= rtrim($document->saveHTML());
+            }
+        }
+
+        return $html;
     }
 
     /**
@@ -555,7 +612,7 @@ class Crawler extends \SplObjectStorage
      */
     public function selectLink($value)
     {
-        $xpath  = sprintf('//a[contains(concat(\' \', normalize-space(string(.)), \' \'), %s)] ', static::xpathLiteral(' '.$value.' ')).
+        $xpath = sprintf('//a[contains(concat(\' \', normalize-space(string(.)), \' \'), %s)] ', static::xpathLiteral(' '.$value.' ')).
                             sprintf('| //a/img[contains(concat(\' \', normalize-space(string(@alt)), \' \'), %s)]/ancestor::a', static::xpathLiteral(' '.$value.' '));
 
         return $this->filterXPath($xpath);
@@ -584,7 +641,7 @@ class Crawler extends \SplObjectStorage
      *
      * @param string $method The method for the link (get by default)
      *
-     * @return Link   A Link instance
+     * @return Link A Link instance
      *
      * @throws \InvalidArgumentException If the current node list is empty
      *
@@ -604,7 +661,7 @@ class Crawler extends \SplObjectStorage
     /**
      * Returns an array of Link objects for the nodes in the list.
      *
-     * @return array An array of Link instances
+     * @return Link[] An array of Link instances
      *
      * @api
      */
@@ -624,7 +681,7 @@ class Crawler extends \SplObjectStorage
      * @param array  $values An array of values for the form fields
      * @param string $method The method for the form
      *
-     * @return Form   A Form instance
+     * @return Form A Form instance
      *
      * @throws \InvalidArgumentException If the current node list is empty
      *
@@ -665,7 +722,6 @@ class Crawler extends \SplObjectStorage
      * @param string $s String to be escaped
      *
      * @return string Converted string
-     *
      */
     public static function xpathLiteral($s)
     {
@@ -693,7 +749,7 @@ class Crawler extends \SplObjectStorage
         return sprintf("concat(%s)", implode($parts, ', '));
     }
 
-    private function getNode($position)
+    protected function getNode($position)
     {
         foreach ($this as $i => $node) {
             if ($i == $position) {
@@ -706,7 +762,7 @@ class Crawler extends \SplObjectStorage
         // @codeCoverageIgnoreEnd
     }
 
-    private function sibling($node, $siblingDir = 'nextSibling')
+    protected function sibling($node, $siblingDir = 'nextSibling')
     {
         $nodes = array();
 

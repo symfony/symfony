@@ -82,6 +82,14 @@ class MetadataBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('_sf2_meta', $this->bag->getStorageKey());
     }
 
+    public function testGetLifetime()
+    {
+        $bag = new MetadataBag();
+        $array = array(MetadataBag::CREATED => 1234567, MetadataBag::UPDATED => 12345678, MetadataBag::LIFETIME => 1000);
+        $bag->initialize($array);
+        $this->assertEquals(1000, $bag->getLifetime());
+    }
+
     public function testGetCreated()
     {
         $this->assertEquals(1234567, $this->bag->getCreated());

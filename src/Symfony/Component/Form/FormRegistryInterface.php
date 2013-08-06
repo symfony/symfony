@@ -19,13 +19,6 @@ namespace Symfony\Component\Form;
 interface FormRegistryInterface
 {
     /**
-     * Adds a form type.
-     *
-     * @param ResolvedFormTypeInterface $type The type
-     */
-    public function addType(ResolvedFormTypeInterface $type);
-
-    /**
      * Returns a form type by name.
      *
      * This methods registers the type extensions from the form extensions.
@@ -34,8 +27,8 @@ interface FormRegistryInterface
      *
      * @return ResolvedFormTypeInterface The type
      *
-     * @throws Exception\UnexpectedTypeException if the passed name is not a string
-     * @throws Exception\FormException           if the type can not be retrieved from any extension
+     * @throws Exception\UnexpectedTypeException  if the passed name is not a string
+     * @throws Exception\InvalidArgumentException if the type can not be retrieved from any extension
      */
     public function getType($name);
 
@@ -49,21 +42,9 @@ interface FormRegistryInterface
     public function hasType($name);
 
     /**
-     * Resolves a form type.
-     *
-     * @param FormTypeInterface $type
-     *
-     * @return ResolvedFormTypeInterface
-     *
-     * @throws Exception\UnexpectedTypeException if the types parent {@link FormTypeInterface::getParent()} is not a string
-     * @throws Exception\FormException           if the types parent can not be retrieved from any extension
-     */
-    public function resolveType(FormTypeInterface $type);
-
-    /**
      * Returns the guesser responsible for guessing types.
      *
-     * @return FormTypeGuesserInterface
+     * @return FormTypeGuesserInterface|null
      */
     public function getTypeGuesser();
 

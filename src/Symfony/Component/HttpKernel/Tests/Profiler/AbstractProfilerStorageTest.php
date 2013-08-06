@@ -156,6 +156,8 @@ abstract class AbstractProfilerStorageTest extends \PHPUnit_Framework_TestCase
     public function testStoreTime()
     {
         $dt = new \DateTime('now');
+        $start = $dt->getTimestamp();
+
         for ($i = 0; $i < 3; $i++) {
             $dt->modify('+1 minute');
             $profile = new Profile('time_'.$i);
@@ -165,11 +167,15 @@ abstract class AbstractProfilerStorageTest extends \PHPUnit_Framework_TestCase
             $profile->setMethod('GET');
             $this->getStorage()->write($profile);
         }
-        $records = $this->getStorage()->find('', '', 3, 'GET');
+
+        $records = $this->getStorage()->find('', '', 3, 'GET', $start, time() + 3 * 60);
         $this->assertCount(3, $records, '->find() returns all previously added records');
         $this->assertEquals($records[0]['token'], 'time_2', '->find() returns records ordered by time in descendant order');
         $this->assertEquals($records[1]['token'], 'time_1', '->find() returns records ordered by time in descendant order');
         $this->assertEquals($records[2]['token'], 'time_0', '->find() returns records ordered by time in descendant order');
+
+        $records = $this->getStorage()->find('', '', 3, 'GET', $start, time() + 2 * 60);
+        $this->assertCount(2, $records, '->find() should return only first two of the previously added records');
     }
 
     public function testRetrieveByEmptyUrlAndIp()
@@ -180,6 +186,21 @@ abstract class AbstractProfilerStorageTest extends \PHPUnit_Framework_TestCase
             $this->getStorage()->write($profile);
         }
         $this->assertCount(5, $this->getStorage()->find('', '', 10, 'GET'), '->find() returns all previously added records');
+        $this->getStorage()->purge();
+    }
+
+    public function testRetrieveByMethodAndLimit()
+    {
+        foreach (array('POST', 'GET') as $method) {
+            for ($i = 0; $i < 5; $i++) {
+                $profile = new Profile('token_'.$i.$method);
+                $profile->setMethod($method);
+                $this->getStorage()->write($profile);
+            }
+        }
+
+        $this->assertCount(5, $this->getStorage()->find('', '', 5, 'POST'));
+
         $this->getStorage()->purge();
     }
 
@@ -212,7 +233,7 @@ abstract class AbstractProfilerStorageTest extends \PHPUnit_Framework_TestCase
     public function testDuplicates()
     {
         for ($i = 1; $i <= 5; $i++) {
-            $profile = new Profile('foo' . $i);
+            $profile = new Profile('foo'.$i);
             $profile->setIp('127.0.0.1');
             $profile->setUrl('http://example.net/');
             $profile->setMethod('GET');

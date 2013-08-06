@@ -14,8 +14,7 @@ namespace Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
-use Symfony\Component\Validator\Constraints\Collection\Optional;
-use Symfony\Component\Validator\Constraints\Collection\Required;
+use Symfony\Component\Validator\Constraints\Optional;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -37,9 +36,7 @@ class CollectionValidator extends ConstraintValidator
             throw new UnexpectedTypeException($value, 'array or Traversable and ArrayAccess');
         }
 
-        $walker = $this->context->getGraphWalker();
         $group = $this->context->getGroup();
-        $propertyPath = $this->context->getPropertyPath();
 
         foreach ($constraint->fields as $field => $fieldConstraint) {
             if (
@@ -48,10 +45,10 @@ class CollectionValidator extends ConstraintValidator
                 ($value instanceof \ArrayAccess && $value->offsetExists($field))
             ) {
                 foreach ($fieldConstraint->constraints as $constr) {
-                    $walker->walkConstraint($constr, $value[$field], $group, $propertyPath.'['.$field.']');
+                    $this->context->validateValue($value[$field], $constr, '['.$field.']', $group);
                 }
             } elseif (!$fieldConstraint instanceof Optional && !$constraint->allowMissingFields) {
-                $this->context->addViolationAtSubPath('['.$field.']', $constraint->missingFieldsMessage, array(
+                $this->context->addViolationAt('['.$field.']', $constraint->missingFieldsMessage, array(
                     '{{ field }}' => $field
                 ), null);
             }
@@ -60,7 +57,7 @@ class CollectionValidator extends ConstraintValidator
         if (!$constraint->allowExtraFields) {
             foreach ($value as $field => $fieldValue) {
                 if (!isset($constraint->fields[$field])) {
-                    $this->context->addViolationAtSubPath('['.$field.']', $constraint->extraFieldsMessage, array(
+                    $this->context->addViolationAt('['.$field.']', $constraint->extraFieldsMessage, array(
                         '{{ field }}' => $field
                     ), $fieldValue);
                 }

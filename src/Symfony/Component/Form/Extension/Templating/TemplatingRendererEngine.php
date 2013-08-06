@@ -114,7 +114,7 @@ class TemplatingRendererEngine extends AbstractRendererEngine
      */
     protected function loadResourceFromTheme($cacheKey, $blockName, $theme)
     {
-        if ($this->engine->exists($templateName = $theme . ':' . $blockName . '.html.php')) {
+        if ($this->engine->exists($templateName = $theme.':'.$blockName.'.html.php')) {
             $this->resources[$cacheKey][$blockName] = $templateName;
 
             return true;

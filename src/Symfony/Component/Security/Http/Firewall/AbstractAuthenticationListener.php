@@ -19,8 +19,7 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\SessionUnavailableException;
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -76,6 +75,8 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
      *                                                                      successful, or failed authentication attempt
      * @param LoggerInterface                        $logger                A LoggerInterface instance
      * @param EventDispatcherInterface               $dispatcher            An EventDispatcherInterface instance
+     *
+     * @throws \InvalidArgumentException
      */
     public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, HttpUtils $httpUtils, $providerKey, AuthenticationSuccessHandlerInterface $successHandler, AuthenticationFailureHandlerInterface $failureHandler, array $options = array(), LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
     {
@@ -91,6 +92,14 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
         $this->failureHandler = $failureHandler;
         $this->options = array_merge(array(
             'check_path'                     => '/login_check',
+            'login_path'                     => '/login',
+            'always_use_default_target_path' => false,
+            'default_target_path'            => '/',
+            'target_path_parameter'          => '_target_path',
+            'use_referer'                    => false,
+            'failure_path'                   => null,
+            'failure_forward'                => false,
+            'require_previous_session'       => true,
         ), $options);
         $this->logger = $logger;
         $this->dispatcher = $dispatcher;
@@ -111,6 +120,9 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
      * Handles form based authentication.
      *
      * @param GetResponseEvent $event A GetResponseEvent instance
+     *
+     * @throws \RuntimeException
+     * @throws SessionUnavailableException
      */
     final public function handle(GetResponseEvent $event)
     {
@@ -125,7 +137,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
         }
 
         try {
-            if (!$request->hasPreviousSession()) {
+            if ($this->options['require_previous_session'] && !$request->hasPreviousSession()) {
                 throw new SessionUnavailableException('Your session has timed out, or you have disabled cookies.');
             }
 
@@ -152,7 +164,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
     /**
      * Whether this request requires authentication.
      *
-     * The default implementation only processed requests to a specific path,
+     * The default implementation only processes requests to a specific path,
      * but a subclass could change this to only authenticate requests where a
      * certain parameters is present.
      *
@@ -182,7 +194,10 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
             $this->logger->info(sprintf('Authentication request failed: %s', $failed->getMessage()));
         }
 
-        $this->securityContext->setToken(null);
+        $token = $this->securityContext->getToken();
+        if ($token instanceof UsernamePasswordToken && $this->providerKey === $token->getProviderKey()) {
+            $this->securityContext->setToken(null);
+        }
 
         $response = $this->failureHandler->onAuthenticationFailure($request, $failed);
 

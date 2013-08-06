@@ -23,7 +23,7 @@ class MoFileDumperTest extends \PHPUnit_Framework_TestCase
 
         $tempDir = sys_get_temp_dir();
         $dumper = new MoFileDumper();
-        $dumperString = $dumper->dump($catalogue, array('path' => $tempDir));
+        $dumper->dump($catalogue, array('path' => $tempDir));
         $this->assertEquals(file_get_contents(__DIR__.'/../fixtures/resources.mo'), file_get_contents($tempDir.'/messages.en.mo'));
 
         unlink($tempDir.'/messages.en.mo');

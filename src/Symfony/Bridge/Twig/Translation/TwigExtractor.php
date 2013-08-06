@@ -39,6 +39,7 @@ class TwigExtractor implements ExtractorInterface
 
     /**
      * The twig environment.
+     *
      * @var \Twig_Environment
      */
     private $twig;
@@ -55,7 +56,7 @@ class TwigExtractor implements ExtractorInterface
     {
         // load any existing translation files
         $finder = new Finder();
-        $files = $finder->files()->name('*.twig')->in($directory);
+        $files = $finder->files()->name('*.twig')->sortByName()->in($directory);
         foreach ($files as $file) {
             $this->extractTemplate(file_get_contents($file->getPathname()), $catalogue);
         }
@@ -77,7 +78,7 @@ class TwigExtractor implements ExtractorInterface
         $this->twig->parse($this->twig->tokenize($template));
 
         foreach ($visitor->getMessages() as $message) {
-            $catalogue->set($message[0], $this->prefix.$message[0], $message[1] ? $message[1] : $this->defaultDomain);
+            $catalogue->set(trim($message[0]), $this->prefix.trim($message[0]), $message[1] ? $message[1] : $this->defaultDomain);
         }
 
         $visitor->disable();

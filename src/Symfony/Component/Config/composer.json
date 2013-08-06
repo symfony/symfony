@@ -16,15 +16,17 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3"
+        "php": ">=5.3.3",
+        "symfony/filesystem": "~2.3"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\Config": "" }
+        "psr-0": { "Symfony\\Component\\Config\\": "" }
     },
     "target-dir": "Symfony/Component/Config",
+    "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.1-dev"
+            "dev-master": "2.4-dev"
         }
     }
 }

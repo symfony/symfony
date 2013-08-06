@@ -21,11 +21,11 @@ interface TokenProviderInterface
     /**
      * Loads the active token for the given series.
      *
-     * @throws TokenNotFoundException if the token is not found
-     *
      * @param string $series
      *
      * @return PersistentTokenInterface
+     *
+     * @throws TokenNotFoundException if the token is not found
      */
     public function loadTokenBySeries($series);
 
@@ -39,9 +39,10 @@ interface TokenProviderInterface
     /**
      * Updates the token according to this data.
      *
-     * @param string   $series
-     * @param string   $tokenValue
-     * @param DateTime $lastUsed
+     * @param string    $series
+     * @param string    $tokenValue
+     * @param \DateTime $lastUsed
+     * @throws TokenNotFoundException if the token is not found
      */
     public function updateToken($series, $tokenValue, \DateTime $lastUsed);
 

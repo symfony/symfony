@@ -14,6 +14,12 @@ namespace Symfony\Component\HttpFoundation;
 /**
  * Response represents an HTTP response in JSON format.
  *
+ * Note that this class does not force the returned JSON content to be an
+ * object. It is however recommended that you do return an object as it
+ * protects yourself against XSSI and JSON-JavaScript Hijacking.
+ *
+ * @see https://www.owasp.org/index.php/OWASP_AJAX_Security_Guidelines#Always_return_JSON_with_an_Object_on_the_outside
+ *
  * @author Igor Wiedler <igor@wiedler.ch>
  */
 class JsonResponse extends Response
@@ -28,17 +34,20 @@ class JsonResponse extends Response
      * @param integer $status  The response status code
      * @param array   $headers An array of response headers
      */
-    public function __construct($data = array(), $status = 200, $headers = array())
+    public function __construct($data = null, $status = 200, $headers = array())
     {
         parent::__construct('', $status, $headers);
 
+        if (null === $data) {
+            $data = new \ArrayObject();
+        }
         $this->setData($data);
     }
 
     /**
      * {@inheritDoc}
      */
-    public static function create($data = array(), $status = 200, $headers = array())
+    public static function create($data = null, $status = 200, $headers = array())
     {
         return new static($data, $status, $headers);
     }
@@ -49,6 +58,8 @@ class JsonResponse extends Response
      * @param string $callback
      *
      * @return JsonResponse
+     *
+     * @throws \InvalidArgumentException
      */
     public function setCallback($callback = null)
     {
@@ -77,11 +88,6 @@ class JsonResponse extends Response
      */
     public function setData($data = array())
     {
-        // root should be JSON object, not array
-        if (is_array($data) && 0 === count($data)) {
-            $data = new \ArrayObject();
-        }
-
         // Encode <, >, ', &, and " for RFC4627-compliant JSON, which may also be embedded into HTML.
         $this->data = json_encode($data, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT);
 
@@ -97,12 +103,16 @@ class JsonResponse extends Response
     {
         if (null !== $this->callback) {
             // Not using application/javascript for compatibility reasons with older browsers.
-            $this->headers->set('Content-Type', 'text/javascript', true);
+            $this->headers->set('Content-Type', 'text/javascript');
 
             return $this->setContent(sprintf('%s(%s);', $this->callback, $this->data));
         }
 
-        $this->headers->set('Content-Type', 'application/json', false);
+        // Only set the header when there is none or when it equals 'text/javascript' (from a previous update with callback)
+        // in order to not overwrite a custom definition.
+        if (!$this->headers->has('Content-Type') || 'text/javascript' === $this->headers->get('Content-Type')) {
+            $this->headers->set('Content-Type', 'application/json');
+        }
 
         return $this->setContent($this->data);
     }

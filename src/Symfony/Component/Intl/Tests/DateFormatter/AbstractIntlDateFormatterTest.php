@@ -143,7 +143,7 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
             array('EEE', 0, 'Thu'),
             array('EEEE', 0, 'Thursday'),
             array('EEEEE', 0, 'T'),
-            array('EEEEEE', 0, 'Thu'),
+            array('EEEEEE', 0, 'Th'),
 
             array('E', 1296540000, 'Tue'), // 2011-02-01
             array('E', 1296950400, 'Sun'), // 2011-02-06
@@ -584,7 +584,7 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
             array('EEE', 'Thu', 0),
             array('EEEE', 'Thursday', 0),
             array('EEEEE', 'T', 432000),
-            array('EEEEEE', 'Thu', 0),
+            array('EEEEEE', 'Th', 0),
         );
     }
 

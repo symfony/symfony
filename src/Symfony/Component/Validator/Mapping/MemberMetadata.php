@@ -86,7 +86,9 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
             'class',
             'name',
             'property',
-            'cascaded', // TESTME
+            'cascaded',
+            'collectionCascaded',
+            'collectionCascadedDeeply',
         ));
     }
 

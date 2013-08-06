@@ -69,6 +69,33 @@ class MemberMetadataTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($this->metadata, $metadata);
     }
+
+    public function testSerializeCollectionCascaded()
+    {
+        $this->metadata->addConstraint(new Valid(array('traverse' => true, 'deep' => false)));
+
+        $metadata = unserialize(serialize($this->metadata));
+
+        $this->assertEquals($this->metadata, $metadata);
+    }
+
+    public function testSerializeCollectionCascadedDeeply()
+    {
+        $this->metadata->addConstraint(new Valid(array('traverse' => true, 'deep' => true)));
+
+        $metadata = unserialize(serialize($this->metadata));
+
+        $this->assertEquals($this->metadata, $metadata);
+    }
+
+    public function testSerializeCollectionNotCascaded()
+    {
+        $this->metadata->addConstraint(new Valid(array('traverse' => false)));
+
+        $metadata = unserialize(serialize($this->metadata));
+
+        $this->assertEquals($this->metadata, $metadata);
+    }
 }
 
 class TestMemberMetadata extends MemberMetadata

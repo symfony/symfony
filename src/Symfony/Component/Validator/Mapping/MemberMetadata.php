@@ -76,6 +76,7 @@ abstract class MemberMetadata extends ElementMetadata
             'property',
             'cascaded',
             'collectionCascaded',
+            'collectionCascadedDeeply',
         ));
     }
 

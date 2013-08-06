@@ -58,7 +58,6 @@
         </service>
 
         <service id="twig.extension.trans" class="%twig.extension.trans.class%" public="false">
-            <tag name="twig.extension" />
             <argument type="service" id="translator" />
         </service>
 
@@ -80,7 +79,6 @@
         </service>
 
         <service id="twig.extension.routing" class="%twig.extension.routing.class%" public="false">
-            <tag name="twig.extension" />
             <argument type="service" id="router" />
         </service>
 
@@ -89,12 +87,11 @@
         </service>
 
         <service id="twig.extension.httpkernel" class="%twig.extension.httpkernel.class%" public="false">
-            <tag name="twig.extension" />
             <argument type="service" id="fragment.handler" />
         </service>
 
+
         <service id="twig.extension.form" class="%twig.extension.form.class%" public="false">
-            <tag name="twig.extension" />
             <argument type="service" id="twig.form.renderer" />
         </service>
 

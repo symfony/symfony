@@ -25,6 +25,7 @@ class CommandTester
     private $command;
     private $input;
     private $output;
+    private $statusCode;
 
     /**
      * Constructor.
@@ -65,19 +66,27 @@ class CommandTester
             $this->output->setVerbosity($options['verbosity']);
         }
 
-        return $this->command->run($this->input, $this->output);
+        return $this->statusCode = $this->command->run($this->input, $this->output);
     }
 
     /**
      * Gets the display returned by the last execution of the command.
      *
+     * @param Boolean $normalize Whether to normalize end of lines to \n or not
+     *
      * @return string The display
      */
-    public function getDisplay()
+    public function getDisplay($normalize = false)
     {
         rewind($this->output->getStream());
 
-        return stream_get_contents($this->output->getStream());
+        $display = stream_get_contents($this->output->getStream());
+
+        if ($normalize) {
+            $display = str_replace(PHP_EOL, "\n", $display);
+        }
+
+        return $display;
     }
 
     /**
@@ -98,5 +107,15 @@ class CommandTester
     public function getOutput()
     {
         return $this->output;
+    }
+
+    /**
+     * Gets the status code returned by the last execution of the application.
+     *
+     * @return integer The status code
+     */
+    public function getStatusCode()
+    {
+        return $this->statusCode;
     }
 }

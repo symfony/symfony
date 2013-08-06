@@ -16,6 +16,6 @@ namespace Symfony\Component\Form\Exception;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-interface ExceptionInterface extends FormException
+interface ExceptionInterface
 {
 }

@@ -141,14 +141,6 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
     /**
      * {@inheritDoc}
      */
-    public function guessMinLength($class, $property)
-    {
-        trigger_error('guessMinLength() is deprecated since version 2.1 and will be removed in 2.3.', E_USER_DEPRECATED);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function guessPattern($class, $property)
     {
         $ret = $this->getMetadata($class);

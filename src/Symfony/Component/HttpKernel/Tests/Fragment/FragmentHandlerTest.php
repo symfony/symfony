@@ -17,13 +17,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class FragmentHandlerTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\EventDispatcher\EventDispatcher')) {
-            $this->markTestSkipped('The "EventDispatcher" component is not available');
-        }
-    }
-
     /**
      * @expectedException \InvalidArgumentException
      */
@@ -61,27 +54,6 @@ class FragmentHandlerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $handler->render('/', 'foo', array('foo' => 'foo')));
     }
 
-    /**
-     * @dataProvider getFixOptionsData
-     */
-    public function testFixOptions($expected, $options)
-    {
-        $handler = new FragmentHandler();
-
-        set_error_handler(function ($errorNumber, $message, $file, $line, $context) { return $errorNumber & E_USER_DEPRECATED; });
-        $this->assertEquals($expected, $handler->fixOptions($options));
-        restore_error_handler();
-    }
-
-    public function getFixOptionsData()
-    {
-        return array(
-            array(array('strategy' => 'esi'), array('standalone' => true)),
-            array(array('strategy' => 'esi'), array('standalone' => 'esi')),
-            array(array('strategy' => 'hinclude'), array('standalone' => 'js')),
-        );
-    }
-
     protected function getHandler($returnValue, $arguments = array())
     {
         $renderer = $this->getMock('Symfony\Component\HttpKernel\Fragment\FragmentRendererInterface');
@@ -102,14 +74,7 @@ class FragmentHandlerTest extends \PHPUnit_Framework_TestCase
 
         $handler = new FragmentHandler();
         $handler->addRenderer($renderer);
-
-        $event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')->disableOriginalConstructor()->getMock();
-        $event
-            ->expects($this->once())
-            ->method('getRequest')
-            ->will($this->returnValue(Request::create('/')))
-        ;
-        $handler->onKernelRequest($event);
+        $handler->setRequest(Request::create('/'));
 
         return $handler;
     }

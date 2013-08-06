@@ -9,6 +9,7 @@ services:
         tags:
             - { name: foo, foo: foo }
             - { name: foo, bar: bar }
+        factory_class: FooClass
         factory_method: getInstance
         arguments: [foo, '@foo.baz', { '%foo%': 'foo is %foo%', foobar: '%foo%' }, true, '@service_container']
         properties: { foo: bar, moo: '@foo.baz' }
@@ -23,6 +24,7 @@ services:
         configurator: ['@foo.baz', configure]
     foo.baz:
         class: %baz_class%
+        factory_class: %baz_class%
         factory_method: getInstance
         configurator: ['%baz_class%', configureStatic1]
     foo_bar:
@@ -57,4 +59,14 @@ services:
         calls:
             - [setFoo, ['@foo_with_inline']]
 
+    request:
+        class: Request
+        synthetic: true
+        synchronized: true
+    depends_on_request:
+        class: stdClass
+        calls:
+            - [setRequest, ['@?request']]
+
     alias_for_foo: @foo
+    alias_for_alias: @foo

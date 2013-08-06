@@ -1,6 +1,30 @@
 CHANGELOG
 =========
 
+2.4.0
+-----
+
+ * allowed multiple IP addresses in profiler matcher settings
+
+2.3.0
+-----
+
+ * [BC BREAK] added a way to disable the profiler (when disabling the profiler, it is now completely removed)
+   To get the same "disabled" behavior as before, set `enabled` to `true` and `collect` to `false`
+ * [BC BREAK] the `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RegisterKernelListenersPass` was moved
+   to `Component\HttpKernel\DependencyInjection\RegisterListenersPass`
+ * added ControllerNameParser::build() which converts a controller short notation (a:b:c) to a class::method notation
+ * added possibility to run PHP built-in server in production environment
+ * added possibility to load the serializer component in the service container
+ * added route debug information when using the `router:match` command
+ * added `TimedPhpEngine`
+ * added `--clean` option to the `translation:update` command
+ * added `http_method_override` option
+ * added support for default templates per render tag
+ * added FormHelper::form(), FormHelper::start() and FormHelper::end()
+ * deprecated FormHelper::enctype() in favor of FormHelper::start()
+ * RedirectController actions now receive the Request instance via the method signature.
+
 2.2.0
 -----
 
@@ -17,10 +41,10 @@ CHANGELOG
  * replaced Symfony\Bundle\FrameworkBundle\Controller\TraceableControllerResolver by Symfony\Component\HttpKernel\Controller\TraceableControllerResolver
  * replaced Symfony\Component\HttpKernel\Debug\ContainerAwareTraceableEventDispatcher by Symfony\Component\HttpKernel\Debug\TraceableEventDispatcher
  * added Client::enableProfiler()
- * A new parameter has been added to the DIC: `router.request_context.base_url`
+ * a new parameter has been added to the DIC: `router.request_context.base_url`
    You can customize it for your functional tests or for generating urls with
    the right base url when your are in the cli context.
- * Added support for default templates per render tag
+ * added support for default templates per render tag
 
 2.1.0
 -----

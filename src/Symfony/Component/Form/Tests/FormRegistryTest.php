@@ -68,21 +68,6 @@ class FormRegistryTest extends \PHPUnit_Framework_TestCase
         ), $this->resolvedTypeFactory);
     }
 
-    public function testGetTypeReturnsAddedType()
-    {
-        $resolvedType = $this->getMock('Symfony\Component\Form\ResolvedFormTypeInterface');
-
-        $resolvedType->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue('foo'));
-
-        set_error_handler(array('Symfony\Component\Form\Test\DeprecationErrorHandler', 'handle'));
-        $this->registry->addType($resolvedType);
-        restore_error_handler();
-
-        $this->assertSame($resolvedType, $this->registry->getType('foo'));
-    }
-
     public function testGetTypeFromExtension()
     {
         $type = new FooType();
@@ -188,7 +173,7 @@ class FormRegistryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Form\Exception\Exception
+     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
      */
     public function testGetTypeThrowsExceptionIfParentNotFound()
     {
@@ -200,7 +185,7 @@ class FormRegistryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Form\Exception\Exception
+     * @expectedException \Symfony\Component\Form\Exception\InvalidArgumentException
      */
     public function testGetTypeThrowsExceptionIfTypeNotFound()
     {
@@ -213,23 +198,6 @@ class FormRegistryTest extends \PHPUnit_Framework_TestCase
     public function testGetTypeThrowsExceptionIfNoString()
     {
         $this->registry->getType(array());
-    }
-
-    public function testHasTypeAfterAdding()
-    {
-        $resolvedType = $this->getMock('Symfony\Component\Form\ResolvedFormTypeInterface');
-
-        $resolvedType->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue('foo'));
-
-        $this->assertFalse($this->registry->hasType('foo'));
-
-        set_error_handler(array('Symfony\Component\Form\Test\DeprecationErrorHandler', 'handle'));
-        $this->registry->addType($resolvedType);
-        restore_error_handler();
-
-        $this->assertTrue($this->registry->hasType('foo'));
     }
 
     public function testHasTypeAfterLoadingFromExtension()

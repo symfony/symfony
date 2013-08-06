@@ -14,7 +14,7 @@ namespace Symfony\Component\Console\Helper;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * The Progress class providers helpers to display progress output.
+ * The Progress class provides helpers to display progress output.
  *
  * @author Chris Jones <leeked@gmail.com>
  * @author Fabien Potencier <fabien@symfony.com>
@@ -91,10 +91,10 @@ class ProgressHelper extends Helper
      * @var array
      */
     private $widths = array(
-        'current'   => 4,
-        'max'       => 4,
-        'percent'   => 3,
-        'elapsed'   => 6,
+        'current' => 4,
+        'max'     => 4,
+        'percent' => 3,
+        'elapsed' => 6,
     );
 
     /**
@@ -177,8 +177,8 @@ class ProgressHelper extends Helper
     /**
      * Starts the progress output.
      *
-     * @param OutputInterface $output  An Output instance
-     * @param integer         $max     Maximum steps
+     * @param OutputInterface $output An Output instance
+     * @param integer         $max    Maximum steps
      */
     public function start(OutputInterface $output, $max = null)
     {
@@ -186,6 +186,8 @@ class ProgressHelper extends Helper
         $this->current   = 0;
         $this->max       = (int) $max;
         $this->output    = $output;
+        $this->lastMessagesLength = 0;
+        $this->barCharOriginal = '';
 
         if (null === $this->format) {
             switch ($output->getVerbosity()) {
@@ -196,6 +198,8 @@ class ProgressHelper extends Helper
                     }
                     break;
                 case OutputInterface::VERBOSITY_VERBOSE:
+                case OutputInterface::VERBOSITY_VERY_VERBOSE:
+                case OutputInterface::VERBOSITY_DEBUG:
                     $this->format = self::FORMAT_VERBOSE_NOMAX;
                     if ($this->max > 0) {
                         $this->format = self::FORMAT_VERBOSE;
@@ -227,11 +231,42 @@ class ProgressHelper extends Helper
             throw new \LogicException('You must start the progress bar before calling advance().');
         }
 
-        if ($this->current === 0) {
+        if (0 === $this->current) {
             $redraw = true;
         }
+
         $this->current += $step;
-        if ($redraw || $this->current % $this->redrawFreq === 0) {
+        if ($redraw || 0 === $this->current % $this->redrawFreq) {
+            $this->display();
+        }
+    }
+
+    /**
+     * Sets the current progress.
+     *
+     * @param integer $current The current progress
+     * @param Boolean $redraw  Whether to redraw or not
+     *
+     * @throws \LogicException
+     */
+    public function setCurrent($current, $redraw = false)
+    {
+        if (null === $this->startTime) {
+            throw new \LogicException('You must start the progress bar before calling setCurrent().');
+        }
+
+        $current = (int) $current;
+
+        if ($current < $this->current) {
+            throw new \LogicException('You can\'t regress the progress bar');
+        }
+
+        if (0 === $this->current) {
+            $redraw = true;
+        }
+
+        $this->current = $current;
+        if ($redraw || 0 === $this->current % $this->redrawFreq) {
             $this->display();
         }
     }
@@ -257,6 +292,18 @@ class ProgressHelper extends Helper
     }
 
     /**
+     * Removes the progress bar from the current line.
+     *
+     * This is useful if you wish to write some output
+     * while a progress bar is running.
+     * Call display() to show the progress bar again.
+     */
+    public function clear()
+    {
+        $this->overwrite($this->output, '');
+    }
+
+    /**
      * Finishes the progress output.
      */
     public function finish()
@@ -265,7 +312,7 @@ class ProgressHelper extends Helper
             throw new \LogicException('You must start the progress bar before calling finish().');
         }
 
-        if ($this->startTime !== null) {
+        if (null !== $this->startTime) {
             if (!$this->max) {
                 $this->barChar = $this->barCharOriginal;
                 $this->display(true);
@@ -283,13 +330,13 @@ class ProgressHelper extends Helper
     {
         $this->formatVars = array();
         foreach ($this->defaultFormatVars as $var) {
-            if (strpos($this->format, "%{$var}%") !== false) {
+            if (false !== strpos($this->format, "%{$var}%")) {
                 $this->formatVars[$var] = true;
             }
         }
 
         if ($this->max > 0) {
-            $this->widths['max']     = strlen($this->max);
+            $this->widths['max']     = $this->strlen($this->max);
             $this->widths['current'] = $this->widths['max'];
         } else {
             $this->barCharOriginal = $this->barChar;
@@ -314,6 +361,7 @@ class ProgressHelper extends Helper
 
         if (isset($this->formatVars['bar'])) {
             $completeBars = 0;
+
             if ($this->max > 0) {
                 $completeBars = floor($percent * $this->barWidth);
             } else {
@@ -324,7 +372,7 @@ class ProgressHelper extends Helper
                 }
             }
 
-            $emptyBars = $this->barWidth - $completeBars - strlen($this->progressChar);
+            $emptyBars = $this->barWidth - $completeBars - $this->strlen($this->progressChar);
             $bar = str_repeat($this->barChar, $completeBars);
             if ($completeBars < $this->barWidth) {
                 $bar .= $this->progressChar;
@@ -370,7 +418,7 @@ class ProgressHelper extends Helper
                     $text = $format[1];
                     break;
                 } else {
-                    $text = ceil($secs / $format[2]) . ' ' . $format[1];
+                    $text = ceil($secs / $format[2]).' '.$format[1];
                     break;
                 }
             }
@@ -383,21 +431,22 @@ class ProgressHelper extends Helper
      * Overwrites a previous message to the output.
      *
      * @param OutputInterface $output   An Output instance
-     * @param string|array    $messages The message as an array of lines or a single string
+     * @param string          $message  The message
      */
-    private function overwrite(OutputInterface $output, $messages)
+    private function overwrite(OutputInterface $output, $message)
     {
+        $length = $this->strlen($message);
+
+        // append whitespace to match the last line's length
+        if (null !== $this->lastMessagesLength && $this->lastMessagesLength > $length) {
+            $message = str_pad($message, $this->lastMessagesLength, "\x20", STR_PAD_RIGHT);
+        }
+
         // carriage return
         $output->write("\x0D");
-        if ($this->lastMessagesLength!==null) {
-            // clear the line with the length of the last message
-            $output->write(str_repeat("\x20", $this->lastMessagesLength));
-            // carriage return
-            $output->write("\x0D");
-        }
-        $output->write($messages);
+        $output->write($message);
 
-        $this->lastMessagesLength=strlen($messages);
+        $this->lastMessagesLength = $this->strlen($message);
     }
 
     /**

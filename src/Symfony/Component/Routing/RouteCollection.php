@@ -37,58 +37,11 @@ class RouteCollection implements \IteratorAggregate, \Countable
      */
     private $resources = array();
 
-    /**
-     * @var string
-     * @deprecated since version 2.2, will be removed in 2.3
-     */
-    private $prefix = '';
-
-    /**
-     * @var RouteCollection|null
-     * @deprecated since version 2.2, will be removed in 2.3
-     */
-    private $parent;
-
     public function __clone()
     {
         foreach ($this->routes as $name => $route) {
             $this->routes[$name] = clone $route;
         }
-    }
-
-    /**
-     * Gets the parent RouteCollection.
-     *
-     * @return RouteCollection|null The parent RouteCollection or null when it's the root
-     *
-     * @deprecated since version 2.2, will be removed in 2.3
-     */
-    public function getParent()
-    {
-        trigger_error('getParent() is deprecated since version 2.2 and will be removed in 2.3. There is no substitution ' .
-            'because RouteCollection is not tree structure anymore.', E_USER_DEPRECATED);
-
-        return $this->parent;
-    }
-
-    /**
-     * Gets the root RouteCollection.
-     *
-     * @return RouteCollection The root RouteCollection
-     *
-     * @deprecated since version 2.2, will be removed in 2.3
-     */
-    public function getRoot()
-    {
-        trigger_error('getRoot() is deprecated since version 2.2 and will be removed in 2.3. There is no substitution ' .
-            'because RouteCollection is not tree structure anymore.', E_USER_DEPRECATED);
-
-        $parent = $this;
-        while ($parent->getParent()) {
-            $parent = $parent->getParent();
-        }
-
-        return $parent;
     }
 
     /**
@@ -155,21 +108,11 @@ class RouteCollection implements \IteratorAggregate, \Countable
     /**
      * Removes a route or an array of routes by name from the collection
      *
-     * For BC it's also removed from the root, which will not be the case in 2.3
-     * as the RouteCollection won't be a tree structure.
-     *
      * @param string|array $name The route name or an array of route names
      */
     public function remove($name)
     {
-        // just for BC
-        $root = $this;
-        while ($root->parent) {
-            $root = $root->parent;
-        }
-
         foreach ((array) $name as $n) {
-            unset($root->routes[$n]);
             unset($this->routes[$n]);
         }
     }
@@ -184,34 +127,6 @@ class RouteCollection implements \IteratorAggregate, \Countable
      */
     public function addCollection(RouteCollection $collection)
     {
-        // This is to keep BC for getParent() and getRoot(). It does not prevent
-        // infinite loops by recursive referencing. But we don't need that logic
-        // anymore as the tree logic has been deprecated and we are just widening
-        // the accepted range.
-        $collection->parent = $this;
-
-        // this is to keep BC
-        $numargs = func_num_args();
-        if ($numargs > 1) {
-            trigger_error('addCollection() should only be used with a single parameter. The params $prefix, $defaults, $requirements and $options ' .
-                'are deprecated since version 2.2 and will be removed in 2.3. Use addPrefix() and addOptions() instead.', E_USER_DEPRECATED);
-            $collection->addPrefix($this->prefix . func_get_arg(1));
-            if ($numargs > 2) {
-                $collection->addDefaults(func_get_arg(2));
-                if ($numargs > 3) {
-                    $collection->addRequirements(func_get_arg(3));
-                    if ($numargs > 4) {
-                        $collection->addOptions(func_get_arg(4));
-                    }
-                }
-            }
-        } else {
-            // the sub-collection must have the prefix of the parent (current instance) prepended because it does not
-            // necessarily already have it applied (depending on the order RouteCollections are added to each other)
-            // this will be removed when the BC layer for getPrefix() is removed
-            $collection->addPrefix($this->prefix);
-        }
-
         // we need to remove all routes with the same names first because just replacing them
         // would not place the new route at the end of the merged array
         foreach ($collection->all() as $name => $route) {
@@ -239,39 +154,11 @@ class RouteCollection implements \IteratorAggregate, \Countable
             return;
         }
 
-        // a prefix must start with a single slash and must not end with a slash
-        $this->prefix = '/' . $prefix . $this->prefix;
-
-        // this is to keep BC
-        if (func_num_args() > 3) {
-            trigger_error('The fourth parameter ($options) of addPrefix() is deprecated since version 2.2 and will be removed in 2.3. ' .
-                'Use addOptions() instead.', E_USER_DEPRECATED);
-            $options = func_get_arg(3);
-        } else {
-            $options = array();
-        }
-
         foreach ($this->routes as $route) {
-            $route->setPath('/' . $prefix . $route->getPath());
+            $route->setPath('/'.$prefix.$route->getPath());
             $route->addDefaults($defaults);
             $route->addRequirements($requirements);
-            $route->addOptions($options);
         }
-    }
-
-    /**
-     * Returns the prefix that may contain placeholders.
-     *
-     * @return string The prefix
-     *
-     * @deprecated since version 2.2, will be removed in 2.3
-     */
-    public function getPrefix()
-    {
-        trigger_error('getPrefix() is deprecated since version 2.2 and will be removed in 2.3. The method suggests that ' .
-            'all routes in the collection would have this prefix, which is not necessarily true.', E_USER_DEPRECATED);
-
-        return $this->prefix;
     }
 
     /**

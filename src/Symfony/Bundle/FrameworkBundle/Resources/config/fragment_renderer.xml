@@ -14,14 +14,15 @@
 
     <services>
         <service id="fragment.handler" class="%fragment.handler.class%">
-            <tag name="kernel.event_subscriber" />
             <argument type="collection" />
             <argument>%kernel.debug%</argument>
+            <call method="setRequest"><argument type="service" id="request" on-invalid="null" strict="false" /></call>
         </service>
 
         <service id="fragment.renderer.inline" class="%fragment.renderer.inline.class%">
             <tag name="kernel.fragment_renderer" />
             <argument type="service" id="http_kernel" />
+            <argument type="service" id="event_dispatcher" />
             <call method="setFragmentPath"><argument>%fragment.path%</argument></call>
         </service>
 

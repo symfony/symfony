@@ -50,7 +50,7 @@ class PropertyPathBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $this->builder->appendIndex('new1');
 
-        $path = new PropertyPath(self::PREFIX . '[new1]');
+        $path = new PropertyPath(self::PREFIX.'[new1]');
 
         $this->assertEquals($path, $this->builder->getPropertyPath());
     }
@@ -59,7 +59,7 @@ class PropertyPathBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $this->builder->appendProperty('new1');
 
-        $path = new PropertyPath(self::PREFIX . '.new1');
+        $path = new PropertyPath(self::PREFIX.'.new1');
 
         $this->assertEquals($path, $this->builder->getPropertyPath());
     }
@@ -67,6 +67,15 @@ class PropertyPathBuilderTest extends \PHPUnit_Framework_TestCase
     public function testAppend()
     {
         $this->builder->append(new PropertyPath('new1[new2]'));
+
+        $path = new PropertyPath(self::PREFIX.'.new1[new2]');
+
+        $this->assertEquals($path, $this->builder->getPropertyPath());
+    }
+
+    public function testAppendUsingString()
+    {
+        $this->builder->append('new1[new2]');
 
         $path = new PropertyPath(self::PREFIX . '.new1[new2]');
 
@@ -77,7 +86,7 @@ class PropertyPathBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $this->builder->append(new PropertyPath('new1[new2].new3'), 1);
 
-        $path = new PropertyPath(self::PREFIX . '[new2].new3');
+        $path = new PropertyPath(self::PREFIX.'[new2].new3');
 
         $this->assertEquals($path, $this->builder->getPropertyPath());
     }
@@ -86,7 +95,7 @@ class PropertyPathBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $this->builder->append(new PropertyPath('new1[new2].new3'), 1, 1);
 
-        $path = new PropertyPath(self::PREFIX . '[new2]');
+        $path = new PropertyPath(self::PREFIX.'[new2]');
 
         $this->assertEquals($path, $this->builder->getPropertyPath());
     }
@@ -168,20 +177,39 @@ class PropertyPathBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($path, $this->builder->getPropertyPath());
     }
 
-    /**
-     * @expectedException \OutOfBoundsException
-     */
-    public function testReplaceDoesNotAllowInvalidOffsets()
+    public function testReplaceUsingString()
     {
-        $this->builder->replace(6, 1, new PropertyPath('new1[new2].new3'));
+        $this->builder->replace(1, 1, 'new1[new2].new3');
+
+        $path = new PropertyPath('old1.new1[new2].new3.old3[old4][old5].old6');
+
+        $this->assertEquals($path, $this->builder->getPropertyPath());
+    }
+
+    public function testReplaceNegative()
+    {
+        $this->builder->replace(-1, 1, new PropertyPath('new1[new2].new3'));
+
+        $path = new PropertyPath('old1[old2].old3[old4][old5].new1[new2].new3');
+
+        $this->assertEquals($path, $this->builder->getPropertyPath());
     }
 
     /**
+     * @dataProvider provideInvalidOffsets
      * @expectedException \OutOfBoundsException
      */
-    public function testReplaceDoesNotAllowNegativeOffsets()
+    public function testReplaceDoesNotAllowInvalidOffsets($offset)
     {
-        $this->builder->replace(-1, 1, new PropertyPath('new1[new2].new3'));
+        $this->builder->replace($offset, 1, new PropertyPath('new1[new2].new3'));
+    }
+
+    public function provideInvalidOffsets()
+    {
+        return array(
+            array(6),
+            array(-7),
+        );
     }
 
     public function testReplaceWithLengthGreaterOne()

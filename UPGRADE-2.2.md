@@ -21,6 +21,29 @@
 
    Note: The function is the preferred way.
 
+#### Deprecations
+
+ * The `standalone` option is deprecated and will replaced with the `strategy` option in 2.3.
+ * The values `true`, `false`, `js` for the `standalone` option were deprecated and replaced respectively with the `esi`, `inline`, `hinclude` in 2.3.
+
+
+   Before:
+
+   ```
+   {% render 'BlogBundle:Post:list' with { 'limit': 2 }, {'standalone': true} %}
+   {% render 'BlogBundle:Post:list' with { 'limit': 2 }, {'standalone': false} %}
+   {% render 'BlogBundle:Post:list' with { 'limit': 2 }, {'standalone': 'js'} %}
+   ```
+
+   After:
+
+   ```
+   {{ render(controller('BlogBundle:Post:list', { 'limit': 2 }), { 'strategy': 'esi'}) }}
+   {{ render(controller('BlogBundle:Post:list', { 'limit': 2 }), { 'strategy': 'inline'}) }}
+   {{ render(controller('BlogBundle:Post:list', { 'limit': 2 }), { 'strategy': 'hinclude'}) }}
+   ```
+
+
 ### HttpFoundation
 
  * The MongoDbSessionHandler default field names and timestamp type have changed.
@@ -441,7 +464,7 @@
                $path .= '.';
            }
 
-           $context->getGraphWalker()->walkReference($someObject, $group, $path . 'myProperty', false);
+           $context->getGraphWalker()->walkReference($someObject, $group, $path.'myProperty', false);
        }
    }
    ```

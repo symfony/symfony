@@ -12,7 +12,6 @@
 namespace Symfony\Component\Security\Core\Encoder;
 
 use Symfony\Component\Security\Core\Encoder\BasePasswordEncoder;
-use Symfony\Component\Security\Core\Util\SecureRandomInterface;
 
 /**
  * @author Elnur Abdurrakhimov <elnur@elnur.pro>
@@ -21,56 +20,57 @@ use Symfony\Component\Security\Core\Util\SecureRandomInterface;
 class BCryptPasswordEncoder extends BasePasswordEncoder
 {
     /**
-     * @var SecureRandomInterface
-     */
-    private $secureRandom;
-
-    /**
      * @var string
      */
     private $cost;
 
-    private static $prefix = null;
-
     /**
      * Constructor.
      *
-     * @param SecureRandomInterface $secureRandom A SecureRandomInterface instance
-     * @param integer               $cost         The algorithmic cost that should be used
+     * @param integer $cost The algorithmic cost that should be used
      *
      * @throws \InvalidArgumentException if cost is out of range
      */
-    public function __construct(SecureRandomInterface $secureRandom, $cost)
+    public function __construct($cost)
     {
-        $this->secureRandom = $secureRandom;
+        if (!function_exists('password_hash')) {
+            throw new \RuntimeException('To use the BCrypt encoder, you need to upgrade to PHP 5.5 or install the "ircmaxell/password-compat" via Composer.');
+        }
 
         $cost = (int) $cost;
         if ($cost < 4 || $cost > 31) {
             throw new \InvalidArgumentException('Cost must be in the range of 4-31.');
         }
-        $this->cost = sprintf('%02d', $cost);
 
-        if (!self::$prefix) {
-            self::$prefix = '$'.(version_compare(phpversion(), '5.3.7', '>=') ? '2y' : '2a').'$';
-        }
+        $this->cost = sprintf('%02d', $cost);
     }
 
     /**
-     * {@inheritdoc}
+     * Encodes the raw password.
+     *
+     * It doesn't work with PHP versions lower than 5.3.7, since
+     * the password compat library uses CRYPT_BLOWFISH hash type with
+     * the "$2y$" salt prefix (which is not available in the early PHP versions).
+     * @see https://github.com/ircmaxell/password_compat/issues/10#issuecomment-11203833
+     *
+     * It is almost best to **not** pass a salt and let PHP generate one for you.
+     *
+     * @param string $raw  The password to encode
+     * @param string $salt The salt
+     *
+     * @return string The encoded password
+     *
+     * @link http://lxr.php.net/xref/PHP_5_5/ext/standard/password.c#111
      */
     public function encodePassword($raw, $salt)
     {
-        if (function_exists('password_hash')) {
-            return password_hash($raw, PASSWORD_BCRYPT, array('cost' => $this->cost));
+        $options = array('cost' => $this->cost);
+
+        if ($salt) {
+            $options['salt'] = $salt;
         }
 
-        $salt = self::$prefix.$this->cost.'$'.$this->encodeSalt($this->getRawSalt());
-        $encoded = crypt($raw, $salt);
-        if (!is_string($encoded) || strlen($encoded) <= 13) {
-            return false;
-        }
-
-        return $encoded;
+        return password_hash($raw, PASSWORD_BCRYPT, $options);
     }
 
     /**
@@ -78,71 +78,6 @@ class BCryptPasswordEncoder extends BasePasswordEncoder
      */
     public function isPasswordValid($encoded, $raw, $salt)
     {
-        if (function_exists('password_verify')) {
-            return password_verify($raw, $encoded);
-        }
-
-        $crypted = crypt($raw, $encoded);
-        if (strlen($crypted) <= 13) {
-            return false;
-        }
-
-        return $this->comparePasswords($encoded, $crypted);
-    }
-
-    /**
-     * Encodes the salt to be used by Bcrypt.
-     *
-     * The blowfish/bcrypt algorithm used by PHP crypt expects a different
-     * set and order of characters than the usual base64_encode function.
-     * Regular b64: ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/
-     * Bcrypt b64:  ./ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789
-     * We care because the last character in our encoded string will
-     * only represent 2 bits.  While two known implementations of
-     * bcrypt will happily accept and correct a salt string which
-     * has the 4 unused bits set to non-zero, we do not want to take
-     * chances and we also do not want to waste an additional byte
-     * of entropy.
-     *
-     * @param  bytes  $random a string of 16 random bytes
-     *
-     * @return string Properly encoded salt to use with php crypt function
-     *
-     * @throws \InvalidArgumentException if string of random bytes is too short
-     */
-    protected function encodeSalt($random)
-    {
-        $len = strlen($random);
-        if ($len < 16) {
-            throw new \InvalidArgumentException('The bcrypt salt needs 16 random bytes.');
-        }
-        if ($len > 16) {
-            $random = substr($random, 0, 16);
-        }
-
-        $base64raw = str_replace('+', '.', base64_encode($random));
-        $salt128bit = substr($base64raw, 0, 21);
-        $lastchar = substr($base64raw, 21, 1);
-        $lastchar = strtr($lastchar, 'AQgw', '.Oeu');
-        $salt128bit .= $lastchar;
-
-        return $salt128bit;
-    }
-
-    /**
-     * @return bytes 16 random bytes to be used in the salt
-     */
-    protected function getRawSalt()
-    {
-        $rawSalt = false;
-        $numBytes = 16;
-        if (function_exists('mcrypt_create_iv')) {
-            $rawSalt = mcrypt_create_iv($numBytes, MCRYPT_DEV_URANDOM);
-        }
-        if (!$rawSalt) {
-            $rawSalt = $this->secureRandom->nextBytes($numBytes);
-        }
-
-        return $rawSalt;
+        return password_verify($raw, $encoded);
     }
 }

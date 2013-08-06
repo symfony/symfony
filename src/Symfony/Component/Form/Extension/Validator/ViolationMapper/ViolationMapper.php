@@ -12,7 +12,7 @@
 namespace Symfony\Component\Form\Extension\Validator\ViolationMapper;
 
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\Util\VirtualFormAwareIterator;
+use Symfony\Component\Form\Util\InheritDataAwareIterator;
 use Symfony\Component\PropertyAccess\PropertyPathIterator;
 use Symfony\Component\PropertyAccess\PropertyPathBuilder;
 use Symfony\Component\PropertyAccess\PropertyPathIteratorInterface;
@@ -88,8 +88,8 @@ class ViolationMapper implements ViolationMapperInterface
         }
 
         // This case happens if an error happened in the data under a
-        // virtual form that does not match any of the children of
-        // the virtual form.
+        // form inheriting its parent data that does not match any of the
+        // children of that form.
         if (null !== $violationPath && !$match) {
             // If we could not map the error to anything more specific
             // than the root element, map it to the innermost directly
@@ -100,6 +100,9 @@ class ViolationMapper implements ViolationMapperInterface
             $scope = $form;
             $it = new ViolationPathIterator($violationPath);
 
+            // Note: acceptsErrors() will always return true for forms inheriting
+            // their parent data, because these forms can never be non-synchronized
+            // (they don't do any data transformation on their own)
             while ($this->acceptsErrors($scope) && $it->valid() && $it->mapsForm()) {
                 if (!$scope->has($it->current())) {
                     // Break if we find a reference to a non-existing child
@@ -162,9 +165,9 @@ class ViolationMapper implements ViolationMapperInterface
             }
         }
 
-        // Ignore virtual forms when iterating the children
+        // Skip forms inheriting their parent data when iterating the children
         $childIterator = new \RecursiveIteratorIterator(
-            new VirtualFormAwareIterator($form->all())
+            new InheritDataAwareIterator($form->all())
         );
 
         // Make the path longer until we find a matching child
@@ -174,9 +177,9 @@ class ViolationMapper implements ViolationMapperInterface
             }
 
             if ($it->isIndex()) {
-                $chunk .= '[' . $it->current() . ']';
+                $chunk .= '['.$it->current().']';
             } else {
-                $chunk .= ('' === $chunk ? '' : '.') . $it->current();
+                $chunk .= ('' === $chunk ? '' : '.').$it->current();
             }
 
             // Test mapping rules as long as we have any
@@ -253,8 +256,8 @@ class ViolationMapper implements ViolationMapperInterface
             // Process child form
             $scope = $scope->get($it->current());
 
-            if ($scope->getConfig()->getVirtual()) {
-                // Form is virtual
+            if ($scope->getConfig()->getInheritData()) {
+                // Form inherits its parent data
                 // Cut the piece out of the property path and proceed
                 $propertyPathBuilder->remove($i);
             } elseif (!$scope->getConfig()->getMapped()) {

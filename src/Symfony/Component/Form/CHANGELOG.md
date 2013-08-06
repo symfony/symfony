@@ -1,6 +1,40 @@
 CHANGELOG
 =========
 
+
+2.3.0
+------
+
+ * deprecated FormPerformanceTestCase and FormIntegrationTestCase in the Symfony\Component\Form\Tests namespace and moved them to the Symfony\Component\Form\Test namespace
+ * deprecated TypeTestCase in the Symfony\Component\Form\Tests\Extension\Core\Type namespace and moved it to the Symfony\Component\Form\Test namespace
+ * changed FormRenderer::humanize() to humanize also camel cased field name
+ * added RequestHandlerInterface and FormInterface::handleRequest()
+ * deprecated passing a Request instance to FormInterface::bind()
+ * added options "method" and "action" to FormType
+ * deprecated option "virtual" in favor "inherit_data"
+ * deprecated VirtualFormAwareIterator in favor of InheritDataAwareIterator
+ * [BC BREAK] removed the "array" type hint from DataMapperInterface
+ * improved forms inheriting their parent data to actually return that data from getData(), getNormData() and getViewData()
+ * added component-level exceptions for various SPL exceptions
+   changed all uses of the deprecated Exception class to use more specialized exceptions instead
+   removed NotInitializedException, NotValidException, TypeDefinitionException, TypeLoaderException, CreationException
+ * added events PRE_SUBMIT, SUBMIT and POST_SUBMIT
+ * deprecated events PRE_BIND, BIND and POST_BIND
+ * [BC BREAK] renamed bind() and isBound() in FormInterface to submit() and isSubmitted()
+ * added methods submit() and isSubmitted() to Form
+ * deprecated bind() and isBound() in Form
+ * deprecated AlreadyBoundException in favor of AlreadySubmittedException
+ * added support for PATCH requests
+ * [BC BREAK] added initialize() to FormInterface
+ * [BC BREAK] added getAutoInitialize() to FormConfigInterface
+ * [BC BREAK] added setAutoInitialize() to FormConfigBuilderInterface
+ * [BC BREAK] initialization for Form instances added to a form tree must be manually disabled
+ * PRE_SET_DATA is now guaranteed to be called after children were added by the form builder,
+   unless FormInterface::setData() is called manually
+ * fixed CSRF error message to be translated
+ * custom CSRF error messages can now be set through the "csrf_message" option
+ * fixed: expanded single-choice fields now show a radio button for the empty value
+
 2.2.0
 -----
 
@@ -22,6 +56,8 @@ CHANGELOG
  * added an optional PropertyAccessorInterface parameter to FormType,
    ObjectChoiceList and PropertyPathMapper
  * [BC BREAK] PropertyPathMapper and FormType now have a constructor
+ * [BC BREAK] setting the option "validation_groups" to ``false`` now disables validation
+   instead of assuming group "Default"
 
 2.1.0
 -----

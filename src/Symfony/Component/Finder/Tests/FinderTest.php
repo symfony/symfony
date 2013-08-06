@@ -717,6 +717,53 @@ class FinderTest extends Iterator\RealIteratorTestCase
         return $this->buildTestData($tests);
     }
 
+    /**
+     * @dataProvider getAdaptersTestData
+     */
+    public function testAccessDeniedException(Adapter\AdapterInterface $adapter)
+    {
+        if (defined('PHP_WINDOWS_VERSION_MAJOR')) {
+            $this->markTestSkipped('chmod is not supported on windows');
+        }
+
+        $finder = $this->buildFinder($adapter);
+        $finder->files()->in(self::$tmpDir);
+
+        // make 'foo' directory non-readable
+        chmod(self::$tmpDir.DIRECTORY_SEPARATOR.'foo', 0333);
+
+        try {
+            $this->assertIterator($this->toAbsolute(array('foo bar', 'test.php', 'test.py')), $finder->getIterator());
+            $this->fail('Finder should throw an exception when opening a non-readable directory.');
+        } catch (\Exception $e) {
+            $this->assertEquals('Symfony\\Component\\Finder\\Exception\\AccessDeniedException', get_class($e));
+        }
+
+        // restore original permissions
+        chmod(self::$tmpDir.DIRECTORY_SEPARATOR.'foo', 0777);
+    }
+
+    /**
+     * @dataProvider getAdaptersTestData
+     */
+    public function testIgnoredAccessDeniedException(Adapter\AdapterInterface $adapter)
+    {
+        if (defined('PHP_WINDOWS_VERSION_MAJOR')) {
+            $this->markTestSkipped('chmod is not supported on windows');
+        }
+
+        $finder = $this->buildFinder($adapter);
+        $finder->files()->ignoreUnreadableDirs()->in(self::$tmpDir);
+
+        // make 'foo' directory non-readable
+        chmod(self::$tmpDir.DIRECTORY_SEPARATOR.'foo', 0333);
+
+        $this->assertIterator($this->toAbsolute(array('foo bar', 'test.php', 'test.py')), $finder->getIterator());
+
+        // restore original permissions
+        chmod(self::$tmpDir.DIRECTORY_SEPARATOR.'foo', 0777);
+    }
+
     private function buildTestData(array $tests)
     {
         $data = array();

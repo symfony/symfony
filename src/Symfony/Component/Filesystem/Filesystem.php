@@ -234,18 +234,19 @@ class Filesystem
     }
 
     /**
-     * Renames a file.
+     * Renames a file or a directory.
      *
-     * @param string $origin The origin filename
-     * @param string $target The new filename
+     * @param string  $origin    The origin filename or directory
+     * @param string  $target    The new filename or directory
+     * @param Boolean $overwrite Whether to overwrite the target if it already exists
      *
-     * @throws IOException When target file already exists
+     * @throws IOException When target file or directory already exists
      * @throws IOException When origin cannot be renamed
      */
-    public function rename($origin, $target)
+    public function rename($origin, $target, $overwrite = false)
     {
         // we check that target does not exist
-        if (is_readable($target)) {
+        if (!$overwrite && is_readable($target)) {
             throw new IOException(sprintf('Cannot rename because the target "%s" already exist.', $target));
         }
 
@@ -330,7 +331,7 @@ class Filesystem
         $endPathRemainder = implode('/', array_slice($endPathArr, $index));
 
         // Construct $endPath from traversing to the common path, then to the remaining $endPath
-        $relativePath = $traverser . (strlen($endPathRemainder) > 0 ? $endPathRemainder . '/' : '');
+        $relativePath = $traverser.(strlen($endPathRemainder) > 0 ? $endPathRemainder.'/' : '');
 
         return (strlen($relativePath) === 0) ? './' : $relativePath;
     }
@@ -438,5 +439,33 @@ class Filesystem
         }
 
         return $files;
+    }
+
+    /**
+     * Atomically dumps content into a file.
+     *
+     * @param  string  $filename The file to be written to.
+     * @param  string  $content  The data to write into the file.
+     * @param  integer $mode     The file mode (octal).
+     * @throws IOException       If the file cannot be written to.
+     */
+    public function dumpFile($filename, $content, $mode = 0666)
+    {
+        $dir = dirname($filename);
+
+        if (!is_dir($dir)) {
+            $this->mkdir($dir);
+        } elseif (!is_writable($dir)) {
+            throw new IOException(sprintf('Unable to write in the %s directory\n', $dir));
+        }
+
+        $tmpFile = tempnam($dir, basename($filename));
+
+        if (false === @file_put_contents($tmpFile, $content)) {
+            throw new IOException(sprintf('Failed to write file "%s".', $filename));
+        }
+
+        $this->rename($tmpFile, $filename, true);
+        $this->chmod($filename, $mode);
     }
 }

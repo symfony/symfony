@@ -32,6 +32,14 @@ class ChainUserProvider implements UserProviderInterface
     }
 
     /**
+     * @return array
+     */
+    public function getProviders()
+    {
+        return $this->providers;
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function loadUserByUsername($username)

@@ -82,7 +82,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException        Symfony\Component\Validator\Exception\MappingException
+     * @expectedException        \Symfony\Component\Validator\Exception\MappingException
      * @expectedExceptionMessage Document types are not allowed.
      */
     public function testDocTypeIsNotAllowed()

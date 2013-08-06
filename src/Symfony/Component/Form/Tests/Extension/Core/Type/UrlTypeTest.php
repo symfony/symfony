@@ -11,13 +11,13 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-class UrlTypeTest extends LocalizedTestCase
+class UrlTypeTest extends TypeTestCase
 {
     public function testSubmitAddsDefaultProtocolIfNoneIsIncluded()
     {
         $form = $this->factory->create('url', 'name');
 
-        $form->bind('www.domain.com');
+        $form->submit('www.domain.com');
 
         $this->assertSame('http://www.domain.com', $form->getData());
         $this->assertSame('http://www.domain.com', $form->getViewData());
@@ -29,7 +29,7 @@ class UrlTypeTest extends LocalizedTestCase
             'default_protocol' => 'http',
         ));
 
-        $form->bind('ftp://www.domain.com');
+        $form->submit('ftp://www.domain.com');
 
         $this->assertSame('ftp://www.domain.com', $form->getData());
         $this->assertSame('ftp://www.domain.com', $form->getViewData());
@@ -41,7 +41,7 @@ class UrlTypeTest extends LocalizedTestCase
             'default_protocol' => 'http',
         ));
 
-        $form->bind('');
+        $form->submit('');
 
         $this->assertNull($form->getData());
         $this->assertSame('', $form->getViewData());
@@ -53,7 +53,7 @@ class UrlTypeTest extends LocalizedTestCase
             'default_protocol' => null,
         ));
 
-        $form->bind('www.domain.com');
+        $form->submit('www.domain.com');
 
         $this->assertSame('www.domain.com', $form->getData());
         $this->assertSame('www.domain.com', $form->getViewData());

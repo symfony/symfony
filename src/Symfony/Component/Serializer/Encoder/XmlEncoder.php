@@ -24,6 +24,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
 {
     private $dom;
     private $format;
+    private $context;
     private $rootNodeName = 'response';
 
     /**
@@ -47,8 +48,9 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
 
         $xmlRootNodeName = $this->resolveXmlRootName($context);
 
-        $this->dom = new \DOMDocument();
+        $this->dom = $this->createDomDocument($context);
         $this->format = $format;
+        $this->context = $context;
 
         if (null !== $data && !is_scalar($data)) {
             $root = $this->dom->createElement($xmlRootNodeName);
@@ -325,7 +327,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
         }
 
         if (is_object($data)) {
-            $data = $this->serializer->normalize($data, $this->format);
+            $data = $this->serializer->normalize($data, $this->format, $this->context);
             if (null !== $data && !is_scalar($data)) {
                 return $this->buildXml($parentNode, $data, $xmlRootNodeName);
             }
@@ -341,7 +343,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
             return $this->appendNode($parentNode, $data, 'data');
         }
 
-        throw new UnexpectedValueException('An unexpected value could not be serialized: '.var_export($data, true));
+        throw new UnexpectedValueException(sprintf('An unexpected value could not be serialized: %s', var_export($data, true)));
     }
 
     /**
@@ -399,7 +401,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
         } elseif ($val instanceof \Traversable) {
             $this->buildXml($node, $val);
         } elseif (is_object($val)) {
-            return $this->buildXml($node, $this->serializer->normalize($val, $this->format));
+            return $this->buildXml($node, $this->serializer->normalize($val, $this->format, $this->context));
         } elseif (is_numeric($val)) {
             return $this->appendText($node, (string) $val);
         } elseif (is_string($val) && $this->needsCdataWrapping($val)) {
@@ -426,4 +428,32 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
             : $this->rootNodeName;
     }
 
+    /**
+     * Create a DOM document, taking serializer options into account.
+     *
+     * @param array $context options that the encoder has access to.
+     *
+     * @return \DOMDocument
+     */
+    private function createDomDocument(array $context)
+    {
+        $document = new \DOMDocument();
+
+        // Set an attribute on the DOM document specifying, as part of the XML declaration,
+        $xmlOptions = array(
+            // the version number of the document
+            'xml_version' => 'xmlVersion',
+            // the encoding of the document
+            'xml_encoding' => 'encoding',
+            // whether the document is standalone
+            'xml_standalone' => 'xmlStandalone',
+        );
+        foreach ($xmlOptions as $xmlOption => $documentProperty) {
+            if (isset($context[$xmlOption])) {
+                $document->$documentProperty = $context[$xmlOption];
+            }
+        }
+
+        return $document;
+    }
 }

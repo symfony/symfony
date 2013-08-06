@@ -35,8 +35,6 @@ class Request
     const HEADER_CLIENT_PROTO = 'client_proto';
     const HEADER_CLIENT_PORT  = 'client_port';
 
-    protected static $trustProxy = false;
-
     protected static $trustedProxies = array();
 
     /**
@@ -118,6 +116,11 @@ class Request
      * @var array
      */
     protected $charsets;
+
+    /**
+     * @var array
+     */
+    protected $encodings;
 
     /**
      * @var array
@@ -220,6 +223,7 @@ class Request
         $this->content = $content;
         $this->languages = null;
         $this->charsets = null;
+        $this->encodings = null;
         $this->acceptableContentTypes = null;
         $this->pathInfo = null;
         $this->requestUri = null;
@@ -388,6 +392,7 @@ class Request
         }
         $dup->languages = null;
         $dup->charsets = null;
+        $dup->encodings = null;
         $dup->acceptableContentTypes = null;
         $dup->pathInfo = null;
         $dup->requestUri = null;
@@ -465,18 +470,6 @@ class Request
     }
 
     /**
-     * Trusts $_SERVER entries coming from proxies.
-     *
-     * @deprecated Deprecated since version 2.0, to be removed in 2.3. Use setTrustedProxies instead.
-     */
-    public static function trustProxyData()
-    {
-        trigger_error('trustProxyData() is deprecated since version 2.0 and will be removed in 2.3. Use setTrustedProxies() instead.', E_USER_DEPRECATED);
-
-        self::$trustProxy = true;
-    }
-
-    /**
      * Sets a list of trusted proxies.
      *
      * You should only list the reverse proxies that you manage directly.
@@ -488,7 +481,6 @@ class Request
     public static function setTrustedProxies(array $proxies)
     {
         self::$trustedProxies = $proxies;
-        self::$trustProxy = $proxies ? true : false;
     }
 
     /**
@@ -528,16 +520,21 @@ class Request
     }
 
     /**
-     * Returns true if $_SERVER entries coming from proxies are trusted,
-     * false otherwise.
+     * Gets the trusted proxy header name.
      *
-     * @return boolean
+     * @param string $key The header key
      *
-     * @deprecated Deprecated since version 2.2, to be removed in 2.3. Use getTrustedProxies instead.
+     * @return string The header name
+     *
+     * @throws \InvalidArgumentException
      */
-    public static function isProxyTrusted()
+    public static function getTrustedHeaderName($key)
     {
-        return self::$trustProxy;
+        if (!array_key_exists($key, self::$trustedHeaders)) {
+            throw new \InvalidArgumentException(sprintf('Unable to get the trusted header name for key "%s".', $key));
+        }
+
+        return self::$trustedHeaders[$key];
     }
 
     /**
@@ -687,6 +684,48 @@ class Request
     }
 
     /**
+     * Returns the client IP addresses.
+     *
+     * The most trusted IP address is first, and the less trusted one last.
+     * The "real" client IP address is the last one, but this is also the
+     * less trusted one.
+     *
+     * Use this method carefully; you should use getClientIp() instead.
+     *
+     * @return array The client IP addresses
+     *
+     * @see getClientIp()
+     */
+    public function getClientIps()
+    {
+        $ip = $this->server->get('REMOTE_ADDR');
+
+        if (!self::$trustedProxies) {
+            return array($ip);
+        }
+
+        if (!self::$trustedHeaders[self::HEADER_CLIENT_IP] || !$this->headers->has(self::$trustedHeaders[self::HEADER_CLIENT_IP])) {
+            return array($ip);
+        }
+
+        $clientIps = array_map('trim', explode(',', $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_IP])));
+        $clientIps[] = $ip;
+
+        $trustedProxies = !self::$trustedProxies ? array($ip) : self::$trustedProxies;
+        $ip = $clientIps[0];
+
+        foreach ($clientIps as $key => $clientIp) {
+            if (IpUtils::checkIp($clientIp, $trustedProxies)) {
+                unset($clientIps[$key]);
+
+                continue;
+            }
+        }
+
+        return $clientIps ? array_reverse($clientIps) : array($ip);
+    }
+
+    /**
      * Returns the client IP address.
      *
      * This method can read the client IP address from the "X-Forwarded-For" header
@@ -701,30 +740,16 @@ class Request
      *
      * @return string The client IP address
      *
+     * @see getClientIps()
      * @see http://en.wikipedia.org/wiki/X-Forwarded-For
      *
      * @api
      */
     public function getClientIp()
     {
-        $ip = $this->server->get('REMOTE_ADDR');
+        $ipAddresses = $this->getClientIps();
 
-        if (!self::$trustProxy) {
-            return $ip;
-        }
-
-        if (!self::$trustedHeaders[self::HEADER_CLIENT_IP] || !$this->headers->has(self::$trustedHeaders[self::HEADER_CLIENT_IP])) {
-            return $ip;
-        }
-
-        $clientIps = array_map('trim', explode(',', $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_IP])));
-        $clientIps[] = $ip;
-
-        $trustedProxies = self::$trustProxy && !self::$trustedProxies ? array($ip) : self::$trustedProxies;
-        $ip = $clientIps[0];
-        $clientIps = array_diff($clientIps, $trustedProxies);
-
-        return $clientIps ? array_pop($clientIps) : $ip;
+        return $ipAddresses[0];
     }
 
     /**
@@ -837,7 +862,7 @@ class Request
      */
     public function getPort()
     {
-        if (self::$trustProxy) {
+        if (self::$trustedProxies) {
             if (self::$trustedHeaders[self::HEADER_CLIENT_PORT] && $port = $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_PORT])) {
                 return $port;
             }
@@ -881,7 +906,7 @@ class Request
 
         $pass = $this->getPassword();
         if ('' != $pass) {
-           $userinfo .= ":$pass";
+            $userinfo .= ":$pass";
         }
 
         return $userinfo;
@@ -1004,7 +1029,7 @@ class Request
      */
     public function isSecure()
     {
-        if (self::$trustProxy && self::$trustedHeaders[self::HEADER_CLIENT_PROTO] && $proto = $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_PROTO])) {
+        if (self::$trustedProxies && self::$trustedHeaders[self::HEADER_CLIENT_PROTO] && $proto = $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_PROTO])) {
             return in_array(strtolower($proto), array('https', 'on', '1'));
         }
 
@@ -1030,7 +1055,7 @@ class Request
      */
     public function getHost()
     {
-        if (self::$trustProxy && self::$trustedHeaders[self::HEADER_CLIENT_HOST] && $host = $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_HOST])) {
+        if (self::$trustedProxies && self::$trustedHeaders[self::HEADER_CLIENT_HOST] && $host = $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_HOST])) {
             $elements = explode(',', $host);
 
             $host = $elements[count($elements) - 1];
@@ -1427,6 +1452,20 @@ class Request
     }
 
     /**
+     * Gets a list of encodings acceptable by the client browser.
+     *
+     * @return array List of encodings in preferable order
+     */
+    public function getEncodings()
+    {
+        if (null !== $this->encodings) {
+            return $this->encodings;
+        }
+
+        return $this->encodings = array_keys(AcceptHeader::fromString($this->headers->get('Accept-Encoding'))->all());
+    }
+
+    /**
      * Gets a list of content types acceptable by the client browser
      *
      * @return array List of content types in preferable order
@@ -1456,31 +1495,6 @@ class Request
     public function isXmlHttpRequest()
     {
         return 'XMLHttpRequest' == $this->headers->get('X-Requested-With');
-    }
-
-    /**
-     * Splits an Accept-* HTTP header.
-     *
-     * @param string $header Header to split
-     *
-     * @return array Array indexed by the values of the Accept-* header in preferred order
-     *
-     * @deprecated Deprecated since version 2.2, to be removed in 2.3.
-     */
-    public function splitHttpAcceptHeader($header)
-    {
-        trigger_error('splitHttpAcceptHeader() is deprecated since version 2.2 and will be removed in 2.3.', E_USER_DEPRECATED);
-
-        $headers = array();
-        foreach (AcceptHeader::fromString($header)->all() as $item) {
-            $key = $item->getValue();
-            foreach ($item->getAttributes() as $name => $value) {
-                $key .= sprintf(';%s=%s', $name, $value);
-            }
-            $headers[$key] = $item->getQuality();
-        }
-
-        return $headers;
     }
 
     /*

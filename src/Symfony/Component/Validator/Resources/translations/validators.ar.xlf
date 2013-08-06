@@ -222,6 +222,26 @@
                 <source>Unsupported card type or invalid card number.</source>
                 <target>نوع البطاقه غير مدعوم او الرقم غير صحيح.</target>
             </trans-unit>
+            <trans-unit id="59">
+                <source>This is not a valid International Bank Account Number (IBAN).</source>
+                <target>الرقم IBAN (رقم الحساب المصرفي الدولي) الذي تم إدخاله غير صالح.</target>
+            </trans-unit>
+            <trans-unit id="60">
+                <source>This value is not a valid ISBN-10.</source>
+                <target>هذه القيمة ليست ISBN-10 صالحة.</target>
+            </trans-unit>
+            <trans-unit id="61">
+                <source>This value is not a valid ISBN-13.</source>
+                <target>هذه القيمة ليست ISBN-13 صالحة.</target>
+            </trans-unit>
+            <trans-unit id="62">
+                <source>This value is neither a valid ISBN-10 nor a valid ISBN-13.</source>
+                <target>هذه القيمة ليست ISBN-10 صالحة ولا ISBN-13 صالحة.</target>
+            </trans-unit>
+            <trans-unit id="63">
+                <source>This value is not a valid ISSN.</source>
+                <target>هذه القيمة ليست ISSN صالحة.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

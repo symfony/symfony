@@ -43,6 +43,7 @@ $container->getParameterBag()->add(array(
     'foo' => 'bar',
 ));
 $container->setAlias('alias_for_foo', 'foo');
+$container->setAlias('alias_for_alias', 'alias_for_foo');
 $container->
     register('method_call1', 'FooClass')->
     setFile(realpath(__DIR__.'/../includes/foo.php'))->
@@ -70,6 +71,15 @@ $container
 $container
     ->register('baz', 'Baz')
     ->addMethodCall('setFoo', array(new Reference('foo_with_inline')))
+;
+$container
+    ->register('request', 'Request')
+    ->setSynthetic(true)
+    ->setSynchronized(true)
+;
+$container
+    ->register('depends_on_request', 'stdClass')
+    ->addMethodCall('setRequest', array(new Reference('request', ContainerInterface::NULL_ON_INVALID_REFERENCE, false)))
 ;
 
 return $container;

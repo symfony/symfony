@@ -212,7 +212,7 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
             'Failed',
             'Failed',
             array(),
-            '',
+            'Bernhard',
             '',
             'Bernhard'
         ));

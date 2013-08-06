@@ -109,7 +109,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 * 2.2.1 (2013-04-06)
 
  * 751abe1: Doctrine cannot handle bare random non-utf8 strings
- * 673fd9b:  idAsIndex should be true with a smallint or bigint id field.
+ * 673fd9b: idAsIndex should be true with a smallint or bigint id field.
  * 64a1d39: Fixed long multibyte parameter logging in DbalLogger:startQuery
  * 4cf06c1: Keep the file extension in the temporary copy and test that it exists (closes #7482)
  * 64ac34d: [Security] fixed wrong interface
@@ -131,7 +131,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * 6575df6: [Security] use current request attributes to generate redirect url?
  * 7216cb0: [Validator] fix showing wrong max file size for upload errors
  * c423f16: [2.1][TwigBridge] Fixes Issue #7342 in TwigBridge
- * 7d87ecd: [FrameworkBundle] fixed cahe:clear command's warmup
+ * 7d87ecd: [FrameworkBundle] fixed cache:clear command's warmup
  * 5ad4bd1: [TwigBridge] now enter/leave scope on Twig_Node_Module
  * fe4cc24: [TwigBridge] fixed fixed scope & trans_default_domain node visitor
  * fc47589: [BrowserKit] added ability to ignored malformed set-cookie header

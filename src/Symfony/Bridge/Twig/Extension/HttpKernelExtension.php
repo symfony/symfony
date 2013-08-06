@@ -54,8 +54,6 @@ class HttpKernelExtension extends \Twig_Extension
      */
     public function renderFragment($uri, $options = array())
     {
-        $options = $this->handler->fixOptions($options);
-
         $strategy = isset($options['strategy']) ? $options['strategy'] : 'inline';
         unset($options['strategy']);
 

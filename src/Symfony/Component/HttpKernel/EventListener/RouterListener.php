@@ -23,6 +23,7 @@ use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RequestContextAwareInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Initializes the context from the request and sets request attributes based on a matching route.
@@ -34,6 +35,7 @@ class RouterListener implements EventSubscriberInterface
     private $matcher;
     private $context;
     private $logger;
+    private $request;
 
     /**
      * Constructor.
@@ -59,12 +61,32 @@ class RouterListener implements EventSubscriberInterface
         $this->logger = $logger;
     }
 
+    /**
+     * Sets the current Request.
+     *
+     * The application should call this method whenever the Request
+     * object changes (entering a Request scope for instance, but
+     * also when leaving a Request scope -- especially when they are
+     * nested).
+     *
+     * @param Request|null $request A Request instance
+     */
+    public function setRequest(Request $request = null)
+    {
+        if (null !== $request && $this->request !== $request) {
+            $this->context->fromRequest($request);
+        }
+        $this->request = $request;
+    }
+
     public function onKernelRequest(GetResponseEvent $event)
     {
         $request = $event->getRequest();
 
         // initialize the context that is also used by the generator (assuming matcher and generator share the same context instance)
-        $this->context->fromRequest($request);
+        // we call setRequest even if most of the time, it has already been done to keep compatibility
+        // with frameworks which do not use the Symfony service container
+        $this->setRequest($request);
 
         if ($request->attributes->has('_controller')) {
             // routing is already done

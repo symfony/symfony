@@ -1,6 +1,20 @@
 CHANGELOG
 =========
 
+2.4.0
+-----
+
+ * The remember-me cookie hashes now use HMAC, which means that current cookies will be invalidated
+ * added simpler customization options
+
+2.3.0
+-----
+
+ * [BC BREAK] the BCrypt encoder constructor signature has changed (the first argument was removed)
+   To use the BCrypt encoder, you now need PHP 5.5 or "ircmaxell/password-compat" as a composer dependency
+ * [BC BREAK] return 401 instead of 500 when using use_forward during for form authentication
+ * added a `require_previous_session` option to `AbstractAuthenticationListener`
+
 2.2.0
 -----
 

@@ -9,13 +9,13 @@ translated strings from these including support for pluralization.
     use Symfony\Component\Translation\Loader\ArrayLoader;
 
     $translator = new Translator('fr_FR', new MessageSelector());
-    $translator->setFallbackLocale('fr');
+    $translator->setFallbackLocales(array('fr'));
     $translator->addLoader('array', new ArrayLoader());
     $translator->addResource('array', array(
         'Hello World!' => 'Bonjour',
     ), 'fr');
 
-    echo $translator->trans('Hello World!') . "\n";
+    echo $translator->trans('Hello World!')."\n";
 
 Resources
 ---------
@@ -26,7 +26,7 @@ https://github.com/fabpot/Silex/blob/master/src/Silex/Provider/TranslationServic
 
 Documentation:
 
-http://symfony.com/doc/2.2/book/translation.html
+http://symfony.com/doc/2.4/book/translation.html
 
 You can run the unit tests with the following command:
 

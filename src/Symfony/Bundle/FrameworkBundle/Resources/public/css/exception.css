@@ -106,3 +106,8 @@
     color: #000;
     font-size: 12px;
 }
+.sf-reset #traces-text pre {
+    white-space: pre;
+    font-size: 12px;
+    font-family: monospace;
+}

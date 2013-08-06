@@ -31,7 +31,7 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         $dumper = new PhpDumper($container = new ContainerBuilder());
 
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services1.php', $dumper->dump(), '->dump() dumps an empty container as an empty PHP class');
-        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services1-1.php', $dumper->dump(array('class' => 'Container', 'base_class' => 'AbstractContainer')), '->dump() takes a class and a base_class options');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services1-1.php', $dumper->dump(array('class' => 'Container', 'base_class' => 'AbstractContainer', 'namespace' => 'Symfony\Component\DependencyInjection\Dump')), '->dump() takes a class and a base_class options');
 
         $container = new ContainerBuilder();
         new PhpDumper($container);
@@ -130,6 +130,32 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         $container->register('bar$', 'FooClass');
         $dumper = new PhpDumper($container);
         $dumper->dump();
+    }
+
+    public function testAliases()
+    {
+        $container = include self::$fixturesPath.'/containers/container9.php';
+        $container->compile();
+        $dumper = new PhpDumper($container);
+        eval('?>'.$dumper->dump(array('class' => 'Symfony_DI_PhpDumper_Test_Aliases')));
+
+        $container = new \Symfony_DI_PhpDumper_Test_Aliases();
+        $container->set('foo', $foo = new \stdClass);
+        $this->assertSame($foo, $container->get('foo'));
+        $this->assertSame($foo, $container->get('alias_for_foo'));
+        $this->assertSame($foo, $container->get('alias_for_alias'));
+    }
+
+    public function testFrozenContainerWithoutAliases()
+    {
+        $container = new ContainerBuilder();
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        eval('?>'.$dumper->dump(array('class' => 'Symfony_DI_PhpDumper_Test_Frozen_No_Aliases')));
+
+        $container = new \Symfony_DI_PhpDumper_Test_Frozen_No_Aliases();
+        $this->assertFalse($container->has('foo'));
     }
 
     public function testOverrideServiceWhenUsingADumpedContainer()

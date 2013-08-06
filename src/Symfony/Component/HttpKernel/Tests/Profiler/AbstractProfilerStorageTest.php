@@ -233,7 +233,7 @@ abstract class AbstractProfilerStorageTest extends \PHPUnit_Framework_TestCase
     public function testDuplicates()
     {
         for ($i = 1; $i <= 5; $i++) {
-            $profile = new Profile('foo' . $i);
+            $profile = new Profile('foo'.$i);
             $profile->setIp('127.0.0.1');
             $profile->setUrl('http://example.net/');
             $profile->setMethod('GET');

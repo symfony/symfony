@@ -52,7 +52,7 @@ class ChoiceToValueTransformer implements DataTransformerInterface
         $choices = $this->choiceList->getChoicesForValues(array($value));
 
         if (1 !== count($choices)) {
-            throw new TransformationFailedException('The choice "' . $value . '" does not exist or is not unique');
+            throw new TransformationFailedException(sprintf('The choice "%s" does not exist or is not unique', $value));
         }
 
         $choice = current($choices);

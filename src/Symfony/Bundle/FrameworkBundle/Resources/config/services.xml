@@ -6,7 +6,7 @@
 
     <parameters>
         <parameter key="event_dispatcher.class">Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher</parameter>
-        <parameter key="http_kernel.class">Symfony\Bundle\FrameworkBundle\HttpKernel</parameter>
+        <parameter key="http_kernel.class">Symfony\Component\HttpKernel\DependencyInjection\ContainerAwareHttpKernel</parameter>
         <parameter key="filesystem.class">Symfony\Component\Filesystem\Filesystem</parameter>
         <parameter key="cache_warmer.class">Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate</parameter>
         <parameter key="cache_clearer.class">Symfony\Component\HttpKernel\CacheClearer\ChainCacheClearer</parameter>
@@ -40,7 +40,7 @@
             This service definition only defines the scope of the request.
             It is used to check references scope.
         -->
-        <service id="request" scope="request" synthetic="true" />
+        <service id="request" scope="request" synthetic="true" synchronized="true" />
 
         <service id="service_container" synthetic="true" />
 

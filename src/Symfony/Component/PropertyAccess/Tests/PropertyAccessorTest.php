@@ -14,6 +14,7 @@ namespace Symfony\Component\PropertyAccess\Tests;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\Author;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\Magician;
+use Symfony\Component\PropertyAccess\Tests\Fixtures\MagicianCall;
 
 class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 {
@@ -114,7 +115,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\PropertyAccessDeniedException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      */
     public function testGetValueThrowsExceptionIfPropertyIsNotPublic()
     {
@@ -138,7 +139,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\PropertyAccessDeniedException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      */
     public function testGetValueThrowsExceptionIfGetterIsNotPublic()
     {
@@ -180,7 +181,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\PropertyAccessDeniedException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      */
     public function testGetValueThrowsExceptionIfIsserIsNotPublic()
     {
@@ -295,7 +296,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\PropertyAccessDeniedException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      */
     public function testSetValueThrowsExceptionIfGetterIsNotPublic()
     {
@@ -331,4 +332,52 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 
         $this->propertyAccessor->setValue($value, 'foobar', 'bam');
     }
+
+    /**
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
+     */
+    public function testSetValueFailsIfMagicCallDisabled()
+    {
+        $value = new MagicianCall();
+
+        $this->propertyAccessor->setValue($value, 'foobar', 'bam');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
+     */
+    public function testGetValueFailsIfMagicCallDisabled()
+    {
+        $value = new MagicianCall();
+
+        $this->propertyAccessor->getValue($value, 'foobar', 'bam');
+    }
+
+    public function testGetValueReadsMagicCall()
+    {
+        $propertyAccessor = new PropertyAccessor(true);
+        $object = new MagicianCall();
+        $object->setMagicProperty('foobar');
+
+        $this->assertSame('foobar', $propertyAccessor->getValue($object, 'magicProperty'));
+    }
+
+    public function testGetValueReadsMagicCallThatReturnsConstant()
+    {
+        $propertyAccessor = new PropertyAccessor(true);
+        $object = new MagicianCall();
+
+        $this->assertNull($propertyAccessor->getValue($object, 'MagicProperty'));
+    }
+
+    public function testSetValueUpdatesMagicCall()
+    {
+        $propertyAccessor = new PropertyAccessor(true);
+        $object = new MagicianCall();
+
+        $propertyAccessor->setValue($object, 'magicProperty', 'foobar');
+
+        $this->assertEquals('foobar', $object->getMagicProperty());
+    }
+
 }

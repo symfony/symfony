@@ -11,13 +11,10 @@
 
 namespace Symfony\Component\HttpKernel\Fragment;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
-use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Renders a URI that represents a resource fragment.
@@ -29,11 +26,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  *
  * @see FragmentRendererInterface
  */
-class FragmentHandler implements EventSubscriberInterface
+class FragmentHandler
 {
     private $debug;
     private $renderers;
-    private $requests;
+    private $request;
 
     /**
      * Constructor.
@@ -48,13 +45,12 @@ class FragmentHandler implements EventSubscriberInterface
             $this->addRenderer($renderer);
         }
         $this->debug = $debug;
-        $this->requests = array();
     }
 
     /**
      * Adds a renderer.
      *
-     * @param FragmentRendererInterface $strategy A FragmentRendererInterface instance
+     * @param FragmentRendererInterface $renderer A FragmentRendererInterface instance
      */
     public function addRenderer(FragmentRendererInterface $renderer)
     {
@@ -62,23 +58,13 @@ class FragmentHandler implements EventSubscriberInterface
     }
 
     /**
-     * Stores the Request object.
+     * Sets the current Request.
      *
-     * @param GetResponseEvent $event A GetResponseEvent instance
+     * @param Request $request The current Request
      */
-    public function onKernelRequest(GetResponseEvent $event)
+    public function setRequest(Request $request = null)
     {
-        array_unshift($this->requests, $event->getRequest());
-    }
-
-    /**
-     * Removes the most recent Request object.
-     *
-     * @param FilterResponseEvent $event A FilterResponseEvent instance
-     */
-    public function onKernelResponse(FilterResponseEvent $event)
-    {
-        array_shift($this->requests);
+        $this->request = $request;
     }
 
     /**
@@ -107,7 +93,11 @@ class FragmentHandler implements EventSubscriberInterface
             throw new \InvalidArgumentException(sprintf('The "%s" renderer does not exist.', $renderer));
         }
 
-        return $this->deliver($this->renderers[$renderer]->render($uri, $this->requests[0], $options));
+        if (null === $this->request) {
+            throw new \LogicException('Rendering a fragment can only be done when handling a master Request.');
+        }
+
+        return $this->deliver($this->renderers[$renderer]->render($uri, $this->request, $options));
     }
 
     /**
@@ -125,7 +115,7 @@ class FragmentHandler implements EventSubscriberInterface
     protected function deliver(Response $response)
     {
         if (!$response->isSuccessful()) {
-            throw new \RuntimeException(sprintf('Error when rendering "%s" (Status code is %s).', $this->requests[0]->getUri(), $response->getStatusCode()));
+            throw new \RuntimeException(sprintf('Error when rendering "%s" (Status code is %s).', $this->request->getUri(), $response->getStatusCode()));
         }
 
         if (!$response instanceof StreamedResponse) {
@@ -133,42 +123,5 @@ class FragmentHandler implements EventSubscriberInterface
         }
 
         $response->sendContent();
-    }
-
-    public static function getSubscribedEvents()
-    {
-        return array(
-            KernelEvents::REQUEST  => 'onKernelRequest',
-            KernelEvents::RESPONSE => 'onKernelResponse',
-        );
-    }
-
-    // to be removed in 2.3
-    public function fixOptions(array $options)
-    {
-        // support for the standalone option is @deprecated in 2.2 and replaced with the strategy option
-        if (isset($options['standalone'])) {
-            trigger_error('The "standalone" option is deprecated in version 2.2 and replaced with the "strategy" option.', E_USER_DEPRECATED);
-
-            // support for the true value is @deprecated in 2.2, will be removed in 2.3
-            if (true === $options['standalone']) {
-                trigger_error('The "true" value for the "standalone" option is deprecated in version 2.2 and replaced with the "esi" value.', E_USER_DEPRECATED);
-
-                $options['standalone'] = 'esi';
-            } elseif (false === $options['standalone']) {
-                trigger_error('The "false" value for the "standalone" option is deprecated in version 2.2 and replaced with the "inline" value.', E_USER_DEPRECATED);
-
-                $options['standalone'] = 'inline';
-            } elseif ('js' === $options['standalone']) {
-                trigger_error('The "js" value for the "standalone" option is deprecated in version 2.2 and replaced with the "hinclude" value.', E_USER_DEPRECATED);
-
-                $options['standalone'] = 'hinclude';
-            }
-
-            $options['strategy'] = $options['standalone'];
-            unset($options['standalone']);
-        }
-
-        return $options;
     }
 }

@@ -222,6 +222,62 @@
                 <source>Unsupported card type or invalid card number.</source>
                 <target>Niet-ondersteund type creditcard of ongeldig nummer.</target>
             </trans-unit>
+            <trans-unit id="59">
+                <source>This is not a valid International Bank Account Number (IBAN).</source>
+                <target>Dit is geen geldig internationaal bankrekeningnummer (IBAN).</target>
+            </trans-unit>
+             <trans-unit id="60">
+                <source>This value is not a valid ISBN-10.</source>
+                <target>Deze waarde is geen geldige ISBN-10.</target>
+            </trans-unit>
+            <trans-unit id="61">
+                <source>This value is not a valid ISBN-13.</source>
+                <target>Deze waarde is geen geldige ISBN-13.</target>
+            </trans-unit>
+            <trans-unit id="62">
+                <source>This value is neither a valid ISBN-10 nor a valid ISBN-13.</source>
+                <target>Deze waarde is geen geldige ISBN-10 of ISBN-13 waarde.</target>
+            </trans-unit>
+            <trans-unit id="63">
+                <source>This value is not a valid ISSN.</source>
+                <target>Deze waarde is geen geldige ISSN waarde.</target>
+            </trans-unit>
+            <trans-unit id="64">
+                <source>This value is not a valid currency.</source>
+                <target>Deze waarde is geen geldige valuta.</target>
+            </trans-unit>
+            <trans-unit id="65">
+                <source>This value should be equal to {{ compared_value }}.</source>
+                <target>Deze waarde moet gelijk zijn aan {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="66">
+                <source>This value should be greater than {{ compared_value }}.</source>
+                <target>Deze waarde moet groter zijn dan {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="67">
+                <source>This value should be greater than or equal to {{ compared_value }}.</source>
+                <target>Deze waarde moet groter dan of gelijk aan {{ compared_value }} zijn.</target>
+            </trans-unit>
+            <trans-unit id="68">
+                <source>This value should be identical  to {{ compared_value_type }} {{ compared_value }}.</source>
+                <target>Deze waarde moet identiek zijn aan {{ compared_value_type }} {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="69">
+                <source>This value should be less than {{ compared_value }}.</source>
+                <target>Deze waarde moet minder zijn dan {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="70">
+                <source>This value should be less than or equal to {{ compared_value }}.</source>
+                <target>Deze waarde moet minder dan of gelijk aan {{ compared_value }} zijn.</target>
+            </trans-unit>
+            <trans-unit id="71">
+                <source>This value should not be equal to {{ compared_value }}.</source>
+                <target>Deze waarde moet niet gelijk zijn aan {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="72">
+                <source>This valuemahould not be identical to {{ compared_value }}.</source>
+                <target>Deze waarde moet niet identiek zijn aan {{ compared_value }}.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

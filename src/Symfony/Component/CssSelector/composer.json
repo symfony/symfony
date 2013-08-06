@@ -11,6 +11,10 @@
             "email": "fabien@symfony.com"
         },
         {
+            "name": "Jean-François Simon",
+            "email": "jeanfrancois.simon@sensiolabs.com"
+        },
+        {
             "name": "Symfony Community",
             "homepage": "http://symfony.com/contributors"
         }
@@ -25,7 +29,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.2-dev"
+            "dev-master": "2.4-dev"
         }
     }
 }

@@ -92,6 +92,14 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
         $this->failureHandler = $failureHandler;
         $this->options = array_merge(array(
             'check_path'                     => '/login_check',
+            'login_path'                     => '/login',
+            'always_use_default_target_path' => false,
+            'default_target_path'            => '/',
+            'target_path_parameter'          => '_target_path',
+            'use_referer'                    => false,
+            'failure_path'                   => null,
+            'failure_forward'                => false,
+            'require_previous_session'       => true,
         ), $options);
         $this->logger = $logger;
         $this->dispatcher = $dispatcher;
@@ -129,7 +137,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
         }
 
         try {
-            if (!$request->hasPreviousSession()) {
+            if ($this->options['require_previous_session'] && !$request->hasPreviousSession()) {
                 throw new SessionUnavailableException('Your session has timed out, or you have disabled cookies.');
             }
 

@@ -67,6 +67,13 @@
         <argument type="service" id="foo_with_inline"/>
       </call>
     </service>
+    <service id="request" class="Request" synthetic="true" synchronized="true"/>
+    <service id="depends_on_request" class="stdClass">
+      <call method="setRequest">
+        <argument type="service" id="request" on-invalid="null" strict="false"/>
+      </call>
+    </service>
     <service id="alias_for_foo" alias="foo"/>
+    <service id="alias_for_alias" alias="foo"/>
   </services>
 </container>

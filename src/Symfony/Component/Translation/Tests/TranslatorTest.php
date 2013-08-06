@@ -27,7 +27,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('fr', $translator->getLocale());
     }
 
-    public function testSetFallbackLocale()
+    public function testSetFallbackLocales()
     {
         $translator = new Translator('en', new MessageSelector());
         $translator->addLoader('array', new ArrayLoader());
@@ -37,11 +37,11 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         // force catalogue loading
         $translator->trans('bar');
 
-        $translator->setFallbackLocale('fr');
+        $translator->setFallbackLocales(array('fr'));
         $this->assertEquals('foobar', $translator->trans('bar'));
     }
 
-    public function testSetFallbackLocaleMultiple()
+    public function testSetFallbackLocalesMultiple()
     {
         $translator = new Translator('en', new MessageSelector());
         $translator->addLoader('array', new ArrayLoader());
@@ -51,7 +51,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         // force catalogue loading
         $translator->trans('bar');
 
-        $translator->setFallbackLocale(array('fr_FR', 'fr'));
+        $translator->setFallbackLocales(array('fr_FR', 'fr'));
         $this->assertEquals('bar (fr)', $translator->trans('bar'));
     }
 
@@ -62,7 +62,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $translator->addResource('array', array('foo' => 'foofoo'), 'en_US');
         $translator->addResource('array', array('bar' => 'foobar'), 'en');
 
-        $translator->setFallbackLocale('en');
+        $translator->setFallbackLocales(array('en'));
 
         $this->assertEquals('foobar', $translator->trans('bar'));
     }
@@ -127,7 +127,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $translator->addResource('array', array('foo' => 'foo (en_US)'), 'en_US');
         $translator->addResource('array', array('bar' => 'bar (en)'), 'en');
 
-        $translator->setFallbackLocale(array('en_US', 'en'));
+        $translator->setFallbackLocales(array('en_US', 'en'));
 
         $this->assertEquals('foo (en_US)', $translator->trans('foo'));
         $this->assertEquals('bar (en)', $translator->trans('bar'));
@@ -136,7 +136,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     public function testTransNonExistentWithFallback()
     {
         $translator = new Translator('fr', new MessageSelector());
-        $translator->setFallbackLocale('en');
+        $translator->setFallbackLocales(array('en'));
         $translator->addLoader('array', new ArrayLoader());
         $this->assertEquals('non-existent', $translator->trans('non-existent'));
     }
@@ -260,7 +260,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     public function testTransChoiceFallback()
     {
         $translator = new Translator('ru', new MessageSelector());
-        $translator->setFallbackLocale('en');
+        $translator->setFallbackLocales(array('en'));
         $translator->addLoader('array', new ArrayLoader());
         $translator->addResource('array', array('some_message2' => 'one thing|%count% things'), 'en');
 
@@ -270,7 +270,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     public function testTransChoiceFallbackBis()
     {
         $translator = new Translator('ru', new MessageSelector());
-        $translator->setFallbackLocale(array('en_US', 'en'));
+        $translator->setFallbackLocales(array('en_US', 'en'));
         $translator->addLoader('array', new ArrayLoader());
         $translator->addResource('array', array('some_message2' => 'one thing|%count% things'), 'en_US');
 
@@ -283,7 +283,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     public function testTransChoiceFallbackWithNoTranslation()
     {
         $translator = new Translator('ru', new MessageSelector());
-        $translator->setFallbackLocale('en');
+        $translator->setFallbackLocales(array('en'));
         $translator->addLoader('array', new ArrayLoader());
 
         $this->assertEquals('10 things', $translator->transChoice('some_message2', 10, array('%count%' => 10)));

@@ -59,4 +59,21 @@ class AnonymousAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
         $listener = new AnonymousAuthenticationListener($context, 'TheKey');
         $listener->handle($this->getMock('Symfony\Component\HttpKernel\Event\GetResponseEvent', array(), array(), '', false));
     }
+
+    public function testHandledEventIsLogged()
+    {
+        if (!interface_exists('Psr\Log\LoggerInterface')) {
+            $this->markTestSkipped('The "LoggerInterface" is not available');
+        }
+
+        $context = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
+        $logger = $this->getMock('Psr\Log\LoggerInterface');
+        $logger->expects($this->once())
+            ->method('info')
+            ->with('Populated SecurityContext with an anonymous Token')
+        ;
+
+        $listener = new AnonymousAuthenticationListener($context, 'TheKey', $logger);
+        $listener->handle($this->getMock('Symfony\Component\HttpKernel\Event\GetResponseEvent', array(), array(), '', false));
+    }
 }

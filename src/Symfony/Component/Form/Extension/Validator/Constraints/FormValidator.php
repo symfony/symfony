@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Extension\Validator\Constraints;
 
+use Symfony\Component\Form\ClickableInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Extension\Validator\Util\ServerParams;
 use Symfony\Component\Validator\Constraint;
@@ -171,20 +172,65 @@ class FormValidator extends ConstraintValidator
      */
     private static function getValidationGroups(FormInterface $form)
     {
+        $button = self::findClickedButton($form->getRoot());
+
+        if (null !== $button) {
+            $groups = $button->getConfig()->getOption('validation_groups');
+
+            if (null !== $groups) {
+                return self::resolveValidationGroups($groups, $form);
+            }
+        }
+
         do {
             $groups = $form->getConfig()->getOption('validation_groups');
 
             if (null !== $groups) {
-                if (!is_string($groups) && is_callable($groups)) {
-                    $groups = call_user_func($groups, $form);
-                }
-
-                return (array) $groups;
+                return self::resolveValidationGroups($groups, $form);
             }
 
             $form = $form->getParent();
         } while (null !== $form);
 
         return array(Constraint::DEFAULT_GROUP);
+    }
+
+    /**
+     * Extracts a clicked button from a form tree, if one exists.
+     *
+     * @param FormInterface $form The root form.
+     *
+     * @return ClickableInterface|null The clicked button or null.
+     */
+    private static function findClickedButton(FormInterface $form)
+    {
+        if ($form instanceof ClickableInterface && $form->isClicked()) {
+            return $form;
+        }
+
+        foreach ($form as $child) {
+            if (null !== ($button = self::findClickedButton($child))) {
+                return $button;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Post-processes the validation groups option for a given form.
+     *
+     * @param array|callable $groups The validation groups.
+     * @param FormInterface  $form   The validated form.
+     *
+     * @return array The validation groups.
+     */
+    private static function resolveValidationGroups($groups, FormInterface $form)
+    {
+        if (!is_string($groups) && is_callable($groups)) {
+            $groups = call_user_func($groups, $form);
+        }
+
+        return (array) $groups;
     }
 }

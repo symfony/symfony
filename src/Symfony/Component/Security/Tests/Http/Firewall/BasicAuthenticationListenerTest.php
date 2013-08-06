@@ -196,6 +196,20 @@ class BasicAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
         $listener->handle($event);
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage $providerKey must not be empty
+     */
+    public function testItRequiresProviderKey()
+    {
+        new BasicAuthenticationListener(
+            $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface'),
+            $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface'),
+            '',
+            $this->getMock('Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface')
+        );
+    }
+
     public function testHandleWithADifferentAuthenticatedToken()
     {
         $request = new Request(array(), array(), array(), array(), array(), array(

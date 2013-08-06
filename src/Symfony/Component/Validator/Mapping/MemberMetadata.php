@@ -26,7 +26,7 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
     public $cascaded = false;
     public $collectionCascaded = false;
     public $collectionCascadedDeeply = false;
-    private $reflMember;
+    private $reflMember = array();
 
     /**
      * Constructor.
@@ -123,31 +123,37 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
     /**
      * Returns whether this member is public
      *
+     * @param object|string $objectOrClassName The object or the class name
+     *
      * @return Boolean
      */
-    public function isPublic()
+    public function isPublic($objectOrClassName)
     {
-        return $this->getReflectionMember()->isPublic();
+        return $this->getReflectionMember($objectOrClassName)->isPublic();
     }
 
     /**
      * Returns whether this member is protected
      *
+     * @param object|string $objectOrClassName The object or the class name
+     *
      * @return Boolean
      */
-    public function isProtected()
+    public function isProtected($objectOrClassName)
     {
-        return $this->getReflectionMember()->isProtected();
+        return $this->getReflectionMember($objectOrClassName)->isProtected();
     }
 
     /**
      * Returns whether this member is private
      *
+     * @param object|string $objectOrClassName The object or the class name
+     *
      * @return Boolean
      */
-    public function isPrivate()
+    public function isPrivate($objectOrClassName)
     {
-        return $this->getReflectionMember()->isPrivate();
+        return $this->getReflectionMember($objectOrClassName)->isPrivate();
     }
 
     /**
@@ -183,40 +189,28 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
     }
 
     /**
-     * Returns the value of this property in the given object
-     *
-     * @param object $object The object
-     *
-     * @return mixed The property value
-     *
-     * @deprecated Deprecated since version 2.2, to be removed in 2.3. Use the
-     *             method {@link getPropertyValue} instead.
-     */
-    public function getValue($object)
-    {
-        trigger_error('getValue() is deprecated since version 2.2 and will be removed in 2.3. Use getPropertyValue() instead.', E_USER_DEPRECATED);
-
-        return $this->getPropertyValue($object);
-    }
-
-    /**
      * Returns the Reflection instance of the member
+     *
+     * @param object|string $objectOrClassName The object or the class name
      *
      * @return object
      */
-    public function getReflectionMember()
+    public function getReflectionMember($objectOrClassName)
     {
-        if (!$this->reflMember) {
-            $this->reflMember = $this->newReflectionMember();
+        $className = is_string($objectOrClassName) ? $objectOrClassName : get_class($objectOrClassName);
+        if (!isset($this->reflMember[$className])) {
+            $this->reflMember[$className] = $this->newReflectionMember($objectOrClassName);
         }
 
-        return $this->reflMember;
+        return $this->reflMember[$className];
     }
 
     /**
      * Creates a new Reflection instance for the member
      *
-     * @return object
+     * @param object|string $objectOrClassName The object or the class name
+     *
+     * @return mixed Reflection class
      */
-    abstract protected function newReflectionMember();
+    abstract protected function newReflectionMember($objectOrClassName);
 }

@@ -24,6 +24,23 @@ class ProjectServiceContainer extends Container
     public function __construct()
     {
         parent::__construct(new ParameterBag($this->getDefaultParameters()));
+        $this->methodMap = array(
+            'bar' => 'getBarService',
+            'baz' => 'getBazService',
+            'depends_on_request' => 'getDependsOnRequestService',
+            'factory_service' => 'getFactoryServiceService',
+            'foo' => 'getFooService',
+            'foo.baz' => 'getFoo_BazService',
+            'foo_bar' => 'getFooBarService',
+            'foo_with_inline' => 'getFooWithInlineService',
+            'inlined' => 'getInlinedService',
+            'method_call1' => 'getMethodCall1Service',
+            'request' => 'getRequestService',
+        );
+        $this->aliases = array(
+            'alias_for_alias' => 'foo',
+            'alias_for_foo' => 'foo',
+        );
     }
 
     /**
@@ -56,6 +73,23 @@ class ProjectServiceContainer extends Container
         $this->services['baz'] = $instance = new \Baz();
 
         $instance->setFoo($this->get('foo_with_inline'));
+
+        return $instance;
+    }
+
+    /**
+     * Gets the 'depends_on_request' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return stdClass A stdClass instance.
+     */
+    protected function getDependsOnRequestService()
+    {
+        $this->services['depends_on_request'] = $instance = new \stdClass();
+
+        $instance->setRequest($this->get('request', ContainerInterface::NULL_ON_INVALID_REFERENCE));
 
         return $instance;
     }
@@ -102,7 +136,7 @@ class ProjectServiceContainer extends Container
      * This service is shared.
      * This method always returns the same instance of the service.
      *
-     * @return Object A %baz_class% instance.
+     * @return object A %baz_class% instance.
      */
     protected function getFoo_BazService()
     {
@@ -116,7 +150,7 @@ class ProjectServiceContainer extends Container
     /**
      * Gets the 'foo_bar' service.
      *
-     * @return Object A %foo_class% instance.
+     * @return object A %foo_class% instance.
      */
     protected function getFooBarService()
     {
@@ -169,13 +203,26 @@ class ProjectServiceContainer extends Container
     }
 
     /**
-     * Gets the alias_for_foo service alias.
+     * Gets the 'request' service.
      *
-     * @return FooClass An instance of the foo service
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @throws RuntimeException always since this service is expected to be injected dynamically
      */
-    protected function getAliasForFooService()
+    protected function getRequestService()
     {
-        return $this->get('foo');
+        throw new RuntimeException('You have requested a synthetic service ("request"). The DIC does not know how to construct this service.');
+    }
+
+    /**
+     * Updates the 'request' service.
+     */
+    protected function synchronizeRequestService()
+    {
+        if ($this->initialized('depends_on_request')) {
+            $this->get('depends_on_request')->setRequest($this->get('request', ContainerInterface::NULL_ON_INVALID_REFERENCE));
+        }
     }
 
     /**

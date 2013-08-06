@@ -48,6 +48,8 @@ class FrameworkExtension extends Extension
         // will be used and everything will still work as expected.
         $loader->load('translation.xml');
 
+        $loader->load('debug_prod.xml');
+
         if ($container->getParameter('kernel.debug')) {
             $loader->load('debug.xml');
 
@@ -66,11 +68,9 @@ class FrameworkExtension extends Extension
             $container->setParameter('kernel.secret', $config['secret']);
         }
 
+        $container->setParameter('kernel.http_method_override', $config['http_method_override']);
+
         $container->setParameter('kernel.trusted_proxies', $config['trusted_proxies']);
-
-        // @deprecated, to be removed in 2.3
-        $container->setParameter('kernel.trust_proxy_headers', $config['trust_proxy_headers']);
-
         $container->setParameter('kernel.default_locale', $config['default_locale']);
 
         if (!empty($config['test'])) {
@@ -102,15 +102,11 @@ class FrameworkExtension extends Extension
 
         $this->registerAnnotationsConfiguration($config['annotations'], $container, $loader);
 
-        $this->addClassesToCompile(array(
-            'Symfony\\Component\\HttpFoundation\\ParameterBag',
-            'Symfony\\Component\\HttpFoundation\\HeaderBag',
-            'Symfony\\Component\\HttpFoundation\\FileBag',
-            'Symfony\\Component\\HttpFoundation\\ServerBag',
-            'Symfony\\Component\\HttpFoundation\\Request',
-            'Symfony\\Component\\HttpFoundation\\Response',
-            'Symfony\\Component\\HttpFoundation\\ResponseHeaderBag',
+        if (isset($config['serializer']) && $config['serializer']['enabled']) {
+            $loader->load('serializer.xml');
+        }
 
+        $this->addClassesToCompile(array(
             'Symfony\\Component\\Config\\FileLocator',
 
             'Symfony\\Component\\EventDispatcher\\Event',
@@ -207,6 +203,13 @@ class FrameworkExtension extends Extension
      */
     private function registerProfilerConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
+        if (!$this->isConfigEnabled($container, $config)) {
+            // this is needed for the WebProfiler to work even if the profiler is disabled
+            $container->setParameter('data_collector.templates', array());
+
+            return;
+        }
+
         $loader->load('profiling.xml');
         $loader->load('collectors.xml');
 
@@ -238,12 +241,16 @@ class FrameworkExtension extends Extension
         if (isset($config['matcher'])) {
             if (isset($config['matcher']['service'])) {
                 $container->setAlias('profiler.request_matcher', $config['matcher']['service']);
-            } elseif (isset($config['matcher']['ip']) || isset($config['matcher']['path'])) {
+            } elseif (isset($config['matcher']['ip']) || isset($config['matcher']['path']) || isset($config['matcher']['ips'])) {
                 $definition = $container->register('profiler.request_matcher', 'Symfony\\Component\\HttpFoundation\\RequestMatcher');
                 $definition->setPublic(false);
 
                 if (isset($config['matcher']['ip'])) {
                     $definition->addMethodCall('matchIp', array($config['matcher']['ip']));
+                }
+
+                if (isset($config['matcher']['ips'])) {
+                    $definition->addMethodCall('matchIps', array($config['matcher']['ips']));
                 }
 
                 if (isset($config['matcher']['path'])) {
@@ -252,7 +259,7 @@ class FrameworkExtension extends Extension
             }
         }
 
-        if (!$this->isConfigEnabled($container, $config)) {
+        if (!$config['collect']) {
             $container->getDefinition('profiler')->addMethodCall('disable', array());
         }
     }
@@ -310,19 +317,13 @@ class FrameworkExtension extends Extension
             }
         }
 
-        //we deprecated session options without cookie_ prefix, but we are still supporting them,
-        //Let's merge the ones that were supplied without prefix
-        foreach (array('lifetime', 'path', 'domain', 'secure', 'httponly') as $key) {
-            if (!isset($options['cookie_'.$key]) && isset($config[$key])) {
-                $options['cookie_'.$key] = $config[$key];
-            }
-        }
         $container->setParameter('session.storage.options', $options);
 
         // session handler (the internal callback registered with PHP session management)
         if (null == $config['handler_id']) {
             // Set the handler class to be null
             $container->getDefinition('session.storage.native')->replaceArgument(1, null);
+            $container->getDefinition('session.storage.php_bridge')->replaceArgument(0, null);
         } else {
             $container->setAlias('session.handler', $config['handler_id']);
         }
@@ -332,6 +333,7 @@ class FrameworkExtension extends Extension
         $this->addClassesToCompile(array(
             'Symfony\\Bundle\\FrameworkBundle\\EventListener\\SessionListener',
             'Symfony\\Component\\HttpFoundation\\Session\\Storage\\NativeSessionStorage',
+            'Symfony\\Component\\HttpFoundation\\Session\\Storage\\PhpBridgeSessionStorage',
             'Symfony\\Component\\HttpFoundation\\Session\\Storage\\Handler\\NativeFileSessionHandler',
             'Symfony\\Component\\HttpFoundation\\Session\\Storage\\Proxy\\AbstractProxy',
             'Symfony\\Component\\HttpFoundation\\Session\\Storage\\Proxy\\SessionHandlerProxy',
@@ -369,6 +371,9 @@ class FrameworkExtension extends Extension
 
         if ($container->getParameter('kernel.debug')) {
             $loader->load('templating_debug.xml');
+
+            $container->setDefinition('templating.engine.php', $container->findDefinition('debug.templating.engine.php'));
+            $container->setAlias('debug.templating.engine.php', 'templating.engine.php');
         }
 
         // create package definitions and add them to the assets helper
@@ -531,7 +536,10 @@ class FrameworkExtension extends Extension
         // Use the "real" translator instead of the identity default
         $container->setAlias('translator', 'translator.default');
         $translator = $container->findDefinition('translator.default');
-        $translator->addMethodCall('setFallbackLocale', array($config['fallback']));
+        if (!is_array($config['fallback'])) {
+            $config['fallback'] = array($config['fallback']);
+        }
+        $translator->addMethodCall('setFallbackLocales', array($config['fallback']));
 
         // Discover translation directories
         $dirs = array();

@@ -118,6 +118,23 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $this->encoder->encode($array, 'xml'));
     }
 
+    public function testEncodeXmlAttributes()
+    {
+        $xml = simplexml_load_string('<firstname>Peter</firstname>');
+        $array = array('person' => $xml);
+
+        $expected = '<?xml version="1.1" encoding="utf-8" standalone="yes"?>'."\n".
+            '<response><person><firstname>Peter</firstname></person></response>'."\n";
+
+        $context = array(
+            'xml_version' => '1.1',
+            'xml_encoding' => 'utf-8',
+            'xml_standalone' => true,
+        );
+
+        $this->assertSame($expected, $this->encoder->encode($array, 'xml', $context));
+    }
+
     public function testEncodeScalarRootAttributes()
     {
         $array = array(

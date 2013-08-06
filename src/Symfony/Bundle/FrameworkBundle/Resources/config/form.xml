@@ -58,9 +58,6 @@
         <service id="property_accessor" class="%property_accessor.class%" />
 
         <!-- CoreExtension -->
-        <service id="form.type.field" class="Symfony\Component\Form\Extension\Core\Type\FieldType">
-            <tag name="form.type" alias="field" />
-        </service>
         <service id="form.type.form" class="Symfony\Component\Form\Extension\Core\Type\FormType">
             <argument type="service" id="property_accessor"/>
             <tag name="form.type" alias="form" />
@@ -140,6 +137,18 @@
         <service id="form.type.url" class="Symfony\Component\Form\Extension\Core\Type\UrlType">
             <tag name="form.type" alias="url" />
         </service>
+        <service id="form.type.button" class="Symfony\Component\Form\Extension\Core\Type\ButtonType">
+            <tag name="form.type" alias="button" />
+        </service>
+        <service id="form.type.submit" class="Symfony\Component\Form\Extension\Core\Type\SubmitType">
+            <tag name="form.type" alias="submit" />
+        </service>
+        <service id="form.type.reset" class="Symfony\Component\Form\Extension\Core\Type\ResetType">
+            <tag name="form.type" alias="reset" />
+        </service>
+        <service id="form.type.currency" class="Symfony\Component\Form\Extension\Core\Type\CurrencyType">
+            <tag name="form.type" alias="currency" />
+        </service>
 
         <!-- FormTypeHttpFoundationExtension -->
         <service id="form.type_extension.form.http_foundation" class="Symfony\Component\Form\Extension\HttpFoundation\Type\FormTypeHttpFoundationExtension">
@@ -153,6 +162,9 @@
         </service>
         <service id="form.type_extension.repeated.validator" class="Symfony\Component\Form\Extension\Validator\Type\RepeatedTypeValidatorExtension">
             <tag name="form.type_extension" alias="repeated" />
+        </service>
+        <service id="form.type_extension.submit.validator" class="Symfony\Component\Form\Extension\Validator\Type\SubmitTypeValidatorExtension">
+            <tag name="form.type_extension" alias="submit" />
         </service>
     </services>
 </container>

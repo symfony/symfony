@@ -1,6 +1,18 @@
 CHANGELOG
 =========
 
+2.3.0
+-----
+
+ * [BC BREAK] renamed `Symfony\Component\HttpKernel\EventListener\DeprecationLoggerListener` to `Symfony\Component\HttpKernel\EventListener\ErrorsLoggerListener` and changed its constructor
+ * deprecated `Symfony\Component\HttpKernel\Debug\ErrorHandler`, `Symfony\Component\HttpKernel\Debug\ExceptionHandler`,
+   `Symfony\Component\HttpKernel\Exception\FatalErrorException`, and `Symfony\Component\HttpKernel\Exception\FlattenException`
+ * deprecated `Symfony\Component\HttpKernel\Kernel::init()``
+ * added the possibility to specify an id an extra attributes to hinclude tags
+ * added the collect of data if a controller is a Closure in the Request collector
+ * pass exceptions from the ExceptionListener to the logger using the logging context to allow for more
+   detailed messages
+
 2.2.0
 -----
 
@@ -12,7 +24,7 @@ CHANGELOG
  * added ControllerReference to create reference of Controllers (used in the FragmentRenderer class)
  * [BC BREAK] renamed TimeDataCollector::getTotalTime() to
    TimeDataCollector::getDuration()
- * updated the MemoryDataCollector to include the memory used in the 
+ * updated the MemoryDataCollector to include the memory used in the
    kernel.terminate event listeners
  * moved the Stopwatch classes to a new component
  * added TraceableControllerResolver

@@ -44,7 +44,9 @@ class ContainerDebugCommand extends ContainerAwareCommand
                 new InputArgument('name', InputArgument::OPTIONAL, 'A service name (foo)'),
                 new InputOption('show-private', null, InputOption::VALUE_NONE, 'Use to show public *and* private services'),
                 new InputOption('tag', null, InputOption::VALUE_REQUIRED, 'Show all services with a specific tag'),
-                new InputOption('tags', null, InputOption::VALUE_NONE, 'Displays tagged services for an application')
+                new InputOption('tags', null, InputOption::VALUE_NONE, 'Displays tagged services for an application'),
+                new InputOption('parameter', null, InputOption::VALUE_REQUIRED, 'Displays a specific parameter for an application'),
+                new InputOption('parameters', null, InputOption::VALUE_NONE, 'Displays parameters for an application')
             ))
             ->setDescription('Displays current services for an application')
             ->setHelp(<<<EOF
@@ -68,6 +70,14 @@ Use the --tags option to display tagged <comment>public</comment> services group
 Find all services with a specific tag by specifying the tag name with the --tag option:
 
   <info>php %command.full_name% --tag=form.type</info>
+
+Use the --parameters option to display all parameters:
+
+  <info>php %command.full_name% --parameters</info>
+
+Display a specific parameter by specifying his name with the --parameter option:
+
+  <info>php %command.full_name% --parameter=kernel.debug</info>
 EOF
             )
         ;
@@ -80,26 +90,36 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $name = $input->getArgument('name');
+        $this->validateInput($input);
 
         $this->containerBuilder = $this->getContainerBuilder();
 
-        $tag = $input->getOption('tag');
-        if ($input->getOption('tags')) {
-            if ($tag || $input->getArgument('name')) {
-                throw new \InvalidArgumentException('The --tags option cannot be combined with the --tag option or the service name argument.');
-            }
+        if ($input->getOption('parameters')) {
+            $parameters = $this->getContainerBuilder()->getParameterBag()->all();
 
+            // Sort parameters alphabetically
+            ksort($parameters);
+
+            $this->outputParameters($output, $parameters);
+
+            return;
+        }
+
+        $parameter = $input->getOption('parameter');
+        if (null !== $parameter) {
+            $output->write($this->formatParameter($this->getContainerBuilder()->getParameter($parameter)));
+
+            return;
+        }
+
+        if ($input->getOption('tags')) {
             $this->outputTags($output, $input->getOption('show-private'));
 
             return;
         }
 
+        $tag = $input->getOption('tag');
         if (null !== $tag) {
-            if ($input->getArgument('name')) {
-                throw new \InvalidArgumentException('The --tag option cannot be combined with the service name argument.');
-            }
-
             $serviceIds = array_keys($this->containerBuilder->findTaggedServiceIds($tag));
         } else {
             $serviceIds = $this->containerBuilder->getServiceIds();
@@ -108,10 +128,30 @@ EOF
         // sort so that it reads like an index of services
         asort($serviceIds);
 
+        $name = $input->getArgument('name');
         if ($name) {
             $this->outputService($output, $name);
         } else {
             $this->outputServices($output, $serviceIds, $input->getOption('show-private'), $tag);
+        }
+    }
+
+    protected function validateInput(InputInterface $input)
+    {
+        $options = array('tags', 'tag', 'parameters', 'parameter');
+
+        $optionsCount = 0;
+        foreach ($options as $option) {
+            if ($input->getOption($option)) {
+                $optionsCount++;
+            }
+        }
+
+        $name = $input->getArgument('name');
+        if ((null !== $name) && ($optionsCount > 0)) {
+            throw new \InvalidArgumentException('The options tags, tag, parameters & parameter can not be combined with the service name argument.');
+        } elseif ((null === $name) && $optionsCount > 1) {
+            throw new \InvalidArgumentException('The options tags, tag, parameters & parameter can not be combined together.');
         }
     }
 
@@ -278,6 +318,48 @@ EOF
         }
     }
 
+    protected function outputParameters(OutputInterface $output, $parameters)
+    {
+        $output->writeln($this->getHelper('formatter')->formatSection('container', 'List of parameters'));
+
+        $terminalDimensions = $this->getApplication()->getTerminalDimensions();
+        $maxTerminalWidth = $terminalDimensions[0];
+        $maxParameterWidth = 0;
+        $maxValueWidth = 0;
+
+        // Determine max parameter & value length
+        foreach ($parameters as $parameter => $value) {
+            $parameterWidth = strlen($parameter);
+            if ($parameterWidth > $maxParameterWidth) {
+                $maxParameterWidth = $parameterWidth;
+            }
+
+            $valueWith = strlen($this->formatParameter($value));
+            if ($valueWith > $maxValueWidth) {
+                $maxValueWidth = $valueWith;
+            }
+        }
+
+        $maxValueWidth = min($maxValueWidth, $maxTerminalWidth - $maxParameterWidth - 1);
+
+        $formatTitle = '%-'.($maxParameterWidth + 19).'s %-'.($maxValueWidth + 19).'s';
+        $format = '%-'.$maxParameterWidth.'s %-'.$maxValueWidth.'s';
+
+        $output->writeln(sprintf($formatTitle, '<comment>Parameter</comment>', '<comment>Value</comment>'));
+
+        foreach ($parameters as $parameter => $value) {
+            $splits = str_split($this->formatParameter($value), $maxValueWidth);
+
+            foreach ($splits as $index => $split) {
+                if (0 === $index) {
+                    $output->writeln(sprintf($format, $parameter, $split));
+                } else {
+                    $output->writeln(sprintf($format, ' ', $split));
+                }
+            }
+        }
+    }
+
     /**
      * Loads the ContainerBuilder from the cache.
      *
@@ -365,5 +447,14 @@ EOF
 
             $output->writeln('');
         }
+    }
+
+    protected function formatParameter($value)
+    {
+        if (is_bool($value) || is_array($value) || (null === $value)) {
+            return json_encode($value);
+        }
+
+        return $value;
     }
 }

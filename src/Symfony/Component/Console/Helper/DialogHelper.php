@@ -19,7 +19,7 @@ use Symfony\Component\Console\Formatter\OutputFormatterStyle;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class DialogHelper extends Helper
+class DialogHelper extends InputAwareHelper
 {
     private $inputStream;
     private static $shell;
@@ -34,12 +34,13 @@ class DialogHelper extends Helper
      * @param Boolean         $default      The default answer if the user enters nothing
      * @param Boolean|integer $attempts Max number of times to ask before giving up (false by default, which means infinite)
      * @param string          $errorMessage Message which will be shown if invalid value from choice list would be picked
+     * @param Boolean         $multiselect  Select more than one value separated by comma
      *
-     * @return integer|string The selected value (the key of the choices array)
+     * @return integer|string|array The selected value or values (the key of the choices array)
      *
      * @throws \InvalidArgumentException
      */
-    public function select(OutputInterface $output, $question, $choices, $default = null, $attempts = false, $errorMessage = 'Value "%s" is invalid')
+    public function select(OutputInterface $output, $question, $choices, $default = null, $attempts = false, $errorMessage = 'Value "%s" is invalid', $multiselect = false)
     {
         $width = max(array_map('strlen', array_keys($choices)));
 
@@ -50,9 +51,31 @@ class DialogHelper extends Helper
 
         $output->writeln($messages);
 
-        $result = $this->askAndValidate($output, '> ', function ($picked) use ($choices, $errorMessage) {
-            if (empty($choices[$picked])) {
-                throw new \InvalidArgumentException(sprintf($errorMessage, $picked));
+        $result = $this->askAndValidate($output, '> ', function ($picked) use ($choices, $errorMessage, $multiselect) {
+            // Collapse all spaces.
+            $selectedChoices = str_replace(" ", "", $picked);
+
+            if ($multiselect) {
+                // Check for a separated comma values
+                if (!preg_match('/^[a-zA-Z0-9_-]+(?:,[a-zA-Z0-9_-]+)*$/', $selectedChoices, $matches)) {
+                    throw new \InvalidArgumentException(sprintf($errorMessage, $picked));
+                }
+                $selectedChoices = explode(",", $selectedChoices);
+            } else {
+                $selectedChoices = array($picked);
+            }
+
+            $multiselectChoices = array();
+
+            foreach ($selectedChoices as $value) {
+                if (empty($choices[$value])) {
+                    throw new \InvalidArgumentException(sprintf($errorMessage, $value));
+                }
+                array_push($multiselectChoices, $value);
+            }
+
+            if ($multiselect) {
+                return $multiselectChoices;
             }
 
             return $picked;
@@ -75,6 +98,10 @@ class DialogHelper extends Helper
      */
     public function ask(OutputInterface $output, $question, $default = null, array $autocomplete = null)
     {
+        if ($this->input && !$this->input->isInteractive()) {
+            return $default;
+        }
+
         $output->write($question);
 
         $inputStream = $this->inputStream ?: STDIN;
@@ -180,7 +207,7 @@ class DialogHelper extends Helper
                     // Save cursor position
                     $output->write("\0337");
                     // Write highlighted text
-                    $output->write('<hl>' . substr($matches[$ofs], $i) . '</hl>');
+                    $output->write('<hl>'.substr($matches[$ofs], $i).'</hl>');
                     // Restore cursor position
                     $output->write("\0338");
                 }
@@ -232,11 +259,11 @@ class DialogHelper extends Helper
     public function askHiddenResponse(OutputInterface $output, $question, $fallback = true)
     {
         if (defined('PHP_WINDOWS_VERSION_BUILD')) {
-            $exe = __DIR__ . '/../Resources/bin/hiddeninput.exe';
+            $exe = __DIR__.'/../Resources/bin/hiddeninput.exe';
 
             // handle code running from a phar
             if ('phar:' === substr(__FILE__, 0, 5)) {
-                $tmpExe = sys_get_temp_dir() . '/hiddeninput.exe';
+                $tmpExe = sys_get_temp_dir().'/hiddeninput.exe';
                 copy($exe, $tmpExe);
                 $exe = $tmpExe;
             }

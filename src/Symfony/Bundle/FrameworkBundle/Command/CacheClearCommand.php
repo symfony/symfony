@@ -142,14 +142,6 @@ EOF
     }
 
     /**
-     * @deprecated to be removed in 2.3
-     */
-    protected function getTempSuffix()
-    {
-        return '';
-    }
-
-    /**
      * @param KernelInterface $parent
      * @param string          $namespace
      * @param string          $parentClass

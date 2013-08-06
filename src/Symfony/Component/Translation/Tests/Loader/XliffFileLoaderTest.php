@@ -102,7 +102,7 @@ class XliffFileLoaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException        Symfony\Component\Translation\Exception\InvalidResourceException
+     * @expectedException        \Symfony\Component\Translation\Exception\InvalidResourceException
      * @expectedExceptionMessage Document types are not allowed.
      */
     public function testDocTypeIsNotAllowed()

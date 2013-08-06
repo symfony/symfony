@@ -13,7 +13,7 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\CallbackTransformer;
 
-class CheckboxTypeTest extends TypeTestCase
+class CheckboxTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 {
     public function testPassValueToView()
     {
@@ -50,59 +50,81 @@ class CheckboxTypeTest extends TypeTestCase
         $this->assertFalse($view->vars['checked']);
     }
 
-    public function testBindWithValueChecked()
+    public function testSubmitWithValueChecked()
     {
         $form = $this->factory->create('checkbox', null, array(
             'value' => 'foobar',
         ));
-        $form->bind('foobar');
+        $form->submit('foobar');
 
         $this->assertTrue($form->getData());
         $this->assertEquals('foobar', $form->getViewData());
     }
 
-    public function testBindWithRandomValueChecked()
+    public function testSubmitWithRandomValueChecked()
     {
         $form = $this->factory->create('checkbox', null, array(
             'value' => 'foobar',
         ));
-        $form->bind('krixikraxi');
+        $form->submit('krixikraxi');
 
         $this->assertTrue($form->getData());
         $this->assertEquals('foobar', $form->getViewData());
     }
 
-    public function testBindWithValueUnchecked()
+    public function testSubmitWithValueUnchecked()
     {
         $form = $this->factory->create('checkbox', null, array(
             'value' => 'foobar',
         ));
-        $form->bind(null);
+        $form->submit(null);
 
         $this->assertFalse($form->getData());
         $this->assertNull($form->getViewData());
     }
 
-    public function testBindWithEmptyValueChecked()
+    public function testSubmitWithEmptyValueChecked()
     {
         $form = $this->factory->create('checkbox', null, array(
             'value' => '',
         ));
-        $form->bind('');
+        $form->submit('');
 
         $this->assertTrue($form->getData());
         $this->assertSame('', $form->getViewData());
     }
 
-    public function testBindWithEmptyValueUnchecked()
+    public function testSubmitWithEmptyValueUnchecked()
     {
         $form = $this->factory->create('checkbox', null, array(
             'value' => '',
         ));
-        $form->bind(null);
+        $form->submit(null);
 
         $this->assertFalse($form->getData());
         $this->assertNull($form->getViewData());
+    }
+
+    public function testBindWithEmptyValueAndFalseUnchecked()
+    {
+        $form = $this->factory->create('checkbox', null, array(
+            'value' => '',
+        ));
+        $form->bind(false);
+
+        $this->assertFalse($form->getData());
+        $this->assertNull($form->getViewData());
+    }
+
+    public function testBindWithEmptyValueAndTrueChecked()
+    {
+        $form = $this->factory->create('checkbox', null, array(
+            'value' => '',
+        ));
+        $form->bind(true);
+
+        $this->assertTrue($form->getData());
+        $this->assertSame('', $form->getViewData());
     }
 
     /**

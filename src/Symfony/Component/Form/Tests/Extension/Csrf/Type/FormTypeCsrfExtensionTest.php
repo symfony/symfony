@@ -13,8 +13,9 @@ namespace Symfony\Component\Form\Tests\Extension\Csrf\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
-use Symfony\Component\Form\Tests\Extension\Core\Type\TypeTestCase;
 
 class FormTypeCsrfExtensionTest_ChildType extends AbstractType
 {
@@ -33,11 +34,20 @@ class FormTypeCsrfExtensionTest_ChildType extends AbstractType
 
 class FormTypeCsrfExtensionTest extends TypeTestCase
 {
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
     protected $csrfProvider;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $translator;
 
     protected function setUp()
     {
         $this->csrfProvider = $this->getMock('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface');
+        $this->translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
 
         parent::setUp();
     }
@@ -45,6 +55,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
     protected function tearDown()
     {
         $this->csrfProvider = null;
+        $this->translator = null;
 
         parent::tearDown();
     }
@@ -52,7 +63,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
     protected function getExtensions()
     {
         return array_merge(parent::getExtensions(), array(
-            new CsrfExtension($this->csrfProvider),
+            new CsrfExtension($this->csrfProvider, $this->translator),
         ));
     }
 
@@ -140,7 +151,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
     /**
      * @dataProvider provideBoolean
      */
-    public function testValidateTokenOnBindIfRootAndCompound($valid)
+    public function testValidateTokenOnSubmitIfRootAndCompound($valid)
     {
         $this->csrfProvider->expects($this->once())
             ->method('isCsrfTokenValid')
@@ -157,7 +168,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
             ->add('child', 'text')
             ->getForm();
 
-        $form->bind(array(
+        $form->submit(array(
             'child' => 'foobar',
             'csrf' => 'token',
         ));
@@ -184,7 +195,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
             ->add('child', 'text')
             ->getForm();
 
-        $form->bind(array(
+        $form->submit(array(
             'child' => 'foobar',
             // token is missing
         ));
@@ -214,7 +225,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
             ->getForm()
             ->get('form');
 
-        $form->bind(array(
+        $form->submit(array(
             'child' => 'foobar',
             'csrf' => 'token',
         ));
@@ -233,7 +244,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
                 'compound' => false,
             ));
 
-        $form->bind(array(
+        $form->submit(array(
             'csrf' => 'token',
         ));
     }
@@ -254,5 +265,37 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
 
         $this->assertFalse(isset($prototypeView['csrf']));
         $this->assertCount(1, $prototypeView);
+    }
+
+    public function testsTranslateCustomErrorMessage()
+    {
+        $this->csrfProvider->expects($this->once())
+            ->method('isCsrfTokenValid')
+            ->with('%INTENTION%', 'token')
+            ->will($this->returnValue(false));
+
+        $this->translator->expects($this->once())
+             ->method('trans')
+             ->with('Foobar')
+             ->will($this->returnValue('[trans]Foobar[/trans]'));
+
+        $form = $this->factory
+            ->createBuilder('form', null, array(
+                'csrf_field_name' => 'csrf',
+                'csrf_provider' => $this->csrfProvider,
+                'csrf_message' => 'Foobar',
+                'intention' => '%INTENTION%',
+                'compound' => true,
+            ))
+            ->getForm();
+
+        $form->submit(array(
+            'csrf' => 'token',
+        ));
+
+        $errors = $form->getErrors();
+
+        $this->assertGreaterThan(0, count($errors));
+        $this->assertEquals(new FormError('[trans]Foobar[/trans]'), $errors[0]);
     }
 }

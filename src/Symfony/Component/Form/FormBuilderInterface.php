@@ -49,7 +49,7 @@ interface FormBuilderInterface extends \Traversable, \Countable, FormConfigBuild
      *
      * @return FormBuilderInterface The builder for the child
      *
-     * @throws Exception\FormException if the given child does not exist
+     * @throws Exception\InvalidArgumentException if the given child does not exist
      */
     public function get($name);
 
@@ -84,42 +84,4 @@ interface FormBuilderInterface extends \Traversable, \Countable, FormConfigBuild
      * @return Form The form
      */
     public function getForm();
-
-    /**
-     * Sets the parent builder.
-     *
-     * @param FormBuilderInterface $parent The parent builder
-     *
-     * @return FormBuilderInterface The builder object.
-     *
-     * @deprecated Deprecated since version 2.2, to be removed in 2.3. You
-     *             should not rely on the parent of a builder, because it is
-     *             likely that the parent is only set after turning the builder
-     *             into a form.
-     */
-    public function setParent(FormBuilderInterface $parent = null);
-
-    /**
-     * Returns the parent builder.
-     *
-     * @return FormBuilderInterface The parent builder
-     *
-     * @deprecated Deprecated since version 2.2, to be removed in 2.3. You
-     *             should not rely on the parent of a builder, because it is
-     *             likely that the parent is only set after turning the builder
-     *             into a form.
-     */
-    public function getParent();
-
-    /**
-     * Returns whether the builder has a parent.
-     *
-     * @return Boolean
-     *
-     * @deprecated Deprecated since version 2.2, to be removed in 2.3. You
-     *             should not rely on the parent of a builder, because it is
-     *             likely that the parent is only set after turning the builder
-     *             into a form.
-     */
-    public function hasParent();
 }

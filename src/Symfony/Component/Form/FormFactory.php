@@ -34,43 +34,43 @@ class FormFactory implements FormFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function create($type = 'form', $data = null, array $options = array(), FormBuilderInterface $parent = null)
+    public function create($type = 'form', $data = null, array $options = array())
     {
-        return $this->createBuilder($type, $data, $options, $parent)->getForm();
+        return $this->createBuilder($type, $data, $options)->getForm();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function createNamed($name, $type = 'form', $data = null, array $options = array(), FormBuilderInterface $parent = null)
+    public function createNamed($name, $type = 'form', $data = null, array $options = array())
     {
-        return $this->createNamedBuilder($name, $type, $data, $options, $parent)->getForm();
+        return $this->createNamedBuilder($name, $type, $data, $options)->getForm();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function createForProperty($class, $property, $data = null, array $options = array(), FormBuilderInterface $parent = null)
+    public function createForProperty($class, $property, $data = null, array $options = array())
     {
-        return $this->createBuilderForProperty($class, $property, $data, $options, $parent)->getForm();
+        return $this->createBuilderForProperty($class, $property, $data, $options)->getForm();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function createBuilder($type = 'form', $data = null, array $options = array(), FormBuilderInterface $parent = null)
+    public function createBuilder($type = 'form', $data = null, array $options = array())
     {
         $name = $type instanceof FormTypeInterface || $type instanceof ResolvedFormTypeInterface
             ? $type->getName()
             : $type;
 
-        return $this->createNamedBuilder($name, $type, $data, $options, $parent);
+        return $this->createNamedBuilder($name, $type, $data, $options);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function createNamedBuilder($name, $type = 'form', $data = null, array $options = array(), FormBuilderInterface $parent = null)
+    public function createNamedBuilder($name, $type = 'form', $data = null, array $options = array())
     {
         if (null !== $data && !array_key_exists('data', $options)) {
             $options['data'] = $data;
@@ -84,44 +84,34 @@ class FormFactory implements FormFactoryInterface
             throw new UnexpectedTypeException($type, 'string, Symfony\Component\Form\ResolvedFormTypeInterface or Symfony\Component\Form\FormTypeInterface');
         }
 
-        return $type->createBuilder($this, $name, $options, $parent);
+        return $type->createBuilder($this, $name, $options);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function createBuilderForProperty($class, $property, $data = null, array $options = array(), FormBuilderInterface $parent = null)
+    public function createBuilderForProperty($class, $property, $data = null, array $options = array())
     {
         if (null === $guesser = $this->registry->getTypeGuesser()) {
-            return $this->createNamedBuilder($property, 'text', $data, $options, $parent);
+            return $this->createNamedBuilder($property, 'text', $data, $options);
         }
 
         $typeGuess = $guesser->guessType($class, $property);
         $maxLengthGuess = $guesser->guessMaxLength($class, $property);
-        // Keep $minLengthGuess for BC until Symfony 2.3
-        set_error_handler(array('Symfony\Component\Form\Test\DeprecationErrorHandler', 'handleBC'));
-        $minLengthGuess = $guesser->guessMinLength($class, $property);
-        restore_error_handler();
         $requiredGuess = $guesser->guessRequired($class, $property);
         $patternGuess = $guesser->guessPattern($class, $property);
 
         $type = $typeGuess ? $typeGuess->getType() : 'text';
 
         $maxLength = $maxLengthGuess ? $maxLengthGuess->getValue() : null;
-        $minLength = $minLengthGuess ? $minLengthGuess->getValue() : null;
         $pattern   = $patternGuess ? $patternGuess->getValue() : null;
 
-        // overrides $minLength, if set
         if (null !== $pattern) {
             $options = array_merge(array('pattern' => $pattern), $options);
         }
 
         if (null !== $maxLength) {
             $options = array_merge(array('max_length' => $maxLength), $options);
-        }
-
-        if (null !== $minLength && $minLength > 0) {
-            $options = array_merge(array('pattern' => '.{'.$minLength.','.$maxLength.'}'), $options);
         }
 
         if ($requiredGuess) {
@@ -133,67 +123,7 @@ class FormFactory implements FormFactoryInterface
             $options = array_merge($typeGuess->getOptions(), $options);
         }
 
-        return $this->createNamedBuilder($property, $type, $data, $options, $parent);
-    }
-
-    /**
-     * Returns whether the given type is supported.
-     *
-     * @param string $name The name of the type
-     *
-     * @return Boolean Whether the type is supported
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
-     *             {@link FormRegistryInterface::hasType()} instead.
-     */
-    public function hasType($name)
-    {
-        trigger_error('hasType() is deprecated since version 2.1 and will be removed in 2.3. Use FormRegistryInterface::hasType() instead.', E_USER_DEPRECATED);
-
-        return $this->registry->hasType($name);
-    }
-
-    /**
-     * Adds a type.
-     *
-     * @param FormTypeInterface $type The type
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
-     *             form extensions or type registration in the Dependency
-     *             Injection Container instead.
-     */
-    public function addType(FormTypeInterface $type)
-    {
-        trigger_error('addType() is deprecated since version 2.1 and will be removed in 2.3. Use form extensions or type registration in the Dependency Injection Container instead.', E_USER_DEPRECATED);
-
-        $parentType = $type->getParent();
-
-        $this->registry->addType($this->resolvedTypeFactory->createResolvedType(
-            $type,
-            array(),
-            $parentType ? $this->registry->getType($parentType) : null
-        ));
-    }
-
-    /**
-     * Returns a type by name.
-     *
-     * This methods registers the type extensions from the form extensions.
-     *
-     * @param string $name The name of the type
-     *
-     * @return FormTypeInterface The type
-     *
-     * @throws Exception\FormException if the type can not be retrieved from any extension
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
-     *             {@link FormRegistryInterface::getType()} instead.
-     */
-    public function getType($name)
-    {
-        trigger_error('getType() is deprecated since version 2.1 and will be removed in 2.3. Use FormRegistryInterface::getType() instead.', E_USER_DEPRECATED);
-
-        return $this->registry->getType($name)->getInnerType();
+        return $this->createNamedBuilder($property, $type, $data, $options);
     }
 
     /**

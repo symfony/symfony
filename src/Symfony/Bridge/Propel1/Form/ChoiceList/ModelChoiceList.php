@@ -15,7 +15,6 @@ use \ModelCriteria;
 use \BaseObject;
 use \Persistent;
 
-use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\StringCastException;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ObjectChoiceList;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -84,7 +83,7 @@ class ModelChoiceList extends ObjectChoiceList
     {
         $this->class        = $class;
 
-        $queryClass         = $this->class . 'Query';
+        $queryClass         = $this->class.'Query';
         $query              = new $queryClass();
 
         $this->identifier   = $query->getTableMap()->getPrimaryKeys();
@@ -198,7 +197,7 @@ class ModelChoiceList extends ObjectChoiceList
     {
         if (!$this->loaded) {
             if (1 === count($this->identifier)) {
-                $filterBy = 'filterBy' . current($this->identifier)->getPhpName();
+                $filterBy = 'filterBy'.current($this->identifier)->getPhpName();
 
                 return (array) $this->query->create()
                     ->$filterBy($values)
@@ -402,8 +401,6 @@ class ModelChoiceList extends ObjectChoiceList
      * @param object $model The model for which to get the identifier
      *
      * @return array
-     *
-     * @throws FormException If the model does not exist
      */
     private function getIdentifierValues($model)
     {

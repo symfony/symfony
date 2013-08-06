@@ -12,12 +12,12 @@
 namespace Symfony\Component\Form\Tests;
 
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\FormConfigBuilder;
+use Symfony\Component\Form\Exception\InvalidArgumentException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-use Symfony\Component\Form\FormConfigBuilder;
-
 class FormConfigTest extends \PHPUnit_Framework_TestCase
 {
     public function getHtml4Ids()
@@ -83,11 +83,66 @@ class FormConfigTest extends \PHPUnit_Framework_TestCase
             if ($accepted) {
                 throw $e;
             }
-        } catch (\InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             // if the value was not accepted, but should be, rethrow exception
             if ($accepted) {
                 throw $e;
             }
         }
+    }
+
+    public function testGetRequestHandlerCreatesNativeRequestHandlerIfNotSet()
+    {
+        $config = $this->getConfigBuilder()->getFormConfig();
+
+        $this->assertInstanceOf('Symfony\Component\Form\NativeRequestHandler', $config->getRequestHandler());
+    }
+
+    public function testGetRequestHandlerReusesNativeRequestHandlerInstance()
+    {
+        $config1 = $this->getConfigBuilder()->getFormConfig();
+        $config2 = $this->getConfigBuilder()->getFormConfig();
+
+        $this->assertSame($config1->getRequestHandler(), $config2->getRequestHandler());
+    }
+
+    public function testSetMethodAllowsGet()
+    {
+        $this->getConfigBuilder()->setMethod('GET');
+    }
+
+    public function testSetMethodAllowsPost()
+    {
+        $this->getConfigBuilder()->setMethod('POST');
+    }
+
+    public function testSetMethodAllowsPut()
+    {
+        $this->getConfigBuilder()->setMethod('PUT');
+    }
+
+    public function testSetMethodAllowsDelete()
+    {
+        $this->getConfigBuilder()->setMethod('DELETE');
+    }
+
+    public function testSetMethodAllowsPatch()
+    {
+        $this->getConfigBuilder()->setMethod('PATCH');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\InvalidArgumentException
+     */
+    public function testSetMethodDoesNotAllowOtherValues()
+    {
+        $this->getConfigBuilder()->setMethod('foo');
+    }
+
+    private function getConfigBuilder($name = 'name')
+    {
+        $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+
+        return new FormConfigBuilder($name, null, $dispatcher);
     }
 }

@@ -116,9 +116,9 @@ class AbstractTokenTest extends \PHPUnit_Framework_TestCase
         $token->setAttributes($attributes);
 
         $this->assertEquals($attributes, $token->getAttributes(), '->getAttributes() returns the token attributes');
-        $this->assertEquals('bar', $token->getAttribute('foo'), '->getAttribute() returns the value of a attribute');
+        $this->assertEquals('bar', $token->getAttribute('foo'), '->getAttribute() returns the value of an attribute');
         $token->setAttribute('foo', 'foo');
-        $this->assertEquals('foo', $token->getAttribute('foo'), '->setAttribute() changes the value of a attribute');
+        $this->assertEquals('foo', $token->getAttribute('foo'), '->setAttribute() changes the value of an attribute');
         $this->assertTrue($token->hasAttribute('foo'), '->hasAttribute() returns true if the attribute is defined');
         $this->assertFalse($token->hasAttribute('oof'), '->hasAttribute() returns false if the attribute is not defined');
 

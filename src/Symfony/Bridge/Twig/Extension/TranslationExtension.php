@@ -28,10 +28,14 @@ class TranslationExtension extends \Twig_Extension
     private $translator;
     private $translationNodeVisitor;
 
-    public function __construct(TranslatorInterface $translator)
+    public function __construct(TranslatorInterface $translator, \Twig_NodeVisitorInterface $translationNodeVisitor = null)
     {
+        if (!$translationNodeVisitor) {
+            $translationNodeVisitor = new TranslationNodeVisitor();
+        }
+
         $this->translator = $translator;
-        $this->translationNodeVisitor = new TranslationNodeVisitor();
+        $this->translationNodeVisitor = $translationNodeVisitor;
     }
 
     public function getTranslator()

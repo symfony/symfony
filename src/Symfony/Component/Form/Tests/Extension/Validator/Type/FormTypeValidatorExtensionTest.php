@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests\Extension\Validator\Type;
 
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Validator\ConstraintViolationList;
 
 class FormTypeValidatorExtensionTest extends TypeTestCase
 {
@@ -40,6 +41,15 @@ class FormTypeValidatorExtensionTest extends TypeTestCase
         $this->assertEquals(array('group1', 'group2'), $form->getConfig()->getOption('validation_groups'));
     }
 
+    public function testValidationGroupsCanBeSetToFalse()
+    {
+        $form = $this->factory->create('form', null, array(
+                'validation_groups' => false,
+            ));
+
+        $this->assertEquals(array(), $form->getConfig()->getOption('validation_groups'));
+    }
+
     public function testValidationGroupsCanBeSetToCallback()
     {
         $form = $this->factory->create('form', null, array(
@@ -58,19 +68,24 @@ class FormTypeValidatorExtensionTest extends TypeTestCase
         $this->assertTrue(is_callable($form->getConfig()->getOption('validation_groups')));
     }
 
-    public function testBindValidatesData()
+    public function testSubmitValidatesData()
     {
-        $builder = $this->factory->createBuilder('form', null, array(
-            'validation_groups' => 'group',
-        ));
+        $builder = $this->factory->createBuilder(
+            'form',
+            null,
+            array(
+                'validation_groups' => 'group',
+            )
+        );
         $builder->add('firstName', 'form');
         $form = $builder->getForm();
 
         $this->validator->expects($this->once())
             ->method('validate')
-            ->with($this->equalTo($form));
+            ->with($this->equalTo($form))
+            ->will($this->returnValue(new ConstraintViolationList()));
 
         // specific data is irrelevant
-        $form->bind(array());
+        $form->submit(array());
     }
 }

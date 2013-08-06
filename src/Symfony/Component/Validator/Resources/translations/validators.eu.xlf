@@ -222,6 +222,62 @@
                 <source>Unsupported card type or invalid card number.</source>
                 <target>Onartzen ez den txartel mota edo txartelaren zenbaki baliogabea.</target>
             </trans-unit>
+            <trans-unit id="59">
+                <source>This is not a valid International Bank Account Number (IBAN).</source>
+                <target>Hau ez da onartutako International Bank Account Number (IBAN) bat.</target>
+            </trans-unit>
+            <trans-unit id="60">
+                <source>This value is not a valid ISBN-10.</source>
+                <target>Balio hau ez da onartutako ISBN-10 bat.</target>
+            </trans-unit>
+            <trans-unit id="61">
+                <source>This value is not a valid ISBN-13.</source>
+                <target>Balio hau ez da onartutako ISBN-13 bat.</target>
+            </trans-unit>
+            <trans-unit id="62">
+                <source>This value is neither a valid ISBN-10 nor a valid ISBN-13.</source>
+                <target>Balio hau ez da onartutako ISBN-10 edo ISBN-13 bat.</target>
+            </trans-unit>
+            <trans-unit id="63">
+                <source>This value is not a valid ISSN.</source>
+                <target>Balio hau ez da onartutako ISSN bat.</target>
+            </trans-unit>
+            <trans-unit id="64">
+                <source>This value is not a valid currency.</source>
+                <target>Balio hau ez da baliozko moneta.</target>
+            </trans-unit>
+            <trans-unit id="65">
+                <source>This value should be equal to {{ compared_value }}.</source>
+                <target>Balio honek {{ compared_value }}-(r)en berdina izan behar du.</target>
+            </trans-unit>
+            <trans-unit id="66">
+                <source>This value should be greater than {{ compared_value }}.</source>
+                <target>Balio honek {{ compared_value }} baino handiagoa izan behar du.</target>
+            </trans-unit>
+            <trans-unit id="67">
+                <source>This value should be greater than or equal to {{ compared_value }}.</source>
+                <target>Balio honek {{ compared_value }}-(r)en berdina edo handiagoa izan beharko luke.</target>
+            </trans-unit>
+            <trans-unit id="68">
+                <source>This value should be identical to {{ compared_value_type }} {{ compared_value }}.</source>
+                <target>Balio honek berbera izan behar du {{ compared_value_type }} {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="69">
+                <source>This value should be less than {{ compared_value }}.</source>
+                <target>Balio honek {{ compared_value }} baino txikiago izan behar du.</target>
+            </trans-unit>
+            <trans-unit id="70">
+                <source>This value should be less than or equal to {{ compared_value }}.</source>
+                <target>Balio honek {{ compared_value }}-(r)en berdina edo txikiago izan behar du.</target>
+            </trans-unit>
+            <trans-unit id="71">
+                <source>This value should not be equal to {{ compared_value }}.</source>
+                <target>Balio honek {{ compared_value }}-(r)en berdina izan behar du.</target>
+            </trans-unit>
+            <trans-unit id="72">
+                <source>This value should not be identical to {{ compared_value_type }} {{ compared_value }}.</source>
+                <target>Balio honek ez du berbera izan behar {{ compared_value_type }} {{ compared_value }}.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

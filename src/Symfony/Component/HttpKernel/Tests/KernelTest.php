@@ -108,6 +108,52 @@ class KernelTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($kernel->isBooted());
     }
 
+    public function testClassCacheIsLoaded()
+    {
+        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest')
+            ->disableOriginalConstructor()
+            ->setMethods(array('initializeBundles', 'initializeContainer', 'getBundles', 'doLoadClassCache'))
+            ->getMock();
+        $kernel->loadClassCache('name', '.extension');
+        $kernel->expects($this->any())
+            ->method('getBundles')
+            ->will($this->returnValue(array()));
+        $kernel->expects($this->once())
+            ->method('doLoadClassCache')
+            ->with('name', '.extension');
+
+        $kernel->boot();
+    }
+
+    public function testClassCacheIsNotLoadedByDefault()
+    {
+        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest')
+            ->disableOriginalConstructor()
+            ->setMethods(array('initializeBundles', 'initializeContainer', 'getBundles', 'doLoadClassCache'))
+            ->getMock();
+        $kernel->expects($this->any())
+            ->method('getBundles')
+            ->will($this->returnValue(array()));
+        $kernel->expects($this->never())
+            ->method('doLoadClassCache');
+
+        $kernel->boot();
+    }
+
+    public function testClassCacheIsNotLoadedWhenKernelIsNotBooted()
+    {
+        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest')
+            ->disableOriginalConstructor()
+            ->setMethods(array('initializeBundles', 'initializeContainer', 'getBundles', 'doLoadClassCache'))
+            ->getMock();
+        $kernel->loadClassCache();
+        $kernel->expects($this->any())
+            ->method('getBundles')
+            ->will($this->returnValue(array()));
+        $kernel->expects($this->never())
+            ->method('doLoadClassCache');
+    }
+
     public function testBootKernelSeveralTimesOnlyInitializesBundlesOnce()
     {
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest')
@@ -286,7 +332,16 @@ class TestClass
 }
 EOF;
 
-        $this->assertEquals($expected, Kernel::stripComments($source));
+        $output = Kernel::stripComments($source);
+
+        // Heredocs are preserved, making the output mixing unix and windows line
+        // endings, switching to "\n" everywhere on windows to avoid failure.
+        if (defined('PHP_WINDOWS_VERSION_MAJOR')) {
+            $expected = str_replace("\r\n", "\n", $expected);
+            $output = str_replace("\r\n", "\n", $output);
+        }
+
+        $this->assertEquals($expected, $output);
     }
 
     public function testIsClassInActiveBundleFalse()
@@ -634,9 +689,9 @@ EOF;
 
     public function testInitializeBundlesSupportsArbitraryBundleRegistrationOrder()
     {
-        $grandparent = $this->getBundle(null, null, 'GrandParentCCundle');
-        $parent = $this->getBundle(null, 'GrandParentCCundle', 'ParentCCundle');
-        $child = $this->getBundle(null, 'ParentCCundle', 'ChildCCundle');
+        $grandparent = $this->getBundle(null, null, 'GrandParentCBundle');
+        $parent = $this->getBundle(null, 'GrandParentCBundle', 'ParentCBundle');
+        $child = $this->getBundle(null, 'ParentCBundle', 'ChildCBundle');
 
         $kernel = $this->getKernel();
         $kernel
@@ -648,9 +703,9 @@ EOF;
         $kernel->initializeBundles();
 
         $map = $kernel->getBundleMap();
-        $this->assertEquals(array($child, $parent, $grandparent), $map['GrandParentCCundle']);
-        $this->assertEquals(array($child, $parent), $map['ParentCCundle']);
-        $this->assertEquals(array($child), $map['ChildCCundle']);
+        $this->assertEquals(array($child, $parent, $grandparent), $map['GrandParentCBundle']);
+        $this->assertEquals(array($child, $parent), $map['ParentCBundle']);
+        $this->assertEquals(array($child), $map['ChildCBundle']);
     }
 
     /**

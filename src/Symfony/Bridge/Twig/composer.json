@@ -20,22 +20,22 @@
         "twig/twig": "~1.11"
     },
     "require-dev": {
-        "symfony/form": "2.2.*",
-        "symfony/http-kernel": ">=2.2,<2.3-dev",
-        "symfony/routing": ">=2.2,<2.3-dev",
+        "symfony/form": "~2.2",
+        "symfony/http-kernel": "~2.2",
+        "symfony/routing": "~2.2",
         "symfony/templating": "~2.1",
-        "symfony/translation": ">=2.0,<2.3-dev",
+        "symfony/translation": "~2.2",
         "symfony/yaml": "~2.0",
-        "symfony/security": ">=2.0,<2.3-dev"
+        "symfony/security": "~2.0"
     },
     "suggest": {
-        "symfony/form": "2.2.*",
-        "symfony/http-kernel": "2.2.*",
-        "symfony/routing": "2.2.*",
-        "symfony/templating": "2.2.*",
-        "symfony/translation": "2.2.*",
-        "symfony/yaml": "2.2.*",
-        "symfony/security": "2.2.*"
+        "symfony/form": "",
+        "symfony/http-kernel": "",
+        "symfony/routing": "",
+        "symfony/templating": "",
+        "symfony/translation": "",
+        "symfony/yaml": "",
+        "symfony/security": ""
     },
     "autoload": {
         "psr-0": { "Symfony\\Bridge\\Twig\\": "" }
@@ -44,7 +44,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.2-dev"
+            "dev-master": "2.4-dev"
         }
     }
 }

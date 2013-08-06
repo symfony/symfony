@@ -193,7 +193,7 @@ class XmlFileLoader extends FileLoader
      */
     protected function loadFile($file)
     {
-        return XmlUtils::loadFile($file, __DIR__ . static::SCHEME_PATH);
+        return XmlUtils::loadFile($file, __DIR__.static::SCHEME_PATH);
     }
 
     /**

@@ -35,6 +35,10 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
         $client->request('GET', '/');
         $this->assertEquals('Request: /', $client->getResponse()->getContent(), '->doRequest() uses the request handler to make the request');
+        $this->assertInstanceOf('Symfony\Component\BrowserKit\Request', $client->getInternalRequest());
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Request', $client->getRequest());
+        $this->assertInstanceOf('Symfony\Component\BrowserKit\Response', $client->getInternalResponse());
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $client->getResponse());
 
         $client->request('GET', 'http://www.example.com/');
         $this->assertEquals('Request: /', $client->getResponse()->getContent(), '->doRequest() uses the request handler to make the request');
@@ -114,7 +118,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
         $files = array(
             array('tmp_name' => $source, 'name' => 'original', 'type' => 'mime/original', 'size' => 123, 'error' => UPLOAD_ERR_OK),
-            new UploadedFile($source, 'original', 'mime/original', 123, UPLOAD_ERR_OK),
+            new UploadedFile($source, 'original', 'mime/original', 123, UPLOAD_ERR_OK, true),
         );
 
         foreach ($files as $file) {
@@ -147,7 +151,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
         $file = $this
             ->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')
-            ->setConstructorArgs(array($source, 'original', 'mime/original', 123, UPLOAD_ERR_OK))
+            ->setConstructorArgs(array($source, 'original', 'mime/original', 123, UPLOAD_ERR_OK, true))
             ->setMethods(array('getSize'))
             ->getMock()
         ;

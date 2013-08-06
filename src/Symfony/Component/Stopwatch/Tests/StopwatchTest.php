@@ -29,6 +29,43 @@ class StopwatchTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('cat', $event->getCategory());
     }
 
+    public function testIsStarted()
+    {
+        $stopwatch = new Stopwatch();
+        $stopwatch->start('foo', 'cat');
+
+        $this->assertTrue($stopwatch->isStarted('foo'));
+    }
+
+    public function testIsNotStarted()
+    {
+        $stopwatch = new Stopwatch();
+
+        $this->assertFalse($stopwatch->isStarted('foo'));
+    }
+
+    public function testIsNotStartedEvent()
+    {
+        $stopwatch = new Stopwatch();
+
+        $sections = new \ReflectionProperty('Symfony\Component\Stopwatch\Stopwatch', 'sections');
+        $sections->setAccessible(true);
+        $section = $sections->getValue($stopwatch);
+
+        $events = new \ReflectionProperty('Symfony\Component\Stopwatch\Section', 'events');
+        $events->setAccessible(true);
+        $events->setValue(
+            end($section),
+            array(
+                'foo' =>
+                $this->getMockBuilder('Symfony\Component\Stopwatch\StopwatchEvent')
+                    ->setConstructorArgs(array(microtime(true) * 1000))
+                    ->getMock())
+        );
+
+        $this->assertFalse($stopwatch->isStarted('foo'));
+    }
+
     public function testStop()
     {
         $stopwatch = new Stopwatch();

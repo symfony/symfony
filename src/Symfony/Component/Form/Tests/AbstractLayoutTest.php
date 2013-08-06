@@ -15,11 +15,9 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 
-abstract class AbstractLayoutTest extends FormIntegrationTestCase
+abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormIntegrationTestCase
 {
     protected $csrfProvider;
-
-    protected $factory;
 
     protected function setUp()
     {
@@ -44,7 +42,6 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     protected function tearDown()
     {
         $this->csrfProvider = null;
-        $this->factory = null;
 
         parent::tearDown();
     }
@@ -79,8 +76,8 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
             $this->fail(sprintf(
                 "Failed asserting that \n\n%s\n\nmatches exactly %s. Matches %s in \n\n%s",
                 $expression,
-                $count == 1 ? 'once' : $count . ' times',
-                $nodeList->length == 1 ? 'once' : $nodeList->length . ' times',
+                $count == 1 ? 'once' : $count.' times',
+                $nodeList->length == 1 ? 'once' : $nodeList->length.' times',
                 // strip away <root> and </root>
                 substr($dom->saveHTML(), 6, -8)
             ));
@@ -102,6 +99,8 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         $this->assertMatchesXpath($html, $xpath);
     }
 
+    abstract protected function renderForm(FormView $view, array $vars = array());
+
     abstract protected function renderEnctype(FormView $view);
 
     abstract protected function renderLabel(FormView $view, $label = null, array $vars = array());
@@ -113,6 +112,10 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     abstract protected function renderRow(FormView $view, array $vars = array());
 
     abstract protected function renderRest(FormView $view, array $vars = array());
+
+    abstract protected function renderStart(FormView $view, array $vars = array());
+
+    abstract protected function renderEnd(FormView $view, array $vars = array());
 
     abstract protected function setTheme(FormView $view, array $themes);
 
@@ -637,7 +640,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         );
     }
 
-    public function testMultipleChoiceSkipEmptyValue()
+    public function testMultipleChoiceSkipsEmptyValue()
     {
         $form = $this->factory->createNamed('name', 'choice', array('&a'), array(
             'choices' => array('&a' => 'Choice&A', '&b' => 'Choice&B'),
@@ -703,7 +706,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         );
     }
 
-    public function testSingleChoiceExpandedSkipEmptyValue()
+    public function testSingleChoiceExpandedWithEmptyValue()
     {
         $form = $this->factory->createNamed('name', 'choice', '&a', array(
             'choices' => array('&a' => 'Choice&A', '&b' => 'Choice&B'),
@@ -715,13 +718,15 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/div
     [
-        ./input[@type="radio"][@name="name"][@id="name_0"][@checked]
+        ./input[@type="radio"][@name="name"][@id="name_placeholder"][not(@checked)]
+        /following-sibling::label[@for="name_placeholder"][.="[trans]Test&Me[/trans]"]
+        /following-sibling::input[@type="radio"][@name="name"][@id="name_0"][@checked]
         /following-sibling::label[@for="name_0"][.="[trans]Choice&A[/trans]"]
         /following-sibling::input[@type="radio"][@name="name"][@id="name_1"][not(@checked)]
         /following-sibling::label[@for="name_1"][.="[trans]Choice&B[/trans]"]
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
-    [count(./input)=3]
+    [count(./input)=4]
 '
         );
     }
@@ -1155,9 +1160,10 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
     public function testDateErrorBubbling()
     {
-        $child = $this->factory->createNamed('date', 'date');
-        $form = $this->factory->createNamed('form', 'form')->add($child);
-        $child->addError(new FormError('[trans]Error![/trans]'));
+        $form = $this->factory->createNamedBuilder('form', 'form')
+            ->add('date', 'date')
+            ->getForm();
+        $form->get('date')->addError(new FormError('[trans]Error![/trans]'));
         $view = $form->createView();
 
         $this->assertEmpty($this->renderErrors($view));
@@ -1381,12 +1387,12 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         );
     }
 
-    public function testPasswordBoundNotAlwaysEmpty()
+    public function testPasswordSubmittedWithNotAlwaysEmpty()
     {
         $form = $this->factory->createNamed('name', 'password', null, array(
             'always_empty' => false,
         ));
-        $form->bind('foo&bar');
+        $form->submit('foo&bar');
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/input
@@ -1681,9 +1687,10 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
     public function testTimeErrorBubbling()
     {
-        $child = $this->factory->createNamed('time', 'time');
-        $form = $this->factory->createNamed('form', 'form')->add($child);
-        $child->addError(new FormError('[trans]Error![/trans]'));
+        $form = $this->factory->createNamedBuilder('form', 'form')
+            ->add('time', 'time')
+            ->getForm();
+        $form->get('time')->addError(new FormError('[trans]Error![/trans]'));
         $view = $form->createView();
 
         $this->assertEmpty($this->renderErrors($view));
@@ -1750,9 +1757,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         $this->assertMatchesXpath($html,
             '//div[@id="name_items"][@data-prototype]
             |
-             //table[@id="name_items"][@data-prototype]
-
-'
+            //table[@id="name_items"][@data-prototype]'
         );
     }
 
@@ -1767,5 +1772,111 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
             |
              //input[@type="text"][@id="child"][@name="child"]'
         , 2);
+    }
+
+    public function testButton()
+    {
+        $form = $this->factory->createNamed('name', 'button');
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+            '/button[@type="button"][@name="name"][.="[trans]Name[/trans]"]'
+        );
+    }
+
+    public function testButtonLabelIsEmpty()
+    {
+        $form = $this->factory->createNamed('name', 'button');
+
+        $this->assertSame('', $this->renderLabel($form->createView()));
+    }
+
+    public function testSubmit()
+    {
+        $form = $this->factory->createNamed('name', 'submit');
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+            '/button[@type="submit"][@name="name"]'
+        );
+    }
+
+    public function testReset()
+    {
+        $form = $this->factory->createNamed('name', 'reset');
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+            '/button[@type="reset"][@name="name"]'
+        );
+    }
+
+    public function testStartTag()
+    {
+        $form = $this->factory->create('form', null, array(
+            'method' => 'get',
+            'action' => 'http://example.com/directory'
+        ));
+
+        $html = $this->renderStart($form->createView());
+
+        $this->assertSame('<form name="form" method="get" action="http://example.com/directory">', $html);
+    }
+
+    public function testStartTagForPutRequest()
+    {
+        $form = $this->factory->create('form', null, array(
+            'method' => 'put',
+            'action' => 'http://example.com/directory'
+        ));
+
+        $html = $this->renderStart($form->createView());
+
+        $this->assertMatchesXpath($html . '</form>',
+'/form
+    [./input[@type="hidden"][@name="_method"][@value="PUT"]]
+    [@method="post"]
+    [@action="http://example.com/directory"]'
+        );
+    }
+
+    public function testStartTagWithOverriddenVars()
+    {
+        $form = $this->factory->create('form', null, array(
+            'method' => 'put',
+            'action' => 'http://example.com/directory',
+        ));
+
+        $html = $this->renderStart($form->createView(), array(
+            'method' => 'post',
+            'action' => 'http://foo.com/directory'
+        ));
+
+        $this->assertSame('<form name="form" method="post" action="http://foo.com/directory">', $html);
+    }
+
+    public function testStartTagForMultipartForm()
+    {
+        $form = $this->factory->createBuilder('form', null, array(
+                'method' => 'get',
+                'action' => 'http://example.com/directory'
+            ))
+            ->add('file', 'file')
+            ->getForm();
+
+        $html = $this->renderStart($form->createView());
+
+        $this->assertSame('<form name="form" method="get" action="http://example.com/directory" enctype="multipart/form-data">', $html);
+    }
+
+    public function testStartTagWithExtraAttributes()
+    {
+        $form = $this->factory->create('form', null, array(
+            'method' => 'get',
+            'action' => 'http://example.com/directory'
+        ));
+
+        $html = $this->renderStart($form->createView(), array(
+            'attr' => array('class' => 'foobar'),
+        ));
+
+        $this->assertSame('<form name="form" method="get" action="http://example.com/directory" class="foobar">', $html);
     }
 }

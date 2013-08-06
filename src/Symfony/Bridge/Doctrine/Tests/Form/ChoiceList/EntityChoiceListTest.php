@@ -70,7 +70,7 @@ class EntityChoiceListTest extends DoctrineOrmTestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Form\Exception\FormException
+     * @expectedException \Symfony\Component\Form\Exception\StringCastException
      * @expectedMessage   Entity "Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIdentEntity" passed to the choice field must have a "__toString()" method defined (or you can also override the "property" option).
      */
     public function testEntitiesMustHaveAToStringMethod()
@@ -97,7 +97,7 @@ class EntityChoiceListTest extends DoctrineOrmTestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Form\Exception\FormException
+     * @expectedException \Symfony\Component\Form\Exception\RuntimeException
      */
     public function testChoicesMustBeManaged()
     {

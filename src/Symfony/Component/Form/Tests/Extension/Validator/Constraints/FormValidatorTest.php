@@ -17,6 +17,7 @@ use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Extension\Validator\Constraints\Form;
 use Symfony\Component\Form\Extension\Validator\Constraints\FormValidator;
+use Symfony\Component\Form\SubmitButtonBuilder;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -169,6 +170,51 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->validate($form, new Form());
     }
 
+    public function testDontValidateIfNoValidationGroups()
+    {
+        $context = $this->getMockExecutionContext();
+        $object = $this->getMock('\stdClass');
+
+        $form = $this->getBuilder('name', '\stdClass', array(
+                'validation_groups' => array(),
+            ))
+            ->setData($object)
+            ->getForm();
+
+        $form->setData($object);
+
+        $context->expects($this->never())
+            ->method('validate');
+
+        $this->validator->initialize($context);
+        $this->validator->validate($form, new Form());
+    }
+
+    public function testDontValidateConstraintsIfNoValidationGroups()
+    {
+        $context = $this->getMockExecutionContext();
+        $object = $this->getMock('\stdClass');
+        $constraint1 = $this->getMock('Symfony\Component\Validator\Constraint');
+        $constraint2 = $this->getMock('Symfony\Component\Validator\Constraint');
+
+        $options = array(
+            'validation_groups' => array(),
+            'constraints' => array($constraint1, $constraint2),
+        );
+        $form = $this->getBuilder('name', '\stdClass', $options)
+            ->setData($object)
+            ->getForm();
+
+        // Launch transformer
+        $form->submit(array());
+
+        $context->expects($this->never())
+            ->method('validate');
+
+        $this->validator->initialize($context);
+        $this->validator->validate($form, new Form());
+    }
+
     public function testDontValidateIfNotSynchronized()
     {
         $context = $this->getMockExecutionContext();
@@ -189,7 +235,47 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
             ->getForm();
 
         // Launch transformer
-        $form->bind('foo');
+        $form->submit('foo');
+
+        $context->expects($this->never())
+            ->method('validate');
+
+        $context->expects($this->once())
+            ->method('addViolation')
+            ->with(
+                'invalid_message_key',
+                array('{{ value }}' => 'foo', '{{ foo }}' => 'bar'),
+                'foo'
+            );
+        $context->expects($this->never())
+            ->method('addViolationAt');
+
+        $this->validator->initialize($context);
+        $this->validator->validate($form, new Form());
+    }
+
+    public function testAddInvalidErrorEvenIfNoValidationGroups()
+    {
+        $context = $this->getMockExecutionContext();
+        $object = $this->getMock('\stdClass');
+
+        $form = $this->getBuilder('name', '\stdClass', array(
+                'invalid_message' => 'invalid_message_key',
+                // Invalid message parameters must be supported, because the
+                // invalid message can be a translation key
+                // see https://github.com/symfony/symfony/issues/5144
+                'invalid_message_parameters' => array('{{ foo }}' => 'bar'),
+                'validation_groups' => array(),
+            ))
+            ->setData($object)
+            ->addViewTransformer(new CallbackTransformer(
+                    function ($data) { return $data; },
+                    function () { throw new TransformationFailedException(); }
+                ))
+            ->getForm();
+
+        // Launch transformer
+        $form->submit('foo');
 
         $context->expects($this->never())
             ->method('validate');
@@ -228,7 +314,7 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
             ->getForm();
 
         // Launch transformer
-        $form->bind(array());
+        $form->submit(array());
 
         $context->expects($this->never())
             ->method('validate');
@@ -260,7 +346,7 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
             ->getForm();
 
         // Launch transformer
-        $form->bind(array('child' => 'foo'));
+        $form->submit(array('child' => 'foo'));
 
         $context->expects($this->never())
             ->method('addViolation');
@@ -325,6 +411,62 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
         $context->expects($this->at(1))
             ->method('validate')
             ->with($object, 'data', 'group2', true);
+
+        $this->validator->initialize($context);
+        $this->validator->validate($form, new Form());
+    }
+
+    public function testUseValidationGroupOfClickedButton()
+    {
+        $context = $this->getMockExecutionContext();
+        $object = $this->getMock('\stdClass');
+
+        $parent = $this->getBuilder('parent', null, array('cascade_validation' => true))
+            ->setCompound(true)
+            ->setDataMapper($this->getDataMapper())
+            ->getForm();
+        $form = $this->getForm('name', '\stdClass', array(
+            'validation_groups' => 'form_group',
+        ));
+
+        $parent->add($form);
+        $parent->add($this->getClickedSubmitButton('submit', array(
+            'validation_groups' => 'button_group',
+        )));
+
+        $form->setData($object);
+
+        $context->expects($this->once())
+            ->method('validate')
+            ->with($object, 'data', 'button_group', true);
+
+        $this->validator->initialize($context);
+        $this->validator->validate($form, new Form());
+    }
+
+    public function testDontUseValidationGroupOfUnclickedButton()
+    {
+        $context = $this->getMockExecutionContext();
+        $object = $this->getMock('\stdClass');
+
+        $parent = $this->getBuilder('parent', null, array('cascade_validation' => true))
+            ->setCompound(true)
+            ->setDataMapper($this->getDataMapper())
+            ->getForm();
+        $form = $this->getForm('name', '\stdClass', array(
+            'validation_groups' => 'form_group',
+        ));
+
+        $parent->add($form);
+        $parent->add($this->getSubmitButton('submit', array(
+            'validation_groups' => 'button_group',
+        )));
+
+        $form->setData($object);
+
+        $context->expects($this->once())
+            ->method('validate')
+            ->with($object, 'data', 'form_group', true);
 
         $this->validator->initialize($context);
         $this->validator->validate($form, new Form());
@@ -457,7 +599,7 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
             ->add($this->getBuilder('child'))
             ->getForm();
 
-        $form->bind(array('foo' => 'bar'));
+        $form->submit(array('foo' => 'bar'));
 
         $context->expects($this->once())
             ->method('addViolation')
@@ -579,9 +721,21 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
         return new FormBuilder($name, $dataClass, $this->dispatcher, $this->factory, $options);
     }
 
-    private function getForm($name = 'name', $dataClass = null)
+    private function getForm($name = 'name', $dataClass = null, array $options = array())
     {
-        return $this->getBuilder($name, $dataClass)->getForm();
+        return $this->getBuilder($name, $dataClass, $options)->getForm();
+    }
+
+    private function getSubmitButton($name = 'name', array $options = array())
+    {
+        $builder = new SubmitButtonBuilder($name, $options);
+
+        return $builder->getForm();
+    }
+
+    private function getClickedSubmitButton($name = 'name', array $options = array())
+    {
+        return $this->getSubmitButton($name, $options)->submit('');
     }
 
     /**

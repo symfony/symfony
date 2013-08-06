@@ -12,6 +12,8 @@
 namespace Symfony\Component\Process;
 
 use Symfony\Component\Process\Exception\InvalidArgumentException;
+use Symfony\Component\Process\Exception\LogicException;
+use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Exception\RuntimeException;
 
 /**
@@ -43,7 +45,9 @@ class Process
     private $env;
     private $stdin;
     private $starttime;
+    private $lastOutputTime;
     private $timeout;
+    private $idleTimeout;
     private $options;
     private $exitcode;
     private $fallbackExitcode;
@@ -57,6 +61,7 @@ class Process
     private $status = self::STATUS_READY;
     private $incrementalOutputOffset;
     private $incrementalErrorOutputOffset;
+    private $tty;
 
     private $fileHandles;
     private $readBytes;
@@ -229,41 +234,13 @@ class Process
             throw new RuntimeException('Process is already running');
         }
 
-        $this->starttime = microtime(true);
+        $this->starttime = $this->lastOutputTime = microtime(true);
         $this->stdout = '';
         $this->stderr = '';
         $this->incrementalOutputOffset = 0;
         $this->incrementalErrorOutputOffset = 0;
         $callback = $this->buildCallback($callback);
-
-        //Fix for PHP bug #51800: reading from STDOUT pipe hangs forever on Windows if the output is too big.
-        //Workaround for this problem is to use temporary files instead of pipes on Windows platform.
-        //@see https://bugs.php.net/bug.php?id=51800
-        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
-            $this->fileHandles = array(
-                self::STDOUT => tmpfile(),
-            );
-            if (false === $this->fileHandles[self::STDOUT]) {
-                throw new RuntimeException('A temporary file could not be opened to write the process output to, verify that your TEMP environment variable is writable');
-            }
-            $this->readBytes = array(
-                self::STDOUT => 0,
-            );
-            $descriptors = array(array('pipe', 'r'), $this->fileHandles[self::STDOUT], array('pipe', 'w'));
-        } else {
-            $descriptors = array(
-                array('pipe', 'r'), // stdin
-                array('pipe', 'w'), // stdout
-                array('pipe', 'w'), // stderr
-            );
-
-            if ($this->enhanceSigchildCompatibility && $this->isSigchildEnabled()) {
-                // last exit code is output on the fourth pipe and caught to work around --enable-sigchild
-                $descriptors = array_merge($descriptors, array(array('pipe', 'w')));
-
-                $this->commandline = '('.$this->commandline.') 3>/dev/null; code=$?; echo $code >&3; exit $code';
-            }
-        }
+        $descriptors = $this->getDescriptors();
 
         $commandline = $this->commandline;
 
@@ -283,6 +260,12 @@ class Process
 
         foreach ($this->pipes as $pipe) {
             stream_set_blocking($pipe, false);
+        }
+
+        if ($this->tty) {
+            $this->status = self::STATUS_TERMINATED;
+
+            return;
         }
 
         if (null === $this->stdin) {
@@ -471,6 +454,51 @@ class Process
         }
 
         return $this->exitcode;
+    }
+
+    /**
+     * Returns the Pid (process identifier), if applicable.
+     *
+     * @return integer|null The process id if running, null otherwise
+     *
+     * @throws RuntimeException In case --enable-sigchild is activated
+     */
+    public function getPid()
+    {
+        if ($this->isSigchildEnabled()) {
+            throw new RuntimeException('This PHP has been compiled with --enable-sigchild. The process identifier can not be retrieved.');
+        }
+
+        $this->updateStatus();
+
+        return $this->isRunning() ? $this->processInformation['pid'] : null;
+    }
+
+    /**
+     * Sends a posix signal to the process.
+     *
+     * @param  integer $signal A valid posix signal (see http://www.php.net/manual/en/pcntl.constants.php)
+     * @return Process
+     *
+     * @throws LogicException   In case the process is not running
+     * @throws RuntimeException In case --enable-sigchild is activated
+     * @throws RuntimeException In case of failure
+     */
+    public function signal($signal)
+    {
+        if (!$this->isRunning()) {
+            throw new LogicException('Can not send signal on a non running process.');
+        }
+
+        if ($this->isSigchildEnabled()) {
+            throw new RuntimeException('This PHP has been compiled with --enable-sigchild. The process can not be signaled.');
+        }
+
+        if (true !== @proc_terminate($this->process, $signal)) {
+            throw new RuntimeException(sprintf('Error while sending signal `%d`.', $signal));
+        }
+
+        return $this;
     }
 
     /**
@@ -720,12 +748,13 @@ class Process
      * Stops the process.
      *
      * @param integer|float $timeout The timeout in seconds
+     * @param integer       $signal  A posix signal to send in case the process has not stop at timeout, default is SIGKILL
      *
      * @return integer The exit-code of the process
      *
      * @throws RuntimeException if the process got signaled
      */
-    public function stop($timeout = 10)
+    public function stop($timeout = 10, $signal = null)
     {
         $timeoutMicro = (int) $timeout*1E6;
         if ($this->isRunning()) {
@@ -736,8 +765,10 @@ class Process
                 usleep(1000);
             }
 
-            if (!defined('PHP_WINDOWS_VERSION_BUILD') && $this->isRunning()) {
-                proc_terminate($this->process, SIGKILL);
+            if ($this->isRunning() && !$this->isSigchildEnabled()) {
+                if (null !== $signal || defined('SIGKILL')) {
+                    $this->signal($signal ?: SIGKILL);
+                }
             }
 
             foreach ($this->pipes as $pipe) {
@@ -767,6 +798,7 @@ class Process
      */
     public function addOutput($line)
     {
+        $this->lastOutputTime = microtime(true);
         $this->stdout .= $line;
     }
 
@@ -777,6 +809,7 @@ class Process
      */
     public function addErrorOutput($line)
     {
+        $this->lastOutputTime = microtime(true);
         $this->stderr .= $line;
     }
 
@@ -807,7 +840,7 @@ class Process
     /**
      * Gets the process timeout.
      *
-     * @return integer|null The timeout in seconds or null if it's disabled
+     * @return float|null The timeout in seconds or null if it's disabled
      */
     public function getTimeout()
     {
@@ -815,11 +848,21 @@ class Process
     }
 
     /**
+     * Gets the process idle timeout.
+     *
+     * @return float|null
+     */
+    public function getIdleTimeout()
+    {
+        return $this->idleTimeout;
+    }
+
+    /**
      * Sets the process timeout.
      *
      * To disable the timeout, set this value to null.
      *
-     * @param float|null $timeout The timeout in seconds
+     * @param integer|float|null $timeout The timeout in seconds
      *
      * @return self The current Process instance
      *
@@ -827,21 +870,49 @@ class Process
      */
     public function setTimeout($timeout)
     {
-        if (null === $timeout) {
-            $this->timeout = null;
-
-            return $this;
-        }
-
-        $timeout = (float) $timeout;
-
-        if ($timeout < 0) {
-            throw new InvalidArgumentException('The timeout value must be a valid positive integer or float number.');
-        }
-
-        $this->timeout = $timeout;
+        $this->timeout = $this->validateTimeout($timeout);
 
         return $this;
+    }
+
+    /**
+     * Sets the process idle timeout.
+     *
+     * @param integer|float|null $timeout
+     *
+     * @return self The current Process instance.
+     *
+     * @throws InvalidArgumentException if the timeout is negative
+     */
+    public function setIdleTimeout($timeout)
+    {
+        $this->idleTimeout = $this->validateTimeout($timeout);
+
+        return $this;
+    }
+
+    /**
+     * Enables or disables the TTY mode.
+     *
+     * @param boolean $tty True to enabled and false to disable
+     *
+     * @return self The current Process instance
+     */
+    public function setTty($tty)
+    {
+        $this->tty = (Boolean) $tty;
+
+        return $this;
+    }
+
+    /**
+     * Checks if  the TTY mode is enabled.
+     *
+     * @return Boolean true if the TTY mode is enabled, false otherwise
+     */
+    public function isTty()
+    {
+        return $this->tty;
     }
 
     /**
@@ -960,7 +1031,7 @@ class Process
     }
 
     /**
-     * Gets whether or not Windows compatibility is enabled
+     * Gets whether or not Windows compatibility is enabled.
      *
      * This is true by default.
      *
@@ -972,7 +1043,7 @@ class Process
     }
 
     /**
-     * Sets whether or not Windows compatibility is enabled
+     * Sets whether or not Windows compatibility is enabled.
      *
      * @param Boolean $enhance
      *
@@ -986,7 +1057,7 @@ class Process
     }
 
     /**
-     * Return whether sigchild compatibility mode is activated or not
+     * Returns whether sigchild compatibility mode is activated or not.
      *
      * @return Boolean
      */
@@ -996,7 +1067,7 @@ class Process
     }
 
     /**
-     * Activate sigchild compatibility mode
+     * Activates sigchild compatibility mode.
      *
      * Sigchild compatibility mode is required to get the exit code and
      * determine the success of a process when PHP has been compiled with
@@ -1014,8 +1085,7 @@ class Process
     }
 
     /**
-     * Performs a check between the timeout definition and the time the process
-     * started
+     * Performs a check between the timeout definition and the time the process started.
      *
      * In case you run a background process (with the start method), you should
      * trigger this method regularly to ensure the process timeout
@@ -1027,8 +1097,62 @@ class Process
         if (0 < $this->timeout && $this->timeout < microtime(true) - $this->starttime) {
             $this->stop(0);
 
-            throw new RuntimeException('The process timed-out.');
+            throw new ProcessTimedOutException($this, ProcessTimedOutException::TYPE_GENERAL);
         }
+
+        if (0 < $this->idleTimeout && $this->idleTimeout < microtime(true) - $this->lastOutputTime) {
+            $this->stop(0);
+
+            throw new ProcessTimedOutException($this, ProcessTimedOutException::TYPE_IDLE);
+        }
+    }
+
+    /**
+     * Creates the descriptors needed by the proc_open.
+     *
+     * @return array
+     */
+    private function getDescriptors()
+    {
+        //Fix for PHP bug #51800: reading from STDOUT pipe hangs forever on Windows if the output is too big.
+        //Workaround for this problem is to use temporary files instead of pipes on Windows platform.
+        //@see https://bugs.php.net/bug.php?id=51800
+        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+            $this->fileHandles = array(
+                self::STDOUT => tmpfile(),
+            );
+            if (false === $this->fileHandles[self::STDOUT]) {
+                throw new RuntimeException('A temporary file could not be opened to write the process output to, verify that your TEMP environment variable is writable');
+            }
+            $this->readBytes = array(
+                self::STDOUT => 0,
+            );
+
+            return array(array('pipe', 'r'), $this->fileHandles[self::STDOUT], array('pipe', 'w'));
+        }
+
+        if ($this->tty) {
+            $descriptors = array(
+                array('file', '/dev/tty', 'r'),
+                array('file', '/dev/tty', 'w'),
+                array('file', '/dev/tty', 'w'),
+            );
+        } else {
+           $descriptors = array(
+                array('pipe', 'r'), // stdin
+                array('pipe', 'w'), // stdout
+                array('pipe', 'w'), // stderr
+            );
+        }
+
+        if ($this->enhanceSigchildCompatibility && $this->isSigchildEnabled()) {
+            // last exit code is output on the fourth pipe and caught to work around --enable-sigchild
+            $descriptors = array_merge($descriptors, array(array('pipe', 'w')));
+
+            $this->commandline = '('.$this->commandline.') 3>/dev/null; code=$?; echo $code >&3; exit $code';
+        }
+
+        return $descriptors;
     }
 
     /**
@@ -1103,7 +1227,7 @@ class Process
     }
 
     /**
-     * Return whether PHP has been compiled with the '--enable-sigchild' option or not
+     * Returns whether PHP has been compiled with the '--enable-sigchild' option or not.
      *
      * @return Boolean
      */
@@ -1120,7 +1244,7 @@ class Process
     }
 
     /**
-     * Handles the windows file handles fallbacks
+     * Handles the windows file handles fallbacks.
      *
      * @param callable $callback A valid PHP callback
      * @param Boolean $closeEmptyHandles if true, handles that are empty will be assumed closed
@@ -1153,5 +1277,27 @@ class Process
 
         // stream_select returns false when the `select` system call is interrupted by an incoming signal
         return isset($lastError['message']) && false !== stripos($lastError['message'], 'interrupted system call');
+    }
+
+    /**
+     * Validates and returns the filtered timeout.
+     *
+     * @param integer|float|null $timeout
+     *
+     * @return float|null
+     */
+    private function validateTimeout($timeout)
+    {
+        if (null === $timeout) {
+            return null;
+        }
+
+        $timeout = (float) $timeout;
+
+        if ($timeout < 0) {
+            throw new InvalidArgumentException('The timeout value must be a valid positive integer or float number.');
+        }
+
+        return $timeout;
     }
 }

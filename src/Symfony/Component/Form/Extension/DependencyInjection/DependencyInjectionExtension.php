@@ -13,6 +13,7 @@ namespace Symfony\Component\Form\Extension\DependencyInjection;
 
 use Symfony\Component\Form\FormExtensionInterface;
 use Symfony\Component\Form\FormTypeGuesserChain;
+use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class DependencyInjectionExtension implements FormExtensionInterface
@@ -40,13 +41,13 @@ class DependencyInjectionExtension implements FormExtensionInterface
     public function getType($name)
     {
         if (!isset($this->typeServiceIds[$name])) {
-            throw new \InvalidArgumentException(sprintf('The field type "%s" is not registered with the service container.', $name));
+            throw new InvalidArgumentException(sprintf('The field type "%s" is not registered with the service container.', $name));
         }
 
         $type = $this->container->get($this->typeServiceIds[$name]);
 
         if ($type->getName() !== $name) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 sprintf('The type name specified for the service "%s" does not match the actual name. Expected "%s", given "%s"',
                     $this->typeServiceIds[$name],
                     $name,

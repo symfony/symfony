@@ -85,7 +85,7 @@ abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
         $this->form->setData($originalData);
 
         $event = new FormEvent($this->form, $newData);
-        $listener->onBind($event);
+        $listener->onSubmit($event);
 
         // The original object was modified
         if (is_object($originalData)) {
@@ -109,7 +109,7 @@ abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
         $this->form->setData($originalData);
 
         $event = new FormEvent($this->form, $newData);
-        $listener->onBind($event);
+        $listener->onSubmit($event);
 
         // The original object was modified
         if (is_object($originalData)) {
@@ -134,7 +134,7 @@ abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
         $this->form->setData($originalData);
 
         $event = new FormEvent($this->form, $newData);
-        $listener->onBind($event);
+        $listener->onSubmit($event);
 
         // We still have the original object
         if (is_object($originalData)) {
@@ -158,7 +158,7 @@ abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
         $this->form->setData($originalData);
 
         $event = new FormEvent($this->form, $newData);
-        $listener->onBind($event);
+        $listener->onSubmit($event);
 
         // The original object was modified
         if (is_object($originalData)) {
@@ -183,7 +183,7 @@ abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
         $this->form->setData($originalData);
 
         $event = new FormEvent($this->form, $newData);
-        $listener->onBind($event);
+        $listener->onSubmit($event);
 
         // We still have the original object
         if (is_object($originalData)) {
@@ -203,7 +203,7 @@ abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
         $newData = 'no array or traversable';
         $event = new FormEvent($this->form, $newData);
         $listener = new MergeCollectionListener($allowAdd, $allowDelete);
-        $listener->onBind($event);
+        $listener->onSubmit($event);
     }
 
     public function testDealWithNullData()
@@ -216,7 +216,7 @@ abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
         $this->form->setData($originalData);
 
         $event = new FormEvent($this->form, $newData);
-        $listener->onBind($event);
+        $listener->onSubmit($event);
 
         $this->assertSame($originalData, $event->getData());
     }
@@ -234,7 +234,7 @@ abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
         $this->form->setData($originalData);
 
         $event = new FormEvent($this->form, $newData);
-        $listener->onBind($event);
+        $listener->onSubmit($event);
 
         $this->assertSame($newData, $event->getData());
     }
@@ -252,7 +252,7 @@ abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
         $this->form->setData($originalData);
 
         $event = new FormEvent($this->form, $newData);
-        $listener->onBind($event);
+        $listener->onSubmit($event);
 
         $this->assertNull($event->getData());
     }

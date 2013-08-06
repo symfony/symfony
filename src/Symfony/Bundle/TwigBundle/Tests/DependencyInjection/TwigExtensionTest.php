@@ -83,6 +83,32 @@ class TwigExtensionTest extends TestCase
         $this->assertTrue($options['strict_variables'], '->load() sets the strict_variables option');
     }
 
+    /**
+     * @dataProvider getFormats
+     */
+    public function testLoadCustomTemplateEscapingGuesserConfiguration($format)
+    {
+        $container = $this->createContainer();
+        $container->registerExtension(new TwigExtension());
+        $this->loadFromFile($container, 'customTemplateEscapingGuesser', $format);
+        $this->compileContainer($container);
+
+        $this->assertTemplateEscapingGuesserDefinition($container, 'my_project.some_bundle.template_escaping_guesser', 'guess');
+    }
+
+    /**
+     * @dataProvider getFormats
+     */
+    public function testLoadDefaultTemplateEscapingGuesserConfiguration($format)
+    {
+        $container = $this->createContainer();
+        $container->registerExtension(new TwigExtension());
+        $this->loadFromFile($container, 'empty', $format);
+        $this->compileContainer($container);
+
+        $this->assertTemplateEscapingGuesserDefinition($container, 'templating.engine.twig', 'guessDefaultEscapingStrategy');
+    }
+
     public function testGlobalsWithDifferentTypesAndValues()
     {
         $globals = array(
@@ -184,9 +210,23 @@ class TwigExtensionTest extends TestCase
                 $loader = new YamlFileLoader($container, $locator);
                 break;
             default:
-                throw new \InvalidArgumentException('Unsupported format: '.$format);
+                throw new \InvalidArgumentException(sprintf('Unsupported format: %s', $format));
         }
 
         $loader->load($file.'.'.$format);
+    }
+
+    private function assertTemplateEscapingGuesserDefinition(ContainerBuilder $container, $serviceId, $serviceMethod)
+    {
+        $def = $container->getDefinition('templating.engine.twig');
+
+        $this->assertCount(1, $def->getMethodCalls());
+
+        foreach ($def->getMethodCalls() as $call) {
+            if ('setDefaultEscapingStrategy' === $call[0]) {
+                $this->assertSame($serviceId, (string) $call[1][0][0]);
+                $this->assertSame($serviceMethod, $call[1][0][1]);
+            }
+        }
     }
 }

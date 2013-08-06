@@ -150,6 +150,16 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array($request), $resolver->getArguments($request, $controller), '->getArguments() injects the request');
     }
 
+    public function testCreateControllerCanReturnAnyCallable()
+    {
+        $mock = $this->getMock('Symfony\Component\HttpKernel\Controller\ControllerResolver', array('createController'));
+        $mock->expects($this->once())->method('createController')->will($this->returnValue('Symfony\Component\HttpKernel\Tests\some_controller_function'));
+
+        $request = Request::create('/');
+        $request->attributes->set('_controller', 'foobar');
+        $mock->getController($request);
+    }
+
     public function __invoke($foo, $bar = null)
     {
     }

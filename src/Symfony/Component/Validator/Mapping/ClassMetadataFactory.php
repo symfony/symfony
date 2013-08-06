@@ -21,7 +21,7 @@ use Symfony\Component\Validator\Mapping\Cache\CacheInterface;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class ClassMetadataFactory implements ClassMetadataFactoryInterface, MetadataFactoryInterface
+class ClassMetadataFactory implements MetadataFactoryInterface
 {
     /**
      * The loader for loading the class metadata
@@ -49,7 +49,7 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface, MetadataFac
     public function getMetadataFor($value)
     {
         if (!is_object($value) && !is_string($value)) {
-            throw new NoSuchMetadataException('Cannot create metadata for non-objects. Got: ' . gettype($value));
+            throw new NoSuchMetadataException(sprintf('Cannot create metadata for non-objects. Got: %s', gettype($value)));
         }
 
         $class = ltrim(is_object($value) ? get_class($value) : $value, '\\');
@@ -63,7 +63,7 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface, MetadataFac
         }
 
         if (!class_exists($class) && !interface_exists($class)) {
-            throw new NoSuchMetadataException('The class or interface "' . $class . '" does not exist.');
+            throw new NoSuchMetadataException(sprintf('The class or interface "%s" does not exist.', $class));
         }
 
         $metadata = new ClassMetadata($class);
@@ -108,18 +108,5 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface, MetadataFac
         }
 
         return false;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @deprecated Deprecated since version 2.2, to be removed in 2.3. Use
-     *             {@link getMetadataFor} instead.
-     */
-    public function getClassMetadata($class)
-    {
-        trigger_error('getClassMetadata() is deprecated since version 2.2 and will be removed in 2.3. Use getMetadataFor() instead.', E_USER_DEPRECATED);
-
-        return $this->getMetadataFor($class);
     }
 }

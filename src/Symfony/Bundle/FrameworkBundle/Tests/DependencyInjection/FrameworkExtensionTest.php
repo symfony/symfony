@@ -37,8 +37,14 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('full');
 
-        $this->assertTrue($container->getParameter('kernel.trust_proxy_headers'));
         $this->assertEquals(array('127.0.0.1', '10.0.0.1'), $container->getParameter('kernel.trusted_proxies'));
+    }
+
+    public function testHttpMethodOverride()
+    {
+        $container = $this->createContainerFromFile('full');
+
+        $this->assertFalse($container->getParameter('kernel.http_method_override'));
     }
 
     public function testEsi()
@@ -48,17 +54,20 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('esi'), '->registerEsiConfiguration() loads esi.xml');
     }
 
-    public function testProfiler()
+    public function testEnabledProfiler()
     {
-        $container = $this->createContainerFromFile('full');
+        $container = $this->createContainerFromFile('profiler');
 
         $this->assertTrue($container->hasDefinition('profiler'), '->registerProfilerConfiguration() loads profiling.xml');
         $this->assertTrue($container->hasDefinition('data_collector.config'), '->registerProfilerConfiguration() loads collectors.xml');
-        $this->assertTrue($container->getParameter('profiler_listener.only_exceptions'));
-        $this->assertEquals('%profiler_listener.only_exceptions%', $container->getDefinition('profiler_listener')->getArgument(2));
+    }
 
-        $calls = $container->getDefinition('profiler')->getMethodCalls();
-        $this->assertEquals('disable', $calls[0][0]);
+    public function testDisabledProfiler()
+    {
+        $container = $this->createContainerFromFile('full');
+
+        $this->assertFalse($container->hasDefinition('profiler'), '->registerProfilerConfiguration() does not load profiling.xml');
+        $this->assertFalse($container->hasDefinition('data_collector.config'), '->registerProfilerConfiguration() does not load collectors.xml');
     }
 
     public function testRouter()
@@ -105,34 +114,13 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals('/path/to/sessions', $container->getParameter('session.save_path'));
     }
 
-    public function testSessionDeprecatedMergeFull()
+    public function testNullSessionHandler()
     {
-        $container = $this->createContainerFromFile('deprecated_merge_full');
+        $container = $this->createContainerFromFile('session');
 
         $this->assertTrue($container->hasDefinition('session'), '->registerSessionConfiguration() loads session.xml');
-
-        $options = $container->getParameter('session.storage.options');
-        $this->assertEquals('_SYMFONY', $options['name']);
-        $this->assertEquals(86400, $options['cookie_lifetime']);
-        $this->assertEquals('/', $options['cookie_path']);
-        $this->assertEquals('example.com', $options['cookie_domain']);
-        $this->assertTrue($options['cookie_secure']);
-        $this->assertTrue($options['cookie_httponly']);
-    }
-
-    public function testSessionDeprecatedMergePartial()
-    {
-        $container = $this->createContainerFromFile('deprecated_merge_partial');
-
-        $this->assertTrue($container->hasDefinition('session'), '->registerSessionConfiguration() loads session.xml');
-
-        $options = $container->getParameter('session.storage.options');
-        $this->assertEquals('_SYMFONY', $options['name']);
-        $this->assertEquals(86400, $options['cookie_lifetime']);
-        $this->assertEquals('/', $options['cookie_path']);
-        $this->assertEquals('sf2.example.com', $options['cookie_domain']);
-        $this->assertFalse($options['cookie_secure']);
-        $this->assertTrue($options['cookie_httponly']);
+        $this->assertNull($container->getDefinition('session.storage.native')->getArgument(1));
+        $this->assertNull($container->getDefinition('session.storage.php_bridge')->getArgument(0));
     }
 
     public function testTemplating()
@@ -193,26 +181,28 @@ abstract class FrameworkExtensionTest extends TestCase
             }
         }
 
-        $rootDirectory = str_replace('/', DIRECTORY_SEPARATOR, realpath(__DIR__.'/../../../../..').'/');
-        $files = array_map(function($resource) use ($rootDirectory, $resources) { return str_replace($rootDirectory, '', realpath($resource[1])); }, $resources);
+        $files = array_map(function($resource) { return realpath($resource[1]); }, $resources);
+        $ref = new \ReflectionClass('Symfony\Component\Validator\Validator');
         $this->assertContains(
-            str_replace('/', DIRECTORY_SEPARATOR, 'Symfony/Component/Validator/Resources/translations/validators.en.xlf'),
+            strtr(dirname($ref->getFileName()) . '/Resources/translations/validators.en.xlf', '/', DIRECTORY_SEPARATOR),
             $files,
             '->registerTranslatorConfiguration() finds Validator translation resources'
         );
+        $ref = new \ReflectionClass('Symfony\Component\Form\Form');
         $this->assertContains(
-            str_replace('/', DIRECTORY_SEPARATOR, 'Symfony/Component/Form/Resources/translations/validators.en.xlf'),
+            strtr(dirname($ref->getFileName()) . '/Resources/translations/validators.en.xlf', '/', DIRECTORY_SEPARATOR),
             $files,
             '->registerTranslatorConfiguration() finds Form translation resources'
         );
+        $ref = new \ReflectionClass('Symfony\Component\Security\Core\SecurityContext');
         $this->assertContains(
-            str_replace('/', DIRECTORY_SEPARATOR, 'Symfony/Component/Security/Resources/translations/security.en.xlf'),
+            strtr(dirname(dirname($ref->getFileName())) . '/Resources/translations/security.en.xlf', '/', DIRECTORY_SEPARATOR),
             $files,
             '->registerTranslatorConfiguration() finds Security translation resources'
         );
 
         $calls = $container->getDefinition('translator.default')->getMethodCalls();
-        $this->assertEquals('fr', $calls[0][1][0]);
+        $this->assertEquals(array('fr'), $calls[0][1][0]);
     }
 
     /**
@@ -234,8 +224,9 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('validator.mapping.loader.yaml_files_loader'), '->registerValidationConfiguration() defines the YAML loader');
 
         $xmlFiles = $container->getParameter('validator.mapping.loader.xml_files_loader.mapping_files');
+        $ref = new \ReflectionClass('Symfony\Component\Form\Form');
         $this->assertContains(
-            realpath(__DIR__.'/../../../../Component/Form/Resources/config/validation.xml'),
+            realpath(dirname($ref->getFileName()).'/Resources/config/validation.xml'),
             array_map('realpath', $xmlFiles),
             '->registerValidationConfiguration() adds Form validation.xml to XML loader'
         );

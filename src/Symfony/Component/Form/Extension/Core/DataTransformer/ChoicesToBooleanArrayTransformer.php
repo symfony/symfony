@@ -109,9 +109,7 @@ class ChoicesToBooleanArrayTransformer implements DataTransformerInterface
         }
 
         if (count($unknown) > 0) {
-            throw new TransformationFailedException(
-                sprintf('The choices "%s" were not found', implode('", "', $unknown))
-            );
+            throw new TransformationFailedException(sprintf('The choices "%s" were not found', implode('", "', $unknown)));
         }
 
         return $result;

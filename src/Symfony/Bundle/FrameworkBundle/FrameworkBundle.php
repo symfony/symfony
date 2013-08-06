@@ -42,6 +42,10 @@ class FrameworkBundle extends Bundle
         } elseif ($this->container->getParameter('kernel.trust_proxy_headers')) {
             Request::trustProxyData(); // @deprecated, to be removed in 2.3
         }
+
+        if ($trustedHosts = $this->container->getParameter('kernel.trusted_hosts')) {
+            Request::setTrustedHosts($trustedHosts);
+        }
     }
 
     public function build(ContainerBuilder $container)

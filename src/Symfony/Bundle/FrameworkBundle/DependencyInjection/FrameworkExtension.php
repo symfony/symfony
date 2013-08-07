@@ -67,6 +67,7 @@ class FrameworkExtension extends Extension
         }
 
         $container->setParameter('kernel.trusted_proxies', $config['trusted_proxies']);
+        $container->setParameter('kernel.trusted_hosts', $config['trusted_hosts']);
 
         // @deprecated, to be removed in 2.3
         $container->setParameter('kernel.trust_proxy_headers', $config['trust_proxy_headers']);

@@ -7,6 +7,13 @@ in 2.1 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.1.0...v2.1.1
 
+* 2.1.12 (2013-08-07)
+
+ * c35cc5b: added trusted hosts check
+ * 6d555bc: Fixed metadata serialization
+ * 0c0a3e9: [Console] fixed regression when calling a command foo:bar if there is another one like foo:bar:baz (closes #8245)
+ * bbfde62: Fixed exit code for exceptions with error code 0
+
 * 2.1.11 (2013-06-02)
 
  * 2038329: [Form] [Validator] Fixed post_max_size = 0 bug (Issue #8065)

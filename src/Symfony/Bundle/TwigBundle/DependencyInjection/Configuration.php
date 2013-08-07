@@ -81,7 +81,9 @@ class Configuration implements ConfigurationInterface
                     ->example(array('foo' => '"@bar"', 'pi' => 3.14))
                     ->prototype('array')
                         ->beforeNormalization()
-                            ->ifTrue(function($v){ return is_string($v) && 0 === strpos($v, '@'); })
+                            ->ifTrue(function($v){
+                                return is_string($v) && 0 === strpos($v, '@') && 0 !== strpos($v, '@@');
+                            })
                             ->then(function($v){ return array('id' => substr($v, 1), 'type' => 'service'); })
                         ->end()
                         ->beforeNormalization()

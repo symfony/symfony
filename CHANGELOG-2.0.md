@@ -7,6 +7,11 @@ in 2.0 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.0.0...v2.0.1
 
+* 2.0.24 (2013-08-07)
+
+ * added trusted hosts check
+ * fixed metadata serialization
+ 
 * 2.0.23 (2013-03-20)
 
  * f8812b2: [Form] Fixed "label" option to accept the value "0"

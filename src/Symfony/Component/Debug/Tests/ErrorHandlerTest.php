@@ -23,10 +23,9 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
     public function testCompileTimeError()
     {
         // the ContextErrorException must not be loaded for this test to work
-        $this->assertFalse(
-            class_exists('Symfony\Component\Debug\Exception\ContextErrorException', false),
-            'The ContextErrorException class is already loaded.'
-        );
+        if (class_exists('Symfony\Component\Debug\Exception\ContextErrorException', false)) {
+            $this->markTestSkipped('The ContextErrorException class is already loaded.');
+        }
     
         $handler = ErrorHandler::register(E_ALL | E_STRICT);
         $displayErrors = ini_get('display_errors');

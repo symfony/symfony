@@ -16,7 +16,7 @@ use Symfony\Component\Debug\ErrorHandler;
 /**
  * ErrorHandlerTest
  *
- * @author Robert Schönthal <seroscho@googlemail.com> 
+ * @author Robert Schönthal <seroscho@googlemail.com>
  */
 class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
 {

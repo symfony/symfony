@@ -22,7 +22,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         $config = $processor->processConfiguration(new Configuration(), array(array('secret' => 's3cr3t')));
 
         $this->assertEquals(
-            array_merge(array('secret' => 's3cr3t'), self::getBundleDefaultConfig()),
+            array_merge(array('secret' => 's3cr3t', 'trusted_hosts' => array()), self::getBundleDefaultConfig()),
             $config
         );
     }

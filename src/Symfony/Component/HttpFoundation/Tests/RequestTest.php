@@ -1501,6 +1501,37 @@ class RequestTest extends \PHPUnit_Framework_TestCase
             )
         );
     }
+
+    public function testTrustedHosts()
+    {
+        // create a request
+        $request = Request::create('/');
+
+        // no trusted host set -> no host check
+        $request->headers->set('host', 'evil.com');
+        $this->assertEquals('evil.com', $request->getHost());
+
+        // add a trusted domain and all its subdomains
+        Request::setTrustedHosts(array('.*\.?trusted.com$'));
+
+        // untrusted host
+        $request->headers->set('host', 'evil.com');
+        try {
+            $request->getHost();
+            $this->fail('Request::getHost() should throw an exception when host is not trusted.');
+        } catch (\UnexpectedValueException $e) {
+            $this->assertEquals('Untrusted Host', $e->getMessage());
+        }
+
+        // trusted hosts
+        $request->headers->set('host', 'trusted.com');
+        $this->assertEquals('trusted.com', $request->getHost());
+        $request->headers->set('host', 'subdomain.trusted.com');
+        $this->assertEquals('subdomain.trusted.com', $request->getHost());
+
+        // reset request for following tests
+        Request::setTrustedHosts(array());
+    }
 }
 
 class RequestContentProxy extends Request

@@ -68,6 +68,13 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('ide')->defaultNull()->end()
                 ->booleanNode('test')->end()
                 ->scalarNode('default_locale')->defaultValue('en')->end()
+                ->arrayNode('trusted_hosts')
+                    ->beforeNormalization()
+                        ->ifTrue(function($v) { return is_string($v); })
+                        ->then(function($v) { return array($v); })
+                    ->end()
+                    ->prototype('scalar')->end()
+                ->end()
             ->end()
         ;
 

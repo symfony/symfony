@@ -16,10 +16,37 @@ use Symfony\Component\Debug\ErrorHandler;
 /**
  * ErrorHandlerTest
  *
- * @author Robert Schönthal <seroscho@googlemail.com>
+ * @author Robert Schönthal <seroscho@googlemail.com> 
  */
 class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
 {
+    public function testCompileTimeError()
+    {
+        // the ContextErrorException must not be loaded for this test to work
+        $this->assertFalse(
+            class_exists('Symfony\Component\Debug\Exception\ContextErrorException', false),
+            'The ContextErrorException class is already loaded.'
+        );
+    
+        $handler = ErrorHandler::register(E_ALL | E_STRICT);
+        $displayErrors = ini_get('display_errors');
+        ini_set('display_errors', '1');
+
+        try {
+            // trigger compile time error
+            eval(<<<'PHP'
+class _BaseCompileTimeError { function foo() {} }
+class _CompileTimeError extends _BaseCompileTimeError { function foo($invalid) {} }
+PHP
+            );
+        } catch(\Exception $e) {
+            // if an exception is thrown, the test passed
+        }
+
+        ini_set('display_errors', $displayErrors);
+        restore_error_handler();
+    }
+   
     public function testConstruct()
     {
         $handler = ErrorHandler::register(3);

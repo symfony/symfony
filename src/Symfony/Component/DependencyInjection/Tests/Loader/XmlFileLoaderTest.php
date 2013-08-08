@@ -114,7 +114,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
                 'float' => 1.3,
                 1000.3,
                 'a string',
-                array('foo', 'bar',)
+                array('foo', 'bar'),
             ),
             'foo_bar' => new Reference('foo_bar'),
             'mixedcase' => array('MixedCaseKey' => 'value'),
@@ -155,7 +155,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
                 'float' => 1.3,
                 1000.3,
                 'a string',
-                array('foo', 'bar',)
+                array('foo', 'bar'),
             ),
             'foo_bar' => new Reference('foo_bar'),
             'mixedcase' => array('MixedCaseKey' => 'value'),

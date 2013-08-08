@@ -39,7 +39,8 @@ class EqualToValidatorTest extends AbstractComparisonValidatorTestCase
             array(3, 3),
             array(3, '3'),
             array('a', 'a'),
-            array(new \DateTime('2000-01-01'), new \DateTime('2000-01-01'))
+            array(new \DateTime('2000-01-01'), new \DateTime('2000-01-01')),
+            array(null, 1),
         );
     }
 

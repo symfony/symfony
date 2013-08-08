@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-08-06T09:19:37Z
+
+The unit test does not pass if using Twig 2.0 and without adding the exists() method.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-08-06T09:21:30Z
+
+This PR addresses the problem mentioned in fabpot/Twig#1156, symfony/symfony#8665. It is an alternative for symfony/symfony#8667, symfony/symfony#8668, and symfony/symfony#8672
+
+---------------------------------------------------------------------------
+
+by hacfi at 2013-08-07T01:14:34Z
+
+:+1: I thought this would be rejected because of duplication of code (try..catch) but it seems to be the only choice here if compatibility with all Twig versions needs to be preserved.

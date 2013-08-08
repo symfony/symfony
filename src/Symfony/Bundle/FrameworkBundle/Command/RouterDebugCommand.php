@@ -129,7 +129,7 @@ EOF
                     $controller = 'Closure';
                 } else {
                     if (is_object($controller)) {
-                        get_class($controller);
+                        $controller = get_class($controller);
                     }
                 }
                 $output->writeln(sprintf($format, $name, $method, $scheme, $host, $route->getPath(), $controller), OutputInterface::OUTPUT_RAW);

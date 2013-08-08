@@ -80,7 +80,7 @@ class FormExtension extends \Twig_Extension
     public function getFilters()
     {
         return array(
-            'humanize' => new \Twig_Filter_Method($this, 'renderer->humanize'),
+            new \Twig_SimpleFilter('humanize', array($this->renderer, 'humanize')),
         );
     }
 
@@ -90,7 +90,7 @@ class FormExtension extends \Twig_Extension
     public function getTests()
     {
         return array(
-            'selectedchoice' => new \Twig_Test_Method($this, 'isSelectedChoice'),
+            new \Twig_SimpleTest('selectedchoice', array($this, 'isSelectedChoice')),
         );
     }
 

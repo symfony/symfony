@@ -49,8 +49,8 @@ class TranslationExtension extends \Twig_Extension
     public function getFilters()
     {
         return array(
-            'trans' => new \Twig_Filter_Method($this, 'trans'),
-            'transchoice' => new \Twig_Filter_Method($this, 'transchoice'),
+            new \Twig_SimpleFilter('trans', array($this, 'trans')),
+            new \Twig_SimpleFilter('transchoice', array($this, 'transchoice')),
         );
     }
 

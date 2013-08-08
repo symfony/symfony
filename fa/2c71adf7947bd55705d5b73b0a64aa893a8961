@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2013-08-08T07:34:55Z
+
+Tests fail on PHP 5.5 now: https://travis-ci.org/symfony/symfony/jobs/9964642#L301
+
+---------------------------------------------------------------------------
+
+by helmer at 2013-08-08T07:54:01Z
+
+Test failure is unrelated to my changes, failing path does not touch ```ProcessBuilder``` or ```ProcessUtils```. The build was green after issueing PR, so its probably something else.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-08-08T10:58:30Z
+
+Looks like it should be merged in 2.2, right?
+
+---------------------------------------------------------------------------
+
+by helmer at 2013-08-08T12:51:35Z
+
+Nope, 2.2 is fine (albeit failing for args containing ```["%]``` on Windows), the PR #6796 breaking empty args was merged into 2.3.0,

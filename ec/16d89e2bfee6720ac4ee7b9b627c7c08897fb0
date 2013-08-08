@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by stof at 2013-08-06T09:34:39Z
+
+:+1:
+
+Are you planning to release Twig 2.0 soon or is it just for safety ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-08-06T10:57:26Z
+
+I have pushed a 2.0-experimental branch so that we can test things out. I plan to release Twig 2.0 by the end of the year. The idea being that you can either rely on ~1.x,<2.0, or ~1.11,<3.0.
+
+---------------------------------------------------------------------------
+
+by stof at 2013-08-06T11:06:22Z
+
+``~1.11,<3.0`` is the same than ``~1.11,<2.0`` and ``~1.11`` as ``~1.11`` means ``>=1.11,<2.0-dev``. And ``>=1.11,<2.0-dev,<3.0`` will never match a 2.0 release. The right constraint would need to be ``>=1.11,<3.0-dev`` (using ``<3.0-dev`` instead of ``<3.0`` is important because ``3.0.0-beta1`` matches ``<3.0``)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-08-06T11:07:29Z
+
+sure, I wrote the constraints without thinking about them, but you got the idea.

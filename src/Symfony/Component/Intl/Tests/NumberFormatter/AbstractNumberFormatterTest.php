@@ -138,15 +138,15 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
         return array(
             array(100, 'CHF', 'CHF', '%s100.00'),
             array(-100, 'CHF', 'CHF', '(%s100.00)'),
-            array(1000.12, 'CHF', 'CHF', '%s1,000.10'),
-            array('1000.12', 'CHF', 'CHF', '%s1,000.10'),
+            array(1000.12, 'CHF', 'CHF', '%s1,000.12'),
+            array('1000.12', 'CHF', 'CHF', '%s1,000.12'),
 
             // Rounding checks
-            array(1000.121, 'CHF', 'CHF', '%s1,000.10'),
-            array(1000.123, 'CHF', 'CHF', '%s1,000.10'),
-            array(1000.125, 'CHF', 'CHF', '%s1,000.10'),
-            array(1000.127, 'CHF', 'CHF', '%s1,000.15'),
-            array(1000.129, 'CHF', 'CHF', '%s1,000.15'),
+            array(1000.121, 'CHF', 'CHF', '%s1,000.12'),
+            array(1000.123, 'CHF', 'CHF', '%s1,000.12'),
+            array(1000.125, 'CHF', 'CHF', '%s1,000.12'),
+            array(1000.127, 'CHF', 'CHF', '%s1,000.13'),
+            array(1000.129, 'CHF', 'CHF', '%s1,000.13'),
 
             array(1200000.00, 'CHF', 'CHF', '%s1,200,000.00'),
             array(1200000.1, 'CHF', 'CHF', '%s1,200,000.10'),

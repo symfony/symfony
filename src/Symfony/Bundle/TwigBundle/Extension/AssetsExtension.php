@@ -35,8 +35,8 @@ class AssetsExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            'asset' => new \Twig_Function_Method($this, 'getAssetUrl'),
-            'assets_version' => new \Twig_Function_Method($this, 'getAssetsVersion'),
+            new \Twig_SimpleFunction('asset', array($this, 'getAssetUrl')),
+            new \Twig_SimpleFunction('assets_version', array($this, 'getAssetsVersion')),
         );
     }
 

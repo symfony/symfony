@@ -7,6 +7,32 @@ in 2.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.3.0...v2.3.1
 
+* 2.3.3 (2013-08-07)
+
+ * c35cc5b: added trusted hosts check
+ * 6d555bc: Fixed metadata serialization
+ * cd51d82: [Form] fixed wrong call to setTimeZone() (closes #8644)
+ * 5c359a8: Fix issue with \DateTimeZone::UTC / 'UTC' for PHP 5.4
+ * 85330a6: [Form] Fixed patched forms to be valid even if children are not submitted
+ * cb5e765: [Form] Fixed: If a form is not present in a request, it is not automatically submitted
+ * 97cbb19: [Form] Removed the "disabled" attribute from the placeholder option in select fields due to problems with the BlackBerry 10 browser
+ * c138304: [routing] added ability for apache matcher to handle array values
+ * 1bd45b3: [FrameworkBundle] fixed regression where the command might have the wrong container if the application is reused several times
+ * b41cf82: [Validator] fixed StaticMethodLoader trying to invoke methods of abstract classes (closes #8589)
+ * e5fba3c: [Form] fixes empty file-inputs get treated as extra field
+ * 3553c71: return 0 if there is no valid data
+ * 50d0727: [DependencyInjection] fixed regression where setting a service to null did not trigger a re-creation of the service when getting it
+ * dc1fff0: The ignoreAttributes itself should be ignored, too.
+ * ae7fa11: [Twig] fixed TwigEngine::exists() method when a template contains a syntax error (closes #8546)
+ * 28e0709: [Validator] fixed ConstraintViolation:: incorrect when nested
+ * 890934d: handle Optional and Required constraints from XML or YAML sources correctly
+ * a2eca45: Fixed #8455: PhpExecutableFinder::find() does not always return the correct binary
+ * 485d53a: [DependencyInjection] Fix Container::camelize to convert beginning and ending chars
+ * 2317443: [Security] fixed issue where authentication listeners clear unrelated tokens
+ * 2ebb783: fix issue #8499 modelChoiceList call getPrimaryKey on a non object
+ * 242b318: [DependencyInjection] Add exception for service name not dumpable in PHP
+ * d3eb9b7: [Validator] Fixed groups argument misplace for validateValue method from validator class
+
 * 2.3.2 (2013-07-17)
 
  * bb59f40: Reverts JSON_NUMERIC_CHECK

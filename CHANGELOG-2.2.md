@@ -7,6 +7,25 @@ in 2.2 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.2.0...v2.2.1
 
+* 2.2.5 (2013-08-07)
+
+ * c35cc5b: added trusted hosts check
+ * 6d555bc: Fixed metadata serialization
+ * cd51d82: [Form] fixed wrong call to setTimeZone() (closes #8644)
+ * 5c359a8: Fix issue with \DateTimeZone::UTC / 'UTC' for PHP 5.4
+ * 97cbb19: [Form] Removed the "disabled" attribute from the placeholder option in select fields due to problems with the BlackBerry 10 browser
+ * c138304: [routing] added ability for apache matcher to handle array values
+ * b41cf82: [Validator] fixed StaticMethodLoader trying to invoke methods of abstract classes (closes #8589)
+ * 3553c71: return 0 if there is no valid data
+ * ae7fa11: [Twig] fixed TwigEngine::exists() method when a template contains a syntax error (closes #8546)
+ * 28e0709: [Validator] fixed ConstraintViolation:: incorrect when nested
+ * 890934d: handle Optional and Required constraints from XML or YAML sources correctly
+ * a2eca45: Fixed #8455: PhpExecutableFinder::find() does not always return the correct binary
+ * 485d53a: [DependencyInjection] Fix Container::camelize to convert beginning and ending chars
+ * 2317443: [Security] fixed issue where authentication listeners clear unrelated tokens
+ * 2ebb783: fix issue #8499 modelChoiceList call getPrimaryKey on a non object
+ * d3eb9b7: [Validator] Fixed groups argument misplace for validateValue method from validator class
+
 * 2.2.4 (2013-07-15)
 
  * 52e530d: Fixed NativeSessionStorage:regenerate when does not exists

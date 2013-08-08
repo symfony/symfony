@@ -40,7 +40,8 @@ class IdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
         return array(
             array(3, 3),
             array('a', 'a'),
-            array($date, $date)
+            array($date, $date),
+            array(null, 1),
         );
     }
 

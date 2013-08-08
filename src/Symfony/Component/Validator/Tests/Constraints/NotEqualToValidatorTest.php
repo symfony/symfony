@@ -38,7 +38,8 @@ class NotEqualToValidatorTest extends AbstractComparisonValidatorTestCase
         return array(
             array(1, 2),
             array('22', '333'),
-            array(new \DateTime('2001-01-01'), new \DateTime('2000-01-01'))
+            array(new \DateTime('2001-01-01'), new \DateTime('2000-01-01')),
+            array(null, 1),
         );
     }
 

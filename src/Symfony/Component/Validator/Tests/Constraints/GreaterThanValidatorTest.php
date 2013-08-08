@@ -37,7 +37,8 @@ class GreaterThanValidatorTest extends AbstractComparisonValidatorTestCase
         return array(
             array(2, 1),
             array(new \DateTime('2005/01/01'), new \DateTime('2001/01/01')),
-            array('333', '22')
+            array('333', '22'),
+            array(null, 1),
         );
     }
 

@@ -321,8 +321,16 @@ class Response
             $obStatus = ob_get_status(1);
             while (($level = ob_get_level()) > 0 && $level !== $previous) {
                 $previous = $level;
-                if ($obStatus[$level - 1] && isset($obStatus[$level - 1]['del']) && $obStatus[$level - 1]['del']) {
-                    ob_end_flush();
+                if ($obStatus[$level - 1]) {
+                    if (version_compare(PHP_VERSION, '5.4', '>=')) {
+                        if (isset($obStatus[$level - 1]['flags']) && ($obStatus[$level - 1]['flags'] & PHP_OUTPUT_HANDLER_REMOVABLE)) {
+                            ob_end_flush();
+                        }
+                    } else {
+                        if (isset($obStatus[$level - 1]['del']) && $obStatus[$level - 1]['del']) {
+                            ob_end_flush();
+                        }
+                    }
                 }
             }
             flush();

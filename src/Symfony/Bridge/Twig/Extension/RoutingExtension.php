@@ -35,8 +35,8 @@ class RoutingExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            'url'  => new \Twig_Function_Method($this, 'getUrl'),
-            'path' => new \Twig_Function_Method($this, 'getPath'),
+            new \Twig_SimpleFunction('url', array($this, 'getUrl')),
+            new \Twig_SimpleFunction('path', array($this, 'getPath')),
         );
     }
 

@@ -120,6 +120,11 @@ class ErrorHandler
         }
 
         if ($this->displayErrors && error_reporting() & $level && $this->level & $level) {
+            // make sure the ContextErrorException class is loaded (https://bugs.php.net/bug.php?id=65322)
+            if (!class_exists('Symfony\Component\Debug\Exception\ContextErrorException')) {
+                require __DIR__.'/Exception/ContextErrorException.php';
+            }
+
             throw new ContextErrorException(sprintf('%s: %s in %s line %d', isset($this->levels[$level]) ? $this->levels[$level] : $level, $message, $file, $line), 0, $level, $file, $line, $context);
         }
 

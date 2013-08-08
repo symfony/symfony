@@ -30,6 +30,7 @@ class ProcessUtilsTest extends \PHPUnit_Framework_TestCase
                 array('"foo bar"', 'foo bar'),
                 array('^%"path"^%', '%path%'),
                 array('"<|>"\\"" "\\""\'f"', '<|>" "\'f'),
+                array('""', ''),
             );
         }
 
@@ -37,6 +38,7 @@ class ProcessUtilsTest extends \PHPUnit_Framework_TestCase
             array("'foo bar'", 'foo bar'),
             array("'%path%'", '%path%'),
             array("'<|>\" \"'\\''f'", '<|>" "\'f'),
+            array("''", ''),
         );
     }
 }

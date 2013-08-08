@@ -69,6 +69,23 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($proc->getEnv());
     }
 
+    public function testAddEnvironmentVariables()
+    {
+        $pb = new ProcessBuilder();
+        $env = array(
+            'foo' => 'bar',
+            'foo2' => 'bar2',
+        );
+        $proc = $pb
+            ->add('command')
+            ->setEnv('foo', 'bar2')
+            ->addEnvironmentVariables($env)
+            ->getProcess()
+        ;
+
+        $this->assertSame($env, $proc->getEnv());
+    }
+
     public function testNotReplaceExplicitlySetVars()
     {
         $snapshot = $_ENV;

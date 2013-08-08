@@ -73,6 +73,14 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
     public function addListener($eventName, $listener, $priority = 0)
     {
         $this->dispatcher->addListener($eventName, $listener, $priority);
+
+        if (!isset($this->wrappedListeners[$eventName])) {
+            $this->wrappedListeners[$eventName] = array();
+        }
+        if (!isset($this->wrappedListeners[$eventName][$priority])) {
+            $this->wrappedListeners[$eventName][$priority] = array();
+        }
+        $this->wrappedListeners[$eventName][$priority][] = $listener;
     }
 
     /**
@@ -375,7 +383,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
             $this->dispatcher->removeListener($eventName, $listener);
             $wrapped = $this->wrapListener($eventName, $listener);
             $this->wrappedListeners[$this->id][$wrapped] = $listener;
-            $this->dispatcher->addListener($eventName, $wrapped);
+            $this->dispatcher->addListener($eventName, $wrapped, $this->getListenerPriority($eventName, $listener));
         }
 
         switch ($eventName) {
@@ -434,7 +442,8 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
 
         foreach ($this->wrappedListeners[$this->id] as $wrapped) {
             $this->dispatcher->removeListener($eventName, $wrapped);
-            $this->dispatcher->addListener($eventName, $this->wrappedListeners[$this->id][$wrapped]);
+            $listener = $this->wrappedListeners[$this->id][$wrapped];
+            $this->dispatcher->addListener($eventName, $listener, $this->getListenerPriority($eventName, $listener));
         }
 
         unset($this->wrappedListeners[$this->id]);
@@ -465,5 +474,20 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
         }
 
         return $listener;
+    }
+
+    private function getListenerPriority($eventName, $listener)
+    {
+        if (!isset($this->wrappedListeners[$eventName])) {
+            return 0;
+        }
+
+        foreach ($this->wrappedListeners[$eventName] as $priority => $listeners) {
+            if (false !== array_search($listener, $listeners, true)) {
+                return $priority;
+            }
+        }
+
+        return 0;
     }
 }

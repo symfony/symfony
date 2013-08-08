@@ -4,6 +4,7 @@ CHANGELOG
 2.4.0
 -----
 
+ * added convevient method to detect verbosity level
  * [BC BREAK] made descriptors use output instead of returning a string
 
 2.3.0

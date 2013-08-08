@@ -16,7 +16,6 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -412,7 +411,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
             case KernelEvents::RESPONSE:
                 $token = $event->getResponse()->headers->get('X-Debug-Token');
                 $this->stopwatch->stopSection($token);
-                if (HttpKernelInterface::MASTER_REQUEST === $event->getRequestType()) {
+                if ($event->isMasterRequest()) {
                     // The profiles can only be updated once they have been created
                     // that is after the 'kernel.response' event of the main request
                     $this->updateProfiles($token, true);

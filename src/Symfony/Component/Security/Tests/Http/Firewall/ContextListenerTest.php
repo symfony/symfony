@@ -201,8 +201,8 @@ class ContextListenerTest extends \PHPUnit_Framework_TestCase
         $listener = new ContextListener($context, array(), 'key123', null, $dispatcher);
 
         $event->expects($this->any())
-            ->method('getRequestType')
-            ->will($this->returnValue(HttpKernelInterface::MASTER_REQUEST));
+            ->method('isMasterRequest')
+            ->will($this->returnValue(true));
         $event->expects($this->any())
             ->method('getRequest')
             ->will($this->returnValue($this->getMock('Symfony\Component\HttpFoundation\Request')));

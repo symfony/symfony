@@ -13,7 +13,6 @@ namespace Symfony\Bundle\WebProfilerBundle\EventListener;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -53,7 +52,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
 
     public function onKernelResponse(FilterResponseEvent $event)
     {
-        if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
+        if (!$event->isMasterRequest()) {
             return;
         }
 

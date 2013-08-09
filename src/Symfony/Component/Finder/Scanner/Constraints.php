@@ -25,40 +25,36 @@ class Constraints
     private $maxDepthExceeded;
     private $pathnameExcluded;
     private $pathnameIncluded;
-    private $directoryKept;
-    private $fileKept;
+    private $keep;
+    private $keepDirectories;
+    private $keepFiles;
 
     public function __construct($type, $minDepth, $maxDepth, array $excludedNames, array $pathnameConstraints, array $filenameConstraints)
     {
         $this->excludedNames = $excludedNames;
 
-        $this->minDepthRespected = 0 === $minDepth
-            ? function () { return true; }
-            : function ($depth) use ($minDepth) { return $depth >= $minDepth; };
+        if (0 !== $minDepth) {
+            $this->minDepthRespected = function ($depth) use ($minDepth) { return $depth >= $minDepth; };
+        }
 
-        $this->maxDepthExceeded = PHP_INT_MAX === $maxDepth
-            ? function () { return false; }
-            : function ($depth) use ($maxDepth) { return $depth > $maxDepth; };
+        if (PHP_INT_MAX !== $maxDepth) {
+            $this->maxDepthExceeded = function ($depth) use ($maxDepth) { return $depth > $maxDepth; };
+        }
 
-        $this->pathnameExcluded = isset($pathnameConstraints['excluded_patterns'])
-            ? self::buildPathnameTest($pathnameConstraints['excluded_patterns'])
-            : function () { return false; };
+        if (isset($pathnameConstraints['excluded_patterns'])) {
+            $this->pathnameExcluded = self::buildPathnameTest($pathnameConstraints['excluded_patterns']);
+        }
 
-        $this->pathnameIncluded = isset($pathnameConstraints['included_patterns'])
-            ? self::buildPathnameTest($pathnameConstraints['included_patterns'])
-            : function () { return true; };
+        if (isset($pathnameConstraints['included_patterns'])) {
+            $this->pathnameIncluded = self::buildPathnameTest($pathnameConstraints['included_patterns']);
+        }
 
-        $keptTest = empty($filenameConstraints) && !isset($pathnameConstraints['included_ending_patterns']) && !isset($pathnameConstraints['excluded_ending_patterns'])
-            ? function () { return true; }
-            : self::buildKeptTest($filenameConstraints, $pathnameConstraints);
+        if (!empty($filenameConstraints) || isset($pathnameConstraints['included_ending_patterns']) || isset($pathnameConstraints['excluded_ending_patterns'])) {
+            $this->keep = self::buildKeptTest($filenameConstraints, $pathnameConstraints);
+        }
 
-        $this->directoryKept = self::TYPE_FILES === $type
-            ? function () { return false; }
-            : $keptTest;
-
-        $this->fileKept = self::TYPE_DIRECTORIES === $type
-            ? function () { return false; }
-            : $keptTest;
+        $this->keepDirectories = self::TYPE_FILES !== $type;
+        $this->keepFiles = self::TYPE_DIRECTORIES !== $type;
     }
 
     public function filterFilenames(array $filenames)
@@ -68,44 +64,64 @@ class Constraints
 
     public function isMinDepthRespected($depth)
     {
-        $minDepthRespected = $this->minDepthRespected;
+        if (!$this->minDepthRespected instanceof \Closure) {
+            return true;
+        }
 
-        return $minDepthRespected($depth);
+        return call_user_func($this->minDepthRespected, $depth);
     }
 
     public function isMaxDepthExceeded($depth)
     {
-        $maxDepthExceeded = $this->maxDepthExceeded;
+        if (!$this->maxDepthExceeded instanceof \Closure) {
+            return false;
+        }
 
-        return $maxDepthExceeded($depth);
+        return call_user_func($this->maxDepthExceeded, $depth);
     }
 
     public function isPathnameExcluded($pathname)
     {
-        $pathnameExcluded = $this->pathnameExcluded;
+        if (!$this->pathnameExcluded instanceof \Closure) {
+            return false;
+        }
 
-        return $pathnameExcluded($pathname);
+        return call_user_func($this->pathnameExcluded, $pathname);
     }
 
     public function isPathnameIncluded($pathname)
     {
-        $pathnameIncluded = $this->pathnameIncluded;
+        if (!$this->pathnameIncluded instanceof \Closure) {
+            return true;
+        }
 
-        return $pathnameIncluded($pathname);
+        return call_user_func($this->pathnameIncluded, $pathname);
     }
 
     public function isDirectoryKept($pathname, $filename)
     {
-        $directoryKept = $this->directoryKept;
+        if (!$this->keepDirectories) {
+            return false;
+        }
 
-        return $directoryKept($pathname, $filename);
+        if (!$this->keep instanceof \Closure) {
+            return true;
+        }
+
+        return call_user_func($this->keep, $pathname, $filename);
     }
 
     public function isFileKept($pathname, $filename)
     {
-        $fileKept = $this->fileKept;
+        if (!$this->keepFiles) {
+            return false;
+        }
 
-        return $fileKept($pathname, $filename);
+        if (!$this->keep instanceof \Closure) {
+            return true;
+        }
+
+        return call_user_func($this->keep, $pathname, $filename);
     }
 
     private static function buildPathnameTest(array $patterns)

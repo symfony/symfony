@@ -365,9 +365,13 @@ abstract class AbstractDoctrineExtension extends Extension
         }
 
         $cacheDef->setPublic(false);
-        // generate a unique namespace for the given application
-        $namespace = 'sf2'.$this->getMappingResourceExtension().'_'.$objectManager['name'].'_'.md5($container->getParameter('kernel.root_dir').$container->getParameter('kernel.environment'));
-        $cacheDef->addMethodCall('setNamespace', array($namespace));
+
+        if (!isset($cacheDriver['namespace'])) {
+            // generate a unique namespace for the given application
+            $cacheDriver['namespace'] = 'sf2'.$this->getMappingResourceExtension().'_'.$objectManager['name'].'_'.md5($container->getParameter('kernel.root_dir').$container->getParameter('kernel.environment'));
+        }
+
+        $cacheDef->addMethodCall('setNamespace', array($cacheDriver['namespace']));
 
         $container->setDefinition($cacheDriverService, $cacheDef);
     }

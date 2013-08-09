@@ -5,7 +5,7 @@ CHANGELOG
 -----
 
  * added a way to force terminal dimensions
- * added convevient method to detect verbosity level
+ * added a convenient method to detect verbosity level
  * [BC BREAK] made descriptors use output instead of returning a string
 
 2.3.0

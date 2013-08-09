@@ -66,6 +66,7 @@ class Application
     private $definition;
     private $helperSet;
     private $dispatcher;
+    private $terminalDimensions;
 
     /**
      * Constructor.
@@ -829,6 +830,10 @@ class Application
      */
     public function getTerminalDimensions()
     {
+        if ($this->terminalDimensions) {
+            return $this->terminalDimensions;
+        }
+
         if (defined('PHP_WINDOWS_VERSION_BUILD')) {
             // extract [w, H] from "wxh (WxH)"
             if (preg_match('/^(\d+)x\d+ \(\d+x(\d+)\)$/', trim(getenv('ANSICON')), $matches)) {
@@ -852,6 +857,23 @@ class Application
         }
 
         return array(null, null);
+    }
+
+    /**
+     * Sets terminal dimensions.
+     *
+     * Can be useful to force terminal dimensions for functional tests.
+     *
+     * @param integer $width  The width
+     * @param integer $height The height
+     *
+     * @return Application The current application
+     */
+    public function setTerminalDimensions($width, $height)
+    {
+        $this->terminalDimensions = array($width, $height);
+
+        return $this;
     }
 
     /**

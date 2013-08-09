@@ -456,7 +456,7 @@ class Filesystem
         if (!is_dir($dir)) {
             $this->mkdir($dir);
         } elseif (!is_writable($dir)) {
-            throw new IOException(sprintf('Unable to write in the %s directory\n', $dir));
+            throw new IOException(sprintf('Unable to write to the "%s" directory.', $dir));
         }
 
         $tmpFile = tempnam($dir, basename($filename));

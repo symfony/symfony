@@ -288,6 +288,140 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('10 things', $translator->transChoice('some_message2', 10, array('%count%' => 10)));
     }
+
+    /**
+     * @dataProvider dataProviderExposeMessages
+     */
+    public function testExposeMessages($resources, $locale, $domains, $expected)
+    {
+        $locales = array_keys($resources);
+        $_locale = !is_null($locale) ? $locale : reset($locales);
+        $locales = array_slice($locales, array_search($_locale, $locales) + 1);
+
+        $translator = new Translator($_locale, new MessageSelector());
+        $translator->setFallbackLocales($locales);
+        $translator->addLoader('array', new ArrayLoader());
+        foreach ($resources as $_locale => $domainMessages) {
+            foreach ($domainMessages as $domain => $messages) {
+                $translator->addResource('array', $messages, $_locale, $domain);
+            }
+        }
+        $result = $translator->exposeMessages($domains, $locale);
+
+        $this->assertEquals($expected, $result);
+    }
+
+    public function dataProviderExposeMessages()
+    {
+        $domains = array('jsmessages', 'validators');
+        $resources = array(
+            'fr' => array(
+                'jsmessages' => array(
+                    'foo' => 'foo (FR)',
+                ),
+                'messages' => array(
+                    'foo' => 'foo messages (FR)',
+                ),
+            ),
+            'en' => array(
+                'jsmessages' => array(
+                    'foo' => 'foo (EN)',
+                    'bar' => 'bar (EN)',
+                ),
+                'messages' => array(
+                    'foo' => 'foo messages (EN)',
+                ),
+                'validators' => array(
+                    'int' => 'integer (EN)',
+                ),
+            ),
+            'pt-PT' => array(
+                'jsmessages' => array(
+                    'foobarfoo' => 'foobarfoo (PT-PT)',
+                ),
+            ),
+            'pt_BR' => array(
+                'validators' => array(
+                    'str' => 'string (PT_BR)',
+                ),
+            ),
+        );
+
+        return array(
+            array($resources, 'fr', array(),
+                array(
+                    'validators' => array(
+                        'str' => 'string (PT_BR)',
+                        'int' => 'integer (EN)',
+                    ),
+                    'jsmessages' => array(
+                        'foobarfoo' => 'foobarfoo (PT-PT)',
+                        'foo' => 'foo (FR)',
+                        'bar' => 'bar (EN)',
+                    ),
+                    'messages' => array(
+                        'foo' => 'foo messages (FR)',
+                    ),
+                )
+            ),
+            array($resources, null, $domains,
+                array(
+                    'validators' => array(
+                        'str' => 'string (PT_BR)',
+                        'int' => 'integer (EN)',
+                    ),
+                    'jsmessages' => array(
+                        'foobarfoo' => 'foobarfoo (PT-PT)',
+                        'foo' => 'foo (FR)',
+                        'bar' => 'bar (EN)',
+                    ),
+                )
+            ),
+            array($resources, 'fr', $domains,
+                array(
+                    'validators' => array(
+                        'str' => 'string (PT_BR)',
+                        'int' => 'integer (EN)',
+                    ),
+                    'jsmessages' => array(
+                        'foobarfoo' => 'foobarfoo (PT-PT)',
+                        'foo' => 'foo (FR)',
+                        'bar' => 'bar (EN)',
+                    ),
+                )
+            ),
+            array($resources, 'en', $domains,
+                array(
+                    'validators' => array(
+                        'str' => 'string (PT_BR)',
+                        'int' => 'integer (EN)',
+                    ),
+                    'jsmessages' => array(
+                        'foobarfoo' => 'foobarfoo (PT-PT)',
+                        'foo' => 'foo (EN)',
+                        'bar' => 'bar (EN)',
+                    ),
+                )
+            ),
+            array($resources, 'pt-PT', $domains,
+                array(
+                    'validators' => array(
+                        'str' => 'string (PT_BR)',
+                    ),
+                    'jsmessages' => array(
+                        'foobarfoo' => 'foobarfoo (PT-PT)',
+                    ),
+                )
+            ),
+            array($resources, 'pt_BR', $domains,
+                array(
+                    'validators' => array(
+                        'str' => 'string (PT_BR)',
+                    ),
+                )
+            ),
+        );
+    }
 }
 
 class String

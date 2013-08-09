@@ -40,6 +40,8 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         require_once self::$fixturesPath.'/Foo2Command.php';
         require_once self::$fixturesPath.'/Foo3Command.php';
         require_once self::$fixturesPath.'/Foo4Command.php';
+        require_once self::$fixturesPath.'/Foo5Command.php';
+        require_once self::$fixturesPath.'/Foo6Command.php';
     }
 
     protected function normalizeLineBreaks($text)
@@ -304,7 +306,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
         // Subnamespace + plural
         try {
-            $a = $application->find('foo3:');
+            $application->find('foo3:');
             $this->fail('->find() should throw an \InvalidArgumentException if a command is ambiguous because of a subnamespace, with alternatives');
         } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e);
@@ -350,6 +352,17 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
             $this->assertRegExp(sprintf('/Command "%s" is not defined./', $commandName), $e->getMessage(), '->find() throws an \InvalidArgumentException if command does not exist, with alternatives');
             $this->assertFalse(strpos($e->getMessage(), 'foo:bar'), '->find() throws an \InvalidArgumentException if command does not exist, without "foo:bar" alternative');
         }
+    }
+
+    public function testCannotDisambiguateAbbreviatedCommonNamespacedCommands()
+    {
+        $application = new Application();
+
+        $application->add(new \Foo5Command());
+        $application->add(new \Foo6Command());
+
+        $command = $application->find('x:f:z');
+        $this->assertEquals($application->get('xxx:faa:zoo'), $command, '->get() returns a command by name');
     }
 
     public function testFindAlternativeNamespace()

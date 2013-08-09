@@ -35,6 +35,35 @@ class OutputTest extends \PHPUnit_Framework_TestCase
         $output = new TestOutput();
         $output->setVerbosity(Output::VERBOSITY_QUIET);
         $this->assertEquals(Output::VERBOSITY_QUIET, $output->getVerbosity(), '->setVerbosity() sets the verbosity');
+
+        $this->assertTrue($output->isQuiet());
+        $this->assertFalse($output->isVerbose());
+        $this->assertFalse($output->isVeryVerbose());
+        $this->assertFalse($output->isDebug());
+
+        $output->setVerbosity(Output::VERBOSITY_NORMAL);
+        $this->assertFalse($output->isQuiet());
+        $this->assertFalse($output->isVerbose());
+        $this->assertFalse($output->isVeryVerbose());
+        $this->assertFalse($output->isDebug());
+
+        $output->setVerbosity(Output::VERBOSITY_VERBOSE);
+        $this->assertFalse($output->isQuiet());
+        $this->assertTrue($output->isVerbose());
+        $this->assertFalse($output->isVeryVerbose());
+        $this->assertFalse($output->isDebug());
+
+        $output->setVerbosity(Output::VERBOSITY_VERY_VERBOSE);
+        $this->assertFalse($output->isQuiet());
+        $this->assertTrue($output->isVerbose());
+        $this->assertTrue($output->isVeryVerbose());
+        $this->assertFalse($output->isDebug());
+
+        $output->setVerbosity(Output::VERBOSITY_DEBUG);
+        $this->assertFalse($output->isQuiet());
+        $this->assertTrue($output->isVerbose());
+        $this->assertTrue($output->isVeryVerbose());
+        $this->assertTrue($output->isDebug());
     }
 
     public function testWriteWithVerbosityQuiet()

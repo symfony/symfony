@@ -28,6 +28,7 @@ CHANGELOG
 2.1.0
 -----
 
+ * added AclProvider::findAclsBySids() 
  * [BC BREAK] The signature of ExceptionListener has changed
  * changed the HttpUtils constructor signature to take a UrlGenerator and a UrlMatcher instead of a Router
  * EncoderFactoryInterface::getEncoder() can now also take a class name as an argument

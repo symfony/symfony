@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Acl\Dbal;
 
+use Doctrine\DBAL\Connection as DBALConnection;
 use Doctrine\DBAL\Driver\Connection;
 use Doctrine\DBAL\Driver\Statement;
 use Symfony\Component\Security\Acl\Model\AclInterface;
@@ -198,6 +199,68 @@ class AclProvider implements AclProviderInterface
         }
 
         return $result;
+    }
+
+    /**
+     * Returns all the ACLs that belong to the given security identities
+     *
+     * @param  array  $sids
+     * @return \SplObjectStorage
+     */
+    public function findAclsBySids(array $sids)
+    {
+        $oids = array();
+        $currentBatch = array();
+
+        for ($offset=0, $total=count($sids); $offset < $total; $offset += self::MAX_BATCH_SIZE) {
+            $currentBatch = array_slice($sids, $offset, self::MAX_BATCH_SIZE);
+
+            $stmt = $this->getObjectIdentitiesBySecurityIdentityStatement($currentBatch);
+
+            foreach ($stmt->fetchAll(\PDO::FETCH_NUM) as $data) {
+                list($objectIdentifier, $classType) = $data;
+                $oids[] = new ObjectIdentity($objectIdentifier, $classType);
+            }
+        }
+
+        return $this->findAcls($oids);
+    }
+
+    /**
+     * Constructs the query used to return all object identities that are
+     * associated with the $securityIds
+     *
+     * @param  array  $securityIds
+     * @return string
+     */
+    protected function getObjectIdentitiesBySecurityIdentityStatement(array $securityIds)
+    {
+        $sql = <<<SELECTCLAUSE
+            SELECT
+                o.object_identifier,
+                c.class_type
+            FROM
+                {$this->options['oid_table_name']} o
+            INNER JOIN {$this->options['class_table_name']} c ON c.id = o.class_id
+            LEFT JOIN {$this->options['entry_table_name']} e ON (
+                e.class_id = o.class_id AND (e.object_identity_id = o.id OR {$this->connection->getDatabasePlatform()->getIsNullExpression('e.object_identity_id')})
+            )
+            LEFT JOIN {$this->options['sid_table_name']} s ON (
+                s.id = e.security_identity_id
+            )
+
+            WHERE (s.identifier IN (?))
+SELECTCLAUSE;
+
+        $sids = array_map(function($sid) {
+            return sprintf("%s-%s", $sid->getClass(), $sid->getUsername());
+        }, $securityIds);
+
+        return $this->connection->executeQuery(
+            $sql,
+            array($sids),
+            array(DBALConnection::PARAM_STR_ARRAY)
+        );
     }
 
     /**

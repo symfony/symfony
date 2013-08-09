@@ -14,6 +14,7 @@ namespace Symfony\Component\Security\Tests\Acl\Dbal;
 use Symfony\Component\Security\Acl\Dbal\AclProvider;
 use Symfony\Component\Security\Acl\Domain\PermissionGrantingStrategy;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
+use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
 use Symfony\Component\Security\Acl\Dbal\Schema;
 use Doctrine\DBAL\DriverManager;
 
@@ -137,6 +138,33 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Symfony\Component\Security\Acl\Domain\UserSecurityIdentity', $sid);
         $this->assertEquals('john.doe', $sid->getUsername());
         $this->assertEquals('SomeClass', $sid->getClass());
+    }
+
+    public function testFindAclBySecurityIdentity()
+    {
+        $provider = $this->getProvider();
+        $sid1 = new UserSecurityIdentity('john.doe', 'SomeClass');
+        $sid2 = new UserSecurityIdentity('john.doe@foo.com', 'MyClass');
+        $sid3 = new UserSecurityIdentity('123', 'FooClass');
+
+        $tests = array(
+            array($sid1,2),
+            array($sid2,2),
+            array($sid3,1)
+        );
+
+        $total = 0;
+        $sids = array();
+
+        foreach ($tests as $item) {
+            list($sid, $count) = $item;
+            $this->assertCount($count, $provider->findAclsBySids(array($sid)));
+
+            $total += $count;
+            $sids[] = $sid;
+            $this->assertCount($total, $provider->findAclsBySids($sids));
+        }
+
     }
 
     protected function setUp()

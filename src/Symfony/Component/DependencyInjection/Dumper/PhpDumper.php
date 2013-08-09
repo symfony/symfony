@@ -1105,7 +1105,7 @@ EOF;
      *
      * @return Boolean
      */
-    private function hasReference($id, array $arguments, $deep = false, $visited = array())
+    private function hasReference($id, array $arguments, $deep = false, array $visited = array())
     {
         foreach ($arguments as $argument) {
             if (is_array($argument)) {
@@ -1113,14 +1113,15 @@ EOF;
                     return true;
                 }
             } elseif ($argument instanceof Reference) {
-                if ($id === (string) $argument) {
+                $argumentId = (string) $argument;
+                if ($id === $argumentId) {
                     return true;
                 }
 
-                if ($deep && !isset($visited[(string) $argument])) {
-                    $visited[(string) $argument] = true;
+                if ($deep && !isset($visited[$argumentId])) {
+                    $visited[$argumentId] = true;
 
-                    $service = $this->container->getDefinition((string) $argument);
+                    $service = $this->container->getDefinition($argumentId);
                     $arguments = array_merge($service->getMethodCalls(), $service->getArguments(), $service->getProperties());
 
                     if ($this->hasReference($id, $arguments, $deep, $visited)) {

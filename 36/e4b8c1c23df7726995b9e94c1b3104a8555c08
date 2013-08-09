@@ -1,0 +1,52 @@
+---------------------------------------------------------------------------
+
+by entering at 2013-05-18T10:24:45Z
+
+I find very strange strstr is faster than strpos, **strstr should have to do more stuff than strpos**, so I research a little and:
+
+"If you only want to determine if a particular needle occurs within haystack, use the faster and **less memory** intensive function strpos() instead."
+@ http://php.net/manual/en/function.strstr.php
+
+```
+php > $class = 'Queue\WorkerBundle\Tests\Unit\Master';
+php > $prefix = 'Queue';
+php > $start = microtime(true); for ($i = 1; $i <= 10000000; ++$i) { 0 === strpos($class, $prefix); } echo microtime(true) - $start . "\n";
+5.5707721710205
+php > $start = microtime(true); for ($i = 1; $i <= 10000000; ++$i) { $class == strstr($class, $prefix); } echo microtime(true) - $start . "\n";
+6.0505480766296
+php > $start = microtime(true); for ($i = 1; $i <= 10000000; ++$i) { '' == strstr($class, $prefix, true); } echo microtime(true) - $start . "\n";
+5.9974181652069
+```
+
+Testing in web context (with php-fpm instead of php-cli) brings similar results:
+strpos 7.2002890110016
+strstr 8.2349851131439
+strstr (version 2) 8.2769768238068
+
+**But the results are not very consistent, I don't have time to proper benchmark it so I had a look on the code**
+
+---
+
+[strpos](https://gist.github.com/entering/5604017) and [strstr](https://gist.github.com/entering/5604019) the code is very similar as expected. But strpos have to an extra check due to offset argument, but strstr in case needle is found have to do extra code. So looking at code strstr in theory can be faster that strpos when is not found (because don't have the extra check of offset), but in the rest of cases will be slower.
+
+And the confirmation, repeated several times the test, and in this case strstr is consistently faster than strpos:
+
+```
+php > $start = microtime(true); for ($i = 1; $i <= 10000000; ++$i) { 0 === strpos($class, $prefix); } echo microtime(true) - $start . "\n";
+5.5468628406525
+php > $start = microtime(true); for ($i = 1; $i <= 10000000; ++$i) { $class == strstr($class, $prefix); } echo microtime(true) - $start . "\n";
+5.2447769641876
+php > $start = microtime(true); for ($i = 1; $i <= 10000000; ++$i) { '' == strstr($class, $prefix, true); } echo microtime(true) - $start . "\n";
+5.5463328361511
+
+php > $start = microtime(true); for ($i = 1; $i <= 10000000; ++$i) { 0 === strpos($class, $prefix); } echo microtime(true) - $start . "\n";
+6.6325149536133
+php > $start = microtime(true); for ($i = 1; $i <= 10000000; ++$i) { $class == strstr($class, $prefix); } echo microtime(true) - $start . "\n";
+5.5603330135345
+php > $start = microtime(true); for ($i = 1; $i <= 10000000; ++$i) { '' == strstr($class, $prefix, true); } echo microtime(true) - $start . "\n";
+6.0463120937347
+```
+
+------------
+
+**So strstr is just faster than strpos in this particular case, that needle is not present on haystack. So replacing strpos with strstr should be well supported. Because the difference is small and depends on the case.**

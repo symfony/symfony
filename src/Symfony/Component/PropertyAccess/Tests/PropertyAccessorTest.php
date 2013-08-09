@@ -15,24 +15,49 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\Author;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\Magician;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\MagicianCall;
+use Symfony\Component\PropertyAccess\PropertyAccessorBuilder;
 
 class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var PropertyAccessor
+     * @var PropertyAccessorBuilder
      */
-    private $propertyAccessor;
+    private $propertyAccessorBuilder;
 
     protected function setUp()
     {
-        $this->propertyAccessor = new PropertyAccessor();
+        $this->propertyAccessorBuilder = new PropertyAccessorBuilder();
+    }
+
+    /**
+     * Get PropertyAccessor configured
+     *
+     * @param string $withMagicCall
+     * @param string $throwExceptionOnInvalidIndex
+     * @return PropertyAccessorInterface
+     */
+    protected function getPropertyAccessor($withMagicCall = false, $throwExceptionOnInvalidIndex = false)
+    {
+        if ($withMagicCall) {
+            $this->propertyAccessorBuilder->enableMagicCall();
+        } else {
+            $this->propertyAccessorBuilder->disableMagicCall();
+        }
+
+        if ($throwExceptionOnInvalidIndex) {
+            $this->propertyAccessorBuilder->enableExceptionOnInvalidIndex();
+        } else {
+            $this->propertyAccessorBuilder->disableExceptionOnInvalidIndex();
+        }
+
+        return $this->propertyAccessorBuilder->getPropertyAccessor();
     }
 
     public function testGetValueReadsArray()
     {
         $array = array('firstName' => 'Bernhard');
 
-        $this->assertEquals('Bernhard', $this->propertyAccessor->getValue($array, '[firstName]'));
+        $this->assertEquals('Bernhard', $this->getPropertyAccessor()->getValue($array, '[firstName]'));
     }
 
     /**
@@ -42,42 +67,50 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     {
         $array = array('firstName' => 'Bernhard');
 
-        $this->propertyAccessor->getValue($array, 'firstName');
+        $this->getPropertyAccessor()->getValue($array, 'firstName');
     }
 
     public function testGetValueReadsZeroIndex()
     {
         $array = array('Bernhard');
 
-        $this->assertEquals('Bernhard', $this->propertyAccessor->getValue($array, '[0]'));
+        $this->assertEquals('Bernhard', $this->getPropertyAccessor()->getValue($array, '[0]'));
     }
 
     public function testGetValueReadsIndexWithSpecialChars()
     {
         $array = array('%!@$§.' => 'Bernhard');
 
-        $this->assertEquals('Bernhard', $this->propertyAccessor->getValue($array, '[%!@$§.]'));
+        $this->assertEquals('Bernhard', $this->getPropertyAccessor()->getValue($array, '[%!@$§.]'));
     }
 
     public function testGetValueReadsNestedIndexWithSpecialChars()
     {
         $array = array('root' => array('%!@$§.' => 'Bernhard'));
 
-        $this->assertEquals('Bernhard', $this->propertyAccessor->getValue($array, '[root][%!@$§.]'));
+        $this->assertEquals('Bernhard', $this->getPropertyAccessor()->getValue($array, '[root][%!@$§.]'));
     }
 
     public function testGetValueReadsArrayWithCustomPropertyPath()
     {
         $array = array('child' => array('index' => array('firstName' => 'Bernhard')));
 
-        $this->assertEquals('Bernhard', $this->propertyAccessor->getValue($array, '[child][index][firstName]'));
+        $this->assertEquals('Bernhard', $this->getPropertyAccessor()->getValue($array, '[child][index][firstName]'));
     }
 
     public function testGetValueReadsArrayWithMissingIndexForCustomPropertyPath()
     {
         $array = array('child' => array('index' => array()));
 
-        $this->assertNull($this->propertyAccessor->getValue($array, '[child][index][firstName]'));
+        // No BC break
+        $this->assertNull($this->getPropertyAccessor()->getValue($array, '[child][index][firstName]'));
+
+        try {
+            $this->getPropertyAccessor(false, true)->getValue($array, '[child][index][firstName]');
+            $this->fail('Getting value on a nonexistent path from array should throw a Symfony\Component\PropertyAccess\Exception\NoSuchIndexException exception');
+        } catch (\Exception $e) {
+            $this->assertInstanceof('Symfony\Component\PropertyAccess\Exception\NoSuchIndexException', $e, 'Getting value on a nonexistent path from array should throw a Symfony\Component\PropertyAccess\Exception\NoSuchIndexException exception');
+        }
     }
 
     public function testGetValueReadsProperty()
@@ -85,7 +118,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
         $object = new Author();
         $object->firstName = 'Bernhard';
 
-        $this->assertEquals('Bernhard', $this->propertyAccessor->getValue($object, 'firstName'));
+        $this->assertEquals('Bernhard', $this->getPropertyAccessor()->getValue($object, 'firstName'));
     }
 
     public function testGetValueIgnoresSingular()
@@ -94,14 +127,14 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 
         $object = (object) array('children' => 'Many');
 
-        $this->assertEquals('Many', $this->propertyAccessor->getValue($object, 'children|child'));
+        $this->assertEquals('Many', $this->getPropertyAccessor()->getValue($object, 'children|child'));
     }
 
     public function testGetValueReadsPropertyWithSpecialCharsExceptDot()
     {
         $array = (object) array('%!@$§' => 'Bernhard');
 
-        $this->assertEquals('Bernhard', $this->propertyAccessor->getValue($array, '%!@$§'));
+        $this->assertEquals('Bernhard', $this->getPropertyAccessor()->getValue($array, '%!@$§'));
     }
 
     public function testGetValueReadsPropertyWithCustomPropertyPath()
@@ -111,7 +144,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
         $object->child['index'] = new Author();
         $object->child['index']->firstName = 'Bernhard';
 
-        $this->assertEquals('Bernhard', $this->propertyAccessor->getValue($object, 'child[index].firstName'));
+        $this->assertEquals('Bernhard', $this->getPropertyAccessor()->getValue($object, 'child[index].firstName'));
     }
 
     /**
@@ -119,7 +152,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetValueThrowsExceptionIfPropertyIsNotPublic()
     {
-        $this->propertyAccessor->getValue(new Author(), 'privateProperty');
+        $this->getPropertyAccessor()->getValue(new Author(), 'privateProperty');
     }
 
     public function testGetValueReadsGetters()
@@ -127,7 +160,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
         $object = new Author();
         $object->setLastName('Schussek');
 
-        $this->assertEquals('Schussek', $this->propertyAccessor->getValue($object, 'lastName'));
+        $this->assertEquals('Schussek', $this->getPropertyAccessor()->getValue($object, 'lastName'));
     }
 
     public function testGetValueCamelizesGetterNames()
@@ -135,7 +168,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
         $object = new Author();
         $object->setLastName('Schussek');
 
-        $this->assertEquals('Schussek', $this->propertyAccessor->getValue($object, 'last_name'));
+        $this->assertEquals('Schussek', $this->getPropertyAccessor()->getValue($object, 'last_name'));
     }
 
     /**
@@ -143,7 +176,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetValueThrowsExceptionIfGetterIsNotPublic()
     {
-        $this->propertyAccessor->getValue(new Author(), 'privateGetter');
+        $this->getPropertyAccessor()->getValue(new Author(), 'privateGetter');
     }
 
     public function testGetValueReadsIssers()
@@ -151,7 +184,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
         $object = new Author();
         $object->setAustralian(false);
 
-        $this->assertFalse($this->propertyAccessor->getValue($object, 'australian'));
+        $this->assertFalse($this->getPropertyAccessor()->getValue($object, 'australian'));
     }
 
     public function testGetValueReadHassers()
@@ -159,7 +192,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
         $object = new Author();
         $object->setReadPermissions(true);
 
-        $this->assertTrue($this->propertyAccessor->getValue($object, 'read_permissions'));
+        $this->assertTrue($this->getPropertyAccessor()->getValue($object, 'read_permissions'));
     }
 
     public function testGetValueReadsMagicGet()
@@ -167,7 +200,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
         $object = new Magician();
         $object->__set('magicProperty', 'foobar');
 
-        $this->assertSame('foobar', $this->propertyAccessor->getValue($object, 'magicProperty'));
+        $this->assertSame('foobar', $this->getPropertyAccessor()->getValue($object, 'magicProperty'));
     }
 
     /*
@@ -177,7 +210,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     {
         $object = new Magician();
 
-        $this->assertNull($this->propertyAccessor->getValue($object, 'magicProperty'));
+        $this->assertNull($this->getPropertyAccessor()->getValue($object, 'magicProperty'));
     }
 
     /**
@@ -185,7 +218,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetValueThrowsExceptionIfIsserIsNotPublic()
     {
-        $this->propertyAccessor->getValue(new Author(), 'privateIsser');
+        $this->getPropertyAccessor()->getValue(new Author(), 'privateIsser');
     }
 
     /**
@@ -193,7 +226,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetValueThrowsExceptionIfPropertyDoesNotExist()
     {
-        $this->propertyAccessor->getValue(new Author(), 'foobar');
+        $this->getPropertyAccessor()->getValue(new Author(), 'foobar');
     }
 
     /**
@@ -201,7 +234,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetValueThrowsExceptionIfNotObjectOrArray()
     {
-        $this->propertyAccessor->getValue('baz', 'foobar');
+        $this->getPropertyAccessor()->getValue('baz', 'foobar');
     }
 
     /**
@@ -209,7 +242,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetValueThrowsExceptionIfNull()
     {
-        $this->propertyAccessor->getValue(null, 'foobar');
+        $this->getPropertyAccessor()->getValue(null, 'foobar');
     }
 
     /**
@@ -217,14 +250,14 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetValueThrowsExceptionIfEmpty()
     {
-        $this->propertyAccessor->getValue('', 'foobar');
+        $this->getPropertyAccessor()->getValue('', 'foobar');
     }
 
     public function testSetValueUpdatesArrays()
     {
         $array = array();
 
-        $this->propertyAccessor->setValue($array, '[firstName]', 'Bernhard');
+        $this->getPropertyAccessor()->setValue($array, '[firstName]', 'Bernhard');
 
         $this->assertEquals(array('firstName' => 'Bernhard'), $array);
     }
@@ -236,14 +269,14 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     {
         $array = array();
 
-        $this->propertyAccessor->setValue($array, 'firstName', 'Bernhard');
+        $this->getPropertyAccessor()->setValue($array, 'firstName', 'Bernhard');
     }
 
     public function testSetValueUpdatesArraysWithCustomPropertyPath()
     {
         $array = array();
 
-        $this->propertyAccessor->setValue($array, '[child][index][firstName]', 'Bernhard');
+        $this->getPropertyAccessor()->setValue($array, '[child][index][firstName]', 'Bernhard');
 
         $this->assertEquals(array('child' => array('index' => array('firstName' => 'Bernhard'))), $array);
     }
@@ -252,7 +285,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     {
         $object = new Author();
 
-        $this->propertyAccessor->setValue($object, 'firstName', 'Bernhard');
+        $this->getPropertyAccessor()->setValue($object, 'firstName', 'Bernhard');
 
         $this->assertEquals('Bernhard', $object->firstName);
     }
@@ -263,7 +296,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
         $object->child = array();
         $object->child['index'] = new Author();
 
-        $this->propertyAccessor->setValue($object, 'child[index].firstName', 'Bernhard');
+        $this->getPropertyAccessor()->setValue($object, 'child[index].firstName', 'Bernhard');
 
         $this->assertEquals('Bernhard', $object->child['index']->firstName);
     }
@@ -272,7 +305,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     {
         $object = new Magician();
 
-        $this->propertyAccessor->setValue($object, 'magicProperty', 'foobar');
+        $this->getPropertyAccessor()->setValue($object, 'magicProperty', 'foobar');
 
         $this->assertEquals('foobar', $object->__get('magicProperty'));
     }
@@ -281,7 +314,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     {
         $object = new Author();
 
-        $this->propertyAccessor->setValue($object, 'lastName', 'Schussek');
+        $this->getPropertyAccessor()->setValue($object, 'lastName', 'Schussek');
 
         $this->assertEquals('Schussek', $object->getLastName());
     }
@@ -290,7 +323,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     {
         $object = new Author();
 
-        $this->propertyAccessor->setValue($object, 'last_name', 'Schussek');
+        $this->getPropertyAccessor()->setValue($object, 'last_name', 'Schussek');
 
         $this->assertEquals('Schussek', $object->getLastName());
     }
@@ -300,7 +333,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetValueThrowsExceptionIfGetterIsNotPublic()
     {
-        $this->propertyAccessor->setValue(new Author(), 'privateSetter', 'foobar');
+        $this->getPropertyAccessor()->setValue(new Author(), 'privateSetter', 'foobar');
     }
 
     /**
@@ -310,7 +343,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     {
         $value = 'baz';
 
-        $this->propertyAccessor->setValue($value, 'foobar', 'bam');
+        $this->getPropertyAccessor()->setValue($value, 'foobar', 'bam');
     }
 
     /**
@@ -320,7 +353,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     {
         $value = null;
 
-        $this->propertyAccessor->setValue($value, 'foobar', 'bam');
+        $this->getPropertyAccessor()->setValue($value, 'foobar', 'bam');
     }
 
     /**
@@ -330,7 +363,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     {
         $value = '';
 
-        $this->propertyAccessor->setValue($value, 'foobar', 'bam');
+        $this->getPropertyAccessor()->setValue($value, 'foobar', 'bam');
     }
 
     /**
@@ -340,7 +373,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     {
         $value = new MagicianCall();
 
-        $this->propertyAccessor->setValue($value, 'foobar', 'bam');
+        $this->getPropertyAccessor()->setValue($value, 'foobar', 'bam');
     }
 
     /**
@@ -350,7 +383,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     {
         $value = new MagicianCall();
 
-        $this->propertyAccessor->getValue($value, 'foobar', 'bam');
+        $this->getPropertyAccessor()->getValue($value, 'foobar', 'bam');
     }
 
     public function testGetValueReadsMagicCall()

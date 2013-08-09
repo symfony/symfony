@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2013-08-09T09:58:13Z
+
+It has a flaw. The message parameter in logging methods of [BasicLogger](https://github.com/propelorm/Propel/blob/master/runtime/lib/logger/BasicLogger.php#L30) can be `mixed`. But the proxied `LoggerInterface` only works with string messages. So you need to add code when the passed message is not string.
+
+---------------------------------------------------------------------------
+
+by willdurand at 2013-08-09T10:08:36Z
+
+@Tobion better?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2013-08-09T10:15:35Z
+
+Yes. :+1:

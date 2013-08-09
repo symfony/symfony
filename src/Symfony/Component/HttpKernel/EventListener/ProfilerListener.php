@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\HttpKernel\EventListener;
 
-use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
@@ -62,7 +61,7 @@ class ProfilerListener implements EventSubscriberInterface
      */
     public function onKernelException(GetResponseForExceptionEvent $event)
     {
-        if ($this->onlyMasterRequests && HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
+        if ($this->onlyMasterRequests && !$event->isMasterRequest()) {
             return;
         }
 
@@ -81,7 +80,7 @@ class ProfilerListener implements EventSubscriberInterface
      */
     public function onKernelResponse(FilterResponseEvent $event)
     {
-        $master = HttpKernelInterface::MASTER_REQUEST === $event->getRequestType();
+        $master = $event->isMasterRequest();
         if ($this->onlyMasterRequests && !$master) {
             return;
         }

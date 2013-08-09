@@ -180,7 +180,7 @@ class XmlFileLoader extends FileLoader
      *
      * @param string $file Path of file
      *
-     * @return SimpleXMLElement
+     * @return \SimpleXMLElement
      *
      * @throws MappingException
      */

@@ -546,33 +546,6 @@ class Process
     }
 
     /**
-     * Returns the current output of the process and clears it
-     *
-     * @return string The process output
-     */
-    public function getAndFlushOutput()
-    {
-        $data = $this->getOutput();
-        $this->flushOutput();
-
-        return $data;
-    }
-
-    /**
-     * Returns the current output of the process and clears it
-     *
-     * @return string The process output since the last call.
-     */
-    public function getAndFlushIncrementalOutput()
-    {
-        $data = $this->getIncrementalOutput();
-        $this->flushOutput();
-
-        return $data;
-    }
-
-
-    /**
      * Returns the current error output of the process (STDERR).
      *
      * @return string The process error output
@@ -616,32 +589,6 @@ class Process
         $this->incrementalErrorOutputOffset = 0;
 
         return $this;
-    }
-
-    /**
-     * Returns the current output of the process and clears it
-     *
-     * @return string The process output
-     */
-    public function getAndFlushErrorOutput()
-    {
-        $data = $this->getErrorOutput();
-        $this->flushErrorOutput();
-
-        return $data;
-    }
-
-    /**
-     * Returns the current output of the process and clears it
-     *
-     * @return string The process output since the last call.
-     */
-    public function getAndFlushIncrementalErrorOutput()
-    {
-        $data = $this->getIncrementalErrorOutput();
-        $this->flushErrorOutput();
-
-        return $data;
     }
 
     /**

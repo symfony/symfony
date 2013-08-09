@@ -55,7 +55,6 @@ class FormType extends BaseType
             ->setDataMapper($options['compound'] ? new PropertyPathMapper($this->propertyAccessor) : null)
             ->setMethod($options['method'])
             ->setAction($options['action'])
-            ->setAutoInitialize($options['auto_initialize'])
         ;
 
         if ($options['trim']) {
@@ -188,7 +187,6 @@ class FormType extends BaseType
             // According to RFC 2396 (http://www.ietf.org/rfc/rfc2396.txt)
             // section 4.2., empty URIs are considered same-document references
             'action'             => '',
-            'auto_initialize'    => true,
         ));
 
         $resolver->setAllowedTypes(array(

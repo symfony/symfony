@@ -12,6 +12,8 @@ CHANGELOG
  * added the collect of data if a controller is a Closure in the Request collector
  * pass exceptions from the ExceptionListener to the logger using the logging context to allow for more
    detailed messages
+ * in `Symfony\Component\HttpKernel\EventListener\ExceptionListener`, reduced the logging level for HttpExceptions with
+   4xx status codes from "error" to "notice"
 
 2.2.0
 -----

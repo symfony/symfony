@@ -100,7 +100,7 @@ class ExceptionListener implements EventSubscriberInterface
             if ($isCritical) {
                 $this->logger->critical($message, $context);
             } else {
-                $this->logger->error($message, $context);
+                $this->logger->notice($message, $context);
             }
         } elseif (!$original || $isCritical) {
             error_log($message);

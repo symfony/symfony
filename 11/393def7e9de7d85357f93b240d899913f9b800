@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-08-02T20:49:42Z
+
+Can you add a note in the CHANGELOG about this new feature. Also, I think that adding some usage examples in the phpdoc of the new method would be good.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-08-08T13:30:44Z
+
+ping @lyrixx
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2013-08-08T16:31:09Z
+
+fixed (ping @fabpot )

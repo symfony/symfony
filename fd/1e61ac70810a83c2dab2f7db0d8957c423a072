@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2013-08-10T11:15:49Z
+
+You broke tests as you changed type of `FlattenException`
+
+---------------------------------------------------------------------------
+
+by dawehner at 2013-08-10T11:46:08Z
+
+Good point. I am wondering whether adding Request in the use statements is right, as this kind of add a new depedency of the http kernel on the http foundation. Maybe this is already the case, so that is not a problem.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2013-08-10T12:02:21Z
+
+Yep. Already the case:
+https://github.com/symfony/symfony/blob/bcd7ab1eae997ab85aafff845f6f503c87bf4b09/src/Symfony/Component/HttpKernel/composer.json#L21
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-08-10T17:47:46Z
+
+Looks good to me.
+
+---------------------------------------------------------------------------
+
+by dawehner at 2013-08-10T19:43:41Z
+
+Thank you for the review ... fixed the codestyle issues.

@@ -65,7 +65,7 @@ interface BundleInterface extends ContainerAwareInterface
      * between the bundles, just a way to extend and override an existing
      * bundle.
      *
-     * @return string The Bundle name it overrides or null if no parent
+     * @return string|array The Bundle parent name it overrides or null if no parent; Use array of parent name if bundle override more than one parent
      *
      * @api
      */

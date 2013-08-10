@@ -485,14 +485,22 @@ abstract class Kernel implements KernelInterface, TerminableInterface
             }
             $this->bundles[$name] = $bundle;
 
-            if ($parentName = $bundle->getParent()) {
-                if (isset($directChildren[$parentName])) {
-                    throw new \LogicException(sprintf('Bundle "%s" is directly extended by two bundles "%s" and "%s".', $parentName, $name, $directChildren[$parentName]));
+            if ($parentNames = $bundle->getParent()) {
+
+                if (!is_array($parentNames)) {
+                    $parentNames = array($parentNames);
                 }
-                if ($parentName == $name) {
-                    throw new \LogicException(sprintf('Bundle "%s" can not extend itself.', $name));
+
+                foreach ($parentNames as $parentName) {
+
+                    if (isset($directChildren[$parentName])) {
+                        throw new \LogicException(sprintf('Bundle "%s" is directly extended by two bundles "%s" and "%s".', $parentName, $name, $directChildren[$parentName]));
+                    }
+                    if ($parentName == $name) {
+                        throw new \LogicException(sprintf('Bundle "%s" can not extend itself.', $name));
+                    }
+                    $directChildren[$parentName] = $name;
                 }
-                $directChildren[$parentName] = $name;
             } else {
                 $topMostBundles[$name] = $bundle;
             }

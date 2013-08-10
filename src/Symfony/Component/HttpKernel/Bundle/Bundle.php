@@ -135,7 +135,7 @@ abstract class Bundle extends ContainerAware implements BundleInterface
     /**
      * Returns the bundle parent name.
      *
-     * @return string The Bundle parent name it overrides or null if no parent
+     * @return string|array The Bundle parent name it overrides or null if no parent; Use array of parent name if bundle override more than one parent
      *
      * @api
      */

@@ -75,7 +75,7 @@ class TableHelper extends Helper
     /**
      * Sets table layout type.
      *
-     * @param int $layout self::LAYOUT_*
+     * @param integer $layout self::LAYOUT_*
      *
      * @return TableHelper
      */

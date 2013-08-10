@@ -43,7 +43,7 @@ class NodeExtension extends AbstractExtension
      * Constructor.
      *
      * @param Translator $translator
-     * @param int        $flags
+     * @param integer    $flags
      */
     public function __construct(Translator $translator, $flags = 0)
     {
@@ -71,7 +71,7 @@ class NodeExtension extends AbstractExtension
     }
 
     /**
-     * @param int $flag
+     * @param integer $flag
      *
      * @return Boolean
      */

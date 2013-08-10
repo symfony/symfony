@@ -45,8 +45,8 @@ interface ContainerInterface
     /**
      * Gets a service.
      *
-     * @param string $id              The service identifier
-     * @param int    $invalidBehavior The behavior when the service does not exist
+     * @param string  $id              The service identifier
+     * @param integer $invalidBehavior The behavior when the service does not exist
      *
      * @return object The associated service
      *

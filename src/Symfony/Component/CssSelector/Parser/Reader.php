@@ -71,8 +71,8 @@ class Reader
     }
 
     /**
-     * @param int $length
-     * @param int $offset
+     * @param integer $length
+     * @param integer $offset
      *
      * @return string
      */
@@ -110,7 +110,7 @@ class Reader
     }
 
     /**
-     * @param int $length
+     * @param integer $length
      */
     public function moveForward($length)
     {

@@ -45,9 +45,9 @@ class Specificity
     /**
      * Constructor.
      *
-     * @param int $a
-     * @param int $b
-     * @param int $c
+     * @param integer $a
+     * @param integer $b
+     * @param integer $c
      */
     public function __construct($a, $b, $c)
     {

@@ -235,8 +235,8 @@ class NumberFormatter
     /**
      * Constructor.
      *
-     * @param string $locale  The locale code. The only currently supported locale is "en".
-     * @param int    $style   Style of the formatting, one of the format style constants.
+     * @param string  $locale The locale code. The only currently supported locale is "en".
+     * @param integer $style  Style of the formatting, one of the format style constants.
      *                        The only supported styles are NumberFormatter::DECIMAL
      *                        and NumberFormatter::CURRENCY.
      * @param string $pattern Not supported. A pattern string in case $style is NumberFormat::PATTERN_DECIMAL or
@@ -273,7 +273,7 @@ class NumberFormatter
      * Static constructor.
      *
      * @param string $locale  The locale code. The only supported locale is "en".
-     * @param int    $style   Style of the formatting, one of the format style constants.
+     * @param integer $style  Style of the formatting, one of the format style constants.
      *                        The only currently supported styles are NumberFormatter::DECIMAL
      *                        and NumberFormatter::CURRENCY.
      * @param string $pattern Not supported. A pattern string in case $style is NumberFormat::PATTERN_DECIMAL or
@@ -333,9 +333,9 @@ class NumberFormatter
     /**
      * Format a number
      *
-     * @param number $value The value to format
-     * @param int    $type  Type of the formatting, one of the format type constants.
-     *                      Only type NumberFormatter::TYPE_DEFAULT is currently supported.
+     * @param number  $value The value to format
+     * @param integer $type  Type of the formatting, one of the format type constants.
+     *                       Only type NumberFormatter::TYPE_DEFAULT is currently supported.
      *
      * @return Boolean|string The formatted value or false on error
      *
@@ -379,7 +379,7 @@ class NumberFormatter
     /**
      * Returns an attribute value
      *
-     * @param int $attr An attribute specifier, one of the numeric attribute constants
+     * @param integer $attr An attribute specifier, one of the numeric attribute constants
      *
      * @return Boolean|int The attribute value on success or false on error
      *
@@ -419,7 +419,7 @@ class NumberFormatter
      *
      * The parameter $type is currently ignored.
      *
-     * @param int $type Not supported. The locale name type to return (Locale::VALID_LOCALE or Locale::ACTUAL_LOCALE)
+     * @param integer $type Not supported. The locale name type to return (Locale::VALID_LOCALE or Locale::ACTUAL_LOCALE)
      *
      * @return string The locale used to create the formatter. Currently always
      *                returns "en".
@@ -448,7 +448,7 @@ class NumberFormatter
     /**
      * Not supported. Returns a formatter symbol value
      *
-     * @param int $attr A symbol specifier, one of the format symbol constants
+     * @param integer $attr A symbol specifier, one of the format symbol constants
      *
      * @return Boolean|string        The symbol value or false on error
      *
@@ -464,7 +464,7 @@ class NumberFormatter
     /**
      * Not supported. Returns a formatter text attribute value
      *
-     * @param int $attr An attribute specifier, one of the text attribute constants
+     * @param integer $attr An attribute specifier, one of the text attribute constants
      *
      * @return Boolean|string        The attribute value or false on error
      *
@@ -480,9 +480,9 @@ class NumberFormatter
     /**
      * Not supported. Parse a currency number
      *
-     * @param string $value    The value to parse
-     * @param string $currency Parameter to receive the currency name (reference)
-     * @param int    $position Offset to begin the parsing on return this value will hold the offset at which the parsing ended
+     * @param string  $value    The value to parse
+     * @param string  $currency Parameter to receive the currency name (reference)
+     * @param integer $position Offset to begin the parsing on return this value will hold the offset at which the parsing ended
      *
      * @return Boolean|string           The parsed numeric value of false on error
      *
@@ -498,11 +498,11 @@ class NumberFormatter
     /**
      * Parse a number
      *
-     * @param string $value    The value to parse
-     * @param int    $type     Type of the formatting, one of the format type constants.
-     *                         The only currently supported types are NumberFormatter::TYPE_DOUBLE,
-     *                         NumberFormatter::TYPE_INT32 and NumberFormatter::TYPE_INT64.
-     * @param int    $position Not supported. Offset to begin the parsing on return this value will hold the offset at which the parsing ended
+     * @param string  $value    The value to parse
+     * @param integer $type     Type of the formatting, one of the format type constants.
+     *                          The only currently supported types are NumberFormatter::TYPE_DOUBLE,
+     *                          NumberFormatter::TYPE_INT32 and NumberFormatter::TYPE_INT64.
+     * @param integer $position Not supported. Offset to begin the parsing on return this value will hold the offset at which the parsing ended
      *
      * @return Boolean|string                               The parsed value of false on error
      *
@@ -547,12 +547,12 @@ class NumberFormatter
     /**
      * Set an attribute
      *
-     * @param int $attr  An attribute specifier, one of the numeric attribute constants.
-     *                   The only currently supported attributes are NumberFormatter::FRACTION_DIGITS,
-     *                   NumberFormatter::GROUPING_USED and NumberFormatter::ROUNDING_MODE.
-     * @param int $value The attribute value. The only currently supported rounding modes are
-     *                   NumberFormatter::ROUND_HALFEVEN, NumberFormatter::ROUND_HALFDOWN and
-     *                   NumberFormatter::ROUND_HALFUP.
+     * @param integer $attr  An attribute specifier, one of the numeric attribute constants.
+     *                       The only currently supported attributes are NumberFormatter::FRACTION_DIGITS,
+     *                       NumberFormatter::GROUPING_USED and NumberFormatter::ROUNDING_MODE.
+     * @param integer $value The attribute value. The only currently supported rounding modes are
+     *                       NumberFormatter::ROUND_HALFEVEN, NumberFormatter::ROUND_HALFDOWN and
+     *                       NumberFormatter::ROUND_HALFUP.
      *
      * @return Boolean true on success or false on failure
      *
@@ -615,8 +615,8 @@ class NumberFormatter
     /**
      * Not supported. Set the formatter's symbol
      *
-     * @param int    $attr  A symbol specifier, one of the format symbol constants
-     * @param string $value The value for the symbol
+     * @param integer $attr  A symbol specifier, one of the format symbol constants
+     * @param string  $value The value for the symbol
      *
      * @return Boolean true on success or false on failure
      *
@@ -632,8 +632,8 @@ class NumberFormatter
     /**
      * Not supported. Set a text attribute
      *
-     * @param int $attr  An attribute specifier, one of the text attribute constants
-     * @param int $value The attribute value
+     * @param integer $attr  An attribute specifier, one of the text attribute constants
+     * @param integer $value The attribute value
      *
      * @return Boolean true on success or false on failure
      *
@@ -695,7 +695,7 @@ class NumberFormatter
      * Rounds a value.
      *
      * @param integer|float $value     The value to round
-     * @param int           $precision The number of decimal digits to round to
+     * @param integer       $precision The number of decimal digits to round to
      *
      * @return integer|float The rounded value
      */
@@ -713,7 +713,7 @@ class NumberFormatter
      * Formats a number.
      *
      * @param integer|float $value     The numeric value to format
-     * @param int           $precision The number of decimal digits to use
+     * @param integer       $precision The number of decimal digits to use
      *
      * @return string The formatted number
      */
@@ -728,7 +728,7 @@ class NumberFormatter
      * Returns the precision value if the DECIMAL style is being used and the FRACTION_DIGITS attribute is unitialized.
      *
      * @param integer|float $value     The value to get the precision from if the FRACTION_DIGITS attribute is unitialized
-     * @param int           $precision The precision value to returns if the FRACTION_DIGITS attribute is initialized
+     * @param integer       $precision The precision value to returns if the FRACTION_DIGITS attribute is initialized
      *
      * @return int The precision value
      */
@@ -763,8 +763,8 @@ class NumberFormatter
     /**
      * Returns the numeric value using the $type to convert to the right data type.
      *
-     * @param mixed $value The value to be converted
-     * @param int   $type  The type to convert. Can be TYPE_DOUBLE (float) or TYPE_INT32 (int)
+     * @param mixed   $value The value to be converted
+     * @param integer $type  The type to convert. Can be TYPE_DOUBLE (float) or TYPE_INT32 (int)
      *
      * @return integer|float The converted value
      */
@@ -848,7 +848,7 @@ class NumberFormatter
     /**
      * Check if the rounding mode is invalid.
      *
-     * @param int $value The rounding mode value to check
+     * @param integer $value The rounding mode value to check
      *
      * @return Boolean true if the rounding mode is invalid, false otherwise
      */

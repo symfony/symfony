@@ -117,7 +117,7 @@ class ProgressHelper extends Helper
     /**
      * Sets the progress bar width.
      *
-     * @param int $size The progress bar size
+     * @param integer $size The progress bar size
      */
     public function setBarWidth($size)
     {
@@ -167,7 +167,7 @@ class ProgressHelper extends Helper
     /**
      * Sets the redraw frequency.
      *
-     * @param int $freq The frequency in steps
+     * @param integer $freq The frequency in steps
      */
     public function setRedrawFrequency($freq)
     {

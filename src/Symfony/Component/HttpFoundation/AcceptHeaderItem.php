@@ -149,7 +149,7 @@ class AcceptHeaderItem
     /**
      * Set the item index.
      *
-     * @param int $index
+     * @param integer $index
      *
      * @return AcceptHeaderItem
      */

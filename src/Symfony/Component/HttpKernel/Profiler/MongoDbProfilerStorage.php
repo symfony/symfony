@@ -160,11 +160,11 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
     }
 
     /**
-     * @param string $ip
-     * @param string $url
-     * @param string $method
-     * @param int    $start
-     * @param int    $end
+     * @param string  $ip
+     * @param string  $url
+     * @param string  $method
+     * @param integer $start
+     * @param integer $end
      *
      * @return array
      */

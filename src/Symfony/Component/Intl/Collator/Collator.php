@@ -100,9 +100,9 @@ class Collator
      *
      * @param array   &$array    Input array
      * @param integer $sortFlag  Flags for sorting, can be one of the following:
-     *                           Collator::SORT_REGULAR - compare items normally (don't change types)
-     *                           Collator::SORT_NUMERIC - compare items numerically
-     *                           Collator::SORT_STRING - compare items as strings
+     *                               Collator::SORT_REGULAR - compare items normally (don't change types)
+     *                               Collator::SORT_NUMERIC - compare items numerically
+     *                               Collator::SORT_STRING - compare items as strings
      *
      * @return Boolean True on success or false on failure
      */
@@ -142,7 +142,7 @@ class Collator
     /**
      * Not supported. Get a value of an integer collator attribute
      *
-     * @param int $attr An attribute specifier, one of the attribute constants
+     * @param integer $attr An attribute specifier, one of the attribute constants
      *
      * @return Boolean|int   The attribute value on success or false on error
      *
@@ -178,7 +178,7 @@ class Collator
     /**
      * Returns the collator's locale
      *
-     * @param int $type Not supported. The locale name type to return (Locale::VALID_LOCALE or Locale::ACTUAL_LOCALE)
+     * @param integer $type Not supported. The locale name type to return (Locale::VALID_LOCALE or Locale::ACTUAL_LOCALE)
      *
      * @return string The locale used to create the collator. Currently always
      *                returns "en".
@@ -221,8 +221,8 @@ class Collator
     /**
      * Not supported. Set a collator's attribute
      *
-     * @param int $attr An attribute specifier, one of the attribute constants
-     * @param int $val  The attribute value, one of the attribute value constants
+     * @param integer $attr An attribute specifier, one of the attribute constants
+     * @param integer $val  The attribute value, one of the attribute value constants
      *
      * @return Boolean True on success or false on failure
      *
@@ -238,13 +238,13 @@ class Collator
     /**
      * Not supported. Set the collator's strength
      *
-     * @param int $strength Strength to set, possible values:
-     *                           Collator::PRIMARY
-     *                           Collator::SECONDARY
-     *                           Collator::TERTIARY
-     *                           Collator::QUATERNARY
-     *                           Collator::IDENTICAL
-     *                           Collator::DEFAULT
+     * @param integer $strength Strength to set, possible values:
+     *                              Collator::PRIMARY
+     *                              Collator::SECONDARY
+     *                              Collator::TERTIARY
+     *                              Collator::QUATERNARY
+     *                              Collator::IDENTICAL
+     *                              Collator::DEFAULT
      *
      * @return Boolean True on success or false on failure
      *
@@ -276,11 +276,11 @@ class Collator
     /**
      * Not supported. Sort array using specified collator
      *
-     * @param  array   &$arr       Array of string to sort
-     * @param int $sortFlag Optional sorting type, one of the following:
-     *                             Collator::SORT_REGULAR
-     *                             Collator::SORT_NUMERIC
-     *                             Collator::SORT_STRING
+     * @param array   &$arr     Array of string to sort
+     * @param integer $sortFlag Optional sorting type, one of the following:
+     *                              Collator::SORT_REGULAR
+     *                              Collator::SORT_NUMERIC
+     *                              Collator::SORT_STRING
      *
      * @return Boolean True on success or false on failure
      *

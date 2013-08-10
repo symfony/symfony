@@ -28,7 +28,7 @@ class Reference
      * Constructor.
      *
      * @param string  $id              The service identifier
-     * @param int     $invalidBehavior The behavior when the service does not exist
+     * @param integer $invalidBehavior The behavior when the service does not exist
      * @param Boolean $strict          Sets how this reference is validated
      *
      * @see Container

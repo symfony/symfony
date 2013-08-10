@@ -122,9 +122,9 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * This method should not be invoked.
      *
-     * @param int|string|FormInterface $child
-     * @param null                     $type
-     * @param array                    $options
+     * @param integer|string|FormInterface $child
+     * @param null                         $type
+     * @param array                        $options
      *
      * @throws BadMethodCallException
      */

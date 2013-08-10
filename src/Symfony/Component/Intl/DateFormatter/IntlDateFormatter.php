@@ -129,13 +129,13 @@ class IntlDateFormatter
     /**
      * Constructor
      *
-     * @param string $locale   The locale code. The only currently supported locale is "en".
-     * @param int    $datetype Type of date formatting, one of the format type constants
-     * @param int    $timetype Type of time formatting, one of the format type constants
-     * @param string $timezone Timezone identifier
-     * @param int    $calendar Calendar to use for formatting or parsing. The only currently
-     *                         supported value is IntlDateFormatter::GREGORIAN.
-     * @param string $pattern Optional pattern to use when formatting
+     * @param string  $locale   The locale code. The only currently supported locale is "en".
+     * @param integer $datetype Type of date formatting, one of the format type constants
+     * @param integer $timetype Type of time formatting, one of the format type constants
+     * @param string  $timezone Timezone identifier
+     * @param integer $calendar Calendar to use for formatting or parsing. The only currently
+     *                          supported value is IntlDateFormatter::GREGORIAN.
+     * @param string  $pattern  Optional pattern to use when formatting
      *
      * @see http://www.php.net/manual/en/intldateformatter.create.php
      * @see http://userguide.icu-project.org/formatparse/datetime
@@ -163,13 +163,13 @@ class IntlDateFormatter
     /**
      * Static constructor
      *
-     * @param string $locale   The locale code. The only currently supported locale is "en".
-     * @param int    $datetype Type of date formatting, one of the format type constants
-     * @param int    $timetype Type of time formatting, one of the format type constants
-     * @param string $timezone Timezone identifier
-     * @param int    $calendar Calendar to use for formatting or parsing; default is Gregorian.
-     *                           One of the calendar constants.
-     * @param string $pattern Optional pattern to use when formatting
+     * @param string  $locale   The locale code. The only currently supported locale is "en".
+     * @param integer $datetype Type of date formatting, one of the format type constants
+     * @param integer $timetype Type of time formatting, one of the format type constants
+     * @param string  $timezone Timezone identifier
+     * @param integer $calendar Calendar to use for formatting or parsing; default is Gregorian.
+     *                          One of the calendar constants.
+     * @param string  $pattern  Optional pattern to use when formatting
      *
      * @return IntlDateFormatter
      *
@@ -326,7 +326,7 @@ class IntlDateFormatter
     /**
      * Returns the formatter's locale
      *
-     * @param int $type Not supported. The locale name type to return (Locale::VALID_LOCALE or Locale::ACTUAL_LOCALE)
+     * @param integer $type Not supported. The locale name type to return (Locale::VALID_LOCALE or Locale::ACTUAL_LOCALE)
      *
      * @return string The locale used to create the formatter. Currently always
      *                returns "en".
@@ -414,11 +414,11 @@ class IntlDateFormatter
     /**
      * Not supported. Parse string to a field-based time value
      *
-     * @param string $value    String to convert to a time value
-     * @param int    $position Position at which to start the parsing in $value (zero-based).
-     *                              If no error occurs before $value is consumed, $parse_pos will
-     *                              contain -1 otherwise it will contain the position at which parsing
-     *                              ended. If $parse_pos > strlen($value), the parse fails immediately.
+     * @param string  $value    String to convert to a time value
+     * @param integer $position Position at which to start the parsing in $value (zero-based).
+     *                          If no error occurs before $value is consumed, $parse_pos will
+     *                          contain -1 otherwise it will contain the position at which parsing
+     *                          ended. If $parse_pos > strlen($value), the parse fails immediately.
      *
      * @return string Localtime compatible array of integers: contains 24 hour clock value in tm_hour field
      *
@@ -434,11 +434,11 @@ class IntlDateFormatter
     /**
      * Parse string to a timestamp value
      *
-     * @param string $value    String to convert to a time value
-     * @param int    $position Not supported. Position at which to start the parsing in $value (zero-based).
-     *                         If no error occurs before $value is consumed, $parse_pos will
-     *                         contain -1 otherwise it will contain the position at which parsing
-     *                         ended. If $parse_pos > strlen($value), the parse fails immediately.
+     * @param string  $value    String to convert to a time value
+     * @param integer $position Not supported. Position at which to start the parsing in $value (zero-based).
+     *                          If no error occurs before $value is consumed, $parse_pos will
+     *                          contain -1 otherwise it will contain the position at which parsing
+     *                          ended. If $parse_pos > strlen($value), the parse fails immediately.
      *
      * @return string Parsed value as a timestamp
      *
@@ -597,7 +597,7 @@ class IntlDateFormatter
      * Create and returns a DateTime object with the specified timestamp and with the
      * current time zone
      *
-     * @param int $timestamp
+     * @param integer $timestamp
      *
      * @return \DateTime
      */

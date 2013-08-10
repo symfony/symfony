@@ -45,9 +45,9 @@ class Token
     private $position;
 
     /**
-     * @param int    $type
-     * @param string $value
-     * @param int    $position
+     * @param integer $type
+     * @param string  $value
+     * @param integer $position
      */
     public function __construct($type, $value, $position)
     {

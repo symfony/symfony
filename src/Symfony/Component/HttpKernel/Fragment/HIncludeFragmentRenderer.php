@@ -125,7 +125,7 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
     /**
      * @param string $template
      *
-     * @return boolean
+     * @return Boolean
      */
     private function templateExists($template)
     {

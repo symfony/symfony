@@ -97,7 +97,7 @@ class Scope
      *
      * @param string $key
      *
-     * @return boolean
+     * @return Boolean
      */
     public function has($key)
     {

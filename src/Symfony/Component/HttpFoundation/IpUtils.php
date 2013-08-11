@@ -29,7 +29,7 @@ class IpUtils
      * @param string       $requestIp
      * @param string|array $ips
      *
-     * @return boolean Whether the IP is valid
+     * @return Boolean Whether the IP is valid
      */
     public static function checkIp($requestIp, $ips)
     {
@@ -54,7 +54,7 @@ class IpUtils
      * @param string $requestIp
      * @param string $ip
      *
-     * @return boolean Whether the IP is valid
+     * @return Boolean Whether the IP is valid
      */
     public static function checkIp4($requestIp, $ip)
     {
@@ -81,7 +81,7 @@ class IpUtils
      * @param string $requestIp
      * @param string $ip
      *
-     * @return boolean Whether the IP is valid
+     * @return Boolean Whether the IP is valid
      *
      * @throws \RuntimeException When IPV6 support is not enabled
      */

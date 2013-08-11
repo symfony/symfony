@@ -48,7 +48,7 @@ abstract class AbstractProxy
     /**
      * Is this proxy handler and instance of \SessionHandlerInterface.
      *
-     * @return boolean
+     * @return Boolean
      */
     public function isSessionHandlerInterface()
     {

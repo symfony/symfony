@@ -29,7 +29,7 @@ interface SessionStorageInterface
      *
      * @throws \RuntimeException If something goes wrong starting the session.
      *
-     * @return boolean True if started.
+     * @return Boolean True if started.
      *
      * @api
      */
@@ -38,7 +38,7 @@ interface SessionStorageInterface
     /**
      * Checks if the session is started.
      *
-     * @return boolean True if started, false otherwise.
+     * @return Boolean True if started, false otherwise.
      */
     public function isStarted();
 

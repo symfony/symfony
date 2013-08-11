@@ -29,14 +29,6 @@ class StopwatchExtensionTest extends TestCase
     /**
      * @expectedException \Twig_Error_Syntax
      */
-    public function testFailIfNameAlreadyExists()
-    {
-        $this->testTiming('{% stopwatch foo %}{% endstopwatch %}{% stopwatch foo %}{% endstopwatch %}', array());
-    }
-
-    /**
-     * @expectedException \Twig_Error_Syntax
-     */
     public function testFailIfStoppingWrongEvent()
     {
         $this->testTiming('{% stopwatch foo %}{% endstopwatch bar %}', array());
@@ -64,6 +56,7 @@ class StopwatchExtensionTest extends TestCase
             array('{% stopwatch foo %}symfony2 is fun{% endstopwatch %}{% stopwatch bar %}something{% endstopwatch %}', array('foo', 'bar')),
             array('{% stopwatch foo %}something{% endstopwatch foo %}', 'foo'),
             array('{% stopwatch "foo.bar" %}something{% endstopwatch %}', 'foo.bar'),
+            array('{% stopwatch foo %}something{% endstopwatch foo %}{% stopwatch foo %}something else{% endstopwatch foo %}', array('foo', 'foo')),
         );
     }
 

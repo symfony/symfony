@@ -21,7 +21,6 @@ use Symfony\Bridge\Twig\Node\StopwatchNode;
 class StopwatchTokenParser extends \Twig_TokenParser
 {
     protected $stopwatchIsAvailable;
-    protected $_events = array();
 
     public function __construct($stopwatchIsAvailable)
     {
@@ -39,11 +38,6 @@ class StopwatchTokenParser extends \Twig_TokenParser
         } else {
             $name = $stream->expect(\Twig_Token::STRING_TYPE)->getValue();
         }
-
-        if (in_array($name, $this->_events)) {
-            throw new \Twig_Error_Syntax(sprintf('The stopwatch event "%s" has already been defined.', $name));
-        }
-        $this->_events[] = $name;
 
         $stream->expect(\Twig_Token::BLOCK_END_TYPE);
 

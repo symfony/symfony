@@ -29,7 +29,7 @@ class Filesystem
      *
      * @param string  $originFile The original filename
      * @param string  $targetFile The target filename
-     * @param boolean $override   Whether to override an existing file or not
+     * @param Boolean $override   Whether to override an existing file or not
      *
      * @throws IOException When copy fails
      */

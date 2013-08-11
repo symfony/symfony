@@ -632,7 +632,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * By default, scanning unreadable directories content throws an AccessDeniedException.
      *
-     * @param boolean $ignore
+     * @param Boolean $ignore
      *
      * @return Finder The current Finder instance
      */

@@ -898,7 +898,7 @@ class Process
     /**
      * Enables or disables the TTY mode.
      *
-     * @param boolean $tty True to enabled and false to disable
+     * @param Boolean $tty True to enabled and false to disable
      *
      * @return self The current Process instance
      */

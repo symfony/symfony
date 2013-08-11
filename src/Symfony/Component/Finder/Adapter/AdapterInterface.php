@@ -115,7 +115,7 @@ interface AdapterInterface
     public function setNotPath(array $notPaths);
 
     /**
-     * @param boolean $ignore
+     * @param Boolean $ignore
      *
      * @return AdapterInterface Current instance
      */

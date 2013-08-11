@@ -678,7 +678,7 @@ class Application
      * Returns a text representation of the Application.
      *
      * @param string  $namespace An optional namespace name
-     * @param boolean $raw       Whether to return raw command list
+     * @param Boolean $raw       Whether to return raw command list
      *
      * @return string A string representing the Application
      *

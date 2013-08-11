@@ -72,11 +72,11 @@ class MemcacheMock
      *
      * @param string   $host
      * @param integer  $port
-     * @param boolean  $persistent
+     * @param Boolean  $persistent
      * @param integer  $weight
      * @param integer  $timeout
      * @param integer  $retry_interval
-     * @param boolean  $status
+     * @param Boolean  $status
      * @param callable $failure_callback
      * @param integer  $timeoutms
      *

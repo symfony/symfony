@@ -18,11 +18,7 @@ class RedirectResponseTest extends \PHPUnit_Framework_TestCase
     public function testGenerateMetaRedirect()
     {
         $response = new RedirectResponse('foo.bar');
-
-        $this->assertEquals(1, preg_match(
-            '#<meta http-equiv="refresh" content="\d+;url=foo\.bar" />#',
-            preg_replace(array('/\s+/', '/\'/'), array(' ', '"'), $response->getContent())
-        ));
+        $this->assertMetaRefreshUrl('foo.bar', $response->getContent());
     }
 
     /**
@@ -79,5 +75,38 @@ class RedirectResponseTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\RedirectResponse', $response);
         $this->assertEquals(301, $response->getStatusCode());
+    }
+
+    /** @dataProvider provideUrlencodedUrls */
+    public function testVariousEncodingUrls($urlencodedUrl)
+    {
+        # This is necessary due to http://www.php.net/manual/en/function.htmlspecialchars.php#102871:
+        ini_set('display_errors', false);
+
+        // $urlencodedUrl is what is sent by the browser on the HTTP level
+        $decoded = urldecode($urlencodedUrl); // This is what we get in PHP (webserver does the decoding)
+        $test = "/test-";
+
+        $response = RedirectResponse::create($test.$decoded);
+
+        $this->assertEquals($test.$urlencodedUrl, $response->headers->get('Location'));
+        $this->assertMetaRefreshUrl($test.$decoded, $response->getContent());
+    }
+
+    public function provideUrlencodedUrls() {
+        return array(
+            array("%C3%A4"), // german umlaut, utf-8 and url-encoded
+            array("%E4"), // german umlaut, latin-1 and url-encoded
+        );
+    }
+
+    protected function assertMetaRefreshUrl($url, $content)
+    {
+        $url = preg_quote($url, '#');
+
+        $this->assertEquals(1, preg_match(
+            '#<meta http-equiv="refresh" content="\d+;url='.$url.'" />#',
+            preg_replace(array('/\s+/', '/\'/'), array(' ', '"'), $content)
+        ));
     }
 }

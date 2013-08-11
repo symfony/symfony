@@ -22,7 +22,7 @@ use Symfony\Component\Finder\SplFileInfo;
 class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
 {
     /**
-     * @var boolean
+     * @var Boolean
      */
     private $ignoreUnreadableDirs;
 

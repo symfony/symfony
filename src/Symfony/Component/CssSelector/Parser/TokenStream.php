@@ -30,7 +30,7 @@ class TokenStream
     private $tokens = array();
 
     /**
-     * @var boolean
+     * @var Boolean
      */
     private $frozen = false;
 
@@ -50,7 +50,7 @@ class TokenStream
     private $peeked = null;
 
     /**
-     * @var boolean
+     * @var Boolean
      */
     private $peeking = false;
 

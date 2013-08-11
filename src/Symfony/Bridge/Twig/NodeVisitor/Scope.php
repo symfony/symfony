@@ -32,7 +32,7 @@ class Scope
     private $data;
 
     /**
-     * @var boolean
+     * @var Boolean
      */
     private $left;
 

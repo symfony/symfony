@@ -102,7 +102,12 @@ class RedirectResponse extends Response
          * otherwise latin-1 site lead browsers to request url-encoded multibyte sequences
          * instead of (urlencoded) single-byte non-ascii chars (umlauts for example).
          */
-        $encoding = mb_detect_encoding($url, 'UTF-8, ISO-8859-1, ISO-8859-15, cp866, cp1251, cp1252, KOI8-R');
+        if (function_exists('mb_detect_encoding')) {
+            $encoding = mb_detect_encoding($url, 'UTF-8, ISO-8859-1, ISO-8859-15, cp866, cp1251, cp1252, KOI8-R');
+        } else {
+            $encoding = 'utf-8'; // as it was previously assumed
+        }
+
         $urlencodedUrl = implode("/", array_map("rawurlencode", explode("/", $url)));
 
         $this->setContent(

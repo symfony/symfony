@@ -62,10 +62,8 @@ class StopwatchExtensionTest extends TestCase
         return array(
             array('{% stopwatch foo %}something{% endstopwatch %}', 'foo'),
             array('{% stopwatch foo %}symfony2 is fun{% endstopwatch %}{% stopwatch bar %}something{% endstopwatch %}', array('foo', 'bar')),
-
             array('{% stopwatch foo %}something{% endstopwatch foo %}', 'foo'),
-
-            array("{% stopwatch 'foo.bar' %}something{% endstopwatch %}", 'foo.bar'),
+            array('{% stopwatch "foo.bar" %}something{% endstopwatch %}', 'foo.bar'),
         );
     }
 

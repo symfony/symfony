@@ -22,11 +22,11 @@ class StopwatchNode extends \Twig_Node
     {
         parent::__construct(array('body' => $body), array('name' => $name), $lineno, $tag);
     }
- 
+
     public function compile(\Twig_Compiler $compiler)
     {
         $name = $this->getAttribute('name');
- 
+
         $compiler
             ->write('$this->env->getExtension(\'stopwatch\')->startEvent(\''.$name.'\');')
             ->subcompile($this->getNode('body'))

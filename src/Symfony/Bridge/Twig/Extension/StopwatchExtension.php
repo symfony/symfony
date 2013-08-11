@@ -22,12 +22,12 @@ use Symfony\Bridge\Twig\TokenParser\StopwatchTokenParser;
 class StopwatchExtension extends \Twig_Extension
 {
     private $stopwatch;
- 
+
     public function __construct(Stopwatch $stopwatch = null)
     {
         $this->stopwatch = $stopwatch;
     }
- 
+
     public function getTokenParsers()
     {
         return array(
@@ -39,19 +39,19 @@ class StopwatchExtension extends \Twig_Extension
             new StopwatchTokenParser($this->stopwatch !== null),
         );
     }
- 
+
     public function getName()
     {
         return 'stopwatch';
     }
- 
+
     public function startEvent($name)
     {
         if ($this->stopwatch instanceof Stopwatch) {
             $this->stopwatch->start($name, 'template');
         }
     }
- 
+
     public function stopEvent($name)
     {
         if ($this->stopwatch instanceof Stopwatch) {

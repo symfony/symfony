@@ -25,12 +25,10 @@ class StopwatchNode extends \Twig_Node
 
     public function compile(\Twig_Compiler $compiler)
     {
-        $name = $this->getAttribute('name');
-
         $compiler
-            ->write('$this->env->getExtension(\'stopwatch\')->startEvent(\''.$name.'\');')
+            ->write(sprintf("\$this->env->getExtension('stopwatch')->getStopwatch()->start('%s', 'template');\n", $this->getAttribute('name')))
             ->subcompile($this->getNode('body'))
-            ->write('$this->env->getExtension(\'stopwatch\')->stopEvent(\''.$name.'\');')
-            ->raw("\n");
+            ->write(sprintf("\$this->env->getExtension('stopwatch')->getStopwatch()->stop('%s');\n", $this->getAttribute('name')))
+        ;
     }
 }

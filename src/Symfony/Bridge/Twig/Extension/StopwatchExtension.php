@@ -28,6 +28,11 @@ class StopwatchExtension extends \Twig_Extension
         $this->stopwatch = $stopwatch;
     }
 
+    public function getStopwatch()
+    {
+        return $this->stopwatch;
+    }
+
     public function getTokenParsers()
     {
         return array(
@@ -43,19 +48,5 @@ class StopwatchExtension extends \Twig_Extension
     public function getName()
     {
         return 'stopwatch';
-    }
-
-    public function startEvent($name)
-    {
-        if ($this->stopwatch instanceof Stopwatch) {
-            $this->stopwatch->start($name, 'template');
-        }
-    }
-
-    public function stopEvent($name)
-    {
-        if ($this->stopwatch instanceof Stopwatch) {
-            $this->stopwatch->stop($name);
-        }
     }
 }

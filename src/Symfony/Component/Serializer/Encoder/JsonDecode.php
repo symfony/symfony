@@ -68,7 +68,7 @@ class JsonDecode implements DecoderInterface
      *
      * The $context array is a simple key=>value array, with the following supported keys:
      *
-     * json_decode_associative: boolean
+     * json_decode_associative: Boolean
      *      If true, returns the object as associative array.
      *      If false, returns the object as nested StdClass
      *      If not specified, this method will use the default set in JsonDecode::__construct

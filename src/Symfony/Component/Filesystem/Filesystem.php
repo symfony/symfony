@@ -342,7 +342,7 @@ class Filesystem
      * @param string       $originDir The origin directory
      * @param string       $targetDir The target directory
      * @param \Traversable $iterator  A Traversable instance
-     * @param array        $options   An array of boolean options
+     * @param array        $options   An array of Boolean options
      *                               Valid options are:
      *                                 - $options['override'] Whether to override an existing file on copy or not (see copy())
      *                                 - $options['copy_on_windows'] Whether to copy files instead of links on Windows (see symlink())

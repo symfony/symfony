@@ -18,7 +18,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
  * This node represents a scalar value in the config tree.
  *
  * The following values are considered scalars:
- *   * booleans
+ *   * Booleans
  *   * strings
  *   * null
  *   * integers

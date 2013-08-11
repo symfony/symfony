@@ -143,7 +143,7 @@ class DoctrineDataCollector extends DataCollector
     /**
      * Sanitizes a param.
      *
-     * The return value is an array with the sanitized value and a boolean
+     * The return value is an array with the sanitized value and a Boolean
      * indicating if the original value was kept (allowing to use the sanitized
      * value to explain the query).
      *

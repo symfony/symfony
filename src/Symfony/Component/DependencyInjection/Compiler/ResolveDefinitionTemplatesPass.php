@@ -127,7 +127,7 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
                 throw new RuntimeException(sprintf('Invalid argument key "%s" found.', $k));
             }
 
-            $index = (integer) substr($k, strlen('index_'));
+            $index = (int) substr($k, strlen('index_'));
             $def->replaceArgument($index, $v);
         }
 

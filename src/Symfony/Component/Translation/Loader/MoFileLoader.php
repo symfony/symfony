@@ -177,6 +177,6 @@ class MoFileLoader extends ArrayLoader implements LoaderInterface
         $result = unpack($isBigEndian ? 'N1' : 'V1', fread($stream, 4));
         $result = current($result);
 
-        return (integer) substr($result, -8);
+        return (int) substr($result, -8);
     }
 }

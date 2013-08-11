@@ -69,7 +69,7 @@ class Cookie
             $this->rawValue = urlencode($value);
         }
         $this->name     = $name;
-        $this->expires  = null === $expires ? null : (integer) $expires;
+        $this->expires  = null === $expires ? null : (int) $expires;
         $this->path     = empty($path) ? '/' : $path;
         $this->domain   = $domain;
         $this->secure   = (Boolean) $secure;

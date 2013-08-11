@@ -97,12 +97,12 @@ class IntlDateFormatter
     );
 
     /**
-     * @var int
+     * @var integer
      */
     private $datetype;
 
     /**
-     * @var int
+     * @var integer
      */
     private $timetype;
 

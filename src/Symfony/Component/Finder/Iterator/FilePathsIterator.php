@@ -26,7 +26,7 @@ class FilePathsIterator extends \ArrayIterator
     private $baseDir;
 
     /**
-     * @var int
+     * @var integer
      */
     private $baseDirLength;
 

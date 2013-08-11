@@ -35,7 +35,7 @@ class NodeExtension extends AbstractExtension
     private $translator;
 
     /**
-     * @var int
+     * @var integer
      */
     private $flags;
 

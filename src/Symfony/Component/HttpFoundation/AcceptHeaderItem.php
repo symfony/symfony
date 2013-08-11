@@ -29,7 +29,7 @@ class AcceptHeaderItem
     private $quality = 1.0;
 
     /**
-     * @var int
+     * @var integer
      */
     private $index = 0;
 

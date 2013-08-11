@@ -142,7 +142,7 @@ class NumberFormatter
     protected $errorMessage = 'U_ZERO_ERROR';
 
     /**
-     * @var int
+     * @var integer
      */
     private $style;
 

@@ -28,17 +28,17 @@ class Specificity
     const C_FACTOR = 1;
 
     /**
-     * @var int
+     * @var integer
      */
     private $a;
 
     /**
-     * @var int
+     * @var integer
      */
     private $b;
 
     /**
-     * @var int
+     * @var integer
      */
     private $c;
 

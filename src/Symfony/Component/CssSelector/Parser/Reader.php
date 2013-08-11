@@ -27,12 +27,12 @@ class Reader
     private $source;
 
     /**
-     * @var int
+     * @var integer
      */
     private $length;
 
     /**
-     * @var int
+     * @var integer
      */
     private $position;
 

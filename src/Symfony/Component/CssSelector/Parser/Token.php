@@ -30,7 +30,7 @@ class Token
     const TYPE_STRING     = 'string';
 
     /**
-     * @var int
+     * @var integer
      */
     private $type;
 
@@ -40,7 +40,7 @@ class Token
     private $value;
 
     /**
-     * @var int
+     * @var integer
      */
     private $position;
 

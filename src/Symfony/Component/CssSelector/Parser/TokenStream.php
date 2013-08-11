@@ -40,7 +40,7 @@ class TokenStream
     private $used = array();
 
     /**
-     * @var int
+     * @var integer
      */
     private $cursor = 0;
 

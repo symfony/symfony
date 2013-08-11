@@ -79,7 +79,7 @@ class Expression implements ValueInterface
     }
 
     /**
-     * @return int
+     * @return integer
      */
     public function getType()
     {

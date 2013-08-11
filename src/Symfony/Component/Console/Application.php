@@ -802,7 +802,7 @@ class Application
     /**
      * Tries to figure out the terminal width in which this application runs
      *
-     * @return int|null
+     * @return integer|null
      */
     protected function getTerminalWidth()
     {
@@ -814,7 +814,7 @@ class Application
     /**
      * Tries to figure out the terminal height in which this application runs
      *
-     * @return int|null
+     * @return integer|null
      */
     protected function getTerminalHeight()
     {

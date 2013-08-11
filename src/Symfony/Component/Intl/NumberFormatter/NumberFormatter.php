@@ -393,7 +393,7 @@ class NumberFormatter
     /**
      * Returns formatter's last error code. Always returns the U_ZERO_ERROR class constant value
      *
-     * @return int The error code from last formatter call
+     * @return integer The error code from last formatter call
      *
      * @see http://www.php.net/manual/en/numberformatter.geterrorcode.php
      */
@@ -730,7 +730,7 @@ class NumberFormatter
      * @param integer|float $value     The value to get the precision from if the FRACTION_DIGITS attribute is unitialized
      * @param integer       $precision The precision value to returns if the FRACTION_DIGITS attribute is initialized
      *
-     * @return int The precision value
+     * @return integer The precision value
      */
     private function getUnitializedPrecision($value, $precision)
     {
@@ -786,7 +786,7 @@ class NumberFormatter
      *
      * @param mixed $value The value to be converted
      *
-     * @return int The converted value
+     * @return integer The converted value
      */
     private function getInt32Value($value)
     {
@@ -802,7 +802,7 @@ class NumberFormatter
      *
      * @param mixed $value The value to be converted
      *
-     * @return int|float       The converted value
+     * @return integer|float The converted value
      *
      * @see https://bugs.php.net/bug.php?id=59597 Bug #59597
      */
@@ -867,7 +867,7 @@ class NumberFormatter
      *
      * @param mixed $value The value to be normalized
      *
-     * @return int The normalized value for the attribute (0 or 1)
+     * @return integer The normalized value for the attribute (0 or 1)
      */
     private function normalizeGroupingUsedValue($value)
     {
@@ -880,7 +880,7 @@ class NumberFormatter
      *
      * @param mixed $value The value to be normalized
      *
-     * @return int The normalized value for the attribute
+     * @return integer The normalized value for the attribute
      */
     private function normalizeFractionDigitsValue($value)
     {

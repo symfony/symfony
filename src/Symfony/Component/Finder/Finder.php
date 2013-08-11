@@ -737,7 +737,7 @@ class Finder implements \IteratorAggregate, \Countable
     /**
      * Counts all the results collected by the iterators.
      *
-     * @return int
+     * @return integer
      */
     public function count()
     {

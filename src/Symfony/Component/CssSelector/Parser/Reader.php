@@ -55,7 +55,7 @@ class Reader
     }
 
     /**
-     * @return int
+     * @return integer
      */
     public function getPosition()
     {
@@ -63,7 +63,7 @@ class Reader
     }
 
     /**
-     * @return int
+     * @return integer
      */
     public function getRemainingLength()
     {
@@ -84,7 +84,7 @@ class Reader
     /**
      * @param string $string
      *
-     * @return int
+     * @return integer
      */
     public function getOffset($string)
     {

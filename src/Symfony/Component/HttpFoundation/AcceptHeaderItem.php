@@ -163,7 +163,7 @@ class AcceptHeaderItem
     /**
      * Returns the item index.
      *
-     * @return int
+     * @return integer
      */
     public function getIndex()
     {

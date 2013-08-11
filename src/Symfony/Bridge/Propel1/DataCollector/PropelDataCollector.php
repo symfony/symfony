@@ -83,7 +83,7 @@ class PropelDataCollector extends DataCollector
     /**
      * Returns the query count.
      *
-     * @return int The query count
+     * @return integer The query count
      */
     public function getQueryCount()
     {
@@ -138,7 +138,7 @@ class PropelDataCollector extends DataCollector
     /**
      * Count queries.
      *
-     * @return int The number of queries.
+     * @return integer The number of queries.
      */
     private function countQueries()
     {

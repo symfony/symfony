@@ -296,7 +296,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
     /**
      * Returns the number of parameters.
      *
-     * @return int The number of parameters
+     * @return integer The number of parameters
      */
     public function count()
     {

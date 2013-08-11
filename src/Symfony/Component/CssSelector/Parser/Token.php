@@ -57,7 +57,7 @@ class Token
     }
 
     /**
-     * @return int
+     * @return integer
      */
     public function getType()
     {
@@ -73,7 +73,7 @@ class Token
     }
 
     /**
-     * @return int
+     * @return integer
      */
     public function getPosition()
     {

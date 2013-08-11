@@ -380,7 +380,7 @@ class TableHelper extends Helper
     /**
      * Gets number of columns for this table.
      *
-     * @return int
+     * @return integer
      */
     private function getNumberOfColumns()
     {
@@ -402,7 +402,7 @@ class TableHelper extends Helper
      *
      * @param integer $column
      *
-     * @return int
+     * @return integer
      */
     private function getColumnWidth($column)
     {
@@ -425,7 +425,7 @@ class TableHelper extends Helper
      * @param array   $row
      * @param integer $column
      *
-     * @return int
+     * @return integer
      */
     private function getCellWidth(array $row, $column)
     {

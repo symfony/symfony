@@ -125,7 +125,7 @@ class Collator
      * @param string $str1 The first string to compare
      * @param string $str2 The second string to compare
      *
-     * @return Boolean|int     Return the comparison result or false on failure:
+     * @return Boolean|integer Return the comparison result or false on failure:
      *                         1 if $str1 is greater than $str2
      *                         0 if $str1 is equal than $str2
      *                         -1 if $str1 is less than $str2
@@ -144,7 +144,7 @@ class Collator
      *
      * @param integer $attr An attribute specifier, one of the attribute constants
      *
-     * @return Boolean|int   The attribute value on success or false on error
+     * @return Boolean|integer The attribute value on success or false on error
      *
      * @see http://www.php.net/manual/en/collator.getattribute.php
      *
@@ -158,7 +158,7 @@ class Collator
     /**
      * Returns collator's last error code. Always returns the U_ZERO_ERROR class constant value
      *
-     * @return int The error code from last collator call
+     * @return integer The error code from last collator call
      */
     public function getErrorCode()
     {
@@ -207,7 +207,7 @@ class Collator
     /**
      * Not supported. Get current collator's strength
      *
-     * @return Boolean|int   The current collator's strength or false on failure
+     * @return Boolean|integer The current collator's strength or false on failure
      *
      * @see http://www.php.net/manual/en/collator.getstrength.php
      *

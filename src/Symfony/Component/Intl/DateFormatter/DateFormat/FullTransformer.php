@@ -134,7 +134,7 @@ class FullTransformer
      * @param \DateTime $dateTime A configured DateTime object to use to perform the date calculation
      * @param string   $value    String to convert to a time value
      *
-     * @return int                       The corresponding Unix timestamp
+     * @return integer The corresponding Unix timestamp
      *
      * @throws \InvalidArgumentException  When the value can not be matched with pattern
      */
@@ -285,7 +285,7 @@ class FullTransformer
      * @param \DateTime $dateTime The DateTime object to be used to calculate the timestamp
      * @param array     $options  An array with the matched values to be used to calculate the timestamp
      *
-     * @return Boolean|int        The calculated timestamp or false if matched date is invalid
+     * @return Boolean|integer The calculated timestamp or false if matched date is invalid
      */
     protected function calculateUnixTimestamp(\DateTime $dateTime, array $options)
     {

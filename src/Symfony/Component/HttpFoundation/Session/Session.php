@@ -151,7 +151,7 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     /**
      * Returns the number of attributes.
      *
-     * @return int The number of attributes
+     * @return integer The number of attributes
      */
     public function count()
     {

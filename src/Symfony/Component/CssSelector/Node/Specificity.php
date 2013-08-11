@@ -69,7 +69,7 @@ class Specificity
     /**
      * Returns global specificity value.
      *
-     * @return int
+     * @return integer
      */
     public function getValue()
     {

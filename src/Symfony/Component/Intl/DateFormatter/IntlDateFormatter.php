@@ -263,7 +263,7 @@ class IntlDateFormatter
     /**
      * Returns the formatter's calendar
      *
-     * @return int The calendar being used by the formatter. Currently always returns
+     * @return integer The calendar being used by the formatter. Currently always returns
      *             IntlDateFormatter::GREGORIAN.
      *
      * @see http://www.php.net/manual/en/intldateformatter.getcalendar.php
@@ -290,7 +290,7 @@ class IntlDateFormatter
     /**
      * Returns the formatter's datetype
      *
-     * @return int The current value of the formatter
+     * @return integer The current value of the formatter
      *
      * @see http://www.php.net/manual/en/intldateformatter.getdatetype.php
      */
@@ -302,7 +302,7 @@ class IntlDateFormatter
     /**
      * Returns formatter's last error code. Always returns the U_ZERO_ERROR class constant value
      *
-     * @return int The error code from last formatter call
+     * @return integer The error code from last formatter call
      *
      * @see http://www.php.net/manual/en/intldateformatter.geterrorcode.php
      */

@@ -212,7 +212,7 @@ class Command
     /**
      * Counts bits stored in command.
      *
-     * @return int The bits count
+     * @return integer The bits count
      */
     public function length()
     {

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Process\Tests;
 
+use Symfony\Component\Process\ProcessableInterface;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\RuntimeException;
@@ -18,7 +19,7 @@ use Symfony\Component\Process\Exception\RuntimeException;
 /**
  * @author Robert Schönthal <seroscho@googlemail.com>
  */
-abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractProcessTest extends ProcessableTestCase
 {
     /**
      * @expectedException \Symfony\Component\Process\Exception\InvalidArgumentException
@@ -44,26 +45,6 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $p->setTimeout(null);
 
         $this->assertNull($p->getTimeout());
-    }
-
-    public function testStopWithTimeoutIsActuallyWorking()
-    {
-        $this->verifyPosixIsEnabled();
-
-        // exec is mandatory here since we send a signal to the process
-        // see https://github.com/symfony/symfony/issues/5030 about prepending
-        // command with exec
-        $p = $this->getProcess('exec php '.__DIR__.'/NonStopableProcess.php 3');
-        $p->start();
-        usleep(100000);
-        $start = microtime(true);
-        $p->stop(1.1, SIGKILL);
-        while ($p->isRunning()) {
-            usleep(1000);
-        }
-        $duration = microtime(true) - $start;
-
-        $this->assertLessThan(1.8, $duration);
     }
 
     public function testCallbacksAreExecutedWithStart()
@@ -136,18 +117,6 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $process = $this->getProcess(sprintf('echo %s %s echo %s', $input, $operator, $input));
         $process->run();
         $this->assertEquals($expected, $process->getOutput());
-    }
-
-    public function testCallbackIsExecutedForOutput()
-    {
-        $p = $this->getProcess(sprintf('php -r %s', escapeshellarg('echo \'foo\';')));
-
-        $called = false;
-        $p->run(function ($type, $buffer) use (&$called) {
-            $called = $buffer === 'foo';
-        });
-
-        $this->assertTrue($called, 'The callback should be executed with the output');
     }
 
     public function testGetErrorOutput()
@@ -225,15 +194,6 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Misuse of shell builtins', $process->getExitCodeText());
     }
 
-    public function testStartIsNonBlocking()
-    {
-        $process = $this->getProcess('php -r "sleep(4);"');
-        $start = microtime(true);
-        $process->start();
-        $end = microtime(true);
-        $this->assertLessThan(1 , $end-$start);
-    }
-
     public function testUpdateStatus()
     {
         $process = $this->getProcess('php -h');
@@ -267,62 +227,6 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $process = $this->getProcess('php -m');
         $process->run();
         $this->assertEquals(0, $process->getExitCode());
-    }
-
-    public function testStatus()
-    {
-        $process = $this->getProcess('php -r "usleep(500000);"');
-        $this->assertFalse($process->isRunning());
-        $this->assertFalse($process->isStarted());
-        $this->assertFalse($process->isTerminated());
-        $this->assertSame(Process::STATUS_READY, $process->getStatus());
-        $process->start();
-        $this->assertTrue($process->isRunning());
-        $this->assertTrue($process->isStarted());
-        $this->assertFalse($process->isTerminated());
-        $this->assertSame(Process::STATUS_STARTED, $process->getStatus());
-        $process->wait();
-        $this->assertFalse($process->isRunning());
-        $this->assertTrue($process->isStarted());
-        $this->assertTrue($process->isTerminated());
-        $this->assertSame(Process::STATUS_TERMINATED, $process->getStatus());
-    }
-
-    public function testStop()
-    {
-        $process = $this->getProcess('php -r "sleep(4);"');
-        $process->start();
-        $this->assertTrue($process->isRunning());
-        $process->stop();
-        $this->assertFalse($process->isRunning());
-    }
-
-    public function testIsSuccessful()
-    {
-        $process = $this->getProcess('php -m');
-        $process->run();
-        $this->assertTrue($process->isSuccessful());
-    }
-
-    public function testIsSuccessfulOnlyAfterTerminated()
-    {
-        $process = $this->getProcess('php -r "sleep(1);"');
-        $process->start();
-        while ($process->isRunning()) {
-            $this->assertFalse($process->isSuccessful());
-            usleep(300000);
-        }
-
-        $this->assertTrue($process->isSuccessful());
-    }
-
-    public function testIsNotSuccessful()
-    {
-        $process = $this->getProcess('php -r "sleep(4);"');
-        $process->start();
-        $this->assertTrue($process->isRunning());
-        $process->stop();
-        $this->assertFalse($process->isSuccessful());
     }
 
     public function testProcessIsNotSignaled()
@@ -404,24 +308,6 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
         $this->setExpectedException('Symfony\Component\Process\Exception\RuntimeException', 'The process has been signaled with signal "9".');
         $process->wait();
-    }
-
-    public function testRestart()
-    {
-        $process1 = $this->getProcess('php -r "echo getmypid();"');
-        $process1->run();
-        $process2 = $process1->restart();
-
-        usleep(300000); // wait for output
-
-        // Ensure that both processed finished and the output is numeric
-        $this->assertFalse($process1->isRunning());
-        $this->assertFalse($process2->isRunning());
-        $this->assertTrue(is_numeric($process1->getOutput()));
-        $this->assertTrue(is_numeric($process2->getOutput()));
-
-        // Ensure that restart returned a new process by check that the output is different
-        $this->assertNotEquals($process1->getOutput(), $process2->getOutput());
     }
 
     public function testPhpDeadlock()
@@ -582,44 +468,6 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $process->signal(SIGHUP);
     }
 
-    private function verifyPosixIsEnabled()
-    {
-        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
-            $this->markTestSkipped('POSIX signals do not work on windows');
-        }
-        if (!defined('SIGUSR1')) {
-            $this->markTestSkipped('The pcntl extension is not enabled');
-        }
-    }
-
-    /**
-     * @expectedException Symfony\Component\Process\Exception\RuntimeException
-     */
-    public function testSignalWithWrongIntSignal()
-    {
-        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
-            $this->markTestSkipped('POSIX signals do not work on windows');
-        }
-
-        $process = $this->getProcess('php -r "sleep(3);"');
-        $process->start();
-        $process->signal(-4);
-    }
-
-    /**
-     * @expectedException Symfony\Component\Process\Exception\RuntimeException
-     */
-    public function testSignalWithWrongNonIntSignal()
-    {
-        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
-            $this->markTestSkipped('POSIX signals do not work on windows');
-        }
-
-        $process = $this->getProcess('php -r "sleep(3);"');
-        $process->start();
-        $process->signal('Céphalopodes');
-    }
-
     public function responsesCodeProvider()
     {
         return array(
@@ -669,6 +517,16 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         );
 
         return $defaults;
+    }
+
+    protected function createProcess($commandline)
+    {
+        return $this->getProcess($commandline);
+    }
+
+    protected function getOutput(ProcessableInterface $process)
+    {
+        return $process->getOutput();
     }
 
     /**

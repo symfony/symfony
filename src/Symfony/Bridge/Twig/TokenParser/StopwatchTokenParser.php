@@ -32,28 +32,17 @@ class StopwatchTokenParser extends \Twig_TokenParser
         $lineno = $token->getLine();
         $stream = $this->parser->getStream();
 
-        // {% stopwatch bar %}
-        if ($stream->test(\Twig_Token::NAME_TYPE)) {
-            $name = $stream->expect(\Twig_Token::NAME_TYPE)->getValue();
-        } else {
-            $name = $stream->expect(\Twig_Token::STRING_TYPE)->getValue();
-        }
+        // {% stopwatch 'bar' %}
+        $name = $this->parser->getExpressionParser()->parseExpression();
 
         $stream->expect(\Twig_Token::BLOCK_END_TYPE);
 
-        // {% endstopwatch %} or {% endstopwatch bar %}
+        // {% endstopwatch %}
         $body = $this->parser->subparse(array($this, 'decideStopwatchEnd'), true);
-        if ($stream->test(\Twig_Token::NAME_TYPE) || $stream->test(\Twig_Token::STRING_TYPE)) {
-            $value = $stream->next()->getValue();
-
-            if ($name != $value) {
-                throw new \Twig_Error_Syntax(sprintf('Expected endstopwatch for event "%s" (but "%s" given).', $name, $value));
-            }
-        }
         $stream->expect(\Twig_Token::BLOCK_END_TYPE);
 
         if ($this->stopwatchIsAvailable) {
-            return new StopwatchNode($name, $body, $lineno, $this->getTag());
+            return new StopwatchNode($name, $body, new \Twig_Node_Expression_AssignName($this->parser->getVarName(), $token->getLine()), $lineno, $this->getTag());
         }
 
         return $body;

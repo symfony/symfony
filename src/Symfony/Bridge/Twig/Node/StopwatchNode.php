@@ -18,17 +18,27 @@ namespace Symfony\Bridge\Twig\Node;
  */
 class StopwatchNode extends \Twig_Node
 {
-    public function __construct($name, $body, $lineno = 0, $tag = null)
+    public function __construct(\Twig_NodeInterface $name, $body, \Twig_Node_Expression_AssignName $var, $lineno = 0, $tag = null)
     {
-        parent::__construct(array('body' => $body), array('name' => $name), $lineno, $tag);
+        parent::__construct(array('body' => $body, 'name' => $name, 'var' => $var), array(), $lineno, $tag);
     }
 
     public function compile(\Twig_Compiler $compiler)
     {
         $compiler
-            ->write(sprintf("\$this->env->getExtension('stopwatch')->getStopwatch()->start('%s', 'template');\n", $this->getAttribute('name')))
+            ->addDebugInfo($this)
+            ->write('')
+            ->subcompile($this->getNode('var'))
+            ->raw(' = ')
+            ->subcompile($this->getNode('name'))
+            ->write(";\n")
+            ->write("\$this->env->getExtension('stopwatch')->getStopwatch()->start(")
+            ->subcompile($this->getNode('var'))
+            ->raw(", 'template');\n")
             ->subcompile($this->getNode('body'))
-            ->write(sprintf("\$this->env->getExtension('stopwatch')->getStopwatch()->stop('%s');\n", $this->getAttribute('name')))
+            ->write("\$this->env->getExtension('stopwatch')->getStopwatch()->stop(")
+            ->subcompile($this->getNode('var'))
+            ->raw(");\n")
         ;
     }
 }

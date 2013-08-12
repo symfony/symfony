@@ -24,12 +24,8 @@ use Symfony\Component\Process\Exception\RuntimeException;
  *
  * @api
  */
-class Process implements ProcessableInterface
+class Process implements ProcessInterface
 {
-    const STDIN = 0;
-    const STDOUT = 1;
-    const STDERR = 2;
-
     // Timeout Precision in seconds.
     const TIMEOUT_PRECISION = 0.2;
 
@@ -254,11 +250,7 @@ class Process implements ProcessableInterface
     }
 
     /**
-     * Returns the Pid (process identifier), if applicable.
-     *
-     * @return integer|null The process id if running, null otherwise
-     *
-     * @throws RuntimeException In case --enable-sigchild is activated
+     * {@inheritdoc}
      */
     public function getPid()
     {
@@ -292,11 +284,7 @@ class Process implements ProcessableInterface
     }
 
     /**
-     * Returns the current output of the process (STDOUT).
-     *
-     * @return string The process output
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function getOutput()
     {
@@ -324,11 +312,7 @@ class Process implements ProcessableInterface
     }
 
     /**
-     * Returns the current error output of the process (STDERR).
-     *
-     * @return string The process error output
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function getErrorOutput()
     {
@@ -357,13 +341,7 @@ class Process implements ProcessableInterface
     }
 
     /**
-     * Returns the exit code returned by the process.
-     *
-     * @return integer The exit status code
-     *
-     * @throws RuntimeException In case --enable-sigchild is activated and the sigchild compatibility mode is disabled
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function getExitCode()
     {
@@ -403,15 +381,7 @@ class Process implements ProcessableInterface
     }
 
     /**
-     * Returns true if the child process has been terminated by an uncaught signal.
-     *
-     * It always returns false on Windows.
-     *
-     * @return Boolean
-     *
-     * @throws RuntimeException In case --enable-sigchild is activated
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function hasBeenSignaled()
     {
@@ -425,15 +395,7 @@ class Process implements ProcessableInterface
     }
 
     /**
-     * Returns the number of the signal that caused the child process to terminate its execution.
-     *
-     * It is only meaningful if hasBeenSignaled() returns true.
-     *
-     * @return integer
-     *
-     * @throws RuntimeException In case --enable-sigchild is activated
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function getTermSignal()
     {
@@ -447,13 +409,7 @@ class Process implements ProcessableInterface
     }
 
     /**
-     * Returns true if the child process has been stopped by a signal.
-     *
-     * It always returns false on Windows.
-     *
-     * @return Boolean
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function hasBeenStopped()
     {
@@ -463,13 +419,7 @@ class Process implements ProcessableInterface
     }
 
     /**
-     * Returns the number of the signal that caused the child process to stop its execution.
-     *
-     * It is only meaningful if hasBeenStopped() returns true.
-     *
-     * @return integer
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function getStopSignal()
     {
@@ -592,9 +542,7 @@ class Process implements ProcessableInterface
     }
 
     /**
-     * Gets the process timeout.
-     *
-     * @return float|null The timeout in seconds or null if it's disabled
+     * {@inheritdoc}
      */
     public function getTimeout()
     {
@@ -602,9 +550,7 @@ class Process implements ProcessableInterface
     }
 
     /**
-     * Gets the process idle timeout.
-     *
-     * @return float|null
+     * {@inheritdoc}
      */
     public function getIdleTimeout()
     {
@@ -612,15 +558,7 @@ class Process implements ProcessableInterface
     }
 
     /**
-     * Sets the process timeout.
-     *
-     * To disable the timeout, set this value to null.
-     *
-     * @param integer|float|null $timeout The timeout in seconds
-     *
-     * @return self The current Process instance
-     *
-     * @throws InvalidArgumentException if the timeout is negative
+     * {@inheritdoc}
      */
     public function setTimeout($timeout)
     {
@@ -630,13 +568,7 @@ class Process implements ProcessableInterface
     }
 
     /**
-     * Sets the process idle timeout.
-     *
-     * @param integer|float|null $timeout
-     *
-     * @return self The current Process instance.
-     *
-     * @throws InvalidArgumentException if the timeout is negative
+     * {@inheritdoc}
      */
     public function setIdleTimeout($timeout)
     {

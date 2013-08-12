@@ -47,6 +47,22 @@ abstract class ProcessableTestCase extends \PHPUnit_Framework_TestCase
         $this->assertTrue($called, 'The callback should be executed with the output');
     }
 
+    public function testCallbacksAreExecutedWithStart()
+    {
+        $data = '';
+
+        $process = $this->createProcess('echo foo && php -r "sleep(1);" && echo foo');
+        $process->start(function ($type, $buffer) use (&$data) {
+            $data .= $buffer;
+        });
+
+        while ($process->isRunning()) {
+            usleep(10000);
+        }
+
+        $this->assertEquals(2, preg_match_all('/foo/', $data, $matches));
+    }
+
     public function testStartIsNonBlocking()
     {
         $process = $this->createProcess('php -r "sleep(4);"');

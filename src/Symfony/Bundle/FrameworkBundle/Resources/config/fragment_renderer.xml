@@ -9,6 +9,7 @@
         <parameter key="fragment.renderer.inline.class">Symfony\Component\HttpKernel\Fragment\InlineFragmentRenderer</parameter>
         <parameter key="fragment.renderer.hinclude.class">Symfony\Bundle\FrameworkBundle\Fragment\ContainerAwareHIncludeFragmentRenderer</parameter>
         <parameter key="fragment.renderer.hinclude.global_template"></parameter>
+        <parameter key="fragment.renderer.esi.class">Symfony\Component\HttpKernel\Fragment\EsiFragmentRenderer</parameter>
         <parameter key="fragment.path">/_fragment</parameter>
     </parameters>
 
@@ -31,6 +32,13 @@
             <argument type="service" id="service_container" />
             <argument type="service" id="uri_signer" />
             <argument>%fragment.renderer.hinclude.global_template%</argument>
+            <call method="setFragmentPath"><argument>%fragment.path%</argument></call>
+        </service>
+
+        <service id="fragment.renderer.esi" class="%fragment.renderer.esi.class%">
+            <tag name="kernel.fragment_renderer" />
+            <argument type="service" id="esi" on-invalid="null" />
+            <argument type="service" id="fragment.renderer.inline" />
             <call method="setFragmentPath"><argument>%fragment.path%</argument></call>
         </service>
     </services>

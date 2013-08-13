@@ -104,6 +104,7 @@ class XmlUtilsTest extends \PHPUnit_Framework_TestCase
     public function getDataForPhpize()
     {
         return array(
+            array('', ''),
             array(null, 'null'),
             array(true, 'true'),
             array(false, 'false'),

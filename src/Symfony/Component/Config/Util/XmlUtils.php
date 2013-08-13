@@ -187,7 +187,7 @@ class XmlUtils
                 $cast = intval($value);
 
                 return '0' == $value[0] ? octdec($value) : (((string) $raw == (string) $cast) ? $cast : $raw);
-            case '-' === $value[0] && ctype_digit(substr($value, 1)):
+            case isset($value[1]) && '-' === $value[0] && ctype_digit(substr($value, 1)):
                 $raw = $value;
                 $cast = intval($value);
 

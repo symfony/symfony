@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-08-11T20:59:38Z
+
+The main differences with the original PR are:
+
+* I have removed the code that checks is stopwatch is available as the check is already done during compilation
+* I have removed the check for names that was already used as it is not needed (the stopwatch knows how to deal with such cases).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-08-12T06:33:09Z
+
+I've made further modifications:
+
+ * The stopwatch name can now be any valid expression (more consistent with the other Twig built-in tags)
+ * I've removed the possibility to add the name after endstopwatch (because of the previous change and also for more consistency)

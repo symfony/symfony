@@ -631,12 +631,10 @@ class Process
      */
     public function stop($timeout = 10)
     {
-        $timeoutMicro = (int) $timeout*1E6;
+        $timeoutMicro = microtime(true) + $timeout;
         if ($this->isRunning()) {
             proc_terminate($this->process);
-            $time = 0;
-            while (1 == $this->isRunning() && $time < $timeoutMicro) {
-                $time += 1000;
+            while ($this->isRunning() && microtime(true) < $timeoutMicro) {
                 usleep(1000);
             }
 

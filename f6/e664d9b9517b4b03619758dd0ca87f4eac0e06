@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by romainneutron at 2013-08-13T16:36:18Z
+
+some internal calls of `Process::updateStatus` may need an update after merging this in 2.3 (`Process::getPid`, probably some other)
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2013-08-13T19:00:56Z
+
+Tests are failing because of another test suite than Process :
+
+```
+Symfony\Component\Config\Tests\Resource\DirectoryResourceTest::testIsFreshDeleteFile
+->isFresh() returns false if an existing file is removed
+Failed asserting that true is false.
+```

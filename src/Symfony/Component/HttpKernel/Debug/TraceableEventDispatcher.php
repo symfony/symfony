@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Debug;
 
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Psr\Log\LoggerInterface;
@@ -366,17 +367,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
 
     private function preDispatch($eventName, Event $event)
     {
-        // wrap all listeners before they are called
-        $this->wrappedListeners[$this->id] = new \SplObjectStorage();
-
-        $listeners = $this->dispatcher->getListeners($eventName);
-
-        foreach ($listeners as $listener) {
-            $this->dispatcher->removeListener($eventName, $listener);
-            $wrapped = $this->wrapListener($eventName, $listener);
-            $this->wrappedListeners[$this->id][$wrapped] = $listener;
-            $this->dispatcher->addListener($eventName, $wrapped);
-        }
+        $this->wrapOneEventListeners($eventName);
 
         switch ($eventName) {
             case KernelEvents::REQUEST:
@@ -432,9 +423,63 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
                 break;
         }
 
+        $this->unwrapOneEventListeners($eventName);
+    }
+
+    private function wrapOneEventListeners($eventName)
+    {
+        // wrap all listeners before they are called
+        $this->wrappedListeners[$this->id] = new \SplObjectStorage();
+
+        if ($this->dispatcher instanceof EventDispatcher) {
+            $ref = new \ReflectionProperty('\Symfony\Component\EventDispatcher\EventDispatcher','listeners');
+            $ref->setAccessible(true);
+            $allListeners = $ref->getValue($this->dispatcher);
+            if (!isset($allListeners[$eventName])){
+                return;
+            }
+            foreach($allListeners[$eventName] as $priority=>$listeners){
+                foreach($listeners as $listener){
+                    $this->dispatcher->removeListener($eventName, $listener);
+                    $wrapped = $this->wrapListener($eventName, $listener);
+                    $this->wrappedListeners[$this->id][$wrapped] = array('listener'=>$listener,'priority'=>$priority);
+                    $this->dispatcher->addListener($eventName, $wrapped, $priority);
+                }
+            }
+            return;
+        }
+
+        $listeners = $this->dispatcher->getListeners($eventName);
+
+        foreach ($listeners as $listener) {
+            $this->dispatcher->removeListener($eventName, $listener);
+            $wrapped = $this->wrapListener($eventName, $listener);
+            $this->wrappedListeners[$this->id][$wrapped] = array('listener'=>$listener,'priority'=>0);
+            $this->dispatcher->addListener($eventName, $wrapped);
+        }
+    }
+
+    private function unwrapOneEventListeners($eventName)
+    {
+        if ($this->dispatcher instanceof EventDispatcher) {
+            $ref = new \ReflectionProperty('\Symfony\Component\EventDispatcher\EventDispatcher','listeners');
+            $ref->setAccessible(true);
+            $allListeners = $ref->getValue($this->dispatcher);
+            if (!isset($allListeners[$eventName])){
+                return;
+            }
+            foreach($this->wrappedListeners[$this->id] as $wrapped){
+                    $this->dispatcher->removeListener($eventName, $wrapped);
+                    $this->dispatcher->addListener($eventName,
+                        $this->wrappedListeners[$this->id][$wrapped]['listener'],
+                        $this->wrappedListeners[$this->id][$wrapped]['priority']);
+            }
+            return;
+        }
+
         foreach ($this->wrappedListeners[$this->id] as $wrapped) {
             $this->dispatcher->removeListener($eventName, $wrapped);
-            $this->dispatcher->addListener($eventName, $this->wrappedListeners[$this->id][$wrapped]);
+            $this->dispatcher->addListener($eventName, $this->wrappedListeners[$this->id][$wrapped]['listener']);
         }
 
         unset($this->wrappedListeners[$this->id]);
@@ -457,11 +502,12 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
         };
     }
 
+
     private function unwrapListener($listener)
     {
         // get the original listener
         if (is_object($listener) && isset($this->wrappedListeners[$this->id][$listener])) {
-            return $this->wrappedListeners[$this->id][$listener];
+            return $this->wrappedListeners[$this->id][$listener]['listener'];
         }
 
         return $listener;

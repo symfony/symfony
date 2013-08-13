@@ -159,6 +159,30 @@ class TraceableEventDispatcherTest extends \PHPUnit_Framework_TestCase
         $dispatcher->dispatch('foo');
     }
 
+     public function testDispatchByPriority()
+     {
+         $invoked = array();
+         $listener1 = function () use (&$invoked) {
+             $invoked[] = '1';
+         };
+         $listener2 = function () use (&$invoked) {
+             $invoked[] = '2';
+         };
+         $listener3 = function () use (&$invoked) {
+             $invoked[] = '3';
+         };
+         $dispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
+         $dispatcher->addListener('pre.foo', $listener1, -10);
+         $dispatcher->addListener('pre.foo', $listener2);
+         $dispatcher->dispatch('pre.foo');
+         $this->assertEquals(array('2', '1'), $invoked);
+         
+         $invoked = array();
+         $dispatcher->addListener('pre.foo', $listener3, -5);
+         $dispatcher->dispatch(('pre.foo'));
+         $this->assertEquals(array('2', '3', '1'), $invoked);
+     }
+
     public function testStopwatchSections()
     {
         $dispatcher = new TraceableEventDispatcher(new EventDispatcher(), $stopwatch = new Stopwatch());

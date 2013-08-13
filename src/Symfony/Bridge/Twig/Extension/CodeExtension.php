@@ -137,7 +137,9 @@ class CodeExtension extends \Twig_Extension
     public function fileExcerpt($file, $line)
     {
         if (is_readable($file)) {
-            $code = highlight_file($file, true);
+            // highlight_file could throw warnings
+            // see https://bugs.php.net/bug.php?id=25725
+            $code = @highlight_file($file, true);
             // remove main code/span tags
             $code = preg_replace('#^<code.*?>\s*<span.*?>(.*)</span>\s*</code>#s', '\\1', $code);
             $content = preg_split('#<br />#', $code);

@@ -375,7 +375,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
             $this->dispatcher->removeListener($eventName, $listener);
             $wrapped = $this->wrapListener($eventName, $listener);
             $this->wrappedListeners[$this->id][$wrapped] = $listener;
-            $this->dispatcher->addListener($eventName, $wrapped);
+            $this->dispatcher->addListener($eventName, $wrapped, $this->getListenerPriority($eventName, $listener));
         }
 
         switch ($eventName) {
@@ -434,7 +434,8 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
 
         foreach ($this->wrappedListeners[$this->id] as $wrapped) {
             $this->dispatcher->removeListener($eventName, $wrapped);
-            $this->dispatcher->addListener($eventName, $this->wrappedListeners[$this->id][$wrapped]);
+            $listener = $this->wrappedListeners[$this->id][$wrapped];
+            $this->dispatcher->addListener($eventName, $listener, $this->getListenerPriority($eventName, $listener));
         }
 
         unset($this->wrappedListeners[$this->id]);
@@ -465,5 +466,23 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
         }
 
         return $listener;
+    }
+
+    private function getListenerPriority($eventName, $listener)
+    {
+        $reflection = new \ReflectionProperty(get_class($this->dispatcher), 'listeners');
+        $reflection->setAccessible(true);
+        $listeners = $reflection->getValue($this->dispatcher);
+        if (!isset($listeners[$eventName])) {
+            return 0;
+        }
+
+        foreach ($listeners[$eventName] as $priority => $listeners) {
+            if (false !== array_search($listener, $listeners, true)) {
+                return $priority;
+            }
+        }
+
+        return 0;
     }
 }

@@ -35,7 +35,7 @@ class EsiFragmentRenderer extends RoutableFragmentRenderer
      * @param Esi                    $esi            An Esi instance
      * @param InlineFragmentRenderer $inlineStrategy The inline strategy to use when ESI is not supported
      */
-    public function __construct(Esi $esi, InlineFragmentRenderer $inlineStrategy)
+    public function __construct(Esi $esi = null, InlineFragmentRenderer $inlineStrategy)
     {
         $this->esi = $esi;
         $this->inlineStrategy = $inlineStrategy;
@@ -56,7 +56,7 @@ class EsiFragmentRenderer extends RoutableFragmentRenderer
      */
     public function render($uri, Request $request, array $options = array())
     {
-        if (!$this->esi->hasSurrogateEsiCapability($request)) {
+        if (!$this->esi || !$this->esi->hasSurrogateEsiCapability($request)) {
             return $this->inlineStrategy->render($uri, $request, $options);
         }
 

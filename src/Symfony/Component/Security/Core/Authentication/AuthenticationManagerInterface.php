@@ -23,7 +23,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 interface AuthenticationManagerInterface
 {
     /**
-     * Attempts to authenticates a TokenInterface object.
+     * Attempts to authenticate a TokenInterface object.
      *
      * @param TokenInterface $token The TokenInterface instance to authenticate
      *

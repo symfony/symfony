@@ -224,6 +224,8 @@ class Process
      *
      * @param callback|null $callback A PHP callback to run whenever there is some
      *                                output available on STDOUT or STDERR
+     * 
+     * @return Process The process itself
      *
      * @throws RuntimeException When process can't be launch or is stopped
      * @throws RuntimeException When process is already running
@@ -329,6 +331,8 @@ class Process
         }
 
         $this->updateStatus();
+        
+        return $this;
     }
 
     /**
@@ -1090,7 +1094,7 @@ class Process
      * In case you run a background process (with the start method), you should
      * trigger this method regularly to ensure the process timeout
      *
-     * @throws RuntimeException In case the timeout was reached
+     * @throws ProcessTimedOutException In case the timeout was reached
      */
     public function checkTimeout()
     {

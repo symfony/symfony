@@ -1221,8 +1221,8 @@ class Process
     /**
      * Handles the windows file handles fallbacks.
      *
-     * @param callable $callback A valid PHP callback
-     * @param Boolean $closeEmptyHandles if true, handles that are empty will be assumed closed
+     * @param callable $callback          A valid PHP callback
+     * @param Boolean  $closeEmptyHandles if true, handles that are empty will be assumed closed
      */
     private function processFileHandles($callback, $closeEmptyHandles = false)
     {

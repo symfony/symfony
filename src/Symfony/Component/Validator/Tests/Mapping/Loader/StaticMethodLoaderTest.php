@@ -66,11 +66,26 @@ class StaticMethodLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(0, $metadata->getConstraints());
     }
 
-    public function testLoadClassMetadataIgnoresAbstractClasses()
+    public function testLoadClassMetadataInAbstractClasses()
     {
         $loader = new StaticMethodLoader('loadMetadata');
         $metadata = new ClassMetadata(__NAMESPACE__.'\AbstractStaticLoader');
 
+        $loader->loadClassMetadata($metadata);
+
+        $this->assertCount(1, $metadata->getConstraints());
+    }
+
+    public function testLoadClassMetadataIgnoresAbstractMethods()
+    {
+        $loader = new StaticMethodLoader('loadMetadata');
+        try {
+            include __DIR__ . '/AbstractMethodStaticLoader.php';
+            $this->fail('AbstractMethodStaticLoader should produce a strict standard error.');
+        } catch (\Exception $e) {
+        }
+
+        $metadata = new ClassMetadata(__NAMESPACE__.'\AbstractMethodStaticLoader');
         $loader->loadClassMetadata($metadata);
 
         $this->assertCount(0, $metadata->getConstraints());
@@ -86,6 +101,7 @@ abstract class AbstractStaticLoader
 {
     public static function loadMetadata(ClassMetadata $metadata)
     {
+        $metadata->addConstraint(new ConstraintA());
     }
 }
 

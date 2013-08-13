@@ -182,7 +182,7 @@ class Command
     public function get($label)
     {
         if (!isset($this->labels[$label])) {
-            throw new \RuntimeException('Label "'.$label.'" does not exists.');
+            throw new \RuntimeException('Label "'.$label.'" does not exist.');
         }
 
         return $this->bits[$this->labels[$label]];

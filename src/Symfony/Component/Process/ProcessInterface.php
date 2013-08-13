@@ -117,7 +117,7 @@ interface ProcessInterface extends ProcessableInterface
      * @throws InvalidArgumentException if the timeout is negative
      */
     public function setTimeout($timeout);
-    
+
     /**
      * Gets the process timeout.
      *
@@ -135,7 +135,7 @@ interface ProcessInterface extends ProcessableInterface
      * @throws InvalidArgumentException if the timeout is negative
      */
     public function setIdleTimeout($timeout);
-    
+
     /**
      * Gets the process idle timeout.
      *

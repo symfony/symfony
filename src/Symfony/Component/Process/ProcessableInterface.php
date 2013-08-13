@@ -22,6 +22,7 @@ interface ProcessableInterface
 
     const STATUS_READY = 'ready';
     const STATUS_STARTED = 'started';
+    const STATUS_STOPPING = 'stopping';
     const STATUS_TERMINATED = 'terminated';
 
     /**

@@ -70,6 +70,23 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertLessThan(1.3, $duration);
     }
 
+    public function testCallbacksAreExecutedWithStart()
+    {
+        $data = '';
+
+        $process = $this->getProcess('echo "foo";sleep 1;echo "foo"');
+        $process->start(function ($type, $buffer) use (&$data) {
+            $data .= $buffer;
+        });
+
+        $start = microtime(true);
+        while ($process->isRunning()) {
+            usleep(10000);
+        }
+
+        $this->assertEquals("foo\nfoo\n", $data);
+    }
+
     /**
      * tests results from sub processes
      *

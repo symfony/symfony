@@ -112,6 +112,7 @@ class XmlUtilsTest extends \PHPUnit_Framework_TestCase
             array(false, 'False'),
             array(0, '0'),
             array(1, '1'),
+            array(-1, '-1'),
             array(0777, '0777'),
             array(255, '0xFF'),
             array(100.0, '1e2'),

@@ -360,7 +360,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
         // Sleep doesn't work as it will allow the process to handle signals and close
         // file handles from the other end.
-        $process = $this->getProcess('php -r "sleep 4"');
+        $process = $this->getProcess('php -r "while (true) {}"');
         $process->start();
 
         // PHP will deadlock when it tries to cleanup $process

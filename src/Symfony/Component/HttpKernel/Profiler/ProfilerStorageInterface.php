@@ -35,7 +35,7 @@ interface ProfilerStorageInterface
     /**
      * Reads data associated with the given token.
      *
-     * The method returns false if the token does not exists in the storage.
+     * The method returns false if the token does not exist in the storage.
      *
      * @param string $token A token
      *

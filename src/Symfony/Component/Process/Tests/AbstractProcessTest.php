@@ -66,6 +66,23 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertLessThan(1.8, $duration);
     }
 
+    public function testCallbacksAreExecutedWithStart()
+    {
+        $data = '';
+
+        $process = $this->getProcess('echo "foo";sleep 1;echo "foo"');
+        $process->start(function ($type, $buffer) use (&$data) {
+            $data .= $buffer;
+        });
+
+        $start = microtime(true);
+        while ($process->isRunning()) {
+            usleep(10000);
+        }
+
+        $this->assertEquals("foo\nfoo\n", $data);
+    }
+
     /**
      * tests results from sub processes
      *
@@ -255,7 +272,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testStop()
     {
-        $process = $this->getProcess('php -r "while (true) {}"');
+        $process = $this->getProcess('php -r "sleep(4);"');
         $process->start();
         $this->assertTrue($process->isRunning());
         $process->stop();
@@ -271,7 +288,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testIsNotSuccessful()
     {
-        $process = $this->getProcess('php -r "while (true) {}"');
+        $process = $this->getProcess('php -r "sleep(4);"');
         $process->start();
         $this->assertTrue($process->isRunning());
         $process->stop();
@@ -317,7 +334,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('Windows does not support POSIX signals');
         }
 
-        $process = $this->getProcess('php -r "while (true) {}"');
+        $process = $this->getProcess('php -r "sleep(4);"');
         $process->start();
         $process->stop();
         $this->assertTrue($process->hasBeenSignaled());
@@ -332,7 +349,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         // SIGTERM is only defined if pcntl extension is present
         $termSignal = defined('SIGTERM') ? SIGTERM : 15;
 
-        $process = $this->getProcess('php -r "while (true) {}"');
+        $process = $this->getProcess('php -r "sleep(4);"');
         $process->start();
         $process->stop();
 
@@ -504,6 +521,24 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->assertEquals('Caught SIGUSR1', $process->getOutput());
+    }
+
+    public function testExitCodeIsAvailableAfterSignal()
+    {
+        $this->verifyPosixIsEnabled();
+
+        $process = $this->getProcess('sleep 4');
+        $process->start();
+        $process->signal(SIGKILL);
+
+        while ($process->isRunning()) {
+            usleep(10000);
+        }
+
+        $this->assertFalse($process->isRunning());
+        $this->assertTrue($process->hasBeenSignaled());
+        $this->assertFalse($process->isSuccessful());
+        $this->assertEquals(137, $process->getExitCode());
     }
 
     /**

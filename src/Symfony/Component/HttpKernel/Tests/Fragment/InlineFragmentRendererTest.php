@@ -85,6 +85,26 @@ class InlineFragmentRendererTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $response->getContent());
     }
 
+    public function testRenderWithTrustedHeaderDisabled()
+    {
+        $trustedHeaderName = Request::getTrustedHeaderName(Request::HEADER_CLIENT_IP);
+
+        Request::setTrustedHeaderName(Request::HEADER_CLIENT_IP, '');
+
+        $kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
+        $kernel
+            ->expects($this->any())
+            ->method('handle')
+            ->with(Request::create('/'))
+        ;
+
+        $strategy = new InlineFragmentRenderer($kernel);
+
+        $strategy->render('/', Request::create('/'));
+
+        Request::setTrustedHeaderName(Request::HEADER_CLIENT_IP, $trustedHeaderName);
+    }
+
     /**
      * @expectedException \RuntimeException
      */
@@ -165,8 +185,11 @@ class InlineFragmentRendererTest extends \PHPUnit_Framework_TestCase
     {
         $expectedSubRequest = Request::create('/');
         $expectedSubRequest->headers->set('Surrogate-Capability', 'abc="ESI/1.0"');
-        $expectedSubRequest->headers->set('x-forwarded-for', array('127.0.0.1'));
-        $expectedSubRequest->server->set('HTTP_X_FORWARDED_FOR', '127.0.0.1');
+
+        if (Request::getTrustedHeaderName(Request::HEADER_CLIENT_IP)) {
+            $expectedSubRequest->headers->set('x-forwarded-for', array('127.0.0.1'));
+            $expectedSubRequest->server->set('HTTP_X_FORWARDED_FOR', '127.0.0.1');
+        }
 
         $kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
         $kernel
@@ -180,6 +203,16 @@ class InlineFragmentRendererTest extends \PHPUnit_Framework_TestCase
         $request = Request::create('/');
         $request->headers->set('Surrogate-Capability', 'abc="ESI/1.0"');
         $strategy->render('/', $request);
+    }
+
+    public function testESIHeaderIsKeptInSubrequestWithTrustedHeaderDisabled()
+    {
+        $trustedHeaderName = Request::getTrustedHeaderName(Request::HEADER_CLIENT_IP);
+        Request::setTrustedHeaderName(Request::HEADER_CLIENT_IP, '');
+
+        $this->testESIHeaderIsKeptInSubrequest();
+
+        Request::setTrustedHeaderName(Request::HEADER_CLIENT_IP, $trustedHeaderName);
     }
 }
 

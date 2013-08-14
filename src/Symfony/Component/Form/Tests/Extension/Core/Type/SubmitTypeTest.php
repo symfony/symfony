@@ -51,4 +51,13 @@ class SubmitTypeTest extends TypeTestCase
 
         $this->assertTrue($button->isClicked());
     }
+
+    public function testSubmitCanBeAddedToForm()
+    {
+        $form = $this->factory
+            ->createBuilder('form')
+            ->getForm();
+
+        $this->assertSame($form, $form->add('send', 'submit'));
+    }
 }

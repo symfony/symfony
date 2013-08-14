@@ -41,6 +41,7 @@ class LessThanOrEqualValidatorTest extends AbstractComparisonValidatorTestCase
             array(new \DateTime('2000-01-01'), new \DateTime('2020-01-01')),
             array('a', 'a'),
             array('a', 'z'),
+            array(null, 1),
         );
     }
 

@@ -377,12 +377,38 @@ class ProcessManagerTest extends ProcessableTestCase
         $this->assertLessThan(0.15, abs($duration - 0.5));
     }
 
-    public function testIsNotSuccessfulIfAtLeastOneProcessFailed()
+    public function testGetExceptionIfAProcessTimeOutWithAbortStrategy()
     {
+        $process = new Process('php -r "sleep(1);"');
+        $process->setTimeout(0.1);
+
         $manager = new ProcessManager();
         $manager->add(new Process('php -r "echo(\'hello\');"'));
         $manager->add(new Process('php -r "echo(\'hello\');"'));
-        $manager->add(new Process('php -r "not php"'));
+        $manager->add($process);
+        $this->setExpectedException('Symfony\Component\Process\Exception\ProcessManagerException', 'Managed process timed-out.');
+        $manager->run();
+        $this->assertFalse($manager->isSuccessful());
+    }
+
+    public function testIsNotSuccessfulIfAProcessTimeOutWithIgnoreStrategy()
+    {
+        $process = new Process('php -r "while(true) {};"');
+        $process->setTimeout(0.1);
+
+        $manager = new ProcessManager();
+        $manager->setTimeoutStrategy(ProcessManager::STRATEGY_IGNORE);
+        $manager->add($process);
+        $manager->run();
+        $this->assertFalse($manager->isSuccessful());
+    }
+
+    public function testIsNotSuccessfulIfAProcessFails()
+    {
+        $process = new Process('php -r "not valid php"');
+
+        $manager = new ProcessManager();
+        $manager->add($process);
         $manager->run();
         $this->assertFalse($manager->isSuccessful());
     }
@@ -396,6 +422,31 @@ class ProcessManagerTest extends ProcessableTestCase
         $manager->run();
         $this->assertTrue($manager->isSuccessful());
     }
+
+    public function testIsNotSuccessfulIfAProcessTimeOutWithRetryStrategy()
+    {
+        $timeout = 0.1;
+        $process = new Process('php -r "usleep(200000);"');
+        $process->setTimeout($timeout);
+
+        $manager = new ProcessManager();
+        $manager->setTimeoutStrategy(ProcessManager::STRATEGY_RETRY);
+        $manager->add($process, 'test');
+        $manager->start();
+        $n = 0;
+        while ($manager->isRunning()) {
+            if ($n >= 2) {
+                $timeout = 1;
+            }
+            usleep(100000);
+            $process->setTimeout($timeout);
+            $n++;
+        }
+        $this->assertNotEmpty($manager->get('test')->getFailures());
+        $this->assertTrue($manager->isSuccessful());
+    }
+
+    // add tests with various strategies and mustRun
 
     public function getOutput(ProcessableInterface $process)
     {

@@ -511,6 +511,7 @@ class ProcessManager implements ProcessableInterface, \Countable
         }
 
         $concurrent = 0;
+        $canRun = false;
         foreach ($this->processes as $name => $process) {
             if ($concurrent >= $this->maxParallel) {
                 break;
@@ -530,9 +531,10 @@ class ProcessManager implements ProcessableInterface, \Countable
                     $this->log('info', sprintf('Starting process %s failed.', $name));
                 }
             }
+            $canRun = $canRun || $process->canRun();
         }
 
-        if (0 === $concurrent) {
+        if (0 === $concurrent && false === $canRun) {
             $this->status = static::STATUS_TERMINATED;
         }
 
@@ -589,6 +591,7 @@ class ProcessManager implements ProcessableInterface, \Countable
             throw new ProcessManagerException($errorMsg, $e->getCode(), $e);
         }
         if (static::STRATEGY_RETRY === $strategy) {
+            $process->addFailure($e);
             $process->retry();
         }
 

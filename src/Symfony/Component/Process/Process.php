@@ -646,9 +646,9 @@ class Process
         $timeoutMicro = microtime(true) + $timeout;
         if ($this->isRunning()) {
             proc_terminate($this->process);
-            while ($this->isRunning() && microtime(true) < $timeoutMicro) {
+            do {
                 usleep(1000);
-            }
+            } while ($this->isRunning() && microtime(true) < $timeoutMicro);
 
             if ($this->isRunning() && !$this->isSigchildEnabled()) {
                 if (null !== $signal || defined('SIGKILL')) {

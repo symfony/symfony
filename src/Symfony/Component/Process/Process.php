@@ -287,7 +287,7 @@ class Process
             stream_set_blocking($pipe, false);
         }
 
-        $this->writePipes(false);
+        $this->writePipes();
         $this->updateStatus(false);
         $this->checkTimeout();
     }
@@ -339,9 +339,9 @@ class Process
         if (null !== $callback) {
             $this->callback = $this->buildCallback($callback);
         }
-        while ($this->processInformation['running']) {
-            $this->updateStatus(true);
+        while ($this->pipes || (defined('PHP_WINDOWS_VERSION_BUILD') && $this->fileHandles)) {
             $this->checkTimeout();
+            $this->readPipes(true);
         }
         $this->updateStatus(false);
         if ($this->processInformation['signaled']) {
@@ -1069,23 +1069,7 @@ class Process
                 return;
             }
 
-            foreach ($r as $pipe) {
-                $type = array_search($pipe, $this->pipes);
-                $data = fread($pipe, 8192);
-
-                if (strlen($data) > 0) {
-                    // last exit code is output and caught to work around --enable-sigchild
-                    if (3 == $type) {
-                        $this->fallbackExitcode = (int) $data;
-                    } else {
-                        call_user_func($this->callback, $type == 1 ? self::OUT : self::ERR, $data);
-                    }
-                }
-                if (false === $data || feof($pipe)) {
-                    fclose($pipe);
-                    unset($this->pipes[$type]);
-                }
-            }
+            $this->processReadPipes($r);
         }
     }
 
@@ -1094,7 +1078,7 @@ class Process
      *
      * @param Boolean $blocking Whether to use blocking calls or not.
      */
-    private function writePipes($blocking)
+    private function writePipes()
     {
         if (null === $this->stdin) {
             fclose($this->pipes[0]);
@@ -1109,7 +1093,11 @@ class Process
         $stdinOffset = 0;
 
         while ($writePipes) {
-            $r = array();
+            if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+                $this->processFileHandles();
+            }
+
+            $r = $this->pipes;
             $w = $writePipes;
             $e = null;
 
@@ -1135,6 +1123,34 @@ class Process
                     fclose($writePipes[0]);
                     $writePipes = null;
                 }
+            }
+
+            $this->processReadPipes($r);
+        }
+    }
+
+    /**
+     * Processes read pipes, executes callback on it.
+     *
+     * @param array $pipes
+     */
+    private function processReadPipes(array $pipes)
+    {
+        foreach ($pipes as $pipe) {
+            $type = array_search($pipe, $this->pipes);
+            $data = fread($pipe, 8192);
+
+            if (strlen($data) > 0) {
+                // last exit code is output and caught to work around --enable-sigchild
+                if (3 == $type) {
+                    $this->fallbackExitcode = (int) $data;
+                } else {
+                    call_user_func($this->callback, $type == 1 ? self::OUT : self::ERR, $data);
+                }
+            }
+            if (false === $data || feof($pipe)) {
+                fclose($pipe);
+                unset($this->pipes[$type]);
             }
         }
     }

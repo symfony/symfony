@@ -64,6 +64,14 @@ class SigchildDisabledProcessTest extends AbstractProcessTest
     /**
      * @expectedException \Symfony\Component\Process\Exception\RuntimeException
      */
+    public function testCheckTimeoutOnStartedProcess()
+    {
+        parent::testCheckTimeoutOnStartedProcess();
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Process\Exception\RuntimeException
+     */
     public function testGetPid()
     {
         parent::testGetPid();

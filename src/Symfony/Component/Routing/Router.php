@@ -234,7 +234,7 @@ class Router implements RouterInterface
 
         $class = $this->options['matcher_cache_class'];
         $cache = new ConfigCache($this->options['cache_dir'].'/'.$class.'.php', $this->options['debug']);
-        if (!$cache->isFresh($class)) {
+        if (!$cache->isFresh()) {
             $dumper = $this->getMatcherDumperInstance();
 
             $options = array(

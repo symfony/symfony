@@ -483,6 +483,24 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Caught SIGUSR1', $process->getOutput());
     }
 
+    public function testExitCodeIsAvailableAfterSignal()
+    {
+        $this->verifyPosixIsEnabled();
+
+        $process = $this->getProcess('sleep 4');
+        $process->start();
+        $process->signal(SIGKILL);
+
+        while ($process->isRunning()) {
+            usleep(10000);
+        }
+
+        $this->assertFalse($process->isRunning());
+        $this->assertTrue($process->hasBeenSignaled());
+        $this->assertFalse($process->isSuccessful());
+        $this->assertEquals(137, $process->getExitCode());
+    }
+
     /**
      * @expectedException Symfony\Component\Process\Exception\LogicException
      */

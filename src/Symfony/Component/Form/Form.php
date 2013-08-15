@@ -552,7 +552,12 @@ class Form implements \IteratorAggregate, FormInterface
                 $submittedData = array();
             }
 
-            foreach ($this->children as $name => $child) {
+            reset($this->children);
+
+            for (reset($this->children); false !== current($this->children); next($this->children)) {
+                $child = current($this->children);
+                $name = key($this->children);
+
                 $child->bind(isset($submittedData[$name]) ? $submittedData[$name] : null);
                 unset($submittedData[$name]);
             }
@@ -829,7 +834,7 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * {@inheritdoc}
      */
-    public function all()
+    public function &all()
     {
         return $this->children;
     }

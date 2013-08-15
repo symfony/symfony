@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Form\Tests;
 
-use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\Extension\HttpFoundation\EventListener\BindRequestListener;
 use Symfony\Component\HttpFoundation\Request;
@@ -44,19 +43,6 @@ class CompoundFormTest extends AbstractFormTest
         ));
 
         $this->assertFalse($this->form->isValid());
-    }
-
-    public function testBindForwardsNullIfValueIsMissing()
-    {
-        $child = $this->getMockForm('firstName');
-
-        $this->form->add($child);
-
-        $child->expects($this->once())
-            ->method('bind')
-            ->with($this->equalTo(null));
-
-        $this->form->bind(array());
     }
 
     public function testCloneChildren()
@@ -320,6 +306,47 @@ class CompoundFormTest extends AbstractFormTest
             ->with('bar', array('firstName' => $child1, 'lastName' => $child2));
 
         $form->setData('foo');
+    }
+
+    public function testBindForwardsNullIfValueIsMissing()
+    {
+        $child = $this->getMockForm('firstName');
+
+        $this->form->add($child);
+
+        $child->expects($this->once())
+            ->method('bind')
+            ->with($this->equalTo(null));
+
+        $this->form->bind(array());
+    }
+
+    public function testBindSupportsDynamicAdditionAndRemovalOfChildren()
+    {
+        $child = $this->getMockForm('child');
+        $childToBeRemoved = $this->getMockForm('removed');
+        $childToBeAdded = $this->getMockForm('added');
+
+        $this->form->add($child);
+        $this->form->add($childToBeRemoved);
+
+        $form = $this->form;
+
+        $child->expects($this->once())
+            ->method('bind')
+            ->will($this->returnCallback(function () use ($form, $childToBeAdded) {
+                $form->remove('removed');
+                $form->add($childToBeAdded);
+            }));
+
+        $childToBeRemoved->expects($this->never())
+            ->method('bind');
+
+        $childToBeAdded->expects($this->once())
+            ->method('bind');
+
+        // pass NULL to all children
+        $this->form->bind(array());
     }
 
     public function testBindMapsBoundChildrenOntoExistingViewData()

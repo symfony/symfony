@@ -109,11 +109,9 @@ abstract class Bundle extends ContainerAware implements BundleInterface
      */
     public function getNamespace()
     {
-        if (null === $this->reflected) {
-            $this->reflected = new \ReflectionObject($this);
-        }
+        $class = get_class($this);
 
-        return $this->reflected->getNamespaceName();
+        return substr($class, 0, strrpos($class, '\\'));
     }
 
     /**

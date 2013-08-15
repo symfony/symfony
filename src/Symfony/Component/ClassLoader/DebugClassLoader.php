@@ -102,7 +102,7 @@ class DebugClassLoader
      */
     public function loadClass($class)
     {
-        if ($file = $this->classFinder->findFile($class)) {
+        if ($class!="" and $file = $this->classFinder->findFile($class)) {
             require $file;
 
             if (!class_exists($class, false) && !interface_exists($class, false) && (!function_exists('trait_exists') || !trait_exists($class, false))) {

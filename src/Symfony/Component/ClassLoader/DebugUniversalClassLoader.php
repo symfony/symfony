@@ -52,7 +52,7 @@ class DebugUniversalClassLoader extends UniversalClassLoader
      */
     public function loadClass($class)
     {
-        if ($file = $this->findFile($class)) {
+        if ($class!="" and $file = $this->findFile($class)) {
             require $file;
 
             if (!class_exists($class, false) && !interface_exists($class, false) && (!function_exists('trait_exists') || !trait_exists($class, false))) {

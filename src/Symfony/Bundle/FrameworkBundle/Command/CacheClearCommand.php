@@ -83,6 +83,7 @@ EOF
             $this->warmup($warmupDir, $realCacheDir, !$input->getOption('no-optional-warmers'));
 
             $filesystem->rename($realCacheDir, $oldCacheDir);
+            sleep(1);  // workaround for windows php rename bug
             $filesystem->rename($warmupDir, $realCacheDir);
         }
 

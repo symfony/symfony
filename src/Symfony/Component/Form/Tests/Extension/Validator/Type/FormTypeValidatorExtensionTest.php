@@ -11,62 +11,8 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Validator\Type;
 
-use Symfony\Component\Form\FormInterface;
-
-class FormTypeValidatorExtensionTest extends TypeTestCase
+class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
 {
-    public function testValidationGroupNullByDefault()
-    {
-        $form =  $this->factory->create('form');
-
-        $this->assertNull($form->getConfig()->getOption('validation_groups'));
-    }
-
-    public function testValidationGroupsTransformedToArray()
-    {
-        $form = $this->factory->create('form', null, array(
-            'validation_groups' => 'group',
-        ));
-
-        $this->assertEquals(array('group'), $form->getConfig()->getOption('validation_groups'));
-    }
-
-    public function testValidationGroupsCanBeSetToArray()
-    {
-        $form = $this->factory->create('form', null, array(
-            'validation_groups' => array('group1', 'group2'),
-        ));
-
-        $this->assertEquals(array('group1', 'group2'), $form->getConfig()->getOption('validation_groups'));
-    }
-
-    public function testValidationGroupsCanBeSetToFalse()
-    {
-        $form = $this->factory->create('form', null, array(
-                'validation_groups' => false,
-            ));
-
-        $this->assertEquals(array(), $form->getConfig()->getOption('validation_groups'));
-    }
-
-    public function testValidationGroupsCanBeSetToCallback()
-    {
-        $form = $this->factory->create('form', null, array(
-            'validation_groups' => array($this, 'testValidationGroupsCanBeSetToCallback'),
-        ));
-
-        $this->assertTrue(is_callable($form->getConfig()->getOption('validation_groups')));
-    }
-
-    public function testValidationGroupsCanBeSetToClosure()
-    {
-        $form = $this->factory->create('form', null, array(
-            'validation_groups' => function(FormInterface $form){ return null; },
-        ));
-
-        $this->assertTrue(is_callable($form->getConfig()->getOption('validation_groups')));
-    }
-
     public function testSubmitValidatesData()
     {
         $builder = $this->factory->createBuilder('form', null, array(
@@ -81,5 +27,10 @@ class FormTypeValidatorExtensionTest extends TypeTestCase
 
         // specific data is irrelevant
         $form->submit(array());
+    }
+
+    protected function createForm(array $options = array())
+    {
+        return $this->factory->create('form', null, $options);
     }
 }

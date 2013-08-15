@@ -29,8 +29,8 @@ use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 abstract class Bundle extends ContainerAware implements BundleInterface
 {
     protected $name;
-    protected $reflected;
     protected $extension;
+    protected $path;
 
     /**
      * Boots the Bundle.
@@ -123,11 +123,12 @@ abstract class Bundle extends ContainerAware implements BundleInterface
      */
     public function getPath()
     {
-        if (null === $this->reflected) {
-            $this->reflected = new \ReflectionObject($this);
+        if (null === $this->path) {
+            $reflected = new \ReflectionObject($this);
+            $this->path = dirname($reflected->getFileName());
         }
 
-        return dirname($this->reflected->getFileName());
+        return $this->path;
     }
 
     /**

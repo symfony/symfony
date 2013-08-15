@@ -445,6 +445,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $duration = microtime(true) - $start;
 
         $this->assertLessThan($timeout + $precision, $duration);
+        $this->assertFalse($process->isSuccessful());
     }
 
     /**

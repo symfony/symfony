@@ -472,7 +472,11 @@ class ProcessManager implements ProcessableInterface, \Countable
             return;
         }
 
-        $this->signal(null !== $signal ? $signal : (defined('SIGTERM') ? SIGTERM : 15));
+        $this->status = static::STATUS_STOPPING;
+
+        if ($this->isRunning()) {
+            $this->signal(null !== $signal ? $signal : (defined('SIGTERM') ? SIGTERM : 15));
+        }
 
         do {
             usleep(1000);
@@ -511,7 +515,8 @@ class ProcessManager implements ProcessableInterface, \Countable
         }
 
         $concurrent = 0;
-        $canRun = false;
+        $canRun = true === $this->isDaemon && static::STATUS_STARTED === $this->status;
+
         foreach ($this->processes as $name => $process) {
             if ($concurrent >= $this->maxParallel) {
                 break;
@@ -526,12 +531,12 @@ class ProcessManager implements ProcessableInterface, \Countable
             } elseif (static::STATUS_STOPPING !== $this->status && $process->canRun()) {
                 if ($this->doExecute($process, 'start', array($callback), 'Unable to start the managed process.')) {
                     $concurrent++;
-                    $this->log('debug', sprintf('Process %s started.', $name));
+                    $this->log('notice', sprintf('Process %s started.', $name));
                 } else {
                     $this->log('info', sprintf('Starting process %s failed.', $name));
                 }
             }
-            $canRun = $canRun || $process->canRun();
+            $canRun = $canRun && $process->canRun();
         }
 
         if (0 === $concurrent && false === $canRun) {

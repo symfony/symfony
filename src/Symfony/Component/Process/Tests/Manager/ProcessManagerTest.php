@@ -446,6 +446,22 @@ class ProcessManagerTest extends ProcessableTestCase
         $this->assertTrue($manager->isSuccessful());
     }
 
+    public function testDaemonProcessManagerStopsOnStop()
+    {
+        declare(ticks=1);
+        $manager = new ProcessManager();
+        $manager->add(new Process('sleep 5'), 'test');
+        $manager->setDaemon(true);
+        pcntl_signal(SIGALRM, function () use ($manager) {
+            $manager->stop();
+        });
+        pcntl_alarm(1);
+        $start = microtime(true);
+        $manager->run();
+        $this->assertLessThan(0.1, abs((microtime(true) - $start) - 1));
+        $this->assertFalse($manager->isRunning());
+    }
+
     // add tests with various strategies and mustRun
 
     public function getOutput(ProcessableInterface $process)

@@ -273,6 +273,9 @@ class ArgvInputTest extends \PHPUnit_Framework_TestCase
 
         $input = new ArgvInput(array('cli.php', 'foo'));
         $this->assertFalse($input->hasParameterOption('--foo'), '->hasParameterOption() returns false if the given short option is not in the raw input');
+
+        $input = new ArgvInput(array('cli.php', '--foo=bar'));
+        $this->assertTrue($input->hasParameterOption('--foo'), '->hasParameterOption() returns true if the given option with provided value is in the raw input');
     }
 
     public function testToString()
@@ -300,6 +303,7 @@ class ArgvInputTest extends \PHPUnit_Framework_TestCase
             array(array('app/console', 'foo:bar', '--env=dev'), '--env', 'dev'),
             array(array('app/console', 'foo:bar', '-e', 'dev'), array('-e', '--env'), 'dev'),
             array(array('app/console', 'foo:bar', '--env=dev'), array('-e', '--env'), 'dev'),
+            array(array('app/console', 'foo:bar', '--env=dev', '--en=1'), array('--en'), '1'),
         );
     }
 }

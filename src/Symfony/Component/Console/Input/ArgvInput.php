@@ -284,9 +284,11 @@ class ArgvInput extends Input
     {
         $values = (array) $values;
 
-        foreach ($this->tokens as $v) {
-            if (in_array($v, $values)) {
-                return true;
+        foreach ($this->tokens as $token) {
+            foreach ($values as $value) {
+                if ($token === $value || 0 === strpos($token, $value.'=')) {
+                    return true;
+                }
             }
         }
 
@@ -311,7 +313,7 @@ class ArgvInput extends Input
         $tokens = $this->tokens;
         while ($token = array_shift($tokens)) {
             foreach ($values as $value) {
-                if (0 === strpos($token, $value)) {
+                if ($token === $value || 0 === strpos($token, $value.'=')) {
                     if (false !== $pos = strpos($token, '=')) {
                         return substr($token, $pos + 1);
                     }

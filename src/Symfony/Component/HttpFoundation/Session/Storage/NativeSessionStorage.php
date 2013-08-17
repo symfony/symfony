@@ -208,7 +208,7 @@ class NativeSessionStorage implements SessionStorageInterface
         $ret = session_regenerate_id($destroy);
 
         // workaround for https://bugs.php.net/bug.php?id=61470 as suggested by David Grudl
-        if($this->getSaveHandler()->getSaveHandlerName() === 'files') {
+        if ('files' === $this->getSaveHandler()->getSaveHandlerName()) {
             session_write_close();
             if (isset($_SESSION)) {
                 $backup = $_SESSION;

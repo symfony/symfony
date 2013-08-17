@@ -55,7 +55,7 @@ class ExceptionListener implements EventSubscriberInterface
             '_controller' => $this->controller,
             'exception'   => FlattenException::create($exception),
             'logger'      => $this->logger instanceof DebugLoggerInterface ? $this->logger : null,
-            'format'      => $request->getRequestFormat(),
+            '_format'     => $request->getRequestFormat(),
         );
 
         $request = $request->duplicate(null, null, $attributes);

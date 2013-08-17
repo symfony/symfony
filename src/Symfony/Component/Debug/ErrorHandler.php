@@ -138,7 +138,7 @@ class ErrorHandler
             return true;
         }
 
-        if ($this->displayErrors && error_reporting() & $level && $this->level & $level) {
+        if ($this->displayErrors && error_reporting() & $level && $this->level & $level && $context) {
             // make sure the ContextErrorException class is loaded (https://bugs.php.net/bug.php?id=65322)
             if (!class_exists('Symfony\Component\Debug\Exception\ContextErrorException')) {
                 require __DIR__.'/Exception/ContextErrorException.php';

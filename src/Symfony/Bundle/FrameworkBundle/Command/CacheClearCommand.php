@@ -129,8 +129,10 @@ EOF
         }
 
         // fix references to cached files with the real cache directory name
+        $warmupDirString = trim(var_export($warmupDir, true), '\'');
+        $realCacheDirString = trim(var_export($realCacheDir, true), '\'');
         foreach (Finder::create()->files()->in($warmupDir) as $file) {
-            $content = str_replace($warmupDir, $realCacheDir, file_get_contents($file));
+            $content = str_replace($warmupDirString, $realCacheDirString, file_get_contents($file));
             file_put_contents($file, $content);
         }
 

@@ -86,7 +86,7 @@ class NamespacedAttributeBag extends AttributeBag
         $retval = null;
         $attributes = & $this->resolveAttributePath($name);
         $name = $this->resolveKey($name);
-        if (array_key_exists($name, $attributes)) {
+        if (null !== $attributes && array_key_exists($name, $attributes)) {
             $retval = $attributes[$name];
             unset($attributes[$name]);
         }

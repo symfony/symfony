@@ -20,10 +20,6 @@ abstract class TypeTestCase extends BaseTypeTestCase
 
     protected function setUp()
     {
-        if (!class_exists('Symfony\Component\Validator\Constraint')) {
-            $this->markTestSkipped('The "Validator" component is not available');
-        }
-
         $this->validator = $this->getMock('Symfony\Component\Validator\ValidatorInterface');
         $metadataFactory = $this->getMock('Symfony\Component\Validator\MetadataFactoryInterface');
         $this->validator->expects($this->once())->method('getMetadataFactory')->will($this->returnValue($metadataFactory));

@@ -141,9 +141,6 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        if (!class_exists('Doctrine\DBAL\DriverManager')) {
-            $this->markTestSkipped('The Doctrine2 DBAL is required for this test');
-        }
         if (!class_exists('PDO') || !in_array('sqlite', \PDO::getAvailableDrivers())) {
             self::markTestSkipped('This test requires SQLite support in your environment');
         }

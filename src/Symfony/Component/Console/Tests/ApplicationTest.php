@@ -731,10 +731,6 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
     public function testRunWithDispatcher()
     {
-        if (!class_exists('Symfony\Component\EventDispatcher\EventDispatcher')) {
-            $this->markTestSkipped('The "EventDispatcher" component is not available');
-        }
-
         $application = new Application();
         $application->setAutoExit(false);
         $application->setDispatcher($this->getDispatcher());
@@ -754,10 +750,6 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
      */
     public function testRunWithExceptionAndDispatcher()
     {
-        if (!class_exists('Symfony\Component\EventDispatcher\EventDispatcher')) {
-            $this->markTestSkipped('The "EventDispatcher" component is not available');
-        }
-
         $application = new Application();
         $application->setDispatcher($this->getDispatcher());
         $application->setAutoExit(false);
@@ -773,10 +765,6 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
     public function testRunDispatchesAllEventsWithException()
     {
-        if (!class_exists('Symfony\Component\EventDispatcher\EventDispatcher')) {
-            $this->markTestSkipped('The "EventDispatcher" component is not available');
-        }
-
         $application = new Application();
         $application->setDispatcher($this->getDispatcher());
         $application->setAutoExit(false);

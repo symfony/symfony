@@ -16,13 +16,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 class RetryAuthenticationEntryPointTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-    }
-
     /**
      * @dataProvider dataForStart
      */

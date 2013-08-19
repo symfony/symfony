@@ -16,15 +16,6 @@ use Symfony\Bridge\Twig\Tests\TestCase;
 
 class RoutingExtensionTest extends TestCase
 {
-    protected function setUp()
-    {
-        parent::setUp();
-
-        if (!class_exists('Symfony\Component\Routing\Route')) {
-            $this->markTestSkipped('The "Routing" component is not available');
-        }
-    }
-
     /**
      * @dataProvider getEscapingTemplates
      */

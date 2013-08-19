@@ -203,6 +203,14 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($source, $this->encoder->encode($obj, 'xml'));
     }
 
+    public function testEncodeWithNamespace()
+    {
+        $source = $this->getNamespacedXmlSource();
+        $array = $this->getNamespacedArray();
+
+        $this->assertEquals($source, $this->encoder->encode($array, 'xml'));
+    }
+
     public function testEncodeSerializerXmlRootNodeNameOption()
     {
         $options = array('xml_root_node_name' => 'test');
@@ -251,6 +259,14 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
                 '<![CDATA[Paul <or Me>]]></firstname></response>'."\n";
 
         $this->assertEquals($expected, $this->encoder->decode($xml, 'xml'));
+    }
+
+    public function testDecodeWithNamespace()
+    {
+        $source = $this->getNamespacedXmlSource();
+        $array = $this->getNamespacedArray();
+
+        $this->assertEquals($array, $this->encoder->decode($source, 'xml'));
     }
 
     public function testDecodeScalarWithAttribute()
@@ -412,6 +428,53 @@ XML;
             '<Barry><FooBar id="1"><Baz>Ed</Baz></FooBar></Barry></baz>'.
             '<qux>1</qux>'.
             '</response>'."\n";
+    }
+
+    protected function getNamespacedXmlSource()
+    {
+        return '<?xml version="1.0"?>'."\n".
+            '<response xmlns="http://www.w3.org/2005/Atom" xmlns:app="http://www.w3.org/2007/app" xmlns:media="http://search.yahoo.com/mrss/" xmlns:gd="http://schemas.google.com/g/2005" xmlns:yt="http://gdata.youtube.com/schemas/2007">'.
+            '<qux>1</qux>'.
+            '<app:foo>foo</app:foo>'.
+            '<yt:bar>a</yt:bar><yt:bar>b</yt:bar>'.
+            '<media:baz><media:key>val</media:key><media:key2>val</media:key2><item key="A B">bar</item>'.
+            '<item><title>title1</title></item><item><title>title2</title></item>'.
+            '<Barry size="large"><FooBar gd:id="1"><Baz>Ed</Baz></FooBar></Barry></media:baz>'.
+            '</response>'."\n";
+    }
+
+    protected function getNamespacedArray()
+    {
+        return array(
+            '@xmlns'       => 'http://www.w3.org/2005/Atom', 
+            '@xmlns:app'   => 'http://www.w3.org/2007/app', 
+            '@xmlns:media' => 'http://search.yahoo.com/mrss/',
+            '@xmlns:gd'    => 'http://schemas.google.com/g/2005',
+            '@xmlns:yt'    => 'http://gdata.youtube.com/schemas/2007',
+            'qux' => "1",
+            'app:foo' => "foo",
+            'yt:bar' => array("a", "b"),
+            'media:baz' => array(
+                'media:key' => "val",
+                'media:key2' => "val",
+                'A B' => "bar",
+                'item' => array(
+                    array(
+                        'title' => 'title1',
+                    ), 
+                    array(
+                        'title' => 'title2',
+                    )
+                ),
+                'Barry' => array(
+                    '@size' => 'large',
+                    'FooBar' => array(
+                        'Baz'    => 'Ed',
+                        '@gd:id' => 1,
+                    ),
+                ),
+            ),
+        );
     }
 
     protected function getObject()

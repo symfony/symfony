@@ -60,17 +60,17 @@ class SwiftMailerHandler extends BaseSwiftMailerHandler
      */
     private function flushMemorySpool()
     {
-        $transport = $this->mailer->getTransport();
-        if (!$transport instanceof \Swift_Transport_SpoolTransport) {
+        $mailerTransport = $this->mailer->getTransport();
+        if (!$mailerTransport instanceof \Swift_Transport_SpoolTransport) {
             return;
         }
 
-        $spool = $transport->getSpool();
+        $spool = $mailerTransport->getSpool();
         if (!$spool instanceof \Swift_MemorySpool) {
             return;
         }
 
-        if (null == $this->transport) {
+        if (null === $this->transport) {
             throw new \Exception('No transport available to flush mail queue');
         }
 

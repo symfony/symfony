@@ -505,7 +505,7 @@ class Process
      */
     public function isSuccessful()
     {
-        return 0 == $this->getExitCode();
+        return 0 === $this->getExitCode();
     }
 
     /**

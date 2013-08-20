@@ -165,17 +165,7 @@ class Process
 
     public function __clone()
     {
-        $this->callback = null;
-        $this->exitcode = null;
-        $this->fallbackExitcode = null;
-        $this->processInformation = null;
-        $this->stdout = null;
-        $this->stderr = null;
-        $this->pipes = null;
-        $this->process = null;
-        $this->status = self::STATUS_READY;
-        $this->fileHandles = null;
-        $this->readBytes = null;
+        $this->resetProcessData();
     }
 
     /**
@@ -231,11 +221,8 @@ class Process
             throw new RuntimeException('Process is already running');
         }
 
+        $this->resetProcessData();
         $this->starttime = microtime(true);
-        $this->stdout = '';
-        $this->stderr = '';
-        $this->incrementalOutputOffset = 0;
-        $this->incrementalErrorOutputOffset = 0;
         $this->callback = $this->buildCallback($callback);
 
         //Fix for PHP bug #51800: reading from STDOUT pipe hangs forever on Windows if the output is too big.
@@ -1153,5 +1140,26 @@ class Process
                 unset($this->pipes[$type]);
             }
         }
+    }
+
+    /**
+     * Resets data related to the latest run of the process.
+     */
+    private function resetProcessData()
+    {
+        $this->starttime = null;
+        $this->callback = null;
+        $this->exitcode = null;
+        $this->fallbackExitcode = null;
+        $this->processInformation = null;
+        $this->stdout = null;
+        $this->stderr = null;
+        $this->pipes = null;
+        $this->process = null;
+        $this->status = self::STATUS_READY;
+        $this->fileHandles = null;
+        $this->readBytes = null;
+        $this->incrementalOutputOffset = 0;
+        $this->incrementalErrorOutputOffset = 0;
     }
 }

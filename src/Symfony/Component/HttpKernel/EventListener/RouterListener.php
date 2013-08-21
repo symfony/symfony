@@ -35,7 +35,6 @@ class RouterListener implements EventSubscriberInterface
     private $matcher;
     private $context;
     private $logger;
-    private $request;
 
     /**
      * Constructor.
@@ -73,10 +72,9 @@ class RouterListener implements EventSubscriberInterface
      */
     public function setRequest(Request $request = null)
     {
-        if (null !== $request && $this->request !== $request) {
+        if (null !== $request) {
             $this->context->fromRequest($request);
         }
-        $this->request = $request;
     }
 
     public function onKernelRequest(GetResponseEvent $event)

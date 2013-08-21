@@ -15,6 +15,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Process\ProcessableInterface;
 use Symfony\Component\Process\Exception\LogicException;
 use Symfony\Component\Process\Exception\InvalidArgumentException;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Exception\ExceptionInterface as ProcessException;
 use Symfony\Component\Process\Exception\ProcessManagerException;
@@ -528,14 +529,20 @@ class ProcessManager implements ProcessableInterface, \Countable
                 } else {
                     $this->log('info', sprintf('Process %s timed-out.', $name));
                 }
-            } elseif (static::STATUS_STOPPING !== $this->status && $process->canRun()) {
-                if ($this->doExecute($process, 'start', array($callback), 'Unable to start the managed process.')) {
+            }
+
+            if (!$process->isRunning()) {
+                if ($process->hasRun() && !$process->isSuccessful()) {
+                    $this->addFailureToProcess($process, new ProcessFailedException($process->getManagedProcess()), $this->failureStrategy);
+                    $this->log('error', sprintf('Process %s failed. (failure #%d)', $name, count($process->getFailures())));
+                }
+                if (static::STATUS_STOPPING !== $this->status && $process->canRun()) {
+                    $this->doExecute($process, 'start', array($callback), 'Unable to start the managed process.');
                     $concurrent++;
                     $this->log('notice', sprintf('Process %s started.', $name));
-                } else {
-                    $this->log('info', sprintf('Starting process %s failed.', $name));
                 }
             }
+
             $canRun = $canRun && $process->canRun();
         }
 
@@ -595,12 +602,24 @@ class ProcessManager implements ProcessableInterface, \Countable
             $this->stop();
             throw new ProcessManagerException($errorMsg, $e->getCode(), $e);
         }
-        if (static::STRATEGY_RETRY === $strategy) {
-            $process->addFailure($e);
-            $process->retry();
-        }
+        $this->addFailureToProcess($process, $e, $strategy);
 
         return $this;
+    }
+
+    /**
+     * Adds a failure to a process, reincrement depending on the strategy.
+     *
+     * @param ManagedProcess $process  The process
+     * @param \Exception     $e        The failure to add
+     * @param string         $strategy The strategy
+     */
+    private function addFailureToProcess($process, $e, $strategy)
+    {
+        $process->addFailure($e);
+        if (static::STRATEGY_RETRY === $strategy) {
+            $process->retry();
+        }
     }
 
     /**

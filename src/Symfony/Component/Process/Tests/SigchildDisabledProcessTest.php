@@ -83,6 +83,14 @@ class SigchildDisabledProcessTest extends AbstractProcessTest
     /**
      * @expectedException \Symfony\Component\Process\Exception\RuntimeException
      */
+    public function testIsSuccessfulOnlyAfterTerminated()
+    {
+        parent::testIsSuccessfulOnlyAfterTerminated();
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Process\Exception\RuntimeException
+     */
     public function testIsNotSuccessful()
     {
         parent::testIsNotSuccessful();

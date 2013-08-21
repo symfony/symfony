@@ -22,6 +22,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class ResponseListener implements EventSubscriberInterface
 {
+    /**
+     * @param FilterResponseEvent $event
+     */
     public function onKernelResponse(FilterResponseEvent $event)
     {
         $request = $event->getRequest();
@@ -32,6 +35,9 @@ class ResponseListener implements EventSubscriberInterface
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public static function getSubscribedEvents()
     {
         return array(KernelEvents::RESPONSE => 'onKernelResponse');

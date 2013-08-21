@@ -1520,7 +1520,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
             $request->getHost();
             $this->fail('Request::getHost() should throw an exception when host is not trusted.');
         } catch (\UnexpectedValueException $e) {
-            $this->assertEquals('Untrusted Host', $e->getMessage());
+            $this->assertEquals('Untrusted Host "evil.com"', $e->getMessage());
         }
 
         // trusted hosts

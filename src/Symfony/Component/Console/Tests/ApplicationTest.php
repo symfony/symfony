@@ -40,6 +40,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         require_once self::$fixturesPath.'/Foo2Command.php';
         require_once self::$fixturesPath.'/Foo3Command.php';
         require_once self::$fixturesPath.'/Foo4Command.php';
+        require_once self::$fixturesPath.'/FoobarCommand.php';
     }
 
     protected function normalizeLineBreaks($text)
@@ -208,6 +209,20 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $application->findNamespace('bar');
     }
 
+    /**
+     * @expectedException        \InvalidArgumentException
+     * @expectedExceptionMessage Command "foo1" is not defined
+     */
+    public function testFindUniqueNameButNamespaceName()
+    {
+        $application = new Application();
+        $application->add(new \FooCommand());
+        $application->add(new \Foo1Command());
+        $application->add(new \Foo2Command());
+
+        $application->find($commandName = 'foo1');
+    }
+
     public function testFind()
     {
         $application = new Application();
@@ -240,7 +255,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         return array(
             array('f', 'Command "f" is not defined.'),
             array('a', 'Command "a" is ambiguous (afoobar, afoobar1 and 1 more).'),
-            array('foo:b', 'Command "foo:b" is ambiguous (foo:bar, foo:bar1).')
+            array('foo:b', 'Command "foo:b" is ambiguous (foo:bar, foo:bar1 and 1 more).')
         );
     }
 
@@ -254,6 +269,23 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Foo4Command', $application->find('foo3:bar:toh'), '->find() returns a command even if its namespace equals another command name');
     }
 
+    public function testFindCommandWithAmbiguousNamespacesButUniqueName()
+    {
+        $application = new Application();
+        $application->add(new \FooCommand());
+        $application->add(new \FoobarCommand());
+
+        $this->assertInstanceOf('FoobarCommand', $application->find('f:f'));
+    }
+
+    public function testFindCommandWithMissingNamespace()
+    {
+        $application = new Application();
+        $application->add(new \Foo4Command());
+
+        $this->assertInstanceOf('Foo4Command', $application->find('f::t'));
+    }
+
     /**
      * @dataProvider             provideInvalidCommandNamesSingle
      * @expectedException        \InvalidArgumentException
@@ -262,15 +294,15 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     public function testFindAlternativeExceptionMessageSingle($name)
     {
         $application = new Application();
-        $application->add(new \FooCommand());
+        $application->add(new \Foo3Command());
         $application->find($name);
     }
 
     public function provideInvalidCommandNamesSingle()
     {
         return array(
-            array('foo:baR'),
-            array('foO:bar')
+            array('foo3:baR'),
+            array('foO3:bar')
         );
     }
 
@@ -288,6 +320,8 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->find() throws an \InvalidArgumentException if command does not exist, with alternatives');
             $this->assertRegExp('/Did you mean one of these/', $e->getMessage(), '->find() throws an \InvalidArgumentException if command does not exist, with alternatives');
+            $this->assertRegExp('/foo1:bar/', $e->getMessage());
+            $this->assertRegExp('/foo:bar/', $e->getMessage());
         }
 
         // Namespace + plural
@@ -297,6 +331,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->find() throws an \InvalidArgumentException if command does not exist, with alternatives');
             $this->assertRegExp('/Did you mean one of these/', $e->getMessage(), '->find() throws an \InvalidArgumentException if command does not exist, with alternatives');
+            $this->assertRegExp('/foo1/', $e->getMessage());
         }
 
         $application->add(new \Foo3Command());
@@ -329,26 +364,17 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals(sprintf('Command "%s" is not defined.', $commandName), $e->getMessage(), '->find() throws an \InvalidArgumentException if command does not exist, without alternatives');
         }
 
+        // Test if "bar1" command throw an "\InvalidArgumentException" and does not contain
+        // "foo:bar" as alternative because "bar1" is too far from "foo:bar"
         try {
-            $application->find($commandName = 'foo');
+            $application->find($commandName = 'bar1');
             $this->fail('->find() throws an \InvalidArgumentException if command does not exist');
         } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->find() throws an \InvalidArgumentException if command does not exist');
             $this->assertRegExp(sprintf('/Command "%s" is not defined./', $commandName), $e->getMessage(), '->find() throws an \InvalidArgumentException if command does not exist, with alternatives');
-            $this->assertRegExp('/foo:bar/', $e->getMessage(), '->find() throws an \InvalidArgumentException if command does not exist, with alternative : "foo:bar"');
-            $this->assertRegExp('/foo1:bar/', $e->getMessage(), '->find() throws an \InvalidArgumentException if command does not exist, with alternative : "foo1:bar"');
+            $this->assertRegExp('/afoobar1/', $e->getMessage(), '->find() throws an \InvalidArgumentException if command does not exist, with alternative : "afoobar1"');
             $this->assertRegExp('/foo:bar1/', $e->getMessage(), '->find() throws an \InvalidArgumentException if command does not exist, with alternative : "foo:bar1"');
-        }
-
-        // Test if "foo1" command throw an "\InvalidArgumentException" and does not contain
-        // "foo:bar" as alternative because "foo1" is too far from "foo:bar"
-        try {
-            $application->find($commandName = 'foo1');
-            $this->fail('->find() throws an \InvalidArgumentException if command does not exist');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->find() throws an \InvalidArgumentException if command does not exist');
-            $this->assertRegExp(sprintf('/Command "%s" is not defined./', $commandName), $e->getMessage(), '->find() throws an \InvalidArgumentException if command does not exist, with alternatives');
-            $this->assertFalse(strpos($e->getMessage(), 'foo:bar'), '->find() throws an \InvalidArgumentException if command does not exist, without "foo:bar" alternative');
+            $this->assertNotRegExp('/foo:bar(?>!1)/', $e->getMessage(), '->find() throws an \InvalidArgumentException if command does not exist, without "foo:bar" alternative');
         }
     }
 

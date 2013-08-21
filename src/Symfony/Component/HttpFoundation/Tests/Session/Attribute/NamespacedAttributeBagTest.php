@@ -143,6 +143,16 @@ class NamespacedAttributeBagTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($this->bag->get('user.login'));
     }
 
+    public function testRemoveExistingNamespacedAttribute()
+    {
+        $this->assertSame('cod', $this->bag->remove('category/fishing/first'));
+    }
+
+    public function testRemoveNonexistingNamespacedAttribute()
+    {
+        $this->assertNull($this->bag->remove('foo/bar/baz'));
+    }
+
     public function testClear()
     {
         $this->bag->clear();

@@ -58,9 +58,9 @@ class ProcessManagerTest extends ProcessableTestCase
         $this->assertEquals(ProcessManager::STRATEGY_IGNORE, $manager->getTimeoutStrategy());
     }
 
-    public function testManagedProcessesMustBeSigneldIfRunningOnDestruction()
+    public function testManagedProcessesMustBeStoppedIfRunningOnDestruction()
     {
-        $process = new Process('php -r "sleep(4);"');
+        $process = new Process('php -r "$n=0;while($n<=400){usleep(10000);$n++;}"');
 
         $manager = new ProcessManager();
         $manager->add($process);
@@ -393,7 +393,7 @@ class ProcessManagerTest extends ProcessableTestCase
 
     public function testIsNotSuccessfulIfAProcessTimeOutWithIgnoreStrategy()
     {
-        $process = new Process('php -r "while(true) {};"');
+        $process = new Process('php -r "$n = 0; while ($n<=200) {usleep(100000);$n++;}"');
         $process->setTimeout(0.1);
 
         $manager = new ProcessManager();

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests;
 
+use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
 use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationRequestHandler;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\Forms;
@@ -370,6 +371,41 @@ class CompoundFormTest extends AbstractFormTest
 
         $form->initialize();
         $form->add($child);
+    }
+
+    public function testSetDataSupportsDynamicAdditionAndRemovalOfChildren()
+    {
+        $form = $this->getBuilder()
+            ->setCompound(true)
+            // We test using PropertyPathMapper on purpose. The traversal logic
+            // is currently contained in InheritDataAwareIterator, but even
+            // if that changes, this test should still function.
+            ->setDataMapper(new PropertyPathMapper())
+            ->getForm();
+
+        $child = $this->getMockForm('child');
+        $childToBeRemoved = $this->getMockForm('removed');
+        $childToBeAdded = $this->getMockForm('added');
+
+        $form->add($child);
+        $form->add($childToBeRemoved);
+
+        $child->expects($this->once())
+            ->method('setData')
+            ->will($this->returnCallback(function () use ($form, $childToBeAdded) {
+                $form->remove('removed');
+                $form->add($childToBeAdded);
+            }));
+
+        $childToBeRemoved->expects($this->never())
+            ->method('setData');
+
+        // once when it it is created, once when it is added
+        $childToBeAdded->expects($this->exactly(2))
+            ->method('setData');
+
+        // pass NULL to all children
+        $form->setData(array());
     }
 
     public function testSetDataMapsViewDataToChildren()

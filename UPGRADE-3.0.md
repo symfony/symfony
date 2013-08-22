@@ -34,6 +34,9 @@ UPGRADE FROM 2.x to 3.0
      * `Symfony\Bridge\Monolog\Logger`
      * `Symfony\Component\HttpKernel\Log\NullLogger`
 
+ * The `Symfony\Component\HttpKernel\EventListener\ExceptionListener` now
+   passes the Request format as the `_format` argument instead of `format`.
+
 ### Routing
 
  * Some route settings have been renamed:

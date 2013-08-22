@@ -552,8 +552,6 @@ class Form implements \IteratorAggregate, FormInterface
                 $submittedData = array();
             }
 
-            reset($this->children);
-
             for (reset($this->children); false !== current($this->children); next($this->children)) {
                 $child = current($this->children);
                 $name = key($this->children);

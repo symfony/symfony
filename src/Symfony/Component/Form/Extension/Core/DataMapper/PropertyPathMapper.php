@@ -35,7 +35,7 @@ class PropertyPathMapper implements DataMapperInterface
      */
     public function __construct(PropertyAccessorInterface $propertyAccessor = null)
     {
-        $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::getPropertyAccessor();
+        $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
     }
 
     /**

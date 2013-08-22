@@ -42,12 +42,13 @@ class EsiFragmentRendererTest extends \PHPUnit_Framework_TestCase
         $strategy = new EsiFragmentRenderer(new Esi(), $this->getInlineStrategy());
 
         $request = Request::create('/');
+        $request->setLocale('fr');
         $request->headers->set('Surrogate-Capability', 'ESI/1.0');
 
         $this->assertEquals('<esi:include src="/" />', $strategy->render('/', $request)->getContent());
         $this->assertEquals("<esi:comment text=\"This is a comment\" />\n<esi:include src=\"/\" />", $strategy->render('/', $request, array('comment' => 'This is a comment'))->getContent());
         $this->assertEquals('<esi:include src="/" alt="foo" />', $strategy->render('/', $request, array('alt' => 'foo'))->getContent());
-        $this->assertEquals('<esi:include src="http://localhost/_fragment?_path=_format%3Dhtml%26_controller%3Dmain_controller" alt="http://localhost/_fragment?_path=_format%3Dhtml%26_controller%3Dalt_controller" />', $strategy->render(new ControllerReference('main_controller', array(), array()), $request, array('alt' => new ControllerReference('alt_controller', array(), array())))->getContent());
+        $this->assertEquals('<esi:include src="http://localhost/_fragment?_path=_format%3Dhtml%26_locale%3Dfr%26_controller%3Dmain_controller" alt="http://localhost/_fragment?_path=_format%3Dhtml%26_locale%3Dfr%26_controller%3Dalt_controller" />', $strategy->render(new ControllerReference('main_controller', array(), array()), $request, array('alt' => new ControllerReference('alt_controller', array(), array())))->getContent());
     }
 
     private function getInlineStrategy($called = false)

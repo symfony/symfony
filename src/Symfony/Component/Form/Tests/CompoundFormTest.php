@@ -399,6 +399,34 @@ class CompoundFormTest extends AbstractFormTest
         $form->setData('foo');
     }
 
+    public function testSubmitSupportsDynamicAdditionAndRemovalOfChildren()
+    {
+        $child = $this->getMockForm('child');
+        $childToBeRemoved = $this->getMockForm('removed');
+        $childToBeAdded = $this->getMockForm('added');
+
+        $this->form->add($child);
+        $this->form->add($childToBeRemoved);
+
+        $form = $this->form;
+
+        $child->expects($this->once())
+            ->method('submit')
+            ->will($this->returnCallback(function () use ($form, $childToBeAdded) {
+                $form->remove('removed');
+                $form->add($childToBeAdded);
+            }));
+
+        $childToBeRemoved->expects($this->never())
+            ->method('submit');
+
+        $childToBeAdded->expects($this->once())
+            ->method('submit');
+
+        // pass NULL to all children
+        $this->form->submit(array());
+    }
+
     public function testSubmitMapsSubmittedChildrenOntoExistingViewData()
     {
         $test = $this;

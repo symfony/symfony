@@ -20,17 +20,26 @@ class FragmentController extends ContainerAware
     {
         $actions = $this->container->get('templating')->get('actions');
 
-        return new Response($actions->render($actions->controller('TestBundle:Fragment:inlined', array(
+        $html1 = $actions->render($actions->controller('TestBundle:Fragment:inlined', array(
             'options' => array(
                 'bar' => new Bar(),
                 'eleven' => 11,
             ),
-        ))));
+        )));
+
+        $html2 = $actions->render($actions->controller('TestBundle:Fragment:customformat', array('_format' => 'html')));
+
+        return new Response($html1.'--'.$html2);
     }
 
     public function inlinedAction($options, $_format)
     {
         return new Response($options['bar']->getBar().' '.$_format);
+    }
+
+    public function customFormatAction($_format)
+    {
+        return new Response($_format);
     }
 }
 

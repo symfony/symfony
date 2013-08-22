@@ -237,6 +237,9 @@ UPGRADE FROM 2.x to 3.0
     * `Symfony\Component\HttpKernel\Exception\FatalErrorException` -> `Symfony\Component\Debug\Exception\FatalErrorException`
     * `Symfony\Component\HttpKernel\Exception\FlattenException` -> `Symfony\Component\Debug\Exception\FlattenException`
 
+ * The `Symfony\Component\HttpKernel\EventListener\ExceptionListener` now
+   passes the Request format as the `_format` argument instead of `format`.
+
 ### Locale
 
  * The Locale component was removed and replaced by the Intl component.

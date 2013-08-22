@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerAware;
 
 class FragmentController extends ContainerAware
 {
-    public function indexAction()
+    public function indexAction(Request $request)
     {
         $actions = $this->container->get('templating')->get('actions');
 
@@ -32,7 +32,10 @@ class FragmentController extends ContainerAware
 
         $html3 = $actions->render($actions->controller('TestBundle:Fragment:customlocale', array('_locale' => 'es')));
 
-        return new Response($html1.'--'.$html2.'--'.$html3);
+        $request->setLocale('fr');
+        $html4 = $actions->render($actions->controller('TestBundle:Fragment:forwardlocale'));
+
+        return new Response($html1.'--'.$html2.'--'.$html3.'--'.$html4);
     }
 
     public function inlinedAction($options, $_format)
@@ -46,6 +49,11 @@ class FragmentController extends ContainerAware
     }
 
     public function customLocaleAction(Request $request)
+    {
+        return new Response($request->getLocale());
+    }
+
+    public function forwardLocaleAction(Request $request)
     {
         return new Response($request->getLocale());
     }

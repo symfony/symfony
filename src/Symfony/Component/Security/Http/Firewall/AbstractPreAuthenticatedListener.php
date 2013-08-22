@@ -105,10 +105,10 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
         $token = $this->securityContext->getToken();
         if ($token instanceof PreAuthenticatedToken && $this->providerKey === $token->getProviderKey()) {
             $this->securityContext->setToken(null);
-        }
-        
-        if (null !== $this->logger) {
-            $this->logger->info(sprintf("Cleared security context due to exception: %s", $exception->getMessage()));
+            
+            if (null !== $this->logger) {
+                $this->logger->info(sprintf("Cleared security context due to exception: %s", $exception->getMessage()));
+            }
         }
     }
 

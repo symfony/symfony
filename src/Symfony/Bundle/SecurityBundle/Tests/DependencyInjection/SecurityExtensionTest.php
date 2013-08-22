@@ -181,6 +181,15 @@ abstract class SecurityExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', (string) $container->getAlias('security.acl.provider'));
     }
 
+    /**
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedExceptionMessage not matched by the firewall pattern
+     */
+    public function testInvalidCheckPath()
+    {
+        $container = $this->getContainer('invalid_check_path');
+    }
+
     protected function getContainer($file)
     {
         $container = new ContainerBuilder();

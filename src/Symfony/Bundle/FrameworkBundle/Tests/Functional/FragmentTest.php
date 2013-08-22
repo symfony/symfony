@@ -28,7 +28,7 @@ class FragmentTest extends WebTestCase
 
         $client->request('GET', '/fragment_home');
 
-        $this->assertEquals('bar txt--html', $client->getResponse()->getContent());
+        $this->assertEquals('bar txt--html--es', $client->getResponse()->getContent());
     }
 
     public function getConfigs()

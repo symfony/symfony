@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\DependencyInjection\ContainerAware;
 
@@ -29,7 +30,9 @@ class FragmentController extends ContainerAware
 
         $html2 = $actions->render($actions->controller('TestBundle:Fragment:customformat', array('_format' => 'html')));
 
-        return new Response($html1.'--'.$html2);
+        $html3 = $actions->render($actions->controller('TestBundle:Fragment:customlocale', array('_locale' => 'es')));
+
+        return new Response($html1.'--'.$html2.'--'.$html3);
     }
 
     public function inlinedAction($options, $_format)
@@ -40,6 +43,11 @@ class FragmentController extends ContainerAware
     public function customFormatAction($_format)
     {
         return new Response($_format);
+    }
+
+    public function customLocaleAction(Request $request)
+    {
+        return new Response($request->getLocale());
     }
 }
 

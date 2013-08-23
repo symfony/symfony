@@ -46,8 +46,16 @@ abstract class RoutableFragmentRenderer implements FragmentRendererInterface
      */
     protected function generateFragmentUri(ControllerReference $reference, Request $request)
     {
+        // We need to forward the current _format and _locale values as we don't have
+        // a proper routing pattern to do the job for us.
+        // This makes things inconsistent if you switch from rendering a controller
+        // to rendering a route if the route pattern does not contain the special
+        // _format and _locale placeholders.
         if (!isset($reference->attributes['_format'])) {
             $reference->attributes['_format'] = $request->getRequestFormat();
+        }
+        if (!isset($reference->attributes['_locale'])) {
+            $reference->attributes['_locale'] = $request->getLocale();
         }
 
         $reference->attributes['_controller'] = $reference->controller;

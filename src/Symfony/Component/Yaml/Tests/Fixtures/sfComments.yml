@@ -49,3 +49,17 @@ yaml: |
     foo: bar # a comment
 php: |
     array('foo' => 'bar')
+---
+test: Comment containing a colon on a hash line
+brief: >
+    Comment containing a colon on a scalar line
+yaml: 'foo # comment: this is also part of the comment'
+php: |
+    'foo'
+---
+test: 'Hash key containing a #'
+brief: >
+    'Hash key containing a #'
+yaml: 'foo#bar: baz'
+php: |
+    array('foo#bar' => 'baz')

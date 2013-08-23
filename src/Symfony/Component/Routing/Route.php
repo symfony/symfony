@@ -57,7 +57,7 @@ class Route implements \Serializable
     private $options = array();
 
     /**
-     * @var null|RouteCompiler
+     * @var null|CompiledRoute
      */
     private $compiled;
 

@@ -15,6 +15,7 @@ namespace Symfony\Component\Translation;
  * MessageSelector.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @api
  */
@@ -73,7 +74,14 @@ class MessageSelector
         }
 
         $position = PluralizationRules::get($number, $locale);
+
         if (!isset($standardRules[$position])) {
+            // when there's exactly one rule given, and that rule is a standard
+            // rule, use this rule
+            if (1 === count($parts) && isset($standardRules[0])) {
+                return $standardRules[0];
+            }
+
             throw new \InvalidArgumentException(sprintf('Unable to choose a translation for "%s" with locale "%s". Double check that this translation has the correct plural options (e.g. "There is one apple|There are %%count%% apples").', $message, $locale));
         }
 

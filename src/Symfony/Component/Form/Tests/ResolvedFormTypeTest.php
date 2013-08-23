@@ -39,14 +39,6 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        if (!class_exists('Symfony\Component\OptionsResolver\OptionsResolver')) {
-            $this->markTestSkipped('The "OptionsResolver" component is not available');
-        }
-
-        if (!class_exists('Symfony\Component\EventDispatcher\EventDispatcher')) {
-            $this->markTestSkipped('The "EventDispatcher" component is not available');
-        }
-
         $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $this->factory = $this->getMock('Symfony\Component\Form\FormFactoryInterface');
         $this->dataMapper = $this->getMock('Symfony\Component\Form\DataMapperInterface');

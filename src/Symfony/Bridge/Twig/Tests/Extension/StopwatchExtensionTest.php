@@ -17,15 +17,6 @@ use Symfony\Bridge\Twig\Tests\TestCase;
 
 class StopwatchExtensionTest extends TestCase
 {
-    protected function setUp()
-    {
-        parent::setUp();
-
-        if (!class_exists('Symfony\Component\Stopwatch\Stopwatch')) {
-            $this->markTestSkipped('The "Stopwatch" component is not available');
-        }
-    }
-
     /**
      * @expectedException \Twig_Error_Syntax
      */

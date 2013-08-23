@@ -22,13 +22,6 @@ use Symfony\Component\HttpKernel\Tests\Fixtures\TestClient;
 
 class ClientTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\BrowserKit\Client')) {
-            $this->markTestSkipped('The "BrowserKit" component is not available');
-        }
-    }
-
     public function testDoRequest()
     {
         $client = new Client(new TestHttpKernel());
@@ -50,14 +43,6 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
     public function testGetScript()
     {
-        if (!class_exists('Symfony\Component\Process\Process')) {
-            $this->markTestSkipped('The "Process" component is not available');
-        }
-
-        if (!class_exists('Symfony\Component\ClassLoader\ClassLoader')) {
-            $this->markTestSkipped('The "ClassLoader" component is not available');
-        }
-
         $client = new TestClient(new TestHttpKernel());
         $client->insulate();
         $client->request('GET', '/');

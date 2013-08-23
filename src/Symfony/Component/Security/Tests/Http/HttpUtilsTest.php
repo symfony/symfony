@@ -19,17 +19,6 @@ use Symfony\Component\Security\Http\HttpUtils;
 
 class HttpUtilsTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
-        if (!class_exists('Symfony\Component\Routing\Router')) {
-            $this->markTestSkipped('The "Routing" component is not available');
-        }
-    }
-
     public function testCreateRedirectResponseWithPath()
     {
         $utils = new HttpUtils($this->getUrlGenerator());

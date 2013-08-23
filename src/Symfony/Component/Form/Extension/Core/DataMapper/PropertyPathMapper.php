@@ -35,7 +35,7 @@ class PropertyPathMapper implements DataMapperInterface
      */
     public function __construct(PropertyAccessorInterface $propertyAccessor = null)
     {
-        $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::getPropertyAccessor();
+        $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
     }
 
     /**
@@ -43,11 +43,9 @@ class PropertyPathMapper implements DataMapperInterface
      */
     public function mapDataToForms($data, $forms)
     {
-        if (null === $data || array() === $data) {
-            return;
-        }
+        $empty = null === $data || array() === $data;
 
-        if (!is_array($data) && !is_object($data)) {
+        if (!$empty && !is_array($data) && !is_object($data)) {
             throw new UnexpectedTypeException($data, 'object, array or empty');
         }
 
@@ -55,8 +53,10 @@ class PropertyPathMapper implements DataMapperInterface
             $propertyPath = $form->getPropertyPath();
             $config = $form->getConfig();
 
-            if (null !== $propertyPath && $config->getMapped()) {
+            if (!$empty && null !== $propertyPath && $config->getMapped()) {
                 $form->setData($this->propertyAccessor->getValue($data, $propertyPath));
+            } else {
+                $form->setData($form->getConfig()->getData());
             }
         }
     }

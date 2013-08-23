@@ -524,6 +524,9 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $tester->run(array('command' => 'list', '--verbose' => true));
         $this->assertSame(Output::VERBOSITY_VERBOSE, $tester->getOutput()->getVerbosity(), '->run() sets the output to verbose if --verbose is passed');
 
+        $tester->run(array('command' => 'list', '--verbose' => 0));
+        $this->assertSame(Output::VERBOSITY_VERBOSE, $tester->getOutput()->getVerbosity(), '->run() sets the output to verbose if smaller --verbose level is passed');
+
         $tester->run(array('command' => 'list', '--verbose' => 1));
         $this->assertSame(Output::VERBOSITY_VERBOSE, $tester->getOutput()->getVerbosity(), '->run() sets the output to verbose if --verbose=1 is passed');
 
@@ -534,7 +537,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(Output::VERBOSITY_DEBUG, $tester->getOutput()->getVerbosity(), '->run() sets the output to debug if --verbose=3 is passed');
 
         $tester->run(array('command' => 'list', '--verbose' => 4));
-        $this->assertSame(Output::VERBOSITY_VERBOSE, $tester->getOutput()->getVerbosity(), '->run() sets the output to verbose if unknown --verbose level is passed');
+        $this->assertSame(Output::VERBOSITY_DEBUG, $tester->getOutput()->getVerbosity(), '->run() sets the output to debug if greater --verbose level is passed');
 
         $tester->run(array('command' => 'list', '-v' => true));
         $this->assertSame(Output::VERBOSITY_VERBOSE, $tester->getOutput()->getVerbosity(), '->run() sets the output to verbose if -v is passed');

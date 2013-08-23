@@ -200,7 +200,8 @@ class Button implements \IteratorAggregate, FormInterface
      */
     public function setData($modelData)
     {
-        throw new BadMethodCallException('Buttons cannot have data.');
+        // called during initialization of the form tree
+        // noop
     }
 
     /**

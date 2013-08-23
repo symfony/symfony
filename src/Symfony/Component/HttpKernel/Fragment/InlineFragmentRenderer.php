@@ -61,9 +61,11 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
             $attributes = $reference->attributes;
             $reference->attributes = array();
 
-            // The request format might have been overriden by the user
-            if (isset($attributes['_format'])) {
-                $reference->attributes['_format'] = $attributes['_format'];
+            // The request format and locale might have been overriden by the user
+            foreach (array('_format', '_locale') as $key) {
+                if (isset($attributes[$key])) {
+                    $reference->attributes[$key] = $attributes[$key];
+                }
             }
 
             $uri = $this->generateFragmentUri($uri, $request, false);

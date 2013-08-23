@@ -872,8 +872,8 @@ class Application
             $verbosity = 1;
             if ($input->hasParameterOption('--verbose')) {
                 $verbosity = (int) $input->getParameterOption('--verbose');
-                if ($verbosity > 3) {
-                    $verbosity = 3;
+                if ($verbosity < 1 || $verbosity > 3) {
+                    $verbosity = 1;
                 }
             }
             if ($input->hasParameterOption('-vvv') || $verbosity === 3) {

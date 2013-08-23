@@ -12,22 +12,31 @@
 namespace Symfony\Component\Form\Util;
 
 /**
- * Iterator that traverses fields of a field group
+ * Iterator that traverses an array of forms.
  *
- * If the iterator encounters a virtual field group, it enters the field
- * group and traverses its children as well.
+ * Contrary to {@link \ArrayIterator}, this iterator recognizes changes in the
+ * original array during iteration.
+ *
+ * You can wrap the iterator into a {@link \RecursiveIterator} in order to
+ * enter any virtual child form and iterate the children of that virtual form.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class VirtualFormAwareIterator extends \ArrayIterator implements \RecursiveIterator
+class VirtualFormAwareIterator extends ReferencingArrayIterator implements \RecursiveIterator
 {
+    /**
+     *{@inheritdoc}
+     */
     public function getChildren()
     {
         return new self($this->current()->all());
     }
 
+    /**
+     *{@inheritdoc}
+     */
     public function hasChildren()
     {
-        return $this->current()->getConfig()->getVirtual();
+        return (bool) $this->current()->getConfig()->getVirtual();
     }
 }

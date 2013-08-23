@@ -81,6 +81,9 @@ abstract class AbstractFormTest extends \PHPUnit_Framework_TestCase
         $form->expects($this->any())
             ->method('getName')
             ->will($this->returnValue($name));
+        $form->expects($this->any())
+            ->method('getConfig')
+            ->will($this->returnValue($this->getMock('Symfony\Component\Form\FormConfigInterface')));
 
         return $form;
     }

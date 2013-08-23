@@ -44,11 +44,9 @@ class PropertyPathMapper implements DataMapperInterface
      */
     public function mapDataToForms($data, array $forms)
     {
-        if (null === $data || array() === $data) {
-            return;
-        }
+        $empty = null === $data || array() === $data;
 
-        if (!is_array($data) && !is_object($data)) {
+        if (!$empty && !is_array($data) && !is_object($data)) {
             throw new UnexpectedTypeException($data, 'object, array or empty');
         }
 
@@ -56,12 +54,14 @@ class PropertyPathMapper implements DataMapperInterface
         $iterator = new \RecursiveIteratorIterator($iterator);
 
         foreach ($iterator as $form) {
-            /* @var FormInterface $form */
+            /* @var \Symfony\Component\Form\FormInterface $form */
             $propertyPath = $form->getPropertyPath();
             $config = $form->getConfig();
 
-            if (null !== $propertyPath && $config->getMapped()) {
+            if (!$empty && null !== $propertyPath && $config->getMapped()) {
                 $form->setData($this->propertyAccessor->getValue($data, $propertyPath));
+            } else {
+                $form->setData($form->getConfig()->getData());
             }
         }
     }
@@ -83,7 +83,7 @@ class PropertyPathMapper implements DataMapperInterface
         $iterator = new \RecursiveIteratorIterator($iterator);
 
         foreach ($iterator as $form) {
-            /* @var FormInterface $form */
+            /* @var \Symfony\Component\Form\FormInterface $form */
             $propertyPath = $form->getPropertyPath();
             $config = $form->getConfig();
 

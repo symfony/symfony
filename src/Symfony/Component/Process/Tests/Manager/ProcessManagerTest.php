@@ -299,7 +299,7 @@ class ProcessManagerTest extends ProcessableTestCase
         $manager->run();
         $duration = microtime(true) - $start;
         // wider error margin due to process start overhead
-        $this->assertLessThan(0.25, abs($duration - 1.5));
+        $this->assertLessThan(0.30, abs($duration - 1.5));
     }
 
     public function testFunctionalMixedParallelismWithRun()
@@ -413,6 +413,28 @@ class ProcessManagerTest extends ProcessableTestCase
         $this->assertFalse($manager->isSuccessful());
     }
 
+    public function testIsNotSuccessfulIfAProcessFailsWithIgnoreStrategy()
+    {
+        $process = new Process('php -r "not valid php"');
+
+        $manager = new ProcessManager();
+        $manager->setTimeoutStrategy(ProcessManager::STRATEGY_IGNORE);
+        $manager->add($process);
+        $manager->run();
+        $this->assertFalse($manager->isSuccessful());
+    }
+
+    public function testIsNotSuccessfulIfAProcessFailsWithAbortStrategy()
+    {
+        $process = new Process('php -r "not valid php"');
+
+        $manager = new ProcessManager();
+        $manager->setTimeoutStrategy(ProcessManager::STRATEGY_ABORT);
+        $manager->add($process);
+        $manager->run();
+        $this->assertFalse($manager->isSuccessful());
+    }
+
     public function testIsSuccessfulIfProcessesSucceeded()
     {
         $manager = new ProcessManager();
@@ -423,7 +445,7 @@ class ProcessManagerTest extends ProcessableTestCase
         $this->assertTrue($manager->isSuccessful());
     }
 
-    public function testIsNotSuccessfulIfAProcessTimeOutWithRetryStrategy()
+    public function testIsSuccessfulIfAProcessTimeOutWithRetryStrategyAndFinallySucceed()
     {
         $timeout = 0.1;
         $process = new Process('php -r "usleep(200000);"');

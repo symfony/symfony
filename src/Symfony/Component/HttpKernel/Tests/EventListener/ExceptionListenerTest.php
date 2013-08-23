@@ -111,6 +111,25 @@ class ExceptionListenerTest extends \PHPUnit_Framework_TestCase
             array($event, $event2)
         );
     }
+
+    public function testSubRequestFormat()
+    {
+        $listener = new ExceptionListener('foo', $this->getMock('Psr\Log\LoggerInterface'));
+
+        $kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
+        $kernel->expects($this->once())->method('handle')->will($this->returnCallback(function (Request $request) {
+            return new Response($request->getRequestFormat());
+        }));
+
+        $request = Request::create('/');
+        $request->setRequestFormat('xml');
+
+        $event = new GetResponseForExceptionEvent($kernel, $request, 'foo', new \Exception('foo'));
+        $listener->onKernelException($event);
+
+        $response = $event->getResponse();
+        $this->assertEquals('xml', $response->getContent());
+    }
 }
 
 class TestLogger extends Logger implements DebugLoggerInterface

@@ -1,0 +1,133 @@
+---------------------------------------------------------------------------
+
+by Burgov at 2013-08-22T13:01:57Z
+
+this looks very nice! I'm gonna try it out in one of our projects and see what happens
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-08-22T13:18:49Z
+
+The good thing is that you can rely on the model data (in this case of the "country" field) in both POST_SET_DATA and POST_SUBMIT. So in practice, you can use the same closure for both events:
+
+```php
+$updateCountry = function (FormEvent $event) {
+    $form = $event->getForm()->getParent();
+    $country = $event->getForm()->getData();
+
+    $form->add('province', 'choice', /* ... something with $country ... */);
+};
+
+$builder->get('country')->addEventListener(FormEvents::POST_SET_DATA, $updateCountry);
+$builder->get('country')->addEventListener(FormEvents::POST_SUBMIT, $updateCountry);
+```
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-08-22T13:21:45Z
+
+There is still an issue with the default value of choice fields (#8747) which requires you to add some boilerplate code over what I just wrote, but that'll hopefully be fixed soon.
+
+---------------------------------------------------------------------------
+
+by Burgov at 2013-08-22T13:22:03Z
+
+@bschussek yeah that is a big advantage. It might even be nice to be able to add two listeners add once. Something like
+
+```php
+$builder->get('country')->addEventListener(array(FormEvents::POST_SET_DATA, FormEvents::POST_SUBMIT), function(FormEvent $e) { /*...*/ }
+```
+
+---------------------------------------------------------------------------
+
+by Burgov at 2013-08-22T13:25:50Z
+
+In the example in your PR message, in your listener you use $event->getData(). I found this not to work: it's an empty array when the data is empty and it's the raw viewdata (e.g. an ID) when the data is submitted.
+
+Using $event->getForm()->getData() does give the correct results. Is this by design?
+
+I've successfully tested the following example (which happens to be only post submit, as it only applies to new entities):
+
+```php
+[...]
+$builder->add('billingCompany', new CompanyFinancialAutocompleteType(), array('label' => 'nitro.project.company', 'ajax_reload' => true));
+$builder->addEventListener(FormEvents::PRE_SET_DATA, function(FormEvent $e) {
+    if (null !== $e->getData()->getBillingCompany()) {
+        $e->getForm()->remove('billingCompany');
+    }
+});
+$builder->get('billingCompany')->addEventListener(FormEvents::POST_SUBMIT, function(FormEvent $e) {
+    $billingCompany = $e->getForm()->getData();
+    if (null === $billingCompany) {
+        return;
+    }
+    $company = $billingCompany->getCompany();
+
+    $form = $e->getForm()->getParent();
+    $form->add('contactPerson', 'entity', array(
+        'query_builder' => function($er) use ($company) {
+            return $er->createQueryBuilder('p')
+                ->leftJoin('p.companies', 'companyContacts')
+                ->where('companyContacts.company = ?1')
+                ->setParameter(1, $company)
+                ;
+        },
+        'class' => 'SamsonNitroAddressBookBundle:Person',
+        'empty_value' => 'Choose contact',
+        'label' => 'nitro.project.contact_person'
+    ));
+    $form->add('contactAddress', 'entity', array(
+        'choices' => $company->getAddresses()->toArray(),
+        'class' => 'SamsonAddressBookBundle:Address',
+        'empty_value' => 'Choose address',
+        'label' => 'nitro.project.contact_address'
+    ));
+});
+[...]
+```
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-08-22T13:43:53Z
+
+Yes you're right, you need to use `$event->getForm()->getData()` in `POST_SUBMIT` listeners, because there the event data is given in view format. I corrected the examples above.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-08-22T13:49:01Z
+
+One further limitation, as can be seen in your example, is that chained dependencies don't work, because you can't attach event listeners to `Form` instances, only to `FormBuilders`. Ideally, you'd add the "billingCompany" field from within the listener, only if the criteria for adding it matches - but then you can't add further event listeners to it. I hope to fix this issue in the future.
+
+```php
+$builder->addEventListener(FormEvents::POST_SET_DATA, function (FormEvent $e) {
+    if (/* condition */) {
+        $form = $event->getForm();
+        $form->add('billingCompany', ...);
+        $form->get('billingCompany')->addEventListener(...); // BANG, not supported
+    }
+});
+```
+
+---------------------------------------------------------------------------
+
+by Burgov at 2013-08-22T14:04:47Z
+
+I ran into that problem exactly, however I do think that it's beyond the scope of this PR. If I'm not mistaken, you should be able to achieve it using the FormFactory from the builder object. Simplifying that later on would be a nice idea though.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-08-22T14:11:45Z
+
+Yes, you can use the factory, and you're also quite right that this is beyond the scope of this PR. I only want to give you an idea of what is coming :)
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-08-23T13:52:08Z
+
+@fabpot Any chance for merging #8827 and this PR before Sunday night?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-08-23T15:09:22Z
+
+@bschussek sorry, I thought you were waiting for some sort of feedback first. Merging now.

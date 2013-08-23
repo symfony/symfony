@@ -845,12 +845,19 @@ class Application
 
         if (true === $input->hasParameterOption(array('--quiet', '-q'))) {
             $output->setVerbosity(OutputInterface::VERBOSITY_QUIET);
-        } else {
-            if ($input->hasParameterOption('-vvv') || $input->hasParameterOption('--verbose=3') || $input->getParameterOption('--verbose') === 3) {
+        } elseif ($input->hasParameterOption(array('--verbose', '-v', '-vv', '-vvv'))) {
+            $verbosity = 1;
+            if ($input->hasParameterOption('--verbose')) {
+                $verbosity = (int) $input->getParameterOption('--verbose');
+                if ($verbosity > 3) {
+                    $verbosity = 3;
+                }
+            }
+            if ($input->hasParameterOption('-vvv') || $verbosity === 3) {
                 $output->setVerbosity(OutputInterface::VERBOSITY_DEBUG);
-            } elseif ($input->hasParameterOption('-vv') || $input->hasParameterOption('--verbose=2') || $input->getParameterOption('--verbose') === 2) {
+            } elseif ($input->hasParameterOption('-vv') || $verbosity === 2) {
                 $output->setVerbosity(OutputInterface::VERBOSITY_VERY_VERBOSE);
-            } elseif ($input->hasParameterOption('-v') || $input->hasParameterOption('--verbose=1') || $input->hasParameterOption('--verbose') || $input->getParameterOption('--verbose')) {
+            } else {
                 $output->setVerbosity(OutputInterface::VERBOSITY_VERBOSE);
             }
         }
@@ -925,7 +932,7 @@ class Application
 
             new InputOption('--help',           '-h', InputOption::VALUE_NONE, 'Display this help message.'),
             new InputOption('--quiet',          '-q', InputOption::VALUE_NONE, 'Do not output any message.'),
-            new InputOption('--verbose',        '-v|vv|vvv', InputOption::VALUE_NONE, 'Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug'),
+            new InputOption('--verbose',        '-v|vv|vvv', InputOption::VALUE_OPTIONAL, 'Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug'),
             new InputOption('--version',        '-V', InputOption::VALUE_NONE, 'Display this application version.'),
             new InputOption('--ansi',           '',   InputOption::VALUE_NONE, 'Force ANSI output.'),
             new InputOption('--no-ansi',        '',   InputOption::VALUE_NONE, 'Disable ANSI output.'),

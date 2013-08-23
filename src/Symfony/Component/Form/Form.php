@@ -536,7 +536,10 @@ class Form implements \IteratorAggregate, FormInterface
                 $submittedData = array();
             }
 
-            foreach ($this->children as $name => $child) {
+            for (reset($this->children); false !== current($this->children); next($this->children)) {
+                $child = current($this->children);
+                $name = key($this->children);
+
                 if (array_key_exists($name, $submittedData) || $clearMissing) {
                     $child->submit(isset($submittedData[$name]) ? $submittedData[$name] : null, $clearMissing);
                     unset($submittedData[$name]);
@@ -762,7 +765,7 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * {@inheritdoc}
      */
-    public function all()
+    public function &all()
     {
         return $this->children;
     }
@@ -833,7 +836,8 @@ class Form implements \IteratorAggregate, FormInterface
         $child->setParent($this);
 
         if (!$this->lockSetData && $this->defaultDataSet && !$this->config->getInheritData()) {
-            $childrenIterator = new InheritDataAwareIterator(array($child));
+            $children = array($child);
+            $childrenIterator = new InheritDataAwareIterator($children);
             $childrenIterator = new \RecursiveIteratorIterator($childrenIterator);
             $this->config->getDataMapper()->mapDataToForms($viewData, $childrenIterator);
         }

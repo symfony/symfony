@@ -422,7 +422,7 @@
   * In the collection type's template, the default name of the prototype field
     has changed from `$$name$$` to `__name__`.
 
-    You can now customize the name of the prototype field by changin the
+    You can now customize the name of the prototype field by changing the
     "prototype_name" option. You are advised to prepend and append two
     underscores wherever you specify a value for the field's "prototype_name"
     option.

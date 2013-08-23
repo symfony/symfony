@@ -20,10 +20,6 @@ class SessionCsrfProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\Session\Session')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
         $this->session = $this->getMock(
             'Symfony\Component\HttpFoundation\Session\Session',
             array(),

@@ -21,10 +21,6 @@ class FixRadioInputListenerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        if (!class_exists('Symfony\Component\EventDispatcher\EventDispatcher')) {
-            $this->markTestSkipped('The "EventDispatcher" component is not available');
-        }
-
         parent::setUp();
 
         $this->choiceList = new SimpleChoiceList(array('' => 'Empty', 0 => 'A', 1 => 'B'));

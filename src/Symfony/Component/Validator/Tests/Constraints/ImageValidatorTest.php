@@ -51,10 +51,6 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testValidImage()
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\File\File')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
         $this->context->expects($this->never())
             ->method('addViolation');
 
@@ -63,10 +59,6 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testValidSize()
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\File\File')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
         $this->context->expects($this->never())
             ->method('addViolation');
 
@@ -82,10 +74,6 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testWidthTooSmall()
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\File\File')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
         $constraint = new Image(array(
             'minWidth' => 3,
             'minWidthMessage' => 'myMessage',
@@ -103,10 +91,6 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testWidthTooBig()
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\File\File')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
         $constraint = new Image(array(
             'maxWidth' => 1,
             'maxWidthMessage' => 'myMessage',
@@ -124,10 +108,6 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testHeightTooSmall()
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\File\File')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
         $constraint = new Image(array(
             'minHeight' => 3,
             'minHeightMessage' => 'myMessage',
@@ -145,10 +125,6 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testHeightTooBig()
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\File\File')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
         $constraint = new Image(array(
             'maxHeight' => 1,
             'maxHeightMessage' => 'myMessage',
@@ -169,10 +145,6 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidMinWidth()
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\File\File')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
         $constraint = new Image(array(
             'minWidth' => '1abc',
         ));
@@ -185,10 +157,6 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidMaxWidth()
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\File\File')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
         $constraint = new Image(array(
             'maxWidth' => '1abc',
         ));
@@ -201,10 +169,6 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidMinHeight()
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\File\File')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
         $constraint = new Image(array(
             'minHeight' => '1abc',
         ));
@@ -217,10 +181,6 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidMaxHeight()
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\File\File')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
         $constraint = new Image(array(
             'maxHeight' => '1abc',
         ));
@@ -230,10 +190,6 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testRatioTooSmall()
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\File\File')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
         $constraint = new Image(array(
             'minRatio' => 2,
             'minRatioMessage' => 'myMessage',
@@ -251,10 +207,6 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testRatioTooBig()
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\File\File')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
         $constraint = new Image(array(
             'maxRatio' => 0.5,
             'maxRatioMessage' => 'myMessage',
@@ -275,10 +227,6 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidMinRatio()
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\File\File')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
         $constraint = new Image(array(
             'minRatio' => '1abc',
         ));
@@ -291,10 +239,6 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidMaxRatio()
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\File\File')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
         $constraint = new Image(array(
             'maxRatio' => '1abc',
         ));
@@ -304,10 +248,6 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testSquareNotAllowed()
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\File\File')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
         $constraint = new Image(array(
             'allowSquare' => false,
             'allowSquareMessage' => 'myMessage',
@@ -325,10 +265,6 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testLandscapeNotAllowed()
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\File\File')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
         $constraint = new Image(array(
             'allowLandscape' => false,
             'allowLandscapeMessage' => 'myMessage',
@@ -346,10 +282,6 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testPortraitNotAllowed()
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\File\File')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
         $constraint = new Image(array(
             'allowPortrait' => false,
             'allowPortraitMessage' => 'myMessage',

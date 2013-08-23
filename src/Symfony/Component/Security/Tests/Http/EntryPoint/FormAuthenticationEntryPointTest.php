@@ -16,17 +16,6 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class FormAuthenticationEntryPointTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
-        if (!class_exists('Symfony\Component\HttpKernel\HttpKernel')) {
-            $this->markTestSkipped('The "HttpKernel" component is not available');
-        }
-    }
-
     public function testStart()
     {
         $request = $this->getMock('Symfony\Component\HttpFoundation\Request', array(), array(), '', false, false);

@@ -13,10 +13,4 @@ namespace Symfony\Bundle\WebProfilerBundle\Tests;
 
 class TestCase extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Twig_Environment')) {
-            $this->markTestSkipped('Twig is not available.');
-        }
-    }
 }

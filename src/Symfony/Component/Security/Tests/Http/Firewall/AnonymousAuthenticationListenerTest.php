@@ -15,13 +15,6 @@ use Symfony\Component\Security\Http\Firewall\AnonymousAuthenticationListener;
 
 class AnonymousAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\EventDispatcher\EventDispatcher')) {
-            $this->markTestSkipped('The "EventDispatcher" component is not available');
-        }
-    }
-
     public function testHandleWithContextHavingAToken()
     {
         $context = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');

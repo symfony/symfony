@@ -17,13 +17,6 @@ use Symfony\Component\Security\Core\Exception\NonceExpiredException;
 
 class DigestAuthenticationEntryPointTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-    }
-
     public function testStart()
     {
         $request = $this->getMock('Symfony\Component\HttpFoundation\Request');

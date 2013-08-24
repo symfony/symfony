@@ -15,6 +15,8 @@ namespace Symfony\Component\Serializer\Encoder;
  * Decodes JSON data
  *
  * @author Sander Coolen <sander@jibber.nl>
+ *
+ * @since v2.2.0
  */
 class JsonDecode implements DecoderInterface
 {
@@ -40,6 +42,8 @@ class JsonDecode implements DecoderInterface
      *
      * @param Boolean  $associative True to return the result associative array, false for a nested stdClass hierarchy
      * @param integer  $depth       Specifies the recursion depth
+     *
+     * @since v2.1.0
      */
     public function __construct($associative = false, $depth = 512)
     {
@@ -53,6 +57,8 @@ class JsonDecode implements DecoderInterface
      * @return integer
      *
      * @see http://php.net/manual/en/function.json-last-error.php json_last_error
+     *
+     * @since v2.1.0
      */
     public function getLastError()
     {
@@ -83,6 +89,8 @@ class JsonDecode implements DecoderInterface
      * @return mixed
      *
      * @see http://php.net/json_decode json_decode
+     *
+     * @since v2.2.0
      */
     public function decode($data, $format, array $context = array())
     {
@@ -105,6 +113,8 @@ class JsonDecode implements DecoderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function supportsDecoding($format)
     {
@@ -117,6 +127,8 @@ class JsonDecode implements DecoderInterface
      * @param array $context
      *
      * @return array
+     *
+     * @since v2.2.0
      */
     private function resolveContext(array $context)
     {

@@ -32,6 +32,8 @@ interface EquatableInterface
      * @param UserInterface $user
      *
      * @return Boolean
+     *
+     * @since v2.1.0
      */
     public function isEqualTo(UserInterface $user);
 }

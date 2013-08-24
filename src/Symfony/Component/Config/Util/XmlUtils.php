@@ -18,11 +18,15 @@ namespace Symfony\Component\Config\Util;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Martin Hasoň <martin.hason@gmail.com>
+ *
+ * @since v2.2.0
  */
 class XmlUtils
 {
     /**
      * This class should not be instantiated
+     *
+     * @since v2.2.0
      */
     private function __construct()
     {
@@ -37,6 +41,8 @@ class XmlUtils
      * @return \DOMDocument
      *
      * @throws \InvalidArgumentException When loading of XML file returns error
+     *
+     * @since v2.2.0
      */
     public static function loadFile($file, $schemaOrCallable = null)
     {
@@ -115,6 +121,8 @@ class XmlUtils
      * @param Boolean     $checkPrefix Check prefix in an element or an attribute name
      *
      * @return array A PHP array
+     *
+     * @since v2.2.0
      */
     public static function convertDomElementToArray(\DomElement $element, $checkPrefix = true)
     {
@@ -173,6 +181,8 @@ class XmlUtils
      * @param mixed $value
      *
      * @return mixed
+     *
+     * @since v2.2.0
      */
     public static function phpize($value)
     {
@@ -207,6 +217,9 @@ class XmlUtils
         }
     }
 
+    /**
+     * @since v2.2.0
+     */
     protected static function getXmlErrors($internalErrors)
     {
         $errors = array();

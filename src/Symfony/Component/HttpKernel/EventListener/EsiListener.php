@@ -20,6 +20,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * EsiListener adds a Surrogate-Control HTTP header when the Response needs to be parsed for ESI.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.1.0
  */
 class EsiListener implements EventSubscriberInterface
 {
@@ -29,6 +31,8 @@ class EsiListener implements EventSubscriberInterface
      * Constructor.
      *
      * @param Esi $esi An ESI instance
+     *
+     * @since v2.0.0
      */
     public function __construct(Esi $esi = null)
     {
@@ -39,6 +43,8 @@ class EsiListener implements EventSubscriberInterface
      * Filters the Response.
      *
      * @param FilterResponseEvent $event A FilterResponseEvent instance
+     *
+     * @since v2.0.0
      */
     public function onKernelResponse(FilterResponseEvent $event)
     {
@@ -49,6 +55,9 @@ class EsiListener implements EventSubscriberInterface
         $this->esi->addSurrogateControl($event->getResponse());
     }
 
+    /**
+     * @since v2.1.0
+     */
     public static function getSubscribedEvents()
     {
         return array(

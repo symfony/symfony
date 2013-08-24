@@ -15,6 +15,8 @@ namespace Symfony\Component\Security\Core\Authentication\Token;
  * PreAuthenticatedToken implements a pre-authenticated token.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class PreAuthenticatedToken extends AbstractToken
 {
@@ -23,6 +25,8 @@ class PreAuthenticatedToken extends AbstractToken
 
     /**
      * Constructor.
+     *
+     * @since v2.0.0
      */
     public function __construct($user, $credentials, $providerKey, array $roles = array())
     {
@@ -41,11 +45,17 @@ class PreAuthenticatedToken extends AbstractToken
         }
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getProviderKey()
     {
         return $this->providerKey;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getCredentials()
     {
         return $this->credentials;
@@ -53,6 +63,8 @@ class PreAuthenticatedToken extends AbstractToken
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function eraseCredentials()
     {
@@ -61,11 +73,17 @@ class PreAuthenticatedToken extends AbstractToken
         $this->credentials = null;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function serialize()
     {
         return serialize(array($this->credentials, $this->providerKey, parent::serialize()));
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function unserialize($str)
     {
         list($this->credentials, $this->providerKey, $parentStr) = unserialize($str);

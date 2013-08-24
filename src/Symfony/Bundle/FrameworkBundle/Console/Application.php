@@ -24,6 +24,8 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  * Application.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class Application extends BaseApplication
 {
@@ -34,6 +36,8 @@ class Application extends BaseApplication
      * Constructor.
      *
      * @param KernelInterface $kernel A KernelInterface instance
+     *
+     * @since v2.0.0
      */
     public function __construct(KernelInterface $kernel)
     {
@@ -51,6 +55,8 @@ class Application extends BaseApplication
      * Gets the Kernel associated with this Console.
      *
      * @return KernelInterface A KernelInterface instance
+     *
+     * @since v2.0.0
      */
     public function getKernel()
     {
@@ -64,6 +70,8 @@ class Application extends BaseApplication
      * @param OutputInterface $output An Output instance
      *
      * @return integer 0 if everything went fine, or an error code
+     *
+     * @since v2.0.0
      */
     public function doRun(InputInterface $input, OutputInterface $output)
     {
@@ -96,6 +104,9 @@ class Application extends BaseApplication
         return parent::doRun($input, $output);
     }
 
+    /**
+     * @since v2.0.0
+     */
     protected function registerCommands()
     {
         foreach ($this->kernel->getBundles() as $bundle) {

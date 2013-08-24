@@ -22,6 +22,8 @@ interface PackageInterface
      * Returns the asset package version.
      *
      * @return string The version string
+     *
+     * @since v2.1.0
      */
     public function getVersion();
 
@@ -31,6 +33,8 @@ interface PackageInterface
      * @param string $path A path
      *
      * @return string The public path
+     *
+     * @since v2.1.0
      */
     public function getUrl($path);
 }

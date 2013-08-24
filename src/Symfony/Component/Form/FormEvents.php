@@ -12,6 +12,8 @@ namespace Symfony\Component\Form;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.0.0
  */
 final class FormEvents
 {
@@ -43,6 +45,9 @@ final class FormEvents
      */
     const POST_BIND = 'form.post_bind';
 
+    /**
+     * @since v2.1.0
+     */
     private function __construct()
     {
     }

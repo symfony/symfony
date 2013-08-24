@@ -20,11 +20,15 @@ namespace Symfony\Component\Intl\ResourceBundle\Writer;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @see http://source.icu-project.org/repos/icu/icuhtml/trunk/design/bnf_rb.txt
+ *
+ * @since v2.3.0
  */
 class TextBundleWriter implements BundleWriterInterface
 {
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function write($path, $locale, $data)
     {
@@ -43,6 +47,8 @@ class TextBundleWriter implements BundleWriterInterface
      * @param mixed    $value      The value of the node.
      *
      * @see http://source.icu-project.org/repos/icu/icuhtml/trunk/design/bnf_rb.txt
+     *
+     * @since v2.3.0
      */
     private function writeResourceBundle($file, $bundleName, $value)
     {
@@ -63,6 +69,8 @@ class TextBundleWriter implements BundleWriterInterface
      *                                around the value.
      *
      * @see http://source.icu-project.org/repos/icu/icuhtml/trunk/design/bnf_rb.txt
+     *
+     * @since v2.3.0
      */
     private function writeResource($file, $value, $indentation, $requireBraces = true)
     {
@@ -106,6 +114,8 @@ class TextBundleWriter implements BundleWriterInterface
      * @param integer  $value The value of the node.
      *
      * @see http://source.icu-project.org/repos/icu/icuhtml/trunk/design/bnf_rb.txt
+     *
+     * @since v2.3.0
      */
     private function writeInteger($file, $value)
     {
@@ -120,6 +130,8 @@ class TextBundleWriter implements BundleWriterInterface
      * @param integer  $indentation The number of levels to indent.
      *
      * @see http://source.icu-project.org/repos/icu/icuhtml/trunk/design/bnf_rb.txt
+     *
+     * @since v2.3.0
      */
     private function writeIntVector($file, array $value, $indentation)
     {
@@ -141,6 +153,8 @@ class TextBundleWriter implements BundleWriterInterface
      *                                around the value.
      *
      * @see http://source.icu-project.org/repos/icu/icuhtml/trunk/design/bnf_rb.txt
+     *
+     * @since v2.3.0
      */
     private function writeString($file, $value, $requireBraces = true)
     {
@@ -161,6 +175,8 @@ class TextBundleWriter implements BundleWriterInterface
      * @param integer  $indentation The number of levels to indent.
      *
      * @see http://source.icu-project.org/repos/icu/icuhtml/trunk/design/bnf_rb.txt
+     *
+     * @since v2.3.0
      */
     private function writeArray($file, array $value, $indentation)
     {
@@ -183,6 +199,8 @@ class TextBundleWriter implements BundleWriterInterface
      * @param resource $file        The file handle to write to.
      * @param array    $value       The value of the node.
      * @param integer  $indentation The number of levels to indent.
+     *
+     * @since v2.3.0
      */
     private function writeTable($file, array $value, $indentation)
     {

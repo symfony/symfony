@@ -16,6 +16,8 @@ namespace Symfony\Component\Process;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class ExecutableFinder
 {
@@ -25,6 +27,8 @@ class ExecutableFinder
      * Replaces default suffixes of executable.
      *
      * @param array $suffixes
+     *
+     * @since v2.0.0
      */
     public function setSuffixes(array $suffixes)
     {
@@ -35,6 +39,8 @@ class ExecutableFinder
      * Adds new possible suffix to check for executable.
      *
      * @param string $suffix
+     *
+     * @since v2.0.0
      */
     public function addSuffix($suffix)
     {
@@ -49,6 +55,8 @@ class ExecutableFinder
      * @param array  $extraDirs Additional dirs to check into
      *
      * @return string The executable path or default value
+     *
+     * @since v2.1.0
      */
     public function find($name, $default = null, array $extraDirs = array())
     {

@@ -19,6 +19,8 @@ use Doctrine\DBAL\Logging\SQLLogger;
  * DbalLogger.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.1.0
  */
 class DbalLogger implements SQLLogger
 {
@@ -33,6 +35,8 @@ class DbalLogger implements SQLLogger
      *
      * @param LoggerInterface $logger    A LoggerInterface instance
      * @param Stopwatch       $stopwatch A Stopwatch instance
+     *
+     * @since v2.1.0
      */
     public function __construct(LoggerInterface $logger = null, Stopwatch $stopwatch = null)
     {
@@ -42,6 +46,8 @@ class DbalLogger implements SQLLogger
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function startQuery($sql, array $params = null, array $types = null)
     {
@@ -83,6 +89,8 @@ class DbalLogger implements SQLLogger
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function stopQuery()
     {
@@ -96,6 +104,8 @@ class DbalLogger implements SQLLogger
      *
      * @param string $message A message to log
      * @param array  $params  The context
+     *
+     * @since v2.1.0
      */
     protected function log($message, array $params)
     {

@@ -21,6 +21,8 @@ use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
  * since this information is necessary to build the proxies in the first place.
  *
  * @author Benjamin Eberlei <kontakt@beberlei.de>
+ *
+ * @since v2.0.0
  */
 class ProxyCacheWarmer implements CacheWarmerInterface
 {
@@ -30,6 +32,8 @@ class ProxyCacheWarmer implements CacheWarmerInterface
      * Constructor.
      *
      * @param ManagerRegistry $registry A ManagerRegistry instance
+     *
+     * @since v2.1.0
      */
     public function __construct(ManagerRegistry $registry)
     {
@@ -40,6 +44,8 @@ class ProxyCacheWarmer implements CacheWarmerInterface
      * This cache warmer is not optional, without proxies fatal error occurs!
      *
      * @return false
+     *
+     * @since v2.0.0
      */
     public function isOptional()
     {
@@ -48,6 +54,8 @@ class ProxyCacheWarmer implements CacheWarmerInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function warmUp($cacheDir)
     {

@@ -20,6 +20,8 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Florian Eckerstorfer <florian@eckerstorfer.org>
+ *
+ * @since v2.0.0
  */
 class NumberToLocalizedStringTransformer implements DataTransformerInterface
 {
@@ -99,6 +101,9 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
 
     protected $roundingMode;
 
+    /**
+     * @since v2.0.0
+     */
     public function __construct($precision = null, $grouping = null, $roundingMode = null)
     {
         if (null === $grouping) {
@@ -123,6 +128,8 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
      *
      * @throws TransformationFailedException If the given value is not numeric
      *                                       or if the value can not be transformed.
+     *
+     * @since v2.0.0
      */
     public function transform($value)
     {
@@ -156,6 +163,8 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
      *
      * @throws TransformationFailedException If the given value is not a string
      *                                       or if the value can not be transformed.
+     *
+     * @since v2.0.0
      */
     public function reverseTransform($value)
     {
@@ -230,6 +239,8 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
      * Returns a preconfigured \NumberFormatter instance
      *
      * @return \NumberFormatter
+     *
+     * @since v2.0.0
      */
     protected function getNumberFormatter()
     {

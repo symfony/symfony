@@ -22,11 +22,15 @@ use Symfony\Component\Routing\Matcher\TraceableUrlMatcher;
  * A console command to test route matching.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.1.0
  */
 class RouterMatchCommand extends ContainerAwareCommand
 {
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function isEnabled()
     {
@@ -43,6 +47,8 @@ class RouterMatchCommand extends ContainerAwareCommand
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     protected function configure()
     {
@@ -63,6 +69,8 @@ EOF
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {

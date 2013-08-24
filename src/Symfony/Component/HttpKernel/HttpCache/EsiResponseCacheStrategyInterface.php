@@ -29,6 +29,8 @@ interface EsiResponseCacheStrategyInterface
      * Adds a Response.
      *
      * @param Response $response
+     *
+     * @since v2.1.0
      */
     public function add(Response $response);
 
@@ -36,6 +38,8 @@ interface EsiResponseCacheStrategyInterface
      * Updates the Response HTTP headers based on the embedded Responses.
      *
      * @param Response $response
+     *
+     * @since v2.1.0
      */
     public function update(Response $response);
 }

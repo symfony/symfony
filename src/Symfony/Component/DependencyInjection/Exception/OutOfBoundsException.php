@@ -13,6 +13,8 @@ namespace Symfony\Component\DependencyInjection\Exception;
 
 /**
  * Base OutOfBoundsException for Dependency Injection component.
+ *
+ * @since v2.1.0
  */
 class OutOfBoundsException extends \OutOfBoundsException implements ExceptionInterface
 {

@@ -22,6 +22,8 @@ interface FieldEntryInterface extends EntryInterface
      * Returns the field used for this entry.
      *
      * @return string
+     *
+     * @since v2.1.0
      */
     public function getField();
 }

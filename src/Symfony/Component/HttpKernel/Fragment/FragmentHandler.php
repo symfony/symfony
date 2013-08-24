@@ -25,6 +25,8 @@ use Symfony\Component\HttpKernel\Controller\ControllerReference;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @see FragmentRendererInterface
+ *
+ * @since v2.3.0
  */
 class FragmentHandler
 {
@@ -37,6 +39,8 @@ class FragmentHandler
      *
      * @param FragmentRendererInterface[] $renderers An array of FragmentRendererInterface instances
      * @param Boolean                     $debug     Whether the debug mode is enabled or not
+     *
+     * @since v2.2.0
      */
     public function __construct(array $renderers = array(), $debug = false)
     {
@@ -51,6 +55,8 @@ class FragmentHandler
      * Adds a renderer.
      *
      * @param FragmentRendererInterface $renderer A FragmentRendererInterface instance
+     *
+     * @since v2.2.0
      */
     public function addRenderer(FragmentRendererInterface $renderer)
     {
@@ -61,6 +67,8 @@ class FragmentHandler
      * Sets the current Request.
      *
      * @param Request $request The current Request
+     *
+     * @since v2.3.0
      */
     public function setRequest(Request $request = null)
     {
@@ -82,6 +90,8 @@ class FragmentHandler
      *
      * @throws \InvalidArgumentException when the renderer does not exist
      * @throws \RuntimeException         when the Response is not successful
+     *
+     * @since v2.2.0
      */
     public function render($uri, $renderer = 'inline', array $options = array())
     {
@@ -111,6 +121,8 @@ class FragmentHandler
      * @return string|null The Response content or null when the Response is streamed
      *
      * @throws \RuntimeException when the Response is not successful
+     *
+     * @since v2.2.0
      */
     protected function deliver(Response $response)
     {

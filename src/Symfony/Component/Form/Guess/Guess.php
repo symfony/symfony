@@ -21,6 +21,8 @@ use Symfony\Component\Form\Exception\InvalidArgumentException;
  * correct than an instance with confidence LOW_CONFIDENCE.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.0.0
  */
 abstract class Guess
 {
@@ -67,6 +69,8 @@ abstract class Guess
      * @param array $guesses A list of guesses
      *
      * @return Guess The guess with the highest confidence
+     *
+     * @since v2.1.0
      */
     public static function getBestGuess(array $guesses)
     {
@@ -89,6 +93,8 @@ abstract class Guess
      * @param integer $confidence The confidence
      *
      * @throws InvalidArgumentException if the given value of confidence is unknown
+     *
+     * @since v2.0.0
      */
     public function __construct($confidence)
     {
@@ -105,6 +111,8 @@ abstract class Guess
      *
      * @return integer One of the constants VERY_HIGH_CONFIDENCE,
      *                 HIGH_CONFIDENCE, MEDIUM_CONFIDENCE and LOW_CONFIDENCE
+     *
+     * @since v2.0.0
      */
     public function getConfidence()
     {

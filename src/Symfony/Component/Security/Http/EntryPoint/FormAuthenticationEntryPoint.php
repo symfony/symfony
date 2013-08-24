@@ -21,6 +21,8 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  * FormAuthenticationEntryPoint starts an authentication via a login form.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class FormAuthenticationEntryPoint implements AuthenticationEntryPointInterface
 {
@@ -36,6 +38,8 @@ class FormAuthenticationEntryPoint implements AuthenticationEntryPointInterface
      * @param HttpUtils           $httpUtils  An HttpUtils instance
      * @param string              $loginPath  The path to the login form
      * @param Boolean             $useForward Whether to forward or redirect to the login form
+     *
+     * @since v2.0.0
      */
     public function __construct(HttpKernelInterface $kernel, HttpUtils $httpUtils, $loginPath, $useForward = false)
     {
@@ -47,6 +51,8 @@ class FormAuthenticationEntryPoint implements AuthenticationEntryPointInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function start(Request $request, AuthenticationException $authException = null)
     {

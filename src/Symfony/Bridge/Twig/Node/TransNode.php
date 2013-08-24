@@ -13,9 +13,14 @@ namespace Symfony\Bridge\Twig\Node;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class TransNode extends \Twig_Node
 {
+    /**
+     * @since v2.1.0
+     */
     public function __construct(\Twig_NodeInterface $body, \Twig_NodeInterface $domain = null, \Twig_Node_Expression $count = null, \Twig_Node_Expression $vars = null, \Twig_Node_Expression $locale = null, $lineno = 0, $tag = null)
     {
         parent::__construct(array('count' => $count, 'body' => $body, 'domain' => $domain, 'vars' => $vars, 'locale' => $locale), array(), $lineno, $tag);
@@ -25,6 +30,8 @@ class TransNode extends \Twig_Node
      * Compiles the node to PHP.
      *
      * @param \Twig_Compiler $compiler A Twig_Compiler instance
+     *
+     * @since v2.0.0
      */
     public function compile(\Twig_Compiler $compiler)
     {
@@ -83,6 +90,9 @@ class TransNode extends \Twig_Node
         $compiler->raw(");\n");
     }
 
+    /**
+     * @since v2.0.0
+     */
     protected function compileString(\Twig_NodeInterface $body, \Twig_Node_Expression_Array $vars)
     {
         if ($body instanceof \Twig_Node_Expression_Constant) {

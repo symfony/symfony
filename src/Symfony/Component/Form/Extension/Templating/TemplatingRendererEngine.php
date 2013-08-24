@@ -17,6 +17,8 @@ use Symfony\Component\Templating\EngineInterface;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.1.0
  */
 class TemplatingRendererEngine extends AbstractRendererEngine
 {
@@ -25,6 +27,9 @@ class TemplatingRendererEngine extends AbstractRendererEngine
      */
     private $engine;
 
+    /**
+     * @since v2.1.0
+     */
     public function __construct(EngineInterface $engine, array $defaultThemes = array())
     {
         parent::__construct($defaultThemes);
@@ -34,6 +39,8 @@ class TemplatingRendererEngine extends AbstractRendererEngine
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function renderBlock(FormView $view, $resource, $blockName, array $variables = array())
     {
@@ -53,6 +60,8 @@ class TemplatingRendererEngine extends AbstractRendererEngine
      * @param string   $blockName The name of the block to load.
      *
      * @return Boolean True if the resource could be loaded, false otherwise.
+     *
+     * @since v2.1.0
      */
     protected function loadResourceForBlockName($cacheKey, FormView $view, $blockName)
     {
@@ -111,6 +120,8 @@ class TemplatingRendererEngine extends AbstractRendererEngine
      * @param mixed  $theme     The theme to load the block from.
      *
      * @return Boolean True if the resource could be loaded, false otherwise.
+     *
+     * @since v2.1.0
      */
     protected function loadResourceFromTheme($cacheKey, $blockName, $theme)
     {

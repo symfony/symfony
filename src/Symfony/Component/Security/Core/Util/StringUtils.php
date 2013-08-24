@@ -15,11 +15,15 @@ namespace Symfony\Component\Security\Core\Util;
  * String utility functions.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.2.0
  */
 class StringUtils
 {
     /**
      * This class should not be instantiated
+     *
+     * @since v2.2.0
      */
     private function __construct() {}
 
@@ -32,6 +36,8 @@ class StringUtils
      * @param string $userInput   The string that the user can control
      *
      * @return Boolean true if the two strings are the same, false otherwise
+     *
+     * @since v2.2.0
      */
     public static function equals($knownString, $userInput)
     {

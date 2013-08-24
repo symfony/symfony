@@ -19,6 +19,8 @@ if (!defined('ENT_SUBSTITUTE')) {
  * Twig extension relate to PHP code and used by the profiler and the default exception templates.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class CodeExtension extends \Twig_Extension
 {
@@ -32,6 +34,8 @@ class CodeExtension extends \Twig_Extension
      * @param string $fileLinkFormat The format for links to source files
      * @param string $rootDir        The project root directory
      * @param string $charset        The charset
+     *
+     * @since v2.2.0
      */
     public function __construct($fileLinkFormat, $rootDir, $charset)
     {
@@ -42,6 +46,8 @@ class CodeExtension extends \Twig_Extension
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getFilters()
     {
@@ -57,6 +63,9 @@ class CodeExtension extends \Twig_Extension
         );
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function abbrClass($class)
     {
         $parts = explode('\\', $class);
@@ -65,6 +74,9 @@ class CodeExtension extends \Twig_Extension
         return sprintf("<abbr title=\"%s\">%s</abbr>", $class, $short);
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function abbrMethod($method)
     {
         if (false !== strpos($method, '::')) {
@@ -85,6 +97,8 @@ class CodeExtension extends \Twig_Extension
      * @param array $args The argument array
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     public function formatArgs($args)
     {
@@ -120,6 +134,8 @@ class CodeExtension extends \Twig_Extension
      * @param array $args The argument array
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     public function formatArgsAsText($args)
     {
@@ -133,6 +149,8 @@ class CodeExtension extends \Twig_Extension
      * @param int    $line The selected line number
      *
      * @return string An HTML string
+     *
+     * @since v2.0.0
      */
     public function fileExcerpt($file, $line)
     {
@@ -161,6 +179,8 @@ class CodeExtension extends \Twig_Extension
      * @param string  $text Use this text for the link rather than the file path
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     public function formatFile($file, $line, $text = null)
     {
@@ -189,6 +209,8 @@ class CodeExtension extends \Twig_Extension
      * @param integer $line The line number
      *
      * @return string A link of false
+     *
+     * @since v2.0.0
      */
     public function getFileLink($file, $line)
     {
@@ -199,6 +221,9 @@ class CodeExtension extends \Twig_Extension
         return false;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function formatFileFromText($text)
     {
         $that = $this;
@@ -208,11 +233,17 @@ class CodeExtension extends \Twig_Extension
         }, $text);
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getName()
     {
         return 'code';
     }
 
+    /**
+     * @since v2.2.0
+     */
     protected static function fixCodeMarkup($line)
     {
         // </span> ending tag from previous line

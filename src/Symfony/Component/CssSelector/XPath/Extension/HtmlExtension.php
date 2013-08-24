@@ -23,6 +23,8 @@ use Symfony\Component\CssSelector\XPath\XPathExpr;
  * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @since v2.3.0
  */
 class HtmlExtension extends AbstractExtension
 {
@@ -30,6 +32,8 @@ class HtmlExtension extends AbstractExtension
      * Constructor.
      *
      * @param Translator $translator
+     *
+     * @since v2.3.0
      */
     public function __construct(Translator $translator)
     {
@@ -41,6 +45,8 @@ class HtmlExtension extends AbstractExtension
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getPseudoClassTranslators()
     {
@@ -58,6 +64,8 @@ class HtmlExtension extends AbstractExtension
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getFunctionTranslators()
     {
@@ -70,6 +78,8 @@ class HtmlExtension extends AbstractExtension
      * @param XPathExpr $xpath
      *
      * @return XPathExpr
+     *
+     * @since v2.3.0
      */
     public function translateChecked(XPathExpr $xpath)
     {
@@ -84,6 +94,8 @@ class HtmlExtension extends AbstractExtension
      * @param XPathExpr $xpath
      *
      * @return XPathExpr
+     *
+     * @since v2.3.0
      */
     public function translateLink(XPathExpr $xpath)
     {
@@ -94,6 +106,8 @@ class HtmlExtension extends AbstractExtension
      * @param XPathExpr $xpath
      *
      * @return XPathExpr
+     *
+     * @since v2.3.0
      */
     public function translateDisabled(XPathExpr $xpath)
     {
@@ -125,6 +139,8 @@ class HtmlExtension extends AbstractExtension
      * @param XPathExpr $xpath
      *
      * @return XPathExpr
+     *
+     * @since v2.3.0
      */
     public function translateEnabled(XPathExpr $xpath)
     {
@@ -166,6 +182,8 @@ class HtmlExtension extends AbstractExtension
      * @return XPathExpr
      *
      * @throws ExpressionErrorException
+     *
+     * @since v2.3.0
      */
     public function translateLang(XPathExpr $xpath, FunctionNode $function)
     {
@@ -192,6 +210,8 @@ class HtmlExtension extends AbstractExtension
      * @param XPathExpr $xpath
      *
      * @return XPathExpr
+     *
+     * @since v2.3.0
      */
     public function translateSelected(XPathExpr $xpath)
     {
@@ -202,6 +222,8 @@ class HtmlExtension extends AbstractExtension
      * @param XPathExpr $xpath
      *
      * @return XPathExpr
+     *
+     * @since v2.3.0
      */
     public function translateInvalid(XPathExpr $xpath)
     {
@@ -212,6 +234,8 @@ class HtmlExtension extends AbstractExtension
      * @param XPathExpr $xpath
      *
      * @return XPathExpr
+     *
+     * @since v2.3.0
      */
     public function translateHover(XPathExpr $xpath)
     {
@@ -222,6 +246,8 @@ class HtmlExtension extends AbstractExtension
      * @param XPathExpr $xpath
      *
      * @return XPathExpr
+     *
+     * @since v2.3.0
      */
     public function translateVisited(XPathExpr $xpath)
     {
@@ -230,6 +256,8 @@ class HtmlExtension extends AbstractExtension
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getName()
     {

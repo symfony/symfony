@@ -19,6 +19,8 @@ use Symfony\Component\HttpFoundation\Response;
  * FirePHPHandler.
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
+ *
+ * @since v2.0.0
  */
 class FirePHPHandler extends BaseFirePHPHandler
 {
@@ -34,6 +36,8 @@ class FirePHPHandler extends BaseFirePHPHandler
 
     /**
      * Adds the headers to the response once it's created
+     *
+     * @since v2.0.0
      */
     public function onKernelResponse(FilterResponseEvent $event)
     {
@@ -59,6 +63,8 @@ class FirePHPHandler extends BaseFirePHPHandler
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     protected function sendHeader($header, $content)
     {
@@ -75,6 +81,8 @@ class FirePHPHandler extends BaseFirePHPHandler
 
     /**
      * Override default behavior since we check the user agent in onKernelResponse
+     *
+     * @since v2.0.10
      */
     protected function headersAccepted()
     {

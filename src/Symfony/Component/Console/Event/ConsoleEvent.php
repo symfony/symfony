@@ -20,6 +20,8 @@ use Symfony\Component\EventDispatcher\Event;
  * Allows to inspect input and output of a command.
  *
  * @author Francesco Levorato <git@flevour.net>
+ *
+ * @since v2.3.0
  */
 class ConsoleEvent extends Event
 {
@@ -28,6 +30,9 @@ class ConsoleEvent extends Event
     private $input;
     private $output;
 
+    /**
+     * @since v2.3.0
+     */
     public function __construct(Command $command, InputInterface $input, OutputInterface $output)
     {
         $this->command = $command;
@@ -39,6 +44,8 @@ class ConsoleEvent extends Event
      * Gets the command that is executed.
      *
      * @return Command A Command instance
+     *
+     * @since v2.3.0
      */
     public function getCommand()
     {
@@ -49,6 +56,8 @@ class ConsoleEvent extends Event
      * Gets the input instance.
      *
      * @return InputInterface An InputInterface instance
+     *
+     * @since v2.3.0
      */
     public function getInput()
     {
@@ -59,6 +68,8 @@ class ConsoleEvent extends Event
      * Gets the output instance.
      *
      * @return OutputInterface An OutputInterface instance
+     *
+     * @since v2.3.0
      */
     public function getOutput()
     {

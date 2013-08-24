@@ -18,12 +18,17 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\MoneyToLocalizedString
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+/**
+ * @since v2.0.0
+ */
 class MoneyType extends AbstractType
 {
     protected static $patterns = array();
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -39,6 +44,8 @@ class MoneyType extends AbstractType
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
@@ -47,6 +54,8 @@ class MoneyType extends AbstractType
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
@@ -61,6 +70,8 @@ class MoneyType extends AbstractType
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getName()
     {
@@ -72,6 +83,8 @@ class MoneyType extends AbstractType
      *
      * The pattern contains the placeholder "{{ widget }}" where the HTML tag should
      * be inserted
+     *
+     * @since v2.2.0
      */
     protected static function getPattern($currency)
     {

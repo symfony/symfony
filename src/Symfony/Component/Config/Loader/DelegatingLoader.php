@@ -20,6 +20,8 @@ use Symfony\Component\Config\Exception\FileLoaderLoadException;
  * a chance to load a given resource (handled by the resolver)
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class DelegatingLoader extends Loader
 {
@@ -27,6 +29,8 @@ class DelegatingLoader extends Loader
      * Constructor.
      *
      * @param LoaderResolverInterface $resolver A LoaderResolverInterface instance
+     *
+     * @since v2.0.0
      */
     public function __construct(LoaderResolverInterface $resolver)
     {
@@ -42,6 +46,8 @@ class DelegatingLoader extends Loader
      * @return mixed
      *
      * @throws FileLoaderLoadException if no loader is found.
+     *
+     * @since v2.0.0
      */
     public function load($resource, $type = null)
     {
@@ -54,6 +60,8 @@ class DelegatingLoader extends Loader
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function supports($resource, $type = null)
     {

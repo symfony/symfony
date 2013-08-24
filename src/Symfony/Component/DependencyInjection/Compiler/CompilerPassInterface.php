@@ -28,6 +28,8 @@ interface CompilerPassInterface
      * @param ContainerBuilder $container
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function process(ContainerBuilder $container);
 }

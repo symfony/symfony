@@ -21,9 +21,14 @@ use Symfony\Bundle\FrameworkBundle\Templating\Helper\FormHelper;
  * Integrates the Templating component with the Form library.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.1.0
  */
 class TemplatingExtension extends AbstractExtension
 {
+    /**
+     * @since v2.1.0
+     */
     public function __construct(PhpEngine $engine, CsrfProviderInterface $csrfProvider = null, array $defaultThemes = array())
     {
         $engine->addHelpers(array(

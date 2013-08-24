@@ -20,6 +20,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @since v2.3.0
  */
 abstract class Descriptor implements DescriptorInterface
 {
@@ -74,6 +76,8 @@ abstract class Descriptor implements DescriptorInterface
      * @param array         $options
      *
      * @return string|mixed
+     *
+     * @since v2.3.0
      */
     abstract protected function describeInputArgument(InputArgument $argument, array $options = array());
 
@@ -84,6 +88,8 @@ abstract class Descriptor implements DescriptorInterface
      * @param array       $options
      *
      * @return string|mixed
+     *
+     * @since v2.3.0
      */
     abstract protected function describeInputOption(InputOption $option, array $options = array());
 
@@ -94,6 +100,8 @@ abstract class Descriptor implements DescriptorInterface
      * @param array           $options
      *
      * @return string|mixed
+     *
+     * @since v2.3.0
      */
     abstract protected function describeInputDefinition(InputDefinition $definition, array $options = array());
 
@@ -104,6 +112,8 @@ abstract class Descriptor implements DescriptorInterface
      * @param array   $options
      *
      * @return string|mixed
+     *
+     * @since v2.3.0
      */
     abstract protected function describeCommand(Command $command, array $options = array());
 
@@ -114,6 +124,8 @@ abstract class Descriptor implements DescriptorInterface
      * @param array       $options
      *
      * @return string|mixed
+     *
+     * @since v2.3.0
      */
     abstract protected function describeApplication(Application $application, array $options = array());
 }

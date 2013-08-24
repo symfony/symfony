@@ -17,6 +17,8 @@ use Symfony\Component\Routing\RouteCollection;
  * GeneratorDumper is the base class for all built-in generator dumpers.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 abstract class GeneratorDumper implements GeneratorDumperInterface
 {
@@ -29,6 +31,8 @@ abstract class GeneratorDumper implements GeneratorDumperInterface
      * Constructor.
      *
      * @param RouteCollection $routes The RouteCollection to dump
+     *
+     * @since v2.0.0
      */
     public function __construct(RouteCollection $routes)
     {
@@ -37,6 +41,8 @@ abstract class GeneratorDumper implements GeneratorDumperInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getRoutes()
     {

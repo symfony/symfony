@@ -15,11 +15,16 @@ namespace Symfony\Component\Debug\Exception;
  * Error Exception with Variable Context.
  *
  * @author Christian Sciberras <uuf6429@gmail.com>
+ *
+ * @since v2.3.0
  */
 class ContextErrorException extends \ErrorException
 {
     private $context = array();
 
+    /**
+     * @since v2.3.0
+     */
     public function __construct($message, $code, $severity, $filename, $lineno, $context = array())
     {
         parent::__construct($message, $code, $severity, $filename, $lineno);
@@ -28,6 +33,8 @@ class ContextErrorException extends \ErrorException
 
     /**
      * @return array Array of variables that existed when the exception occurred
+     *
+     * @since v2.3.0
      */
     public function getContext()
     {

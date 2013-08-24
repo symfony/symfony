@@ -22,6 +22,8 @@ interface TwigRendererInterface extends FormRendererInterface
      * Sets Twig's environment.
      *
      * @param \Twig_Environment $environment
+     *
+     * @since v2.1.0
      */
     public function setEnvironment(\Twig_Environment $environment);
 }

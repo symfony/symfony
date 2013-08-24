@@ -18,6 +18,8 @@ namespace Symfony\Component\Routing\Generator\Dumper;
  * @author Tobias Schultze <http://tobion.de>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class PhpGeneratorDumper extends GeneratorDumper
 {
@@ -34,6 +36,8 @@ class PhpGeneratorDumper extends GeneratorDumper
      * @return string A PHP class representing the generator class
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function dump(array $options = array())
     {
@@ -79,6 +83,8 @@ EOF;
      * together with the routes properties (e.g. requirements).
      *
      * @return string PHP code
+     *
+     * @since v2.1.0
      */
     private function generateDeclaredRoutes()
     {
@@ -104,6 +110,8 @@ EOF;
      * Generates PHP code representing the `generate` method that implements the UrlGeneratorInterface.
      *
      * @return string PHP code
+     *
+     * @since v2.1.0
      */
     private function generateGenerateMethod()
     {

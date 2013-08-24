@@ -15,6 +15,8 @@ namespace Symfony\Component\Console;
  * Contains all events dispatched by an Application.
  *
  * @author Francesco Levorato <git@flevour.net>
+ *
+ * @since v2.3.0
  */
 final class ConsoleEvents
 {

@@ -20,11 +20,16 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollector;
  * SecurityDataCollector.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class SecurityDataCollector extends DataCollector
 {
     private $context;
 
+    /**
+     * @since v2.0.0
+     */
     public function __construct(SecurityContextInterface $context = null)
     {
         $this->context = $context;
@@ -32,6 +37,8 @@ class SecurityDataCollector extends DataCollector
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
@@ -66,6 +73,8 @@ class SecurityDataCollector extends DataCollector
      * Checks if security is enabled.
      *
      * @return Boolean true if security is enabled, false otherwise
+     *
+     * @since v2.0.0
      */
     public function isEnabled()
     {
@@ -76,6 +85,8 @@ class SecurityDataCollector extends DataCollector
      * Gets the user.
      *
      * @return string The user
+     *
+     * @since v2.0.0
      */
     public function getUser()
     {
@@ -86,6 +97,8 @@ class SecurityDataCollector extends DataCollector
      * Gets the roles of the user.
      *
      * @return array The roles
+     *
+     * @since v2.0.0
      */
     public function getRoles()
     {
@@ -96,6 +109,8 @@ class SecurityDataCollector extends DataCollector
      * Checks if the user is authenticated or not.
      *
      * @return Boolean true if the user is authenticated, false otherwise
+     *
+     * @since v2.0.0
      */
     public function isAuthenticated()
     {
@@ -106,6 +121,8 @@ class SecurityDataCollector extends DataCollector
      * Get the class name of the security token.
      *
      * @return string The token
+     *
+     * @since v2.2.0
      */
     public function getTokenClass()
     {
@@ -114,6 +131,8 @@ class SecurityDataCollector extends DataCollector
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getName()
     {

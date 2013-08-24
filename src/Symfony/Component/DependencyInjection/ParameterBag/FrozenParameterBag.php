@@ -19,6 +19,8 @@ use Symfony\Component\DependencyInjection\Exception\LogicException;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class FrozenParameterBag extends ParameterBag
 {
@@ -33,6 +35,8 @@ class FrozenParameterBag extends ParameterBag
      * @param array $parameters An array of parameters
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function __construct(array $parameters = array())
     {
@@ -44,6 +48,8 @@ class FrozenParameterBag extends ParameterBag
      * {@inheritDoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function clear()
     {
@@ -54,6 +60,8 @@ class FrozenParameterBag extends ParameterBag
      * {@inheritDoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function add(array $parameters)
     {
@@ -64,6 +72,8 @@ class FrozenParameterBag extends ParameterBag
      * {@inheritDoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function set($name, $value)
     {

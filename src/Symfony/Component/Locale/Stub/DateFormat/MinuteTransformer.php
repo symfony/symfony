@@ -21,6 +21,8 @@ use Symfony\Component\Intl\DateFormatter\DateFormat\MinuteTransformer as BaseMin
  * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
  *             {@link \Symfony\Component\Intl\DateFormatter\DateFormat\MinuteTransformer}
  *             instead.
+ *
+ * @since v2.3.0
  */
 class MinuteTransformer extends BaseMinuteTransformer
 {

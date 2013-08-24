@@ -15,6 +15,8 @@ namespace Symfony\Component\Console\Helper;
  * Helper is the base class for all helper classes.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 abstract class Helper implements HelperInterface
 {
@@ -24,6 +26,8 @@ abstract class Helper implements HelperInterface
      * Sets the helper set associated with this helper.
      *
      * @param HelperSet $helperSet A HelperSet instance
+     *
+     * @since v2.0.0
      */
     public function setHelperSet(HelperSet $helperSet = null)
     {
@@ -34,6 +38,8 @@ abstract class Helper implements HelperInterface
      * Gets the helper set associated with this helper.
      *
      * @return HelperSet A HelperSet instance
+     *
+     * @since v2.0.0
      */
     public function getHelperSet()
     {
@@ -46,6 +52,8 @@ abstract class Helper implements HelperInterface
      * @param string $string The string to check its length
      *
      * @return integer The length of the string
+     *
+     * @since v2.3.0
      */
     protected function strlen($string)
     {

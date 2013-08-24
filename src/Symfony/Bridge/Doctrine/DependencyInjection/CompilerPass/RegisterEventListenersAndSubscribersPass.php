@@ -20,6 +20,8 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
  *
  * @author Jeremy Mikola <jmikola@gmail.com>
  * @author Alexander <iam.asm89@gmail.com>
+ *
+ * @since v2.1.0
  */
 class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
 {
@@ -36,6 +38,8 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
      * @param string $managerTemplate sprintf() template for generating the event
      *                                manager's service ID for a connection name
      * @param string $tagPrefix Tag prefix for listeners and subscribers
+     *
+     * @since v2.1.0
      */
     public function __construct($connections, $managerTemplate, $tagPrefix)
     {
@@ -46,6 +50,8 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function process(ContainerBuilder $container)
     {
@@ -98,6 +104,9 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
         }
     }
 
+    /**
+     * @since v2.1.0
+     */
     private function groupByConnection(array $services, $isListener = false)
     {
         $grouped = array();
@@ -136,6 +145,9 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
         return $grouped;
     }
 
+    /**
+     * @since v2.1.0
+     */
     private function getEventManager($name)
     {
         if (null === $this->eventManagers) {

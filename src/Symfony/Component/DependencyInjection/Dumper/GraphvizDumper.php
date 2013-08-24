@@ -55,6 +55,8 @@ class GraphvizDumper extends Dumper
      * @param array $options An array of options
      *
      * @return string The dot representation of the service container
+     *
+     * @since v2.0.0
      */
     public function dump(array $options = array())
     {
@@ -88,6 +90,8 @@ class GraphvizDumper extends Dumper
      * Returns all nodes.
      *
      * @return string A string representation of all nodes
+     *
+     * @since v2.0.0
      */
     private function addNodes()
     {
@@ -105,6 +109,8 @@ class GraphvizDumper extends Dumper
      * Returns all edges.
      *
      * @return string A string representation of all edges
+     *
+     * @since v2.0.0
      */
     private function addEdges()
     {
@@ -127,6 +133,8 @@ class GraphvizDumper extends Dumper
      * @param string  $name
      *
      * @return array An array of edges
+     *
+     * @since v2.0.0
      */
     private function findEdges($id, $arguments, $required, $name)
     {
@@ -156,6 +164,8 @@ class GraphvizDumper extends Dumper
      * Finds all nodes.
      *
      * @return array An array of all nodes
+     *
+     * @since v2.0.0
      */
     private function findNodes()
     {
@@ -185,6 +195,9 @@ class GraphvizDumper extends Dumper
         return $nodes;
     }
 
+    /**
+     * @since v2.0.23
+     */
     private function cloneContainer()
     {
         $parameterBag = new ParameterBag($this->container->getParameterBag()->all());
@@ -207,6 +220,8 @@ class GraphvizDumper extends Dumper
      * Returns the start dot.
      *
      * @return string The string representation of a start dot
+     *
+     * @since v2.0.0
      */
     private function startDot()
     {
@@ -221,6 +236,8 @@ class GraphvizDumper extends Dumper
      * Returns the end dot.
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     private function endDot()
     {
@@ -233,6 +250,8 @@ class GraphvizDumper extends Dumper
      * @param array $attributes An array of attributes
      *
      * @return string A comma separated list of attributes
+     *
+     * @since v2.0.0
      */
     private function addAttributes($attributes)
     {
@@ -250,6 +269,8 @@ class GraphvizDumper extends Dumper
      * @param array $options An array of options
      *
      * @return string A space separated list of options
+     *
+     * @since v2.0.0
      */
     private function addOptions($options)
     {
@@ -267,6 +288,8 @@ class GraphvizDumper extends Dumper
      * @param string $id The identifier to dotize
      *
      * @return string A dotized string
+     *
+     * @since v2.0.0
      */
     private function dotize($id)
     {
@@ -279,6 +302,8 @@ class GraphvizDumper extends Dumper
      * @param string $id A service id
      *
      * @return array An array of aliases
+     *
+     * @since v2.0.0
      */
     private function getAliases($id)
     {

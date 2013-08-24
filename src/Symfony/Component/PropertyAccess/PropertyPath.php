@@ -19,6 +19,8 @@ use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
  * Default implementation of {@link PropertyPathInterface}.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.2.0
  */
 class PropertyPath implements \IteratorAggregate, PropertyPathInterface
 {
@@ -66,6 +68,8 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
      *
      * @throws UnexpectedTypeException      If the given path is not a string
      * @throws InvalidPropertyPathException If the syntax of the property path is not valid
+     *
+     * @since v2.2.0
      */
     public function __construct($propertyPath)
     {
@@ -135,6 +139,8 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function __toString()
     {
@@ -143,6 +149,8 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function getLength()
     {
@@ -151,6 +159,8 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function getParent()
     {
@@ -173,6 +183,8 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
      * Returns a new iterator for this path
      *
      * @return PropertyPathIteratorInterface
+     *
+     * @since v2.2.0
      */
     public function getIterator()
     {
@@ -181,6 +193,8 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function getElements()
     {
@@ -189,6 +203,8 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function getElement($index)
     {
@@ -201,6 +217,8 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function isProperty($index)
     {
@@ -213,6 +231,8 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function isIndex($index)
     {

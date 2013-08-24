@@ -18,6 +18,8 @@ use Symfony\Component\Config\Definition\Exception\InvalidDefinitionException;
  * This class provides a fluent interface for defining a node.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 abstract class NodeDefinition implements NodeParentInterface
 {
@@ -43,6 +45,8 @@ abstract class NodeDefinition implements NodeParentInterface
      *
      * @param string              $name   The name of the node
      * @param NodeParentInterface $parent The parent
+     *
+     * @since v2.0.0
      */
     public function __construct($name, NodeParentInterface $parent = null)
     {
@@ -60,6 +64,8 @@ abstract class NodeDefinition implements NodeParentInterface
      * @param NodeParentInterface $parent The parent
      *
      * @return NodeDefinition
+     *
+     * @since v2.0.0
      */
     public function setParent(NodeParentInterface $parent)
     {
@@ -74,6 +80,8 @@ abstract class NodeDefinition implements NodeParentInterface
      * @param string $info The info text
      *
      * @return NodeDefinition
+     *
+     * @since v2.1.0
      */
     public function info($info)
     {
@@ -86,6 +94,8 @@ abstract class NodeDefinition implements NodeParentInterface
      * @param string|array $example
      *
      * @return NodeDefinition
+     *
+     * @since v2.1.0
      */
     public function example($example)
     {
@@ -99,6 +109,8 @@ abstract class NodeDefinition implements NodeParentInterface
      * @param mixed $value
      *
      * @return NodeDefinition
+     *
+     * @since v2.1.0
      */
     public function attribute($key, $value)
     {
@@ -111,6 +123,8 @@ abstract class NodeDefinition implements NodeParentInterface
      * Returns the parent node.
      *
      * @return NodeParentInterface The builder of the parent node
+     *
+     * @since v2.0.0
      */
     public function end()
     {
@@ -123,6 +137,8 @@ abstract class NodeDefinition implements NodeParentInterface
      * @param Boolean $forceRootNode Whether to force this node as the root node
      *
      * @return NodeInterface
+     *
+     * @since v2.0.0
      */
     public function getNode($forceRootNode = false)
     {
@@ -150,6 +166,8 @@ abstract class NodeDefinition implements NodeParentInterface
      * @param mixed $value The default value
      *
      * @return NodeDefinition
+     *
+     * @since v2.0.0
      */
     public function defaultValue($value)
     {
@@ -163,6 +181,8 @@ abstract class NodeDefinition implements NodeParentInterface
      * Sets the node as required.
      *
      * @return NodeDefinition
+     *
+     * @since v2.0.0
      */
     public function isRequired()
     {
@@ -177,6 +197,8 @@ abstract class NodeDefinition implements NodeParentInterface
      * @param mixed $value
      *
      * @return NodeDefinition
+     *
+     * @since v2.0.0
      */
     public function treatNullLike($value)
     {
@@ -191,6 +213,8 @@ abstract class NodeDefinition implements NodeParentInterface
      * @param mixed $value
      *
      * @return NodeDefinition
+     *
+     * @since v2.0.0
      */
     public function treatTrueLike($value)
     {
@@ -205,6 +229,8 @@ abstract class NodeDefinition implements NodeParentInterface
      * @param mixed $value
      *
      * @return NodeDefinition
+     *
+     * @since v2.0.0
      */
     public function treatFalseLike($value)
     {
@@ -217,6 +243,8 @@ abstract class NodeDefinition implements NodeParentInterface
      * Sets null as the default value.
      *
      * @return NodeDefinition
+     *
+     * @since v2.0.0
      */
     public function defaultNull()
     {
@@ -227,6 +255,8 @@ abstract class NodeDefinition implements NodeParentInterface
      * Sets true as the default value.
      *
      * @return NodeDefinition
+     *
+     * @since v2.0.0
      */
     public function defaultTrue()
     {
@@ -237,6 +267,8 @@ abstract class NodeDefinition implements NodeParentInterface
      * Sets false as the default value.
      *
      * @return NodeDefinition
+     *
+     * @since v2.0.0
      */
     public function defaultFalse()
     {
@@ -247,6 +279,8 @@ abstract class NodeDefinition implements NodeParentInterface
      * Sets an expression to run before the normalization.
      *
      * @return ExprBuilder
+     *
+     * @since v2.1.0
      */
     public function beforeNormalization()
     {
@@ -257,6 +291,8 @@ abstract class NodeDefinition implements NodeParentInterface
      * Denies the node value being empty.
      *
      * @return NodeDefinition
+     *
+     * @since v2.1.0
      */
     public function cannotBeEmpty()
     {
@@ -273,6 +309,8 @@ abstract class NodeDefinition implements NodeParentInterface
      * An exception should be thrown when the node is not valid.
      *
      * @return ExprBuilder
+     *
+     * @since v2.1.0
      */
     public function validate()
     {
@@ -285,6 +323,8 @@ abstract class NodeDefinition implements NodeParentInterface
      * @param Boolean $deny Whether the overwriting is forbidden or not
      *
      * @return NodeDefinition
+     *
+     * @since v2.1.0
      */
     public function cannotBeOverwritten($deny = true)
     {
@@ -297,6 +337,8 @@ abstract class NodeDefinition implements NodeParentInterface
      * Gets the builder for validation rules.
      *
      * @return ValidationBuilder
+     *
+     * @since v2.0.0
      */
     protected function validation()
     {
@@ -311,6 +353,8 @@ abstract class NodeDefinition implements NodeParentInterface
      * Gets the builder for merging rules.
      *
      * @return MergeBuilder
+     *
+     * @since v2.0.0
      */
     protected function merge()
     {
@@ -325,6 +369,8 @@ abstract class NodeDefinition implements NodeParentInterface
      * Gets the builder for normalization rules.
      *
      * @return NormalizationBuilder
+     *
+     * @since v2.1.0
      */
     protected function normalization()
     {
@@ -341,6 +387,8 @@ abstract class NodeDefinition implements NodeParentInterface
      * @return NodeInterface $node The node instance
      *
      * @throws InvalidDefinitionException When the definition is invalid
+     *
+     * @since v2.0.0
      */
     abstract protected function createNode();
 

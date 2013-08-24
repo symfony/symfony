@@ -20,6 +20,8 @@ use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Tobias Schultze <http://tobion.de>
+ *
+ * @since v2.1.0
  */
 class OptionsResolver implements OptionsResolverInterface
 {
@@ -55,6 +57,8 @@ class OptionsResolver implements OptionsResolverInterface
 
     /**
      * Creates a new instance.
+     *
+     * @since v2.1.0
      */
     public function __construct()
     {
@@ -63,6 +67,8 @@ class OptionsResolver implements OptionsResolverInterface
 
     /**
      * Clones the resolver.
+     *
+     * @since v2.1.0
      */
     public function __clone()
     {
@@ -71,6 +77,8 @@ class OptionsResolver implements OptionsResolverInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function setDefaults(array $defaultValues)
     {
@@ -85,6 +93,8 @@ class OptionsResolver implements OptionsResolverInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function replaceDefaults(array $defaultValues)
     {
@@ -99,6 +109,8 @@ class OptionsResolver implements OptionsResolverInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function setOptional(array $optionNames)
     {
@@ -115,6 +127,8 @@ class OptionsResolver implements OptionsResolverInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function setRequired(array $optionNames)
     {
@@ -135,6 +149,8 @@ class OptionsResolver implements OptionsResolverInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function setAllowedValues(array $allowedValues)
     {
@@ -147,6 +163,8 @@ class OptionsResolver implements OptionsResolverInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function addAllowedValues(array $allowedValues)
     {
@@ -159,6 +177,8 @@ class OptionsResolver implements OptionsResolverInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function setAllowedTypes(array $allowedTypes)
     {
@@ -171,6 +191,8 @@ class OptionsResolver implements OptionsResolverInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function addAllowedTypes(array $allowedTypes)
     {
@@ -183,6 +205,8 @@ class OptionsResolver implements OptionsResolverInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function setNormalizers(array $normalizers)
     {
@@ -197,6 +221,8 @@ class OptionsResolver implements OptionsResolverInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function isKnown($option)
     {
@@ -205,6 +231,8 @@ class OptionsResolver implements OptionsResolverInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function isRequired($option)
     {
@@ -213,6 +241,8 @@ class OptionsResolver implements OptionsResolverInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function resolve(array $options = array())
     {
@@ -243,6 +273,8 @@ class OptionsResolver implements OptionsResolverInterface
      * @param array $options An list of option names as keys.
      *
      * @throws InvalidOptionsException If any of the options has not been defined.
+     *
+     * @since v2.1.0
      */
     private function validateOptionsExistence(array $options)
     {
@@ -267,6 +299,8 @@ class OptionsResolver implements OptionsResolverInterface
      * @param array $options An list of option names as keys.
      *
      * @throws MissingOptionsException If a required option is missing.
+     *
+     * @since v2.1.0
      */
     private function validateOptionsCompleteness(array $options)
     {
@@ -290,6 +324,8 @@ class OptionsResolver implements OptionsResolverInterface
      *
      * @throws InvalidOptionsException If any of the values does not match the
      *                                 allowed values of the option.
+     *
+     * @since v2.1.0
      */
     private function validateOptionValues(array $options)
     {
@@ -308,6 +344,8 @@ class OptionsResolver implements OptionsResolverInterface
      *
      * @throws InvalidOptionsException If any of the types does not match the
      *                                 allowed types of the option.
+     *
+     * @since v2.1.0
      */
     private function validateOptionTypes(array $options)
     {

@@ -20,6 +20,8 @@ interface StubbingContextInterface
      * Returns the directory where the binary resource bundles are stored.
      *
      * @return string An absolute path to a directory.
+     *
+     * @since v2.3.0
      */
     public function getBinaryDir();
 
@@ -27,6 +29,8 @@ interface StubbingContextInterface
      * Returns the directory where the stub resource bundles are stored.
      *
      * @return string An absolute path to a directory.
+     *
+     * @since v2.3.0
      */
     public function getStubDir();
 
@@ -34,6 +38,8 @@ interface StubbingContextInterface
      * Returns a tool for manipulating the filesystem.
      *
      * @return \Symfony\Component\Filesystem\Filesystem The filesystem manipulator.
+     *
+     * @since v2.3.0
      */
     public function getFilesystem();
 
@@ -41,6 +47,8 @@ interface StubbingContextInterface
      * Returns the ICU version of the bundles being converted.
      *
      * @return string The ICU version string.
+     *
+     * @since v2.3.0
      */
     public function getIcuVersion();
 }

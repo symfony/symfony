@@ -17,11 +17,15 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Proxy;
  * This proxy is built-in session handlers in PHP 5.3.x
  *
  * @author Drak <drak@zikula.org>
+ *
+ * @since v2.1.0
  */
 class NativeProxy extends AbstractProxy
 {
     /**
      * Constructor.
+     *
+     * @since v2.1.0
      */
     public function __construct()
     {
@@ -33,6 +37,8 @@ class NativeProxy extends AbstractProxy
      * Returns true if this handler wraps an internal PHP session save handler using \SessionHandler.
      *
      * @return Boolean False.
+     *
+     * @since v2.1.0
      */
     public function isWrapper()
     {

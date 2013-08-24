@@ -15,11 +15,15 @@ namespace Symfony\Component\Intl\ResourceBundle;
  * Default implementation of {@link RegionBundleInterface}.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.3.0
  */
 class RegionBundle extends AbstractBundle implements RegionBundleInterface
 {
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getCountryName($country, $locale = null)
     {
@@ -32,6 +36,8 @@ class RegionBundle extends AbstractBundle implements RegionBundleInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getCountryNames($locale = null)
     {

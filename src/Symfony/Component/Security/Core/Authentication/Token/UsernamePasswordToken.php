@@ -15,6 +15,8 @@ namespace Symfony\Component\Security\Core\Authentication\Token;
  * UsernamePasswordToken implements a username and password token.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class UsernamePasswordToken extends AbstractToken
 {
@@ -30,6 +32,8 @@ class UsernamePasswordToken extends AbstractToken
      * @param RoleInterface[] $roles       An array of roles
      *
      * @throws \InvalidArgumentException
+     *
+     * @since v2.0.0
      */
     public function __construct($user, $credentials, $providerKey, array $roles = array())
     {
@@ -48,6 +52,8 @@ class UsernamePasswordToken extends AbstractToken
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function setAuthenticated($isAuthenticated)
     {
@@ -58,11 +64,17 @@ class UsernamePasswordToken extends AbstractToken
         parent::setAuthenticated(false);
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getCredentials()
     {
         return $this->credentials;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getProviderKey()
     {
         return $this->providerKey;
@@ -70,6 +82,8 @@ class UsernamePasswordToken extends AbstractToken
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function eraseCredentials()
     {
@@ -80,6 +94,8 @@ class UsernamePasswordToken extends AbstractToken
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function serialize()
     {
@@ -88,6 +104,8 @@ class UsernamePasswordToken extends AbstractToken
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function unserialize($serialized)
     {

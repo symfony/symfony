@@ -20,6 +20,8 @@ use Symfony\Component\CssSelector\Parser\Token;
  * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @since v2.3.0
  */
 class FunctionNode extends AbstractNode
 {
@@ -42,6 +44,8 @@ class FunctionNode extends AbstractNode
      * @param NodeInterface $selector
      * @param string        $name
      * @param Token[]       $arguments
+     *
+     * @since v2.3.0
      */
     public function __construct(NodeInterface $selector, $name, array $arguments = array())
     {
@@ -52,6 +56,8 @@ class FunctionNode extends AbstractNode
 
     /**
      * @return NodeInterface
+     *
+     * @since v2.3.0
      */
     public function getSelector()
     {
@@ -60,6 +66,8 @@ class FunctionNode extends AbstractNode
 
     /**
      * @return string
+     *
+     * @since v2.3.0
      */
     public function getName()
     {
@@ -68,6 +76,8 @@ class FunctionNode extends AbstractNode
 
     /**
      * @return Token[]
+     *
+     * @since v2.3.0
      */
     public function getArguments()
     {
@@ -76,6 +86,8 @@ class FunctionNode extends AbstractNode
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getSpecificity()
     {
@@ -84,6 +96,8 @@ class FunctionNode extends AbstractNode
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function __toString()
     {

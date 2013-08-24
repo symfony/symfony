@@ -15,6 +15,8 @@
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @see \Symfony\Component\Intl\Locale\Locale
+ *
+ * @since v2.3.0
  */
 class Locale extends \Symfony\Component\Intl\Locale\Locale
 {

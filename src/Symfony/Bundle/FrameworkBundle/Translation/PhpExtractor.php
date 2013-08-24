@@ -19,6 +19,8 @@ use Symfony\Component\Translation\Extractor\ExtractorInterface;
  * PhpExtractor extracts translation messages from a php template.
  *
  * @author Michel Salib <michelsalib@hotmail.com>
+ *
+ * @since v2.1.0
  */
 class PhpExtractor implements ExtractorInterface
 {
@@ -53,6 +55,8 @@ class PhpExtractor implements ExtractorInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function extract($directory, MessageCatalogue $catalog)
     {
@@ -66,6 +70,8 @@ class PhpExtractor implements ExtractorInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function setPrefix($prefix)
     {
@@ -77,6 +83,8 @@ class PhpExtractor implements ExtractorInterface
      *
      * @param mixed $token
      * @return string
+     *
+     * @since v2.1.0
      */
     protected function normalizeToken($token)
     {
@@ -92,6 +100,8 @@ class PhpExtractor implements ExtractorInterface
      *
      * @param array            $tokens
      * @param MessageCatalogue $catalog
+     *
+     * @since v2.1.0
      */
     protected function parseTokens($tokens, MessageCatalogue $catalog)
     {

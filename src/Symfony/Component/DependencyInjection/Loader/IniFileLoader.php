@@ -28,6 +28,8 @@ class IniFileLoader extends FileLoader
      * @param string $type The resource type
      *
      * @throws InvalidArgumentException When ini file is not valid
+     *
+     * @since v2.0.0
      */
     public function load($file, $type = null)
     {
@@ -54,6 +56,8 @@ class IniFileLoader extends FileLoader
      * @param string $type     The resource type
      *
      * @return Boolean true if this class supports the given resource, false otherwise
+     *
+     * @since v2.0.0
      */
     public function supports($resource, $type = null)
     {

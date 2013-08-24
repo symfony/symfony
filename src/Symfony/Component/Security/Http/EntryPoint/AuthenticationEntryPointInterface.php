@@ -29,6 +29,8 @@ interface AuthenticationEntryPointInterface
      * @param AuthenticationException $authException The exception that started the authentication process
      *
      * @return Response
+     *
+     * @since v2.1.0
      */
     public function start(Request $request, AuthenticationException $authException = null);
 }

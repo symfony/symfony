@@ -18,9 +18,14 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
  * Represents the Propel form extension, which loads the Propel functionality.
  *
  * @author Joseph Rouff <rouffj@gmail.com>
+ *
+ * @since v2.1.0
  */
 class PropelExtension extends AbstractExtension
 {
+    /**
+     * @since v2.1.0
+     */
     protected function loadTypes()
     {
         return array(
@@ -30,6 +35,9 @@ class PropelExtension extends AbstractExtension
         );
     }
 
+    /**
+     * @since v2.1.0
+     */
     protected function loadTypeGuesser()
     {
         return new PropelTypeGuesser();

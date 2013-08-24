@@ -27,6 +27,8 @@ use Symfony\Component\EventDispatcher\Debug\TraceableEventDispatcherInterface;
  * This event dispatcher delegates the dispatching to another one.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.2.0
  */
 class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEventDispatcherInterface
 {
@@ -45,6 +47,8 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
      * @param EventDispatcherInterface $dispatcher An EventDispatcherInterface instance
      * @param Stopwatch                $stopwatch  A Stopwatch instance
      * @param LoggerInterface          $logger     A LoggerInterface instance
+     *
+     * @since v2.2.0
      */
     public function __construct(EventDispatcherInterface $dispatcher, Stopwatch $stopwatch, LoggerInterface $logger = null)
     {
@@ -60,6 +64,8 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
      * Sets the profiler.
      *
      * @param Profiler|null $profiler A Profiler instance
+     *
+     * @since v2.2.0
      */
     public function setProfiler(Profiler $profiler = null)
     {
@@ -68,6 +74,8 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function addListener($eventName, $listener, $priority = 0)
     {
@@ -76,6 +84,8 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function addSubscriber(EventSubscriberInterface $subscriber)
     {
@@ -84,6 +94,8 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function removeListener($eventName, $listener)
     {
@@ -92,6 +104,8 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function removeSubscriber(EventSubscriberInterface $subscriber)
     {
@@ -100,6 +114,8 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function getListeners($eventName = null)
     {
@@ -108,6 +124,8 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function hasListeners($eventName = null)
     {
@@ -116,6 +134,8 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function dispatch($eventName, Event $event = null)
     {
@@ -151,6 +171,8 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function getCalledListeners()
     {
@@ -159,6 +181,8 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function getNotCalledListeners()
     {
@@ -183,6 +207,8 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
      * @param array  $arguments The method arguments
      *
      * @return mixed
+     *
+     * @since v2.2.0
      */
     public function __call($method, $arguments)
     {
@@ -195,6 +221,8 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
      * This method is public because it is used in a closure.
      * Whenever Symfony will require PHP 5.4, this could be changed
      * to a proper private method.
+     *
+     * @since v2.2.0
      */
     public function logSkippedListeners($eventName, Event $event, $listener)
     {
@@ -229,6 +257,8 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
      * This method is public because it is used in a closure.
      * Whenever Symfony will require PHP 5.4, this could be changed
      * to a proper private method.
+     *
+     * @since v2.2.0
      */
     public function preListenerCall($eventName, $listener)
     {
@@ -257,6 +287,8 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
      * @param string $eventName The event name
      *
      * @return array Informations about the listener
+     *
+     * @since v2.0.0
      */
     private function getListenerInfo($listener, $eventName)
     {
@@ -317,6 +349,8 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
      *
      * @param string  $token          Profile token
      * @param Boolean $updateChildren Whether to update the children altogether
+     *
+     * @since v2.1.0
      */
     private function updateProfiles($token, $updateChildren)
     {
@@ -332,6 +366,8 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
      *
      * @param Profile $profile        The root profile
      * @param Boolean $updateChildren Whether to update the children altogether
+     *
+     * @since v2.2.0
      */
     private function saveInfoInProfile(Profile $profile, $updateChildren)
     {
@@ -363,6 +399,9 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
         }
     }
 
+    /**
+     * @since v2.2.0
+     */
     private function preDispatch($eventName, Event $event)
     {
         // wrap all listeners before they are called
@@ -402,6 +441,9 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
         }
     }
 
+    /**
+     * @since v2.2.0
+     */
     private function postDispatch($eventName, Event $event)
     {
         switch ($eventName) {
@@ -439,6 +481,9 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
         unset($this->wrappedListeners[$this->id]);
     }
 
+    /**
+     * @since v2.2.0
+     */
     private function wrapListener($eventName, $listener)
     {
         $self = $this;
@@ -456,6 +501,9 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
         };
     }
 
+    /**
+     * @since v2.2.0
+     */
     private function unwrapListener($listener)
     {
         // get the original listener

@@ -16,6 +16,8 @@ namespace Symfony\Component\Routing;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Tobias Schultze <http://tobion.de>
+ *
+ * @since v2.0.0
  */
 class RouteCompiler implements RouteCompilerInterface
 {
@@ -34,6 +36,8 @@ class RouteCompiler implements RouteCompilerInterface
      * @throws \LogicException  If a variable is referenced more than once
      * @throws \DomainException If a variable name is numeric because PHP raises an error for such
      *                          subpatterns in PCRE and thus would break matching, e.g. "(?P<123>.+)".
+     *
+     * @since v2.2.0
      */
     public static function compile(Route $route)
     {
@@ -80,6 +84,9 @@ class RouteCompiler implements RouteCompilerInterface
         );
     }
 
+    /**
+     * @since v2.2.0
+     */
     private static function compilePattern(Route $route, $pattern, $isHost)
     {
         $tokens = array();
@@ -179,6 +186,8 @@ class RouteCompiler implements RouteCompilerInterface
      * @param string $pattern The route pattern
      *
      * @return string The next static character that functions as separator (or empty string when none available)
+     *
+     * @since v2.2.0
      */
     private static function findNextSeparator($pattern)
     {
@@ -200,6 +209,8 @@ class RouteCompiler implements RouteCompilerInterface
      * @param integer $firstOptional The index of the first optional token
      *
      * @return string The regexp pattern for a single token
+     *
+     * @since v2.2.0
      */
     private static function computeRegexp(array $tokens, $index, $firstOptional)
     {

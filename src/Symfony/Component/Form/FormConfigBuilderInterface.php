@@ -28,6 +28,8 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *                            listeners with a lower priority.
      *
      * @return self The configuration object.
+     *
+     * @since v2.1.0
      */
     public function addEventListener($eventName, $listener, $priority = 0);
 
@@ -37,6 +39,8 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      * @param EventSubscriberInterface $subscriber The subscriber to attach.
      *
      * @return self The configuration object.
+     *
+     * @since v2.1.0
      */
     public function addEventSubscriber(EventSubscriberInterface $subscriber);
 
@@ -52,6 +56,8 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      * @param Boolean                  $forcePrepend if set to true, prepend instead of appending
      *
      * @return self The configuration object.
+     *
+     * @since v2.1.0
      */
     public function addViewTransformer(DataTransformerInterface $viewTransformer, $forcePrepend = false);
 
@@ -59,6 +65,8 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      * Clears the view transformers.
      *
      * @return self The configuration object.
+     *
+     * @since v2.1.0
      */
     public function resetViewTransformers();
 
@@ -74,6 +82,8 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      * @param Boolean                  $forceAppend if set to true, append instead of prepending
      *
      * @return self The configuration object.
+     *
+     * @since v2.1.0
      */
     public function addModelTransformer(DataTransformerInterface $modelTransformer, $forceAppend = false);
 
@@ -81,6 +91,8 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      * Clears the normalization transformers.
      *
      * @return self The configuration object.
+     *
+     * @since v2.1.0
      */
     public function resetModelTransformers();
 
@@ -91,6 +103,8 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      * @param string $value The value of the attribute
      *
      * @return self The configuration object.
+     *
+     * @since v2.1.0
      */
     public function setAttribute($name, $value);
 
@@ -100,6 +114,8 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      * @param array $attributes The attributes.
      *
      * @return self The configuration object.
+     *
+     * @since v2.1.0
      */
     public function setAttributes(array $attributes);
 
@@ -109,6 +125,8 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      * @param DataMapperInterface $dataMapper
      *
      * @return self The configuration object.
+     *
+     * @since v2.1.0
      */
     public function setDataMapper(DataMapperInterface $dataMapper = null);
 
@@ -118,6 +136,8 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      * @param Boolean $disabled Whether the form is disabled
      *
      * @return self The configuration object.
+     *
+     * @since v2.1.0
      */
     public function setDisabled($disabled);
 
@@ -127,6 +147,8 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      * @param mixed $emptyData The empty data.
      *
      * @return self The configuration object.
+     *
+     * @since v2.1.0
      */
     public function setEmptyData($emptyData);
 
@@ -136,6 +158,8 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      * @param Boolean $errorBubbling
      *
      * @return self The configuration object.
+     *
+     * @since v2.1.0
      */
     public function setErrorBubbling($errorBubbling);
 
@@ -145,6 +169,8 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      * @param Boolean $required
      *
      * @return self The configuration object.
+     *
+     * @since v2.1.0
      */
     public function setRequired($required);
 
@@ -156,6 +182,8 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *             automatically based on the form's name.
      *
      * @return self The configuration object.
+     *
+     * @since v2.1.0
      */
     public function setPropertyPath($propertyPath);
 
@@ -166,6 +194,8 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      * @param Boolean $mapped Whether the form should be mapped.
      *
      * @return self The configuration object.
+     *
+     * @since v2.1.0
      */
     public function setMapped($mapped);
 
@@ -176,6 +206,8 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *                              modified by reference.
      *
      * @return self The configuration object.
+     *
+     * @since v2.1.0
      */
     public function setByReference($byReference);
 
@@ -185,6 +217,8 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      * @param Boolean $inheritData Whether the form should inherit its parent's data.
      *
      * @return self The configuration object.
+     *
+     * @since v2.3.0
      */
     public function setInheritData($inheritData);
 
@@ -196,6 +230,8 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      * @return self The configuration object.
      *
      * @see FormConfigInterface::getCompound()
+     *
+     * @since v2.1.0
      */
     public function setCompound($compound);
 
@@ -205,6 +241,8 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      * @param ResolvedFormTypeInterface $type The type of the form.
      *
      * @return self The configuration object.
+     *
+     * @since v2.1.0
      */
     public function setType(ResolvedFormTypeInterface $type);
 
@@ -214,6 +252,8 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      * @param array $data The data of the form in application format.
      *
      * @return self The configuration object.
+     *
+     * @since v2.1.0
      */
     public function setData($data);
 
@@ -227,6 +267,8 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      * @param Boolean $locked Whether to lock the default data.
      *
      * @return self The configuration object.
+     *
+     * @since v2.1.0
      */
     public function setDataLocked($locked);
 
@@ -234,6 +276,8 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      * Sets the form factory used for creating new forms.
      *
      * @param FormFactoryInterface $formFactory The form factory.
+     *
+     * @since v2.2.0
      */
     public function setFormFactory(FormFactoryInterface $formFactory);
 
@@ -243,6 +287,8 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      * @param string $action The target URL of the form.
      *
      * @return self The configuration object.
+     *
+     * @since v2.3.0
      */
     public function setAction($action);
 
@@ -252,6 +298,8 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      * @param string $method The HTTP method of the form.
      *
      * @return self The configuration object.
+     *
+     * @since v2.3.0
      */
     public function setMethod($method);
 
@@ -261,6 +309,8 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      * @param RequestHandlerInterface $requestHandler
      *
      * @return self The configuration object.
+     *
+     * @since v2.3.0
      */
     public function setRequestHandler(RequestHandlerInterface $requestHandler);
 
@@ -275,6 +325,8 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *                            {@link FormInterface::initialize()} manually.
      *
      * @return self The configuration object.
+     *
+     * @since v2.3.0
      */
     public function setAutoInitialize($initialize);
 
@@ -282,6 +334,8 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      * Builds and returns the form configuration.
      *
      * @return FormConfigInterface
+     *
+     * @since v2.1.0
      */
     public function getFormConfig();
 }

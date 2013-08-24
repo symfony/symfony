@@ -35,6 +35,8 @@ use PDO, DateTime;
  *  `class`    varchar(100) NOT NULL,
  *  `username` varchar(200) NOT NULL
  * );
+ *
+ * @since v2.3.0
  */
 class DoctrineTokenProvider implements TokenProviderInterface
 {
@@ -50,6 +52,8 @@ class DoctrineTokenProvider implements TokenProviderInterface
      * new DoctrineTokenProvider for the RemembeMe authentication service
      *
      * @param \Doctrine\DBAL\Connection $conn
+     *
+     * @since v2.3.0
      */
     public function __construct(Connection $conn)
     {
@@ -58,6 +62,8 @@ class DoctrineTokenProvider implements TokenProviderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function loadTokenBySeries($series)
     {
@@ -81,6 +87,8 @@ class DoctrineTokenProvider implements TokenProviderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function deleteTokenBySeries($series)
     {
@@ -92,6 +100,8 @@ class DoctrineTokenProvider implements TokenProviderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function updateToken($series, $tokenValue, DateTime $lastUsed)
     {
@@ -111,6 +121,8 @@ class DoctrineTokenProvider implements TokenProviderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function createNewToken(PersistentTokenInterface $token)
     {

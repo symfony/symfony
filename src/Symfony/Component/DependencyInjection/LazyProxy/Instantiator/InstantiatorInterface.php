@@ -32,6 +32,8 @@ interface InstantiatorInterface
      *                                             service instance
      *
      * @return object
+     *
+     * @since v2.3.0
      */
     public function instantiateProxy(ContainerInterface $container, Definition $definition, $id, $realInstantiator);
 }

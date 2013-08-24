@@ -26,6 +26,8 @@ use Psr\Log\LoggerInterface;
  * @author Tobias Schultze <http://tobion.de>
  *
  * @api
+ *
+ * @since v2.1.0
  */
 class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInterface
 {
@@ -85,6 +87,8 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
      * @param LoggerInterface|null $logger  A logger instance
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function __construct(RouteCollection $routes, RequestContext $context, LoggerInterface $logger = null)
     {
@@ -95,6 +99,8 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function setContext(RequestContext $context)
     {
@@ -103,6 +109,8 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getContext()
     {
@@ -111,6 +119,8 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function setStrictRequirements($enabled)
     {
@@ -119,6 +129,8 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function isStrictRequirements()
     {
@@ -127,6 +139,8 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.2.0
      */
     public function generate($name, $parameters = array(), $referenceType = self::ABSOLUTE_PATH)
     {
@@ -144,6 +158,8 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
      * @throws MissingMandatoryParametersException When some parameters are missing that are mandatory for the route
      * @throws InvalidParameterException           When a parameter value for a placeholder is not correct because
      *                                             it does not match the requirement
+     *
+     * @since v2.2.0
      */
     protected function doGenerate($variables, $defaults, $requirements, $tokens, $parameters, $name, $referenceType, $hostTokens)
     {
@@ -288,6 +304,8 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
      * @param string $targetPath The target path
      *
      * @return string The relative target path
+     *
+     * @since v2.2.0
      */
     public static function getRelativePath($basePath, $targetPath)
     {

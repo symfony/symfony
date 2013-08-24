@@ -24,6 +24,8 @@ use Symfony\Component\Templating\Asset\PackageInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Kris Wallsmith <kris@symfony.com>
+ *
+ * @since v2.0.0
  */
 class CoreAssetsHelper extends Helper implements PackageInterface
 {
@@ -35,6 +37,8 @@ class CoreAssetsHelper extends Helper implements PackageInterface
      *
      * @param PackageInterface $defaultPackage The default package
      * @param array            $namedPackages  Additional packages indexed by name
+     *
+     * @since v2.0.0
      */
     public function __construct(PackageInterface $defaultPackage, array $namedPackages = array())
     {
@@ -50,6 +54,8 @@ class CoreAssetsHelper extends Helper implements PackageInterface
      * Sets the default package.
      *
      * @param PackageInterface $defaultPackage The default package
+     *
+     * @since v2.0.0
      */
     public function setDefaultPackage(PackageInterface $defaultPackage)
     {
@@ -61,6 +67,8 @@ class CoreAssetsHelper extends Helper implements PackageInterface
      *
      * @param string           $name    The package name
      * @param PackageInterface $package The package
+     *
+     * @since v2.0.0
      */
     public function addPackage($name, PackageInterface $package)
     {
@@ -75,6 +83,8 @@ class CoreAssetsHelper extends Helper implements PackageInterface
      * @return PackageInterface An asset package
      *
      * @throws \InvalidArgumentException If there is no package by that name
+     *
+     * @since v2.0.0
      */
     public function getPackage($name = null)
     {
@@ -95,6 +105,8 @@ class CoreAssetsHelper extends Helper implements PackageInterface
      * @param string $packageName A package name
      *
      * @return string The current version
+     *
+     * @since v2.0.0
      */
     public function getVersion($packageName = null)
     {
@@ -110,6 +122,8 @@ class CoreAssetsHelper extends Helper implements PackageInterface
      * @param string $packageName The name of the asset package to use
      *
      * @return string A public path which takes into account the base path and URL path
+     *
+     * @since v2.0.0
      */
     public function getUrl($path, $packageName = null)
     {
@@ -120,6 +134,8 @@ class CoreAssetsHelper extends Helper implements PackageInterface
      * Returns the canonical name of this helper.
      *
      * @return string The canonical name
+     *
+     * @since v2.0.0
      */
     public function getName()
     {

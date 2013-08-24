@@ -21,6 +21,8 @@ interface ExtensionGuesserInterface
      *
      * @param string $mimeType The mime type
      * @return string          The guessed extension or NULL, if none could be guessed
+     *
+     * @since v2.1.0
      */
     public function guess($mimeType);
 }

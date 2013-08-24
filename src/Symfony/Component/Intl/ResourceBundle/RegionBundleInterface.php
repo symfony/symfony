@@ -26,6 +26,8 @@ interface RegionBundleInterface extends ResourceBundleInterface
      *                        Defaults to {@link \Locale::getDefault()}.
      *
      * @return string|null The name of the country or NULL if not found.
+     *
+     * @since v2.3.0
      */
     public function getCountryName($country, $locale = null);
 
@@ -36,6 +38,8 @@ interface RegionBundleInterface extends ResourceBundleInterface
      *                       Defaults to {@link \Locale::getDefault()}.
      *
      * @return string[] A list of country names indexed by country codes.
+     *
+     * @since v2.3.0
      */
     public function getCountryNames($locale = null);
 }

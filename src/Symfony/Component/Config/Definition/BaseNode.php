@@ -19,6 +19,8 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
  * The base node class
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 abstract class BaseNode implements NodeInterface
 {
@@ -38,6 +40,8 @@ abstract class BaseNode implements NodeInterface
      * @param NodeInterface $parent The parent of this node
      *
      * @throws \InvalidArgumentException if the name contains a period.
+     *
+     * @since v2.0.0
      */
     public function __construct($name, NodeInterface $parent = null)
     {
@@ -54,31 +58,49 @@ abstract class BaseNode implements NodeInterface
         $this->equivalentValues = array();
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function setAttribute($key, $value)
     {
         $this->attributes[$key] = $value;
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function getAttribute($key, $default = null)
     {
         return isset($this->attributes[$key]) ? $this->attributes[$key] : $default;
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function hasAttribute($key)
     {
         return isset($this->attributes[$key]);
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function getAttributes()
     {
         return $this->attributes;
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function setAttributes(array $attributes)
     {
         $this->attributes = $attributes;
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function removeAttribute($key)
     {
         unset($this->attributes[$key]);
@@ -88,6 +110,8 @@ abstract class BaseNode implements NodeInterface
      * Sets an info message.
      *
      * @param string $info
+     *
+     * @since v2.1.0
      */
     public function setInfo($info)
     {
@@ -98,6 +122,8 @@ abstract class BaseNode implements NodeInterface
      * Returns info message.
      *
      * @return string The info text
+     *
+     * @since v2.1.0
      */
     public function getInfo()
     {
@@ -108,6 +134,8 @@ abstract class BaseNode implements NodeInterface
      * Sets the example configuration for this node.
      *
      * @param string|array $example
+     *
+     * @since v2.1.0
      */
     public function setExample($example)
     {
@@ -118,6 +146,8 @@ abstract class BaseNode implements NodeInterface
      * Retrieves the example configuration for this node.
      *
      * @return string|array The example
+     *
+     * @since v2.1.0
      */
     public function getExample()
     {
@@ -129,6 +159,8 @@ abstract class BaseNode implements NodeInterface
      *
      * @param mixed $originalValue
      * @param mixed $equivalentValue
+     *
+     * @since v2.0.0
      */
     public function addEquivalentValue($originalValue, $equivalentValue)
     {
@@ -139,6 +171,8 @@ abstract class BaseNode implements NodeInterface
      * Set this node as required.
      *
      * @param Boolean $boolean Required node
+     *
+     * @since v2.0.0
      */
     public function setRequired($boolean)
     {
@@ -149,6 +183,8 @@ abstract class BaseNode implements NodeInterface
      * Sets if this node can be overridden.
      *
      * @param Boolean $allow
+     *
+     * @since v2.0.0
      */
     public function setAllowOverwrite($allow)
     {
@@ -159,6 +195,8 @@ abstract class BaseNode implements NodeInterface
      * Sets the closures used for normalization.
      *
      * @param \Closure[] $closures An array of Closures used for normalization
+     *
+     * @since v2.0.0
      */
     public function setNormalizationClosures(array $closures)
     {
@@ -169,6 +207,8 @@ abstract class BaseNode implements NodeInterface
      * Sets the closures used for final validation.
      *
      * @param \Closure[] $closures An array of Closures used for final validation
+     *
+     * @since v2.0.0
      */
     public function setFinalValidationClosures(array $closures)
     {
@@ -179,6 +219,8 @@ abstract class BaseNode implements NodeInterface
      * Checks if this node is required.
      *
      * @return Boolean
+     *
+     * @since v2.0.0
      */
     public function isRequired()
     {
@@ -189,6 +231,8 @@ abstract class BaseNode implements NodeInterface
      * Returns the name of this node
      *
      * @return string The Node's name.
+     *
+     * @since v2.0.0
      */
     public function getName()
     {
@@ -199,6 +243,8 @@ abstract class BaseNode implements NodeInterface
      * Retrieves the path of this node.
      *
      * @return string The Node's path
+     *
+     * @since v2.0.0
      */
     public function getPath()
     {
@@ -220,6 +266,8 @@ abstract class BaseNode implements NodeInterface
      * @return mixed The merged value
      *
      * @throws ForbiddenOverwriteException
+     *
+     * @since v2.1.0
      */
     final public function merge($leftSide, $rightSide)
     {
@@ -244,6 +292,8 @@ abstract class BaseNode implements NodeInterface
      * @param mixed $value Value to normalize.
      *
      * @return mixed The normalized value.
+     *
+     * @since v2.1.0
      */
     final public function normalize($value)
     {
@@ -274,6 +324,8 @@ abstract class BaseNode implements NodeInterface
      * @param $value
      *
      * @return $value The normalized array value
+     *
+     * @since v2.2.0
      */
     protected function preNormalize($value)
     {
@@ -298,6 +350,8 @@ abstract class BaseNode implements NodeInterface
      * @return mixed The finalized value
      *
      * @throws InvalidConfigurationException
+     *
+     * @since v2.1.0
      */
     final public function finalize($value)
     {
@@ -330,6 +384,8 @@ abstract class BaseNode implements NodeInterface
      * @param mixed $value The value to validate
      *
      * @throws InvalidTypeException when the value is invalid
+     *
+     * @since v2.0.0
      */
     abstract protected function validateType($value);
 
@@ -339,6 +395,8 @@ abstract class BaseNode implements NodeInterface
      * @param mixed $value The value to normalize.
      *
      * @return mixed The normalized value
+     *
+     * @since v2.0.0
      */
     abstract protected function normalizeValue($value);
 
@@ -349,6 +407,8 @@ abstract class BaseNode implements NodeInterface
      * @param mixed $rightSide
      *
      * @return mixed The merged value
+     *
+     * @since v2.0.0
      */
     abstract protected function mergeValues($leftSide, $rightSide);
 
@@ -358,6 +418,8 @@ abstract class BaseNode implements NodeInterface
      * @param mixed $value The value to finalize
      *
      * @return mixed The finalized value
+     *
+     * @since v2.0.0
      */
     abstract protected function finalizeValue($value);
 }

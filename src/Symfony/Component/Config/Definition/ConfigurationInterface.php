@@ -22,6 +22,8 @@ interface ConfigurationInterface
      * Generates the configuration tree builder.
      *
      * @return \Symfony\Component\Config\Definition\Builder\TreeBuilder The tree builder
+     *
+     * @since v2.1.0
      */
     public function getConfigTreeBuilder();
 }

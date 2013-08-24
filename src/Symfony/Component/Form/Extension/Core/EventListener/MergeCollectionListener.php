@@ -18,6 +18,8 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.1.0
  */
 class MergeCollectionListener implements EventSubscriberInterface
 {
@@ -40,6 +42,8 @@ class MergeCollectionListener implements EventSubscriberInterface
      *                                collection.
      * @param Boolean $allowDelete Whether values might be removed from the
      *                                collection.
+     *
+     * @since v2.1.0
      */
     public function __construct($allowAdd = false, $allowDelete = false)
     {
@@ -47,6 +51,9 @@ class MergeCollectionListener implements EventSubscriberInterface
         $this->allowDelete = $allowDelete;
     }
 
+    /**
+     * @since v2.1.0
+     */
     public static function getSubscribedEvents()
     {
         return array(
@@ -54,6 +61,9 @@ class MergeCollectionListener implements EventSubscriberInterface
         );
     }
 
+    /**
+     * @since v2.3.0
+     */
     public function onSubmit(FormEvent $event)
     {
         $dataToMergeInto = $event->getForm()->getNormData();
@@ -129,6 +139,8 @@ class MergeCollectionListener implements EventSubscriberInterface
      *
      * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
      *             {@link onSubmit()} instead.
+     *
+     * @since v2.3.0
      */
     public function onBind(FormEvent $event)
     {

@@ -19,11 +19,15 @@ use Symfony\Component\Console\Output\OutputInterface;
  * Warmup the cache.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class CacheWarmupCommand extends ContainerAwareCommand
 {
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     protected function configure()
     {
@@ -49,6 +53,8 @@ EOF
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {

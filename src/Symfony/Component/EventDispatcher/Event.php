@@ -26,6 +26,8 @@ namespace Symfony\Component\EventDispatcher;
  * @author  Bernhard Schussek <bschussek@gmail.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class Event
 {
@@ -51,6 +53,8 @@ class Event
      * @return Boolean Whether propagation was already stopped for this event.
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function isPropagationStopped()
     {
@@ -65,6 +69,8 @@ class Event
      * stopPropagation().
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function stopPropagation()
     {
@@ -77,6 +83,8 @@ class Event
      * @param EventDispatcherInterface $dispatcher
      *
      * @api
+     *
+     * @since v2.2.0
      */
     public function setDispatcher(EventDispatcherInterface $dispatcher)
     {
@@ -89,6 +97,8 @@ class Event
      * @return EventDispatcherInterface
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function getDispatcher()
     {
@@ -101,6 +111,8 @@ class Event
      * @return string
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function getName()
     {
@@ -113,6 +125,8 @@ class Event
      * @param string $name The event name.
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function setName($name)
     {

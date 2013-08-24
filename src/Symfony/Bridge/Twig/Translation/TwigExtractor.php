@@ -20,6 +20,8 @@ use Symfony\Component\Translation\MessageCatalogue;
  *
  * @author Michel Salib <michelsalib@hotmail.com>
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.1.0
  */
 class TwigExtractor implements ExtractorInterface
 {
@@ -44,6 +46,9 @@ class TwigExtractor implements ExtractorInterface
      */
     private $twig;
 
+    /**
+     * @since v2.1.0
+     */
     public function __construct(\Twig_Environment $twig)
     {
         $this->twig = $twig;
@@ -51,6 +56,8 @@ class TwigExtractor implements ExtractorInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function extract($directory, MessageCatalogue $catalogue)
     {
@@ -64,12 +71,17 @@ class TwigExtractor implements ExtractorInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function setPrefix($prefix)
     {
         $this->prefix = $prefix;
     }
 
+    /**
+     * @since v2.1.0
+     */
     protected function extractTemplate($template, MessageCatalogue $catalogue)
     {
         $visitor = $this->twig->getExtension('translator')->getTranslationNodeVisitor();

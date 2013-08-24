@@ -23,6 +23,8 @@ use Symfony\Component\HttpFoundation\Response;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class GetResponseEvent extends KernelEvent
 {
@@ -38,6 +40,8 @@ class GetResponseEvent extends KernelEvent
      * @return Response
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getResponse()
     {
@@ -50,6 +54,8 @@ class GetResponseEvent extends KernelEvent
      * @param Response $response
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setResponse(Response $response)
     {
@@ -64,6 +70,8 @@ class GetResponseEvent extends KernelEvent
      * @return Boolean Whether a response was set
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function hasResponse()
     {

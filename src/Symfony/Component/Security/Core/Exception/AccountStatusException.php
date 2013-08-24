@@ -19,6 +19,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Alexander <iam.asm89@gmail.com>
+ *
+ * @since v2.0.0
  */
 abstract class AccountStatusException extends AuthenticationException
 {
@@ -28,6 +30,8 @@ abstract class AccountStatusException extends AuthenticationException
      * Get the user.
      *
      * @return UserInterface
+     *
+     * @since v2.2.0
      */
     public function getUser()
     {
@@ -38,6 +42,8 @@ abstract class AccountStatusException extends AuthenticationException
      * Set the user.
      *
      * @param UserInterface $user
+     *
+     * @since v2.2.0
      */
     public function setUser(UserInterface $user)
     {
@@ -46,6 +52,8 @@ abstract class AccountStatusException extends AuthenticationException
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.2.0
      */
     public function serialize()
     {
@@ -57,6 +65,8 @@ abstract class AccountStatusException extends AuthenticationException
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.2.0
      */
     public function unserialize($str)
     {

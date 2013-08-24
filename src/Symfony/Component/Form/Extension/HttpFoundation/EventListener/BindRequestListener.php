@@ -22,15 +22,23 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @deprecated Deprecated since version 2.3, to be removed in 3.0. Pass the
  *             Request instance to {@link Form::process()} instead.
+ *
+ * @since v2.1.0
  */
 class BindRequestListener implements EventSubscriberInterface
 {
+    /**
+     * @since v2.1.0
+     */
     public static function getSubscribedEvents()
     {
         // High priority in order to supersede other listeners
         return array(FormEvents::PRE_BIND => array('preBind', 128));
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function preBind(FormEvent $event)
     {
         $form = $event->getForm();

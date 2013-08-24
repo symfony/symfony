@@ -15,6 +15,8 @@ namespace Symfony\Component\Intl\DateFormatter\DateFormat;
  * Parser and formatter for date formats
  *
  * @author Igor Wiedler <igor@wiedler.ch>
+ *
+ * @since v2.3.0
  */
 abstract class Transformer
 {
@@ -26,6 +28,8 @@ abstract class Transformer
      * @param int       $length   The formatted value string length
      *
      * @return string               The formatted value
+     *
+     * @since v2.3.0
      */
     abstract public function format(\DateTime $dateTime, $length);
 
@@ -35,6 +39,8 @@ abstract class Transformer
      * @param int $length The length of the value to be reverse matched
      *
      * @return string           The reverse matching regular expression
+     *
+     * @since v2.3.0
      */
     abstract public function getReverseMatchingRegExp($length);
 
@@ -46,6 +52,8 @@ abstract class Transformer
      * @param int    $length  The length of the Transformer pattern string
      *
      * @return array             An associative array
+     *
+     * @since v2.3.0
      */
     abstract public function extractDateOptions($matched, $length);
 
@@ -56,6 +64,8 @@ abstract class Transformer
      * @param int    $length The length to pad
      *
      * @return string           The padded string
+     *
+     * @since v2.3.0
      */
     protected function padLeft($value, $length)
     {

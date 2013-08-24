@@ -17,6 +17,8 @@ use Symfony\Component\Validator\Constraint;
  * @Annotation
  *
  * @author Antonio J. García Lagar <aj@garcialagar.es>
+ *
+ * @since v2.3.0
  */
 class Issn extends Constraint
 {

@@ -22,6 +22,8 @@ interface RequestContextAwareInterface
      * @param RequestContext $context The context
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function setContext(RequestContext $context);
 
@@ -31,6 +33,8 @@ interface RequestContextAwareInterface
      * @return RequestContext The context
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function getContext();
 }

@@ -18,6 +18,8 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * @author Chris Jones <leeked@gmail.com>
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.2.0
  */
 class ProgressHelper extends Helper
 {
@@ -118,6 +120,8 @@ class ProgressHelper extends Helper
      * Sets the progress bar width.
      *
      * @param int $size The progress bar size
+     *
+     * @since v2.2.0
      */
     public function setBarWidth($size)
     {
@@ -128,6 +132,8 @@ class ProgressHelper extends Helper
      * Sets the bar character.
      *
      * @param string $char A character
+     *
+     * @since v2.2.0
      */
     public function setBarCharacter($char)
     {
@@ -138,6 +144,8 @@ class ProgressHelper extends Helper
      * Sets the empty bar character.
      *
      * @param string $char A character
+     *
+     * @since v2.2.0
      */
     public function setEmptyBarCharacter($char)
     {
@@ -148,6 +156,8 @@ class ProgressHelper extends Helper
      * Sets the progress bar character.
      *
      * @param string $char A character
+     *
+     * @since v2.2.0
      */
     public function setProgressCharacter($char)
     {
@@ -158,6 +168,8 @@ class ProgressHelper extends Helper
      * Sets the progress bar format.
      *
      * @param string $format The format
+     *
+     * @since v2.2.0
      */
     public function setFormat($format)
     {
@@ -168,6 +180,8 @@ class ProgressHelper extends Helper
      * Sets the redraw frequency.
      *
      * @param int $freq The frequency in steps
+     *
+     * @since v2.2.0
      */
     public function setRedrawFrequency($freq)
     {
@@ -179,6 +193,8 @@ class ProgressHelper extends Helper
      *
      * @param OutputInterface $output An Output instance
      * @param integer         $max    Maximum steps
+     *
+     * @since v2.2.0
      */
     public function start(OutputInterface $output, $max = null)
     {
@@ -224,6 +240,8 @@ class ProgressHelper extends Helper
      * @param Boolean $redraw Whether to redraw or not
      *
      * @throws \LogicException
+     *
+     * @since v2.2.0
      */
     public function advance($step = 1, $redraw = false)
     {
@@ -248,6 +266,8 @@ class ProgressHelper extends Helper
      * @param Boolean $redraw  Whether to redraw or not
      *
      * @throws \LogicException
+     *
+     * @since v2.3.0
      */
     public function setCurrent($current, $redraw = false)
     {
@@ -277,6 +297,8 @@ class ProgressHelper extends Helper
      * @param Boolean $finish Forces the end result
      *
      * @throws \LogicException
+     *
+     * @since v2.2.0
      */
     public function display($finish = false)
     {
@@ -305,6 +327,8 @@ class ProgressHelper extends Helper
 
     /**
      * Finishes the progress output.
+     *
+     * @since v2.2.0
      */
     public function finish()
     {
@@ -325,6 +349,8 @@ class ProgressHelper extends Helper
 
     /**
      * Initializes the progress helper.
+     *
+     * @since v2.2.0
      */
     private function initialize()
     {
@@ -350,6 +376,8 @@ class ProgressHelper extends Helper
      * @param Boolean $finish Forces the end result
      *
      * @return array Array of format vars and values
+     *
+     * @since v2.2.0
      */
     private function generate($finish = false)
     {
@@ -408,6 +436,8 @@ class ProgressHelper extends Helper
      * @param integer $secs Number of seconds
      *
      * @return string Time in readable format
+     *
+     * @since v2.2.0
      */
     private function humaneTime($secs)
     {
@@ -432,6 +462,8 @@ class ProgressHelper extends Helper
      *
      * @param OutputInterface $output   An Output instance
      * @param string          $message  The message
+     *
+     * @since v2.3.0
      */
     private function overwrite(OutputInterface $output, $message)
     {
@@ -451,6 +483,8 @@ class ProgressHelper extends Helper
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.2.0
      */
     public function getName()
     {

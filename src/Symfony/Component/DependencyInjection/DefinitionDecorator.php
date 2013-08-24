@@ -20,6 +20,8 @@ use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class DefinitionDecorator extends Definition
 {
@@ -32,6 +34,8 @@ class DefinitionDecorator extends Definition
      * @param string $parent The id of Definition instance to decorate.
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function __construct($parent)
     {
@@ -47,6 +51,8 @@ class DefinitionDecorator extends Definition
      * @return string
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getParent()
     {
@@ -59,6 +65,8 @@ class DefinitionDecorator extends Definition
      * @return array An array of changes for this Definition
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getChanges()
     {
@@ -69,6 +77,8 @@ class DefinitionDecorator extends Definition
      * {@inheritDoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setClass($class)
     {
@@ -81,6 +91,8 @@ class DefinitionDecorator extends Definition
      * {@inheritDoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setFactoryClass($class)
     {
@@ -93,6 +105,8 @@ class DefinitionDecorator extends Definition
      * {@inheritDoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setFactoryMethod($method)
     {
@@ -105,6 +119,8 @@ class DefinitionDecorator extends Definition
      * {@inheritDoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setFactoryService($service)
     {
@@ -117,6 +133,8 @@ class DefinitionDecorator extends Definition
      * {@inheritDoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setConfigurator($callable)
     {
@@ -129,6 +147,8 @@ class DefinitionDecorator extends Definition
      * {@inheritDoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setFile($file)
     {
@@ -141,6 +161,8 @@ class DefinitionDecorator extends Definition
      * {@inheritDoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setPublic($boolean)
     {
@@ -153,6 +175,8 @@ class DefinitionDecorator extends Definition
      * {@inheritDoc}
      *
      * @api
+     *
+     * @since v2.3.3
      */
     public function setLazy($boolean)
     {
@@ -174,6 +198,8 @@ class DefinitionDecorator extends Definition
      * @throws OutOfBoundsException When the argument does not exist
      *
      * @api
+     *
+     * @since v2.0.10
      */
     public function getArgument($index)
     {
@@ -205,6 +231,8 @@ class DefinitionDecorator extends Definition
      * @throws InvalidArgumentException when $index isn't an integer
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function replaceArgument($index, $value)
     {

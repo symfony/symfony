@@ -15,6 +15,8 @@ use Symfony\Component\Routing\Matcher\RedirectableUrlMatcher as BaseMatcher;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.1.0
  */
 class RedirectableUrlMatcher extends BaseMatcher
 {
@@ -26,6 +28,8 @@ class RedirectableUrlMatcher extends BaseMatcher
      * @param string $scheme The URL scheme (null to keep the current one)
      *
      * @return array An array of parameters
+     *
+     * @since v2.0.0
      */
     public function redirect($path, $route, $scheme = null)
     {

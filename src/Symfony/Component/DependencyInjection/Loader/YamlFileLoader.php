@@ -36,6 +36,8 @@ class YamlFileLoader extends FileLoader
      *
      * @param mixed  $file The resource
      * @param string $type The resource type
+     *
+     * @since v2.0.0
      */
     public function load($file, $type = null)
     {
@@ -74,6 +76,8 @@ class YamlFileLoader extends FileLoader
      * @param string $type     The resource type
      *
      * @return Boolean true if this class supports the given resource, false otherwise
+     *
+     * @since v2.0.0
      */
     public function supports($resource, $type = null)
     {
@@ -85,6 +89,8 @@ class YamlFileLoader extends FileLoader
      *
      * @param array  $content
      * @param string $file
+     *
+     * @since v2.0.0
      */
     private function parseImports($content, $file)
     {
@@ -103,6 +109,8 @@ class YamlFileLoader extends FileLoader
      *
      * @param array  $content
      * @param string $file
+     *
+     * @since v2.0.0
      */
     private function parseDefinitions($content, $file)
     {
@@ -123,6 +131,8 @@ class YamlFileLoader extends FileLoader
      * @param string $file
      *
      * @throws InvalidArgumentException When tags are invalid
+     *
+     * @since v2.0.0
      */
     private function parseDefinition($id, $service, $file)
     {
@@ -242,6 +252,8 @@ class YamlFileLoader extends FileLoader
      * @param string $file
      *
      * @return array The file content
+     *
+     * @since v2.1.10
      */
     protected function loadFile($file)
     {
@@ -269,6 +281,8 @@ class YamlFileLoader extends FileLoader
      * @return array
      *
      * @throws InvalidArgumentException When service file is not valid
+     *
+     * @since v2.0.0
      */
     private function validate($content, $file)
     {
@@ -306,6 +320,8 @@ class YamlFileLoader extends FileLoader
      * @param string $value
      *
      * @return Reference
+     *
+     * @since v2.0.0
      */
     private function resolveServices($value)
     {
@@ -342,6 +358,8 @@ class YamlFileLoader extends FileLoader
      * Loads from Extensions
      *
      * @param array $content
+     *
+     * @since v2.0.0
      */
     private function loadFromExtensions($content)
     {

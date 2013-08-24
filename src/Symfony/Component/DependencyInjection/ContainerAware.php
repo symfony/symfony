@@ -17,6 +17,8 @@ namespace Symfony\Component\DependencyInjection;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.1.0
  */
 abstract class ContainerAware implements ContainerAwareInterface
 {
@@ -33,6 +35,8 @@ abstract class ContainerAware implements ContainerAwareInterface
      * @param ContainerInterface $container A ContainerInterface instance
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setContainer(ContainerInterface $container = null)
     {

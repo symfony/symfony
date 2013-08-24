@@ -36,6 +36,8 @@ interface LoaderInterface
      *
      * @throws NotFoundResourceException when the resource cannot be found
      * @throws InvalidResourceException  when the resource cannot be loaded
+     *
+     * @since v2.1.0
      */
     public function load($resource, $locale, $domain = 'messages');
 }

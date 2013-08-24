@@ -41,6 +41,8 @@ namespace Symfony\Component\Security\Acl\Permission;
  *          action on the domain object as well as grant any permission
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class MaskBuilder
 {
@@ -75,6 +77,8 @@ class MaskBuilder
      * @param integer $mask optional; defaults to 0
      *
      * @throws \InvalidArgumentException
+     *
+     * @since v2.0.0
      */
     public function __construct($mask = 0)
     {
@@ -93,6 +97,8 @@ class MaskBuilder
      * @return MaskBuilder
      *
      * @throws \InvalidArgumentException
+     *
+     * @since v2.0.0
      */
     public function add($mask)
     {
@@ -111,6 +117,8 @@ class MaskBuilder
      * Returns the mask of this permission
      *
      * @return integer
+     *
+     * @since v2.0.0
      */
     public function get()
     {
@@ -121,6 +129,8 @@ class MaskBuilder
      * Returns a human-readable representation of the permission
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     public function getPattern()
     {
@@ -149,6 +159,8 @@ class MaskBuilder
      * @return MaskBuilder
      *
      * @throws \InvalidArgumentException
+     *
+     * @since v2.0.0
      */
     public function remove($mask)
     {
@@ -167,6 +179,8 @@ class MaskBuilder
      * Resets the PermissionBuilder
      *
      * @return MaskBuilder
+     *
+     * @since v2.0.0
      */
     public function reset()
     {
@@ -182,6 +196,8 @@ class MaskBuilder
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      * @return string
+     *
+     * @since v2.1.0
      */
     public static function getCode($mask)
     {

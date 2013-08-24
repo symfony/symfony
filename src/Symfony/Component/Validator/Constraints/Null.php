@@ -19,6 +19,8 @@ use Symfony\Component\Validator\Constraint;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class Null extends Constraint
 {

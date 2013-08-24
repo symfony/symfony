@@ -29,6 +29,8 @@ interface TemplateNameParserInterface
      * @return TemplateReferenceInterface A template
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function parse($name);
 }

@@ -18,6 +18,8 @@ namespace Symfony\Component\CssSelector\Parser;
  * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @since v2.3.0
  */
 class Reader
 {
@@ -38,6 +40,8 @@ class Reader
 
     /**
      * @param string $source
+     *
+     * @since v2.3.0
      */
     public function __construct($source)
     {
@@ -48,6 +52,8 @@ class Reader
 
     /**
      * @return bool
+     *
+     * @since v2.3.0
      */
     public function isEOF()
     {
@@ -56,6 +62,8 @@ class Reader
 
     /**
      * @return int
+     *
+     * @since v2.3.0
      */
     public function getPosition()
     {
@@ -64,6 +72,8 @@ class Reader
 
     /**
      * @return int
+     *
+     * @since v2.3.0
      */
     public function getRemainingLength()
     {
@@ -75,6 +85,8 @@ class Reader
      * @param int $offset
      *
      * @return string
+     *
+     * @since v2.3.0
      */
     public function getSubstring($length, $offset = 0)
     {
@@ -85,6 +97,8 @@ class Reader
      * @param string $string
      *
      * @return int
+     *
+     * @since v2.3.0
      */
     public function getOffset($string)
     {
@@ -97,6 +111,8 @@ class Reader
      * @param string $pattern
      *
      * @return bool
+     *
+     * @since v2.3.0
      */
     public function findPattern($pattern)
     {
@@ -111,6 +127,8 @@ class Reader
 
     /**
      * @param int $length
+     *
+     * @since v2.3.0
      */
     public function moveForward($length)
     {
@@ -118,6 +136,8 @@ class Reader
     }
 
     /**
+     *
+     * @since v2.3.0
      */
     public function moveToEnd()
     {

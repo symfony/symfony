@@ -15,6 +15,8 @@ namespace Symfony\Component\Finder\Comparator;
  * Comparator.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class Comparator
 {
@@ -25,6 +27,8 @@ class Comparator
      * Gets the target value.
      *
      * @return string The target value
+     *
+     * @since v2.0.0
      */
     public function getTarget()
     {
@@ -35,6 +39,8 @@ class Comparator
      * Sets the target value.
      *
      * @param string $target The target value
+     *
+     * @since v2.0.0
      */
     public function setTarget($target)
     {
@@ -45,6 +51,8 @@ class Comparator
      * Gets the comparison operator.
      *
      * @return string The operator
+     *
+     * @since v2.0.0
      */
     public function getOperator()
     {
@@ -57,6 +65,8 @@ class Comparator
      * @param string $operator A valid operator
      *
      * @throws \InvalidArgumentException
+     *
+     * @since v2.0.0
      */
     public function setOperator($operator)
     {
@@ -77,6 +87,8 @@ class Comparator
      * @param mixed $test A test value
      *
      * @return Boolean
+     *
+     * @since v2.0.0
      */
     public function test($test)
     {

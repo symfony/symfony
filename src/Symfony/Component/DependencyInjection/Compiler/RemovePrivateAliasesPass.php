@@ -19,6 +19,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  * one of the previous passes.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class RemovePrivateAliasesPass implements CompilerPassInterface
 {
@@ -26,6 +28,8 @@ class RemovePrivateAliasesPass implements CompilerPassInterface
      * Removes private aliases from the ContainerBuilder
      *
      * @param ContainerBuilder $container
+     *
+     * @since v2.0.0
      */
     public function process(ContainerBuilder $container)
     {

@@ -17,6 +17,8 @@ use Symfony\Component\Finder\Expression\Expression;
  * MultiplePcreFilterIterator filters files using patterns (regexps, globs or strings).
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.1.0
  */
 abstract class MultiplePcreFilterIterator extends FilterIterator
 {
@@ -29,6 +31,8 @@ abstract class MultiplePcreFilterIterator extends FilterIterator
      * @param \Iterator $iterator        The Iterator to filter
      * @param array     $matchPatterns   An array of patterns that need to match
      * @param array     $noMatchPatterns An array of patterns that need to not match
+     *
+     * @since v2.1.0
      */
     public function __construct(\Iterator $iterator, array $matchPatterns, array $noMatchPatterns)
     {
@@ -51,6 +55,8 @@ abstract class MultiplePcreFilterIterator extends FilterIterator
      * @param string $str
      *
      * @return Boolean Whether the given string is a regex
+     *
+     * @since v2.1.0
      */
     protected function isRegex($str)
     {
@@ -63,6 +69,8 @@ abstract class MultiplePcreFilterIterator extends FilterIterator
      * @param string $str Pattern
      *
      * @return string regexp corresponding to a given string
+     *
+     * @since v2.1.0
      */
     abstract protected function toRegex($str);
 }

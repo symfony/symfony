@@ -20,6 +20,8 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.3.0
  */
 class FormTypeValidatorExtension extends BaseValidatorExtension
 {
@@ -33,6 +35,9 @@ class FormTypeValidatorExtension extends BaseValidatorExtension
      */
     private $violationMapper;
 
+    /**
+     * @since v2.0.0
+     */
     public function __construct(ValidatorInterface $validator)
     {
         $this->validator = $validator;
@@ -41,6 +46,8 @@ class FormTypeValidatorExtension extends BaseValidatorExtension
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -49,6 +56,8 @@ class FormTypeValidatorExtension extends BaseValidatorExtension
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
@@ -76,6 +85,8 @@ class FormTypeValidatorExtension extends BaseValidatorExtension
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getExtendedType()
     {

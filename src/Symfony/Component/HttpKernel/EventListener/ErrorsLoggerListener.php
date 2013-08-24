@@ -21,6 +21,8 @@ use Symfony\Component\HttpKernel\KernelEvents;
  *
  * @author Colin Frei <colin@colinfrei.com>
  * @author Konstantin Myakshin <koc-dp@yandex.ru>
+ *
+ * @since v2.3.0
  */
 class ErrorsLoggerListener implements EventSubscriberInterface
 {
@@ -28,12 +30,18 @@ class ErrorsLoggerListener implements EventSubscriberInterface
 
     private $logger;
 
+    /**
+     * @since v2.3.0
+     */
     public function __construct($channel, LoggerInterface $logger = null)
     {
         $this->channel = $channel;
         $this->logger = $logger;
     }
 
+    /**
+     * @since v2.2.0
+     */
     public function injectLogger()
     {
         if (null !== $this->logger) {
@@ -41,6 +49,9 @@ class ErrorsLoggerListener implements EventSubscriberInterface
         }
     }
 
+    /**
+     * @since v2.2.0
+     */
     public static function getSubscribedEvents()
     {
         return array(KernelEvents::REQUEST => 'injectLogger');

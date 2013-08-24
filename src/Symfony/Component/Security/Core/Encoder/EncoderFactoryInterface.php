@@ -28,6 +28,8 @@ interface EncoderFactoryInterface
      * @return PasswordEncoderInterface
      *
      * @throws \RuntimeException when no password encoder could be found for the user
+     *
+     * @since v2.1.0
      */
     public function getEncoder($user);
 }

@@ -15,6 +15,8 @@ namespace Symfony\Component\Finder\Iterator;
  * FileTypeFilterIterator only keeps files, directories, or both.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.1.0
  */
 class FileTypeFilterIterator extends FilterIterator
 {
@@ -28,6 +30,8 @@ class FileTypeFilterIterator extends FilterIterator
      *
      * @param \Iterator $iterator The Iterator to filter
      * @param integer   $mode     The mode (self::ONLY_FILES or self::ONLY_DIRECTORIES)
+     *
+     * @since v2.0.0
      */
     public function __construct(\Iterator $iterator, $mode)
     {
@@ -40,6 +44,8 @@ class FileTypeFilterIterator extends FilterIterator
      * Filters the iterator values.
      *
      * @return Boolean true if the value should be kept, false otherwise
+     *
+     * @since v2.0.0
      */
     public function accept()
     {

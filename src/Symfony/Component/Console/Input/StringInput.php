@@ -21,6 +21,8 @@ namespace Symfony\Component\Console\Input;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class StringInput extends ArgvInput
 {
@@ -36,6 +38,8 @@ class StringInput extends ArgvInput
      * @deprecated The second argument is deprecated as it does not work (will be removed in 3.0), use 'bind' method instead
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function __construct($input, InputDefinition $definition = null)
     {
@@ -56,6 +60,8 @@ class StringInput extends ArgvInput
      * @return array An array of tokens
      *
      * @throws \InvalidArgumentException When unable to parse input (should never happen)
+     *
+     * @since v2.0.0
      */
     private function tokenize($input)
     {

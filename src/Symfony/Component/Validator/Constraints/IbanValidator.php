@@ -18,11 +18,15 @@ use Symfony\Component\Validator\ConstraintValidator;
  * @author Manuel Reinhard <manu@sprain.ch>
  * @author Michael Schummel
  * @link http://www.michael-schummel.de/2007/10/05/iban-prufung-mit-php/
+ *
+ * @since v2.3.0
  */
 class IbanValidator extends ConstraintValidator
 {
     /**
      * {@inheritDoc}
+     *
+     * @since v2.3.0
      */
     public function validate($value, Constraint $constraint)
     {

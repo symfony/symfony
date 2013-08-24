@@ -38,6 +38,8 @@ interface UrlMatcherInterface extends RequestContextAwareInterface
      * @throws MethodNotAllowedException If the resource was found but the request method is not allowed
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function match($pathinfo);
 }

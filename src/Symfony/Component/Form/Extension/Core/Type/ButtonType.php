@@ -18,11 +18,15 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  * A form button.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.3.0
  */
 class ButtonType extends BaseType implements ButtonTypeInterface
 {
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getParent()
     {
@@ -31,6 +35,8 @@ class ButtonType extends BaseType implements ButtonTypeInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getName()
     {

@@ -15,6 +15,8 @@ namespace Symfony\Component\Security\Core\Authentication\Token;
  * AnonymousToken represents an anonymous token.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 
 class AnonymousToken extends AbstractToken
@@ -27,6 +29,8 @@ class AnonymousToken extends AbstractToken
      * @param string          $key   The key shared with the authentication provider
      * @param string          $user  The user
      * @param RoleInterface[] $roles An array of roles
+     *
+     * @since v2.0.0
      */
     public function __construct($key, $user, array $roles = array())
     {
@@ -39,6 +43,8 @@ class AnonymousToken extends AbstractToken
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getCredentials()
     {
@@ -49,6 +55,8 @@ class AnonymousToken extends AbstractToken
      * Returns the key.
      *
      * @return string The Key
+     *
+     * @since v2.0.0
      */
     public function getKey()
     {
@@ -57,6 +65,8 @@ class AnonymousToken extends AbstractToken
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function serialize()
     {
@@ -65,6 +75,8 @@ class AnonymousToken extends AbstractToken
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.2.0
      */
     public function unserialize($serialized)
     {

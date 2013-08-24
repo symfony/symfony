@@ -19,12 +19,17 @@ use Symfony\Component\Console\Output\OutputInterface;
  * Allows to handle exception thrown in a command.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.3.0
  */
 class ConsoleExceptionEvent extends ConsoleEvent
 {
     private $exception;
     private $exitCode;
 
+    /**
+     * @since v2.3.0
+     */
     public function __construct(Command $command, InputInterface $input, OutputInterface $output, \Exception $exception, $exitCode)
     {
         parent::__construct($command, $input, $output);
@@ -37,6 +42,8 @@ class ConsoleExceptionEvent extends ConsoleEvent
      * Returns the thrown exception.
      *
      * @return \Exception The thrown exception
+     *
+     * @since v2.3.0
      */
     public function getException()
     {
@@ -49,6 +56,8 @@ class ConsoleExceptionEvent extends ConsoleEvent
      * This exception will be thrown if no response is set in the event.
      *
      * @param \Exception $exception The thrown exception
+     *
+     * @since v2.3.0
      */
     public function setException(\Exception $exception)
     {
@@ -59,6 +68,8 @@ class ConsoleExceptionEvent extends ConsoleEvent
      * Gets the exit code.
      *
      * @return integer The command exit code
+     *
+     * @since v2.3.0
      */
     public function getExitCode()
     {

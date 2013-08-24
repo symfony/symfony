@@ -26,6 +26,8 @@ class Parameter
      * Constructor.
      *
      * @param string $id The parameter key
+     *
+     * @since v2.0.0
      */
     public function __construct($id)
     {
@@ -36,6 +38,8 @@ class Parameter
      * __toString.
      *
      * @return string The parameter key
+     *
+     * @since v2.0.0
      */
     public function __toString()
     {

@@ -31,6 +31,8 @@ use Symfony\Component\Finder\Exception\ExceptionInterface;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.1.0
  */
 class Finder implements \IteratorAggregate, \Countable
 {
@@ -61,6 +63,8 @@ class Finder implements \IteratorAggregate, \Countable
 
     /**
      * Constructor.
+     *
+     * @since v2.0.0
      */
     public function __construct()
     {
@@ -80,6 +84,8 @@ class Finder implements \IteratorAggregate, \Countable
      * @return Finder A new Finder instance
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public static function create()
     {
@@ -93,6 +99,8 @@ class Finder implements \IteratorAggregate, \Countable
      * @param integer          $priority Highest is selected first
      *
      * @return Finder The current Finder instance
+     *
+     * @since v2.2.0
      */
     public function addAdapter(Adapter\AdapterInterface $adapter, $priority = 0)
     {
@@ -109,6 +117,8 @@ class Finder implements \IteratorAggregate, \Countable
      * Sets the selected adapter to the best one according to the current platform the code is run on.
      *
      * @return Finder The current Finder instance
+     *
+     * @since v2.2.0
      */
     public function useBestAdapter()
     {
@@ -125,6 +135,8 @@ class Finder implements \IteratorAggregate, \Countable
      * @throws \InvalidArgumentException
      *
      * @return Finder The current Finder instance
+     *
+     * @since v2.2.0
      */
     public function setAdapter($name)
     {
@@ -142,6 +154,8 @@ class Finder implements \IteratorAggregate, \Countable
      * Removes all adapters registered in the finder.
      *
      * @return Finder The current Finder instance
+     *
+     * @since v2.2.0
      */
     public function removeAdapters()
     {
@@ -154,6 +168,8 @@ class Finder implements \IteratorAggregate, \Countable
      * Returns registered adapters ordered by priority without extra information.
      *
      * @return AdapterInterface[]
+     *
+     * @since v2.2.0
      */
     public function getAdapters()
     {
@@ -168,6 +184,8 @@ class Finder implements \IteratorAggregate, \Countable
      * @return Finder The current Finder instance
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function directories()
     {
@@ -182,6 +200,8 @@ class Finder implements \IteratorAggregate, \Countable
      * @return Finder The current Finder instance
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function files()
     {
@@ -206,6 +226,8 @@ class Finder implements \IteratorAggregate, \Countable
      * @see Symfony\Component\Finder\Comparator\NumberComparator
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function depth($level)
     {
@@ -233,6 +255,8 @@ class Finder implements \IteratorAggregate, \Countable
      * @see Symfony\Component\Finder\Comparator\DateComparator
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function date($date)
     {
@@ -257,6 +281,8 @@ class Finder implements \IteratorAggregate, \Countable
      * @see Symfony\Component\Finder\Iterator\FilenameFilterIterator
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function name($pattern)
     {
@@ -275,6 +301,8 @@ class Finder implements \IteratorAggregate, \Countable
      * @see Symfony\Component\Finder\Iterator\FilenameFilterIterator
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function notName($pattern)
     {
@@ -296,6 +324,8 @@ class Finder implements \IteratorAggregate, \Countable
      * @return Finder The current Finder instance
      *
      * @see Symfony\Component\Finder\Iterator\FilecontentFilterIterator
+     *
+     * @since v2.1.0
      */
     public function contains($pattern)
     {
@@ -317,6 +347,8 @@ class Finder implements \IteratorAggregate, \Countable
      * @return Finder The current Finder instance
      *
      * @see Symfony\Component\Finder\Iterator\FilecontentFilterIterator
+     *
+     * @since v2.1.0
      */
     public function notContains($pattern)
     {
@@ -340,6 +372,8 @@ class Finder implements \IteratorAggregate, \Countable
      * @return Finder The current Finder instance
      *
      * @see Symfony\Component\Finder\Iterator\FilenameFilterIterator
+     *
+     * @since v2.2.0
      */
     public function path($pattern)
     {
@@ -363,6 +397,8 @@ class Finder implements \IteratorAggregate, \Countable
      * @return Finder The current Finder instance
      *
      * @see Symfony\Component\Finder\Iterator\FilenameFilterIterator
+     *
+     * @since v2.2.0
      */
     public function notPath($pattern)
     {
@@ -386,6 +422,8 @@ class Finder implements \IteratorAggregate, \Countable
      * @see Symfony\Component\Finder\Comparator\NumberComparator
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function size($size)
     {
@@ -404,6 +442,8 @@ class Finder implements \IteratorAggregate, \Countable
      * @see Symfony\Component\Finder\Iterator\ExcludeDirectoryFilterIterator
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function exclude($dirs)
     {
@@ -422,6 +462,8 @@ class Finder implements \IteratorAggregate, \Countable
      * @see Symfony\Component\Finder\Iterator\ExcludeDirectoryFilterIterator
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function ignoreDotFiles($ignoreDotFiles)
     {
@@ -444,6 +486,8 @@ class Finder implements \IteratorAggregate, \Countable
      * @see Symfony\Component\Finder\Iterator\ExcludeDirectoryFilterIterator
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function ignoreVCS($ignoreVCS)
     {
@@ -462,6 +506,8 @@ class Finder implements \IteratorAggregate, \Countable
      * @see ignoreVCS
      *
      * @param string|string[] $pattern VCS patterns to ignore
+     *
+     * @since v2.1.0
      */
     public static function addVCSPattern($pattern)
     {
@@ -486,6 +532,8 @@ class Finder implements \IteratorAggregate, \Countable
      * @see Symfony\Component\Finder\Iterator\SortableIterator
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function sort(\Closure $closure)
     {
@@ -504,6 +552,8 @@ class Finder implements \IteratorAggregate, \Countable
      * @see Symfony\Component\Finder\Iterator\SortableIterator
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function sortByName()
     {
@@ -522,6 +572,8 @@ class Finder implements \IteratorAggregate, \Countable
      * @see Symfony\Component\Finder\Iterator\SortableIterator
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function sortByType()
     {
@@ -542,6 +594,8 @@ class Finder implements \IteratorAggregate, \Countable
      * @see Symfony\Component\Finder\Iterator\SortableIterator
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function sortByAccessedTime()
     {
@@ -564,6 +618,8 @@ class Finder implements \IteratorAggregate, \Countable
      * @see Symfony\Component\Finder\Iterator\SortableIterator
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function sortByChangedTime()
     {
@@ -584,6 +640,8 @@ class Finder implements \IteratorAggregate, \Countable
      * @see Symfony\Component\Finder\Iterator\SortableIterator
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function sortByModifiedTime()
     {
@@ -605,6 +663,8 @@ class Finder implements \IteratorAggregate, \Countable
      * @see Symfony\Component\Finder\Iterator\CustomFilterIterator
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function filter(\Closure $closure)
     {
@@ -619,6 +679,8 @@ class Finder implements \IteratorAggregate, \Countable
      * @return Finder The current Finder instance
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function followLinks()
     {
@@ -635,6 +697,8 @@ class Finder implements \IteratorAggregate, \Countable
      * @param boolean $ignore
      *
      * @return Finder The current Finder instance
+     *
+     * @since v2.3.0
      */
     public function ignoreUnreadableDirs($ignore = true)
     {
@@ -653,6 +717,8 @@ class Finder implements \IteratorAggregate, \Countable
      * @throws \InvalidArgumentException if one of the directories does not exist
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function in($dirs)
     {
@@ -681,6 +747,8 @@ class Finder implements \IteratorAggregate, \Countable
      * @return \Iterator An iterator
      *
      * @throws \LogicException if the in() method has not been called
+     *
+     * @since v2.0.0
      */
     public function getIterator()
     {
@@ -714,6 +782,8 @@ class Finder implements \IteratorAggregate, \Countable
      * @return Finder The finder
      *
      * @throws \InvalidArgumentException When the given argument is not iterable.
+     *
+     * @since v2.0.0
      */
     public function append($iterator)
     {
@@ -738,6 +808,8 @@ class Finder implements \IteratorAggregate, \Countable
      * Counts all the results collected by the iterators.
      *
      * @return int
+     *
+     * @since v2.1.0
      */
     public function count()
     {
@@ -746,6 +818,8 @@ class Finder implements \IteratorAggregate, \Countable
 
     /**
      * @return Finder The current Finder instance
+     *
+     * @since v2.2.0
      */
     private function sortAdapters()
     {
@@ -766,6 +840,8 @@ class Finder implements \IteratorAggregate, \Countable
      * @return \Iterator
      *
      * @throws \RuntimeException When none of the adapters are supported
+     *
+     * @since v2.2.0
      */
     private function searchInDirectory($dir)
     {
@@ -794,6 +870,8 @@ class Finder implements \IteratorAggregate, \Countable
      * @param AdapterInterface $adapter
      *
      * @return AdapterInterface
+     *
+     * @since v2.2.0
      */
     private function buildAdapter(AdapterInterface $adapter)
     {
@@ -817,6 +895,8 @@ class Finder implements \IteratorAggregate, \Countable
 
     /**
      * Unselects all adapters.
+     *
+     * @since v2.2.0
      */
     private function resetAdapterSelection()
     {

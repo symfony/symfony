@@ -15,6 +15,8 @@ use Symfony\Component\Intl\Exception\NotImplementedException;
 
 /**
  * @author Eriksen Costa <eriksen.costa@infranology.com.br>
+ *
+ * @since v2.3.0
  */
 class MethodArgumentNotImplementedException extends NotImplementedException
 {
@@ -23,6 +25,8 @@ class MethodArgumentNotImplementedException extends NotImplementedException
      *
      * @param string $methodName The method name that raised the exception
      * @param string $argName    The argument name that is not implemented
+     *
+     * @since v2.3.0
      */
     public function __construct($methodName, $argName)
     {

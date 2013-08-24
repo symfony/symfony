@@ -19,6 +19,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  * Replaces all references to aliases with references to the actual service.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class ResolveReferencesToAliasesPass implements CompilerPassInterface
 {
@@ -28,6 +30,8 @@ class ResolveReferencesToAliasesPass implements CompilerPassInterface
      * Processes the ContainerBuilder to replace references to aliases with actual service references.
      *
      * @param ContainerBuilder $container
+     *
+     * @since v2.0.0
      */
     public function process(ContainerBuilder $container)
     {
@@ -57,6 +61,8 @@ class ResolveReferencesToAliasesPass implements CompilerPassInterface
      * @param array $arguments An array of References
      *
      * @return array An array of References
+     *
+     * @since v2.0.0
      */
     private function processArguments(array $arguments)
     {
@@ -81,6 +87,8 @@ class ResolveReferencesToAliasesPass implements CompilerPassInterface
      * @param string $id The definition or alias id to resolve
      *
      * @return string The definition id with aliases resolved
+     *
+     * @since v2.0.0
      */
     private function getDefinitionId($id)
     {

@@ -16,9 +16,14 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @since v2.3.0
  */
 class ExtensionPass implements CompilerPassInterface
 {
+    /**
+     * @since v2.3.0
+     */
     public function process(ContainerBuilder $container)
     {
         if ($container->has('form.extension')) {

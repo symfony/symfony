@@ -23,6 +23,8 @@ use Symfony\Component\DependencyInjection\Reference;
  *
  * @author Lukas Kahwe Smith <smith@pooteeweet.org>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 abstract class AbstractFactory implements SecurityFactoryInterface
 {
@@ -47,6 +49,9 @@ abstract class AbstractFactory implements SecurityFactoryInterface
         'failure_path_parameter'         => '_failure_path',
     );
 
+    /**
+     * @since v2.0.0
+     */
     public function create(ContainerBuilder $container, $id, $config, $userProviderId, $defaultEntryPointId)
     {
         // authentication provider
@@ -69,6 +74,9 @@ abstract class AbstractFactory implements SecurityFactoryInterface
         return array($authProviderId, $listenerId, $entryPointId);
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function addConfiguration(NodeDefinition $node)
     {
         $builder = $node->children();
@@ -89,6 +97,9 @@ abstract class AbstractFactory implements SecurityFactoryInterface
         }
     }
 
+    /**
+     * @since v2.1.0
+     */
     final public function addOption($name, $default = null)
     {
         $this->options[$name] = $default;
@@ -104,6 +115,8 @@ abstract class AbstractFactory implements SecurityFactoryInterface
      * @param string           $userProviderId The id of the user provider
      *
      * @return string never null, the id of the authentication provider
+     *
+     * @since v2.0.0
      */
     abstract protected function createAuthProvider(ContainerBuilder $container, $id, $config, $userProviderId);
 
@@ -121,6 +134,8 @@ abstract class AbstractFactory implements SecurityFactoryInterface
      * In the above case, this method would return "my.listener.id".
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     abstract protected function getListenerId();
 
@@ -134,6 +149,8 @@ abstract class AbstractFactory implements SecurityFactoryInterface
      * @param string           $defaultEntryPointId
      *
      * @return string the entry point id
+     *
+     * @since v2.0.0
      */
     protected function createEntryPoint($container, $id, $config, $defaultEntryPointId)
     {
@@ -147,12 +164,17 @@ abstract class AbstractFactory implements SecurityFactoryInterface
      * @param array $config
      *
      * @return Boolean Whether a possibly configured RememberMeServices should be set for this listener
+     *
+     * @since v2.0.0
      */
     protected function isRememberMeAware($config)
     {
         return $config['remember_me'];
     }
 
+    /**
+     * @since v2.0.0
+     */
     protected function createListener($container, $id, $config, $userProvider)
     {
         $listenerId = $this->getListenerId();
@@ -168,6 +190,9 @@ abstract class AbstractFactory implements SecurityFactoryInterface
         return $listenerId;
     }
 
+    /**
+     * @since v2.1.0
+     */
     protected function createAuthenticationSuccessHandler($container, $id, $config)
     {
         if (isset($config['success_handler'])) {
@@ -183,6 +208,9 @@ abstract class AbstractFactory implements SecurityFactoryInterface
         return $successHandlerId;
     }
 
+    /**
+     * @since v2.1.0
+     */
     protected function createAuthenticationFailureHandler($container, $id, $config)
     {
         if (isset($config['failure_handler'])) {

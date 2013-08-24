@@ -19,6 +19,8 @@ use Symfony\Component\HttpKernel\KernelInterface;
  * WebTestCase is the base class for functional tests.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 abstract class WebTestCase extends \PHPUnit_Framework_TestCase
 {
@@ -36,6 +38,8 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
      * @param array $server  An array of server parameters
      *
      * @return Client A Client instance
+     *
+     * @since v2.1.0
      */
     protected static function createClient(array $options = array(), array $server = array())
     {
@@ -61,6 +65,8 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
      * @return string The directory where phpunit.xml(.dist) is stored
      *
      * @throws \RuntimeException
+     *
+     * @since v2.1.0
      */
     protected static function getPhpUnitXmlDir()
     {
@@ -94,6 +100,8 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
      * the last configuration argument.
      *
      * @return string The value of the PHPUnit cli configuration option
+     *
+     * @since v2.1.0
      */
     private static function getPhpUnitCliConfigArgument()
     {
@@ -121,6 +129,8 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
      * @return string The Kernel class name
      *
      * @throws \RuntimeException
+     *
+     * @since v2.1.0
      */
     protected static function getKernelClass()
     {
@@ -152,6 +162,8 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
      * @param array $options An array of options
      *
      * @return KernelInterface A KernelInterface instance
+     *
+     * @since v2.1.0
      */
     protected static function createKernel(array $options = array())
     {
@@ -167,6 +179,8 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
 
     /**
      * Shuts the kernel down if it was used in the test.
+     *
+     * @since v2.0.0
      */
     protected function tearDown()
     {

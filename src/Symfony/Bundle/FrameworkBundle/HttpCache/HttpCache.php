@@ -22,6 +22,8 @@ use Symfony\Component\HttpFoundation\Response;
  * Manages HTTP cache objects in a Container.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 abstract class HttpCache extends BaseHttpCache
 {
@@ -33,6 +35,8 @@ abstract class HttpCache extends BaseHttpCache
      *
      * @param HttpKernelInterface $kernel   An HttpKernelInterface instance
      * @param string              $cacheDir The cache directory (default used if null)
+     *
+     * @since v2.1.0
      */
     public function __construct(HttpKernelInterface $kernel, $cacheDir = null)
     {
@@ -50,6 +54,8 @@ abstract class HttpCache extends BaseHttpCache
      * @param Response $entry   A Response instance (the stale entry if present, null otherwise)
      *
      * @return Response A Response instance
+     *
+     * @since v2.0.0
      */
     protected function forward(Request $request, $raw = false, Response $entry = null)
     {
@@ -64,17 +70,25 @@ abstract class HttpCache extends BaseHttpCache
      * Returns an array of options to customize the Cache configuration.
      *
      * @return array An array of options
+     *
+     * @since v2.0.0
      */
     protected function getOptions()
     {
         return array();
     }
 
+    /**
+     * @since v2.1.0
+     */
     protected function createEsi()
     {
         return new Esi();
     }
 
+    /**
+     * @since v2.1.0
+     */
     protected function createStore()
     {
         return new Store($this->cacheDir ?: $this->kernel->getCacheDir().'/http_cache');

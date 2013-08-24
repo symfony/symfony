@@ -34,6 +34,8 @@ interface AuthenticationFailureHandlerInterface
      * @param AuthenticationException $exception
      *
      * @return Response The response to return, never null
+     *
+     * @since v2.1.0
      */
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception);
 }

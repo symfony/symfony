@@ -13,6 +13,8 @@ namespace Symfony\Component\Validator\Exception;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.2.0
  */
 class NoSuchMetadataException extends ValidatorException
 {

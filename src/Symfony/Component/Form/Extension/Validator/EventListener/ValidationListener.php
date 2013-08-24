@@ -20,6 +20,8 @@ use Symfony\Component\Form\Extension\Validator\Constraints\Form;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.1.0
  */
 class ValidationListener implements EventSubscriberInterface
 {
@@ -29,12 +31,17 @@ class ValidationListener implements EventSubscriberInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public static function getSubscribedEvents()
     {
         return array(FormEvents::POST_SUBMIT => 'validateForm');
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function __construct(ValidatorInterface $validator, ViolationMapperInterface $violationMapper)
     {
         $this->validator = $validator;
@@ -45,6 +52,8 @@ class ValidationListener implements EventSubscriberInterface
      * Validates the form and its domain object.
      *
      * @param FormEvent $event The event object
+     *
+     * @since v2.1.0
      */
     public function validateForm(FormEvent $event)
     {

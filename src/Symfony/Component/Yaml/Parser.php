@@ -29,6 +29,8 @@ class Parser
      * Constructor
      *
      * @param integer $offset The offset of YAML document (used for line numbers in error messages)
+     *
+     * @since v2.0.0
      */
     public function __construct($offset = 0)
     {
@@ -45,6 +47,8 @@ class Parser
      * @return mixed  A PHP value
      *
      * @throws ParseException If the YAML is not valid
+     *
+     * @since v2.0.22
      */
     public function parse($value, $exceptionOnInvalidType = false, $objectSupport = false)
     {
@@ -259,6 +263,8 @@ class Parser
      * Returns the current line number (takes the offset into account).
      *
      * @return integer The current line number
+     *
+     * @since v2.0.0
      */
     private function getRealCurrentLineNb()
     {
@@ -269,6 +275,8 @@ class Parser
      * Returns the current line indentation.
      *
      * @return integer The current line indentation
+     *
+     * @since v2.0.0
      */
     private function getCurrentLineIndentation()
     {
@@ -283,6 +291,8 @@ class Parser
      * @return string A YAML string
      *
      * @throws ParseException When indentation problem are detected
+     *
+     * @since v2.0.0
      */
     private function getNextEmbedBlock($indentation = null)
     {
@@ -344,6 +354,8 @@ class Parser
      * Moves the parser to the next line.
      *
      * @return Boolean
+     *
+     * @since v2.0.0
      */
     private function moveToNextLine()
     {
@@ -358,6 +370,8 @@ class Parser
 
     /**
      * Moves the parser to the previous line.
+     *
+     * @since v2.0.0
      */
     private function moveToPreviousLine()
     {
@@ -374,6 +388,8 @@ class Parser
      * @return mixed  A PHP value
      *
      * @throws ParseException When reference does not exist
+     *
+     * @since v2.0.22
      */
     private function parseValue($value, $exceptionOnInvalidType, $objectSupport)
     {
@@ -415,6 +431,8 @@ class Parser
      * @param integer $indentation The indentation that was used to begin this folded scalar
      *
      * @return string  The text value
+     *
+     * @since v2.0.0
      */
     private function parseFoldedScalar($separator, $indicator = '', $indentation = 0)
     {
@@ -492,6 +510,8 @@ class Parser
      * Returns true if the next line is indented.
      *
      * @return Boolean Returns true if the next line is indented, false otherwise
+     *
+     * @since v2.0.0
      */
     private function isNextLineIndented()
     {
@@ -520,6 +540,8 @@ class Parser
      * Returns true if the current line is blank or if it is a comment line.
      *
      * @return Boolean Returns true if the current line is empty or if it is a comment line, false otherwise
+     *
+     * @since v2.0.0
      */
     private function isCurrentLineEmpty()
     {
@@ -530,6 +552,8 @@ class Parser
      * Returns true if the current line is blank.
      *
      * @return Boolean Returns true if the current line is blank, false otherwise
+     *
+     * @since v2.0.0
      */
     private function isCurrentLineBlank()
     {
@@ -540,6 +564,8 @@ class Parser
      * Returns true if the current line is a comment line.
      *
      * @return Boolean Returns true if the current line is a comment line, false otherwise
+     *
+     * @since v2.0.0
      */
     private function isCurrentLineComment()
     {
@@ -555,6 +581,8 @@ class Parser
      * @param string $value The input YAML string
      *
      * @return string A cleaned up YAML string
+     *
+     * @since v2.0.0
      */
     private function cleanup($value)
     {
@@ -591,6 +619,8 @@ class Parser
      * Returns true if the next line starts unindented collection
      *
      * @return Boolean Returns true if the next line starts unindented collection, false otherwise
+     *
+     * @since v2.1.0
      */
     private function isNextLineUnIndentedCollection()
     {
@@ -623,6 +653,8 @@ class Parser
      * Returns true if the string is un-indented collection item
      *
      * @return Boolean Returns true if the string is un-indented collection item, false otherwise
+     *
+     * @since v2.1.10
      */
     private function isStringUnIndentedCollectionItem()
     {

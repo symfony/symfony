@@ -11,10 +11,16 @@
 
 namespace Symfony\Component\Validator\Exception;
 
+/**
+ * @since v2.0.0
+ */
 class MissingOptionsException extends ValidatorException
 {
     private $options;
 
+    /**
+     * @since v2.0.0
+     */
     public function __construct($message, array $options)
     {
         parent::__construct($message);
@@ -22,6 +28,9 @@ class MissingOptionsException extends ValidatorException
         $this->options = $options;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getOptions()
     {
         return $this->options;

@@ -23,6 +23,8 @@ interface DataMapperInterface
      * @param FormInterface[] $forms A list of {@link FormInterface} instances.
      *
      * @throws Exception\UnexpectedTypeException if the type of the data parameter is not supported.
+     *
+     * @since v2.3.0
      */
     public function mapDataToForms($data, $forms);
 
@@ -33,6 +35,8 @@ interface DataMapperInterface
      * @param mixed           $data  Structured data.
      *
      * @throws Exception\UnexpectedTypeException if the type of the data parameter is not supported.
+     *
+     * @since v2.3.0
      */
     public function mapFormsToData($forms, &$data);
 }

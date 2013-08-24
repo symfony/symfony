@@ -15,6 +15,8 @@ namespace Symfony\Component\Yaml;
  * YAML strings.
  *
  * @author Matthew Lewinski <matthew@lewinski.org>
+ *
+ * @since v2.0.0
  */
 class Unescaper
 {
@@ -32,6 +34,8 @@ class Unescaper
      * @param string $value A single quoted string.
      *
      * @return string The unescaped string.
+     *
+     * @since v2.0.0
      */
     public function unescapeSingleQuotedString($value)
     {
@@ -44,6 +48,8 @@ class Unescaper
      * @param string $value A double quoted string.
      *
      * @return string The unescaped string.
+     *
+     * @since v2.0.0
      */
     public function unescapeDoubleQuotedString($value)
     {
@@ -62,6 +68,8 @@ class Unescaper
      * @param string $value An escaped character
      *
      * @return string The unescaped character
+     *
+     * @since v2.0.0
      */
     public function unescapeCharacter($value)
     {
@@ -131,6 +139,8 @@ class Unescaper
      * @return string The string with the new encoding
      *
      * @throws RuntimeException if no suitable encoding function is found (iconv or mbstring)
+     *
+     * @since v2.0.0
      */
     private function convertEncoding($value, $to, $from)
     {

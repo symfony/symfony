@@ -42,6 +42,8 @@ interface OutputInterface
      * @throws \InvalidArgumentException When unknown output type is given
      *
      * @api
+     *
+     * @since v2.3.0
      */
     public function write($messages, $newline = false, $type = self::OUTPUT_NORMAL);
 
@@ -54,6 +56,8 @@ interface OutputInterface
      * @throws \InvalidArgumentException When unknown output type is given
      *
      * @api
+     *
+     * @since v2.3.0
      */
     public function writeln($messages, $type = self::OUTPUT_NORMAL);
 
@@ -63,6 +67,8 @@ interface OutputInterface
      * @param integer $level The level of verbosity (one of the VERBOSITY constants)
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function setVerbosity($level);
 
@@ -72,6 +78,8 @@ interface OutputInterface
      * @return integer The current level of verbosity (one of the VERBOSITY constants)
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function getVerbosity();
 
@@ -81,6 +89,8 @@ interface OutputInterface
      * @param Boolean $decorated Whether to decorate the messages
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function setDecorated($decorated);
 
@@ -90,6 +100,8 @@ interface OutputInterface
      * @return Boolean true if the output will decorate messages, false otherwise
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function isDecorated();
 
@@ -99,6 +111,8 @@ interface OutputInterface
      * @param OutputFormatterInterface $formatter
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function setFormatter(OutputFormatterInterface $formatter);
 
@@ -108,6 +122,8 @@ interface OutputInterface
      * @return  OutputFormatterInterface
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function getFormatter();
 }

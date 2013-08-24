@@ -17,6 +17,8 @@ namespace Symfony\Component\Console\Formatter;
  * @author Konstantin Kudryashov <ever.zet@gmail.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class OutputFormatterStyle implements OutputFormatterStyleInterface
 {
@@ -60,6 +62,8 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
      * @param array  $options    The style options
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function __construct($foreground = null, $background = null, array $options = array())
     {
@@ -82,6 +86,8 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
      * @throws \InvalidArgumentException When the color name isn't defined
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setForeground($color = null)
     {
@@ -110,6 +116,8 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
      * @throws \InvalidArgumentException When the color name isn't defined
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setBackground($color = null)
     {
@@ -138,6 +146,8 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
      * @throws \InvalidArgumentException When the option name isn't defined
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setOption($option)
     {
@@ -161,6 +171,8 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
      *
      * @throws \InvalidArgumentException When the option name isn't defined
      *
+     *
+     * @since v2.0.0
      */
     public function unsetOption($option)
     {
@@ -182,6 +194,8 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
      * Sets multiple style options at once.
      *
      * @param array $options
+     *
+     * @since v2.0.0
      */
     public function setOptions(array $options)
     {
@@ -198,6 +212,8 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
      * @param string $text The text to style
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     public function apply($text)
     {

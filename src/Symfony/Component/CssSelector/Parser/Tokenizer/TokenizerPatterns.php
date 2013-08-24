@@ -18,6 +18,8 @@ namespace Symfony\Component\CssSelector\Parser\Tokenizer;
  * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @since v2.3.0
  */
 class TokenizerPatterns
 {
@@ -83,6 +85,8 @@ class TokenizerPatterns
 
     /**
      * Constructor.
+     *
+     * @since v2.3.0
      */
     public function __construct()
     {
@@ -102,6 +106,8 @@ class TokenizerPatterns
 
     /**
      * @return string
+     *
+     * @since v2.3.0
      */
     public function getNewLineEscapePattern()
     {
@@ -110,6 +116,8 @@ class TokenizerPatterns
 
     /**
      * @return string
+     *
+     * @since v2.3.0
      */
     public function getSimpleEscapePattern()
     {
@@ -118,6 +126,8 @@ class TokenizerPatterns
 
     /**
      * @return string
+     *
+     * @since v2.3.0
      */
     public function getUnicodeEscapePattern()
     {
@@ -126,6 +136,8 @@ class TokenizerPatterns
 
     /**
      * @return string
+     *
+     * @since v2.3.0
      */
     public function getIdentifierPattern()
     {
@@ -134,6 +146,8 @@ class TokenizerPatterns
 
     /**
      * @return string
+     *
+     * @since v2.3.0
      */
     public function getHashPattern()
     {
@@ -142,6 +156,8 @@ class TokenizerPatterns
 
     /**
      * @return string
+     *
+     * @since v2.3.0
      */
     public function getNumberPattern()
     {
@@ -152,6 +168,8 @@ class TokenizerPatterns
      * @param string $quote
      *
      * @return string
+     *
+     * @since v2.3.0
      */
     public function getQuotedStringPattern($quote)
     {

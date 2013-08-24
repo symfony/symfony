@@ -19,6 +19,8 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Florian Eckerstorfer <florian@eckerstorfer.org>
+ *
+ * @since v2.0.0
  */
 class DateTimeToStringTransformer extends BaseDateTimeTransformer
 {
@@ -59,6 +61,8 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
      * @param Boolean $parseUsingPipe Whether to parse by appending a pipe "|" to the parse format
      *
      * @throws UnexpectedTypeException if a timezone is not a string
+     *
+     * @since v2.1.10
      */
     public function __construct($inputTimezone = null, $outputTimezone = null, $format = 'Y-m-d H:i:s', $parseUsingPipe = null)
     {
@@ -96,6 +100,8 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
      * @throws TransformationFailedException If the given value is not a \DateTime
      *                                       instance or if the output timezone
      *                                       is not supported.
+     *
+     * @since v2.0.0
      */
     public function transform($value)
     {
@@ -127,6 +133,8 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
      * @throws TransformationFailedException If the given value is not a string,
      *                                       if the date could not be parsed or
      *                                       if the input timezone is not supported.
+     *
+     * @since v2.0.0
      */
     public function reverseTransform($value)
     {

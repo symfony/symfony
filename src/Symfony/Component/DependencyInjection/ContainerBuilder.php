@@ -31,6 +31,8 @@ use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\RealServiceInst
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class ContainerBuilder extends Container implements TaggedContainerInterface
 {
@@ -85,6 +87,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * to depend on the Config component, set this flag to false.
      *
      * @param Boolean $track true if you want to track resources, false otherwise
+     *
+     * @since v2.2.0
      */
     public function setResourceTracking($track)
     {
@@ -95,6 +99,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * Checks if resources are tracked.
      *
      * @return Boolean true if resources are tracked, false otherwise
+     *
+     * @since v2.2.0
      */
     public function isTrackingResources()
     {
@@ -105,6 +111,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * Sets the instantiator to be used when fetching proxies.
      *
      * @param InstantiatorInterface $proxyInstantiator
+     *
+     * @since v2.3.0
      */
     public function setProxyInstantiator(InstantiatorInterface $proxyInstantiator)
     {
@@ -117,6 +125,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @param ExtensionInterface $extension An extension instance
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function registerExtension(ExtensionInterface $extension)
     {
@@ -137,6 +147,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @throws LogicException if the extension is not registered
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getExtension($name)
     {
@@ -157,6 +169,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @return ExtensionInterface[] An array of ExtensionInterface
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getExtensions()
     {
@@ -171,6 +185,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @return Boolean If the extension exists
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function hasExtension($name)
     {
@@ -183,6 +199,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @return ResourceInterface[] An array of resources
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getResources()
     {
@@ -197,6 +215,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @return ContainerBuilder The current instance
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function addResource(ResourceInterface $resource)
     {
@@ -217,6 +237,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @return ContainerBuilder The current instance
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function setResources(array $resources)
     {
@@ -237,6 +259,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @return ContainerBuilder The current instance
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function addObjectResource($object)
     {
@@ -253,6 +277,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @param \ReflectionClass $class
      *
      * @return ContainerBuilder The current instance
+     *
+     * @since v2.3.0
      */
     public function addClassResource(\ReflectionClass $class)
     {
@@ -279,6 +305,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @throws \LogicException if the container is frozen
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function loadFromExtension($extension, array $values = array())
     {
@@ -302,6 +330,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @return ContainerBuilder The current instance
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function addCompilerPass(CompilerPassInterface $pass, $type = PassConfig::TYPE_BEFORE_OPTIMIZATION)
     {
@@ -322,6 +352,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @return PassConfig The compiler pass config
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getCompilerPassConfig()
     {
@@ -338,6 +370,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @return Compiler The compiler
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getCompiler()
     {
@@ -354,6 +388,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @return array An array of scopes
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getScopes()
     {
@@ -366,6 +402,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @return array An array of scope children.
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getScopeChildren()
     {
@@ -382,6 +420,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @throws BadMethodCallException When this ContainerBuilder is frozen
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function set($id, $service, $scope = self::SCOPE_CONTAINER)
     {
@@ -419,6 +459,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @param string $id The service identifier
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function removeDefinition($id)
     {
@@ -433,6 +475,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @return Boolean true if the service is defined, false otherwise
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function has($id)
     {
@@ -457,6 +501,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @see Reference
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function get($id, $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE)
     {
@@ -533,6 +579,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @throws BadMethodCallException When this ContainerBuilder is frozen
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function merge(ContainerBuilder $container)
     {
@@ -567,6 +615,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @return array An array of configuration
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getExtensionConfig($name)
     {
@@ -582,6 +632,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @param string $name    The name of the extension
      * @param array  $config  The config to set
+     *
+     * @since v2.2.0
      */
     public function prependExtensionConfig($name, array $config)
     {
@@ -607,6 +659,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *  * Extension loading is disabled.
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function compile()
     {
@@ -637,6 +691,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * Gets all service ids.
      *
      * @return array An array of all defined service ids
+     *
+     * @since v2.0.0
      */
     public function getServiceIds()
     {
@@ -649,6 +705,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @param array $aliases An array of aliases
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function addAliases(array $aliases)
     {
@@ -663,6 +721,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @param array $aliases An array of aliases
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setAliases(array $aliases)
     {
@@ -680,6 +740,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @throws InvalidArgumentException if the alias is for itself
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setAlias($alias, $id)
     {
@@ -706,6 +768,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @param string $alias The alias to remove
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function removeAlias($alias)
     {
@@ -720,6 +784,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @return Boolean true if the alias exists, false otherwise
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function hasAlias($id)
     {
@@ -732,6 +798,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @return Alias[] An array of aliases
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getAliases()
     {
@@ -748,6 +816,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @throws InvalidArgumentException if the alias does not exist
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getAlias($id)
     {
@@ -772,6 +842,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @return Definition A Definition instance
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function register($id, $class = null)
     {
@@ -784,6 +856,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @param Definition[] $definitions An array of service definitions
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function addDefinitions(array $definitions)
     {
@@ -798,6 +872,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @param Definition[] $definitions An array of service definitions
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setDefinitions(array $definitions)
     {
@@ -811,6 +887,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @return Definition[] An array of Definition instances
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getDefinitions()
     {
@@ -828,6 +906,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @throws BadMethodCallException When this ContainerBuilder is frozen
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setDefinition($id, Definition $definition)
     {
@@ -850,6 +930,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @return Boolean true if the service definition exists, false otherwise
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function hasDefinition($id)
     {
@@ -866,6 +948,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @throws InvalidArgumentException if the service definition does not exist
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getDefinition($id)
     {
@@ -890,6 +974,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @throws InvalidArgumentException if the service definition does not exist
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function findDefinition($id)
     {
@@ -915,6 +1001,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @throws InvalidArgumentException When configure callable is not callable
      *
      * @internal this method is public because of PHP 5.3 limitations, do not use it explicitly in your code
+     *
+     * @since v2.3.0
      */
     public function createService(Definition $definition, $id, $tryProxy = true)
     {
@@ -998,6 +1086,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @param mixed $value A value
      *
      * @return mixed The same value with all service references replaced by the real service instances
+     *
+     * @since v2.0.0
      */
     public function resolveServices($value)
     {
@@ -1033,6 +1123,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @return array An array of tags with the tagged service as key, holding a list of attribute arrays.
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function findTaggedServiceIds($name)
     {
@@ -1050,6 +1142,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * Returns all tags the defined services use.
      *
      * @return array An array of tags
+     *
+     * @since v2.2.0
      */
     public function findTags()
     {
@@ -1067,6 +1161,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @param mixed $value An array of conditionals to return.
      *
      * @return array An array of Service conditionals
+     *
+     * @since v2.1.0
      */
     public static function getServiceConditionals($value)
     {
@@ -1087,6 +1183,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * Retrieves the currently set proxy instantiator or instantiates one.
      *
      * @return InstantiatorInterface
+     *
+     * @since v2.3.0
      */
     private function getProxyInstantiator()
     {
@@ -1104,6 +1202,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * service by calling all methods referencing it.
      *
      * @param string $id A service id
+     *
+     * @since v2.3.0
      */
     private function synchronize($id)
     {
@@ -1123,6 +1223,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
     }
 
+    /**
+     * @since v2.3.0
+     */
     private function callMethod($service, $call)
     {
         $services = self::getServiceConditionals($call[1]);
@@ -1144,6 +1247,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @param string     $id
      *
      * @throws InactiveScopeException
+     *
+     * @since v2.3.0
      */
     private function shareService(Definition $definition, $service, $id)
     {

@@ -13,6 +13,9 @@ namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
+/**
+ * @since v2.0.0
+ */
 class FormFactory implements FormFactoryInterface
 {
     /**
@@ -25,6 +28,9 @@ class FormFactory implements FormFactoryInterface
      */
     private $resolvedTypeFactory;
 
+    /**
+     * @since v2.1.0
+     */
     public function __construct(FormRegistryInterface $registry, ResolvedFormTypeFactoryInterface $resolvedTypeFactory)
     {
         $this->registry = $registry;
@@ -33,6 +39,8 @@ class FormFactory implements FormFactoryInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function create($type = 'form', $data = null, array $options = array())
     {
@@ -41,6 +49,8 @@ class FormFactory implements FormFactoryInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function createNamed($name, $type = 'form', $data = null, array $options = array())
     {
@@ -49,6 +59,8 @@ class FormFactory implements FormFactoryInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function createForProperty($class, $property, $data = null, array $options = array())
     {
@@ -57,6 +69,8 @@ class FormFactory implements FormFactoryInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function createBuilder($type = 'form', $data = null, array $options = array())
     {
@@ -69,6 +83,8 @@ class FormFactory implements FormFactoryInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function createNamedBuilder($name, $type = 'form', $data = null, array $options = array())
     {
@@ -89,6 +105,8 @@ class FormFactory implements FormFactoryInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function createBuilderForProperty($class, $property, $data = null, array $options = array())
     {
@@ -133,6 +151,8 @@ class FormFactory implements FormFactoryInterface
      * @param FormTypeInterface $type The type to resolve.
      *
      * @return ResolvedFormTypeInterface The resolved type.
+     *
+     * @since v2.1.0
      */
     private function resolveType(FormTypeInterface $type)
     {

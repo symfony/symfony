@@ -27,6 +27,8 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  * sections are normalized, and merged.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class MainConfiguration implements ConfigurationInterface
 {
@@ -38,6 +40,8 @@ class MainConfiguration implements ConfigurationInterface
      *
      * @param array $factories
      * @param array $userProviderFactories
+     *
+     * @since v2.1.0
      */
     public function __construct(array $factories, array $userProviderFactories)
     {
@@ -49,6 +53,8 @@ class MainConfiguration implements ConfigurationInterface
      * Generates the configuration tree builder.
      *
      * @return \Symfony\Component\Config\Definition\Builder\TreeBuilder The tree builder
+     *
+     * @since v2.0.0
      */
     public function getConfigTreeBuilder()
     {
@@ -83,6 +89,9 @@ class MainConfiguration implements ConfigurationInterface
         return $tb;
     }
 
+    /**
+     * @since v2.0.0
+     */
     private function addAclSection(ArrayNodeDefinition $rootNode)
     {
         $rootNode
@@ -123,6 +132,9 @@ class MainConfiguration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @since v2.0.0
+     */
     private function addRoleHierarchySection(ArrayNodeDefinition $rootNode)
     {
         $rootNode
@@ -144,6 +156,9 @@ class MainConfiguration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @since v2.0.0
+     */
     private function addAccessControlSection(ArrayNodeDefinition $rootNode)
     {
         $rootNode
@@ -183,6 +198,9 @@ class MainConfiguration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @since v2.0.0
+     */
     private function addFirewallsSection(ArrayNodeDefinition $rootNode, array $factories)
     {
         $firewallNodeBuilder = $rootNode
@@ -298,6 +316,9 @@ class MainConfiguration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @since v2.0.0
+     */
     private function addProvidersSection(ArrayNodeDefinition $rootNode)
     {
         $providerNodeBuilder = $rootNode
@@ -359,6 +380,9 @@ class MainConfiguration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @since v2.0.0
+     */
     private function addEncodersSection(ArrayNodeDefinition $rootNode)
     {
         $rootNode

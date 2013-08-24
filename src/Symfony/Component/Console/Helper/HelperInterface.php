@@ -26,6 +26,8 @@ interface HelperInterface
      * @param HelperSet $helperSet A HelperSet instance
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function setHelperSet(HelperSet $helperSet = null);
 
@@ -35,6 +37,8 @@ interface HelperInterface
      * @return HelperSet A HelperSet instance
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function getHelperSet();
 
@@ -44,6 +48,8 @@ interface HelperInterface
      * @return string The canonical name
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function getName();
 }

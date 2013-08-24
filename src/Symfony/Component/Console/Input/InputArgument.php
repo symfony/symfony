@@ -17,6 +17,8 @@ namespace Symfony\Component\Console\Input;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class InputArgument
 {
@@ -40,6 +42,8 @@ class InputArgument
      * @throws \InvalidArgumentException When argument mode is not valid
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function __construct($name, $mode = null, $description = '', $default = null)
     {
@@ -60,6 +64,8 @@ class InputArgument
      * Returns the argument name.
      *
      * @return string The argument name
+     *
+     * @since v2.0.0
      */
     public function getName()
     {
@@ -70,6 +76,8 @@ class InputArgument
      * Returns true if the argument is required.
      *
      * @return Boolean true if parameter mode is self::REQUIRED, false otherwise
+     *
+     * @since v2.0.0
      */
     public function isRequired()
     {
@@ -80,6 +88,8 @@ class InputArgument
      * Returns true if the argument can take multiple values.
      *
      * @return Boolean true if mode is self::IS_ARRAY, false otherwise
+     *
+     * @since v2.0.0
      */
     public function isArray()
     {
@@ -92,6 +102,8 @@ class InputArgument
      * @param mixed $default The default value
      *
      * @throws \LogicException When incorrect default value is given
+     *
+     * @since v2.0.0
      */
     public function setDefault($default = null)
     {
@@ -114,6 +126,8 @@ class InputArgument
      * Returns the default value.
      *
      * @return mixed The default value
+     *
+     * @since v2.0.0
      */
     public function getDefault()
     {
@@ -124,6 +138,8 @@ class InputArgument
      * Returns the description text.
      *
      * @return string The description text
+     *
+     * @since v2.0.0
      */
     public function getDescription()
     {

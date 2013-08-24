@@ -22,6 +22,8 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.0.0
  */
 class FormTypeCsrfExtension extends AbstractTypeExtension
 {
@@ -50,6 +52,9 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
      */
     private $translationDomain;
 
+    /**
+     * @since v2.3.0
+     */
     public function __construct(CsrfProviderInterface $defaultCsrfProvider, $defaultEnabled = true, $defaultFieldName = '_token', TranslatorInterface $translator = null, $translationDomain = null)
     {
         $this->defaultCsrfProvider = $defaultCsrfProvider;
@@ -64,6 +69,8 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
      *
      * @param FormBuilderInterface $builder The form builder
      * @param array                $options The options
+     *
+     * @since v2.1.0
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -90,6 +97,8 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
      * @param FormView      $view    The form view
      * @param FormInterface $form    The form
      * @param array         $options The options
+     *
+     * @since v2.1.0
      */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
@@ -107,6 +116,8 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
@@ -121,6 +132,8 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function getExtendedType()
     {

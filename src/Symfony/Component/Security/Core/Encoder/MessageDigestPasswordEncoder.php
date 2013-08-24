@@ -15,6 +15,8 @@ namespace Symfony\Component\Security\Core\Encoder;
  * MessageDigestPasswordEncoder uses a message digest algorithm.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class MessageDigestPasswordEncoder extends BasePasswordEncoder
 {
@@ -28,6 +30,8 @@ class MessageDigestPasswordEncoder extends BasePasswordEncoder
      * @param string  $algorithm          The digest algorithm to use
      * @param Boolean $encodeHashAsBase64 Whether to base64 encode the password hash
      * @param integer $iterations         The number of iterations to use to stretch the password hash
+     *
+     * @since v2.0.0
      */
     public function __construct($algorithm = 'sha512', $encodeHashAsBase64 = true, $iterations = 5000)
     {
@@ -38,6 +42,8 @@ class MessageDigestPasswordEncoder extends BasePasswordEncoder
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function encodePassword($raw, $salt)
     {
@@ -58,6 +64,8 @@ class MessageDigestPasswordEncoder extends BasePasswordEncoder
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function isPasswordValid($encoded, $raw, $salt)
     {

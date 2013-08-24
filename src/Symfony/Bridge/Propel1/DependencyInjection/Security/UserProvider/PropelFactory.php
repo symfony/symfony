@@ -20,18 +20,26 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  * PropelFactory creates services for Propel user provider.
  *
  * @author William Durand <william.durand1@gmail.com>
+ *
+ * @since v2.1.0
  */
 class PropelFactory implements UserProviderFactoryInterface
 {
     private $key;
     private $providerId;
 
+    /**
+     * @since v2.1.0
+     */
     public function __construct($key, $providerId)
     {
         $this->key = $key;
         $this->providerId = $providerId;
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function create(ContainerBuilder $container, $id, $config)
     {
         $container
@@ -41,11 +49,17 @@ class PropelFactory implements UserProviderFactoryInterface
             ;
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function getKey()
     {
         return $this->key;
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function addConfiguration(NodeDefinition $node)
     {
         $node

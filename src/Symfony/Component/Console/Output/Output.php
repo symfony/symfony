@@ -28,6 +28,8 @@ use Symfony\Component\Console\Formatter\OutputFormatter;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 abstract class Output implements OutputInterface
 {
@@ -42,6 +44,8 @@ abstract class Output implements OutputInterface
      * @param OutputFormatterInterface|null $formatter Output formatter instance (null to use default OutputFormatter)
      *
      * @api
+     *
+     * @since v2.3.0
      */
     public function __construct($verbosity = self::VERBOSITY_NORMAL, $decorated = false, OutputFormatterInterface $formatter = null)
     {
@@ -52,6 +56,8 @@ abstract class Output implements OutputInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function setFormatter(OutputFormatterInterface $formatter)
     {
@@ -60,6 +66,8 @@ abstract class Output implements OutputInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getFormatter()
     {
@@ -68,6 +76,8 @@ abstract class Output implements OutputInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function setDecorated($decorated)
     {
@@ -76,6 +86,8 @@ abstract class Output implements OutputInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function isDecorated()
     {
@@ -84,6 +96,8 @@ abstract class Output implements OutputInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function setVerbosity($level)
     {
@@ -92,6 +106,8 @@ abstract class Output implements OutputInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getVerbosity()
     {
@@ -120,6 +136,8 @@ abstract class Output implements OutputInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function writeln($messages, $type = self::OUTPUT_NORMAL)
     {
@@ -128,6 +146,8 @@ abstract class Output implements OutputInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function write($messages, $newline = false, $type = self::OUTPUT_NORMAL)
     {
@@ -160,6 +180,8 @@ abstract class Output implements OutputInterface
      *
      * @param string  $message A message to write to the output
      * @param Boolean $newline Whether to add a newline or not
+     *
+     * @since v2.1.0
      */
     abstract protected function doWrite($message, $newline);
 }

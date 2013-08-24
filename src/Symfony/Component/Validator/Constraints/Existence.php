@@ -15,11 +15,16 @@ use Symfony\Component\Validator\Constraint;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.3.0
  */
 abstract class Existence extends Constraint
 {
     public $constraints = array();
 
+    /**
+     * @since v2.3.0
+     */
     public function getDefaultOption()
     {
         return 'constraints';

@@ -15,6 +15,8 @@ namespace Symfony\Component\Config\Definition\Builder;
  * This class provides a fluent interface for building a node.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class NodeBuilder implements NodeParentInterface
 {
@@ -24,6 +26,8 @@ class NodeBuilder implements NodeParentInterface
     /**
      * Constructor
      *
+     *
+     * @since v2.0.0
      */
     public function __construct()
     {
@@ -44,6 +48,8 @@ class NodeBuilder implements NodeParentInterface
      * @param ParentNodeDefinitionInterface $parent The parent node
      *
      * @return NodeBuilder This node builder
+     *
+     * @since v2.0.0
      */
     public function setParent(ParentNodeDefinitionInterface $parent = null)
     {
@@ -58,6 +64,8 @@ class NodeBuilder implements NodeParentInterface
      * @param string $name The name of the node
      *
      * @return ArrayNodeDefinition The child node
+     *
+     * @since v2.0.0
      */
     public function arrayNode($name)
     {
@@ -70,6 +78,8 @@ class NodeBuilder implements NodeParentInterface
      * @param string $name the name of the node
      *
      * @return ScalarNodeDefinition The child node
+     *
+     * @since v2.0.0
      */
     public function scalarNode($name)
     {
@@ -82,6 +92,8 @@ class NodeBuilder implements NodeParentInterface
      * @param string $name The name of the node
      *
      * @return BooleanNodeDefinition The child node
+     *
+     * @since v2.0.0
      */
     public function booleanNode($name)
     {
@@ -94,6 +106,8 @@ class NodeBuilder implements NodeParentInterface
      * @param string $name the name of the node
      *
      * @return IntegerNodeDefinition The child node
+     *
+     * @since v2.2.0
      */
     public function integerNode($name)
     {
@@ -106,6 +120,8 @@ class NodeBuilder implements NodeParentInterface
      * @param string $name the name of the node
      *
      * @return FloatNodeDefinition The child node
+     *
+     * @since v2.2.0
      */
     public function floatNode($name)
     {
@@ -118,6 +134,8 @@ class NodeBuilder implements NodeParentInterface
      * @param string $name
      *
      * @return EnumNodeDefinition
+     *
+     * @since v2.1.0
      */
     public function enumNode($name)
     {
@@ -130,6 +148,8 @@ class NodeBuilder implements NodeParentInterface
      * @param string $name The name of the node
      *
      * @return VariableNodeDefinition The builder of the child node
+     *
+     * @since v2.0.0
      */
     public function variableNode($name)
     {
@@ -140,6 +160,8 @@ class NodeBuilder implements NodeParentInterface
      * Returns the parent node.
      *
      * @return ParentNodeDefinitionInterface The parent node
+     *
+     * @since v2.0.0
      */
     public function end()
     {
@@ -156,6 +178,8 @@ class NodeBuilder implements NodeParentInterface
      *
      * @throws \RuntimeException When the node type is not registered
      * @throws \RuntimeException When the node class is not found
+     *
+     * @since v2.0.0
      */
     public function node($name, $type)
     {
@@ -184,6 +208,8 @@ class NodeBuilder implements NodeParentInterface
      * @param NodeDefinition $node
      *
      * @return NodeBuilder This node builder
+     *
+     * @since v2.1.0
      */
     public function append(NodeDefinition $node)
     {
@@ -209,6 +235,8 @@ class NodeBuilder implements NodeParentInterface
      * @param string $class The fully qualified name the node definition class
      *
      * @return NodeBuilder This node builder
+     *
+     * @since v2.0.0
      */
     public function setNodeClass($type, $class)
     {
@@ -226,6 +254,8 @@ class NodeBuilder implements NodeParentInterface
      *
      * @throws \RuntimeException When the node type is not registered
      * @throws \RuntimeException When the node class is not found
+     *
+     * @since v2.0.0
      */
     protected function getNodeClass($type)
     {

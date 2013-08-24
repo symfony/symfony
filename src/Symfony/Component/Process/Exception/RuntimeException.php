@@ -15,6 +15,8 @@ namespace Symfony\Component\Process\Exception;
  * RuntimeException for the Process Component.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.1.0
  */
 class RuntimeException extends \RuntimeException implements ExceptionInterface
 {

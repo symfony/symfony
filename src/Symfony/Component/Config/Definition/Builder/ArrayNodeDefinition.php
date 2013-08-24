@@ -19,6 +19,8 @@ use Symfony\Component\Config\Definition\Exception\InvalidDefinitionException;
  * This class provides a fluent interface for defining an array node.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinitionInterface
 {
@@ -37,6 +39,8 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function __construct($name, NodeParentInterface $parent = null)
     {
@@ -58,6 +62,8 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      * Sets a custom children builder.
      *
      * @param NodeBuilder $builder A custom NodeBuilder
+     *
+     * @since v2.0.0
      */
     public function setBuilder(NodeBuilder $builder)
     {
@@ -68,6 +74,8 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      * Returns a builder to add children nodes.
      *
      * @return NodeBuilder
+     *
+     * @since v2.0.0
      */
     public function children()
     {
@@ -80,6 +88,8 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      * @param string $type the type of node
      *
      * @return NodeDefinition
+     *
+     * @since v2.0.0
      */
     public function prototype($type)
     {
@@ -94,6 +104,8 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      * phase, it's default value will be derived from its children default values.
      *
      * @return ArrayNodeDefinition
+     *
+     * @since v2.0.0
      */
     public function addDefaultsIfNotSet()
     {
@@ -110,6 +122,8 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      * This method is applicable to prototype nodes only.
      *
      * @return ArrayNodeDefinition
+     *
+     * @since v2.1.0
      */
     public function addDefaultChildrenIfNoneSet($children = null)
     {
@@ -124,6 +138,8 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      * This method is applicable to prototype nodes only.
      *
      * @return ArrayNodeDefinition
+     *
+     * @since v2.0.0
      */
     public function requiresAtLeastOneElement()
     {
@@ -138,6 +154,8 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      * If used all keys have to be defined in the same configuration file.
      *
      * @return ArrayNodeDefinition
+     *
+     * @since v2.0.0
      */
     public function disallowNewKeysInSubsequentConfigs()
     {
@@ -153,6 +171,8 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      * @param string $plural   The plural of the key for irregular plurals
      *
      * @return ArrayNodeDefinition
+     *
+     * @since v2.0.0
      */
     public function fixXmlConfig($singular, $plural = null)
     {
@@ -188,6 +208,8 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      * @param Boolean $removeKeyItem Whether or not the key item should be removed.
      *
      * @return ArrayNodeDefinition
+     *
+     * @since v2.0.0
      */
     public function useAttributeAsKey($name, $removeKeyItem = true)
     {
@@ -203,6 +225,8 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      * @param Boolean $allow
      *
      * @return ArrayNodeDefinition
+     *
+     * @since v2.0.0
      */
     public function canBeUnset($allow = true)
     {
@@ -225,6 +249,8 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      * enableableArrayNode: false                  # The config is disabled
      *
      * @return ArrayNodeDefinition
+     *
+     * @since v2.2.0
      */
     public function canBeEnabled()
     {
@@ -255,6 +281,8 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      * By default, the section is enabled.
      *
      * @return ArrayNodeDefinition
+     *
+     * @since v2.2.0
      */
     public function canBeDisabled()
     {
@@ -275,6 +303,8 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      * Disables the deep merging of the node.
      *
      * @return ArrayNodeDefinition
+     *
+     * @since v2.0.0
      */
     public function performNoDeepMerging()
     {
@@ -292,6 +322,8 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      * array through a special tree that processes only part of the array.
      *
      * @return ArrayNodeDefinition
+     *
+     * @since v2.0.0
      */
     public function ignoreExtraKeys()
     {
@@ -306,6 +338,8 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      * @param Boolean $bool Whether to enable key normalization
      *
      * @return ArrayNodeDefinition
+     *
+     * @since v2.2.0
      */
     public function normalizeKeys($bool)
     {
@@ -328,6 +362,8 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      * @param NodeDefinition $node A NodeDefinition instance
      *
      * @return ArrayNodeDefinition This node
+     *
+     * @since v2.0.0
      */
     public function append(NodeDefinition $node)
     {
@@ -340,6 +376,8 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      * Returns a node builder to be used to add children and prototype
      *
      * @return NodeBuilder The node builder
+     *
+     * @since v2.0.0
      */
     protected function getNodeBuilder()
     {
@@ -352,6 +390,8 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     protected function createNode()
     {
@@ -426,6 +466,8 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      * @param ArrayNode $node The related node
      *
      * @throws InvalidDefinitionException
+     *
+     * @since v2.1.0
      */
     protected function validateConcreteNode(ArrayNode $node)
     {
@@ -462,6 +504,8 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      * @param PrototypedArrayNode $node The related node
      *
      * @throws InvalidDefinitionException
+     *
+     * @since v2.1.0
      */
     protected function validatePrototypeNode(PrototypedArrayNode $node)
     {

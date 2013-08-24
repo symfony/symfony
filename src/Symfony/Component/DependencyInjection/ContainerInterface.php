@@ -39,6 +39,8 @@ interface ContainerInterface
      * @param string $scope   The scope of the service
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function set($id, $service, $scope = self::SCOPE_CONTAINER);
 
@@ -57,6 +59,8 @@ interface ContainerInterface
      * @see Reference
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function get($id, $invalidBehavior = self::EXCEPTION_ON_INVALID_REFERENCE);
 
@@ -68,6 +72,8 @@ interface ContainerInterface
      * @return Boolean true if the service is defined, false otherwise
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function has($id);
 
@@ -81,6 +87,8 @@ interface ContainerInterface
      * @throws InvalidArgumentException if the parameter is not defined
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function getParameter($name);
 
@@ -92,6 +100,8 @@ interface ContainerInterface
      * @return Boolean The presence of parameter in container
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function hasParameter($name);
 
@@ -102,6 +112,8 @@ interface ContainerInterface
      * @param mixed  $value The parameter value
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function setParameter($name, $value);
 
@@ -111,6 +123,8 @@ interface ContainerInterface
      * @param string $name
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function enterScope($name);
 
@@ -120,6 +134,8 @@ interface ContainerInterface
      * @param string $name
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function leaveScope($name);
 
@@ -129,6 +145,8 @@ interface ContainerInterface
      * @param ScopeInterface $scope
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function addScope(ScopeInterface $scope);
 
@@ -140,6 +158,8 @@ interface ContainerInterface
      * @return Boolean
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function hasScope($name);
 
@@ -153,6 +173,8 @@ interface ContainerInterface
      * @return Boolean
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function isScopeActive($name);
 }

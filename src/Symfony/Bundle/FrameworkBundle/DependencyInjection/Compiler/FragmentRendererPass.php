@@ -19,9 +19,14 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
  * Adds services tagged kernel.fragment_renderer as HTTP content rendering strategies.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.2.0
  */
 class FragmentRendererPass implements CompilerPassInterface
 {
+    /**
+     * @since v2.2.0
+     */
     public function process(ContainerBuilder $container)
     {
         if (false === $container->hasDefinition('fragment.handler')) {

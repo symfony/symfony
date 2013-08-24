@@ -46,6 +46,8 @@ interface DataTransformerInterface
      * @return mixed The value in the transformed representation
      *
      * @throws TransformationFailedException When the transformation fails.
+     *
+     * @since v2.1.0
      */
     public function transform($value);
 
@@ -72,6 +74,8 @@ interface DataTransformerInterface
      * @return mixed The value in the original representation
      *
      * @throws TransformationFailedException When the transformation fails.
+     *
+     * @since v2.1.0
      */
     public function reverseTransform($value);
 }

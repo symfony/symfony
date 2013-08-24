@@ -15,6 +15,8 @@ namespace Symfony\Component\Intl\Util;
  * Facilitates the comparison of ICU version strings.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.3.0
  */
 class IcuVersion
 {
@@ -52,6 +54,8 @@ class IcuVersion
      * @return Boolean Whether the comparison succeeded.
      *
      * @see normalize()
+     *
+     * @since v2.3.0
      */
     public static function compare($version1, $version2, $operator, $precision = null)
     {
@@ -86,6 +90,8 @@ class IcuVersion
      *
      * @return string|null The normalized ICU version or NULL if it couldn't be
      *                     normalized.
+     *
+     * @since v2.3.0
      */
     public static function normalize($version, $precision)
     {
@@ -100,6 +106,8 @@ class IcuVersion
 
     /**
      * Must not be instantiated.
+     *
+     * @since v2.3.0
      */
     private function __construct() {}
 }

@@ -15,6 +15,8 @@ namespace Symfony\Component\Finder\Comparator;
  * DateCompare compiles date comparisons.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class DateComparator extends Comparator
 {
@@ -25,6 +27,8 @@ class DateComparator extends Comparator
      * @param string $test A comparison string
      *
      * @throws \InvalidArgumentException If the test is not understood
+     *
+     * @since v2.0.0
      */
     public function __construct($test)
     {

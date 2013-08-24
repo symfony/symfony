@@ -18,9 +18,14 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
  * Registers the Twig exception listener if Twig is registered as a templating engine.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class ExceptionListenerPass implements CompilerPassInterface
 {
+    /**
+     * @since v2.0.0
+     */
     public function process(ContainerBuilder $container)
     {
         if (false === $container->hasDefinition('twig')) {

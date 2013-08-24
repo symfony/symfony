@@ -18,6 +18,8 @@ use Symfony\Component\Serializer\SerializerAwareInterface;
  * SerializerAware Encoder implementation
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
+ *
+ * @since v2.0.0
  */
 abstract class SerializerAwareEncoder implements SerializerAwareInterface
 {
@@ -25,6 +27,8 @@ abstract class SerializerAwareEncoder implements SerializerAwareInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function setSerializer(SerializerInterface $serializer)
     {

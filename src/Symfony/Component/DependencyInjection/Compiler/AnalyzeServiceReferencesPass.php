@@ -23,6 +23,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  * retrieve the graph in other passes from the compiler.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class AnalyzeServiceReferencesPass implements RepeatablePassInterface
 {
@@ -37,6 +39,8 @@ class AnalyzeServiceReferencesPass implements RepeatablePassInterface
      * Constructor.
      *
      * @param Boolean $onlyConstructorArguments Sets this Service Reference pass to ignore method calls
+     *
+     * @since v2.0.0
      */
     public function __construct($onlyConstructorArguments = false)
     {
@@ -45,6 +49,8 @@ class AnalyzeServiceReferencesPass implements RepeatablePassInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.10
      */
     public function setRepeatedPass(RepeatedPass $repeatedPass)
     {
@@ -55,6 +61,8 @@ class AnalyzeServiceReferencesPass implements RepeatablePassInterface
      * Processes a ContainerBuilder object to populate the service reference graph.
      *
      * @param ContainerBuilder $container
+     *
+     * @since v2.0.0
      */
     public function process(ContainerBuilder $container)
     {
@@ -89,6 +97,8 @@ class AnalyzeServiceReferencesPass implements RepeatablePassInterface
      * Processes service definitions for arguments to find relationships for the service graph.
      *
      * @param array $arguments An array of Reference or Definition objects relating to service definitions
+     *
+     * @since v2.0.0
      */
     private function processArguments(array $arguments)
     {
@@ -117,6 +127,8 @@ class AnalyzeServiceReferencesPass implements RepeatablePassInterface
      * @param string $id A full id or alias for a service definition.
      *
      * @return Definition|null The definition related to the supplied id
+     *
+     * @since v2.0.0
      */
     private function getDefinition($id)
     {
@@ -125,6 +137,9 @@ class AnalyzeServiceReferencesPass implements RepeatablePassInterface
         return null === $id ? null : $this->container->getDefinition($id);
     }
 
+    /**
+     * @since v2.0.0
+     */
     private function getDefinitionId($id)
     {
         while ($this->container->hasAlias($id)) {

@@ -23,6 +23,8 @@ namespace Symfony\Component\DependencyInjection;
  * by the PHP dumper.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class Variable
 {
@@ -32,6 +34,8 @@ class Variable
      * Constructor
      *
      * @param string $name
+     *
+     * @since v2.0.0
      */
     public function __construct($name)
     {
@@ -42,6 +46,8 @@ class Variable
      * Converts the object to a string
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     public function __toString()
     {

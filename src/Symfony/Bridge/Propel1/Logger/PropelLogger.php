@@ -47,6 +47,8 @@ class PropelLogger implements \BasicLogger
      *
      * @param LoggerInterface $logger    A LoggerInterface instance
      * @param Stopwatch       $stopwatch A Stopwatch instance
+     *
+     * @since v2.1.0
      */
     public function __construct(LoggerInterface $logger = null, Stopwatch $stopwatch = null)
     {
@@ -56,6 +58,8 @@ class PropelLogger implements \BasicLogger
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function alert($message)
     {
@@ -64,6 +68,8 @@ class PropelLogger implements \BasicLogger
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function crit($message)
     {
@@ -72,6 +78,8 @@ class PropelLogger implements \BasicLogger
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function err($message)
     {
@@ -80,6 +88,8 @@ class PropelLogger implements \BasicLogger
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function warning($message)
     {
@@ -88,6 +98,8 @@ class PropelLogger implements \BasicLogger
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function notice($message)
     {
@@ -96,6 +108,8 @@ class PropelLogger implements \BasicLogger
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function info($message)
     {
@@ -104,6 +118,8 @@ class PropelLogger implements \BasicLogger
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function debug($message)
     {
@@ -169,6 +185,8 @@ class PropelLogger implements \BasicLogger
      * Returns queries.
      *
      * @return array Queries
+     *
+     * @since v2.1.0
      */
     public function getQueries()
     {

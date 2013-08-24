@@ -27,6 +27,8 @@ class ChainLoader extends Loader
      * Constructor.
      *
      * @param LoaderInterface[] $loaders An array of loader instances
+     *
+     * @since v2.0.0
      */
     public function __construct(array $loaders = array())
     {
@@ -40,6 +42,8 @@ class ChainLoader extends Loader
      * Adds a loader instance.
      *
      * @param LoaderInterface $loader A Loader instance
+     *
+     * @since v2.1.0
      */
     public function addLoader(LoaderInterface $loader)
     {
@@ -52,6 +56,8 @@ class ChainLoader extends Loader
      * @param TemplateReferenceInterface $template A template
      *
      * @return Storage|Boolean false if the template cannot be loaded, a Storage instance otherwise
+     *
+     * @since v2.0.0
      */
     public function load(TemplateReferenceInterface $template)
     {
@@ -71,6 +77,8 @@ class ChainLoader extends Loader
      * @param integer                    $time     The last modification time of the cached template (timestamp)
      *
      * @return Boolean
+     *
+     * @since v2.0.0
      */
     public function isFresh(TemplateReferenceInterface $template, $time)
     {

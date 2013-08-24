@@ -17,6 +17,8 @@ use Symfony\Bridge\Twig\Node\TransNode;
  * Token Parser for the 'trans' tag.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class TransTokenParser extends \Twig_TokenParser
 {
@@ -28,6 +30,8 @@ class TransTokenParser extends \Twig_TokenParser
      * @return \Twig_NodeInterface A Twig_NodeInterface instance
      *
      * @throws \Twig_Error_Syntax
+     *
+     * @since v2.0.0
      */
     public function parse(\Twig_Token $token)
     {
@@ -72,6 +76,9 @@ class TransTokenParser extends \Twig_TokenParser
         return new TransNode($body, $domain, null, $vars, $locale, $lineno, $this->getTag());
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function decideTransFork($token)
     {
         return $token->test(array('endtrans'));
@@ -81,6 +88,8 @@ class TransTokenParser extends \Twig_TokenParser
      * Gets the tag name associated with this token parser.
      *
      * @return string The tag name
+     *
+     * @since v2.0.0
      */
     public function getTag()
     {

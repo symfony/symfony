@@ -28,6 +28,8 @@ use Psr\Log\LoggerInterface;
  * capabilities.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
 {
@@ -43,6 +45,8 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
      * @param array                 $options
      * @param LoggerInterface       $logger
      * @param SecureRandomInterface $secureRandom
+     *
+     * @since v2.2.0
      */
     public function __construct(array $userProviders, $key, $providerKey, array $options = array(), LoggerInterface $logger = null, SecureRandomInterface $secureRandom)
     {
@@ -55,6 +59,8 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
      * Sets the token provider
      *
      * @param TokenProviderInterface $tokenProvider
+     *
+     * @since v2.0.0
      */
     public function setTokenProvider(TokenProviderInterface $tokenProvider)
     {
@@ -63,6 +69,8 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.2.0
      */
     protected function cancelCookie(Request $request)
     {
@@ -80,6 +88,8 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     protected function processAutoLoginCookie(array $cookieParts, Request $request)
     {
@@ -118,6 +128,8 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     protected function onLoginSuccess(Request $request, Response $response, TokenInterface $token)
     {

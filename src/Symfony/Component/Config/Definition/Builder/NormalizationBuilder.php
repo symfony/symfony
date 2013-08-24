@@ -15,6 +15,8 @@ namespace Symfony\Component\Config\Definition\Builder;
  * This class builds normalization conditions.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class NormalizationBuilder
 {
@@ -26,6 +28,8 @@ class NormalizationBuilder
      * Constructor
      *
      * @param NodeDefinition $node The related node
+     *
+     * @since v2.0.0
      */
     public function __construct(NodeDefinition $node)
     {
@@ -42,6 +46,8 @@ class NormalizationBuilder
      * @param string $plural The plural of the key in case of irregular plural
      *
      * @return NormalizationBuilder
+     *
+     * @since v2.0.0
      */
     public function remap($key, $plural = null)
     {
@@ -56,6 +62,8 @@ class NormalizationBuilder
      * @param \Closure $closure
      *
      * @return ExprBuilder|NormalizationBuilder
+     *
+     * @since v2.0.0
      */
     public function before(\Closure $closure = null)
     {

@@ -16,6 +16,8 @@ use Symfony\Component\Security\Core\Encoder\BasePasswordEncoder;
 /**
  * @author Elnur Abdurrakhimov <elnur@elnur.pro>
  * @author Terje Bråten <terje@braten.be>
+ *
+ * @since v2.2.0
  */
 class BCryptPasswordEncoder extends BasePasswordEncoder
 {
@@ -30,6 +32,8 @@ class BCryptPasswordEncoder extends BasePasswordEncoder
      * @param integer $cost The algorithmic cost that should be used
      *
      * @throws \InvalidArgumentException if cost is out of range
+     *
+     * @since v2.3.0
      */
     public function __construct($cost)
     {
@@ -61,6 +65,8 @@ class BCryptPasswordEncoder extends BasePasswordEncoder
      * @return string The encoded password
      *
      * @link http://lxr.php.net/xref/PHP_5_5/ext/standard/password.c#111
+     *
+     * @since v2.2.0
      */
     public function encodePassword($raw, $salt)
     {
@@ -75,6 +81,8 @@ class BCryptPasswordEncoder extends BasePasswordEncoder
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function isPasswordValid($encoded, $raw, $salt)
     {

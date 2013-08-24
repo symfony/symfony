@@ -13,6 +13,9 @@ namespace Symfony\Component\Validator\Mapping\Loader;
 
 use Symfony\Component\Validator\Exception\MappingException;
 
+/**
+ * @since v2.1.0
+ */
 abstract class AbstractLoader implements LoaderInterface
 {
     /**
@@ -26,6 +29,8 @@ abstract class AbstractLoader implements LoaderInterface
      *
      * @param string $alias     The alias
      * @param string $namespace The PHP namespace
+     *
+     * @since v2.1.0
      */
     protected function addNamespaceAlias($alias, $namespace)
     {
@@ -43,6 +48,8 @@ abstract class AbstractLoader implements LoaderInterface
      * @return Constraint
      *
      * @throws MappingException If the namespace prefix is undefined
+     *
+     * @since v2.1.0
      */
     protected function newConstraint($name, $options)
     {

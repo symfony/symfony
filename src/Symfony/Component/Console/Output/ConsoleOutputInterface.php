@@ -25,6 +25,8 @@ interface ConsoleOutputInterface extends OutputInterface
      * Gets the OutputInterface for errors.
      *
      * @return OutputInterface
+     *
+     * @since v2.1.0
      */
     public function getErrorOutput();
 
@@ -32,6 +34,8 @@ interface ConsoleOutputInterface extends OutputInterface
      * Sets the OutputInterface used for errors.
      *
      * @param OutputInterface $error
+     *
+     * @since v2.1.0
      */
     public function setErrorOutput(OutputInterface $error);
 }

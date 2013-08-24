@@ -23,6 +23,8 @@ use Symfony\Component\HttpFoundation\Request;
  * INVALIDATE: the session id is updated, attributes are lost
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class SessionAuthenticationStrategy implements SessionAuthenticationStrategyInterface
 {
@@ -32,6 +34,9 @@ class SessionAuthenticationStrategy implements SessionAuthenticationStrategyInte
 
     private $strategy;
 
+    /**
+     * @since v2.0.0
+     */
     public function __construct($strategy)
     {
         $this->strategy = $strategy;
@@ -39,6 +44,8 @@ class SessionAuthenticationStrategy implements SessionAuthenticationStrategyInte
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function onAuthentication(Request $request, TokenInterface $token)
     {

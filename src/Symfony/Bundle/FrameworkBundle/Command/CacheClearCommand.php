@@ -22,11 +22,15 @@ use Symfony\Component\Finder\Finder;
  *
  * @author Francis Besset <francis.besset@gmail.com>
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class CacheClearCommand extends ContainerAwareCommand
 {
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     protected function configure()
     {
@@ -50,6 +54,8 @@ EOF
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -96,6 +102,8 @@ EOF
      * @param string $warmupDir
      * @param string $realCacheDir
      * @param bool   $enableOptionalWarmers
+     *
+     * @since v2.1.10
      */
     protected function warmup($warmupDir, $realCacheDir, $enableOptionalWarmers = true)
     {
@@ -151,6 +159,8 @@ EOF
      * @param string          $warmupDir
      *
      * @return KernelInterface
+     *
+     * @since v2.1.10
      */
     protected function getTempKernel(KernelInterface $parent, $namespace, $parentClass, $warmupDir)
     {

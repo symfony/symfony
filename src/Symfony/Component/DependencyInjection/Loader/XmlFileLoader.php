@@ -34,6 +34,8 @@ class XmlFileLoader extends FileLoader
      *
      * @param mixed  $file The resource
      * @param string $type The resource type
+     *
+     * @since v2.0.0
      */
     public function load($file, $type = null)
     {
@@ -67,6 +69,8 @@ class XmlFileLoader extends FileLoader
      * @param string $type     The resource type
      *
      * @return Boolean true if this class supports the given resource, false otherwise
+     *
+     * @since v2.0.0
      */
     public function supports($resource, $type = null)
     {
@@ -78,6 +82,8 @@ class XmlFileLoader extends FileLoader
      *
      * @param SimpleXMLElement $xml
      * @param string           $file
+     *
+     * @since v2.0.0
      */
     private function parseParameters(SimpleXMLElement $xml, $file)
     {
@@ -93,6 +99,8 @@ class XmlFileLoader extends FileLoader
      *
      * @param SimpleXMLElement $xml
      * @param string           $file
+     *
+     * @since v2.0.0
      */
     private function parseImports(SimpleXMLElement $xml, $file)
     {
@@ -111,6 +119,8 @@ class XmlFileLoader extends FileLoader
      *
      * @param SimpleXMLElement $xml
      * @param string           $file
+     *
+     * @since v2.0.0
      */
     private function parseDefinitions(SimpleXMLElement $xml, $file)
     {
@@ -129,6 +139,8 @@ class XmlFileLoader extends FileLoader
      * @param string           $id
      * @param SimpleXMLElement $service
      * @param string           $file
+     *
+     * @since v2.0.0
      */
     private function parseDefinition($id, $service, $file)
     {
@@ -204,6 +216,8 @@ class XmlFileLoader extends FileLoader
      * @return SimpleXMLElement
      *
      * @throws InvalidArgumentException When loading of XML file returns error
+     *
+     * @since v2.1.10
      */
     protected function parseFile($file)
     {
@@ -223,6 +237,8 @@ class XmlFileLoader extends FileLoader
      *
      * @param SimpleXMLElement $xml
      * @param string           $file
+     *
+     * @since v2.0.0
      */
     private function processAnonymousServices(SimpleXMLElement $xml, $file)
     {
@@ -280,6 +296,8 @@ class XmlFileLoader extends FileLoader
      * @return Boolean
      *
      * @throws RuntimeException When extension references a non-existent XSD file
+     *
+     * @since v2.2.0
      */
     public function validateSchema(\DOMDocument $dom)
     {
@@ -351,6 +369,8 @@ EOF
      * @param string       $file
      *
      * @throws InvalidArgumentException When no extension is found corresponding to a tag
+     *
+     * @since v2.0.0
      */
     private function validateExtensions(\DOMDocument $dom, $file)
     {
@@ -377,6 +397,8 @@ EOF
      * Loads from an extension.
      *
      * @param SimpleXMLElement $xml
+     *
+     * @since v2.0.0
      */
     private function loadFromExtensions(SimpleXMLElement $xml)
     {
@@ -412,6 +434,8 @@ EOF
      * @param \DomElement $element A \DomElement instance
      *
      * @return array A PHP array
+     *
+     * @since v2.1.0
      */
     public static function convertDomElementToArray(\DomElement $element)
     {

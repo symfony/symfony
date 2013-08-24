@@ -23,6 +23,8 @@ namespace Symfony\Component\Security\Core\Encoder;
  * @author Sebastiaan Stok <s.stok@rollerscapes.net>
  * @author Andrew Johnson
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.2.0
  */
 class Pbkdf2PasswordEncoder extends BasePasswordEncoder
 {
@@ -38,6 +40,8 @@ class Pbkdf2PasswordEncoder extends BasePasswordEncoder
      * @param Boolean $encodeHashAsBase64 Whether to base64 encode the password hash
      * @param integer $iterations         The number of iterations to use to stretch the password hash
      * @param integer $length             Length of derived key to create
+     *
+     * @since v2.2.0
      */
     public function __construct($algorithm = 'sha512', $encodeHashAsBase64 = true, $iterations = 1000, $length = 40)
     {
@@ -51,6 +55,8 @@ class Pbkdf2PasswordEncoder extends BasePasswordEncoder
      * {@inheritdoc}
      *
      * @throws \LogicException when the algorithm is not supported
+     *
+     * @since v2.2.0
      */
     public function encodePassword($raw, $salt)
     {
@@ -69,12 +75,17 @@ class Pbkdf2PasswordEncoder extends BasePasswordEncoder
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function isPasswordValid($encoded, $raw, $salt)
     {
         return $this->comparePasswords($encoded, $this->encodePassword($raw, $salt));
     }
 
+    /**
+     * @since v2.2.0
+     */
     private function hashPbkdf2($algorithm, $password, $salt, $iterations, $length = 0)
     {
         // Number of blocks needed to create the derived key

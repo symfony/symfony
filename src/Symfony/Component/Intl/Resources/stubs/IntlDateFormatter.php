@@ -15,6 +15,8 @@
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @see \Symfony\Component\Intl\DateFormatter\IntlDateFormatter
+ *
+ * @since v2.3.0
  */
 class IntlDateFormatter extends \Symfony\Component\Intl\DateFormatter\IntlDateFormatter
 {

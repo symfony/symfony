@@ -15,6 +15,8 @@ namespace Symfony\Component\PropertyAccess\Exception;
  * Thrown when a property cannot be found.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.2.0
  */
 class NoSuchPropertyException extends RuntimeException
 {

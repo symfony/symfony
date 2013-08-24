@@ -19,16 +19,24 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * Adds a protocol to a URL if it doesn't already have one.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.0.0
  */
 class FixUrlProtocolListener implements EventSubscriberInterface
 {
     private $defaultProtocol;
 
+    /**
+     * @since v2.0.0
+     */
     public function __construct($defaultProtocol = 'http')
     {
         $this->defaultProtocol = $defaultProtocol;
     }
 
+    /**
+     * @since v2.3.0
+     */
     public function onSubmit(FormEvent $event)
     {
         $data = $event->getData();
@@ -43,12 +51,17 @@ class FixUrlProtocolListener implements EventSubscriberInterface
      *
      * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
      *             {@link onSubmit()} instead.
+     *
+     * @since v2.3.0
      */
     public function onBind(FormEvent $event)
     {
         $this->onSubmit($event);
     }
 
+    /**
+     * @since v2.1.0
+     */
     public static function getSubscribedEvents()
     {
         return array(FormEvents::SUBMIT => 'onSubmit');

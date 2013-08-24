@@ -23,6 +23,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  * Implements the inline rendering strategy where the Request is rendered by the current HTTP kernel.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.2.0
  */
 class InlineFragmentRenderer extends RoutableFragmentRenderer
 {
@@ -34,6 +36,8 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
      *
      * @param HttpKernelInterface      $kernel     A HttpKernelInterface instance
      * @param EventDispatcherInterface $dispatcher A EventDispatcherInterface instance
+     *
+     * @since v2.3.0
      */
     public function __construct(HttpKernelInterface $kernel, EventDispatcherInterface $dispatcher = null)
     {
@@ -47,6 +51,8 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
      * Additional available options:
      *
      *  * alt: an alternative URI to render in case of an error
+     *
+     * @since v2.2.0
      */
     public function render($uri, Request $request, array $options = array())
     {
@@ -112,6 +118,9 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
         }
     }
 
+    /**
+     * @since v2.2.0
+     */
     protected function createSubRequest($uri, Request $request)
     {
         $cookies = $request->cookies->all();
@@ -146,6 +155,8 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function getName()
     {

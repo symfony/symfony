@@ -20,6 +20,8 @@ use Symfony\Component\Config\Resource\FileResource;
  * used form the file to change the container.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class PhpFileLoader extends FileLoader
 {
@@ -28,6 +30,8 @@ class PhpFileLoader extends FileLoader
      *
      * @param mixed  $file The resource
      * @param string $type The resource type
+     *
+     * @since v2.0.0
      */
     public function load($file, $type = null)
     {
@@ -49,6 +53,8 @@ class PhpFileLoader extends FileLoader
      * @param string $type     The resource type
      *
      * @return Boolean true if this class supports the given resource, false otherwise
+     *
+     * @since v2.0.0
      */
     public function supports($resource, $type = null)
     {

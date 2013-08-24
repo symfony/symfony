@@ -19,6 +19,8 @@ use Symfony\Component\HttpKernel\KernelInterface;
  * (Bundle\BlogBundle\Controller\PostController::indexAction).
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class ControllerNameParser
 {
@@ -28,6 +30,8 @@ class ControllerNameParser
      * Constructor.
      *
      * @param KernelInterface $kernel A KernelInterface instance
+     *
+     * @since v2.0.0
      */
     public function __construct(KernelInterface $kernel)
     {
@@ -43,6 +47,8 @@ class ControllerNameParser
      *
      * @throws \InvalidArgumentException when the specified bundle is not enabled
      *                                   or the controller cannot be found
+     *
+     * @since v2.0.0
      */
     public function parse($controller)
     {
@@ -80,6 +86,8 @@ class ControllerNameParser
      * @return string A short notation controller (a:b:c)
      *
      * @throws \InvalidArgumentException when the controller is not valid or cannot be found in any bundle
+     *
+     * @since v2.3.0
      */
     public function build($controller)
     {

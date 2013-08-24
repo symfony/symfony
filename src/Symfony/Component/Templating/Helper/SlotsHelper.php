@@ -17,6 +17,8 @@ namespace Symfony\Component\Templating\Helper;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class SlotsHelper extends Helper
 {
@@ -34,6 +36,8 @@ class SlotsHelper extends Helper
      * @throws \InvalidArgumentException if a slot with the same name is already started
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function start($name)
     {
@@ -54,6 +58,8 @@ class SlotsHelper extends Helper
      * @throws \LogicException if no slot has been started
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function stop()
     {
@@ -74,6 +80,8 @@ class SlotsHelper extends Helper
      * @return Boolean
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function has($name)
     {
@@ -89,6 +97,8 @@ class SlotsHelper extends Helper
      * @return string The slot content
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function get($name, $default = false)
     {
@@ -102,6 +112,8 @@ class SlotsHelper extends Helper
      * @param string $content The slot content
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function set($name, $content)
     {
@@ -117,6 +129,8 @@ class SlotsHelper extends Helper
      * @return Boolean true if the slot is defined or if a default content has been provided, false otherwise
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function output($name, $default = false)
     {
@@ -141,6 +155,8 @@ class SlotsHelper extends Helper
      * @return string The canonical name
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getName()
     {

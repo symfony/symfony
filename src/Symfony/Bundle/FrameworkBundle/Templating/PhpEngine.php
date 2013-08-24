@@ -21,6 +21,8 @@ use Symfony\Component\HttpFoundation\Response;
  * This engine knows how to render Symfony templates.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class PhpEngine extends BasePhpEngine implements EngineInterface
 {
@@ -33,6 +35,8 @@ class PhpEngine extends BasePhpEngine implements EngineInterface
      * @param ContainerInterface          $container The DI container
      * @param LoaderInterface             $loader    A loader instance
      * @param GlobalVariables|null        $globals   A GlobalVariables instance or null
+     *
+     * @since v2.0.0
      */
     public function __construct(TemplateNameParserInterface $parser, ContainerInterface $container, LoaderInterface $loader, GlobalVariables $globals = null)
     {
@@ -47,6 +51,8 @@ class PhpEngine extends BasePhpEngine implements EngineInterface
 
     /**
      * @throws \InvalidArgumentException When the helper is not defined
+     *
+     * @since v2.0.0
      */
     public function get($name)
     {
@@ -64,6 +70,8 @@ class PhpEngine extends BasePhpEngine implements EngineInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function setHelpers(array $helpers)
     {
@@ -78,6 +86,8 @@ class PhpEngine extends BasePhpEngine implements EngineInterface
      * @param Response $response   A Response instance
      *
      * @return Response A Response instance
+     *
+     * @since v2.0.0
      */
     public function renderResponse($view, array $parameters = array(), Response $response = null)
     {

@@ -20,11 +20,15 @@ use Symfony\Component\Finder\Expression\Expression;
  * Shell engine implementation using BSD find command.
  *
  * @author Jean-François Simon <contact@jfsimon.fr>
+ *
+ * @since v2.2.0
  */
 class BsdFindAdapter extends AbstractFindAdapter
 {
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function getName()
     {
@@ -33,6 +37,8 @@ class BsdFindAdapter extends AbstractFindAdapter
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     protected function canBeUsed()
     {
@@ -41,6 +47,8 @@ class BsdFindAdapter extends AbstractFindAdapter
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     protected function buildFormatSorting(Command $command, $sort)
     {
@@ -73,6 +81,8 @@ class BsdFindAdapter extends AbstractFindAdapter
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     protected function buildFindCommand(Command $command, $dir)
     {
@@ -83,6 +93,8 @@ class BsdFindAdapter extends AbstractFindAdapter
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     protected function buildContentFiltering(Command $command, array $contains, $not = false)
     {

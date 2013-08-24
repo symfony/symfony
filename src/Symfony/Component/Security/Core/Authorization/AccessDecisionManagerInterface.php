@@ -28,6 +28,8 @@ interface AccessDecisionManagerInterface
      * @param object         $object     The object to secure
      *
      * @return Boolean true if the access is granted, false otherwise
+     *
+     * @since v2.1.0
      */
     public function decide(TokenInterface $token, array $attributes, $object = null);
 
@@ -37,6 +39,8 @@ interface AccessDecisionManagerInterface
      * @param string $attribute An attribute
      *
      * @return Boolean true if this decision manager supports the attribute, false otherwise
+     *
+     * @since v2.1.0
      */
     public function supportsAttribute($attribute);
 
@@ -46,6 +50,8 @@ interface AccessDecisionManagerInterface
      * @param string $class A class name
      *
      * @return true if this decision manager can process the class
+     *
+     * @since v2.1.0
      */
     public function supportsClass($class);
 }

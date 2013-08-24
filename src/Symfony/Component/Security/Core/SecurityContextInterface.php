@@ -28,6 +28,8 @@ interface SecurityContextInterface
      * Returns the current security token.
      *
      * @return TokenInterface|null A TokenInterface instance or null if no authentication information is available
+     *
+     * @since v2.1.0
      */
     public function getToken();
 
@@ -35,6 +37,8 @@ interface SecurityContextInterface
      * Sets the authentication token.
      *
      * @param TokenInterface $token
+     *
+     * @since v2.1.0
      */
     public function setToken(TokenInterface $token = null);
 
@@ -45,6 +49,8 @@ interface SecurityContextInterface
      * @param mixed $object
      *
      * @return Boolean
+     *
+     * @since v2.1.0
      */
     public function isGranted($attributes, $object = null);
 }

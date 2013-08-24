@@ -17,11 +17,16 @@ use Symfony\Component\Process\Process;
  * Exception for failed processes.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.1.0
  */
 class ProcessFailedException extends RuntimeException
 {
     private $process;
 
+    /**
+     * @since v2.1.0
+     */
     public function __construct(Process $process)
     {
         if ($process->isSuccessful()) {
@@ -42,6 +47,9 @@ class ProcessFailedException extends RuntimeException
         $this->process = $process;
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function getProcess()
     {
         return $this->process;

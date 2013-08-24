@@ -15,6 +15,8 @@ namespace Symfony\Component\Config\Definition\Builder;
  * Abstract class that contain common code of integer and float node definition.
  *
  * @author David Jeanmonod <david.jeanmonod@gmail.com>
+ *
+ * @since v2.2.0
  */
 abstract class NumericNodeDefinition extends ScalarNodeDefinition
 {
@@ -29,6 +31,8 @@ abstract class NumericNodeDefinition extends ScalarNodeDefinition
      * @return NumericNodeDefinition
      *
      * @throws \InvalidArgumentException when the constraint is inconsistent
+     *
+     * @since v2.2.0
      */
     public function max($max)
     {
@@ -48,6 +52,8 @@ abstract class NumericNodeDefinition extends ScalarNodeDefinition
      * @return NumericNodeDefinition
      *
      * @throws \InvalidArgumentException when the constraint is inconsistent
+     *
+     * @since v2.2.0
      */
     public function min($min)
     {

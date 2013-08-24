@@ -21,6 +21,8 @@ use Symfony\Component\Debug\Exception\FlattenException as DebugFlattenException;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @deprecated Deprecated in 2.3, to be removed in 3.0. Use the same class from the Debug component instead.
+ *
+ * @since v2.3.0
  */
 class FlattenException extends DebugFlattenException
 {

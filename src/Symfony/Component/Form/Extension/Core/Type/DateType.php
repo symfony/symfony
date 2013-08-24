@@ -24,6 +24,9 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
+/**
+ * @since v2.0.0
+ */
 class DateType extends AbstractType
 {
     const DEFAULT_FORMAT = \IntlDateFormatter::MEDIUM;
@@ -39,6 +42,8 @@ class DateType extends AbstractType
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -122,6 +127,8 @@ class DateType extends AbstractType
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
@@ -157,6 +164,8 @@ class DateType extends AbstractType
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
@@ -236,12 +245,17 @@ class DateType extends AbstractType
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getName()
     {
         return 'date';
     }
 
+    /**
+     * @since v2.1.0
+     */
     private function formatTimestamps(\IntlDateFormatter $formatter, $regex, array $timestamps)
     {
         $pattern = $formatter->getPattern();
@@ -274,6 +288,9 @@ class DateType extends AbstractType
         return $timestamps;
     }
 
+    /**
+     * @since v2.1.0
+     */
     private function listYears(array $years)
     {
         $result = array();
@@ -285,6 +302,9 @@ class DateType extends AbstractType
         return $result;
     }
 
+    /**
+     * @since v2.1.0
+     */
     private function listMonths(array $months)
     {
         $result = array();
@@ -296,6 +316,9 @@ class DateType extends AbstractType
         return $result;
     }
 
+    /**
+     * @since v2.1.0
+     */
     private function listDays(array $days)
     {
         $result = array();

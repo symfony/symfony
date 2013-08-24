@@ -53,6 +53,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class Application
 {
@@ -75,6 +77,8 @@ class Application
      * @param string $version The version of the application
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function __construct($name = 'UNKNOWN', $version = 'UNKNOWN')
     {
@@ -91,6 +95,9 @@ class Application
         }
     }
 
+    /**
+     * @since v2.3.0
+     */
     public function setDispatcher(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
@@ -107,6 +114,8 @@ class Application
      * @throws \Exception When doRun returns Exception
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function run(InputInterface $input = null, OutputInterface $output = null)
     {
@@ -163,6 +172,8 @@ class Application
      * @param OutputInterface $output An Output instance
      *
      * @return integer 0 if everything went fine, or an error code
+     *
+     * @since v2.0.0
      */
     public function doRun(InputInterface $input, OutputInterface $output)
     {
@@ -203,6 +214,8 @@ class Application
      * @param HelperSet $helperSet The helper set
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setHelperSet(HelperSet $helperSet)
     {
@@ -215,6 +228,8 @@ class Application
      * @return HelperSet The HelperSet instance associated with this command
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getHelperSet()
     {
@@ -227,6 +242,8 @@ class Application
      * @param InputDefinition $definition The input definition
      *
      * @api
+     *
+     * @since v2.2.0
      */
     public function setDefinition(InputDefinition $definition)
     {
@@ -237,6 +254,8 @@ class Application
      * Gets the InputDefinition related to this Application.
      *
      * @return InputDefinition The InputDefinition instance
+     *
+     * @since v2.0.0
      */
     public function getDefinition()
     {
@@ -247,6 +266,8 @@ class Application
      * Gets the help message.
      *
      * @return string A help message.
+     *
+     * @since v2.0.0
      */
     public function getHelp()
     {
@@ -276,6 +297,8 @@ class Application
      * @param Boolean $boolean Whether to catch exceptions or not during commands execution
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setCatchExceptions($boolean)
     {
@@ -288,6 +311,8 @@ class Application
      * @param Boolean $boolean Whether to automatically exit after a command execution or not
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setAutoExit($boolean)
     {
@@ -300,6 +325,8 @@ class Application
      * @return string The application name
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getName()
     {
@@ -312,6 +339,8 @@ class Application
      * @param string $name The application name
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setName($name)
     {
@@ -324,6 +353,8 @@ class Application
      * @return string The application version
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getVersion()
     {
@@ -336,6 +367,8 @@ class Application
      * @param string $version The application version
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setVersion($version)
     {
@@ -348,6 +381,8 @@ class Application
      * @return string The long application version
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getLongVersion()
     {
@@ -366,6 +401,8 @@ class Application
      * @return Command The newly created command
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function register($name)
     {
@@ -378,6 +415,8 @@ class Application
      * @param Command[] $commands An array of commands
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function addCommands(array $commands)
     {
@@ -396,6 +435,8 @@ class Application
      * @return Command The registered command
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function add(Command $command)
     {
@@ -426,6 +467,8 @@ class Application
      * @throws \InvalidArgumentException When command name given does not exist
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function get($name)
     {
@@ -455,6 +498,8 @@ class Application
      * @return Boolean true if the command exists, false otherwise
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function has($name)
     {
@@ -467,6 +512,8 @@ class Application
      * It does not returns the global namespace which always exists.
      *
      * @return array An array of namespaces
+     *
+     * @since v2.0.0
      */
     public function getNamespaces()
     {
@@ -490,6 +537,8 @@ class Application
      * @return string A registered namespace
      *
      * @throws \InvalidArgumentException When namespace is incorrect or ambiguous
+     *
+     * @since v2.0.0
      */
     public function findNamespace($namespace)
     {
@@ -534,6 +583,8 @@ class Application
      * @throws \InvalidArgumentException When command name is incorrect or ambiguous
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function find($name)
     {
@@ -581,6 +632,8 @@ class Application
      * @return Command[] An array of Command instances
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function all($namespace = null)
     {
@@ -604,6 +657,8 @@ class Application
      * @param array $names An array of names
      *
      * @return array An array of abbreviations
+     *
+     * @since v2.1.0
      */
     public static function getAbbreviations($names)
     {
@@ -627,6 +682,8 @@ class Application
      * @return string A string representing the Application
      *
      * @deprecated Deprecated since version 2.3, to be removed in 3.0.
+     *
+     * @since v2.1.0
      */
     public function asText($namespace = null, $raw = false)
     {
@@ -646,6 +703,8 @@ class Application
      * @return string|\DOMDocument An XML string representing the Application
      *
      * @deprecated Deprecated since version 2.3, to be removed in 3.0.
+     *
+     * @since v2.0.0
      */
     public function asXml($namespace = null, $asDom = false)
     {
@@ -666,6 +725,8 @@ class Application
      *
      * @param Exception       $e      An exception instance
      * @param OutputInterface $output An OutputInterface instance
+     *
+     * @since v2.0.0
      */
     public function renderException($e, $output)
     {
@@ -747,6 +808,8 @@ class Application
      * Tries to figure out the terminal width in which this application runs
      *
      * @return int|null
+     *
+     * @since v2.0.22
      */
     protected function getTerminalWidth()
     {
@@ -759,6 +822,8 @@ class Application
      * Tries to figure out the terminal height in which this application runs
      *
      * @return int|null
+     *
+     * @since v2.0.22
      */
     protected function getTerminalHeight()
     {
@@ -771,6 +836,8 @@ class Application
      * Tries to figure out the terminal dimensions based on the current environment
      *
      * @return array Array containing width and height
+     *
+     * @since v2.1.10
      */
     public function getTerminalDimensions()
     {
@@ -825,6 +892,8 @@ class Application
      *
      * @param InputInterface  $input  An InputInterface instance
      * @param OutputInterface $output An OutputInterface instance
+     *
+     * @since v2.3.0
      */
     protected function configureIO(InputInterface $input, OutputInterface $output)
     {
@@ -867,6 +936,8 @@ class Application
      * @param OutputInterface $output  An Output instance
      *
      * @return integer 0 if everything went fine, or an error code
+     *
+     * @since v2.3.0
      */
     protected function doRunCommand(Command $command, InputInterface $input, OutputInterface $output)
     {
@@ -907,6 +978,8 @@ class Application
      * @param InputInterface $input The input interface
      *
      * @return string The command name
+     *
+     * @since v2.0.0
      */
     protected function getCommandName(InputInterface $input)
     {
@@ -917,6 +990,8 @@ class Application
      * Gets the default input definition.
      *
      * @return InputDefinition An InputDefinition instance
+     *
+     * @since v2.1.0
      */
     protected function getDefaultInputDefinition()
     {
@@ -937,6 +1012,8 @@ class Application
      * Gets the default commands that should always be available.
      *
      * @return Command[] An array of default Command instances
+     *
+     * @since v2.1.0
      */
     protected function getDefaultCommands()
     {
@@ -947,6 +1024,8 @@ class Application
      * Gets the default helper set with the helpers that should always be available.
      *
      * @return HelperSet A HelperSet instance
+     *
+     * @since v2.1.0
      */
     protected function getDefaultHelperSet()
     {
@@ -962,6 +1041,8 @@ class Application
      * Runs and parses stty -a if it's available, suppressing any error output
      *
      * @return string
+     *
+     * @since v2.1.0
      */
     private function getSttyColumns()
     {
@@ -985,6 +1066,8 @@ class Application
      * Runs and parses mode CON if it's available, suppressing any error output
      *
      * @return string <width>x<height> or null if it could not be parsed
+     *
+     * @since v2.1.10
      */
     private function getConsoleMode()
     {
@@ -1012,6 +1095,8 @@ class Application
      * @param array $abbrevs Abbreviated suggestions to convert
      *
      * @return string A formatted string of abbreviated suggestions
+     *
+     * @since v2.0.0
      */
     private function getAbbreviationSuggestions($abbrevs)
     {
@@ -1027,6 +1112,8 @@ class Application
      * @param string $limit The maximum number of parts of the namespace
      *
      * @return string The namespace of the command
+     *
+     * @since v2.3.0
      */
     public function extractNamespace($name, $limit = null)
     {

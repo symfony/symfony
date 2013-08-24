@@ -18,6 +18,8 @@ use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
  * Resolves all parameter placeholders "%somevalue%" to their real values.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class ResolveParameterPlaceHoldersPass implements CompilerPassInterface
 {
@@ -27,6 +29,8 @@ class ResolveParameterPlaceHoldersPass implements CompilerPassInterface
      * @param ContainerBuilder $container
      *
      * @throws ParameterNotFoundException
+     *
+     * @since v2.0.0
      */
     public function process(ContainerBuilder $container)
     {

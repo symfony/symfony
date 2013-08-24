@@ -27,6 +27,8 @@ use Symfony\Component\Console\Formatter\OutputFormatterInterface;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class StreamOutput extends Output
 {
@@ -43,6 +45,8 @@ class StreamOutput extends Output
      * @throws \InvalidArgumentException When first argument is not a real stream
      *
      * @api
+     *
+     * @since v2.0.10
      */
     public function __construct($stream, $verbosity = self::VERBOSITY_NORMAL, $decorated = null, OutputFormatterInterface $formatter = null)
     {
@@ -63,6 +67,8 @@ class StreamOutput extends Output
      * Gets the stream attached to this StreamOutput instance.
      *
      * @return resource A stream resource
+     *
+     * @since v2.0.0
      */
     public function getStream()
     {
@@ -71,6 +77,8 @@ class StreamOutput extends Output
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     protected function doWrite($message, $newline)
     {
@@ -93,6 +101,8 @@ class StreamOutput extends Output
      *  -  non tty consoles
      *
      * @return Boolean true if the stream supports colorization, false otherwise
+     *
+     * @since v2.0.0
      */
     protected function hasColorSupport()
     {

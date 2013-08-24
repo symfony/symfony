@@ -17,11 +17,16 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Twig extension for Symfony assets helper
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class AssetsExtension extends \Twig_Extension
 {
     private $container;
 
+    /**
+     * @since v2.0.0
+     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
@@ -31,6 +36,8 @@ class AssetsExtension extends \Twig_Extension
      * Returns a list of functions to add to the existing list.
      *
      * @return array An array of functions
+     *
+     * @since v2.0.0
      */
     public function getFunctions()
     {
@@ -49,6 +56,8 @@ class AssetsExtension extends \Twig_Extension
      * @param string $packageName The name of the asset package to use
      *
      * @return string A public path which takes into account the base path and URL path
+     *
+     * @since v2.0.0
      */
     public function getAssetUrl($path, $packageName = null)
     {
@@ -61,6 +70,8 @@ class AssetsExtension extends \Twig_Extension
      * @param string $packageName
      *
      * @return int
+     *
+     * @since v2.0.0
      */
     public function getAssetsVersion($packageName = null)
     {
@@ -71,6 +82,8 @@ class AssetsExtension extends \Twig_Extension
      * Returns the name of the extension.
      *
      * @return string The extension name
+     *
+     * @since v2.0.0
      */
     public function getName()
     {

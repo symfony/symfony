@@ -19,6 +19,8 @@ use Symfony\Component\Validator\Constraint;
  * @author Miha Vrhovnik <miha.vrhovnik@pagein.si>
  *
  * @api
+ *
+ * @since v2.3.0
  */
 class Currency extends Constraint
 {

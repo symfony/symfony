@@ -22,6 +22,8 @@ use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
  * The permission granting strategy to apply to the access control list.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
 {
@@ -35,6 +37,8 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
      * Sets the audit logger
      *
      * @param AuditLoggerInterface $auditLogger
+     *
+     * @since v2.0.0
      */
     public function setAuditLogger(AuditLoggerInterface $auditLogger)
     {
@@ -43,6 +47,8 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function isGranted(AclInterface $acl, array $masks, array $sids, $administrativeMode = false)
     {
@@ -75,6 +81,8 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function isFieldGranted(AclInterface $acl, $field, array $masks, array $sids, $administrativeMode = false)
     {
@@ -133,6 +141,8 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
      * @return Boolean true, or false; either granting, or denying access respectively.
      *
      * @throws NoAceFoundException
+     *
+     * @since v2.0.0
      */
     private function hasSufficientPermissions(AclInterface $acl, array $aces, array $masks, array $sids, $administrativeMode)
     {
@@ -194,6 +204,8 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
      * @return Boolean
      *
      * @throws \RuntimeException if the ACE strategy is not supported
+     *
+     * @since v2.0.0
      */
     private function isAceApplicable($requiredMask, EntryInterface $ace)
     {

@@ -15,6 +15,8 @@ namespace Symfony\Component\EventDispatcher;
  * A read-only proxy for an event dispatcher.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.1.0
  */
 class ImmutableEventDispatcher implements EventDispatcherInterface
 {
@@ -28,6 +30,8 @@ class ImmutableEventDispatcher implements EventDispatcherInterface
      * Creates an unmodifiable proxy for an event dispatcher.
      *
      * @param EventDispatcherInterface $dispatcher The proxied event dispatcher.
+     *
+     * @since v2.1.0
      */
     public function __construct(EventDispatcherInterface $dispatcher)
     {
@@ -36,6 +40,8 @@ class ImmutableEventDispatcher implements EventDispatcherInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function dispatch($eventName, Event $event = null)
     {
@@ -44,6 +50,8 @@ class ImmutableEventDispatcher implements EventDispatcherInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function addListener($eventName, $listener, $priority = 0)
     {
@@ -52,6 +60,8 @@ class ImmutableEventDispatcher implements EventDispatcherInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function addSubscriber(EventSubscriberInterface $subscriber)
     {
@@ -60,6 +70,8 @@ class ImmutableEventDispatcher implements EventDispatcherInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function removeListener($eventName, $listener)
     {
@@ -68,6 +80,8 @@ class ImmutableEventDispatcher implements EventDispatcherInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function removeSubscriber(EventSubscriberInterface $subscriber)
     {
@@ -76,6 +90,8 @@ class ImmutableEventDispatcher implements EventDispatcherInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getListeners($eventName = null)
     {
@@ -84,6 +100,8 @@ class ImmutableEventDispatcher implements EventDispatcherInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function hasListeners($eventName = null)
     {

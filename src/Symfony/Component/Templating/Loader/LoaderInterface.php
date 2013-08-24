@@ -30,6 +30,8 @@ interface LoaderInterface
      * @return Storage|Boolean false if the template cannot be loaded, a Storage instance otherwise
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function load(TemplateReferenceInterface $template);
 
@@ -42,6 +44,8 @@ interface LoaderInterface
      * @return Boolean
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function isFresh(TemplateReferenceInterface $template, $time);
 }

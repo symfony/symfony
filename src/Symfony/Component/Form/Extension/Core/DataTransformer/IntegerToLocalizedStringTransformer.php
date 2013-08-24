@@ -16,6 +16,8 @@ namespace Symfony\Component\Form\Extension\Core\DataTransformer;
  * (each thousand) and comma separators.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.0.0
  */
 class IntegerToLocalizedStringTransformer extends NumberToLocalizedStringTransformer
 {

@@ -19,11 +19,16 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * ResponseListener fixes the Response headers based on the Request.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.1.0
  */
 class ResponseListener implements EventSubscriberInterface
 {
     private $charset;
 
+    /**
+     * @since v2.0.0
+     */
     public function __construct($charset)
     {
         $this->charset = $charset;
@@ -33,6 +38,8 @@ class ResponseListener implements EventSubscriberInterface
      * Filters the Response.
      *
      * @param FilterResponseEvent $event A FilterResponseEvent instance
+     *
+     * @since v2.0.0
      */
     public function onKernelResponse(FilterResponseEvent $event)
     {
@@ -49,6 +56,9 @@ class ResponseListener implements EventSubscriberInterface
         $response->prepare($event->getRequest());
     }
 
+    /**
+     * @since v2.1.0
+     */
     public static function getSubscribedEvents()
     {
         return array(

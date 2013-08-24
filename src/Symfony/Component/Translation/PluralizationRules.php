@@ -15,6 +15,8 @@ namespace Symfony\Component\Translation;
  * Returns the plural rules for a given locale.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class PluralizationRules
 {
@@ -28,6 +30,8 @@ class PluralizationRules
      * @param string  $locale The locale
      *
      * @return integer The plural position
+     *
+     * @since v2.1.0
      */
     public static function get($number, $locale)
     {
@@ -196,6 +200,8 @@ class PluralizationRules
      * @return null
      *
      * @throws \LogicException
+     *
+     * @since v2.1.0
      */
     public static function set($rule, $locale)
     {

@@ -15,6 +15,8 @@ namespace Symfony\Component\Security\Core\Role;
  * RoleHierarchy defines a role hierarchy.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class RoleHierarchy implements RoleHierarchyInterface
 {
@@ -25,6 +27,8 @@ class RoleHierarchy implements RoleHierarchyInterface
      * Constructor.
      *
      * @param array $hierarchy An array defining the hierarchy
+     *
+     * @since v2.0.0
      */
     public function __construct(array $hierarchy)
     {
@@ -39,6 +43,8 @@ class RoleHierarchy implements RoleHierarchyInterface
      * @param RoleInterface[] $roles An array of RoleInterface instances
      *
      * @return RoleInterface[] An array of RoleInterface instances
+     *
+     * @since v2.0.0
      */
     public function getReachableRoles(array $roles)
     {
@@ -56,6 +62,9 @@ class RoleHierarchy implements RoleHierarchyInterface
         return $reachableRoles;
     }
 
+    /**
+     * @since v2.0.0
+     */
     private function buildRoleMap()
     {
         $this->map = array();

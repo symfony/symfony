@@ -20,6 +20,8 @@ use Symfony\Component\Config\Loader\Loader;
  * The Closure has access to the container as its first argument.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class ClosureLoader extends Loader
 {
@@ -29,6 +31,8 @@ class ClosureLoader extends Loader
      * Constructor.
      *
      * @param ContainerBuilder $container A ContainerBuilder instance
+     *
+     * @since v2.0.0
      */
     public function __construct(ContainerBuilder $container)
     {
@@ -40,6 +44,8 @@ class ClosureLoader extends Loader
      *
      * @param \Closure $closure The resource
      * @param string   $type    The resource type
+     *
+     * @since v2.0.0
      */
     public function load($closure, $type = null)
     {
@@ -53,6 +59,8 @@ class ClosureLoader extends Loader
      * @param string $type     The resource type
      *
      * @return Boolean true if this class supports the given resource, false otherwise
+     *
+     * @since v2.0.0
      */
     public function supports($resource, $type = null)
     {

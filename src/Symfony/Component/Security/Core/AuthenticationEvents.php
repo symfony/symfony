@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Security\Core;
 
+/**
+ * @since v2.1.0
+ */
 final class AuthenticationEvents
 {
     /**

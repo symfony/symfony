@@ -24,6 +24,8 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  *
  * @author William Durand <william.durand1@gmail.com>
  * @author Toni Uebernickel <tuebernickel@gmail.com>
+ *
+ * @since v2.1.0
  */
 class ModelChoiceList extends ObjectChoiceList
 {
@@ -78,6 +80,8 @@ class ModelChoiceList extends ObjectChoiceList
      *                                                    Either an array if $choices is given,
      *                                                    or a ModelCriteria to be merged with the $queryObject.
      * @param PropertyAccessorInterface $propertyAccessor The reflection graph for reading property paths.
+     *
+     * @since v2.2.0
      */
     public function __construct($class, $labelPath = null, $choices = null, $queryObject = null, $groupPath = null, $preferred = array(), PropertyAccessorInterface $propertyAccessor = null)
     {
@@ -112,6 +116,8 @@ class ModelChoiceList extends ObjectChoiceList
      * Returns the class name
      *
      * @return string
+     *
+     * @since v2.1.0
      */
     public function getClass()
     {
@@ -124,6 +130,8 @@ class ModelChoiceList extends ObjectChoiceList
      * @return array
      *
      * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     *
+     * @since v2.1.0
      */
     public function getChoices()
     {
@@ -140,6 +148,8 @@ class ModelChoiceList extends ObjectChoiceList
      * @return array
      *
      * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     *
+     * @since v2.1.0
      */
     public function getValues()
     {
@@ -157,6 +167,8 @@ class ModelChoiceList extends ObjectChoiceList
      * @return array
      *
      * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     *
+     * @since v2.1.0
      */
     public function getPreferredViews()
     {
@@ -174,6 +186,8 @@ class ModelChoiceList extends ObjectChoiceList
      * @return array
      *
      * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     *
+     * @since v2.1.0
      */
     public function getRemainingViews()
     {
@@ -192,6 +206,8 @@ class ModelChoiceList extends ObjectChoiceList
      * @return array
      *
      * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     *
+     * @since v2.1.0
      */
     public function getChoicesForValues(array $values)
     {
@@ -218,6 +234,8 @@ class ModelChoiceList extends ObjectChoiceList
      * @return array
      *
      * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     *
+     * @since v2.1.0
      */
     public function getValuesForChoices(array $models)
     {
@@ -252,6 +270,8 @@ class ModelChoiceList extends ObjectChoiceList
      * @return array
      *
      * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     *
+     * @since v2.1.0
      */
     public function getIndicesForChoices(array $models)
     {
@@ -310,6 +330,8 @@ class ModelChoiceList extends ObjectChoiceList
      * @return array
      *
      * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     *
+     * @since v2.1.0
      */
     public function getIndicesForValues(array $values)
     {
@@ -339,6 +361,8 @@ class ModelChoiceList extends ObjectChoiceList
      *
      * @return integer|string A unique index containing only ASCII letters,
      *                        digits and underscores.
+     *
+     * @since v2.1.0
      */
     protected function createIndex($model)
     {
@@ -359,6 +383,8 @@ class ModelChoiceList extends ObjectChoiceList
      * @param mixed $model The choice to create a value for
      *
      * @return integer|string A unique value without character limitations.
+     *
+     * @since v2.1.0
      */
     protected function createValue($model)
     {
@@ -371,6 +397,8 @@ class ModelChoiceList extends ObjectChoiceList
 
     /**
      * Loads the list with model objects.
+     *
+     * @since v2.1.0
      */
     private function load()
     {
@@ -401,6 +429,8 @@ class ModelChoiceList extends ObjectChoiceList
      * @param object $model The model for which to get the identifier
      *
      * @return array
+     *
+     * @since v2.1.0
      */
     private function getIdentifierValues($model)
     {
@@ -426,6 +456,8 @@ class ModelChoiceList extends ObjectChoiceList
      * @param \ColumnMap $column
      *
      * @return Boolean
+     *
+     * @since v2.2.0
      */
     private function isInteger(\ColumnMap $column)
     {

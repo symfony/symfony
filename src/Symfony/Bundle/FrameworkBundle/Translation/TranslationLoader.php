@@ -19,6 +19,8 @@ use Symfony\Component\Translation\Loader\LoaderInterface;
  * TranslationLoader loads translation messages from translation files.
  *
  * @author Michel Salib <michelsalib@hotmail.com>
+ *
+ * @since v2.1.0
  */
 class TranslationLoader
 {
@@ -33,6 +35,8 @@ class TranslationLoader
      * Adds a loader to the translation extractor.
      * @param string          $format The format of the loader
      * @param LoaderInterface $loader
+     *
+     * @since v2.1.0
      */
     public function addLoader($format, LoaderInterface $loader)
     {
@@ -44,6 +48,8 @@ class TranslationLoader
      *
      * @param string           $directory the directory to look into
      * @param MessageCatalogue $catalogue the catalogue
+     *
+     * @since v2.1.0
      */
     public function loadMessages($directory, MessageCatalogue $catalogue)
     {

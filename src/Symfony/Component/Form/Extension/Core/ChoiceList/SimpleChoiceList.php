@@ -28,6 +28,8 @@ namespace Symfony\Component\Form\Extension\Core\ChoiceList;
  * </code>
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.1.0
  */
 class SimpleChoiceList extends ChoiceList
 {
@@ -41,6 +43,8 @@ class SimpleChoiceList extends ChoiceList
      *                       in the array key pointing to the nested array.
      * @param array $preferredChoices A flat array of choices that should be
      *                                presented to the user with priority.
+     *
+     * @since v2.1.0
      */
     public function __construct(array $choices, array $preferredChoices = array())
     {
@@ -50,6 +54,8 @@ class SimpleChoiceList extends ChoiceList
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getChoicesForValues(array $values)
     {
@@ -62,6 +68,8 @@ class SimpleChoiceList extends ChoiceList
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getValuesForChoices(array $choices)
     {
@@ -85,6 +93,8 @@ class SimpleChoiceList extends ChoiceList
      * @param array|\Traversable $choices            The list of choices.
      * @param array              $labels             Ignored.
      * @param array              $preferredChoices   The preferred choices.
+     *
+     * @since v2.1.0
      */
     protected function addChoices(array &$bucketForPreferred, array &$bucketForRemaining, $choices, array $labels, array $preferredChoices)
     {
@@ -125,6 +135,8 @@ class SimpleChoiceList extends ChoiceList
      * @param array $preferredChoices An array of preferred choices.
      *
      * @return Boolean Whether the choice is preferred.
+     *
+     * @since v2.1.0
      */
     protected function isPreferred($choice, array $preferredChoices)
     {
@@ -138,6 +150,8 @@ class SimpleChoiceList extends ChoiceList
      * @param mixed $choice The choice.
      *
      * @return string|integer A valid PHP array key.
+     *
+     * @since v2.1.0
      */
     protected function fixChoice($choice)
     {
@@ -146,6 +160,8 @@ class SimpleChoiceList extends ChoiceList
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     protected function fixChoices(array $choices)
     {
@@ -154,6 +170,8 @@ class SimpleChoiceList extends ChoiceList
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     protected function createValue($choice)
     {

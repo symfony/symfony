@@ -22,6 +22,8 @@ interface ResourceBundleInterface
      * Returns the list of locales that this bundle supports.
      *
      * @return string[] A list of locale codes.
+     *
+     * @since v2.3.0
      */
     public function getLocales();
 }

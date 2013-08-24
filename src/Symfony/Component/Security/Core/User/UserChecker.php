@@ -20,11 +20,15 @@ use Symfony\Component\Security\Core\Exception\AccountExpiredException;
  * UserChecker checks the user account flags.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class UserChecker implements UserCheckerInterface
 {
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function checkPreAuth(UserInterface $user)
     {
@@ -41,6 +45,8 @@ class UserChecker implements UserCheckerInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function checkPostAuth(UserInterface $user)
     {

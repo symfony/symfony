@@ -15,6 +15,8 @@ namespace Symfony\Component\Config\Definition\Builder;
  * This class builds validation conditions.
  *
  * @author Christophe Coevoet <stof@notk.org>
+ *
+ * @since v2.0.0
  */
 class ValidationBuilder
 {
@@ -25,6 +27,8 @@ class ValidationBuilder
      * Constructor
      *
      * @param NodeDefinition $node The related node
+     *
+     * @since v2.0.0
      */
     public function __construct(NodeDefinition $node)
     {
@@ -39,6 +43,8 @@ class ValidationBuilder
      * @param \Closure $closure
      *
      * @return ExprBuilder|ValidationBuilder
+     *
+     * @since v2.0.0
      */
     public function rule(\Closure $closure = null)
     {

@@ -21,12 +21,17 @@ use Symfony\Component\Serializer\Exception\RuntimeException;
  * @author Jordi Boggiano <j.boggiano@seld.be>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  * @author Lukas Kahwe Smith <smith@pooteeweet.org>
+ *
+ * @since v2.1.0
  */
 class ChainEncoder implements EncoderInterface
 {
     protected $encoders = array();
     protected $encoderByFormat = array();
 
+    /**
+     * @since v2.1.0
+     */
     public function __construct(array $encoders = array())
     {
         $this->encoders = $encoders;
@@ -34,6 +39,8 @@ class ChainEncoder implements EncoderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     final public function encode($data, $format, array $context = array())
     {
@@ -42,6 +49,8 @@ class ChainEncoder implements EncoderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function supportsEncoding($format)
     {
@@ -60,6 +69,8 @@ class ChainEncoder implements EncoderInterface
      * @param string $format
      *
      * @return Boolean
+     *
+     * @since v2.1.0
      */
     public function needsNormalization($format)
     {
@@ -83,6 +94,8 @@ class ChainEncoder implements EncoderInterface
      *
      * @return EncoderInterface
      * @throws RuntimeException if no encoder is found
+     *
+     * @since v2.1.0
      */
     private function getEncoder($format)
     {

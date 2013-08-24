@@ -23,6 +23,8 @@ use Symfony\Component\CssSelector\Parser\Tokenizer\TokenizerPatterns;
  * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @since v2.3.0
  */
 class NumberHandler implements HandlerInterface
 {
@@ -33,6 +35,8 @@ class NumberHandler implements HandlerInterface
 
     /**
      * @param TokenizerPatterns $patterns
+     *
+     * @since v2.3.0
      */
     public function __construct(TokenizerPatterns $patterns)
     {
@@ -41,6 +45,8 @@ class NumberHandler implements HandlerInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function handle(Reader $reader, TokenStream $stream)
     {

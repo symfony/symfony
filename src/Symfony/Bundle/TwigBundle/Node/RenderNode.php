@@ -15,9 +15,14 @@ namespace Symfony\Bundle\TwigBundle\Node;
  * Represents a render node.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class RenderNode extends \Twig_Node
 {
+    /**
+     * @since v2.2.0
+     */
     public function __construct(\Twig_Node_Expression $expr, \Twig_Node_Expression $options, $lineno, $tag = null)
     {
         parent::__construct(array('expr' => $expr, 'options' => $options), array(), $lineno, $tag);
@@ -27,6 +32,8 @@ class RenderNode extends \Twig_Node
      * Compiles the node to PHP.
      *
      * @param \Twig_Compiler $compiler A Twig_Compiler instance
+     *
+     * @since v2.0.0
      */
     public function compile(\Twig_Compiler $compiler)
     {

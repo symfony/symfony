@@ -24,6 +24,8 @@ interface CacheInterface
      * Returns whether metadata for the given class exists in the cache
      *
      * @param string $class
+     *
+     * @since v2.1.0
      */
     public function has($class);
 
@@ -33,6 +35,8 @@ interface CacheInterface
      * @param string $class Class Name
      *
      * @return ClassMetadata|false A ClassMetadata instance or false on miss
+     *
+     * @since v2.1.0
      */
     public function read($class);
 
@@ -40,6 +44,8 @@ interface CacheInterface
      * Stores a class metadata in the cache
      *
      * @param ClassMetadata $metadata A Class Metadata
+     *
+     * @since v2.1.0
      */
     public function write(ClassMetadata $metadata);
 }

@@ -17,6 +17,8 @@ namespace Symfony\Component\DomCrawler;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class Link
 {
@@ -43,6 +45,8 @@ class Link
      * @throws \InvalidArgumentException if the node is not a link
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function __construct(\DOMNode $node, $currentUri, $method = 'GET')
     {
@@ -59,6 +63,8 @@ class Link
      * Gets the node associated with this link.
      *
      * @return \DOMNode A \DOMNode instance
+     *
+     * @since v2.0.0
      */
     public function getNode()
     {
@@ -71,6 +77,8 @@ class Link
      * @return string The method
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getMethod()
     {
@@ -83,6 +91,8 @@ class Link
      * @return string The URI
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getUri()
     {
@@ -143,6 +153,8 @@ class Link
      * Returns raw uri data.
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     protected function getRawUri()
     {
@@ -155,6 +167,8 @@ class Link
      * @param string $path URI path
      *
      * @return string
+     *
+     * @since v2.1.10
      */
     protected function canonicalizePath($path)
     {
@@ -185,6 +199,8 @@ class Link
      * @param \DOMNode $node A \DOMNode instance
      *
      * @throws \LogicException If given node is not an anchor
+     *
+     * @since v2.0.0
      */
     protected function setNode(\DOMNode $node)
     {

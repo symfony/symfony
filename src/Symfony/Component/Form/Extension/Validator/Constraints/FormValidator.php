@@ -19,6 +19,8 @@ use Symfony\Component\Validator\ConstraintValidator;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.1.0
  */
 class FormValidator extends ConstraintValidator
 {
@@ -32,6 +34,8 @@ class FormValidator extends ConstraintValidator
      *
      * @param ServerParams $params The server parameters. Default
      *                             parameters are created if null.
+     *
+     * @since v2.1.0
      */
     public function __construct(ServerParams $params = null)
     {
@@ -40,6 +44,8 @@ class FormValidator extends ConstraintValidator
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function validate($form, Constraint $constraint)
     {
@@ -137,6 +143,8 @@ class FormValidator extends ConstraintValidator
      * @param  FormInterface $form The form to test.
      *
      * @return Boolean Whether the graph walker may walk the data.
+     *
+     * @since v2.1.0
      */
     private static function allowDataWalking(FormInterface $form)
     {
@@ -169,6 +177,8 @@ class FormValidator extends ConstraintValidator
      * @param  FormInterface $form The form.
      *
      * @return array The validation groups.
+     *
+     * @since v2.1.0
      */
     private static function getValidationGroups(FormInterface $form)
     {
@@ -201,6 +211,8 @@ class FormValidator extends ConstraintValidator
      * @param FormInterface $form The root form.
      *
      * @return ClickableInterface|null The clicked button or null.
+     *
+     * @since v2.3.0
      */
     private static function findClickedButton(FormInterface $form)
     {
@@ -224,6 +236,8 @@ class FormValidator extends ConstraintValidator
      * @param FormInterface  $form   The validated form.
      *
      * @return array The validation groups.
+     *
+     * @since v2.3.0
      */
     private static function resolveValidationGroups($groups, FormInterface $form)
     {

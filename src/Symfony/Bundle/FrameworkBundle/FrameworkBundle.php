@@ -37,9 +37,14 @@ use Symfony\Component\HttpKernel\DependencyInjection\RegisterListenersPass;
  * Bundle.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class FrameworkBundle extends Bundle
 {
+    /**
+     * @since v2.0.0
+     */
     public function boot()
     {
         if ($trustedProxies = $this->container->getParameter('kernel.trusted_proxies')) {
@@ -55,6 +60,9 @@ class FrameworkBundle extends Bundle
         }
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function build(ContainerBuilder $container)
     {
         parent::build($container);

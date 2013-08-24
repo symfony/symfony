@@ -20,11 +20,15 @@ use Symfony\Component\Config\Resource\FileResource;
  * IcuResFileLoader loads translations from a resource bundle.
  *
  * @author stealth35
+ *
+ * @since v2.1.0
  */
 class IcuDatFileLoader extends IcuResFileLoader
 {
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function load($resource, $locale, $domain = 'messages')
     {

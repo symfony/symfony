@@ -15,6 +15,8 @@ namespace Symfony\Component\HttpFoundation;
  * Represents an Accept-* header item.
  *
  * @author Jean-François Simon <contact@jfsimon.fr>
+ *
+ * @since v2.2.0
  */
 class AcceptHeaderItem
 {
@@ -43,6 +45,8 @@ class AcceptHeaderItem
      *
      * @param string $value
      * @param array  $attributes
+     *
+     * @since v2.2.0
      */
     public function __construct($value, array $attributes = array())
     {
@@ -58,6 +62,8 @@ class AcceptHeaderItem
      * @param string $itemValue
      *
      * @return AcceptHeaderItem
+     *
+     * @since v2.2.0
      */
     public static function fromString($itemValue)
     {
@@ -85,6 +91,8 @@ class AcceptHeaderItem
      * Returns header  value's string representation.
      *
      * @return string
+     *
+     * @since v2.2.0
      */
     public function __toString()
     {
@@ -104,6 +112,8 @@ class AcceptHeaderItem
      * @param string $value
      *
      * @return AcceptHeaderItem
+     *
+     * @since v2.2.0
      */
     public function setValue($value)
     {
@@ -116,6 +126,8 @@ class AcceptHeaderItem
      * Returns the item value.
      *
      * @return string
+     *
+     * @since v2.2.0
      */
     public function getValue()
     {
@@ -128,6 +140,8 @@ class AcceptHeaderItem
      * @param float $quality
      *
      * @return AcceptHeaderItem
+     *
+     * @since v2.2.0
      */
     public function setQuality($quality)
     {
@@ -140,6 +154,8 @@ class AcceptHeaderItem
      * Returns the item quality.
      *
      * @return float
+     *
+     * @since v2.2.0
      */
     public function getQuality()
     {
@@ -152,6 +168,8 @@ class AcceptHeaderItem
      * @param int $index
      *
      * @return AcceptHeaderItem
+     *
+     * @since v2.2.0
      */
     public function setIndex($index)
     {
@@ -164,6 +182,8 @@ class AcceptHeaderItem
      * Returns the item index.
      *
      * @return int
+     *
+     * @since v2.2.0
      */
     public function getIndex()
     {
@@ -176,6 +196,8 @@ class AcceptHeaderItem
      * @param string $name
      *
      * @return Boolean
+     *
+     * @since v2.2.0
      */
     public function hasAttribute($name)
     {
@@ -189,6 +211,8 @@ class AcceptHeaderItem
      * @param mixed  $default
      *
      * @return mixed
+     *
+     * @since v2.2.0
      */
     public function getAttribute($name, $default = null)
     {
@@ -199,6 +223,8 @@ class AcceptHeaderItem
      * Returns all attributes.
      *
      * @return array
+     *
+     * @since v2.2.0
      */
     public function getAttributes()
     {
@@ -212,6 +238,8 @@ class AcceptHeaderItem
      * @param string $value
      *
      * @return AcceptHeaderItem
+     *
+     * @since v2.2.0
      */
     public function setAttribute($name, $value)
     {

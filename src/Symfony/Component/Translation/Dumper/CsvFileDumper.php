@@ -17,6 +17,8 @@ use Symfony\Component\Translation\MessageCatalogue;
  * CsvFileDumper generates a csv formatted string representation of a message catalogue.
  *
  * @author Stealth35
+ *
+ * @since v2.1.0
  */
 class CsvFileDumper extends FileDumper
 {
@@ -25,6 +27,8 @@ class CsvFileDumper extends FileDumper
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function format(MessageCatalogue $messages, $domain = 'messages')
     {
@@ -46,6 +50,8 @@ class CsvFileDumper extends FileDumper
      *
      * @param string $delimiter delimiter character
      * @param string $enclosure enclosure character
+     *
+     * @since v2.1.0
      */
     public function setCsvControl($delimiter = ';', $enclosure = '"')
     {
@@ -55,6 +61,8 @@ class CsvFileDumper extends FileDumper
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     protected function getExtension()
     {

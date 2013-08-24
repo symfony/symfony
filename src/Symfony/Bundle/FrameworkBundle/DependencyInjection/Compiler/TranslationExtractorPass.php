@@ -17,9 +17,14 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
 /**
  * Adds tagged translation.extractor services to translation extractor
+ *
+ * @since v2.1.0
  */
 class TranslationExtractorPass implements CompilerPassInterface
 {
+    /**
+     * @since v2.1.0
+     */
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition('translation.extractor')) {

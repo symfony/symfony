@@ -29,6 +29,8 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
  * DoctrineMongodbBundle, DoctrineCouchdbBundle and DoctrinePhpcrBundle.
  *
  * @author David Buchmann <david@liip.ch>
+ *
+ * @since v2.3.0
  */
 abstract class RegisterMappingsPass implements CompilerPassInterface
 {
@@ -77,6 +79,8 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
      * @param string               $enabledParameter  service container parameter that must be
      *                                                present to enable the mapping. Set to false
      *                                                to not do any check, optional.
+     *
+     * @since v2.3.0
      */
     public function __construct($driver, array $namespaces, array $managerParameters, $driverPattern, $enabledParameter = false)
     {
@@ -91,6 +95,8 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
      * Register mappings with the metadata drivers.
      *
      * @param ContainerBuilder $container
+     *
+     * @since v2.3.0
      */
     public function process(ContainerBuilder $container)
     {
@@ -119,6 +125,8 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
      *
      * @throws ParameterNotFoundException if non of the managerParameters has a
      *      non-empty value.
+     *
+     * @since v2.3.0
      */
     protected function getChainDriverServiceName(ContainerBuilder $container)
     {
@@ -141,6 +149,8 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
      *      needs access to the container.
      *
      * @return Definition|Reference the metadata driver to add to all chain drivers
+     *
+     * @since v2.3.0
      */
     protected function getDriver(ContainerBuilder $container)
     {
@@ -157,6 +167,8 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
      * @param ContainerBuilder $container
      *
      * @return boolean whether this compiler pass really should register the mappings
+     *
+     * @since v2.3.0
      */
     protected function enabled(ContainerBuilder $container)
     {

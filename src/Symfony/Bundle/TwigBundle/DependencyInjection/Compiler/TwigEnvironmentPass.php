@@ -19,9 +19,14 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
  * Adds tagged twig.extension services to twig service
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class TwigEnvironmentPass implements CompilerPassInterface
 {
+    /**
+     * @since v2.0.0
+     */
     public function process(ContainerBuilder $container)
     {
         if (false === $container->hasDefinition('twig')) {

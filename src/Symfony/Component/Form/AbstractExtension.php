@@ -16,6 +16,8 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.0.0
  */
 abstract class AbstractExtension implements FormExtensionInterface
 {
@@ -45,6 +47,8 @@ abstract class AbstractExtension implements FormExtensionInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getType($name)
     {
@@ -61,6 +65,8 @@ abstract class AbstractExtension implements FormExtensionInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function hasType($name)
     {
@@ -73,6 +79,8 @@ abstract class AbstractExtension implements FormExtensionInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getTypeExtensions($name)
     {
@@ -87,6 +95,8 @@ abstract class AbstractExtension implements FormExtensionInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function hasTypeExtensions($name)
     {
@@ -99,6 +109,8 @@ abstract class AbstractExtension implements FormExtensionInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getTypeGuesser()
     {
@@ -113,6 +125,8 @@ abstract class AbstractExtension implements FormExtensionInterface
      * Registers the types.
      *
      * @return FormTypeInterface[] An array of FormTypeInterface instances
+     *
+     * @since v2.0.0
      */
     protected function loadTypes()
     {
@@ -123,6 +137,8 @@ abstract class AbstractExtension implements FormExtensionInterface
      * Registers the type extensions.
      *
      * @return FormTypeExtensionInterface[] An array of FormTypeExtensionInterface instances
+     *
+     * @since v2.0.0
      */
     protected function loadTypeExtensions()
     {
@@ -133,6 +149,8 @@ abstract class AbstractExtension implements FormExtensionInterface
      * Registers the type guesser.
      *
      * @return FormTypeGuesserInterface|null A type guesser
+     *
+     * @since v2.0.0
      */
     protected function loadTypeGuesser()
     {
@@ -143,6 +161,8 @@ abstract class AbstractExtension implements FormExtensionInterface
      * Initializes the types.
      *
      * @throws UnexpectedTypeException if any registered type is not an instance of FormTypeInterface
+     *
+     * @since v2.0.0
      */
     private function initTypes()
     {
@@ -162,6 +182,8 @@ abstract class AbstractExtension implements FormExtensionInterface
      *
      * @throws UnexpectedTypeException if any registered type extension is not
      *                                 an instance of FormTypeExtensionInterface
+     *
+     * @since v2.0.0
      */
     private function initTypeExtensions()
     {
@@ -182,6 +204,8 @@ abstract class AbstractExtension implements FormExtensionInterface
      * Initializes the type guesser.
      *
      * @throws UnexpectedTypeException if the type guesser is not an instance of FormTypeGuesserInterface
+     *
+     * @since v2.0.0
      */
     private function initTypeGuesser()
     {

@@ -19,6 +19,8 @@ use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
  * Auditable ACE implementation
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class Entry implements AuditableEntryInterface
 {
@@ -42,6 +44,8 @@ class Entry implements AuditableEntryInterface
      * @param Boolean                   $granting
      * @param Boolean                   $auditFailure
      * @param Boolean                   $auditSuccess
+     *
+     * @since v2.0.0
      */
     public function __construct($id, AclInterface $acl, SecurityIdentityInterface $sid, $strategy, $mask, $granting, $auditFailure, $auditSuccess)
     {
@@ -57,6 +61,8 @@ class Entry implements AuditableEntryInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function getAcl()
     {
@@ -65,6 +71,8 @@ class Entry implements AuditableEntryInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function getMask()
     {
@@ -73,6 +81,8 @@ class Entry implements AuditableEntryInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function getId()
     {
@@ -81,6 +91,8 @@ class Entry implements AuditableEntryInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function getSecurityIdentity()
     {
@@ -89,6 +101,8 @@ class Entry implements AuditableEntryInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function getStrategy()
     {
@@ -97,6 +111,8 @@ class Entry implements AuditableEntryInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function isAuditFailure()
     {
@@ -105,6 +121,8 @@ class Entry implements AuditableEntryInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function isAuditSuccess()
     {
@@ -113,6 +131,8 @@ class Entry implements AuditableEntryInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function isGranting()
     {
@@ -126,6 +146,8 @@ class Entry implements AuditableEntryInterface
      * AclInterface instead.
      *
      * @param Boolean $boolean
+     *
+     * @since v2.0.0
      */
     public function setAuditFailure($boolean)
     {
@@ -139,6 +161,8 @@ class Entry implements AuditableEntryInterface
      * AclInterface instead.
      *
      * @param Boolean $boolean
+     *
+     * @since v2.0.0
      */
     public function setAuditSuccess($boolean)
     {
@@ -152,6 +176,8 @@ class Entry implements AuditableEntryInterface
      * AclInterface instead.
      *
      * @param integer $mask
+     *
+     * @since v2.0.0
      */
     public function setMask($mask)
     {
@@ -165,6 +191,8 @@ class Entry implements AuditableEntryInterface
      * AclInterface instead.
      *
      * @param string $strategy
+     *
+     * @since v2.0.0
      */
     public function setStrategy($strategy)
     {
@@ -175,6 +203,8 @@ class Entry implements AuditableEntryInterface
      * Implementation of \Serializable
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     public function serialize()
     {
@@ -193,6 +223,8 @@ class Entry implements AuditableEntryInterface
      * Implementation of \Serializable
      *
      * @param string $serialized
+     *
+     * @since v2.0.0
      */
     public function unserialize($serialized)
     {

@@ -25,6 +25,8 @@ interface ExtensionInterface
      * Returns node translators.
      *
      * @return callable[]
+     *
+     * @since v2.3.0
      */
     public function getNodeTranslators();
 
@@ -32,6 +34,8 @@ interface ExtensionInterface
      * Returns combination translators.
      *
      * @return callable[]
+     *
+     * @since v2.3.0
      */
     public function getCombinationTranslators();
 
@@ -39,6 +43,8 @@ interface ExtensionInterface
      * Returns function translators.
      *
      * @return callable[]
+     *
+     * @since v2.3.0
      */
     public function getFunctionTranslators();
 
@@ -46,6 +52,8 @@ interface ExtensionInterface
      * Returns pseudo-class translators.
      *
      * @return callable[]
+     *
+     * @since v2.3.0
      */
     public function getPseudoClassTranslators();
 
@@ -53,6 +61,8 @@ interface ExtensionInterface
      * Returns attribute operation translators.
      *
      * @return callable[]
+     *
+     * @since v2.3.0
      */
     public function getAttributeMatchingTranslators();
 
@@ -60,6 +70,8 @@ interface ExtensionInterface
      * Returns extension name.
      *
      * @return string
+     *
+     * @since v2.3.0
      */
     public function getName();
 }

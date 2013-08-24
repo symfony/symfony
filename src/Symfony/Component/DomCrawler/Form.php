@@ -19,6 +19,8 @@ use Symfony\Component\DomCrawler\Field\FormField;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class Form extends Link implements \ArrayAccess
 {
@@ -42,6 +44,8 @@ class Form extends Link implements \ArrayAccess
      * @throws \LogicException if the node is not a button inside a form tag
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function __construct(\DOMNode $node, $currentUri, $method = null)
     {
@@ -54,6 +58,8 @@ class Form extends Link implements \ArrayAccess
      * Gets the form node associated with this form.
      *
      * @return \DOMNode A \DOMNode instance
+     *
+     * @since v2.0.0
      */
     public function getFormNode()
     {
@@ -68,6 +74,8 @@ class Form extends Link implements \ArrayAccess
      * @return Form
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setValues(array $values)
     {
@@ -86,6 +94,8 @@ class Form extends Link implements \ArrayAccess
      * @return array An array of field values.
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getValues()
     {
@@ -109,6 +119,8 @@ class Form extends Link implements \ArrayAccess
      * @return array An array of file field values.
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getFiles()
     {
@@ -140,6 +152,8 @@ class Form extends Link implements \ArrayAccess
      * @return array An array of field values.
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getPhpValues()
     {
@@ -158,6 +172,8 @@ class Form extends Link implements \ArrayAccess
      * @return array An array of field values.
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getPhpFiles()
     {
@@ -177,6 +193,8 @@ class Form extends Link implements \ArrayAccess
      * @return string The URI
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getUri()
     {
@@ -190,6 +208,9 @@ class Form extends Link implements \ArrayAccess
         return $uri;
     }
 
+    /**
+     * @since v2.0.0
+     */
     protected function getRawUri()
     {
         return $this->node->getAttribute('action');
@@ -203,6 +224,8 @@ class Form extends Link implements \ArrayAccess
      * @return string The method
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getMethod()
     {
@@ -221,6 +244,8 @@ class Form extends Link implements \ArrayAccess
      * @return Boolean true if the field exists, false otherwise
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function has($name)
     {
@@ -235,6 +260,8 @@ class Form extends Link implements \ArrayAccess
      * @throws \InvalidArgumentException when the name is malformed
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function remove($name)
     {
@@ -251,6 +278,8 @@ class Form extends Link implements \ArrayAccess
      * @throws \InvalidArgumentException When field is not present in this form
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function get($name)
     {
@@ -263,6 +292,8 @@ class Form extends Link implements \ArrayAccess
      * @param FormField $field The field
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function set(FormField $field)
     {
@@ -275,6 +306,8 @@ class Form extends Link implements \ArrayAccess
      * @return FormField[] An array of fields
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function all()
     {
@@ -287,6 +320,8 @@ class Form extends Link implements \ArrayAccess
      * @param string $name The field name
      *
      * @return Boolean true if the field exists, false otherwise
+     *
+     * @since v2.1.0
      */
     public function offsetExists($name)
     {
@@ -301,6 +336,8 @@ class Form extends Link implements \ArrayAccess
      * @return FormField The associated Field instance
      *
      * @throws \InvalidArgumentException if the field does not exist
+     *
+     * @since v2.1.0
      */
     public function offsetGet($name)
     {
@@ -314,6 +351,8 @@ class Form extends Link implements \ArrayAccess
      * @param string|array $value The value of the field
      *
      * @throws \InvalidArgumentException if the field does not exist
+     *
+     * @since v2.1.0
      */
     public function offsetSet($name, $value)
     {
@@ -324,6 +363,8 @@ class Form extends Link implements \ArrayAccess
      * Removes a field from the form.
      *
      * @param string $name The field name
+     *
+     * @since v2.1.0
      */
     public function offsetUnset($name)
     {
@@ -338,6 +379,8 @@ class Form extends Link implements \ArrayAccess
      * @param \DOMNode $node A \DOMNode instance
      *
      * @throws \LogicException If given node is not a button or input or does not have a form ancestor
+     *
+     * @since v2.1.0
      */
     protected function setNode(\DOMNode $node)
     {
@@ -367,6 +410,9 @@ class Form extends Link implements \ArrayAccess
         $this->node = $node;
     }
 
+    /**
+     * @since v2.0.0
+     */
     private function initialize()
     {
         $this->fields = new FormFieldRegistry();
@@ -396,6 +442,9 @@ class Form extends Link implements \ArrayAccess
         }
     }
 
+    /**
+     * @since v2.3.0
+     */
     private function addField(\DOMNode $node, \DOMNode $button)
     {
         if (!$node->hasAttribute('name') || !$node->getAttribute('name')) {

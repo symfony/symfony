@@ -23,6 +23,8 @@ use Symfony\Component\Intl\ResourceBundle\Reader\StructuredBundleReader;
  * Gives access to internationalization data.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.3.0
  */
 class Intl
 {
@@ -71,6 +73,8 @@ class Intl
      * Returns whether the intl extension is installed.
      *
      * @return Boolean Returns true if the intl extension is installed, false otherwise.
+     *
+     * @since v2.3.0
      */
     public static function isExtensionLoaded()
     {
@@ -81,6 +85,8 @@ class Intl
      * Returns the bundle containing currency information.
      *
      * @return ResourceBundle\CurrencyBundleInterface The currency resource bundle.
+     *
+     * @since v2.3.0
      */
     public static function getCurrencyBundle()
     {
@@ -95,6 +101,8 @@ class Intl
      * Returns the bundle containing language information.
      *
      * @return ResourceBundle\LanguageBundleInterface The language resource bundle.
+     *
+     * @since v2.3.0
      */
     public static function getLanguageBundle()
     {
@@ -109,6 +117,8 @@ class Intl
      * Returns the bundle containing locale information.
      *
      * @return ResourceBundle\LocaleBundleInterface The locale resource bundle.
+     *
+     * @since v2.3.0
      */
     public static function getLocaleBundle()
     {
@@ -123,6 +133,8 @@ class Intl
      * Returns the bundle containing region information.
      *
      * @return ResourceBundle\RegionBundleInterface The region resource bundle.
+     *
+     * @since v2.3.0
      */
     public static function getRegionBundle()
     {
@@ -137,6 +149,8 @@ class Intl
      * Returns the version of the installed ICU library.
      *
      * @return null|string The ICU version or NULL if it could not be determined.
+     *
+     * @since v2.3.0
      */
     public static function getIcuVersion()
     {
@@ -167,6 +181,8 @@ class Intl
      * Returns the version of the installed ICU data.
      *
      * @return string The version of the installed ICU data.
+     *
+     * @since v2.3.0
      */
     public static function getIcuDataVersion()
     {
@@ -181,6 +197,8 @@ class Intl
      * Returns the ICU version that the stub classes mimic.
      *
      * @return string The ICU version of the stub classes.
+     *
+     * @since v2.3.0
      */
     public static function getIcuStubVersion()
     {
@@ -191,6 +209,8 @@ class Intl
      * Returns a resource bundle reader for .php resource bundle files.
      *
      * @return ResourceBundle\Reader\StructuredBundleReaderInterface The resource reader.
+     *
+     * @since v2.3.0
      */
     private static function getBundleReader()
     {
@@ -206,6 +226,8 @@ class Intl
 
     /**
      * This class must not be instantiated.
+     *
+     * @since v2.3.0
      */
     private function __construct() {}
 }

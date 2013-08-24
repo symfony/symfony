@@ -20,6 +20,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * Sets the session in the request.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.1.0
  */
 class SessionListener implements EventSubscriberInterface
 {
@@ -28,11 +30,17 @@ class SessionListener implements EventSubscriberInterface
      */
     private $container;
 
+    /**
+     * @since v2.3.0
+     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function onKernelRequest(GetResponseEvent $event)
     {
         if (!$event->isMasterRequest()) {
@@ -47,6 +55,9 @@ class SessionListener implements EventSubscriberInterface
         $request->setSession($this->container->get('session'));
     }
 
+    /**
+     * @since v2.1.0
+     */
     public static function getSubscribedEvents()
     {
         return array(

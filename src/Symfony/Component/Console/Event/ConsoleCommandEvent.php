@@ -15,6 +15,8 @@ namespace Symfony\Component\Console\Event;
  * Allows to do things before the command is executed.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.3.0
  */
 class ConsoleCommandEvent extends ConsoleEvent
 {

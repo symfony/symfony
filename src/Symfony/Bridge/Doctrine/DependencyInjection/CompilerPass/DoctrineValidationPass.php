@@ -19,6 +19,8 @@ use Symfony\Component\Config\Resource\FileResource;
  * Registers additional validators
  *
  * @author Benjamin Eberlei <kontakt@beberlei.de>
+ *
+ * @since v2.1.0
  */
 class DoctrineValidationPass implements CompilerPassInterface
 {
@@ -27,6 +29,9 @@ class DoctrineValidationPass implements CompilerPassInterface
      */
     private $managerType;
 
+    /**
+     * @since v2.1.0
+     */
     public function __construct($managerType)
     {
         $this->managerType = $managerType;
@@ -34,6 +39,8 @@ class DoctrineValidationPass implements CompilerPassInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function process(ContainerBuilder $container)
     {
@@ -48,6 +55,8 @@ class DoctrineValidationPass implements CompilerPassInterface
      * @param ContainerBuilder $container
      * @param string           $mapping
      * @param string           $extension
+     *
+     * @since v2.1.0
      */
     private function updateValidatorMappingFiles(ContainerBuilder $container, $mapping, $extension)
     {

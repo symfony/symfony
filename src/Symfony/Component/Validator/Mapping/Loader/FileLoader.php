@@ -13,6 +13,9 @@ namespace Symfony\Component\Validator\Mapping\Loader;
 
 use Symfony\Component\Validator\Exception\MappingException;
 
+/**
+ * @since v2.1.0
+ */
 abstract class FileLoader extends AbstractLoader
 {
     protected $file;
@@ -24,6 +27,8 @@ abstract class FileLoader extends AbstractLoader
      *
      * @throws MappingException if the mapping file does not exist
      * @throws MappingException if the mapping file is not readable
+     *
+     * @since v2.0.0
      */
     public function __construct($file)
     {

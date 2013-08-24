@@ -16,6 +16,8 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
 /**
  * Compiler pass to register tagged services for an event dispatcher.
+ *
+ * @since v2.3.0
  */
 class RegisterListenersPass implements CompilerPassInterface
 {
@@ -40,6 +42,8 @@ class RegisterListenersPass implements CompilerPassInterface
      * @param string $dispatcherService Service name of the event dispatcher in processed container
      * @param string $listenerTag       Tag name used for listener
      * @param string $subscriberTag     Tag name used for subscribers
+     *
+     * @since v2.3.0
      */
     public function __construct($dispatcherService = 'event_dispatcher', $listenerTag = 'kernel.event_listener', $subscriberTag = 'kernel.event_subscriber')
     {
@@ -48,6 +52,9 @@ class RegisterListenersPass implements CompilerPassInterface
         $this->subscriberTag = $subscriberTag;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition($this->dispatcherService)) {

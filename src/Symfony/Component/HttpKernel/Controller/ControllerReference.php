@@ -22,6 +22,8 @@ namespace Symfony\Component\HttpKernel\Controller;
  *
  * @see Symfony\Component\HttpKernel\FragmentRenderer
  * @see Symfony\Component\HttpKernel\Fragment\FragmentRendererInterface
+ *
+ * @since v2.2.0
  */
 class ControllerReference
 {
@@ -35,6 +37,8 @@ class ControllerReference
      * @param string $controller The controller name
      * @param array  $attributes An array of parameters to add to the Request attributes
      * @param array  $query      An array of parameters to add to the Request query string
+     *
+     * @since v2.2.0
      */
     public function __construct($controller, array $attributes = array(), array $query = array())
     {

@@ -45,6 +45,8 @@ interface EventSubscriberInterface
      * @return array The event names to listen to
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public static function getSubscribedEvents();
 }

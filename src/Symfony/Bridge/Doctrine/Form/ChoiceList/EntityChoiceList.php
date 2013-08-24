@@ -21,6 +21,8 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  * A choice list presenting a list of Doctrine entities as choices
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.1.0
  */
 class EntityChoiceList extends ObjectChoiceList
 {
@@ -97,6 +99,8 @@ class EntityChoiceList extends ObjectChoiceList
      *                                                     to group the choices. Only allowed if
      *                                                     the choices are given as flat array.
      * @param PropertyAccessorInterface $propertyAccessor  The reflection graph for reading property paths.
+     *
+     * @since v2.2.0
      */
     public function __construct(ObjectManager $manager, $class, $labelPath = null, EntityLoaderInterface $entityLoader = null, $entities = null,  array $preferredEntities = array(), $groupPath = null, PropertyAccessorInterface $propertyAccessor = null)
     {
@@ -133,6 +137,8 @@ class EntityChoiceList extends ObjectChoiceList
      * @return array
      *
      * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     *
+     * @since v2.1.0
      */
     public function getChoices()
     {
@@ -149,6 +155,8 @@ class EntityChoiceList extends ObjectChoiceList
      * @return array
      *
      * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     *
+     * @since v2.1.0
      */
     public function getValues()
     {
@@ -166,6 +174,8 @@ class EntityChoiceList extends ObjectChoiceList
      * @return array
      *
      * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     *
+     * @since v2.1.0
      */
     public function getPreferredViews()
     {
@@ -183,6 +193,8 @@ class EntityChoiceList extends ObjectChoiceList
      * @return array
      *
      * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     *
+     * @since v2.1.0
      */
     public function getRemainingViews()
     {
@@ -201,6 +213,8 @@ class EntityChoiceList extends ObjectChoiceList
      * @return array
      *
      * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     *
+     * @since v2.1.0
      */
     public function getChoicesForValues(array $values)
     {
@@ -229,6 +243,8 @@ class EntityChoiceList extends ObjectChoiceList
      * @return array
      *
      * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     *
+     * @since v2.1.0
      */
     public function getValuesForChoices(array $entities)
     {
@@ -264,6 +280,8 @@ class EntityChoiceList extends ObjectChoiceList
      * @return array
      *
      * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     *
+     * @since v2.1.0
      */
     public function getIndicesForChoices(array $entities)
     {
@@ -299,6 +317,8 @@ class EntityChoiceList extends ObjectChoiceList
      * @return array
      *
      * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     *
+     * @since v2.1.0
      */
     public function getIndicesForValues(array $values)
     {
@@ -327,6 +347,8 @@ class EntityChoiceList extends ObjectChoiceList
      *
      * @return integer|string A unique index containing only ASCII letters,
      *                        digits and underscores.
+     *
+     * @since v2.1.0
      */
     protected function createIndex($entity)
     {
@@ -347,6 +369,8 @@ class EntityChoiceList extends ObjectChoiceList
      * @param mixed $entity The choice to create a value for
      *
      * @return integer|string A unique value without character limitations.
+     *
+     * @since v2.1.0
      */
     protected function createValue($entity)
     {
@@ -359,6 +383,8 @@ class EntityChoiceList extends ObjectChoiceList
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.10
      */
     protected function fixIndex($index)
     {
@@ -376,6 +402,8 @@ class EntityChoiceList extends ObjectChoiceList
 
     /**
      * Loads the list with entities.
+     *
+     * @since v2.1.0
      */
     private function load()
     {
@@ -407,6 +435,8 @@ class EntityChoiceList extends ObjectChoiceList
      * @return array          The identifier values
      *
      * @throws RuntimeException If the entity does not exist in Doctrine's identity map
+     *
+     * @since v2.1.0
      */
     private function getIdentifierValues($entity)
     {

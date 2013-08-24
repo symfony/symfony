@@ -18,6 +18,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.1.0
  */
 class CollectionToArrayTransformer implements DataTransformerInterface
 {
@@ -29,6 +31,8 @@ class CollectionToArrayTransformer implements DataTransformerInterface
      * @return mixed An array of entities
      *
      * @throws TransformationFailedException
+     *
+     * @since v2.1.0
      */
     public function transform($collection)
     {
@@ -49,6 +53,8 @@ class CollectionToArrayTransformer implements DataTransformerInterface
      * @param mixed $array An array of entities
      *
      * @return Collection   A collection of entities
+     *
+     * @since v2.1.0
      */
     public function reverseTransform($array)
     {

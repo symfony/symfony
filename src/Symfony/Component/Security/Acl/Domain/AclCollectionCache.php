@@ -19,6 +19,8 @@ use Symfony\Component\Security\Acl\Model\SecurityIdentityRetrievalStrategyInterf
  * This service caches ACLs for an entire collection of objects.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class AclCollectionCache
 {
@@ -32,6 +34,8 @@ class AclCollectionCache
      * @param AclProviderInterface                       $aclProvider
      * @param ObjectIdentityRetrievalStrategyInterface   $oidRetrievalStrategy
      * @param SecurityIdentityRetrievalStrategyInterface $sidRetrievalStrategy
+     *
+     * @since v2.0.0
      */
     public function __construct(AclProviderInterface $aclProvider, ObjectIdentityRetrievalStrategyInterface $oidRetrievalStrategy, SecurityIdentityRetrievalStrategyInterface $sidRetrievalStrategy)
     {
@@ -46,6 +50,8 @@ class AclCollectionCache
      *
      * @param mixed            $collection anything that can be passed to foreach()
      * @param TokenInterface[] $tokens     an array of TokenInterface implementations
+     *
+     * @since v2.0.0
      */
     public function cache($collection, array $tokens = array())
     {

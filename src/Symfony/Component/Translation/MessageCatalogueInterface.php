@@ -28,6 +28,8 @@ interface MessageCatalogueInterface
      * @return string The locale
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function getLocale();
 
@@ -37,6 +39,8 @@ interface MessageCatalogueInterface
      * @return array An array of domains
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function getDomains();
 
@@ -50,6 +54,8 @@ interface MessageCatalogueInterface
      * @return array An array of messages
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function all($domain = null);
 
@@ -61,6 +67,8 @@ interface MessageCatalogueInterface
      * @param string $domain      The domain name
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function set($id, $translation, $domain = 'messages');
 
@@ -73,6 +81,8 @@ interface MessageCatalogueInterface
      * @return Boolean true if the message has a translation, false otherwise
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function has($id, $domain = 'messages');
 
@@ -85,6 +95,8 @@ interface MessageCatalogueInterface
      * @return Boolean true if the message has a translation, false otherwise
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function defines($id, $domain = 'messages');
 
@@ -97,6 +109,8 @@ interface MessageCatalogueInterface
      * @return string The message translation
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function get($id, $domain = 'messages');
 
@@ -107,6 +121,8 @@ interface MessageCatalogueInterface
      * @param string $domain   The domain name
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function replace($messages, $domain = 'messages');
 
@@ -117,6 +133,8 @@ interface MessageCatalogueInterface
      * @param string $domain   The domain name
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function add($messages, $domain = 'messages');
 
@@ -128,6 +146,8 @@ interface MessageCatalogueInterface
      * @param MessageCatalogueInterface $catalogue A MessageCatalogueInterface instance
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function addCatalogue(MessageCatalogueInterface $catalogue);
 
@@ -140,6 +160,8 @@ interface MessageCatalogueInterface
      * @param MessageCatalogueInterface $catalogue A MessageCatalogueInterface instance
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function addFallbackCatalogue(MessageCatalogueInterface $catalogue);
 
@@ -149,6 +171,8 @@ interface MessageCatalogueInterface
      * @return MessageCatalogueInterface|null A MessageCatalogueInterface instance or null when no fallback has been set
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function getFallbackCatalogue();
 
@@ -158,6 +182,8 @@ interface MessageCatalogueInterface
      * @return ResourceInterface[] An array of resources
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function getResources();
 
@@ -167,6 +193,8 @@ interface MessageCatalogueInterface
      * @param ResourceInterface $resource A resource instance
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function addResource(ResourceInterface $resource);
 }

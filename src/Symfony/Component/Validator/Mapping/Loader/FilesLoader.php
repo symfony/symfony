@@ -20,6 +20,8 @@ namespace Symfony\Component\Validator\Mapping\Loader;
  *
  * @see    Symfony\Component\Validator\Mapping\Loader\YamlFileLoader
  * @see    Symfony\Component\Validator\Mapping\Loader\XmlFileLoader
+ *
+ * @since v2.0.0
  */
 abstract class FilesLoader extends LoaderChain
 {
@@ -27,6 +29,8 @@ abstract class FilesLoader extends LoaderChain
      * Array of mapping files.
      *
      * @param array $paths Array of file paths
+     *
+     * @since v2.0.0
      */
     public function __construct(array $paths)
     {
@@ -39,6 +43,8 @@ abstract class FilesLoader extends LoaderChain
      * @param array $paths Array of file paths
      *
      * @return LoaderInterface[] Array of metadata loaders
+     *
+     * @since v2.0.0
      */
     protected function getFileLoaders($paths)
     {
@@ -56,6 +62,8 @@ abstract class FilesLoader extends LoaderChain
      * @param string $file
      *
      * @return LoaderInterface
+     *
+     * @since v2.0.0
      */
     abstract protected function getFileLoaderInstance($file);
 }

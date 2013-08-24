@@ -21,11 +21,15 @@ use Symfony\Component\CssSelector\XPath\XPathExpr;
  * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @since v2.3.0
  */
 class AttributeMatchingExtension extends AbstractExtension
 {
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getAttributeMatchingTranslators()
     {
@@ -47,6 +51,8 @@ class AttributeMatchingExtension extends AbstractExtension
      * @param string    $value
      *
      * @return XPathExpr
+     *
+     * @since v2.3.0
      */
     public function translateExists(XPathExpr $xpath, $attribute, $value)
     {
@@ -59,6 +65,8 @@ class AttributeMatchingExtension extends AbstractExtension
      * @param string    $value
      *
      * @return XPathExpr
+     *
+     * @since v2.3.0
      */
     public function translateEquals(XPathExpr $xpath, $attribute, $value)
     {
@@ -71,6 +79,8 @@ class AttributeMatchingExtension extends AbstractExtension
      * @param string    $value
      *
      * @return XPathExpr
+     *
+     * @since v2.3.0
      */
     public function translateIncludes(XPathExpr $xpath, $attribute, $value)
     {
@@ -87,6 +97,8 @@ class AttributeMatchingExtension extends AbstractExtension
      * @param string    $value
      *
      * @return XPathExpr
+     *
+     * @since v2.3.0
      */
     public function translateDashMatch(XPathExpr $xpath, $attribute, $value)
     {
@@ -104,6 +116,8 @@ class AttributeMatchingExtension extends AbstractExtension
      * @param string    $value
      *
      * @return XPathExpr
+     *
+     * @since v2.3.0
      */
     public function translatePrefixMatch(XPathExpr $xpath, $attribute, $value)
     {
@@ -120,6 +134,8 @@ class AttributeMatchingExtension extends AbstractExtension
      * @param string    $value
      *
      * @return XPathExpr
+     *
+     * @since v2.3.0
      */
     public function translateSuffixMatch(XPathExpr $xpath, $attribute, $value)
     {
@@ -137,6 +153,8 @@ class AttributeMatchingExtension extends AbstractExtension
      * @param string    $value
      *
      * @return XPathExpr
+     *
+     * @since v2.3.0
      */
     public function translateSubstringMatch(XPathExpr $xpath, $attribute, $value)
     {
@@ -153,6 +171,8 @@ class AttributeMatchingExtension extends AbstractExtension
      * @param string    $value
      *
      * @return XPathExpr
+     *
+     * @since v2.3.0
      */
     public function translateDifferent(XPathExpr $xpath, $attribute, $value)
     {
@@ -165,6 +185,8 @@ class AttributeMatchingExtension extends AbstractExtension
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getName()
     {

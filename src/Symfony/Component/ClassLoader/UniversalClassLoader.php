@@ -57,6 +57,8 @@ namespace Symfony\Component\ClassLoader;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class UniversalClassLoader
 {
@@ -71,6 +73,8 @@ class UniversalClassLoader
      * of installed PEAR packages
      *
      * @param Boolean $useIncludePath
+     *
+     * @since v2.1.0
      */
     public function useIncludePath($useIncludePath)
     {
@@ -82,6 +86,8 @@ class UniversalClassLoader
      * for classes.
      *
      * @return Boolean
+     *
+     * @since v2.1.0
      */
     public function getUseIncludePath()
     {
@@ -92,6 +98,8 @@ class UniversalClassLoader
      * Gets the configured namespaces.
      *
      * @return array A hash with namespaces as keys and directories as values
+     *
+     * @since v2.0.0
      */
     public function getNamespaces()
     {
@@ -102,6 +110,8 @@ class UniversalClassLoader
      * Gets the configured class prefixes.
      *
      * @return array A hash with class prefixes as keys and directories as values
+     *
+     * @since v2.0.0
      */
     public function getPrefixes()
     {
@@ -112,6 +122,8 @@ class UniversalClassLoader
      * Gets the directory(ies) to use as a fallback for namespaces.
      *
      * @return array An array of directories
+     *
+     * @since v2.0.0
      */
     public function getNamespaceFallbacks()
     {
@@ -122,6 +134,8 @@ class UniversalClassLoader
      * Gets the directory(ies) to use as a fallback for class prefixes.
      *
      * @return array An array of directories
+     *
+     * @since v2.0.0
      */
     public function getPrefixFallbacks()
     {
@@ -134,6 +148,8 @@ class UniversalClassLoader
      * @param array $dirs An array of directories
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function registerNamespaceFallbacks(array $dirs)
     {
@@ -144,6 +160,8 @@ class UniversalClassLoader
      * Registers a directory to use as a fallback for namespaces.
      *
      * @param string $dir A directory
+     *
+     * @since v2.1.0
      */
     public function registerNamespaceFallback($dir)
     {
@@ -156,6 +174,8 @@ class UniversalClassLoader
      * @param array $dirs An array of directories
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function registerPrefixFallbacks(array $dirs)
     {
@@ -166,6 +186,8 @@ class UniversalClassLoader
      * Registers a directory to use as a fallback for class prefixes.
      *
      * @param string $dir A directory
+     *
+     * @since v2.1.0
      */
     public function registerPrefixFallback($dir)
     {
@@ -178,6 +200,8 @@ class UniversalClassLoader
      * @param array $namespaces An array of namespaces (namespaces as keys and locations as values)
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function registerNamespaces(array $namespaces)
     {
@@ -193,6 +217,8 @@ class UniversalClassLoader
      * @param array|string $paths     The location(s) of the namespace
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function registerNamespace($namespace, $paths)
     {
@@ -205,6 +231,8 @@ class UniversalClassLoader
      * @param array $classes An array of classes (prefixes as keys and locations as values)
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function registerPrefixes(array $classes)
     {
@@ -220,6 +248,8 @@ class UniversalClassLoader
      * @param array|string $paths  The location(s) of the classes
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function registerPrefix($prefix, $paths)
     {
@@ -232,6 +262,8 @@ class UniversalClassLoader
      * @param Boolean $prepend Whether to prepend the autoloader or not
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function register($prepend = false)
     {
@@ -244,6 +276,8 @@ class UniversalClassLoader
      * @param string $class The name of the class
      *
      * @return Boolean|null True, if loaded
+     *
+     * @since v2.0.0
      */
     public function loadClass($class)
     {
@@ -260,6 +294,8 @@ class UniversalClassLoader
      * @param string $class The name of the class
      *
      * @return string|null The path, if found
+     *
+     * @since v2.0.0
      */
     public function findFile($class)
     {

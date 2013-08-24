@@ -22,30 +22,40 @@ interface PersistentTokenInterface
     /**
      * Returns the class of the user
      * @return string
+     *
+     * @since v2.1.0
      */
     public function getClass();
 
     /**
      * Returns the username
      * @return string
+     *
+     * @since v2.1.0
      */
     public function getUsername();
 
     /**
      * Returns the series
      * @return string
+     *
+     * @since v2.1.0
      */
     public function getSeries();
 
     /**
      * Returns the token value
      * @return string
+     *
+     * @since v2.1.0
      */
     public function getTokenValue();
 
     /**
      * Returns the last time the cookie was used
      * @return \DateTime
+     *
+     * @since v2.1.0
      */
     public function getLastUsed();
 }

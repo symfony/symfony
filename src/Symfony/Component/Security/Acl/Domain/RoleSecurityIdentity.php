@@ -18,6 +18,8 @@ use Symfony\Component\Security\Core\Role\Role;
  * A SecurityIdentity implementation for roles
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 final class RoleSecurityIdentity implements SecurityIdentityInterface
 {
@@ -27,6 +29,8 @@ final class RoleSecurityIdentity implements SecurityIdentityInterface
      * Constructor
      *
      * @param mixed $role a Role instance, or its string representation
+     *
+     * @since v2.0.0
      */
     public function __construct($role)
     {
@@ -41,6 +45,8 @@ final class RoleSecurityIdentity implements SecurityIdentityInterface
      * Returns the role name
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     public function getRole()
     {
@@ -49,6 +55,8 @@ final class RoleSecurityIdentity implements SecurityIdentityInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function equals(SecurityIdentityInterface $sid)
     {
@@ -65,6 +73,8 @@ final class RoleSecurityIdentity implements SecurityIdentityInterface
      * This is solely used for debugging purposes, not to make an equality decision.
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     public function __toString()
     {

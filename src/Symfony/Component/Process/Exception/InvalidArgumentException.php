@@ -15,6 +15,8 @@ namespace Symfony\Component\Process\Exception;
  * InvalidArgumentException for the Process Component.
  *
  * @author Romain Neutron <imprec@gmail.com>
+ *
+ * @since v2.2.0
  */
 class InvalidArgumentException extends \InvalidArgumentException implements ExceptionInterface
 {

@@ -22,6 +22,8 @@ interface InputInterface
      * Returns the first argument from the raw parameters (not parsed).
      *
      * @return string The value of the first argument or null otherwise
+     *
+     * @since v2.1.0
      */
     public function getFirstArgument();
 
@@ -34,6 +36,8 @@ interface InputInterface
      * @param string|array $values The values to look for in the raw parameters (can be an array)
      *
      * @return Boolean true if the value is contained in the raw parameters
+     *
+     * @since v2.1.0
      */
     public function hasParameterOption($values);
 
@@ -47,6 +51,8 @@ interface InputInterface
      * @param mixed        $default The default value to return if no result is found
      *
      * @return mixed The option value
+     *
+     * @since v2.1.0
      */
     public function getParameterOption($values, $default = false);
 
@@ -54,6 +60,8 @@ interface InputInterface
      * Binds the current Input instance with the given arguments and options.
      *
      * @param InputDefinition $definition A InputDefinition instance
+     *
+     * @since v2.1.0
      */
     public function bind(InputDefinition $definition);
 
@@ -63,6 +71,8 @@ interface InputInterface
      * Throws an exception when not enough arguments are given.
      *
      * @throws \RuntimeException
+     *
+     * @since v2.1.0
      */
     public function validate();
 
@@ -70,6 +80,8 @@ interface InputInterface
      * Returns all the given arguments merged with the default values.
      *
      * @return array
+     *
+     * @since v2.1.0
      */
     public function getArguments();
 
@@ -79,6 +91,8 @@ interface InputInterface
      * @param string $name The name of the argument
      *
      * @return mixed
+     *
+     * @since v2.1.0
      */
     public function getArgument($name);
 
@@ -89,6 +103,8 @@ interface InputInterface
      * @param string $value The argument value
      *
      * @throws \InvalidArgumentException When argument given doesn't exist
+     *
+     * @since v2.1.0
      */
     public function setArgument($name, $value);
 
@@ -98,6 +114,8 @@ interface InputInterface
      * @param string|integer $name The InputArgument name or position
      *
      * @return Boolean true if the InputArgument object exists, false otherwise
+     *
+     * @since v2.1.0
      */
     public function hasArgument($name);
 
@@ -105,6 +123,8 @@ interface InputInterface
      * Returns all the given options merged with the default values.
      *
      * @return array
+     *
+     * @since v2.1.0
      */
     public function getOptions();
 
@@ -114,6 +134,8 @@ interface InputInterface
      * @param string $name The name of the option
      *
      * @return mixed
+     *
+     * @since v2.1.0
      */
     public function getOption($name);
 
@@ -124,6 +146,8 @@ interface InputInterface
      * @param string $value The option value
      *
      * @throws \InvalidArgumentException When option given doesn't exist
+     *
+     * @since v2.1.0
      */
     public function setOption($name, $value);
 
@@ -133,6 +157,8 @@ interface InputInterface
      * @param string $name The InputOption name
      *
      * @return Boolean true if the InputOption object exists, false otherwise
+     *
+     * @since v2.1.0
      */
     public function hasOption($name);
 
@@ -140,6 +166,8 @@ interface InputInterface
      * Is this input means interactive?
      *
      * @return Boolean
+     *
+     * @since v2.1.0
      */
     public function isInteractive();
 
@@ -147,6 +175,8 @@ interface InputInterface
      * Sets the input interactivity.
      *
      * @param Boolean $interactive If the input should be interactive
+     *
+     * @since v2.1.0
      */
     public function setInteractive($interactive);
 }

@@ -17,6 +17,8 @@ use Symfony\Component\Config\Definition\ScalarNode;
  * This class provides a fluent interface for defining a node.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class ScalarNodeDefinition extends VariableNodeDefinition
 {
@@ -24,6 +26,8 @@ class ScalarNodeDefinition extends VariableNodeDefinition
      * Instantiate a Node
      *
      * @return ScalarNode The node
+     *
+     * @since v2.0.0
      */
     protected function instantiateNode()
     {

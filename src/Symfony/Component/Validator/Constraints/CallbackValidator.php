@@ -22,11 +22,15 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class CallbackValidator extends ConstraintValidator
 {
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function validate($object, Constraint $constraint)
     {

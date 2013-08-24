@@ -17,11 +17,16 @@ namespace Symfony\Component\Templating;
  * @author Victor Berchet <victor@suumit.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class TemplateReference implements TemplateReferenceInterface
 {
     protected $parameters;
 
+    /**
+     * @since v2.0.0
+     */
     public function __construct($name = null, $engine = null)
     {
         $this->parameters = array(
@@ -30,6 +35,9 @@ class TemplateReference implements TemplateReferenceInterface
         );
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function __toString()
     {
         return $this->getLogicalName();
@@ -46,6 +54,8 @@ class TemplateReference implements TemplateReferenceInterface
      * @throws  \InvalidArgumentException if the parameter is not defined
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function set($name, $value)
     {
@@ -68,6 +78,8 @@ class TemplateReference implements TemplateReferenceInterface
      * @throws  \InvalidArgumentException if the parameter is not defined
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function get($name)
     {
@@ -84,6 +96,8 @@ class TemplateReference implements TemplateReferenceInterface
      * @return array An array of parameters
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function all()
     {
@@ -98,6 +112,8 @@ class TemplateReference implements TemplateReferenceInterface
      * @return string A path to the template or a resource
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getPath()
     {
@@ -112,6 +128,8 @@ class TemplateReference implements TemplateReferenceInterface
      * @return string The template name
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getLogicalName()
     {

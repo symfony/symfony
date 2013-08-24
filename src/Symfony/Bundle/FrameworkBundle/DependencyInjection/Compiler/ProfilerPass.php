@@ -19,9 +19,14 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
  * Adds tagged data_collector services to profiler service
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class ProfilerPass implements CompilerPassInterface
 {
+    /**
+     * @since v2.0.0
+     */
     public function process(ContainerBuilder $container)
     {
         if (false === $container->hasDefinition('profiler')) {

@@ -28,6 +28,8 @@ interface DumperInterface
      * @return string The representation of the service container
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function dump(array $options = array());
 }

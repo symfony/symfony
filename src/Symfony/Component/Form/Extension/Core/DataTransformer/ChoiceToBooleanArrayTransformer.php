@@ -17,6 +17,8 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.1.0
  */
 class ChoiceToBooleanArrayTransformer implements DataTransformerInterface
 {
@@ -29,6 +31,8 @@ class ChoiceToBooleanArrayTransformer implements DataTransformerInterface
      *
      * @param ChoiceListInterface $choiceList
      * @param Boolean             $placeholderPresent
+     *
+     * @since v2.3.0
      */
     public function __construct(ChoiceListInterface $choiceList, $placeholderPresent)
     {
@@ -51,6 +55,8 @@ class ChoiceToBooleanArrayTransformer implements DataTransformerInterface
      *
      * @throws TransformationFailedException If the given value is not scalar or
      *                                       if the choices can not be retrieved.
+     *
+     * @since v2.1.0
      */
     public function transform($choice)
     {
@@ -88,6 +94,8 @@ class ChoiceToBooleanArrayTransformer implements DataTransformerInterface
      *                                       if the recuperation of the choices
      *                                       fails or if some choice can't be
      *                                       found.
+     *
+     * @since v2.1.0
      */
     public function reverseTransform($values)
     {

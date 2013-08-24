@@ -21,6 +21,8 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
  * ControllerResolver.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class ControllerResolver extends BaseControllerResolver
 {
@@ -33,6 +35,8 @@ class ControllerResolver extends BaseControllerResolver
      * @param ContainerInterface   $container A ContainerInterface instance
      * @param ControllerNameParser $parser    A ControllerNameParser instance
      * @param LoggerInterface      $logger    A LoggerInterface instance
+     *
+     * @since v2.0.0
      */
     public function __construct(ContainerInterface $container, ControllerNameParser $parser, LoggerInterface $logger = null)
     {
@@ -51,6 +55,8 @@ class ControllerResolver extends BaseControllerResolver
      *
      * @throws \LogicException When the name could not be parsed
      * @throws \InvalidArgumentException When the controller class does not exist
+     *
+     * @since v2.0.0
      */
     protected function createController($controller)
     {

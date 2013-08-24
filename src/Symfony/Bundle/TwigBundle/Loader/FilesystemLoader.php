@@ -19,6 +19,8 @@ use Symfony\Component\Config\FileLocatorInterface;
  * to work with the Symfony2 paths.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class FilesystemLoader extends \Twig_Loader_Filesystem
 {
@@ -30,6 +32,8 @@ class FilesystemLoader extends \Twig_Loader_Filesystem
      *
      * @param FileLocatorInterface        $locator A FileLocatorInterface instance
      * @param TemplateNameParserInterface $parser  A TemplateNameParserInterface instance
+     *
+     * @since v2.0.0
      */
     public function __construct(FileLocatorInterface $locator, TemplateNameParserInterface $parser)
     {
@@ -71,6 +75,8 @@ class FilesystemLoader extends \Twig_Loader_Filesystem
      * @return string The path to the template file
      *
      * @throws \Twig_Error_Loader if the template could not be found
+     *
+     * @since v2.0.0
      */
     protected function findTemplate($template)
     {

@@ -20,6 +20,8 @@ use Symfony\Component\Form\Extension\Core\View\ChoiceView;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.0.0
  */
 class FormExtension extends \Twig_Extension
 {
@@ -31,6 +33,9 @@ class FormExtension extends \Twig_Extension
      */
     public $renderer;
 
+    /**
+     * @since v2.1.0
+     */
     public function __construct(TwigRendererInterface $renderer)
     {
         $this->renderer = $renderer;
@@ -38,6 +43,8 @@ class FormExtension extends \Twig_Extension
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function initRuntime(\Twig_Environment $environment)
     {
@@ -46,6 +53,8 @@ class FormExtension extends \Twig_Extension
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getTokenParsers()
     {
@@ -57,6 +66,8 @@ class FormExtension extends \Twig_Extension
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getFunctions()
     {
@@ -76,6 +87,8 @@ class FormExtension extends \Twig_Extension
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getFilters()
     {
@@ -86,6 +99,8 @@ class FormExtension extends \Twig_Extension
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getTests()
     {
@@ -116,6 +131,8 @@ class FormExtension extends \Twig_Extension
      * @return Boolean Whether the choice is selected.
      *
      * @see ChoiceView::isSelected()
+     *
+     * @since v2.1.0
      */
     public function isSelectedChoice(ChoiceView $choice, $selectedValue)
     {
@@ -128,6 +145,8 @@ class FormExtension extends \Twig_Extension
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getName()
     {

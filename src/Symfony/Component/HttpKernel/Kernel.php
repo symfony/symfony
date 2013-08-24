@@ -42,6 +42,8 @@ use Symfony\Component\ClassLoader\ClassCollectionLoader;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.1.0
  */
 abstract class Kernel implements KernelInterface, TerminableInterface
 {
@@ -75,6 +77,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      * @param Boolean $debug       Whether to enable debugging or not
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function __construct($environment, $debug)
     {
@@ -94,11 +98,16 @@ abstract class Kernel implements KernelInterface, TerminableInterface
 
     /**
      * @deprecated Deprecated since version 2.3, to be removed in 3.0. Move your logic in the constructor instead.
+     *
+     * @since v2.0.0
      */
     public function init()
     {
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function __clone()
     {
         if ($this->debug) {
@@ -113,6 +122,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      * Boots the current kernel.
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function boot()
     {
@@ -142,6 +153,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function terminate(Request $request, Response $response)
     {
@@ -158,6 +171,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function shutdown()
     {
@@ -179,6 +194,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
@@ -193,6 +210,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      * Gets a http kernel from the container
      *
      * @return HttpKernel
+     *
+     * @since v2.0.0
      */
     protected function getHttpKernel()
     {
@@ -203,6 +222,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getBundles()
     {
@@ -213,6 +234,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function isClassInActiveBundle($class)
     {
@@ -229,6 +252,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getBundle($name, $first = true)
     {
@@ -273,6 +298,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      * @throws \RuntimeException         if a custom resource is hidden by a resource in a derived bundle
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function locateResource($name, $dir = null, $first = true)
     {
@@ -332,6 +359,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getName()
     {
@@ -346,6 +375,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getEnvironment()
     {
@@ -356,6 +387,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function isDebug()
     {
@@ -366,6 +399,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getRootDir()
     {
@@ -381,6 +416,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getContainer()
     {
@@ -398,6 +435,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      *
      * @param string $name      The cache name prefix
      * @param string $extension File extension of the resulting file
+     *
+     * @since v2.0.0
      */
     public function loadClassCache($name = 'classes', $extension = '.php')
     {
@@ -406,6 +445,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
 
     /**
      * Used internally.
+     *
+     * @since v2.0.0
      */
     public function setClassCache(array $classes)
     {
@@ -416,6 +457,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getStartTime()
     {
@@ -426,6 +469,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getCacheDir()
     {
@@ -436,6 +481,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getLogDir()
     {
@@ -446,12 +493,17 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function getCharset()
     {
         return 'UTF-8';
     }
 
+    /**
+     * @since v2.3.0
+     */
     protected function doLoadClassCache($name, $extension)
     {
         if (!$this->booted && is_file($this->getCacheDir().'/classes.map')) {
@@ -469,6 +521,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      * @throws \LogicException if a bundle tries to extend a non-registered bundle
      * @throws \LogicException if a bundle tries to extend itself
      * @throws \LogicException if two bundles extend the same ancestor
+     *
+     * @since v2.0.0
      */
     protected function initializeBundles()
     {
@@ -526,6 +580,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      * Gets the container class.
      *
      * @return string The container class
+     *
+     * @since v2.0.0
      */
     protected function getContainerClass()
     {
@@ -538,6 +594,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      * All names except Container must be fully qualified.
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     protected function getContainerBaseClass()
     {
@@ -549,6 +607,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      *
      * The cached version of the service container is used when fresh, otherwise the
      * container is built.
+     *
+     * @since v2.0.0
      */
     protected function initializeContainer()
     {
@@ -577,6 +637,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      * Returns the kernel parameters.
      *
      * @return array An array of kernel parameters
+     *
+     * @since v2.0.0
      */
     protected function getKernelParameters()
     {
@@ -607,6 +669,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      * Only the parameters starting with "SYMFONY__" are considered.
      *
      * @return array An array of parameters
+     *
+     * @since v2.0.0
      */
     protected function getEnvParameters()
     {
@@ -626,6 +690,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      * @return ContainerBuilder The compiled service container
      *
      * @throws \RuntimeException
+     *
+     * @since v2.0.0
      */
     protected function buildContainer()
     {
@@ -656,6 +722,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      * Prepares the ContainerBuilder before it is compiled.
      *
      * @param ContainerBuilder $container A ContainerBuilder instance
+     *
+     * @since v2.3.0
      */
     protected function prepareContainer(ContainerBuilder $container)
     {
@@ -682,6 +750,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      * Gets a new ContainerBuilder instance used to build the service container.
      *
      * @return ContainerBuilder
+     *
+     * @since v2.1.0
      */
     protected function getContainerBuilder()
     {
@@ -701,6 +771,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      * @param ContainerBuilder $container The service container
      * @param string           $class     The name of the class to generate
      * @param string           $baseClass The name of the container's base class
+     *
+     * @since v2.0.0
      */
     protected function dumpContainer(ConfigCache $cache, ContainerBuilder $container, $class, $baseClass)
     {
@@ -725,6 +797,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      * @param ContainerInterface $container The service container
      *
      * @return DelegatingLoader The loader
+     *
+     * @since v2.0.0
      */
     protected function getContainerLoader(ContainerInterface $container)
     {
@@ -749,6 +823,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      * @param string $source A PHP string
      *
      * @return string The PHP string with the comments removed
+     *
+     * @since v2.1.0
      */
     public static function stripComments($source)
     {
@@ -780,11 +856,17 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         return $output;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function serialize()
     {
         return serialize(array($this->environment, $this->debug));
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function unserialize($data)
     {
         list($environment, $debug) = unserialize($data);

@@ -18,12 +18,17 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Florian Eckerstorfer <florian@eckerstorfer.org>
+ *
+ * @since v2.0.0
  */
 class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransformer
 {
 
     private $divisor;
 
+    /**
+     * @since v2.0.0
+     */
     public function __construct($precision = null, $grouping = null, $roundingMode = null, $divisor = null)
     {
         if (null === $grouping) {
@@ -52,6 +57,8 @@ class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransform
      *
      * @throws TransformationFailedException If the given value is not numeric or
      *                                       if the value can not be transformed.
+     *
+     * @since v2.0.0
      */
     public function transform($value)
     {
@@ -75,6 +82,8 @@ class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransform
      *
      * @throws TransformationFailedException If the given value is not a string
      *                                       or if the value can not be transformed.
+     *
+     * @since v2.0.0
      */
     public function reverseTransform($value)
     {

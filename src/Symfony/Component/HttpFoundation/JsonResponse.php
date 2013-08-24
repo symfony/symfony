@@ -21,6 +21,8 @@ namespace Symfony\Component\HttpFoundation;
  * @see https://www.owasp.org/index.php/OWASP_AJAX_Security_Guidelines#Always_return_JSON_with_an_Object_on_the_outside
  *
  * @author Igor Wiedler <igor@wiedler.ch>
+ *
+ * @since v2.1.0
  */
 class JsonResponse extends Response
 {
@@ -33,6 +35,8 @@ class JsonResponse extends Response
      * @param mixed   $data    The response data
      * @param integer $status  The response status code
      * @param array   $headers An array of response headers
+     *
+     * @since v2.2.0
      */
     public function __construct($data = null, $status = 200, $headers = array())
     {
@@ -46,6 +50,8 @@ class JsonResponse extends Response
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.2.0
      */
     public static function create($data = null, $status = 200, $headers = array())
     {
@@ -60,6 +66,8 @@ class JsonResponse extends Response
      * @return JsonResponse
      *
      * @throws \InvalidArgumentException
+     *
+     * @since v2.1.0
      */
     public function setCallback($callback = null)
     {
@@ -85,6 +93,8 @@ class JsonResponse extends Response
      * @param mixed $data
      *
      * @return JsonResponse
+     *
+     * @since v2.1.0
      */
     public function setData($data = array())
     {
@@ -98,6 +108,8 @@ class JsonResponse extends Response
      * Updates the content and headers according to the json data and callback.
      *
      * @return JsonResponse
+     *
+     * @since v2.1.0
      */
     protected function update()
     {

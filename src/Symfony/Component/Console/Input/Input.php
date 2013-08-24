@@ -21,6 +21,8 @@ namespace Symfony\Component\Console\Input;
  *  * `ArrayInput`: The input is provided as an array
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 abstract class Input implements InputInterface
 {
@@ -33,6 +35,8 @@ abstract class Input implements InputInterface
      * Constructor.
      *
      * @param InputDefinition $definition A InputDefinition instance
+     *
+     * @since v2.0.0
      */
     public function __construct(InputDefinition $definition = null)
     {
@@ -50,6 +54,8 @@ abstract class Input implements InputInterface
      * Binds the current Input instance with the given arguments and options.
      *
      * @param InputDefinition $definition A InputDefinition instance
+     *
+     * @since v2.0.0
      */
     public function bind(InputDefinition $definition)
     {
@@ -62,6 +68,8 @@ abstract class Input implements InputInterface
 
     /**
      * Processes command line arguments.
+     *
+     * @since v2.0.0
      */
     abstract protected function parse();
 
@@ -69,6 +77,8 @@ abstract class Input implements InputInterface
      * Validates the input.
      *
      * @throws \RuntimeException When not enough arguments are given
+     *
+     * @since v2.0.0
      */
     public function validate()
     {
@@ -81,6 +91,8 @@ abstract class Input implements InputInterface
      * Checks if the input is interactive.
      *
      * @return Boolean Returns true if the input is interactive
+     *
+     * @since v2.0.0
      */
     public function isInteractive()
     {
@@ -91,6 +103,8 @@ abstract class Input implements InputInterface
      * Sets the input interactivity.
      *
      * @param Boolean $interactive If the input should be interactive
+     *
+     * @since v2.0.0
      */
     public function setInteractive($interactive)
     {
@@ -101,6 +115,8 @@ abstract class Input implements InputInterface
      * Returns the argument values.
      *
      * @return array An array of argument values
+     *
+     * @since v2.0.0
      */
     public function getArguments()
     {
@@ -115,6 +131,8 @@ abstract class Input implements InputInterface
      * @return mixed The argument value
      *
      * @throws \InvalidArgumentException When argument given doesn't exist
+     *
+     * @since v2.0.0
      */
     public function getArgument($name)
     {
@@ -132,6 +150,8 @@ abstract class Input implements InputInterface
      * @param string $value The argument value
      *
      * @throws \InvalidArgumentException When argument given doesn't exist
+     *
+     * @since v2.0.0
      */
     public function setArgument($name, $value)
     {
@@ -148,6 +168,8 @@ abstract class Input implements InputInterface
      * @param string|integer $name The InputArgument name or position
      *
      * @return Boolean true if the InputArgument object exists, false otherwise
+     *
+     * @since v2.0.0
      */
     public function hasArgument($name)
     {
@@ -158,6 +180,8 @@ abstract class Input implements InputInterface
      * Returns the options values.
      *
      * @return array An array of option values
+     *
+     * @since v2.0.0
      */
     public function getOptions()
     {
@@ -172,6 +196,8 @@ abstract class Input implements InputInterface
      * @return mixed The option value
      *
      * @throws \InvalidArgumentException When option given doesn't exist
+     *
+     * @since v2.0.0
      */
     public function getOption($name)
     {
@@ -189,6 +215,8 @@ abstract class Input implements InputInterface
      * @param string $value The option value
      *
      * @throws \InvalidArgumentException When option given doesn't exist
+     *
+     * @since v2.0.0
      */
     public function setOption($name, $value)
     {
@@ -205,6 +233,8 @@ abstract class Input implements InputInterface
      * @param string $name The InputOption name
      *
      * @return Boolean true if the InputOption object exists, false otherwise
+     *
+     * @since v2.0.0
      */
     public function hasOption($name)
     {
@@ -217,6 +247,8 @@ abstract class Input implements InputInterface
      * @param string $token
      *
      * @return string
+     *
+     * @since v2.3.0
      */
     public function escapeToken($token)
     {

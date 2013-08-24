@@ -23,6 +23,8 @@ use Psr\Log\LoggerInterface;
  * to the fully-qualified form (from a:b:c to class:method).
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class DelegatingLoader extends BaseDelegatingLoader
 {
@@ -35,6 +37,8 @@ class DelegatingLoader extends BaseDelegatingLoader
      * @param ControllerNameParser    $parser   A ControllerNameParser instance
      * @param LoggerInterface         $logger   A LoggerInterface instance
      * @param LoaderResolverInterface $resolver A LoaderResolverInterface instance
+     *
+     * @since v2.0.0
      */
     public function __construct(ControllerNameParser $parser, LoggerInterface $logger = null, LoaderResolverInterface $resolver)
     {
@@ -51,6 +55,8 @@ class DelegatingLoader extends BaseDelegatingLoader
      * @param string $type     The resource type
      *
      * @return RouteCollection A RouteCollection instance
+     *
+     * @since v2.0.0
      */
     public function load($resource, $type = null)
     {

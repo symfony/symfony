@@ -23,6 +23,8 @@ use Symfony\Component\Process\Exception\RuntimeException;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class Process
 {
@@ -132,6 +134,8 @@ class Process
      * @throws RuntimeException When proc_open is not installed
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function __construct($commandline, $cwd = null, array $env = null, $stdin = null, $timeout = 60, array $options = array())
     {
@@ -162,12 +166,18 @@ class Process
         $this->options = array_replace(array('suppress_errors' => true, 'binary_pipes' => true), $options);
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function __destruct()
     {
         // stop() will check if we have a process running.
         $this->stop();
     }
 
+    /**
+     * @since v2.2.0
+     */
     public function __clone()
     {
         $this->resetProcessData();
@@ -191,6 +201,8 @@ class Process
      * @throws RuntimeException When process can't be launch or is stopped
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function run($callback = null)
     {
@@ -221,6 +233,8 @@ class Process
      *
      * @throws RuntimeException When process can't be launch or is stopped
      * @throws RuntimeException When process is already running
+     *
+     * @since v2.1.0
      */
     public function start($callback = null)
     {
@@ -272,6 +286,8 @@ class Process
      * @throws \RuntimeException When process is already running
      *
      * @see start()
+     *
+     * @since v2.2.0
      */
     public function restart($callback = null)
     {
@@ -298,6 +314,8 @@ class Process
      *
      * @throws \RuntimeException When process timed out
      * @throws \RuntimeException When process stopped after receiving signal
+     *
+     * @since v2.1.0
      */
     public function wait($callback = null)
     {
@@ -341,6 +359,8 @@ class Process
      * @return integer|null The process id if running, null otherwise
      *
      * @throws RuntimeException In case --enable-sigchild is activated
+     *
+     * @since v2.3.0
      */
     public function getPid()
     {
@@ -362,6 +382,8 @@ class Process
      * @throws LogicException   In case the process is not running
      * @throws RuntimeException In case --enable-sigchild is activated
      * @throws RuntimeException In case of failure
+     *
+     * @since v2.3.0
      */
     public function signal($signal)
     {
@@ -386,6 +408,8 @@ class Process
      * @return string The process output
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getOutput()
     {
@@ -401,6 +425,8 @@ class Process
      * output, this one returns the new output since the last call.
      *
      * @return string The process output since the last call
+     *
+     * @since v2.2.0
      */
     public function getIncrementalOutput()
     {
@@ -418,6 +444,8 @@ class Process
      * @return string The process error output
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getErrorOutput()
     {
@@ -434,6 +462,8 @@ class Process
      * call.
      *
      * @return string The process error output since the last call
+     *
+     * @since v2.2.0
      */
     public function getIncrementalErrorOutput()
     {
@@ -453,6 +483,8 @@ class Process
      * @throws RuntimeException In case --enable-sigchild is activated and the sigchild compatibility mode is disabled
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getExitCode()
     {
@@ -475,6 +507,8 @@ class Process
      *
      * @see http://tldp.org/LDP/abs/html/exitcodes.html
      * @see http://en.wikipedia.org/wiki/Unix_signal
+     *
+     * @since v2.1.0
      */
     public function getExitCodeText()
     {
@@ -489,6 +523,8 @@ class Process
      * @return Boolean true if the process ended successfully, false otherwise
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function isSuccessful()
     {
@@ -505,6 +541,8 @@ class Process
      * @throws RuntimeException In case --enable-sigchild is activated
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function hasBeenSignaled()
     {
@@ -527,6 +565,8 @@ class Process
      * @throws RuntimeException In case --enable-sigchild is activated
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getTermSignal()
     {
@@ -547,6 +587,8 @@ class Process
      * @return Boolean
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function hasBeenStopped()
     {
@@ -563,6 +605,8 @@ class Process
      * @return integer
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getStopSignal()
     {
@@ -575,6 +619,8 @@ class Process
      * Checks if the process is currently running.
      *
      * @return Boolean true if the process is currently running, false otherwise
+     *
+     * @since v2.1.0
      */
     public function isRunning()
     {
@@ -591,6 +637,8 @@ class Process
      * Checks if the process has been started with no regard to the current state.
      *
      * @return Boolean true if status is ready, false otherwise
+     *
+     * @since v2.2.0
      */
     public function isStarted()
     {
@@ -601,6 +649,8 @@ class Process
      * Checks if the process is terminated.
      *
      * @return Boolean true if process is terminated, false otherwise
+     *
+     * @since v2.2.0
      */
     public function isTerminated()
     {
@@ -615,6 +665,8 @@ class Process
      * The status is one of: ready, started, terminated.
      *
      * @return string The current process status
+     *
+     * @since v2.2.0
      */
     public function getStatus()
     {
@@ -632,6 +684,8 @@ class Process
      * @return integer The exit-code of the process
      *
      * @throws RuntimeException if the process got signaled
+     *
+     * @since v2.3.0
      */
     public function stop($timeout = 10, $signal = null)
     {
@@ -659,6 +713,8 @@ class Process
      * Adds a line to the STDOUT stream.
      *
      * @param string $line The line to append
+     *
+     * @since v2.0.0
      */
     public function addOutput($line)
     {
@@ -670,6 +726,8 @@ class Process
      * Adds a line to the STDERR stream.
      *
      * @param string $line The line to append
+     *
+     * @since v2.0.0
      */
     public function addErrorOutput($line)
     {
@@ -681,6 +739,8 @@ class Process
      * Gets the command line to be executed.
      *
      * @return string The command to execute
+     *
+     * @since v2.0.0
      */
     public function getCommandLine()
     {
@@ -693,6 +753,8 @@ class Process
      * @param string $commandline The command to execute
      *
      * @return self The current Process instance
+     *
+     * @since v2.0.0
      */
     public function setCommandLine($commandline)
     {
@@ -705,6 +767,8 @@ class Process
      * Gets the process timeout.
      *
      * @return float|null The timeout in seconds or null if it's disabled
+     *
+     * @since v2.0.0
      */
     public function getTimeout()
     {
@@ -731,6 +795,8 @@ class Process
      * @return self The current Process instance
      *
      * @throws InvalidArgumentException if the timeout is negative
+     *
+     * @since v2.0.0
      */
     public function setTimeout($timeout)
     {
@@ -761,6 +827,8 @@ class Process
      * @param boolean $tty True to enabled and false to disable
      *
      * @return self The current Process instance
+     *
+     * @since v2.3.0
      */
     public function setTty($tty)
     {
@@ -773,6 +841,8 @@ class Process
      * Checks if  the TTY mode is enabled.
      *
      * @return Boolean true if the TTY mode is enabled, false otherwise
+     *
+     * @since v2.3.0
      */
     public function isTty()
     {
@@ -783,6 +853,8 @@ class Process
      * Gets the working directory.
      *
      * @return string The current working directory
+     *
+     * @since v2.0.0
      */
     public function getWorkingDirectory()
     {
@@ -802,6 +874,8 @@ class Process
      * @param string $cwd The new working directory
      *
      * @return self The current Process instance
+     *
+     * @since v2.0.0
      */
     public function setWorkingDirectory($cwd)
     {
@@ -814,6 +888,8 @@ class Process
      * Gets the environment variables.
      *
      * @return array The current environment variables
+     *
+     * @since v2.0.0
      */
     public function getEnv()
     {
@@ -832,6 +908,8 @@ class Process
      * @param array $env The new environment variables
      *
      * @return self The current Process instance
+     *
+     * @since v2.0.0
      */
     public function setEnv(array $env)
     {
@@ -850,6 +928,8 @@ class Process
      * Gets the contents of STDIN.
      *
      * @return string The current contents
+     *
+     * @since v2.0.0
      */
     public function getStdin()
     {
@@ -862,6 +942,8 @@ class Process
      * @param string $stdin The new contents
      *
      * @return self The current Process instance
+     *
+     * @since v2.0.0
      */
     public function setStdin($stdin)
     {
@@ -874,6 +956,8 @@ class Process
      * Gets the options for proc_open.
      *
      * @return array The current options
+     *
+     * @since v2.0.0
      */
     public function getOptions()
     {
@@ -886,6 +970,8 @@ class Process
      * @param array $options The new options
      *
      * @return self The current Process instance
+     *
+     * @since v2.0.0
      */
     public function setOptions(array $options)
     {
@@ -900,6 +986,8 @@ class Process
      * This is true by default.
      *
      * @return Boolean
+     *
+     * @since v2.1.0
      */
     public function getEnhanceWindowsCompatibility()
     {
@@ -912,6 +1000,8 @@ class Process
      * @param Boolean $enhance
      *
      * @return self The current Process instance
+     *
+     * @since v2.1.0
      */
     public function setEnhanceWindowsCompatibility($enhance)
     {
@@ -924,6 +1014,8 @@ class Process
      * Returns whether sigchild compatibility mode is activated or not.
      *
      * @return Boolean
+     *
+     * @since v2.1.10
      */
     public function getEnhanceSigchildCompatibility()
     {
@@ -940,6 +1032,8 @@ class Process
      * @param Boolean $enhance
      *
      * @return self The current Process instance
+     *
+     * @since v2.1.10
      */
     public function setEnhanceSigchildCompatibility($enhance)
     {
@@ -955,6 +1049,8 @@ class Process
      * trigger this method regularly to ensure the process timeout
      *
      * @throws ProcessTimedOutException In case the timeout was reached
+     *
+     * @since v2.1.10
      */
     public function checkTimeout()
     {
@@ -975,6 +1071,8 @@ class Process
      * Creates the descriptors needed by the proc_open.
      *
      * @return array
+     *
+     * @since v2.3.0
      */
     private function getDescriptors()
     {
@@ -1028,6 +1126,8 @@ class Process
      * @param callback|null $callback The user defined PHP callback
      *
      * @return callback A PHP callable
+     *
+     * @since v2.1.0
      */
     protected function buildCallback($callback)
     {
@@ -1074,6 +1174,8 @@ class Process
      * Returns whether PHP has been compiled with the '--enable-sigchild' option or not.
      *
      * @return Boolean
+     *
+     * @since v2.1.10
      */
     protected function isSigchildEnabled()
     {
@@ -1113,6 +1215,8 @@ class Process
      * Returns true if a system call has been interrupted.
      *
      * @return Boolean
+     *
+     * @since v2.2.3
      */
     private function hasSystemCallBeenInterrupted()
     {

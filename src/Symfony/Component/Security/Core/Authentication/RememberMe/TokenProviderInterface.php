@@ -26,6 +26,8 @@ interface TokenProviderInterface
      * @return PersistentTokenInterface
      *
      * @throws TokenNotFoundException if the token is not found
+     *
+     * @since v2.1.0
      */
     public function loadTokenBySeries($series);
 
@@ -33,6 +35,8 @@ interface TokenProviderInterface
      * Deletes all tokens belonging to series.
      *
      * @param string $series
+     *
+     * @since v2.1.0
      */
     public function deleteTokenBySeries($series);
 
@@ -43,6 +47,8 @@ interface TokenProviderInterface
      * @param string    $tokenValue
      * @param \DateTime $lastUsed
      * @throws TokenNotFoundException if the token is not found
+     *
+     * @since v2.1.0
      */
     public function updateToken($series, $tokenValue, \DateTime $lastUsed);
 
@@ -50,6 +56,8 @@ interface TokenProviderInterface
      * Creates a new token.
      *
      * @param PersistentTokenInterface $token
+     *
+     * @since v2.1.0
      */
     public function createNewToken(PersistentTokenInterface $token);
 }

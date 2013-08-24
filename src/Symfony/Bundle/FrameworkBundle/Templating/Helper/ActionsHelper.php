@@ -19,6 +19,8 @@ use Symfony\Component\HttpKernel\Controller\ControllerReference;
  * ActionsHelper manages action inclusions.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class ActionsHelper extends Helper
 {
@@ -28,6 +30,8 @@ class ActionsHelper extends Helper
      * Constructor.
      *
      * @param FragmentHandler $handler A FragmentHandler instance
+     *
+     * @since v2.2.0
      */
     public function __construct(FragmentHandler $handler)
     {
@@ -43,6 +47,8 @@ class ActionsHelper extends Helper
      * @return string The fragment content
      *
      * @see Symfony\Component\HttpKernel\Fragment\FragmentHandler::render()
+     *
+     * @since v2.2.0
      */
     public function render($uri, array $options = array())
     {
@@ -52,6 +58,9 @@ class ActionsHelper extends Helper
         return $this->handler->render($uri, $strategy, $options);
     }
 
+    /**
+     * @since v2.2.0
+     */
     public function controller($controller, $attributes = array(), $query = array())
     {
         return new ControllerReference($controller, $attributes, $query);
@@ -61,6 +70,8 @@ class ActionsHelper extends Helper
      * Returns the canonical name of this helper.
      *
      * @return string The canonical name
+     *
+     * @since v2.0.0
      */
     public function getName()
     {

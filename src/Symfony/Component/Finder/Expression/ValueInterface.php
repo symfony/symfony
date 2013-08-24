@@ -20,6 +20,8 @@ interface ValueInterface
      * Renders string representation of expression.
      *
      * @return string
+     *
+     * @since v2.2.0
      */
     public function render();
 
@@ -27,6 +29,8 @@ interface ValueInterface
      * Renders string representation of pattern.
      *
      * @return string
+     *
+     * @since v2.2.0
      */
     public function renderPattern();
 
@@ -34,6 +38,8 @@ interface ValueInterface
      * Returns value case sensitivity.
      *
      * @return bool
+     *
+     * @since v2.2.0
      */
     public function isCaseSensitive();
 
@@ -41,6 +47,8 @@ interface ValueInterface
      * Returns expression type.
      *
      * @return int
+     *
+     * @since v2.2.0
      */
     public function getType();
 
@@ -48,6 +56,8 @@ interface ValueInterface
      * @param string $expr
      *
      * @return ValueInterface
+     *
+     * @since v2.2.0
      */
     public function prepend($expr);
 
@@ -55,6 +65,8 @@ interface ValueInterface
      * @param string $expr
      *
      * @return ValueInterface
+     *
+     * @since v2.2.0
      */
     public function append($expr);
 }

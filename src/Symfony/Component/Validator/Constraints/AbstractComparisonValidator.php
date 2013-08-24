@@ -18,11 +18,15 @@ use Symfony\Component\Validator\ConstraintValidator;
  * Provides a base class for the validation of property comparisons.
  *
  * @author Daniel Holmes <daniel@danielholmes.org>
+ *
+ * @since v2.3.0
  */
 abstract class AbstractComparisonValidator extends ConstraintValidator
 {
     /**
      * {@inheritDoc}
+     *
+     * @since v2.3.0
      */
     public function validate($value, Constraint $constraint)
     {
@@ -45,6 +49,8 @@ abstract class AbstractComparisonValidator extends ConstraintValidator
      * @param  mixed $value
      *
      * @return string
+     *
+     * @since v2.3.0
      */
     private function valueToType($value)
     {
@@ -57,6 +63,8 @@ abstract class AbstractComparisonValidator extends ConstraintValidator
      * @param  mixed  $value
      *
      * @return string
+     *
+     * @since v2.3.0
      */
     private function valueToString($value)
     {
@@ -74,6 +82,8 @@ abstract class AbstractComparisonValidator extends ConstraintValidator
      * @param mixed      $value2     The second value to compare
      *
      * @return Boolean true if the relationship is valid, false otherwise
+     *
+     * @since v2.3.0
      */
     abstract protected function compareValues($value1, $value2);
 }

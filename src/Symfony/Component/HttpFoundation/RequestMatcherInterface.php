@@ -28,6 +28,8 @@ interface RequestMatcherInterface
      * @return Boolean true if the request matches, false otherwise
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function matches(Request $request);
 }

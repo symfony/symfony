@@ -21,6 +21,8 @@ use Symfony\Component\CssSelector\Exception\SyntaxErrorException;
  * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @since v2.3.0
  */
 class TokenStream
 {
@@ -60,6 +62,8 @@ class TokenStream
      * @param Token $token
      *
      * @return TokenStream
+     *
+     * @since v2.3.0
      */
     public function push(Token $token)
     {
@@ -72,6 +76,8 @@ class TokenStream
      * Freezes stream.
      *
      * @return TokenStream
+     *
+     * @since v2.3.0
      */
     public function freeze()
     {
@@ -86,6 +92,8 @@ class TokenStream
      * @throws InternalErrorException If there is no more token
      *
      * @return Token
+     *
+     * @since v2.3.0
      */
     public function getNext()
     {
@@ -107,6 +115,8 @@ class TokenStream
      * Returns peeked token.
      *
      * @return Token
+     *
+     * @since v2.3.0
      */
     public function getPeek()
     {
@@ -122,6 +132,8 @@ class TokenStream
      * Returns used tokens.
      *
      * @return Token[]
+     *
+     * @since v2.3.0
      */
     public function getUsed()
     {
@@ -134,6 +146,8 @@ class TokenStream
      * @throws SyntaxErrorException If next token is not an identifier
      *
      * @return string The identifier token value
+     *
+     * @since v2.3.0
      */
     public function getNextIdentifier()
     {
@@ -152,6 +166,8 @@ class TokenStream
      * @throws SyntaxErrorException If next token is not an identifier or a star delimiter
      *
      * @return null|string The identifier token value or null if star found
+     *
+     * @since v2.3.0
      */
     public function getNextIdentifierOrStar()
     {
@@ -170,6 +186,8 @@ class TokenStream
 
     /**
      * Skips next whitespace if any.
+     *
+     * @since v2.3.0
      */
     public function skipWhitespace()
     {

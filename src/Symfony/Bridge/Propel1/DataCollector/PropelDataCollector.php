@@ -20,6 +20,8 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollector;
  * The PropelDataCollector collector class collects information.
  *
  * @author William Durand <william.durand1@gmail.com>
+ *
+ * @since v2.1.0
  */
 class PropelDataCollector extends DataCollector
 {
@@ -42,6 +44,8 @@ class PropelDataCollector extends DataCollector
      *
      * @param PropelLogger         $logger              A Propel logger.
      * @param \PropelConfiguration $propelConfiguration The Propel configuration object.
+     *
+     * @since v2.1.0
      */
     public function __construct(PropelLogger $logger, \PropelConfiguration $propelConfiguration)
     {
@@ -51,6 +55,8 @@ class PropelDataCollector extends DataCollector
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
@@ -64,6 +70,8 @@ class PropelDataCollector extends DataCollector
      * Returns the collector name.
      *
      * @return string The collector name.
+     *
+     * @since v2.1.0
      */
     public function getName()
     {
@@ -74,6 +82,8 @@ class PropelDataCollector extends DataCollector
      * Returns queries.
      *
      * @return array Queries
+     *
+     * @since v2.1.0
      */
     public function getQueries()
     {
@@ -84,6 +94,8 @@ class PropelDataCollector extends DataCollector
      * Returns the query count.
      *
      * @return int The query count
+     *
+     * @since v2.1.0
      */
     public function getQueryCount()
     {
@@ -94,6 +106,8 @@ class PropelDataCollector extends DataCollector
      * Returns the total time of queries.
      *
      * @return float The total time of queries
+     *
+     * @since v2.1.0
      */
     public function getTime()
     {
@@ -109,6 +123,8 @@ class PropelDataCollector extends DataCollector
      * Creates an array of Build objects.
      *
      * @return array An array of Build objects
+     *
+     * @since v2.1.0
      */
     private function buildQueries()
     {
@@ -139,6 +155,8 @@ class PropelDataCollector extends DataCollector
      * Count queries.
      *
      * @return int The number of queries.
+     *
+     * @since v2.1.0
      */
     private function countQueries()
     {

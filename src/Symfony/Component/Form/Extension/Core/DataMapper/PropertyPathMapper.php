@@ -20,6 +20,8 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  * A data mapper using property paths to read/write data.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.0.0
  */
 class PropertyPathMapper implements DataMapperInterface
 {
@@ -32,6 +34,8 @@ class PropertyPathMapper implements DataMapperInterface
      * Creates a new property path mapper.
      *
      * @param PropertyAccessorInterface $propertyAccessor
+     *
+     * @since v2.2.0
      */
     public function __construct(PropertyAccessorInterface $propertyAccessor = null)
     {
@@ -40,6 +44,8 @@ class PropertyPathMapper implements DataMapperInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function mapDataToForms($data, $forms)
     {
@@ -63,6 +69,8 @@ class PropertyPathMapper implements DataMapperInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function mapFormsToData($forms, &$data)
     {

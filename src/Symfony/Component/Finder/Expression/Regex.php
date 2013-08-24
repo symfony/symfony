@@ -13,6 +13,8 @@ namespace Symfony\Component\Finder\Expression;
 
 /**
  * @author Jean-François Simon <contact@jfsimon.fr>
+ *
+ * @since v2.2.0
  */
 class Regex implements ValueInterface
 {
@@ -58,6 +60,8 @@ class Regex implements ValueInterface
      * @return Regex
      *
      * @throws \InvalidArgumentException
+     *
+     * @since v2.2.0
      */
     public static function create($expr)
     {
@@ -77,6 +81,8 @@ class Regex implements ValueInterface
      * @param string $pattern
      * @param string $options
      * @param string $delimiter
+     *
+     * @since v2.2.0
      */
     public function __construct($pattern, $options = '', $delimiter = null)
     {
@@ -91,6 +97,8 @@ class Regex implements ValueInterface
 
     /**
      * @return string
+     *
+     * @since v2.2.0
      */
     public function __toString()
     {
@@ -99,6 +107,8 @@ class Regex implements ValueInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function render()
     {
@@ -110,6 +120,8 @@ class Regex implements ValueInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function renderPattern()
     {
@@ -122,6 +134,8 @@ class Regex implements ValueInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function isCaseSensitive()
     {
@@ -130,6 +144,8 @@ class Regex implements ValueInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function getType()
     {
@@ -138,6 +154,8 @@ class Regex implements ValueInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function prepend($expr)
     {
@@ -148,6 +166,8 @@ class Regex implements ValueInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function append($expr)
     {
@@ -160,6 +180,8 @@ class Regex implements ValueInterface
      * @param string $option
      *
      * @return bool
+     *
+     * @since v2.2.0
      */
     public function hasOption($option)
     {
@@ -170,6 +192,8 @@ class Regex implements ValueInterface
      * @param string $option
      *
      * @return Regex
+     *
+     * @since v2.2.0
      */
     public function addOption($option)
     {
@@ -184,6 +208,8 @@ class Regex implements ValueInterface
      * @param string $option
      *
      * @return Regex
+     *
+     * @since v2.2.0
      */
     public function removeOption($option)
     {
@@ -196,6 +222,8 @@ class Regex implements ValueInterface
      * @param bool $startFlag
      *
      * @return Regex
+     *
+     * @since v2.2.0
      */
     public function setStartFlag($startFlag)
     {
@@ -206,6 +234,8 @@ class Regex implements ValueInterface
 
     /**
      * @return bool
+     *
+     * @since v2.2.0
      */
     public function hasStartFlag()
     {
@@ -216,6 +246,8 @@ class Regex implements ValueInterface
      * @param bool $endFlag
      *
      * @return Regex
+     *
+     * @since v2.2.0
      */
     public function setEndFlag($endFlag)
     {
@@ -226,6 +258,8 @@ class Regex implements ValueInterface
 
     /**
      * @return bool
+     *
+     * @since v2.2.0
      */
     public function hasEndFlag()
     {
@@ -236,6 +270,8 @@ class Regex implements ValueInterface
      * @param bool $startJoker
      *
      * @return Regex
+     *
+     * @since v2.2.0
      */
     public function setStartJoker($startJoker)
     {
@@ -246,6 +282,8 @@ class Regex implements ValueInterface
 
     /**
      * @return bool
+     *
+     * @since v2.2.0
      */
     public function hasStartJoker()
     {
@@ -256,6 +294,8 @@ class Regex implements ValueInterface
      * @param bool $endJoker
      *
      * @return Regex
+     *
+     * @since v2.2.0
      */
     public function setEndJoker($endJoker)
     {
@@ -266,6 +306,8 @@ class Regex implements ValueInterface
 
     /**
      * @return bool
+     *
+     * @since v2.2.0
      */
     public function hasEndJoker()
     {
@@ -276,6 +318,8 @@ class Regex implements ValueInterface
      * @param array $replacement
      *
      * @return Regex
+     *
+     * @since v2.2.0
      */
     public function replaceJokers($replacement)
     {
@@ -293,6 +337,8 @@ class Regex implements ValueInterface
 
     /**
      * @param string $pattern
+     *
+     * @since v2.2.0
      */
     private function parsePattern($pattern)
     {

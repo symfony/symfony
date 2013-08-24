@@ -20,6 +20,8 @@ use Symfony\Component\Translation\TranslatorInterface;
  * This extension protects forms by using a CSRF token.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.0.0
  */
 class CsrfExtension extends AbstractExtension
 {
@@ -44,6 +46,8 @@ class CsrfExtension extends AbstractExtension
      * @param CsrfProviderInterface $csrfProvider      The CSRF provider
      * @param TranslatorInterface   $translator        The translator for translating error messages.
      * @param null|string           $translationDomain The translation domain for translating.
+     *
+     * @since v2.3.0
      */
     public function __construct(CsrfProviderInterface $csrfProvider, TranslatorInterface $translator = null, $translationDomain = null)
     {
@@ -54,6 +58,8 @@ class CsrfExtension extends AbstractExtension
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     protected function loadTypeExtensions()
     {

@@ -17,6 +17,8 @@ use Symfony\Component\Console\Shell as BaseShell;
  * Shell.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class Shell extends BaseShell
 {
@@ -24,6 +26,8 @@ class Shell extends BaseShell
      * Returns the shell header.
      *
      * @return string The header string
+     *
+     * @since v2.0.0
      */
     protected function getHeader()
     {

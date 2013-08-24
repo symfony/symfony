@@ -33,6 +33,8 @@ use Symfony\Component\Security\Acl\Model\PermissionGrantingStrategyInterface;
  * This provider assumes that all ACLs share the same PermissionGrantingStrategy.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class AclProvider implements AclProviderInterface
 {
@@ -52,6 +54,8 @@ class AclProvider implements AclProviderInterface
      * @param PermissionGrantingStrategyInterface $permissionGrantingStrategy
      * @param array                               $options
      * @param AclCacheInterface                   $cache
+     *
+     * @since v2.0.0
      */
     public function __construct(Connection $connection, PermissionGrantingStrategyInterface $permissionGrantingStrategy, array $options, AclCacheInterface $cache = null)
     {
@@ -65,6 +69,8 @@ class AclProvider implements AclProviderInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function findChildren(ObjectIdentityInterface $parentOid, $directChildrenOnly = false)
     {
@@ -80,6 +86,8 @@ class AclProvider implements AclProviderInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function findAcl(ObjectIdentityInterface $oid, array $sids = array())
     {
@@ -88,6 +96,8 @@ class AclProvider implements AclProviderInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function findAcls(array $oids, array $sids = array())
     {
@@ -206,6 +216,8 @@ class AclProvider implements AclProviderInterface
      *
      * @param array $ancestorIds
      * @return string
+     *
+     * @since v2.0.0
      */
     protected function getLookupSql(array $ancestorIds)
     {
@@ -247,6 +259,9 @@ SELECTCLAUSE;
         return $sql;
     }
 
+    /**
+     * @since v2.0.0
+     */
     protected function getAncestorLookupSql(array $batch)
     {
         $sql = <<<SELECTCLAUSE
@@ -311,6 +326,8 @@ SELECTCLAUSE;
      * @param ObjectIdentityInterface $oid
      * @param Boolean                 $directChildrenOnly
      * @return string
+     *
+     * @since v2.0.0
      */
     protected function getFindChildrenSql(ObjectIdentityInterface $oid, $directChildrenOnly)
     {
@@ -342,6 +359,8 @@ FINDCHILDREN;
      *
      * @param ObjectIdentityInterface $oid
      * @return string
+     *
+     * @since v2.0.0
      */
     protected function getSelectObjectIdentityIdSql(ObjectIdentityInterface $oid)
     {
@@ -366,6 +385,8 @@ QUERY;
      *
      * @param ObjectIdentityInterface $oid
      * @return integer
+     *
+     * @since v2.1.0
      */
     final protected function retrieveObjectIdentityPrimaryKey(ObjectIdentityInterface $oid)
     {
@@ -376,6 +397,8 @@ QUERY;
      * This method is called when an ACL instance is retrieved from the cache.
      *
      * @param AclInterface $acl
+     *
+     * @since v2.0.0
      */
     private function updateAceIdentityMap(AclInterface $acl)
     {
@@ -404,6 +427,8 @@ QUERY;
      * @param array $batch
      *
      * @return array
+     *
+     * @since v2.0.0
      */
     private function getAncestorIds(array $batch)
     {
@@ -424,6 +449,8 @@ QUERY;
      * map to ensure every ACE only gets instantiated once.
      *
      * @param array &$aces
+     *
+     * @since v2.0.0
      */
     private function doUpdateAceIdentityMap(array &$aces)
     {
@@ -447,6 +474,8 @@ QUERY;
      * @return \SplObjectStorage mapping object identities to ACL instances
      *
      * @throws AclNotFoundException
+     *
+     * @since v2.0.0
      */
     private function lookupObjectIdentities(array $batch, array $sids, array $oidLookup)
     {
@@ -475,6 +504,8 @@ QUERY;
      * @param array     $sids
      * @throws \RuntimeException
      * @return \SplObjectStorage
+     *
+     * @since v2.0.10
      */
     private function hydrateObjectIdentities(Statement $stmt, array $oidLookup, array $sids)
     {

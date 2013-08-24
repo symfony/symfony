@@ -25,6 +25,8 @@ interface NodeInterface
      * Returns node's name.
      *
      * @return string
+     *
+     * @since v2.3.0
      */
     public function getNodeName();
 
@@ -32,6 +34,8 @@ interface NodeInterface
      * Returns node's specificity.
      *
      * @return Specificity
+     *
+     * @since v2.3.0
      */
     public function getSpecificity();
 
@@ -39,6 +43,8 @@ interface NodeInterface
      * Returns node's string representation.
      *
      * @return string
+     *
+     * @since v2.3.0
      */
     public function __toString();
 }

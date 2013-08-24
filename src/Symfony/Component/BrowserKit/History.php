@@ -15,6 +15,8 @@ namespace Symfony\Component\BrowserKit;
  * History.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class History
 {
@@ -23,6 +25,8 @@ class History
 
     /**
      * Constructor.
+     *
+     * @since v2.0.0
      */
     public function __construct()
     {
@@ -31,6 +35,8 @@ class History
 
     /**
      * Clears the history.
+     *
+     * @since v2.0.0
      */
     public function clear()
     {
@@ -42,6 +48,8 @@ class History
      * Adds a Request to the history.
      *
      * @param Request $request A Request instance
+     *
+     * @since v2.0.0
      */
     public function add(Request $request)
     {
@@ -54,6 +62,8 @@ class History
      * Returns true if the history is empty.
      *
      * @return Boolean true if the history is empty, false otherwise
+     *
+     * @since v2.0.0
      */
     public function isEmpty()
     {
@@ -66,6 +76,8 @@ class History
      * @return Request A Request instance
      *
      * @throws \LogicException if the stack is already on the first page
+     *
+     * @since v2.0.0
      */
     public function back()
     {
@@ -82,6 +94,8 @@ class History
      * @return Request A Request instance
      *
      * @throws \LogicException if the stack is already on the last page
+     *
+     * @since v2.0.0
      */
     public function forward()
     {
@@ -98,6 +112,8 @@ class History
      * @return Request A Request instance
      *
      * @throws \LogicException if the stack is empty
+     *
+     * @since v2.0.0
      */
     public function current()
     {

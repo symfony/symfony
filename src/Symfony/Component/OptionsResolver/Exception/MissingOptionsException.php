@@ -15,6 +15,8 @@ namespace Symfony\Component\OptionsResolver\Exception;
  * Exception thrown when a required option is missing.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.1.0
  */
 class MissingOptionsException extends \InvalidArgumentException implements ExceptionInterface
 {

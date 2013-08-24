@@ -19,6 +19,8 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
  * SecurityHelper provides read-only access to the security context.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class SecurityHelper extends Helper
 {
@@ -28,12 +30,17 @@ class SecurityHelper extends Helper
      * Constructor.
      *
      * @param SecurityContextInterface $context A SecurityContext instance
+     *
+     * @since v2.0.0
      */
     public function __construct(SecurityContextInterface $context = null)
     {
         $this->context = $context;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function isGranted($role, $object = null, $field = null)
     {
         if (null === $this->context) {
@@ -51,6 +58,8 @@ class SecurityHelper extends Helper
      * Returns the canonical name of this helper.
      *
      * @return string The canonical name
+     *
+     * @since v2.0.0
      */
     public function getName()
     {

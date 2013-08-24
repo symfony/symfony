@@ -18,16 +18,24 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
  * SecurityExtension exposes security context features.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class SecurityExtension extends \Twig_Extension
 {
     private $context;
 
+    /**
+     * @since v2.0.0
+     */
     public function __construct(SecurityContextInterface $context = null)
     {
         $this->context = $context;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function isGranted($role, $object = null, $field = null)
     {
         if (null === $this->context) {
@@ -43,6 +51,8 @@ class SecurityExtension extends \Twig_Extension
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getFunctions()
     {
@@ -55,6 +65,8 @@ class SecurityExtension extends \Twig_Extension
      * Returns the name of the extension.
      *
      * @return string The extension name
+     *
+     * @since v2.0.0
      */
     public function getName()
     {

@@ -26,6 +26,8 @@ interface FileLocatorInterface
      * @return string|array The full path to the file|An array of file paths
      *
      * @throws \InvalidArgumentException When file is not found
+     *
+     * @since v2.1.0
      */
     public function locate($name, $currentPath = null, $first = true);
 }

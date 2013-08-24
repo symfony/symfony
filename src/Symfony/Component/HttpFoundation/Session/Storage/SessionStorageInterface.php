@@ -32,6 +32,8 @@ interface SessionStorageInterface
      * @return boolean True if started.
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function start();
 
@@ -39,6 +41,8 @@ interface SessionStorageInterface
      * Checks if the session is started.
      *
      * @return boolean True if started, false otherwise.
+     *
+     * @since v2.1.0
      */
     public function isStarted();
 
@@ -48,6 +52,8 @@ interface SessionStorageInterface
      * @return string The session ID or empty.
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function getId();
 
@@ -57,6 +63,8 @@ interface SessionStorageInterface
      * @param string $id
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function setId($id);
 
@@ -66,6 +74,8 @@ interface SessionStorageInterface
      * @return mixed The session name.
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function getName();
 
@@ -75,6 +85,8 @@ interface SessionStorageInterface
      * @param string $name
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function setName($name);
 
@@ -100,6 +112,8 @@ interface SessionStorageInterface
      * @throws \RuntimeException If an error occurs while regenerating this storage
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function regenerate($destroy = false, $lifetime = null);
 
@@ -113,11 +127,15 @@ interface SessionStorageInterface
      *
      * @throws \RuntimeException If the session is saved without being started, or if the session
      *                           is already closed.
+     *
+     * @since v2.1.0
      */
     public function save();
 
     /**
      * Clear all session data in memory.
+     *
+     * @since v2.1.0
      */
     public function clear();
 
@@ -129,6 +147,8 @@ interface SessionStorageInterface
      * @return SessionBagInterface
      *
      * @throws \InvalidArgumentException If the bag does not exist
+     *
+     * @since v2.1.0
      */
     public function getBag($name);
 
@@ -136,11 +156,15 @@ interface SessionStorageInterface
      * Registers a SessionBagInterface for use.
      *
      * @param SessionBagInterface $bag
+     *
+     * @since v2.1.0
      */
     public function registerBag(SessionBagInterface $bag);
 
     /**
      * @return MetadataBag
+     *
+     * @since v2.1.0
      */
     public function getMetadataBag();
 }

@@ -22,6 +22,8 @@ namespace Symfony\Component\ClassLoader;
  * @author Christophe Coevoet <stof@notk.org>
  *
  * @api
+ *
+ * @since v2.1.0
  */
 class DebugClassLoader
 {
@@ -33,6 +35,8 @@ class DebugClassLoader
      * @param object $classFinder
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function __construct($classFinder)
     {
@@ -51,6 +55,8 @@ class DebugClassLoader
 
     /**
      * Replaces all autoloaders implementing a findFile method by a DebugClassLoader wrapper.
+     *
+     * @since v2.1.0
      */
     public static function enable()
     {
@@ -73,6 +79,8 @@ class DebugClassLoader
 
     /**
      * Unregisters this instance as an autoloader.
+     *
+     * @since v2.1.0
      */
     public function unregister()
     {
@@ -85,6 +93,8 @@ class DebugClassLoader
      * @param string $class A class name to resolve to file
      *
      * @return string|null
+     *
+     * @since v2.1.10
      */
     public function findFile($class)
     {
@@ -99,6 +109,8 @@ class DebugClassLoader
      * @return Boolean|null True, if loaded
      *
      * @throws \RuntimeException
+     *
+     * @since v2.1.0
      */
     public function loadClass($class)
     {

@@ -13,6 +13,8 @@ namespace Symfony\Component\Finder\Exception;
 
 /**
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @since v2.3.0
  */
 class AccessDeniedException extends \UnexpectedValueException
 {

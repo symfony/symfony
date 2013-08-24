@@ -24,6 +24,8 @@ interface SecureRandomInterface
      * @param integer $nbBytes
      *
      * @return string
+     *
+     * @since v2.2.0
      */
     public function nextBytes($nbBytes);
 }

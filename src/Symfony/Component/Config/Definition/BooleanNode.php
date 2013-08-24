@@ -17,11 +17,15 @@ use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
  * This node represents a Boolean value in the config tree.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class BooleanNode extends ScalarNode
 {
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     protected function validateType($value)
     {

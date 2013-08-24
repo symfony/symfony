@@ -20,6 +20,8 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class All extends Constraint
 {
@@ -27,6 +29,8 @@ class All extends Constraint
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function __construct($options = null)
     {
@@ -47,11 +51,17 @@ class All extends Constraint
         }
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getDefaultOption()
     {
         return 'constraints';
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getRequiredOptions()
     {
         return array('constraints');

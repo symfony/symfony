@@ -22,6 +22,8 @@ use Symfony\Component\CssSelector\Parser\Tokenizer\Tokenizer;
  * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @since v2.3.0
  */
 class Parser implements ParserInterface
 {
@@ -34,6 +36,8 @@ class Parser implements ParserInterface
      * Constructor.
      *
      * @param null|Tokenizer $tokenizer
+     *
+     * @since v2.3.0
      */
     public function __construct(Tokenizer $tokenizer = null)
     {
@@ -42,6 +46,8 @@ class Parser implements ParserInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function parse($source)
     {
@@ -59,6 +65,8 @@ class Parser implements ParserInterface
      * @throws SyntaxErrorException
      *
      * @return array
+     *
+     * @since v2.3.0
      */
     public static function parseSeries(array $tokens)
     {
@@ -106,6 +114,8 @@ class Parser implements ParserInterface
      * @param TokenStream $stream
      *
      * @return array
+     *
+     * @since v2.3.0
      */
     private function parseSelectorList(TokenStream $stream)
     {
@@ -134,6 +144,8 @@ class Parser implements ParserInterface
      * @throws SyntaxErrorException
      *
      * @return Node\SelectorNode
+     *
+     * @since v2.3.0
      */
     private function parserSelectorNode(TokenStream $stream)
     {
@@ -174,6 +186,8 @@ class Parser implements ParserInterface
      * @throws SyntaxErrorException
      *
      * @return array
+     *
+     * @since v2.3.0
      */
     private function parseSimpleSelector(TokenStream $stream, $insideNegation = false)
     {
@@ -295,6 +309,8 @@ class Parser implements ParserInterface
      * @param TokenStream $stream
      *
      * @return Node\ElementNode
+     *
+     * @since v2.3.0
      */
     private function parseElementNode(TokenStream $stream)
     {
@@ -331,6 +347,8 @@ class Parser implements ParserInterface
      * @throws SyntaxErrorException
      *
      * @return Node\AttributeNode
+     *
+     * @since v2.3.0
      */
     private function parseAttributeNode(Node\NodeInterface $selector, TokenStream $stream)
     {

@@ -17,6 +17,8 @@ namespace Symfony\Component\HttpFoundation\Session\Flash;
  * \IteratorAggregate implementation is deprecated and will be removed in 3.0.
  *
  * @author Drak <drak@zikula.org>
+ *
+ * @since v2.3.0
  */
 class FlashBag implements FlashBagInterface, \IteratorAggregate
 {
@@ -40,6 +42,8 @@ class FlashBag implements FlashBagInterface, \IteratorAggregate
      * Constructor.
      *
      * @param string $storageKey The key used to store flashes in the session.
+     *
+     * @since v2.1.0
      */
     public function __construct($storageKey = '_sf2_flashes')
     {
@@ -48,12 +52,17 @@ class FlashBag implements FlashBagInterface, \IteratorAggregate
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getName()
     {
         return $this->name;
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function setName($name)
     {
         $this->name = $name;
@@ -61,6 +70,8 @@ class FlashBag implements FlashBagInterface, \IteratorAggregate
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function initialize(array &$flashes)
     {
@@ -69,6 +80,8 @@ class FlashBag implements FlashBagInterface, \IteratorAggregate
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function add($type, $message)
     {
@@ -85,6 +98,8 @@ class FlashBag implements FlashBagInterface, \IteratorAggregate
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function peekAll()
     {
@@ -93,6 +108,8 @@ class FlashBag implements FlashBagInterface, \IteratorAggregate
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function get($type, array $default = array())
     {
@@ -109,6 +126,8 @@ class FlashBag implements FlashBagInterface, \IteratorAggregate
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function all()
     {
@@ -120,6 +139,8 @@ class FlashBag implements FlashBagInterface, \IteratorAggregate
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function set($type, $messages)
     {
@@ -128,6 +149,8 @@ class FlashBag implements FlashBagInterface, \IteratorAggregate
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function setAll(array $messages)
     {
@@ -136,6 +159,8 @@ class FlashBag implements FlashBagInterface, \IteratorAggregate
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function has($type)
     {
@@ -144,6 +169,8 @@ class FlashBag implements FlashBagInterface, \IteratorAggregate
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function keys()
     {
@@ -152,6 +179,8 @@ class FlashBag implements FlashBagInterface, \IteratorAggregate
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getStorageKey()
     {
@@ -160,6 +189,8 @@ class FlashBag implements FlashBagInterface, \IteratorAggregate
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function clear()
     {
@@ -172,6 +203,8 @@ class FlashBag implements FlashBagInterface, \IteratorAggregate
      * @deprecated Will be removed in 3.0.
      *
      * @return \ArrayIterator An \ArrayIterator instance
+     *
+     * @since v2.1.0
      */
     public function getIterator()
     {

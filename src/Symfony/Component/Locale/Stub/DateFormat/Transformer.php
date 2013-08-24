@@ -21,6 +21,8 @@ use Symfony\Component\Intl\DateFormatter\DateFormat\Transformer as BaseTransform
  * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
  *             {@link \Symfony\Component\Intl\DateFormatter\DateFormat\Transformer}
  *             instead.
+ *
+ * @since v2.3.0
  */
 abstract class Transformer extends BaseTransformer
 {

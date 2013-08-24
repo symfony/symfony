@@ -15,6 +15,8 @@ namespace Symfony\Component\Form;
  * A builder for {@link SubmitButton} instances.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.3.0
  */
 class SubmitButtonBuilder extends ButtonBuilder
 {
@@ -22,6 +24,8 @@ class SubmitButtonBuilder extends ButtonBuilder
      * Creates the button.
      *
      * @return Button The button
+     *
+     * @since v2.3.0
      */
     public function getForm()
     {

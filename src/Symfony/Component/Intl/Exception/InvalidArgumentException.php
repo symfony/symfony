@@ -15,6 +15,8 @@ namespace Symfony\Component\Intl\Exception;
  * InvalidArgumentException for the Intl component.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.3.0
  */
 class InvalidArgumentException extends \InvalidArgumentException implements ExceptionInterface
 {

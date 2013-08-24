@@ -18,6 +18,8 @@ namespace Symfony\Component\HttpFoundation;
  * sorted by descending quality.
  *
  * @author Jean-François Simon <contact@jfsimon.fr>
+ *
+ * @since v2.2.0
  */
 class AcceptHeader
 {
@@ -35,6 +37,8 @@ class AcceptHeader
      * Constructor.
      *
      * @param AcceptHeaderItem[] $items
+     *
+     * @since v2.2.0
      */
     public function __construct(array $items)
     {
@@ -49,6 +53,8 @@ class AcceptHeader
      * @param string $headerValue
      *
      * @return AcceptHeader
+     *
+     * @since v2.2.0
      */
     public static function fromString($headerValue)
     {
@@ -66,6 +72,8 @@ class AcceptHeader
      * Returns header value's string representation.
      *
      * @return string
+     *
+     * @since v2.2.0
      */
     public function __toString()
     {
@@ -78,6 +86,8 @@ class AcceptHeader
      * @param string $value
      *
      * @return Boolean
+     *
+     * @since v2.2.0
      */
     public function has($value)
     {
@@ -90,6 +100,8 @@ class AcceptHeader
      * @param string $value
      *
      * @return AcceptHeaderItem|null
+     *
+     * @since v2.2.0
      */
     public function get($value)
     {
@@ -102,6 +114,8 @@ class AcceptHeader
      * @param AcceptHeaderItem $item
      *
      * @return AcceptHeader
+     *
+     * @since v2.2.0
      */
     public function add(AcceptHeaderItem $item)
     {
@@ -115,6 +129,8 @@ class AcceptHeader
      * Returns all items.
      *
      * @return AcceptHeaderItem[]
+     *
+     * @since v2.2.0
      */
     public function all()
     {
@@ -129,6 +145,8 @@ class AcceptHeader
      * @param string $pattern
      *
      * @return AcceptHeader
+     *
+     * @since v2.2.0
      */
     public function filter($pattern)
     {
@@ -141,6 +159,8 @@ class AcceptHeader
      * Returns first item.
      *
      * @return AcceptHeaderItem|null
+     *
+     * @since v2.2.0
      */
     public function first()
     {
@@ -151,6 +171,8 @@ class AcceptHeader
 
     /**
      * Sorts items by descending quality
+     *
+     * @since v2.2.0
      */
     private function sort()
     {

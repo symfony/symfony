@@ -25,6 +25,9 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
+/**
+ * @since v2.1.0
+ */
 abstract class DoctrineType extends AbstractType
 {
     /**
@@ -42,12 +45,18 @@ abstract class DoctrineType extends AbstractType
      */
     private $propertyAccessor;
 
+    /**
+     * @since v2.2.0
+     */
     public function __construct(ManagerRegistry $registry, PropertyAccessorInterface $propertyAccessor = null)
     {
         $this->registry = $registry;
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::getPropertyAccessor();
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if ($options['multiple']) {
@@ -58,6 +67,9 @@ abstract class DoctrineType extends AbstractType
         }
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $choiceListCache =& $this->choiceListCache;
@@ -183,9 +195,14 @@ abstract class DoctrineType extends AbstractType
      * @param string        $class
      *
      * @return EntityLoaderInterface
+     *
+     * @since v2.1.0
      */
     abstract public function getLoader(ObjectManager $manager, $queryBuilder, $class);
 
+    /**
+     * @since v2.1.0
+     */
     public function getParent()
     {
         return 'choice';

@@ -17,6 +17,8 @@ namespace Symfony\Component\Finder\Iterator;
  * @see https://bugs.php.net/bug.php?id=49104
  *
  * @author Alex Bogomazov
+ *
+ * @since v2.1.0
  */
 abstract class FilterIterator extends \FilterIterator
 {
@@ -25,6 +27,8 @@ abstract class FilterIterator extends \FilterIterator
      * rewind in some cases.
      *
      * @see FilterIterator::rewind()
+     *
+     * @since v2.1.0
      */
     public function rewind()
     {

@@ -18,6 +18,8 @@ use Psr\Log\LoggerInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.2.0
  */
 final class SecureRandom implements SecureRandomInterface
 {
@@ -36,6 +38,8 @@ final class SecureRandom implements SecureRandomInterface
      *
      * @param string          $seedFile
      * @param LoggerInterface $logger
+     *
+     * @since v2.2.0
      */
     public function __construct($seedFile = null, LoggerInterface $logger = null)
     {
@@ -57,6 +61,8 @@ final class SecureRandom implements SecureRandomInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function nextBytes($nbBytes)
     {
@@ -98,11 +104,17 @@ final class SecureRandom implements SecureRandomInterface
         return substr($bytes, 0, $nbBytes);
     }
 
+    /**
+     * @since v2.2.0
+     */
     private function readSeed()
     {
         return json_decode(file_get_contents($this->seedFile));
     }
 
+    /**
+     * @since v2.2.0
+     */
     private function updateSeed()
     {
         if (!$this->seedUpdated && $this->seedLastUpdatedAt < time() - mt_rand(1, 10)) {

@@ -24,6 +24,8 @@ interface PropertyMetadataContainerInterface
      * @param string $property The property name.
      *
      * @return Boolean
+     *
+     * @since v2.2.0
      */
     public function hasPropertyMetadata($property);
 
@@ -37,6 +39,8 @@ interface PropertyMetadataContainerInterface
      *
      * @return PropertyMetadataInterface[] A list of metadata instances. Empty if
      *                                     no metadata exists for the property.
+     *
+     * @since v2.2.0
      */
     public function getPropertyMetadata($property);
 }

@@ -15,11 +15,15 @@ namespace Symfony\Component\ClassLoader;
  * Checks that the class is actually declared in the included file.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class DebugUniversalClassLoader extends UniversalClassLoader
 {
     /**
      * Replaces all regular UniversalClassLoader instances by a DebugUniversalClassLoader ones.
+     *
+     * @since v2.1.0
      */
     public static function enable()
     {
@@ -49,6 +53,8 @@ class DebugUniversalClassLoader extends UniversalClassLoader
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function loadClass($class)
     {

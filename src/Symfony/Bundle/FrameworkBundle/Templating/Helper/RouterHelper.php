@@ -18,6 +18,8 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  * RouterHelper manages links between pages in a template context.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class RouterHelper extends Helper
 {
@@ -27,6 +29,8 @@ class RouterHelper extends Helper
      * Constructor.
      *
      * @param UrlGeneratorInterface $router A Router instance
+     *
+     * @since v2.0.0
      */
     public function __construct(UrlGeneratorInterface $router)
     {
@@ -43,6 +47,8 @@ class RouterHelper extends Helper
      * @return string The generated URL
      *
      * @see UrlGeneratorInterface
+     *
+     * @since v2.2.0
      */
     public function generate($name, $parameters = array(), $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH)
     {
@@ -53,6 +59,8 @@ class RouterHelper extends Helper
      * Returns the canonical name of this helper.
      *
      * @return string The canonical name
+     *
+     * @since v2.0.0
      */
     public function getName()
     {

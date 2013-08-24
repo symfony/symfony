@@ -22,6 +22,9 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
+/**
+ * @since v2.3.0
+ */
 class FormType extends BaseType
 {
     /**
@@ -29,6 +32,9 @@ class FormType extends BaseType
      */
     private $propertyAccessor;
 
+    /**
+     * @since v2.2.0
+     */
     public function __construct(PropertyAccessorInterface $propertyAccessor = null)
     {
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::getPropertyAccessor();
@@ -36,6 +42,8 @@ class FormType extends BaseType
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -64,6 +72,8 @@ class FormType extends BaseType
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
@@ -102,6 +112,8 @@ class FormType extends BaseType
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
@@ -119,6 +131,8 @@ class FormType extends BaseType
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
@@ -196,6 +210,8 @@ class FormType extends BaseType
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getParent()
     {
@@ -204,6 +220,8 @@ class FormType extends BaseType
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getName()
     {

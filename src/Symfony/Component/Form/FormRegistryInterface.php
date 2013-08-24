@@ -29,6 +29,8 @@ interface FormRegistryInterface
      *
      * @throws Exception\UnexpectedTypeException  if the passed name is not a string
      * @throws Exception\InvalidArgumentException if the type can not be retrieved from any extension
+     *
+     * @since v2.1.0
      */
     public function getType($name);
 
@@ -38,6 +40,8 @@ interface FormRegistryInterface
      * @param string $name The name of the type
      *
      * @return Boolean Whether the type is supported
+     *
+     * @since v2.1.0
      */
     public function hasType($name);
 
@@ -45,6 +49,8 @@ interface FormRegistryInterface
      * Returns the guesser responsible for guessing types.
      *
      * @return FormTypeGuesserInterface|null
+     *
+     * @since v2.1.0
      */
     public function getTypeGuesser();
 
@@ -52,6 +58,8 @@ interface FormRegistryInterface
      * Returns the extensions loaded by the framework.
      *
      * @return array
+     *
+     * @since v2.1.0
      */
     public function getExtensions();
 }

@@ -20,9 +20,14 @@ use Symfony\Component\DependencyInjection\Exception\LogicException;
  * Adds services tagged twig.loader as Twig loaders
  *
  * @author Daniel Leech <daniel@dantleech.com>
+ *
+ * @since v2.2.0
  */
 class TwigLoaderPass implements CompilerPassInterface
 {
+    /**
+     * @since v2.2.0
+     */
     public function process(ContainerBuilder $container)
     {
         if (false === $container->hasDefinition('twig')) {

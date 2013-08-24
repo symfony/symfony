@@ -24,6 +24,8 @@ use Symfony\Component\CssSelector\Parser\Tokenizer\TokenizerPatterns;
  * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @since v2.3.0
  */
 class HashHandler implements HandlerInterface
 {
@@ -40,6 +42,8 @@ class HashHandler implements HandlerInterface
     /**
      * @param TokenizerPatterns $patterns
      * @param TokenizerEscaping $escaping
+     *
+     * @since v2.3.0
      */
     public function __construct(TokenizerPatterns $patterns, TokenizerEscaping $escaping)
     {
@@ -49,6 +53,8 @@ class HashHandler implements HandlerInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function handle(Reader $reader, TokenStream $stream)
     {

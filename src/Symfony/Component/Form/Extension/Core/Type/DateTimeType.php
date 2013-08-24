@@ -27,6 +27,9 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\ArrayToPartsTransforme
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+/**
+ * @since v2.0.0
+ */
 class DateTimeType extends AbstractType
 {
     const DEFAULT_DATE_FORMAT = \IntlDateFormatter::MEDIUM;
@@ -66,6 +69,8 @@ class DateTimeType extends AbstractType
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -175,6 +180,8 @@ class DateTimeType extends AbstractType
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
@@ -190,6 +197,8 @@ class DateTimeType extends AbstractType
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
@@ -273,6 +282,8 @@ class DateTimeType extends AbstractType
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getName()
     {

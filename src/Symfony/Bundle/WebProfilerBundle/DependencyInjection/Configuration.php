@@ -21,6 +21,8 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  * sections are normalized, and merged.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class Configuration implements ConfigurationInterface
 {
@@ -28,6 +30,8 @@ class Configuration implements ConfigurationInterface
      * Generates the configuration tree builder.
      *
      * @return \Symfony\Component\Config\Definition\Builder\TreeBuilder The tree builder
+     *
+     * @since v2.0.0
      */
     public function getConfigTreeBuilder()
     {

@@ -29,6 +29,8 @@ use Symfony\Component\Security\Core\Exception\BadCredentialsException;
  * for instance).
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 abstract class AbstractPreAuthenticatedListener implements ListenerInterface
 {
@@ -38,6 +40,9 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
     private $providerKey;
     private $dispatcher;
 
+    /**
+     * @since v2.0.0
+     */
     public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, $providerKey, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->securityContext = $securityContext;
@@ -51,6 +56,8 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
      * Handles pre-authentication.
      *
      * @param GetResponseEvent $event A GetResponseEvent instance
+     *
+     * @since v2.1.0
      */
     final public function handle(GetResponseEvent $event)
     {
@@ -97,6 +104,8 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
 
     /**
      * Clears a PreAuthenticatedToken for this provider (if present)
+     *
+     * @since v2.2.5
      */
     protected function clearToken()
     {
@@ -116,6 +125,8 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
      * @param Request $request A Request instance
      *
      * @return array An array composed of the user and the credentials
+     *
+     * @since v2.0.0
      */
     abstract protected function getPreAuthenticatedData(Request $request);
 }

@@ -20,16 +20,24 @@ use Symfony\Component\Security\Http\Firewall\ExceptionListener;
  * of the website.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class FirewallMap implements FirewallMapInterface
 {
     private $map = array();
 
+    /**
+     * @since v2.0.0
+     */
     public function add(RequestMatcherInterface $requestMatcher = null, array $listeners = array(), ExceptionListener $exceptionListener = null)
     {
         $this->map[] = array($requestMatcher, $listeners, $exceptionListener);
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getListeners(Request $request)
     {
         foreach ($this->map as $elements) {

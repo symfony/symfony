@@ -15,18 +15,26 @@ namespace Symfony\Component\HttpKernel\CacheWarmer;
  * Aggregates several cache warmers into a single one.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class CacheWarmerAggregate implements CacheWarmerInterface
 {
     protected $warmers;
     protected $optionalsEnabled;
 
+    /**
+     * @since v2.0.0
+     */
     public function __construct(array $warmers = array())
     {
         $this->setWarmers($warmers);
         $this->optionalsEnabled = false;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function enableOptionalWarmers()
     {
         $this->optionalsEnabled = true;
@@ -36,6 +44,8 @@ class CacheWarmerAggregate implements CacheWarmerInterface
      * Warms up the cache.
      *
      * @param string $cacheDir The cache directory
+     *
+     * @since v2.0.0
      */
     public function warmUp($cacheDir)
     {
@@ -52,12 +62,17 @@ class CacheWarmerAggregate implements CacheWarmerInterface
      * Checks whether this warmer is optional or not.
      *
      * @return Boolean always true
+     *
+     * @since v2.0.0
      */
     public function isOptional()
     {
         return false;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function setWarmers(array $warmers)
     {
         $this->warmers = array();
@@ -66,6 +81,9 @@ class CacheWarmerAggregate implements CacheWarmerInterface
         }
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function add(CacheWarmerInterface $warmer)
     {
         $this->warmers[] = $warmer;

@@ -17,6 +17,8 @@ use Symfony\Component\Routing\Route;
  * Container for a Route.
  *
  * @author Arnaud Le Blanc <arnaud.lb@gmail.com>
+ *
+ * @since v2.2.0
  */
 class DumperRoute
 {
@@ -35,6 +37,8 @@ class DumperRoute
      *
      * @param string $name  The route name
      * @param Route  $route The route
+     *
+     * @since v2.2.0
      */
     public function __construct($name, Route $route)
     {
@@ -46,6 +50,8 @@ class DumperRoute
      * Returns the route name.
      *
      * @return string The route name
+     *
+     * @since v2.2.0
      */
     public function getName()
     {
@@ -56,6 +62,8 @@ class DumperRoute
      * Returns the route.
      *
      * @return Route The route
+     *
+     * @since v2.2.0
      */
     public function getRoute()
     {

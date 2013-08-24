@@ -19,6 +19,8 @@ use Symfony\Component\Intl\DateFormatter\DateFormat\MonthTransformer;
  * Parser and formatter for date formats
  *
  * @author Igor Wiedler <igor@wiedler.ch>
+ *
+ * @since v2.3.0
  */
 class FullTransformer
 {
@@ -40,6 +42,8 @@ class FullTransformer
      *
      * @param string $pattern  The pattern to be used to format and/or parse values
      * @param string $timezone The timezone to perform the date/time calculations
+     *
+     * @since v2.3.0
      */
     public function __construct($pattern, $timezone)
     {
@@ -74,6 +78,8 @@ class FullTransformer
      * Return the array of Transformer objects
      *
      * @return Transformer[] Associative array of Transformer objects (format char => Transformer)
+     *
+     * @since v2.3.0
      */
     public function getTransformers()
     {
@@ -86,6 +92,8 @@ class FullTransformer
      * @param \DateTime $dateTime A DateTime object to be used to generate the formatted value
      *
      * @return string               The formatted value
+     *
+     * @since v2.3.0
      */
     public function format(\DateTime $dateTime)
     {
@@ -107,6 +115,8 @@ class FullTransformer
      * @return string                   The formatted value
      *
      * @throws NotImplementedException  When it encounters a not implemented date character
+     *
+     * @since v2.3.0
      */
     public function formatReplace($dateChars, $dateTime)
     {
@@ -137,6 +147,8 @@ class FullTransformer
      * @return int                       The corresponding Unix timestamp
      *
      * @throws \InvalidArgumentException  When the value can not be matched with pattern
+     *
+     * @since v2.3.0
      */
     public function parse(\DateTime $dateTime, $value)
     {
@@ -174,6 +186,8 @@ class FullTransformer
      *
      * @return string            The reverse matching regular expression with named captures being formed by the
      *                           transformer index in the $transformer array
+     *
+     * @since v2.3.0
      */
     public function getReverseMatchingRegExp($pattern)
     {
@@ -212,6 +226,8 @@ class FullTransformer
      * @param string $quoteMatch The string to check
      *
      * @return Boolean              true if matches, false otherwise
+     *
+     * @since v2.3.0
      */
     public function isQuoteMatch($quoteMatch)
     {
@@ -224,6 +240,8 @@ class FullTransformer
      * @param string $quoteMatch The string to replace the quotes
      *
      * @return string               A string with the single quotes replaced
+     *
+     * @since v2.3.0
      */
     public function replaceQuoteMatch($quoteMatch)
     {
@@ -240,6 +258,8 @@ class FullTransformer
      * @param string $specialChars A string of chars to build the regular expression
      *
      * @return string                 The chars match regular expression
+     *
+     * @since v2.3.0
      */
     protected function buildCharsMatch($specialChars)
     {
@@ -259,6 +279,8 @@ class FullTransformer
      * @param array $data
      *
      * @return array
+     *
+     * @since v2.3.0
      */
     protected function normalizeArray(array $data)
     {
@@ -286,6 +308,8 @@ class FullTransformer
      * @param array     $options  An array with the matched values to be used to calculate the timestamp
      *
      * @return Boolean|int        The calculated timestamp or false if matched date is invalid
+     *
+     * @since v2.3.0
      */
     protected function calculateUnixTimestamp(\DateTime $dateTime, array $options)
     {
@@ -338,6 +362,8 @@ class FullTransformer
      * @param array $options
      *
      * @return array
+     *
+     * @since v2.3.0
      */
     private function getDefaultValueForOptions(array $options)
     {

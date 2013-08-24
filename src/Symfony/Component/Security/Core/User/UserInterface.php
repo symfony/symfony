@@ -46,6 +46,8 @@ interface UserInterface
      * is created.
      *
      * @return Role[] The user roles
+     *
+     * @since v2.1.0
      */
     public function getRoles();
 
@@ -56,6 +58,8 @@ interface UserInterface
      * password will be salted, encoded, and then compared to this value.
      *
      * @return string The password
+     *
+     * @since v2.1.0
      */
     public function getPassword();
 
@@ -65,6 +69,8 @@ interface UserInterface
      * This can return null if the password was not encoded using a salt.
      *
      * @return string The salt
+     *
+     * @since v2.1.0
      */
     public function getSalt();
 
@@ -72,6 +78,8 @@ interface UserInterface
      * Returns the username used to authenticate the user.
      *
      * @return string The username
+     *
+     * @since v2.1.0
      */
     public function getUsername();
 
@@ -82,6 +90,8 @@ interface UserInterface
      * the plain-text password is stored on this object.
      *
      * @return void
+     *
+     * @since v2.1.0
      */
     public function eraseCredentials();
 }

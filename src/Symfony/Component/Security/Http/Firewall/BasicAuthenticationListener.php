@@ -23,6 +23,8 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
  * BasicAuthenticationListener implements Basic HTTP authentication.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class BasicAuthenticationListener implements ListenerInterface
 {
@@ -33,6 +35,9 @@ class BasicAuthenticationListener implements ListenerInterface
     private $logger;
     private $ignoreFailure;
 
+    /**
+     * @since v2.0.0
+     */
     public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, $providerKey, AuthenticationEntryPointInterface $authenticationEntryPoint, LoggerInterface $logger = null)
     {
         if (empty($providerKey)) {
@@ -51,6 +56,8 @@ class BasicAuthenticationListener implements ListenerInterface
      * Handles basic authentication.
      *
      * @param GetResponseEvent $event A GetResponseEvent instance
+     *
+     * @since v2.0.0
      */
     public function handle(GetResponseEvent $event)
     {

@@ -16,6 +16,8 @@ use Symfony\Component\Console\Command\Command;
 
 /**
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @since v2.3.0
  */
 class ApplicationDescription
 {
@@ -51,6 +53,8 @@ class ApplicationDescription
      *
      * @param Application $application
      * @param string|null $namespace
+     *
+     * @since v2.3.0
      */
     public function __construct(Application $application, $namespace = null)
     {
@@ -60,6 +64,8 @@ class ApplicationDescription
 
     /**
      * @return array
+     *
+     * @since v2.3.0
      */
     public function getNamespaces()
     {
@@ -72,6 +78,8 @@ class ApplicationDescription
 
     /**
      * @return Command[]
+     *
+     * @since v2.3.0
      */
     public function getCommands()
     {
@@ -88,6 +96,8 @@ class ApplicationDescription
      * @return Command
      *
      * @throws \InvalidArgumentException
+     *
+     * @since v2.3.0
      */
     public function getCommand($name)
     {
@@ -98,6 +108,9 @@ class ApplicationDescription
         return isset($this->commands[$name]) ? $this->commands[$name] : $this->aliases[$name];
     }
 
+    /**
+     * @since v2.3.0
+     */
     private function inspectApplication()
     {
         $this->commands = array();
@@ -130,6 +143,8 @@ class ApplicationDescription
      * @param array $commands
      *
      * @return array
+     *
+     * @since v2.3.0
      */
     private function sortCommands(array $commands)
     {

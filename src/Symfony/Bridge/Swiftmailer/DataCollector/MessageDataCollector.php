@@ -24,6 +24,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @deprecated Deprecated since version 2.4, to be removed in 3.0. Use
  *             MessageDataCollector of SwiftmailerBundle instead.
+ *
+ * @since v2.0.0
  */
 class MessageDataCollector extends DataCollector
 {
@@ -38,6 +40,8 @@ class MessageDataCollector extends DataCollector
      *
      * @param ContainerInterface $container A ContainerInterface instance
      * @param Boolean            $isSpool
+     *
+     * @since v2.0.0
      */
     public function __construct(ContainerInterface $container, $isSpool)
     {
@@ -47,6 +51,8 @@ class MessageDataCollector extends DataCollector
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
@@ -63,16 +69,25 @@ class MessageDataCollector extends DataCollector
         $this->data['isSpool'] = $this->isSpool;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getMessageCount()
     {
         return $this->data['messageCount'];
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getMessages()
     {
         return $this->data['messages'];
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function isSpool()
     {
         return $this->data['isSpool'];
@@ -80,6 +95,8 @@ class MessageDataCollector extends DataCollector
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getName()
     {

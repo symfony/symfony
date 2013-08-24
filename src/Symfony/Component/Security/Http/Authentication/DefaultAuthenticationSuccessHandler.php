@@ -24,6 +24,8 @@ use Symfony\Component\Security\Http\HttpUtils;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  * @author Alexander <iam.asm89@gmail.com>
+ *
+ * @since v2.1.0
  */
 class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandlerInterface
 {
@@ -36,6 +38,8 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
      *
      * @param HttpUtils $httpUtils
      * @param array     $options   Options for processing a successful authentication attempt.
+     *
+     * @since v2.1.0
      */
     public function __construct(HttpUtils $httpUtils, array $options)
     {
@@ -52,6 +56,8 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function onAuthenticationSuccess(Request $request, TokenInterface $token)
     {
@@ -62,6 +68,8 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
      * Get the provider key.
      *
      * @return string
+     *
+     * @since v2.1.0
      */
     public function getProviderKey()
     {
@@ -72,6 +80,8 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
      * Set the provider key.
      *
      * @param string $providerKey
+     *
+     * @since v2.1.0
      */
     public function setProviderKey($providerKey)
     {
@@ -84,6 +94,8 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
      * @param Request $request
      *
      * @return string
+     *
+     * @since v2.1.0
      */
     protected function determineTargetUrl(Request $request)
     {

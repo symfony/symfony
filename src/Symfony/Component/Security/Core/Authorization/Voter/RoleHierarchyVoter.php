@@ -19,11 +19,16 @@ use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
  * the user before voting.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class RoleHierarchyVoter extends RoleVoter
 {
     private $roleHierarchy;
 
+    /**
+     * @since v2.0.0
+     */
     public function __construct(RoleHierarchyInterface $roleHierarchy, $prefix = 'ROLE_')
     {
         $this->roleHierarchy = $roleHierarchy;
@@ -33,6 +38,8 @@ class RoleHierarchyVoter extends RoleVoter
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     protected function extractRoles(TokenInterface $token)
     {

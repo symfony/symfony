@@ -54,6 +54,8 @@ interface MetadataInterface
      * @param mixed                      $value        The value to validate.
      * @param string|string[]            $group        The validation group to validate in.
      * @param string                     $propertyPath The current property path in the validation graph.
+     *
+     * @since v2.2.0
      */
     public function accept(ValidationVisitorInterface $visitor, $value, $group, $propertyPath);
 
@@ -63,6 +65,8 @@ interface MetadataInterface
      * @param string $group The validation group.
      *
      * @return Constraint[] A list of constraint instances.
+     *
+     * @since v2.2.0
      */
     public function findConstraints($group);
 }

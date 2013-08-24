@@ -18,6 +18,8 @@ use Symfony\Component\Translation\Dumper\DumperInterface;
  * TranslationWriter writes translation messages.
  *
  * @author Michel Salib <michelsalib@hotmail.com>
+ *
+ * @since v2.1.0
  */
 class TranslationWriter
 {
@@ -33,6 +35,8 @@ class TranslationWriter
      *
      * @param string          $format The format of the dumper
      * @param DumperInterface $dumper The dumper
+     *
+     * @since v2.1.0
      */
     public function addDumper($format, DumperInterface $dumper)
     {
@@ -43,6 +47,8 @@ class TranslationWriter
      * Obtains the list of supported formats.
      *
      * @return array
+     *
+     * @since v2.1.0
      */
     public function getFormats()
     {
@@ -57,6 +63,8 @@ class TranslationWriter
      * @param array            $options   Options that are passed to the dumper
      *
      * @throws \InvalidArgumentException
+     *
+     * @since v2.1.0
      */
     public function writeTranslations(MessageCatalogue $catalogue, $format, $options = array())
     {

@@ -23,6 +23,8 @@ use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface;
  * Generates dumped php code of proxies via reflection.
  *
  * @author Marco Pivetta <ocramius@gmail.com>
+ *
+ * @since v2.3.0
  */
 class ProxyDumper implements DumperInterface
 {
@@ -38,6 +40,8 @@ class ProxyDumper implements DumperInterface
 
     /**
      * Constructor
+     *
+     * @since v2.3.0
      */
     public function __construct()
     {
@@ -47,6 +51,8 @@ class ProxyDumper implements DumperInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.3.0
      */
     public function isProxyCandidate(Definition $definition)
     {
@@ -55,6 +61,8 @@ class ProxyDumper implements DumperInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.3.0
      */
     public function getProxyFactoryCode(Definition $definition, $id)
     {
@@ -90,6 +98,8 @@ EOF;
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.3.0
      */
     public function getProxyCode(Definition $definition)
     {
@@ -106,6 +116,8 @@ EOF;
      * @param Definition $definition
      *
      * @return string
+     *
+     * @since v2.3.0
      */
     private function getProxyClassName(Definition $definition)
     {

@@ -15,6 +15,8 @@ namespace Symfony\Component\Intl\DateFormatter\DateFormat;
  * Base class for hour transformers
  *
  * @author Eriksen Costa <eriksen.costa@infranology.com.br>
+ *
+ * @since v2.3.0
  */
 abstract class HourTransformer extends Transformer
 {
@@ -25,6 +27,8 @@ abstract class HourTransformer extends Transformer
      * @param string $marker An optional AM/PM marker
      *
      * @return int              The normalized hour value
+     *
+     * @since v2.3.0
      */
     abstract public function normalizeHour($hour, $marker = null);
 }

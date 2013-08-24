@@ -14,6 +14,9 @@ namespace Symfony\Component\Validator\Mapping\Loader;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Yaml\Parser as YamlParser;
 
+/**
+ * @since v2.0.0
+ */
 class YamlFileLoader extends FileLoader
 {
     private $yamlParser;
@@ -27,6 +30,8 @@ class YamlFileLoader extends FileLoader
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function loadClassMetadata(ClassMetadata $metadata)
     {
@@ -115,6 +120,8 @@ class YamlFileLoader extends FileLoader
      * @param array $nodes The YAML nodes
      *
      * @return array An array of values or Constraint instances
+     *
+     * @since v2.0.0
      */
     protected function parseNodes(array $nodes)
     {

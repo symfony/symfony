@@ -32,6 +32,8 @@ class FilesystemLoader extends Loader
      * @param array $templatePathPatterns An array of path patterns to look for templates
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function __construct($templatePathPatterns)
     {
@@ -46,6 +48,8 @@ class FilesystemLoader extends Loader
      * @return Storage|Boolean false if the template cannot be loaded, a Storage instance otherwise
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function load(TemplateReferenceInterface $template)
     {
@@ -93,6 +97,8 @@ class FilesystemLoader extends Loader
      * @return Boolean true if the template is still fresh, false otherwise
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function isFresh(TemplateReferenceInterface $template, $time)
     {
@@ -109,6 +115,8 @@ class FilesystemLoader extends Loader
      * @param string $file A path
      *
      * @return Boolean true if the path exists and is absolute, false otherwise
+     *
+     * @since v2.1.0
      */
     protected static function isAbsolutePath($file)
     {

@@ -30,6 +30,8 @@ interface SecurityIdentityRetrievalStrategyInterface
      * @param TokenInterface $token
      *
      * @return SecurityIdentityInterface[] An array of SecurityIdentityInterface implementations
+     *
+     * @since v2.1.0
      */
     public function getSecurityIdentities(TokenInterface $token);
 }

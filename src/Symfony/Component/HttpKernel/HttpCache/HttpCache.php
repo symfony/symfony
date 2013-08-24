@@ -27,6 +27,8 @@ use Symfony\Component\HttpKernel\HttpCache\Esi;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.1.0
  */
 class HttpCache implements HttpKernelInterface, TerminableInterface
 {
@@ -76,6 +78,8 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      * @param StoreInterface      $store   A Store instance
      * @param Esi                 $esi     An Esi instance
      * @param array               $options An array of options
+     *
+     * @since v2.0.0
      */
     public function __construct(HttpKernelInterface $kernel, StoreInterface $store, Esi $esi = null, array $options = array())
     {
@@ -102,6 +106,8 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      * Gets the current store.
      *
      * @return StoreInterface $store A StoreInterface instance
+     *
+     * @since v2.0.10
      */
     public function getStore()
     {
@@ -112,6 +118,8 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      * Returns an array of events that took place during processing of the last request.
      *
      * @return array An array of events
+     *
+     * @since v2.0.0
      */
     public function getTraces()
     {
@@ -122,6 +130,8 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      * Returns a log message for the events of the last request processing.
      *
      * @return string A log message
+     *
+     * @since v2.0.0
      */
     public function getLog()
     {
@@ -137,6 +147,8 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      * Gets the Request instance associated with the master request.
      *
      * @return Request A Request instance
+     *
+     * @since v2.0.0
      */
     public function getRequest()
     {
@@ -147,6 +159,8 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      * Gets the Kernel instance
      *
      * @return HttpKernelInterface An HttpKernelInterface instance
+     *
+     * @since v2.0.0
      */
     public function getKernel()
     {
@@ -158,6 +172,8 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      * Gets the Esi instance
      *
      * @return Esi An Esi instance
+     *
+     * @since v2.0.0
      */
     public function getEsi()
     {
@@ -168,6 +184,8 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
@@ -221,6 +239,8 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function terminate(Request $request, Response $response)
     {
@@ -236,6 +256,8 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      * @param Boolean $catch   Whether to process exceptions
      *
      * @return Response A Response instance
+     *
+     * @since v2.0.0
      */
     protected function pass(Request $request, $catch = false)
     {
@@ -255,6 +277,8 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      * @throws \Exception
      *
      * @see RFC2616 13.10
+     *
+     * @since v2.0.0
      */
     protected function invalidate(Request $request, $catch = false)
     {
@@ -302,6 +326,8 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      * @return Response A Response instance
      *
      * @throws \Exception
+     *
+     * @since v2.0.0
      */
     protected function lookup(Request $request, $catch = false)
     {
@@ -354,6 +380,8 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      * @param Boolean  $catch   Whether to process exceptions
      *
      * @return Response A Response instance
+     *
+     * @since v2.0.0
      */
     protected function validate(Request $request, Response $entry, $catch = false)
     {
@@ -415,6 +443,8 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      * @param Boolean $catch   whether to process exceptions
      *
      * @return Response A Response instance
+     *
+     * @since v2.0.0
      */
     protected function fetch(Request $request, $catch = false)
     {
@@ -450,6 +480,8 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      * @param Response $entry   A Response instance (the stale entry if present, null otherwise)
      *
      * @return Response A Response instance
+     *
+     * @since v2.0.0
      */
     protected function forward(Request $request, $catch = false, Response $entry = null)
     {
@@ -498,6 +530,8 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      * @param Response $entry   A Response instance
      *
      * @return Boolean true if the cache entry if fresh enough, false otherwise
+     *
+     * @since v2.0.0
      */
     protected function isFreshEnough(Request $request, Response $entry)
     {
@@ -519,6 +553,8 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      * @param Response $entry   A Response instance
      *
      * @return Boolean true if the cache entry can be returned even if it is staled, false otherwise
+     *
+     * @since v2.0.0
      */
     protected function lock(Request $request, Response $entry)
     {
@@ -577,6 +613,8 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      * @param Response $response A Response instance
      *
      * @throws \Exception
+     *
+     * @since v2.0.0
      */
     protected function store(Request $request, Response $response)
     {
@@ -605,6 +643,8 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      * @param Response $response A Response instance
      *
      * @return Response A Response instance
+     *
+     * @since v2.0.0
      */
     private function restoreResponseBody(Request $request, Response $response)
     {
@@ -639,6 +679,9 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         $response->headers->remove('X-Body-File');
     }
 
+    /**
+     * @since v2.0.0
+     */
     protected function processResponseBody(Request $request, Response $response)
     {
         if (null !== $this->esi && $this->esi->needsEsiParsing($response)) {
@@ -653,6 +696,8 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      * @param Request $request A Request instance
      *
      * @return Boolean true if the Request is private, false otherwise
+     *
+     * @since v2.0.0
      */
     private function isPrivateRequest(Request $request)
     {
@@ -676,6 +721,8 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      *
      * @param Request $request A Request instance
      * @param string  $event   The event name
+     *
+     * @since v2.0.0
      */
     private function record(Request $request, $event)
     {

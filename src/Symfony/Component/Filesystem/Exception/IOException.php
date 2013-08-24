@@ -17,6 +17,8 @@ namespace Symfony\Component\Filesystem\Exception;
  * @author Romain Neutron <imprec@gmail.com>
  *
  * @api
+ *
+ * @since v2.1.0
  */
 class IOException extends \RuntimeException implements ExceptionInterface
 {

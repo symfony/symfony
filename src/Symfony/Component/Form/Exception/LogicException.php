@@ -15,6 +15,8 @@ namespace Symfony\Component\Form\Exception;
  * Base LogicException for Form component.
  *
  * @author Alexander Kotynia <aleksander.kot@gmail.com>
+ *
+ * @since v2.3.0
  */
 class LogicException extends \LogicException implements ExceptionInterface
 {

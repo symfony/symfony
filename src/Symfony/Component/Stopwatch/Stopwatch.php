@@ -15,6 +15,8 @@ namespace Symfony\Component\Stopwatch;
  * Stopwatch provides a way to profile code.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.1.0
  */
 class Stopwatch
 {
@@ -28,6 +30,9 @@ class Stopwatch
      */
     private $activeSections;
 
+    /**
+     * @since v2.1.0
+     */
     public function __construct()
     {
         $this->sections = $this->activeSections = array('__root__' => new Section('__root__'));
@@ -39,6 +44,8 @@ class Stopwatch
      * @param string|null $id The id of the session to re-open, null to create a new one
      *
      * @throws \LogicException When the section to re-open is not reachable
+     *
+     * @since v2.1.0
      */
     public function openSection($id = null)
     {
@@ -63,6 +70,8 @@ class Stopwatch
      * @param string $id The identifier of the section
      *
      * @throws \LogicException When there's no started section to be stopped
+     *
+     * @since v2.1.0
      */
     public function stopSection($id)
     {
@@ -83,6 +92,8 @@ class Stopwatch
      * @param string $category The event category
      *
      * @return StopwatchEvent A StopwatchEvent instance
+     *
+     * @since v2.1.0
      */
     public function start($name, $category = null)
     {
@@ -95,6 +106,8 @@ class Stopwatch
      * @param string $name The event name
      *
      * @return bool
+     *
+     * @since v2.3.0
      */
     public function isStarted($name)
     {
@@ -107,6 +120,8 @@ class Stopwatch
      * @param string $name The event name
      *
      * @return StopwatchEvent A StopwatchEvent instance
+     *
+     * @since v2.1.0
      */
     public function stop($name)
     {
@@ -119,6 +134,8 @@ class Stopwatch
      * @param string $name The event name
      *
      * @return StopwatchEvent A StopwatchEvent instance
+     *
+     * @since v2.1.0
      */
     public function lap($name)
     {
@@ -131,6 +148,8 @@ class Stopwatch
      * @param string $id A section identifier
      *
      * @return StopwatchEvent[] An array of StopwatchEvent instances
+     *
+     * @since v2.1.0
      */
     public function getSectionEvents($id)
     {
@@ -143,6 +162,8 @@ class Stopwatch
  * @internal This class is for internal usage only
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.1.0
  */
 class Section
 {
@@ -170,6 +191,8 @@ class Section
      * Constructor.
      *
      * @param float|null $origin Set the origin of the events in this section, use null to set their origin to their start time
+     *
+     * @since v2.1.0
      */
     public function __construct($origin = null)
     {
@@ -182,6 +205,8 @@ class Section
      * @param string $id The child section identifier
      *
      * @return Section|null The child section or null when none found
+     *
+     * @since v2.1.0
      */
     public function get($id)
     {
@@ -200,6 +225,8 @@ class Section
      * @param string|null $id null to create a new section, the identifier to re-open an existing one.
      *
      * @return Section A child section
+     *
+     * @since v2.1.0
      */
     public function open($id)
     {
@@ -212,6 +239,8 @@ class Section
 
     /**
      * @return string The identifier of the section
+     *
+     * @since v2.1.0
      */
     public function getId()
     {
@@ -224,6 +253,8 @@ class Section
      * @param string $id The session identifier
      *
      * @return Section The current section
+     *
+     * @since v2.1.0
      */
     public function setId($id)
     {
@@ -239,6 +270,8 @@ class Section
      * @param string $category The event category
      *
      * @return StopwatchEvent The event
+     *
+     * @since v2.1.0
      */
     public function startEvent($name, $category)
     {
@@ -255,6 +288,8 @@ class Section
      * @param string $name The event name
      *
      * @return bool
+     *
+     * @since v2.3.0
      */
     public function isEventStarted($name)
     {
@@ -269,6 +304,8 @@ class Section
      * @return StopwatchEvent The event
      *
      * @throws \LogicException When the event has not been started
+     *
+     * @since v2.1.0
      */
     public function stopEvent($name)
     {
@@ -287,6 +324,8 @@ class Section
      * @return StopwatchEvent The event
      *
      * @throws \LogicException When the event has not been started
+     *
+     * @since v2.1.0
      */
     public function lap($name)
     {
@@ -297,6 +336,8 @@ class Section
      * Returns the events from this section.
      *
      * @return StopwatchEvent[] An array of StopwatchEvent instances
+     *
+     * @since v2.1.0
      */
     public function getEvents()
     {

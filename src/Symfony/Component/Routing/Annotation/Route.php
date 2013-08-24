@@ -17,6 +17,8 @@ namespace Symfony\Component\Routing\Annotation;
  * @Annotation
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class Route
 {
@@ -35,6 +37,8 @@ class Route
      * @param array $data An array of key/value parameters.
      *
      * @throws \BadMethodCallException
+     *
+     * @since v2.0.0
      */
     public function __construct(array $data)
     {
@@ -60,6 +64,8 @@ class Route
 
     /**
      * @deprecated Deprecated in 2.2, to be removed in 3.0. Use setPath instead.
+     *
+     * @since v2.0.0
      */
     public function setPattern($pattern)
     {
@@ -68,87 +74,137 @@ class Route
 
     /**
      * @deprecated Deprecated in 2.2, to be removed in 3.0. Use getPath instead.
+     *
+     * @since v2.0.0
      */
     public function getPattern()
     {
         return $this->path;
     }
 
+    /**
+     * @since v2.2.0
+     */
     public function setPath($path)
     {
         $this->path = $path;
     }
 
+    /**
+     * @since v2.2.0
+     */
     public function getPath()
     {
         return $this->path;
     }
 
+    /**
+     * @since v2.2.0
+     */
     public function setHost($pattern)
     {
         $this->host = $pattern;
     }
 
+    /**
+     * @since v2.2.0
+     */
     public function getHost()
     {
         return $this->host;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function setName($name)
     {
         $this->name = $name;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getName()
     {
         return $this->name;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function setRequirements($requirements)
     {
         $this->requirements = $requirements;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getRequirements()
     {
         return $this->requirements;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function setOptions($options)
     {
         $this->options = $options;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getOptions()
     {
         return $this->options;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function setDefaults($defaults)
     {
         $this->defaults = $defaults;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getDefaults()
     {
         return $this->defaults;
     }
 
+    /**
+     * @since v2.2.0
+     */
     public function setSchemes($schemes)
     {
         $this->schemes = is_array($schemes) ? $schemes : array($schemes);
     }
 
+    /**
+     * @since v2.2.0
+     */
     public function getSchemes()
     {
         return $this->schemes;
     }
 
+    /**
+     * @since v2.2.0
+     */
     public function setMethods($methods)
     {
         $this->methods = is_array($methods) ? $methods : array($methods);
     }
 
+    /**
+     * @since v2.2.0
+     */
     public function getMethods()
     {
         return $this->methods;

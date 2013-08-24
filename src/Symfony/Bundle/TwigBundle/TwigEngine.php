@@ -22,6 +22,8 @@ use Symfony\Component\Config\FileLocatorInterface;
  * This engine renders Twig templates.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.1.0
  */
 class TwigEngine extends BaseEngine implements EngineInterface
 {
@@ -33,6 +35,8 @@ class TwigEngine extends BaseEngine implements EngineInterface
      * @param \Twig_Environment           $environment A \Twig_Environment instance
      * @param TemplateNameParserInterface $parser      A TemplateNameParserInterface instance
      * @param FileLocatorInterface        $locator     A FileLocatorInterface instance
+     *
+     * @since v2.2.0
      */
     public function __construct(\Twig_Environment $environment, TemplateNameParserInterface $parser, FileLocatorInterface $locator)
     {
@@ -41,11 +45,17 @@ class TwigEngine extends BaseEngine implements EngineInterface
         $this->locator = $locator;
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function setDefaultEscapingStrategy($strategy)
     {
         $this->environment->getExtension('escaper')->setDefaultStrategy($strategy);
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function guessDefaultEscapingStrategy($filename)
     {
         // remove .twig
@@ -72,6 +82,8 @@ class TwigEngine extends BaseEngine implements EngineInterface
      * @throws \InvalidArgumentException if the template does not exist
      * @throws \RuntimeException         if the template cannot be rendered
      * @throws \Twig_Error
+     *
+     * @since v2.0.0
      */
     public function render($name, array $parameters = array())
     {
@@ -98,6 +110,8 @@ class TwigEngine extends BaseEngine implements EngineInterface
      * @param Response $response   A Response instance
      *
      * @return Response A Response instance
+     *
+     * @since v2.0.0
      */
     public function renderResponse($view, array $parameters = array(), Response $response = null)
     {

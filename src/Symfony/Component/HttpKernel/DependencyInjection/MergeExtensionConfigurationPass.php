@@ -18,16 +18,24 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  * Ensures certain extensions are always loaded.
  *
  * @author Kris Wallsmith <kris@symfony.com>
+ *
+ * @since v2.0.0
  */
 class MergeExtensionConfigurationPass extends BaseMergeExtensionConfigurationPass
 {
     private $extensions;
 
+    /**
+     * @since v2.0.0
+     */
     public function __construct(array $extensions)
     {
         $this->extensions = $extensions;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function process(ContainerBuilder $container)
     {
         foreach ($this->extensions as $extension) {

@@ -25,6 +25,8 @@ namespace Symfony\Component\HttpFoundation;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.1.0
  */
 class StreamedResponse extends Response
 {
@@ -39,6 +41,8 @@ class StreamedResponse extends Response
      * @param array   $headers  An array of response headers
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function __construct($callback = null, $status = 200, $headers = array())
     {
@@ -52,6 +56,8 @@ class StreamedResponse extends Response
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public static function create($callback = null, $status = 200, $headers = array())
     {
@@ -64,6 +70,8 @@ class StreamedResponse extends Response
      * @param mixed $callback A valid PHP callback
      *
      * @throws \LogicException
+     *
+     * @since v2.1.0
      */
     public function setCallback($callback)
     {
@@ -75,6 +83,8 @@ class StreamedResponse extends Response
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function prepare(Request $request)
     {
@@ -87,6 +97,8 @@ class StreamedResponse extends Response
      * {@inheritdoc}
      *
      * This method only sends the content once.
+     *
+     * @since v2.1.0
      */
     public function sendContent()
     {
@@ -107,6 +119,8 @@ class StreamedResponse extends Response
      * {@inheritdoc}
      *
      * @throws \LogicException when the content is not null
+     *
+     * @since v2.1.0
      */
     public function setContent($content)
     {
@@ -119,6 +133,8 @@ class StreamedResponse extends Response
      * {@inheritdoc}
      *
      * @return false
+     *
+     * @since v2.1.0
      */
     public function getContent()
     {

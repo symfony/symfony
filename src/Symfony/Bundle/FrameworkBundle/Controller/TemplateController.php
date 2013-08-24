@@ -18,6 +18,8 @@ use Symfony\Component\HttpFoundation\Response;
  * TemplateController.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class TemplateController extends ContainerAware
 {
@@ -30,6 +32,8 @@ class TemplateController extends ContainerAware
      * @param Boolean|null $private   Whether or not caching should apply for client caches only
      *
      * @return Response A Response instance
+     *
+     * @since v2.2.0
      */
     public function templateAction($template, $maxAge = null, $sharedAge = null, $private = null)
     {

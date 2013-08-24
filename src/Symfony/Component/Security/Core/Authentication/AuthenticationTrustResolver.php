@@ -17,6 +17,8 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  * The default implementation of the authentication trust resolver.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class AuthenticationTrustResolver implements AuthenticationTrustResolverInterface
 {
@@ -28,6 +30,8 @@ class AuthenticationTrustResolver implements AuthenticationTrustResolverInterfac
      *
      * @param string $anonymousClass
      * @param string $rememberMeClass
+     *
+     * @since v2.0.0
      */
     public function __construct($anonymousClass, $rememberMeClass)
     {
@@ -37,6 +41,8 @@ class AuthenticationTrustResolver implements AuthenticationTrustResolverInterfac
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function isAnonymous(TokenInterface $token = null)
     {
@@ -49,6 +55,8 @@ class AuthenticationTrustResolver implements AuthenticationTrustResolverInterfac
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function isRememberMe(TokenInterface $token = null)
     {
@@ -61,6 +69,8 @@ class AuthenticationTrustResolver implements AuthenticationTrustResolverInterfac
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function isFullFledged(TokenInterface $token = null)
     {

@@ -13,11 +13,15 @@ namespace Symfony\Component\Serializer\Normalizer;
 
 /**
  * @author Jordi Boggiano <j.boggiano@seld.be>
+ *
+ * @since v2.1.0
  */
 class CustomNormalizer extends SerializerAwareNormalizer implements NormalizerInterface, DenormalizerInterface
 {
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function normalize($object, $format = null, array $context = array())
     {
@@ -26,6 +30,8 @@ class CustomNormalizer extends SerializerAwareNormalizer implements NormalizerIn
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function denormalize($data, $class, $format = null, array $context = array())
     {
@@ -42,6 +48,8 @@ class CustomNormalizer extends SerializerAwareNormalizer implements NormalizerIn
      * @param string $format The format being (de-)serialized from or into.
      *
      * @return Boolean
+     *
+     * @since v2.0.0
      */
     public function supportsNormalization($data, $format = null)
     {
@@ -56,6 +64,8 @@ class CustomNormalizer extends SerializerAwareNormalizer implements NormalizerIn
      * @param string $format The format being deserialized from.
      *
      * @return Boolean
+     *
+     * @since v2.0.0
      */
     public function supportsDenormalization($data, $type, $format = null)
     {

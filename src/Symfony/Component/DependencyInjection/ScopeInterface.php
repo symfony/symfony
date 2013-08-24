@@ -22,11 +22,15 @@ interface ScopeInterface
 {
     /**
      * @api
+     *
+     * @since v2.1.0
      */
     public function getName();
 
     /**
      * @api
+     *
+     * @since v2.1.0
      */
     public function getParentName();
 }

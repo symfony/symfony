@@ -18,11 +18,16 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  * This event is dispatched on authentication failure.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.1.0
  */
 class AuthenticationFailureEvent extends AuthenticationEvent
 {
     private $authenticationException;
 
+    /**
+     * @since v2.1.0
+     */
     public function __construct(TokenInterface $token, AuthenticationException $ex)
     {
         parent::__construct($token);
@@ -30,6 +35,9 @@ class AuthenticationFailureEvent extends AuthenticationEvent
         $this->authenticationException = $ex;
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function getAuthenticationException()
     {
         return $this->authenticationException;

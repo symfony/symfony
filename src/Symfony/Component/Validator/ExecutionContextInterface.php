@@ -95,6 +95,8 @@ interface ExecutionContextInterface
      * @param integer|null $code          The violation code.
      *
      * @api
+     *
+     * @since v2.2.0
      */
     public function addViolation($message, array $params = array(), $invalidValue = null, $pluralization = null, $code = null);
 
@@ -110,6 +112,8 @@ interface ExecutionContextInterface
      * @param integer|null $code          The violation code.
      *
      * @api
+     *
+     * @since v2.2.0
      */
     public function addViolationAt($subPath, $message, array $params = array(), $invalidValue = null, $pluralization = null, $code = null);
 
@@ -151,6 +155,8 @@ interface ExecutionContextInterface
      *                                       or an instance of <tt>\Traversable</tt>.
      * @param Boolean              $deep     Whether to traverse the value recursively if
      *                                       it is a collection of collections.
+     *
+     * @since v2.2.0
      */
     public function validate($value, $subPath = '', $groups = null, $traverse = false, $deep = false);
 
@@ -180,6 +186,8 @@ interface ExecutionContextInterface
      * @param null|string|string[]    $groups      The groups to validate in. If you don't pass any
      *                                             groups here, the current group of the context
      *                                             will be used.
+     *
+     * @since v2.2.0
      */
     public function validateValue($value, $constraints, $subPath = '', $groups = null);
 
@@ -189,6 +197,8 @@ interface ExecutionContextInterface
      * @return ConstraintViolationListInterface The constraint violation list.
      *
      * @api
+     *
+     * @since v2.2.0
      */
     public function getViolations();
 
@@ -202,6 +212,8 @@ interface ExecutionContextInterface
      * The current value is returned by {@link getValue}.
      *
      * @return mixed The root value of the validation.
+     *
+     * @since v2.2.0
      */
     public function getRoot();
 
@@ -212,6 +224,8 @@ interface ExecutionContextInterface
      * validator, use {@link getRoot}.
      *
      * @return mixed The currently validated value.
+     *
+     * @since v2.2.0
      */
     public function getValue();
 
@@ -230,6 +244,8 @@ interface ExecutionContextInterface
      *
      * @return MetadataInterface|null The metadata of the currently validated
      *                                value.
+     *
+     * @since v2.2.0
      */
     public function getMetadata();
 
@@ -237,6 +253,8 @@ interface ExecutionContextInterface
      * Returns the used metadata factory.
      *
      * @return MetadataFactoryInterface The metadata factory.
+     *
+     * @since v2.2.0
      */
     public function getMetadataFactory();
 
@@ -244,6 +262,8 @@ interface ExecutionContextInterface
      * Returns the validation group that is currently being validated.
      *
      * @return string The current validation group.
+     *
+     * @since v2.2.0
      */
     public function getGroup();
 
@@ -255,6 +275,8 @@ interface ExecutionContextInterface
      * current node, this method returns null.
      *
      * @return string|null The class name or null, if no class name could be found.
+     *
+     * @since v2.2.0
      */
     public function getClassName();
 
@@ -266,6 +288,8 @@ interface ExecutionContextInterface
      * current node, this method returns null.
      *
      * @return string|null The property name or null, if no property name could be found.
+     *
+     * @since v2.2.0
      */
     public function getPropertyName();
 
@@ -299,6 +323,8 @@ interface ExecutionContextInterface
      * @return string The current property path. The result may be an empty
      *                string if the validator is currently validating the
      *                root value of the validation graph.
+     *
+     * @since v2.2.0
      */
     public function getPropertyPath($subPath = '');
 }

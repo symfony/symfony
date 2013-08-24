@@ -16,6 +16,8 @@ namespace Symfony\Component\HttpFoundation\Session\Attribute;
  * a name spacing character in the key.
  *
  * @author Drak <drak@zikula.org>
+ *
+ * @since v2.1.0
  */
 class NamespacedAttributeBag extends AttributeBag
 {
@@ -31,6 +33,8 @@ class NamespacedAttributeBag extends AttributeBag
      *
      * @param string $storageKey         Session storage key.
      * @param string $namespaceCharacter Namespace character to use in keys.
+     *
+     * @since v2.1.0
      */
     public function __construct($storageKey = '_sf2_attributes', $namespaceCharacter = '/')
     {
@@ -40,6 +44,8 @@ class NamespacedAttributeBag extends AttributeBag
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function has($name)
     {
@@ -55,6 +61,8 @@ class NamespacedAttributeBag extends AttributeBag
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function get($name, $default = null)
     {
@@ -70,6 +78,8 @@ class NamespacedAttributeBag extends AttributeBag
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function set($name, $value)
     {
@@ -80,6 +90,8 @@ class NamespacedAttributeBag extends AttributeBag
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function remove($name)
     {
@@ -103,6 +115,8 @@ class NamespacedAttributeBag extends AttributeBag
      * @param boolean $writeContext Write context, default false
      *
      * @return array
+     *
+     * @since v2.1.0
      */
     protected function &resolveAttributePath($name, $writeContext = false)
     {
@@ -146,6 +160,8 @@ class NamespacedAttributeBag extends AttributeBag
      * @param string $name
      *
      * @return string
+     *
+     * @since v2.1.0
      */
     protected function resolveKey($name)
     {

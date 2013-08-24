@@ -34,6 +34,8 @@ interface TerminableInterface
      * @param Response $response A Response instance
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function terminate(Request $request, Response $response);
 }

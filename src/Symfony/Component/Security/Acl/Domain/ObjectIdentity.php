@@ -20,6 +20,8 @@ use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
  * ObjectIdentity implementation
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 final class ObjectIdentity implements ObjectIdentityInterface
 {
@@ -33,6 +35,8 @@ final class ObjectIdentity implements ObjectIdentityInterface
      * @param string $type
      *
      * @throws \InvalidArgumentException
+     *
+     * @since v2.0.0
      */
     public function __construct($identifier, $type)
     {
@@ -53,6 +57,8 @@ final class ObjectIdentity implements ObjectIdentityInterface
      * @param object $domainObject
      * @throws InvalidDomainObjectException
      * @return ObjectIdentity
+     *
+     * @since v2.1.0
      */
     public static function fromDomainObject($domainObject)
     {
@@ -75,6 +81,8 @@ final class ObjectIdentity implements ObjectIdentityInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function getIdentifier()
     {
@@ -83,6 +91,8 @@ final class ObjectIdentity implements ObjectIdentityInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function getType()
     {
@@ -91,6 +101,8 @@ final class ObjectIdentity implements ObjectIdentityInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function equals(ObjectIdentityInterface $identity)
     {
@@ -104,6 +116,8 @@ final class ObjectIdentity implements ObjectIdentityInterface
      * Returns a textual representation of this object identity
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     public function __toString()
     {

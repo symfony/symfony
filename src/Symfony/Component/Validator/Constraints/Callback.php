@@ -19,6 +19,8 @@ use Symfony\Component\Validator\Constraint;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class Callback extends Constraint
 {
@@ -26,6 +28,8 @@ class Callback extends Constraint
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function getRequiredOptions()
     {
@@ -34,6 +38,8 @@ class Callback extends Constraint
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function getDefaultOption()
     {
@@ -42,6 +48,8 @@ class Callback extends Constraint
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function getTargets()
     {

@@ -15,10 +15,15 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+/**
+ * @since v2.0.0
+ */
 class CountryType extends AbstractType
 {
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
@@ -29,6 +34,8 @@ class CountryType extends AbstractType
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getParent()
     {
@@ -37,6 +44,8 @@ class CountryType extends AbstractType
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getName()
     {

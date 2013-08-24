@@ -15,6 +15,8 @@ namespace Symfony\Component\Security\Core\Encoder;
  * PlaintextPasswordEncoder does not do any encoding.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class PlaintextPasswordEncoder extends BasePasswordEncoder
 {
@@ -24,6 +26,8 @@ class PlaintextPasswordEncoder extends BasePasswordEncoder
      * Constructor.
      *
      * @param Boolean $ignorePasswordCase Compare password case-insensitive
+     *
+     * @since v2.0.0
      */
     public function __construct($ignorePasswordCase = false)
     {
@@ -32,6 +36,8 @@ class PlaintextPasswordEncoder extends BasePasswordEncoder
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function encodePassword($raw, $salt)
     {
@@ -40,6 +46,8 @@ class PlaintextPasswordEncoder extends BasePasswordEncoder
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function isPasswordValid($encoded, $raw, $salt)
     {

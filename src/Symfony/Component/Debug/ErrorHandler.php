@@ -23,6 +23,8 @@ use Symfony\Component\Debug\FatalErrorHandler\FatalErrorHandlerInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Konstantin Myakshin <koc-dp@yandex.ru>
+ *
+ * @since v2.3.0
  */
 class ErrorHandler
 {
@@ -62,6 +64,8 @@ class ErrorHandler
      * @param Boolean $displayErrors Display errors (for dev environment) or just log they (production usage)
      *
      * @return The registered error handler
+     *
+     * @since v2.3.0
      */
     public static function register($level = null, $displayErrors = true)
     {
@@ -81,6 +85,8 @@ class ErrorHandler
      * Sets the level at which the conversion to Exception is done.
      *
      * @param integer|null $level The level (null to use the error_reporting() value and 0 to disable)
+     *
+     * @since v2.3.0
      */
     public function setLevel($level)
     {
@@ -91,6 +97,8 @@ class ErrorHandler
      * Sets the display_errors flag value.
      *
      * @param integer $displayErrors The display_errors flag value
+     *
+     * @since v2.3.0
      */
     public function setDisplayErrors($displayErrors)
     {
@@ -102,6 +110,8 @@ class ErrorHandler
      *
      * @param LoggerInterface $logger  A logger interface
      * @param string          $channel The channel associated with the logger (deprecation or emergency)
+     *
+     * @since v2.3.0
      */
     public static function setLogger(LoggerInterface $logger, $channel = 'deprecation')
     {
@@ -110,6 +120,8 @@ class ErrorHandler
 
     /**
      * @throws ContextErrorException When error_reporting returns error
+     *
+     * @since v2.3.0
      */
     public function handle($level, $message, $file = 'unknown', $line = 0, $context = array())
     {
@@ -150,6 +162,9 @@ class ErrorHandler
         return false;
     }
 
+    /**
+     * @since v2.3.0
+     */
     public function handleFatal()
     {
         if (null === $error = error_get_last()) {

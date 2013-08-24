@@ -18,11 +18,15 @@ use Symfony\Component\Templating\TemplateNameParserInterface;
  * TemplateReferenceInterface instances.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.1.0
  */
 class TemplateFilenameParser implements TemplateNameParserInterface
 {
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function parse($file)
     {

@@ -29,6 +29,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * AccessDeniedHttpException exception.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.2.0
  */
 class FragmentListener implements EventSubscriberInterface
 {
@@ -40,6 +42,8 @@ class FragmentListener implements EventSubscriberInterface
      *
      * @param UriSigner $signer       A UriSigner instance
      * @param string    $fragmentPath The path that triggers this listener
+     *
+     * @since v2.2.0
      */
     public function __construct(UriSigner $signer, $fragmentPath = '/_fragment')
     {
@@ -53,6 +57,8 @@ class FragmentListener implements EventSubscriberInterface
      * @param GetResponseEvent $event A GetResponseEvent instance
      *
      * @throws AccessDeniedHttpException if the request does not come from a trusted IP.
+     *
+     * @since v2.2.0
      */
     public function onKernelRequest(GetResponseEvent $event)
     {
@@ -70,6 +76,9 @@ class FragmentListener implements EventSubscriberInterface
         $request->query->remove('_path');
     }
 
+    /**
+     * @since v2.2.0
+     */
     protected function validateRequest(Request $request)
     {
         // is the Request safe?
@@ -93,11 +102,17 @@ class FragmentListener implements EventSubscriberInterface
         throw new AccessDeniedHttpException();
     }
 
+    /**
+     * @since v2.2.0
+     */
     protected function getLocalIpAddresses()
     {
         return array('127.0.0.1', 'fe80::1', '::1');
     }
 
+    /**
+     * @since v2.2.0
+     */
     public static function getSubscribedEvents()
     {
         return array(

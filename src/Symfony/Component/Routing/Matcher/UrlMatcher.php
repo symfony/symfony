@@ -23,6 +23,8 @@ use Symfony\Component\Routing\Route;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class UrlMatcher implements UrlMatcherInterface
 {
@@ -52,6 +54,8 @@ class UrlMatcher implements UrlMatcherInterface
      * @param RequestContext  $context The context
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function __construct(RouteCollection $routes, RequestContext $context)
     {
@@ -61,6 +65,8 @@ class UrlMatcher implements UrlMatcherInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function setContext(RequestContext $context)
     {
@@ -69,6 +75,8 @@ class UrlMatcher implements UrlMatcherInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getContext()
     {
@@ -77,6 +85,8 @@ class UrlMatcher implements UrlMatcherInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function match($pathinfo)
     {
@@ -101,6 +111,8 @@ class UrlMatcher implements UrlMatcherInterface
      *
      * @throws ResourceNotFoundException If the resource could not be found
      * @throws MethodNotAllowedException If the resource was found but the request method is not allowed
+     *
+     * @since v2.0.0
      */
     protected function matchCollection($pathinfo, RouteCollection $routes)
     {
@@ -161,6 +173,8 @@ class UrlMatcher implements UrlMatcherInterface
      * @param array  $attributes An array of attributes from the matcher
      *
      * @return array An array of parameters
+     *
+     * @since v2.2.0
      */
     protected function getAttributes(Route $route, $name, array $attributes)
     {
@@ -177,6 +191,8 @@ class UrlMatcher implements UrlMatcherInterface
      * @param Route  $route    The route
      *
      * @return array The first element represents the status, the second contains additional information
+     *
+     * @since v2.1.0
      */
     protected function handleRouteRequirements($pathinfo, $name, Route $route)
     {
@@ -194,6 +210,8 @@ class UrlMatcher implements UrlMatcherInterface
      * @param array $defaults The defaults
      *
      * @return array Merged default parameters
+     *
+     * @since v2.0.0
      */
     protected function mergeDefaults($params, $defaults)
     {

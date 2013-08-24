@@ -20,6 +20,8 @@ use Symfony\Component\Config\Definition\Exception\Exception;
  * Represents a prototyped Array node in the config tree.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class PrototypedArrayNode extends ArrayNode
 {
@@ -35,6 +37,8 @@ class PrototypedArrayNode extends ArrayNode
      *
      * @param string        $name   The Node's name
      * @param NodeInterface $parent The node parent
+     *
+     * @since v2.0.0
      */
     public function __construct($name, NodeInterface $parent = null)
     {
@@ -49,6 +53,8 @@ class PrototypedArrayNode extends ArrayNode
      * contain. By default this is zero, meaning no elements.
      *
      * @param integer $number
+     *
+     * @since v2.0.0
      */
     public function setMinNumberOfElements($number)
     {
@@ -78,6 +84,8 @@ class PrototypedArrayNode extends ArrayNode
      *
      * @param string  $attribute The name of the attribute which value is to be used as a key
      * @param Boolean $remove    Whether or not to remove the key
+     *
+     * @since v2.0.0
      */
     public function setKeyAttribute($attribute, $remove = true)
     {
@@ -89,6 +97,8 @@ class PrototypedArrayNode extends ArrayNode
      * Retrieves the name of the attribute which value should be used as key.
      *
      * @return string The name of the attribute
+     *
+     * @since v2.1.0
      */
     public function getKeyAttribute()
     {
@@ -101,6 +111,8 @@ class PrototypedArrayNode extends ArrayNode
      * @param string $value
      *
      * @throws \InvalidArgumentException if the default value is not an array
+     *
+     * @since v2.0.0
      */
     public function setDefaultValue($value)
     {
@@ -115,6 +127,8 @@ class PrototypedArrayNode extends ArrayNode
      * Checks if the node has a default value.
      *
      * @return Boolean
+     *
+     * @since v2.0.0
      */
     public function hasDefaultValue()
     {
@@ -125,6 +139,8 @@ class PrototypedArrayNode extends ArrayNode
      * Adds default children when none are set.
      *
      * @param integer|string|array|null $children The number of children|The child name|The children names to be added
+     *
+     * @since v2.1.0
      */
     public function setAddChildrenIfNoneSet($children = array('defaults'))
     {
@@ -142,6 +158,8 @@ class PrototypedArrayNode extends ArrayNode
      * default value.
      *
      * @return array The default value
+     *
+     * @since v2.0.0
      */
     public function getDefaultValue()
     {
@@ -162,6 +180,8 @@ class PrototypedArrayNode extends ArrayNode
      * Sets the node prototype.
      *
      * @param PrototypeNodeInterface $node
+     *
+     * @since v2.0.0
      */
     public function setPrototype(PrototypeNodeInterface $node)
     {
@@ -172,6 +192,8 @@ class PrototypedArrayNode extends ArrayNode
      * Retrieves the prototype
      *
      * @return PrototypeNodeInterface The prototype
+     *
+     * @since v2.1.0
      */
     public function getPrototype()
     {
@@ -184,6 +206,8 @@ class PrototypedArrayNode extends ArrayNode
      * @param NodeInterface $node The child node to add
      *
      * @throws Exception
+     *
+     * @since v2.0.0
      */
     public function addChild(NodeInterface $node)
     {
@@ -199,6 +223,8 @@ class PrototypedArrayNode extends ArrayNode
      *
      * @throws UnsetKeyException
      * @throws InvalidConfigurationException if the node doesn't have enough children
+     *
+     * @since v2.0.0
      */
     protected function finalizeValue($value)
     {
@@ -236,6 +262,8 @@ class PrototypedArrayNode extends ArrayNode
      *
      * @throws InvalidConfigurationException
      * @throws DuplicateKeyException
+     *
+     * @since v2.0.0
      */
     protected function normalizeValue($value)
     {
@@ -299,6 +327,8 @@ class PrototypedArrayNode extends ArrayNode
      *
      * @throws InvalidConfigurationException
      * @throws \RuntimeException
+     *
+     * @since v2.0.0
      */
     protected function mergeValues($leftSide, $rightSide)
     {

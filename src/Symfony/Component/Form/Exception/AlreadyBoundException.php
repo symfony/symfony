@@ -16,6 +16,8 @@ namespace Symfony\Component\Form\Exception;
  *
  * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
  *             {@link AlreadySubmittedException} instead.
+ *
+ * @since v2.3.0
  */
 class AlreadyBoundException extends LogicException
 {

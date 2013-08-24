@@ -15,6 +15,8 @@ namespace Symfony\Component\PropertyAccess;
  * A configurable builder for PropertyAccessorInterface objects.
  *
  * @author Jérémie Augustin <jeremie.augustin@pixel-cookers.com>
+ *
+ * @since v2.3.0
  */
 class PropertyAccessorBuilder
 {
@@ -27,6 +29,8 @@ class PropertyAccessorBuilder
      * Enables the use of "__call" by the PropertyAccessor.
      *
      * @return PropertyAccessorBuilder The builder object
+     *
+     * @since v2.3.0
      */
     public function enableMagicCall()
     {
@@ -39,6 +43,8 @@ class PropertyAccessorBuilder
      * Disables the use of "__call" by the PropertyAccessor.
      *
      * @return PropertyAccessorBuilder The builder object
+     *
+     * @since v2.3.0
      */
     public function disableMagicCall()
     {
@@ -49,6 +55,8 @@ class PropertyAccessorBuilder
 
     /**
      * @return Boolean true if the use of "__call" by the ProperyAccessor is enabled
+     *
+     * @since v2.3.0
      */
     public function isMagicCallEnabled()
     {
@@ -59,6 +67,8 @@ class PropertyAccessorBuilder
      * Builds and returns a new propertyAccessor object.
      *
      * @return PropertyAccessorInterface The built propertyAccessor
+     *
+     * @since v2.3.0
      */
     public function getPropertyAccessor()
     {

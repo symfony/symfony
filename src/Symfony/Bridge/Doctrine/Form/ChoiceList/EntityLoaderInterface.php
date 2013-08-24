@@ -22,6 +22,8 @@ interface EntityLoaderInterface
      * Returns an array of entities that are valid choices in the corresponding choice list.
      *
      * @return array The entities.
+     *
+     * @since v2.1.0
      */
     public function getEntities();
 
@@ -34,6 +36,8 @@ interface EntityLoaderInterface
      * @param array $values The values of the identifiers.
      *
      * @return array The entities.
+     *
+     * @since v2.1.0
      */
     public function getEntitiesByIds($identifier, array $values);
 }

@@ -18,6 +18,8 @@ class SubmitTypeValidatorExtension extends BaseValidatorExtension
 {
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getExtendedType()
     {

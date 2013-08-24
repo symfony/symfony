@@ -22,9 +22,14 @@ use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\ExtensionPass;
  * Bundle.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class TwigBundle extends Bundle
 {
+    /**
+     * @since v2.0.0
+     */
     public function build(ContainerBuilder $container)
     {
         parent::build($container);

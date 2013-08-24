@@ -28,6 +28,8 @@ use Symfony\Component\Console\Helper\HelperSet;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class Command
 {
@@ -52,6 +54,8 @@ class Command
      * @throws \LogicException When the command name is empty
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function __construct($name = null)
     {
@@ -76,6 +80,8 @@ class Command
      * Ignores validation errors.
      *
      * This is mainly useful for the help command.
+     *
+     * @since v2.0.10
      */
     public function ignoreValidationErrors()
     {
@@ -88,6 +94,8 @@ class Command
      * @param Application $application An Application instance
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setApplication(Application $application = null)
     {
@@ -103,6 +111,8 @@ class Command
      * Sets the helper set.
      *
      * @param HelperSet $helperSet A HelperSet instance
+     *
+     * @since v2.0.0
      */
     public function setHelperSet(HelperSet $helperSet)
     {
@@ -113,6 +123,8 @@ class Command
      * Gets the helper set.
      *
      * @return HelperSet A HelperSet instance
+     *
+     * @since v2.0.0
      */
     public function getHelperSet()
     {
@@ -125,6 +137,8 @@ class Command
      * @return Application An Application instance
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getApplication()
     {
@@ -138,6 +152,8 @@ class Command
      * run properly under the current conditions.
      *
      * @return Boolean
+     *
+     * @since v2.1.0
      */
     public function isEnabled()
     {
@@ -146,6 +162,8 @@ class Command
 
     /**
      * Configures the current command.
+     *
+     * @since v2.0.0
      */
     protected function configure()
     {
@@ -166,6 +184,8 @@ class Command
      *
      * @throws \LogicException When this abstract method is not implemented
      * @see    setCode()
+     *
+     * @since v2.0.0
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -177,6 +197,8 @@ class Command
      *
      * @param InputInterface  $input  An InputInterface instance
      * @param OutputInterface $output An OutputInterface instance
+     *
+     * @since v2.0.0
      */
     protected function interact(InputInterface $input, OutputInterface $output)
     {
@@ -190,6 +212,8 @@ class Command
      *
      * @param InputInterface  $input  An InputInterface instance
      * @param OutputInterface $output An OutputInterface instance
+     *
+     * @since v2.0.0
      */
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
@@ -213,6 +237,8 @@ class Command
      * @see execute()
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function run(InputInterface $input, OutputInterface $output)
     {
@@ -263,6 +289,8 @@ class Command
      * @see execute()
      *
      * @api
+     *
+     * @since v2.2.0
      */
     public function setCode($code)
     {
@@ -281,6 +309,8 @@ class Command
      * This method is not part of public API and should not be used directly.
      *
      * @param Boolean $mergeArgs Whether to merge or not the Application definition arguments to Command definition arguments
+     *
+     * @since v2.3.0
      */
     public function mergeApplicationDefinition($mergeArgs = true)
     {
@@ -310,6 +340,8 @@ class Command
      * @return Command The current instance
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setDefinition($definition)
     {
@@ -330,6 +362,8 @@ class Command
      * @return InputDefinition An InputDefinition instance
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getDefinition()
     {
@@ -345,6 +379,8 @@ class Command
      * This method is not part of public API and should not be used directly.
      *
      * @return InputDefinition An InputDefinition instance
+     *
+     * @since v2.3.0
      */
     public function getNativeDefinition()
     {
@@ -362,6 +398,8 @@ class Command
      * @return Command The current instance
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function addArgument($name, $mode = null, $description = '', $default = null)
     {
@@ -382,6 +420,8 @@ class Command
      * @return Command The current instance
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function addOption($name, $shortcut = null, $mode = null, $description = '', $default = null)
     {
@@ -405,6 +445,8 @@ class Command
      * @throws \InvalidArgumentException When command name given is empty
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setName($name)
     {
@@ -421,6 +463,8 @@ class Command
      * @return string The command name
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getName()
     {
@@ -435,6 +479,8 @@ class Command
      * @return Command The current instance
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setDescription($description)
     {
@@ -449,6 +495,8 @@ class Command
      * @return string The description for the command
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getDescription()
     {
@@ -463,6 +511,8 @@ class Command
      * @return Command The current instance
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setHelp($help)
     {
@@ -477,6 +527,8 @@ class Command
      * @return string The help for the command
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getHelp()
     {
@@ -488,6 +540,8 @@ class Command
      * %command.full_name% patterns with the real values dynamically.
      *
      * @return string  The processed help for the command
+     *
+     * @since v2.0.0
      */
     public function getProcessedHelp()
     {
@@ -513,6 +567,8 @@ class Command
      * @return Command The current instance
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setAliases($aliases)
     {
@@ -531,6 +587,8 @@ class Command
      * @return array An array of aliases for the command
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getAliases()
     {
@@ -541,6 +599,8 @@ class Command
      * Returns the synopsis for the command.
      *
      * @return string The synopsis
+     *
+     * @since v2.0.0
      */
     public function getSynopsis()
     {
@@ -561,6 +621,8 @@ class Command
      * @throws \InvalidArgumentException if the helper is not defined
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getHelper($name)
     {
@@ -573,6 +635,8 @@ class Command
      * @return string A string representing the command
      *
      * @deprecated Deprecated since version 2.3, to be removed in 3.0.
+     *
+     * @since v2.0.0
      */
     public function asText()
     {
@@ -591,6 +655,8 @@ class Command
      * @return string|\DOMDocument An XML string representing the command
      *
      * @deprecated Deprecated since version 2.3, to be removed in 3.0.
+     *
+     * @since v2.0.0
      */
     public function asXml($asDom = false)
     {
@@ -606,6 +672,9 @@ class Command
         return $output->fetch();
     }
 
+    /**
+     * @since v2.0.0
+     */
     private function validateName($name)
     {
         if (!preg_match('/^[^\:]+(\:[^\:]+)*$/', $name)) {

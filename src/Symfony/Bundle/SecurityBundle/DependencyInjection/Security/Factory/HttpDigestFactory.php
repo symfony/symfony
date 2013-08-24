@@ -21,9 +21,14 @@ use Symfony\Component\DependencyInjection\Reference;
  * HttpDigestFactory creates services for HTTP digest authentication.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class HttpDigestFactory implements SecurityFactoryInterface
 {
+    /**
+     * @since v2.0.0
+     */
     public function create(ContainerBuilder $container, $id, $config, $userProvider, $defaultEntryPoint)
     {
         $provider = 'security.authentication.provider.dao.'.$id;
@@ -46,16 +51,25 @@ class HttpDigestFactory implements SecurityFactoryInterface
         return array($provider, $listenerId, $entryPointId);
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getPosition()
     {
         return 'http';
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getKey()
     {
         return 'http-digest';
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function addConfiguration(NodeDefinition $node)
     {
         $node
@@ -67,6 +81,9 @@ class HttpDigestFactory implements SecurityFactoryInterface
         ;
     }
 
+    /**
+     * @since v2.0.0
+     */
     protected function createEntryPoint($container, $id, $config, $defaultEntryPoint)
     {
         if (null !== $defaultEntryPoint) {

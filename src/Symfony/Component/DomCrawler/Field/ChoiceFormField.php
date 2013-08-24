@@ -19,6 +19,8 @@ namespace Symfony\Component\DomCrawler\Field;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class ChoiceFormField extends FormField
 {
@@ -39,6 +41,8 @@ class ChoiceFormField extends FormField
      * Returns true if the field should be included in the submitted values.
      *
      * @return Boolean true if the field should be included in the submitted values, false otherwise
+     *
+     * @since v2.0.0
      */
     public function hasValue()
     {
@@ -54,6 +58,8 @@ class ChoiceFormField extends FormField
      * Check if the current selected option is disabled
      *
      * @return Boolean
+     *
+     * @since v2.0.10
      */
     public function isDisabled()
     {
@@ -72,6 +78,8 @@ class ChoiceFormField extends FormField
      * @param string $value The value of the field
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function select($value)
     {
@@ -84,6 +92,8 @@ class ChoiceFormField extends FormField
      * @throws \LogicException When the type provided is not correct
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function tick()
     {
@@ -100,6 +110,8 @@ class ChoiceFormField extends FormField
      * @throws \LogicException When the type provided is not correct
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function untick()
     {
@@ -116,6 +128,8 @@ class ChoiceFormField extends FormField
      * @param string $value The value of the field
      *
      * @throws \InvalidArgumentException When value type provided is not correct
+     *
+     * @since v2.0.0
      */
     public function setValue($value)
     {
@@ -160,6 +174,8 @@ class ChoiceFormField extends FormField
      * @param \DOMNode $node A \DOMNode
      *
      * @throws \LogicException When choice provided is not multiple nor radio
+     *
+     * @since v2.0.0
      */
     public function addChoice(\DOMNode $node)
     {
@@ -179,6 +195,8 @@ class ChoiceFormField extends FormField
      * Returns the type of the choice field (radio, select, or checkbox).
      *
      * @return string The type
+     *
+     * @since v2.0.0
      */
     public function getType()
     {
@@ -189,6 +207,8 @@ class ChoiceFormField extends FormField
      * Returns true if the field accepts multiple values.
      *
      * @return Boolean true if the field accepts multiple values, false otherwise
+     *
+     * @since v2.0.0
      */
     public function isMultiple()
     {
@@ -199,6 +219,8 @@ class ChoiceFormField extends FormField
      * Initializes the form field.
      *
      * @throws \LogicException When node type is incorrect
+     *
+     * @since v2.0.0
      */
     protected function initialize()
     {
@@ -258,6 +280,8 @@ class ChoiceFormField extends FormField
      * @param \DOMNode $node
      *
      * @return array
+     *
+     * @since v2.0.10
      */
     private function buildOptionValue($node)
     {
@@ -277,6 +301,8 @@ class ChoiceFormField extends FormField
      * @param array  $options
      *
      * @return bool
+     *
+     * @since v2.0.10
      */
     public function containsOption($optionValue, $options)
     {
@@ -293,6 +319,8 @@ class ChoiceFormField extends FormField
      * Returns list of available field options
      *
      * @return array
+     *
+     * @since v2.0.10
      */
     public function availableOptionValues()
     {

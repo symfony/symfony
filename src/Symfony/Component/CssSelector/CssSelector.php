@@ -30,6 +30,8 @@ use Symfony\Component\CssSelector\XPath\Translator;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class CssSelector
 {
@@ -46,6 +48,8 @@ class CssSelector
      * @return string
      *
      * @api
+     *
+     * @since v2.3.0
      */
     public static function toXPath($cssExpr, $prefix = 'descendant-or-self::')
     {
@@ -67,6 +71,8 @@ class CssSelector
 
     /**
      * Enables the HTML extension.
+     *
+     * @since v2.3.0
      */
     public static function enableHtmlExtension()
     {
@@ -75,6 +81,8 @@ class CssSelector
 
     /**
      * Disables the HTML extension.
+     *
+     * @since v2.3.0
      */
     public static function disableHtmlExtension()
     {

@@ -16,12 +16,18 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 
+/**
+ * @since v2.0.0
+ */
 class RememberMeAuthenticationProvider implements AuthenticationProviderInterface
 {
     private $userChecker;
     private $key;
     private $providerKey;
 
+    /**
+     * @since v2.0.0
+     */
     public function __construct(UserCheckerInterface $userChecker, $key, $providerKey)
     {
         $this->userChecker = $userChecker;
@@ -29,6 +35,9 @@ class RememberMeAuthenticationProvider implements AuthenticationProviderInterfac
         $this->providerKey = $providerKey;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function authenticate(TokenInterface $token)
     {
         if (!$this->supports($token)) {
@@ -48,6 +57,9 @@ class RememberMeAuthenticationProvider implements AuthenticationProviderInterfac
         return $authenticatedToken;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function supports(TokenInterface $token)
     {
         return $token instanceof RememberMeToken && $token->getProviderKey() === $this->providerKey;

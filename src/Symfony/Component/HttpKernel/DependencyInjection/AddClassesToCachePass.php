@@ -20,11 +20,16 @@ use Symfony\Component\HttpKernel\Kernel;
  * Sets the classes to compile in the cache for the container.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class AddClassesToCachePass implements CompilerPassInterface
 {
     private $kernel;
 
+    /**
+     * @since v2.0.0
+     */
     public function __construct(Kernel $kernel)
     {
         $this->kernel = $kernel;
@@ -32,6 +37,8 @@ class AddClassesToCachePass implements CompilerPassInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function process(ContainerBuilder $container)
     {

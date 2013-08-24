@@ -20,6 +20,8 @@ use Symfony\Component\DependencyInjection\Compiler\PassConfig;
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class Compiler
 {
@@ -30,6 +32,8 @@ class Compiler
 
     /**
      * Constructor.
+     *
+     * @since v2.0.0
      */
     public function __construct()
     {
@@ -45,6 +49,8 @@ class Compiler
      * @return PassConfig The PassConfig instance
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getPassConfig()
     {
@@ -57,6 +63,8 @@ class Compiler
      * @return ServiceReferenceGraph The ServiceReferenceGraph instance
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getServiceReferenceGraph()
     {
@@ -67,6 +75,8 @@ class Compiler
      * Returns the logging formatter which can be used by compilation passes.
      *
      * @return LoggingFormatter
+     *
+     * @since v2.0.0
      */
     public function getLoggingFormatter()
     {
@@ -80,6 +90,8 @@ class Compiler
      * @param string                $type The type of the pass
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function addPass(CompilerPassInterface $pass, $type = PassConfig::TYPE_BEFORE_OPTIMIZATION)
     {
@@ -90,6 +102,8 @@ class Compiler
      * Adds a log message.
      *
      * @param string $string The log message
+     *
+     * @since v2.0.0
      */
     public function addLogMessage($string)
     {
@@ -100,6 +114,8 @@ class Compiler
      * Returns the log.
      *
      * @return array Log array
+     *
+     * @since v2.0.0
      */
     public function getLog()
     {
@@ -112,6 +128,8 @@ class Compiler
      * @param ContainerBuilder $container
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function compile(ContainerBuilder $container)
     {

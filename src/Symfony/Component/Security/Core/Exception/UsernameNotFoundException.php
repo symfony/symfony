@@ -16,6 +16,8 @@ namespace Symfony\Component\Security\Core\Exception;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Alexander <iam.asm89@gmail.com>
+ *
+ * @since v2.0.0
  */
 class UsernameNotFoundException extends AuthenticationException
 {
@@ -23,6 +25,8 @@ class UsernameNotFoundException extends AuthenticationException
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.2.0
      */
     public function getMessageKey()
     {
@@ -33,6 +37,8 @@ class UsernameNotFoundException extends AuthenticationException
      * Get the username.
      *
      * @return string
+     *
+     * @since v2.2.0
      */
     public function getUsername()
     {
@@ -43,6 +49,8 @@ class UsernameNotFoundException extends AuthenticationException
      * Set the username.
      *
      * @param string $username
+     *
+     * @since v2.2.0
      */
     public function setUsername($username)
     {
@@ -51,6 +59,8 @@ class UsernameNotFoundException extends AuthenticationException
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.2.0
      */
     public function serialize()
     {
@@ -62,6 +72,8 @@ class UsernameNotFoundException extends AuthenticationException
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.2.0
      */
     public function unserialize($str)
     {

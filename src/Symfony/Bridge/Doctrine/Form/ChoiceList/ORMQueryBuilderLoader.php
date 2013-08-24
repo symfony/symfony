@@ -17,6 +17,8 @@ use Doctrine\DBAL\Connection;
 
 /**
  * Getting Entities through the ORM QueryBuilder
+ *
+ * @since v2.1.0
  */
 class ORMQueryBuilderLoader implements EntityLoaderInterface
 {
@@ -38,6 +40,8 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
      * @param string                $class
      *
      * @throws UnexpectedTypeException
+     *
+     * @since v2.3.0
      */
     public function __construct($queryBuilder, $manager = null, $class = null)
     {
@@ -60,6 +64,8 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function getEntities()
     {
@@ -68,6 +74,8 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function getEntitiesByIds($identifier, array $values)
     {

@@ -27,6 +27,8 @@ interface DenormalizerInterface
      * @param array  $context options available to the denormalizer
      *
      * @return object
+     *
+     * @since v2.2.0
      */
     public function denormalize($data, $class, $format = null, array $context = array());
 
@@ -38,6 +40,8 @@ interface DenormalizerInterface
      * @param string $format The format being deserialized from.
      *
      * @return Boolean
+     *
+     * @since v2.1.0
      */
     public function supportsDenormalization($data, $type, $format = null);
 }

@@ -15,6 +15,8 @@
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @see \Symfony\Component\Intl\Collator\StubCollator
+ *
+ * @since v2.3.0
  */
 class Collator extends \Symfony\Component\Intl\Collator\Collator
 {

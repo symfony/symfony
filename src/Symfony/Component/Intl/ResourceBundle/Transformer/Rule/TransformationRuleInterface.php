@@ -25,6 +25,8 @@ interface TransformationRuleInterface
      * Returns the name of the compiled resource bundle.
      *
      * @return string The name of the bundle.
+     *
+     * @since v2.3.0
      */
     public function getBundleName();
 
@@ -36,6 +38,8 @@ interface TransformationRuleInterface
      *                                             the compilation.
      *
      * @return string[] The source directories/files of the bundle.
+     *
+     * @since v2.3.0
      */
     public function beforeCompile(CompilationContextInterface $context);
 
@@ -45,6 +49,8 @@ interface TransformationRuleInterface
      *
      * @param CompilationContextInterface $context The contextual information of
      *                                             the compilation.
+     *
+     * @since v2.3.0
      */
     public function afterCompile(CompilationContextInterface $context);
 
@@ -56,6 +62,8 @@ interface TransformationRuleInterface
      *                                          the compilation.
      *
      * @return mixed The data to include in the stub version.
+     *
+     * @since v2.3.0
      */
     public function beforeCreateStub(StubbingContextInterface $context);
 
@@ -65,6 +73,8 @@ interface TransformationRuleInterface
      *
      * @param StubbingContextInterface $context The contextual information of
      *                                          the compilation.
+     *
+     * @since v2.3.0
      */
     public function afterCreateStub(StubbingContextInterface $context);
 }

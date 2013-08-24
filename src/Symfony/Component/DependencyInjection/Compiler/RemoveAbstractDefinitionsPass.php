@@ -16,6 +16,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 /**
  * Removes abstract Definitions
  *
+ *
+ * @since v2.0.0
  */
 class RemoveAbstractDefinitionsPass implements CompilerPassInterface
 {
@@ -23,6 +25,8 @@ class RemoveAbstractDefinitionsPass implements CompilerPassInterface
      * Removes abstract definitions from the ContainerBuilder
      *
      * @param ContainerBuilder $container
+     *
+     * @since v2.0.0
      */
     public function process(ContainerBuilder $container)
     {

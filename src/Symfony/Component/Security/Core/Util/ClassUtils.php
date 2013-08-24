@@ -19,6 +19,8 @@ namespace Symfony\Component\Security\Core\Util;
  *
  * @author Benjamin Eberlei <kontakt@beberlei.de>
  * @author Johannes Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.1.0
  */
 class ClassUtils
 {
@@ -38,6 +40,8 @@ class ClassUtils
 
     /**
      * This class should not be instantiated
+     *
+     * @since v2.2.0
      */
     private function __construct() {}
 
@@ -46,6 +50,8 @@ class ClassUtils
      *
      * @param string|object
      * @return string
+     *
+     * @since v2.1.0
      */
     public static function getRealClass($object)
     {

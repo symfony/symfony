@@ -17,6 +17,8 @@ namespace Symfony\Component\Console\Formatter;
  * @author Konstantin Kudryashov <ever.zet@gmail.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class OutputFormatter implements OutputFormatterInterface
 {
@@ -35,6 +37,8 @@ class OutputFormatter implements OutputFormatterInterface
      * @param string $text Text to escape
      *
      * @return string Escaped text
+     *
+     * @since v2.1.0
      */
     public static function escape($text)
     {
@@ -48,6 +52,8 @@ class OutputFormatter implements OutputFormatterInterface
      * @param FormatterStyle[] $styles    Array of "name => FormatterStyle" instances
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function __construct($decorated = null, array $styles = array())
     {
@@ -71,6 +77,8 @@ class OutputFormatter implements OutputFormatterInterface
      * @param Boolean $decorated Whether to decorate the messages or not
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setDecorated($decorated)
     {
@@ -83,6 +91,8 @@ class OutputFormatter implements OutputFormatterInterface
      * @return Boolean true if the output will decorate messages, false otherwise
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function isDecorated()
     {
@@ -96,6 +106,8 @@ class OutputFormatter implements OutputFormatterInterface
      * @param OutputFormatterStyleInterface $style The style instance
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setStyle($name, OutputFormatterStyleInterface $style)
     {
@@ -110,6 +122,8 @@ class OutputFormatter implements OutputFormatterInterface
      * @return Boolean
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function hasStyle($name)
     {
@@ -126,6 +140,8 @@ class OutputFormatter implements OutputFormatterInterface
      * @throws \InvalidArgumentException When style isn't defined
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getStyle($name)
     {
@@ -144,6 +160,8 @@ class OutputFormatter implements OutputFormatterInterface
      * @return string The styled message
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function format($message)
     {
@@ -154,6 +172,8 @@ class OutputFormatter implements OutputFormatterInterface
 
     /**
      * @return OutputFormatterStyleStack
+     *
+     * @since v2.1.0
      */
     public function getStyleStack()
     {
@@ -166,6 +186,8 @@ class OutputFormatter implements OutputFormatterInterface
      * @param array $match
      *
      * @return string The replaced style
+     *
+     * @since v2.0.0
      */
     private function replaceStyle($match)
     {
@@ -211,6 +233,8 @@ class OutputFormatter implements OutputFormatterInterface
      * @param string $string
      *
      * @return OutputFormatterStyle|Boolean false if string is not format string
+     *
+     * @since v2.0.0
      */
     private function createStyleFromString($string)
     {
@@ -240,6 +264,8 @@ class OutputFormatter implements OutputFormatterInterface
      * @param string $text Input text
      *
      * @return string Styled text
+     *
+     * @since v2.1.0
      */
     private function applyCurrentStyle($text)
     {

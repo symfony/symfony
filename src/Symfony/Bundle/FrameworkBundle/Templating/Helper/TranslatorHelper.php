@@ -18,6 +18,8 @@ use Symfony\Component\Translation\TranslatorInterface;
  * TranslatorHelper.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class TranslatorHelper extends Helper
 {
@@ -27,6 +29,8 @@ class TranslatorHelper extends Helper
      * Constructor.
      *
      * @param TranslatorInterface $translator A TranslatorInterface instance
+     *
+     * @since v2.0.0
      */
     public function __construct(TranslatorInterface $translator)
     {
@@ -35,6 +39,8 @@ class TranslatorHelper extends Helper
 
     /**
      * @see TranslatorInterface::trans()
+     *
+     * @since v2.0.0
      */
     public function trans($id, array $parameters = array(), $domain = 'messages', $locale = null)
     {
@@ -43,6 +49,8 @@ class TranslatorHelper extends Helper
 
     /**
      * @see TranslatorInterface::transChoice()
+     *
+     * @since v2.0.0
      */
     public function transChoice($id, $number, array $parameters = array(), $domain = 'messages', $locale = null)
     {
@@ -53,6 +61,8 @@ class TranslatorHelper extends Helper
      * Returns the canonical name of this helper.
      *
      * @return string The canonical name
+     *
+     * @since v2.0.0
      */
     public function getName()
     {

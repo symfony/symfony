@@ -31,6 +31,8 @@ interface DataCollectorInterface
      * @param \Exception $exception An Exception instance
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function collect(Request $request, Response $response, \Exception $exception = null);
 
@@ -40,6 +42,8 @@ interface DataCollectorInterface
      * @return string The collector name
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function getName();
 }

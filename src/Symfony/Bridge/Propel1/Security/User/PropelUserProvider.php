@@ -20,6 +20,8 @@ use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
  * Provides easy to use provisioning for Propel model users.
  *
  * @author William DURAND <william.durand1@gmail.com>
+ *
+ * @since v2.1.0
  */
 class PropelUserProvider implements UserProviderInterface
 {
@@ -49,6 +51,8 @@ class PropelUserProvider implements UserProviderInterface
      *
      * @param $class        The User model class.
      * @param $property     The property to use to retrieve a user.
+     *
+     * @since v2.1.0
      */
     public function __construct($class, $property = null)
     {
@@ -59,6 +63,8 @@ class PropelUserProvider implements UserProviderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function loadUserByUsername($username)
     {
@@ -81,6 +87,8 @@ class PropelUserProvider implements UserProviderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function refreshUser(UserInterface $user)
     {
@@ -95,6 +103,8 @@ class PropelUserProvider implements UserProviderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function supportsClass($class)
     {

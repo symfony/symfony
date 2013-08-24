@@ -15,6 +15,8 @@ namespace Symfony\Component\Intl\Exception;
  * Base BadMethodCallException for the Intl component.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.3.0
  */
 class BadMethodCallException extends \BadMethodCallException implements ExceptionInterface
 {

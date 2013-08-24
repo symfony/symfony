@@ -17,6 +17,8 @@ namespace Symfony\Component\HttpKernel;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 final class KernelEvents
 {

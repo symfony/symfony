@@ -26,6 +26,8 @@ abstract class Loader implements LoaderInterface
      * Sets the debugger to use for this loader.
      *
      * @param DebuggerInterface $debugger A debugger instance
+     *
+     * @since v2.0.0
      */
     public function setDebugger(DebuggerInterface $debugger)
     {

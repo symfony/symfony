@@ -37,6 +37,8 @@ namespace Symfony\Component\Console\Input;
  * @see    http://www.opengroup.org/onlinepubs/009695399/basedefs/xbd_chap12.html#tag_12_02
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class ArgvInput extends Input
 {
@@ -50,6 +52,8 @@ class ArgvInput extends Input
      * @param InputDefinition $definition A InputDefinition instance
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function __construct(array $argv = null, InputDefinition $definition = null)
     {
@@ -65,6 +69,9 @@ class ArgvInput extends Input
         parent::__construct($definition);
     }
 
+    /**
+     * @since v2.0.0
+     */
     protected function setTokens(array $tokens)
     {
         $this->tokens = $tokens;
@@ -72,6 +79,8 @@ class ArgvInput extends Input
 
     /**
      * Processes command line arguments.
+     *
+     * @since v2.0.0
      */
     protected function parse()
     {
@@ -96,6 +105,8 @@ class ArgvInput extends Input
      * Parses a short option.
      *
      * @param string $token The current token.
+     *
+     * @since v2.0.0
      */
     private function parseShortOption($token)
     {
@@ -119,6 +130,8 @@ class ArgvInput extends Input
      * @param string $name The current token
      *
      * @throws \RuntimeException When option given doesn't exist
+     *
+     * @since v2.0.0
      */
     private function parseShortOptionSet($name)
     {
@@ -143,6 +156,8 @@ class ArgvInput extends Input
      * Parses a long option.
      *
      * @param string $token The current token
+     *
+     * @since v2.0.0
      */
     private function parseLongOption($token)
     {
@@ -161,6 +176,8 @@ class ArgvInput extends Input
      * @param string $token The current token
      *
      * @throws \RuntimeException When too many arguments are given
+     *
+     * @since v2.0.0
      */
     private function parseArgument($token)
     {
@@ -189,6 +206,8 @@ class ArgvInput extends Input
      * @param mixed  $value    The value for the option
      *
      * @throws \RuntimeException When option given doesn't exist
+     *
+     * @since v2.0.0
      */
     private function addShortOption($shortcut, $value)
     {
@@ -206,6 +225,8 @@ class ArgvInput extends Input
      * @param mixed  $value The value for the option
      *
      * @throws \RuntimeException When option given doesn't exist
+     *
+     * @since v2.0.0
      */
     private function addLongOption($name, $value)
     {
@@ -258,6 +279,8 @@ class ArgvInput extends Input
      * Returns the first argument from the raw parameters (not parsed).
      *
      * @return string The value of the first argument or null otherwise
+     *
+     * @since v2.0.0
      */
     public function getFirstArgument()
     {
@@ -279,6 +302,8 @@ class ArgvInput extends Input
      * @param string|array $values The value(s) to look for in the raw parameters (can be an array)
      *
      * @return Boolean true if the value is contained in the raw parameters
+     *
+     * @since v2.0.0
      */
     public function hasParameterOption($values)
     {
@@ -305,6 +330,8 @@ class ArgvInput extends Input
      * @param mixed        $default The default value to return if no result is found
      *
      * @return mixed The option value
+     *
+     * @since v2.0.0
      */
     public function getParameterOption($values, $default = false)
     {
@@ -330,6 +357,8 @@ class ArgvInput extends Input
      * Returns a stringified representation of the args passed to the command
      *
      * @return string
+     *
+     * @since v2.3.0
      */
     public function __toString()
     {

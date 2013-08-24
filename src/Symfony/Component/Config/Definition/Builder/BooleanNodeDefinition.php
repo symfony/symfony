@@ -17,11 +17,15 @@ use Symfony\Component\Config\Definition\BooleanNode;
  * This class provides a fluent interface for defining a node.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class BooleanNodeDefinition extends ScalarNodeDefinition
 {
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function __construct($name, NodeParentInterface $parent = null)
     {
@@ -34,6 +38,8 @@ class BooleanNodeDefinition extends ScalarNodeDefinition
      * Instantiate a Node
      *
      * @return BooleanNode The node
+     *
+     * @since v2.0.0
      */
     protected function instantiateNode()
     {

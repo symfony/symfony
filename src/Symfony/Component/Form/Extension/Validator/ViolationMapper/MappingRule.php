@@ -16,6 +16,8 @@ use Symfony\Component\Form\Exception\ErrorMappingException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.1.0
  */
 class MappingRule
 {
@@ -34,6 +36,9 @@ class MappingRule
      */
     private $targetPath;
 
+    /**
+     * @since v2.1.0
+     */
     public function __construct(FormInterface $origin, $propertyPath, $targetPath)
     {
         $this->origin = $origin;
@@ -43,6 +48,8 @@ class MappingRule
 
     /**
      * @return FormInterface
+     *
+     * @since v2.1.0
      */
     public function getOrigin()
     {
@@ -58,6 +65,8 @@ class MappingRule
      * @param  string $propertyPath The property path to match against the rule.
      *
      * @return null|FormInterface The mapped form or null.
+     *
+     * @since v2.1.0
      */
     public function match($propertyPath)
     {
@@ -74,6 +83,8 @@ class MappingRule
      * @param string $propertyPath The property path to match against the rule.
      *
      * @return Boolean Whether the property path is a prefix of the rule or not.
+     *
+     * @since v2.1.0
      */
     public function isPrefix($propertyPath)
     {
@@ -88,6 +99,8 @@ class MappingRule
      * @return FormInterface
      *
      * @throws ErrorMappingException
+     *
+     * @since v2.1.0
      */
     public function getTarget()
     {

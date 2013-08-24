@@ -18,6 +18,8 @@ use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
  * Default implementation of {@link PropertyAccessorInterface}.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.2.0
  */
 class PropertyAccessor implements PropertyAccessorInterface
 {
@@ -29,6 +31,8 @@ class PropertyAccessor implements PropertyAccessorInterface
     /**
      * Should not be used by application code. Use
      * {@link PropertyAccess::getPropertyAccessor()} instead.
+     *
+     * @since v2.3.0
      */
     public function __construct($magicCall = false)
     {
@@ -37,6 +41,8 @@ class PropertyAccessor implements PropertyAccessorInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function getValue($objectOrArray, $propertyPath)
     {
@@ -53,6 +59,8 @@ class PropertyAccessor implements PropertyAccessorInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function setValue(&$objectOrArray, $propertyPath, $value)
     {
@@ -105,6 +113,8 @@ class PropertyAccessor implements PropertyAccessorInterface
      * @return array The values read in the path.
      *
      * @throws UnexpectedTypeException If a value within the path is neither object nor array.
+     *
+     * @since v2.2.0
      */
     private function &readPropertiesUntil(&$objectOrArray, PropertyPathInterface $propertyPath, $lastIndex)
     {
@@ -147,6 +157,8 @@ class PropertyAccessor implements PropertyAccessorInterface
      * @return mixed The value of the key
      *
      * @throws NoSuchPropertyException If the array does not implement \ArrayAccess or it is not an array
+     *
+     * @since v2.2.0
      */
     private function &readIndex(&$array, $index)
     {
@@ -184,6 +196,8 @@ class PropertyAccessor implements PropertyAccessorInterface
      *
      * @throws NoSuchPropertyException If the property does not exist or is not
      *                                 public.
+     *
+     * @since v2.2.0
      */
     private function &readProperty(&$object, $property)
     {
@@ -256,6 +270,8 @@ class PropertyAccessor implements PropertyAccessorInterface
      * @param mixed              $value The value to write
      *
      * @throws NoSuchPropertyException If the array does not implement \ArrayAccess or it is not an array
+     *
+     * @since v2.2.0
      */
     private function writeIndex(&$array, $index, $value)
     {
@@ -276,6 +292,8 @@ class PropertyAccessor implements PropertyAccessorInterface
      *
      * @throws NoSuchPropertyException If the property does not exist or is not
      *                                 public.
+     *
+     * @since v2.2.0
      */
     private function writeProperty(&$object, $property, $singular, $value)
     {
@@ -375,6 +393,8 @@ class PropertyAccessor implements PropertyAccessorInterface
      * @param  string $string Some string
      *
      * @return string The camelized version of the string
+     *
+     * @since v2.2.0
      */
     private function camelize($string)
     {
@@ -390,6 +410,8 @@ class PropertyAccessor implements PropertyAccessorInterface
      * @return array|null An array containing the adder and remover when found, null otherwise
      *
      * @throws NoSuchPropertyException If the property does not exist
+     *
+     * @since v2.2.0
      */
     private function findAdderAndRemover(\ReflectionClass $reflClass, array $singulars)
     {
@@ -426,6 +448,8 @@ class PropertyAccessor implements PropertyAccessorInterface
      *
      * @return Boolean Whether the method is public and has $parameters
      *                                      required parameters
+     *
+     * @since v2.2.0
      */
     private function isAccessible(\ReflectionClass $class, $methodName, $parameters)
     {

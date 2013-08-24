@@ -15,6 +15,8 @@ namespace Symfony\Component\DependencyInjection\Exception;
  * This exception is thrown when the a scope crossing injection is detected.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class ScopeCrossingInjectionException extends RuntimeException
 {
@@ -23,6 +25,9 @@ class ScopeCrossingInjectionException extends RuntimeException
     private $destServiceId;
     private $destScope;
 
+    /**
+     * @since v2.3.0
+     */
     public function __construct($sourceServiceId, $sourceScope, $destServiceId, $destScope, \Exception $previous = null)
     {
         parent::__construct(sprintf(
@@ -43,21 +48,33 @@ class ScopeCrossingInjectionException extends RuntimeException
         $this->destScope = $destScope;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getSourceServiceId()
     {
         return $this->sourceServiceId;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getSourceScope()
     {
         return $this->sourceScope;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getDestServiceId()
     {
         return $this->destServiceId;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getDestScope()
     {
         return $this->destScope;

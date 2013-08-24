@@ -20,6 +20,8 @@ use Symfony\Component\Translation\TranslatorInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.0.0
  */
 class Validator implements ValidatorInterface
 {
@@ -48,6 +50,9 @@ class Validator implements ValidatorInterface
      */
     private $objectInitializers;
 
+    /**
+     * @since v2.0.0
+     */
     public function __construct(
         MetadataFactoryInterface $metadataFactory,
         ConstraintValidatorFactoryInterface $validatorFactory,
@@ -65,6 +70,8 @@ class Validator implements ValidatorInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getMetadataFactory()
     {
@@ -73,6 +80,8 @@ class Validator implements ValidatorInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.2.0
      */
     public function getMetadataFor($value)
     {
@@ -81,6 +90,8 @@ class Validator implements ValidatorInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.2.0
      */
     public function validate($value, $groups = null, $traverse = false, $deep = false)
     {
@@ -97,6 +108,8 @@ class Validator implements ValidatorInterface
      * {@inheritDoc}
      *
      * @throws ValidatorException If the metadata for the value does not support properties.
+     *
+     * @since v2.2.0
      */
     public function validateProperty($containingValue, $property, $groups = null)
     {
@@ -128,6 +141,8 @@ class Validator implements ValidatorInterface
      * {@inheritDoc}
      *
      * @throws ValidatorException If the metadata for the value does not support properties.
+     *
+     * @since v2.2.0
      */
     public function validatePropertyValue($containingValue, $property, $value, $groups = null)
     {
@@ -157,6 +172,8 @@ class Validator implements ValidatorInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.2.0
      */
     public function validateValue($value, $constraints, $groups = null)
     {
@@ -196,6 +213,8 @@ class Validator implements ValidatorInterface
      * @param mixed $root
      *
      * @return ValidationVisitor
+     *
+     * @since v2.2.0
      */
     private function createVisitor($root)
     {
@@ -213,6 +232,8 @@ class Validator implements ValidatorInterface
      * @param null|string|string[] $groups
      *
      * @return string[]
+     *
+     * @since v2.2.0
      */
     private function resolveGroups($groups)
     {

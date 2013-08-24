@@ -15,6 +15,8 @@ namespace Symfony\Component\Validator\Constraints;
  * @Annotation
  *
  * @author Daniel Holmes <daniel@danielholmes.org>
+ *
+ * @since v2.3.0
  */
 class NotIdenticalTo extends AbstractComparison
 {

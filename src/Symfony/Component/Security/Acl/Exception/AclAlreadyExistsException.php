@@ -16,6 +16,8 @@ namespace Symfony\Component\Security\Acl\Exception;
  * identity that already has one.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class AclAlreadyExistsException extends Exception
 {

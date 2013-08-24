@@ -15,6 +15,8 @@ namespace Symfony\Component\Form\Extension\Core\View;
  * Represents a choice in templates.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.1.0
  */
 class ChoiceView
 {
@@ -45,6 +47,8 @@ class ChoiceView
      * @param mixed  $data  The original choice.
      * @param string $value The view representation of the choice.
      * @param string $label The label displayed to humans.
+     *
+     * @since v2.1.0
      */
     public function __construct($data, $value, $label)
     {

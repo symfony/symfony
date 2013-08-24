@@ -15,11 +15,15 @@ namespace Symfony\Component\Validator\Constraints;
  * Validates values aren't identical (!==).
  *
  * @author Daniel Holmes <daniel@danielholmes.org>
+ *
+ * @since v2.3.0
  */
 class NotIdenticalToValidator extends AbstractComparisonValidator
 {
     /**
      * @inheritDoc
+     *
+     * @since v2.3.0
      */
     protected function compareValues($value1, $value2)
     {

@@ -18,10 +18,16 @@ use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\Constraints\GroupSequenceProvider;
 use Symfony\Component\Validator\Constraint;
 
+/**
+ * @since v2.0.0
+ */
 class AnnotationLoader implements LoaderInterface
 {
     protected $reader;
 
+    /**
+     * @since v2.0.0
+     */
     public function __construct(Reader $reader)
     {
         $this->reader = $reader;
@@ -29,6 +35,8 @@ class AnnotationLoader implements LoaderInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function loadClassMetadata(ClassMetadata $metadata)
     {

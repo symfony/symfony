@@ -17,6 +17,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * Authentication Token for "Remember-Me".
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class RememberMeToken extends AbstractToken
 {
@@ -31,6 +33,8 @@ class RememberMeToken extends AbstractToken
      * @param string        $key
      *
      * @throws \InvalidArgumentException
+     *
+     * @since v2.0.10
      */
     public function __construct(UserInterface $user, $providerKey, $key)
     {
@@ -51,6 +55,9 @@ class RememberMeToken extends AbstractToken
         parent::setAuthenticated(true);
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function setAuthenticated($authenticated)
     {
         if ($authenticated) {
@@ -60,16 +67,25 @@ class RememberMeToken extends AbstractToken
         parent::setAuthenticated(false);
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getProviderKey()
     {
         return $this->providerKey;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getKey()
     {
         return $this->key;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getCredentials()
     {
         return '';
@@ -77,6 +93,8 @@ class RememberMeToken extends AbstractToken
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function serialize()
     {
@@ -89,6 +107,8 @@ class RememberMeToken extends AbstractToken
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function unserialize($serialized)
     {

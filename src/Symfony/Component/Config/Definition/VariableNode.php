@@ -20,6 +20,8 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
  * Any PHP type is accepted as a value.
  *
  * @author Jeremy Mikola <jmikola@gmail.com>
+ *
+ * @since v2.0.0
  */
 class VariableNode extends BaseNode implements PrototypeNodeInterface
 {
@@ -29,6 +31,8 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function setDefaultValue($value)
     {
@@ -38,6 +42,8 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function hasDefaultValue()
     {
@@ -46,6 +52,8 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function getDefaultValue()
     {
@@ -56,6 +64,8 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
      * Sets if this node is allowed to have an empty value.
      *
      * @param Boolean $boolean True if this entity will accept empty values.
+     *
+     * @since v2.0.0
      */
     public function setAllowEmptyValue($boolean)
     {
@@ -64,6 +74,8 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function setName($name)
     {
@@ -72,6 +84,8 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     protected function validateType($value)
     {
@@ -79,6 +93,8 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     protected function finalizeValue($value)
     {
@@ -98,6 +114,8 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     protected function normalizeValue($value)
     {
@@ -106,6 +124,8 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     protected function mergeValues($leftSide, $rightSide)
     {

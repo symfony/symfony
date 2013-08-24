@@ -20,6 +20,8 @@ use Symfony\Component\HttpFoundation\Session\Session;
  * @see DefaultCsrfProvider
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.0.0
  */
 class SessionCsrfProvider extends DefaultCsrfProvider
 {
@@ -37,6 +39,8 @@ class SessionCsrfProvider extends DefaultCsrfProvider
      *
      * @param Session $session The user session
      * @param string  $secret  A secret value included in the CSRF token
+     *
+     * @since v2.0.0
      */
     public function __construct(Session $session, $secret)
     {
@@ -47,6 +51,8 @@ class SessionCsrfProvider extends DefaultCsrfProvider
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     protected function getSessionId()
     {

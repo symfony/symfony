@@ -17,6 +17,8 @@ use Symfony\Component\Finder\Expression\Expression;
  * FilenameFilterIterator filters files by patterns (a regexp, a glob, or a string).
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.1.0
  */
 class FilenameFilterIterator extends MultiplePcreFilterIterator
 {
@@ -25,6 +27,8 @@ class FilenameFilterIterator extends MultiplePcreFilterIterator
      * Filters the iterator values.
      *
      * @return Boolean true if the value should be kept, false otherwise
+     *
+     * @since v2.0.0
      */
     public function accept()
     {
@@ -60,6 +64,8 @@ class FilenameFilterIterator extends MultiplePcreFilterIterator
      * @param string $str Pattern: glob or regexp
      *
      * @return string regexp corresponding to a given glob or regexp
+     *
+     * @since v2.1.0
      */
     protected function toRegex($str)
     {

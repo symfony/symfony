@@ -16,11 +16,16 @@ namespace Symfony\Component\Process;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class PhpExecutableFinder
 {
     private $executableFinder;
 
+    /**
+     * @since v2.0.0
+     */
     public function __construct()
     {
         $this->executableFinder = new ExecutableFinder();
@@ -30,6 +35,8 @@ class PhpExecutableFinder
      * Finds The PHP executable.
      *
      * @return string|false The PHP executable path or false if it cannot be found
+     *
+     * @since v2.0.0
      */
     public function find()
     {

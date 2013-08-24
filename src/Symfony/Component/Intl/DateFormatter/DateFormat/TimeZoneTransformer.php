@@ -17,6 +17,8 @@ use Symfony\Component\Intl\Exception\NotImplementedException;
  * Parser and formatter for time zone format
  *
  * @author Igor Wiedler <igor@wiedler.ch>
+ *
+ * @since v2.3.0
  */
 class TimeZoneTransformer extends Transformer
 {
@@ -24,6 +26,8 @@ class TimeZoneTransformer extends Transformer
      * {@inheritDoc}
      *
      * @throws NotImplementedException  When time zone is different than UTC or GMT (Etc/GMT)
+     *
+     * @since v2.3.0
      */
     public function format(\DateTime $dateTime, $length)
     {
@@ -41,6 +45,8 @@ class TimeZoneTransformer extends Transformer
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.3.0
      */
     public function getReverseMatchingRegExp($length)
     {
@@ -49,6 +55,8 @@ class TimeZoneTransformer extends Transformer
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.3.0
      */
     public function extractDateOptions($matched, $length)
     {
@@ -76,6 +84,8 @@ class TimeZoneTransformer extends Transformer
      *
      * @throws NotImplementedException   When the GMT time zone have minutes offset different than zero
      * @throws \InvalidArgumentException  When the value can not be matched with pattern
+     *
+     * @since v2.3.0
      */
     public static function getEtcTimeZoneId($formattedTimeZone)
     {

@@ -14,8 +14,14 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
+/**
+ * @since v2.0.0
+ */
 class TemplatingPass implements CompilerPassInterface
 {
+    /**
+     * @since v2.0.0
+     */
     public function process(ContainerBuilder $container)
     {
         if ($container->hasDefinition('templating')) {

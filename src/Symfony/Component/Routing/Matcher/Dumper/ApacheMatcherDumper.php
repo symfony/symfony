@@ -18,6 +18,8 @@ use Symfony\Component\Routing\Route;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Kris Wallsmith <kris@symfony.com>
+ *
+ * @since v2.0.0
  */
 class ApacheMatcherDumper extends MatcherDumper
 {
@@ -34,6 +36,8 @@ class ApacheMatcherDumper extends MatcherDumper
      * @return string A string to be used as Apache rewrite rules
      *
      * @throws \LogicException When the route regex is invalid
+     *
+     * @since v2.0.0
      */
     public function dump(array $options = array())
     {
@@ -112,6 +116,8 @@ class ApacheMatcherDumper extends MatcherDumper
      * @param  bool   $hostRegexUnique Unique identifier for the host regex
      *
      * @return string The compiled route
+     *
+     * @since v2.2.0
      */
     private function dumpRoute($name, $route, array $options, $hostRegexUnique)
     {
@@ -188,6 +194,8 @@ class ApacheMatcherDumper extends MatcherDumper
      * @param Route  $route The route
      *
      * @return array The methods
+     *
+     * @since v2.2.0
      */
     private function getRouteMethods(Route $route)
     {
@@ -209,6 +217,8 @@ class ApacheMatcherDumper extends MatcherDumper
      * @param string  $regex The regex
      *
      * @return string The converted regex
+     *
+     * @since v2.2.0
      */
     private function regexToApacheRegex($regex)
     {
@@ -225,6 +235,8 @@ class ApacheMatcherDumper extends MatcherDumper
      * @param string $with   The character to be used for escaping
      *
      * @return string The escaped string
+     *
+     * @since v2.1.0
      */
     private static function escape($string, $char, $with)
     {
@@ -255,6 +267,8 @@ class ApacheMatcherDumper extends MatcherDumper
      * @param array $values
      *
      * @return string[]
+     *
+     * @since v2.2.5
      */
     private function normalizeValues(array $values)
     {

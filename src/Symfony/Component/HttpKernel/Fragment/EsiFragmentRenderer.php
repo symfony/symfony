@@ -20,6 +20,8 @@ use Symfony\Component\HttpKernel\HttpCache\Esi;
  * Implements the ESI rendering strategy.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.2.0
  */
 class EsiFragmentRenderer extends RoutableFragmentRenderer
 {
@@ -53,6 +55,8 @@ class EsiFragmentRenderer extends RoutableFragmentRenderer
      *  * comment: a comment to add when returning an esi:include tag
      *
      * @see Symfony\Component\HttpKernel\HttpCache\ESI
+     *
+     * @since v2.2.0
      */
     public function render($uri, Request $request, array $options = array())
     {
@@ -76,6 +80,8 @@ class EsiFragmentRenderer extends RoutableFragmentRenderer
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function getName()
     {

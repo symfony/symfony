@@ -25,6 +25,8 @@ use Symfony\Component\HttpKernel\UriSigner;
  * Implements the Hinclude rendering strategy.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.2.0
  */
 class HIncludeFragmentRenderer extends RoutableFragmentRenderer
 {
@@ -40,6 +42,8 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
      * @param UriSigner                         $signer                A UriSigner instance
      * @param string                            $globalDefaultTemplate The global default content (it can be a template name or the content)
      * @param string                            $charset
+     *
+     * @since v2.3.0
      */
     public function __construct($templating = null, UriSigner $signer = null, $globalDefaultTemplate = null, $charset = 'utf-8')
     {
@@ -55,6 +59,8 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
      * @param EngineInterface|\Twig_Environment|null $templating An EngineInterface or a \Twig_Environment instance
      *
      * @throws \InvalidArgumentException
+     *
+     * @since v2.2.0
      */
     public function setTemplating($templating)
     {
@@ -69,6 +75,8 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
      * Checks if a templating engine has been set.
      *
      * @return Boolean true if the templating engine has been set, false otherwise
+     *
+     * @since v2.2.0
      */
     public function hasTemplating()
     {
@@ -83,6 +91,8 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
      *  * default:    The default content (it can be a template name or the content)
      *  * id:         An optional hx:include tag id attribute
      *  * attributes: An optional array of hx:include tag attributes
+     *
+     * @since v2.2.0
      */
     public function render($uri, Request $request, array $options = array())
     {
@@ -126,6 +136,8 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
      * @param string $template
      *
      * @return boolean
+     *
+     * @since v2.2.0
      */
     private function templateExists($template)
     {
@@ -154,6 +166,8 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function getName()
     {

@@ -15,6 +15,8 @@ namespace Symfony\Component\Config\Exception;
  * Exception class for when a resource cannot be loaded or imported.
  *
  * @author Ryan Weaver <ryan@thatsquality.com>
+ *
+ * @since v2.0.0
  */
 class FileLoaderLoadException extends \Exception
 {
@@ -23,6 +25,8 @@ class FileLoaderLoadException extends \Exception
      * @param string     $sourceResource The original resource importing the new resource
      * @param integer    $code           The error code
      * @param \Exception $previous       A previous exception
+     *
+     * @since v2.0.0
      */
     public function __construct($resource, $sourceResource = null, $code = null, $previous = null)
     {
@@ -45,6 +49,9 @@ class FileLoaderLoadException extends \Exception
         parent::__construct($message, $code, $previous);
     }
 
+    /**
+     * @since v2.0.0
+     */
     protected function varToString($var)
     {
         if (is_object($var)) {

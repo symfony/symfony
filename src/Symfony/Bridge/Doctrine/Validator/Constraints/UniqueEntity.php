@@ -18,6 +18,8 @@ use Symfony\Component\Validator\Constraint;
  *
  * @Annotation
  * @author Benjamin Eberlei <kontakt@beberlei.de>
+ *
+ * @since v2.0.0
  */
 class UniqueEntity extends Constraint
 {
@@ -29,6 +31,9 @@ class UniqueEntity extends Constraint
     public $errorPath = null;
     public $ignoreNull = true;
 
+    /**
+     * @since v2.0.0
+     */
     public function getRequiredOptions()
     {
         return array('fields');
@@ -38,6 +43,8 @@ class UniqueEntity extends Constraint
      * The validator must be defined as a service with this name.
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     public function validatedBy()
     {
@@ -46,12 +53,17 @@ class UniqueEntity extends Constraint
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function getTargets()
     {
         return self::CLASS_CONSTRAINT;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getDefaultOption()
     {
         return 'fields';

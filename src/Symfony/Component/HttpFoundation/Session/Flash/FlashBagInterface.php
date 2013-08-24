@@ -25,6 +25,8 @@ interface FlashBagInterface extends SessionBagInterface
      *
      * @param string $type
      * @param string $message
+     *
+     * @since v2.1.0
      */
     public function add($type, $message);
 
@@ -33,6 +35,8 @@ interface FlashBagInterface extends SessionBagInterface
      *
      * @param string       $type
      * @param string|array $message
+     *
+     * @since v2.1.0
      */
     public function set($type, $message);
 
@@ -43,6 +47,8 @@ interface FlashBagInterface extends SessionBagInterface
      * @param array  $default Default value if $type does not exist.
      *
      * @return array
+     *
+     * @since v2.1.0
      */
     public function peek($type, array $default = array());
 
@@ -50,6 +56,8 @@ interface FlashBagInterface extends SessionBagInterface
      * Gets all flash messages.
      *
      * @return array
+     *
+     * @since v2.1.0
      */
     public function peekAll();
 
@@ -60,6 +68,8 @@ interface FlashBagInterface extends SessionBagInterface
      * @param array  $default Default value if $type does not exist.
      *
      * @return array
+     *
+     * @since v2.1.0
      */
     public function get($type, array $default = array());
 
@@ -67,11 +77,15 @@ interface FlashBagInterface extends SessionBagInterface
      * Gets and clears flashes from the stack.
      *
      * @return array
+     *
+     * @since v2.1.0
      */
     public function all();
 
     /**
      * Sets all flash messages.
+     *
+     * @since v2.1.0
      */
     public function setAll(array $messages);
 
@@ -81,6 +95,8 @@ interface FlashBagInterface extends SessionBagInterface
      * @param string $type
      *
      * @return boolean
+     *
+     * @since v2.1.0
      */
     public function has($type);
 
@@ -88,6 +104,8 @@ interface FlashBagInterface extends SessionBagInterface
      * Returns a list of all defined types.
      *
      * @return array
+     *
+     * @since v2.1.0
      */
     public function keys();
 }

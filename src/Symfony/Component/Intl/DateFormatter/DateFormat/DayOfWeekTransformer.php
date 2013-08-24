@@ -15,11 +15,15 @@ namespace Symfony\Component\Intl\DateFormatter\DateFormat;
  * Parser and formatter for day of week format
  *
  * @author Igor Wiedler <igor@wiedler.ch>
+ *
+ * @since v2.3.0
  */
 class DayOfWeekTransformer extends Transformer
 {
     /**
      * {@inheritDoc}
+     *
+     * @since v2.3.0
      */
     public function format(\DateTime $dateTime, $length)
     {
@@ -38,6 +42,8 @@ class DayOfWeekTransformer extends Transformer
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.3.0
      */
     public function getReverseMatchingRegExp($length)
     {
@@ -55,6 +61,8 @@ class DayOfWeekTransformer extends Transformer
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.3.0
      */
     public function extractDateOptions($matched, $length)
     {

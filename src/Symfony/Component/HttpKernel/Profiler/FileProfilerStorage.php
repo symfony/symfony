@@ -14,6 +14,8 @@ namespace Symfony\Component\HttpKernel\Profiler;
  * Storage for profiler using files.
  *
  * @author Alexandre Salomé <alexandre.salome@gmail.com>
+ *
+ * @since v2.1.0
  */
 class FileProfilerStorage implements ProfilerStorageInterface
 {
@@ -32,6 +34,8 @@ class FileProfilerStorage implements ProfilerStorageInterface
      * @param string $dsn The DSN
      *
      * @throws \RuntimeException
+     *
+     * @since v2.1.0
      */
     public function __construct($dsn)
     {
@@ -47,6 +51,8 @@ class FileProfilerStorage implements ProfilerStorageInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function find($ip, $url, $limit, $method, $start = null, $end = null)
     {
@@ -94,6 +100,8 @@ class FileProfilerStorage implements ProfilerStorageInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function purge()
     {
@@ -112,6 +120,8 @@ class FileProfilerStorage implements ProfilerStorageInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function read($token)
     {
@@ -124,6 +134,8 @@ class FileProfilerStorage implements ProfilerStorageInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function write(Profile $profile)
     {
@@ -180,6 +192,8 @@ class FileProfilerStorage implements ProfilerStorageInterface
      * @param string $token
      *
      * @return string The profile filename
+     *
+     * @since v2.1.0
      */
     protected function getFilename($token)
     {
@@ -194,6 +208,8 @@ class FileProfilerStorage implements ProfilerStorageInterface
      * Gets the index filename.
      *
      * @return string The index filename
+     *
+     * @since v2.1.0
      */
     protected function getIndexFilename()
     {
@@ -208,6 +224,8 @@ class FileProfilerStorage implements ProfilerStorageInterface
      * @param resource $file The file resource, with the pointer placed at the end of the line to read
      *
      * @return mixed A string representing the line or null if beginning of file is reached
+     *
+     * @since v2.1.0
      */
     protected function readLineFromFile($file)
     {
@@ -247,6 +265,9 @@ class FileProfilerStorage implements ProfilerStorageInterface
         return '' === $line ? null : $line;
     }
 
+    /**
+     * @since v2.1.0
+     */
     protected function createProfileFromData($token, $data, $parent = null)
     {
         $profile = new Profile($token);

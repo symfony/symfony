@@ -17,6 +17,8 @@ namespace Symfony\Component\DependencyInjection\Compiler;
  * Value is typically a reference.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class ServiceReferenceGraphEdge
 {
@@ -30,6 +32,8 @@ class ServiceReferenceGraphEdge
      * @param ServiceReferenceGraphNode $sourceNode
      * @param ServiceReferenceGraphNode $destNode
      * @param string                    $value
+     *
+     * @since v2.0.0
      */
     public function __construct(ServiceReferenceGraphNode $sourceNode, ServiceReferenceGraphNode $destNode, $value = null)
     {
@@ -42,6 +46,8 @@ class ServiceReferenceGraphEdge
      * Returns the value of the edge
      *
      * @return ServiceReferenceGraphNode
+     *
+     * @since v2.0.0
      */
     public function getValue()
     {
@@ -52,6 +58,8 @@ class ServiceReferenceGraphEdge
      * Returns the source node
      *
      * @return ServiceReferenceGraphNode
+     *
+     * @since v2.0.0
      */
     public function getSourceNode()
     {
@@ -62,6 +70,8 @@ class ServiceReferenceGraphEdge
      * Returns the destination node
      *
      * @return ServiceReferenceGraphNode
+     *
+     * @since v2.0.0
      */
     public function getDestNode()
     {

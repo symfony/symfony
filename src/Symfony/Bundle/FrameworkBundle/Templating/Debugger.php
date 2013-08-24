@@ -18,6 +18,8 @@ use Psr\Log\LoggerInterface;
  * Binds the Symfony templating loader debugger to the Symfony logger.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class Debugger implements DebuggerInterface
 {
@@ -27,6 +29,8 @@ class Debugger implements DebuggerInterface
      * Constructor.
      *
      * @param LoggerInterface $logger A LoggerInterface instance
+     *
+     * @since v2.0.0
      */
     public function __construct(LoggerInterface $logger = null)
     {
@@ -37,6 +41,8 @@ class Debugger implements DebuggerInterface
      * Logs a message.
      *
      * @param string $message A message to log
+     *
+     * @since v2.0.0
      */
     public function log($message)
     {

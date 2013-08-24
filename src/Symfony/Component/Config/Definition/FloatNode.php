@@ -17,11 +17,15 @@ use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
  * This node represents a float value in the config tree.
  *
  * @author Jeanmonod David <david.jeanmonod@gmail.com>
+ *
+ * @since v2.2.0
  */
 class FloatNode extends NumericNode
 {
     /**
      * {@inheritDoc}
+     *
+     * @since v2.2.0
      */
     protected function validateType($value)
     {

@@ -25,6 +25,8 @@ interface SecurityIdentityInterface
      * not rely on referential equality.
      *
      * @param SecurityIdentityInterface $identity
+     *
+     * @since v2.1.0
      */
     public function equals(SecurityIdentityInterface $identity);
 }

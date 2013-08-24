@@ -16,6 +16,8 @@ use Symfony\Component\Form\FormView;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.1.0
  */
 class TwigRendererEngine extends AbstractRendererEngine implements TwigRendererEngineInterface
 {
@@ -31,6 +33,8 @@ class TwigRendererEngine extends AbstractRendererEngine implements TwigRendererE
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function setEnvironment(\Twig_Environment $environment)
     {
@@ -39,6 +43,8 @@ class TwigRendererEngine extends AbstractRendererEngine implements TwigRendererE
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function renderBlock(FormView $view, $resource, $blockName, array $variables = array())
     {
@@ -75,6 +81,8 @@ class TwigRendererEngine extends AbstractRendererEngine implements TwigRendererE
      * @param string   $blockName The name of the block to load.
      *
      * @return Boolean True if the resource could be loaded, false otherwise.
+     *
+     * @since v2.1.0
      */
     protected function loadResourceForBlockName($cacheKey, FormView $view, $blockName)
     {
@@ -147,6 +155,8 @@ class TwigRendererEngine extends AbstractRendererEngine implements TwigRendererE
      *                         to initialize the theme first. Any changes made to
      *                         this variable will be kept and be available upon
      *                         further calls to this method using the same theme.
+     *
+     * @since v2.1.0
      */
     protected function loadResourcesFromTheme($cacheKey, &$theme)
     {

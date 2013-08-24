@@ -19,6 +19,8 @@ use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
  * AnonymousAuthenticationProvider validates AnonymousToken instances.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class AnonymousAuthenticationProvider implements AuthenticationProviderInterface
 {
@@ -28,6 +30,8 @@ class AnonymousAuthenticationProvider implements AuthenticationProviderInterface
      * Constructor.
      *
      * @param string $key The key shared with the authentication token
+     *
+     * @since v2.0.0
      */
     public function __construct($key)
     {
@@ -36,6 +40,8 @@ class AnonymousAuthenticationProvider implements AuthenticationProviderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function authenticate(TokenInterface $token)
     {
@@ -52,6 +58,8 @@ class AnonymousAuthenticationProvider implements AuthenticationProviderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function supports(TokenInterface $token)
     {

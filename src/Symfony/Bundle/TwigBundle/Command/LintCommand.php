@@ -20,9 +20,14 @@ use Symfony\Component\Finder\Finder;
  * Command that will validate your template syntax and output encountered errors.
  *
  * @author Marc Weistroff <marc.weistroff@sensiolabs.com>
+ *
+ * @since v2.1.0
  */
 class LintCommand extends ContainerAwareCommand
 {
+    /**
+     * @since v2.1.0
+     */
     protected function configure()
     {
         $this
@@ -55,6 +60,9 @@ EOF
         ;
     }
 
+    /**
+     * @since v2.1.0
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $twig = $this->getContainer()->get('twig');
@@ -95,6 +103,9 @@ EOF
         return $errors > 0 ? 1 : 0;
     }
 
+    /**
+     * @since v2.1.10
+     */
     protected function validateTemplate(\Twig_Environment $twig, OutputInterface $output, $template, $file = null)
     {
         try {
@@ -109,6 +120,9 @@ EOF
         return 0;
     }
 
+    /**
+     * @since v2.1.10
+     */
     protected function renderException(OutputInterface $output, $template, \Twig_Error $exception, $file = null)
     {
         $line =  $exception->getTemplateLine();
@@ -133,6 +147,9 @@ EOF
         }
     }
 
+    /**
+     * @since v2.1.10
+     */
     protected function getContext($template, $line, $context = 3)
     {
         $lines = explode("\n", $template);

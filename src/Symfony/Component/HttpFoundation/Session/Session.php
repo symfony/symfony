@@ -26,6 +26,8 @@ use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
  * @author Drak <drak@zikula.org>
  *
  * @api
+ *
+ * @since v2.1.0
  */
 class Session implements SessionInterface, \IteratorAggregate, \Countable
 {
@@ -52,6 +54,8 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
      * @param SessionStorageInterface $storage    A SessionStorageInterface instance.
      * @param AttributeBagInterface   $attributes An AttributeBagInterface instance, (defaults null for default AttributeBag)
      * @param FlashBagInterface       $flashes    A FlashBagInterface instance (defaults null for default FlashBag)
+     *
+     * @since v2.1.0
      */
     public function __construct(SessionStorageInterface $storage = null, AttributeBagInterface $attributes = null, FlashBagInterface $flashes = null)
     {
@@ -68,6 +72,8 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function start()
     {
@@ -76,6 +82,8 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function has($name)
     {
@@ -84,6 +92,8 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function get($name, $default = null)
     {
@@ -92,6 +102,8 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function set($name, $value)
     {
@@ -100,6 +112,8 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function all()
     {
@@ -108,6 +122,8 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function replace(array $attributes)
     {
@@ -116,6 +132,8 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function remove($name)
     {
@@ -124,6 +142,8 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function clear()
     {
@@ -132,6 +152,8 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function isStarted()
     {
@@ -142,6 +164,8 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
      * Returns an iterator for attributes.
      *
      * @return \ArrayIterator An \ArrayIterator instance
+     *
+     * @since v2.1.0
      */
     public function getIterator()
     {
@@ -152,6 +176,8 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
      * Returns the number of attributes.
      *
      * @return int The number of attributes
+     *
+     * @since v2.1.0
      */
     public function count()
     {
@@ -160,6 +186,8 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function invalidate($lifetime = null)
     {
@@ -170,6 +198,8 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function migrate($destroy = false, $lifetime = null)
     {
@@ -178,6 +208,8 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function save()
     {
@@ -186,6 +218,8 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getId()
     {
@@ -194,6 +228,8 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function setId($id)
     {
@@ -202,6 +238,8 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getName()
     {
@@ -210,6 +248,8 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function setName($name)
     {
@@ -218,6 +258,8 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getMetadataBag()
     {
@@ -226,6 +268,8 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function registerBag(SessionBagInterface $bag)
     {
@@ -234,6 +278,8 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getBag($name)
     {
@@ -244,6 +290,8 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
      * Gets the flashbag interface.
      *
      * @return FlashBagInterface
+     *
+     * @since v2.1.0
      */
     public function getFlashBag()
     {

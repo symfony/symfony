@@ -35,6 +35,8 @@ interface SessionHandlerInterface
      * @throws \RuntimeException If something goes wrong starting the session.
      *
      * @return boolean
+     *
+     * @since v2.1.0
      */
     public function open($savePath, $sessionName);
 
@@ -44,6 +46,8 @@ interface SessionHandlerInterface
      * @see http://php.net/sessionhandlerinterface.close
      *
      * @return boolean
+     *
+     * @since v2.1.0
      */
     public function close();
 
@@ -57,6 +61,8 @@ interface SessionHandlerInterface
      * @throws \RuntimeException On fatal error but not "record not found".
      *
      * @return string String as stored in persistent storage or empty string in all other cases.
+     *
+     * @since v2.1.0
      */
     public function read($sessionId);
 
@@ -69,6 +75,8 @@ interface SessionHandlerInterface
      * @param string $data      Session serialized data to save.
      *
      * @return boolean
+     *
+     * @since v2.1.0
      */
     public function write($sessionId, $data);
 
@@ -82,6 +90,8 @@ interface SessionHandlerInterface
      * @throws \RuntimeException On fatal error.
      *
      * @return boolean
+     *
+     * @since v2.1.0
      */
     public function destroy($sessionId);
 
@@ -95,6 +105,8 @@ interface SessionHandlerInterface
      * @throws \RuntimeException On fatal error.
      *
      * @return boolean
+     *
+     * @since v2.1.0
      */
     public function gc($lifetime);
 }

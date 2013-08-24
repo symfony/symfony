@@ -36,6 +36,8 @@ namespace Symfony\Component\ClassLoader;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Jordi Boggiano <j.boggiano@seld.be>
+ *
+ * @since v2.1.0
  */
 class ClassLoader
 {
@@ -47,6 +49,8 @@ class ClassLoader
      * Returns prefixes.
      *
      * @return array
+     *
+     * @since v2.1.0
      */
     public function getPrefixes()
     {
@@ -57,6 +61,8 @@ class ClassLoader
      * Returns fallback directories.
      *
      * @return array
+     *
+     * @since v2.1.0
      */
     public function getFallbackDirs()
     {
@@ -67,6 +73,8 @@ class ClassLoader
      * Adds prefixes.
      *
      * @param array $prefixes Prefixes to add
+     *
+     * @since v2.1.0
      */
     public function addPrefixes(array $prefixes)
     {
@@ -80,6 +88,8 @@ class ClassLoader
      *
      * @param string       $prefix The classes prefix
      * @param array|string $paths  The location(s) of the classes
+     *
+     * @since v2.1.0
      */
     public function addPrefix($prefix, $paths)
     {
@@ -104,6 +114,8 @@ class ClassLoader
      * Turns on searching the include for class files.
      *
      * @param Boolean $useIncludePath
+     *
+     * @since v2.1.0
      */
     public function setUseIncludePath($useIncludePath)
     {
@@ -115,6 +127,8 @@ class ClassLoader
      * for classes.
      *
      * @return Boolean
+     *
+     * @since v2.1.0
      */
     public function getUseIncludePath()
     {
@@ -125,6 +139,8 @@ class ClassLoader
      * Registers this instance as an autoloader.
      *
      * @param Boolean $prepend Whether to prepend the autoloader or not
+     *
+     * @since v2.1.0
      */
     public function register($prepend = false)
     {
@@ -133,6 +149,8 @@ class ClassLoader
 
     /**
      * Unregisters this instance as an autoloader.
+     *
+     * @since v2.1.0
      */
     public function unregister()
     {
@@ -145,6 +163,8 @@ class ClassLoader
      * @param string $class The name of the class
      *
      * @return Boolean|null True, if loaded
+     *
+     * @since v2.1.0
      */
     public function loadClass($class)
     {
@@ -161,6 +181,8 @@ class ClassLoader
      * @param string $class The name of the class
      *
      * @return string|null The path, if found
+     *
+     * @since v2.1.0
      */
     public function findFile($class)
     {

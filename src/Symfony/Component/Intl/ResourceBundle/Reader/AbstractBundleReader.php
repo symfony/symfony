@@ -15,11 +15,15 @@ namespace Symfony\Component\Intl\ResourceBundle\Reader;
  * Base class for {@link BundleReaderInterface} implementations.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.3.0
  */
 abstract class AbstractBundleReader implements BundleReaderInterface
 {
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getLocales($path)
     {
@@ -37,6 +41,8 @@ abstract class AbstractBundleReader implements BundleReaderInterface
      * Returns the extension of locale files in this bundle.
      *
      * @return string The file extension (without leading dot).
+     *
+     * @since v2.3.0
      */
     abstract protected function getFileExtension();
 }

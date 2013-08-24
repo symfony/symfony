@@ -18,6 +18,8 @@ namespace Symfony\Component\CssSelector\Node;
  * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @since v2.3.0
  */
 class AttributeNode extends AbstractNode
 {
@@ -52,6 +54,8 @@ class AttributeNode extends AbstractNode
      * @param string        $attribute
      * @param string        $operator
      * @param string        $value
+     *
+     * @since v2.3.0
      */
     public function __construct(NodeInterface $selector, $namespace, $attribute, $operator, $value)
     {
@@ -64,6 +68,8 @@ class AttributeNode extends AbstractNode
 
     /**
      * @return NodeInterface
+     *
+     * @since v2.3.0
      */
     public function getSelector()
     {
@@ -72,6 +78,8 @@ class AttributeNode extends AbstractNode
 
     /**
      * @return string
+     *
+     * @since v2.3.0
      */
     public function getNamespace()
     {
@@ -80,6 +88,8 @@ class AttributeNode extends AbstractNode
 
     /**
      * @return string
+     *
+     * @since v2.3.0
      */
     public function getAttribute()
     {
@@ -88,6 +98,8 @@ class AttributeNode extends AbstractNode
 
     /**
      * @return string
+     *
+     * @since v2.3.0
      */
     public function getOperator()
     {
@@ -96,6 +108,8 @@ class AttributeNode extends AbstractNode
 
     /**
      * @return string
+     *
+     * @since v2.3.0
      */
     public function getValue()
     {
@@ -104,6 +118,8 @@ class AttributeNode extends AbstractNode
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getSpecificity()
     {
@@ -112,6 +128,8 @@ class AttributeNode extends AbstractNode
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function __toString()
     {

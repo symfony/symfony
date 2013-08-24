@@ -24,6 +24,8 @@ interface FormExtensionInterface
      * @return FormTypeInterface The type
      *
      * @throws Exception\InvalidArgumentException if the given type is not supported by this extension
+     *
+     * @since v2.1.0
      */
     public function getType($name);
 
@@ -33,6 +35,8 @@ interface FormExtensionInterface
      * @param string $name The name of the type
      *
      * @return Boolean Whether the type is supported by this extension
+     *
+     * @since v2.1.0
      */
     public function hasType($name);
 
@@ -42,6 +46,8 @@ interface FormExtensionInterface
      * @param string $name The name of the type
      *
      * @return FormTypeExtensionInterface[] An array of extensions as FormTypeExtensionInterface instances
+     *
+     * @since v2.1.0
      */
     public function getTypeExtensions($name);
 
@@ -51,6 +57,8 @@ interface FormExtensionInterface
      * @param string $name The name of the type
      *
      * @return Boolean Whether the given type has extensions
+     *
+     * @since v2.1.0
      */
     public function hasTypeExtensions($name);
 
@@ -58,6 +66,8 @@ interface FormExtensionInterface
      * Returns the type guesser provided by this extension.
      *
      * @return FormTypeGuesserInterface|null The type guesser
+     *
+     * @since v2.1.0
      */
     public function getTypeGuesser();
 }

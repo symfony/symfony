@@ -23,6 +23,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  * Circular reference from method calls will only be detected at run-time.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class CheckCircularReferencesPass implements CompilerPassInterface
 {
@@ -33,6 +35,8 @@ class CheckCircularReferencesPass implements CompilerPassInterface
      * Checks the ContainerBuilder object for circular references.
      *
      * @param ContainerBuilder $container The ContainerBuilder instances
+     *
+     * @since v2.0.0
      */
     public function process(ContainerBuilder $container)
     {
@@ -52,6 +56,8 @@ class CheckCircularReferencesPass implements CompilerPassInterface
      * @param ServiceReferenceGraphEdge[] $edges An array of Edges
      *
      * @throws ServiceCircularReferenceException When a circular reference is found.
+     *
+     * @since v2.0.0
      */
     private function checkOutEdges(array $edges)
     {

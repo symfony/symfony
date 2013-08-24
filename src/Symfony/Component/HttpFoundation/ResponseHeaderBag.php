@@ -17,6 +17,8 @@ namespace Symfony\Component\HttpFoundation;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class ResponseHeaderBag extends HeaderBag
 {
@@ -47,6 +49,8 @@ class ResponseHeaderBag extends HeaderBag
      * @param array $headers An array of HTTP headers
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function __construct(array $headers = array())
     {
@@ -59,6 +63,8 @@ class ResponseHeaderBag extends HeaderBag
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function __toString()
     {
@@ -76,6 +82,8 @@ class ResponseHeaderBag extends HeaderBag
      * Returns the headers, with original capitalizations.
      *
      * @return array An array of headers
+     *
+     * @since v2.2.0
      */
     public function allPreserveCase()
     {
@@ -86,6 +94,8 @@ class ResponseHeaderBag extends HeaderBag
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function replace(array $headers = array())
     {
@@ -102,6 +112,8 @@ class ResponseHeaderBag extends HeaderBag
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function set($key, $values, $replace = true)
     {
@@ -123,6 +135,8 @@ class ResponseHeaderBag extends HeaderBag
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function remove($key)
     {
@@ -138,6 +152,8 @@ class ResponseHeaderBag extends HeaderBag
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function hasCacheControlDirective($key)
     {
@@ -146,6 +162,8 @@ class ResponseHeaderBag extends HeaderBag
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getCacheControlDirective($key)
     {
@@ -158,6 +176,8 @@ class ResponseHeaderBag extends HeaderBag
      * @param Cookie $cookie
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setCookie(Cookie $cookie)
     {
@@ -172,6 +192,8 @@ class ResponseHeaderBag extends HeaderBag
      * @param string $domain
      *
      * @api
+     *
+     * @since v2.0.10
      */
     public function removeCookie($name, $path = '/', $domain = null)
     {
@@ -200,6 +222,8 @@ class ResponseHeaderBag extends HeaderBag
      * @return array
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getCookies($format = self::COOKIES_FLAT)
     {
@@ -231,6 +255,8 @@ class ResponseHeaderBag extends HeaderBag
      * @param string $domain
      *
      * @api
+     *
+     * @since v2.0.10
      */
     public function clearCookie($name, $path = '/', $domain = null)
     {
@@ -250,6 +276,8 @@ class ResponseHeaderBag extends HeaderBag
      *
      * @throws \InvalidArgumentException
      * @see RFC 6266
+     *
+     * @since v2.1.0
      */
     public function makeDisposition($disposition, $filename, $filenameFallback = '')
     {
@@ -292,6 +320,8 @@ class ResponseHeaderBag extends HeaderBag
      * cache-control header to a sensible, conservative value.
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     protected function computeCacheControlValue()
     {

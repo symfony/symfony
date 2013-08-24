@@ -22,18 +22,26 @@ use Symfony\Component\HttpFoundation\Request;
  * This entry point is not intended to work with HTTP post requests.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class RetryAuthenticationEntryPoint implements AuthenticationEntryPointInterface
 {
     private $httpPort;
     private $httpsPort;
 
+    /**
+     * @since v2.0.0
+     */
     public function __construct($httpPort = 80, $httpsPort = 443)
     {
         $this->httpPort = $httpPort;
         $this->httpsPort = $httpsPort;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function start(Request $request, AuthenticationException $authException = null)
     {
         $scheme = $request->isSecure() ? 'http' : 'https';

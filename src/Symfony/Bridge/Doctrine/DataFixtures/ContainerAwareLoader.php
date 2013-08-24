@@ -22,6 +22,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * Note: Use of this class requires the Doctrine data fixtures extension, which
  * is a suggested dependency for Symfony.
+ *
+ * @since v2.1.0
  */
 class ContainerAwareLoader extends Loader
 {
@@ -34,6 +36,8 @@ class ContainerAwareLoader extends Loader
      * Constructor.
      *
      * @param ContainerInterface $container A ContainerInterface instance
+     *
+     * @since v2.1.0
      */
     public function __construct(ContainerInterface $container)
     {
@@ -42,6 +46,8 @@ class ContainerAwareLoader extends Loader
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function addFixture(FixtureInterface $fixture)
     {

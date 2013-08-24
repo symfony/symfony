@@ -24,6 +24,8 @@ use Symfony\Component\Validator\Exception\GroupDefinitionException;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.2.0
  */
 class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassBasedInterface, PropertyMetadataContainerInterface
 {
@@ -71,6 +73,8 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
      * Constructs a metadata for the given class
      *
      * @param string $class
+     *
+     * @since v2.0.0
      */
     public function __construct($class)
     {
@@ -83,6 +87,9 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
         }
     }
 
+    /**
+     * @since v2.2.0
+     */
     public function accept(ValidationVisitorInterface $visitor, $value, $group, $propertyPath, $propagatedGroup = null)
     {
         if (null === $propagatedGroup && Constraint::DEFAULT_GROUP === $group
@@ -121,6 +128,8 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
      * Returns the properties to be serialized
      *
      * @return array
+     *
+     * @since v2.0.0
      */
     public function __sleep()
     {
@@ -139,6 +148,8 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
      * Returns the fully qualified name of the class
      *
      * @return string  The fully qualified class name
+     *
+     * @since v2.0.0
      */
     public function getClassName()
     {
@@ -159,6 +170,8 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
      * can still be validated by validating the class in "<ClassName>".
      *
      * @return string  The name of the default group
+     *
+     * @since v2.0.0
      */
     public function getDefaultGroup()
     {
@@ -167,6 +180,8 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function addConstraint(Constraint $constraint)
     {
@@ -189,6 +204,8 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
      * @param Constraint $constraint The constraint
      *
      * @return ClassMetadata This object
+     *
+     * @since v2.0.0
      */
     public function addPropertyConstraint($property, Constraint $constraint)
     {
@@ -215,6 +232,8 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
      * @param Constraint $constraint The constraint
      *
      * @return ClassMetadata This object
+     *
+     * @since v2.0.0
      */
     public function addGetterConstraint($property, Constraint $constraint)
     {
@@ -235,6 +254,8 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
      * Merges the constraints of the given metadata into this object.
      *
      * @param ClassMetadata $source The source metadata
+     *
+     * @since v2.0.0
      */
     public function mergeConstraints(ClassMetadata $source)
     {
@@ -269,6 +290,8 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
      * Adds a member metadata.
      *
      * @param MemberMetadata $metadata
+     *
+     * @since v2.0.0
      */
     protected function addMemberMetadata(MemberMetadata $metadata)
     {
@@ -283,6 +306,8 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
      * @param string $property The name of the property
      *
      * @return Boolean
+     *
+     * @since v2.0.0
      */
     public function hasMemberMetadatas($property)
     {
@@ -295,6 +320,8 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
      * @param string $property The name of the property
      *
      * @return MemberMetadata[] An array of MemberMetadata
+     *
+     * @since v2.0.0
      */
     public function getMemberMetadatas($property)
     {
@@ -303,6 +330,8 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function hasPropertyMetadata($property)
     {
@@ -311,6 +340,8 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function getPropertyMetadata($property)
     {
@@ -321,6 +352,8 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
      * Returns all properties for which constraints are defined.
      *
      * @return array An array of property names
+     *
+     * @since v2.0.0
      */
     public function getConstrainedProperties()
     {
@@ -335,6 +368,8 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
      * @return ClassMetadata
      *
      * @throws GroupDefinitionException
+     *
+     * @since v2.0.0
      */
     public function setGroupSequence(array $groups)
     {
@@ -359,6 +394,8 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
      * Returns whether this class has an overridden default group sequence.
      *
      * @return Boolean
+     *
+     * @since v2.0.0
      */
     public function hasGroupSequence()
     {
@@ -369,6 +406,8 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
      * Returns the default group sequence for this class.
      *
      * @return array An array of group names
+     *
+     * @since v2.0.0
      */
     public function getGroupSequence()
     {
@@ -379,6 +418,8 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
      * Returns a ReflectionClass instance for this class.
      *
      * @return \ReflectionClass
+     *
+     * @since v2.0.0
      */
     public function getReflectionClass()
     {
@@ -395,6 +436,8 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
      * @param Boolean $active
      *
      * @throws GroupDefinitionException
+     *
+     * @since v2.1.0
      */
     public function setGroupSequenceProvider($active)
     {
@@ -413,6 +456,8 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
      * Returns whether the class is a group sequence provider.
      *
      * @return Boolean
+     *
+     * @since v2.1.0
      */
     public function isGroupSequenceProvider()
     {

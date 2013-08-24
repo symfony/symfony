@@ -27,6 +27,8 @@ interface AclInterface extends \Serializable
      * Returns all class-based ACEs associated with this ACL
      *
      * @return array
+     *
+     * @since v2.1.0
      */
     public function getClassAces();
 
@@ -35,6 +37,8 @@ interface AclInterface extends \Serializable
      *
      * @param string $field
      * @return array
+     *
+     * @since v2.1.0
      */
     public function getClassFieldAces($field);
 
@@ -42,6 +46,8 @@ interface AclInterface extends \Serializable
      * Returns all object-based ACEs associated with this ACL
      *
      * @return array
+     *
+     * @since v2.1.0
      */
     public function getObjectAces();
 
@@ -50,6 +56,8 @@ interface AclInterface extends \Serializable
      *
      * @param string $field
      * @return array
+     *
+     * @since v2.1.0
      */
     public function getObjectFieldAces($field);
 
@@ -57,6 +65,8 @@ interface AclInterface extends \Serializable
      * Returns the object identity associated with this ACL
      *
      * @return ObjectIdentityInterface
+     *
+     * @since v2.1.0
      */
     public function getObjectIdentity();
 
@@ -64,6 +74,8 @@ interface AclInterface extends \Serializable
      * Returns the parent ACL, or null if there is none.
      *
      * @return AclInterface|null
+     *
+     * @since v2.1.0
      */
     public function getParentAcl();
 
@@ -71,6 +83,8 @@ interface AclInterface extends \Serializable
      * Whether this ACL is inheriting ACEs from a parent ACL.
      *
      * @return Boolean
+     *
+     * @since v2.1.0
      */
     public function isEntriesInheriting();
 
@@ -82,6 +96,8 @@ interface AclInterface extends \Serializable
      * @param array   $securityIdentities
      * @param Boolean $administrativeMode
      * @return Boolean
+     *
+     * @since v2.1.0
      */
     public function isFieldGranted($field, array $masks, array $securityIdentities, $administrativeMode = false);
 
@@ -93,6 +109,8 @@ interface AclInterface extends \Serializable
      * @param array   $securityIdentities
      * @param Boolean $administrativeMode
      * @return Boolean
+     *
+     * @since v2.1.0
      */
     public function isGranted(array $masks, array $securityIdentities, $administrativeMode = false);
 
@@ -101,6 +119,8 @@ interface AclInterface extends \Serializable
      *
      * @param mixed $securityIdentities an implementation of SecurityIdentityInterface, or an array thereof
      * @return Boolean
+     *
+     * @since v2.1.0
      */
     public function isSidLoaded($securityIdentities);
 }

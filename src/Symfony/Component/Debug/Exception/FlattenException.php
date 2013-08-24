@@ -19,6 +19,8 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
  * Basically, this class removes all objects from the trace.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.3.0
  */
 class FlattenException
 {
@@ -32,6 +34,9 @@ class FlattenException
     private $file;
     private $line;
 
+    /**
+     * @since v2.3.0
+     */
     public static function create(\Exception $exception, $statusCode = null, array $headers = array())
     {
         $e = new static();
@@ -60,6 +65,9 @@ class FlattenException
         return $e;
     }
 
+    /**
+     * @since v2.3.0
+     */
     public function toArray()
     {
         $exceptions = array();
@@ -74,86 +82,137 @@ class FlattenException
         return $exceptions;
     }
 
+    /**
+     * @since v2.3.0
+     */
     public function getStatusCode()
     {
         return $this->statusCode;
     }
 
+    /**
+     * @since v2.3.0
+     */
     public function setStatusCode($code)
     {
         $this->statusCode = $code;
     }
 
+    /**
+     * @since v2.3.0
+     */
     public function getHeaders()
     {
         return $this->headers;
     }
 
+    /**
+     * @since v2.3.0
+     */
     public function setHeaders(array $headers)
     {
         $this->headers = $headers;
     }
 
+    /**
+     * @since v2.3.0
+     */
     public function getClass()
     {
         return $this->class;
     }
 
+    /**
+     * @since v2.3.0
+     */
     public function setClass($class)
     {
         $this->class = $class;
     }
 
+    /**
+     * @since v2.3.0
+     */
     public function getFile()
     {
         return $this->file;
     }
 
+    /**
+     * @since v2.3.0
+     */
     public function setFile($file)
     {
         $this->file = $file;
     }
 
+    /**
+     * @since v2.3.0
+     */
     public function getLine()
     {
         return $this->line;
     }
 
+    /**
+     * @since v2.3.0
+     */
     public function setLine($line)
     {
         $this->line = $line;
     }
 
+    /**
+     * @since v2.3.0
+     */
     public function getMessage()
     {
         return $this->message;
     }
 
+    /**
+     * @since v2.3.0
+     */
     public function setMessage($message)
     {
         $this->message = $message;
     }
 
+    /**
+     * @since v2.3.0
+     */
     public function getCode()
     {
         return $this->code;
     }
 
+    /**
+     * @since v2.3.0
+     */
     public function setCode($code)
     {
         $this->code = $code;
     }
 
+    /**
+     * @since v2.3.0
+     */
     public function getPrevious()
     {
         return $this->previous;
     }
 
+    /**
+     * @since v2.3.0
+     */
     public function setPrevious(FlattenException $previous)
     {
         $this->previous = $previous;
     }
 
+    /**
+     * @since v2.3.0
+     */
     public function getAllPrevious()
     {
         $exceptions = array();
@@ -165,11 +224,17 @@ class FlattenException
         return $exceptions;
     }
 
+    /**
+     * @since v2.3.0
+     */
     public function getTrace()
     {
         return $this->trace;
     }
 
+    /**
+     * @since v2.3.0
+     */
     public function setTraceFromException(\Exception $exception)
     {
         $trace = $exception->getTrace();
@@ -204,6 +269,9 @@ class FlattenException
         $this->setTrace($trace, $exception->getFile(), $exception->getLine());
     }
 
+    /**
+     * @since v2.3.0
+     */
     public function setTrace($trace, $file, $line)
     {
         $this->trace = array();
@@ -239,6 +307,9 @@ class FlattenException
         }
     }
 
+    /**
+     * @since v2.3.0
+     */
     private function flattenArgs($args, $level = 0)
     {
         $result = array();
@@ -268,6 +339,9 @@ class FlattenException
         return $result;
     }
 
+    /**
+     * @since v2.3.0
+     */
     private function getClassNameFromIncomplete(\__PHP_Incomplete_Class $value)
     {
         $array = new \ArrayObject($value);

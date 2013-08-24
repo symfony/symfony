@@ -17,11 +17,16 @@ use Doctrine\DBAL\Schema\Schema;
  * DBAL Session Storage Schema.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.1.0
  */
 final class DbalSessionHandlerSchema extends Schema
 {
     private $tableName;
 
+    /**
+     * @since v2.1.0
+     */
     public function __construct($tableName = 'sessions')
     {
         parent::__construct();
@@ -30,6 +35,9 @@ final class DbalSessionHandlerSchema extends Schema
         $this->addSessionTable();
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function addToSchema(Schema $schema)
     {
         foreach ($this->getTables() as $table) {
@@ -37,6 +45,9 @@ final class DbalSessionHandlerSchema extends Schema
         }
     }
 
+    /**
+     * @since v2.1.0
+     */
     private function addSessionTable()
     {
         $table = $this->createTable($this->tableName);

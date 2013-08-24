@@ -25,6 +25,8 @@ use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 abstract class Bundle extends ContainerAware implements BundleInterface
 {
@@ -34,6 +36,8 @@ abstract class Bundle extends ContainerAware implements BundleInterface
 
     /**
      * Boots the Bundle.
+     *
+     * @since v2.0.0
      */
     public function boot()
     {
@@ -41,6 +45,8 @@ abstract class Bundle extends ContainerAware implements BundleInterface
 
     /**
      * Shutdowns the Bundle.
+     *
+     * @since v2.0.0
      */
     public function shutdown()
     {
@@ -55,6 +61,8 @@ abstract class Bundle extends ContainerAware implements BundleInterface
      * other extensions, ...
      *
      * @param ContainerBuilder $container A ContainerBuilder instance
+     *
+     * @since v2.0.0
      */
     public function build(ContainerBuilder $container)
     {
@@ -68,6 +76,8 @@ abstract class Bundle extends ContainerAware implements BundleInterface
      * @throws \LogicException
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getContainerExtension()
     {
@@ -106,6 +116,8 @@ abstract class Bundle extends ContainerAware implements BundleInterface
      * @return string The Bundle namespace
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getNamespace()
     {
@@ -122,6 +134,8 @@ abstract class Bundle extends ContainerAware implements BundleInterface
      * @return string The Bundle absolute path
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getPath()
     {
@@ -138,6 +152,8 @@ abstract class Bundle extends ContainerAware implements BundleInterface
      * @return string The Bundle parent name it overrides or null if no parent
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getParent()
     {
@@ -150,6 +166,8 @@ abstract class Bundle extends ContainerAware implements BundleInterface
      * @return string The Bundle name
      *
      * @api
+     *
+     * @since v2.0.0
      */
     final public function getName()
     {
@@ -172,6 +190,8 @@ abstract class Bundle extends ContainerAware implements BundleInterface
      * * Commands extend Symfony\Component\Console\Command\Command
      *
      * @param Application $application An Application instance
+     *
+     * @since v2.0.0
      */
     public function registerCommands(Application $application)
     {

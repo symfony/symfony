@@ -24,6 +24,8 @@ use Symfony\Component\DependencyInjection\Scope;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.2.0
  */
 class ContainerAwareHttpKernel extends HttpKernel
 {
@@ -35,6 +37,8 @@ class ContainerAwareHttpKernel extends HttpKernel
      * @param EventDispatcherInterface    $dispatcher         An EventDispatcherInterface instance
      * @param ContainerInterface          $container          A ContainerInterface instance
      * @param ControllerResolverInterface $controllerResolver A ControllerResolverInterface instance
+     *
+     * @since v2.2.0
      */
     public function __construct(EventDispatcherInterface $dispatcher, ContainerInterface $container, ControllerResolverInterface $controllerResolver)
     {
@@ -50,6 +54,8 @@ class ContainerAwareHttpKernel extends HttpKernel
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {

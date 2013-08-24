@@ -22,6 +22,8 @@ use Psr\Log\LoggerInterface;
  * DigestAuthenticationEntryPoint starts an HTTP Digest authentication.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class DigestAuthenticationEntryPoint implements AuthenticationEntryPointInterface
 {
@@ -30,6 +32,9 @@ class DigestAuthenticationEntryPoint implements AuthenticationEntryPointInterfac
     private $nonceValiditySeconds;
     private $logger;
 
+    /**
+     * @since v2.0.0
+     */
     public function __construct($realmName, $key, $nonceValiditySeconds = 300, LoggerInterface $logger = null)
     {
         $this->realmName = $realmName;
@@ -38,6 +43,9 @@ class DigestAuthenticationEntryPoint implements AuthenticationEntryPointInterfac
         $this->logger = $logger;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function start(Request $request, AuthenticationException $authException = null)
     {
         $expiryTime = microtime(true) + $this->nonceValiditySeconds * 1000;
@@ -62,11 +70,17 @@ class DigestAuthenticationEntryPoint implements AuthenticationEntryPointInterfac
         return $response;
     }
 
+    /**
+     * @since v2.0.10
+     */
     public function getKey()
     {
         return $this->key;
     }
 
+    /**
+     * @since v2.0.10
+     */
     public function getRealmName()
     {
         return $this->realmName;

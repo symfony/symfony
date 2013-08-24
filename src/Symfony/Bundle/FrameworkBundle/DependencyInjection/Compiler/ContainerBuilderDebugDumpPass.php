@@ -22,9 +22,14 @@ use Symfony\Component\Filesystem\Filesystem;
  *
  * @author Ryan Weaver <ryan@thatsquality.com>
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class ContainerBuilderDebugDumpPass implements CompilerPassInterface
 {
+    /**
+     * @since v2.0.0
+     */
     public function process(ContainerBuilder $container)
     {
         $dumper = new XmlDumper($container);

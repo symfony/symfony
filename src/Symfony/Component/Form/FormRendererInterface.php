@@ -22,6 +22,8 @@ interface FormRendererInterface
      * Returns the engine used by this renderer.
      *
      * @return FormRendererEngineInterface The renderer engine.
+     *
+     * @since v2.1.0
      */
     public function getEngine();
 
@@ -31,6 +33,8 @@ interface FormRendererInterface
      * @param FormView $view   The view to assign the theme(s) to.
      * @param mixed             $themes The theme(s). The type of these themes
      *                                  is open to the implementation.
+     *
+     * @since v2.1.0
      */
     public function setTheme(FormView $view, $themes);
 
@@ -42,6 +46,8 @@ interface FormRendererInterface
      * @param array    $variables The variables to pass to the template.
      *
      * @return string The HTML markup
+     *
+     * @since v2.1.0
      */
     public function renderBlock(FormView $view, $blockName, array $variables = array());
 
@@ -60,6 +66,8 @@ interface FormRendererInterface
      * @param array    $variables       The variables to pass to the template.
      *
      * @return string The HTML markup
+     *
+     * @since v2.1.0
      */
     public function searchAndRenderBlock(FormView $view, $blockNameSuffix, array $variables = array());
 
@@ -85,6 +93,8 @@ interface FormRendererInterface
      * @param string $intention The intention of the protected action
      *
      * @return string A CSRF token
+     *
+     * @since v2.1.0
      */
     public function renderCsrfToken($intention);
 
@@ -98,6 +108,8 @@ interface FormRendererInterface
      * @param string $text The text to humanize.
      *
      * @return string The humanized text.
+     *
+     * @since v2.1.0
      */
     public function humanize($text);
 }

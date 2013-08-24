@@ -15,6 +15,8 @@ namespace Symfony\Component\Serializer\Exception;
  * RuntimeException
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class RuntimeException extends \RuntimeException implements Exception
 {

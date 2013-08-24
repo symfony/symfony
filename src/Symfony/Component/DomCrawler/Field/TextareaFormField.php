@@ -17,6 +17,8 @@ namespace Symfony\Component\DomCrawler\Field;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class TextareaFormField extends FormField
 {
@@ -24,6 +26,8 @@ class TextareaFormField extends FormField
      * Initializes the form field.
      *
      * @throws \LogicException When node type is incorrect
+     *
+     * @since v2.0.0
      */
     protected function initialize()
     {

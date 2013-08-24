@@ -33,6 +33,8 @@ use Symfony\Component\Serializer\Exception\RuntimeException;
  * takes place.
  *
  * @author Nils Adermann <naderman@naderman.de>
+ *
+ * @since v2.1.0
  */
 class GetSetMethodNormalizer extends SerializerAwareNormalizer implements NormalizerInterface, DenormalizerInterface
 {
@@ -46,6 +48,8 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
      * @param array $callbacks help normalize the result
      *
      * @throws InvalidArgumentException if a non-callable callback is set
+     *
+     * @since v2.1.0
      */
     public function setCallbacks(array $callbacks)
     {
@@ -61,6 +65,8 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
      * Set ignored attributes for normalization
      *
      * @param array $ignoredAttributes
+     *
+     * @since v2.1.0
      */
     public function setIgnoredAttributes(array $ignoredAttributes)
     {
@@ -71,6 +77,8 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
      * Set attributes to be camelized on denormalize
      *
      * @param array $camelizedAttributes
+     *
+     * @since v2.3.0
      */
     public function setCamelizedAttributes(array $camelizedAttributes)
     {
@@ -79,6 +87,8 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function normalize($object, $format = null, array $context = array())
     {
@@ -111,6 +121,8 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function denormalize($data, $class, $format = null, array $context = array())
     {
@@ -160,6 +172,8 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
      *
      * @param string $attributeName
      * @return string
+     *
+     * @since v2.3.0
      */
     protected function formatAttribute($attributeName)
     {
@@ -176,6 +190,8 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function supportsNormalization($data, $format = null)
     {
@@ -184,6 +200,8 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function supportsDenormalization($data, $type, $format = null)
     {
@@ -196,6 +214,8 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
      * @param string $class
      *
      * @return Boolean
+     *
+     * @since v2.0.0
      */
     private function supports($class)
     {
@@ -216,6 +236,8 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
      * @param \ReflectionMethod $method the method to check
      *
      * @return Boolean whether the method is a getter.
+     *
+     * @since v2.0.0
      */
     private function isGetMethod(\ReflectionMethod $method)
     {

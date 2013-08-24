@@ -35,6 +35,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  * Response instances.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class ExceptionListener
 {
@@ -47,6 +49,9 @@ class ExceptionListener
     private $logger;
     private $httpUtils;
 
+    /**
+     * @since v2.1.0
+     */
     public function __construct(SecurityContextInterface $context, AuthenticationTrustResolverInterface $trustResolver, HttpUtils $httpUtils, $providerKey, AuthenticationEntryPointInterface $authenticationEntryPoint = null, $errorPage = null, AccessDeniedHandlerInterface $accessDeniedHandler = null, LoggerInterface $logger = null)
     {
         $this->context = $context;
@@ -63,6 +68,8 @@ class ExceptionListener
      * Registers a onKernelException listener to take care of security exceptions.
      *
      * @param EventDispatcherInterface $dispatcher An EventDispatcherInterface instance
+     *
+     * @since v2.0.0
      */
     public function register(EventDispatcherInterface $dispatcher)
     {
@@ -73,6 +80,8 @@ class ExceptionListener
      * Handles security related exceptions.
      *
      * @param GetResponseForExceptionEvent $event An GetResponseForExceptionEvent instance
+     *
+     * @since v2.0.0
      */
     public function onKernelException(GetResponseForExceptionEvent $event)
     {
@@ -157,6 +166,9 @@ class ExceptionListener
         $event->setResponse($response);
     }
 
+    /**
+     * @since v2.0.0
+     */
     private function startAuthentication(Request $request, AuthenticationException $authException)
     {
         if (null === $this->authenticationEntryPoint) {
@@ -177,6 +189,9 @@ class ExceptionListener
         return $this->authenticationEntryPoint->start($request, $authException);
     }
 
+    /**
+     * @since v2.0.10
+     */
     protected function setTargetPath(Request $request)
     {
         // session isn't required when using http basic authentication mechanism for example

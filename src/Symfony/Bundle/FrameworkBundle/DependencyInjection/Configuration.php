@@ -19,6 +19,8 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  * FrameworkExtension configuration structure.
  *
  * @author Jeremy Mikola <jmikola@gmail.com>
+ *
+ * @since v2.0.0
  */
 class Configuration implements ConfigurationInterface
 {
@@ -26,6 +28,8 @@ class Configuration implements ConfigurationInterface
      * Generates the configuration tree builder.
      *
      * @return TreeBuilder The tree builder
+     *
+     * @since v2.0.0
      */
     public function getConfigTreeBuilder()
     {
@@ -93,6 +97,9 @@ class Configuration implements ConfigurationInterface
         return $treeBuilder;
     }
 
+    /**
+     * @since v2.0.0
+     */
     private function addFormSection(ArrayNodeDefinition $rootNode)
     {
         $rootNode
@@ -111,6 +118,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @since v2.0.0
+     */
     private function addEsiSection(ArrayNodeDefinition $rootNode)
     {
         $rootNode
@@ -123,6 +133,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @since v2.2.0
+     */
     private function addFragmentsSection(ArrayNodeDefinition $rootNode)
     {
         $rootNode
@@ -138,6 +151,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @since v2.0.0
+     */
     private function addProfilerSection(ArrayNodeDefinition $rootNode)
     {
         $rootNode
@@ -175,6 +191,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @since v2.0.0
+     */
     private function addRouterSection(ArrayNodeDefinition $rootNode)
     {
         $rootNode
@@ -202,6 +221,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @since v2.0.0
+     */
     private function addSessionSection(ArrayNodeDefinition $rootNode)
     {
         $rootNode
@@ -228,6 +250,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @since v2.0.0
+     */
     private function addTemplatingSection(ArrayNodeDefinition $rootNode)
     {
         $organizeUrls = function($urls) {
@@ -361,6 +386,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @since v2.0.0
+     */
     private function addTranslatorSection(ArrayNodeDefinition $rootNode)
     {
         $rootNode
@@ -376,6 +404,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @since v2.0.0
+     */
     private function addValidationSection(ArrayNodeDefinition $rootNode)
     {
         $rootNode
@@ -393,6 +424,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @since v2.0.0
+     */
     private function addAnnotationsSection(ArrayNodeDefinition $rootNode)
     {
         $rootNode
@@ -410,6 +444,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @since v2.3.0
+     */
     private function addSerializerSection(ArrayNodeDefinition $rootNode)
     {
         $rootNode

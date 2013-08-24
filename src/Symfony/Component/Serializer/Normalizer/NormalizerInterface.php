@@ -26,6 +26,8 @@ interface NormalizerInterface
      * @param array $context Context options for the normalizer
      *
      * @return array|scalar
+     *
+     * @since v2.2.0
      */
     public function normalize($object, $format = null, array $context = array());
 
@@ -36,6 +38,8 @@ interface NormalizerInterface
      * @param string $format The format being (de-)serialized from or into.
      *
      * @return Boolean
+     *
+     * @since v2.1.0
      */
     public function supportsNormalization($data, $format = null);
 }

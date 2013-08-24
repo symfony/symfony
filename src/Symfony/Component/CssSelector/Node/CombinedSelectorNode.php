@@ -18,6 +18,8 @@ namespace Symfony\Component\CssSelector\Node;
  * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @since v2.3.0
  */
 class CombinedSelectorNode extends AbstractNode
 {
@@ -40,6 +42,8 @@ class CombinedSelectorNode extends AbstractNode
      * @param NodeInterface $selector
      * @param string        $combinator
      * @param NodeInterface $subSelector
+     *
+     * @since v2.3.0
      */
     public function __construct(NodeInterface $selector, $combinator, NodeInterface $subSelector)
     {
@@ -50,6 +54,8 @@ class CombinedSelectorNode extends AbstractNode
 
     /**
      * @return NodeInterface
+     *
+     * @since v2.3.0
      */
     public function getSelector()
     {
@@ -58,6 +64,8 @@ class CombinedSelectorNode extends AbstractNode
 
     /**
      * @return string
+     *
+     * @since v2.3.0
      */
     public function getCombinator()
     {
@@ -66,6 +74,8 @@ class CombinedSelectorNode extends AbstractNode
 
     /**
      * @return NodeInterface
+     *
+     * @since v2.3.0
      */
     public function getSubSelector()
     {
@@ -74,6 +84,8 @@ class CombinedSelectorNode extends AbstractNode
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getSpecificity()
     {
@@ -82,6 +94,8 @@ class CombinedSelectorNode extends AbstractNode
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function __toString()
     {

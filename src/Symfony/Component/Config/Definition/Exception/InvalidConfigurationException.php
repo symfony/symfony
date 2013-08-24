@@ -16,16 +16,24 @@ namespace Symfony\Component\Config\Definition\Exception;
  * exceptions is suitable.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class InvalidConfigurationException extends Exception
 {
     private $path;
 
+    /**
+     * @since v2.0.0
+     */
     public function setPath($path)
     {
         $this->path = $path;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getPath()
     {
         return $this->path;

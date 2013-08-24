@@ -20,6 +20,8 @@ use Symfony\Component\HttpKernel\Profiler\Profile;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Artur Wielogórski <wodor@wodor.net>
+ *
+ * @since v2.1.0
  */
 class TemplateManager
 {
@@ -33,6 +35,8 @@ class TemplateManager
      * @param Profiler          $profiler
      * @param \Twig_Environment $twig
      * @param array             $templates
+     *
+     * @since v2.2.0
      */
     public function __construct(Profiler $profiler, \Twig_Environment $twig, array $templates)
     {
@@ -50,6 +54,8 @@ class TemplateManager
      * @return mixed
      *
      * @throws NotFoundHttpException
+     *
+     * @since v2.1.0
      */
     public function getName(Profile $profile, $panel)
     {
@@ -68,6 +74,8 @@ class TemplateManager
      * @param Profile $profile
      *
      * @return array
+     *
+     * @since v2.1.0
      */
     public function getTemplates(Profile $profile)
     {
@@ -87,6 +95,8 @@ class TemplateManager
      * @return array
      *
      * @throws \UnexpectedValueException
+     *
+     * @since v2.1.0
      */
     protected function getNames(Profile $profile)
     {
@@ -117,6 +127,9 @@ class TemplateManager
         return $templates;
     }
 
+    /**
+     * @since v2.2.0
+     */
     // to be removed when the minimum required version of Twig is >= 2.0
     protected function templateExists($template)
     {

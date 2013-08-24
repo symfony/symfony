@@ -24,6 +24,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * ProfilerListener collects data for the current request by listening to the onKernelResponse event.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.1.0
  */
 class ProfilerListener implements EventSubscriberInterface
 {
@@ -43,6 +45,8 @@ class ProfilerListener implements EventSubscriberInterface
      * @param RequestMatcherInterface $matcher            A RequestMatcher instance
      * @param Boolean                 $onlyException      true if the profiler only collects data when an exception occurs, false otherwise
      * @param Boolean                 $onlyMasterRequests true if the profiler only collects data when the request is a master request, false otherwise
+     *
+     * @since v2.0.0
      */
     public function __construct(Profiler $profiler, RequestMatcherInterface $matcher = null, $onlyException = false, $onlyMasterRequests = false)
     {
@@ -58,6 +62,8 @@ class ProfilerListener implements EventSubscriberInterface
      * Handles the onKernelException event.
      *
      * @param GetResponseForExceptionEvent $event A GetResponseForExceptionEvent instance
+     *
+     * @since v2.0.0
      */
     public function onKernelException(GetResponseForExceptionEvent $event)
     {
@@ -68,6 +74,9 @@ class ProfilerListener implements EventSubscriberInterface
         $this->exception = $event->getException();
     }
 
+    /**
+     * @since v2.0.10
+     */
     public function onKernelRequest(GetResponseEvent $event)
     {
         $this->requests[] = $event->getRequest();
@@ -77,6 +86,8 @@ class ProfilerListener implements EventSubscriberInterface
      * Handles the onKernelResponse event.
      *
      * @param FilterResponseEvent $event A FilterResponseEvent instance
+     *
+     * @since v2.0.0
      */
     public function onKernelResponse(FilterResponseEvent $event)
     {
@@ -137,6 +148,9 @@ class ProfilerListener implements EventSubscriberInterface
         }
     }
 
+    /**
+     * @since v2.1.0
+     */
     public static function getSubscribedEvents()
     {
         return array(
@@ -152,6 +166,8 @@ class ProfilerListener implements EventSubscriberInterface
      * Saves the profile hierarchy.
      *
      * @param Profile $profile The root profile
+     *
+     * @since v2.1.0
      */
     private function saveProfiles(Profile $profile)
     {

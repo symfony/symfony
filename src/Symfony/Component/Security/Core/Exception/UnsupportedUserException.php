@@ -16,6 +16,8 @@ namespace Symfony\Component\Security\Core\Exception;
  * doesn't support the passed implementation of UserInterface.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class UnsupportedUserException extends AuthenticationServiceException
 {

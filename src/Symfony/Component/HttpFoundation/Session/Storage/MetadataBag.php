@@ -19,6 +19,8 @@ use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
  * Adds metadata to the session.
  *
  * @author Drak <drak@zikula.org>
+ *
+ * @since v2.1.0
  */
 class MetadataBag implements SessionBagInterface
 {
@@ -52,6 +54,8 @@ class MetadataBag implements SessionBagInterface
      * Constructor.
      *
      * @param string $storageKey The key used to store bag in the session.
+     *
+     * @since v2.1.0
      */
     public function __construct($storageKey = '_sf2_meta')
     {
@@ -61,6 +65,8 @@ class MetadataBag implements SessionBagInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function initialize(array &$array)
     {
@@ -78,6 +84,8 @@ class MetadataBag implements SessionBagInterface
      * Gets the lifetime that the session cookie was set with.
      *
      * @return integer
+     *
+     * @since v2.1.0
      */
     public function getLifetime()
     {
@@ -91,6 +99,8 @@ class MetadataBag implements SessionBagInterface
      *                          will leave the system settings unchanged, 0 sets the cookie
      *                          to expire with browser session. Time is in seconds, and is
      *                          not a Unix timestamp.
+     *
+     * @since v2.1.0
      */
     public function stampNew($lifetime = null)
     {
@@ -99,6 +109,8 @@ class MetadataBag implements SessionBagInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getStorageKey()
     {
@@ -109,6 +121,8 @@ class MetadataBag implements SessionBagInterface
      * Gets the created timestamp metadata.
      *
      * @return integer Unix timestamp
+     *
+     * @since v2.1.0
      */
     public function getCreated()
     {
@@ -119,6 +133,8 @@ class MetadataBag implements SessionBagInterface
      * Gets the last used metadata.
      *
      * @return integer Unix timestamp
+     *
+     * @since v2.1.0
      */
     public function getLastUsed()
     {
@@ -127,6 +143,8 @@ class MetadataBag implements SessionBagInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function clear()
     {
@@ -135,6 +153,8 @@ class MetadataBag implements SessionBagInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getName()
     {
@@ -145,12 +165,17 @@ class MetadataBag implements SessionBagInterface
      * Sets name.
      *
      * @param string $name
+     *
+     * @since v2.1.0
      */
     public function setName($name)
     {
         $this->name = $name;
     }
 
+    /**
+     * @since v2.1.0
+     */
     private function stampCreated($lifetime = null)
     {
         $timeStamp = time();

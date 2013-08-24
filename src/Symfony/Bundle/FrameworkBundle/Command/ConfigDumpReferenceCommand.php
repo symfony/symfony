@@ -21,11 +21,15 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  * A console command for dumping available configuration reference
  *
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @since v2.1.0
  */
 class ConfigDumpReferenceCommand extends ContainerDebugCommand
 {
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     protected function configure()
     {
@@ -56,6 +60,8 @@ EOF
      * {@inheritdoc}
      *
      * @throws \LogicException
+     *
+     * @since v2.1.0
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {

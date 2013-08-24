@@ -21,6 +21,8 @@ use Symfony\Component\HttpFoundation\Response;
  * Store implements all the logic for storing cache metadata (Request and Response headers).
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class Store implements StoreInterface
 {
@@ -32,6 +34,8 @@ class Store implements StoreInterface
      * Constructor.
      *
      * @param string $root The path to the cache directory
+     *
+     * @since v2.0.0
      */
     public function __construct($root)
     {
@@ -45,6 +49,8 @@ class Store implements StoreInterface
 
     /**
      * Cleanups storage.
+     *
+     * @since v2.0.0
      */
     public function cleanup()
     {
@@ -68,6 +74,8 @@ class Store implements StoreInterface
      * @param Request $request A Request instance
      *
      * @return Boolean|string true if the lock is acquired, the path to the current lock otherwise
+     *
+     * @since v2.0.0
      */
     public function lock(Request $request)
     {
@@ -94,6 +102,8 @@ class Store implements StoreInterface
      * @param Request $request A Request instance
      *
      * @return Boolean False if the lock file does not exist or cannot be unlocked, true otherwise
+     *
+     * @since v2.0.0
      */
     public function unlock(Request $request)
     {
@@ -102,6 +112,9 @@ class Store implements StoreInterface
         return is_file($file) ? @unlink($file) : false;
     }
 
+    /**
+     * @since v2.2.0
+     */
     public function isLocked(Request $request)
     {
         return is_file($this->getPath($this->getCacheKey($request).'.lck'));
@@ -113,6 +126,8 @@ class Store implements StoreInterface
      * @param Request $request A Request instance
      *
      * @return Response|null A Response instance, or null if no cache entry was found
+     *
+     * @since v2.0.0
      */
     public function lookup(Request $request)
     {
@@ -159,6 +174,8 @@ class Store implements StoreInterface
      * @return string The key under which the response is stored
      *
      * @throws \RuntimeException
+     *
+     * @since v2.0.0
      */
     public function write(Request $request, Response $response)
     {
@@ -211,6 +228,8 @@ class Store implements StoreInterface
      * @param Response $response
      *
      * @return string
+     *
+     * @since v2.1.10
      */
     protected function generateContentDigest(Response $response)
     {
@@ -223,6 +242,8 @@ class Store implements StoreInterface
      * @param Request $request A Request instance
      *
      * @throws \RuntimeException
+     *
+     * @since v2.0.0
      */
     public function invalidate(Request $request)
     {
@@ -257,6 +278,8 @@ class Store implements StoreInterface
      * @param array  $env2 A Request HTTP header array
      *
      * @return Boolean true if the two environments match, false otherwise
+     *
+     * @since v2.0.0
      */
     private function requestsMatch($vary, $env1, $env2)
     {
@@ -284,6 +307,8 @@ class Store implements StoreInterface
      * @param string $key The store key
      *
      * @return array An array of data associated with the key
+     *
+     * @since v2.0.0
      */
     private function getMetadata($key)
     {
@@ -300,6 +325,8 @@ class Store implements StoreInterface
      * @param string $url A URL
      *
      * @return Boolean true if the URL exists and has been purged, false otherwise
+     *
+     * @since v2.0.0
      */
     public function purge($url)
     {
@@ -318,6 +345,8 @@ class Store implements StoreInterface
      * @param string $key The store key
      *
      * @return string The data associated with the key
+     *
+     * @since v2.0.0
      */
     private function load($key)
     {
@@ -333,6 +362,8 @@ class Store implements StoreInterface
      * @param string $data The data to store
      *
      * @return Boolean
+     *
+     * @since v2.0.0
      */
     private function save($key, $data)
     {
@@ -359,6 +390,9 @@ class Store implements StoreInterface
         @chmod($path, 0666 & ~umask());
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getPath($key)
     {
         return $this->root.DIRECTORY_SEPARATOR.substr($key, 0, 2).DIRECTORY_SEPARATOR.substr($key, 2, 2).DIRECTORY_SEPARATOR.substr($key, 4, 2).DIRECTORY_SEPARATOR.substr($key, 6);
@@ -370,6 +404,8 @@ class Store implements StoreInterface
      * @param Request $request A Request instance
      *
      * @return string A key for the given Request
+     *
+     * @since v2.0.0
      */
     private function getCacheKey(Request $request)
     {
@@ -386,6 +422,8 @@ class Store implements StoreInterface
      * @param Request $request A Request instance
      *
      * @return array An array of HTTP headers
+     *
+     * @since v2.0.0
      */
     private function persistRequest(Request $request)
     {
@@ -398,6 +436,8 @@ class Store implements StoreInterface
      * @param Response $response A Response instance
      *
      * @return array An array of HTTP headers
+     *
+     * @since v2.0.0
      */
     private function persistResponse(Response $response)
     {
@@ -414,6 +454,8 @@ class Store implements StoreInterface
      * @param string $body    The Response body
      *
      * @return Response
+     *
+     * @since v2.0.0
      */
     private function restoreResponse($headers, $body = null)
     {

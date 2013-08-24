@@ -20,6 +20,8 @@ use Symfony\Component\Validator\Exception\MissingOptionsException;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @api
+ *
+ * @since v2.1.0
  */
 class Range extends Constraint
 {
@@ -29,6 +31,9 @@ class Range extends Constraint
     public $min;
     public $max;
 
+    /**
+     * @since v2.1.0
+     */
     public function __construct($options = null)
     {
         parent::__construct($options);

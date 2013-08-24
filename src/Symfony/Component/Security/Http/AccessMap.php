@@ -19,6 +19,8 @@ use Symfony\Component\HttpFoundation\Request;
  * specific parts of the website.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.1.0
  */
 class AccessMap implements AccessMapInterface
 {
@@ -30,12 +32,17 @@ class AccessMap implements AccessMapInterface
      * @param RequestMatcherInterface $requestMatcher A RequestMatcherInterface instance
      * @param array                   $roles          An array of roles needed to access the resource
      * @param string|null             $channel        The channel to enforce (http, https, or null)
+     *
+     * @since v2.0.0
      */
     public function add(RequestMatcherInterface $requestMatcher, array $roles = array(), $channel = null)
     {
         $this->map[] = array($requestMatcher, $roles, $channel);
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getPatterns(Request $request)
     {
         foreach ($this->map as $elements) {

@@ -18,16 +18,24 @@ use Symfony\Component\EventDispatcher\Event;
  * This is a general purpose authentication event.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.1.0
  */
 class AuthenticationEvent extends Event
 {
     private $authenticationToken;
 
+    /**
+     * @since v2.1.0
+     */
     public function __construct(TokenInterface $token)
     {
         $this->authenticationToken = $token;
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function getAuthenticationToken()
     {
         return $this->authenticationToken;

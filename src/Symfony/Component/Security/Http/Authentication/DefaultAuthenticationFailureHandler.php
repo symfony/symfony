@@ -27,6 +27,8 @@ use Symfony\Component\Security\Http\HttpUtils;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  * @author Alexander <iam.asm89@gmail.com>
+ *
+ * @since v2.1.0
  */
 class DefaultAuthenticationFailureHandler implements AuthenticationFailureHandlerInterface
 {
@@ -42,6 +44,8 @@ class DefaultAuthenticationFailureHandler implements AuthenticationFailureHandle
      * @param HttpUtils           $httpUtils
      * @param array               $options    Options for processing a failed authentication attempt.
      * @param LoggerInterface     $logger     Optional logger
+     *
+     * @since v2.1.0
      */
     public function __construct(HttpKernelInterface $httpKernel, HttpUtils $httpUtils, array $options, LoggerInterface $logger = null)
     {
@@ -59,6 +63,8 @@ class DefaultAuthenticationFailureHandler implements AuthenticationFailureHandle
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
     {

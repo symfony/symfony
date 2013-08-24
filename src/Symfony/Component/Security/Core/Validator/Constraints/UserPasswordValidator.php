@@ -18,17 +18,26 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
+/**
+ * @since v2.2.0
+ */
 class UserPasswordValidator extends ConstraintValidator
 {
     private $securityContext;
     private $encoderFactory;
 
+    /**
+     * @since v2.2.0
+     */
     public function __construct(SecurityContextInterface $securityContext, EncoderFactoryInterface $encoderFactory)
     {
         $this->securityContext = $securityContext;
         $this->encoderFactory = $encoderFactory;
     }
 
+    /**
+     * @since v2.2.0
+     */
     public function validate($password, Constraint $constraint)
     {
         $user = $this->securityContext->getToken()->getUser();

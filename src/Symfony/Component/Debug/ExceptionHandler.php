@@ -28,12 +28,17 @@ if (!defined('ENT_SUBSTITUTE')) {
  * available, the Response content is always HTML.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.3.0
  */
 class ExceptionHandler
 {
     private $debug;
     private $charset;
 
+    /**
+     * @since v2.3.0
+     */
     public function __construct($debug = true, $charset = 'UTF-8')
     {
         $this->debug = $debug;
@@ -46,6 +51,8 @@ class ExceptionHandler
      * @param Boolean $debug
      *
      * @return ExceptionHandler The registered exception handler
+     *
+     * @since v2.3.0
      */
     public static function register($debug = true)
     {
@@ -67,6 +74,8 @@ class ExceptionHandler
      *
      * @see sendPhpResponse
      * @see createResponse
+     *
+     * @since v2.3.0
      */
     public function handle(\Exception $exception)
     {
@@ -84,6 +93,8 @@ class ExceptionHandler
      * the response.
      *
      * @param \Exception|FlattenException $exception An \Exception instance
+     *
+     * @since v2.3.0
      */
     public function sendPhpResponse($exception)
     {
@@ -105,6 +116,8 @@ class ExceptionHandler
      * @param \Exception|FlattenException $exception An \Exception instance
      *
      * @return Response A Response instance
+     *
+     * @since v2.3.0
      */
     public function createResponse($exception)
     {
@@ -121,6 +134,8 @@ class ExceptionHandler
      * @param FlattenException $exception A FlattenException instance
      *
      * @return string The content as a string
+     *
+     * @since v2.3.0
      */
     public function getContent(FlattenException $exception)
     {
@@ -192,6 +207,8 @@ EOF;
      * @param FlattenException $exception A FlattenException instance
      *
      * @return string The stylesheet as a string
+     *
+     * @since v2.3.0
      */
     public function getStylesheet(FlattenException $exception)
     {
@@ -249,6 +266,9 @@ EOF;
 EOF;
     }
 
+    /**
+     * @since v2.3.0
+     */
     private function decorate($content, $css)
     {
         return <<<EOF
@@ -274,6 +294,9 @@ EOF;
 EOF;
     }
 
+    /**
+     * @since v2.3.0
+     */
     private function abbrClass($class)
     {
         $parts = explode('\\', $class);
@@ -287,6 +310,8 @@ EOF;
      * @param array $args The argument array
      *
      * @return string
+     *
+     * @since v2.3.0
      */
     private function formatArgs(array $args)
     {

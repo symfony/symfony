@@ -15,6 +15,8 @@ namespace Symfony\Component\Routing;
  * CompiledRoutes are returned by the RouteCompiler class.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class CompiledRoute
 {
@@ -38,6 +40,8 @@ class CompiledRoute
      * @param array       $hostTokens         Host tokens
      * @param array       $hostVariables      An array of host variables
      * @param array       $variables          An array of variables (variables defined in the path and in the host patterns)
+     *
+     * @since v2.2.0
      */
     public function __construct($staticPrefix, $regex, array $tokens, array $pathVariables, $hostRegex = null, array $hostTokens = array(), array $hostVariables = array(), array $variables = array())
     {
@@ -55,6 +59,8 @@ class CompiledRoute
      * Returns the static prefix.
      *
      * @return string The static prefix
+     *
+     * @since v2.0.0
      */
     public function getStaticPrefix()
     {
@@ -65,6 +71,8 @@ class CompiledRoute
      * Returns the regex.
      *
      * @return string The regex
+     *
+     * @since v2.0.0
      */
     public function getRegex()
     {
@@ -75,6 +83,8 @@ class CompiledRoute
      * Returns the host regex
      *
      * @return string|null The host regex or null
+     *
+     * @since v2.2.0
      */
     public function getHostRegex()
     {
@@ -85,6 +95,8 @@ class CompiledRoute
      * Returns the tokens.
      *
      * @return array The tokens
+     *
+     * @since v2.0.0
      */
     public function getTokens()
     {
@@ -95,6 +107,8 @@ class CompiledRoute
      * Returns the host tokens.
      *
      * @return array The tokens
+     *
+     * @since v2.2.0
      */
     public function getHostTokens()
     {
@@ -105,6 +119,8 @@ class CompiledRoute
      * Returns the variables.
      *
      * @return array The variables
+     *
+     * @since v2.0.0
      */
     public function getVariables()
     {
@@ -115,6 +131,8 @@ class CompiledRoute
      * Returns the path variables.
      *
      * @return array The variables
+     *
+     * @since v2.2.0
      */
     public function getPathVariables()
     {
@@ -125,6 +143,8 @@ class CompiledRoute
      * Returns the host variables.
      *
      * @return array The variables
+     *
+     * @since v2.2.0
      */
     public function getHostVariables()
     {

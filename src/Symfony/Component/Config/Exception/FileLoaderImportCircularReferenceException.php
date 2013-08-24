@@ -15,9 +15,14 @@ namespace Symfony\Component\Config\Exception;
  * Exception class for when a circular reference is detected when importing resources.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class FileLoaderImportCircularReferenceException extends FileLoaderLoadException
 {
+    /**
+     * @since v2.0.0
+     */
     public function __construct(array $resources, $code = null, $previous = null)
     {
         $message = sprintf('Circular reference detected in "%s" ("%s" > "%s").', $this->varToString($resources[0]), implode('" > "', $resources), $resources[0]);

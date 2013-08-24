@@ -24,6 +24,8 @@ interface BundleWriterInterface
      * @param string $path   The path to the resource bundle.
      * @param string $locale The locale to (over-)write.
      * @param mixed  $data   The data to write.
+     *
+     * @since v2.3.0
      */
     public function write($path, $locale, $data);
 }

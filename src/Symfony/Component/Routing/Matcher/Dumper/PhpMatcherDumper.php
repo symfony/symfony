@@ -20,6 +20,8 @@ use Symfony\Component\Routing\RouteCollection;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Tobias Schultze <http://tobion.de>
  * @author Arnaud Le Blanc <arnaud.lb@gmail.com>
+ *
+ * @since v2.0.0
  */
 class PhpMatcherDumper extends MatcherDumper
 {
@@ -34,6 +36,8 @@ class PhpMatcherDumper extends MatcherDumper
      * @param array $options An array of options
      *
      * @return string A PHP class representing the matcher class
+     *
+     * @since v2.0.0
      */
     public function dump(array $options = array())
     {
@@ -81,6 +85,8 @@ EOF;
      * @param Boolean $supportsRedirections Whether redirections are supported by the base class
      *
      * @return string Match method as PHP code
+     *
+     * @since v2.1.0
      */
     private function generateMatchMethod($supportsRedirections)
     {
@@ -106,6 +112,8 @@ EOF;
      * @param Boolean         $supportsRedirections Whether redirections are supported by the base class
      *
      * @return string PHP code
+     *
+     * @since v2.2.0
      */
     private function compileRoutes(RouteCollection $routes, $supportsRedirections)
     {
@@ -148,6 +156,8 @@ EOF;
      * @param string                 $parentPrefix         Prefix of the parent collection
      *
      * @return string PHP code
+     *
+     * @since v2.2.0
      */
     private function compilePrefixRoutes(DumperPrefixCollection $collection, $supportsRedirections, $parentPrefix = '')
     {
@@ -190,6 +200,8 @@ EOF;
      * @return string PHP code
      *
      * @throws \LogicException
+     *
+     * @since v2.0.0
      */
     private function compileRoute(Route $route, $name, $supportsRedirections, $parentPrefix = null)
     {
@@ -330,6 +342,8 @@ EOF;
      * @param RouteCollection $routes A flat RouteCollection
      *
      * @return DumperCollection A collection with routes grouped by host regex in sub-collections
+     *
+     * @since v2.2.0
      */
     private function groupRoutesByHostRegex(RouteCollection $routes)
     {
@@ -361,6 +375,8 @@ EOF;
      * @param DumperCollection $collection A collection of routes
      *
      * @return DumperPrefixCollection
+     *
+     * @since v2.2.0
      */
     private function buildPrefixTree(DumperCollection $collection)
     {

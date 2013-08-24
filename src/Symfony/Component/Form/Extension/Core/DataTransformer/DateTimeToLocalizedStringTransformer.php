@@ -19,6 +19,8 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Florian Eckerstorfer <florian@eckerstorfer.org>
+ *
+ * @since v2.0.0
  */
 class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
 {
@@ -40,6 +42,8 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
      * @param string  $pattern        A pattern to pass to \IntlDateFormatter
      *
      * @throws UnexpectedTypeException If a format is not supported or if a timezone is not a string
+     *
+     * @since v2.0.0
      */
     public function __construct($inputTimezone = null, $outputTimezone = null, $dateFormat = null, $timeFormat = null, $calendar = \IntlDateFormatter::GREGORIAN, $pattern = null)
     {
@@ -77,6 +81,8 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
      * @throws TransformationFailedException If the given value is not an instance
      *                                       of \DateTime or if the date could not
      *                                       be transformed.
+     *
+     * @since v2.0.0
      */
     public function transform($dateTime)
     {
@@ -113,6 +119,8 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
      * @throws TransformationFailedException if the given value is not a string,
      *                                       if the date could not be parsed or
      *                                       if the input timezone is not supported
+     *
+     * @since v2.0.0
      */
     public function reverseTransform($value)
     {
@@ -152,6 +160,8 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
      * Returns a preconfigured IntlDateFormatter instance
      *
      * @return \IntlDateFormatter
+     *
+     * @since v2.0.0
      */
     protected function getIntlDateFormatter()
     {

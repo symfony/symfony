@@ -27,6 +27,8 @@ interface LanguageBundleInterface extends ResourceBundleInterface
      *                            Defaults to {@link \Locale::getDefault()}.
      *
      * @return string|null The name of the language or NULL if not found.
+     *
+     * @since v2.3.0
      */
     public function getLanguageName($lang, $region = null, $locale = null);
 
@@ -37,6 +39,8 @@ interface LanguageBundleInterface extends ResourceBundleInterface
      *                       Defaults to {@link \Locale::getDefault()}.
      *
      * @return string[] A list of language names indexed by language codes.
+     *
+     * @since v2.3.0
      */
     public function getLanguageNames($locale = null);
 
@@ -49,6 +53,8 @@ interface LanguageBundleInterface extends ResourceBundleInterface
      *                       Defaults to {@link \Locale::getDefault()}.
      *
      * @return string|null The name of the script or NULL if not found.
+     *
+     * @since v2.3.0
      */
     public function getScriptName($script, $lang = null, $locale = null);
 
@@ -59,6 +65,8 @@ interface LanguageBundleInterface extends ResourceBundleInterface
      *                       Defaults to {@link \Locale::getDefault()}.
      *
      * @return string[] A list of script names indexed by script codes.
+     *
+     * @since v2.3.0
      */
     public function getScriptNames($locale = null);
 }

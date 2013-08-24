@@ -20,6 +20,8 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
  * @author Bulat Shakirzyanov <mallluhuct@gmail.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class FileBag extends ParameterBag
 {
@@ -31,6 +33,8 @@ class FileBag extends ParameterBag
      * @param array $parameters An array of HTTP files
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function __construct(array $parameters = array())
     {
@@ -41,6 +45,8 @@ class FileBag extends ParameterBag
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function replace(array $files = array())
     {
@@ -52,6 +58,8 @@ class FileBag extends ParameterBag
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function set($key, $value)
     {
@@ -66,6 +74,8 @@ class FileBag extends ParameterBag
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function add(array $files = array())
     {
@@ -80,6 +90,8 @@ class FileBag extends ParameterBag
      * @param array|UploadedFile $file A (multi-dimensional) array of uploaded file information
      *
      * @return array A (multi-dimensional) array of UploadedFile instances
+     *
+     * @since v2.0.0
      */
     protected function convertFileInformation($file)
     {
@@ -121,6 +133,8 @@ class FileBag extends ParameterBag
      * @param array $data
      *
      * @return array
+     *
+     * @since v2.0.0
      */
     protected function fixPhpFilesArray($data)
     {

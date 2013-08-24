@@ -25,6 +25,8 @@ interface MutableAclProviderInterface extends AclProviderInterface
      *                                   object identity
      * @param ObjectIdentityInterface $oid
      * @return MutableAclInterface
+     *
+     * @since v2.1.0
      */
     public function createAcl(ObjectIdentityInterface $oid);
 
@@ -35,6 +37,8 @@ interface MutableAclProviderInterface extends AclProviderInterface
      * want child ACLs to be deleted, you will have to set their parent ACL to null.
      *
      * @param ObjectIdentityInterface $oid
+     *
+     * @since v2.1.0
      */
     public function deleteAcl(ObjectIdentityInterface $oid);
 
@@ -45,6 +49,8 @@ interface MutableAclProviderInterface extends AclProviderInterface
      * Changes to parent ACLs are not persisted.
      *
      * @param MutableAclInterface $acl
+     *
+     * @since v2.1.0
      */
     public function updateAcl(MutableAclInterface $acl);
 }

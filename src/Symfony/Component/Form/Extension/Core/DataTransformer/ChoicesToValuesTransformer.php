@@ -18,6 +18,8 @@ use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.1.0
  */
 class ChoicesToValuesTransformer implements DataTransformerInterface
 {
@@ -27,6 +29,8 @@ class ChoicesToValuesTransformer implements DataTransformerInterface
      * Constructor.
      *
      * @param ChoiceListInterface $choiceList
+     *
+     * @since v2.1.0
      */
     public function __construct(ChoiceListInterface $choiceList)
     {
@@ -39,6 +43,8 @@ class ChoicesToValuesTransformer implements DataTransformerInterface
      * @return array
      *
      * @throws TransformationFailedException If the given value is not an array.
+     *
+     * @since v2.0.0
      */
     public function transform($array)
     {
@@ -61,6 +67,8 @@ class ChoicesToValuesTransformer implements DataTransformerInterface
      * @throws TransformationFailedException If the given value is not an array
      *                                       or if no matching choice could be
      *                                       found for some given value.
+     *
+     * @since v2.0.0
      */
     public function reverseTransform($array)
     {

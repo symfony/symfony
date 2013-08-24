@@ -20,6 +20,8 @@ use Symfony\Component\Translation\Exception\NotFoundResourceException;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class Translator implements TranslatorInterface
 {
@@ -60,6 +62,8 @@ class Translator implements TranslatorInterface
      * @param MessageSelector|null $selector The message selector for pluralization
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function __construct($locale, MessageSelector $selector = null)
     {
@@ -74,6 +78,8 @@ class Translator implements TranslatorInterface
      * @param LoaderInterface $loader A LoaderInterface instance
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function addLoader($format, LoaderInterface $loader)
     {
@@ -89,6 +95,8 @@ class Translator implements TranslatorInterface
      * @param string $domain   The domain
      *
      * @api
+     *
+     * @since v2.3.0
      */
     public function addResource($format, $resource, $locale, $domain = null)
     {
@@ -109,6 +117,8 @@ class Translator implements TranslatorInterface
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setLocale($locale)
     {
@@ -119,6 +129,8 @@ class Translator implements TranslatorInterface
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getLocale()
     {
@@ -133,6 +145,8 @@ class Translator implements TranslatorInterface
      * @deprecated since 2.3, to be removed in 3.0. Use setFallbackLocales() instead.
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function setFallbackLocale($locales)
     {
@@ -145,6 +159,8 @@ class Translator implements TranslatorInterface
      * @param array $locales The fallback locales
      *
      * @api
+     *
+     * @since v2.3.0
      */
     public function setFallbackLocales(array $locales)
     {
@@ -160,6 +176,8 @@ class Translator implements TranslatorInterface
      * @return array $locales The fallback locales
      *
      * @api
+     *
+     * @since v2.3.0
      */
     public function getFallbackLocales()
     {
@@ -170,6 +188,8 @@ class Translator implements TranslatorInterface
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.3.0
      */
     public function trans($id, array $parameters = array(), $domain = null, $locale = null)
     {
@@ -192,6 +212,8 @@ class Translator implements TranslatorInterface
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.3.0
      */
     public function transChoice($id, $number, array $parameters = array(), $domain = null, $locale = null)
     {
@@ -222,6 +244,9 @@ class Translator implements TranslatorInterface
         return strtr($this->selector->choose($catalogue->get($id, $domain), (int) $number, $locale), $parameters);
     }
 
+    /**
+     * @since v2.0.0
+     */
     protected function loadCatalogue($locale)
     {
         try {
@@ -234,6 +259,9 @@ class Translator implements TranslatorInterface
         $this->loadFallbackCatalogues($locale);
     }
 
+    /**
+     * @since v2.1.0
+     */
     private function doLoadCatalogue($locale)
     {
         $this->catalogues[$locale] = new MessageCatalogue($locale);
@@ -248,6 +276,9 @@ class Translator implements TranslatorInterface
         }
     }
 
+    /**
+     * @since v2.1.0
+     */
     private function loadFallbackCatalogues($locale)
     {
         $current = $this->catalogues[$locale];
@@ -262,6 +293,9 @@ class Translator implements TranslatorInterface
         }
     }
 
+    /**
+     * @since v2.1.0
+     */
     protected function computeFallbackLocales($locale)
     {
         $locales = array();

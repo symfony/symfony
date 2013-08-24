@@ -24,6 +24,8 @@ use Symfony\Component\EventDispatcher\ImmutableEventDispatcher;
  * A basic form configuration.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.1.0
  */
 class FormConfigBuilder implements FormConfigBuilderInterface
 {
@@ -187,6 +189,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      *
      * @throws InvalidArgumentException If the data class is not a valid class or if
      *                                   the name contains invalid characters.
+     *
+     * @since v2.1.0
      */
     public function __construct($name, $dataClass, EventDispatcherInterface $dispatcher, array $options = array())
     {
@@ -204,6 +208,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function addEventListener($eventName, $listener, $priority = 0)
     {
@@ -218,6 +224,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function addEventSubscriber(EventSubscriberInterface $subscriber)
     {
@@ -232,6 +240,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function addViewTransformer(DataTransformerInterface $viewTransformer, $forcePrepend = false)
     {
@@ -250,6 +260,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function resetViewTransformers()
     {
@@ -264,6 +276,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function addModelTransformer(DataTransformerInterface $modelTransformer, $forceAppend = false)
     {
@@ -282,6 +296,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function resetModelTransformers()
     {
@@ -296,6 +312,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getEventDispatcher()
     {
@@ -308,6 +326,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getName()
     {
@@ -316,6 +336,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getPropertyPath()
     {
@@ -324,6 +346,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getMapped()
     {
@@ -332,6 +356,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getByReference()
     {
@@ -340,6 +366,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getInheritData()
     {
@@ -353,6 +381,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      *
      * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
      *             {@link getInheritData()} instead.
+     *
+     * @since v2.1.0
      */
     public function getVirtual()
     {
@@ -363,6 +393,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getCompound()
     {
@@ -371,6 +403,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getType()
     {
@@ -379,6 +413,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getViewTransformers()
     {
@@ -387,6 +423,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getModelTransformers()
     {
@@ -395,6 +433,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getDataMapper()
     {
@@ -403,6 +443,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getRequired()
     {
@@ -411,6 +453,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getDisabled()
     {
@@ -419,6 +463,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getErrorBubbling()
     {
@@ -427,6 +473,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getEmptyData()
     {
@@ -435,6 +483,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getAttributes()
     {
@@ -443,6 +493,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function hasAttribute($name)
     {
@@ -451,6 +503,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getAttribute($name, $default = null)
     {
@@ -459,6 +513,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getData()
     {
@@ -467,6 +523,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getDataClass()
     {
@@ -475,6 +533,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getDataLocked()
     {
@@ -483,6 +543,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function getFormFactory()
     {
@@ -491,6 +553,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getAction()
     {
@@ -499,6 +563,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getMethod()
     {
@@ -507,6 +573,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getRequestHandler()
     {
@@ -522,6 +590,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getAutoInitialize()
     {
@@ -530,6 +600,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getOptions()
     {
@@ -538,6 +610,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function hasOption($name)
     {
@@ -546,6 +620,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getOption($name, $default = null)
     {
@@ -554,6 +630,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function setAttribute($name, $value)
     {
@@ -568,6 +646,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function setAttributes(array $attributes)
     {
@@ -582,6 +662,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function setDataMapper(DataMapperInterface $dataMapper = null)
     {
@@ -596,6 +678,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function setDisabled($disabled)
     {
@@ -610,6 +694,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function setEmptyData($emptyData)
     {
@@ -624,6 +710,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function setErrorBubbling($errorBubbling)
     {
@@ -638,6 +726,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function setRequired($required)
     {
@@ -652,6 +742,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function setPropertyPath($propertyPath)
     {
@@ -670,6 +762,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function setMapped($mapped)
     {
@@ -684,6 +778,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function setByReference($byReference)
     {
@@ -698,6 +794,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function setInheritData($inheritData)
     {
@@ -719,6 +817,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      *
      * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
      *             {@link setInheritData()} instead.
+     *
+     * @since v2.3.0
      */
     public function setVirtual($inheritData)
     {
@@ -730,6 +830,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function setCompound($compound)
     {
@@ -744,6 +846,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function setType(ResolvedFormTypeInterface $type)
     {
@@ -758,6 +862,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function setData($data)
     {
@@ -772,6 +878,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function setDataLocked($locked)
     {
@@ -786,6 +894,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function setFormFactory(FormFactoryInterface $formFactory)
     {
@@ -800,6 +910,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function setAction($action)
     {
@@ -814,6 +926,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function setMethod($method)
     {
@@ -838,6 +952,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function setRequestHandler(RequestHandlerInterface $requestHandler)
     {
@@ -852,6 +968,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function setAutoInitialize($initialize)
     {
@@ -862,6 +980,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getFormConfig()
     {
@@ -883,6 +1003,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      *
      * @throws UnexpectedTypeException   If the name is not a string or an integer.
      * @throws InvalidArgumentException If the name contains invalid characters.
+     *
+     * @since v2.1.0
      */
     public static function validateName($name)
     {
@@ -911,6 +1033,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      * @param string $name The tested form name.
      *
      * @return Boolean Whether the name is valid.
+     *
+     * @since v2.1.0
      */
     public static function isValidName($name)
     {

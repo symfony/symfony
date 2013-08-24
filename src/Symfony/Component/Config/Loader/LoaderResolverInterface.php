@@ -25,6 +25,8 @@ interface LoaderResolverInterface
      * @param string $type     The resource type
      *
      * @return LoaderInterface A LoaderInterface instance
+     *
+     * @since v2.1.0
      */
     public function resolve($resource, $type = null);
 }

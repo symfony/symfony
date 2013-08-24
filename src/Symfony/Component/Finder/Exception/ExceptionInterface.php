@@ -18,6 +18,8 @@ interface ExceptionInterface
 {
     /**
      * @return \Symfony\Component\Finder\Adapter\AdapterInterface
+     *
+     * @since v2.2.0
      */
     public function getAdapter();
 }

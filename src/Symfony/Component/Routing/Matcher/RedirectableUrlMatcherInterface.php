@@ -30,6 +30,8 @@ interface RedirectableUrlMatcherInterface
      * @return array An array of parameters
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function redirect($path, $route, $scheme = null);
 }

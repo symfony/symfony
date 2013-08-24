@@ -15,6 +15,8 @@ namespace Symfony\Component\Serializer\Encoder;
  * Encodes JSON data
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
+ *
+ * @since v2.2.0
  */
 class JsonEncoder implements EncoderInterface, DecoderInterface
 {
@@ -30,6 +32,9 @@ class JsonEncoder implements EncoderInterface, DecoderInterface
      */
     protected $decodingImpl;
 
+    /**
+     * @since v2.1.0
+     */
     public function __construct(JsonEncode $encodingImpl = null, JsonDecode $decodingImpl = null)
     {
         $this->encodingImpl = null === $encodingImpl ? new JsonEncode() : $encodingImpl;
@@ -40,6 +45,8 @@ class JsonEncoder implements EncoderInterface, DecoderInterface
      * Returns the last encoding error (if any)
      *
      * @return integer
+     *
+     * @since v2.1.0
      */
     public function getLastEncodingError()
     {
@@ -50,6 +57,8 @@ class JsonEncoder implements EncoderInterface, DecoderInterface
      * Returns the last decoding error (if any)
      *
      * @return integer
+     *
+     * @since v2.1.0
      */
     public function getLastDecodingError()
     {
@@ -58,6 +67,8 @@ class JsonEncoder implements EncoderInterface, DecoderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function encode($data, $format, array $context = array())
     {
@@ -66,6 +77,8 @@ class JsonEncoder implements EncoderInterface, DecoderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function decode($data, $format, array $context = array())
     {
@@ -74,6 +87,8 @@ class JsonEncoder implements EncoderInterface, DecoderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function supportsEncoding($format)
     {
@@ -82,6 +97,8 @@ class JsonEncoder implements EncoderInterface, DecoderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function supportsDecoding($format)
     {

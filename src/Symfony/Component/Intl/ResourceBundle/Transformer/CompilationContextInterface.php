@@ -23,6 +23,8 @@ interface CompilationContextInterface
      * are stored.
      *
      * @return string An absolute path to a directory.
+     *
+     * @since v2.3.0
      */
     public function getSourceDir();
 
@@ -30,6 +32,8 @@ interface CompilationContextInterface
      * Returns the directory where the binary resource bundles are stored.
      *
      * @return string An absolute path to a directory.
+     *
+     * @since v2.3.0
      */
     public function getBinaryDir();
 
@@ -37,6 +41,8 @@ interface CompilationContextInterface
      * Returns a tool for manipulating the filesystem.
      *
      * @return \Symfony\Component\Filesystem\Filesystem The filesystem manipulator.
+     *
+     * @since v2.3.0
      */
     public function getFilesystem();
 
@@ -44,6 +50,8 @@ interface CompilationContextInterface
      * Returns a resource bundle compiler.
      *
      * @return \Symfony\Component\Intl\ResourceBundle\Compiler\BundleCompilerInterface The loaded resource bundle compiler.
+     *
+     * @since v2.3.0
      */
     public function getCompiler();
 
@@ -51,6 +59,8 @@ interface CompilationContextInterface
      * Returns the ICU version of the bundles being converted.
      *
      * @return string The ICU version string.
+     *
+     * @since v2.3.0
      */
     public function getIcuVersion();
 }

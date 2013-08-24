@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Form\Exception;
 
+/**
+ * @since v2.3.0
+ */
 class ErrorMappingException extends RuntimeException
 {
 }

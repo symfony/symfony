@@ -16,6 +16,8 @@ namespace Symfony\Component\HttpKernel\Exception;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Christophe Coevoet <stof@notk.org>
+ *
+ * @since v2.0.0
  */
 class AccessDeniedHttpException extends HttpException
 {
@@ -25,6 +27,8 @@ class AccessDeniedHttpException extends HttpException
      * @param string     $message  The internal exception message
      * @param \Exception $previous The previous exception
      * @param integer    $code     The internal exception code
+     *
+     * @since v2.0.0
      */
     public function __construct($message = null, \Exception $previous = null, $code = 0)
     {

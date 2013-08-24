@@ -21,6 +21,8 @@ use Symfony\Component\Console\Input\InputOption;
  * XML descriptor.
  *
  * @author Jean-François Simon <contact@jfsimon.fr>
+ *
+ * @since v2.3.0
  */
 class XmlDescriptor extends Descriptor
 {
@@ -168,6 +170,8 @@ class XmlDescriptor extends Descriptor
      *
      * @param \DOMNode $parentNode
      * @param \DOMNode $importedParent
+     *
+     * @since v2.3.0
      */
     private function appendDocument(\DOMNode $parentNode, \DOMNode $importedParent)
     {

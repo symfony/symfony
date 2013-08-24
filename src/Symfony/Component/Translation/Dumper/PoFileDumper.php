@@ -17,11 +17,15 @@ use Symfony\Component\Translation\MessageCatalogue;
  * PoFileDumper generates a gettext formatted string representation of a message catalogue.
  *
  * @author Stealth35
+ *
+ * @since v2.1.0
  */
 class PoFileDumper extends FileDumper
 {
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function format(MessageCatalogue $messages, $domain = 'messages')
     {
@@ -42,12 +46,17 @@ class PoFileDumper extends FileDumper
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     protected function getExtension()
     {
         return 'po';
     }
 
+    /**
+     * @since v2.1.0
+     */
     private function escape($str)
     {
         return addcslashes($str, "\0..\37\42\134");

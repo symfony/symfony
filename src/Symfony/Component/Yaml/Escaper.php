@@ -15,6 +15,8 @@ namespace Symfony\Component\Yaml;
  * YAML strings.
  *
  * @author Matthew Lewinski <matthew@lewinski.org>
+ *
+ * @since v2.0.0
  */
 class Escaper
 {
@@ -44,6 +46,8 @@ class Escaper
      * @param string $value A PHP value
      *
      * @return Boolean True if the value would require double quotes.
+     *
+     * @since v2.1.0
      */
     public static function requiresDoubleQuoting($value)
     {
@@ -56,6 +60,8 @@ class Escaper
      * @param string $value A PHP value
      *
      * @return string The quoted, escaped string
+     *
+     * @since v2.1.0
      */
     public static function escapeWithDoubleQuotes($value)
     {
@@ -68,6 +74,8 @@ class Escaper
      * @param string $value A PHP value
      *
      * @return Boolean True if the value would require single quotes.
+     *
+     * @since v2.1.0
      */
     public static function requiresSingleQuoting($value)
     {
@@ -80,6 +88,8 @@ class Escaper
      * @param string $value A PHP value
      *
      * @return string The quoted, escaped string
+     *
+     * @since v2.1.0
      */
     public static function escapeWithSingleQuotes($value)
     {

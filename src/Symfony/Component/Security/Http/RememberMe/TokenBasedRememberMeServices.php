@@ -23,11 +23,15 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * remember-me capabilities without requiring a TokenProvider.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class TokenBasedRememberMeServices extends AbstractRememberMeServices
 {
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     protected function processAutoLoginCookie(array $cookieParts, Request $request)
     {
@@ -74,6 +78,8 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
      * @param string $hash2 The second hash
      *
      * @return Boolean true if the two hashes are the same, false otherwise
+     *
+     * @since v2.0.0
      */
     private function compareHashes($hash1, $hash2)
     {
@@ -91,6 +97,8 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     protected function onLoginSuccess(Request $request, Response $response, TokenInterface $token)
     {
@@ -122,6 +130,8 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
      * @throws \RuntimeException if username contains invalid chars
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     protected function generateCookieValue($class, $username, $expires, $password)
     {
@@ -144,6 +154,8 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
      * @throws \RuntimeException when the private key is empty
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     protected function generateCookieHash($class, $username, $expires, $password)
     {

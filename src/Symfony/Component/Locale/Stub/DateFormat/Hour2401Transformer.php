@@ -21,6 +21,8 @@ use Symfony\Component\Intl\DateFormatter\DateFormat\Hour2401Transformer as BaseH
  * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
  *             {@link \Symfony\Component\Intl\DateFormatter\DateFormat\Hour2401Transformer}
  *             instead.
+ *
+ * @since v2.3.0
  */
 class Hour2401Transformer extends BaseHour2401Transformer
 {

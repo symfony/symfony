@@ -22,6 +22,8 @@ use Symfony\Component\Routing\RouteCollection;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class ClosureLoader extends Loader
 {
@@ -34,6 +36,8 @@ class ClosureLoader extends Loader
      * @return RouteCollection A RouteCollection instance
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function load($closure, $type = null)
     {
@@ -44,6 +48,8 @@ class ClosureLoader extends Loader
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function supports($resource, $type = null)
     {

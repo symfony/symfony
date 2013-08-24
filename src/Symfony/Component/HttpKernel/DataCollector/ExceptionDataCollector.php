@@ -19,11 +19,15 @@ use Symfony\Component\HttpKernel\Exception\FlattenException;
  * ExceptionDataCollector.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class ExceptionDataCollector extends DataCollector
 {
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
@@ -38,6 +42,8 @@ class ExceptionDataCollector extends DataCollector
      * Checks if the exception is not null.
      *
      * @return Boolean true if the exception is not null, false otherwise
+     *
+     * @since v2.0.0
      */
     public function hasException()
     {
@@ -48,6 +54,8 @@ class ExceptionDataCollector extends DataCollector
      * Gets the exception.
      *
      * @return \Exception The exception
+     *
+     * @since v2.0.0
      */
     public function getException()
     {
@@ -58,6 +66,8 @@ class ExceptionDataCollector extends DataCollector
      * Gets the exception message.
      *
      * @return string The exception message
+     *
+     * @since v2.0.0
      */
     public function getMessage()
     {
@@ -68,6 +78,8 @@ class ExceptionDataCollector extends DataCollector
      * Gets the exception code.
      *
      * @return integer The exception code
+     *
+     * @since v2.0.0
      */
     public function getCode()
     {
@@ -78,6 +90,8 @@ class ExceptionDataCollector extends DataCollector
      * Gets the status code.
      *
      * @return integer The status code
+     *
+     * @since v2.0.0
      */
     public function getStatusCode()
     {
@@ -88,6 +102,8 @@ class ExceptionDataCollector extends DataCollector
      * Gets the exception trace.
      *
      * @return array The exception trace
+     *
+     * @since v2.0.0
      */
     public function getTrace()
     {
@@ -96,6 +112,8 @@ class ExceptionDataCollector extends DataCollector
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getName()
     {

@@ -19,6 +19,8 @@ use Symfony\Component\Console\Output\OutputInterface;
  * Allows to manipulate the exit code of a command after its execution.
  *
  * @author Francesco Levorato <git@flevour.net>
+ *
+ * @since v2.3.0
  */
 class ConsoleTerminateEvent extends ConsoleEvent
 {
@@ -29,6 +31,9 @@ class ConsoleTerminateEvent extends ConsoleEvent
      */
     private $exitCode;
 
+    /**
+     * @since v2.3.0
+     */
     public function __construct(Command $command, InputInterface $input, OutputInterface $output, $exitCode)
     {
         parent::__construct($command, $input, $output);
@@ -40,6 +45,8 @@ class ConsoleTerminateEvent extends ConsoleEvent
      * Sets the exit code.
      *
      * @param integer $exitCode The command exit code
+     *
+     * @since v2.3.0
      */
     public function setExitCode($exitCode)
     {
@@ -50,6 +57,8 @@ class ConsoleTerminateEvent extends ConsoleEvent
      * Gets the exit code.
      *
      * @return integer The command exit code
+     *
+     * @since v2.3.0
      */
     public function getExitCode()
     {

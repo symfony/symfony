@@ -18,6 +18,8 @@ namespace Symfony\Component\Config\Loader;
  * Each loader determines whether it can load a resource and how.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class LoaderResolver implements LoaderResolverInterface
 {
@@ -30,6 +32,8 @@ class LoaderResolver implements LoaderResolverInterface
      * Constructor.
      *
      * @param LoaderInterface[] $loaders An array of loaders
+     *
+     * @since v2.0.0
      */
     public function __construct(array $loaders = array())
     {
@@ -46,6 +50,8 @@ class LoaderResolver implements LoaderResolverInterface
      * @param string $type     The resource type
      *
      * @return LoaderInterface|false A LoaderInterface instance
+     *
+     * @since v2.0.0
      */
     public function resolve($resource, $type = null)
     {
@@ -62,6 +68,8 @@ class LoaderResolver implements LoaderResolverInterface
      * Adds a loader.
      *
      * @param LoaderInterface $loader A LoaderInterface instance
+     *
+     * @since v2.0.0
      */
     public function addLoader(LoaderInterface $loader)
     {
@@ -73,6 +81,8 @@ class LoaderResolver implements LoaderResolverInterface
      * Returns the registered loaders.
      *
      * @return LoaderInterface[] An array of LoaderInterface instances
+     *
+     * @since v2.0.0
      */
     public function getLoaders()
     {

@@ -15,6 +15,8 @@ namespace Symfony\Component\OptionsResolver\Exception;
  * Thrown when an option definition is invalid.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.1.0
  */
 class OptionDefinitionException extends \RuntimeException implements ExceptionInterface
 {

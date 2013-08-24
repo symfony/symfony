@@ -19,6 +19,8 @@ use Symfony\Component\Config\Exception\FileLoaderImportCircularReferenceExceptio
  * FileLoader is the abstract class used by all built-in loaders that are file based.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 abstract class FileLoader extends Loader
 {
@@ -32,17 +34,25 @@ abstract class FileLoader extends Loader
      * Constructor.
      *
      * @param FileLocatorInterface $locator A FileLocatorInterface instance
+     *
+     * @since v2.0.0
      */
     public function __construct(FileLocatorInterface $locator)
     {
         $this->locator = $locator;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function setCurrentDir($dir)
     {
         $this->currentDir = $dir;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getLocator()
     {
         return $this->locator;
@@ -60,6 +70,8 @@ abstract class FileLoader extends Loader
      *
      * @throws FileLoaderLoadException
      * @throws FileLoaderImportCircularReferenceException
+     *
+     * @since v2.0.0
      */
     public function import($resource, $type = null, $ignoreErrors = false, $sourceResource = null)
     {

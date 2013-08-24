@@ -22,6 +22,8 @@ interface ConstraintValidatorInterface
      * Initializes the constraint validator.
      *
      * @param ExecutionContextInterface $context The current validation context
+     *
+     * @since v2.2.0
      */
     public function initialize(ExecutionContextInterface $context);
 
@@ -32,6 +34,8 @@ interface ConstraintValidatorInterface
      * @param Constraint $constraint The constraint for the validation
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function validate($value, Constraint $constraint);
 }

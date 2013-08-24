@@ -17,12 +17,17 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
  * This node represents a numeric value in the config tree
  *
  * @author David Jeanmonod <david.jeanmonod@gmail.com>
+ *
+ * @since v2.2.0
  */
 class NumericNode extends ScalarNode
 {
     protected $min;
     protected $max;
 
+    /**
+     * @since v2.2.0
+     */
     public function __construct($name, NodeInterface $parent = null, $min = null, $max = null)
     {
         parent::__construct($name, $parent);
@@ -32,6 +37,8 @@ class NumericNode extends ScalarNode
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.2.0
      */
     protected function finalizeValue($value)
     {

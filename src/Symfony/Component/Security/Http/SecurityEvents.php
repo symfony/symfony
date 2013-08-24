@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Security\Http;
 
+/**
+ * @since v2.0.0
+ */
 final class SecurityEvents
 {
     /**

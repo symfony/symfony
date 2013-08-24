@@ -15,6 +15,8 @@ namespace Symfony\Component\Config\Definition;
  * This class is the entry point for config normalization/merging/finalization.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class Processor
 {
@@ -25,6 +27,8 @@ class Processor
      * @param array         $configs    An array of configuration items to process
      *
      * @return array The processed configuration
+     *
+     * @since v2.2.0
      */
     public function process(NodeInterface $configTree, array $configs)
     {
@@ -44,6 +48,8 @@ class Processor
      * @param array                  $configs       An array of configuration items to process
      *
      * @return array The processed configuration
+     *
+     * @since v2.2.0
      */
     public function processConfiguration(ConfigurationInterface $configuration, array $configs)
     {
@@ -72,6 +78,8 @@ class Processor
      * @param string $plural The plural form of the key if it is irregular
      *
      * @return array
+     *
+     * @since v2.0.16
      */
     public static function normalizeConfig($config, $key, $plural = null)
     {

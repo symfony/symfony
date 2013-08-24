@@ -20,6 +20,8 @@ use Symfony\Component\HttpFoundation\Response;
  * ExceptionController.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.2.0
  */
 class ExceptionController
 {
@@ -27,6 +29,9 @@ class ExceptionController
     protected $debug;
     protected $profiler;
 
+    /**
+     * @since v2.3.0
+     */
     public function __construct(Profiler $profiler = null, \Twig_Environment $twig, $debug)
     {
         $this->profiler = $profiler;
@@ -40,6 +45,8 @@ class ExceptionController
      * @param string $token The profiler token
      *
      * @return Response A Response instance
+     *
+     * @since v2.2.0
      */
     public function showAction($token)
     {
@@ -78,6 +85,8 @@ class ExceptionController
      * @param string $token The profiler token
      *
      * @return Response A Response instance
+     *
+     * @since v2.2.0
      */
     public function cssAction($token)
     {
@@ -99,11 +108,17 @@ class ExceptionController
         return new Response($this->twig->render('@WebProfiler/Collector/exception.css.twig'), 200, array('Content-Type' => 'text/css'));
     }
 
+    /**
+     * @since v2.2.0
+     */
     protected function getTemplate()
     {
         return '@Twig/Exception/'.($this->debug ? 'exception' : 'error').'.html.twig';
     }
 
+    /**
+     * @since v2.2.0
+     */
     // to be removed when the minimum required version of Twig is >= 2.0
     protected function templateExists($template)
     {

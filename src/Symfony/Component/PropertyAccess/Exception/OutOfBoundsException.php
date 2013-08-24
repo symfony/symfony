@@ -15,6 +15,8 @@ namespace Symfony\Component\PropertyAccess\Exception;
  * Base OutOfBoundsException for the PropertyAccess component.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.2.0
  */
 class OutOfBoundsException extends \OutOfBoundsException implements ExceptionInterface
 {

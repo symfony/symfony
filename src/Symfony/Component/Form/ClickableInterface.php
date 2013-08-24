@@ -22,6 +22,8 @@ interface ClickableInterface
      * Returns whether this element was clicked.
      *
      * @return Boolean Whether this element was clicked.
+     *
+     * @since v2.3.0
      */
     public function isClicked();
 }

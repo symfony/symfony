@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Form;
 
+/**
+ * @since v2.0.0
+ */
 class CallbackTransformer implements DataTransformerInterface
 {
     /**
@@ -30,6 +33,8 @@ class CallbackTransformer implements DataTransformerInterface
      *
      * @param \Closure $transform        The forward transform callback
      * @param \Closure $reverseTransform The reverse transform callback
+     *
+     * @since v2.0.0
      */
     public function __construct(\Closure $transform, \Closure $reverseTransform)
     {
@@ -46,6 +51,8 @@ class CallbackTransformer implements DataTransformerInterface
      *
      * @throws UnexpectedTypeException   when the argument is not a string
      * @throws TransformationFailedException  when the transformation fails
+     *
+     * @since v2.0.0
      */
     public function transform($data)
     {
@@ -62,6 +69,8 @@ class CallbackTransformer implements DataTransformerInterface
      *
      * @throws UnexpectedTypeException   when the argument is not of the expected type
      * @throws TransformationFailedException  when the transformation fails
+     *
+     * @since v2.0.0
      */
     public function reverseTransform($data)
     {

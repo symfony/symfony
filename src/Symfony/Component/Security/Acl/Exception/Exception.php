@@ -15,6 +15,8 @@ namespace Symfony\Component\Security\Acl\Exception;
  * Base ACL exception
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class Exception extends \Exception
 {

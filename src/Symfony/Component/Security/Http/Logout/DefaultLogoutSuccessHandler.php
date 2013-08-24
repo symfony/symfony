@@ -20,6 +20,8 @@ use Symfony\Component\Security\Http\Logout\LogoutSuccessHandlerInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Alexander <iam.asm89@gmail.com>
+ *
+ * @since v2.1.0
  */
 class DefaultLogoutSuccessHandler implements LogoutSuccessHandlerInterface
 {
@@ -29,6 +31,8 @@ class DefaultLogoutSuccessHandler implements LogoutSuccessHandlerInterface
     /**
      * @param HttpUtils $httpUtils
      * @param string    $targetUrl
+     *
+     * @since v2.1.0
      */
     public function __construct(HttpUtils $httpUtils, $targetUrl = '/')
     {
@@ -39,6 +43,8 @@ class DefaultLogoutSuccessHandler implements LogoutSuccessHandlerInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function onLogoutSuccess(Request $request)
     {

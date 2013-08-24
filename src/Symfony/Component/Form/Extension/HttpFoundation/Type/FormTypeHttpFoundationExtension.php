@@ -18,6 +18,8 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.1.0
  */
 class FormTypeHttpFoundationExtension extends AbstractTypeExtension
 {
@@ -31,6 +33,9 @@ class FormTypeHttpFoundationExtension extends AbstractTypeExtension
      */
     private $requestHandler;
 
+    /**
+     * @since v2.1.0
+     */
     public function __construct()
     {
         $this->listener = new BindRequestListener();
@@ -39,6 +44,8 @@ class FormTypeHttpFoundationExtension extends AbstractTypeExtension
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -48,6 +55,8 @@ class FormTypeHttpFoundationExtension extends AbstractTypeExtension
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getExtendedType()
     {

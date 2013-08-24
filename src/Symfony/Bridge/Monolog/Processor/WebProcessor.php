@@ -18,15 +18,23 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
  * WebProcessor override to read from the HttpFoundation's Request
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
+ *
+ * @since v2.0.0
  */
 class WebProcessor extends BaseWebProcessor
 {
+    /**
+     * @since v2.0.13
+     */
     public function __construct()
     {
         // Pass an empty array as the default null value would access $_SERVER
         parent::__construct(array());
     }
 
+    /**
+     * @since v2.0.13
+     */
     public function onKernelRequest(GetResponseEvent $event)
     {
         if ($event->isMasterRequest()) {

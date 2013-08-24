@@ -30,6 +30,8 @@ interface MimeTypeGuesserInterface
      *
      * @throws FileNotFoundException  If the file does not exist
      * @throws AccessDeniedException  If the file could not be read
+     *
+     * @since v2.1.0
      */
     public function guess($path);
 }

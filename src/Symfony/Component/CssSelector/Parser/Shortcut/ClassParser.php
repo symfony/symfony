@@ -23,11 +23,15 @@ use Symfony\Component\CssSelector\Parser\ParserInterface;
  * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @since v2.3.0
  */
 class ClassParser implements ParserInterface
 {
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function parse($source)
     {

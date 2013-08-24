@@ -17,6 +17,8 @@ use Symfony\Component\ClassLoader\DebugClassLoader;
  * Registers all the debug tools.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.3.0
  */
 class Debug
 {
@@ -32,6 +34,8 @@ class Debug
      *
      * @param integer $errorReportingLevel The level of error reporting you want
      * @param Boolean $displayErrors       Whether to display errors (for development) or just log them (for production)
+     *
+     * @since v2.3.0
      */
     public static function enable($errorReportingLevel = null, $displayErrors = true)
     {

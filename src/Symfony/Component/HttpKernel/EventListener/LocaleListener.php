@@ -21,18 +21,26 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * Initializes the locale based on the current request.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.1.0
  */
 class LocaleListener implements EventSubscriberInterface
 {
     private $router;
     private $defaultLocale;
 
+    /**
+     * @since v2.1.0
+     */
     public function __construct($defaultLocale = 'en', RequestContextAwareInterface $router = null)
     {
         $this->defaultLocale = $defaultLocale;
         $this->router = $router;
     }
 
+    /**
+     * @since v2.3.0
+     */
     public function setRequest(Request $request = null)
     {
         if (null === $request) {
@@ -48,6 +56,9 @@ class LocaleListener implements EventSubscriberInterface
         }
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function onKernelRequest(GetResponseEvent $event)
     {
         $request = $event->getRequest();
@@ -56,6 +67,9 @@ class LocaleListener implements EventSubscriberInterface
         $this->setRequest($request);
     }
 
+    /**
+     * @since v2.1.0
+     */
     public static function getSubscribedEvents()
     {
         return array(

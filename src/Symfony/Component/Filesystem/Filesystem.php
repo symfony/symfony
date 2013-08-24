@@ -17,6 +17,8 @@ use Symfony\Component\Filesystem\Exception\IOException;
  * Provides basic utility to manipulate the file system.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class Filesystem
 {
@@ -32,6 +34,8 @@ class Filesystem
      * @param boolean $override   Whether to override an existing file or not
      *
      * @throws IOException When copy fails
+     *
+     * @since v2.0.0
      */
     public function copy($originFile, $targetFile, $override = false)
     {
@@ -69,6 +73,8 @@ class Filesystem
      * @param integer                   $mode The directory mode
      *
      * @throws IOException On any directory creation failure
+     *
+     * @since v2.0.0
      */
     public function mkdir($dirs, $mode = 0777)
     {
@@ -89,6 +95,8 @@ class Filesystem
      * @param string|array|\Traversable $files A filename, an array of files, or a \Traversable instance to check
      *
      * @return Boolean true if the file exists, false otherwise
+     *
+     * @since v2.1.0
      */
     public function exists($files)
     {
@@ -109,6 +117,8 @@ class Filesystem
      * @param integer                   $atime The access time as a unix timestamp
      *
      * @throws IOException When touch fails
+     *
+     * @since v2.1.0
      */
     public function touch($files, $time = null, $atime = null)
     {
@@ -126,6 +136,8 @@ class Filesystem
      * @param string|array|\Traversable $files A filename, an array of files, or a \Traversable instance to remove
      *
      * @throws IOException When removal fails
+     *
+     * @since v2.0.0
      */
     public function remove($files)
     {
@@ -166,6 +178,8 @@ class Filesystem
      * @param Boolean                   $recursive Whether change the mod recursively or not
      *
      * @throws IOException When the change fail
+     *
+     * @since v2.1.0
      */
     public function chmod($files, $mode, $umask = 0000, $recursive = false)
     {
@@ -187,6 +201,8 @@ class Filesystem
      * @param Boolean                   $recursive Whether change the owner recursively or not
      *
      * @throws IOException When the change fail
+     *
+     * @since v2.1.0
      */
     public function chown($files, $user, $recursive = false)
     {
@@ -214,6 +230,8 @@ class Filesystem
      * @param Boolean                   $recursive Whether change the group recursively or not
      *
      * @throws IOException When the change fail
+     *
+     * @since v2.1.0
      */
     public function chgrp($files, $group, $recursive = false)
     {
@@ -242,6 +260,8 @@ class Filesystem
      *
      * @throws IOException When target file or directory already exists
      * @throws IOException When origin cannot be renamed
+     *
+     * @since v2.3.0
      */
     public function rename($origin, $target, $overwrite = false)
     {
@@ -263,6 +283,8 @@ class Filesystem
      * @param Boolean $copyOnWindows Whether to copy files if on Windows
      *
      * @throws IOException When symlink fails
+     *
+     * @since v2.0.0
      */
     public function symlink($originDir, $targetDir, $copyOnWindows = false)
     {
@@ -303,6 +325,8 @@ class Filesystem
      * @param string $startPath Absolute path where traversal begins
      *
      * @return string Path of target relative to starting path
+     *
+     * @since v2.1.0
      */
     public function makePathRelative($endPath, $startPath)
     {
@@ -349,6 +373,8 @@ class Filesystem
      *                                 - $options['delete'] Whether to delete files that are not in the source directory (defaults to false)
      *
      * @throws IOException When file type is unknown
+     *
+     * @since v2.0.0
      */
     public function mirror($originDir, $targetDir, \Traversable $iterator = null, $options = array())
     {
@@ -411,6 +437,8 @@ class Filesystem
      * @param string $file A file path
      *
      * @return Boolean
+     *
+     * @since v2.0.0
      */
     public function isAbsolutePath($file)
     {
@@ -431,6 +459,8 @@ class Filesystem
      * @param mixed $files
      *
      * @return \Traversable
+     *
+     * @since v2.0.0
      */
     private function toIterator($files)
     {
@@ -448,6 +478,8 @@ class Filesystem
      * @param  string  $content  The data to write into the file.
      * @param  integer $mode     The file mode (octal).
      * @throws IOException       If the file cannot be written to.
+     *
+     * @since v2.3.0
      */
     public function dumpFile($filename, $content, $mode = 0666)
     {

@@ -20,9 +20,14 @@ use Symfony\Component\DependencyInjection\Reference;
  * encoders and normalizers to the Serializer service.
  *
  * @author Javier Lopez <f12loalf@gmail.com>
+ *
+ * @since v2.3.0
  */
 class SerializerPass implements CompilerPassInterface
 {
+    /**
+     * @since v2.3.0
+     */
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition('serializer')) {
@@ -38,6 +43,9 @@ class SerializerPass implements CompilerPassInterface
         $container->getDefinition('serializer')->replaceArgument(1, $encoders);
     }
 
+    /**
+     * @since v2.3.0
+     */
     private function findAndSortTaggedServices($tagName, ContainerBuilder $container)
     {
         $services = $container->findTaggedServiceIds($tagName);

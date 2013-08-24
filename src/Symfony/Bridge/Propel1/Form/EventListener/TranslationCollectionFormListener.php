@@ -19,6 +19,8 @@ use Symfony\Component\Form\FormEvent;
  * listener class for propel1_translatable_collection
  *
  * @author Patrick Kaufmann
+ *
+ * @since v2.2.0
  */
 class TranslationCollectionFormListener implements EventSubscriberInterface
 {
@@ -26,12 +28,18 @@ class TranslationCollectionFormListener implements EventSubscriberInterface
     private $i18nClass;
     private $languages;
 
+    /**
+     * @since v2.2.0
+     */
     public function __construct($languages, $i18nClass)
     {
         $this->i18nClass = $i18nClass;
         $this->languages = $languages;
     }
 
+    /**
+     * @since v2.2.0
+     */
     public static function getSubscribedEvents()
     {
         return array(
@@ -39,6 +47,9 @@ class TranslationCollectionFormListener implements EventSubscriberInterface
         );
     }
 
+    /**
+     * @since v2.2.0
+     */
     public function preSetData(FormEvent $event)
     {
         $form = $event->getForm();

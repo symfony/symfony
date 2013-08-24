@@ -28,6 +28,8 @@ use Symfony\Bundle\WebProfilerBundle\EventListener\WebDebugToolbarListener;
  *    />
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class WebProfilerExtension extends Extension
 {
@@ -36,6 +38,8 @@ class WebProfilerExtension extends Extension
      *
      * @param array            $configs   An array of configuration settings
      * @param ContainerBuilder $container A ContainerBuilder instance
+     *
+     * @since v2.0.0
      */
     public function load(array $configs, ContainerBuilder $container)
     {
@@ -57,12 +61,17 @@ class WebProfilerExtension extends Extension
      * Returns the base path for the XSD files.
      *
      * @return string The XSD base path
+     *
+     * @since v2.0.0
      */
     public function getXsdValidationBasePath()
     {
         return __DIR__.'/../Resources/config/schema';
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getNamespace()
     {
         return 'http://symfony.com/schema/dic/webprofiler';

@@ -20,6 +20,8 @@ use Symfony\Component\CssSelector\Parser\Token;
  * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @since v2.3.0
  */
 class SyntaxErrorException extends ParseException implements ExceptionInterface
 {
@@ -28,6 +30,8 @@ class SyntaxErrorException extends ParseException implements ExceptionInterface
      * @param Token  $foundToken
      *
      * @return SyntaxErrorException
+     *
+     * @since v2.3.0
      */
     public static function unexpectedToken($expectedValue, Token $foundToken)
     {
@@ -39,6 +43,8 @@ class SyntaxErrorException extends ParseException implements ExceptionInterface
      * @param string $unexpectedLocation
      *
      * @return SyntaxErrorException
+     *
+     * @since v2.3.0
      */
     public static function pseudoElementFound($pseudoElement, $unexpectedLocation)
     {
@@ -49,6 +55,8 @@ class SyntaxErrorException extends ParseException implements ExceptionInterface
      * @param int $position
      *
      * @return SyntaxErrorException
+     *
+     * @since v2.3.0
      */
     public static function unclosedString($position)
     {
@@ -57,6 +65,8 @@ class SyntaxErrorException extends ParseException implements ExceptionInterface
 
     /**
      * @return SyntaxErrorException
+     *
+     * @since v2.3.0
      */
     public static function nestedNot()
     {
@@ -65,6 +75,8 @@ class SyntaxErrorException extends ParseException implements ExceptionInterface
 
     /**
      * @return SyntaxErrorException
+     *
+     * @since v2.3.0
      */
     public static function stringAsFunctionArgument()
     {

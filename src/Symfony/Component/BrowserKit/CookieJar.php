@@ -17,6 +17,8 @@ namespace Symfony\Component\BrowserKit;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class CookieJar
 {
@@ -28,6 +30,8 @@ class CookieJar
      * @param Cookie $cookie A Cookie instance
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function set(Cookie $cookie)
     {
@@ -49,6 +53,8 @@ class CookieJar
      * @return Cookie|null A Cookie instance or null if the cookie does not exist
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function get($name, $path = '/', $domain = null)
     {
@@ -80,6 +86,8 @@ class CookieJar
      * @param string $domain The cookie domain
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function expire($name, $path = '/', $domain = null)
     {
@@ -112,6 +120,8 @@ class CookieJar
      * Removes all the cookies from the jar.
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function clear()
     {
@@ -123,6 +133,8 @@ class CookieJar
      *
      * @param array  $setCookies Set-Cookie headers from an HTTP response
      * @param string $uri        The base URL
+     *
+     * @since v2.1.0
      */
     public function updateFromSetCookie(array $setCookies, $uri = null)
     {
@@ -152,6 +164,8 @@ class CookieJar
      *
      * @param Response $response A Response object
      * @param string   $uri      The base URL
+     *
+     * @since v2.1.0
      */
     public function updateFromResponse(Response $response, $uri = null)
     {
@@ -162,6 +176,8 @@ class CookieJar
      * Returns not yet expired cookies.
      *
      * @return Cookie[] An array of cookies
+     *
+     * @since v2.0.0
      */
     public function all()
     {
@@ -186,6 +202,8 @@ class CookieJar
      * @param Boolean $returnsRawValue Returns raw value or urldecoded value
      *
      * @return array An array of cookie values
+     *
+     * @since v2.0.0
      */
     public function allValues($uri, $returnsRawValue = false)
     {
@@ -225,6 +243,8 @@ class CookieJar
      * @param string $uri A URI
      *
      * @return array An array of cookie values
+     *
+     * @since v2.0.0
      */
     public function allRawValues($uri)
     {
@@ -233,6 +253,8 @@ class CookieJar
 
     /**
      * Removes all expired cookies.
+     *
+     * @since v2.0.0
      */
     public function flushExpiredCookies()
     {

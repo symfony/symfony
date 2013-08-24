@@ -24,6 +24,8 @@ use Symfony\Component\Config\Loader\FileLoader;
  * @author Tobias Schultze <http://tobion.de>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class YamlFileLoader extends FileLoader
 {
@@ -43,6 +45,8 @@ class YamlFileLoader extends FileLoader
      * @throws \InvalidArgumentException When a route can't be parsed because YAML is invalid
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function load($file, $type = null)
     {
@@ -101,6 +105,8 @@ class YamlFileLoader extends FileLoader
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function supports($resource, $type = null)
     {
@@ -114,6 +120,8 @@ class YamlFileLoader extends FileLoader
      * @param string          $name       Route name
      * @param array           $config     Route definition
      * @param string          $path       Full path of the YAML file being processed
+     *
+     * @since v2.2.0
      */
     protected function parseRoute(RouteCollection $collection, $name, array $config, $path)
     {
@@ -136,6 +144,8 @@ class YamlFileLoader extends FileLoader
      * @param array           $config     Route definition
      * @param string          $path       Full path of the YAML file being processed
      * @param string          $file       Loaded file name
+     *
+     * @since v2.2.0
      */
     protected function parseImport(RouteCollection $collection, array $config, $path, $file)
     {
@@ -178,6 +188,8 @@ class YamlFileLoader extends FileLoader
      *
      * @throws \InvalidArgumentException If one of the provided config keys is not supported,
      *                                   something is missing or the combination is nonsense
+     *
+     * @since v2.2.0
      */
     protected function validate($config, $name, $path)
     {

@@ -26,6 +26,8 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
  * This voter can be used as a base class for implementing your own permissions.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class AclVoter implements VoterInterface
 {
@@ -36,6 +38,9 @@ class AclVoter implements VoterInterface
     private $allowIfObjectIdentityUnavailable;
     private $logger;
 
+    /**
+     * @since v2.0.0
+     */
     public function __construct(AclProviderInterface $aclProvider, ObjectIdentityRetrievalStrategyInterface $oidRetrievalStrategy, SecurityIdentityRetrievalStrategyInterface $sidRetrievalStrategy, PermissionMapInterface $permissionMap, LoggerInterface $logger = null, $allowIfObjectIdentityUnavailable = true)
     {
         $this->aclProvider = $aclProvider;
@@ -46,11 +51,17 @@ class AclVoter implements VoterInterface
         $this->allowIfObjectIdentityUnavailable = $allowIfObjectIdentityUnavailable;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function supportsAttribute($attribute)
     {
         return $this->permissionMap->contains($attribute);
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function vote(TokenInterface $token, $object, array $attributes)
     {
         foreach ($attributes as $attribute) {
@@ -135,6 +146,8 @@ class AclVoter implements VoterInterface
      * @param string $class The class name
      *
      * @return Boolean
+     *
+     * @since v2.0.0
      */
     public function supportsClass($class)
     {

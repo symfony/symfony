@@ -15,6 +15,8 @@ namespace Symfony\Component\ClassLoader;
  * ClassMapGenerator
  *
  * @author Gyula Sallai <salla016@gmail.com>
+ *
+ * @since v2.1.0
  */
 class ClassMapGenerator
 {
@@ -23,6 +25,8 @@ class ClassMapGenerator
      *
      * @param array|string $dirs Directories or a single path to search in
      * @param string       $file The name of the class map file
+     *
+     * @since v2.1.0
      */
     public static function dump($dirs, $file)
     {
@@ -42,6 +46,8 @@ class ClassMapGenerator
      * @param Iterator|string $dir The directory to search in or an iterator
      *
      * @return array A class map array
+     *
+     * @since v2.1.0
      */
     public static function createMap($dir)
     {
@@ -79,6 +85,8 @@ class ClassMapGenerator
      * @param string $path The file to check
      *
      * @return array The found classes
+     *
+     * @since v2.1.0
      */
     private static function findClasses($path)
     {

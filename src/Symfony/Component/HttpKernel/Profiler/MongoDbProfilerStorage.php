@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\HttpKernel\Profiler;
 
+/**
+ * @since v2.1.0
+ */
 class MongoDbProfilerStorage implements ProfilerStorageInterface
 {
     protected $dsn;
@@ -24,6 +27,8 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
      * @param string  $username Not used
      * @param string  $password Not used
      * @param integer $lifetime The lifetime to use for the purge
+     *
+     * @since v2.1.0
      */
     public function __construct($dsn, $username = '', $password = '', $lifetime = 86400)
     {
@@ -33,6 +38,8 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function find($ip, $url, $limit, $method, $start = null, $end = null)
     {
@@ -48,6 +55,8 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function purge()
     {
@@ -56,6 +65,8 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function read($token)
     {
@@ -70,6 +81,8 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function write(Profile $profile)
     {
@@ -96,6 +109,8 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
      * @return \MongoCollection
      *
      * @throws \RuntimeException
+     *
+     * @since v2.1.0
      */
     protected function getMongo()
     {
@@ -120,6 +135,8 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
      * @param array $data
      *
      * @return Profile
+     *
+     * @since v2.1.0
      */
     protected function createProfileFromData(array $data)
     {
@@ -141,6 +158,8 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
      * @param string $token
      *
      * @return Profile[] An array of Profile instances
+     *
+     * @since v2.1.0
      */
     protected function readChildren($token)
     {
@@ -154,6 +173,9 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
         return $profiles;
     }
 
+    /**
+     * @since v2.1.0
+     */
     protected function cleanup()
     {
         $this->getMongo()->remove(array('time' => array('$lt' => time() - $this->lifetime)));
@@ -167,6 +189,8 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
      * @param int    $end
      *
      * @return array
+     *
+     * @since v2.2.0
      */
     private function buildQuery($ip, $url, $method, $start, $end)
     {
@@ -203,6 +227,8 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
      * @param array $data
      *
      * @return array
+     *
+     * @since v2.1.0
      */
     private function getData(array $data)
     {
@@ -221,6 +247,8 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
      * @param array $data
      *
      * @return Profile
+     *
+     * @since v2.1.0
      */
     private function getProfile(array $data)
     {

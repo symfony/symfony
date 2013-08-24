@@ -23,6 +23,8 @@ use Symfony\Component\Intl\Intl;
  * test that is not provided by the stub intl implementation.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.3.0
  */
 class IntlTestHelper
 {
@@ -30,6 +32,8 @@ class IntlTestHelper
      * Should be called before tests that work fine with the stub implementation.
      *
      * @param \PhpUnit_Framework_TestCase $testCase
+     *
+     * @since v2.3.0
      */
     public static function requireIntl(\PhpUnit_Framework_TestCase $testCase)
     {
@@ -66,6 +70,8 @@ class IntlTestHelper
      * implementation.
      *
      * @param \PhpUnit_Framework_TestCase $testCase
+     *
+     * @since v2.3.0
      */
     public static function requireFullIntl(\PhpUnit_Framework_TestCase $testCase)
     {
@@ -101,6 +107,8 @@ class IntlTestHelper
      * Skips the test unless the current system has a 32bit architecture.
      *
      * @param \PhpUnit_Framework_TestCase $testCase
+     *
+     * @since v2.3.0
      */
     public static function require32Bit(\PhpUnit_Framework_TestCase $testCase)
     {
@@ -113,6 +121,8 @@ class IntlTestHelper
      * Skips the test unless the current system has a 64bit architecture.
      *
      * @param \PhpUnit_Framework_TestCase $testCase
+     *
+     * @since v2.3.0
      */
     public static function require64Bit(\PhpUnit_Framework_TestCase $testCase)
     {
@@ -123,6 +133,8 @@ class IntlTestHelper
 
     /**
      * Must not be instantiated.
+     *
+     * @since v2.3.0
      */
     private function __construct() {}
 }

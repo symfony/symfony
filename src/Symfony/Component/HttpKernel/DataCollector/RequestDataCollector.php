@@ -24,11 +24,16 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * RequestDataCollector.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.1.0
  */
 class RequestDataCollector extends DataCollector implements EventSubscriberInterface
 {
     protected $controllers;
 
+    /**
+     * @since v2.1.0
+     */
     public function __construct()
     {
         $this->controllers = new \SplObjectStorage();
@@ -36,6 +41,8 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
@@ -147,86 +154,137 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
         }
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function getPathInfo()
     {
         return $this->data['path_info'];
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getRequestRequest()
     {
         return new ParameterBag($this->data['request_request']);
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getRequestQuery()
     {
         return new ParameterBag($this->data['request_query']);
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getRequestHeaders()
     {
         return new HeaderBag($this->data['request_headers']);
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getRequestServer()
     {
         return new ParameterBag($this->data['request_server']);
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getRequestCookies()
     {
         return new ParameterBag($this->data['request_cookies']);
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getRequestAttributes()
     {
         return new ParameterBag($this->data['request_attributes']);
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getResponseHeaders()
     {
         return new ResponseHeaderBag($this->data['response_headers']);
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function getSessionMetadata()
     {
         return $this->data['session_metadata'];
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getSessionAttributes()
     {
         return $this->data['session_attributes'];
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function getFlashes()
     {
         return $this->data['flashes'];
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getContent()
     {
         return $this->data['content'];
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getContentType()
     {
         return $this->data['content_type'];
     }
 
+    /**
+     * @since v2.3.0
+     */
     public function getStatusText()
     {
         return $this->data['status_text'];
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getStatusCode()
     {
         return $this->data['status_code'];
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getFormat()
     {
         return $this->data['format'];
     }
 
+    /**
+     * @since v2.2.0
+     */
     public function getLocale()
     {
         return $this->data['locale'];
@@ -238,6 +296,8 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
      * The _route request attributes is automatically set by the Router Matcher.
      *
      * @return string The route
+     *
+     * @since v2.1.0
      */
     public function getRoute()
     {
@@ -250,6 +310,8 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
      * The _route_params request attributes is automatically set by the RouterListener.
      *
      * @return array The parameters
+     *
+     * @since v2.1.0
      */
     public function getRouteParams()
     {
@@ -260,17 +322,25 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
      * Gets the controller.
      *
      * @return string The controller as a string
+     *
+     * @since v2.1.0
      */
     public function getController()
     {
         return $this->data['controller'];
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function onKernelController(FilterControllerEvent $event)
     {
         $this->controllers[$event->getRequest()] = $event->getController();
     }
 
+    /**
+     * @since v2.1.0
+     */
     public static function getSubscribedEvents()
     {
         return array(KernelEvents::CONTROLLER => 'onKernelController');
@@ -278,12 +348,17 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getName()
     {
         return 'request';
     }
 
+    /**
+     * @since v2.0.0
+     */
     private function getCookieHeader($name, $value, $expires, $path, $domain, $secure, $httponly)
     {
         $cookie = sprintf('%s=%s', $name, urlencode($value));

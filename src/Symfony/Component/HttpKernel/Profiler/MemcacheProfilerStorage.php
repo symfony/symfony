@@ -17,6 +17,8 @@ use Memcache;
  * Memcache Profiler Storage
  *
  * @author Andrej Hudec <pulzarraider@gmail.com>
+ *
+ * @since v2.1.0
  */
 class MemcacheProfilerStorage extends BaseMemcacheProfilerStorage
 {
@@ -31,6 +33,8 @@ class MemcacheProfilerStorage extends BaseMemcacheProfilerStorage
      * @return Memcache
      *
      * @throws \RuntimeException
+     *
+     * @since v2.1.0
      */
     protected function getMemcache()
     {
@@ -55,6 +59,8 @@ class MemcacheProfilerStorage extends BaseMemcacheProfilerStorage
      * Set instance of the Memcache
      *
      * @param Memcache $memcache
+     *
+     * @since v2.1.0
      */
     public function setMemcache($memcache)
     {
@@ -63,6 +69,8 @@ class MemcacheProfilerStorage extends BaseMemcacheProfilerStorage
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     protected function getValue($key)
     {
@@ -71,6 +79,8 @@ class MemcacheProfilerStorage extends BaseMemcacheProfilerStorage
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     protected function setValue($key, $value, $expiration = 0)
     {
@@ -79,6 +89,8 @@ class MemcacheProfilerStorage extends BaseMemcacheProfilerStorage
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     protected function delete($key)
     {
@@ -87,6 +99,8 @@ class MemcacheProfilerStorage extends BaseMemcacheProfilerStorage
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     protected function appendValue($key, $value, $expiration = 0)
     {

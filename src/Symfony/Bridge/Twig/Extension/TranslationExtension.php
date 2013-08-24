@@ -22,12 +22,17 @@ use Symfony\Bridge\Twig\NodeVisitor\TranslationDefaultDomainNodeVisitor;
  * Provides integration of the Translation component with Twig.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class TranslationExtension extends \Twig_Extension
 {
     private $translator;
     private $translationNodeVisitor;
 
+    /**
+     * @since v2.3.0
+     */
     public function __construct(TranslatorInterface $translator, \Twig_NodeVisitorInterface $translationNodeVisitor = null)
     {
         if (!$translationNodeVisitor) {
@@ -38,6 +43,9 @@ class TranslationExtension extends \Twig_Extension
         $this->translationNodeVisitor = $translationNodeVisitor;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getTranslator()
     {
         return $this->translator;
@@ -45,6 +53,8 @@ class TranslationExtension extends \Twig_Extension
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getFilters()
     {
@@ -58,6 +68,8 @@ class TranslationExtension extends \Twig_Extension
      * Returns the token parser instance to add to the existing list.
      *
      * @return array An array of Twig_TokenParser instances
+     *
+     * @since v2.0.0
      */
     public function getTokenParsers()
     {
@@ -77,17 +89,25 @@ class TranslationExtension extends \Twig_Extension
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getNodeVisitors()
     {
         return array($this->translationNodeVisitor, new TranslationDefaultDomainNodeVisitor());
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function getTranslationNodeVisitor()
     {
         return $this->translationNodeVisitor;
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function trans($message, array $arguments = array(), $domain = null, $locale = null)
     {
         if (null === $domain) {
@@ -97,6 +117,9 @@ class TranslationExtension extends \Twig_Extension
         return $this->translator->trans($message, $arguments, $domain, $locale);
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function transchoice($message, $count, array $arguments = array(), $domain = null, $locale = null)
     {
         if (null === $domain) {
@@ -110,6 +133,8 @@ class TranslationExtension extends \Twig_Extension
      * Returns the name of the extension.
      *
      * @return string The extension name
+     *
+     * @since v2.0.0
      */
     public function getName()
     {

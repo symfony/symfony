@@ -18,6 +18,8 @@ use Symfony\Component\Templating\Asset\PathPackage as BasePathPackage;
  * The path packages adds a version and a base path to asset URLs.
  *
  * @author Kris Wallsmith <kris@symfony.com>
+ *
+ * @since v2.0.0
  */
 class PathPackage extends BasePathPackage
 {
@@ -27,6 +29,8 @@ class PathPackage extends BasePathPackage
      * @param Request $request The current request
      * @param string  $version The version
      * @param string  $format  The version format
+     *
+     * @since v2.0.0
      */
     public function __construct(Request $request, $version = null, $format = null)
     {

@@ -16,9 +16,14 @@ namespace Symfony\Bridge\Twig\Node;
  *
  * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
  *             the helper "form_start()" instead.
+ *
+ * @since v2.3.0
  */
 class FormEnctypeNode extends SearchAndRenderBlockNode
 {
+    /**
+     * @since v2.3.0
+     */
     public function compile(\Twig_Compiler $compiler)
     {
         parent::compile($compiler);

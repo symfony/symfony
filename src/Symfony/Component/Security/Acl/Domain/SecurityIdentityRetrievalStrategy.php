@@ -23,6 +23,8 @@ use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
  * Strategy for retrieving security identities
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class SecurityIdentityRetrievalStrategy implements SecurityIdentityRetrievalStrategyInterface
 {
@@ -34,6 +36,8 @@ class SecurityIdentityRetrievalStrategy implements SecurityIdentityRetrievalStra
      *
      * @param RoleHierarchyInterface      $roleHierarchy
      * @param AuthenticationTrustResolver $authenticationTrustResolver
+     *
+     * @since v2.0.0
      */
     public function __construct(RoleHierarchyInterface $roleHierarchy, AuthenticationTrustResolver $authenticationTrustResolver)
     {
@@ -43,6 +47,8 @@ class SecurityIdentityRetrievalStrategy implements SecurityIdentityRetrievalStra
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function getSecurityIdentities(TokenInterface $token)
     {

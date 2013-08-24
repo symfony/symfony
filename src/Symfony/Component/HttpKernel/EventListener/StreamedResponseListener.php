@@ -21,6 +21,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * to the client.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.1.0
  */
 class StreamedResponseListener implements EventSubscriberInterface
 {
@@ -28,6 +30,8 @@ class StreamedResponseListener implements EventSubscriberInterface
      * Filters the Response.
      *
      * @param FilterResponseEvent $event A FilterResponseEvent instance
+     *
+     * @since v2.1.0
      */
     public function onKernelResponse(FilterResponseEvent $event)
     {
@@ -42,6 +46,9 @@ class StreamedResponseListener implements EventSubscriberInterface
         }
     }
 
+    /**
+     * @since v2.1.0
+     */
     public static function getSubscribedEvents()
     {
         return array(

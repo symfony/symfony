@@ -20,11 +20,15 @@ use Symfony\Component\Config\Resource\DirectoryResource;
  * IcuResFileLoader loads translations from a resource bundle.
  *
  * @author stealth35
+ *
+ * @since v2.1.0
  */
 class IcuResFileLoader implements LoaderInterface
 {
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function load($resource, $locale, $domain = 'messages')
     {
@@ -67,6 +71,8 @@ class IcuResFileLoader implements LoaderInterface
      * @param string          $path     current path being parsed, used internally for recursive calls
      *
      * @return array the flattened ResourceBundle
+     *
+     * @since v2.1.0
      */
     protected function flatten(\ResourceBundle $rb, array &$messages = array(), $path = null)
     {

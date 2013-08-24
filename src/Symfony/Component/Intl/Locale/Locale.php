@@ -21,6 +21,8 @@ use Symfony\Component\Intl\Exception\MethodNotImplementedException;
  *
  * @author Eriksen Costa <eriksen.costa@infranology.com.br>
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.3.0
  */
 class Locale
 {
@@ -49,6 +51,8 @@ class Locale
      * @see http://www.php.net/manual/en/locale.acceptfromhttp.php
      *
      * @throws MethodNotImplementedException
+     *
+     * @since v2.3.0
      */
     public static function acceptFromHttp($header)
     {
@@ -65,6 +69,8 @@ class Locale
      * @see http://www.php.net/manual/en/locale.composelocale.php
      *
      * @throws MethodNotImplementedException
+     *
+     * @since v2.3.0
      */
     public static function composeLocale(array $subtags)
     {
@@ -83,6 +89,8 @@ class Locale
      * @see http://www.php.net/manual/en/locale.filtermatches.php
      *
      * @throws MethodNotImplementedException
+     *
+     * @since v2.3.0
      */
     public static function filterMatches($langtag, $locale, $canonicalize = false)
     {
@@ -99,6 +107,8 @@ class Locale
      * @see http://www.php.net/manual/en/locale.getallvariants.php
      *
      * @throws MethodNotImplementedException
+     *
+     * @since v2.3.0
      */
     public static function getAllVariants($locale)
     {
@@ -111,6 +121,8 @@ class Locale
      * @return string The default locale code. Always returns 'en'
      *
      * @see http://www.php.net/manual/en/locale.getdefault.php
+     *
+     * @since v2.3.0
      */
     public static function getDefault()
     {
@@ -128,6 +140,8 @@ class Locale
      * @see http://www.php.net/manual/en/locale.getdisplaylanguage.php
      *
      * @throws MethodNotImplementedException
+     *
+     * @since v2.3.0
      */
     public static function getDisplayLanguage($locale, $inLocale = null)
     {
@@ -145,6 +159,8 @@ class Locale
      * @see http://www.php.net/manual/en/locale.getdisplayname.php
      *
      * @throws MethodNotImplementedException
+     *
+     * @since v2.3.0
      */
     public static function getDisplayName($locale, $inLocale = null)
     {
@@ -162,6 +178,8 @@ class Locale
      * @see http://www.php.net/manual/en/locale.getdisplayregion.php
      *
      * @throws MethodNotImplementedException
+     *
+     * @since v2.3.0
      */
     public static function getDisplayRegion($locale, $inLocale = null)
     {
@@ -179,6 +197,8 @@ class Locale
      * @see http://www.php.net/manual/en/locale.getdisplayscript.php
      *
      * @throws MethodNotImplementedException
+     *
+     * @since v2.3.0
      */
     public static function getDisplayScript($locale, $inLocale = null)
     {
@@ -196,6 +216,8 @@ class Locale
      * @see http://www.php.net/manual/en/locale.getdisplayvariant.php
      *
      * @throws MethodNotImplementedException
+     *
+     * @since v2.3.0
      */
     public static function getDisplayVariant($locale, $inLocale = null)
     {
@@ -212,6 +234,8 @@ class Locale
      * @see http://www.php.net/manual/en/locale.getkeywords.php
      *
      * @throws MethodNotImplementedException
+     *
+     * @since v2.3.0
      */
     public static function getKeywords($locale)
     {
@@ -228,6 +252,8 @@ class Locale
      * @see http://www.php.net/manual/en/locale.getprimarylanguage.php
      *
      * @throws MethodNotImplementedException
+     *
+     * @since v2.3.0
      */
     public static function getPrimaryLanguage($locale)
     {
@@ -244,6 +270,8 @@ class Locale
      * @see http://www.php.net/manual/en/locale.getregion.php
      *
      * @throws MethodNotImplementedException
+     *
+     * @since v2.3.0
      */
     public static function getRegion($locale)
     {
@@ -260,6 +288,8 @@ class Locale
      * @see http://www.php.net/manual/en/locale.getscript.php
      *
      * @throws MethodNotImplementedException
+     *
+     * @since v2.3.0
      */
     public static function getScript($locale)
     {
@@ -277,6 +307,8 @@ class Locale
      * @see http://www.php.net/manual/en/locale.lookup.php
      *
      * @throws MethodNotImplementedException
+     *
+     * @since v2.3.0
      */
     public static function lookup(array $langtag, $locale, $canonicalize = false, $default = null)
     {
@@ -293,6 +325,8 @@ class Locale
      * @see http://www.php.net/manual/en/locale.parselocale.php
      *
      * @throws MethodNotImplementedException
+     *
+     * @since v2.3.0
      */
     public static function parseLocale($locale)
     {
@@ -309,6 +343,8 @@ class Locale
      * @see http://www.php.net/manual/en/locale.parselocale.php
      *
      * @throws MethodNotImplementedException
+     *
+     * @since v2.3.0
      */
     public static function setDefault($locale)
     {

@@ -59,6 +59,8 @@ namespace Symfony\Component\ClassLoader;
  * @author Kris Wallsmith <kris@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class ApcUniversalClassLoader extends UniversalClassLoader
 {
@@ -72,6 +74,8 @@ class ApcUniversalClassLoader extends UniversalClassLoader
      * @throws \RuntimeException
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function __construct($prefix)
     {
@@ -88,6 +92,8 @@ class ApcUniversalClassLoader extends UniversalClassLoader
      * @param string $class A class name to resolve to file
      *
      * @return string|null The path, if found
+     *
+     * @since v2.0.0
      */
     public function findFile($class)
     {

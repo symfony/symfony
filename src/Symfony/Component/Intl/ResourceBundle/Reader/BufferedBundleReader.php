@@ -15,6 +15,8 @@ use Symfony\Component\Intl\ResourceBundle\Util\RingBuffer;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.3.0
  */
 class BufferedBundleReader implements BundleReaderInterface
 {
@@ -31,6 +33,8 @@ class BufferedBundleReader implements BundleReaderInterface
      * @param BundleReaderInterface $reader     The reader to buffer.
      * @param integer               $bufferSize The number of entries to store
      *                                          in the buffer.
+     *
+     * @since v2.3.0
      */
     public function __construct(BundleReaderInterface $reader, $bufferSize)
     {
@@ -40,6 +44,8 @@ class BufferedBundleReader implements BundleReaderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function read($path, $locale)
     {
@@ -54,6 +60,8 @@ class BufferedBundleReader implements BundleReaderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getLocales($path)
     {

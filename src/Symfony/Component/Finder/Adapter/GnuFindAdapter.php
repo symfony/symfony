@@ -20,11 +20,15 @@ use Symfony\Component\Finder\Expression\Expression;
  * Shell engine implementation using GNU find command.
  *
  * @author Jean-François Simon <contact@jfsimon.fr>
+ *
+ * @since v2.2.0
  */
 class GnuFindAdapter extends AbstractFindAdapter
 {
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function getName()
     {
@@ -33,6 +37,8 @@ class GnuFindAdapter extends AbstractFindAdapter
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     protected function buildFormatSorting(Command $command, $sort)
     {
@@ -69,6 +75,8 @@ class GnuFindAdapter extends AbstractFindAdapter
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     protected function canBeUsed()
     {
@@ -77,6 +85,8 @@ class GnuFindAdapter extends AbstractFindAdapter
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     protected function buildFindCommand(Command $command, $dir)
     {
@@ -85,6 +95,8 @@ class GnuFindAdapter extends AbstractFindAdapter
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     protected function buildContentFiltering(Command $command, array $contains, $not = false)
     {

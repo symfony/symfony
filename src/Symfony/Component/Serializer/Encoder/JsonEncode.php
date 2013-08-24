@@ -15,12 +15,17 @@ namespace Symfony\Component\Serializer\Encoder;
  * Encodes JSON data
  *
  * @author Sander Coolen <sander@jibber.nl>
+ *
+ * @since v2.2.0
  */
 class JsonEncode implements EncoderInterface
 {
     private $options ;
     private $lastError = JSON_ERROR_NONE;
 
+    /**
+     * @since v2.1.0
+     */
     public function __construct($bitmask = 0)
     {
         $this->options = $bitmask;
@@ -32,6 +37,8 @@ class JsonEncode implements EncoderInterface
      * @return integer
      *
      * @see http://php.net/manual/en/function.json-last-error.php json_last_error
+     *
+     * @since v2.1.0
      */
     public function getLastError()
     {
@@ -42,6 +49,8 @@ class JsonEncode implements EncoderInterface
      * Encodes PHP data to a JSON string
      *
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function encode($data, $format, array $context = array())
     {
@@ -55,6 +64,8 @@ class JsonEncode implements EncoderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function supportsEncoding($format)
     {
@@ -66,6 +77,8 @@ class JsonEncode implements EncoderInterface
      *
      * @param array $context
      * @return array
+     *
+     * @since v2.2.0
      */
     private function resolveContext(array $context = array())
     {

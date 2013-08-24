@@ -15,15 +15,24 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Symfony\Component\Form\AbstractExtension;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
+/**
+ * @since v2.0.0
+ */
 class DoctrineOrmExtension extends AbstractExtension
 {
     protected $registry;
 
+    /**
+     * @since v2.1.0
+     */
     public function __construct(ManagerRegistry $registry)
     {
         $this->registry = $registry;
     }
 
+    /**
+     * @since v2.0.0
+     */
     protected function loadTypes()
     {
         return array(
@@ -31,6 +40,9 @@ class DoctrineOrmExtension extends AbstractExtension
         );
     }
 
+    /**
+     * @since v2.0.0
+     */
     protected function loadTypeGuesser()
     {
         return new DoctrineOrmTypeGuesser($this->registry);

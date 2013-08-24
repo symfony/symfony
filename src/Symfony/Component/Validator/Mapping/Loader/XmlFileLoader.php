@@ -15,6 +15,9 @@ use Symfony\Component\Validator\Exception\MappingException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Config\Util\XmlUtils;
 
+/**
+ * @since v2.0.0
+ */
 class XmlFileLoader extends FileLoader
 {
     /**
@@ -26,6 +29,8 @@ class XmlFileLoader extends FileLoader
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function loadClassMetadata(ClassMetadata $metadata)
     {
@@ -83,6 +88,8 @@ class XmlFileLoader extends FileLoader
      * @param \SimpleXMLElement $nodes The XML nodes
      *
      * @return array The Constraint instances
+     *
+     * @since v2.0.0
      */
     protected function parseConstraints(\SimpleXMLElement $nodes)
     {
@@ -117,6 +124,8 @@ class XmlFileLoader extends FileLoader
      * @param \SimpleXMLElement $nodes The XML nodes
      *
      * @return array The values
+     *
+     * @since v2.0.0
      */
     protected function parseValues(\SimpleXMLElement $nodes)
     {
@@ -151,6 +160,8 @@ class XmlFileLoader extends FileLoader
      * @param \SimpleXMLElement $nodes The XML nodes
      *
      * @return array The options
+     *
+     * @since v2.0.0
      */
     protected function parseOptions(\SimpleXMLElement $nodes)
     {
@@ -183,6 +194,8 @@ class XmlFileLoader extends FileLoader
      * @return \SimpleXMLElement
      *
      * @throws MappingException
+     *
+     * @since v2.0.0
      */
     protected function parseFile($file)
     {

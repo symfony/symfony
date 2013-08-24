@@ -18,9 +18,14 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
  * Represents the main form extension, which loads the core functionality.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.0.0
  */
 class CoreExtension extends AbstractExtension
 {
+    /**
+     * @since v2.0.0
+     */
     protected function loadTypes()
     {
         return array(

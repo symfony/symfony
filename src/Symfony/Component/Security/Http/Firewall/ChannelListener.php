@@ -21,6 +21,8 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
  * configuration.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class ChannelListener implements ListenerInterface
 {
@@ -28,6 +30,9 @@ class ChannelListener implements ListenerInterface
     private $authenticationEntryPoint;
     private $logger;
 
+    /**
+     * @since v2.1.0
+     */
     public function __construct(AccessMapInterface $map, AuthenticationEntryPointInterface $authenticationEntryPoint, LoggerInterface $logger = null)
     {
         $this->map = $map;
@@ -39,6 +44,8 @@ class ChannelListener implements ListenerInterface
      * Handles channel management.
      *
      * @param GetResponseEvent $event A GetResponseEvent instance
+     *
+     * @since v2.0.0
      */
     public function handle(GetResponseEvent $event)
     {

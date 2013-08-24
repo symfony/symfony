@@ -17,6 +17,8 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  * Bundle.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class WebProfilerBundle extends Bundle
 {

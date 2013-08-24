@@ -252,4 +252,9 @@ class StubLocaleTest extends LocaleTestCase
     {
         StubLocale::setDefault('pt_BR');
     }
+
+    public function testSetDefaultAcceptsEn()
+    {
+        StubLocale::setDefault('en');
+    }
 }

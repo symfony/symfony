@@ -466,7 +466,9 @@ class StubLocale
      */
     public static function setDefault($locale)
     {
-        throw new MethodNotImplementedException(__METHOD__);
+        if ('en' !== $locale) {
+            throw new MethodNotImplementedException(__METHOD__);
+        }
     }
 
     public static function getDataDirectory()

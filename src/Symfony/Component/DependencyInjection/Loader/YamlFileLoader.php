@@ -26,6 +26,8 @@ use Symfony\Component\Yaml\Parser as YamlParser;
  * The YAML format does not support anonymous services (cf. the XML loader).
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class YamlFileLoader extends FileLoader
 {

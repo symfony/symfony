@@ -20,6 +20,8 @@ namespace Symfony\Component\Templating\Helper;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 abstract class Helper implements HelperInterface
 {

@@ -17,6 +17,8 @@ use Symfony\Component\Config\Util\XmlUtils;
  * SimpleXMLElement class.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class SimpleXMLElement extends \SimpleXMLElement
 {

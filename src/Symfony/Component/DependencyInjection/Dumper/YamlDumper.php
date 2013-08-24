@@ -26,6 +26,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class YamlDumper extends Dumper
 {

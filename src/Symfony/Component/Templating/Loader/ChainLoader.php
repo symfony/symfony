@@ -18,6 +18,8 @@ use Symfony\Component\Templating\TemplateReferenceInterface;
  * ChainLoader is a loader that calls other loaders to load templates.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class ChainLoader extends Loader
 {

@@ -26,6 +26,8 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
  *   dot -Tpng container.dot > foo.png
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class GraphvizDumper extends Dumper
 {

@@ -25,6 +25,8 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
  * @author Martin Hasoň <martin.hason@gmail.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class XmlDumper extends Dumper
 {

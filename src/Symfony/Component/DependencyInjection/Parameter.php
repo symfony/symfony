@@ -17,6 +17,8 @@ namespace Symfony\Component\DependencyInjection;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class Parameter
 {

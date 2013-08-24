@@ -23,6 +23,8 @@ use Symfony\Component\Templating\TemplateReferenceInterface;
  * All other mechanism would imply the use of `eval()`.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class CacheLoader extends Loader
 {

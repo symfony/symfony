@@ -31,6 +31,8 @@ use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\NullDumper;
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class PhpDumper extends Dumper
 {

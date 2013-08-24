@@ -16,6 +16,8 @@ use Symfony\Component\Yaml\Exception\ParseException;
  * Parser parses YAML strings to convert them to PHP arrays.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class Parser
 {

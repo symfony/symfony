@@ -26,6 +26,8 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
  * XmlFileLoader loads XML files service definitions.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class XmlFileLoader extends FileLoader
 {

@@ -20,6 +20,8 @@ use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class Definition
 {

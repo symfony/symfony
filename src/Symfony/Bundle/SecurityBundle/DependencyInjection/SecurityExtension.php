@@ -171,7 +171,6 @@ class SecurityExtension extends Extension
      *
      * @since v2.0.0
      */
-
     private function createRoleHierarchy($config, ContainerBuilder $container)
     {
         if (!isset($config['role_hierarchy'])) {
@@ -519,9 +518,10 @@ class SecurityExtension extends Extension
     }
 
     /**
+     * Parses user providers and returns an array of their ids
+     *
      * @since v2.0.0
      */
-    // Parses user providers and returns an array of their ids
     private function createUserProviders($config, ContainerBuilder $container)
     {
         $providerIds = array();
@@ -534,9 +534,10 @@ class SecurityExtension extends Extension
     }
 
     /**
+     * Parses a <provider> tag and returns the id for the related user provider service
+     *
      * @since v2.0.0
      */
-    // Parses a <provider> tag and returns the id for the related user provider service
     private function createUserDaoProvider($name, $provider, ContainerBuilder $container, $master = true)
     {
         $name = $this->getUserProviderId(strtolower($name));

@@ -18,7 +18,6 @@ namespace Symfony\Component\Security\Core\Authentication\Token;
  *
  * @since v2.0.0
  */
-
 class AnonymousToken extends AbstractToken
 {
     private $key;

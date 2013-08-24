@@ -34,7 +34,7 @@ class ResponseListenerTest extends \PHPUnit_Framework_TestCase
         $listener->onKernelResponse($this->getEvent($request, $response));
     }
 
-    public function testRemmeberMeCookieIsNotSendWithResponse()
+    public function testRememberMeCookieIsNotSendWithResponse()
     {
         $request = $this->getRequest();
 

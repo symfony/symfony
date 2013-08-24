@@ -62,7 +62,7 @@ class ProcessBuilder
     /**
      * Adds an unescaped prefix to the command string.
      *
-     * The prefix is preserved when reseting arguments.
+     * The prefix is preserved when resetting arguments.
      *
      * @param string|array $prefix A command prefix or an array of command prefixes
      *

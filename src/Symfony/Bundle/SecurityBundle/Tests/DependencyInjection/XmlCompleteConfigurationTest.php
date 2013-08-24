@@ -12,14 +12,14 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
+use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\Config\FileLocator;
 
-class PhpSecurityExtensionTest extends SecurityExtensionTest
+class XmlCompleteConfigurationTest extends CompleteConfigurationTest
 {
     protected function loadFromFile(ContainerBuilder $container, $file)
     {
-        $loadXml = new PhpFileLoader($container, new FileLocator(__DIR__.'/Fixtures/php'));
-        $loadXml->load($file.'.php');
+        $loadXml = new XmlFileLoader($container, new FileLocator(__DIR__.'/Fixtures/xml'));
+        $loadXml->load($file.'.xml');
     }
 }

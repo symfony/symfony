@@ -551,7 +551,7 @@ EOF
         ));
     }
 
-    public function testNestedStringBlockWithComments()
+    public function testFoldedStringBlockWithComments()
     {
         $this->assertEquals(array(array('content' => <<<EOT
 # comment 1
@@ -566,6 +566,38 @@ footer # comment3
 EOT
         )), Yaml::parse(<<<EOF
 -
+    content: |
+        # comment 1
+        header
+
+            # comment 2
+            <body>
+                <h1>title</h1>
+            </body>
+
+        footer # comment3
+EOF
+        ));
+    }
+
+    public function testNestedFoldedStringBlockWithComments()
+    {
+        $this->assertEquals(array(array(
+            'title'   => 'some title',
+            'content' => <<<EOT
+# comment 1
+header
+
+    # comment 2
+    <body>
+        <h1>title</h1>
+    </body>
+
+footer # comment3
+EOT
+        )), Yaml::parse(<<<EOF
+-
+    title: some title
     content: |
         # comment 1
         header

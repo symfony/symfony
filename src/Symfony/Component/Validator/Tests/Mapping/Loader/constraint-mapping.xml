@@ -78,7 +78,7 @@
       <!-- Constraint with options -->
       <constraint name="Choice">
         <!-- Option with single value -->
-        <option name="message">Must be one of %choices%</option>
+        <option name="message"> Must be one of %choices% </option>
         <!-- Option with multiple values -->
         <option name="choices">
           <value>A</value>

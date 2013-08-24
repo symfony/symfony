@@ -19,6 +19,8 @@ use Symfony\Component\Yaml\Exception\ParseException;
  */
 class Parser
 {
+    const FOLDED_SCALAR_PATTERN = '(?P<separator>\||>)(?P<modifiers>\+|\-|\d+|\+\d+|\-\d+|\d+\+|\d+\-)?(?P<comments> +#.*)?';
+
     private $offset         = 0;
     private $lines          = array();
     private $currentLineNb  = -1;
@@ -304,10 +306,15 @@ class Parser
 
         $isItUnindentedCollection = $this->isStringUnIndentedCollectionItem($this->currentLine);
 
-        // We are in string block (ie. after a line ending with "|")
-        $removeComments = !preg_match('~(.*)\|[\s]*$~', $this->currentLine);
+        // Comments must not be removed inside a string block (ie. after a line ending with "|")
+        $removeCommentsPattern = '~'.self::FOLDED_SCALAR_PATTERN.'$~';
+        $removeComments = !preg_match($removeCommentsPattern, $this->currentLine);
 
         while ($this->moveToNextLine()) {
+            if ($this->getCurrentLineIndentation() === $newIndent) {
+                $removeComments = !preg_match($removeCommentsPattern, $this->currentLine);
+            }
+
             if ($isItUnindentedCollection && !$this->isStringUnIndentedCollectionItem($this->currentLine)) {
                 $this->moveToPreviousLine();
                 break;
@@ -391,7 +398,7 @@ class Parser
             return $this->refs[$value];
         }
 
-        if (preg_match('/^(?P<separator>\||>)(?P<modifiers>\+|\-|\d+|\+\d+|\-\d+|\d+\+|\d+\-)?(?P<comments> +#.*)?$/', $value, $matches)) {
+        if (preg_match('/^'.self::FOLDED_SCALAR_PATTERN.'$/', $value, $matches)) {
             $modifiers = isset($matches['modifiers']) ? $matches['modifiers'] : '';
 
             return $this->parseFoldedScalar($matches['separator'], preg_replace('#\d+#', '', $modifiers), intval(abs($modifiers)));

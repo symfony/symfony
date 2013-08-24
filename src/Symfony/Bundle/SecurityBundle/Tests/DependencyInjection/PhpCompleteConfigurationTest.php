@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\Config\FileLocator;
 
-class PhpSecurityExtensionTest extends CompleteConfigurationTest
+class PhpCompleteConfigurationTest extends CompleteConfigurationTest
 {
     protected function loadFromFile(ContainerBuilder $container, $file)
     {

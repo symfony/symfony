@@ -14,15 +14,12 @@ namespace Symfony\Component\Form\Util;
 /**
  * Iterator that traverses an array of forms.
  *
- * Contrary to {@link \ArrayIterator}, this iterator recognizes changes in the
- * original array during iteration.
- *
  * You can wrap the iterator into a {@link \RecursiveIterator} in order to
  * enter any virtual child form and iterate the children of that virtual form.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class VirtualFormAwareIterator extends ReferencingArrayIterator implements \RecursiveIterator
+class VirtualFormAwareIterator extends \ArrayIterator implements \RecursiveIterator
 {
     /**
      *{@inheritdoc}

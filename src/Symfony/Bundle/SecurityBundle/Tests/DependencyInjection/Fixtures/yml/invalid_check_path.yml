@@ -1,9 +1,0 @@
-security:
-    providers:
-        default: { id: foo }
-
-    firewalls:
-        some_firewall:
-            pattern: /secured_area/.*
-            form_login:
-                check_path: /some_area/login_check

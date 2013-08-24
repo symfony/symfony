@@ -14,7 +14,7 @@ namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\MainConfiguration;
 use Symfony\Component\Config\Definition\Processor;
 
-class ConfigurationTest extends \PHPUnit_Framework_TestCase
+class MainConfigurationTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * The minimal, required config needed to not have any required validation

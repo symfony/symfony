@@ -46,25 +46,25 @@ class MessageSelectorTest extends \PHPUnit_Framework_TestCase
     public function getNonMatchingMessages()
     {
         return array(
-            array('{0} There is no apple|{1} There is one apple', 2),
+            array('{0} There are no apples|{1} There is one apple', 2),
             array('{1} There is one apple|]1,Inf] There are %count% apples', 0),
             array('{1} There is one apple|]2,Inf] There are %count% apples', 2),
-            array('{0} There is no apple|There is one apple', 2),
+            array('{0} There are no apples|There is one apple', 2),
         );
     }
 
     public function getChooseTests()
     {
         return array(
-            array('There is no apple', '{0} There is no apple|{1} There is one apple|]1,Inf] There are %count% apples', 0),
-            array('There is no apple', '{0}     There is no apple|{1} There is one apple|]1,Inf] There are %count% apples', 0),
-            array('There is no apple', '{0}There is no apple|{1} There is one apple|]1,Inf] There are %count% apples', 0),
+            array('There are no apples', '{0} There are no apples|{1} There is one apple|]1,Inf] There are %count% apples', 0),
+            array('There are no apples', '{0}     There are no apples|{1} There is one apple|]1,Inf] There are %count% apples', 0),
+            array('There are no apples', '{0}There are no apples|{1} There is one apple|]1,Inf] There are %count% apples', 0),
 
-            array('There is one apple', '{0} There is no apple|{1} There is one apple|]1,Inf] There are %count% apples', 1),
+            array('There is one apple', '{0} There are no apples|{1} There is one apple|]1,Inf] There are %count% apples', 1),
 
-            array('There are %count% apples', '{0} There is no apple|{1} There is one apple|]1,Inf] There are %count% apples', 10),
-            array('There are %count% apples', '{0} There is no apple|{1} There is one apple|]1,Inf]There are %count% apples', 10),
-            array('There are %count% apples', '{0} There is no apple|{1} There is one apple|]1,Inf]     There are %count% apples', 10),
+            array('There are %count% apples', '{0} There are no apples|{1} There is one apple|]1,Inf] There are %count% apples', 10),
+            array('There are %count% apples', '{0} There are no apples|{1} There is one apple|]1,Inf]There are %count% apples', 10),
+            array('There are %count% apples', '{0} There are no apples|{1} There is one apple|]1,Inf]     There are %count% apples', 10),
 
             array('There are %count% apples', 'There is one apple|There are %count% apples', 0),
             array('There is one apple', 'There is one apple|There are %count% apples', 1),
@@ -74,12 +74,12 @@ class MessageSelectorTest extends \PHPUnit_Framework_TestCase
             array('There is one apple', 'one: There is one apple|more: There are %count% apples', 1),
             array('There are %count% apples', 'one: There is one apple|more: There are %count% apples', 10),
 
-            array('There is no apple', '{0} There is no apple|one: There is one apple|more: There are %count% apples', 0),
-            array('There is one apple', '{0} There is no apple|one: There is one apple|more: There are %count% apples', 1),
-            array('There are %count% apples', '{0} There is no apple|one: There is one apple|more: There are %count% apples', 10),
+            array('There are no apples', '{0} There are no apples|one: There is one apple|more: There are %count% apples', 0),
+            array('There is one apple', '{0} There are no apples|one: There is one apple|more: There are %count% apples', 1),
+            array('There are %count% apples', '{0} There are no apples|one: There is one apple|more: There are %count% apples', 10),
 
             array('', '{0}|{1} There is one apple|]1,Inf] There are %count% apples', 0),
-            array('', '{0} There is no apple|{1}|]1,Inf] There are %count% apples', 1),
+            array('', '{0} There are no apples|{1}|]1,Inf] There are %count% apples', 1),
 
             // Indexed only tests which are Gettext PoFile* compatible strings.
             array('There are %count% apples', 'There is one apple|There are %count% apples', 0),
@@ -87,12 +87,12 @@ class MessageSelectorTest extends \PHPUnit_Framework_TestCase
             array('There are %count% apples', 'There is one apple|There are %count% apples', 2),
 
             // Tests for float numbers
-            array('There is almost one apple', '{0} There is no apple|]0,1[ There is almost one apple|{1} There is one apple|[1,Inf] There is more than one apple', 0.7),
-            array('There is one apple', '{0} There is no apple|]0,1[There are %count% apples|{1} There is one apple|[1,Inf] There is more than one apple', 1),
-            array('There is more than one apple', '{0} There is no apple|]0,1[There are %count% apples|{1} There is one apple|[1,Inf] There is more than one apple', 1.7),
-            array('There is no apple', '{0} There is no apple|]0,1[There are %count% apples|{1} There is one apple|[1,Inf] There is more than one apple', 0),
-            array('There is no apple', '{0} There is no apple|]0,1[There are %count% apples|{1} There is one apple|[1,Inf] There is more than one apple', 0.0),
-            array('There is no apple', '{0.0} There is no apple|]0,1[There are %count% apples|{1} There is one apple|[1,Inf] There is more than one apple', 0),
+            array('There is almost one apple', '{0} There are no apples|]0,1[ There is almost one apple|{1} There is one apple|[1,Inf] There is more than one apple', 0.7),
+            array('There is one apple', '{0} There are no apples|]0,1[There are %count% apples|{1} There is one apple|[1,Inf] There is more than one apple', 1),
+            array('There is more than one apple', '{0} There are no apples|]0,1[There are %count% apples|{1} There is one apple|[1,Inf] There is more than one apple', 1.7),
+            array('There are no apples', '{0} There are no apples|]0,1[There are %count% apples|{1} There is one apple|[1,Inf] There is more than one apple', 0),
+            array('There are no apples', '{0} There are no apples|]0,1[There are %count% apples|{1} There is one apple|[1,Inf] There is more than one apple', 0.0),
+            array('There are no apples', '{0.0} There are no apples|]0,1[There are %count% apples|{1} There is one apple|[1,Inf] There is more than one apple', 0),
         );
     }
 }

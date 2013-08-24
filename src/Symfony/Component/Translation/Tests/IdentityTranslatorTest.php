@@ -79,9 +79,9 @@ class IdentityTranslatorTest extends \PHPUnit_Framework_TestCase
     public function getTransChoiceTests()
     {
         return array(
-            array('There is no apple', '{0} There is no apple|{1} There is one apple|]1,Inf] There are %count% apples', 0, array('%count%' => 0)),
-            array('There is one apple', '{0} There is no apple|{1} There is one apple|]1,Inf] There are %count% apples', 1, array('%count%' => 1)),
-            array('There are 10 apples', '{0} There is no apple|{1} There is one apple|]1,Inf] There are %count% apples', 10, array('%count%' => 10)),
+            array('There are no apples', '{0} There are no apples|{1} There is one apple|]1,Inf] There are %count% apples', 0, array('%count%' => 0)),
+            array('There is one apple', '{0} There are no apples|{1} There is one apple|]1,Inf] There are %count% apples', 1, array('%count%' => 1)),
+            array('There are 10 apples', '{0} There are no apples|{1} There is one apple|]1,Inf] There are %count% apples', 10, array('%count%' => 10)),
             array('There are 0 apples', 'There is 1 apple|There are %count% apples', 0, array('%count%' => 0)),
             array('There is 1 apple', 'There is 1 apple|There are %count% apples', 1, array('%count%' => 1)),
             array('There are 10 apples', 'There is 1 apple|There are %count% apples', 10, array('%count%' => 10)),

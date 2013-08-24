@@ -28,7 +28,7 @@ class PropertyAccessor implements PropertyAccessorInterface
 
     /**
      * Should not be used by application code. Use
-     * {@link PropertyAccess::getPropertyAccessor()} instead.
+     * {@link PropertyAccess::createPropertyAccessor()} instead.
      */
     public function __construct($magicCall = false)
     {

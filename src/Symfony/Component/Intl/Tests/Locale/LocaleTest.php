@@ -150,6 +150,11 @@ class LocaleTest extends AbstractLocaleTest
         $this->call('setDefault', 'pt_BR');
     }
 
+    public function testSetDefaultAcceptsEn()
+    {
+        $this->call('setDefault', 'en');
+    }
+
     protected function call($methodName)
     {
         $args = array_slice(func_get_args(), 1);

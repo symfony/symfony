@@ -208,7 +208,7 @@ abstract class AbstractToken implements TokenInterface
     }
 
     /**
-     * Sets a attribute.
+     * Sets an attribute.
      *
      * @param string $name  The attribute name
      * @param mixed  $value The attribute value

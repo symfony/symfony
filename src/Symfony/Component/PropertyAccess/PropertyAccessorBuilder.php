@@ -24,7 +24,7 @@ class PropertyAccessorBuilder
     private $magicCall = false;
 
     /**
-     * Enables the use of "__call" by the ProperyAccessor.
+     * Enables the use of "__call" by the PropertyAccessor.
      *
      * @return PropertyAccessorBuilder The builder object
      */
@@ -36,7 +36,7 @@ class PropertyAccessorBuilder
     }
 
     /**
-     * Disables the use of "__call" by the ProperyAccessor.
+     * Disables the use of "__call" by the PropertyAccessor.
      *
      * @return PropertyAccessorBuilder The builder object
      */

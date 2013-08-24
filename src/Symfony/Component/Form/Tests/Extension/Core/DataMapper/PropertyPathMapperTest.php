@@ -54,6 +54,7 @@ class PropertyPathMapperTest extends \PHPUnit_Framework_TestCase
     /**
      * @param FormConfigInterface $config
      * @param Boolean $synchronized
+     * @param Boolean $submitted
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
     private function getForm(FormConfigInterface $config, $synchronized = true, $submitted = true)

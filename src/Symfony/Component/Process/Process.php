@@ -1182,8 +1182,6 @@ class Process
 
     /**
      * Writes data to pipes.
-     *
-     * @param Boolean $blocking Whether to use blocking calls or not.
      */
     private function writePipes()
     {

@@ -15,12 +15,17 @@ namespace Symfony\Component\DependencyInjection\Exception;
  * This exception is thrown when a non-existent service is requested.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class ServiceNotFoundException extends InvalidArgumentException
 {
     private $id;
     private $sourceId;
 
+    /**
+     * @since v2.3.0
+     */
     public function __construct($id, $sourceId = null, \Exception $previous = null, array $alternatives = array())
     {
         if (null === $sourceId) {
@@ -44,11 +49,17 @@ class ServiceNotFoundException extends InvalidArgumentException
         $this->sourceId = $sourceId;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getId()
     {
         return $this->id;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getSourceId()
     {
         return $this->sourceId;

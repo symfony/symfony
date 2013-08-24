@@ -17,11 +17,15 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.1.0
  */
 class RepeatedTypeValidatorExtension extends AbstractTypeExtension
 {
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
@@ -37,6 +41,8 @@ class RepeatedTypeValidatorExtension extends AbstractTypeExtension
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getExtendedType()
     {

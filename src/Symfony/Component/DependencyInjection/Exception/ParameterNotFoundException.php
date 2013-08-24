@@ -15,6 +15,8 @@ namespace Symfony\Component\DependencyInjection\Exception;
  * This exception is thrown when a non-existent parameter is used.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class ParameterNotFoundException extends InvalidArgumentException
 {
@@ -31,6 +33,8 @@ class ParameterNotFoundException extends InvalidArgumentException
      * @param string     $sourceKey    The parameter key that references the non-existent parameter
      * @param \Exception $previous     The previous exception
      * @param string[]   $alternatives Some parameter name alternatives
+     *
+     * @since v2.3.0
      */
     public function __construct($key, $sourceId = null, $sourceKey = null, \Exception $previous = null, array $alternatives = array())
     {
@@ -44,6 +48,9 @@ class ParameterNotFoundException extends InvalidArgumentException
         $this->updateRepr();
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function updateRepr()
     {
         if (null !== $this->sourceId) {
@@ -64,21 +71,33 @@ class ParameterNotFoundException extends InvalidArgumentException
         }
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getKey()
     {
         return $this->key;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getSourceId()
     {
         return $this->sourceId;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getSourceKey()
     {
         return $this->sourceKey;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function setSourceId($sourceId)
     {
         $this->sourceId = $sourceId;
@@ -86,6 +105,9 @@ class ParameterNotFoundException extends InvalidArgumentException
         $this->updateRepr();
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function setSourceKey($sourceKey)
     {
         $this->sourceKey = $sourceKey;

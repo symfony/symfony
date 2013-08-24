@@ -16,10 +16,15 @@ use Symfony\Component\Intl\Intl;
 use Symfony\Component\Locale\Locale;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+/**
+ * @since v2.0.0
+ */
 class LocaleType extends AbstractType
 {
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
@@ -30,6 +35,8 @@ class LocaleType extends AbstractType
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getParent()
     {
@@ -38,6 +45,8 @@ class LocaleType extends AbstractType
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getName()
     {

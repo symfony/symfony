@@ -21,11 +21,15 @@ use Symfony\Component\CssSelector\XPath\XPathExpr;
  * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @since v2.3.0
  */
 class PseudoClassExtension extends AbstractExtension
 {
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getPseudoClassTranslators()
     {
@@ -45,6 +49,8 @@ class PseudoClassExtension extends AbstractExtension
      * @param XPathExpr $xpath
      *
      * @return XPathExpr
+     *
+     * @since v2.3.0
      */
     public function translateRoot(XPathExpr $xpath)
     {
@@ -55,6 +61,8 @@ class PseudoClassExtension extends AbstractExtension
      * @param XPathExpr $xpath
      *
      * @return XPathExpr
+     *
+     * @since v2.3.0
      */
     public function translateFirstChild(XPathExpr $xpath)
     {
@@ -68,6 +76,8 @@ class PseudoClassExtension extends AbstractExtension
      * @param XPathExpr $xpath
      *
      * @return XPathExpr
+     *
+     * @since v2.3.0
      */
     public function translateLastChild(XPathExpr $xpath)
     {
@@ -83,6 +93,8 @@ class PseudoClassExtension extends AbstractExtension
      * @return XPathExpr
      *
      * @throws ExpressionErrorException
+     *
+     * @since v2.3.0
      */
     public function translateFirstOfType(XPathExpr $xpath)
     {
@@ -101,6 +113,8 @@ class PseudoClassExtension extends AbstractExtension
      * @return XPathExpr
      *
      * @throws ExpressionErrorException
+     *
+     * @since v2.3.0
      */
     public function translateLastOfType(XPathExpr $xpath)
     {
@@ -117,6 +131,8 @@ class PseudoClassExtension extends AbstractExtension
      * @param XPathExpr $xpath
      *
      * @return XPathExpr
+     *
+     * @since v2.3.0
      */
     public function translateOnlyChild(XPathExpr $xpath)
     {
@@ -132,6 +148,8 @@ class PseudoClassExtension extends AbstractExtension
      * @return XPathExpr
      *
      * @throws ExpressionErrorException
+     *
+     * @since v2.3.0
      */
     public function translateOnlyOfType(XPathExpr $xpath)
     {
@@ -146,6 +164,8 @@ class PseudoClassExtension extends AbstractExtension
      * @param XPathExpr $xpath
      *
      * @return XPathExpr
+     *
+     * @since v2.3.0
      */
     public function translateEmpty(XPathExpr $xpath)
     {
@@ -154,6 +174,8 @@ class PseudoClassExtension extends AbstractExtension
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getName()
     {

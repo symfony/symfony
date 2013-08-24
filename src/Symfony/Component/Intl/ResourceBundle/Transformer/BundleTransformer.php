@@ -19,6 +19,8 @@ use Symfony\Component\Intl\ResourceBundle\Writer\PhpBundleWriter;
  * Compiles a number of resource bundles based on predefined compilation rules.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.3.0
  */
 class BundleTransformer
 {
@@ -31,6 +33,8 @@ class BundleTransformer
      * Adds a new compilation rule.
      *
      * @param TransformationRuleInterface $rule The compilation rule.
+     *
+     * @since v2.3.0
      */
     public function addRule(TransformationRuleInterface $rule)
     {
@@ -45,6 +49,8 @@ class BundleTransformer
      *
      * @throws RuntimeException If any of the files to be compiled by the loaded
      *                          compilation rules does not exist.
+     *
+     * @since v2.3.0
      */
     public function compileBundles(CompilationContextInterface $context)
     {
@@ -75,6 +81,9 @@ class BundleTransformer
         }
     }
 
+    /**
+     * @since v2.3.0
+     */
     public function createStubs(StubbingContextInterface $context)
     {
         $filesystem = $context->getFilesystem();

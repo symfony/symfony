@@ -18,6 +18,8 @@ use InvalidArgumentException;
  * Provides helpers to display table output.
  *
  * @author Саша Стаменковић <umpirsky@gmail.com>
+ *
+ * @since v2.3.0
  */
 class TableHelper extends Helper
 {
@@ -67,6 +69,9 @@ class TableHelper extends Helper
      */
     private $output;
 
+    /**
+     * @since v2.3.0
+     */
     public function __construct()
     {
         $this->setLayout(self::LAYOUT_DEFAULT);
@@ -78,6 +83,8 @@ class TableHelper extends Helper
      * @param int $layout self::LAYOUT_*
      *
      * @return TableHelper
+     *
+     * @since v2.3.0
      */
     public function setLayout($layout)
     {
@@ -116,6 +123,9 @@ class TableHelper extends Helper
         return $this;
     }
 
+    /**
+     * @since v2.3.0
+     */
     public function setHeaders(array $headers)
     {
         $this->headers = array_values($headers);
@@ -123,6 +133,9 @@ class TableHelper extends Helper
         return $this;
     }
 
+    /**
+     * @since v2.3.0
+     */
     public function setRows(array $rows)
     {
         $this->rows = array();
@@ -130,6 +143,9 @@ class TableHelper extends Helper
         return $this->addRows($rows);
     }
 
+    /**
+     * @since v2.3.0
+     */
     public function addRows(array $rows)
     {
         foreach ($rows as $row) {
@@ -139,6 +155,9 @@ class TableHelper extends Helper
         return $this;
     }
 
+    /**
+     * @since v2.3.0
+     */
     public function addRow(array $row)
     {
         $this->rows[] = array_values($row);
@@ -146,6 +165,9 @@ class TableHelper extends Helper
         return $this;
     }
 
+    /**
+     * @since v2.3.0
+     */
     public function setRow($column, array $row)
     {
         $this->rows[$column] = $row;
@@ -159,6 +181,8 @@ class TableHelper extends Helper
      * @param string $paddingChar
      *
      * @return TableHelper
+     *
+     * @since v2.3.0
      */
     public function setPaddingChar($paddingChar)
     {
@@ -173,6 +197,8 @@ class TableHelper extends Helper
      * @param string $horizontalBorderChar
      *
      * @return TableHelper
+     *
+     * @since v2.3.0
      */
     public function setHorizontalBorderChar($horizontalBorderChar)
     {
@@ -187,6 +213,8 @@ class TableHelper extends Helper
      * @param string $verticalBorderChar
      *
      * @return TableHelper
+     *
+     * @since v2.3.0
      */
     public function setVerticalBorderChar($verticalBorderChar)
     {
@@ -201,6 +229,8 @@ class TableHelper extends Helper
      * @param string $crossingChar
      *
      * @return TableHelper
+     *
+     * @since v2.3.0
      */
     public function setCrossingChar($crossingChar)
     {
@@ -215,6 +245,8 @@ class TableHelper extends Helper
      * @param string $cellHeaderFormat
      *
      * @return TableHelper
+     *
+     * @since v2.3.0
      */
     public function setCellHeaderFormat($cellHeaderFormat)
     {
@@ -229,6 +261,8 @@ class TableHelper extends Helper
      * @param string $cellRowFormat
      *
      * @return TableHelper
+     *
+     * @since v2.3.0
      */
     public function setCellRowFormat($cellRowFormat)
     {
@@ -243,6 +277,8 @@ class TableHelper extends Helper
      * @param string $borderFormat
      *
      * @return TableHelper
+     *
+     * @since v2.3.0
      */
     public function setBorderFormat($borderFormat)
     {
@@ -257,6 +293,8 @@ class TableHelper extends Helper
      * @param integer $padType STR_PAD_*
      *
      * @return TableHelper
+     *
+     * @since v2.3.0
      */
     public function setPadType($padType)
     {
@@ -278,6 +316,8 @@ class TableHelper extends Helper
      * +---------------+-----------------------+------------------+
      *
      * @param OutputInterface $output
+     *
+     * @since v2.3.0
      */
     public function render(OutputInterface $output)
     {
@@ -302,6 +342,8 @@ class TableHelper extends Helper
      * Renders horizontal header separator.
      *
      * Example: +-----+-----------+-------+
+     *
+     * @since v2.3.0
      */
     private function renderRowSeparator()
     {
@@ -321,6 +363,8 @@ class TableHelper extends Helper
 
     /**
      * Renders vertical column separator.
+     *
+     * @since v2.3.0
      */
     private function renderColumnSeparator()
     {
@@ -334,6 +378,8 @@ class TableHelper extends Helper
      *
      * @param array  $row
      * @param string $cellFormat
+     *
+     * @since v2.3.0
      */
     private function renderRow(array $row, $cellFormat)
     {
@@ -355,6 +401,8 @@ class TableHelper extends Helper
      * @param array   $row
      * @param integer $column
      * @param string  $cellFormat
+     *
+     * @since v2.3.0
      */
     private function renderCell(array $row, $column, $cellFormat)
     {
@@ -381,6 +429,8 @@ class TableHelper extends Helper
      * Gets number of columns for this table.
      *
      * @return int
+     *
+     * @since v2.3.0
      */
     private function getNumberOfColumns()
     {
@@ -403,6 +453,8 @@ class TableHelper extends Helper
      * @param integer $column
      *
      * @return int
+     *
+     * @since v2.3.0
      */
     private function getColumnWidth($column)
     {
@@ -426,6 +478,8 @@ class TableHelper extends Helper
      * @param integer $column
      *
      * @return int
+     *
+     * @since v2.3.0
      */
     private function getCellWidth(array $row, $column)
     {
@@ -442,6 +496,8 @@ class TableHelper extends Helper
 
     /**
      * Called after rendering to cleanup cache data.
+     *
+     * @since v2.3.0
      */
     private function cleanup()
     {
@@ -451,6 +507,8 @@ class TableHelper extends Helper
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.3.0
      */
     public function getName()
     {

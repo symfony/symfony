@@ -19,6 +19,8 @@ use Symfony\Component\Config\Definition\Exception\UnsetKeyException;
  * Represents an Array node in the config tree.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class ArrayNode extends BaseNode implements PrototypeNodeInterface
 {
@@ -36,6 +38,8 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      *
      * @param string        $name   The Node's name
      * @param NodeInterface $parent The node parent
+     *
+     * @since v2.0.0
      */
     public function __construct($name, NodeInterface $parent = null)
     {
@@ -51,6 +55,9 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
         $this->normalizeKeys = true;
     }
 
+    /**
+     * @since v2.2.0
+     */
     public function setNormalizeKeys($normalizeKeys)
     {
         $this->normalizeKeys = (Boolean) $normalizeKeys;
@@ -68,6 +75,8 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      * @param mixed $value
      *
      * @return array The value with normalized keys
+     *
+     * @since v2.2.0
      */
     protected function preNormalize($value)
     {
@@ -89,6 +98,8 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      * Retrieves the children of this node.
      *
      * @return array The children
+     *
+     * @since v2.1.0
      */
     public function getChildren()
     {
@@ -99,6 +110,8 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      * Sets the xml remappings that should be performed.
      *
      * @param array $remappings an array of the form array(array(string, string))
+     *
+     * @since v2.0.0
      */
     public function setXmlRemappings(array $remappings)
     {
@@ -110,6 +123,8 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      * defined in any of the configuration files.
      *
      * @param Boolean $boolean
+     *
+     * @since v2.0.0
      */
     public function setAddIfNotSet($boolean)
     {
@@ -120,6 +135,8 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      * Sets whether false is allowed as value indicating that the array should be unset.
      *
      * @param Boolean $allow
+     *
+     * @since v2.0.0
      */
     public function setAllowFalse($allow)
     {
@@ -130,6 +147,8 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      * Sets whether new keys can be defined in subsequent configurations.
      *
      * @param Boolean $allow
+     *
+     * @since v2.0.0
      */
     public function setAllowNewKeys($allow)
     {
@@ -140,6 +159,8 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      * Sets if deep merging should occur.
      *
      * @param Boolean $boolean
+     *
+     * @since v2.0.0
      */
     public function setPerformDeepMerging($boolean)
     {
@@ -150,6 +171,8 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      * Whether extra keys should just be ignore without an exception.
      *
      * @param Boolean $boolean To allow extra keys
+     *
+     * @since v2.0.0
      */
     public function setIgnoreExtraKeys($boolean)
     {
@@ -160,6 +183,8 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      * Sets the node Name.
      *
      * @param string $name The node's name
+     *
+     * @since v2.0.0
      */
     public function setName($name)
     {
@@ -170,6 +195,8 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      * Checks if the node has a default value.
      *
      * @return Boolean
+     *
+     * @since v2.0.0
      */
     public function hasDefaultValue()
     {
@@ -182,6 +209,8 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      * @return array The default value
      *
      * @throws \RuntimeException if the node has no default value
+     *
+     * @since v2.0.0
      */
     public function getDefaultValue()
     {
@@ -206,6 +235,8 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      *
      * @throws \InvalidArgumentException when the child node has no name
      * @throws \InvalidArgumentException when the child node's name is not unique
+     *
+     * @since v2.0.0
      */
     public function addChild(NodeInterface $node)
     {
@@ -229,6 +260,8 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      *
      * @throws UnsetKeyException
      * @throws InvalidConfigurationException if the node doesn't have enough children
+     *
+     * @since v2.0.0
      */
     protected function finalizeValue($value)
     {
@@ -270,6 +303,8 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      * @param mixed $value
      *
      * @throws InvalidTypeException
+     *
+     * @since v2.0.0
      */
     protected function validateType($value)
     {
@@ -293,6 +328,8 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      * @return mixed The normalized value
      *
      * @throws InvalidConfigurationException
+     *
+     * @since v2.0.0
      */
     protected function normalizeValue($value)
     {
@@ -328,6 +365,8 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      * @param array $value The source values
      *
      * @return array The remapped values
+     *
+     * @since v2.0.0
      */
     protected function remapXml($value)
     {
@@ -355,6 +394,8 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      *
      * @throws InvalidConfigurationException
      * @throws \RuntimeException
+     *
+     * @since v2.0.0
      */
     protected function mergeValues($leftSide, $rightSide)
     {

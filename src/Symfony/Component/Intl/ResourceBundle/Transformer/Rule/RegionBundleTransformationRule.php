@@ -20,11 +20,15 @@ use Symfony\Component\Intl\Util\IcuVersion;
  * The rule for compiling the region bundle.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.3.0
  */
 class RegionBundleTransformationRule implements TransformationRuleInterface
 {
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getBundleName()
     {
@@ -33,6 +37,8 @@ class RegionBundleTransformationRule implements TransformationRuleInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function beforeCompile(CompilationContextInterface $context)
     {
@@ -46,6 +52,8 @@ class RegionBundleTransformationRule implements TransformationRuleInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function afterCompile(CompilationContextInterface $context)
     {
@@ -53,6 +61,8 @@ class RegionBundleTransformationRule implements TransformationRuleInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function beforeCreateStub(StubbingContextInterface $context)
     {
@@ -63,6 +73,8 @@ class RegionBundleTransformationRule implements TransformationRuleInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function afterCreateStub(StubbingContextInterface $context)
     {

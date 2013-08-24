@@ -62,6 +62,8 @@ interface ValidationVisitorInterface
      *
      * @throws Exception\NoSuchMetadataException If no metadata can be found for
      *                                           the given value.
+     *
+     * @since v2.2.0
      */
     public function validate($value, $group, $propertyPath, $traverse = false, $deep = false);
 
@@ -75,6 +77,8 @@ interface ValidationVisitorInterface
      * @param mixed             $value        The value to validate.
      * @param string            $group        The validation group to validate.
      * @param string            $propertyPath The current property path in the validation graph.
+     *
+     * @since v2.2.0
      */
     public function visit(MetadataInterface $metadata, $value, $group, $propertyPath);
 }

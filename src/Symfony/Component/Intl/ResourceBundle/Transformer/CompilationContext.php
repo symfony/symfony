@@ -18,6 +18,8 @@ use Symfony\Component\Intl\ResourceBundle\Compiler\BundleCompilerInterface;
  * Default implementation of {@link CompilationContextInterface}.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.3.0
  */
 class CompilationContext implements CompilationContextInterface
 {
@@ -46,6 +48,9 @@ class CompilationContext implements CompilationContextInterface
      */
     private $icuVersion;
 
+    /**
+     * @since v2.3.0
+     */
     public function __construct($sourceDir, $binaryDir, Filesystem $filesystem, BundleCompilerInterface $compiler, $icuVersion)
     {
         $this->sourceDir = $sourceDir;
@@ -57,6 +62,8 @@ class CompilationContext implements CompilationContextInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getSourceDir()
     {
@@ -65,6 +72,8 @@ class CompilationContext implements CompilationContextInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getBinaryDir()
     {
@@ -73,6 +82,8 @@ class CompilationContext implements CompilationContextInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getFilesystem()
     {
@@ -81,6 +92,8 @@ class CompilationContext implements CompilationContextInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getCompiler()
     {
@@ -89,6 +102,8 @@ class CompilationContext implements CompilationContextInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getIcuVersion()
     {

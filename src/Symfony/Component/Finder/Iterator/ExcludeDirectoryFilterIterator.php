@@ -15,6 +15,8 @@ namespace Symfony\Component\Finder\Iterator;
  * ExcludeDirectoryFilterIterator filters out directories.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.1.0
  */
 class ExcludeDirectoryFilterIterator extends FilterIterator
 {
@@ -25,6 +27,8 @@ class ExcludeDirectoryFilterIterator extends FilterIterator
      *
      * @param \Iterator $iterator    The Iterator to filter
      * @param array     $directories An array of directories to exclude
+     *
+     * @since v2.0.0
      */
     public function __construct(\Iterator $iterator, array $directories)
     {
@@ -40,6 +44,8 @@ class ExcludeDirectoryFilterIterator extends FilterIterator
      * Filters the iterator values.
      *
      * @return Boolean true if the value should be kept, false otherwise
+     *
+     * @since v2.0.0
      */
     public function accept()
     {

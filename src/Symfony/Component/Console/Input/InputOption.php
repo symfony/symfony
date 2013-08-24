@@ -17,6 +17,8 @@ namespace Symfony\Component\Console\Input;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class InputOption
 {
@@ -43,6 +45,8 @@ class InputOption
      * @throws \InvalidArgumentException If option mode is invalid or incompatible
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function __construct($name, $shortcut = null, $mode = null, $description = '', $default = null)
     {
@@ -93,6 +97,8 @@ class InputOption
      * Returns the option shortcut.
      *
      * @return string The shortcut
+     *
+     * @since v2.0.0
      */
     public function getShortcut()
     {
@@ -103,6 +109,8 @@ class InputOption
      * Returns the option name.
      *
      * @return string The name
+     *
+     * @since v2.0.0
      */
     public function getName()
     {
@@ -113,6 +121,8 @@ class InputOption
      * Returns true if the option accepts a value.
      *
      * @return Boolean true if value mode is not self::VALUE_NONE, false otherwise
+     *
+     * @since v2.0.0
      */
     public function acceptValue()
     {
@@ -123,6 +133,8 @@ class InputOption
      * Returns true if the option requires a value.
      *
      * @return Boolean true if value mode is self::VALUE_REQUIRED, false otherwise
+     *
+     * @since v2.0.0
      */
     public function isValueRequired()
     {
@@ -133,6 +145,8 @@ class InputOption
      * Returns true if the option takes an optional value.
      *
      * @return Boolean true if value mode is self::VALUE_OPTIONAL, false otherwise
+     *
+     * @since v2.0.0
      */
     public function isValueOptional()
     {
@@ -143,6 +157,8 @@ class InputOption
      * Returns true if the option can take multiple values.
      *
      * @return Boolean true if mode is self::VALUE_IS_ARRAY, false otherwise
+     *
+     * @since v2.0.0
      */
     public function isArray()
     {
@@ -155,6 +171,8 @@ class InputOption
      * @param mixed $default The default value
      *
      * @throws \LogicException When incorrect default value is given
+     *
+     * @since v2.0.0
      */
     public function setDefault($default = null)
     {
@@ -177,6 +195,8 @@ class InputOption
      * Returns the default value.
      *
      * @return mixed The default value
+     *
+     * @since v2.0.0
      */
     public function getDefault()
     {
@@ -187,6 +207,8 @@ class InputOption
      * Returns the description text.
      *
      * @return string The description text
+     *
+     * @since v2.0.0
      */
     public function getDescription()
     {
@@ -198,6 +220,8 @@ class InputOption
      *
      * @param InputOption $option option to compare
      * @return Boolean
+     *
+     * @since v2.1.0
      */
     public function equals(InputOption $option)
     {

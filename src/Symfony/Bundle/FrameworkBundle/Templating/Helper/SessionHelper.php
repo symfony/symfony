@@ -18,6 +18,8 @@ use Symfony\Component\HttpFoundation\Request;
  * SessionHelper provides read-only access to the session attributes.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class SessionHelper extends Helper
 {
@@ -27,6 +29,8 @@ class SessionHelper extends Helper
      * Constructor.
      *
      * @param Request $request A Request instance
+     *
+     * @since v2.0.0
      */
     public function __construct(Request $request)
     {
@@ -40,22 +44,33 @@ class SessionHelper extends Helper
      * @param mixed  $default The default value
      *
      * @return mixed
+     *
+     * @since v2.0.0
      */
     public function get($name, $default = null)
     {
         return $this->session->get($name, $default);
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function getFlash($name, array $default = array())
     {
         return $this->session->getFlashBag()->get($name, $default);
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function getFlashes()
     {
         return $this->session->getFlashBag()->all();
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function hasFlash($name)
     {
         return $this->session->getFlashBag()->has($name);
@@ -65,6 +80,8 @@ class SessionHelper extends Helper
      * Returns the canonical name of this helper.
      *
      * @return string The canonical name
+     *
+     * @since v2.0.0
      */
     public function getName()
     {

@@ -21,6 +21,8 @@ use Symfony\Component\Intl\ResourceBundle\Writer\TextBundleWriter;
  * The rule for compiling the locale bundle.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.3.0
  */
 class LocaleBundleTransformationRule implements TransformationRuleInterface
 {
@@ -34,6 +36,9 @@ class LocaleBundleTransformationRule implements TransformationRuleInterface
      */
     private $regionBundle;
 
+    /**
+     * @since v2.3.0
+     */
     public function __construct()
     {
         $this->languageBundle = Intl::getLanguageBundle();
@@ -42,6 +47,8 @@ class LocaleBundleTransformationRule implements TransformationRuleInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getBundleName()
     {
@@ -50,6 +57,8 @@ class LocaleBundleTransformationRule implements TransformationRuleInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function beforeCompile(CompilationContextInterface $context)
     {
@@ -65,6 +74,8 @@ class LocaleBundleTransformationRule implements TransformationRuleInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function afterCompile(CompilationContextInterface $context)
     {
@@ -73,6 +84,8 @@ class LocaleBundleTransformationRule implements TransformationRuleInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function beforeCreateStub(StubbingContextInterface $context)
     {
@@ -83,11 +96,16 @@ class LocaleBundleTransformationRule implements TransformationRuleInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function afterCreateStub(StubbingContextInterface $context)
     {
     }
 
+    /**
+     * @since v2.3.0
+     */
     private function scanLocales(CompilationContextInterface $context)
     {
         $tempDir = sys_get_temp_dir() . '/icu-data-locales-source';
@@ -137,6 +155,9 @@ class LocaleBundleTransformationRule implements TransformationRuleInterface
         return $locales;
     }
 
+    /**
+     * @since v2.3.0
+     */
     private function generateTextFiles($targetDirectory, array $locales)
     {
         $displayLocales = array_unique(array_merge(
@@ -178,6 +199,9 @@ class LocaleBundleTransformationRule implements TransformationRuleInterface
         }
     }
 
+    /**
+     * @since v2.3.0
+     */
     private function generateLocaleName($locale, $displayLocale)
     {
         $name = null;

@@ -25,6 +25,8 @@ use Symfony\Component\Routing\Matcher\Dumper\MatcherDumperInterface;
  * routing system for easier use.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class Router implements RouterInterface
 {
@@ -76,6 +78,8 @@ class Router implements RouterInterface
      * @param array           $options  An array of options
      * @param RequestContext  $context  The context
      * @param LoggerInterface $logger   A logger instance
+     *
+     * @since v2.1.0
      */
     public function __construct(LoaderInterface $loader, $resource, array $options = array(), RequestContext $context = null, LoggerInterface $logger = null)
     {
@@ -98,6 +102,8 @@ class Router implements RouterInterface
      * @param array $options An array of options
      *
      * @throws \InvalidArgumentException When unsupported option is provided
+     *
+     * @since v2.0.0
      */
     public function setOptions(array $options)
     {
@@ -138,6 +144,8 @@ class Router implements RouterInterface
      * @param mixed  $value The value
      *
      * @throws \InvalidArgumentException
+     *
+     * @since v2.0.0
      */
     public function setOption($key, $value)
     {
@@ -156,6 +164,8 @@ class Router implements RouterInterface
      * @return mixed The value
      *
      * @throws \InvalidArgumentException
+     *
+     * @since v2.0.0
      */
     public function getOption($key)
     {
@@ -168,6 +178,8 @@ class Router implements RouterInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getRouteCollection()
     {
@@ -180,6 +192,8 @@ class Router implements RouterInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function setContext(RequestContext $context)
     {
@@ -195,6 +209,8 @@ class Router implements RouterInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getContext()
     {
@@ -203,6 +219,8 @@ class Router implements RouterInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function generate($name, $parameters = array(), $referenceType = self::ABSOLUTE_PATH)
     {
@@ -211,6 +229,8 @@ class Router implements RouterInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function match($pathinfo)
     {
@@ -221,6 +241,8 @@ class Router implements RouterInterface
      * Gets the UrlMatcher instance associated with this Router.
      *
      * @return UrlMatcherInterface A UrlMatcherInterface instance
+     *
+     * @since v2.0.0
      */
     public function getMatcher()
     {
@@ -254,6 +276,8 @@ class Router implements RouterInterface
      * Gets the UrlGenerator instance associated with this Router.
      *
      * @return UrlGeneratorInterface A UrlGeneratorInterface instance
+     *
+     * @since v2.0.0
      */
     public function getGenerator()
     {

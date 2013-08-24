@@ -22,6 +22,8 @@ use Symfony\Component\CssSelector\XPath\XPathExpr;
  * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @since v2.3.0
  */
 class NodeExtension extends AbstractExtension
 {
@@ -44,6 +46,8 @@ class NodeExtension extends AbstractExtension
      *
      * @param Translator $translator
      * @param int        $flags
+     *
+     * @since v2.3.0
      */
     public function __construct(Translator $translator, $flags = 0)
     {
@@ -56,6 +60,8 @@ class NodeExtension extends AbstractExtension
      * @param boolean $on
      *
      * @return NodeExtension
+     *
+     * @since v2.3.0
      */
     public function setFlag($flag, $on)
     {
@@ -74,6 +80,8 @@ class NodeExtension extends AbstractExtension
      * @param int $flag
      *
      * @return boolean
+     *
+     * @since v2.3.0
      */
     public function hasFlag($flag)
     {
@@ -82,6 +90,8 @@ class NodeExtension extends AbstractExtension
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getNodeTranslators()
     {
@@ -102,6 +112,8 @@ class NodeExtension extends AbstractExtension
      * @param Node\SelectorNode $node
      *
      * @return XPathExpr
+     *
+     * @since v2.3.0
      */
     public function translateSelector(Node\SelectorNode $node)
     {
@@ -112,6 +124,8 @@ class NodeExtension extends AbstractExtension
      * @param Node\CombinedSelectorNode $node
      *
      * @return XPathExpr
+     *
+     * @since v2.3.0
      */
     public function translateCombinedSelector(Node\CombinedSelectorNode $node)
     {
@@ -122,6 +136,8 @@ class NodeExtension extends AbstractExtension
      * @param Node\NegationNode $node
      *
      * @return XPathExpr
+     *
+     * @since v2.3.0
      */
     public function translateNegation(Node\NegationNode $node)
     {
@@ -140,6 +156,8 @@ class NodeExtension extends AbstractExtension
      * @param Node\FunctionNode $node
      *
      * @return XPathExpr
+     *
+     * @since v2.3.0
      */
     public function translateFunction(Node\FunctionNode $node)
     {
@@ -152,6 +170,8 @@ class NodeExtension extends AbstractExtension
      * @param Node\PseudoNode $node
      *
      * @return XPathExpr
+     *
+     * @since v2.3.0
      */
     public function translatePseudo(Node\PseudoNode $node)
     {
@@ -164,6 +184,8 @@ class NodeExtension extends AbstractExtension
      * @param Node\AttributeNode $node
      *
      * @return XPathExpr
+     *
+     * @since v2.3.0
      */
     public function translateAttribute(Node\AttributeNode $node)
     {
@@ -194,6 +216,8 @@ class NodeExtension extends AbstractExtension
      * @param Node\ClassNode $node
      *
      * @return XPathExpr
+     *
+     * @since v2.3.0
      */
     public function translateClass(Node\ClassNode $node)
     {
@@ -206,6 +230,8 @@ class NodeExtension extends AbstractExtension
      * @param Node\HashNode $node
      *
      * @return XPathExpr
+     *
+     * @since v2.3.0
      */
     public function translateHash(Node\HashNode $node)
     {
@@ -218,6 +244,8 @@ class NodeExtension extends AbstractExtension
      * @param Node\ElementNode $node
      *
      * @return XPathExpr
+     *
+     * @since v2.3.0
      */
     public function translateElement(Node\ElementNode $node)
     {
@@ -250,6 +278,8 @@ class NodeExtension extends AbstractExtension
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getName()
     {
@@ -262,6 +292,8 @@ class NodeExtension extends AbstractExtension
      * @param string $name
      *
      * @return boolean
+     *
+     * @since v2.3.0
      */
     private function isSafeName($name)
     {

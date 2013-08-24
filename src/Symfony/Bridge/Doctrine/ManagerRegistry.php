@@ -19,6 +19,8 @@ use Doctrine\Common\Persistence\AbstractManagerRegistry;
  * References Doctrine connections and entity/document managers.
  *
  * @author  Lukas Kahwe Smith <smith@pooteeweet.org>
+ *
+ * @since v2.1.0
  */
 abstract class ManagerRegistry extends AbstractManagerRegistry implements ContainerAwareInterface
 {
@@ -29,6 +31,8 @@ abstract class ManagerRegistry extends AbstractManagerRegistry implements Contai
 
     /**
      * @inheritdoc
+     *
+     * @since v2.1.0
      */
     protected function getService($name)
     {
@@ -37,6 +41,8 @@ abstract class ManagerRegistry extends AbstractManagerRegistry implements Contai
 
     /**
      * @inheritdoc
+     *
+     * @since v2.1.0
      */
     protected function resetService($name)
     {
@@ -45,6 +51,8 @@ abstract class ManagerRegistry extends AbstractManagerRegistry implements Contai
 
     /**
      * @inheritdoc
+     *
+     * @since v2.1.0
      */
     public function setContainer(ContainerInterface $container = null)
     {

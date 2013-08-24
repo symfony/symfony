@@ -16,6 +16,9 @@ use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
+/**
+ * @since v2.0.0
+ */
 class RememberMeFactory implements SecurityFactoryInterface
 {
     protected $options = array(
@@ -29,6 +32,9 @@ class RememberMeFactory implements SecurityFactoryInterface
         'remember_me_parameter' => '_remember_me',
     );
 
+    /**
+     * @since v2.0.0
+     */
     public function create(ContainerBuilder $container, $id, $config, $userProvider, $defaultEntryPoint)
     {
         // authentication provider
@@ -106,16 +112,25 @@ class RememberMeFactory implements SecurityFactoryInterface
         return array($authProviderId, $listenerId, $defaultEntryPoint);
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getPosition()
     {
         return 'remember_me';
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getKey()
     {
         return 'remember-me';
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function addConfiguration(NodeDefinition $node)
     {
         $node->fixXmlConfig('user_provider');

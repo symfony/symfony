@@ -21,6 +21,8 @@ use Symfony\Component\Intl\DateFormatter\DateFormat\MonthTransformer as BaseMont
  * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
  *             {@link \Symfony\Component\Intl\DateFormatter\DateFormat\MonthTransformer}
  *             instead.
+ *
+ * @since v2.3.0
  */
 class MonthTransformer extends BaseMonthTransformer
 {

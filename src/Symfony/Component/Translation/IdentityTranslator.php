@@ -17,6 +17,8 @@ namespace Symfony\Component\Translation;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class IdentityTranslator implements TranslatorInterface
 {
@@ -29,6 +31,8 @@ class IdentityTranslator implements TranslatorInterface
      * @param MessageSelector $selector The message selector for pluralization
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function __construct(MessageSelector $selector)
     {
@@ -39,6 +43,8 @@ class IdentityTranslator implements TranslatorInterface
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setLocale($locale)
     {
@@ -49,6 +55,8 @@ class IdentityTranslator implements TranslatorInterface
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getLocale()
     {
@@ -59,6 +67,8 @@ class IdentityTranslator implements TranslatorInterface
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function trans($id, array $parameters = array(), $domain = 'messages', $locale = null)
     {
@@ -69,6 +79,8 @@ class IdentityTranslator implements TranslatorInterface
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function transChoice($id, $number, array $parameters = array(), $domain = 'messages', $locale = null)
     {

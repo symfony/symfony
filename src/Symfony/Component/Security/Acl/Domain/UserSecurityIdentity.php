@@ -20,6 +20,8 @@ use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
  * A SecurityIdentity implementation used for actual users
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 final class UserSecurityIdentity implements SecurityIdentityInterface
 {
@@ -33,6 +35,8 @@ final class UserSecurityIdentity implements SecurityIdentityInterface
      * @param string $class    the user's fully qualified class name
      *
      * @throws \InvalidArgumentException
+     *
+     * @since v2.0.0
      */
     public function __construct($username, $class)
     {
@@ -52,6 +56,8 @@ final class UserSecurityIdentity implements SecurityIdentityInterface
      *
      * @param UserInterface $user
      * @return UserSecurityIdentity
+     *
+     * @since v2.1.0
      */
     public static function fromAccount(UserInterface $user)
     {
@@ -63,6 +69,8 @@ final class UserSecurityIdentity implements SecurityIdentityInterface
      *
      * @param TokenInterface $token
      * @return UserSecurityIdentity
+     *
+     * @since v2.1.0
      */
     public static function fromToken(TokenInterface $token)
     {
@@ -79,6 +87,8 @@ final class UserSecurityIdentity implements SecurityIdentityInterface
      * Returns the username
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     public function getUsername()
     {
@@ -89,6 +99,8 @@ final class UserSecurityIdentity implements SecurityIdentityInterface
      * Returns the user's class name
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     public function getClass()
     {
@@ -97,6 +109,8 @@ final class UserSecurityIdentity implements SecurityIdentityInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function equals(SecurityIdentityInterface $sid)
     {
@@ -114,6 +128,8 @@ final class UserSecurityIdentity implements SecurityIdentityInterface
      * This is not used for equality comparison, but only for debugging.
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     public function __toString()
     {

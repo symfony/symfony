@@ -21,6 +21,8 @@ if (!defined('ENT_SUBSTITUTE')) {
  * CodeHelper.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class CodeHelper extends Helper
 {
@@ -34,6 +36,8 @@ class CodeHelper extends Helper
      * @param string $fileLinkFormat The format for links to source files
      * @param string $rootDir        The project root directory
      * @param string $charset        The charset
+     *
+     * @since v2.0.10
      */
     public function __construct($fileLinkFormat, $rootDir, $charset)
     {
@@ -48,12 +52,17 @@ class CodeHelper extends Helper
      * @param array $args The argument array
      *
      * @return string
+     *
+     * @since v2.0.1
      */
     public function formatArgsAsText(array $args)
     {
         return strip_tags($this->formatArgs($args));
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function abbrClass($class)
     {
         $parts = explode('\\', $class);
@@ -62,6 +71,9 @@ class CodeHelper extends Helper
         return sprintf("<abbr title=\"%s\">%s</abbr>", $class, $short);
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function abbrMethod($method)
     {
         if (false !== strpos($method, '::')) {
@@ -82,6 +94,8 @@ class CodeHelper extends Helper
      * @param array $args The argument array
      *
      * @return string
+     *
+     * @since v2.0.1
      */
     public function formatArgs(array $args)
     {
@@ -118,6 +132,8 @@ class CodeHelper extends Helper
      * @param int    $line The selected line number
      *
      * @return string An HTML string
+     *
+     * @since v2.0.0
      */
     public function fileExcerpt($file, $line)
     {
@@ -155,6 +171,8 @@ class CodeHelper extends Helper
      * @param string  $text Use this text for the link rather than the file path
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     public function formatFile($file, $line, $text = null)
     {
@@ -183,6 +201,8 @@ class CodeHelper extends Helper
      * @param integer $line The line number
      *
      * @return string A link of false
+     *
+     * @since v2.0.0
      */
     public function getFileLink($file, $line)
     {
@@ -193,6 +213,9 @@ class CodeHelper extends Helper
         return false;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function formatFileFromText($text)
     {
         $that = $this;
@@ -206,12 +229,17 @@ class CodeHelper extends Helper
      * Returns the canonical name of this helper.
      *
      * @return string The canonical name
+     *
+     * @since v2.0.0
      */
     public function getName()
     {
         return 'code';
     }
 
+    /**
+     * @since v2.1.0
+     */
     protected static function fixCodeMarkup($line)
     {
         // </span> ending tag from previous line

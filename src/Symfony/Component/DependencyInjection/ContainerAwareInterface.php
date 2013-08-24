@@ -26,6 +26,8 @@ interface ContainerAwareInterface
      * @param ContainerInterface|null $container A ContainerInterface instance or null
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function setContainer(ContainerInterface $container = null);
 }

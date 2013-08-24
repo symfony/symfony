@@ -15,6 +15,8 @@ namespace Symfony\Component\Config\Resource;
  * DirectoryResource represents a resources stored in a subdirectory tree.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.1.0
  */
 class DirectoryResource implements ResourceInterface, \Serializable
 {
@@ -26,6 +28,8 @@ class DirectoryResource implements ResourceInterface, \Serializable
      *
      * @param string $resource The file path to the resource
      * @param string $pattern  A pattern to restrict monitored files
+     *
+     * @since v2.0.0
      */
     public function __construct($resource, $pattern = null)
     {
@@ -37,6 +41,8 @@ class DirectoryResource implements ResourceInterface, \Serializable
      * Returns a string representation of the Resource.
      *
      * @return string A string representation of the Resource
+     *
+     * @since v2.0.0
      */
     public function __toString()
     {
@@ -47,12 +53,17 @@ class DirectoryResource implements ResourceInterface, \Serializable
      * Returns the resource tied to this Resource.
      *
      * @return mixed The resource
+     *
+     * @since v2.0.0
      */
     public function getResource()
     {
         return $this->resource;
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function getPattern()
     {
         return $this->pattern;
@@ -64,6 +75,8 @@ class DirectoryResource implements ResourceInterface, \Serializable
      * @param integer $timestamp The last time the resource was loaded
      *
      * @return Boolean true if the resource has not been updated, false otherwise
+     *
+     * @since v2.1.0
      */
     public function isFresh($timestamp)
     {
@@ -90,11 +103,17 @@ class DirectoryResource implements ResourceInterface, \Serializable
         return $newestMTime < $timestamp;
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function serialize()
     {
         return serialize(array($this->resource, $this->pattern));
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function unserialize($serialized)
     {
         list($this->resource, $this->pattern) = unserialize($serialized);

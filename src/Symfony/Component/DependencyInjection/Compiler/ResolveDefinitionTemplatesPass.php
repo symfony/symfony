@@ -21,6 +21,8 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
  * merged Definition instance.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class ResolveDefinitionTemplatesPass implements CompilerPassInterface
 {
@@ -32,6 +34,8 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
      * Process the ContainerBuilder to replace DefinitionDecorator instances with their real Definition instances.
      *
      * @param ContainerBuilder $container
+     *
+     * @since v2.0.0
      */
     public function process(ContainerBuilder $container)
     {
@@ -60,6 +64,8 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
      * @return Definition
      *
      * @throws \RuntimeException When the definition is invalid
+     *
+     * @since v2.0.0
      */
     private function resolveDefinition($id, DefinitionDecorator $definition)
     {

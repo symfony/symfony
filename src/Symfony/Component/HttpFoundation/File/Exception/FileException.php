@@ -15,6 +15,8 @@ namespace Symfony\Component\HttpFoundation\File\Exception;
  * Thrown when an error occurred in the component File
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.0.0
  */
 class FileException extends \RuntimeException
 {

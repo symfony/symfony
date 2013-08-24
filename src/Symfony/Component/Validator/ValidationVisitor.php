@@ -20,6 +20,8 @@ use Symfony\Component\Translation\TranslatorInterface;
  * {@link GlobalExecutionContextInterface}.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.2.0
  */
 class ValidationVisitor implements ValidationVisitorInterface, GlobalExecutionContextInterface
 {
@@ -74,6 +76,8 @@ class ValidationVisitor implements ValidationVisitorInterface, GlobalExecutionCo
      * @param ObjectInitializerInterface[]        $objectInitializers The initializers for preparing objects before validation.
      *
      * @throws UnexpectedTypeException If any of the object initializers is not an instance of ObjectInitializerInterface
+     *
+     * @since v2.2.0
      */
     public function __construct($root, MetadataFactoryInterface $metadataFactory, ConstraintValidatorFactoryInterface $validatorFactory, TranslatorInterface $translator, $translationDomain = null, array $objectInitializers = array())
     {
@@ -94,6 +98,8 @@ class ValidationVisitor implements ValidationVisitorInterface, GlobalExecutionCo
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function visit(MetadataInterface $metadata, $value, $group, $propertyPath)
     {
@@ -112,6 +118,8 @@ class ValidationVisitor implements ValidationVisitorInterface, GlobalExecutionCo
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function validate($value, $group, $propertyPath, $traverse = false, $deep = false)
     {
@@ -165,6 +173,8 @@ class ValidationVisitor implements ValidationVisitorInterface, GlobalExecutionCo
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function getViolations()
     {
@@ -173,6 +183,8 @@ class ValidationVisitor implements ValidationVisitorInterface, GlobalExecutionCo
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function getRoot()
     {
@@ -181,6 +193,8 @@ class ValidationVisitor implements ValidationVisitorInterface, GlobalExecutionCo
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function getVisitor()
     {
@@ -189,6 +203,8 @@ class ValidationVisitor implements ValidationVisitorInterface, GlobalExecutionCo
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function getValidatorFactory()
     {
@@ -197,6 +213,8 @@ class ValidationVisitor implements ValidationVisitorInterface, GlobalExecutionCo
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function getMetadataFactory()
     {

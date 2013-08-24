@@ -13,6 +13,8 @@ namespace Symfony\Component\Finder\Shell;
 
 /**
  * @author Jean-François Simon <contact@jfsimon.fr>
+ *
+ * @since v2.2.0
  */
 class Command
 {
@@ -40,6 +42,8 @@ class Command
      * Constructor.
      *
      * @param Command $parent Parent command
+     *
+     * @since v2.2.0
      */
     public function __construct(Command $parent = null)
     {
@@ -52,6 +56,8 @@ class Command
      * Returns command as string.
      *
      * @return string
+     *
+     * @since v2.2.0
      */
     public function __toString()
     {
@@ -64,6 +70,8 @@ class Command
      * @param Command $parent Parent command
      *
      * @return Command New Command instance
+     *
+     * @since v2.2.0
      */
     public static function create(Command $parent = null)
     {
@@ -76,6 +84,8 @@ class Command
      * @param string $input A string to escape
      *
      * @return string The escaped string
+     *
+     * @since v2.2.0
      */
     public static function escape($input)
     {
@@ -88,6 +98,8 @@ class Command
      * @param string $input An argument string
      *
      * @return string The quoted string
+     *
+     * @since v2.2.0
      */
     public static function quote($input)
     {
@@ -100,6 +112,8 @@ class Command
      * @param string|Command $bit
      *
      * @return Command The current Command instance
+     *
+     * @since v2.2.0
      */
     public function add($bit)
     {
@@ -114,6 +128,8 @@ class Command
      * @param string|Command $bit
      *
      * @return Command The current Command instance
+     *
+     * @since v2.2.0
      */
     public function top($bit)
     {
@@ -132,6 +148,8 @@ class Command
      * @param string $arg
      *
      * @return Command The current Command instance
+     *
+     * @since v2.2.0
      */
     public function arg($arg)
     {
@@ -146,6 +164,8 @@ class Command
      * @param string $esc
      *
      * @return Command The current Command instance
+     *
+     * @since v2.2.0
      */
     public function cmd($esc)
     {
@@ -162,6 +182,8 @@ class Command
      * @return Command The current Command instance
      *
      * @throws \RuntimeException If label already exists
+     *
+     * @since v2.2.0
      */
     public function ins($label)
     {
@@ -183,6 +205,8 @@ class Command
      * @return Command The labeled command
      *
      * @throws \RuntimeException
+     *
+     * @since v2.2.0
      */
     public function get($label)
     {
@@ -199,6 +223,8 @@ class Command
      * @return Command Parent command
      *
      * @throws \RuntimeException If command has no parent
+     *
+     * @since v2.2.0
      */
     public function end()
     {
@@ -213,6 +239,8 @@ class Command
      * Counts bits stored in command.
      *
      * @return int The bits count
+     *
+     * @since v2.2.0
      */
     public function length()
     {
@@ -223,6 +251,8 @@ class Command
      * @param \Closure $errorHandler
      *
      * @return Command
+     *
+     * @since v2.3.0
      */
     public function setErrorHandler(\Closure $errorHandler)
     {
@@ -233,6 +263,8 @@ class Command
 
     /**
      * @return callable|null
+     *
+     * @since v2.3.0
      */
     public function getErrorHandler()
     {
@@ -245,6 +277,8 @@ class Command
      * @return array The command result
      *
      * @throws \RuntimeException
+     *
+     * @since v2.2.0
      */
     public function execute()
     {
@@ -268,6 +302,8 @@ class Command
      * Joins bits.
      *
      * @return string
+     *
+     * @since v2.2.0
      */
     public function join()
     {
@@ -286,6 +322,8 @@ class Command
      * @param integer        $index
      *
      * @return Command The current Command instance
+     *
+     * @since v2.2.0
      */
     public function addAtIndex($bit, $index)
     {

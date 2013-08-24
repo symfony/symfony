@@ -18,6 +18,8 @@ namespace Symfony\Component\CssSelector\XPath;
  * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @since v2.3.0
  */
 class XPathExpr
 {
@@ -41,6 +43,8 @@ class XPathExpr
      * @param string  $element
      * @param string  $condition
      * @param boolean $starPrefix
+     *
+     * @since v2.3.0
      */
     public function __construct($path = '', $element = '*', $condition = '', $starPrefix = false)
     {
@@ -55,6 +59,8 @@ class XPathExpr
 
     /**
      * @return string
+     *
+     * @since v2.3.0
      */
     public function getElement()
     {
@@ -65,6 +71,8 @@ class XPathExpr
      * @param $condition
      *
      * @return XPathExpr
+     *
+     * @since v2.3.0
      */
     public function addCondition($condition)
     {
@@ -75,6 +83,8 @@ class XPathExpr
 
     /**
      * @return string
+     *
+     * @since v2.3.0
      */
     public function getCondition()
     {
@@ -83,6 +93,8 @@ class XPathExpr
 
     /**
      * @return XPathExpr
+     *
+     * @since v2.3.0
      */
     public function addNameTest()
     {
@@ -96,6 +108,8 @@ class XPathExpr
 
     /**
      * @return XPathExpr
+     *
+     * @since v2.3.0
      */
     public function addStarPrefix()
     {
@@ -111,6 +125,8 @@ class XPathExpr
      * @param XPathExpr $expr
      *
      * @return XPathExpr
+     *
+     * @since v2.3.0
      */
     public function join($combiner, XPathExpr $expr)
     {
@@ -129,6 +145,8 @@ class XPathExpr
 
     /**
      * @return string
+     *
+     * @since v2.3.0
      */
     public function __toString()
     {

@@ -22,11 +22,15 @@ use Symfony\Component\Console\Output\OutputInterface;
  * Text descriptor.
  *
  * @author Jean-François Simon <contact@jfsimon.fr>
+ *
+ * @since v2.3.0
  */
 class TextDescriptor extends Descriptor
 {
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     protected function describeInputArgument(InputArgument $argument, array $options = array())
     {
@@ -47,6 +51,8 @@ class TextDescriptor extends Descriptor
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     protected function describeInputOption(InputOption $option, array $options = array())
     {
@@ -70,6 +76,8 @@ class TextDescriptor extends Descriptor
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     protected function describeInputDefinition(InputDefinition $definition, array $options = array())
     {
@@ -111,6 +119,8 @@ class TextDescriptor extends Descriptor
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     protected function describeCommand(Command $command, array $options = array())
     {
@@ -144,6 +154,8 @@ class TextDescriptor extends Descriptor
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     protected function describeApplication(Application $application, array $options = array())
     {
@@ -203,6 +215,8 @@ class TextDescriptor extends Descriptor
      * @param mixed $default
      *
      * @return string
+     *
+     * @since v2.3.0
      */
     private function formatDefaultValue($default)
     {
@@ -217,6 +231,8 @@ class TextDescriptor extends Descriptor
      * @param Command[] $commands
      *
      * @return int
+     *
+     * @since v2.3.0
      */
     private function getColumnWidth(array $commands)
     {

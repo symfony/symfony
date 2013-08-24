@@ -21,6 +21,8 @@ interface PropertyPathIteratorInterface extends \Iterator, \SeekableIterator
      * index.
      *
      * @return Boolean
+     *
+     * @since v2.2.0
      */
     public function isIndex();
 
@@ -29,6 +31,8 @@ interface PropertyPathIteratorInterface extends \Iterator, \SeekableIterator
      * name.
      *
      * @return Boolean
+     *
+     * @since v2.2.0
      */
     public function isProperty();
 }

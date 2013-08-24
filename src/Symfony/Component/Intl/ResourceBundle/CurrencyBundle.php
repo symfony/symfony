@@ -15,6 +15,8 @@ namespace Symfony\Component\Intl\ResourceBundle;
  * Default implementation of {@link CurrencyBundleInterface}.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.3.0
  */
 class CurrencyBundle extends AbstractBundle implements CurrencyBundleInterface
 {
@@ -28,6 +30,8 @@ class CurrencyBundle extends AbstractBundle implements CurrencyBundleInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getCurrencySymbol($currency, $locale = null)
     {
@@ -40,6 +44,8 @@ class CurrencyBundle extends AbstractBundle implements CurrencyBundleInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getCurrencyName($currency, $locale = null)
     {
@@ -52,6 +58,8 @@ class CurrencyBundle extends AbstractBundle implements CurrencyBundleInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getCurrencyNames($locale = null)
     {
@@ -78,6 +86,8 @@ class CurrencyBundle extends AbstractBundle implements CurrencyBundleInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getFractionDigits($currency)
     {
@@ -86,6 +96,8 @@ class CurrencyBundle extends AbstractBundle implements CurrencyBundleInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getRoundingIncrement($currency)
     {

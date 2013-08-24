@@ -15,6 +15,8 @@ namespace Symfony\Component\Config;
  * FileLocator uses an array of pre-defined paths to find files.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class FileLocator implements FileLocatorInterface
 {
@@ -24,6 +26,8 @@ class FileLocator implements FileLocatorInterface
      * Constructor.
      *
      * @param string|array $paths A path or an array of paths where to look for resources
+     *
+     * @since v2.0.0
      */
     public function __construct($paths = array())
     {
@@ -40,6 +44,8 @@ class FileLocator implements FileLocatorInterface
      * @return string|array The full path to the file|An array of file paths
      *
      * @throws \InvalidArgumentException When file is not found
+     *
+     * @since v2.0.0
      */
     public function locate($name, $currentPath = null, $first = true)
     {
@@ -81,6 +87,8 @@ class FileLocator implements FileLocatorInterface
      * @param string $file A file path
      *
      * @return Boolean
+     *
+     * @since v2.0.0
      */
     private function isAbsolutePath($file)
     {

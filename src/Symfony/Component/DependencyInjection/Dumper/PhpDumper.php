@@ -31,6 +31,8 @@ use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\NullDumper;
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class PhpDumper extends Dumper
 {
@@ -61,6 +63,8 @@ class PhpDumper extends Dumper
      * {@inheritDoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function __construct(ContainerBuilder $container)
     {
@@ -73,6 +77,8 @@ class PhpDumper extends Dumper
      * Sets the dumper to be used when dumping proxies in the generated container.
      *
      * @param ProxyDumper $proxyDumper
+     *
+     * @since v2.3.0
      */
     public function setProxyDumper(ProxyDumper $proxyDumper)
     {
@@ -93,6 +99,8 @@ class PhpDumper extends Dumper
      * @return string A PHP class representing of the service container
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function dump(array $options = array())
     {
@@ -124,6 +132,8 @@ class PhpDumper extends Dumper
      * Retrieves the currently set proxy dumper or instantiates one.
      *
      * @return ProxyDumper
+     *
+     * @since v2.3.0
      */
     private function getProxyDumper()
     {
@@ -141,6 +151,8 @@ class PhpDumper extends Dumper
      * @param string $definition
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     private function addServiceLocalTempVariables($cId, $definition)
     {
@@ -187,6 +199,8 @@ class PhpDumper extends Dumper
      * Generates code for the proxies to be attached after the container class
      *
      * @return string
+     *
+     * @since v2.3.0
      */
     private function addProxyClasses()
     {
@@ -211,6 +225,8 @@ class PhpDumper extends Dumper
      * @param Definition $definition
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     private function addServiceInclude($id, $definition)
     {
@@ -244,6 +260,8 @@ class PhpDumper extends Dumper
      *
      * @throws RuntimeException When the factory definition is incomplete
      * @throws ServiceCircularReferenceException When a circular reference is detected
+     *
+     * @since v2.0.0
      */
     private function addServiceInlinedDefinitions($id, $definition)
     {
@@ -306,6 +324,8 @@ class PhpDumper extends Dumper
      * @param Definition $definition
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     private function addServiceReturn($id, $definition)
     {
@@ -326,6 +346,8 @@ class PhpDumper extends Dumper
      *
      * @throws InvalidArgumentException
      * @throws RuntimeException
+     *
+     * @since v2.0.0
      */
     private function addServiceInstance($id, $definition)
     {
@@ -370,6 +392,8 @@ class PhpDumper extends Dumper
      * @param Definition $definition
      *
      * @return Boolean
+     *
+     * @since v2.0.0
      */
     private function isSimpleInstance($id, $definition)
     {
@@ -394,6 +418,8 @@ class PhpDumper extends Dumper
      * @param string     $variableName
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     private function addServiceMethodCalls($id, $definition, $variableName = 'instance')
     {
@@ -410,6 +436,9 @@ class PhpDumper extends Dumper
         return $calls;
     }
 
+    /**
+     * @since v2.0.0
+     */
     private function addServiceProperties($id, $definition, $variableName = 'instance')
     {
         $code = '';
@@ -426,6 +455,8 @@ class PhpDumper extends Dumper
      * @param string     $id
      * @param Definition $definition
      * @return string
+     *
+     * @since v2.0.0
      */
     private function addServiceInlinedDefinitionsSetup($id, $definition)
     {
@@ -464,6 +495,8 @@ class PhpDumper extends Dumper
      * @param string     $variableName
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     private function addServiceConfigurator($id, $definition, $variableName = 'instance')
     {
@@ -489,6 +522,8 @@ class PhpDumper extends Dumper
      * @param Definition $definition
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     private function addService($id, $definition)
     {
@@ -599,6 +634,8 @@ EOF;
      * Adds multiple services
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     private function addServices()
     {
@@ -623,6 +660,8 @@ EOF;
      *
      * @param string     $id         A service identifier
      * @param Definition $definition A Definition instance
+     *
+     * @since v2.3.0
      */
     private function addServiceSynchronizer($id, Definition $definition)
     {
@@ -669,6 +708,9 @@ $code    }
 EOF;
     }
 
+    /**
+     * @since v2.0.22
+     */
     private function addNewInstance($id, Definition $definition, $return, $instantiation)
     {
         $class = $this->dumpValue($definition->getClass());
@@ -739,6 +781,8 @@ EOF;
      * Adds the constructor.
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     private function addConstructor()
     {
@@ -776,6 +820,8 @@ EOF;
      * Adds the constructor for a frozen container.
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     private function addFrozenConstructor()
     {
@@ -826,6 +872,8 @@ EOF;
      * Adds the methodMap property definition
      *
      * @return string
+     *
+     * @since v2.3.1
      */
     private function addMethodMap()
     {
@@ -846,6 +894,8 @@ EOF;
      * Adds the aliases property definition
      *
      * @return string
+     *
+     * @since v2.3.1
      */
     private function addAliases()
     {
@@ -874,6 +924,8 @@ EOF;
      * Adds default parameters method.
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     private function addDefaultParametersMethod()
     {
@@ -960,6 +1012,8 @@ EOF;
      * @return string
      *
      * @throws InvalidArgumentException
+     *
+     * @since v2.0.0
      */
     private function exportParameters($parameters, $path = '', $indent = 12)
     {
@@ -987,6 +1041,8 @@ EOF;
      * Ends the class definition.
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     private function endClass()
     {
@@ -1003,6 +1059,8 @@ EOF;
      * @param string $code
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     private function wrapServiceConditionals($value, $code)
     {
@@ -1027,6 +1085,8 @@ EOF;
      * @param array  $arguments
      * @param array  &$calls    By reference
      * @param array  &$behavior By reference
+     *
+     * @since v2.0.0
      */
     private function getServiceCallsFromArguments(array $arguments, array &$calls, array &$behavior)
     {
@@ -1056,6 +1116,8 @@ EOF;
      * @param Definition $definition
      *
      * @return array
+     *
+     * @since v2.0.0
      */
     private function getInlinedDefinitions(Definition $definition)
     {
@@ -1080,6 +1142,8 @@ EOF;
      * @param array $arguments
      *
      * @return array
+     *
+     * @since v2.0.0
      */
     private function getDefinitionsFromArguments(array $arguments)
     {
@@ -1147,6 +1211,8 @@ EOF;
      * @return string
      *
      * @throws RuntimeException
+     *
+     * @since v2.0.0
      */
     private function dumpValue($value, $interpolate = true)
     {
@@ -1227,6 +1293,8 @@ EOF;
      * @param string $name
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     public function dumpParameter($name)
     {
@@ -1244,6 +1312,8 @@ EOF;
      * @param Reference $reference
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     private function getServiceCall($id, Reference $reference = null)
     {
@@ -1270,6 +1340,8 @@ EOF;
      * @return string
      *
      * @throws InvalidArgumentException
+     *
+     * @since v2.3.3
      */
     private function camelize($id)
     {
@@ -1286,6 +1358,8 @@ EOF;
      * Returns the next name to use
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     private function getNextVariableName()
     {

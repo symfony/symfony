@@ -16,6 +16,8 @@ namespace Symfony\Component\Finder\Iterator;
  *
  * @author Fabien Potencier  <fabien@symfony.com>
  * @author Włodzimierz Gajda <gajdaw@gajdaw.pl>
+ *
+ * @since v2.2.0
  */
 class PathFilterIterator extends MultiplePcreFilterIterator
 {
@@ -24,6 +26,8 @@ class PathFilterIterator extends MultiplePcreFilterIterator
      * Filters the iterator values.
      *
      * @return Boolean true if the value should be kept, false otherwise
+     *
+     * @since v2.2.0
      */
     public function accept()
     {
@@ -67,6 +71,8 @@ class PathFilterIterator extends MultiplePcreFilterIterator
      * @param string $str Pattern: regexp or dirname.
      *
      * @return string regexp corresponding to a given string or regexp
+     *
+     * @since v2.2.0
      */
     protected function toRegex($str)
     {

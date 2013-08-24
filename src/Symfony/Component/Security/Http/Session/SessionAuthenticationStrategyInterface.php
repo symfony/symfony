@@ -32,6 +32,8 @@ interface SessionAuthenticationStrategyInterface
      *
      * @param Request        $request
      * @param TokenInterface $token
+     *
+     * @since v2.1.0
      */
     public function onAuthentication(Request $request, TokenInterface $token);
 }

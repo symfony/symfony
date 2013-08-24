@@ -15,6 +15,8 @@ namespace Symfony\Component\Config\Definition\Builder;
  * This class builds merge conditions.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class MergeBuilder
 {
@@ -26,6 +28,8 @@ class MergeBuilder
      * Constructor
      *
      * @param NodeDefinition $node The related node
+     *
+     * @since v2.0.0
      */
     public function __construct(NodeDefinition $node)
     {
@@ -40,6 +44,8 @@ class MergeBuilder
      * @param Boolean $allow
      *
      * @return MergeBuilder
+     *
+     * @since v2.0.0
      */
     public function allowUnset($allow = true)
     {
@@ -54,6 +60,8 @@ class MergeBuilder
      * @param Boolean $deny Whether the overwriting is forbidden or not
      *
      * @return MergeBuilder
+     *
+     * @since v2.0.0
      */
     public function denyOverwrite($deny = true)
     {
@@ -66,6 +74,8 @@ class MergeBuilder
      * Returns the related node.
      *
      * @return NodeDefinition
+     *
+     * @since v2.0.0
      */
     public function end()
     {

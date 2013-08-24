@@ -20,16 +20,24 @@ use Symfony\Component\HttpFoundation\Request;
  * BasicAuthenticationEntryPoint starts an HTTP Basic authentication.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class BasicAuthenticationEntryPoint implements AuthenticationEntryPointInterface
 {
     private $realmName;
 
+    /**
+     * @since v2.0.0
+     */
     public function __construct($realmName)
     {
         $this->realmName = $realmName;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function start(Request $request, AuthenticationException $authException = null)
     {
         $response = new Response();

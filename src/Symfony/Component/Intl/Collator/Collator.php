@@ -30,6 +30,8 @@ use Symfony\Component\Intl\Locale\Locale;
  *
  * @author Igor Wiedler <igor@wiedler.ch>
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.3.0
  */
 class Collator
 {
@@ -73,6 +75,8 @@ class Collator
      * @param string $locale The locale code. The only currently supported locale is "en".
      *
      * @throws MethodArgumentValueNotImplementedException  When $locale different than "en" is passed
+     *
+     * @since v2.3.0
      */
     public function __construct($locale)
     {
@@ -89,6 +93,8 @@ class Collator
      * @return Collator
      *
      * @throws MethodArgumentValueNotImplementedException  When $locale different than "en" is passed
+     *
+     * @since v2.3.0
      */
     public static function create($locale)
     {
@@ -105,6 +111,8 @@ class Collator
      *                           Collator::SORT_STRING - compare items as strings
      *
      * @return Boolean True on success or false on failure
+     *
+     * @since v2.3.0
      */
     public function asort(&$array, $sortFlag = self::SORT_REGULAR)
     {
@@ -133,6 +141,8 @@ class Collator
      * @see http://www.php.net/manual/en/collator.compare.php
      *
      * @throws MethodNotImplementedException
+     *
+     * @since v2.3.0
      */
     public function compare($str1, $str2)
     {
@@ -149,6 +159,8 @@ class Collator
      * @see http://www.php.net/manual/en/collator.getattribute.php
      *
      * @throws MethodNotImplementedException
+     *
+     * @since v2.3.0
      */
     public function getAttribute($attr)
     {
@@ -159,6 +171,8 @@ class Collator
      * Returns collator's last error code. Always returns the U_ZERO_ERROR class constant value
      *
      * @return int The error code from last collator call
+     *
+     * @since v2.3.0
      */
     public function getErrorCode()
     {
@@ -169,6 +183,8 @@ class Collator
      * Returns collator's last error message. Always returns the U_ZERO_ERROR_MESSAGE class constant value
      *
      * @return string The error message from last collator call
+     *
+     * @since v2.3.0
      */
     public function getErrorMessage()
     {
@@ -182,6 +198,8 @@ class Collator
      *
      * @return string The locale used to create the collator. Currently always
      *                returns "en".
+     *
+     * @since v2.3.0
      */
     public function getLocale($type = Locale::ACTUAL_LOCALE)
     {
@@ -198,6 +216,8 @@ class Collator
      * @see http://www.php.net/manual/en/collator.getsortkey.php
      *
      * @throws MethodNotImplementedException
+     *
+     * @since v2.3.0
      */
     public function getSortKey($string)
     {
@@ -212,6 +232,8 @@ class Collator
      * @see http://www.php.net/manual/en/collator.getstrength.php
      *
      * @throws MethodNotImplementedException
+     *
+     * @since v2.3.0
      */
     public function getStrength()
     {
@@ -229,6 +251,8 @@ class Collator
      * @see http://www.php.net/manual/en/collator.setattribute.php
      *
      * @throws MethodNotImplementedException
+     *
+     * @since v2.3.0
      */
     public function setAttribute($attr, $val)
     {
@@ -251,6 +275,8 @@ class Collator
      * @see http://www.php.net/manual/en/collator.setstrength.php
      *
      * @throws MethodNotImplementedException
+     *
+     * @since v2.3.0
      */
     public function setStrength($strength)
     {
@@ -267,6 +293,8 @@ class Collator
      * @see http://www.php.net/manual/en/collator.sortwithsortkeys.php
      *
      * @throws MethodNotImplementedException
+     *
+     * @since v2.3.0
      */
     public function sortWithSortKeys(&$arr)
     {
@@ -287,6 +315,8 @@ class Collator
      * @see http://www.php.net/manual/en/collator.sort.php
      *
      * @throws MethodNotImplementedException
+     *
+     * @since v2.3.0
      */
     public function sort(&$arr, $sortFlag = self::SORT_REGULAR)
     {

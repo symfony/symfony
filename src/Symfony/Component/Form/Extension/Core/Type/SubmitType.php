@@ -20,9 +20,14 @@ use Symfony\Component\Form\SubmitButtonTypeInterface;
  * A submit button.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.3.0
  */
 class SubmitType extends AbstractType implements SubmitButtonTypeInterface
 {
+    /**
+     * @since v2.3.0
+     */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['clicked'] = $form->isClicked();
@@ -30,6 +35,8 @@ class SubmitType extends AbstractType implements SubmitButtonTypeInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getParent()
     {
@@ -38,6 +45,8 @@ class SubmitType extends AbstractType implements SubmitButtonTypeInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getName()
     {

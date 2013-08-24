@@ -24,11 +24,15 @@ use Symfony\Component\Translation\MessageCatalogue;
  * A command that parse templates to extract translation messages and add them into the translation files.
  *
  * @author Michel Salib <michelsalib@hotmail.com>
+ *
+ * @since v2.1.0
  */
 class TranslationUpdateCommand extends ContainerAwareCommand
 {
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     protected function configure()
     {
@@ -74,6 +78,8 @@ EOF
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {

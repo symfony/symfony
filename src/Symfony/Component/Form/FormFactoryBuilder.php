@@ -15,6 +15,8 @@ namespace Symfony\Component\Form;
  * The default implementation of FormFactoryBuilderInterface.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.1.0
  */
 class FormFactoryBuilder implements FormFactoryBuilderInterface
 {
@@ -45,6 +47,8 @@ class FormFactoryBuilder implements FormFactoryBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function setResolvedTypeFactory(ResolvedFormTypeFactoryInterface $resolvedTypeFactory)
     {
@@ -55,6 +59,8 @@ class FormFactoryBuilder implements FormFactoryBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function addExtension(FormExtensionInterface $extension)
     {
@@ -65,6 +71,8 @@ class FormFactoryBuilder implements FormFactoryBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function addExtensions(array $extensions)
     {
@@ -75,6 +83,8 @@ class FormFactoryBuilder implements FormFactoryBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function addType(FormTypeInterface $type)
     {
@@ -85,6 +95,8 @@ class FormFactoryBuilder implements FormFactoryBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function addTypes(array $types)
     {
@@ -97,6 +109,8 @@ class FormFactoryBuilder implements FormFactoryBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function addTypeExtension(FormTypeExtensionInterface $typeExtension)
     {
@@ -107,6 +121,8 @@ class FormFactoryBuilder implements FormFactoryBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function addTypeExtensions(array $typeExtensions)
     {
@@ -119,6 +135,8 @@ class FormFactoryBuilder implements FormFactoryBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function addTypeGuesser(FormTypeGuesserInterface $typeGuesser)
     {
@@ -129,6 +147,8 @@ class FormFactoryBuilder implements FormFactoryBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function addTypeGuessers(array $typeGuessers)
     {
@@ -139,6 +159,8 @@ class FormFactoryBuilder implements FormFactoryBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getFormFactory()
     {

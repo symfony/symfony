@@ -13,6 +13,8 @@ namespace Symfony\Component\Console\Formatter;
 
 /**
  * @author Jean-François Simon <contact@jfsimon.fr>
+ *
+ * @since v2.1.0
  */
 class OutputFormatterStyleStack
 {
@@ -30,6 +32,8 @@ class OutputFormatterStyleStack
      * Constructor.
      *
      * @param OutputFormatterStyleInterface $emptyStyle
+     *
+     * @since v2.1.0
      */
     public function __construct(OutputFormatterStyleInterface $emptyStyle = null)
     {
@@ -39,6 +43,8 @@ class OutputFormatterStyleStack
 
     /**
      * Resets stack (ie. empty internal arrays).
+     *
+     * @since v2.1.0
      */
     public function reset()
     {
@@ -49,6 +55,8 @@ class OutputFormatterStyleStack
      * Pushes a style in the stack.
      *
      * @param OutputFormatterStyleInterface $style
+     *
+     * @since v2.1.0
      */
     public function push(OutputFormatterStyleInterface $style)
     {
@@ -63,6 +71,8 @@ class OutputFormatterStyleStack
      * @return OutputFormatterStyleInterface
      *
      * @throws \InvalidArgumentException  When style tags incorrectly nested
+     *
+     * @since v2.1.0
      */
     public function pop(OutputFormatterStyleInterface $style = null)
     {
@@ -89,6 +99,8 @@ class OutputFormatterStyleStack
      * Computes current style with stacks top codes.
      *
      * @return OutputFormatterStyle
+     *
+     * @since v2.1.0
      */
     public function getCurrent()
     {
@@ -103,6 +115,8 @@ class OutputFormatterStyleStack
      * @param OutputFormatterStyleInterface $emptyStyle
      *
      * @return OutputFormatterStyleStack
+     *
+     * @since v2.1.0
      */
     public function setEmptyStyle(OutputFormatterStyleInterface $emptyStyle)
     {
@@ -113,6 +127,8 @@ class OutputFormatterStyleStack
 
     /**
      * @return OutputFormatterStyleInterface
+     *
+     * @since v2.1.0
      */
     public function getEmptyStyle()
     {

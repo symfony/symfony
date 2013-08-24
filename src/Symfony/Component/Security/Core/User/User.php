@@ -17,6 +17,8 @@ namespace Symfony\Component\Security\Core\User;
  * This should not be used for anything else.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 final class User implements AdvancedUserInterface
 {
@@ -28,6 +30,9 @@ final class User implements AdvancedUserInterface
     private $accountNonLocked;
     private $roles;
 
+    /**
+     * @since v2.0.0
+     */
     public function __construct($username, $password, array $roles = array(), $enabled = true, $userNonExpired = true, $credentialsNonExpired = true, $userNonLocked = true)
     {
         if (empty($username)) {
@@ -45,6 +50,8 @@ final class User implements AdvancedUserInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getRoles()
     {
@@ -53,6 +60,8 @@ final class User implements AdvancedUserInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getPassword()
     {
@@ -61,6 +70,8 @@ final class User implements AdvancedUserInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getSalt()
     {
@@ -69,6 +80,8 @@ final class User implements AdvancedUserInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getUsername()
     {
@@ -77,6 +90,8 @@ final class User implements AdvancedUserInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function isAccountNonExpired()
     {
@@ -85,6 +100,8 @@ final class User implements AdvancedUserInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function isAccountNonLocked()
     {
@@ -93,6 +110,8 @@ final class User implements AdvancedUserInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function isCredentialsNonExpired()
     {
@@ -101,6 +120,8 @@ final class User implements AdvancedUserInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function isEnabled()
     {
@@ -109,6 +130,8 @@ final class User implements AdvancedUserInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function eraseCredentials()
     {

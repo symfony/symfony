@@ -15,6 +15,8 @@
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @see \Symfony\Component\Intl\NumberFormatter\NumberFormatter
+ *
+ * @since v2.3.0
  */
 class NumberFormatter extends \Symfony\Component\Intl\NumberFormatter\NumberFormatter
 {

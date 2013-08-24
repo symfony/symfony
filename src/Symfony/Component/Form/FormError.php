@@ -15,6 +15,8 @@ namespace Symfony\Component\Form;
  * Wraps errors in forms
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.0.0
  */
 class FormError
 {
@@ -54,6 +56,8 @@ class FormError
      * @param integer|null $messagePluralization The value for error message pluralization
      *
      * @see \Symfony\Component\Translation\Translator
+     *
+     * @since v2.2.0
      */
     public function __construct($message, $messageTemplate = null, array $messageParameters = array(), $messagePluralization = null)
     {
@@ -67,6 +71,8 @@ class FormError
      * Returns the error message
      *
      * @return string
+     *
+     * @since v2.1.0
      */
     public function getMessage()
     {
@@ -77,6 +83,8 @@ class FormError
      * Returns the error message template
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     public function getMessageTemplate()
     {
@@ -87,6 +95,8 @@ class FormError
      * Returns the parameters to be inserted in the message template
      *
      * @return array
+     *
+     * @since v2.0.0
      */
     public function getMessageParameters()
     {
@@ -97,6 +107,8 @@ class FormError
      * Returns the value for error message pluralization.
      *
      * @return integer|null
+     *
+     * @since v2.1.0
      */
     public function getMessagePluralization()
     {

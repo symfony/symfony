@@ -18,6 +18,8 @@ use Symfony\Bundle\FrameworkBundle\Templating\Loader\TemplateLocator;
  * Computes the association between template names and their paths on the disk.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class TemplatePathsCacheWarmer extends CacheWarmer
 {
@@ -29,6 +31,8 @@ class TemplatePathsCacheWarmer extends CacheWarmer
      *
      * @param TemplateFinderInterface $finder  A template finder
      * @param TemplateLocator         $locator The template locator
+     *
+     * @since v2.0.0
      */
     public function __construct(TemplateFinderInterface $finder, TemplateLocator $locator)
     {
@@ -40,6 +44,8 @@ class TemplatePathsCacheWarmer extends CacheWarmer
      * Warms up the cache.
      *
      * @param string $cacheDir The cache directory
+     *
+     * @since v2.0.0
      */
     public function warmUp($cacheDir)
     {
@@ -56,6 +62,8 @@ class TemplatePathsCacheWarmer extends CacheWarmer
      * Checks whether this warmer is optional or not.
      *
      * @return Boolean always true
+     *
+     * @since v2.0.0
      */
     public function isOptional()
     {

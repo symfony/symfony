@@ -19,6 +19,8 @@ use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
  * ChromePhpHandler.
  *
  * @author Christophe Coevoet <stof@notk.org>
+ *
+ * @since v2.1.0
  */
 class ChromePhpHandler extends BaseChromePhpHandler
 {
@@ -34,6 +36,8 @@ class ChromePhpHandler extends BaseChromePhpHandler
 
     /**
      * Adds the headers to the response once it's created
+     *
+     * @since v2.1.0
      */
     public function onKernelResponse(FilterResponseEvent $event)
     {
@@ -58,6 +62,8 @@ class ChromePhpHandler extends BaseChromePhpHandler
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     protected function sendHeader($header, $content)
     {
@@ -74,6 +80,8 @@ class ChromePhpHandler extends BaseChromePhpHandler
 
     /**
      * Override default behavior since we check it in onKernelResponse
+     *
+     * @since v2.1.0
      */
     protected function headersAccepted()
     {

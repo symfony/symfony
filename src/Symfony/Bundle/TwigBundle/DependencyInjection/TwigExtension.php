@@ -22,6 +22,8 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Jeremy Mikola <jmikola@gmail.com>
+ *
+ * @since v2.0.0
  */
 class TwigExtension extends Extension
 {
@@ -30,6 +32,8 @@ class TwigExtension extends Extension
      *
      * @param array            $configs
      * @param ContainerBuilder $container
+     *
+     * @since v2.0.0
      */
     public function load(array $configs, ContainerBuilder $container)
     {
@@ -130,6 +134,9 @@ class TwigExtension extends Extension
         ));
     }
 
+    /**
+     * @since v2.2.0
+     */
     private function addTwigPath($twigFilesystemLoaderDefinition, $dir, $bundle)
     {
         $name = $bundle;
@@ -143,12 +150,17 @@ class TwigExtension extends Extension
      * Returns the base path for the XSD files.
      *
      * @return string The XSD base path
+     *
+     * @since v2.0.0
      */
     public function getXsdValidationBasePath()
     {
         return __DIR__.'/../Resources/config/schema';
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getNamespace()
     {
         return 'http://symfony.com/schema/dic/twig';

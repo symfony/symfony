@@ -15,12 +15,17 @@ namespace Symfony\Component\HttpKernel\Exception;
  * HttpException.
  *
  * @author Kris Wallsmith <kris@symfony.com>
+ *
+ * @since v2.0.0
  */
 class HttpException extends \RuntimeException implements HttpExceptionInterface
 {
     private $statusCode;
     private $headers;
 
+    /**
+     * @since v2.0.0
+     */
     public function __construct($statusCode, $message = null, \Exception $previous = null, array $headers = array(), $code = 0)
     {
         $this->statusCode = $statusCode;
@@ -29,11 +34,17 @@ class HttpException extends \RuntimeException implements HttpExceptionInterface
         parent::__construct($message, $code, $previous);
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getStatusCode()
     {
         return $this->statusCode;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getHeaders()
     {
         return $this->headers;

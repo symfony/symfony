@@ -29,6 +29,8 @@ interface GeneratorDumperInterface
      * @param array $options An array of options
      *
      * @return string Executable code
+     *
+     * @since v2.1.0
      */
     public function dump(array $options = array());
 
@@ -36,6 +38,8 @@ interface GeneratorDumperInterface
      * Gets the routes to dump.
      *
      * @return RouteCollection A RouteCollection instance
+     *
+     * @since v2.1.0
      */
     public function getRoutes();
 }

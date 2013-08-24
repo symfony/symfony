@@ -16,6 +16,8 @@ use Symfony\Component\Finder\Shell\Command;
 
 /**
  * @author Jean-François Simon <contact@jfsimon.fr>
+ *
+ * @since v2.2.0
  */
 class ShellCommandFailureException extends AdapterFailureException
 {
@@ -28,6 +30,8 @@ class ShellCommandFailureException extends AdapterFailureException
      * @param AdapterInterface $adapter
      * @param Command          $command
      * @param \Exception|null  $previous
+     *
+     * @since v2.2.0
      */
     public function __construct(AdapterInterface $adapter, Command $command, \Exception $previous = null)
     {
@@ -37,6 +41,8 @@ class ShellCommandFailureException extends AdapterFailureException
 
     /**
      * @return Command
+     *
+     * @since v2.2.0
      */
     public function getCommand()
     {

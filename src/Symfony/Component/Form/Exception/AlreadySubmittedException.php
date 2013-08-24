@@ -16,6 +16,8 @@ namespace Symfony\Component\Form\Exception;
  * a form.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.3.0
  */
 class AlreadySubmittedException extends AlreadyBoundException
 {

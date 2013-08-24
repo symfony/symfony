@@ -24,6 +24,8 @@ interface OperationInterface
      * Returns domains affected by operation.
      *
      * @return array
+     *
+     * @since v2.3.0
      */
     public function getDomains();
 
@@ -33,6 +35,8 @@ interface OperationInterface
      * @param string $domain
      *
      * @return array
+     *
+     * @since v2.3.0
      */
     public function getMessages($domain);
 
@@ -42,6 +46,8 @@ interface OperationInterface
      * @param string $domain
      *
      * @return array
+     *
+     * @since v2.3.0
      */
     public function getNewMessages($domain);
 
@@ -51,6 +57,8 @@ interface OperationInterface
      * @param string $domain
      *
      * @return array
+     *
+     * @since v2.3.0
      */
     public function getObsoleteMessages($domain);
 
@@ -58,6 +66,8 @@ interface OperationInterface
      * Returns resulting catalogue.
      *
      * @return MessageCatalogueInterface
+     *
+     * @since v2.3.0
      */
     public function getResult();
 }

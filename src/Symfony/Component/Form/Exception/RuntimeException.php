@@ -15,6 +15,8 @@ namespace Symfony\Component\Form\Exception;
  * Base RuntimeException for the Form component.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.3.0
  */
 class RuntimeException extends \RuntimeException implements ExceptionInterface
 {

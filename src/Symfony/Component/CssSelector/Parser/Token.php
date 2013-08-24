@@ -18,6 +18,8 @@ namespace Symfony\Component\CssSelector\Parser;
  * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @since v2.3.0
  */
 class Token
 {
@@ -48,6 +50,8 @@ class Token
      * @param int    $type
      * @param string $value
      * @param int    $position
+     *
+     * @since v2.3.0
      */
     public function __construct($type, $value, $position)
     {
@@ -58,6 +62,8 @@ class Token
 
     /**
      * @return int
+     *
+     * @since v2.3.0
      */
     public function getType()
     {
@@ -66,6 +72,8 @@ class Token
 
     /**
      * @return string
+     *
+     * @since v2.3.0
      */
     public function getValue()
     {
@@ -74,6 +82,8 @@ class Token
 
     /**
      * @return int
+     *
+     * @since v2.3.0
      */
     public function getPosition()
     {
@@ -82,6 +92,8 @@ class Token
 
     /**
      * @return boolean
+     *
+     * @since v2.3.0
      */
     public function isFileEnd()
     {
@@ -92,6 +104,8 @@ class Token
      * @param array $values
      *
      * @return boolean
+     *
+     * @since v2.3.0
      */
     public function isDelimiter(array $values = array())
     {
@@ -108,6 +122,8 @@ class Token
 
     /**
      * @return boolean
+     *
+     * @since v2.3.0
      */
     public function isWhitespace()
     {
@@ -116,6 +132,8 @@ class Token
 
     /**
      * @return boolean
+     *
+     * @since v2.3.0
      */
     public function isIdentifier()
     {
@@ -124,6 +142,8 @@ class Token
 
     /**
      * @return boolean
+     *
+     * @since v2.3.0
      */
     public function isHash()
     {
@@ -132,6 +152,8 @@ class Token
 
     /**
      * @return boolean
+     *
+     * @since v2.3.0
      */
     public function isNumber()
     {
@@ -140,6 +162,8 @@ class Token
 
     /**
      * @return boolean
+     *
+     * @since v2.3.0
      */
     public function isString()
     {
@@ -148,6 +172,8 @@ class Token
 
     /**
      * @return string
+     *
+     * @since v2.3.0
      */
     public function __toString()
     {

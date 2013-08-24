@@ -22,6 +22,8 @@ use Symfony\Component\Console\Output\OutputInterface;
  * This class adds helper method to describe objects in various formats.
  *
  * @author Jean-François Simon <contact@jfsimon.fr>
+ *
+ * @since v2.3.0
  */
 class DescriptorHelper extends Helper
 {
@@ -32,6 +34,8 @@ class DescriptorHelper extends Helper
 
     /**
      * Constructor.
+     *
+     * @since v2.3.0
      */
     public function __construct()
     {
@@ -78,6 +82,8 @@ class DescriptorHelper extends Helper
      * @param DescriptorInterface $descriptor
      *
      * @return DescriptorHelper
+     *
+     * @since v2.3.0
      */
     public function register($format, DescriptorInterface $descriptor)
     {
@@ -88,6 +94,8 @@ class DescriptorHelper extends Helper
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getName()
     {

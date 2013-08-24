@@ -20,6 +20,8 @@ use Symfony\Component\Intl\Globals\IntlGlobals;
  *
  * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
  *             {@link \Symfony\Component\Intl\Globals\IntlGlobals} instead.
+ *
+ * @since v2.3.0
  */
 abstract class StubIntl extends IntlGlobals
 {

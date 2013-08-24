@@ -25,6 +25,8 @@ use Symfony\Component\Templating\Asset\UrlPackage;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Kris Wallsmith <kris@symfony.com>
+ *
+ * @since v2.0.0
  */
 class AssetsHelper extends CoreAssetsHelper
 {
@@ -36,6 +38,8 @@ class AssetsHelper extends CoreAssetsHelper
      * @param string       $version       The asset version
      * @param string       $format        The version format
      * @param array        $namedPackages Additional packages
+     *
+     * @since v2.0.0
      */
     public function __construct($basePath = null, $baseUrls = array(), $version = null, $format = null, $namedPackages = array())
     {

@@ -18,18 +18,26 @@ use Symfony\Component\Security\Http\Firewall\ExceptionListener;
  * to lazy load the context for one specific firewall only when we need it.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class FirewallContext
 {
     private $listeners;
     private $exceptionListener;
 
+    /**
+     * @since v2.0.0
+     */
     public function __construct(array $listeners, ExceptionListener $exceptionListener = null)
     {
         $this->listeners = $listeners;
         $this->exceptionListener = $exceptionListener;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getContext()
     {
         return array($this->listeners, $this->exceptionListener);

@@ -21,6 +21,8 @@ use Symfony\Component\Config\Resource\FileResource;
  * @author Saša Stamenković <umpirsky@gmail.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class CsvFileLoader extends ArrayLoader implements LoaderInterface
 {
@@ -32,6 +34,8 @@ class CsvFileLoader extends ArrayLoader implements LoaderInterface
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function load($resource, $locale, $domain = 'messages')
     {
@@ -82,6 +86,8 @@ class CsvFileLoader extends ArrayLoader implements LoaderInterface
      * @param string $delimiter delimiter character
      * @param string $enclosure enclosure character
      * @param string $escape    escape character
+     *
+     * @since v2.0.0
      */
     public function setCsvControl($delimiter = ';', $enclosure = '"', $escape = '\\')
     {

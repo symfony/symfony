@@ -38,6 +38,8 @@ interface OptionsResolverInterface
      *                             values or closures as values.
      *
      * @return OptionsResolverInterface The resolver instance.
+     *
+     * @since v2.1.0
      */
     public function setDefaults(array $defaultValues);
 
@@ -53,6 +55,8 @@ interface OptionsResolverInterface
      *                             values or closures as values.
      *
      * @return OptionsResolverInterface The resolver instance.
+     *
+     * @since v2.1.0
      */
     public function replaceDefaults(array $defaultValues);
 
@@ -70,6 +74,8 @@ interface OptionsResolverInterface
      * @return OptionsResolverInterface The resolver instance.
      *
      * @throws Exception\OptionDefinitionException When trying to pass default values.
+     *
+     * @since v2.1.0
      */
     public function setOptional(array $optionNames);
 
@@ -84,6 +90,8 @@ interface OptionsResolverInterface
      * @return OptionsResolverInterface The resolver instance.
      *
      * @throws Exception\OptionDefinitionException When trying to pass default values.
+     *
+     * @since v2.1.0
      */
     public function setRequired(array $optionNames);
 
@@ -99,6 +107,8 @@ interface OptionsResolverInterface
      * @throws Exception\InvalidOptionsException If an option has not been defined
      *                                 (see {@link isKnown()}) for which
      *                                 an allowed value is set.
+     *
+     * @since v2.1.0
      */
     public function setAllowedValues(array $allowedValues);
 
@@ -116,6 +126,8 @@ interface OptionsResolverInterface
      * @throws Exception\InvalidOptionsException If an option has not been defined
      *                                 (see {@link isKnown()}) for which
      *                                 an allowed value is set.
+     *
+     * @since v2.1.0
      */
     public function addAllowedValues(array $allowedValues);
 
@@ -129,6 +141,8 @@ interface OptionsResolverInterface
      *
      * @throws Exception\InvalidOptionsException If an option has not been defined for
      *                                           which an allowed type is set.
+     *
+     * @since v2.1.0
      */
     public function setAllowedTypes(array $allowedTypes);
 
@@ -144,6 +158,8 @@ interface OptionsResolverInterface
      *
      * @throws Exception\InvalidOptionsException If an option has not been defined for
      *                                           which an allowed type is set.
+     *
+     * @since v2.1.0
      */
     public function addAllowedTypes(array $allowedTypes);
 
@@ -164,6 +180,8 @@ interface OptionsResolverInterface
      * @param array $normalizers An array of closures.
      *
      * @return OptionsResolverInterface The resolver instance.
+     *
+     * @since v2.1.0
      */
     public function setNormalizers(array $normalizers);
 
@@ -176,6 +194,8 @@ interface OptionsResolverInterface
      * @param string $option The name of the option.
      *
      * @return Boolean Whether the option is known.
+     *
+     * @since v2.1.0
      */
     public function isKnown($option);
 
@@ -189,6 +209,8 @@ interface OptionsResolverInterface
      * @param string $option The name of the option.
      *
      * @return Boolean Whether the option is required.
+     *
+     * @since v2.1.0
      */
     public function isRequired($option);
 
@@ -205,6 +227,8 @@ interface OptionsResolverInterface
      * @throws Exception\MissingOptionsException   If a required option is missing.
      * @throws Exception\OptionDefinitionException If a cyclic dependency is detected
      *                                             between two lazy options.
+     *
+     * @since v2.1.0
      */
     public function resolve(array $options = array());
 }

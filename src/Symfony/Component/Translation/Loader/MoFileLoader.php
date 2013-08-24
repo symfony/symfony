@@ -17,6 +17,8 @@ use Symfony\Component\Config\Resource\FileResource;
 
 /**
  * @copyright Copyright (c) 2010, Union of RAD http://union-of-rad.org (http://lithify.me/)
+ *
+ * @since v2.1.0
  */
 class MoFileLoader extends ArrayLoader implements LoaderInterface
 {
@@ -43,6 +45,9 @@ class MoFileLoader extends ArrayLoader implements LoaderInterface
      */
     const MO_HEADER_SIZE = 28;
 
+    /**
+     * @since v2.1.0
+     */
     public function load($resource, $locale, $domain = 'messages')
     {
         if (!stream_is_local($resource)) {
@@ -79,6 +84,8 @@ class MoFileLoader extends ArrayLoader implements LoaderInterface
      *
      * @return array
      * @throws InvalidResourceException If stream content has an invalid format.
+     *
+     * @since v2.1.0
      */
     private function parse($resource)
     {
@@ -171,6 +178,8 @@ class MoFileLoader extends ArrayLoader implements LoaderInterface
      * @param  resource $stream
      * @param  boolean  $isBigEndian
      * @return integer
+     *
+     * @since v2.1.0
      */
     private function readLong($stream, $isBigEndian)
     {

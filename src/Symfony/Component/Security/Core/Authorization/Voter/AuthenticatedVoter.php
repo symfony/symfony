@@ -22,6 +22,8 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class AuthenticatedVoter implements VoterInterface
 {
@@ -35,6 +37,8 @@ class AuthenticatedVoter implements VoterInterface
      * Constructor.
      *
      * @param AuthenticationTrustResolverInterface $authenticationTrustResolver
+     *
+     * @since v2.0.0
      */
     public function __construct(AuthenticationTrustResolverInterface $authenticationTrustResolver)
     {
@@ -43,6 +47,8 @@ class AuthenticatedVoter implements VoterInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function supportsAttribute($attribute)
     {
@@ -51,6 +57,8 @@ class AuthenticatedVoter implements VoterInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function supportsClass($class)
     {
@@ -59,6 +67,8 @@ class AuthenticatedVoter implements VoterInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function vote(TokenInterface $token, $object, array $attributes)
     {

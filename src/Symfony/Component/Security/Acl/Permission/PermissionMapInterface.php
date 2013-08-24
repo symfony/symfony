@@ -27,6 +27,8 @@ interface PermissionMapInterface
      * @param string $permission
      * @param object $object
      * @return array may return null if permission/object combination is not supported
+     *
+     * @since v2.1.0
      */
     public function getMasks($permission, $object);
 
@@ -35,6 +37,8 @@ interface PermissionMapInterface
      *
      * @param string $permission
      * @return Boolean
+     *
+     * @since v2.1.0
      */
     public function contains($permission);
 }

@@ -17,11 +17,15 @@ use Symfony\Component\Yaml\Dumper as YamlDumper;
  * Provides integration of the Yaml component with Twig.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class YamlExtension extends \Twig_Extension
 {
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getFilters()
     {
@@ -31,6 +35,9 @@ class YamlExtension extends \Twig_Extension
         );
     }
 
+    /**
+     * @since v2.0.22
+     */
     public function encode($input, $inline = 0, $dumpObjects = false)
     {
         static $dumper;
@@ -42,6 +49,9 @@ class YamlExtension extends \Twig_Extension
         return $dumper->dump($input, $inline, false, $dumpObjects);
     }
 
+    /**
+     * @since v2.0.22
+     */
     public function dump($value, $inline = 0, $dumpObjects = false)
     {
         if (is_resource($value)) {
@@ -59,6 +69,8 @@ class YamlExtension extends \Twig_Extension
      * Returns the name of the extension.
      *
      * @return string The extension name
+     *
+     * @since v2.0.0
      */
     public function getName()
     {

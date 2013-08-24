@@ -17,6 +17,8 @@ namespace Symfony\Component\BrowserKit;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class Response
 {
@@ -35,6 +37,8 @@ class Response
      * @param array   $headers An array of headers
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function __construct($content = '', $status = 200, array $headers = array())
     {
@@ -47,6 +51,8 @@ class Response
      * Converts the response object to string containing all headers and the response content.
      *
      * @return string The response with headers and content
+     *
+     * @since v2.0.0
      */
     public function __toString()
     {
@@ -71,6 +77,8 @@ class Response
      * @param string $value The header value
      *
      * @return string The built header line
+     *
+     * @since v2.0.0
      */
     protected function buildHeader($name, $value)
     {
@@ -83,6 +91,8 @@ class Response
      * @return string The response content
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getContent()
     {
@@ -95,6 +105,8 @@ class Response
      * @return integer The response status code
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getStatus()
     {
@@ -107,6 +119,8 @@ class Response
      * @return array The response headers
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getHeaders()
     {
@@ -120,6 +134,8 @@ class Response
      * @param Boolean $first  Whether to return the first value or all header values
      *
      * @return string|array The first header value if $first is true, an array of values otherwise
+     *
+     * @since v2.0.0
      */
     public function getHeader($header, $first = true)
     {

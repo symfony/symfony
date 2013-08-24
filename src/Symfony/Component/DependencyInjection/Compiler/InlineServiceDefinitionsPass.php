@@ -20,6 +20,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  * Inline service definitions where this is possible.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class InlineServiceDefinitionsPass implements RepeatablePassInterface
 {
@@ -31,6 +33,8 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function setRepeatedPass(RepeatedPass $repeatedPass)
     {
@@ -41,6 +45,8 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
      * Processes the ContainerBuilder for inline service definitions.
      *
      * @param ContainerBuilder $container
+     *
+     * @since v2.0.0
      */
     public function process(ContainerBuilder $container)
     {
@@ -72,6 +78,8 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
      * @param array            $arguments An array of arguments
      *
      * @return array
+     *
+     * @since v2.0.0
      */
     private function inlineArguments(ContainerBuilder $container, array $arguments)
     {
@@ -110,6 +118,8 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
      * @param Definition       $definition
      *
      * @return Boolean If the definition is inlineable
+     *
+     * @since v2.1.0
      */
     private function isInlineableDefinition(ContainerBuilder $container, $id, Definition $definition)
     {

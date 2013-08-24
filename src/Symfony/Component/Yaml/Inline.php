@@ -17,6 +17,8 @@ use Symfony\Component\Yaml\Exception\DumpException;
  * Inline implements a YAML parser/dumper for the YAML inline syntax.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class Inline
 {
@@ -35,6 +37,8 @@ class Inline
      * @return array A PHP array representing the YAML string
      *
      * @throws ParseException
+     *
+     * @since v2.0.22
      */
     public static function parse($value, $exceptionOnInvalidType = false, $objectSupport = false)
     {
@@ -88,6 +92,8 @@ class Inline
      * @return string The YAML string representing the PHP array
      *
      * @throws DumpException When trying to dump PHP resource
+     *
+     * @since v2.0.22
      */
     public static function dump($value, $exceptionOnInvalidType = false, $objectSupport = false)
     {
@@ -152,6 +158,8 @@ class Inline
      * @param Boolean $objectSupport          true if object support is enabled, false otherwise
      *
      * @return string The YAML string representing the PHP array
+     *
+     * @since v2.0.22
      */
     private static function dumpArray($value, $exceptionOnInvalidType, $objectSupport)
     {
@@ -189,6 +197,8 @@ class Inline
      * @return string A YAML string
      *
      * @throws ParseException When malformed inline YAML string is parsed
+     *
+     * @since v2.1.0
      */
     public static function parseScalar($scalar, $delimiters = null, $stringDelimiters = array('"', "'"), &$i = 0, $evaluate = true)
     {
@@ -234,6 +244,8 @@ class Inline
      * @return string A YAML string
      *
      * @throws ParseException When malformed inline YAML string is parsed
+     *
+     * @since v2.1.0
      */
     private static function parseQuotedScalar($scalar, &$i)
     {
@@ -264,6 +276,8 @@ class Inline
      * @return string A YAML string
      *
      * @throws ParseException When malformed inline YAML string is parsed
+     *
+     * @since v2.1.0
      */
     private static function parseSequence($sequence, &$i = 0)
     {
@@ -320,6 +334,8 @@ class Inline
      * @return string A YAML string
      *
      * @throws ParseException When malformed inline YAML string is parsed
+     *
+     * @since v2.1.0
      */
     private static function parseMapping($mapping, &$i = 0)
     {
@@ -381,6 +397,8 @@ class Inline
      * @param string $scalar
      *
      * @return string A YAML string
+     *
+     * @since v2.1.0
      */
     private static function evaluateScalar($scalar)
     {
@@ -441,6 +459,8 @@ class Inline
      * @return string The regular expression
      *
      * @see http://www.yaml.org/spec/1.2/spec.html#id2761573
+     *
+     * @since v2.1.0
      */
     private static function getTimestampRegex()
     {

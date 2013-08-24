@@ -15,6 +15,8 @@ namespace Symfony\Component\Finder\Adapter;
  * Interface for finder engine implementations.
  *
  * @author Jean-François Simon <contact@jfsimon.fr>
+ *
+ * @since v2.2.0
  */
 abstract class AbstractAdapter implements AdapterInterface
 {
@@ -39,6 +41,8 @@ abstract class AbstractAdapter implements AdapterInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.2.0
      */
     public function isSupported()
     {
@@ -53,6 +57,8 @@ abstract class AbstractAdapter implements AdapterInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function setFollowLinks($followLinks)
     {
@@ -63,6 +69,8 @@ abstract class AbstractAdapter implements AdapterInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function setMode($mode)
     {
@@ -73,6 +81,8 @@ abstract class AbstractAdapter implements AdapterInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function setDepths(array $depths)
     {
@@ -103,6 +113,8 @@ abstract class AbstractAdapter implements AdapterInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function setExclude(array $exclude)
     {
@@ -113,6 +125,8 @@ abstract class AbstractAdapter implements AdapterInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function setNames(array $names)
     {
@@ -123,6 +137,8 @@ abstract class AbstractAdapter implements AdapterInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function setNotNames(array $notNames)
     {
@@ -133,6 +149,8 @@ abstract class AbstractAdapter implements AdapterInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function setContains(array $contains)
     {
@@ -143,6 +161,8 @@ abstract class AbstractAdapter implements AdapterInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function setNotContains(array $notContains)
     {
@@ -153,6 +173,8 @@ abstract class AbstractAdapter implements AdapterInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function setSizes(array $sizes)
     {
@@ -163,6 +185,8 @@ abstract class AbstractAdapter implements AdapterInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function setDates(array $dates)
     {
@@ -173,6 +197,8 @@ abstract class AbstractAdapter implements AdapterInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function setFilters(array $filters)
     {
@@ -183,6 +209,8 @@ abstract class AbstractAdapter implements AdapterInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function setSort($sort)
     {
@@ -193,6 +221,8 @@ abstract class AbstractAdapter implements AdapterInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function setPath(array $paths)
     {
@@ -203,6 +233,8 @@ abstract class AbstractAdapter implements AdapterInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function setNotPath(array $notPaths)
     {
@@ -213,6 +245,8 @@ abstract class AbstractAdapter implements AdapterInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function ignoreUnreadableDirs($ignore = true)
     {
@@ -231,6 +265,8 @@ abstract class AbstractAdapter implements AdapterInterface
      * @see isSupported
      *
      * @return Boolean Whether the adapter is supported
+     *
+     * @since v2.2.0
      */
     abstract protected function canBeUsed();
 }

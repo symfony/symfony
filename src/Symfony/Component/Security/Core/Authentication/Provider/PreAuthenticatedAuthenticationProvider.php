@@ -26,6 +26,8 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  * UsernameNotFoundException, for example.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class PreAuthenticatedAuthenticationProvider implements AuthenticationProviderInterface
 {
@@ -39,6 +41,8 @@ class PreAuthenticatedAuthenticationProvider implements AuthenticationProviderIn
      * @param UserProviderInterface $userProvider An UserProviderInterface instance
      * @param UserCheckerInterface  $userChecker  An UserCheckerInterface instance
      * @param string                $providerKey  The provider key
+     *
+     * @since v2.0.0
      */
     public function __construct(UserProviderInterface $userProvider, UserCheckerInterface $userChecker, $providerKey)
     {
@@ -49,6 +53,8 @@ class PreAuthenticatedAuthenticationProvider implements AuthenticationProviderIn
 
      /**
       * {@inheritdoc}
+     *
+     * @since v2.0.0
       */
      public function authenticate(TokenInterface $token)
      {
@@ -76,6 +82,8 @@ class PreAuthenticatedAuthenticationProvider implements AuthenticationProviderIn
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function supports(TokenInterface $token)
     {

@@ -16,16 +16,24 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.0.0
  */
 class ArrayToPartsTransformer implements DataTransformerInterface
 {
     private $partMapping;
 
+    /**
+     * @since v2.0.0
+     */
     public function __construct(array $partMapping)
     {
         $this->partMapping = $partMapping;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function transform($array)
     {
         if (null === $array) {
@@ -49,6 +57,9 @@ class ArrayToPartsTransformer implements DataTransformerInterface
         return $result;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function reverseTransform($array)
     {
         if (!is_array($array) ) {

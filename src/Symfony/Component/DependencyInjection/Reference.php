@@ -17,6 +17,8 @@ namespace Symfony\Component\DependencyInjection;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class Reference
 {
@@ -32,6 +34,8 @@ class Reference
      * @param Boolean $strict          Sets how this reference is validated
      *
      * @see Container
+     *
+     * @since v2.0.0
      */
     public function __construct($id, $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $strict = true)
     {
@@ -44,6 +48,8 @@ class Reference
      * __toString.
      *
      * @return string The service identifier
+     *
+     * @since v2.0.0
      */
     public function __toString()
     {
@@ -54,6 +60,8 @@ class Reference
      * Returns the behavior to be used when the service does not exist.
      *
      * @return int
+     *
+     * @since v2.0.0
      */
     public function getInvalidBehavior()
     {
@@ -64,6 +72,8 @@ class Reference
      * Returns true when this Reference is strict
      *
      * @return Boolean
+     *
+     * @since v2.0.0
      */
     public function isStrict()
     {

@@ -21,11 +21,15 @@ use Symfony\Component\Routing\RouterInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Tobias Schultze <http://tobion.de>
+ *
+ * @since v2.0.0
  */
 class RouterDebugCommand extends ContainerAwareCommand
 {
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function isEnabled()
     {
@@ -42,6 +46,8 @@ class RouterDebugCommand extends ContainerAwareCommand
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     protected function configure()
     {
@@ -64,6 +70,8 @@ EOF
      * {@inheritdoc}
      *
      * @throws \InvalidArgumentException When route does not exist
+     *
+     * @since v2.0.0
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -76,6 +84,9 @@ EOF
         }
     }
 
+    /**
+     * @since v2.1.0
+     */
     protected function outputRoutes(OutputInterface $output, $routes = null)
     {
         if (null === $routes) {
@@ -113,6 +124,8 @@ EOF
 
     /**
      * @throws \InvalidArgumentException When route does not exist
+     *
+     * @since v2.1.0
      */
     protected function outputRoute(OutputInterface $output, $name)
     {
@@ -166,6 +179,9 @@ EOF
         }
     }
 
+    /**
+     * @since v2.0.0
+     */
     protected function formatValue($value)
     {
         if (is_object($value)) {
@@ -179,6 +195,9 @@ EOF
         return preg_replace("/\n\s*/s", '', var_export($value, true));
     }
 
+    /**
+     * @since v2.2.1
+     */
     private function formatConfigs(array $array)
     {
         $string = '';

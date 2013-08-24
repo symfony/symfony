@@ -20,6 +20,8 @@ use Symfony\Component\Translation\TranslatorInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.2.0
  */
 class ExecutionContext implements ExecutionContextInterface
 {
@@ -68,6 +70,8 @@ class ExecutionContext implements ExecutionContextInterface
      * @param mixed                           $value             The value of the validated node.
      * @param string                          $group             The current validation group.
      * @param string                          $propertyPath      The property path to the current node.
+     *
+     * @since v2.2.0
      */
     public function __construct(GlobalExecutionContextInterface $globalContext, TranslatorInterface $translator, $translationDomain = null, MetadataInterface $metadata = null, $value = null, $group = null, $propertyPath = '')
     {
@@ -86,6 +90,8 @@ class ExecutionContext implements ExecutionContextInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function addViolation($message, array $params = array(), $invalidValue = null, $pluralization = null, $code = null)
     {
@@ -114,6 +120,8 @@ class ExecutionContext implements ExecutionContextInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function addViolationAt($subPath, $message, array $params = array(), $invalidValue = null, $pluralization = null, $code = null)
     {
@@ -134,6 +142,8 @@ class ExecutionContext implements ExecutionContextInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getViolations()
     {
@@ -142,6 +152,8 @@ class ExecutionContext implements ExecutionContextInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getRoot()
     {
@@ -150,6 +162,8 @@ class ExecutionContext implements ExecutionContextInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function getPropertyPath($subPath = '')
     {
@@ -162,6 +176,8 @@ class ExecutionContext implements ExecutionContextInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function getClassName()
     {
@@ -174,6 +190,8 @@ class ExecutionContext implements ExecutionContextInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function getPropertyName()
     {
@@ -186,6 +204,8 @@ class ExecutionContext implements ExecutionContextInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function getValue()
     {
@@ -194,6 +214,8 @@ class ExecutionContext implements ExecutionContextInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getGroup()
     {
@@ -202,6 +224,8 @@ class ExecutionContext implements ExecutionContextInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function getMetadata()
     {
@@ -210,6 +234,8 @@ class ExecutionContext implements ExecutionContextInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function getMetadataFor($value)
     {
@@ -218,6 +244,8 @@ class ExecutionContext implements ExecutionContextInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function validate($value, $subPath = '', $groups = null, $traverse = false, $deep = false)
     {
@@ -230,6 +258,8 @@ class ExecutionContext implements ExecutionContextInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function validateValue($value, $constraints, $subPath = '', $groups = null)
     {
@@ -256,6 +286,8 @@ class ExecutionContext implements ExecutionContextInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getMetadataFactory()
     {
@@ -267,6 +299,8 @@ class ExecutionContext implements ExecutionContextInterface
      *
      * @param mixed        $value       The value to validate.
      * @param Constraint[] $constraints The constraints to match against.
+     *
+     * @since v2.2.0
      */
     private function executeConstraintValidators($value, array $constraints)
     {
@@ -286,6 +320,8 @@ class ExecutionContext implements ExecutionContextInterface
      *                                     group of the context is returned.
      *
      * @return array An array of validation groups.
+     *
+     * @since v2.2.0
      */
     private function resolveGroups($groups)
     {

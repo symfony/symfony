@@ -18,6 +18,8 @@ use Symfony\Component\Intl\ResourceBundle\Reader\StructuredBundleReaderInterface
  * Base class for {@link ResourceBundleInterface} implementations.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.3.0
  */
 abstract class AbstractBundle implements ResourceBundleInterface
 {
@@ -38,6 +40,8 @@ abstract class AbstractBundle implements ResourceBundleInterface
      * @param string                          $path   The path to the bundle.
      * @param StructuredBundleReaderInterface $reader The reader for reading
      *                                                the bundle.
+     *
+     * @since v2.3.0
      */
     public function __construct($path, StructuredBundleReaderInterface $reader)
     {
@@ -47,6 +51,8 @@ abstract class AbstractBundle implements ResourceBundleInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getLocales()
     {
@@ -55,6 +61,8 @@ abstract class AbstractBundle implements ResourceBundleInterface
 
     /**
      * Proxy method for {@link StructuredBundleReaderInterface#read}.
+     *
+     * @since v2.3.0
      */
     protected function read($locale)
     {
@@ -63,6 +71,8 @@ abstract class AbstractBundle implements ResourceBundleInterface
 
     /**
      * Proxy method for {@link StructuredBundleReaderInterface#readEntry}.
+     *
+     * @since v2.3.0
      */
     protected function readEntry($locale, array $indices, $mergeFallback = false)
     {

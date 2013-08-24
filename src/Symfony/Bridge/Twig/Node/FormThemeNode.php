@@ -13,9 +13,14 @@ namespace Symfony\Bridge\Twig\Node;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class FormThemeNode extends \Twig_Node
 {
+    /**
+     * @since v2.0.0
+     */
     public function __construct(\Twig_NodeInterface $form, \Twig_NodeInterface $resources, $lineno, $tag = null)
     {
         parent::__construct(array('form' => $form, 'resources' => $resources), array(), $lineno, $tag);
@@ -25,6 +30,8 @@ class FormThemeNode extends \Twig_Node
      * Compiles the node to PHP.
      *
      * @param \Twig_Compiler $compiler A Twig_Compiler instance
+     *
+     * @since v2.0.0
      */
     public function compile(\Twig_Compiler $compiler)
     {

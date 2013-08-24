@@ -21,11 +21,16 @@ use Symfony\Component\HttpFoundation\Request;
  * GlobalVariables is the entry point for Symfony global variables in Twig templates.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class GlobalVariables
 {
     protected $container;
 
+    /**
+     * @since v2.0.0
+     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
@@ -35,6 +40,8 @@ class GlobalVariables
      * Returns the security context service.
      *
      * @return SecurityContext|null The security context
+     *
+     * @since v2.0.0
      */
     public function getSecurity()
     {
@@ -49,6 +56,8 @@ class GlobalVariables
      * @return mixed|void
      *
      * @see TokenInterface::getUser()
+     *
+     * @since v2.0.0
      */
     public function getUser()
     {
@@ -72,6 +81,8 @@ class GlobalVariables
      * Returns the current request.
      *
      * @return Request|null The http request object
+     *
+     * @since v2.0.0
      */
     public function getRequest()
     {
@@ -84,6 +95,8 @@ class GlobalVariables
      * Returns the current session.
      *
      * @return Session|null The session
+     *
+     * @since v2.0.0
      */
     public function getSession()
     {
@@ -96,6 +109,8 @@ class GlobalVariables
      * Returns the current app environment.
      *
      * @return string The current environment string (e.g 'dev')
+     *
+     * @since v2.0.0
      */
     public function getEnvironment()
     {
@@ -106,6 +121,8 @@ class GlobalVariables
      * Returns the current app debug mode.
      *
      * @return Boolean The current debug mode
+     *
+     * @since v2.0.0
      */
     public function getDebug()
     {

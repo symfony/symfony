@@ -30,6 +30,8 @@ use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
  * An implementation of the MutableAclProviderInterface using Doctrine DBAL.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class MutableAclProvider extends AclProvider implements MutableAclProviderInterface, PropertyChangedListener
 {
@@ -37,6 +39,8 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function __construct(Connection $connection, PermissionGrantingStrategyInterface $permissionGrantingStrategy, array $options, AclCacheInterface $cache = null)
     {
@@ -47,6 +51,8 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function createAcl(ObjectIdentityInterface $oid)
     {
@@ -74,6 +80,8 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function deleteAcl(ObjectIdentityInterface $oid)
     {
@@ -110,6 +118,8 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function findAcls(array $oids, array $sids = array())
     {
@@ -149,6 +159,8 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
      * @param mixed  $newValue
      *
      * @throws \InvalidArgumentException
+     *
+     * @since v2.0.0
      */
     public function propertyChanged($sender, $propertyName, $oldValue, $newValue)
     {
@@ -217,6 +229,8 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function updateAcl(MutableAclInterface $acl)
     {
@@ -340,6 +354,8 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
      *
      * @param integer $oidPK
      * @return string
+     *
+     * @since v2.0.0
      */
     protected function getDeleteAccessControlEntriesSql($oidPK)
     {
@@ -355,6 +371,8 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
      *
      * @param integer $acePK
      * @return string
+     *
+     * @since v2.0.0
      */
     protected function getDeleteAccessControlEntrySql($acePK)
     {
@@ -370,6 +388,8 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
      *
      * @param integer $pk
      * @return string
+     *
+     * @since v2.0.0
      */
     protected function getDeleteObjectIdentitySql($pk)
     {
@@ -385,6 +405,8 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
      *
      * @param integer $pk
      * @return string
+     *
+     * @since v2.0.0
      */
     protected function getDeleteObjectIdentityRelationsSql($pk)
     {
@@ -409,6 +431,8 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
      * @param Boolean      $auditSuccess
      * @param Boolean      $auditFailure
      * @return string
+     *
+     * @since v2.0.0
      */
     protected function getInsertAccessControlEntrySql($classId, $objectIdentityId, $field, $aceOrder, $securityIdentityId, $strategy, $mask, $granting, $auditSuccess, $auditFailure)
     {
@@ -449,6 +473,8 @@ QUERY;
      *
      * @param string $classType
      * @return string
+     *
+     * @since v2.0.0
      */
     protected function getInsertClassSql($classType)
     {
@@ -465,6 +491,8 @@ QUERY;
      * @param integer $objectIdentityId
      * @param integer $ancestorId
      * @return string
+     *
+     * @since v2.0.0
      */
     protected function getInsertObjectIdentityRelationSql($objectIdentityId, $ancestorId)
     {
@@ -483,6 +511,8 @@ QUERY;
      * @param integer $classId
      * @param Boolean $entriesInheriting
      * @return string
+     *
+     * @since v2.0.0
      */
     protected function getInsertObjectIdentitySql($identifier, $classId, $entriesInheriting)
     {
@@ -506,6 +536,8 @@ QUERY;
      * @param SecurityIdentityInterface $sid
      * @throws \InvalidArgumentException
      * @return string
+     *
+     * @since v2.0.0
      */
     protected function getInsertSecurityIdentitySql(SecurityIdentityInterface $sid)
     {
@@ -535,6 +567,8 @@ QUERY;
      * @param string  $field
      * @param integer $order
      * @return string
+     *
+     * @since v2.0.0
      */
     protected function getSelectAccessControlEntryIdSql($classId, $oid, $field, $order)
     {
@@ -558,6 +592,8 @@ QUERY;
      *
      * @param string $classType
      * @return string
+     *
+     * @since v2.0.0
      */
     protected function getSelectClassIdSql($classType)
     {
@@ -574,6 +610,8 @@ QUERY;
      * @param SecurityIdentityInterface $sid
      * @throws \InvalidArgumentException
      * @return string
+     *
+     * @since v2.0.0
      */
     protected function getSelectSecurityIdentityIdSql(SecurityIdentityInterface $sid)
     {
@@ -602,6 +640,8 @@ QUERY;
      * @param array   $changes
      * @throws \InvalidArgumentException
      * @return string
+     *
+     * @since v2.0.0
      */
     protected function getUpdateObjectIdentitySql($pk, array $changes)
     {
@@ -624,6 +664,8 @@ QUERY;
      * @param array   $sets
      * @throws \InvalidArgumentException
      * @return string
+     *
+     * @since v2.0.0
      */
     protected function getUpdateAccessControlEntrySql($pk, array $sets)
     {
@@ -643,6 +685,8 @@ QUERY;
      * Creates the ACL for the passed object identity
      *
      * @param ObjectIdentityInterface $oid
+     *
+     * @since v2.0.0
      */
     private function createObjectIdentity(ObjectIdentityInterface $oid)
     {
@@ -658,6 +702,8 @@ QUERY;
      *
      * @param string $classType
      * @return integer
+     *
+     * @since v2.0.0
      */
     private function createOrRetrieveClassId($classType)
     {
@@ -678,6 +724,8 @@ QUERY;
      *
      * @param SecurityIdentityInterface $sid
      * @return integer
+     *
+     * @since v2.0.0
      */
     private function createOrRetrieveSecurityIdentityId(SecurityIdentityInterface $sid)
     {
@@ -694,6 +742,8 @@ QUERY;
      * Deletes all ACEs for the given object identity primary key.
      *
      * @param integer $oidPK
+     *
+     * @since v2.0.0
      */
     private function deleteAccessControlEntries($oidPK)
     {
@@ -704,6 +754,8 @@ QUERY;
      * Deletes the object identity from the database.
      *
      * @param integer $pk
+     *
+     * @since v2.0.0
      */
     private function deleteObjectIdentity($pk)
     {
@@ -714,6 +766,8 @@ QUERY;
      * Deletes all entries from the relations table from the database.
      *
      * @param integer $pk
+     *
+     * @since v2.0.0
      */
     private function deleteObjectIdentityRelations($pk)
     {
@@ -724,6 +778,8 @@ QUERY;
      * This regenerates the ancestor table which is used for fast read access.
      *
      * @param AclInterface $acl
+     *
+     * @since v2.0.0
      */
     private function regenerateAncestorRelations(AclInterface $acl)
     {
@@ -744,6 +800,8 @@ QUERY;
      *
      * @param string $name
      * @param array  $changes
+     *
+     * @since v2.0.0
      */
     private function updateFieldAceProperty($name, array $changes)
     {
@@ -800,6 +858,8 @@ QUERY;
      *
      * @param string $name
      * @param array  $changes
+     *
+     * @since v2.0.0
      */
     private function updateAceProperty($name, array $changes)
     {
@@ -853,6 +913,8 @@ QUERY;
      * Persists the changes which were made to ACEs to the database.
      *
      * @param \SplObjectStorage $aces
+     *
+     * @since v2.0.0
      */
     private function updateAces(\SplObjectStorage $aces)
     {

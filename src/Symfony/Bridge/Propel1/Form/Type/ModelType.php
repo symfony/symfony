@@ -47,6 +47,8 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  *      ;
  *   }
  * </code>
+ *
+ * @since v2.1.0
  */
 class ModelType extends AbstractType
 {
@@ -55,11 +57,17 @@ class ModelType extends AbstractType
      */
     private $propertyAccessor;
 
+    /**
+     * @since v2.2.0
+     */
     public function __construct(PropertyAccessorInterface $propertyAccessor = null)
     {
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::getPropertyAccessor();
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if ($options['multiple']) {
@@ -67,6 +75,9 @@ class ModelType extends AbstractType
         }
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $propertyAccessor = $this->propertyAccessor;
@@ -97,11 +108,17 @@ class ModelType extends AbstractType
         ));
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function getParent()
     {
         return 'choice';
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function getName()
     {
         return 'model';

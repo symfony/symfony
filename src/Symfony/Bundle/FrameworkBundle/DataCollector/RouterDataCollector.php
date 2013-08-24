@@ -19,9 +19,14 @@ use Symfony\Bundle\FrameworkBundle\Controller\RedirectController;
  * RouterDataCollector.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.1.0
  */
 class RouterDataCollector extends BaseRouterDataCollector
 {
+    /**
+     * @since v2.1.0
+     */
     public function guessRoute(Request $request, $controller)
     {
         if (is_array($controller)) {

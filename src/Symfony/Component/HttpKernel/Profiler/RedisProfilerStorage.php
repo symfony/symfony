@@ -18,6 +18,8 @@ use Redis;
  *
  * @author Andrej Hudec <pulzarraider@gmail.com>
  * @author Stephane PY <py.stephane1@gmail.com>
+ *
+ * @since v2.1.0
  */
 class RedisProfilerStorage implements ProfilerStorageInterface
 {
@@ -43,6 +45,8 @@ class RedisProfilerStorage implements ProfilerStorageInterface
      * @param string $username Not used
      * @param string $password Not used
      * @param int    $lifetime The lifetime to use for the purge
+     *
+     * @since v2.1.0
      */
     public function __construct($dsn, $username = '', $password = '', $lifetime = 86400)
     {
@@ -52,6 +56,8 @@ class RedisProfilerStorage implements ProfilerStorageInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function find($ip, $url, $limit, $method, $start = null, $end = null)
     {
@@ -105,6 +111,8 @@ class RedisProfilerStorage implements ProfilerStorageInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function purge()
     {
@@ -138,6 +146,8 @@ class RedisProfilerStorage implements ProfilerStorageInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function read($token)
     {
@@ -156,6 +166,8 @@ class RedisProfilerStorage implements ProfilerStorageInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function write(Profile $profile)
     {
@@ -202,6 +214,8 @@ class RedisProfilerStorage implements ProfilerStorageInterface
      * @return Redis
      *
      * @throws \RuntimeException
+     *
+     * @since v2.1.0
      */
     protected function getRedis()
     {
@@ -239,12 +253,17 @@ class RedisProfilerStorage implements ProfilerStorageInterface
      * Set instance of the Redis
      *
      * @param Redis $redis
+     *
+     * @since v2.1.0
      */
     public function setRedis($redis)
     {
         $this->redis = $redis;
     }
 
+    /**
+     * @since v2.1.0
+     */
     private function createProfileFromData($token, $data, $parent = null)
     {
         $profile = new Profile($token);
@@ -283,6 +302,8 @@ class RedisProfilerStorage implements ProfilerStorageInterface
      * @param string $token
      *
      * @return string
+     *
+     * @since v2.1.0
      */
     private function getItemName($token)
     {
@@ -299,6 +320,8 @@ class RedisProfilerStorage implements ProfilerStorageInterface
      * Gets the name of the index.
      *
      * @return string
+     *
+     * @since v2.1.0
      */
     private function getIndexName()
     {
@@ -311,6 +334,9 @@ class RedisProfilerStorage implements ProfilerStorageInterface
         return false;
     }
 
+    /**
+     * @since v2.1.0
+     */
     private function isItemNameValid($name)
     {
         $length = strlen($name);
@@ -329,6 +355,8 @@ class RedisProfilerStorage implements ProfilerStorageInterface
      * @param int    $serializer
      *
      * @return mixed
+     *
+     * @since v2.1.0
      */
     private function getValue($key, $serializer = self::REDIS_SERIALIZER_NONE)
     {
@@ -347,6 +375,8 @@ class RedisProfilerStorage implements ProfilerStorageInterface
      * @param int    $serializer
      *
      * @return Boolean
+     *
+     * @since v2.1.0
      */
     private function setValue($key, $value, $expiration = 0, $serializer = self::REDIS_SERIALIZER_NONE)
     {
@@ -364,6 +394,8 @@ class RedisProfilerStorage implements ProfilerStorageInterface
      * @param int    $expiration
      *
      * @return Boolean
+     *
+     * @since v2.1.0
      */
     private function appendValue($key, $value, $expiration = 0)
     {
@@ -385,6 +417,8 @@ class RedisProfilerStorage implements ProfilerStorageInterface
      * @param array $keys
      *
      * @return Boolean
+     *
+     * @since v2.1.0
      */
     private function delete(array $keys)
     {

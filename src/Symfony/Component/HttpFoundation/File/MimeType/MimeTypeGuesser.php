@@ -36,6 +36,8 @@ use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
  *     $guesser->register(new FileinfoMimeTypeGuesser('/path/to/magic/file'));
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.0.0
  */
 class MimeTypeGuesser implements MimeTypeGuesserInterface
 {
@@ -57,6 +59,8 @@ class MimeTypeGuesser implements MimeTypeGuesserInterface
      * Returns the singleton instance
      *
      * @return MimeTypeGuesser
+     *
+     * @since v2.1.0
      */
     public static function getInstance()
     {
@@ -69,6 +73,8 @@ class MimeTypeGuesser implements MimeTypeGuesserInterface
 
     /**
      * Registers all natively provided mime type guessers
+     *
+     * @since v2.0.0
      */
     private function __construct()
     {
@@ -87,6 +93,8 @@ class MimeTypeGuesser implements MimeTypeGuesserInterface
      * When guessing, this guesser is preferred over previously registered ones.
      *
      * @param MimeTypeGuesserInterface $guesser
+     *
+     * @since v2.0.0
      */
     public function register(MimeTypeGuesserInterface $guesser)
     {
@@ -108,6 +116,8 @@ class MimeTypeGuesser implements MimeTypeGuesserInterface
      * @throws \LogicException
      * @throws FileNotFoundException
      * @throws AccessDeniedException
+     *
+     * @since v2.0.0
      */
     public function guess($path)
     {

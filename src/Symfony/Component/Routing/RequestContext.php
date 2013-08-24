@@ -19,6 +19,8 @@ use Symfony\Component\HttpFoundation\Request;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class RequestContext
 {
@@ -49,6 +51,8 @@ class RequestContext
      * @param string  $queryString  The query string
      *
      * @api
+     *
+     * @since v2.3.0
      */
     public function __construct($baseUrl = '', $method = 'GET', $host = 'localhost', $scheme = 'http', $httpPort = 80, $httpsPort = 443, $path = '/', $queryString = '')
     {
@@ -62,6 +66,9 @@ class RequestContext
         $this->queryString = $queryString;
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function fromRequest(Request $request)
     {
         $this->setBaseUrl($request->getBaseUrl());
@@ -78,6 +85,8 @@ class RequestContext
      * Gets the base URL.
      *
      * @return string The base URL
+     *
+     * @since v2.0.0
      */
     public function getBaseUrl()
     {
@@ -90,6 +99,8 @@ class RequestContext
      * @param string $baseUrl The base URL
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setBaseUrl($baseUrl)
     {
@@ -100,6 +111,8 @@ class RequestContext
      * Gets the path info.
      *
      * @return string The path info
+     *
+     * @since v2.2.0
      */
     public function getPathInfo()
     {
@@ -110,6 +123,8 @@ class RequestContext
      * Sets the path info.
      *
      * @param string $pathInfo The path info
+     *
+     * @since v2.2.0
      */
     public function setPathInfo($pathInfo)
     {
@@ -122,6 +137,8 @@ class RequestContext
      * The method is always an uppercased string.
      *
      * @return string The HTTP method
+     *
+     * @since v2.0.0
      */
     public function getMethod()
     {
@@ -134,6 +151,8 @@ class RequestContext
      * @param string $method The HTTP method
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setMethod($method)
     {
@@ -144,6 +163,8 @@ class RequestContext
      * Gets the HTTP host.
      *
      * @return string The HTTP host
+     *
+     * @since v2.0.0
      */
     public function getHost()
     {
@@ -156,6 +177,8 @@ class RequestContext
      * @param string $host The HTTP host
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setHost($host)
     {
@@ -166,6 +189,8 @@ class RequestContext
      * Gets the HTTP scheme.
      *
      * @return string The HTTP scheme
+     *
+     * @since v2.0.0
      */
     public function getScheme()
     {
@@ -178,6 +203,8 @@ class RequestContext
      * @param string $scheme The HTTP scheme
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setScheme($scheme)
     {
@@ -188,6 +215,8 @@ class RequestContext
      * Gets the HTTP port.
      *
      * @return string The HTTP port
+     *
+     * @since v2.0.0
      */
     public function getHttpPort()
     {
@@ -200,6 +229,8 @@ class RequestContext
      * @param string $httpPort The HTTP port
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setHttpPort($httpPort)
     {
@@ -210,6 +241,8 @@ class RequestContext
      * Gets the HTTPS port.
      *
      * @return string The HTTPS port
+     *
+     * @since v2.0.0
      */
     public function getHttpsPort()
     {
@@ -222,6 +255,8 @@ class RequestContext
      * @param string $httpsPort The HTTPS port
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setHttpsPort($httpsPort)
     {
@@ -232,6 +267,8 @@ class RequestContext
      * Gets the query string.
      *
      * @return string The query string
+     *
+     * @since v2.3.0
      */
     public function getQueryString()
     {
@@ -244,6 +281,8 @@ class RequestContext
      * @param string $queryString The query string
      *
      * @api
+     *
+     * @since v2.3.0
      */
     public function setQueryString($queryString)
     {
@@ -254,6 +293,8 @@ class RequestContext
      * Returns the parameters.
      *
      * @return array The parameters
+     *
+     * @since v2.0.0
      */
     public function getParameters()
     {
@@ -268,6 +309,8 @@ class RequestContext
      * @param array $parameters The parameters
      *
      * @return Route The current Route instance
+     *
+     * @since v2.0.0
      */
     public function setParameters(array $parameters)
     {
@@ -282,6 +325,8 @@ class RequestContext
      * @param string $name A parameter name
      *
      * @return mixed The parameter value
+     *
+     * @since v2.0.0
      */
     public function getParameter($name)
     {
@@ -294,6 +339,8 @@ class RequestContext
      * @param string $name A parameter name
      *
      * @return Boolean true if the parameter value is set, false otherwise
+     *
+     * @since v2.0.0
      */
     public function hasParameter($name)
     {
@@ -307,6 +354,8 @@ class RequestContext
      * @param mixed  $parameter The parameter value
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setParameter($name, $parameter)
     {

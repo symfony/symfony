@@ -30,6 +30,8 @@ interface AuthenticationManagerInterface
      * @return TokenInterface An authenticated TokenInterface instance, never null
      *
      * @throws AuthenticationException if the authentication fails
+     *
+     * @since v2.1.0
      */
     public function authenticate(TokenInterface $token);
 }

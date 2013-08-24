@@ -28,6 +28,8 @@ use Symfony\Component\Console\Output\BufferedOutput;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class InputDefinition
 {
@@ -44,6 +46,8 @@ class InputDefinition
      * @param array $definition An array of InputArgument and InputOption instance
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function __construct(array $definition = array())
     {
@@ -56,6 +60,8 @@ class InputDefinition
      * @param array $definition The definition array
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setDefinition(array $definition)
     {
@@ -79,6 +85,8 @@ class InputDefinition
      * @param InputArgument[] $arguments An array of InputArgument objects
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setArguments($arguments = array())
     {
@@ -95,6 +103,8 @@ class InputDefinition
      * @param InputArgument[] $arguments An array of InputArgument objects
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function addArguments($arguments = array())
     {
@@ -113,6 +123,8 @@ class InputDefinition
      * @throws \LogicException When incorrect argument is given
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function addArgument(InputArgument $argument)
     {
@@ -151,6 +163,8 @@ class InputDefinition
      * @throws \InvalidArgumentException When argument given doesn't exist
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getArgument($name)
     {
@@ -171,6 +185,8 @@ class InputDefinition
      * @return Boolean true if the InputArgument object exists, false otherwise
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function hasArgument($name)
     {
@@ -185,6 +201,8 @@ class InputDefinition
      * @return InputArgument[] An array of InputArgument objects
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getArguments()
     {
@@ -195,6 +213,8 @@ class InputDefinition
      * Returns the number of InputArguments.
      *
      * @return integer The number of InputArguments
+     *
+     * @since v2.0.0
      */
     public function getArgumentCount()
     {
@@ -205,6 +225,8 @@ class InputDefinition
      * Returns the number of required InputArguments.
      *
      * @return integer The number of required InputArguments
+     *
+     * @since v2.0.0
      */
     public function getArgumentRequiredCount()
     {
@@ -215,6 +237,8 @@ class InputDefinition
      * Gets the default values.
      *
      * @return array An array of default values
+     *
+     * @since v2.0.0
      */
     public function getArgumentDefaults()
     {
@@ -232,6 +256,8 @@ class InputDefinition
      * @param InputOption[] $options An array of InputOption objects
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setOptions($options = array())
     {
@@ -246,6 +272,8 @@ class InputDefinition
      * @param InputOption[] $options An array of InputOption objects
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function addOptions($options = array())
     {
@@ -262,6 +290,8 @@ class InputDefinition
      * @throws \LogicException When option given already exist
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function addOption(InputOption $option)
     {
@@ -295,6 +325,8 @@ class InputDefinition
      * @throws \InvalidArgumentException When option given doesn't exist
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getOption($name)
     {
@@ -313,6 +345,8 @@ class InputDefinition
      * @return Boolean true if the InputOption object exists, false otherwise
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function hasOption($name)
     {
@@ -325,6 +359,8 @@ class InputDefinition
      * @return InputOption[] An array of InputOption objects
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getOptions()
     {
@@ -337,6 +373,8 @@ class InputDefinition
      * @param string $name The InputOption shortcut
      *
      * @return Boolean true if the InputOption object exists, false otherwise
+     *
+     * @since v2.0.0
      */
     public function hasShortcut($name)
     {
@@ -349,6 +387,8 @@ class InputDefinition
      * @param string $shortcut the Shortcut name
      *
      * @return InputOption An InputOption object
+     *
+     * @since v2.0.0
      */
     public function getOptionForShortcut($shortcut)
     {
@@ -359,6 +399,8 @@ class InputDefinition
      * Gets an array of default values.
      *
      * @return array An array of all default values
+     *
+     * @since v2.0.0
      */
     public function getOptionDefaults()
     {
@@ -378,6 +420,8 @@ class InputDefinition
      * @return string The InputOption name
      *
      * @throws \InvalidArgumentException When option given does not exist
+     *
+     * @since v2.0.0
      */
     private function shortcutToName($shortcut)
     {
@@ -392,6 +436,8 @@ class InputDefinition
      * Gets the synopsis.
      *
      * @return string The synopsis
+     *
+     * @since v2.0.0
      */
     public function getSynopsis()
     {
@@ -418,6 +464,8 @@ class InputDefinition
      * @return string A string representing the InputDefinition
      *
      * @deprecated Deprecated since version 2.3, to be removed in 3.0.
+     *
+     * @since v2.0.0
      */
     public function asText()
     {
@@ -436,6 +484,8 @@ class InputDefinition
      * @return string|\DOMDocument An XML string representing the InputDefinition
      *
      * @deprecated Deprecated since version 2.3, to be removed in 3.0.
+     *
+     * @since v2.0.0
      */
     public function asXml($asDom = false)
     {

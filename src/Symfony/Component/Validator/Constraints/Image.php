@@ -15,6 +15,8 @@ namespace Symfony\Component\Validator\Constraints;
  * @Annotation
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class Image extends File
 {

@@ -23,6 +23,8 @@ use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\InstantiatorInt
  * Runtime lazy loading proxy generator.
  *
  * @author Marco Pivetta <ocramius@gmail.com>
+ *
+ * @since v2.3.0
  */
 class RuntimeInstantiator implements InstantiatorInterface
 {
@@ -33,6 +35,8 @@ class RuntimeInstantiator implements InstantiatorInterface
 
     /**
      * Constructor
+     *
+     * @since v2.3.0
      */
     public function __construct()
     {
@@ -45,6 +49,8 @@ class RuntimeInstantiator implements InstantiatorInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.3.0
      */
     public function instantiateProxy(ContainerInterface $container, Definition $definition, $id, $realInstantiator)
     {

@@ -20,6 +20,8 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.1.0
  */
 class CsrfValidationListener implements EventSubscriberInterface
 {
@@ -61,6 +63,9 @@ class CsrfValidationListener implements EventSubscriberInterface
      */
     private $translationDomain;
 
+    /**
+     * @since v2.1.0
+     */
     public static function getSubscribedEvents()
     {
         return array(
@@ -68,6 +73,9 @@ class CsrfValidationListener implements EventSubscriberInterface
         );
     }
 
+    /**
+     * @since v2.3.0
+     */
     public function __construct($fieldName, CsrfProviderInterface $csrfProvider, $intention, $errorMessage, TranslatorInterface $translator = null, $translationDomain = null)
     {
         $this->fieldName = $fieldName;
@@ -78,6 +86,9 @@ class CsrfValidationListener implements EventSubscriberInterface
         $this->translationDomain = $translationDomain;
     }
 
+    /**
+     * @since v2.3.0
+     */
     public function preSubmit(FormEvent $event)
     {
         $form = $event->getForm();
@@ -107,6 +118,8 @@ class CsrfValidationListener implements EventSubscriberInterface
      *
      * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
      *             {@link preSubmit()} instead.
+     *
+     * @since v2.3.0
      */
     public function preBind(FormEvent $event)
     {

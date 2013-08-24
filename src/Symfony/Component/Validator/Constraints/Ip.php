@@ -23,6 +23,8 @@ use Symfony\Component\Validator\Constraint;
  * @author Joseph Bielawski <stloyd@gmail.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class Ip extends Constraint
 {
@@ -69,6 +71,8 @@ class Ip extends Constraint
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function __construct($options = null)
     {

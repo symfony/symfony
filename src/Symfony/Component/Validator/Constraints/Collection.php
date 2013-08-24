@@ -22,6 +22,8 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class Collection extends Constraint
 {
@@ -33,6 +35,8 @@ class Collection extends Constraint
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function __construct($options = null)
     {
@@ -75,6 +79,9 @@ class Collection extends Constraint
         }
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getRequiredOptions()
     {
         return array('fields');

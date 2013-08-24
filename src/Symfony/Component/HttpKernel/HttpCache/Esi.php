@@ -25,6 +25,8 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  *  * Edge Architecture Specification (http://www.w3.org/TR/edge-arch)
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class Esi
 {
@@ -35,6 +37,8 @@ class Esi
      *
      * @param array $contentTypes An array of content-type that should be parsed for ESI information.
      *                           (default: text/html, text/xml, application/xhtml+xml, and application/xml)
+     *
+     * @since v2.2.0
      */
     public function __construct(array $contentTypes = array('text/html', 'text/xml', 'application/xhtml+xml', 'application/xml'))
     {
@@ -45,6 +49,8 @@ class Esi
      * Returns a new cache strategy instance.
      *
      * @return EsiResponseCacheStrategyInterface A EsiResponseCacheStrategyInterface instance
+     *
+     * @since v2.0.0
      */
     public function createCacheStrategy()
     {
@@ -57,6 +63,8 @@ class Esi
      * @param Request $request A Request instance
      *
      * @return Boolean true if one surrogate has ESI/1.0 capability, false otherwise
+     *
+     * @since v2.0.0
      */
     public function hasSurrogateEsiCapability(Request $request)
     {
@@ -71,6 +79,8 @@ class Esi
      * Adds ESI/1.0 capability to the given Request.
      *
      * @param Request $request A Request instance
+     *
+     * @since v2.0.0
      */
     public function addSurrogateEsiCapability(Request $request)
     {
@@ -86,6 +96,8 @@ class Esi
      * This method only adds an ESI HTTP header if the Response has some ESI tags.
      *
      * @param Response $response A Response instance
+     *
+     * @since v2.0.0
      */
     public function addSurrogateControl(Response $response)
     {
@@ -100,6 +112,8 @@ class Esi
      * @param Response $response A Response instance
      *
      * @return Boolean true if the Response needs to be parsed, false otherwise
+     *
+     * @since v2.0.0
      */
     public function needsEsiParsing(Response $response)
     {
@@ -119,6 +133,8 @@ class Esi
      * @param string  $comment      A comment to add as an esi:include tag
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     public function renderIncludeTag($uri, $alt = null, $ignoreErrors = true, $comment = '')
     {
@@ -142,6 +158,8 @@ class Esi
      * @param Response $response A Response instance
      *
      * @return Response
+     *
+     * @since v2.0.0
      */
     public function process(Request $request, Response $response)
     {
@@ -191,6 +209,8 @@ class Esi
      *
      * @throws \RuntimeException
      * @throws \Exception
+     *
+     * @since v2.0.0
      */
     public function handle(HttpCache $cache, $uri, $alt, $ignoreErrors)
     {
@@ -223,6 +243,8 @@ class Esi
      * @return string The response content for the include.
      *
      * @throws \RuntimeException
+     *
+     * @since v2.0.0
      */
     private function handleEsiIncludeTag($attributes)
     {

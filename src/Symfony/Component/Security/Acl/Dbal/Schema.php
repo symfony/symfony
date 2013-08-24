@@ -18,6 +18,8 @@ use Doctrine\DBAL\Connection;
  * The schema used for the ACL system.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 final class Schema extends BaseSchema
 {
@@ -28,6 +30,8 @@ final class Schema extends BaseSchema
      *
      * @param array      $options    the names for tables
      * @param Connection $connection
+     *
+     * @since v2.1.0
      */
     public function __construct(array $options, Connection $connection = null)
     {
@@ -48,6 +52,8 @@ final class Schema extends BaseSchema
      * Merges ACL schema with the given schema.
      *
      * @param BaseSchema $schema
+     *
+     * @since v2.1.0
      */
     public function addToSchema(BaseSchema $schema)
     {
@@ -62,6 +68,8 @@ final class Schema extends BaseSchema
 
     /**
      * Adds the class table to the schema
+     *
+     * @since v2.0.0
      */
     protected function addClassTable()
     {
@@ -74,6 +82,8 @@ final class Schema extends BaseSchema
 
     /**
      * Adds the entry table to the schema
+     *
+     * @since v2.0.0
      */
     protected function addEntryTable()
     {
@@ -102,6 +112,8 @@ final class Schema extends BaseSchema
 
     /**
      * Adds the object identity table to the schema
+     *
+     * @since v2.0.0
      */
     protected function addObjectIdentitiesTable()
     {
@@ -122,6 +134,8 @@ final class Schema extends BaseSchema
 
     /**
      * Adds the object identity relation table to the schema
+     *
+     * @since v2.0.0
      */
     protected function addObjectIdentityAncestorsTable()
     {
@@ -139,6 +153,8 @@ final class Schema extends BaseSchema
 
     /**
      * Adds the security identity table to the schema
+     *
+     * @since v2.0.0
      */
     protected function addSecurityIdentitiesTable()
     {

@@ -18,11 +18,15 @@ use Symfony\Component\Yaml\Yaml;
  * YamlFileDumper generates yaml files from a message catalogue.
  *
  * @author Michel Salib <michelsalib@hotmail.com>
+ *
+ * @since v2.1.0
  */
 class YamlFileDumper extends FileDumper
 {
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     protected function format(MessageCatalogue $messages, $domain)
     {
@@ -31,6 +35,8 @@ class YamlFileDumper extends FileDumper
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     protected function getExtension()
     {

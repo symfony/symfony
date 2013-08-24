@@ -15,6 +15,8 @@ namespace Symfony\Component\Templating\Asset;
  * The basic package will add a version to asset URLs.
  *
  * @author Kris Wallsmith <kris@symfony.com>
+ *
+ * @since v2.0.0
  */
 class Package implements PackageInterface
 {
@@ -26,6 +28,8 @@ class Package implements PackageInterface
      *
      * @param string $version The package version
      * @param string $format  The format used to apply the version
+     *
+     * @since v2.0.0
      */
     public function __construct($version = null, $format = null)
     {
@@ -33,11 +37,17 @@ class Package implements PackageInterface
         $this->format = $format ?: '%s?%s';
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getVersion()
     {
         return $this->version;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getUrl($path)
     {
         if (false !== strpos($path, '://') || 0 === strpos($path, '//')) {
@@ -53,6 +63,8 @@ class Package implements PackageInterface
      * @param string $path A path
      *
      * @return string The versionized path
+     *
+     * @since v2.0.0
      */
     protected function applyVersion($path)
     {

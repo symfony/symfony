@@ -18,6 +18,8 @@ namespace Symfony\Component\Form\Extension\Csrf\CsrfProvider;
  * user-defined secret value to secure the CSRF token.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.0.0
  */
 class DefaultCsrfProvider implements CsrfProviderInterface
 {
@@ -34,6 +36,8 @@ class DefaultCsrfProvider implements CsrfProviderInterface
      * 32 characters and mixed letters, digits and special characters.
      *
      * @param string $secret A secret value included in the CSRF token
+     *
+     * @since v2.0.0
      */
     public function __construct($secret)
     {
@@ -42,6 +46,8 @@ class DefaultCsrfProvider implements CsrfProviderInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function generateCsrfToken($intention)
     {
@@ -50,6 +56,8 @@ class DefaultCsrfProvider implements CsrfProviderInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function isCsrfTokenValid($intention, $token)
     {
@@ -62,6 +70,8 @@ class DefaultCsrfProvider implements CsrfProviderInterface
      * Automatically starts the session if necessary.
      *
      * @return string The session ID
+     *
+     * @since v2.0.0
      */
     protected function getSessionId()
     {

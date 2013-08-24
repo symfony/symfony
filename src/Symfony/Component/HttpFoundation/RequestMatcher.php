@@ -17,6 +17,8 @@ namespace Symfony\Component\HttpFoundation;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class RequestMatcher implements RequestMatcherInterface
 {
@@ -51,6 +53,8 @@ class RequestMatcher implements RequestMatcherInterface
      * @param string|string[]|null $methods
      * @param string|string[]|null $ips
      * @param array                $attributes
+     *
+     * @since v2.3.0
      */
     public function __construct($path = null, $host = null, $methods = null, $ips = null, array $attributes = array())
     {
@@ -67,6 +71,8 @@ class RequestMatcher implements RequestMatcherInterface
      * Adds a check for the URL host name.
      *
      * @param string $regexp A Regexp
+     *
+     * @since v2.0.0
      */
     public function matchHost($regexp)
     {
@@ -77,6 +83,8 @@ class RequestMatcher implements RequestMatcherInterface
      * Adds a check for the URL path info.
      *
      * @param string $regexp A Regexp
+     *
+     * @since v2.0.0
      */
     public function matchPath($regexp)
     {
@@ -87,6 +95,8 @@ class RequestMatcher implements RequestMatcherInterface
      * Adds a check for the client IP.
      *
      * @param string $ip A specific IP address or a range specified using IP/netmask like 192.168.1.0/24
+     *
+     * @since v2.0.0
      */
     public function matchIp($ip)
     {
@@ -97,6 +107,8 @@ class RequestMatcher implements RequestMatcherInterface
      * Adds a check for the client IP.
      *
      * @param string|string[] $ips A specific IP address or a range specified using IP/netmask like 192.168.1.0/24
+     *
+     * @since v2.3.0
      */
     public function matchIps($ips)
     {
@@ -107,6 +119,8 @@ class RequestMatcher implements RequestMatcherInterface
      * Adds a check for the HTTP method.
      *
      * @param string|string[]|null $method An HTTP method or an array of HTTP methods
+     *
+     * @since v2.0.0
      */
     public function matchMethod($method)
     {
@@ -118,6 +132,8 @@ class RequestMatcher implements RequestMatcherInterface
      *
      * @param string $key    The request attribute name
      * @param string $regexp A Regexp
+     *
+     * @since v2.0.0
      */
     public function matchAttribute($key, $regexp)
     {
@@ -128,6 +144,8 @@ class RequestMatcher implements RequestMatcherInterface
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function matches(Request $request)
     {

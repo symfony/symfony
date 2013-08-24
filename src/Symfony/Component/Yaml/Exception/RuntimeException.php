@@ -17,6 +17,8 @@ namespace Symfony\Component\Yaml\Exception;
  * @author Romain Neutron <imprec@gmail.com>
  *
  * @api
+ *
+ * @since v2.2.0
  */
 class RuntimeException extends \RuntimeException implements ExceptionInterface
 {

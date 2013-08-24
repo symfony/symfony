@@ -33,6 +33,8 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      * @return BundleInterface[] An array of bundle instances.
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function registerBundles();
 
@@ -42,6 +44,8 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      * @param LoaderInterface $loader A LoaderInterface instance
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function registerContainerConfiguration(LoaderInterface $loader);
 
@@ -49,6 +53,8 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      * Boots the current kernel.
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function boot();
 
@@ -58,6 +64,8 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      * This method is mainly useful when doing functional testing.
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function shutdown();
 
@@ -67,6 +75,8 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      * @return BundleInterface[] An array of registered bundle instances
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function getBundles();
 
@@ -78,6 +88,8 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      * @return Boolean true if the class belongs to an active bundle, false otherwise
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function isClassInActiveBundle($class);
 
@@ -92,6 +104,8 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      * @throws \InvalidArgumentException when the bundle is not enabled
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function getBundle($name, $first = true);
 
@@ -122,6 +136,8 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      * @throws \RuntimeException         if the name contains invalid/unsafe characters
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function locateResource($name, $dir = null, $first = true);
 
@@ -131,6 +147,8 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      * @return string The kernel name
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function getName();
 
@@ -140,6 +158,8 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      * @return string The current environment
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function getEnvironment();
 
@@ -149,6 +169,8 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      * @return Boolean true if debug mode is enabled, false otherwise
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function isDebug();
 
@@ -158,6 +180,8 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      * @return string The application root dir
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function getRootDir();
 
@@ -167,6 +191,8 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      * @return ContainerInterface A ContainerInterface instance
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function getContainer();
 
@@ -176,6 +202,8 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      * @return integer The request start timestamp
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function getStartTime();
 
@@ -185,6 +213,8 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      * @return string The cache directory
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function getCacheDir();
 
@@ -194,6 +224,8 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      * @return string The log directory
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function getLogDir();
 
@@ -203,6 +235,8 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      * @return string The charset
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function getCharset();
 }

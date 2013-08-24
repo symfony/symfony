@@ -24,6 +24,8 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  * ProfilerController.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.2.0
  */
 class ProfilerController
 {
@@ -42,6 +44,8 @@ class ProfilerController
      * @param \Twig_Environment     $twig            The twig environment
      * @param array                 $templates       The templates
      * @param string                $toolbarPosition The toolbar position (top, bottom, normal, or null -- use the configuration)
+     *
+     * @since v2.3.0
      */
     public function __construct(UrlGeneratorInterface $generator, Profiler $profiler = null, \Twig_Environment $twig, array $templates, $toolbarPosition = 'normal')
     {
@@ -56,6 +60,8 @@ class ProfilerController
      * Redirects to the last profiles.
      *
      * @return RedirectResponse A RedirectResponse instance
+     *
+     * @since v2.2.0
      */
     public function homeAction()
     {
@@ -77,6 +83,8 @@ class ProfilerController
      * @return Response A Response instance
      *
      * @throws NotFoundHttpException
+     *
+     * @since v2.1.0
      */
     public function panelAction(Request $request, $token)
     {
@@ -117,6 +125,8 @@ class ProfilerController
      * @return Response A Response instance
      *
      * @throws NotFoundHttpException
+     *
+     * @since v2.0.0
      */
     public function exportAction($token)
     {
@@ -140,6 +150,8 @@ class ProfilerController
      * Purges all tokens.
      *
      * @return Response A Response instance
+     *
+     * @since v2.0.0
      */
     public function purgeAction()
     {
@@ -159,6 +171,8 @@ class ProfilerController
      * @param Request $request The current HTTP Request
      *
      * @return Response A Response instance
+     *
+     * @since v2.1.0
      */
     public function importAction(Request $request)
     {
@@ -187,6 +201,8 @@ class ProfilerController
      * @param string $about The about message
      *
      * @return Response A Response instance
+     *
+     * @since v2.1.0
      */
     public function infoAction($about)
     {
@@ -208,6 +224,8 @@ class ProfilerController
      * @param string  $token    The profiler token
      *
      * @return Response A Response instance
+     *
+     * @since v2.2.0
      */
     public function toolbarAction(Request $request, $token)
     {
@@ -259,6 +277,8 @@ class ProfilerController
      * @param Request $request The current HTTP Request
      *
      * @return Response A Response instance
+     *
+     * @since v2.1.0
      */
     public function searchBarAction(Request $request)
     {
@@ -304,6 +324,8 @@ class ProfilerController
      * @param string  $token   The token
      *
      * @return Response A Response instance
+     *
+     * @since v2.1.0
      */
     public function searchResultsAction(Request $request, $token)
     {
@@ -342,6 +364,8 @@ class ProfilerController
      * @param Request $request The current HTTP Request
      *
      * @return Response A Response instance
+     *
+     * @since v2.1.0
      */
     public function searchAction(Request $request)
     {
@@ -390,6 +414,8 @@ class ProfilerController
      * Displays the PHP info.
      *
      * @return Response A Response instance
+     *
+     * @since v2.1.0
      */
     public function phpinfoAction()
     {
@@ -410,6 +436,8 @@ class ProfilerController
      * Gets the Template Manager.
      *
      * @return TemplateManager The Template Manager
+     *
+     * @since v2.1.0
      */
     protected function getTemplateManager()
     {

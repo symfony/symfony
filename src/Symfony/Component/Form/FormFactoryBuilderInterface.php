@@ -24,6 +24,8 @@ interface FormFactoryBuilderInterface
      * @param ResolvedFormTypeFactoryInterface $resolvedTypeFactory
      *
      * @return FormFactoryBuilderInterface The builder.
+     *
+     * @since v2.1.0
      */
     public function setResolvedTypeFactory(ResolvedFormTypeFactoryInterface $resolvedTypeFactory);
 
@@ -33,6 +35,8 @@ interface FormFactoryBuilderInterface
      * @param FormExtensionInterface $extension The extension.
      *
      * @return FormFactoryBuilderInterface The builder.
+     *
+     * @since v2.1.0
      */
     public function addExtension(FormExtensionInterface $extension);
 
@@ -42,6 +46,8 @@ interface FormFactoryBuilderInterface
      * @param array $extensions The extensions.
      *
      * @return FormFactoryBuilderInterface The builder.
+     *
+     * @since v2.1.0
      */
     public function addExtensions(array $extensions);
 
@@ -51,6 +57,8 @@ interface FormFactoryBuilderInterface
      * @param FormTypeInterface $type The form type.
      *
      * @return FormFactoryBuilderInterface The builder.
+     *
+     * @since v2.1.0
      */
     public function addType(FormTypeInterface $type);
 
@@ -60,6 +68,8 @@ interface FormFactoryBuilderInterface
      * @param array $types The form types.
      *
      * @return FormFactoryBuilderInterface The builder.
+     *
+     * @since v2.1.0
      */
     public function addTypes(array $types);
 
@@ -69,6 +79,8 @@ interface FormFactoryBuilderInterface
      * @param FormTypeExtensionInterface $typeExtension The form type extension.
      *
      * @return FormFactoryBuilderInterface The builder.
+     *
+     * @since v2.1.0
      */
     public function addTypeExtension(FormTypeExtensionInterface $typeExtension);
 
@@ -78,6 +90,8 @@ interface FormFactoryBuilderInterface
      * @param array $typeExtensions The form type extensions.
      *
      * @return FormFactoryBuilderInterface The builder.
+     *
+     * @since v2.1.0
      */
     public function addTypeExtensions(array $typeExtensions);
 
@@ -87,6 +101,8 @@ interface FormFactoryBuilderInterface
      * @param FormTypeGuesserInterface $typeGuesser The type guesser.
      *
      * @return FormFactoryBuilderInterface The builder.
+     *
+     * @since v2.1.0
      */
     public function addTypeGuesser(FormTypeGuesserInterface $typeGuesser);
 
@@ -96,6 +112,8 @@ interface FormFactoryBuilderInterface
      * @param array $typeGuessers The type guessers.
      *
      * @return FormFactoryBuilderInterface The builder.
+     *
+     * @since v2.1.0
      */
     public function addTypeGuessers(array $typeGuessers);
 
@@ -103,6 +121,8 @@ interface FormFactoryBuilderInterface
      * Builds and returns the factory.
      *
      * @return FormFactoryInterface The form factory.
+     *
+     * @since v2.1.0
      */
     public function getFormFactory();
 }

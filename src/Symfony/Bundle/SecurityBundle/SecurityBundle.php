@@ -27,9 +27,14 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\InMe
  * Bundle.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class SecurityBundle extends Bundle
 {
+    /**
+     * @since v2.0.0
+     */
     public function build(ContainerBuilder $container)
     {
         parent::build($container);

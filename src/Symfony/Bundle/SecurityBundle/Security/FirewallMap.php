@@ -21,18 +21,26 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Listeners will only be initialized if we really need them.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class FirewallMap implements FirewallMapInterface
 {
     protected $container;
     protected $map;
 
+    /**
+     * @since v2.0.0
+     */
     public function __construct(ContainerInterface $container, array $map)
     {
         $this->container = $container;
         $this->map = $map;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getListeners(Request $request)
     {
         foreach ($this->map as $contextId => $requestMatcher) {

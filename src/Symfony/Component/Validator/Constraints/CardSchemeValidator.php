@@ -20,6 +20,8 @@ use Symfony\Component\Validator\ConstraintValidator;
  * @see http://en.wikipedia.org/wiki/Bank_card_number
  * @see http://www.regular-expressions.info/creditcard.html
  * @author Tim Nagel <t.nagel@infinite.net.au>
+ *
+ * @since v2.2.0
  */
 class CardSchemeValidator extends ConstraintValidator
 {
@@ -100,6 +102,8 @@ class CardSchemeValidator extends ConstraintValidator
      *
      * @param mixed $value
      * @param Constraint $constraint
+     *
+     * @since v2.2.0
      */
     public function validate($value, Constraint $constraint)
     {

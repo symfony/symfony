@@ -18,6 +18,8 @@ namespace Symfony\Component\Finder\Iterator;
  * to remove files.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.1.0
  */
 class CustomFilterIterator extends FilterIterator
 {
@@ -30,6 +32,8 @@ class CustomFilterIterator extends FilterIterator
      * @param array     $filters  An array of PHP callbacks
      *
      * @throws \InvalidArgumentException
+     *
+     * @since v2.0.0
      */
     public function __construct(\Iterator $iterator, array $filters)
     {
@@ -47,6 +51,8 @@ class CustomFilterIterator extends FilterIterator
      * Filters the iterator values.
      *
      * @return Boolean true if the value should be kept, false otherwise
+     *
+     * @since v2.0.0
      */
     public function accept()
     {

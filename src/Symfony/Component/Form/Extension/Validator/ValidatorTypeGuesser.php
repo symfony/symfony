@@ -18,10 +18,16 @@ use Symfony\Component\Form\Guess\ValueGuess;
 use Symfony\Component\Validator\MetadataFactoryInterface;
 use Symfony\Component\Validator\Constraint;
 
+/**
+ * @since v2.0.0
+ */
 class ValidatorTypeGuesser implements FormTypeGuesserInterface
 {
     private $metadataFactory;
 
+    /**
+     * @since v2.2.0
+     */
     public function __construct(MetadataFactoryInterface $metadataFactory)
     {
         $this->metadataFactory = $metadataFactory;
@@ -29,6 +35,8 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function guessType($class, $property)
     {
@@ -41,6 +49,8 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function guessRequired($class, $property)
     {
@@ -55,6 +65,8 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function guessMaxLength($class, $property)
     {
@@ -67,6 +79,8 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function guessPattern($class, $property)
     {
@@ -83,6 +97,8 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
      * @param Constraint $constraint The constraint to guess for
      *
      * @return TypeGuess The guessed field class and options
+     *
+     * @since v2.0.0
      */
     public function guessTypeForConstraint(Constraint $constraint)
     {
@@ -172,6 +188,8 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
      * @param Constraint $constraint The constraint to guess for
      *
      * @return Guess The guess whether the field is required
+     *
+     * @since v2.0.0
      */
     public function guessRequiredForConstraint(Constraint $constraint)
     {
@@ -191,6 +209,8 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
      * @param Constraint $constraint The constraint to guess for
      *
      * @return Guess The guess for the maximum length
+     *
+     * @since v2.0.0
      */
     public function guessMaxLengthForConstraint(Constraint $constraint)
     {
@@ -217,6 +237,8 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
      * @param Constraint $constraint The constraint to guess for
      *
      * @return Guess The guess for the pattern
+     *
+     * @since v2.1.0
      */
     public function guessPatternForConstraint(Constraint $constraint)
     {
@@ -257,6 +279,8 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
      *                               can be guessed.
      *
      * @return Guess The guessed value with the highest confidence
+     *
+     * @since v2.1.0
      */
     protected function guess($class, $property, \Closure $closure, $defaultValue = null)
     {

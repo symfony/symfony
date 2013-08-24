@@ -16,8 +16,14 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
+/**
+ * @since v2.0.0
+ */
 class CompilerDebugDumpPass implements CompilerPassInterface
 {
+    /**
+     * @since v2.0.0
+     */
     public function process(ContainerBuilder $container)
     {
         $filesystem = new Filesystem();
@@ -28,6 +34,9 @@ class CompilerDebugDumpPass implements CompilerPassInterface
         );
     }
 
+    /**
+     * @since v2.1.0
+     */
     public static function getCompilerLogFilename(ContainerInterface $container)
     {
         $class = $container->getParameter('kernel.container_class');

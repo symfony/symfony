@@ -45,6 +45,8 @@ interface StructuredBundleReaderInterface extends BundleReaderInterface
      * @return mixed Returns an array or {@link \ArrayAccess} instance for
      *               complex data, a scalar value for simple data and NULL
      *               if the given path could not be accessed.
+     *
+     * @since v2.3.0
      */
     public function readEntry($path, $locale, array $indices, $fallback = true);
 }

@@ -15,6 +15,8 @@ namespace Symfony\Component\DependencyInjection\Exception;
  * Base InvalidArgumentException for Dependency Injection component.
  *
  * @author Bulat Shakirzyanov <bulat@theopenskyproject.com>
+ *
+ * @since v2.1.0
  */
 class InvalidArgumentException extends \InvalidArgumentException implements ExceptionInterface
 {

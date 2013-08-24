@@ -20,6 +20,8 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class Valid extends Constraint
 {
@@ -27,6 +29,9 @@ class Valid extends Constraint
 
     public $deep = false;
 
+    /**
+     * @since v2.1.0
+     */
     public function __construct($options = null)
     {
         if (is_array($options) && array_key_exists('groups', $options)) {

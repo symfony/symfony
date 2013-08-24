@@ -22,6 +22,8 @@ interface ResolvedFormTypeInterface
      * Returns the name of the type.
      *
      * @return string The type name.
+     *
+     * @since v2.1.0
      */
     public function getName();
 
@@ -29,6 +31,8 @@ interface ResolvedFormTypeInterface
      * Returns the parent type.
      *
      * @return ResolvedFormTypeInterface The parent type or null.
+     *
+     * @since v2.1.0
      */
     public function getParent();
 
@@ -36,6 +40,8 @@ interface ResolvedFormTypeInterface
      * Returns the wrapped form type.
      *
      * @return FormTypeInterface The wrapped form type.
+     *
+     * @since v2.1.0
      */
     public function getInnerType();
 
@@ -43,6 +49,8 @@ interface ResolvedFormTypeInterface
      * Returns the extensions of the wrapped form type.
      *
      * @return FormTypeExtensionInterface[] An array of {@link FormTypeExtensionInterface} instances.
+     *
+     * @since v2.1.0
      */
     public function getTypeExtensions();
 
@@ -54,6 +62,8 @@ interface ResolvedFormTypeInterface
      * @param array                $options The builder options.
      *
      * @return FormBuilderInterface The created form builder.
+     *
+     * @since v2.3.0
      */
     public function createBuilder(FormFactoryInterface $factory, $name, array $options = array());
 
@@ -64,6 +74,8 @@ interface ResolvedFormTypeInterface
      * @param FormView $parent The parent view or null.
      *
      * @return FormView The created form view.
+     *
+     * @since v2.1.0
      */
     public function createView(FormInterface $form, FormView $parent = null);
 
@@ -72,6 +84,8 @@ interface ResolvedFormTypeInterface
      *
      * @param FormBuilderInterface $builder The builder to configure.
      * @param array                $options The options used for the configuration.
+     *
+     * @since v2.1.0
      */
     public function buildForm(FormBuilderInterface $builder, array $options);
 
@@ -83,6 +97,8 @@ interface ResolvedFormTypeInterface
      * @param FormView      $view    The form view to configure.
      * @param FormInterface $form    The form corresponding to the view.
      * @param array         $options The options used for the configuration.
+     *
+     * @since v2.1.0
      */
     public function buildView(FormView $view, FormInterface $form, array $options);
 
@@ -94,6 +110,8 @@ interface ResolvedFormTypeInterface
      * @param FormView      $view    The form view to configure.
      * @param FormInterface $form    The form corresponding to the view.
      * @param array         $options The options used for the configuration.
+     *
+     * @since v2.1.0
      */
     public function finishView(FormView $view, FormInterface $form, array $options);
 
@@ -101,6 +119,8 @@ interface ResolvedFormTypeInterface
      * Returns the configured options resolver used for this type.
      *
      * @return \Symfony\Component\OptionsResolver\OptionsResolverInterface The options resolver.
+     *
+     * @since v2.1.0
      */
     public function getOptionsResolver();
 }

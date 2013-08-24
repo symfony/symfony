@@ -26,6 +26,8 @@ use Symfony\Component\Console\Output\StreamOutput;
  *     $application->setAutoExit(false);
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class ApplicationTester
 {
@@ -38,6 +40,8 @@ class ApplicationTester
      * Constructor.
      *
      * @param Application $application An Application instance to test.
+     *
+     * @since v2.0.0
      */
     public function __construct(Application $application)
     {
@@ -57,6 +61,8 @@ class ApplicationTester
      * @param array $options An array of options
      *
      * @return integer The command exit code
+     *
+     * @since v2.0.0
      */
     public function run(array $input, $options = array())
     {
@@ -82,6 +88,8 @@ class ApplicationTester
      * @param Boolean $normalize Whether to normalize end of lines to \n or not
      *
      * @return string The display
+     *
+     * @since v2.3.0
      */
     public function getDisplay($normalize = false)
     {
@@ -100,6 +108,8 @@ class ApplicationTester
      * Gets the input instance used by the last execution of the application.
      *
      * @return InputInterface The current input instance
+     *
+     * @since v2.0.0
      */
     public function getInput()
     {
@@ -110,6 +120,8 @@ class ApplicationTester
      * Gets the output instance used by the last execution of the application.
      *
      * @return OutputInterface The current output instance
+     *
+     * @since v2.0.0
      */
     public function getOutput()
     {

@@ -23,6 +23,8 @@ use Symfony\Component\Routing\RouteCollection;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class PhpFileLoader extends FileLoader
 {
@@ -35,6 +37,8 @@ class PhpFileLoader extends FileLoader
      * @return RouteCollection A RouteCollection instance
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function load($file, $type = null)
     {
@@ -54,6 +58,8 @@ class PhpFileLoader extends FileLoader
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function supports($resource, $type = null)
     {

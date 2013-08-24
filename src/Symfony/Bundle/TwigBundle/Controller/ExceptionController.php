@@ -21,12 +21,17 @@ use Symfony\Component\HttpFoundation\Response;
  * ExceptionController.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.2.0
  */
 class ExceptionController
 {
     protected $twig;
     protected $debug;
 
+    /**
+     * @since v2.2.0
+     */
     public function __construct(\Twig_Environment $twig, $debug)
     {
         $this->twig = $twig;
@@ -67,6 +72,8 @@ class ExceptionController
      * @param integer $startObLevel
      *
      * @return string
+     *
+     * @since v2.2.0
      */
     protected function getAndCleanOutputBuffering($startObLevel)
     {
@@ -90,6 +97,8 @@ class ExceptionController
      * @param Boolean $debug
      *
      * @return TemplateReference
+     *
+     * @since v2.2.0
      */
     protected function findTemplate(Request $request, $format, $code, $debug)
     {
@@ -118,6 +127,9 @@ class ExceptionController
         return new TemplateReference('TwigBundle', 'Exception', $name, 'html', 'twig');
     }
 
+    /**
+     * @since v2.2.0
+     */
     // to be removed when the minimum required version of Twig is >= 2.0
     protected function templateExists($template)
     {

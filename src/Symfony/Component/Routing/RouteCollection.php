@@ -24,6 +24,8 @@ use Symfony\Component\Config\Resource\ResourceInterface;
  * @author Tobias Schultze <http://tobion.de>
  *
  * @api
+ *
+ * @since v2.1.0
  */
 class RouteCollection implements \IteratorAggregate, \Countable
 {
@@ -37,6 +39,9 @@ class RouteCollection implements \IteratorAggregate, \Countable
      */
     private $resources = array();
 
+    /**
+     * @since v2.1.0
+     */
     public function __clone()
     {
         foreach ($this->routes as $name => $route) {
@@ -52,6 +57,8 @@ class RouteCollection implements \IteratorAggregate, \Countable
      * @see all()
      *
      * @return \ArrayIterator An \ArrayIterator object for iterating over routes
+     *
+     * @since v2.0.0
      */
     public function getIterator()
     {
@@ -62,6 +69,8 @@ class RouteCollection implements \IteratorAggregate, \Countable
      * Gets the number of Routes in this collection.
      *
      * @return int The number of routes
+     *
+     * @since v2.1.0
      */
     public function count()
     {
@@ -75,6 +84,8 @@ class RouteCollection implements \IteratorAggregate, \Countable
      * @param Route  $route A Route instance
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function add($name, Route $route)
     {
@@ -87,6 +98,8 @@ class RouteCollection implements \IteratorAggregate, \Countable
      * Returns all routes in this collection.
      *
      * @return Route[] An array of routes
+     *
+     * @since v2.0.0
      */
     public function all()
     {
@@ -99,6 +112,8 @@ class RouteCollection implements \IteratorAggregate, \Countable
      * @param string $name The route name
      *
      * @return Route|null A Route instance or null when not found
+     *
+     * @since v2.0.0
      */
     public function get($name)
     {
@@ -109,6 +124,8 @@ class RouteCollection implements \IteratorAggregate, \Countable
      * Removes a route or an array of routes by name from the collection
      *
      * @param string|array $name The route name or an array of route names
+     *
+     * @since v2.0.10
      */
     public function remove($name)
     {
@@ -124,6 +141,8 @@ class RouteCollection implements \IteratorAggregate, \Countable
      * @param RouteCollection $collection      A RouteCollection instance
      *
      * @api
+     *
+     * @since v2.2.0
      */
     public function addCollection(RouteCollection $collection)
     {
@@ -145,6 +164,8 @@ class RouteCollection implements \IteratorAggregate, \Countable
      * @param array  $requirements An array of requirements
      *
      * @api
+     *
+     * @since v2.2.0
      */
     public function addPrefix($prefix, array $defaults = array(), array $requirements = array())
     {
@@ -167,6 +188,8 @@ class RouteCollection implements \IteratorAggregate, \Countable
      * @param string $pattern      The pattern
      * @param array  $defaults     An array of default values
      * @param array  $requirements An array of requirements
+     *
+     * @since v2.2.0
      */
     public function setHost($pattern, array $defaults = array(), array $requirements = array())
     {
@@ -183,6 +206,8 @@ class RouteCollection implements \IteratorAggregate, \Countable
      * An existing default value under the same name in a route will be overridden.
      *
      * @param array $defaults An array of default values
+     *
+     * @since v2.2.0
      */
     public function addDefaults(array $defaults)
     {
@@ -199,6 +224,8 @@ class RouteCollection implements \IteratorAggregate, \Countable
      * An existing requirement under the same name in a route will be overridden.
      *
      * @param array $requirements An array of requirements
+     *
+     * @since v2.2.0
      */
     public function addRequirements(array $requirements)
     {
@@ -215,6 +242,8 @@ class RouteCollection implements \IteratorAggregate, \Countable
      * An existing option value under the same name in a route will be overridden.
      *
      * @param array $options An array of options
+     *
+     * @since v2.2.0
      */
     public function addOptions(array $options)
     {
@@ -229,6 +258,8 @@ class RouteCollection implements \IteratorAggregate, \Countable
      * Sets the schemes (e.g. 'https') all child routes are restricted to.
      *
      * @param string|array $schemes The scheme or an array of schemes
+     *
+     * @since v2.2.0
      */
     public function setSchemes($schemes)
     {
@@ -241,6 +272,8 @@ class RouteCollection implements \IteratorAggregate, \Countable
      * Sets the HTTP methods (e.g. 'POST') all child routes are restricted to.
      *
      * @param string|array $methods The method or an array of methods
+     *
+     * @since v2.2.0
      */
     public function setMethods($methods)
     {
@@ -253,6 +286,8 @@ class RouteCollection implements \IteratorAggregate, \Countable
      * Returns an array of resources loaded to build this collection.
      *
      * @return ResourceInterface[] An array of resources
+     *
+     * @since v2.0.0
      */
     public function getResources()
     {
@@ -263,6 +298,8 @@ class RouteCollection implements \IteratorAggregate, \Countable
      * Adds a resource for this collection.
      *
      * @param ResourceInterface $resource A resource instance
+     *
+     * @since v2.0.0
      */
     public function addResource(ResourceInterface $resource)
     {

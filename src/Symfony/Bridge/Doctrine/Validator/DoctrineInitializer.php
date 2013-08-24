@@ -18,16 +18,24 @@ use Symfony\Component\Validator\ObjectInitializerInterface;
  * Automatically loads proxy object before validation.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.1.0
  */
 class DoctrineInitializer implements ObjectInitializerInterface
 {
     protected $registry;
 
+    /**
+     * @since v2.1.0
+     */
     public function __construct(ManagerRegistry $registry)
     {
         $this->registry = $registry;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function initialize($object)
     {
         $manager = $this->registry->getManagerForClass(get_class($object));

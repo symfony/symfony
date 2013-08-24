@@ -24,11 +24,15 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  *    c) the configuration class resides in the DependencyInjection sub-folder
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.1.0
  */
 abstract class ConfigurableExtension extends Extension
 {
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     final public function load(array $configs, ContainerBuilder $container)
     {
@@ -40,6 +44,8 @@ abstract class ConfigurableExtension extends Extension
      *
      * @param array            $mergedConfig
      * @param ContainerBuilder $container
+     *
+     * @since v2.1.0
      */
     abstract protected function loadInternal(array $mergedConfig, ContainerBuilder $container);
 }

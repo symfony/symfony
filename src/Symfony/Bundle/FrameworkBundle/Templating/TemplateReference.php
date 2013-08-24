@@ -17,9 +17,14 @@ use Symfony\Component\Templating\TemplateReference as BaseTemplateReference;
  * Internal representation of a template.
  *
  * @author Victor Berchet <victor@suumit.com>
+ *
+ * @since v2.0.0
  */
 class TemplateReference extends BaseTemplateReference
 {
+    /**
+     * @since v2.0.0
+     */
     public function __construct($bundle = null, $controller = null, $name = null, $format = null, $engine = null)
     {
         $this->parameters = array(
@@ -37,6 +42,8 @@ class TemplateReference extends BaseTemplateReference
      *  - as a resource when the template is part of a bundle
      *
      * @return string A path to the template or a resource
+     *
+     * @since v2.0.0
      */
     public function getPath()
     {
@@ -49,6 +56,8 @@ class TemplateReference extends BaseTemplateReference
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getLogicalName()
     {

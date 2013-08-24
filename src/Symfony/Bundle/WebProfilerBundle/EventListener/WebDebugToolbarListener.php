@@ -26,6 +26,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * This means that the WDT is never included in sub-requests or ESI requests.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.1.0
  */
 class WebDebugToolbarListener implements EventSubscriberInterface
 {
@@ -37,6 +39,9 @@ class WebDebugToolbarListener implements EventSubscriberInterface
     protected $mode;
     protected $position;
 
+    /**
+     * @since v2.2.0
+     */
     public function __construct(\Twig_Environment $twig, $interceptRedirects = false, $mode = self::ENABLED, $position = 'bottom')
     {
         $this->twig = $twig;
@@ -45,11 +50,17 @@ class WebDebugToolbarListener implements EventSubscriberInterface
         $this->position = $position;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function isEnabled()
     {
         return self::DISABLED !== $this->mode;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function onKernelResponse(FilterResponseEvent $event)
     {
         if (!$event->isMasterRequest()) {
@@ -92,6 +103,8 @@ class WebDebugToolbarListener implements EventSubscriberInterface
      * Injects the web debug toolbar into the given Response.
      *
      * @param Response $response A Response instance
+     *
+     * @since v2.0.0
      */
     protected function injectToolbar(Response $response)
     {
@@ -119,6 +132,9 @@ class WebDebugToolbarListener implements EventSubscriberInterface
         }
     }
 
+    /**
+     * @since v2.1.0
+     */
     public static function getSubscribedEvents()
     {
         return array(

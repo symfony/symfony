@@ -28,6 +28,9 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\ChoicesToBooleanArrayT
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+/**
+ * @since v2.0.0
+ */
 class ChoiceType extends AbstractType
 {
     /**
@@ -38,6 +41,8 @@ class ChoiceType extends AbstractType
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -92,6 +97,8 @@ class ChoiceType extends AbstractType
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
@@ -134,6 +141,8 @@ class ChoiceType extends AbstractType
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
@@ -154,6 +163,8 @@ class ChoiceType extends AbstractType
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
@@ -232,6 +243,8 @@ class ChoiceType extends AbstractType
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getName()
     {
@@ -244,6 +257,8 @@ class ChoiceType extends AbstractType
      * @param FormBuilderInterface $builder     The form builder.
      * @param array                $choiceViews The choice view objects.
      * @param array                $options     The build options.
+     *
+     * @since v2.1.0
      */
     private function addSubForms(FormBuilderInterface $builder, array $choiceViews, array $options)
     {

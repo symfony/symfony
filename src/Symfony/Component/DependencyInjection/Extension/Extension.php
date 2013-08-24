@@ -23,6 +23,8 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  * Provides useful features shared by many extensions.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.2.0
  */
 abstract class Extension implements ExtensionInterface, ConfigurationExtensionInterface
 {
@@ -30,6 +32,8 @@ abstract class Extension implements ExtensionInterface, ConfigurationExtensionIn
      * Returns the base path for the XSD files.
      *
      * @return string The XSD base path
+     *
+     * @since v2.2.0
      */
     public function getXsdValidationBasePath()
     {
@@ -40,6 +44,8 @@ abstract class Extension implements ExtensionInterface, ConfigurationExtensionIn
      * Returns the namespace to be used for this extension (XML namespace).
      *
      * @return string The XML namespace
+     *
+     * @since v2.2.0
      */
     public function getNamespace()
     {
@@ -65,6 +71,8 @@ abstract class Extension implements ExtensionInterface, ConfigurationExtensionIn
      * @return string The alias
      *
      * @throws BadMethodCallException When the extension name does not follow conventions
+     *
+     * @since v2.2.0
      */
     public function getAlias()
     {
@@ -79,6 +87,8 @@ abstract class Extension implements ExtensionInterface, ConfigurationExtensionIn
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.2.0
      */
     public function getConfiguration(array $config, ContainerBuilder $container)
     {
@@ -100,6 +110,9 @@ abstract class Extension implements ExtensionInterface, ConfigurationExtensionIn
         return null;
     }
 
+    /**
+     * @since v2.2.0
+     */
     final protected function processConfiguration(ConfigurationInterface $configuration, array $configs)
     {
         $processor = new Processor();
@@ -114,6 +127,8 @@ abstract class Extension implements ExtensionInterface, ConfigurationExtensionIn
      * @return Boolean Whether the configuration is enabled
      *
      * @throws InvalidArgumentException When the config is not enableable
+     *
+     * @since v2.2.0
      */
     protected function isConfigEnabled(ContainerBuilder $container, array $config)
     {

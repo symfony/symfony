@@ -18,11 +18,15 @@ use Symfony\Component\Routing\Route;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 abstract class RedirectableUrlMatcher extends UrlMatcher implements RedirectableUrlMatcherInterface
 {
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function match($pathinfo)
     {
@@ -47,6 +51,8 @@ abstract class RedirectableUrlMatcher extends UrlMatcher implements Redirectable
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     protected function handleRouteRequirements($pathinfo, $name, Route $route)
     {

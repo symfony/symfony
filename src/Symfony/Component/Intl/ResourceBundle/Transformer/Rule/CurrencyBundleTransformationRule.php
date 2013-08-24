@@ -21,11 +21,15 @@ use Symfony\Component\Intl\Util\IcuVersion;
  * The rule for compiling the currency bundle.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.3.0
  */
 class CurrencyBundleTransformationRule implements TransformationRuleInterface
 {
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getBundleName()
     {
@@ -34,6 +38,8 @@ class CurrencyBundleTransformationRule implements TransformationRuleInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function beforeCompile(CompilationContextInterface $context)
     {
@@ -51,6 +57,8 @@ class CurrencyBundleTransformationRule implements TransformationRuleInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function afterCompile(CompilationContextInterface $context)
     {
@@ -65,6 +73,8 @@ class CurrencyBundleTransformationRule implements TransformationRuleInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function beforeCreateStub(StubbingContextInterface $context)
     {
@@ -87,6 +97,8 @@ class CurrencyBundleTransformationRule implements TransformationRuleInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function afterCreateStub(StubbingContextInterface $context)
     {

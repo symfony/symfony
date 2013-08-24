@@ -20,12 +20,18 @@ use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\Form\Guess\ValueGuess;
 
+/**
+ * @since v2.0.0
+ */
 class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
 {
     protected $registry;
 
     private $cache;
 
+    /**
+     * @since v2.1.0
+     */
     public function __construct(ManagerRegistry $registry)
     {
         $this->registry = $registry;
@@ -34,6 +40,8 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function guessType($class, $property)
     {
@@ -81,6 +89,8 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function guessRequired($class, $property)
     {
@@ -121,6 +131,8 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function guessMaxLength($class, $property)
     {
@@ -140,6 +152,8 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function guessPattern($class, $property)
     {
@@ -151,6 +165,9 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
         }
     }
 
+    /**
+     * @since v2.0.0
+     */
     protected function getMetadata($class)
     {
         if (array_key_exists($class, $this->cache)) {

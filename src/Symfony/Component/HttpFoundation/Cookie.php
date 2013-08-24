@@ -17,6 +17,8 @@ namespace Symfony\Component\HttpFoundation;
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class Cookie
 {
@@ -42,6 +44,8 @@ class Cookie
      * @throws \InvalidArgumentException
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function __construct($name, $value = null, $expire = 0, $path = '/', $domain = null, $secure = false, $httpOnly = true)
     {
@@ -78,6 +82,8 @@ class Cookie
      * Returns the cookie as a string.
      *
      * @return string The cookie
+     *
+     * @since v2.0.0
      */
     public function __toString()
     {
@@ -118,6 +124,8 @@ class Cookie
      * @return string
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getName()
     {
@@ -130,6 +138,8 @@ class Cookie
      * @return string
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getValue()
     {
@@ -142,6 +152,8 @@ class Cookie
      * @return string
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getDomain()
     {
@@ -154,6 +166,8 @@ class Cookie
      * @return integer
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getExpiresTime()
     {
@@ -166,6 +180,8 @@ class Cookie
      * @return string
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getPath()
     {
@@ -178,6 +194,8 @@ class Cookie
      * @return Boolean
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function isSecure()
     {
@@ -190,6 +208,8 @@ class Cookie
      * @return Boolean
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function isHttpOnly()
     {
@@ -202,6 +222,8 @@ class Cookie
      * @return Boolean
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function isCleared()
     {

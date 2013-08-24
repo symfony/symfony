@@ -22,6 +22,8 @@ use Symfony\Component\Config\Resource\FileResource;
  * This abstract classes groups common code that Doctrine Object Manager extensions (ORM, MongoDB, CouchDB) need.
  *
  * @author Benjamin Eberlei <kontakt@beberlei.de>
+ *
+ * @since v2.0.0
  */
 abstract class AbstractDoctrineExtension extends Extension
 {
@@ -44,6 +46,8 @@ abstract class AbstractDoctrineExtension extends Extension
      * @param ContainerBuilder $container     A ContainerBuilder instance
      *
      * @throws \InvalidArgumentException
+     *
+     * @since v2.0.0
      */
     protected function loadMappingInformation(array $objectManager, ContainerBuilder $container)
     {
@@ -109,6 +113,8 @@ abstract class AbstractDoctrineExtension extends Extension
      *
      * @param array  $mappingConfig
      * @param string $mappingName
+     *
+     * @since v2.0.0
      */
     protected function setMappingDriverAlias($mappingConfig, $mappingName)
     {
@@ -126,6 +132,8 @@ abstract class AbstractDoctrineExtension extends Extension
      * @param string $mappingName
      *
      * @throws \InvalidArgumentException
+     *
+     * @since v2.0.0
      */
     protected function setMappingDriverConfig(array $mappingConfig, $mappingName)
     {
@@ -146,6 +154,8 @@ abstract class AbstractDoctrineExtension extends Extension
      * @param ContainerBuilder $container    A ContainerBuilder instance
      *
      * @return array|false
+     *
+     * @since v2.0.0
      */
     protected function getMappingDriverBundleConfigDefaults(array $bundleConfig, \ReflectionClass $bundle, ContainerBuilder $container)
     {
@@ -182,6 +192,8 @@ abstract class AbstractDoctrineExtension extends Extension
      *
      * @param array            $objectManager
      * @param ContainerBuilder $container     A ContainerBuilder instance
+     *
+     * @since v2.0.0
      */
     protected function registerMappingDrivers($objectManager, ContainerBuilder $container)
     {
@@ -237,6 +249,8 @@ abstract class AbstractDoctrineExtension extends Extension
      * @param string $objectManagerName
      *
      * @throws \InvalidArgumentException
+     *
+     * @since v2.0.0
      */
     protected function assertValidMappingConfiguration(array $mappingConfig, $objectManagerName)
     {
@@ -264,6 +278,8 @@ abstract class AbstractDoctrineExtension extends Extension
      * @param ContainerBuilder $container A ContainerBuilder instance
      *
      * @return string|null A metadata driver short name, if one can be detected
+     *
+     * @since v2.0.0
      */
     protected function detectMetadataDriver($dir, ContainerBuilder $container)
     {
@@ -303,6 +319,8 @@ abstract class AbstractDoctrineExtension extends Extension
      * @param string           $cacheName
      *
      * @throws \InvalidArgumentException In case of unknown driver type.
+     *
+     * @since v2.1.0
      */
     protected function loadObjectManagerCacheDriver(array $objectManager, ContainerBuilder $container, $cacheName)
     {
@@ -384,6 +402,8 @@ abstract class AbstractDoctrineExtension extends Extension
      * @param string $name
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     abstract protected function getObjectManagerElementName($name);
 
@@ -393,6 +413,8 @@ abstract class AbstractDoctrineExtension extends Extension
      * Will be used for autodetection of persistent objects directory.
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     abstract protected function getMappingObjectDefaultName();
 
@@ -400,6 +422,8 @@ abstract class AbstractDoctrineExtension extends Extension
      * Relative path from the bundle root to the directory where mapping files reside.
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     abstract protected function getMappingResourceConfigDirectory();
 
@@ -407,6 +431,8 @@ abstract class AbstractDoctrineExtension extends Extension
      * Extension used by the mapping files.
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     abstract protected function getMappingResourceExtension();
 }

@@ -18,6 +18,8 @@ namespace Symfony\Component\Form;
  * reverseTransform() method is called and vice versa.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.0.0
  */
 class ReversedTransformer implements DataTransformerInterface
 {
@@ -31,6 +33,8 @@ class ReversedTransformer implements DataTransformerInterface
      * Reverses this transformer
      *
      * @param DataTransformerInterface $reversedTransformer
+     *
+     * @since v2.0.0
      */
     public function __construct(DataTransformerInterface $reversedTransformer)
     {
@@ -39,6 +43,8 @@ class ReversedTransformer implements DataTransformerInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function transform($value)
     {
@@ -47,6 +53,8 @@ class ReversedTransformer implements DataTransformerInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function reverseTransform($value)
     {

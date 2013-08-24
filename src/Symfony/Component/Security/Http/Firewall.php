@@ -25,6 +25,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * everything else for instance).
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.2.0
  */
 class Firewall implements EventSubscriberInterface
 {
@@ -36,6 +38,8 @@ class Firewall implements EventSubscriberInterface
      *
      * @param FirewallMapInterface     $map        A FirewallMapInterface instance
      * @param EventDispatcherInterface $dispatcher An EventDispatcherInterface instance
+     *
+     * @since v2.0.0
      */
     public function __construct(FirewallMapInterface $map, EventDispatcherInterface $dispatcher)
     {
@@ -47,6 +51,8 @@ class Firewall implements EventSubscriberInterface
      * Handles security.
      *
      * @param GetResponseEvent $event An GetResponseEvent instance
+     *
+     * @since v2.0.0
      */
     public function onKernelRequest(GetResponseEvent $event)
     {
@@ -70,6 +76,9 @@ class Firewall implements EventSubscriberInterface
         }
     }
 
+    /**
+     * @since v2.2.0
+     */
     public static function getSubscribedEvents()
     {
         return array(KernelEvents::REQUEST => array('onKernelRequest', 8));

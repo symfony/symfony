@@ -39,6 +39,8 @@ class DialogHelper extends InputAwareHelper
      * @return integer|string|array The selected value or values (the key of the choices array)
      *
      * @throws \InvalidArgumentException
+     *
+     * @since v2.3.0
      */
     public function select(OutputInterface $output, $question, $choices, $default = null, $attempts = false, $errorMessage = 'Value "%s" is invalid', $multiselect = false)
     {
@@ -95,6 +97,8 @@ class DialogHelper extends InputAwareHelper
      * @return string The user answer
      *
      * @throws \RuntimeException If there is no data to read in the input stream
+     *
+     * @since v2.2.0
      */
     public function ask(OutputInterface $output, $question, $default = null, array $autocomplete = null)
     {
@@ -230,6 +234,8 @@ class DialogHelper extends InputAwareHelper
      * @param Boolean         $default  The default answer if the user enters nothing
      *
      * @return Boolean true if the user has confirmed, false otherwise
+     *
+     * @since v2.0.0
      */
     public function askConfirmation(OutputInterface $output, $question, $default = true)
     {
@@ -255,6 +261,8 @@ class DialogHelper extends InputAwareHelper
      * @return string         The answer
      *
      * @throws \RuntimeException In case the fallback is deactivated and the response can not be hidden
+     *
+     * @since v2.2.0
      */
     public function askHiddenResponse(OutputInterface $output, $question, $fallback = true)
     {
@@ -332,6 +340,8 @@ class DialogHelper extends InputAwareHelper
      * @return mixed
      *
      * @throws \Exception When any of the validators return an error
+     *
+     * @since v2.2.0
      */
     public function askAndValidate(OutputInterface $output, $question, $validator, $attempts = false, $default = null, array $autocomplete = null)
     {
@@ -362,6 +372,8 @@ class DialogHelper extends InputAwareHelper
      * @throws \Exception        When any of the validators return an error
      * @throws \RuntimeException In case the fallback is deactivated and the response can not be hidden
      *
+     *
+     * @since v2.2.0
      */
     public function askHiddenResponseAndValidate(OutputInterface $output, $question, $validator, $attempts = false, $fallback = true)
     {
@@ -380,6 +392,8 @@ class DialogHelper extends InputAwareHelper
      * This is mainly useful for testing purpose.
      *
      * @param resource $stream The input stream
+     *
+     * @since v2.0.0
      */
     public function setInputStream($stream)
     {
@@ -390,6 +404,8 @@ class DialogHelper extends InputAwareHelper
      * Returns the helper's input stream
      *
      * @return string
+     *
+     * @since v2.1.0
      */
     public function getInputStream()
     {
@@ -398,6 +414,8 @@ class DialogHelper extends InputAwareHelper
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function getName()
     {
@@ -408,6 +426,8 @@ class DialogHelper extends InputAwareHelper
      * Return a valid unix shell
      *
      * @return string|Boolean  The valid shell name, false in case no valid shell is found
+     *
+     * @since v2.2.0
      */
     private function getShell()
     {
@@ -431,6 +451,9 @@ class DialogHelper extends InputAwareHelper
         return self::$shell;
     }
 
+    /**
+     * @since v2.2.0
+     */
     private function hasSttyAvailable()
     {
         if (null !== self::$stty) {
@@ -453,6 +476,8 @@ class DialogHelper extends InputAwareHelper
      * @return string   The validated response
      *
      * @throws \Exception In case the max number of attempts has been reached and no valid response has been given
+     *
+     * @since v2.2.0
      */
     private function validateAttempts($interviewer, OutputInterface $output, $validator, $attempts)
     {

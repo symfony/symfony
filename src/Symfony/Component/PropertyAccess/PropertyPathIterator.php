@@ -16,6 +16,8 @@ namespace Symfony\Component\PropertyAccess;
  * information about the current element
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.2.0
  */
 class PropertyPathIterator extends \ArrayIterator implements PropertyPathIteratorInterface
 {
@@ -29,6 +31,8 @@ class PropertyPathIterator extends \ArrayIterator implements PropertyPathIterato
      * Constructor.
      *
      * @param PropertyPathInterface $path The property path to traverse
+     *
+     * @since v2.2.0
      */
     public function __construct(PropertyPathInterface $path)
     {
@@ -39,6 +43,8 @@ class PropertyPathIterator extends \ArrayIterator implements PropertyPathIterato
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function isIndex()
     {
@@ -47,6 +53,8 @@ class PropertyPathIterator extends \ArrayIterator implements PropertyPathIterato
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function isProperty()
     {

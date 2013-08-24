@@ -22,6 +22,8 @@ namespace Symfony\Component\Form\Util;
  * of that form as well.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.3.0
  */
 class InheritDataAwareIterator extends VirtualFormAwareIterator
 {

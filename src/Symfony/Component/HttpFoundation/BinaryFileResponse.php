@@ -22,6 +22,8 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
  * @author Igor Wiedler <igor@wiedler.ch>
  * @author Jordan Alliot <jordan.alliot@gmail.com>
  * @author Sergey Linnik <linniksa@gmail.com>
+ *
+ * @since v2.2.0
  */
 class BinaryFileResponse extends Response
 {
@@ -41,6 +43,8 @@ class BinaryFileResponse extends Response
      * @param null|string        $contentDisposition The type of Content-Disposition to set automatically with the filename
      * @param boolean            $autoEtag           Whether the ETag header should be automatically set
      * @param boolean            $autoLastModified   Whether the Last-Modified header should be automatically set
+     *
+     * @since v2.2.0
      */
     public function __construct($file, $status = 200, $headers = array(), $public = true, $contentDisposition = null, $autoEtag = false, $autoLastModified = true)
     {
@@ -55,6 +59,8 @@ class BinaryFileResponse extends Response
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public static function create($file = null, $status = 200, $headers = array(), $public = true, $contentDisposition = null, $autoEtag = false, $autoLastModified = true)
     {
@@ -72,6 +78,8 @@ class BinaryFileResponse extends Response
      * @return BinaryFileResponse
      *
      * @throws FileException
+     *
+     * @since v2.2.0
      */
     public function setFile($file, $contentDisposition = null, $autoEtag = false, $autoLastModified = true)
     {
@@ -102,6 +110,8 @@ class BinaryFileResponse extends Response
      * Gets the file.
      *
      * @return File The file to stream
+     *
+     * @since v2.2.0
      */
     public function getFile()
     {
@@ -110,6 +120,8 @@ class BinaryFileResponse extends Response
 
     /**
      * Automatically sets the Last-Modified header according the file modification date.
+     *
+     * @since v2.2.0
      */
     public function setAutoLastModified()
     {
@@ -120,6 +132,8 @@ class BinaryFileResponse extends Response
 
     /**
      * Automatically sets the ETag header according to the checksum of the file.
+     *
+     * @since v2.2.0
      */
     public function setAutoEtag()
     {
@@ -136,6 +150,8 @@ class BinaryFileResponse extends Response
      * @param string $filenameFallback A fallback filename, containing only ASCII characters. Defaults to an automatically encoded filename
      *
      * @return BinaryFileResponse
+     *
+     * @since v2.2.0
      */
     public function setContentDisposition($disposition, $filename = '', $filenameFallback = '')
     {
@@ -151,6 +167,8 @@ class BinaryFileResponse extends Response
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function prepare(Request $request)
     {
@@ -226,6 +244,8 @@ class BinaryFileResponse extends Response
 
     /**
      * Sends the file.
+     *
+     * @since v2.2.0
      */
     public function sendContent()
     {
@@ -252,6 +272,8 @@ class BinaryFileResponse extends Response
      * {@inheritdoc}
      *
      * @throws \LogicException when the content is not null
+     *
+     * @since v2.2.0
      */
     public function setContent($content)
     {
@@ -264,6 +286,8 @@ class BinaryFileResponse extends Response
      * {@inheritdoc}
      *
      * @return false
+     *
+     * @since v2.2.0
      */
     public function getContent()
     {
@@ -272,6 +296,8 @@ class BinaryFileResponse extends Response
 
     /**
      * Trust X-Sendfile-Type header.
+     *
+     * @since v2.2.0
      */
     public static function trustXSendfileTypeHeader()
     {

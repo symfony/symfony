@@ -30,6 +30,8 @@ namespace Symfony\Component\Translation;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @see    http://en.wikipedia.org/wiki/Interval_%28mathematics%29#The_ISO_notation
+ *
+ * @since v2.0.0
  */
 class Interval
 {
@@ -42,6 +44,8 @@ class Interval
      * @return Boolean
      *
      * @throws \InvalidArgumentException
+     *
+     * @since v2.1.0
      */
     public static function test($number, $interval)
     {
@@ -74,6 +78,8 @@ class Interval
      * Returns a Regexp that matches valid intervals.
      *
      * @return string A Regexp (without the delimiters)
+     *
+     * @since v2.1.0
      */
     public static function getIntervalRegexp()
     {
@@ -94,6 +100,9 @@ class Interval
 EOF;
     }
 
+    /**
+     * @since v2.1.0
+     */
     private static function convertNumber($number)
     {
         if ('-Inf' === $number) {

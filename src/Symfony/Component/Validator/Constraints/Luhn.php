@@ -17,6 +17,8 @@ use Symfony\Component\Validator\Constraint;
  * Metadata for the LuhnValidator.
  *
  * @Annotation
+ *
+ * @since v2.2.0
  */
 class Luhn extends Constraint
 {

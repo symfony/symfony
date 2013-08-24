@@ -26,6 +26,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class YamlDumper extends Dumper
 {
@@ -37,6 +39,8 @@ class YamlDumper extends Dumper
      * @param ContainerBuilder $container The service container to dump
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function __construct(ContainerBuilder $container)
     {
@@ -53,6 +57,8 @@ class YamlDumper extends Dumper
      * @return string A YAML string representing of the service container
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function dump(array $options = array())
     {
@@ -66,6 +72,8 @@ class YamlDumper extends Dumper
      * @param Definition $definition
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     private function addService($id, $definition)
     {
@@ -156,6 +164,8 @@ class YamlDumper extends Dumper
      * @param Alias  $id
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     private function addServiceAlias($alias, $id)
     {
@@ -170,6 +180,8 @@ class YamlDumper extends Dumper
      * Adds services
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     private function addServices()
     {
@@ -197,6 +209,8 @@ class YamlDumper extends Dumper
      * Adds parameters
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     private function addParameters()
     {
@@ -217,6 +231,8 @@ class YamlDumper extends Dumper
      * @return mixed
      *
      * @throws RuntimeException When trying to dump object or resource
+     *
+     * @since v2.0.0
      */
     private function dumpValue($value)
     {
@@ -245,6 +261,8 @@ class YamlDumper extends Dumper
      * @param Reference $reference
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     private function getServiceCall($id, Reference $reference = null)
     {
@@ -261,6 +279,8 @@ class YamlDumper extends Dumper
      * @param string $id
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     private function getParameterCall($id)
     {
@@ -274,6 +294,8 @@ class YamlDumper extends Dumper
      * @param Boolean $escape
      *
      * @return array
+     *
+     * @since v2.0.22
      */
     private function prepareParameters($parameters, $escape = true)
     {
@@ -297,6 +319,8 @@ class YamlDumper extends Dumper
      * @param array $arguments
      *
      * @return array
+     *
+     * @since v2.0.0
      */
     private function escape($arguments)
     {

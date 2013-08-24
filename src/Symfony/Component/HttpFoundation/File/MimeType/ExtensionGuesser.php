@@ -22,6 +22,8 @@ namespace Symfony\Component\HttpFoundation\File\MimeType;
  *     $guesser->register(new MyCustomExtensionGuesser());
  *
  * The last registered guesser is preferred over previously registered ones.
+ *
+ * @since v2.1.0
  */
 class ExtensionGuesser implements ExtensionGuesserInterface
 {
@@ -43,6 +45,8 @@ class ExtensionGuesser implements ExtensionGuesserInterface
      * Returns the singleton instance
      *
      * @return ExtensionGuesser
+     *
+     * @since v2.1.0
      */
     public static function getInstance()
     {
@@ -55,6 +59,8 @@ class ExtensionGuesser implements ExtensionGuesserInterface
 
     /**
      * Registers all natively provided extension guessers
+     *
+     * @since v2.1.0
      */
     private function __construct()
     {
@@ -67,6 +73,8 @@ class ExtensionGuesser implements ExtensionGuesserInterface
      * When guessing, this guesser is preferred over previously registered ones.
      *
      * @param ExtensionGuesserInterface $guesser
+     *
+     * @since v2.1.0
      */
     public function register(ExtensionGuesserInterface $guesser)
     {
@@ -83,6 +91,8 @@ class ExtensionGuesser implements ExtensionGuesserInterface
      *
      * @param string $mimeType The mime type
      * @return string          The guessed extension or NULL, if none could be guessed
+     *
+     * @since v2.1.0
      */
     public function guess($mimeType)
     {

@@ -17,6 +17,8 @@ use Symfony\Bridge\Twig\Node\FormThemeNode;
  * Token Parser for the 'form_theme' tag.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class FormThemeTokenParser extends \Twig_TokenParser
 {
@@ -26,6 +28,8 @@ class FormThemeTokenParser extends \Twig_TokenParser
      * @param \Twig_Token $token A Twig_Token instance
      *
      * @return \Twig_NodeInterface A Twig_NodeInterface instance
+     *
+     * @since v2.0.0
      */
     public function parse(\Twig_Token $token)
     {
@@ -53,6 +57,8 @@ class FormThemeTokenParser extends \Twig_TokenParser
      * Gets the tag name associated with this token parser.
      *
      * @return string The tag name
+     *
+     * @since v2.0.0
      */
     public function getTag()
     {

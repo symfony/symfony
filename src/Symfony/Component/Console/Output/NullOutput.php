@@ -23,11 +23,15 @@ use Symfony\Component\Console\Formatter\OutputFormatterInterface;
  * @author Tobias Schultze <http://tobion.de>
  *
  * @api
+ *
+ * @since v2.3.0
  */
 class NullOutput implements OutputInterface
 {
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function setFormatter(OutputFormatterInterface $formatter)
     {
@@ -36,6 +40,8 @@ class NullOutput implements OutputInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getFormatter()
     {
@@ -45,6 +51,8 @@ class NullOutput implements OutputInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function setDecorated($decorated)
     {
@@ -53,6 +61,8 @@ class NullOutput implements OutputInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function isDecorated()
     {
@@ -61,6 +71,8 @@ class NullOutput implements OutputInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function setVerbosity($level)
     {
@@ -69,6 +81,8 @@ class NullOutput implements OutputInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getVerbosity()
     {
@@ -77,6 +91,8 @@ class NullOutput implements OutputInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function writeln($messages, $type = self::OUTPUT_NORMAL)
     {
@@ -85,6 +101,8 @@ class NullOutput implements OutputInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function write($messages, $newline = false, $type = self::OUTPUT_NORMAL)
     {

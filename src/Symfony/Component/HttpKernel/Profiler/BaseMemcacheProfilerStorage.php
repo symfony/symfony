@@ -15,6 +15,8 @@ namespace Symfony\Component\HttpKernel\Profiler;
  * Base Memcache storage for profiling information in a Memcache.
  *
  * @author Andrej Hudec <pulzarraider@gmail.com>
+ *
+ * @since v2.1.0
  */
 abstract class BaseMemcacheProfilerStorage implements ProfilerStorageInterface
 {
@@ -30,6 +32,8 @@ abstract class BaseMemcacheProfilerStorage implements ProfilerStorageInterface
      * @param string $username
      * @param string $password
      * @param int    $lifetime The lifetime to use for the purge
+     *
+     * @since v2.1.0
      */
     public function __construct($dsn, $username = '', $password = '', $lifetime = 86400)
     {
@@ -39,6 +43,8 @@ abstract class BaseMemcacheProfilerStorage implements ProfilerStorageInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function find($ip, $url, $limit, $method, $start = null, $end = null)
     {
@@ -102,6 +108,8 @@ abstract class BaseMemcacheProfilerStorage implements ProfilerStorageInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function purge()
     {
@@ -131,6 +139,8 @@ abstract class BaseMemcacheProfilerStorage implements ProfilerStorageInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function read($token)
     {
@@ -149,6 +159,8 @@ abstract class BaseMemcacheProfilerStorage implements ProfilerStorageInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function write(Profile $profile)
     {
@@ -195,6 +207,8 @@ abstract class BaseMemcacheProfilerStorage implements ProfilerStorageInterface
      * @param string $key
      *
      * @return mixed
+     *
+     * @since v2.1.0
      */
     abstract protected function getValue($key);
 
@@ -206,6 +220,8 @@ abstract class BaseMemcacheProfilerStorage implements ProfilerStorageInterface
      * @param int    $expiration
      *
      * @return boolean
+     *
+     * @since v2.1.0
      */
     abstract protected function setValue($key, $value, $expiration = 0);
 
@@ -215,6 +231,8 @@ abstract class BaseMemcacheProfilerStorage implements ProfilerStorageInterface
      * @param string $key
      *
      * @return boolean
+     *
+     * @since v2.1.0
      */
     abstract protected function delete($key);
 
@@ -225,9 +243,14 @@ abstract class BaseMemcacheProfilerStorage implements ProfilerStorageInterface
      * @param int    $expiration
      *
      * @return boolean
+     *
+     * @since v2.1.0
      */
     abstract protected function appendValue($key, $value, $expiration = 0);
 
+    /**
+     * @since v2.1.0
+     */
     private function createProfileFromData($token, $data, $parent = null)
     {
         $profile = new Profile($token);
@@ -266,6 +289,8 @@ abstract class BaseMemcacheProfilerStorage implements ProfilerStorageInterface
      * @param string $token
      *
      * @return string
+     *
+     * @since v2.1.0
      */
     private function getItemName($token)
     {
@@ -282,6 +307,8 @@ abstract class BaseMemcacheProfilerStorage implements ProfilerStorageInterface
      * Get name of index
      *
      * @return string
+     *
+     * @since v2.1.0
      */
     private function getIndexName()
     {
@@ -294,6 +321,9 @@ abstract class BaseMemcacheProfilerStorage implements ProfilerStorageInterface
         return false;
     }
 
+    /**
+     * @since v2.1.0
+     */
     private function isItemNameValid($name)
     {
         $length = strlen($name);

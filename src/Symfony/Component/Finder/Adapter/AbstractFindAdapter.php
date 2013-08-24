@@ -24,6 +24,8 @@ use Symfony\Component\Finder\Comparator\DateComparator;
  * Shell engine implementation using GNU find command.
  *
  * @author Jean-François Simon <contact@jfsimon.fr>
+ *
+ * @since v2.2.0
  */
 abstract class AbstractFindAdapter extends AbstractAdapter
 {
@@ -34,6 +36,8 @@ abstract class AbstractFindAdapter extends AbstractAdapter
 
     /**
      * Constructor.
+     *
+     * @since v2.2.0
      */
     public function __construct()
     {
@@ -42,6 +46,8 @@ abstract class AbstractFindAdapter extends AbstractAdapter
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function searchInDirectory($dir)
     {
@@ -124,6 +130,8 @@ abstract class AbstractFindAdapter extends AbstractAdapter
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     protected function canBeUsed()
     {
@@ -135,6 +143,8 @@ abstract class AbstractFindAdapter extends AbstractAdapter
      * @param string  $dir
      *
      * @return Command
+     *
+     * @since v2.2.0
      */
     protected function buildFindCommand(Command $command, $dir)
     {
@@ -149,6 +159,8 @@ abstract class AbstractFindAdapter extends AbstractAdapter
      * @param Command  $command
      * @param string[] $names
      * @param Boolean  $not
+     *
+     * @since v2.2.0
      */
     private function buildNamesFiltering(Command $command, array $names, $not = false)
     {
@@ -197,6 +209,8 @@ abstract class AbstractFindAdapter extends AbstractAdapter
      * @param string   $dir
      * @param string[] $paths
      * @param Boolean  $not
+     *
+     * @since v2.2.0
      */
     private function buildPathsFiltering(Command $command, $dir, array $paths, $not = false)
     {
@@ -237,6 +251,8 @@ abstract class AbstractFindAdapter extends AbstractAdapter
     /**
      * @param Command            $command
      * @param NumberComparator[] $sizes
+     *
+     * @since v2.2.0
      */
     private function buildSizesFiltering(Command $command, array $sizes)
     {
@@ -266,6 +282,8 @@ abstract class AbstractFindAdapter extends AbstractAdapter
     /**
      * @param Command          $command
      * @param DateComparator[] $dates
+     *
+     * @since v2.2.0
      */
     private function buildDatesFiltering(Command $command, array $dates)
     {
@@ -306,6 +324,8 @@ abstract class AbstractFindAdapter extends AbstractAdapter
      * @param string  $sort
      *
      * @throws \InvalidArgumentException
+     *
+     * @since v2.2.0
      */
     private function buildSorting(Command $command, $sort)
     {
@@ -315,6 +335,8 @@ abstract class AbstractFindAdapter extends AbstractAdapter
     /**
      * @param Command $command
      * @param string  $sort
+     *
+     * @since v2.2.0
      */
     abstract protected function buildFormatSorting(Command $command, $sort);
 
@@ -322,6 +344,8 @@ abstract class AbstractFindAdapter extends AbstractAdapter
      * @param Command $command
      * @param array   $contains
      * @param Boolean $not
+     *
+     * @since v2.2.0
      */
     abstract protected function buildContentFiltering(Command $command, array $contains, $not = false);
 }

@@ -39,6 +39,8 @@ namespace Symfony\Component\ClassLoader;
  * @author Kim Hemsø Rasmussen <kimhemsoe@gmail.com>
  *
  * @api
+ *
+ * @since v2.1.0
  */
 class XcacheClassLoader
 {
@@ -55,6 +57,8 @@ class XcacheClassLoader
      * @throws \InvalidArgumentException
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function __construct($prefix, $classFinder)
     {
@@ -74,6 +78,8 @@ class XcacheClassLoader
      * Registers this instance as an autoloader.
      *
      * @param Boolean $prepend Whether to prepend the autoloader or not
+     *
+     * @since v2.1.0
      */
     public function register($prepend = false)
     {
@@ -82,6 +88,8 @@ class XcacheClassLoader
 
     /**
      * Unregisters this instance as an autoloader.
+     *
+     * @since v2.1.0
      */
     public function unregister()
     {
@@ -94,6 +102,8 @@ class XcacheClassLoader
      * @param string $class The name of the class
      *
      * @return Boolean|null True, if loaded
+     *
+     * @since v2.1.0
      */
     public function loadClass($class)
     {
@@ -110,6 +120,8 @@ class XcacheClassLoader
      * @param string $class A class name to resolve to file
      *
      * @return string|null
+     *
+     * @since v2.1.0
      */
     public function findFile($class)
     {

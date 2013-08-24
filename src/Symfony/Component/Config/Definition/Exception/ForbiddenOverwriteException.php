@@ -16,6 +16,8 @@ namespace Symfony\Component\Config\Definition\Exception;
  * subsequent configuration file, but the entry node specifically forbids this.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class ForbiddenOverwriteException extends InvalidConfigurationException
 {

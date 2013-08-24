@@ -18,6 +18,8 @@ use Symfony\Component\Intl\Exception\RuntimeException;
  * A SVN repository containing ICU data.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.3.0
  */
 class SvnRepository
 {
@@ -45,6 +47,8 @@ class SvnRepository
      * @return SvnRepository The directory where the data is stored.
      *
      * @throws RuntimeException If an error occurs during the download.
+     *
+     * @since v2.3.0
      */
     public static function download($url, $targetDir)
     {
@@ -74,6 +78,8 @@ class SvnRepository
      * Reads the SVN repository at the given path.
      *
      * @param string $path The path to the repository.
+     *
+     * @since v2.3.0
      */
     public function __construct($path)
     {
@@ -84,6 +90,8 @@ class SvnRepository
      * Returns the path to the repository.
      *
      * @return string The path to the repository.
+     *
+     * @since v2.3.0
      */
     public function getPath()
     {
@@ -94,6 +102,8 @@ class SvnRepository
      * Returns the URL of the repository.
      *
      * @return string The URL of the repository.
+     *
+     * @since v2.3.0
      */
     public function getUrl()
     {
@@ -104,6 +114,8 @@ class SvnRepository
      * Returns the last commit of the repository.
      *
      * @return SvnCommit The last commit.
+     *
+     * @since v2.3.0
      */
     public function getLastCommit()
     {
@@ -120,6 +132,8 @@ class SvnRepository
      * @return \SimpleXMLElement The XML result from the "svn info" command.
      *
      * @throws RuntimeException If the "svn info" command failed.
+     *
+     * @since v2.3.0
      */
     private function getSvnInfo()
     {

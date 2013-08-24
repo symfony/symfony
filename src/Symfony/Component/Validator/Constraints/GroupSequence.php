@@ -19,6 +19,8 @@ namespace Symfony\Component\Validator\Constraints;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class GroupSequence
 {
@@ -28,6 +30,9 @@ class GroupSequence
      */
     public $groups;
 
+    /**
+     * @since v2.0.0
+     */
     public function __construct(array $groups)
     {
         $this->groups = $groups['value'];

@@ -15,11 +15,15 @@ namespace Symfony\Component\Intl\ResourceBundle;
  * Default implementation of {@link LanguageBundleInterface}.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.3.0
  */
 class LanguageBundle extends AbstractBundle implements LanguageBundleInterface
 {
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getLanguageName($lang, $region = null, $locale = null)
     {
@@ -42,6 +46,8 @@ class LanguageBundle extends AbstractBundle implements LanguageBundleInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getLanguageNames($locale = null)
     {
@@ -62,6 +68,8 @@ class LanguageBundle extends AbstractBundle implements LanguageBundleInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getScriptName($script, $lang = null, $locale = null)
     {
@@ -95,6 +103,8 @@ class LanguageBundle extends AbstractBundle implements LanguageBundleInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getScriptNames($locale = null)
     {

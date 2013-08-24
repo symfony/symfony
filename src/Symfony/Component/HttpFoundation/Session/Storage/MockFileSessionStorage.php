@@ -21,6 +21,8 @@ namespace Symfony\Component\HttpFoundation\Session\Storage;
  * or session.* PHP ini directives.
  *
  * @author Drak <drak@zikula.org>
+ *
+ * @since v2.1.0
  */
 class MockFileSessionStorage extends MockArraySessionStorage
 {
@@ -35,6 +37,8 @@ class MockFileSessionStorage extends MockArraySessionStorage
      * @param string      $savePath Path of directory to save session files.
      * @param string      $name     Session name.
      * @param MetadataBag $metaBag  MetadataBag instance.
+     *
+     * @since v2.1.0
      */
     public function __construct($savePath = null, $name = 'MOCKSESSID', MetadataBag $metaBag = null)
     {
@@ -53,6 +57,8 @@ class MockFileSessionStorage extends MockArraySessionStorage
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function start()
     {
@@ -73,6 +79,8 @@ class MockFileSessionStorage extends MockArraySessionStorage
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function regenerate($destroy = false, $lifetime = null)
     {
@@ -89,6 +97,8 @@ class MockFileSessionStorage extends MockArraySessionStorage
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function save()
     {
@@ -107,6 +117,8 @@ class MockFileSessionStorage extends MockArraySessionStorage
     /**
      * Deletes a session from persistent storage.
      * Deliberately leaves session data in memory intact.
+     *
+     * @since v2.1.0
      */
     private function destroy()
     {
@@ -119,6 +131,8 @@ class MockFileSessionStorage extends MockArraySessionStorage
      * Calculate path to file.
      *
      * @return string File path
+     *
+     * @since v2.1.0
      */
     private function getFilePath()
     {
@@ -127,6 +141,8 @@ class MockFileSessionStorage extends MockArraySessionStorage
 
     /**
      * Reads session from storage and loads session.
+     *
+     * @since v2.1.0
      */
     private function read()
     {

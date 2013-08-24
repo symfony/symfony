@@ -20,6 +20,8 @@ use Symfony\Component\Intl\Collator\Collator;
  *
  * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
  *             {@link \Symfony\Component\Intl\Collator\Collator} instead.
+ *
+ * @since v2.3.0
  */
 class StubCollator extends Collator
 {

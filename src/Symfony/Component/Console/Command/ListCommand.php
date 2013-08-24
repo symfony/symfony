@@ -22,11 +22,15 @@ use Symfony\Component\Console\Input\InputDefinition;
  * ListCommand displays the list of all available commands for the application.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class ListCommand extends Command
 {
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     protected function configure()
     {
@@ -57,6 +61,8 @@ EOF
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getNativeDefinition()
     {
@@ -65,6 +71,8 @@ EOF
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -82,6 +90,8 @@ EOF
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.12
      */
     private function createDefinition()
     {

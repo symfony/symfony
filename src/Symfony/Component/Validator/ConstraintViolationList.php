@@ -15,6 +15,8 @@ namespace Symfony\Component\Validator;
  * Default implementation of {@ConstraintViolationListInterface}.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.2.0
  */
 class ConstraintViolationList implements \IteratorAggregate, ConstraintViolationListInterface
 {
@@ -27,6 +29,8 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
      * Creates a new constraint violation list.
      *
      * @param ConstraintViolationInterface[] $violations The constraint violations to add to the list
+     *
+     * @since v2.1.0
      */
     public function __construct(array $violations = array())
     {
@@ -39,6 +43,8 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
      * Converts the violation into a string for debugging purposes.
      *
      * @return string The violation as string.
+     *
+     * @since v2.0.0
      */
     public function __toString()
     {
@@ -53,6 +59,8 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.2.0
      */
     public function add(ConstraintViolationInterface $violation)
     {
@@ -61,6 +69,8 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.2.0
      */
     public function addAll(ConstraintViolationListInterface $otherList)
     {
@@ -71,6 +81,8 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function get($offset)
     {
@@ -83,6 +95,8 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function has($offset)
     {
@@ -91,6 +105,8 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.2.0
      */
     public function set($offset, ConstraintViolationInterface $violation)
     {
@@ -99,6 +115,8 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function remove($offset)
     {
@@ -107,6 +125,8 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function getIterator()
     {
@@ -115,6 +135,8 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function count()
     {
@@ -123,6 +145,8 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function offsetExists($offset)
     {
@@ -131,6 +155,8 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function offsetGet($offset)
     {
@@ -139,6 +165,8 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function offsetSet($offset, $violation)
     {
@@ -151,6 +179,8 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function offsetUnset($offset)
     {

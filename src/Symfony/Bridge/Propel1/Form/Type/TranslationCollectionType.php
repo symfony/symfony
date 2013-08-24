@@ -21,11 +21,15 @@ use Symfony\Bridge\Propel1\Form\EventListener\TranslationCollectionFormListener;
  * form type for i18n-columns in propel
  *
  * @author Patrick Kaufmann
+ *
+ * @since v2.2.0
  */
 class TranslationCollectionType extends AbstractType
 {
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -40,6 +44,9 @@ class TranslationCollectionType extends AbstractType
         $builder->addEventSubscriber($listener);
     }
 
+    /**
+     * @since v2.2.0
+     */
     public function getParent()
     {
         return 'collection';
@@ -47,6 +54,8 @@ class TranslationCollectionType extends AbstractType
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function getName()
     {
@@ -55,6 +64,8 @@ class TranslationCollectionType extends AbstractType
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {

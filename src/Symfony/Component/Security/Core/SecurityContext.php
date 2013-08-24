@@ -23,6 +23,8 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class SecurityContext implements SecurityContextInterface
 {
@@ -37,6 +39,8 @@ class SecurityContext implements SecurityContextInterface
      * @param AuthenticationManagerInterface      $authenticationManager An AuthenticationManager instance
      * @param AccessDecisionManagerInterface|null $accessDecisionManager An AccessDecisionManager instance
      * @param Boolean                             $alwaysAuthenticate
+     *
+     * @since v2.0.0
      */
     public function __construct(AuthenticationManagerInterface $authenticationManager, AccessDecisionManagerInterface $accessDecisionManager, $alwaysAuthenticate = false)
     {
@@ -54,6 +58,8 @@ class SecurityContext implements SecurityContextInterface
      * @param mixed|null $object
      *
      * @return Boolean
+     *
+     * @since v2.1.0
      */
     final public function isGranted($attributes, $object = null)
     {
@@ -76,6 +82,8 @@ class SecurityContext implements SecurityContextInterface
      * Gets the currently authenticated token.
      *
      * @return TokenInterface|null A TokenInterface instance or null if no authentication information is available
+     *
+     * @since v2.0.0
      */
     public function getToken()
     {
@@ -86,6 +94,8 @@ class SecurityContext implements SecurityContextInterface
      * Sets the currently authenticated token.
      *
      * @param TokenInterface $token A TokenInterface token, or null if no further authentication information should be stored
+     *
+     * @since v2.0.0
      */
     public function setToken(TokenInterface $token = null)
     {

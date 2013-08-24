@@ -18,11 +18,15 @@ use Symfony\Component\Validator\ConstraintValidator;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class NotNullValidator extends ConstraintValidator
 {
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function validate($value, Constraint $constraint)
     {

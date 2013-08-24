@@ -18,11 +18,15 @@ use Symfony\Component\Form\ButtonTypeInterface;
  * A reset button.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.3.0
  */
 class ResetType extends AbstractType implements ButtonTypeInterface
 {
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getParent()
     {
@@ -31,6 +35,8 @@ class ResetType extends AbstractType implements ButtonTypeInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getName()
     {

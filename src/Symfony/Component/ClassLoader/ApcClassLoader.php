@@ -38,6 +38,8 @@ namespace Symfony\Component\ClassLoader;
  * @author Kris Wallsmith <kris@symfony.com>
  *
  * @api
+ *
+ * @since v2.1.0
  */
 class ApcClassLoader
 {
@@ -61,6 +63,8 @@ class ApcClassLoader
      * @throws \InvalidArgumentException
      *
      * @api
+     *
+     * @since v2.2.0
      */
     public function __construct($prefix, $decorated)
     {
@@ -80,6 +84,8 @@ class ApcClassLoader
      * Registers this instance as an autoloader.
      *
      * @param Boolean $prepend Whether to prepend the autoloader or not
+     *
+     * @since v2.1.0
      */
     public function register($prepend = false)
     {
@@ -88,6 +94,8 @@ class ApcClassLoader
 
     /**
      * Unregisters this instance as an autoloader.
+     *
+     * @since v2.1.0
      */
     public function unregister()
     {
@@ -100,6 +108,8 @@ class ApcClassLoader
      * @param string $class The name of the class
      *
      * @return Boolean|null True, if loaded
+     *
+     * @since v2.1.0
      */
     public function loadClass($class)
     {
@@ -116,6 +126,8 @@ class ApcClassLoader
      * @param string $class A class name to resolve to file
      *
      * @return string|null
+     *
+     * @since v2.1.0
      */
     public function findFile($class)
     {
@@ -128,6 +140,8 @@ class ApcClassLoader
 
     /**
      * Passes through all unknown calls onto the decorated object.
+     *
+     * @since v2.2.0
      */
     public function __call($method, $args)
     {

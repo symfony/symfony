@@ -28,6 +28,8 @@ use Symfony\Component\Console\Output\ConsoleOutputInterface;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.1.0
  */
 class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
 {
@@ -41,6 +43,8 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
      * @param OutputFormatterInterface|null $formatter Output formatter instance (null to use default OutputFormatter)
      *
      * @api
+     *
+     * @since v2.0.10
      */
     public function __construct($verbosity = self::VERBOSITY_NORMAL, $decorated = null, OutputFormatterInterface $formatter = null)
     {
@@ -56,6 +60,8 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function setDecorated($decorated)
     {
@@ -65,6 +71,8 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function setFormatter(OutputFormatterInterface $formatter)
     {
@@ -74,6 +82,8 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function setVerbosity($level)
     {
@@ -83,6 +93,8 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getErrorOutput()
     {
@@ -91,6 +103,8 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function setErrorOutput(OutputInterface $error)
     {
@@ -106,6 +120,8 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
      * output.
      *
      * @return boolean
+     *
+     * @since v2.0.13
      */
     protected function hasStdoutSupport()
     {

@@ -15,6 +15,8 @@ namespace Symfony\Component\DomCrawler\Field;
  * FormField is the abstract class for all form fields.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 abstract class FormField
 {
@@ -47,6 +49,8 @@ abstract class FormField
      * Constructor.
      *
      * @param \DOMNode $node The node associated with this field
+     *
+     * @since v2.0.0
      */
     public function __construct(\DOMNode $node)
     {
@@ -67,6 +71,8 @@ abstract class FormField
      * Returns the name of the field.
      *
      * @return string The name of the field
+     *
+     * @since v2.0.0
      */
     public function getName()
     {
@@ -77,6 +83,8 @@ abstract class FormField
      * Gets the value of the field.
      *
      * @return string|array The value of the field
+     *
+     * @since v2.0.0
      */
     public function getValue()
     {
@@ -89,6 +97,8 @@ abstract class FormField
      * @param string $value The value of the field
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setValue($value)
     {
@@ -99,6 +109,8 @@ abstract class FormField
      * Returns true if the field should be included in the submitted values.
      *
      * @return Boolean true if the field should be included in the submitted values, false otherwise
+     *
+     * @since v2.0.0
      */
     public function hasValue()
     {
@@ -109,6 +121,8 @@ abstract class FormField
      * Check if the current field is disabled
      *
      * @return Boolean
+     *
+     * @since v2.0.1
      */
     public function isDisabled()
     {
@@ -117,6 +131,8 @@ abstract class FormField
 
     /**
      * Initializes the form field.
+     *
+     * @since v2.0.0
      */
     abstract protected function initialize();
 }

@@ -21,6 +21,8 @@ interface GroupSequenceProviderInterface
      * of the object.
      *
      * @return array An array of validation groups
+     *
+     * @since v2.1.0
      */
     public function getGroupSequence();
 }

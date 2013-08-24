@@ -16,6 +16,8 @@ namespace Symfony\Component\Config\Definition\Exception;
  * internally to signal the parent scope to unset a key.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class UnsetKeyException extends Exception
 {

@@ -26,6 +26,8 @@ interface ParameterBagInterface
      * Clears all parameters.
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function clear();
 
@@ -35,6 +37,8 @@ interface ParameterBagInterface
      * @param array $parameters An array of parameters
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function add(array $parameters);
 
@@ -44,6 +48,8 @@ interface ParameterBagInterface
      * @return array An array of parameters
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function all();
 
@@ -57,6 +63,8 @@ interface ParameterBagInterface
      * @throws ParameterNotFoundException if the parameter is not defined
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function get($name);
 
@@ -67,6 +75,8 @@ interface ParameterBagInterface
      * @param mixed  $value The parameter value
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function set($name, $value);
 
@@ -78,11 +88,15 @@ interface ParameterBagInterface
      * @return Boolean true if the parameter name is defined, false otherwise
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function has($name);
 
     /**
      * Replaces parameter placeholders (%name%) by their values for all parameters.
+     *
+     * @since v2.1.0
      */
     public function resolve();
 
@@ -92,6 +106,8 @@ interface ParameterBagInterface
      * @param mixed $value A value
      *
      * @throws ParameterNotFoundException if a placeholder references a parameter that does not exist
+     *
+     * @since v2.1.0
      */
     public function resolveValue($value);
 
@@ -101,6 +117,8 @@ interface ParameterBagInterface
      * @param mixed $value
      *
      * @return mixed
+     *
+     * @since v2.1.0
      */
     public function escapeValue($value);
 
@@ -110,6 +128,8 @@ interface ParameterBagInterface
      * @param mixed $value
      *
      * @return mixed
+     *
+     * @since v2.1.0
      */
     public function unescapeValue($value);
 }

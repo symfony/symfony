@@ -22,6 +22,8 @@ interface TemplateFinderInterface
      * Find all the templates.
      *
      * @return array An array of templates of type TemplateReferenceInterface
+     *
+     * @since v2.1.0
      */
     public function findAllTemplates();
 }

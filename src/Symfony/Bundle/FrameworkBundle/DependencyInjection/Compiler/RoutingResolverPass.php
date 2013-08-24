@@ -19,9 +19,14 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
  * Adds tagged routing.loader services to routing.resolver service
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class RoutingResolverPass implements CompilerPassInterface
 {
+    /**
+     * @since v2.0.0
+     */
     public function process(ContainerBuilder $container)
     {
         if (false === $container->hasDefinition('routing.resolver')) {

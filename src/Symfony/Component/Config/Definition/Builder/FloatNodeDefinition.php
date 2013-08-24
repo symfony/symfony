@@ -17,6 +17,8 @@ use Symfony\Component\Config\Definition\FloatNode;
  * This class provides a fluent interface for defining a float node.
  *
  * @author Jeanmonod David <david.jeanmonod@gmail.com>
+ *
+ * @since v2.2.0
  */
 class FloatNodeDefinition extends NumericNodeDefinition
 {
@@ -24,6 +26,8 @@ class FloatNodeDefinition extends NumericNodeDefinition
      * Instantiates a Node.
      *
      * @return FloatNode The node
+     *
+     * @since v2.2.0
      */
     protected function instantiateNode()
     {

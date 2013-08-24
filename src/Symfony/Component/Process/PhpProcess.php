@@ -23,6 +23,8 @@ use Symfony\Component\Process\Exception\RuntimeException;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class PhpProcess extends Process
 {
@@ -38,6 +40,8 @@ class PhpProcess extends Process
      * @param array   $options An array of options for proc_open
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function __construct($script, $cwd = null, array $env = array(), $timeout = 60, array $options = array())
     {
@@ -50,6 +54,8 @@ class PhpProcess extends Process
      * Sets the path to the PHP binary to use.
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setPhpBinary($php)
     {
@@ -58,6 +64,8 @@ class PhpProcess extends Process
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.10
      */
     public function start($callback = null)
     {

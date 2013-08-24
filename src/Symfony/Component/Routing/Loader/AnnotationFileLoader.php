@@ -21,6 +21,8 @@ use Symfony\Component\Config\FileLocatorInterface;
  * on a PHP class and its methods.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class AnnotationFileLoader extends FileLoader
 {
@@ -34,6 +36,8 @@ class AnnotationFileLoader extends FileLoader
      * @param string|array          $paths   A path or an array of paths where to look for resources
      *
      * @throws \RuntimeException
+     *
+     * @since v2.2.0
      */
     public function __construct(FileLocatorInterface $locator, AnnotationClassLoader $loader, $paths = array())
     {
@@ -55,6 +59,8 @@ class AnnotationFileLoader extends FileLoader
      * @return RouteCollection A RouteCollection instance
      *
      * @throws \InvalidArgumentException When the file does not exist or its routes cannot be parsed
+     *
+     * @since v2.0.0
      */
     public function load($file, $type = null)
     {
@@ -71,6 +77,8 @@ class AnnotationFileLoader extends FileLoader
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function supports($resource, $type = null)
     {
@@ -83,6 +91,8 @@ class AnnotationFileLoader extends FileLoader
      * @param string $file A PHP file path
      *
      * @return string|false Full class name if found, false otherwise
+     *
+     * @since v2.0.0
      */
     protected function findClass($file)
     {

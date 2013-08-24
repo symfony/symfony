@@ -27,6 +27,8 @@ class HelperSet implements \IteratorAggregate
      * Constructor.
      *
      * @param Helper[] $helpers An array of helper.
+     *
+     * @since v2.0.0
      */
     public function __construct(array $helpers = array())
     {
@@ -41,6 +43,8 @@ class HelperSet implements \IteratorAggregate
      *
      * @param HelperInterface $helper The helper instance
      * @param string          $alias  An alias
+     *
+     * @since v2.0.0
      */
     public function set(HelperInterface $helper, $alias = null)
     {
@@ -58,6 +62,8 @@ class HelperSet implements \IteratorAggregate
      * @param string $name The helper name
      *
      * @return Boolean true if the helper is defined, false otherwise
+     *
+     * @since v2.0.0
      */
     public function has($name)
     {
@@ -72,6 +78,8 @@ class HelperSet implements \IteratorAggregate
      * @return HelperInterface The helper instance
      *
      * @throws \InvalidArgumentException if the helper is not defined
+     *
+     * @since v2.0.0
      */
     public function get($name)
     {
@@ -86,6 +94,8 @@ class HelperSet implements \IteratorAggregate
      * Sets the command associated with this helper set.
      *
      * @param Command $command A Command instance
+     *
+     * @since v2.0.0
      */
     public function setCommand(Command $command = null)
     {
@@ -96,6 +106,8 @@ class HelperSet implements \IteratorAggregate
      * Gets the command associated with this helper set.
      *
      * @return Command A Command instance
+     *
+     * @since v2.0.0
      */
     public function getCommand()
     {

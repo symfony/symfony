@@ -17,6 +17,8 @@ namespace Symfony\Component\BrowserKit;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class Cookie
 {
@@ -58,6 +60,8 @@ class Cookie
      * @param Boolean $encodedValue Whether the value is encoded or not
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function __construct($name, $value, $expires = null, $path = null, $domain = '', $secure = false, $httponly = true, $encodedValue = false)
     {
@@ -82,6 +86,8 @@ class Cookie
      * @return string The HTTP representation of the Cookie
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function __toString()
     {
@@ -121,6 +127,8 @@ class Cookie
      * @throws \InvalidArgumentException
      *
      * @api
+     *
+     * @since v2.0.16
      */
     public static function fromString($cookie, $url = null)
     {
@@ -193,6 +201,9 @@ class Cookie
         );
     }
 
+    /**
+     * @since v2.0.0
+     */
     private static function parseDate($dateValue)
     {
         // trim single quotes around date if present
@@ -220,6 +231,8 @@ class Cookie
      * @return string The cookie name
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getName()
     {
@@ -232,6 +245,8 @@ class Cookie
      * @return string The cookie value
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getValue()
     {
@@ -244,6 +259,8 @@ class Cookie
      * @return string The cookie value
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getRawValue()
     {
@@ -256,6 +273,8 @@ class Cookie
      * @return string The cookie expires time
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getExpiresTime()
     {
@@ -268,6 +287,8 @@ class Cookie
      * @return string The cookie path
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getPath()
     {
@@ -280,6 +301,8 @@ class Cookie
      * @return string The cookie domain
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getDomain()
     {
@@ -292,6 +315,8 @@ class Cookie
      * @return Boolean The cookie secure flag
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function isSecure()
     {
@@ -304,6 +329,8 @@ class Cookie
      * @return Boolean The cookie httponly flag
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function isHttpOnly()
     {
@@ -316,6 +343,8 @@ class Cookie
      * @return Boolean true if the cookie has expired, false otherwise
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function isExpired()
     {

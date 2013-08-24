@@ -25,18 +25,26 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * ExceptionListener.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.1.0
  */
 class ExceptionListener implements EventSubscriberInterface
 {
     protected $controller;
     protected $logger;
 
+    /**
+     * @since v2.0.0
+     */
     public function __construct($controller, LoggerInterface $logger = null)
     {
         $this->controller = $controller;
         $this->logger = $logger;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function onKernelException(GetResponseForExceptionEvent $event)
     {
         static $handling;
@@ -71,6 +79,9 @@ class ExceptionListener implements EventSubscriberInterface
         $handling = false;
     }
 
+    /**
+     * @since v2.1.0
+     */
     public static function getSubscribedEvents()
     {
         return array(
@@ -84,6 +95,8 @@ class ExceptionListener implements EventSubscriberInterface
      * @param \Exception $exception The original \Exception instance
      * @param string     $message   The error message to log
      * @param Boolean    $original  False when the handling of the exception thrown another exception
+     *
+     * @since v2.2.0
      */
     protected function logException(\Exception $exception, $message, $original = true)
     {

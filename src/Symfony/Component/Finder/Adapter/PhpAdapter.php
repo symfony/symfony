@@ -17,11 +17,15 @@ use Symfony\Component\Finder\Iterator;
  * PHP finder engine implementation.
  *
  * @author Jean-François Simon <contact@jfsimon.fr>
+ *
+ * @since v2.2.0
  */
 class PhpAdapter extends AbstractAdapter
 {
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function searchInDirectory($dir)
     {
@@ -82,6 +86,8 @@ class PhpAdapter extends AbstractAdapter
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function getName()
     {
@@ -90,6 +96,8 @@ class PhpAdapter extends AbstractAdapter
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     protected function canBeUsed()
     {

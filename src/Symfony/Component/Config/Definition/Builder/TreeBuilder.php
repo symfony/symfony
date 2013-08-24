@@ -17,6 +17,8 @@ use Symfony\Component\Config\Definition\NodeInterface;
  * This is the entry class for building a config tree.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class TreeBuilder implements NodeParentInterface
 {
@@ -34,6 +36,8 @@ class TreeBuilder implements NodeParentInterface
      * @return ArrayNodeDefinition|NodeDefinition The root node (as an ArrayNodeDefinition when the type is 'array')
      *
      * @throws \RuntimeException When the node type is not supported
+     *
+     * @since v2.0.0
      */
     public function root($name, $type = 'array', NodeBuilder $builder = null)
     {
@@ -48,6 +52,8 @@ class TreeBuilder implements NodeParentInterface
      * @return NodeInterface
      *
      * @throws \RuntimeException
+     *
+     * @since v2.0.0
      */
     public function buildTree()
     {

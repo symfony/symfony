@@ -17,6 +17,8 @@ use Symfony\Component\OptionsResolver\Exception\OptionDefinitionException;
  * Container for resolving inter-dependent options.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.1.0
  */
 class Options implements \ArrayAccess, \Iterator, \Countable
 {
@@ -76,6 +78,8 @@ class Options implements \ArrayAccess, \Iterator, \Countable
      * @throws OptionDefinitionException If options have already been read.
      *                                   Once options are read, the container
      *                                   becomes immutable.
+     *
+     * @since v2.1.0
      */
     public function set($option, $value)
     {
@@ -113,6 +117,8 @@ class Options implements \ArrayAccess, \Iterator, \Countable
      * @throws OptionDefinitionException If options have already been read.
      *                                   Once options are read, the container
      *                                   becomes immutable.
+     *
+     * @since v2.1.0
      */
     public function setNormalizer($option, \Closure $normalizer)
     {
@@ -134,6 +140,8 @@ class Options implements \ArrayAccess, \Iterator, \Countable
      * @throws OptionDefinitionException If options have already been read.
      *                                   Once options are read, the container
      *                                   becomes immutable.
+     *
+     * @since v2.1.0
      */
     public function replace(array $options)
     {
@@ -170,6 +178,8 @@ class Options implements \ArrayAccess, \Iterator, \Countable
      * @throws OptionDefinitionException If options have already been read.
      *                                   Once options are read, the container
      *                                   becomes immutable.
+     *
+     * @since v2.1.0
      */
     public function overload($option, $value)
     {
@@ -219,6 +229,8 @@ class Options implements \ArrayAccess, \Iterator, \Countable
      * @throws \OutOfBoundsException     If the option does not exist.
      * @throws OptionDefinitionException If a cyclic dependency is detected
      *                                   between two lazy options.
+     *
+     * @since v2.1.0
      */
     public function get($option)
     {
@@ -245,6 +257,8 @@ class Options implements \ArrayAccess, \Iterator, \Countable
      * @param string $option The option name.
      *
      * @return Boolean Whether the option exists.
+     *
+     * @since v2.1.0
      */
     public function has($option)
     {
@@ -259,6 +273,8 @@ class Options implements \ArrayAccess, \Iterator, \Countable
      * @throws OptionDefinitionException If options have already been read.
      *                                   Once options are read, the container
      *                                   becomes immutable.
+     *
+     * @since v2.1.0
      */
     public function remove($option)
     {
@@ -277,6 +293,8 @@ class Options implements \ArrayAccess, \Iterator, \Countable
      * @throws OptionDefinitionException If options have already been read.
      *                                   Once options are read, the container
      *                                   becomes immutable.
+     *
+     * @since v2.1.0
      */
     public function clear()
     {
@@ -295,6 +313,8 @@ class Options implements \ArrayAccess, \Iterator, \Countable
      * Lazy options are evaluated at this point.
      *
      * @return array The option values.
+     *
+     * @since v2.1.0
      */
     public function all()
     {
@@ -327,6 +347,8 @@ class Options implements \ArrayAccess, \Iterator, \Countable
      * @return Boolean Whether the option exists.
      *
      * @see \ArrayAccess::offsetExists()
+     *
+     * @since v2.1.0
      */
     public function offsetExists($option)
     {
@@ -345,6 +367,8 @@ class Options implements \ArrayAccess, \Iterator, \Countable
      *                                   between two lazy options.
      *
      * @see \ArrayAccess::offsetGet()
+     *
+     * @since v2.1.0
      */
     public function offsetGet($option)
     {
@@ -363,6 +387,8 @@ class Options implements \ArrayAccess, \Iterator, \Countable
      *                                   becomes immutable.
      *
      * @see \ArrayAccess::offsetSet()
+     *
+     * @since v2.1.0
      */
     public function offsetSet($option, $value)
     {
@@ -379,6 +405,8 @@ class Options implements \ArrayAccess, \Iterator, \Countable
      *                                   becomes immutable.
      *
      * @see \ArrayAccess::offsetUnset()
+     *
+     * @since v2.1.0
      */
     public function offsetUnset($option)
     {
@@ -387,6 +415,8 @@ class Options implements \ArrayAccess, \Iterator, \Countable
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function current()
     {
@@ -395,6 +425,8 @@ class Options implements \ArrayAccess, \Iterator, \Countable
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function next()
     {
@@ -403,6 +435,8 @@ class Options implements \ArrayAccess, \Iterator, \Countable
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function key()
     {
@@ -411,6 +445,8 @@ class Options implements \ArrayAccess, \Iterator, \Countable
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function valid()
     {
@@ -419,6 +455,8 @@ class Options implements \ArrayAccess, \Iterator, \Countable
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function rewind()
     {
@@ -427,6 +465,8 @@ class Options implements \ArrayAccess, \Iterator, \Countable
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function count()
     {
@@ -443,6 +483,8 @@ class Options implements \ArrayAccess, \Iterator, \Countable
      *
      * @throws OptionDefinitionException If the option has a cyclic dependency
      *                                   on another option.
+     *
+     * @since v2.1.0
      */
     private function resolve($option)
     {
@@ -481,6 +523,8 @@ class Options implements \ArrayAccess, \Iterator, \Countable
      *
      * @throws OptionDefinitionException If the option has a cyclic dependency
      *                                   on another option.
+     *
+     * @since v2.1.0
      */
     private function normalize($option)
     {

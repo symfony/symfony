@@ -15,6 +15,8 @@ namespace Symfony\Component\Stopwatch;
  * Represents an Period for an Event.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.2.0
  */
 class StopwatchPeriod
 {
@@ -27,6 +29,8 @@ class StopwatchPeriod
      *
      * @param integer $start The relative time of the start of the period
      * @param integer $end   The relative time of the end of the period
+     *
+     * @since v2.2.0
      */
     public function __construct($start, $end)
     {
@@ -39,6 +43,8 @@ class StopwatchPeriod
      * Gets the relative time of the start of the period.
      *
      * @return integer The time (in milliseconds)
+     *
+     * @since v2.2.0
      */
     public function getStartTime()
     {
@@ -49,6 +55,8 @@ class StopwatchPeriod
      * Gets the relative time of the end of the period.
      *
      * @return integer The time (in milliseconds)
+     *
+     * @since v2.2.0
      */
     public function getEndTime()
     {
@@ -59,6 +67,8 @@ class StopwatchPeriod
      * Gets the time spent in this period.
      *
      * @return integer The period duration (in milliseconds)
+     *
+     * @since v2.2.0
      */
     public function getDuration()
     {
@@ -69,6 +79,8 @@ class StopwatchPeriod
      * Gets the memory usage.
      *
      * @return integer The memory usage (in bytes)
+     *
+     * @since v2.2.0
      */
     public function getMemory()
     {

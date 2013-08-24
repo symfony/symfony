@@ -16,11 +16,15 @@ namespace Symfony\Component\Security\Core\Exception;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Alexander <iam.asm89@gmail.com>
+ *
+ * @since v2.0.0
  */
 class AccountExpiredException extends AccountStatusException
 {
     /**
      * {@inheritDoc}
+     *
+     * @since v2.2.0
      */
     public function getMessageKey()
     {

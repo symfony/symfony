@@ -25,11 +25,15 @@ use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
  *   * floats
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class ScalarNode extends VariableNode
 {
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     protected function validateType($value)
     {

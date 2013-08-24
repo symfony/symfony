@@ -16,6 +16,8 @@ namespace Symfony\Component\Security\Acl\Exception;
  * one ACL of the same class type concurrently.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class ConcurrentModificationException extends Exception
 {

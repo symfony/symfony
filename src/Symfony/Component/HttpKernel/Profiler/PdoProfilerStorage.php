@@ -16,6 +16,8 @@ namespace Symfony\Component\HttpKernel\Profiler;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Jan Schumann <js@schumann-it.com>
+ *
+ * @since v2.0.0
  */
 abstract class PdoProfilerStorage implements ProfilerStorageInterface
 {
@@ -32,6 +34,8 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
      * @param string  $username The username for the database
      * @param string  $password The password for the database
      * @param integer $lifetime The lifetime to use for the purge
+     *
+     * @since v2.0.0
      */
     public function __construct($dsn, $username = '', $password = '', $lifetime = 86400)
     {
@@ -43,6 +47,8 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function find($ip, $url, $limit, $method, $start = null, $end = null)
     {
@@ -67,6 +73,8 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function read($token)
     {
@@ -83,6 +91,8 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function write(Profile $profile)
     {
@@ -117,6 +127,8 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function purge()
     {
@@ -136,6 +148,8 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
      * @param string $method The request method
      *
      * @return array An array with (criteria, args)
+     *
+     * @since v2.2.0
      */
     abstract protected function buildCriteria($ip, $url, $start, $end, $limit, $method);
 
@@ -143,9 +157,14 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
      * Initializes the database
      *
      * @throws \RuntimeException When the requested database driver is not installed
+     *
+     * @since v2.0.0
      */
     abstract protected function initDb();
 
+    /**
+     * @since v2.0.0
+     */
     protected function cleanup()
     {
         $db = $this->initDb();
@@ -153,6 +172,9 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
         $this->close($db);
     }
 
+    /**
+     * @since v2.0.0
+     */
     protected function exec($db, $query, array $args = array())
     {
         $stmt = $this->prepareStatement($db, $query);
@@ -166,6 +188,9 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
         }
     }
 
+    /**
+     * @since v2.0.0
+     */
     protected function prepareStatement($db, $query)
     {
         try {
@@ -181,6 +206,9 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
         return $stmt;
     }
 
+    /**
+     * @since v2.0.0
+     */
     protected function fetch($db, $query, array $args = array())
     {
         $stmt = $this->prepareStatement($db, $query);
@@ -194,10 +222,16 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
         return $return;
     }
 
+    /**
+     * @since v2.0.0
+     */
     protected function close($db)
     {
     }
 
+    /**
+     * @since v2.0.0
+     */
     protected function createProfileFromData($token, $data, $parent = null)
     {
         $profile = new Profile($token);
@@ -227,6 +261,8 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
      * @param string $parent The parent instance
      *
      * @return Profile[] An array of Profile instance
+     *
+     * @since v2.0.0
      */
     protected function readChildren($token, $parent)
     {
@@ -252,6 +288,8 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
      * @param string $token The profile token
      *
      * @return string
+     *
+     * @since v2.1.0
      */
     protected function has($token)
     {

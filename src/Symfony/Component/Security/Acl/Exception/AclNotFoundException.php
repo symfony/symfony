@@ -16,6 +16,8 @@ namespace Symfony\Component\Security\Acl\Exception;
  * ObjectIdentity implementation.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class AclNotFoundException extends Exception
 {

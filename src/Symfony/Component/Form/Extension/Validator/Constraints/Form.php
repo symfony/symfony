@@ -15,6 +15,8 @@ use Symfony\Component\Validator\Constraint;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.1.0
  */
 class Form extends Constraint
 {
@@ -25,6 +27,8 @@ class Form extends Constraint
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getTargets()
     {

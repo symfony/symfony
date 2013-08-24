@@ -19,6 +19,8 @@ use Doctrine\DBAL\Driver\Connection;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.1.0
  */
 class DbalSessionHandler implements \SessionHandlerInterface
 {
@@ -37,6 +39,8 @@ class DbalSessionHandler implements \SessionHandlerInterface
      *
      * @param Connection $con       An instance of Connection.
      * @param string     $tableName Table name.
+     *
+     * @since v2.1.0
      */
     public function __construct(Connection $con, $tableName = 'sessions')
     {
@@ -46,6 +50,8 @@ class DbalSessionHandler implements \SessionHandlerInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function open($path = null, $name = null)
     {
@@ -54,6 +60,8 @@ class DbalSessionHandler implements \SessionHandlerInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function close()
     {
@@ -63,6 +71,8 @@ class DbalSessionHandler implements \SessionHandlerInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function destroy($id)
     {
@@ -79,6 +89,8 @@ class DbalSessionHandler implements \SessionHandlerInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function gc($lifetime)
     {
@@ -95,6 +107,8 @@ class DbalSessionHandler implements \SessionHandlerInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function read($id)
     {
@@ -118,6 +132,8 @@ class DbalSessionHandler implements \SessionHandlerInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function write($id, $data)
     {
@@ -159,6 +175,8 @@ class DbalSessionHandler implements \SessionHandlerInterface
     * @param string $data
     *
     * @return Boolean
+     *
+     * @since v2.1.0
     */
     private function createNewSession($id, $data = '')
     {

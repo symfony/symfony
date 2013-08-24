@@ -18,6 +18,8 @@ use Symfony\Component\Serializer\SerializerAwareInterface;
  * SerializerAware Normalizer implementation
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
+ *
+ * @since v2.1.0
  */
 abstract class SerializerAwareNormalizer implements SerializerAwareInterface
 {
@@ -28,6 +30,8 @@ abstract class SerializerAwareNormalizer implements SerializerAwareInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function setSerializer(SerializerInterface $serializer)
     {

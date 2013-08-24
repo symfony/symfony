@@ -22,6 +22,8 @@ use Symfony\Component\Config\Resource\FileResource;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class XliffFileLoader implements LoaderInterface
 {
@@ -29,6 +31,8 @@ class XliffFileLoader implements LoaderInterface
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function load($resource, $locale, $domain = 'messages')
     {
@@ -83,6 +87,8 @@ class XliffFileLoader implements LoaderInterface
      * @return \SimpleXMLElement
      *
      * @throws InvalidResourceException
+     *
+     * @since v2.0.0
      */
     private function parseFile($file)
     {
@@ -140,6 +146,8 @@ class XliffFileLoader implements LoaderInterface
      * @param Boolean $internalErrors
      *
      * @return array An array of errors
+     *
+     * @since v2.0.17
      */
     private function getXmlErrors($internalErrors)
     {

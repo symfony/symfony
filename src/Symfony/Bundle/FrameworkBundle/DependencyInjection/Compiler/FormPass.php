@@ -19,9 +19,14 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
  * arguments of the "form.extension" service
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.0.0
  */
 class FormPass implements CompilerPassInterface
 {
+    /**
+     * @since v2.0.0
+     */
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition('form.extension')) {

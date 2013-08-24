@@ -19,6 +19,8 @@ use Symfony\Component\Form\RequestHandlerInterface;
  * A request handler using PHP's super globals $_GET, $_POST and $_SERVER.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.3.0
  */
 class NativeRequestHandler implements RequestHandlerInterface
 {
@@ -37,6 +39,8 @@ class NativeRequestHandler implements RequestHandlerInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function handleRequest(FormInterface $form, $request = null)
     {
@@ -100,6 +104,8 @@ class NativeRequestHandler implements RequestHandlerInterface
      * Returns the method used to submit the request to the server.
      *
      * @return string The request method.
+     *
+     * @since v2.3.0
      */
     private static function getRequestMethod()
     {
@@ -132,6 +138,8 @@ class NativeRequestHandler implements RequestHandlerInterface
      * @param array $data
      *
      * @return array
+     *
+     * @since v2.3.0
      */
     private static function fixPhpFilesArray($data)
     {
@@ -170,6 +178,8 @@ class NativeRequestHandler implements RequestHandlerInterface
      * @param mixed $data The file upload data.
      *
      * @return array|null Returns the stripped upload data.
+     *
+     * @since v2.3.0
      */
     private static function stripEmptyFiles($data)
     {

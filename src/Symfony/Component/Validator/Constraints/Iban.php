@@ -15,6 +15,8 @@ use Symfony\Component\Validator\Constraint;
 
 /**
  * @Annotation
+ *
+ * @since v2.3.0
  */
 class Iban extends Constraint
 {

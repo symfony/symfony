@@ -21,6 +21,8 @@ use Symfony\Component\Validator\ConstraintValidator;
  * Unique Entity Validator checks if one or a set of fields contain unique values.
  *
  * @author Benjamin Eberlei <kontakt@beberlei.de>
+ *
+ * @since v2.0.0
  */
 class UniqueEntityValidator extends ConstraintValidator
 {
@@ -31,6 +33,8 @@ class UniqueEntityValidator extends ConstraintValidator
 
     /**
      * @param ManagerRegistry $registry
+     *
+     * @since v2.1.0
      */
     public function __construct(ManagerRegistry $registry)
     {
@@ -43,6 +47,8 @@ class UniqueEntityValidator extends ConstraintValidator
      *
      * @throws UnexpectedTypeException
      * @throws ConstraintDefinitionException
+     *
+     * @since v2.1.0
      */
     public function validate($entity, Constraint $constraint)
     {

@@ -30,6 +30,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.1.0
  */
 class HttpKernel implements HttpKernelInterface, TerminableInterface
 {
@@ -43,6 +45,8 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
      * @param ControllerResolverInterface $resolver   A ControllerResolverInterface instance
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function __construct(EventDispatcherInterface $dispatcher, ControllerResolverInterface $resolver)
     {
@@ -54,6 +58,8 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
@@ -72,6 +78,8 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function terminate(Request $request, Response $response)
     {
@@ -90,6 +98,8 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
      *
      * @throws \LogicException If one of the listener does not behave as expected
      * @throws NotFoundHttpException When controller cannot be found
+     *
+     * @since v2.0.0
      */
     private function handleRaw(Request $request, $type = self::MASTER_REQUEST)
     {
@@ -149,6 +159,8 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
      * @return Response The filtered Response instance
      *
      * @throws \RuntimeException if the passed object is not a Response instance
+     *
+     * @since v2.0.0
      */
     private function filterResponse(Response $response, Request $request, $type)
     {
@@ -169,6 +181,8 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
      * @return Response A Response instance
      *
      * @throws \Exception
+     *
+     * @since v2.0.0
      */
     private function handleException(\Exception $e, $request, $type)
     {
@@ -207,6 +221,9 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
         }
     }
 
+    /**
+     * @since v2.0.0
+     */
     private function varToString($var)
     {
         if (is_object($var)) {

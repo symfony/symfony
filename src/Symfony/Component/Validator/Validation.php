@@ -15,6 +15,8 @@ namespace Symfony\Component\Validator;
  * Entry point for the Validator component.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.1.0
  */
 final class Validation
 {
@@ -25,6 +27,8 @@ final class Validation
      * {@link createValidatorBuilder()} instead.
      *
      * @return ValidatorInterface The new validator.
+     *
+     * @since v2.1.0
      */
     public static function createValidator()
     {
@@ -35,6 +39,8 @@ final class Validation
      * Creates a configurable builder for validator objects.
      *
      * @return ValidatorBuilderInterface The new builder.
+     *
+     * @since v2.1.0
      */
     public static function createValidatorBuilder()
     {
@@ -43,6 +49,8 @@ final class Validation
 
     /**
      * This class cannot be instantiated.
+     *
+     * @since v2.1.0
      */
     private function __construct()
     {

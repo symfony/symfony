@@ -16,6 +16,9 @@ use Symfony\Component\Form\FormTypeGuesserChain;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * @since v2.0.0
+ */
 class DependencyInjectionExtension implements FormExtensionInterface
 {
     private $container;
@@ -28,6 +31,9 @@ class DependencyInjectionExtension implements FormExtensionInterface
 
     private $guesserLoaded = false;
 
+    /**
+     * @since v2.0.0
+     */
     public function __construct(ContainerInterface $container,
         array $typeServiceIds, array $typeExtensionServiceIds,
         array $guesserServiceIds)
@@ -38,6 +44,9 @@ class DependencyInjectionExtension implements FormExtensionInterface
         $this->guesserServiceIds = $guesserServiceIds;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getType($name)
     {
         if (!isset($this->typeServiceIds[$name])) {
@@ -58,11 +67,17 @@ class DependencyInjectionExtension implements FormExtensionInterface
         return $type;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function hasType($name)
     {
         return isset($this->typeServiceIds[$name]);
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getTypeExtensions($name)
     {
         $extensions = array();
@@ -76,11 +91,17 @@ class DependencyInjectionExtension implements FormExtensionInterface
         return $extensions;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function hasTypeExtensions($name)
     {
         return isset($this->typeExtensionServiceIds[$name]);
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getTypeGuesser()
     {
         if (!$this->guesserLoaded) {

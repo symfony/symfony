@@ -13,6 +13,8 @@ namespace Symfony\Bridge\Twig\NodeVisitor;
 
 /**
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @since v2.1.10
  */
 class Scope
 {
@@ -38,6 +40,8 @@ class Scope
 
     /**
      * @param Scope $parent
+     *
+     * @since v2.1.10
      */
     public function __construct(Scope $parent = null)
     {
@@ -50,6 +54,8 @@ class Scope
      * Opens a new child scope.
      *
      * @return Scope
+     *
+     * @since v2.1.10
      */
     public function enter()
     {
@@ -63,6 +69,8 @@ class Scope
      * Closes current scope and returns parent one.
      *
      * @return Scope|null
+     *
+     * @since v2.1.10
      */
     public function leave()
     {
@@ -80,6 +88,8 @@ class Scope
      * @throws \LogicException
      *
      * @return Scope Current scope
+     *
+     * @since v2.1.10
      */
     public function set($key, $value)
     {
@@ -98,6 +108,8 @@ class Scope
      * @param string $key
      *
      * @return boolean
+     *
+     * @since v2.1.10
      */
     public function has($key)
     {
@@ -119,6 +131,8 @@ class Scope
      * @param mixed  $default
      *
      * @return mixed
+     *
+     * @since v2.1.10
      */
     public function get($key, $default = null)
     {

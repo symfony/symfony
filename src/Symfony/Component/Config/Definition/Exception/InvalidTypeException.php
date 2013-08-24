@@ -15,6 +15,8 @@ namespace Symfony\Component\Config\Definition\Exception;
  * This exception is thrown if an invalid type is encountered.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class InvalidTypeException extends InvalidConfigurationException
 {

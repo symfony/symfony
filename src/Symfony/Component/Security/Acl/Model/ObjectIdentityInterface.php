@@ -29,6 +29,8 @@ interface ObjectIdentityInterface
      *
      * @param ObjectIdentityInterface $identity
      * @return Boolean
+     *
+     * @since v2.1.0
      */
     public function equals(ObjectIdentityInterface $identity);
 
@@ -37,6 +39,8 @@ interface ObjectIdentityInterface
      * re-used for other objects with the same type.
      *
      * @return string cannot return null
+     *
+     * @since v2.1.0
      */
     public function getIdentifier();
 
@@ -44,6 +48,8 @@ interface ObjectIdentityInterface
      * Returns a type for the domain object. Typically, this is the PHP class name.
      *
      * @return string cannot return null
+     *
+     * @since v2.1.0
      */
     public function getType();
 }

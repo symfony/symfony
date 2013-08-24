@@ -19,6 +19,8 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Florian Eckerstorfer <florian@eckerstorfer.org>
+ *
+ * @since v2.0.0
  */
 class BooleanToStringTransformer implements DataTransformerInterface
 {
@@ -32,6 +34,8 @@ class BooleanToStringTransformer implements DataTransformerInterface
      * Sets the value emitted upon transform if the input is true.
      *
      * @param string $trueValue
+     *
+     * @since v2.1.0
      */
     public function __construct($trueValue)
     {
@@ -46,6 +50,8 @@ class BooleanToStringTransformer implements DataTransformerInterface
      * @return string String value.
      *
      * @throws TransformationFailedException If the given value is not a Boolean.
+     *
+     * @since v2.0.0
      */
     public function transform($value)
     {
@@ -68,6 +74,8 @@ class BooleanToStringTransformer implements DataTransformerInterface
      * @return Boolean Boolean value.
      *
      * @throws TransformationFailedException If the given value is not a string.
+     *
+     * @since v2.0.0
      */
     public function reverseTransform($value)
     {

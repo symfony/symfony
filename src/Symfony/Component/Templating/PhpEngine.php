@@ -27,6 +27,8 @@ if (!defined('ENT_SUBSTITUTE')) {
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.1.0
  */
 class PhpEngine implements EngineInterface, \ArrayAccess
 {
@@ -51,6 +53,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      * @param TemplateNameParserInterface $parser  A TemplateNameParserInterface instance
      * @param LoaderInterface             $loader  A loader instance
      * @param HelperInterface[]           $helpers An array of helper instances
+     *
+     * @since v2.0.0
      */
     public function __construct(TemplateNameParserInterface $parser, LoaderInterface $loader, array $helpers = array())
     {
@@ -82,6 +86,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      * @throws \RuntimeException         if the template cannot be rendered
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function render($name, array $parameters = array())
     {
@@ -119,6 +125,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      * @return Boolean true if the template exists, false otherwise
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function exists($name)
     {
@@ -139,6 +147,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      * @return Boolean true if this class supports the given resource, false otherwise
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function supports($name)
     {
@@ -156,6 +166,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      * @return string|false The evaluated template, or false if the engine is unable to render the template
      *
      * @throws \InvalidArgumentException
+     *
+     * @since v2.0.0
      */
     protected function evaluate(Storage $template, array $parameters = array())
     {
@@ -206,6 +218,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      * @throws \InvalidArgumentException if the helper is not defined
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function offsetGet($name)
     {
@@ -220,6 +234,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      * @return Boolean true if the helper is defined, false otherwise
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function offsetExists($name)
     {
@@ -233,6 +249,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      * @param string          $value An alias
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function offsetSet($name, $value)
     {
@@ -247,6 +265,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      * @throws \LogicException
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function offsetUnset($name)
     {
@@ -259,6 +279,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      * @param HelperInterface[] $helpers An array of helper
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function addHelpers(array $helpers)
     {
@@ -273,6 +295,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      * @param HelperInterface[] $helpers An array of helper
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setHelpers(array $helpers)
     {
@@ -287,6 +311,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      * @param string          $alias  An alias
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function set(HelperInterface $helper, $alias = null)
     {
@@ -306,6 +332,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      * @return Boolean true if the helper is defined, false otherwise
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function has($name)
     {
@@ -322,6 +350,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      * @throws \InvalidArgumentException if the helper is not defined
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function get($name)
     {
@@ -338,6 +368,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      * @param string $template The decorator logical name
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function extend($template)
     {
@@ -353,6 +385,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      * @return string The escaped value
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function escape($value, $context = 'html')
     {
@@ -379,6 +413,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      * @param string $charset The charset
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setCharset($charset)
     {
@@ -391,6 +427,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      * @return string The current charset
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getCharset()
     {
@@ -404,6 +442,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      * @param mixed  $escaper A PHP callable
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setEscaper($context, $escaper)
     {
@@ -421,6 +461,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      * @throws \InvalidArgumentException
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getEscaper($context)
     {
@@ -436,6 +478,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      * @param mixed  $value
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function addGlobal($name, $value)
     {
@@ -448,6 +492,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      * @return array
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getGlobals()
     {
@@ -470,6 +516,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * For each function there is a define to avoid problems with strings being
      * incorrectly specified.
+     *
+     * @since v2.0.0
      */
     protected function initializeEscapers()
     {
@@ -542,6 +590,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      * @return string The string with the new encoding
      *
      * @throws \RuntimeException if no suitable encoding function is found (iconv or mbstring)
+     *
+     * @since v2.0.0
      */
     public function convertEncoding($string, $to, $from)
     {
@@ -558,6 +608,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      * Gets the loader associated with this engine.
      *
      * @return LoaderInterface A LoaderInterface instance
+     *
+     * @since v2.0.0
      */
     public function getLoader()
     {
@@ -572,6 +624,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      * @return Storage A Storage instance
      *
      * @throws \InvalidArgumentException if the template cannot be found
+     *
+     * @since v2.0.0
      */
     protected function load($name)
     {

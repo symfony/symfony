@@ -23,6 +23,8 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
  * This Router creates the Loader only when the cache is empty.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.1.0
  */
 class Router extends BaseRouter implements WarmableInterface
 {
@@ -35,6 +37,8 @@ class Router extends BaseRouter implements WarmableInterface
      * @param mixed              $resource  The main resource to load
      * @param array              $options   An array of options
      * @param RequestContext     $context   The context
+     *
+     * @since v2.1.0
      */
     public function __construct(ContainerInterface $container, $resource, array $options = array(), RequestContext $context = null)
     {
@@ -47,6 +51,8 @@ class Router extends BaseRouter implements WarmableInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getRouteCollection()
     {
@@ -60,6 +66,8 @@ class Router extends BaseRouter implements WarmableInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function warmUp($cacheDir)
     {
@@ -81,6 +89,8 @@ class Router extends BaseRouter implements WarmableInterface
      * - the route host.
      *
      * @param RouteCollection $collection
+     *
+     * @since v2.1.0
      */
     private function resolveParameters(RouteCollection $collection)
     {
@@ -108,6 +118,8 @@ class Router extends BaseRouter implements WarmableInterface
      *
      * @throws ParameterNotFoundException When a placeholder does not exist as a container parameter
      * @throws RuntimeException           When a container value is not a string or a numeric value
+     *
+     * @since v2.2.0
      */
     private function resolve($value)
     {

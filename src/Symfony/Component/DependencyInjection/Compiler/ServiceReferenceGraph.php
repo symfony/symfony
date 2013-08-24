@@ -20,6 +20,8 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
  * it themselves which improves performance quite a lot.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class ServiceReferenceGraph
 {
@@ -30,6 +32,8 @@ class ServiceReferenceGraph
 
     /**
      * Constructor.
+     *
+     * @since v2.0.0
      */
     public function __construct()
     {
@@ -42,6 +46,8 @@ class ServiceReferenceGraph
      * @param string $id Id to check
      *
      * @return Boolean
+     *
+     * @since v2.0.0
      */
     public function hasNode($id)
     {
@@ -56,6 +62,8 @@ class ServiceReferenceGraph
      * @return ServiceReferenceGraphNode The node matching the supplied identifier
      *
      * @throws InvalidArgumentException if no node matches the supplied identifier
+     *
+     * @since v2.0.0
      */
     public function getNode($id)
     {
@@ -70,6 +78,8 @@ class ServiceReferenceGraph
      * Returns all nodes.
      *
      * @return ServiceReferenceGraphNode[] An array of all ServiceReferenceGraphNode objects
+     *
+     * @since v2.0.0
      */
     public function getNodes()
     {
@@ -78,6 +88,8 @@ class ServiceReferenceGraph
 
     /**
      * Clears all nodes.
+     *
+     * @since v2.0.0
      */
     public function clear()
     {
@@ -92,6 +104,8 @@ class ServiceReferenceGraph
      * @param string $destId
      * @param string $destValue
      * @param string $reference
+     *
+     * @since v2.0.0
      */
     public function connect($sourceId, $sourceValue, $destId, $destValue = null, $reference = null)
     {
@@ -110,6 +124,8 @@ class ServiceReferenceGraph
      * @param string $value
      *
      * @return ServiceReferenceGraphNode
+     *
+     * @since v2.0.0
      */
     private function createNode($id, $value)
     {

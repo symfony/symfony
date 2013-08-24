@@ -23,6 +23,8 @@ interface ObjectIdentityRetrievalStrategyInterface
      *
      * @param object $domainObject
      * @return ObjectIdentityInterface
+     *
+     * @since v2.1.0
      */
     public function getObjectIdentity($domainObject);
 }

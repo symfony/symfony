@@ -15,6 +15,8 @@ namespace Symfony\Component\DependencyInjection\Exception;
  * Thrown when a scope widening injection is detected.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class ScopeWideningInjectionException extends RuntimeException
 {
@@ -23,6 +25,9 @@ class ScopeWideningInjectionException extends RuntimeException
     private $destServiceId;
     private $destScope;
 
+    /**
+     * @since v2.3.0
+     */
     public function __construct($sourceServiceId, $sourceScope, $destServiceId, $destScope, \Exception $previous = null)
     {
         parent::__construct(sprintf(
@@ -42,21 +47,33 @@ class ScopeWideningInjectionException extends RuntimeException
         $this->destScope = $destScope;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getSourceServiceId()
     {
         return $this->sourceServiceId;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getSourceScope()
     {
         return $this->sourceScope;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getDestServiceId()
     {
         return $this->destServiceId;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getDestScope()
     {
         return $this->destScope;

@@ -13,6 +13,8 @@ namespace Symfony\Component\Finder\Shell;
 
 /**
  * @author Jean-François Simon <contact@jfsimon.fr>
+ *
+ * @since v2.2.0
  */
 class Shell
 {
@@ -31,6 +33,8 @@ class Shell
      * Returns guessed OS type.
      *
      * @return int
+     *
+     * @since v2.2.0
      */
     public function getType()
     {
@@ -47,6 +51,8 @@ class Shell
      * @param string $command
      *
      * @return bool
+     *
+     * @since v2.2.0
      */
     public function testCommand($command)
     {
@@ -69,6 +75,8 @@ class Shell
      * Guesses OS type.
      *
      * @return int
+     *
+     * @since v2.2.0
      */
     private function guessType()
     {

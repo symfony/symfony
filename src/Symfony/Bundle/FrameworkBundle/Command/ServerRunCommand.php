@@ -21,11 +21,15 @@ use Symfony\Component\Process\ProcessBuilder;
  * Runs Symfony2 application using PHP built-in web server
  *
  * @author Michał Pipa <michal.pipa.xsolve@gmail.com>
+ *
+ * @since v2.1.0
  */
 class ServerRunCommand extends ContainerAwareCommand
 {
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function isEnabled()
     {
@@ -38,6 +42,8 @@ class ServerRunCommand extends ContainerAwareCommand
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     protected function configure()
     {
@@ -75,6 +81,8 @@ EOF
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {

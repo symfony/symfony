@@ -21,6 +21,8 @@ use Symfony\Component\Intl\DateFormatter\DateFormat\SecondTransformer as BaseSec
  * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
  *             {@link \Symfony\Component\Intl\DateFormatter\DateFormat\SecondTransformer}
  *             instead.
+ *
+ * @since v2.3.0
  */
 class SecondTransformer extends BaseSecondTransformer
 {

@@ -18,11 +18,16 @@ use Symfony\Component\HttpFoundation\Request;
  * Creates packages based on whether the current request is secure.
  *
  * @author Kris Wallsmith <kris@symfony.com>
+ *
+ * @since v2.0.0
  */
 class PackageFactory
 {
     private $container;
 
+    /**
+     * @since v2.0.0
+     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
@@ -36,6 +41,8 @@ class PackageFactory
      * @param string  $sslId   The id for the package to use when the current request is SSL
      *
      * @return PackageInterface The package
+     *
+     * @since v2.0.0
      */
     public function getPackage(Request $request, $httpId, $sslId)
     {

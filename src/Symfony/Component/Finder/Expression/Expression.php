@@ -13,6 +13,8 @@ namespace Symfony\Component\Finder\Expression;
 
 /**
  * @author Jean-François Simon <contact@jfsimon.fr>
+ *
+ * @since v2.2.0
  */
 class Expression implements ValueInterface
 {
@@ -28,6 +30,8 @@ class Expression implements ValueInterface
      * @param string $expr
      *
      * @return Expression
+     *
+     * @since v2.2.0
      */
     public static function create($expr)
     {
@@ -36,6 +40,8 @@ class Expression implements ValueInterface
 
     /**
      * @param string $expr
+     *
+     * @since v2.2.0
      */
     public function __construct($expr)
     {
@@ -48,6 +54,8 @@ class Expression implements ValueInterface
 
     /**
      * @return string
+     *
+     * @since v2.2.0
      */
     public function __toString()
     {
@@ -56,6 +64,8 @@ class Expression implements ValueInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function render()
     {
@@ -64,6 +74,8 @@ class Expression implements ValueInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function renderPattern()
     {
@@ -72,6 +84,8 @@ class Expression implements ValueInterface
 
     /**
      * @return bool
+     *
+     * @since v2.2.0
      */
     public function isCaseSensitive()
     {
@@ -80,6 +94,8 @@ class Expression implements ValueInterface
 
     /**
      * @return int
+     *
+     * @since v2.2.0
      */
     public function getType()
     {
@@ -88,6 +104,8 @@ class Expression implements ValueInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function prepend($expr)
     {
@@ -98,6 +116,8 @@ class Expression implements ValueInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function append($expr)
     {
@@ -108,6 +128,8 @@ class Expression implements ValueInterface
 
     /**
      * @return bool
+     *
+     * @since v2.2.0
      */
     public function isRegex()
     {
@@ -116,6 +138,8 @@ class Expression implements ValueInterface
 
     /**
      * @return bool
+     *
+     * @since v2.2.0
      */
     public function isGlob()
     {
@@ -126,6 +150,8 @@ class Expression implements ValueInterface
      * @throws \LogicException
      *
      * @return Glob
+     *
+     * @since v2.3.0
      */
     public function getGlob()
     {
@@ -138,6 +164,8 @@ class Expression implements ValueInterface
 
     /**
      * @return Regex
+     *
+     * @since v2.2.0
      */
     public function getRegex()
     {

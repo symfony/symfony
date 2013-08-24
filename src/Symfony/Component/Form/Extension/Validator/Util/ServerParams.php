@@ -13,6 +13,8 @@ namespace Symfony\Component\Form\Extension\Validator\Util;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.1.0
  */
 class ServerParams
 {
@@ -20,6 +22,8 @@ class ServerParams
      * Returns maximum post size in bytes.
      *
      * @return null|integer The maximum post size in bytes
+     *
+     * @since v2.1.0
      */
     public function getPostMaxSize()
     {
@@ -43,6 +47,8 @@ class ServerParams
      * Returns the normalized "post_max_size" ini setting.
      *
      * @return string
+     *
+     * @since v2.1.0
      */
     public function getNormalizedIniPostMaxSize()
     {
@@ -53,6 +59,8 @@ class ServerParams
      * Returns the content length of the request.
      *
      * @return mixed The request content length.
+     *
+     * @since v2.1.0
      */
     public function getContentLength()
     {

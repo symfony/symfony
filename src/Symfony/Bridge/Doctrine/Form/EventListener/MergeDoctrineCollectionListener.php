@@ -23,9 +23,14 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @see    Doctrine\Common\Collections\Collection
+ *
+ * @since v2.1.0
  */
 class MergeDoctrineCollectionListener implements EventSubscriberInterface
 {
+    /**
+     * @since v2.1.0
+     */
     public static function getSubscribedEvents()
     {
         // Higher priority than core MergeCollectionListener so that this one
@@ -33,6 +38,9 @@ class MergeDoctrineCollectionListener implements EventSubscriberInterface
         return array(FormEvents::SUBMIT => array('onBind', 10));
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function onBind(FormEvent $event)
     {
         $collection = $event->getForm()->getData();

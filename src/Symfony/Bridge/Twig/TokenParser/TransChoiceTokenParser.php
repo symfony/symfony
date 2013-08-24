@@ -17,6 +17,8 @@ use Symfony\Bridge\Twig\Node\TransNode;
  * Token Parser for the 'transchoice' tag.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class TransChoiceTokenParser extends TransTokenParser
 {
@@ -28,6 +30,8 @@ class TransChoiceTokenParser extends TransTokenParser
      * @return \Twig_NodeInterface A Twig_NodeInterface instance
      *
      * @throws \Twig_Error_Syntax
+     *
+     * @since v2.0.0
      */
     public function parse(\Twig_Token $token)
     {
@@ -72,6 +76,9 @@ class TransChoiceTokenParser extends TransTokenParser
         return new TransNode($body, $domain, $count, $vars, $locale, $lineno, $this->getTag());
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function decideTransChoiceFork($token)
     {
         return $token->test(array('endtranschoice'));
@@ -81,6 +88,8 @@ class TransChoiceTokenParser extends TransTokenParser
      * Gets the tag name associated with this token parser.
      *
      * @return string The tag name
+     *
+     * @since v2.0.0
      */
     public function getTag()
     {

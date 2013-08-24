@@ -21,6 +21,8 @@ use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface;
  * indexed array.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.1.0
  */
 class FixCheckboxInputListener implements EventSubscriberInterface
 {
@@ -30,12 +32,17 @@ class FixCheckboxInputListener implements EventSubscriberInterface
      * Constructor.
      *
      * @param ChoiceListInterface $choiceList
+     *
+     * @since v2.1.0
      */
     public function __construct(ChoiceListInterface $choiceList)
     {
         $this->choiceList = $choiceList;
     }
 
+    /**
+     * @since v2.3.0
+     */
     public function preSubmit(FormEvent $event)
     {
         $values = (array) $event->getData();
@@ -49,12 +56,17 @@ class FixCheckboxInputListener implements EventSubscriberInterface
      *
      * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
      *             {@link preSubmit()} instead.
+     *
+     * @since v2.3.0
      */
     public function preBind(FormEvent $event)
     {
         $this->preSubmit($event);
     }
 
+    /**
+     * @since v2.1.0
+     */
     public static function getSubscribedEvents()
     {
         return array(FormEvents::PRE_SUBMIT => 'preSubmit');

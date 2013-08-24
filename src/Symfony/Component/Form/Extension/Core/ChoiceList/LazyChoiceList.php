@@ -21,6 +21,8 @@ use Symfony\Component\Form\Exception\InvalidArgumentException;
  * which should return a ChoiceListInterface instance.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.1.0
  */
 abstract class LazyChoiceList implements ChoiceListInterface
 {
@@ -33,6 +35,8 @@ abstract class LazyChoiceList implements ChoiceListInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getChoices()
     {
@@ -45,6 +49,8 @@ abstract class LazyChoiceList implements ChoiceListInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getValues()
     {
@@ -57,6 +63,8 @@ abstract class LazyChoiceList implements ChoiceListInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getPreferredViews()
     {
@@ -69,6 +77,8 @@ abstract class LazyChoiceList implements ChoiceListInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getRemainingViews()
     {
@@ -81,6 +91,8 @@ abstract class LazyChoiceList implements ChoiceListInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getChoicesForValues(array $values)
     {
@@ -93,6 +105,8 @@ abstract class LazyChoiceList implements ChoiceListInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getValuesForChoices(array $choices)
     {
@@ -105,6 +119,8 @@ abstract class LazyChoiceList implements ChoiceListInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getIndicesForChoices(array $choices)
     {
@@ -117,6 +133,8 @@ abstract class LazyChoiceList implements ChoiceListInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getIndicesForValues(array $values)
     {
@@ -133,9 +151,14 @@ abstract class LazyChoiceList implements ChoiceListInterface
      * Should be implemented by child classes.
      *
      * @return ChoiceListInterface The loaded choice list
+     *
+     * @since v2.1.0
      */
     abstract protected function loadChoiceList();
 
+    /**
+     * @since v2.1.0
+     */
     private function load()
     {
         $choiceList = $this->loadChoiceList();

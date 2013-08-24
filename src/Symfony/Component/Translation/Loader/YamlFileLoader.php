@@ -23,6 +23,8 @@ use Symfony\Component\Yaml\Exception\ParseException;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class YamlFileLoader extends ArrayLoader implements LoaderInterface
 {
@@ -32,6 +34,8 @@ class YamlFileLoader extends ArrayLoader implements LoaderInterface
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function load($resource, $locale, $domain = 'messages')
     {

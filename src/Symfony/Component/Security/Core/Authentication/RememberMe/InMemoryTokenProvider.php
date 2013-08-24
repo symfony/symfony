@@ -17,11 +17,16 @@ use Symfony\Component\Security\Core\Exception\TokenNotFoundException;
  * This class is used for testing purposes, and is not really suited for production.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class InMemoryTokenProvider implements TokenProviderInterface
 {
     private $tokens = array();
 
+    /**
+     * @since v2.0.0
+     */
     public function loadTokenBySeries($series)
     {
         if (!isset($this->tokens[$series])) {
@@ -31,6 +36,9 @@ class InMemoryTokenProvider implements TokenProviderInterface
         return $this->tokens[$series];
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function updateToken($series, $tokenValue, \DateTime $lastUsed)
     {
         if (!isset($this->tokens[$series])) {
@@ -47,11 +55,17 @@ class InMemoryTokenProvider implements TokenProviderInterface
         $this->tokens[$series] = $token;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function deleteTokenBySeries($series)
     {
         unset($this->tokens[$series]);
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function createNewToken(PersistentTokenInterface $token)
     {
         $this->tokens[$token->getSeries()] = $token;

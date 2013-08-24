@@ -24,6 +24,8 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  * UserProviderInterface retrieves users for UsernamePasswordToken tokens.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 abstract class UserAuthenticationProvider implements AuthenticationProviderInterface
 {
@@ -39,6 +41,8 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
      * @param Boolean              $hideUserNotFoundExceptions Whether to hide user not found exception or not
      *
      * @throws \InvalidArgumentException
+     *
+     * @since v2.0.0
      */
     public function __construct(UserCheckerInterface $userChecker, $providerKey, $hideUserNotFoundExceptions = true)
     {
@@ -53,6 +57,8 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function authenticate(TokenInterface $token)
     {
@@ -100,6 +106,8 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function supports(TokenInterface $token)
     {
@@ -115,6 +123,8 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
      * @return UserInterface The user
      *
      * @throws AuthenticationException if the credentials could not be validated
+     *
+     * @since v2.0.0
      */
     abstract protected function retrieveUser($username, UsernamePasswordToken $token);
 
@@ -126,6 +136,8 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
      * @param UsernamePasswordToken $token The UsernamePasswordToken token to be authenticated
      *
      * @throws AuthenticationException if the credentials could not be validated
+     *
+     * @since v2.0.0
      */
     abstract protected function checkAuthentication(UserInterface $user, UsernamePasswordToken $token);
 }

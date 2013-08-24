@@ -19,6 +19,8 @@ use Symfony\Component\Config\Resource\DirectoryResource;
  * on PHP classes and methods.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class AnnotationDirectoryLoader extends AnnotationFileLoader
 {
@@ -31,6 +33,8 @@ class AnnotationDirectoryLoader extends AnnotationFileLoader
      * @return RouteCollection A RouteCollection instance
      *
      * @throws \InvalidArgumentException When the directory does not exist or its routes cannot be parsed
+     *
+     * @since v2.0.0
      */
     public function load($path, $type = null)
     {
@@ -63,6 +67,8 @@ class AnnotationDirectoryLoader extends AnnotationFileLoader
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function supports($resource, $type = null)
     {

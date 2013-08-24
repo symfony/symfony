@@ -16,6 +16,8 @@ namespace Symfony\Component\Finder\Iterator;
  *
  * @author Fabien Potencier  <fabien@symfony.com>
  * @author Włodzimierz Gajda <gajdaw@gajdaw.pl>
+ *
+ * @since v2.1.0
  */
 class FilecontentFilterIterator extends MultiplePcreFilterIterator
 {
@@ -23,6 +25,8 @@ class FilecontentFilterIterator extends MultiplePcreFilterIterator
      * Filters the iterator values.
      *
      * @return Boolean true if the value should be kept, false otherwise
+     *
+     * @since v2.1.0
      */
     public function accept()
     {
@@ -68,6 +72,8 @@ class FilecontentFilterIterator extends MultiplePcreFilterIterator
      * @param string $str Pattern: string or regexp
      *
      * @return string regexp corresponding to a given string or regexp
+     *
+     * @since v2.1.0
      */
     protected function toRegex($str)
     {

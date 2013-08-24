@@ -24,6 +24,8 @@ use Symfony\Component\Config\Util\XmlUtils;
  * @author Tobias Schultze <http://tobion.de>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class XmlFileLoader extends FileLoader
 {
@@ -42,6 +44,8 @@ class XmlFileLoader extends FileLoader
      *                                   parsed because it does not validate against the scheme.
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function load($file, $type = null)
     {
@@ -73,6 +77,8 @@ class XmlFileLoader extends FileLoader
      * @param string          $file       Loaded file name
      *
      * @throws \InvalidArgumentException When the XML is invalid
+     *
+     * @since v2.0.0
      */
     protected function parseNode(RouteCollection $collection, \DOMElement $node, $path, $file)
     {
@@ -96,6 +102,8 @@ class XmlFileLoader extends FileLoader
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function supports($resource, $type = null)
     {
@@ -110,6 +118,8 @@ class XmlFileLoader extends FileLoader
      * @param string          $path       Full path of the XML file being processed
      *
      * @throws \InvalidArgumentException When the XML is invalid
+     *
+     * @since v2.2.0
      */
     protected function parseRoute(RouteCollection $collection, \DOMElement $node, $path)
     {
@@ -144,6 +154,8 @@ class XmlFileLoader extends FileLoader
      * @param string          $file       Loaded file name
      *
      * @throws \InvalidArgumentException When the XML is invalid
+     *
+     * @since v2.2.0
      */
     protected function parseImport(RouteCollection $collection, \DOMElement $node, $path, $file)
     {
@@ -190,6 +202,8 @@ class XmlFileLoader extends FileLoader
      * @throws \InvalidArgumentException When loading of XML file fails because of syntax errors
      *                                   or when the XML structure is not as expected by the scheme -
      *                                   see validate()
+     *
+     * @since v2.0.0
      */
     protected function loadFile($file)
     {
@@ -205,6 +219,8 @@ class XmlFileLoader extends FileLoader
      * @return array An array with the defaults as first item, requirements as second and options as third.
      *
      * @throws \InvalidArgumentException When the XML is invalid
+     *
+     * @since v2.2.0
      */
     private function parseConfigs(\DOMElement $node, $path)
     {

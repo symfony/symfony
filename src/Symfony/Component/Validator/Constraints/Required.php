@@ -15,6 +15,8 @@ namespace Symfony\Component\Validator\Constraints;
  * @Annotation
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.3.0
  */
 class Required extends Existence
 {

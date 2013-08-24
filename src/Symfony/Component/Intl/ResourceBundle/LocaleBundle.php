@@ -15,11 +15,15 @@ namespace Symfony\Component\Intl\ResourceBundle;
  * Default implementation of {@link LocaleBundleInterface}.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.3.0
  */
 class LocaleBundle extends AbstractBundle implements LocaleBundleInterface
 {
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getLocaleName($ofLocale, $locale = null)
     {
@@ -32,6 +36,8 @@ class LocaleBundle extends AbstractBundle implements LocaleBundleInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getLocaleNames($locale = null)
     {

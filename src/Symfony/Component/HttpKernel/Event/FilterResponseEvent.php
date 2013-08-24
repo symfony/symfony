@@ -25,6 +25,8 @@ use Symfony\Component\HttpFoundation\Response;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class FilterResponseEvent extends KernelEvent
 {
@@ -34,6 +36,9 @@ class FilterResponseEvent extends KernelEvent
      */
     private $response;
 
+    /**
+     * @since v2.0.0
+     */
     public function __construct(HttpKernelInterface $kernel, Request $request, $requestType, Response $response)
     {
         parent::__construct($kernel, $request, $requestType);
@@ -47,6 +52,8 @@ class FilterResponseEvent extends KernelEvent
      * @return Response
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getResponse()
     {
@@ -59,6 +66,8 @@ class FilterResponseEvent extends KernelEvent
      * @param Response $response
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setResponse(Response $response)
     {

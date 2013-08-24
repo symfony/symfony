@@ -17,11 +17,15 @@ use Symfony\Component\Translation\MessageCatalogue;
  * IcuResDumper generates an ICU ResourceBundle formatted string representation of a message catalogue.
  *
  * @author Stealth35
+ *
+ * @since v2.1.0
  */
 class IcuResFileDumper implements DumperInterface
 {
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function dump(MessageCatalogue $messages, $options = array())
     {
@@ -50,6 +54,8 @@ class IcuResFileDumper implements DumperInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function format(MessageCatalogue $messages, $domain = 'messages')
     {
@@ -109,6 +115,9 @@ class IcuResFileDumper implements DumperInterface
         return $output;
     }
 
+    /**
+     * @since v2.1.0
+     */
     private function writePadding($data)
     {
         $padding = strlen($data) % 4;
@@ -118,6 +127,9 @@ class IcuResFileDumper implements DumperInterface
         }
     }
 
+    /**
+     * @since v2.1.0
+     */
     private function getPosition($data)
     {
         $position = (strlen($data) + 28) / 4;
@@ -127,6 +139,8 @@ class IcuResFileDumper implements DumperInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     protected function getExtension()
     {

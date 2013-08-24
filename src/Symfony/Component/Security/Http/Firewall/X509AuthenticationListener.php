@@ -22,12 +22,17 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  * X509 authentication listener.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class X509AuthenticationListener extends AbstractPreAuthenticatedListener
 {
     private $userKey;
     private $credentialKey;
 
+    /**
+     * @since v2.0.0
+     */
     public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, $providerKey, $userKey = 'SSL_CLIENT_S_DN_Email', $credentialKey = 'SSL_CLIENT_S_DN', LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
     {
         parent::__construct($securityContext, $authenticationManager, $providerKey, $logger, $dispatcher);
@@ -36,6 +41,9 @@ class X509AuthenticationListener extends AbstractPreAuthenticatedListener
         $this->credentialKey = $credentialKey;
     }
 
+    /**
+     * @since v2.0.0
+     */
     protected function getPreAuthenticatedData(Request $request)
     {
         if (!$request->server->has($this->userKey)) {

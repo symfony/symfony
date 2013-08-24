@@ -15,6 +15,8 @@ namespace Symfony\Component\PropertyAccess;
  * Entry point of the PropertyAccess component.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.2.0
  */
 final class PropertyAccess
 {
@@ -22,6 +24,8 @@ final class PropertyAccess
      * Creates a property accessor with the default configuration.
      *
      * @return PropertyAccessor The new property accessor
+     *
+     * @since v2.3.0
      */
     public static function createPropertyAccessor()
     {
@@ -32,6 +36,8 @@ final class PropertyAccess
      * Creates a property accessor builder.
      *
      * @return PropertyAccessorBuilder The new property accessor builder
+     *
+     * @since v2.3.0
      */
     public static function createPropertyAccessorBuilder()
     {
@@ -45,6 +51,8 @@ final class PropertyAccess
      *
      * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
      *             {@link createPropertyAccessor()} instead.
+     *
+     * @since v2.3.0
      */
     public static function getPropertyAccessor()
     {
@@ -53,6 +61,8 @@ final class PropertyAccess
 
     /**
      * This class cannot be instantiated.
+     *
+     * @since v2.2.0
      */
     private function __construct()
     {

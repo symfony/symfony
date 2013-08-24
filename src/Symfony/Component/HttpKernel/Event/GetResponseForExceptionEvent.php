@@ -28,6 +28,8 @@ use Symfony\Component\HttpFoundation\Request;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class GetResponseForExceptionEvent extends GetResponseEvent
 {
@@ -37,6 +39,9 @@ class GetResponseForExceptionEvent extends GetResponseEvent
      */
     private $exception;
 
+    /**
+     * @since v2.0.0
+     */
     public function __construct(HttpKernelInterface $kernel, Request $request, $requestType, \Exception $e)
     {
         parent::__construct($kernel, $request, $requestType);
@@ -50,6 +55,8 @@ class GetResponseForExceptionEvent extends GetResponseEvent
      * @return \Exception  The thrown exception
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getException()
     {
@@ -64,6 +71,8 @@ class GetResponseForExceptionEvent extends GetResponseEvent
      * @param \Exception $exception The thrown exception
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setException(\Exception $exception)
     {

@@ -21,11 +21,15 @@ use Symfony\Component\Finder\Finder;
  * Command that places bundle web assets into a given directory.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class AssetsInstallCommand extends ContainerAwareCommand
 {
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     protected function configure()
     {
@@ -64,6 +68,8 @@ EOT
      * {@inheritdoc}
      *
      * @throws \InvalidArgumentException When the target directory does not exist or symlink cannot be used
+     *
+     * @since v2.0.0
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {

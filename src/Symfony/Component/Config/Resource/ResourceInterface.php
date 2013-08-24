@@ -22,6 +22,8 @@ interface ResourceInterface
      * Returns a string representation of the Resource.
      *
      * @return string A string representation of the Resource
+     *
+     * @since v2.1.0
      */
     public function __toString();
 
@@ -31,6 +33,8 @@ interface ResourceInterface
      * @param integer $timestamp The last time the resource was loaded
      *
      * @return Boolean true if the resource has not been updated, false otherwise
+     *
+     * @since v2.1.0
      */
     public function isFresh($timestamp);
 
@@ -38,6 +42,8 @@ interface ResourceInterface
      * Returns the resource tied to this Resource.
      *
      * @return mixed The resource
+     *
+     * @since v2.1.0
      */
     public function getResource();
 }

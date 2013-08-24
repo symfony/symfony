@@ -32,6 +32,8 @@ namespace Symfony\Component\Finder\Comparator;
  * @copyright 2002 Richard Clamp <richardc@unixbeard.net>
  *
  * @see       http://physics.nist.gov/cuu/Units/binary.html
+ *
+ * @since v2.0.0
  */
 class NumberComparator extends Comparator
 {
@@ -41,6 +43,8 @@ class NumberComparator extends Comparator
      * @param string $test A comparison string
      *
      * @throws \InvalidArgumentException If the test is not understood
+     *
+     * @since v2.0.0
      */
     public function __construct($test)
     {

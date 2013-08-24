@@ -18,11 +18,15 @@ use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
  * Merges extension configs into the container builder
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class MergeExtensionConfigurationPass implements CompilerPassInterface
 {
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function process(ContainerBuilder $container)
     {

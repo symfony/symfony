@@ -22,6 +22,8 @@ use Symfony\Component\Config\Resource\FileResource;
  * @author Benjamin Eberlei <kontakt@beberlei.de>
  *
  * @api
+ *
+ * @since v2.2.0
  */
 class QtFileLoader implements LoaderInterface
 {
@@ -29,6 +31,8 @@ class QtFileLoader implements LoaderInterface
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.2.0
      */
     public function load($resource, $locale, $domain = 'messages')
     {
@@ -72,6 +76,8 @@ class QtFileLoader implements LoaderInterface
      * Returns the XML errors of the internal XML parser
      *
      * @return array An array of errors
+     *
+     * @since v2.2.0
      */
     private function getXmlErrors()
     {

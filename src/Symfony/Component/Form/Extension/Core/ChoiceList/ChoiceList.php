@@ -33,6 +33,8 @@ use Symfony\Component\Form\Extension\Core\View\ChoiceView;
  * </code>
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.1.0
  */
 class ChoiceList implements ChoiceListInterface
 {
@@ -81,6 +83,8 @@ class ChoiceList implements ChoiceListInterface
      *                                presented to the user with priority.
      *
      * @throws UnexpectedTypeException If the choices are not an array or \Traversable.
+     *
+     * @since v2.1.0
      */
     public function __construct($choices, array $labels, array $preferredChoices = array())
     {
@@ -99,6 +103,8 @@ class ChoiceList implements ChoiceListInterface
      * @param array|\Traversable $choices          The choices to write into the list.
      * @param array              $labels           The labels belonging to the choices.
      * @param array              $preferredChoices The choices to display with priority.
+     *
+     * @since v2.1.0
      */
     protected function initialize($choices, array $labels, array $preferredChoices)
     {
@@ -118,6 +124,8 @@ class ChoiceList implements ChoiceListInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getChoices()
     {
@@ -126,6 +134,8 @@ class ChoiceList implements ChoiceListInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getValues()
     {
@@ -134,6 +144,8 @@ class ChoiceList implements ChoiceListInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getPreferredViews()
     {
@@ -142,6 +154,8 @@ class ChoiceList implements ChoiceListInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getRemainingViews()
     {
@@ -150,6 +164,8 @@ class ChoiceList implements ChoiceListInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getChoicesForValues(array $values)
     {
@@ -174,6 +190,8 @@ class ChoiceList implements ChoiceListInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getValuesForChoices(array $choices)
     {
@@ -198,6 +216,8 @@ class ChoiceList implements ChoiceListInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getIndicesForChoices(array $choices)
     {
@@ -222,6 +242,8 @@ class ChoiceList implements ChoiceListInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getIndicesForValues(array $values)
     {
@@ -257,6 +279,8 @@ class ChoiceList implements ChoiceListInterface
      *
      * @throws InvalidArgumentException     If the structures of the choices and labels array do not match.
      * @throws InvalidConfigurationException If no valid value or index could be created for a choice.
+     *
+     * @since v2.1.0
      */
     protected function addChoices(array &$bucketForPreferred, array &$bucketForRemaining, $choices, array $labels, array $preferredChoices)
     {
@@ -303,6 +327,8 @@ class ChoiceList implements ChoiceListInterface
      * @param array  $preferredChoices   The preferred choices.
      *
      * @throws InvalidConfigurationException If no valid value or index could be created for a choice.
+     *
+     * @since v2.1.0
      */
     protected function addChoiceGroup($group, array &$bucketForPreferred, array &$bucketForRemaining, array $choices, array $labels, array $preferredChoices)
     {
@@ -340,6 +366,8 @@ class ChoiceList implements ChoiceListInterface
      * @param array  $preferredChoices   The preferred choices.
      *
      * @throws InvalidConfigurationException If no valid value or index could be created.
+     *
+     * @since v2.1.0
      */
     protected function addChoice(array &$bucketForPreferred, array &$bucketForRemaining, $choice, $label, array $preferredChoices)
     {
@@ -378,6 +406,8 @@ class ChoiceList implements ChoiceListInterface
      * @param array $preferredChoices An array of preferred choices.
      *
      * @return Boolean Whether the choice is preferred.
+     *
+     * @since v2.1.0
      */
     protected function isPreferred($choice, array $preferredChoices)
     {
@@ -393,6 +423,8 @@ class ChoiceList implements ChoiceListInterface
      *
      * @return integer|string A unique index containing only ASCII letters,
      *                        digits and underscores.
+     *
+     * @since v2.1.0
      */
     protected function createIndex($choice)
     {
@@ -409,6 +441,8 @@ class ChoiceList implements ChoiceListInterface
      * @param mixed $choice The choice to create a value for
      *
      * @return string A unique string.
+     *
+     * @since v2.1.0
      */
     protected function createValue($choice)
     {
@@ -422,6 +456,8 @@ class ChoiceList implements ChoiceListInterface
      * @param mixed $value The choice value.
      *
      * @return string The value as string.
+     *
+     * @since v2.1.0
      */
     protected function fixValue($value)
     {
@@ -435,6 +471,8 @@ class ChoiceList implements ChoiceListInterface
      * @param array $values The choice values.
      *
      * @return array The values as strings.
+     *
+     * @since v2.1.0
      */
     protected function fixValues(array $values)
     {
@@ -452,6 +490,8 @@ class ChoiceList implements ChoiceListInterface
      * @param mixed $index The choice index.
      *
      * @return integer|string The index as PHP array key.
+     *
+     * @since v2.1.0
      */
     protected function fixIndex($index)
     {
@@ -469,6 +509,8 @@ class ChoiceList implements ChoiceListInterface
      * @param array $indices The choice indices.
      *
      * @return array The indices as strings.
+     *
+     * @since v2.1.0
      */
     protected function fixIndices(array $indices)
     {
@@ -488,6 +530,8 @@ class ChoiceList implements ChoiceListInterface
      * @param mixed $choice The choice.
      *
      * @return mixed The fixed choice.
+     *
+     * @since v2.1.0
      */
     protected function fixChoice($choice)
     {
@@ -502,6 +546,8 @@ class ChoiceList implements ChoiceListInterface
     * @return array The fixed choices.
     *
     * @see fixChoice
+     *
+     * @since v2.1.0
     */
     protected function fixChoices(array $choices)
     {

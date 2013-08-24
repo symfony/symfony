@@ -22,6 +22,8 @@ use Symfony\Component\HttpFoundation\Response;
  * DoctrineDataCollector.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class DoctrineDataCollector extends DataCollector
 {
@@ -30,6 +32,9 @@ class DoctrineDataCollector extends DataCollector
     private $managers;
     private $loggers = array();
 
+    /**
+     * @since v2.1.0
+     */
     public function __construct(ManagerRegistry $registry)
     {
         $this->registry = $registry;
@@ -42,6 +47,8 @@ class DoctrineDataCollector extends DataCollector
      *
      * @param string     $name
      * @param DebugStack $logger
+     *
+     * @since v2.1.0
      */
     public function addLogger($name, DebugStack $logger)
     {
@@ -50,6 +57,8 @@ class DoctrineDataCollector extends DataCollector
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
@@ -65,26 +74,41 @@ class DoctrineDataCollector extends DataCollector
         );
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getManagers()
     {
         return $this->data['managers'];
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getConnections()
     {
         return $this->data['connections'];
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getQueryCount()
     {
         return array_sum(array_map('count', $this->data['queries']));
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getQueries()
     {
         return $this->data['queries'];
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getTime()
     {
         $time = 0;
@@ -99,12 +123,17 @@ class DoctrineDataCollector extends DataCollector
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getName()
     {
         return 'db';
     }
 
+    /**
+     * @since v2.1.0
+     */
     private function sanitizeQueries($connectionName, $queries)
     {
         foreach ($queries as $i => $query) {
@@ -114,6 +143,9 @@ class DoctrineDataCollector extends DataCollector
         return $queries;
     }
 
+    /**
+     * @since v2.1.0
+     */
     private function sanitizeQuery($connectionName, $query)
     {
         $query['explainable'] = true;
@@ -150,6 +182,8 @@ class DoctrineDataCollector extends DataCollector
      * @param mixed $var
      *
      * @return array
+     *
+     * @since v2.1.0
      */
     private function sanitizeParam($var)
     {

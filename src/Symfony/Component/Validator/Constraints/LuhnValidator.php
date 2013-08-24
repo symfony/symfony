@@ -23,6 +23,8 @@ use Symfony\Component\Validator\ConstraintValidator;
  * @see    http://en.wikipedia.org/wiki/Luhn_algorithm
  * @author Tim Nagel <t.nagel@infinite.net.au>
  * @author Greg Knapp http://gregk.me/2011/php-implementation-of-bank-card-luhn-algorithm/
+ *
+ * @since v2.2.0
  */
 class LuhnValidator extends ConstraintValidator
 {
@@ -31,6 +33,8 @@ class LuhnValidator extends ConstraintValidator
      *
      * @param mixed      $value
      * @param Constraint $constraint
+     *
+     * @since v2.2.0
      */
     public function validate($value, Constraint $constraint)
     {

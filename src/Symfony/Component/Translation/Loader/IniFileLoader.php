@@ -19,11 +19,15 @@ use Symfony\Component\Config\Resource\FileResource;
  * IniFileLoader loads translations from an ini file.
  *
  * @author stealth35
+ *
+ * @since v2.1.0
  */
 class IniFileLoader extends ArrayLoader implements LoaderInterface
 {
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function load($resource, $locale, $domain = 'messages')
     {

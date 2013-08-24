@@ -18,11 +18,16 @@ use Symfony\Component\Config\Definition\Builder\ScalarNodeDefinition;
  * Enum Node Definition.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.1.0
  */
 class EnumNodeDefinition extends ScalarNodeDefinition
 {
     private $values;
 
+    /**
+     * @since v2.1.0
+     */
     public function values(array $values)
     {
         $values = array_unique($values);
@@ -42,6 +47,8 @@ class EnumNodeDefinition extends ScalarNodeDefinition
      * @return EnumNode The node
      *
      * @throws \RuntimeException
+     *
+     * @since v2.1.0
      */
     protected function instantiateNode()
     {

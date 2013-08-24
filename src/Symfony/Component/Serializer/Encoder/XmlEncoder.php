@@ -19,6 +19,8 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
  * @author Jordi Boggiano <j.boggiano@seld.be>
  * @author John Wards <jwards@whiteoctober.co.uk>
  * @author Fabian Vogler <fabian@equivalence.ch>
+ *
+ * @since v2.0.0
  */
 class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, DecoderInterface, NormalizationAwareInterface
 {
@@ -31,6 +33,8 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
      * Construct new XmlEncoder and allow to change the root node element name.
      *
      * @param string $rootNodeName
+     *
+     * @since v2.2.0
      */
     public function __construct($rootNodeName = 'response')
     {
@@ -39,6 +43,8 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function encode($data, $format, array $context = array())
     {
@@ -65,6 +71,8 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function decode($data, $format, array $context = array())
     {
@@ -108,6 +116,8 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
      public function supportsEncoding($format)
      {
@@ -116,6 +126,8 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
 
      /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
      public function supportsDecoding($format)
      {
@@ -126,6 +138,8 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
      * Sets the root node name
      *
      * @param string $name root node name
+     *
+     * @since v2.0.0
      */
     public function setRootNodeName($name)
     {
@@ -135,6 +149,8 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
     /**
      * Returns the root node name
      * @return string
+     *
+     * @since v2.0.0
      */
     public function getRootNodeName()
     {
@@ -211,6 +227,8 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
      * @param string $name
      *
      * @return Boolean
+     *
+     * @since v2.0.0
      */
     final protected function isElementNameValid($name)
     {
@@ -369,6 +387,8 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
      * @param string $val
      *
      * @return Boolean
+     *
+     * @since v2.1.0
      */
     private function needsCdataWrapping($val)
     {
@@ -412,6 +432,8 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
 
     /**
      * Get real XML root node name, taking serializer options into account.
+     *
+     * @since v2.2.0
      */
     private function resolveXmlRootName(array $context = array())
     {

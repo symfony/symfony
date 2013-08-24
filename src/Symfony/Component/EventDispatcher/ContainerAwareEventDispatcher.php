@@ -20,6 +20,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Jordan Alliot <jordan.alliot@gmail.com>
+ *
+ * @since v2.0.0
  */
 class ContainerAwareEventDispatcher extends EventDispatcher
 {
@@ -45,6 +47,8 @@ class ContainerAwareEventDispatcher extends EventDispatcher
      * Constructor.
      *
      * @param ContainerInterface $container A ContainerInterface instance
+     *
+     * @since v2.0.0
      */
     public function __construct(ContainerInterface $container)
     {
@@ -62,6 +66,8 @@ class ContainerAwareEventDispatcher extends EventDispatcher
      *                            Defaults to 0.
      *
      * @throws \InvalidArgumentException
+     *
+     * @since v2.0.0
      */
     public function addListenerService($eventName, $callback, $priority = 0)
     {
@@ -72,6 +78,9 @@ class ContainerAwareEventDispatcher extends EventDispatcher
         $this->listenerIds[$eventName][] = array($callback[0], $callback[1], $priority);
     }
 
+    /**
+     * @since v2.0.12
+     */
     public function removeListener($eventName, $listener)
     {
         $this->lazyLoad($eventName);
@@ -101,6 +110,8 @@ class ContainerAwareEventDispatcher extends EventDispatcher
 
     /**
      * @see EventDispatcherInterface::hasListeners
+     *
+     * @since v2.0.10
      */
     public function hasListeners($eventName = null)
     {
@@ -117,6 +128,8 @@ class ContainerAwareEventDispatcher extends EventDispatcher
 
     /**
      * @see EventDispatcherInterface::getListeners
+     *
+     * @since v2.0.10
      */
     public function getListeners($eventName = null)
     {
@@ -136,6 +149,8 @@ class ContainerAwareEventDispatcher extends EventDispatcher
      *
      * @param string $serviceId The service ID of the subscriber service
      * @param string $class     The service's class name (which must implement EventSubscriberInterface)
+     *
+     * @since v2.1.0
      */
     public function addSubscriberService($serviceId, $class)
     {
@@ -159,6 +174,8 @@ class ContainerAwareEventDispatcher extends EventDispatcher
      * container.
      *
      * @throws \InvalidArgumentException if the service is not defined
+     *
+     * @since v2.0.0
      */
     public function dispatch($eventName, Event $event = null)
     {
@@ -167,6 +184,9 @@ class ContainerAwareEventDispatcher extends EventDispatcher
         return parent::dispatch($eventName, $event);
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function getContainer()
     {
         return $this->container;
@@ -179,6 +199,8 @@ class ContainerAwareEventDispatcher extends EventDispatcher
      * @param string $eventName The name of the event to dispatch. The name of
      *                          the event is the name of the method that is
      *                          invoked on listeners.
+     *
+     * @since v2.0.10
      */
     protected function lazyLoad($eventName)
     {

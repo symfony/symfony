@@ -20,6 +20,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * Resize a collection form element based on the data sent from the client.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.0.0
  */
 class ResizeFormListener implements EventSubscriberInterface
 {
@@ -45,6 +47,9 @@ class ResizeFormListener implements EventSubscriberInterface
      */
     protected $allowDelete;
 
+    /**
+     * @since v2.2.0
+     */
     public function __construct($type, array $options = array(), $allowAdd = false, $allowDelete = false)
     {
         $this->type = $type;
@@ -53,6 +58,9 @@ class ResizeFormListener implements EventSubscriberInterface
         $this->options = $options;
     }
 
+    /**
+     * @since v2.1.0
+     */
     public static function getSubscribedEvents()
     {
         return array(
@@ -63,6 +71,9 @@ class ResizeFormListener implements EventSubscriberInterface
         );
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function preSetData(FormEvent $event)
     {
         $form = $event->getForm();
@@ -89,6 +100,9 @@ class ResizeFormListener implements EventSubscriberInterface
         }
     }
 
+    /**
+     * @since v2.3.0
+     */
     public function preSubmit(FormEvent $event)
     {
         $form = $event->getForm();
@@ -123,6 +137,9 @@ class ResizeFormListener implements EventSubscriberInterface
         }
     }
 
+    /**
+     * @since v2.3.0
+     */
     public function onSubmit(FormEvent $event)
     {
         $form = $event->getForm();
@@ -154,6 +171,8 @@ class ResizeFormListener implements EventSubscriberInterface
      *
      * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
      *             {@link preSubmit()} instead.
+     *
+     * @since v2.3.0
      */
     public function preBind(FormEvent $event)
     {
@@ -165,6 +184,8 @@ class ResizeFormListener implements EventSubscriberInterface
      *
      * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
      *             {@link onSubmit()} instead.
+     *
+     * @since v2.3.0
      */
     public function onBind(FormEvent $event)
     {

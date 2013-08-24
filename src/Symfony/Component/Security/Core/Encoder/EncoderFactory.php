@@ -15,11 +15,16 @@ namespace Symfony\Component\Security\Core\Encoder;
  * A generic encoder factory implementation
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class EncoderFactory implements EncoderFactoryInterface
 {
     private $encoders;
 
+    /**
+     * @since v2.0.0
+     */
     public function __construct(array $encoders)
     {
         $this->encoders = $encoders;
@@ -27,6 +32,8 @@ class EncoderFactory implements EncoderFactoryInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function getEncoder($user)
     {
@@ -53,6 +60,8 @@ class EncoderFactory implements EncoderFactoryInterface
      * @return PasswordEncoderInterface
      *
      * @throws \InvalidArgumentException
+     *
+     * @since v2.0.0
      */
     private function createEncoder(array $config)
     {

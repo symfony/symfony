@@ -21,6 +21,8 @@ use Symfony\Component\EventDispatcher\Event;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class KernelEvent extends Event
 {
@@ -43,6 +45,9 @@ class KernelEvent extends Event
      */
     private $requestType;
 
+    /**
+     * @since v2.0.0
+     */
     public function __construct(HttpKernelInterface $kernel, Request $request, $requestType)
     {
         $this->kernel = $kernel;
@@ -56,6 +61,8 @@ class KernelEvent extends Event
      * @return HttpKernelInterface
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getKernel()
     {
@@ -68,6 +75,8 @@ class KernelEvent extends Event
      * @return Request
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getRequest()
     {
@@ -81,6 +90,8 @@ class KernelEvent extends Event
      *                  HttpKernelInterface::SUB_REQUEST
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getRequestType()
     {

@@ -24,11 +24,15 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  * cannot be extended (via {@link FormTypeExtension}s) nor themed.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.3.0
  */
 abstract class BaseType extends AbstractType
 {
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -38,6 +42,8 @@ abstract class BaseType extends AbstractType
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
@@ -104,6 +110,8 @@ abstract class BaseType extends AbstractType
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {

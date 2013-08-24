@@ -16,11 +16,15 @@ use Symfony\Component\Validator\ConstraintValidator;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.1.0
  */
 class RangeValidator extends ConstraintValidator
 {
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function validate($value, Constraint $constraint)
     {

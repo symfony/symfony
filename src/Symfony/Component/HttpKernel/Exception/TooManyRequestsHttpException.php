@@ -16,6 +16,8 @@ namespace Symfony\Component\HttpKernel\Exception;
  *
  * @author Ben Ramsey <ben@benramsey.com>
  * @see http://tools.ietf.org/html/rfc6585
+ *
+ * @since v2.2.0
  */
 class TooManyRequestsHttpException extends HttpException
 {
@@ -26,6 +28,8 @@ class TooManyRequestsHttpException extends HttpException
      * @param string         $message    The internal exception message
      * @param \Exception     $previous   The previous exception
      * @param integer        $code       The internal exception code
+     *
+     * @since v2.2.0
      */
     public function __construct($retryAfter = null, $message = null, \Exception $previous = null, $code = 0)
     {

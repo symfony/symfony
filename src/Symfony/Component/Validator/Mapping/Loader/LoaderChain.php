@@ -23,6 +23,8 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  * successful or not.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.0.0
  */
 class LoaderChain implements LoaderInterface
 {
@@ -34,6 +36,8 @@ class LoaderChain implements LoaderInterface
      * @param LoaderInterface[] $loaders An array of LoaderInterface instances
      *
      * @throws MappingException If any of the loaders does not implement LoaderInterface
+     *
+     * @since v2.0.0
      */
     public function __construct(array $loaders)
     {
@@ -48,6 +52,8 @@ class LoaderChain implements LoaderInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function loadClassMetadata(ClassMetadata $metadata)
     {

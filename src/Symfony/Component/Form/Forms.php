@@ -150,6 +150,8 @@ use Symfony\Component\Form\Extension\Core\CoreExtension;
  * </code>
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.1.0
  */
 final class Forms
 {
@@ -157,6 +159,8 @@ final class Forms
      * Creates a form factory with the default configuration.
      *
      * @return FormFactoryInterface The form factory.
+     *
+     * @since v2.1.0
      */
     public static function createFormFactory()
     {
@@ -167,6 +171,8 @@ final class Forms
      * Creates a form factory builder with the default configuration.
      *
      * @return FormFactoryBuilderInterface The form factory builder.
+     *
+     * @since v2.1.0
      */
     public static function createFormFactoryBuilder()
     {
@@ -178,6 +184,8 @@ final class Forms
 
     /**
      * This class cannot be instantiated.
+     *
+     * @since v2.1.0
      */
     private function __construct()
     {

@@ -17,6 +17,8 @@ namespace Symfony\Component\Templating;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.1.0
  */
 class DelegatingEngine implements EngineInterface, StreamingEngineInterface
 {
@@ -31,6 +33,8 @@ class DelegatingEngine implements EngineInterface, StreamingEngineInterface
      * @param EngineInterface[] $engines An array of EngineInterface instances to add
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function __construct(array $engines = array())
     {
@@ -44,6 +48,8 @@ class DelegatingEngine implements EngineInterface, StreamingEngineInterface
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function render($name, array $parameters = array())
     {
@@ -54,6 +60,8 @@ class DelegatingEngine implements EngineInterface, StreamingEngineInterface
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function stream($name, array $parameters = array())
     {
@@ -69,6 +77,8 @@ class DelegatingEngine implements EngineInterface, StreamingEngineInterface
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function exists($name)
     {
@@ -81,6 +91,8 @@ class DelegatingEngine implements EngineInterface, StreamingEngineInterface
      * @param EngineInterface $engine An EngineInterface instance
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function addEngine(EngineInterface $engine)
     {
@@ -91,6 +103,8 @@ class DelegatingEngine implements EngineInterface, StreamingEngineInterface
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function supports($name)
     {

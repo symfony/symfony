@@ -20,11 +20,15 @@ use Symfony\Bridge\Propel1\Form\EventListener\TranslationFormListener;
  * Translation type class
  *
  * @author Patrick Kaufmann
+ *
+ * @since v2.2.0
  */
 class TranslationType extends AbstractType
 {
     /**
       * {@inheritdoc}
+     *
+     * @since v2.2.0
       */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -35,6 +39,8 @@ class TranslationType extends AbstractType
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function getName()
     {
@@ -43,6 +49,8 @@ class TranslationType extends AbstractType
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {

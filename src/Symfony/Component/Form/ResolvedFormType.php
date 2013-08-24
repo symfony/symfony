@@ -20,6 +20,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  * A wrapper for a form type and its extensions.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.1.0
  */
 class ResolvedFormType implements ResolvedFormTypeInterface
 {
@@ -43,6 +45,9 @@ class ResolvedFormType implements ResolvedFormTypeInterface
      */
     private $optionsResolver;
 
+    /**
+     * @since v2.1.0
+     */
     public function __construct(FormTypeInterface $innerType, array $typeExtensions = array(), ResolvedFormTypeInterface $parent = null)
     {
         if (!preg_match('/^[a-z0-9_]*$/i', $innerType->getName())) {
@@ -66,6 +71,8 @@ class ResolvedFormType implements ResolvedFormTypeInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getName()
     {
@@ -74,6 +81,8 @@ class ResolvedFormType implements ResolvedFormTypeInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getParent()
     {
@@ -82,6 +91,8 @@ class ResolvedFormType implements ResolvedFormTypeInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getInnerType()
     {
@@ -90,6 +101,8 @@ class ResolvedFormType implements ResolvedFormTypeInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getTypeExtensions()
     {
@@ -103,6 +116,8 @@ class ResolvedFormType implements ResolvedFormTypeInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function createBuilder(FormFactoryInterface $factory, $name, array $options = array())
     {
@@ -121,6 +136,8 @@ class ResolvedFormType implements ResolvedFormTypeInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function createView(FormInterface $form, FormView $parent = null)
     {
@@ -148,6 +165,8 @@ class ResolvedFormType implements ResolvedFormTypeInterface
      *
      * @param FormBuilderInterface $builder The builder to configure.
      * @param array                $options The options used for the configuration.
+     *
+     * @since v2.1.0
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -174,6 +193,8 @@ class ResolvedFormType implements ResolvedFormTypeInterface
      * @param FormView      $view    The form view to configure.
      * @param FormInterface $form    The form corresponding to the view.
      * @param array         $options The options used for the configuration.
+     *
+     * @since v2.1.0
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
@@ -200,6 +221,8 @@ class ResolvedFormType implements ResolvedFormTypeInterface
      * @param FormView      $view    The form view to configure.
      * @param FormInterface $form    The form corresponding to the view.
      * @param array         $options The options used for the configuration.
+     *
+     * @since v2.1.0
      */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
@@ -222,6 +245,8 @@ class ResolvedFormType implements ResolvedFormTypeInterface
      * to change or call it in re-implementations of {@link createBuilder()}.
      *
      * @return \Symfony\Component\OptionsResolver\OptionsResolverInterface The options resolver.
+     *
+     * @since v2.1.0
      */
     public function getOptionsResolver()
     {
@@ -254,6 +279,8 @@ class ResolvedFormType implements ResolvedFormTypeInterface
      * @param array                $options   The builder options.
      *
      * @return FormBuilderInterface The new builder instance.
+     *
+     * @since v2.3.0
      */
     protected function newBuilder($name, $dataClass, FormFactoryInterface $factory, array $options)
     {
@@ -276,6 +303,8 @@ class ResolvedFormType implements ResolvedFormTypeInterface
      * @param FormView|null $parent The parent view, if available.
      *
      * @return FormView A new view instance.
+     *
+     * @since v2.3.0
      */
     protected function newView(FormView $parent = null)
     {

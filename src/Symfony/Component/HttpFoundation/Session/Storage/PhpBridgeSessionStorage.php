@@ -19,6 +19,8 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeSessionHandle
  * Allows session to be started by PHP and managed by Symfony2
  *
  * @author Drak <drak@zikula.org>
+ *
+ * @since v2.3.0
  */
 class PhpBridgeSessionStorage extends NativeSessionStorage
 {
@@ -27,6 +29,8 @@ class PhpBridgeSessionStorage extends NativeSessionStorage
      *
      * @param AbstractProxy|NativeSessionHandler|\SessionHandlerInterface|null $handler
      * @param MetadataBag                                                      $metaBag MetadataBag
+     *
+     * @since v2.3.0
      */
     public function __construct($handler = null, MetadataBag $metaBag = null)
     {
@@ -36,6 +40,8 @@ class PhpBridgeSessionStorage extends NativeSessionStorage
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function start()
     {
@@ -54,6 +60,8 @@ class PhpBridgeSessionStorage extends NativeSessionStorage
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function clear()
     {

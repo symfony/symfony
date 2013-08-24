@@ -20,6 +20,8 @@ use Symfony\Component\Validator\Mapping\Cache\CacheInterface;
  * A factory for creating metadata for PHP classes.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.3.0
  */
 class ClassMetadataFactory implements MetadataFactoryInterface
 {
@@ -37,6 +39,9 @@ class ClassMetadataFactory implements MetadataFactoryInterface
 
     protected $loadedClasses = array();
 
+    /**
+     * @since v2.1.0
+     */
     public function __construct(LoaderInterface $loader = null, CacheInterface $cache = null)
     {
         $this->loader = $loader;
@@ -45,6 +50,8 @@ class ClassMetadataFactory implements MetadataFactoryInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function getMetadataFor($value)
     {
@@ -94,6 +101,8 @@ class ClassMetadataFactory implements MetadataFactoryInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function hasMetadataFor($value)
     {

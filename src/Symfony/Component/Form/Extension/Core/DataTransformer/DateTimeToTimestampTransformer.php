@@ -18,6 +18,8 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Florian Eckerstorfer <florian@eckerstorfer.org>
+ *
+ * @since v2.0.0
  */
 class DateTimeToTimestampTransformer extends BaseDateTimeTransformer
 {
@@ -31,6 +33,8 @@ class DateTimeToTimestampTransformer extends BaseDateTimeTransformer
      * @throws TransformationFailedException If the given value is not an instance
      *                                       of \DateTime or if the output
      *                                       timezone is not supported.
+     *
+     * @since v2.0.0
      */
     public function transform($value)
     {
@@ -61,6 +65,8 @@ class DateTimeToTimestampTransformer extends BaseDateTimeTransformer
      *
      * @throws TransformationFailedException If the given value is not a timestamp
      *                                       or if the given timestamp is invalid.
+     *
+     * @since v2.0.0
      */
     public function reverseTransform($value)
     {

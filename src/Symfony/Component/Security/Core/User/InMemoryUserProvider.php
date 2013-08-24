@@ -21,6 +21,8 @@ use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
  * (a backend with a unique admin for instance)
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class InMemoryUserProvider implements UserProviderInterface
 {
@@ -33,6 +35,8 @@ class InMemoryUserProvider implements UserProviderInterface
      * an array of attributes: 'password', 'enabled', and 'roles'.
      *
      * @param array $users An array of users
+     *
+     * @since v2.0.0
      */
     public function __construct(array $users = array())
     {
@@ -52,6 +56,8 @@ class InMemoryUserProvider implements UserProviderInterface
      * @param UserInterface $user A UserInterface instance
      *
      * @throws \LogicException
+     *
+     * @since v2.0.0
      */
     public function createUser(UserInterface $user)
     {
@@ -64,6 +70,8 @@ class InMemoryUserProvider implements UserProviderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function loadUserByUsername($username)
     {
@@ -82,6 +90,8 @@ class InMemoryUserProvider implements UserProviderInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function refreshUser(UserInterface $user)
     {
@@ -94,6 +104,8 @@ class InMemoryUserProvider implements UserProviderInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function supportsClass($class)
     {

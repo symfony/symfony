@@ -17,6 +17,8 @@ use Symfony\Component\Config\Exception\FileLoaderLoadException;
  * Loader is the abstract class used by all built-in loaders.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 abstract class Loader implements LoaderInterface
 {
@@ -26,6 +28,8 @@ abstract class Loader implements LoaderInterface
      * Gets the loader resolver.
      *
      * @return LoaderResolverInterface A LoaderResolverInterface instance
+     *
+     * @since v2.0.0
      */
     public function getResolver()
     {
@@ -36,6 +40,8 @@ abstract class Loader implements LoaderInterface
      * Sets the loader resolver.
      *
      * @param LoaderResolverInterface $resolver A LoaderResolverInterface instance
+     *
+     * @since v2.1.0
      */
     public function setResolver(LoaderResolverInterface $resolver)
     {
@@ -49,6 +55,8 @@ abstract class Loader implements LoaderInterface
      * @param string $type     The resource type
      *
      * @return mixed
+     *
+     * @since v2.0.0
      */
     public function import($resource, $type = null)
     {
@@ -64,6 +72,8 @@ abstract class Loader implements LoaderInterface
      * @return LoaderInterface A LoaderInterface instance
      *
      * @throws FileLoaderLoadException if no loader is found
+     *
+     * @since v2.0.0
      */
     public function resolve($resource, $type = null)
     {

@@ -22,6 +22,8 @@ use Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy;
  * This provides a base class for session attribute storage.
  *
  * @author Drak <drak@zikula.org>
+ *
+ * @since v2.1.0
  */
 class NativeSessionStorage implements SessionStorageInterface
 {
@@ -95,6 +97,8 @@ class NativeSessionStorage implements SessionStorageInterface
      * @param array                                                            $options Session configuration options.
      * @param AbstractProxy|NativeSessionHandler|\SessionHandlerInterface|null $handler
      * @param MetadataBag                                                      $metaBag MetadataBag.
+     *
+     * @since v2.3.0
      */
     public function __construct(array $options = array(), $handler = null, MetadataBag $metaBag = null)
     {
@@ -116,6 +120,8 @@ class NativeSessionStorage implements SessionStorageInterface
      * Gets the save handler instance.
      *
      * @return AbstractProxy
+     *
+     * @since v2.1.0
      */
     public function getSaveHandler()
     {
@@ -124,6 +130,8 @@ class NativeSessionStorage implements SessionStorageInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function start()
     {
@@ -160,6 +168,8 @@ class NativeSessionStorage implements SessionStorageInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getId()
     {
@@ -172,6 +182,8 @@ class NativeSessionStorage implements SessionStorageInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function setId($id)
     {
@@ -180,6 +192,8 @@ class NativeSessionStorage implements SessionStorageInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getName()
     {
@@ -188,6 +202,8 @@ class NativeSessionStorage implements SessionStorageInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function setName($name)
     {
@@ -196,6 +212,8 @@ class NativeSessionStorage implements SessionStorageInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function regenerate($destroy = false, $lifetime = null)
     {
@@ -226,6 +244,8 @@ class NativeSessionStorage implements SessionStorageInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function save()
     {
@@ -241,6 +261,8 @@ class NativeSessionStorage implements SessionStorageInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function clear()
     {
@@ -258,6 +280,8 @@ class NativeSessionStorage implements SessionStorageInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function registerBag(SessionBagInterface $bag)
     {
@@ -266,6 +290,8 @@ class NativeSessionStorage implements SessionStorageInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getBag($name)
     {
@@ -286,6 +312,8 @@ class NativeSessionStorage implements SessionStorageInterface
      * Sets the MetadataBag.
      *
      * @param MetadataBag $metaBag
+     *
+     * @since v2.1.0
      */
     public function setMetadataBag(MetadataBag $metaBag = null)
     {
@@ -300,6 +328,8 @@ class NativeSessionStorage implements SessionStorageInterface
      * Gets the MetadataBag.
      *
      * @return MetadataBag
+     *
+     * @since v2.1.0
      */
     public function getMetadataBag()
     {
@@ -308,6 +338,8 @@ class NativeSessionStorage implements SessionStorageInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function isStarted()
     {
@@ -323,6 +355,8 @@ class NativeSessionStorage implements SessionStorageInterface
      * @param array $options Session ini directives array(key => value).
      *
      * @see http://php.net/session.configuration
+     *
+     * @since v2.1.0
      */
     public function setOptions(array $options)
     {
@@ -366,6 +400,8 @@ class NativeSessionStorage implements SessionStorageInterface
      * @param AbstractProxy|NativeSessionHandler|\SessionHandlerInterface|null $saveHandler
      *
      * @throws \InvalidArgumentException
+     *
+     * @since v2.1.0
      */
     public function setSaveHandler($saveHandler = null)
     {
@@ -410,6 +446,8 @@ class NativeSessionStorage implements SessionStorageInterface
      * and populates $_SESSION with the result automatically.
      *
      * @param array|null $session
+     *
+     * @since v2.1.0
      */
     protected function loadSession(array &$session = null)
     {

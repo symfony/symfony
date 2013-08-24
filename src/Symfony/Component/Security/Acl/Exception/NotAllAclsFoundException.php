@@ -19,6 +19,8 @@ namespace Symfony\Component\Security\Acl\Exception;
  * This exception contains the partial result.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class NotAllAclsFoundException extends AclNotFoundException
 {
@@ -28,6 +30,8 @@ class NotAllAclsFoundException extends AclNotFoundException
      * Sets the partial result
      *
      * @param \SplObjectStorage $result
+     *
+     * @since v2.0.0
      */
     public function setPartialResult(\SplObjectStorage $result)
     {
@@ -38,6 +42,8 @@ class NotAllAclsFoundException extends AclNotFoundException
      * Returns the partial result
      *
      * @return \SplObjectStorage
+     *
+     * @since v2.0.0
      */
     public function getPartialResult()
     {

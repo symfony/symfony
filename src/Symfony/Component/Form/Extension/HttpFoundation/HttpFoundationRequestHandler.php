@@ -21,11 +21,15 @@ use Symfony\Component\HttpFoundation\Request;
  * component.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.3.0
  */
 class HttpFoundationRequestHandler implements RequestHandlerInterface
 {
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function handleRequest(FormInterface $form, $request = null)
     {

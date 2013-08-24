@@ -17,6 +17,8 @@ use Symfony\Component\Intl\Exception\RuntimeException;
  * Compiles .txt resource bundles to binary .res files.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.3.0
  */
 class BundleCompiler implements BundleCompilerInterface
 {
@@ -33,6 +35,8 @@ class BundleCompiler implements BundleCompilerInterface
      *                        running "genrb".
      *
      * @throws RuntimeException If the "genrb" cannot be found.
+     *
+     * @since v2.3.0
      */
     public function __construct($genrb = 'genrb', $envVars = '')
     {
@@ -50,6 +54,8 @@ class BundleCompiler implements BundleCompilerInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function compile($sourcePath, $targetDir)
     {

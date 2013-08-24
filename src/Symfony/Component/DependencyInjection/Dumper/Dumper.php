@@ -19,6 +19,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 abstract class Dumper implements DumperInterface
 {
@@ -30,6 +32,8 @@ abstract class Dumper implements DumperInterface
      * @param ContainerBuilder $container The service container to dump
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function __construct(ContainerBuilder $container)
     {

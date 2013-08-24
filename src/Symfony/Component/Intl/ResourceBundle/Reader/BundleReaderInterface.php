@@ -26,6 +26,8 @@ interface BundleReaderInterface
      *
      * @return mixed Returns an array or {@link \ArrayAccess} instance for
      *               complex data, a scalar value otherwise.
+     *
+     * @since v2.3.0
      */
     public function read($path, $locale);
 
@@ -35,6 +37,8 @@ interface BundleReaderInterface
      * @param string $path The path to the resource bundle.
      *
      * @return string[] A list of supported locale codes.
+     *
+     * @since v2.3.0
      */
     public function getLocales($path);
 }

@@ -26,6 +26,8 @@ interface CurrencyBundleInterface extends ResourceBundleInterface
      *                         Defaults to {@link \Locale::getDefault()}.
      *
      * @return string|null The currency symbol or NULL if not found.
+     *
+     * @since v2.3.0
      */
     public function getCurrencySymbol($currency, $locale = null);
 
@@ -37,6 +39,8 @@ interface CurrencyBundleInterface extends ResourceBundleInterface
      *                         Defaults to {@link \Locale::getDefault()}.
      *
      * @return string|null The name of the currency or NULL if not found.
+     *
+     * @since v2.3.0
      */
     public function getCurrencyName($currency, $locale = null);
 
@@ -47,6 +51,8 @@ interface CurrencyBundleInterface extends ResourceBundleInterface
      *                       Defaults to {@link \Locale::getDefault()}.
      *
      * @return string[] A list of currency names indexed by currency codes.
+     *
+     * @since v2.3.0
      */
     public function getCurrencyNames($locale = null);
 
@@ -56,6 +62,8 @@ interface CurrencyBundleInterface extends ResourceBundleInterface
      * @param string $currency A currency code (e.g. "EUR").
      *
      * @return integer|null The number of digits after the comma or NULL if not found.
+     *
+     * @since v2.3.0
      */
     public function getFractionDigits($currency);
 
@@ -69,6 +77,8 @@ interface CurrencyBundleInterface extends ResourceBundleInterface
      * @param string $currency A currency code (e.g. "EUR").
      *
      * @return float|integer|null The rounding increment or NULL if not found.
+     *
+     * @since v2.3.0
      */
     public function getRoundingIncrement($currency);
 }

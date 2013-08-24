@@ -20,6 +20,8 @@ use Symfony\Component\HttpFoundation\Response;
  * DelegatingEngine selects an engine for a given template.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class DelegatingEngine extends BaseDelegatingEngine implements EngineInterface
 {
@@ -30,6 +32,8 @@ class DelegatingEngine extends BaseDelegatingEngine implements EngineInterface
      *
      * @param ContainerInterface $container The DI container
      * @param array              $engineIds An array of engine Ids
+     *
+     * @since v2.0.0
      */
     public function __construct(ContainerInterface $container, array $engineIds)
     {
@@ -39,6 +43,8 @@ class DelegatingEngine extends BaseDelegatingEngine implements EngineInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function supports($name)
     {
@@ -81,6 +87,8 @@ class DelegatingEngine extends BaseDelegatingEngine implements EngineInterface
      * @param Response $response   A Response instance
      *
      * @return Response A Response instance
+     *
+     * @since v2.0.0
      */
     public function renderResponse($view, array $parameters = array(), Response $response = null)
     {

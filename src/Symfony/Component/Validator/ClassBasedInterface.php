@@ -22,6 +22,8 @@ interface ClassBasedInterface
      * Returns the name of the backing PHP class.
      *
      * @return string The name of the backing class.
+     *
+     * @since v2.2.0
      */
     public function getClassName();
 }

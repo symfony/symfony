@@ -18,11 +18,15 @@ use Symfony\Component\Intl\Exception\RuntimeException;
  * Reads .php resource bundles.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.3.0
  */
 class PhpBundleReader extends AbstractBundleReader implements BundleReaderInterface
 {
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function read($path, $locale)
     {
@@ -53,6 +57,8 @@ class PhpBundleReader extends AbstractBundleReader implements BundleReaderInterf
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     protected function getFileExtension()
     {

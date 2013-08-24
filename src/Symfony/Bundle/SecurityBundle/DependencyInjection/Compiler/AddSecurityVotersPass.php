@@ -19,11 +19,15 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
  * Adds all configured security voters to the access decision manager
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class AddSecurityVotersPass implements CompilerPassInterface
 {
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function process(ContainerBuilder $container)
     {

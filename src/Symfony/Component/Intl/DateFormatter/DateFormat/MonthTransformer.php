@@ -15,6 +15,8 @@ namespace Symfony\Component\Intl\DateFormatter\DateFormat;
  * Parser and formatter for month format
  *
  * @author Igor Wiedler <igor@wiedler.ch>
+ *
+ * @since v2.3.0
  */
 class MonthTransformer extends Transformer
 {
@@ -56,6 +58,8 @@ class MonthTransformer extends Transformer
 
     /**
      * Constructor
+     *
+     * @since v2.3.0
      */
     public function __construct()
     {
@@ -71,6 +75,8 @@ class MonthTransformer extends Transformer
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.3.0
      */
     public function format(\DateTime $dateTime, $length)
     {
@@ -94,6 +100,8 @@ class MonthTransformer extends Transformer
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.3.0
      */
     public function getReverseMatchingRegExp($length)
     {
@@ -120,6 +128,8 @@ class MonthTransformer extends Transformer
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.3.0
      */
     public function extractDateOptions($matched, $length)
     {

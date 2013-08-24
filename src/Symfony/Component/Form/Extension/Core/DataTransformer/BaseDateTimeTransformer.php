@@ -14,6 +14,9 @@ namespace Symfony\Component\Form\Extension\Core\DataTransformer;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
+/**
+ * @since v2.0.0
+ */
 abstract class BaseDateTimeTransformer implements DataTransformerInterface
 {
     protected static $formats = array(
@@ -35,6 +38,8 @@ abstract class BaseDateTimeTransformer implements DataTransformerInterface
      * @param string $outputTimezone The name of the output timezone
      *
      * @throws UnexpectedTypeException if a timezone is not a string
+     *
+     * @since v2.0.0
      */
     public function __construct($inputTimezone = null, $outputTimezone = null)
     {

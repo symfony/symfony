@@ -33,6 +33,8 @@ interface ResolvedFormTypeFactoryInterface
      *
      * @throws Exception\UnexpectedTypeException  if the types parent {@link FormTypeInterface::getParent()} is not a string
      * @throws Exception\InvalidArgumentException if the types parent can not be retrieved from any extension
+     *
+     * @since v2.1.0
      */
     public function createResolvedType(FormTypeInterface $type, array $typeExtensions, ResolvedFormTypeInterface $parent = null);
 }

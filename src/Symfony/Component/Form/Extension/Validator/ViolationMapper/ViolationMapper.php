@@ -22,6 +22,8 @@ use Symfony\Component\Validator\ConstraintViolation;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.1.0
  */
 class ViolationMapper implements ViolationMapperInterface
 {
@@ -32,6 +34,8 @@ class ViolationMapper implements ViolationMapperInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function mapViolation(ConstraintViolation $violation, FormInterface $form, $allowNonSynchronized = false)
     {
@@ -145,6 +149,8 @@ class ViolationMapper implements ViolationMapperInterface
      * @param PropertyPathIteratorInterface $it   The iterator at its current position.
      *
      * @return null|FormInterface The found match or null.
+     *
+     * @since v2.1.10
      */
     private function matchChild(FormInterface $form, PropertyPathIteratorInterface $it)
     {
@@ -235,6 +241,8 @@ class ViolationMapper implements ViolationMapperInterface
      * @param  FormInterface $origin        The root form of the tree.
      *
      * @return RelativePath The reconstructed path.
+     *
+     * @since v2.1.0
      */
     private function reconstructPath(ViolationPath $violationPath, FormInterface $origin)
     {
@@ -291,6 +299,8 @@ class ViolationMapper implements ViolationMapperInterface
      * @param FormInterface $form
      *
      * @return Boolean
+     *
+     * @since v2.1.10
      */
     private function acceptsErrors(FormInterface $form)
     {

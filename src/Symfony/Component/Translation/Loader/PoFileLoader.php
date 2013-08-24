@@ -18,9 +18,14 @@ use Symfony\Component\Config\Resource\FileResource;
 /**
  * @copyright Copyright (c) 2010, Union of RAD http://union-of-rad.org (http://lithify.me/)
  * @copyright Copyright (c) 2012, Clemens Tolboom
+ *
+ * @since v2.1.0
  */
 class PoFileLoader extends ArrayLoader implements LoaderInterface
 {
+    /**
+     * @since v2.1.0
+     */
     public function load($resource, $locale, $domain = 'messages')
     {
         if (!stream_is_local($resource)) {
@@ -93,6 +98,8 @@ class PoFileLoader extends ArrayLoader implements LoaderInterface
      * @param resource $resource
      *
      * @return array
+     *
+     * @since v2.1.0
      */
     private function parse($resource)
     {
@@ -153,6 +160,8 @@ class PoFileLoader extends ArrayLoader implements LoaderInterface
      *
      * @param array $messages
      * @param array $item
+     *
+     * @since v2.1.0
      */
     private function addMessage(array &$messages, array $item)
     {

@@ -25,6 +25,8 @@ use Symfony\Component\Security\Http\Logout\LogoutSuccessHandlerInterface;
  * LogoutListener logout users.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class LogoutListener implements ListenerInterface
 {
@@ -43,6 +45,8 @@ class LogoutListener implements ListenerInterface
      * @param LogoutSuccessHandlerInterface $successHandler  A LogoutSuccessHandlerInterface instance
      * @param array                         $options         An array of options to process a logout attempt
      * @param CsrfProviderInterface         $csrfProvider    A CsrfProviderInterface instance
+     *
+     * @since v2.1.0
      */
     public function __construct(SecurityContextInterface $securityContext, HttpUtils $httpUtils, LogoutSuccessHandlerInterface $successHandler, array $options = array(), CsrfProviderInterface $csrfProvider = null)
     {
@@ -62,6 +66,8 @@ class LogoutListener implements ListenerInterface
      * Adds a logout handler
      *
      * @param LogoutHandlerInterface $handler
+     *
+     * @since v2.0.0
      */
     public function addHandler(LogoutHandlerInterface $handler)
     {
@@ -79,6 +85,8 @@ class LogoutListener implements ListenerInterface
      * @throws InvalidCsrfTokenException if the CSRF token is invalid
      * @throws \RuntimeException if the LogoutSuccessHandlerInterface instance does not return a response
      * @throws LogoutException
+     *
+     * @since v2.0.0
      */
     public function handle(GetResponseEvent $event)
     {
@@ -123,6 +131,8 @@ class LogoutListener implements ListenerInterface
      * @param Request $request
      *
      * @return Boolean
+     *
+     * @since v2.1.0
      */
     protected function requiresLogout(Request $request)
     {

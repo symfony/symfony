@@ -15,6 +15,8 @@ namespace Symfony\Component\Form;
  * Default implementation of {@link FormRendererEngineInterface}.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.1.0
  */
 abstract class AbstractRendererEngine implements FormRendererEngineInterface
 {
@@ -48,6 +50,8 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface
      *
      * @param array $defaultThemes The default themes. The type of these
      *                             themes is open to the implementation.
+     *
+     * @since v2.1.0
      */
     public function __construct(array $defaultThemes = array())
     {
@@ -56,6 +60,8 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function setTheme(FormView $view, $themes)
     {
@@ -73,6 +79,8 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getResourceForBlockName(FormView $view, $blockName)
     {
@@ -87,6 +95,8 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getResourceForBlockNameHierarchy(FormView $view, array $blockNameHierarchy, $hierarchyLevel)
     {
@@ -102,6 +112,8 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getResourceHierarchyLevel(FormView $view, array $blockNameHierarchy, $hierarchyLevel)
     {
@@ -132,6 +144,8 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface
      * @param string   $blockName The name of the block to load.
      *
      * @return Boolean True if the resource could be loaded, false otherwise.
+     *
+     * @since v2.1.0
      */
     abstract protected function loadResourceForBlockName($cacheKey, FormView $view, $blockName);
 
@@ -150,6 +164,8 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface
      *                                     should be loaded.
      *
      * @return Boolean True if the resource could be loaded, false otherwise.
+     *
+     * @since v2.1.0
      */
     private function loadResourceForBlockNameHierarchy($cacheKey, FormView $view, array $blockNameHierarchy, $hierarchyLevel)
     {

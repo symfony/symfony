@@ -24,6 +24,8 @@ use Symfony\Component\HttpFoundation\Request;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class ControllerResolver implements ControllerResolverInterface
 {
@@ -33,6 +35,8 @@ class ControllerResolver implements ControllerResolverInterface
      * Constructor.
      *
      * @param LoggerInterface $logger A LoggerInterface instance
+     *
+     * @since v2.0.0
      */
     public function __construct(LoggerInterface $logger = null)
     {
@@ -53,6 +57,8 @@ class ControllerResolver implements ControllerResolverInterface
      * @throws \InvalidArgumentException|\LogicException If the controller can't be found
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getController(Request $request)
     {
@@ -96,6 +102,8 @@ class ControllerResolver implements ControllerResolverInterface
      * @throws \RuntimeException When value for argument given is not provided
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getArguments(Request $request, $controller)
     {
@@ -111,6 +119,9 @@ class ControllerResolver implements ControllerResolverInterface
         return $this->doGetArguments($request, $controller, $r->getParameters());
     }
 
+    /**
+     * @since v2.0.1
+     */
     protected function doGetArguments(Request $request, $controller, array $parameters)
     {
         $attributes = $request->attributes->all();
@@ -146,6 +157,8 @@ class ControllerResolver implements ControllerResolverInterface
      * @return mixed A PHP callable
      *
      * @throws \InvalidArgumentException
+     *
+     * @since v2.0.0
      */
     protected function createController($controller)
     {

@@ -26,6 +26,8 @@ interface DebugLoggerInterface
      * It can also have an optional context key containing an array.
      *
      * @return array An array of logs
+     *
+     * @since v2.1.0
      */
     public function getLogs();
 
@@ -33,6 +35,8 @@ interface DebugLoggerInterface
      * Returns the number of errors.
      *
      * @return integer The number of errors
+     *
+     * @since v2.1.0
      */
     public function countErrors();
 }

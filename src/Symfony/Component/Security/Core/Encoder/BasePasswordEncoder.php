@@ -17,6 +17,8 @@ use Symfony\Component\Security\Core\Util\StringUtils;
  * BasePasswordEncoder is the base class for all password encoders.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 abstract class BasePasswordEncoder implements PasswordEncoderInterface
 {
@@ -26,6 +28,8 @@ abstract class BasePasswordEncoder implements PasswordEncoderInterface
      * @param string $mergedPasswordSalt The merged password and salt string
      *
      * @return array An array where the first element is the password and the second the salt
+     *
+     * @since v2.0.0
      */
     protected function demergePasswordAndSalt($mergedPasswordSalt)
     {
@@ -54,6 +58,8 @@ abstract class BasePasswordEncoder implements PasswordEncoderInterface
      * @return string a merged password and salt
      *
      * @throws \InvalidArgumentException
+     *
+     * @since v2.0.0
      */
     protected function mergePasswordAndSalt($password, $salt)
     {
@@ -78,6 +84,8 @@ abstract class BasePasswordEncoder implements PasswordEncoderInterface
      * @param string $password2 The second password
      *
      * @return Boolean true if the two passwords are the same, false otherwise
+     *
+     * @since v2.0.0
      */
     protected function comparePasswords($password1, $password2)
     {

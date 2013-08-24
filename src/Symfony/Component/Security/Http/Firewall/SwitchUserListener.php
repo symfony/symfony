@@ -34,6 +34,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  * (like the Unix su command).
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class SwitchUserListener implements ListenerInterface
 {
@@ -49,6 +51,8 @@ class SwitchUserListener implements ListenerInterface
 
     /**
      * Constructor.
+     *
+     * @since v2.0.0
      */
     public function __construct(SecurityContextInterface $securityContext, UserProviderInterface $provider, UserCheckerInterface $userChecker, $providerKey, AccessDecisionManagerInterface $accessDecisionManager, LoggerInterface $logger = null, $usernameParameter = '_switch_user', $role = 'ROLE_ALLOWED_TO_SWITCH', EventDispatcherInterface $dispatcher = null)
     {
@@ -73,6 +77,8 @@ class SwitchUserListener implements ListenerInterface
      * @param GetResponseEvent $event A GetResponseEvent instance
      *
      * @throws \LogicException
+     *
+     * @since v2.0.0
      */
     public function handle(GetResponseEvent $event)
     {
@@ -107,6 +113,8 @@ class SwitchUserListener implements ListenerInterface
      *
      * @throws \LogicException
      * @throws AccessDeniedException
+     *
+     * @since v2.0.0
      */
     private function attemptSwitchUser(Request $request)
     {
@@ -155,6 +163,8 @@ class SwitchUserListener implements ListenerInterface
      * @return TokenInterface The original TokenInterface instance
      *
      * @throws AuthenticationCredentialsNotFoundException
+     *
+     * @since v2.0.0
      */
     private function attemptExitUser(Request $request)
     {
@@ -176,6 +186,8 @@ class SwitchUserListener implements ListenerInterface
      * @param TokenInterface $token A switched TokenInterface instance
      *
      * @return TokenInterface|false The original TokenInterface instance, false if the current TokenInterface is not switched
+     *
+     * @since v2.0.0
      */
     private function getOriginalToken(TokenInterface $token)
     {

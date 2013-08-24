@@ -17,16 +17,24 @@ namespace Symfony\Component\HttpKernel\DataCollector;
  * Children of this class must store the collected data in the data property.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 abstract class DataCollector implements DataCollectorInterface, \Serializable
 {
     protected $data;
 
+    /**
+     * @since v2.0.0
+     */
     public function serialize()
     {
         return serialize($this->data);
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function unserialize($data)
     {
         $this->data = unserialize($data);
@@ -38,6 +46,8 @@ abstract class DataCollector implements DataCollectorInterface, \Serializable
      * @param mixed $var A PHP variable
      *
      * @return string The string representation of the variable
+     *
+     * @since v2.0.18
      */
     protected function varToString($var)
     {

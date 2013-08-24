@@ -27,6 +27,8 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 abstract class Constraint
 {
@@ -81,6 +83,8 @@ abstract class Constraint
      *                                       NULL
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function __construct($options = null)
     {
@@ -136,6 +140,8 @@ abstract class Constraint
 
     /**
      * Unsupported operation.
+     *
+     * @since v2.0.0
      */
     public function __set($option, $value)
     {
@@ -148,6 +154,8 @@ abstract class Constraint
      * @param string $group
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function addImplicitGroupName($group)
     {
@@ -165,6 +173,8 @@ abstract class Constraint
      * @see __construct()
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getDefaultOption()
     {
@@ -180,6 +190,8 @@ abstract class Constraint
      * @see __construct()
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getRequiredOptions()
     {
@@ -196,6 +208,8 @@ abstract class Constraint
      * @return string
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function validatedBy()
     {
@@ -212,6 +226,8 @@ abstract class Constraint
      * @return string|array  One or more constant values
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getTargets()
     {

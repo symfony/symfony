@@ -21,11 +21,15 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  * @author The Whole Life To Learn <thewholelifetolearn@gmail.com>
  *
  * @see https://en.wikipedia.org/wiki/Isbn
+ *
+ * @since v2.3.0
  */
 class IsbnValidator extends ConstraintValidator
 {
     /**
      * {@inheritDoc}
+     *
+     * @since v2.3.0
      */
     public function validate($value, Constraint $constraint)
     {

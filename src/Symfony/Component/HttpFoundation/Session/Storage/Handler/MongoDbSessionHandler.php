@@ -15,6 +15,8 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
  * MongoDB session handler
  *
  * @author Markus Bachmann <markus.bachmann@bachi.biz>
+ *
+ * @since v2.1.0
  */
 class MongoDbSessionHandler implements \SessionHandlerInterface
 {
@@ -48,6 +50,8 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
      *
      * @throws \InvalidArgumentException When MongoClient or Mongo instance not provided
      * @throws \InvalidArgumentException When "database" or "collection" not provided
+     *
+     * @since v2.1.10
      */
     public function __construct($mongo, array $options)
     {
@@ -70,6 +74,8 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function open($savePath, $sessionName)
     {
@@ -78,6 +84,8 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function close()
     {
@@ -86,6 +94,8 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function destroy($sessionId)
     {
@@ -98,6 +108,8 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function gc($lifetime)
     {
@@ -120,6 +132,8 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
 
     /**
      * {@inheritDoc]
+     *
+     * @since v2.1.0
      */
     public function write($sessionId, $data)
     {
@@ -137,6 +151,8 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function read($sessionId)
     {
@@ -151,6 +167,8 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
      * Return a "MongoCollection" instance
      *
      * @return \MongoCollection
+     *
+     * @since v2.1.0
      */
     private function getCollection()
     {

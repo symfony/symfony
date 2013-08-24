@@ -22,11 +22,15 @@ use Symfony\Component\Routing\RouterInterface;
  * RouterApacheDumperCommand.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class RouterApacheDumperCommand extends ContainerAwareCommand
 {
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function isEnabled()
     {
@@ -43,6 +47,8 @@ class RouterApacheDumperCommand extends ContainerAwareCommand
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     protected function configure()
     {
@@ -66,6 +72,8 @@ EOF
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {

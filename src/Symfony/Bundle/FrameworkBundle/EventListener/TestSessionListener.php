@@ -25,16 +25,24 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  *
  * @author Bulat Shakirzyanov <mallluhuct@gmail.com>
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.1.0
  */
 class TestSessionListener implements EventSubscriberInterface
 {
     protected $container;
 
+    /**
+     * @since v2.0.0
+     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function onKernelRequest(GetResponseEvent $event)
     {
         if (!$event->isMasterRequest()) {
@@ -59,6 +67,8 @@ class TestSessionListener implements EventSubscriberInterface
      * Runs on 'kernel.response' in test environment
      *
      * @param FilterResponseEvent $event
+     *
+     * @since v2.0.0
      */
     public function onKernelResponse(FilterResponseEvent $event)
     {
@@ -74,6 +84,9 @@ class TestSessionListener implements EventSubscriberInterface
         }
     }
 
+    /**
+     * @since v2.1.0
+     */
     public static function getSubscribedEvents()
     {
         return array(

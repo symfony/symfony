@@ -25,11 +25,15 @@ use Symfony\Component\CssSelector\XPath\XPathExpr;
  * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @since v2.3.0
  */
 class FunctionExtension extends AbstractExtension
 {
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getFunctionTranslators()
     {
@@ -52,6 +56,8 @@ class FunctionExtension extends AbstractExtension
      * @return XPathExpr
      *
      * @throws ExpressionErrorException
+     *
+     * @since v2.3.0
      */
     public function translateNthChild(XPathExpr $xpath, FunctionNode $function, $last = false, $addNameTest = true)
     {
@@ -113,6 +119,8 @@ class FunctionExtension extends AbstractExtension
      * @param FunctionNode $function
      *
      * @return XPathExpr
+     *
+     * @since v2.3.0
      */
     public function translateNthLastChild(XPathExpr $xpath, FunctionNode $function)
     {
@@ -124,6 +132,8 @@ class FunctionExtension extends AbstractExtension
      * @param FunctionNode $function
      *
      * @return XPathExpr
+     *
+     * @since v2.3.0
      */
     public function translateNthOfType(XPathExpr $xpath, FunctionNode $function)
     {
@@ -137,6 +147,8 @@ class FunctionExtension extends AbstractExtension
      * @return XPathExpr
      *
      * @throws ExpressionErrorException
+     *
+     * @since v2.3.0
      */
     public function translateNthLastOfType(XPathExpr $xpath, FunctionNode $function)
     {
@@ -154,6 +166,8 @@ class FunctionExtension extends AbstractExtension
      * @return XPathExpr
      *
      * @throws ExpressionErrorException
+     *
+     * @since v2.3.0
      */
     public function translateContains(XPathExpr $xpath, FunctionNode $function)
     {
@@ -180,6 +194,8 @@ class FunctionExtension extends AbstractExtension
      * @return XPathExpr
      *
      * @throws ExpressionErrorException
+     *
+     * @since v2.3.0
      */
     public function translateLang(XPathExpr $xpath, FunctionNode $function)
     {
@@ -201,6 +217,8 @@ class FunctionExtension extends AbstractExtension
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getName()
     {

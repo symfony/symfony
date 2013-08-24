@@ -31,6 +31,8 @@ use Doctrine\Common\Cache\ArrayCache;
  * The default implementation of {@link ValidatorBuilderInterface}.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.1.0
  */
 class ValidatorBuilder implements ValidatorBuilderInterface
 {
@@ -86,6 +88,8 @@ class ValidatorBuilder implements ValidatorBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function addObjectInitializer(ObjectInitializerInterface $initializer)
     {
@@ -96,6 +100,8 @@ class ValidatorBuilder implements ValidatorBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function addObjectInitializers(array $initializers)
     {
@@ -106,6 +112,8 @@ class ValidatorBuilder implements ValidatorBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function addXmlMapping($path)
     {
@@ -120,6 +128,8 @@ class ValidatorBuilder implements ValidatorBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function addXmlMappings(array $paths)
     {
@@ -134,6 +144,8 @@ class ValidatorBuilder implements ValidatorBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function addYamlMapping($path)
     {
@@ -148,6 +160,8 @@ class ValidatorBuilder implements ValidatorBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function addYamlMappings(array $paths)
     {
@@ -162,6 +176,8 @@ class ValidatorBuilder implements ValidatorBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function addMethodMapping($methodName)
     {
@@ -176,6 +192,8 @@ class ValidatorBuilder implements ValidatorBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function addMethodMappings(array $methodNames)
     {
@@ -190,6 +208,8 @@ class ValidatorBuilder implements ValidatorBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function enableAnnotationMapping(Reader $annotationReader = null)
     {
@@ -212,6 +232,8 @@ class ValidatorBuilder implements ValidatorBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function disableAnnotationMapping()
     {
@@ -222,6 +244,8 @@ class ValidatorBuilder implements ValidatorBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function setMetadataFactory(MetadataFactoryInterface $metadataFactory)
     {
@@ -236,6 +260,8 @@ class ValidatorBuilder implements ValidatorBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function setMetadataCache(CacheInterface $cache)
     {
@@ -250,6 +276,8 @@ class ValidatorBuilder implements ValidatorBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function setConstraintValidatorFactory(ConstraintValidatorFactoryInterface $validatorFactory)
     {
@@ -260,6 +288,8 @@ class ValidatorBuilder implements ValidatorBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function setTranslator(TranslatorInterface $translator)
     {
@@ -270,6 +300,8 @@ class ValidatorBuilder implements ValidatorBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function setTranslationDomain($translationDomain)
     {
@@ -280,6 +312,8 @@ class ValidatorBuilder implements ValidatorBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getValidator()
     {

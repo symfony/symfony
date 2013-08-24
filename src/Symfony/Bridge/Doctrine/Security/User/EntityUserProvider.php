@@ -24,6 +24,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class EntityUserProvider implements UserProviderInterface
 {
@@ -32,6 +34,9 @@ class EntityUserProvider implements UserProviderInterface
     private $property;
     private $metadata;
 
+    /**
+     * @since v2.1.0
+     */
     public function __construct(ManagerRegistry $registry, $class, $property = null, $managerName = null)
     {
         $em = $registry->getManager($managerName);
@@ -48,6 +53,8 @@ class EntityUserProvider implements UserProviderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function loadUserByUsername($username)
     {
@@ -70,6 +77,8 @@ class EntityUserProvider implements UserProviderInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function refreshUser(UserInterface $user)
     {
@@ -102,6 +111,8 @@ class EntityUserProvider implements UserProviderInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function supportsClass($class)
     {

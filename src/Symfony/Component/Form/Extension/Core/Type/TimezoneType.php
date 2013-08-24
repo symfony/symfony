@@ -14,6 +14,9 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+/**
+ * @since v2.0.0
+ */
 class TimezoneType extends AbstractType
 {
     /**
@@ -24,6 +27,8 @@ class TimezoneType extends AbstractType
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
@@ -34,6 +39,8 @@ class TimezoneType extends AbstractType
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getParent()
     {
@@ -42,6 +49,8 @@ class TimezoneType extends AbstractType
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getName()
     {
@@ -57,6 +66,8 @@ class TimezoneType extends AbstractType
      * overhead.
      *
      * @return array The timezone choices
+     *
+     * @since v2.1.0
      */
     public static function getTimezones()
     {

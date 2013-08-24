@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Validator\Exception;
 
+/**
+ * @since v2.0.0
+ */
 class ConstraintDefinitionException extends ValidatorException
 {
 }

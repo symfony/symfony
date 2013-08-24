@@ -15,11 +15,15 @@ namespace Symfony\Component\HttpFoundation;
  * Http utility functions.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.2.0
  */
 class IpUtils
 {
     /**
      * This class should not be instantiated
+     *
+     * @since v2.2.0
      */
     private function __construct() {}
 
@@ -30,6 +34,8 @@ class IpUtils
      * @param string|array $ips
      *
      * @return boolean Whether the IP is valid
+     *
+     * @since v2.3.0
      */
     public static function checkIp($requestIp, $ips)
     {
@@ -55,6 +61,8 @@ class IpUtils
      * @param string $ip
      *
      * @return boolean Whether the IP is valid
+     *
+     * @since v2.2.0
      */
     public static function checkIp4($requestIp, $ip)
     {
@@ -84,6 +92,8 @@ class IpUtils
      * @return boolean Whether the IP is valid
      *
      * @throws \RuntimeException When IPV6 support is not enabled
+     *
+     * @since v2.2.0
      */
     public static function checkIp6($requestIp, $ip)
     {

@@ -28,6 +28,8 @@ use Psr\Log\LoggerInterface;
  * Base class implementing the RememberMeServicesInterface
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 abstract class AbstractRememberMeServices implements RememberMeServicesInterface, LogoutHandlerInterface
 {
@@ -49,6 +51,8 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
      * @param LoggerInterface $logger
      *
      * @throws \InvalidArgumentException
+     *
+     * @since v2.0.0
      */
     public function __construct(array $userProviders, $key, $providerKey, array $options = array(), LoggerInterface $logger = null)
     {
@@ -74,12 +78,17 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
      * services have been requested.
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     public function getRememberMeParameter()
     {
         return $this->options['remember_me_parameter'];
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getKey()
     {
         return $this->key;
@@ -94,6 +103,8 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
      * @return TokenInterface|null
      *
      * @throws CookieTheftException
+     *
+     * @since v2.1.0
      */
     final public function autoLogin(Request $request)
     {
@@ -148,6 +159,8 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
      * @param Request        $request
      * @param Response       $response
      * @param TokenInterface $token
+     *
+     * @since v2.0.0
      */
     public function logout(Request $request, Response $response, TokenInterface $token)
     {
@@ -159,6 +172,8 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
      * an attempted authentication fails.
      *
      * @param Request $request
+     *
+     * @since v2.1.0
      */
     final public function loginFail(Request $request)
     {
@@ -173,6 +188,8 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
      * @param Request        $request
      * @param Response       $response
      * @param TokenInterface $token    The token that resulted in a successful authentication
+     *
+     * @since v2.1.0
      */
     final public function loginSuccess(Request $request, Response $response, TokenInterface $token)
     {
@@ -216,9 +233,14 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
      * @param Request $request
      *
      * @return TokenInterface
+     *
+     * @since v2.0.0
      */
     abstract protected function processAutoLoginCookie(array $cookieParts, Request $request);
 
+    /**
+     * @since v2.0.0
+     */
     protected function onLoginFail(Request $request)
     {
     }
@@ -231,9 +253,14 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
      * @param Request        $request
      * @param Response       $response
      * @param TokenInterface $token
+     *
+     * @since v2.0.0
      */
     abstract protected function onLoginSuccess(Request $request, Response $response, TokenInterface $token);
 
+    /**
+     * @since v2.1.0
+     */
     final protected function getUserProvider($class)
     {
         foreach ($this->userProviders as $provider) {
@@ -251,6 +278,8 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
      * @param string $rawCookie
      *
      * @return array
+     *
+     * @since v2.0.0
      */
     protected function decodeCookie($rawCookie)
     {
@@ -263,6 +292,8 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
      * @param array $cookieParts
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     protected function encodeCookie(array $cookieParts)
     {
@@ -273,6 +304,8 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
      * Deletes the remember-me cookie
      *
      * @param Request $request
+     *
+     * @since v2.0.0
      */
     protected function cancelCookie(Request $request)
     {
@@ -289,6 +322,8 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
      * @param Request $request
      *
      * @return Boolean
+     *
+     * @since v2.0.0
      */
     protected function isRememberMeRequested(Request $request)
     {

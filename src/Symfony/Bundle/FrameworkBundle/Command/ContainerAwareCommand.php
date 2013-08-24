@@ -19,6 +19,8 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
  * Command.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 abstract class ContainerAwareCommand extends Command implements ContainerAwareInterface
 {
@@ -29,6 +31,8 @@ abstract class ContainerAwareCommand extends Command implements ContainerAwareIn
 
     /**
      * @return ContainerInterface
+     *
+     * @since v2.0.0
      */
     protected function getContainer()
     {
@@ -41,6 +45,8 @@ abstract class ContainerAwareCommand extends Command implements ContainerAwareIn
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function setContainer(ContainerInterface $container = null)
     {

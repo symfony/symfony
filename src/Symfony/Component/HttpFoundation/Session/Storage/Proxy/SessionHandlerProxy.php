@@ -15,6 +15,8 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Proxy;
  * SessionHandler proxy.
  *
  * @author Drak <drak@zikula.org>
+ *
+ * @since v2.1.0
  */
 class SessionHandlerProxy extends AbstractProxy implements \SessionHandlerInterface
 {
@@ -27,6 +29,8 @@ class SessionHandlerProxy extends AbstractProxy implements \SessionHandlerInterf
      * Constructor.
      *
      * @param \SessionHandlerInterface $handler
+     *
+     * @since v2.1.0
      */
     public function __construct(\SessionHandlerInterface $handler)
     {
@@ -39,6 +43,8 @@ class SessionHandlerProxy extends AbstractProxy implements \SessionHandlerInterf
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function open($savePath, $sessionName)
     {
@@ -53,6 +59,8 @@ class SessionHandlerProxy extends AbstractProxy implements \SessionHandlerInterf
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function close()
     {
@@ -63,6 +71,8 @@ class SessionHandlerProxy extends AbstractProxy implements \SessionHandlerInterf
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function read($id)
     {
@@ -71,6 +81,8 @@ class SessionHandlerProxy extends AbstractProxy implements \SessionHandlerInterf
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function write($id, $data)
     {
@@ -79,6 +91,8 @@ class SessionHandlerProxy extends AbstractProxy implements \SessionHandlerInterf
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function destroy($id)
     {
@@ -87,6 +101,8 @@ class SessionHandlerProxy extends AbstractProxy implements \SessionHandlerInterf
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function gc($maxlifetime)
     {

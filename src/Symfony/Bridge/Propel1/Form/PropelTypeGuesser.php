@@ -20,6 +20,8 @@ use Symfony\Component\Form\Guess\ValueGuess;
  * Propel Type guesser.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.1.0
  */
 class PropelTypeGuesser implements FormTypeGuesserInterface
 {
@@ -27,6 +29,8 @@ class PropelTypeGuesser implements FormTypeGuesserInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function guessType($class, $property)
     {
@@ -102,6 +106,8 @@ class PropelTypeGuesser implements FormTypeGuesserInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function guessRequired($class, $property)
     {
@@ -112,6 +118,8 @@ class PropelTypeGuesser implements FormTypeGuesserInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function guessMaxLength($class, $property)
     {
@@ -131,6 +139,8 @@ class PropelTypeGuesser implements FormTypeGuesserInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function guessPattern($class, $property)
     {
@@ -145,6 +155,9 @@ class PropelTypeGuesser implements FormTypeGuesserInterface
         }
     }
 
+    /**
+     * @since v2.1.0
+     */
     protected function getTable($class)
     {
         if (isset($this->cache[$class])) {
@@ -158,6 +171,9 @@ class PropelTypeGuesser implements FormTypeGuesserInterface
         }
     }
 
+    /**
+     * @since v2.1.0
+     */
     protected function getColumn($class, $property)
     {
         if (isset($this->cache[$class.'::'.$property])) {

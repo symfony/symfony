@@ -17,6 +17,8 @@ use Symfony\Component\Finder\SplFileInfo;
  * Iterate over shell command result.
  *
  * @author Jean-François Simon <contact@jfsimon.fr>
+ *
+ * @since v2.2.0
  */
 class FilePathsIterator extends \ArrayIterator
 {
@@ -48,6 +50,8 @@ class FilePathsIterator extends \ArrayIterator
     /**
      * @param array  $paths   List of paths returned by shell command
      * @param string $baseDir Base dir for relative path building
+     *
+     * @since v2.2.0
      */
     public function __construct(array $paths, $baseDir)
     {
@@ -62,6 +66,8 @@ class FilePathsIterator extends \ArrayIterator
      * @param array  $arguments
      *
      * @return mixed
+     *
+     * @since v2.2.0
      */
     public function __call($name, array $arguments)
     {
@@ -72,6 +78,8 @@ class FilePathsIterator extends \ArrayIterator
      * Return an instance of SplFileInfo with support for relative paths.
      *
      * @return SplFileInfo File information
+     *
+     * @since v2.2.0
      */
     public function current()
     {
@@ -80,18 +88,26 @@ class FilePathsIterator extends \ArrayIterator
 
     /**
      * @return string
+     *
+     * @since v2.2.0
      */
     public function key()
     {
         return $this->current->getPathname();
     }
 
+    /**
+     * @since v2.2.0
+     */
     public function next()
     {
         parent::next();
         $this->buildProperties();
     }
 
+    /**
+     * @since v2.2.0
+     */
     public function rewind()
     {
         parent::rewind();
@@ -100,6 +116,8 @@ class FilePathsIterator extends \ArrayIterator
 
     /**
      * @return string
+     *
+     * @since v2.2.0
      */
     public function getSubPath()
     {
@@ -108,12 +126,17 @@ class FilePathsIterator extends \ArrayIterator
 
     /**
      * @return string
+     *
+     * @since v2.2.0
      */
     public function getSubPathname()
     {
         return $this->subPathname;
     }
 
+    /**
+     * @since v2.2.0
+     */
     private function buildProperties()
     {
         $absolutePath = parent::current();

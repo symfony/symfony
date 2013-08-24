@@ -32,6 +32,8 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  * </code>
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.1.0
  */
 class ObjectChoiceList extends ChoiceList
 {
@@ -84,6 +86,8 @@ class ObjectChoiceList extends ChoiceList
      *                                                    for the choice values. If not given, integers
      *                                                    are generated instead.
      * @param PropertyAccessorInterface $propertyAccessor The reflection graph for reading property paths.
+     *
+     * @since v2.2.0
      */
     public function __construct($choices, $labelPath = null, array $preferredChoices = array(), $groupPath = null, $valuePath = null, PropertyAccessorInterface $propertyAccessor = null)
     {
@@ -106,6 +110,8 @@ class ObjectChoiceList extends ChoiceList
      *
      * @throws InvalidArgumentException When passing a hierarchy of choices and using
      *                                   the "groupPath" option at the same time.
+     *
+     * @since v2.1.0
      */
     protected function initialize($choices, array $labels, array $preferredChoices)
     {
@@ -156,6 +162,8 @@ class ObjectChoiceList extends ChoiceList
      * @param mixed $choice The choice to create a value for
      *
      * @return integer|string A unique value without character limitations.
+     *
+     * @since v2.1.0
      */
     protected function createValue($choice)
     {
@@ -166,6 +174,9 @@ class ObjectChoiceList extends ChoiceList
         return parent::createValue($choice);
     }
 
+    /**
+     * @since v2.1.0
+     */
     private function extractLabels($choices, array &$labels)
     {
         foreach ($choices as $i => $choice) {

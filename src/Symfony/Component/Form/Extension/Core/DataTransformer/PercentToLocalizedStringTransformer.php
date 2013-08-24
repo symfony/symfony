@@ -20,6 +20,8 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Florian Eckerstorfer <florian@eckerstorfer.org>
+ *
+ * @since v2.0.0
  */
 class PercentToLocalizedStringTransformer implements DataTransformerInterface
 {
@@ -44,6 +46,8 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
      * @param string  $type      One of the supported types
      *
      * @throws UnexpectedTypeException if the given value of type is unknown
+     *
+     * @since v2.0.0
      */
     public function __construct($precision = null, $type = null)
     {
@@ -72,6 +76,8 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
      *
      * @throws TransformationFailedException If the given value is not numeric or
      *                                       if the value could not be transformed.
+     *
+     * @since v2.0.0
      */
     public function transform($value)
     {
@@ -107,6 +113,8 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
      *
      * @throws TransformationFailedException If the given value is not a string or
      *                                       if the value could not be transformed.
+     *
+     * @since v2.0.0
      */
     public function reverseTransform($value)
     {
@@ -137,6 +145,8 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
      * Returns a preconfigured \NumberFormatter instance
      *
      * @return \NumberFormatter
+     *
+     * @since v2.0.0
      */
     protected function getNumberFormatter()
     {

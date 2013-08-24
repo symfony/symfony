@@ -19,11 +19,15 @@ use Symfony\Component\EventDispatcher\Debug\TraceableEventDispatcherInterface;
  * EventDataCollector.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class EventDataCollector extends DataCollector
 {
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
@@ -39,6 +43,8 @@ class EventDataCollector extends DataCollector
      * @param array $listeners An array of called listeners
      *
      * @see TraceableEventDispatcherInterface
+     *
+     * @since v2.2.0
      */
     public function setCalledListeners(array $listeners)
     {
@@ -51,6 +57,8 @@ class EventDataCollector extends DataCollector
      * @return array An array of called listeners
      *
      * @see TraceableEventDispatcherInterface
+     *
+     * @since v2.0.0
      */
     public function getCalledListeners()
     {
@@ -63,6 +71,8 @@ class EventDataCollector extends DataCollector
      * @param array $listeners An array of not called listeners
      *
      * @see TraceableEventDispatcherInterface
+     *
+     * @since v2.2.0
      */
     public function setNotCalledListeners(array $listeners)
     {
@@ -75,6 +85,8 @@ class EventDataCollector extends DataCollector
      * @return array An array of not called listeners
      *
      * @see TraceableEventDispatcherInterface
+     *
+     * @since v2.0.0
      */
     public function getNotCalledListeners()
     {
@@ -83,6 +95,8 @@ class EventDataCollector extends DataCollector
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getName()
     {

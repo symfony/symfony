@@ -19,6 +19,8 @@ use Symfony\Component\HttpFoundation\Request;
  * Handler for clearing invalidating the current session.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class SessionLogoutHandler implements LogoutHandlerInterface
 {
@@ -28,6 +30,8 @@ class SessionLogoutHandler implements LogoutHandlerInterface
      * @param Request        $request
      * @param Response       $response
      * @param TokenInterface $token
+     *
+     * @since v2.0.0
      */
     public function logout(Request $request, Response $response, TokenInterface $token)
     {

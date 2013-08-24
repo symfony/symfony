@@ -25,6 +25,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  * RememberMeListener implements authentication capabilities via a cookie
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class RememberMeListener implements ListenerInterface
 {
@@ -42,6 +44,8 @@ class RememberMeListener implements ListenerInterface
      * @param AuthenticationManagerInterface $authenticationManager
      * @param LoggerInterface                $logger
      * @param EventDispatcherInterface       $dispatcher
+     *
+     * @since v2.1.0
      */
     public function __construct(SecurityContextInterface $securityContext, RememberMeServicesInterface $rememberMeServices, AuthenticationManagerInterface $authenticationManager, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
     {
@@ -56,6 +60,8 @@ class RememberMeListener implements ListenerInterface
      * Handles remember-me cookie based authentication.
      *
      * @param GetResponseEvent $event A GetResponseEvent instance
+     *
+     * @since v2.0.0
      */
     public function handle(GetResponseEvent $event)
     {

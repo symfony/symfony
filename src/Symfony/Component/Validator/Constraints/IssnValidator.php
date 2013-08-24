@@ -21,11 +21,15 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  * @author Antonio J. García Lagar <aj@garcialagar.es>
  *
  * @see https://en.wikipedia.org/wiki/Issn
+ *
+ * @since v2.3.0
  */
 class IssnValidator extends ConstraintValidator
 {
     /**
      * {@inheritDoc}
+     *
+     * @since v2.3.0
      */
     public function validate($value, Constraint $constraint)
     {

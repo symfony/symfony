@@ -25,6 +25,8 @@ use Symfony\Component\Config\FileLocator;
  * A console command for retrieving information about services
  *
  * @author Ryan Weaver <ryan@thatsquality.com>
+ *
+ * @since v2.1.0
  */
 class ContainerDebugCommand extends ContainerAwareCommand
 {
@@ -35,6 +37,8 @@ class ContainerDebugCommand extends ContainerAwareCommand
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     protected function configure()
     {
@@ -87,6 +91,8 @@ EOF
      * {@inheritdoc}
      *
      * @throws \LogicException
+     *
+     * @since v2.0.0
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -136,6 +142,9 @@ EOF
         }
     }
 
+    /**
+     * @since v2.3.0
+     */
     protected function validateInput(InputInterface $input)
     {
         $options = array('tags', 'tag', 'parameters', 'parameter');
@@ -155,6 +164,9 @@ EOF
         }
     }
 
+    /**
+     * @since v2.2.0
+     */
     protected function outputServices(OutputInterface $output, $serviceIds, $showPrivate = false, $showTagAttributes = null)
     {
         // set the label to specify public or public+private
@@ -256,6 +268,9 @@ EOF
         }
     }
 
+    /**
+     * @since v2.2.0
+     */
     protected function buildArgumentsArray($serviceId, $scope, $className, array $tagAttributes = array())
     {
         $arguments = array($serviceId);
@@ -270,6 +285,8 @@ EOF
 
     /**
      * Renders detailed service information about one service
+     *
+     * @since v2.0.0
      */
     protected function outputService(OutputInterface $output, $serviceId)
     {
@@ -318,6 +335,9 @@ EOF
         }
     }
 
+    /**
+     * @since v2.3.0
+     */
     protected function outputParameters(OutputInterface $output, $parameters)
     {
         $output->writeln($this->getHelper('formatter')->formatSection('container', 'List of parameters'));
@@ -366,6 +386,8 @@ EOF
      * @return ContainerBuilder
      *
      * @throws \LogicException
+     *
+     * @since v2.1.0
      */
     protected function getContainerBuilder()
     {
@@ -392,6 +414,8 @@ EOF
      * @param string $serviceId The service id to resolve
      *
      * @return Definition|Alias
+     *
+     * @since v2.1.0
      */
     protected function resolveServiceDefinition($serviceId)
     {
@@ -413,6 +437,8 @@ EOF
      *
      * @param OutputInterface $output
      * @param Boolean         $showPrivate
+     *
+     * @since v2.2.0
      */
     protected function outputTags(OutputInterface $output, $showPrivate = false)
     {
@@ -449,6 +475,9 @@ EOF
         }
     }
 
+    /**
+     * @since v2.3.0
+     */
     protected function formatParameter($value)
     {
         if (is_bool($value) || is_array($value) || (null === $value)) {

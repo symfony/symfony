@@ -20,11 +20,15 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  * {@link SubmitTypeValidatorExtension}.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.3.0
  */
 abstract class BaseValidatorExtension extends AbstractTypeExtension
 {
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {

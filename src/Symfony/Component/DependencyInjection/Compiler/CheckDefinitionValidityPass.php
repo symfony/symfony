@@ -27,6 +27,8 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
  * - synthetic services are always of non-prototype scope
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class CheckDefinitionValidityPass implements CompilerPassInterface
 {
@@ -36,6 +38,8 @@ class CheckDefinitionValidityPass implements CompilerPassInterface
      * @param ContainerBuilder $container
      *
      * @throws RuntimeException When the Definition is invalid
+     *
+     * @since v2.0.0
      */
     public function process(ContainerBuilder $container)
     {

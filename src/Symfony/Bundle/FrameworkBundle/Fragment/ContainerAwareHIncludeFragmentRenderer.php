@@ -20,6 +20,8 @@ use Symfony\Component\HttpKernel\Fragment\HIncludeFragmentRenderer;
  * Implements the Hinclude rendering strategy.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.2.0
  */
 class ContainerAwareHIncludeFragmentRenderer extends HIncludeFragmentRenderer
 {
@@ -27,6 +29,8 @@ class ContainerAwareHIncludeFragmentRenderer extends HIncludeFragmentRenderer
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function __construct(ContainerInterface $container, UriSigner $signer = null, $globalDefaultTemplate = null)
     {
@@ -37,6 +41,8 @@ class ContainerAwareHIncludeFragmentRenderer extends HIncludeFragmentRenderer
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function render($uri, Request $request, array $options = array())
     {

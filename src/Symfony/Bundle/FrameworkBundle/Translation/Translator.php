@@ -20,6 +20,8 @@ use Symfony\Component\Config\ConfigCache;
  * Translator.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class Translator extends BaseTranslator
 {
@@ -41,6 +43,8 @@ class Translator extends BaseTranslator
      * @param array              $options   An array of options
      *
      * @throws \InvalidArgumentException
+     *
+     * @since v2.1.0
      */
     public function __construct(ContainerInterface $container, MessageSelector $selector, $loaderIds = array(), array $options = array())
     {
@@ -64,6 +68,8 @@ class Translator extends BaseTranslator
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getLocale()
     {
@@ -76,6 +82,8 @@ class Translator extends BaseTranslator
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     protected function loadCatalogue($locale)
     {
@@ -141,6 +149,9 @@ EOF
         $this->catalogues[$locale] = include $cache;
     }
 
+    /**
+     * @since v2.0.0
+     */
     protected function initialize()
     {
         foreach ($this->loaderIds as $id => $aliases) {

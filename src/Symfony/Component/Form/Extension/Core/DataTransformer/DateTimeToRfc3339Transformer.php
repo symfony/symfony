@@ -15,11 +15,15 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.1.0
  */
 class DateTimeToRfc3339Transformer extends BaseDateTimeTransformer
 {
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function transform($dateTime)
     {
@@ -41,6 +45,8 @@ class DateTimeToRfc3339Transformer extends BaseDateTimeTransformer
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function reverseTransform($rfc3339)
     {

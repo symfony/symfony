@@ -20,11 +20,16 @@ use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
  * LogDataCollector.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class LoggerDataCollector extends DataCollector
 {
     private $logger;
 
+    /**
+     * @since v2.0.0
+     */
     public function __construct($logger = null)
     {
         if (null !== $logger && $logger instanceof DebugLoggerInterface) {
@@ -34,6 +39,8 @@ class LoggerDataCollector extends DataCollector
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
@@ -52,6 +59,8 @@ class LoggerDataCollector extends DataCollector
      * @return array An array of called events
      *
      * @see TraceableEventDispatcherInterface
+     *
+     * @since v2.0.0
      */
     public function countErrors()
     {
@@ -62,12 +71,17 @@ class LoggerDataCollector extends DataCollector
      * Gets the logs.
      *
      * @return array An array of logs
+     *
+     * @since v2.0.0
      */
     public function getLogs()
     {
         return isset($this->data['logs']) ? $this->data['logs'] : array();
     }
 
+    /**
+     * @since v2.2.0
+     */
     public function countDeprecations()
     {
         return isset($this->data['deprecation_count']) ? $this->data['deprecation_count'] : 0;
@@ -75,12 +89,17 @@ class LoggerDataCollector extends DataCollector
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getName()
     {
         return 'logger';
     }
 
+    /**
+     * @since v2.0.0
+     */
     private function sanitizeLogs($logs)
     {
         foreach ($logs as $i => $log) {
@@ -90,6 +109,9 @@ class LoggerDataCollector extends DataCollector
         return $logs;
     }
 
+    /**
+     * @since v2.0.0
+     */
     private function sanitizeContext($context)
     {
         if (is_array($context)) {
@@ -111,6 +133,9 @@ class LoggerDataCollector extends DataCollector
         return $context;
     }
 
+    /**
+     * @since v2.2.0
+     */
     private function computeDeprecationCount()
     {
         $count = 0;

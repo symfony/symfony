@@ -18,6 +18,8 @@ use Symfony\Component\Validator\Exception\MissingOptionsException;
  * @Annotation
  *
  * @author The Whole Life To Learn <thewholelifetolearn@gmail.com>
+ *
+ * @since v2.3.0
  */
 class Isbn extends Constraint
 {
@@ -27,6 +29,9 @@ class Isbn extends Constraint
     public $isbn10;
     public $isbn13;
 
+    /**
+     * @since v2.3.0
+     */
     public function __construct($options = null)
     {
         if (null !== $options && !is_array($options)) {

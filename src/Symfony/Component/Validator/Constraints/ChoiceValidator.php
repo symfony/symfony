@@ -24,11 +24,15 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @api
+ *
+ * @since v2.2.0
  */
 class ChoiceValidator extends ConstraintValidator
 {
     /**
      * {@inheritDoc}
+     *
+     * @since v2.2.0
      */
     public function validate($value, Constraint $constraint)
     {

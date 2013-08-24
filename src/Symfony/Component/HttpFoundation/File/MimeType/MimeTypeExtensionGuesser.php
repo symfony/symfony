@@ -13,6 +13,8 @@ namespace Symfony\Component\HttpFoundation\File\MimeType;
 
 /**
  * Provides a best-guess mapping of mime type to file extension.
+ *
+ * @since v2.1.0
  */
 class MimeTypeExtensionGuesser implements ExtensionGuesserInterface
 {
@@ -797,6 +799,8 @@ class MimeTypeExtensionGuesser implements ExtensionGuesserInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function guess($mimeType)
     {

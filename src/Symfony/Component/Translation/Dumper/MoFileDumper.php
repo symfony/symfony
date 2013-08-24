@@ -18,11 +18,15 @@ use Symfony\Component\Translation\Loader\MoFileLoader;
  * MoFileDumper generates a gettext formatted string representation of a message catalogue.
  *
  * @author Stealth35
+ *
+ * @since v2.1.0
  */
 class MoFileDumper extends FileDumper
 {
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function format(MessageCatalogue $messages, $domain = 'messages')
     {
@@ -69,12 +73,17 @@ class MoFileDumper extends FileDumper
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     protected function getExtension()
     {
         return 'mo';
     }
 
+    /**
+     * @since v2.1.0
+     */
     private function writeLong($str)
     {
         return pack('V*', $str);

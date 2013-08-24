@@ -26,6 +26,8 @@ interface SerializerInterface
      * @param array  $context options normalizers/encoders have access to
      *
      * @return string
+     *
+     * @since v2.2.0
      */
     public function serialize($data, $format, array $context = array());
 
@@ -38,6 +40,8 @@ interface SerializerInterface
      * @param array  $context
      *
      * @return object
+     *
+     * @since v2.2.0
      */
     public function deserialize($data, $type, $format, array $context = array());
 }

@@ -31,6 +31,8 @@ interface FragmentRendererInterface
      * @param array                      $options An array of options
      *
      * @return Response A Response instance
+     *
+     * @since v2.2.0
      */
     public function render($uri, Request $request, array $options = array());
 
@@ -38,6 +40,8 @@ interface FragmentRendererInterface
      * Gets the name of the strategy.
      *
      * @return string The strategy name
+     *
+     * @since v2.2.0
      */
     public function getName();
 }

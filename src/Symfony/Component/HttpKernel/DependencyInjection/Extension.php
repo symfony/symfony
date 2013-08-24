@@ -17,6 +17,8 @@ use Symfony\Component\DependencyInjection\Extension\Extension as BaseExtension;
  * Allow adding classes to the class cache.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.2.0
  */
 abstract class Extension extends BaseExtension
 {
@@ -26,6 +28,8 @@ abstract class Extension extends BaseExtension
      * Gets the classes to cache.
      *
      * @return array An array of classes
+     *
+     * @since v2.0.0
      */
     public function getClassesToCompile()
     {
@@ -36,6 +40,8 @@ abstract class Extension extends BaseExtension
      * Adds classes to the class cache.
      *
      * @param array $classes An array of classes
+     *
+     * @since v2.0.0
      */
     public function addClassesToCompile(array $classes)
     {

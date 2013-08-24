@@ -17,6 +17,8 @@ use Symfony\Component\Routing\RouteCollection;
  * MatcherDumper is the abstract class for all built-in matcher dumpers.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 abstract class MatcherDumper implements MatcherDumperInterface
 {
@@ -29,6 +31,8 @@ abstract class MatcherDumper implements MatcherDumperInterface
      * Constructor.
      *
      * @param RouteCollection $routes The RouteCollection to dump
+     *
+     * @since v2.0.0
      */
     public function __construct(RouteCollection $routes)
     {
@@ -37,6 +41,8 @@ abstract class MatcherDumper implements MatcherDumperInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getRoutes()
     {

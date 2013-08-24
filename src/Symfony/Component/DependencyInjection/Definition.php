@@ -20,6 +20,8 @@ use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class Definition
 {
@@ -48,6 +50,8 @@ class Definition
      * @param array  $arguments An array of arguments to pass to the service constructor
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function __construct($class = null, array $arguments = array())
     {
@@ -73,6 +77,8 @@ class Definition
      * @return Definition The current instance
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setFactoryClass($factoryClass)
     {
@@ -87,6 +93,8 @@ class Definition
      * @return string The factory class name
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getFactoryClass()
     {
@@ -101,6 +109,8 @@ class Definition
      * @return Definition The current instance
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setFactoryMethod($factoryMethod)
     {
@@ -115,6 +125,8 @@ class Definition
      * @return string The factory method name
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getFactoryMethod()
     {
@@ -129,6 +141,8 @@ class Definition
      * @return Definition The current instance
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setFactoryService($factoryService)
     {
@@ -143,6 +157,8 @@ class Definition
      * @return string The factory service id
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getFactoryService()
     {
@@ -157,6 +173,8 @@ class Definition
      * @return Definition The current instance
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setClass($class)
     {
@@ -171,6 +189,8 @@ class Definition
      * @return string The service class
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getClass()
     {
@@ -185,6 +205,8 @@ class Definition
      * @return Definition The current instance
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setArguments(array $arguments)
     {
@@ -195,6 +217,8 @@ class Definition
 
     /**
      * @api
+     *
+     * @since v2.0.0
      */
     public function setProperties(array $properties)
     {
@@ -205,6 +229,8 @@ class Definition
 
     /**
      * @api
+     *
+     * @since v2.0.0
      */
     public function getProperties()
     {
@@ -213,6 +239,8 @@ class Definition
 
     /**
      * @api
+     *
+     * @since v2.0.0
      */
     public function setProperty($name, $value)
     {
@@ -229,6 +257,8 @@ class Definition
      * @return Definition The current instance
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function addArgument($argument)
     {
@@ -248,6 +278,8 @@ class Definition
      * @throws OutOfBoundsException When the replaced argument does not exist
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function replaceArgument($index, $argument)
     {
@@ -266,6 +298,8 @@ class Definition
      * @return array The array of arguments
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getArguments()
     {
@@ -282,6 +316,8 @@ class Definition
      * @throws OutOfBoundsException When the argument does not exist
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getArgument($index)
     {
@@ -300,6 +336,8 @@ class Definition
      * @return Definition The current instance
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setMethodCalls(array $calls = array())
     {
@@ -322,6 +360,8 @@ class Definition
      * @throws InvalidArgumentException on empty $method param
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function addMethodCall($method, array $arguments = array())
     {
@@ -341,6 +381,8 @@ class Definition
      * @return Definition The current instance
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function removeMethodCall($method)
     {
@@ -362,6 +404,8 @@ class Definition
      * @return Boolean
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function hasMethodCall($method)
     {
@@ -380,6 +424,8 @@ class Definition
      * @return array An array of method calls
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getMethodCalls()
     {
@@ -394,6 +440,8 @@ class Definition
      * @return Definition the current instance
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setTags(array $tags)
     {
@@ -408,6 +456,8 @@ class Definition
      * @return array An array of tags
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getTags()
     {
@@ -422,6 +472,8 @@ class Definition
      * @return array An array of attributes
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getTag($name)
     {
@@ -437,6 +489,8 @@ class Definition
      * @return Definition The current instance
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function addTag($name, array $attributes = array())
     {
@@ -453,6 +507,8 @@ class Definition
      * @return Boolean
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function hasTag($name)
     {
@@ -465,6 +521,8 @@ class Definition
      * @param string $name The tag name
      *
      * @return Definition
+     *
+     * @since v2.1.0
      */
     public function clearTag($name)
     {
@@ -481,6 +539,8 @@ class Definition
      * @return Definition The current instance
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function clearTags()
     {
@@ -497,6 +557,8 @@ class Definition
      * @return Definition The current instance
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setFile($file)
     {
@@ -511,6 +573,8 @@ class Definition
      * @return string The full pathname to include
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getFile()
     {
@@ -525,6 +589,8 @@ class Definition
      * @return Definition The current instance
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setScope($scope)
     {
@@ -539,6 +605,8 @@ class Definition
      * @return string
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getScope()
     {
@@ -553,6 +621,8 @@ class Definition
      * @return Definition The current instance
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setPublic($boolean)
     {
@@ -567,6 +637,8 @@ class Definition
      * @return Boolean
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function isPublic()
     {
@@ -581,6 +653,8 @@ class Definition
      * @return Definition The current instance
      *
      * @api
+     *
+     * @since v2.3.0
      */
     public function setSynchronized($boolean)
     {
@@ -595,6 +669,8 @@ class Definition
      * @return Boolean
      *
      * @api
+     *
+     * @since v2.3.0
      */
     public function isSynchronized()
     {
@@ -607,6 +683,8 @@ class Definition
      * @param Boolean $lazy
      *
      * @return Definition The current instance
+     *
+     * @since v2.3.0
      */
     public function setLazy($lazy)
     {
@@ -619,6 +697,8 @@ class Definition
      * Whether this service is lazy.
      *
      * @return Boolean
+     *
+     * @since v2.3.0
      */
     public function isLazy()
     {
@@ -634,6 +714,8 @@ class Definition
      * @return Definition the current instance
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setSynthetic($boolean)
     {
@@ -649,6 +731,8 @@ class Definition
      * @return Boolean
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function isSynthetic()
     {
@@ -664,6 +748,8 @@ class Definition
      * @return Definition the current instance
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setAbstract($boolean)
     {
@@ -679,6 +765,8 @@ class Definition
      * @return Boolean
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function isAbstract()
     {
@@ -693,6 +781,8 @@ class Definition
      * @return Definition The current instance
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setConfigurator($callable)
     {
@@ -707,6 +797,8 @@ class Definition
      * @return callable The PHP callable to call
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getConfigurator()
     {

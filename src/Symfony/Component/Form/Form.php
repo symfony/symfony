@@ -56,6 +56,8 @@ use Symfony\Component\PropertyAccess\PropertyPath;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.0.0
  */
 class Form implements \IteratorAggregate, FormInterface
 {
@@ -147,6 +149,8 @@ class Form implements \IteratorAggregate, FormInterface
      * @param FormConfigInterface $config The form configuration.
      *
      * @throws LogicException if a data mapper is not provided for a compound form
+     *
+     * @since v2.1.0
      */
     public function __construct(FormConfigInterface $config)
     {
@@ -166,6 +170,9 @@ class Form implements \IteratorAggregate, FormInterface
         $this->config = $config;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function __clone()
     {
         foreach ($this->children as $key => $child) {
@@ -175,6 +182,8 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getConfig()
     {
@@ -183,6 +192,8 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getName()
     {
@@ -191,6 +202,8 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getPropertyPath()
     {
@@ -217,6 +230,8 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function isRequired()
     {
@@ -229,6 +244,8 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function isDisabled()
     {
@@ -241,6 +258,8 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function setParent(FormInterface $parent = null)
     {
@@ -259,6 +278,8 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getParent()
     {
@@ -267,6 +288,8 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getRoot()
     {
@@ -275,6 +298,8 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function isRoot()
     {
@@ -283,6 +308,8 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function setData($modelData)
     {
@@ -385,6 +412,8 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getData()
     {
@@ -405,6 +434,8 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getNormData()
     {
@@ -425,6 +456,8 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getViewData()
     {
@@ -445,6 +478,8 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getExtraData()
     {
@@ -453,6 +488,8 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function initialize()
     {
@@ -472,6 +509,8 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function handleRequest($request = null)
     {
@@ -482,6 +521,8 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function submit($submittedData, $clearMissing = true)
     {
@@ -635,6 +676,8 @@ class Form implements \IteratorAggregate, FormInterface
      *
      * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
      *             {@link submit()} instead.
+     *
+     * @since v2.3.0
      */
     public function bind($submittedData)
     {
@@ -643,6 +686,8 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function addError(FormError $error)
     {
@@ -657,6 +702,8 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function isSubmitted()
     {
@@ -668,6 +715,8 @@ class Form implements \IteratorAggregate, FormInterface
      *
      * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
      *             {@link isSubmitted()} instead.
+     *
+     * @since v2.0.0
      */
     public function isBound()
     {
@@ -676,6 +725,8 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function isSynchronized()
     {
@@ -684,6 +735,8 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function isEmpty()
     {
@@ -702,6 +755,8 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function isValid()
     {
@@ -728,6 +783,8 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getErrors()
     {
@@ -742,6 +799,8 @@ class Form implements \IteratorAggregate, FormInterface
      * @param integer $level The indentation level (used internally)
      *
      * @return string A string representation of all errors
+     *
+     * @since v2.1.0
      */
     public function getErrorsAsString($level = 0)
     {
@@ -772,6 +831,8 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function add($child, $type = null, array $options = array())
     {
@@ -847,6 +908,8 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function remove($name)
     {
@@ -865,6 +928,8 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function has($name)
     {
@@ -873,6 +938,8 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function get($name)
     {
@@ -889,6 +956,8 @@ class Form implements \IteratorAggregate, FormInterface
      * @param string $name The name of the child
      *
      * @return Boolean
+     *
+     * @since v2.0.0
      */
     public function offsetExists($name)
     {
@@ -903,6 +972,8 @@ class Form implements \IteratorAggregate, FormInterface
      * @return FormInterface The child form
      *
      * @throws \OutOfBoundsException If the named child does not exist.
+     *
+     * @since v2.0.0
      */
     public function offsetGet($name)
     {
@@ -919,6 +990,8 @@ class Form implements \IteratorAggregate, FormInterface
      * @throws LogicException            When trying to add a child to a non-compound form.
      *
      * @see self::add()
+     *
+     * @since v2.0.0
      */
     public function offsetSet($name, $child)
     {
@@ -931,6 +1004,8 @@ class Form implements \IteratorAggregate, FormInterface
      * @param string $name The name of the child to remove
      *
      * @throws AlreadySubmittedException If the form has already been submitted.
+     *
+     * @since v2.0.0
      */
     public function offsetUnset($name)
     {
@@ -941,6 +1016,8 @@ class Form implements \IteratorAggregate, FormInterface
      * Returns the iterator for this group.
      *
      * @return \ArrayIterator
+     *
+     * @since v2.0.0
      */
     public function getIterator()
     {
@@ -951,6 +1028,8 @@ class Form implements \IteratorAggregate, FormInterface
      * Returns the number of form children (implements the \Countable interface).
      *
      * @return integer The number of embedded form children
+     *
+     * @since v2.0.0
      */
     public function count()
     {
@@ -959,6 +1038,8 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function createView(FormView $parent = null)
     {
@@ -975,6 +1056,8 @@ class Form implements \IteratorAggregate, FormInterface
      * @param mixed $value The value to transform
      *
      * @return mixed
+     *
+     * @since v2.1.0
      */
     private function modelToNorm($value)
     {
@@ -991,6 +1074,8 @@ class Form implements \IteratorAggregate, FormInterface
      * @param string $value The value to reverse transform
      *
      * @return mixed
+     *
+     * @since v2.1.0
      */
     private function normToModel($value)
     {
@@ -1009,6 +1094,8 @@ class Form implements \IteratorAggregate, FormInterface
      * @param mixed $value The value to transform
      *
      * @return mixed
+     *
+     * @since v2.1.0
      */
     private function normToView($value)
     {
@@ -1034,6 +1121,8 @@ class Form implements \IteratorAggregate, FormInterface
      * @param string $value The value to reverse transform
      *
      * @return mixed
+     *
+     * @since v2.1.0
      */
     private function viewToNorm($value)
     {

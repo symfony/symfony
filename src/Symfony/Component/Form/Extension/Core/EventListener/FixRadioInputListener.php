@@ -21,6 +21,8 @@ use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface;
  * to an array.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.0.0
  */
 class FixRadioInputListener implements EventSubscriberInterface
 {
@@ -33,6 +35,8 @@ class FixRadioInputListener implements EventSubscriberInterface
      *
      * @param ChoiceListInterface $choiceList
      * @param Boolean             $placeholderPresent
+     *
+     * @since v2.3.0
      */
     public function __construct(ChoiceListInterface $choiceList, $placeholderPresent)
     {
@@ -40,6 +44,9 @@ class FixRadioInputListener implements EventSubscriberInterface
         $this->placeholderPresent = $placeholderPresent;
     }
 
+    /**
+     * @since v2.3.0
+     */
     public function preSubmit(FormEvent $event)
     {
         $value = $event->getData();
@@ -53,12 +60,17 @@ class FixRadioInputListener implements EventSubscriberInterface
      *
      * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
      *             {@link preSubmit()} instead.
+     *
+     * @since v2.3.0
      */
     public function preBind(FormEvent $event)
     {
         $this->preSubmit($event);
     }
 
+    /**
+     * @since v2.1.0
+     */
     public static function getSubscribedEvents()
     {
         return array(FormEvents::PRE_SUBMIT => 'preSubmit');

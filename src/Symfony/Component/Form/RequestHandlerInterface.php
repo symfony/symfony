@@ -23,6 +23,8 @@ interface RequestHandlerInterface
      *
      * @param FormInterface $form    The form to submit.
      * @param mixed         $request The current request.
+     *
+     * @since v2.3.0
      */
     public function handleRequest(FormInterface $form, $request = null);
 }

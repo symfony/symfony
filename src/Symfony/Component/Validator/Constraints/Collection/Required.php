@@ -20,6 +20,8 @@ use Symfony\Component\Validator\Constraints\Required as BaseRequired;
  *
  * @deprecated Deprecated in 2.3, to be removed in 3.0. Use
  *             {@link \Symfony\Component\Validator\Constraints\Required} instead.
+ *
+ * @since v2.3.0
  */
 class Required extends BaseRequired
 {

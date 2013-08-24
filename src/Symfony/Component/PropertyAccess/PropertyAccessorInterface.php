@@ -46,6 +46,8 @@ interface PropertyAccessorInterface
      * @throws Exception\NoSuchPropertyException If a property does not exist or is not public.
      * @throws Exception\UnexpectedTypeException If a value within the path is neither object
      *                                           nor array
+     *
+     * @since v2.2.0
      */
     public function setValue(&$objectOrArray, $propertyPath, $value);
 
@@ -76,6 +78,8 @@ interface PropertyAccessorInterface
      * @return mixed The value at the end of the property path
      *
      * @throws Exception\NoSuchPropertyException If a property does not exist or is not public.
+     *
+     * @since v2.2.0
      */
     public function getValue($objectOrArray, $propertyPath);
 }

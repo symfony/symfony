@@ -17,6 +17,8 @@ use Symfony\Component\Config\Util\XmlUtils;
  * SimpleXMLElement class.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class SimpleXMLElement extends \SimpleXMLElement
 {
@@ -26,6 +28,8 @@ class SimpleXMLElement extends \SimpleXMLElement
      * @param string $name
      *
      * @return mixed
+     *
+     * @since v2.0.0
      */
     public function getAttributeAsPhp($name)
     {
@@ -39,6 +43,8 @@ class SimpleXMLElement extends \SimpleXMLElement
      * @param Boolean $lowercase
      *
      * @return mixed
+     *
+     * @since v2.0.0
      */
     public function getArgumentsAsPhp($name, $lowercase = true)
     {
@@ -100,6 +106,8 @@ class SimpleXMLElement extends \SimpleXMLElement
      * @param mixed $value
      *
      * @return mixed
+     *
+     * @since v2.1.0
      */
     public static function phpize($value)
     {

@@ -44,6 +44,8 @@ interface ControllerResolverInterface
      * @throws \InvalidArgumentException|\LogicException If the controller can't be found
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function getController(Request $request);
 
@@ -58,6 +60,8 @@ interface ControllerResolverInterface
      * @throws \RuntimeException When value for argument given is not provided
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function getArguments(Request $request, $controller);
 }

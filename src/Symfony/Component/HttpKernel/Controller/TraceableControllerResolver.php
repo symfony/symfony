@@ -18,6 +18,8 @@ use Symfony\Component\HttpFoundation\Request;
  * TraceableControllerResolver.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.2.0
  */
 class TraceableControllerResolver implements ControllerResolverInterface
 {
@@ -29,6 +31,8 @@ class TraceableControllerResolver implements ControllerResolverInterface
      *
      * @param ControllerResolverInterface $resolver  A ControllerResolverInterface instance
      * @param Stopwatch                   $stopwatch A Stopwatch instance
+     *
+     * @since v2.2.0
      */
     public function __construct(ControllerResolverInterface $resolver, Stopwatch $stopwatch)
     {
@@ -38,6 +42,8 @@ class TraceableControllerResolver implements ControllerResolverInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getController(Request $request)
     {
@@ -52,6 +58,8 @@ class TraceableControllerResolver implements ControllerResolverInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getArguments(Request $request, $controller)
     {

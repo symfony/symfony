@@ -28,6 +28,8 @@ use Symfony\Component\Config\FileLocator;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class SecurityExtension extends Extension
 {
@@ -37,6 +39,9 @@ class SecurityExtension extends Extension
     private $factories = array();
     private $userProviderFactories = array();
 
+    /**
+     * @since v2.1.0
+     */
     public function __construct()
     {
         foreach ($this->listenerPositions as $position) {
@@ -44,6 +49,9 @@ class SecurityExtension extends Extension
         }
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function load(array $configs, ContainerBuilder $container)
     {
         if (!array_filter($configs)) {
@@ -103,6 +111,9 @@ class SecurityExtension extends Extension
         ));
     }
 
+    /**
+     * @since v2.0.0
+     */
     private function aclLoad($config, ContainerBuilder $container)
     {
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
@@ -123,6 +134,9 @@ class SecurityExtension extends Extension
         $this->configureDbalAclProvider($config, $container, $loader);
     }
 
+    /**
+     * @since v2.0.0
+     */
     private function configureDbalAclProvider(array $config, ContainerBuilder $container, $loader)
     {
         $loader->load('security_acl_dbal.xml');
@@ -154,8 +168,9 @@ class SecurityExtension extends Extension
      *
      * @param array            $config    An array of configuration settings
      * @param ContainerBuilder $container A ContainerBuilder instance
+     *
+     * @since v2.0.0
      */
-
     private function createRoleHierarchy($config, ContainerBuilder $container)
     {
         if (!isset($config['role_hierarchy'])) {
@@ -168,6 +183,9 @@ class SecurityExtension extends Extension
         $container->removeDefinition('security.access.simple_role_voter');
     }
 
+    /**
+     * @since v2.0.0
+     */
     private function createAuthorization($config, ContainerBuilder $container)
     {
         if (!$config['access_control']) {
@@ -192,6 +210,9 @@ class SecurityExtension extends Extension
         }
     }
 
+    /**
+     * @since v2.0.0
+     */
     private function createFirewalls($config, ContainerBuilder $container)
     {
         if (!isset($config['firewalls'])) {
@@ -237,6 +258,9 @@ class SecurityExtension extends Extension
         ;
     }
 
+    /**
+     * @since v2.1.0
+     */
     private function createFirewall(ContainerBuilder $container, $id, $firewall, &$authenticationProviders, $providerIds)
     {
         // Matcher
@@ -357,6 +381,9 @@ class SecurityExtension extends Extension
         return array($matcher, $listeners, $exceptionListener);
     }
 
+    /**
+     * @since v2.0.0
+     */
     private function createContextListener($container, $contextKey)
     {
         if (isset($this->contextListeners[$contextKey])) {
@@ -370,6 +397,9 @@ class SecurityExtension extends Extension
         return $this->contextListeners[$contextKey] = $listenerId;
     }
 
+    /**
+     * @since v2.1.0
+     */
     private function createAuthenticationListeners($container, $id, $firewall, &$authenticationProviders, $defaultProvider)
     {
         $listeners = array();
@@ -419,6 +449,9 @@ class SecurityExtension extends Extension
         return array($listeners, $defaultEntryPoint);
     }
 
+    /**
+     * @since v2.0.0
+     */
     private function createEncoders($encoders, ContainerBuilder $container)
     {
         $encoderMap = array();
@@ -432,6 +465,9 @@ class SecurityExtension extends Extension
         ;
     }
 
+    /**
+     * @since v2.0.0
+     */
     private function createEncoder($config, ContainerBuilder $container)
     {
         // a custom encoder service
@@ -481,7 +517,11 @@ class SecurityExtension extends Extension
         );
     }
 
-    // Parses user providers and returns an array of their ids
+    /**
+     * Parses user providers and returns an array of their ids
+     *
+     * @since v2.0.0
+     */
     private function createUserProviders($config, ContainerBuilder $container)
     {
         $providerIds = array();
@@ -493,7 +533,11 @@ class SecurityExtension extends Extension
         return $providerIds;
     }
 
-    // Parses a <provider> tag and returns the id for the related user provider service
+    /**
+     * Parses a <provider> tag and returns the id for the related user provider service
+     *
+     * @since v2.0.0
+     */
     private function createUserDaoProvider($name, $provider, ContainerBuilder $container, $master = true)
     {
         $name = $this->getUserProviderId(strtolower($name));
@@ -557,11 +601,17 @@ class SecurityExtension extends Extension
         return $name;
     }
 
+    /**
+     * @since v2.0.0
+     */
     private function getUserProviderId($name)
     {
         return 'security.user.provider.concrete.'.$name;
     }
 
+    /**
+     * @since v2.0.0
+     */
     private function createExceptionListener($container, $config, $id, $defaultEntryPoint)
     {
         $exceptionListenerId = 'security.exception_listener.'.$id;
@@ -579,6 +629,9 @@ class SecurityExtension extends Extension
         return $exceptionListenerId;
     }
 
+    /**
+     * @since v2.0.0
+     */
     private function createSwitchUserListener($container, $id, $config, $defaultProvider)
     {
         $userProvider = isset($config['provider']) ? $this->getUserProviderId($config['provider']) : $defaultProvider;
@@ -593,6 +646,9 @@ class SecurityExtension extends Extension
         return $switchUserListenerId;
     }
 
+    /**
+     * @since v2.0.19
+     */
     private function createRequestMatcher($container, $path = null, $host = null, $methods = array(), $ip = null, array $attributes = array())
     {
         $serialized = serialize(array($path, $host, $methods, $ip, $attributes));
@@ -621,11 +677,17 @@ class SecurityExtension extends Extension
         return $this->requestMatchers[$id] = new Reference($id);
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function addSecurityListenerFactory(SecurityFactoryInterface $factory)
     {
         $this->factories[$factory->getPosition()][] = $factory;
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function addUserProviderFactory(UserProviderFactoryInterface $factory)
     {
         $this->userProviderFactories[] = $factory;
@@ -635,17 +697,25 @@ class SecurityExtension extends Extension
      * Returns the base path for the XSD files.
      *
      * @return string The XSD base path
+     *
+     * @since v2.0.0
      */
     public function getXsdValidationBasePath()
     {
         return __DIR__.'/../Resources/config/schema';
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getNamespace()
     {
         return 'http://symfony.com/schema/dic/security';
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function getConfiguration(array $config, ContainerBuilder $container)
     {
         // first assemble the factories

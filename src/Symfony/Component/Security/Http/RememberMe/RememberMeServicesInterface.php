@@ -50,6 +50,8 @@ interface RememberMeServicesInterface
      * @param Request $request
      *
      * @return TokenInterface
+     *
+     * @since v2.1.0
      */
     public function autoLogin(Request $request);
 
@@ -60,6 +62,8 @@ interface RememberMeServicesInterface
      * This method needs to take care of invalidating the cookie.
      *
      * @param Request $request
+     *
+     * @since v2.1.0
      */
     public function loginFail(Request $request);
 
@@ -77,6 +81,8 @@ interface RememberMeServicesInterface
      * @param Request        $request
      * @param Response       $response
      * @param TokenInterface $token
+     *
+     * @since v2.1.0
      */
     public function loginSuccess(Request $request, Response $response, TokenInterface $token);
 }

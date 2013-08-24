@@ -25,6 +25,8 @@ use Symfony\Component\HttpFoundation\Response;
  * or force validation if one of the ESI has validation cache strategy.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class EsiResponseCacheStrategy implements EsiResponseCacheStrategyInterface
 {
@@ -35,6 +37,8 @@ class EsiResponseCacheStrategy implements EsiResponseCacheStrategyInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function add(Response $response)
     {
@@ -50,6 +54,8 @@ class EsiResponseCacheStrategy implements EsiResponseCacheStrategyInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function update(Response $response)
     {

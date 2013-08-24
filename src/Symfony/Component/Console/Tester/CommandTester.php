@@ -19,6 +19,8 @@ use Symfony\Component\Console\Output\StreamOutput;
  * Eases the testing of console commands.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class CommandTester
 {
@@ -31,6 +33,8 @@ class CommandTester
      * Constructor.
      *
      * @param Command $command A Command instance to test.
+     *
+     * @since v2.0.0
      */
     public function __construct(Command $command)
     {
@@ -50,6 +54,8 @@ class CommandTester
      * @param array $options An array of options
      *
      * @return integer The command exit code
+     *
+     * @since v2.0.0
      */
     public function execute(array $input, array $options = array())
     {
@@ -75,6 +81,8 @@ class CommandTester
      * @param Boolean $normalize Whether to normalize end of lines to \n or not
      *
      * @return string The display
+     *
+     * @since v2.3.0
      */
     public function getDisplay($normalize = false)
     {
@@ -93,6 +101,8 @@ class CommandTester
      * Gets the input instance used by the last execution of the command.
      *
      * @return InputInterface The current input instance
+     *
+     * @since v2.0.0
      */
     public function getInput()
     {
@@ -103,6 +113,8 @@ class CommandTester
      * Gets the output instance used by the last execution of the command.
      *
      * @return OutputInterface The current output instance
+     *
+     * @since v2.0.0
      */
     public function getOutput()
     {

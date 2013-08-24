@@ -24,6 +24,8 @@ use Symfony\Component\BrowserKit\CookieJar;
  * Client simulates a browser and makes requests to a Kernel object.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class Client extends BaseClient
 {
@@ -32,6 +34,8 @@ class Client extends BaseClient
 
     /**
      * @inheritdoc
+     *
+     * @since v2.2.0
      */
     public function __construct(KernelInterface $kernel, array $server = array(), History $history = null, CookieJar $cookieJar = null)
     {
@@ -42,6 +46,8 @@ class Client extends BaseClient
      * Returns the container.
      *
      * @return ContainerInterface
+     *
+     * @since v2.0.0
      */
     public function getContainer()
     {
@@ -52,6 +58,8 @@ class Client extends BaseClient
      * Returns the kernel.
      *
      * @return KernelInterface
+     *
+     * @since v2.0.0
      */
     public function getKernel()
     {
@@ -62,6 +70,8 @@ class Client extends BaseClient
      * Gets the profile associated with the current Response.
      *
      * @return HttpProfile A Profile instance
+     *
+     * @since v2.0.0
      */
     public function getProfile()
     {
@@ -76,6 +86,8 @@ class Client extends BaseClient
      * Enables the profiler for the very next request.
      *
      * If the profiler is not enabled, the call to this method does nothing.
+     *
+     * @since v2.2.0
      */
     public function enableProfiler()
     {
@@ -90,6 +102,8 @@ class Client extends BaseClient
      * @param Request $request A Request instance
      *
      * @return Response A Response instance
+     *
+     * @since v2.0.0
      */
     protected function doRequest($request)
     {
@@ -117,6 +131,8 @@ class Client extends BaseClient
      * @param Request $request A Request instance
      *
      * @return Response A Response instance
+     *
+     * @since v2.2.0
      */
     protected function doRequestInProcess($request)
     {
@@ -138,6 +154,8 @@ class Client extends BaseClient
      * @param Request $request A Request instance
      *
      * @return string The script content
+     *
+     * @since v2.0.0
      */
     protected function getScript($request)
     {

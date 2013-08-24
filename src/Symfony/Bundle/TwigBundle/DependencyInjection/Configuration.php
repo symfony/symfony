@@ -19,6 +19,8 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  * TwigExtension configuration structure.
  *
  * @author Jeremy Mikola <jmikola@gmail.com>
+ *
+ * @since v2.0.0
  */
 class Configuration implements ConfigurationInterface
 {
@@ -26,6 +28,8 @@ class Configuration implements ConfigurationInterface
      * Generates the configuration tree builder.
      *
      * @return \Symfony\Component\Config\Definition\Builder\TreeBuilder The tree builder
+     *
+     * @since v2.0.0
      */
     public function getConfigTreeBuilder()
     {
@@ -45,6 +49,9 @@ class Configuration implements ConfigurationInterface
         return $treeBuilder;
     }
 
+    /**
+     * @since v2.0.0
+     */
     private function addFormSection(ArrayNodeDefinition $rootNode)
     {
         $rootNode
@@ -70,6 +77,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @since v2.0.0
+     */
     private function addGlobalsSection(ArrayNodeDefinition $rootNode)
     {
         $rootNode
@@ -113,6 +123,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @since v2.0.0
+     */
     private function addTwigOptions(ArrayNodeDefinition $rootNode)
     {
         $rootNode

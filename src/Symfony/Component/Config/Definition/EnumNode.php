@@ -18,11 +18,16 @@ use Symfony\Component\Config\Definition\ScalarNode;
  * Node which only allows a finite set of values.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.1.0
  */
 class EnumNode extends ScalarNode
 {
     private $values;
 
+    /**
+     * @since v2.1.0
+     */
     public function __construct($name, NodeInterface $parent = null, array $values = array())
     {
         $values = array_unique($values);
@@ -34,11 +39,17 @@ class EnumNode extends ScalarNode
         $this->values = $values;
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function getValues()
     {
         return $this->values;
     }
 
+    /**
+     * @since v2.1.0
+     */
     protected function finalizeValue($value)
     {
         $value = parent::finalizeValue($value);

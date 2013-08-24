@@ -23,6 +23,8 @@ use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class UploadedFile extends File
 {
@@ -88,6 +90,8 @@ class UploadedFile extends File
      * @throws FileNotFoundException If the file does not exist
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function __construct($path, $originalName, $mimeType = null, $size = null, $error = null, $test = false)
     {
@@ -113,6 +117,8 @@ class UploadedFile extends File
      * @return string|null The original name
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getClientOriginalName()
     {
@@ -126,6 +132,8 @@ class UploadedFile extends File
      * Then is should not be considered as a safe value.
      *
      * @return string The extension
+     *
+     * @since v2.2.0
      */
     public function getClientOriginalExtension()
     {
@@ -146,6 +154,8 @@ class UploadedFile extends File
      * @see getMimeType
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getClientMimeType()
     {
@@ -168,6 +178,8 @@ class UploadedFile extends File
      *
      * @see guessExtension()
      * @see getClientMimeType()
+     *
+     * @since v2.3.0
      */
     public function guessClientExtension()
     {
@@ -186,6 +198,8 @@ class UploadedFile extends File
      * @return integer|null The file size
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getClientSize()
     {
@@ -201,6 +215,8 @@ class UploadedFile extends File
      * @return integer The upload error
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getError()
     {
@@ -213,6 +229,8 @@ class UploadedFile extends File
      * @return Boolean True if the file has been uploaded with HTTP and no error occurred.
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function isValid()
     {
@@ -232,6 +250,8 @@ class UploadedFile extends File
      * @throws FileException if, for any reason, the file could not have been moved
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function move($directory, $name = null)
     {
@@ -259,6 +279,8 @@ class UploadedFile extends File
      * Returns the maximum size of an uploaded file as configured in php.ini
      *
      * @return int The maximum size of an uploaded file in bytes
+     *
+     * @since v2.1.0
      */
     public static function getMaxFilesize()
     {

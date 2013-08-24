@@ -21,6 +21,8 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class ParameterBag implements ParameterBagInterface
 {
@@ -33,6 +35,8 @@ class ParameterBag implements ParameterBagInterface
      * @param array $parameters An array of parameters
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function __construct(array $parameters = array())
     {
@@ -45,6 +49,8 @@ class ParameterBag implements ParameterBagInterface
      * Clears all parameters.
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function clear()
     {
@@ -57,6 +63,8 @@ class ParameterBag implements ParameterBagInterface
      * @param array $parameters An array of parameters
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function add(array $parameters)
     {
@@ -71,6 +79,8 @@ class ParameterBag implements ParameterBagInterface
      * @return array An array of parameters
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function all()
     {
@@ -87,6 +97,8 @@ class ParameterBag implements ParameterBagInterface
      * @throws ParameterNotFoundException if the parameter is not defined
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function get($name)
     {
@@ -118,6 +130,8 @@ class ParameterBag implements ParameterBagInterface
      * @param mixed  $value The parameter value
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function set($name, $value)
     {
@@ -132,6 +146,8 @@ class ParameterBag implements ParameterBagInterface
      * @return Boolean true if the parameter name is defined, false otherwise
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function has($name)
     {
@@ -144,6 +160,8 @@ class ParameterBag implements ParameterBagInterface
      * @param string $name The parameter name
      *
      * @api
+     *
+     * @since v2.1.10
      */
     public function remove($name)
     {
@@ -152,6 +170,8 @@ class ParameterBag implements ParameterBagInterface
 
     /**
      * Replaces parameter placeholders (%name%) by their values for all parameters.
+     *
+     * @since v2.0.0
      */
     public function resolve()
     {
@@ -186,6 +206,8 @@ class ParameterBag implements ParameterBagInterface
      * @throws ParameterNotFoundException if a placeholder references a parameter that does not exist
      * @throws ParameterCircularReferenceException if a circular reference if detected
      * @throws RuntimeException when a given parameter has a type problem.
+     *
+     * @since v2.0.0
      */
     public function resolveValue($value, array $resolving = array())
     {
@@ -216,6 +238,8 @@ class ParameterBag implements ParameterBagInterface
      * @throws ParameterNotFoundException if a placeholder references a parameter that does not exist
      * @throws ParameterCircularReferenceException if a circular reference if detected
      * @throws RuntimeException when a given parameter has a type problem.
+     *
+     * @since v2.0.0
      */
     public function resolveString($value, array $resolving = array())
     {
@@ -260,6 +284,9 @@ class ParameterBag implements ParameterBagInterface
         }, $value);
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function isResolved()
     {
         return $this->resolved;
@@ -267,6 +294,8 @@ class ParameterBag implements ParameterBagInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function escapeValue($value)
     {
@@ -286,6 +315,9 @@ class ParameterBag implements ParameterBagInterface
         return $value;
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function unescapeValue($value)
     {
         if (is_string($value)) {

@@ -21,11 +21,15 @@ use Symfony\Component\Translation\MessageCatalogue;
  * - path (mandatory): the directory where the files should be saved
  *
  * @author Michel Salib <michelsalib@hotmail.com>
+ *
+ * @since v2.1.0
  */
 abstract class FileDumper implements DumperInterface
 {
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function dump(MessageCatalogue $messages, $options = array())
     {
@@ -53,6 +57,8 @@ abstract class FileDumper implements DumperInterface
      * @param string           $domain
      *
      * @return string representation
+     *
+     * @since v2.1.0
      */
     abstract protected function format(MessageCatalogue $messages, $domain);
 
@@ -60,6 +66,8 @@ abstract class FileDumper implements DumperInterface
      * Gets the file extension of the dumper.
      *
      * @return string file extension
+     *
+     * @since v2.1.0
      */
     abstract protected function getExtension();
 }

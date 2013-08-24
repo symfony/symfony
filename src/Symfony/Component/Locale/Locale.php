@@ -21,6 +21,8 @@ use Symfony\Component\Intl\Intl;
  *
  * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
  *             {@link \Locale} and {@link \Symfony\Component\Intl\Intl} instead.
+ *
+ * @since v2.0.0
  */
 class Locale extends \Locale
 {
@@ -50,6 +52,8 @@ class Locale extends \Locale
      * @return array              The country names with their codes as keys
      *
      * @throws \RuntimeException  When the resource bundles cannot be loaded
+     *
+     * @since v2.1.0
      */
     public static function getDisplayCountries($locale)
     {
@@ -65,6 +69,8 @@ class Locale extends \Locale
      *
      * @return array              The country codes
      * @throws \RuntimeException  When the resource bundles cannot be loaded
+     *
+     * @since v2.1.0
      */
     public static function getCountries()
     {
@@ -79,6 +85,8 @@ class Locale extends \Locale
      * @return array              The language names with their codes as keys
      *
      * @throws \RuntimeException  When the resource bundles cannot be loaded
+     *
+     * @since v2.1.0
      */
     public static function getDisplayLanguages($locale)
     {
@@ -94,6 +102,8 @@ class Locale extends \Locale
      *
      * @return array              The language codes
      * @throws \RuntimeException  When the resource bundles cannot be loaded
+     *
+     * @since v2.1.0
      */
     public static function getLanguages()
     {
@@ -108,6 +118,8 @@ class Locale extends \Locale
      * @return array              The locale names with their codes as keys
      *
      * @throws \RuntimeException  When the resource bundles cannot be loaded
+     *
+     * @since v2.1.0
      */
     public static function getDisplayLocales($locale)
     {
@@ -123,6 +135,8 @@ class Locale extends \Locale
      *
      * @return array              The locale codes
      * @throws \RuntimeException  When the resource bundles cannot be loaded
+     *
+     * @since v2.1.0
      */
     public static function getLocales()
     {
@@ -133,6 +147,8 @@ class Locale extends \Locale
      * Returns the ICU version as defined by the intl extension
      *
      * @return string|null The ICU version
+     *
+     * @since v2.1.0
      */
     public static function getIntlIcuVersion()
     {
@@ -143,6 +159,8 @@ class Locale extends \Locale
      * Returns the ICU Data version as defined by the intl extension
      *
      * @return string|null The ICU Data version
+     *
+     * @since v2.1.0
      */
     public static function getIntlIcuDataVersion()
     {
@@ -154,6 +172,8 @@ class Locale extends \Locale
      * defined, it will try use the ICU data version as defined by the intl extension, if available.
      *
      * @return string The ICU data version that ships with Symfony
+     *
+     * @since v2.1.0
      */
     public static function getIcuDataVersion()
     {
@@ -164,6 +184,8 @@ class Locale extends \Locale
      * Returns the directory path of the ICU data that ships with Symfony
      *
      * @return string The path to the ICU data directory
+     *
+     * @since v2.1.0
      */
     public static function getIcuDataDirectory()
     {
@@ -176,6 +198,8 @@ class Locale extends \Locale
      * @param string $locale The locale to find the fallback for.
      *
      * @return string|null The fallback locale, or null if no parent exists
+     *
+     * @since v2.1.0
      */
     protected static function getFallbackLocale($locale)
     {

@@ -28,6 +28,8 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
  * DigestAuthenticationListener implements Digest HTTP authentication.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class DigestAuthenticationListener implements ListenerInterface
 {
@@ -37,6 +39,9 @@ class DigestAuthenticationListener implements ListenerInterface
     private $authenticationEntryPoint;
     private $logger;
 
+    /**
+     * @since v2.0.0
+     */
     public function __construct(SecurityContextInterface $securityContext, UserProviderInterface $provider, $providerKey, DigestAuthenticationEntryPoint $authenticationEntryPoint, LoggerInterface $logger = null)
     {
         if (empty($providerKey)) {
@@ -56,6 +61,8 @@ class DigestAuthenticationListener implements ListenerInterface
      * @param GetResponseEvent $event A GetResponseEvent instance
      *
      * @throws AuthenticationServiceException
+     *
+     * @since v2.0.0
      */
     public function handle(GetResponseEvent $event)
     {
@@ -122,6 +129,9 @@ class DigestAuthenticationListener implements ListenerInterface
         $this->securityContext->setToken(new UsernamePasswordToken($user, $user->getPassword(), $this->providerKey));
     }
 
+    /**
+     * @since v2.0.0
+     */
     private function fail(GetResponseEvent $event, Request $request, AuthenticationException $authException)
     {
         $token = $this->securityContext->getToken();
@@ -137,12 +147,18 @@ class DigestAuthenticationListener implements ListenerInterface
     }
 }
 
+/**
+ * @since v2.0.0
+ */
 class DigestData
 {
     private $elements;
     private $header;
     private $nonceExpiryTime;
 
+    /**
+     * @since v2.0.0
+     */
     public function __construct($header)
     {
         $this->header = $header;
@@ -155,16 +171,25 @@ class DigestData
         }
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getResponse()
     {
         return $this->elements['response'];
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getUsername()
     {
         return strtr($this->elements['username'], array("\\\"" => "\"", "\\\\" => "\\"));
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function validateAndDecode($entryPointKey, $expectedRealm)
     {
         if ($keys = array_diff(array('username', 'realm', 'nonce', 'uri', 'response'), array_keys($this->elements))) {
@@ -198,6 +223,9 @@ class DigestData
         }
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function calculateServerDigest($password, $httpMethod)
     {
         $a2Md5 = md5(strtoupper($httpMethod).':'.$this->elements['uri']);
@@ -215,6 +243,9 @@ class DigestData
         return md5($digest);
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function isNonceExpired()
     {
         return $this->nonceExpiryTime < microtime(true);

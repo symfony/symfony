@@ -34,6 +34,8 @@ interface NormalizableInterface
      * @param array $context Options for normalizing this object
      *
      * @return array|scalar
+     *
+     * @since v2.2.0
      */
     public function normalize(NormalizerInterface $normalizer, $format = null, array $context = array());
 }

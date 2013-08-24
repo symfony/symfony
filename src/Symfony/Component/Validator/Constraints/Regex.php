@@ -19,6 +19,8 @@ use Symfony\Component\Validator\Constraint;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class Regex extends Constraint
 {
@@ -29,6 +31,8 @@ class Regex extends Constraint
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function getDefaultOption()
     {
@@ -37,6 +41,8 @@ class Regex extends Constraint
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function getRequiredOptions()
     {
@@ -47,6 +53,8 @@ class Regex extends Constraint
      * Returns htmlPattern if exists or pattern is convertible.
      *
      * @return string|null
+     *
+     * @since v2.1.0
      */
     public function getHtmlPattern()
     {
@@ -73,6 +81,8 @@ class Regex extends Constraint
      * @link http://dev.w3.org/html5/spec/single-page.html#the-pattern-attribute
      *
      * @return string|null
+     *
+     * @since v2.1.0
      */
     private function getNonDelimitedPattern()
     {

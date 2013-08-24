@@ -34,6 +34,8 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
  * @author Jordi Boggiano <j.boggiano@seld.be>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  * @author Lukas Kahwe Smith <smith@pooteeweet.org>
+ *
+ * @since v2.1.0
  */
 class Serializer implements SerializerInterface, NormalizerInterface, DenormalizerInterface, EncoderInterface, DecoderInterface
 {
@@ -43,6 +45,9 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     protected $normalizerCache   = array();
     protected $denormalizerCache = array();
 
+    /**
+     * @since v2.2.0
+     */
     public function __construct(array $normalizers = array(), array $encoders = array())
     {
         foreach ($normalizers as $normalizer) {
@@ -71,6 +76,8 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     final public function serialize($data, $format, array $context = array())
     {
@@ -87,6 +94,8 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     final public function deserialize($data, $type, $format, array $context = array())
     {
@@ -101,6 +110,8 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function normalize($data, $format = null, array $context = array())
     {
@@ -133,6 +144,8 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function denormalize($data, $type, $format = null, array $context = array())
     {
@@ -141,6 +154,8 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function supportsNormalization($data, $format = null)
     {
@@ -155,6 +170,8 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function supportsDenormalization($data, $type, $format = null)
     {
@@ -169,6 +186,8 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     private function getNormalizer($data, $format = null)
     {
@@ -183,6 +202,8 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     private function getDenormalizer($data, $type, $format = null)
     {
@@ -197,6 +218,8 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     final public function encode($data, $format, array $context = array())
     {
@@ -205,6 +228,8 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     final public function decode($data, $format, array $context = array())
     {
@@ -222,6 +247,8 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
      *
      * @throws LogicException
      * @throws UnexpectedValueException
+     *
+     * @since v2.2.0
      */
     private function normalizeObject($object, $format = null, array $context = array())
     {
@@ -258,6 +285,8 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
      *
      * @throws LogicException
      * @throws UnexpectedValueException
+     *
+     * @since v2.2.0
      */
     private function denormalizeObject($data, $class, $format = null, array $context = array())
     {
@@ -283,6 +312,8 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function supportsEncoding($format)
     {
@@ -291,6 +322,8 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function supportsDecoding($format)
     {

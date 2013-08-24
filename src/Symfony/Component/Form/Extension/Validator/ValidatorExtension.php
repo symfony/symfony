@@ -21,11 +21,16 @@ use Symfony\Component\Validator\Constraints\Valid;
  * Extension supporting the Symfony2 Validator component in forms.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.0.0
  */
 class ValidatorExtension extends AbstractExtension
 {
     private $validator;
 
+    /**
+     * @since v2.0.0
+     */
     public function __construct(ValidatorInterface $validator)
     {
         $this->validator = $validator;
@@ -41,11 +46,17 @@ class ValidatorExtension extends AbstractExtension
         $metadata->addPropertyConstraint('children', new Valid());
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function loadTypeGuesser()
     {
         return new ValidatorTypeGuesser($this->validator->getMetadataFactory());
     }
 
+    /**
+     * @since v2.0.0
+     */
     protected function loadTypeExtensions()
     {
         return array(

@@ -37,6 +37,8 @@ namespace Symfony\Component\ClassLoader;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Kris Wallsmith <kris@symfony.com>
  * @author Artem Ryzhkov <artem@smart-core.org>
+ *
+ * @since v2.3.0
  */
 class WinCacheClassLoader
 {
@@ -58,6 +60,8 @@ class WinCacheClassLoader
      *
      * @throws \RuntimeException
      * @throws \InvalidArgumentException
+     *
+     * @since v2.3.0
      */
     public function __construct($prefix, $decorated)
     {
@@ -77,6 +81,8 @@ class WinCacheClassLoader
      * Registers this instance as an autoloader.
      *
      * @param Boolean $prepend Whether to prepend the autoloader or not
+     *
+     * @since v2.3.0
      */
     public function register($prepend = false)
     {
@@ -85,6 +91,8 @@ class WinCacheClassLoader
 
     /**
      * Unregisters this instance as an autoloader.
+     *
+     * @since v2.3.0
      */
     public function unregister()
     {
@@ -97,6 +105,8 @@ class WinCacheClassLoader
      * @param string $class The name of the class
      *
      * @return Boolean|null True, if loaded
+     *
+     * @since v2.3.0
      */
     public function loadClass($class)
     {
@@ -113,6 +123,8 @@ class WinCacheClassLoader
      * @param string $class A class name to resolve to file
      *
      * @return string|null
+     *
+     * @since v2.3.0
      */
     public function findFile($class)
     {
@@ -125,6 +137,8 @@ class WinCacheClassLoader
 
     /**
      * Passes through all unknown calls onto the decorated object.
+     *
+     * @since v2.3.0
      */
     public function __call($method, $args)
     {

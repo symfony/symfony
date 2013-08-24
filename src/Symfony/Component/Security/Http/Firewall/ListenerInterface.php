@@ -24,6 +24,8 @@ interface ListenerInterface
      * This interface must be implemented by firewall listeners.
      *
      * @param GetResponseEvent $event
+     *
+     * @since v2.1.0
      */
     public function handle(GetResponseEvent $event);
 }

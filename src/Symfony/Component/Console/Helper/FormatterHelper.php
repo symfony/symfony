@@ -17,6 +17,8 @@ use Symfony\Component\Console\Formatter\OutputFormatter;
  * The Formatter class provides helpers to format messages.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class FormatterHelper extends Helper
 {
@@ -28,6 +30,8 @@ class FormatterHelper extends Helper
      * @param string $style   The style to apply to the section
      *
      * @return string The format section
+     *
+     * @since v2.0.0
      */
     public function formatSection($section, $message, $style = 'info')
     {
@@ -42,6 +46,8 @@ class FormatterHelper extends Helper
      * @param Boolean      $large    Whether to return a large block
      *
      * @return string The formatter message
+     *
+     * @since v2.0.0
      */
     public function formatBlock($messages, $style, $large = false)
     {
@@ -72,6 +78,8 @@ class FormatterHelper extends Helper
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function getName()
     {

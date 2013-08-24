@@ -17,11 +17,16 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  * Provides integration of the Routing component with Twig.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class RoutingExtension extends \Twig_Extension
 {
     private $generator;
 
+    /**
+     * @since v2.0.0
+     */
     public function __construct(UrlGeneratorInterface $generator)
     {
         $this->generator = $generator;
@@ -31,6 +36,8 @@ class RoutingExtension extends \Twig_Extension
      * Returns a list of functions to add to the existing list.
      *
      * @return array An array of functions
+     *
+     * @since v2.0.0
      */
     public function getFunctions()
     {
@@ -40,11 +47,17 @@ class RoutingExtension extends \Twig_Extension
         );
     }
 
+    /**
+     * @since v2.2.0
+     */
     public function getPath($name, $parameters = array(), $relative = false)
     {
         return $this->generator->generate($name, $parameters, $relative ? UrlGeneratorInterface::RELATIVE_PATH : UrlGeneratorInterface::ABSOLUTE_PATH);
     }
 
+    /**
+     * @since v2.2.0
+     */
     public function getUrl($name, $parameters = array(), $schemeRelative = false)
     {
         return $this->generator->generate($name, $parameters, $schemeRelative ? UrlGeneratorInterface::NETWORK_PATH : UrlGeneratorInterface::ABSOLUTE_URL);
@@ -71,6 +84,8 @@ class RoutingExtension extends \Twig_Extension
      * @param \Twig_Node $argsNode The arguments of the path/url function
      *
      * @return array An array with the contexts the URL is safe
+     *
+     * @since v2.3.0
      */
     public function isUrlGenerationSafe(\Twig_Node $argsNode)
     {
@@ -92,6 +107,8 @@ class RoutingExtension extends \Twig_Extension
      * Returns the name of the extension.
      *
      * @return string The extension name
+     *
+     * @since v2.0.0
      */
     public function getName()
     {

@@ -18,6 +18,8 @@ namespace Symfony\Component\CssSelector\Node;
  * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @since v2.3.0
  */
 class NegationNode extends AbstractNode
 {
@@ -34,6 +36,8 @@ class NegationNode extends AbstractNode
     /**
      * @param NodeInterface $selector
      * @param NodeInterface $subSelector
+     *
+     * @since v2.3.0
      */
     public function __construct(NodeInterface $selector, NodeInterface $subSelector)
     {
@@ -43,6 +47,8 @@ class NegationNode extends AbstractNode
 
     /**
      * @return NodeInterface
+     *
+     * @since v2.3.0
      */
     public function getSelector()
     {
@@ -51,6 +57,8 @@ class NegationNode extends AbstractNode
 
     /**
      * @return NodeInterface
+     *
+     * @since v2.3.0
      */
     public function getSubSelector()
     {
@@ -59,6 +67,8 @@ class NegationNode extends AbstractNode
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getSpecificity()
     {
@@ -67,6 +77,8 @@ class NegationNode extends AbstractNode
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function __toString()
     {

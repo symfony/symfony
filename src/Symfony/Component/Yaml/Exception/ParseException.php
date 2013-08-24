@@ -17,6 +17,8 @@ namespace Symfony\Component\Yaml\Exception;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.2.0
  */
 class ParseException extends RuntimeException
 {
@@ -33,6 +35,8 @@ class ParseException extends RuntimeException
      * @param integer   $snippet    The snippet of code near the problem
      * @param string    $parsedFile The file name where the error occurred
      * @param Exception $previous   The previous exception
+     *
+     * @since v2.0.0
      */
     public function __construct($message, $parsedLine = -1, $snippet = null, $parsedFile = null, Exception $previous = null)
     {
@@ -50,6 +54,8 @@ class ParseException extends RuntimeException
      * Gets the snippet of code near the error.
      *
      * @return string The snippet of code
+     *
+     * @since v2.0.0
      */
     public function getSnippet()
     {
@@ -60,6 +66,8 @@ class ParseException extends RuntimeException
      * Sets the snippet of code near the error.
      *
      * @param string $snippet The code snippet
+     *
+     * @since v2.0.0
      */
     public function setSnippet($snippet)
     {
@@ -74,6 +82,8 @@ class ParseException extends RuntimeException
      * This method returns null if a string is parsed.
      *
      * @return string The filename
+     *
+     * @since v2.0.0
      */
     public function getParsedFile()
     {
@@ -84,6 +94,8 @@ class ParseException extends RuntimeException
      * Sets the filename where the error occurred.
      *
      * @param string $parsedFile The filename
+     *
+     * @since v2.0.0
      */
     public function setParsedFile($parsedFile)
     {
@@ -96,6 +108,8 @@ class ParseException extends RuntimeException
      * Gets the line where the error occurred.
      *
      * @return integer The file line
+     *
+     * @since v2.0.0
      */
     public function getParsedLine()
     {
@@ -106,6 +120,8 @@ class ParseException extends RuntimeException
      * Sets the line where the error occurred.
      *
      * @param integer $parsedLine The file line
+     *
+     * @since v2.0.0
      */
     public function setParsedLine($parsedLine)
     {
@@ -114,6 +130,9 @@ class ParseException extends RuntimeException
         $this->updateRepr();
     }
 
+    /**
+     * @since v2.0.0
+     */
     private function updateRepr()
     {
         $this->message = $this->rawMessage;

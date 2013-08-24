@@ -30,6 +30,8 @@ class VirtualFormAwareIterator extends ReferencingArrayIterator implements \Recu
 {
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getChildren()
     {
@@ -38,6 +40,8 @@ class VirtualFormAwareIterator extends ReferencingArrayIterator implements \Recu
 
     /**
      *{@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function hasChildren()
     {

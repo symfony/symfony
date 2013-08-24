@@ -26,6 +26,8 @@ interface LocaleBundleInterface extends ResourceBundleInterface
      *                         Defaults to {@link \Locale::getDefault()}.
      *
      * @return string|null The name of the locale or NULL if not found.
+     *
+     * @since v2.3.0
      */
     public function getLocaleName($ofLocale, $locale = null);
 
@@ -36,6 +38,8 @@ interface LocaleBundleInterface extends ResourceBundleInterface
      *                       Defaults to {@link \Locale::getDefault()}.
      *
      * @return string[] A list of locale names indexed by locale codes.
+     *
+     * @since v2.3.0
      */
     public function getLocaleNames($locale = null);
 }

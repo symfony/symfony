@@ -15,6 +15,8 @@ namespace Symfony\Component\HttpFoundation\File\Exception;
  * Thrown when the access on a file was denied.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.0.0
  */
 class AccessDeniedException extends FileException
 {
@@ -22,6 +24,8 @@ class AccessDeniedException extends FileException
      * Constructor.
      *
      * @param string $path The path to the accessed file
+     *
+     * @since v2.0.0
      */
     public function __construct($path)
     {

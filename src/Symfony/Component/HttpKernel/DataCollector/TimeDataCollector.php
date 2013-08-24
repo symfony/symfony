@@ -20,11 +20,16 @@ use Symfony\Component\HttpFoundation\Response;
  * TimeDataCollector.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.1.0
  */
 class TimeDataCollector extends DataCollector
 {
     protected $kernel;
 
+    /**
+     * @since v2.1.0
+     */
     public function __construct(KernelInterface $kernel = null)
     {
         $this->kernel = $kernel;
@@ -32,6 +37,8 @@ class TimeDataCollector extends DataCollector
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
@@ -51,6 +58,8 @@ class TimeDataCollector extends DataCollector
      * Sets the request events.
      *
      * @param array $events The request events
+     *
+     * @since v2.1.0
      */
     public function setEvents(array $events)
     {
@@ -65,6 +74,8 @@ class TimeDataCollector extends DataCollector
      * Gets the request events.
      *
      * @return array The request events
+     *
+     * @since v2.1.0
      */
     public function getEvents()
     {
@@ -75,6 +86,8 @@ class TimeDataCollector extends DataCollector
      * Gets the request elapsed time.
      *
      * @return float The elapsed time
+     *
+     * @since v2.2.0
      */
     public function getDuration()
     {
@@ -93,6 +106,8 @@ class TimeDataCollector extends DataCollector
      * This is the time spent until the beginning of the request handling.
      *
      * @return float The elapsed time
+     *
+     * @since v2.1.0
      */
     public function getInitTime()
     {
@@ -107,6 +122,8 @@ class TimeDataCollector extends DataCollector
      * Gets the request time.
      *
      * @return integer The time
+     *
+     * @since v2.1.0
      */
     public function getStartTime()
     {
@@ -115,6 +132,8 @@ class TimeDataCollector extends DataCollector
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getName()
     {

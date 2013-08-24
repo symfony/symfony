@@ -29,6 +29,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class ContextListener implements ListenerInterface
 {
@@ -38,6 +40,9 @@ class ContextListener implements ListenerInterface
     private $userProviders;
     private $dispatcher;
 
+    /**
+     * @since v2.1.0
+     */
     public function __construct(SecurityContextInterface $context, array $userProviders, $contextKey, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
     {
         if (empty($contextKey)) {
@@ -61,6 +66,8 @@ class ContextListener implements ListenerInterface
      * Reads the SecurityContext from the session.
      *
      * @param GetResponseEvent $event A GetResponseEvent instance
+     *
+     * @since v2.0.0
      */
     public function handle(GetResponseEvent $event)
     {
@@ -100,6 +107,8 @@ class ContextListener implements ListenerInterface
      * Writes the SecurityContext to the session.
      *
      * @param FilterResponseEvent $event A FilterResponseEvent instance
+     *
+     * @since v2.0.0
      */
     public function onKernelResponse(FilterResponseEvent $event)
     {
@@ -139,6 +148,8 @@ class ContextListener implements ListenerInterface
      * @return TokenInterface|null
      *
      * @throws \RuntimeException
+     *
+     * @since v2.0.0
      */
     private function refreshUser(TokenInterface $token)
     {

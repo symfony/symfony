@@ -19,6 +19,8 @@ use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
  * Renders a form into HTML using a rendering engine.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.1.0
  */
 class FormRenderer implements FormRendererInterface
 {
@@ -49,6 +51,9 @@ class FormRenderer implements FormRendererInterface
      */
     private $variableStack = array();
 
+    /**
+     * @since v2.1.0
+     */
     public function __construct(FormRendererEngineInterface $engine, CsrfProviderInterface $csrfProvider = null)
     {
         $this->engine = $engine;
@@ -57,6 +62,8 @@ class FormRenderer implements FormRendererInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getEngine()
     {
@@ -65,6 +72,8 @@ class FormRenderer implements FormRendererInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function setTheme(FormView $view, $themes)
     {
@@ -73,6 +82,8 @@ class FormRenderer implements FormRendererInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function renderCsrfToken($intention)
     {
@@ -85,6 +96,8 @@ class FormRenderer implements FormRendererInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function renderBlock(FormView $view, $blockName, array $variables = array())
     {
@@ -144,6 +157,8 @@ class FormRenderer implements FormRendererInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function searchAndRenderBlock(FormView $view, $blockNameSuffix, array $variables = array())
     {
@@ -296,6 +311,8 @@ class FormRenderer implements FormRendererInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function humanize($text)
     {

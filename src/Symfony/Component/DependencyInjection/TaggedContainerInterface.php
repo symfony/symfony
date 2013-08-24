@@ -28,6 +28,8 @@ interface TaggedContainerInterface extends ContainerInterface
      * @return array An array of tags
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function findTaggedServiceIds($name);
 }

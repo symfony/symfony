@@ -21,6 +21,8 @@ use Symfony\Component\HttpFoundation\Response;
  * ConfigDataCollector.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class ConfigDataCollector extends DataCollector
 {
@@ -33,6 +35,8 @@ class ConfigDataCollector extends DataCollector
      *
      * @param string $name    The name of the application using the web profiler
      * @param string $version The version of the application using the web profiler
+     *
+     * @since v2.2.1
      */
     public function __construct($name = null, $version = null)
     {
@@ -44,6 +48,8 @@ class ConfigDataCollector extends DataCollector
      * Sets the Kernel associated with this Request.
      *
      * @param KernelInterface $kernel A KernelInterface instance
+     *
+     * @since v2.2.0
      */
     public function setKernel(KernelInterface $kernel = null)
     {
@@ -52,6 +58,8 @@ class ConfigDataCollector extends DataCollector
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
@@ -81,11 +89,17 @@ class ConfigDataCollector extends DataCollector
         }
     }
 
+    /**
+     * @since v2.2.1
+     */
     public function getApplicationName()
     {
         return $this->data['app_name'];
     }
 
+    /**
+     * @since v2.2.1
+     */
     public function getApplicationVersion()
     {
         return $this->data['app_version'];
@@ -95,6 +109,8 @@ class ConfigDataCollector extends DataCollector
      * Gets the token.
      *
      * @return string The token
+     *
+     * @since v2.0.0
      */
     public function getToken()
     {
@@ -105,6 +121,8 @@ class ConfigDataCollector extends DataCollector
      * Gets the Symfony version.
      *
      * @return string The Symfony version
+     *
+     * @since v2.0.0
      */
     public function getSymfonyVersion()
     {
@@ -115,6 +133,8 @@ class ConfigDataCollector extends DataCollector
      * Gets the PHP version.
      *
      * @return string The PHP version
+     *
+     * @since v2.0.0
      */
     public function getPhpVersion()
     {
@@ -125,6 +145,8 @@ class ConfigDataCollector extends DataCollector
      * Gets the application name.
      *
      * @return string The application name
+     *
+     * @since v2.0.0
      */
     public function getAppName()
     {
@@ -135,6 +157,8 @@ class ConfigDataCollector extends DataCollector
      * Gets the environment.
      *
      * @return string The environment
+     *
+     * @since v2.0.0
      */
     public function getEnv()
     {
@@ -145,6 +169,8 @@ class ConfigDataCollector extends DataCollector
      * Returns true if the debug is enabled.
      *
      * @return Boolean true if debug is enabled, false otherwise
+     *
+     * @since v2.0.0
      */
     public function isDebug()
     {
@@ -155,6 +181,8 @@ class ConfigDataCollector extends DataCollector
      * Returns true if the XDebug is enabled.
      *
      * @return Boolean true if XDebug is enabled, false otherwise
+     *
+     * @since v2.0.0
      */
     public function hasXDebug()
     {
@@ -165,6 +193,8 @@ class ConfigDataCollector extends DataCollector
      * Returns true if EAccelerator is enabled.
      *
      * @return Boolean true if EAccelerator is enabled, false otherwise
+     *
+     * @since v2.0.0
      */
     public function hasEAccelerator()
     {
@@ -175,6 +205,8 @@ class ConfigDataCollector extends DataCollector
      * Returns true if APC is enabled.
      *
      * @return Boolean true if APC is enabled, false otherwise
+     *
+     * @since v2.0.0
      */
     public function hasApc()
     {
@@ -185,6 +217,8 @@ class ConfigDataCollector extends DataCollector
      * Returns true if Zend OPcache is enabled
      *
      * @return Boolean true if Zend OPcache is enabled, false otherwise
+     *
+     * @since v2.3.0
      */
     public function hasZendOpcache()
     {
@@ -195,6 +229,8 @@ class ConfigDataCollector extends DataCollector
      * Returns true if XCache is enabled.
      *
      * @return Boolean true if XCache is enabled, false otherwise
+     *
+     * @since v2.0.0
      */
     public function hasXCache()
     {
@@ -205,6 +241,8 @@ class ConfigDataCollector extends DataCollector
      * Returns true if WinCache is enabled.
      *
      * @return Boolean true if WinCache is enabled, false otherwise
+     *
+     * @since v2.2.0
      */
     public function hasWinCache()
     {
@@ -215,12 +253,17 @@ class ConfigDataCollector extends DataCollector
      * Returns true if any accelerator is enabled.
      *
      * @return Boolean true if any accelerator is enabled, false otherwise
+     *
+     * @since v2.0.0
      */
     public function hasAccelerator()
     {
         return $this->hasApc() || $this->hasZendOpcache() || $this->hasEAccelerator() || $this->hasXCache() || $this->hasWinCache();
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getBundles()
     {
         return $this->data['bundles'];
@@ -230,6 +273,8 @@ class ConfigDataCollector extends DataCollector
      * Gets the PHP SAPI name.
      *
      * @return string The environment
+     *
+     * @since v2.2.0
      */
     public function getSapiName()
     {
@@ -238,6 +283,8 @@ class ConfigDataCollector extends DataCollector
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getName()
     {

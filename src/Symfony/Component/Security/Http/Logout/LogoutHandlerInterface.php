@@ -30,6 +30,8 @@ interface LogoutHandlerInterface
      * @param Request        $request
      * @param Response       $response
      * @param TokenInterface $token
+     *
+     * @since v2.1.0
      */
     public function logout(Request $request, Response $response, TokenInterface $token);
 }

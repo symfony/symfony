@@ -17,6 +17,8 @@ use Symfony\Bundle\SecurityBundle\Templating\Helper\LogoutUrlHelper;
  * LogoutUrlHelper provides generator functions for the logout URL to Twig.
  *
  * @author Jeremy Mikola <jmikola@gmail.com>
+ *
+ * @since v2.1.0
  */
 class LogoutUrlExtension extends \Twig_Extension
 {
@@ -26,6 +28,8 @@ class LogoutUrlExtension extends \Twig_Extension
      * Constructor.
      *
      * @param LogoutUrlHelper $helper
+     *
+     * @since v2.1.0
      */
     public function __construct(LogoutUrlHelper $helper)
     {
@@ -34,6 +38,8 @@ class LogoutUrlExtension extends \Twig_Extension
 
     /**
      * @see Twig_Extension::getFunctions()
+     *
+     * @since v2.1.0
      */
     public function getFunctions()
     {
@@ -48,6 +54,8 @@ class LogoutUrlExtension extends \Twig_Extension
      *
      * @param string $key The firewall key
      * @return string The relative logout URL
+     *
+     * @since v2.1.0
      */
     public function getLogoutPath($key)
     {
@@ -59,6 +67,8 @@ class LogoutUrlExtension extends \Twig_Extension
      *
      * @param string $key The firewall key
      * @return string The absolute logout URL
+     *
+     * @since v2.1.0
      */
     public function getLogoutUrl($key)
     {
@@ -67,6 +77,8 @@ class LogoutUrlExtension extends \Twig_Extension
 
     /**
      * @see Twig_ExtensionInterface::getName()
+     *
+     * @since v2.1.0
      */
     public function getName()
     {

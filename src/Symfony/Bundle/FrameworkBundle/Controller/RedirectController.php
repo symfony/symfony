@@ -21,6 +21,8 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  * Redirects a request to another URL.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class RedirectController extends ContainerAware
 {
@@ -39,6 +41,8 @@ class RedirectController extends ContainerAware
      * @param Boolean|array $ignoreAttributes Whether to ignore attributes or an array of attributes to ignore
      *
      * @return Response A Response instance
+     *
+     * @since v2.3.0
      */
     public function redirectAction(Request $request, $route, $permanent = false, $ignoreAttributes = false)
     {
@@ -75,6 +79,8 @@ class RedirectController extends ContainerAware
      * @param integer|null $httpsPort The HTTPS port (null to keep the current one for the same scheme or the configured port in the container)
      *
      * @return Response A Response instance
+     *
+     * @since v2.3.0
      */
     public function urlRedirectAction(Request $request, $path, $permanent = false, $scheme = null, $httpPort = null, $httpsPort = null)
     {

@@ -15,11 +15,15 @@ namespace Symfony\Component\Translation\Catalogue;
  * Merge operation between two catalogues.
  *
  * @author Jean-François Simon <contact@jfsimon.fr>
+ *
+ * @since v2.3.0
  */
 class MergeOperation extends AbstractOperation
 {
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     protected function processDomain($domain)
     {

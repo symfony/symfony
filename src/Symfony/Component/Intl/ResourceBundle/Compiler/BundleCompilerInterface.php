@@ -24,6 +24,8 @@ interface BundleCompilerInterface
      *
      * @param string $sourcePath
      * @param string $targetDir
+     *
+     * @since v2.3.0
      */
     public function compile($sourcePath, $targetDir);
 }

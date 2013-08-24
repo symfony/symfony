@@ -18,6 +18,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Twig extension for Symfony actions helper
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class ActionsExtension extends \Twig_Extension
 {
@@ -27,6 +29,8 @@ class ActionsExtension extends \Twig_Extension
      * Constructor.
      *
      * @param ContainerInterface $container The service container
+     *
+     * @since v2.0.0
      */
     public function __construct(ContainerInterface $container)
     {
@@ -40,6 +44,8 @@ class ActionsExtension extends \Twig_Extension
      * @param array  $options An array of options
      *
      * @see Symfony\Bundle\FrameworkBundle\Controller\ControllerResolver::render()
+     *
+     * @since v2.2.0
      */
     public function renderUri($uri, array $options = array())
     {
@@ -50,6 +56,8 @@ class ActionsExtension extends \Twig_Extension
      * Returns the token parser instance to add to the existing list.
      *
      * @return array An array of Twig_TokenParser instances
+     *
+     * @since v2.0.0
      */
     public function getTokenParsers()
     {
@@ -59,6 +67,9 @@ class ActionsExtension extends \Twig_Extension
         );
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getName()
     {
         return 'actions';

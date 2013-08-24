@@ -19,11 +19,15 @@ use Symfony\Component\DependencyInjection\Reference;
  * Registers the cache clearers.
  *
  * @author Dustin Dobervich <ddobervich@gmail.com>
+ *
+ * @since v2.1.0
  */
 class AddCacheClearerPass implements CompilerPassInterface
 {
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function process(ContainerBuilder $container)
     {

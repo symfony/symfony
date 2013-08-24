@@ -42,6 +42,8 @@ interface ConfigurableRequirementsInterface
      * Passing null will deactivate the requirements check completely.
      *
      * @param Boolean|null $enabled
+     *
+     * @since v2.1.0
      */
     public function setStrictRequirements($enabled);
 
@@ -50,6 +52,8 @@ interface ConfigurableRequirementsInterface
      * Null means the requirements check is deactivated completely.
      *
      * @return Boolean|null
+     *
+     * @since v2.1.0
      */
     public function isStrictRequirements();
 }

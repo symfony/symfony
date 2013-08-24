@@ -28,6 +28,8 @@ interface BundleInterface extends ContainerAwareInterface
      * Boots the Bundle.
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function boot();
 
@@ -35,6 +37,8 @@ interface BundleInterface extends ContainerAwareInterface
      * Shutdowns the Bundle.
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function shutdown();
 
@@ -46,6 +50,8 @@ interface BundleInterface extends ContainerAwareInterface
      * @param ContainerBuilder $container A ContainerBuilder instance
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function build(ContainerBuilder $container);
 
@@ -55,6 +61,8 @@ interface BundleInterface extends ContainerAwareInterface
      * @return ExtensionInterface|null The default extension or null if there is none
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function getContainerExtension();
 
@@ -68,6 +76,8 @@ interface BundleInterface extends ContainerAwareInterface
      * @return string The Bundle name it overrides or null if no parent
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function getParent();
 
@@ -77,6 +87,8 @@ interface BundleInterface extends ContainerAwareInterface
      * @return string The Bundle name
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function getName();
 
@@ -86,6 +98,8 @@ interface BundleInterface extends ContainerAwareInterface
      * @return string The Bundle namespace
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function getNamespace();
 
@@ -97,6 +111,8 @@ interface BundleInterface extends ContainerAwareInterface
      * @return string The Bundle absolute path
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function getPath();
 }

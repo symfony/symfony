@@ -29,6 +29,8 @@ interface ProfilerStorageInterface
      * @param int|null $end    The end date to search to
      *
      * @return array An array of tokens
+     *
+     * @since v2.2.0
      */
     public function find($ip, $url, $limit, $method, $start = null, $end = null);
 
@@ -40,6 +42,8 @@ interface ProfilerStorageInterface
      * @param string $token A token
      *
      * @return Profile The profile associated with token
+     *
+     * @since v2.1.0
      */
     public function read($token);
 
@@ -49,11 +53,15 @@ interface ProfilerStorageInterface
      * @param Profile $profile A Profile instance
      *
      * @return Boolean Write operation successful
+     *
+     * @since v2.1.0
      */
     public function write(Profile $profile);
 
     /**
      * Purges all data from the database.
+     *
+     * @since v2.1.0
      */
     public function purge();
 }

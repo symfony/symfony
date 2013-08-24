@@ -26,6 +26,8 @@ interface DumperInterface
      * @param Definition $definition
      *
      * @return bool
+     *
+     * @since v2.3.0
      */
     public function isProxyCandidate(Definition $definition);
 
@@ -36,6 +38,8 @@ interface DumperInterface
      * @param string     $id         service identifier
      *
      * @return string
+     *
+     * @since v2.3.0
      */
     public function getProxyFactoryCode(Definition $definition, $id);
 
@@ -45,6 +49,8 @@ interface DumperInterface
      * @param Definition $definition
      *
      * @return string
+     *
+     * @since v2.3.0
      */
     public function getProxyCode(Definition $definition);
 }

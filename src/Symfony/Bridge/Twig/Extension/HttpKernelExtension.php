@@ -18,6 +18,8 @@ use Symfony\Component\HttpKernel\Controller\ControllerReference;
  * Provides integration with the HttpKernel component.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.2.0
  */
 class HttpKernelExtension extends \Twig_Extension
 {
@@ -27,12 +29,17 @@ class HttpKernelExtension extends \Twig_Extension
      * Constructor.
      *
      * @param FragmentHandler $handler A FragmentHandler instance
+     *
+     * @since v2.2.0
      */
     public function __construct(FragmentHandler $handler)
     {
         $this->handler = $handler;
     }
 
+    /**
+     * @since v2.2.0
+     */
     public function getFunctions()
     {
         return array(
@@ -51,6 +58,8 @@ class HttpKernelExtension extends \Twig_Extension
      * @return string The fragment content
      *
      * @see Symfony\Component\HttpKernel\Fragment\FragmentHandler::render()
+     *
+     * @since v2.2.0
      */
     public function renderFragment($uri, $options = array())
     {
@@ -70,17 +79,25 @@ class HttpKernelExtension extends \Twig_Extension
      * @return string The fragment content
      *
      * @see Symfony\Component\HttpKernel\Fragment\FragmentHandler::render()
+     *
+     * @since v2.2.0
      */
     public function renderFragmentStrategy($strategy, $uri, $options = array())
     {
         return $this->handler->render($uri, $strategy, $options);
     }
 
+    /**
+     * @since v2.2.0
+     */
     public function controller($controller, $attributes = array(), $query = array())
     {
         return new ControllerReference($controller, $attributes, $query);
     }
 
+    /**
+     * @since v2.2.0
+     */
     public function getName()
     {
         return 'http_kernel';

@@ -15,6 +15,8 @@ namespace Symfony\Component\Stopwatch;
  * Represents an Event managed by Stopwatch.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.1.0
  */
 class StopwatchEvent
 {
@@ -45,6 +47,8 @@ class StopwatchEvent
      * @param string $category The event category
      *
      * @throws \InvalidArgumentException When the raw time is not valid
+     *
+     * @since v2.1.0
      */
     public function __construct($origin, $category = null)
     {
@@ -58,6 +62,8 @@ class StopwatchEvent
      * Gets the category.
      *
      * @return string The category
+     *
+     * @since v2.1.0
      */
     public function getCategory()
     {
@@ -68,6 +74,8 @@ class StopwatchEvent
      * Gets the origin.
      *
      * @return integer The origin in milliseconds
+     *
+     * @since v2.1.0
      */
     public function getOrigin()
     {
@@ -78,6 +86,8 @@ class StopwatchEvent
      * Starts a new event period.
      *
      * @return StopwatchEvent The event
+     *
+     * @since v2.1.0
      */
     public function start()
     {
@@ -94,6 +104,8 @@ class StopwatchEvent
      * @return StopwatchEvent The event
      *
      * @throws \LogicException When stop() is called without a matching call to start()
+     *
+     * @since v2.1.0
      */
     public function stop()
     {
@@ -110,6 +122,8 @@ class StopwatchEvent
      * Checks if the event was started
      *
      * @return bool
+     *
+     * @since v2.3.0
      */
     public function isStarted()
     {
@@ -120,6 +134,8 @@ class StopwatchEvent
      * Stops the current period and then starts a new one.
      *
      * @return StopwatchEvent The event
+     *
+     * @since v2.1.0
      */
     public function lap()
     {
@@ -128,6 +144,8 @@ class StopwatchEvent
 
     /**
      * Stops all non already stopped periods.
+     *
+     * @since v2.1.0
      */
     public function ensureStopped()
     {
@@ -140,6 +158,8 @@ class StopwatchEvent
      * Gets all event periods.
      *
      * @return StopwatchPeriod[] An array of StopwatchPeriod instances
+     *
+     * @since v2.1.0
      */
     public function getPeriods()
     {
@@ -150,6 +170,8 @@ class StopwatchEvent
      * Gets the relative time of the start of the first period.
      *
      * @return integer The time (in milliseconds)
+     *
+     * @since v2.1.0
      */
     public function getStartTime()
     {
@@ -160,6 +182,8 @@ class StopwatchEvent
      * Gets the relative time of the end of the last period.
      *
      * @return integer The time (in milliseconds)
+     *
+     * @since v2.1.0
      */
     public function getEndTime()
     {
@@ -170,6 +194,8 @@ class StopwatchEvent
      * Gets the duration of the events (including all periods).
      *
      * @return integer The duration (in milliseconds)
+     *
+     * @since v2.2.0
      */
     public function getDuration()
     {
@@ -185,6 +211,8 @@ class StopwatchEvent
      * Gets the max memory usage of all periods.
      *
      * @return integer The memory usage (in bytes)
+     *
+     * @since v2.2.0
      */
     public function getMemory()
     {
@@ -202,6 +230,8 @@ class StopwatchEvent
      * Return the current time relative to origin.
      *
      * @return float Time in ms
+     *
+     * @since v2.1.0
      */
     protected function getNow()
     {
@@ -216,6 +246,8 @@ class StopwatchEvent
      * @return float The formatted time
      *
      * @throws \InvalidArgumentException When the raw time is not valid
+     *
+     * @since v2.1.0
      */
     private function formatTime($time)
     {

@@ -26,6 +26,8 @@ interface HelperInterface
      * @return string The canonical name
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function getName();
 
@@ -35,6 +37,8 @@ interface HelperInterface
      * @param string $charset The charset
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function setCharset($charset);
 
@@ -44,6 +48,8 @@ interface HelperInterface
      * @return string The default charset
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function getCharset();
 }

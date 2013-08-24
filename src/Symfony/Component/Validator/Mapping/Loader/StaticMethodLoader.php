@@ -14,10 +14,16 @@ namespace Symfony\Component\Validator\Mapping\Loader;
 use Symfony\Component\Validator\Exception\MappingException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
+/**
+ * @since v2.0.0
+ */
 class StaticMethodLoader implements LoaderInterface
 {
     protected $methodName;
 
+    /**
+     * @since v2.0.0
+     */
     public function __construct($methodName = 'loadValidatorMetadata')
     {
         $this->methodName = $methodName;
@@ -25,6 +31,8 @@ class StaticMethodLoader implements LoaderInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function loadClassMetadata(ClassMetadata $metadata)
     {

@@ -17,6 +17,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  * Removes unused service definitions from the container.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class RemoveUnusedDefinitionsPass implements RepeatablePassInterface
 {
@@ -24,6 +26,8 @@ class RemoveUnusedDefinitionsPass implements RepeatablePassInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function setRepeatedPass(RepeatedPass $repeatedPass)
     {
@@ -34,6 +38,8 @@ class RemoveUnusedDefinitionsPass implements RepeatablePassInterface
      * Processes the ContainerBuilder to remove unused definitions.
      *
      * @param ContainerBuilder $container
+     *
+     * @since v2.0.0
      */
     public function process(ContainerBuilder $container)
     {

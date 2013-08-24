@@ -13,6 +13,9 @@ namespace Symfony\Component\Validator\Mapping;
 
 use Symfony\Component\Validator\Constraint;
 
+/**
+ * @since v2.0.0
+ */
 abstract class ElementMetadata
 {
     /**
@@ -29,6 +32,8 @@ abstract class ElementMetadata
      * Returns the names of the properties that should be serialized.
      *
      * @return array
+     *
+     * @since v2.0.0
      */
     public function __sleep()
     {
@@ -40,6 +45,8 @@ abstract class ElementMetadata
 
     /**
      * Clones this object.
+     *
+     * @since v2.0.0
      */
     public function __clone()
     {
@@ -59,6 +66,8 @@ abstract class ElementMetadata
      * @param Constraint $constraint
      *
      * @return ElementMetadata
+     *
+     * @since v2.0.0
      */
     public function addConstraint(Constraint $constraint)
     {
@@ -75,6 +84,8 @@ abstract class ElementMetadata
      * Returns all constraints of this element.
      *
      * @return Constraint[] An array of Constraint instances
+     *
+     * @since v2.0.0
      */
     public function getConstraints()
     {
@@ -85,6 +96,8 @@ abstract class ElementMetadata
      * Returns whether this element has any constraints.
      *
      * @return Boolean
+     *
+     * @since v2.0.0
      */
     public function hasConstraints()
     {
@@ -97,6 +110,8 @@ abstract class ElementMetadata
      * @param string $group The group name
      *
      * @return array An array with all Constraint instances belonging to the group
+     *
+     * @since v2.0.0
      */
     public function findConstraints($group)
     {

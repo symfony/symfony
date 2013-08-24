@@ -25,6 +25,8 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
  * @author Martin Hasoň <martin.hason@gmail.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class XmlDumper extends Dumper
 {
@@ -41,6 +43,8 @@ class XmlDumper extends Dumper
      * @return string An xml string representing of the service container
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function dump(array $options = array())
     {
@@ -65,6 +69,8 @@ class XmlDumper extends Dumper
      * Adds parameters.
      *
      * @param \DOMElement $parent
+     *
+     * @since v2.0.0
      */
     private function addParameters(\DOMElement $parent)
     {
@@ -87,6 +93,8 @@ class XmlDumper extends Dumper
      *
      * @param array       $methodcalls
      * @param \DOMElement $parent
+     *
+     * @since v2.0.0
      */
     private function addMethodCalls(array $methodcalls, \DOMElement $parent)
     {
@@ -106,6 +114,8 @@ class XmlDumper extends Dumper
      * @param Definition  $definition
      * @param string      $id
      * @param \DOMElement $parent
+     *
+     * @since v2.0.0
      */
     private function addService($definition, $id, \DOMElement $parent)
     {
@@ -185,6 +195,8 @@ class XmlDumper extends Dumper
      * @param string      $alias
      * @param Alias       $id
      * @param \DOMElement $parent
+     *
+     * @since v2.3.1
      */
     private function addServiceAlias($alias, Alias $id, \DOMElement $parent)
     {
@@ -201,6 +213,8 @@ class XmlDumper extends Dumper
      * Adds services.
      *
      * @param \DOMElement $parent
+     *
+     * @since v2.0.0
      */
     private function addServices(\DOMElement $parent)
     {
@@ -231,6 +245,8 @@ class XmlDumper extends Dumper
      * @param string      $type
      * @param \DOMElement $parent
      * @param string      $keyAttribute
+     *
+     * @since v2.0.0
      */
     private function convertParameters($parameters, $type, \DOMElement $parent, $keyAttribute = 'key')
     {
@@ -276,6 +292,8 @@ class XmlDumper extends Dumper
      * @param array $arguments
      *
      * @return array
+     *
+     * @since v2.0.0
      */
     private function escape($arguments)
     {
@@ -301,6 +319,8 @@ class XmlDumper extends Dumper
      * @return string
      *
      * @throws RuntimeException When trying to dump object or resource
+     *
+     * @since v2.1.0
      */
     public static function phpToXml($value)
     {

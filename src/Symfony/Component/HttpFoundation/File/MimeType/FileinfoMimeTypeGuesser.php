@@ -18,6 +18,8 @@ use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
  * Guesses the mime type using the PECL extension FileInfo.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.0.0
  */
 class FileinfoMimeTypeGuesser implements MimeTypeGuesserInterface
 {
@@ -29,6 +31,8 @@ class FileinfoMimeTypeGuesser implements MimeTypeGuesserInterface
      * @param string $magicFile A magic file to use with the finfo instance
      *
      * @link http://www.php.net/manual/en/function.finfo-open.php
+     *
+     * @since v2.3.0
      */
     public function __construct($magicFile = null)
     {
@@ -39,6 +43,8 @@ class FileinfoMimeTypeGuesser implements MimeTypeGuesserInterface
      * Returns whether this guesser is supported on the current OS/PHP setup
      *
      * @return Boolean
+     *
+     * @since v2.1.0
      */
     public static function isSupported()
     {
@@ -47,6 +53,8 @@ class FileinfoMimeTypeGuesser implements MimeTypeGuesserInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function guess($path)
     {

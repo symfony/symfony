@@ -19,6 +19,8 @@ use Symfony\Component\HttpKernel\EventListener\FragmentListener;
  * Adds the possibility to generate a fragment URI for a given Controller.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.2.0
  */
 abstract class RoutableFragmentRenderer implements FragmentRendererInterface
 {
@@ -30,6 +32,8 @@ abstract class RoutableFragmentRenderer implements FragmentRendererInterface
      * @param string $path The path
      *
      * @see FragmentListener
+     *
+     * @since v2.2.0
      */
     public function setFragmentPath($path)
     {

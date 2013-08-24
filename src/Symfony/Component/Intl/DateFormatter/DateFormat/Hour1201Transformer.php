@@ -15,11 +15,15 @@ namespace Symfony\Component\Intl\DateFormatter\DateFormat;
  * Parser and formatter for 12 hour format (1-12)
  *
  * @author Igor Wiedler <igor@wiedler.ch>
+ *
+ * @since v2.3.0
  */
 class Hour1201Transformer extends HourTransformer
 {
     /**
      * {@inheritDoc}
+     *
+     * @since v2.3.0
      */
     public function format(\DateTime $dateTime, $length)
     {
@@ -28,6 +32,8 @@ class Hour1201Transformer extends HourTransformer
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.3.0
      */
     public function normalizeHour($hour, $marker = null)
     {
@@ -43,6 +49,8 @@ class Hour1201Transformer extends HourTransformer
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.3.0
      */
     public function getReverseMatchingRegExp($length)
     {
@@ -51,6 +59,8 @@ class Hour1201Transformer extends HourTransformer
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.3.0
      */
     public function extractDateOptions($matched, $length)
     {

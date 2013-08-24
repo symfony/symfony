@@ -22,11 +22,15 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  * @author Miha Vrhovnik <miha.vrhovnik@pagein.si>
  *
  * @api
+ *
+ * @since v2.3.0
  */
 class CurrencyValidator extends ConstraintValidator
 {
     /**
      * {@inheritDoc}
+     *
+     * @since v2.3.0
      */
     public function validate($value, Constraint $constraint)
     {

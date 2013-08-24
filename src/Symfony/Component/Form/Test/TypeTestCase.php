@@ -14,6 +14,9 @@ namespace Symfony\Component\Form\Test;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
+/**
+ * @since v2.3.0
+ */
 abstract class TypeTestCase extends FormIntegrationTestCase
 {
     /**
@@ -26,6 +29,9 @@ abstract class TypeTestCase extends FormIntegrationTestCase
      */
     protected $dispatcher;
 
+    /**
+     * @since v2.3.0
+     */
     protected function setUp()
     {
         parent::setUp();
@@ -34,6 +40,9 @@ abstract class TypeTestCase extends FormIntegrationTestCase
         $this->builder = new FormBuilder(null, null, $this->dispatcher, $this->factory);
     }
 
+    /**
+     * @since v2.3.0
+     */
     public static function assertDateTimeEquals(\DateTime $expected, \DateTime $actual)
     {
         self::assertEquals($expected->format('c'), $actual->format('c'));

@@ -23,6 +23,8 @@ use Symfony\Component\Intl\Locale\Locale;
  * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
  *             {@link \Symfony\Component\Intl\Locale\Locale} and
  *             {@link \Symfony\Component\Intl\Intl} instead.
+ *
+ * @since v2.3.0
  */
 class StubLocale extends Locale
 {
@@ -46,6 +48,8 @@ class StubLocale extends Locale
      * @param string $locale
      *
      * @return array  The currencies data
+     *
+     * @since v2.1.0
      */
     public static function getCurrenciesData($locale)
     {
@@ -64,6 +68,8 @@ class StubLocale extends Locale
      * @return array                     The currencies names with their codes as keys
      *
      * @throws \InvalidArgumentException  When the locale is different than 'en'
+     *
+     * @since v2.1.0
      */
     public static function getDisplayCurrencies($locale)
     {
@@ -78,17 +84,25 @@ class StubLocale extends Locale
      * Returns all available currencies codes
      *
      * @return array  The currencies codes
+     *
+     * @since v2.1.0
      */
     public static function getCurrencies()
     {
         return array_keys(self::getCurrenciesData(self::getDefault()));
     }
 
+    /**
+     * @since v2.1.0
+     */
     public static function getDataDirectory()
     {
         return IcuData::getResourceDirectory();
     }
 
+    /**
+     * @since v2.3.0
+     */
     private static function prepareCurrencies($locale)
     {
         self::$currencies = array();

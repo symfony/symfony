@@ -13,6 +13,8 @@ namespace Symfony\Component\Finder\Expression;
 
 /**
  * @author Jean-François Simon <contact@jfsimon.fr>
+ *
+ * @since v2.2.0
  */
 class Glob implements ValueInterface
 {
@@ -23,6 +25,8 @@ class Glob implements ValueInterface
 
     /**
      * @param string $pattern
+     *
+     * @since v2.2.0
      */
     public function __construct($pattern)
     {
@@ -31,6 +35,8 @@ class Glob implements ValueInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function render()
     {
@@ -39,6 +45,8 @@ class Glob implements ValueInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function renderPattern()
     {
@@ -47,6 +55,8 @@ class Glob implements ValueInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function getType()
     {
@@ -55,6 +65,8 @@ class Glob implements ValueInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function isCaseSensitive()
     {
@@ -63,6 +75,8 @@ class Glob implements ValueInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function prepend($expr)
     {
@@ -73,6 +87,8 @@ class Glob implements ValueInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function append($expr)
     {
@@ -85,6 +101,8 @@ class Glob implements ValueInterface
      * Tests if glob is expandable ("*.{a,b}" syntax).
      *
      * @return bool
+     *
+     * @since v2.3.0
      */
     public function isExpandable()
     {
@@ -97,6 +115,8 @@ class Glob implements ValueInterface
      * @param bool $strictWildcardSlash
      *
      * @return Regex
+     *
+     * @since v2.2.0
      */
     public function toRegex($strictLeadingDot = true, $strictWildcardSlash = true)
     {

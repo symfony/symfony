@@ -20,6 +20,8 @@ interface AdapterInterface
      * @param Boolean $followLinks
      *
      * @return AdapterInterface Current instance
+     *
+     * @since v2.2.0
      */
     public function setFollowLinks($followLinks);
 
@@ -27,6 +29,8 @@ interface AdapterInterface
      * @param integer $mode
      *
      * @return AdapterInterface Current instance
+     *
+     * @since v2.2.0
      */
     public function setMode($mode);
 
@@ -34,6 +38,8 @@ interface AdapterInterface
      * @param array $exclude
      *
      * @return AdapterInterface Current instance
+     *
+     * @since v2.2.0
      */
     public function setExclude(array $exclude);
 
@@ -41,6 +47,8 @@ interface AdapterInterface
      * @param array $depths
      *
      * @return AdapterInterface Current instance
+     *
+     * @since v2.2.0
      */
     public function setDepths(array $depths);
 
@@ -48,6 +56,8 @@ interface AdapterInterface
      * @param array $names
      *
      * @return AdapterInterface Current instance
+     *
+     * @since v2.2.0
      */
     public function setNames(array $names);
 
@@ -55,6 +65,8 @@ interface AdapterInterface
      * @param array $notNames
      *
      * @return AdapterInterface Current instance
+     *
+     * @since v2.2.0
      */
     public function setNotNames(array $notNames);
 
@@ -62,6 +74,8 @@ interface AdapterInterface
      * @param array $contains
      *
      * @return AdapterInterface Current instance
+     *
+     * @since v2.2.0
      */
     public function setContains(array $contains);
 
@@ -69,6 +83,8 @@ interface AdapterInterface
      * @param array $notContains
      *
      * @return AdapterInterface Current instance
+     *
+     * @since v2.2.0
      */
     public function setNotContains(array $notContains);
 
@@ -76,6 +92,8 @@ interface AdapterInterface
      * @param array $sizes
      *
      * @return AdapterInterface Current instance
+     *
+     * @since v2.2.0
      */
     public function setSizes(array $sizes);
 
@@ -83,6 +101,8 @@ interface AdapterInterface
      * @param array $dates
      *
      * @return AdapterInterface Current instance
+     *
+     * @since v2.2.0
      */
     public function setDates(array $dates);
 
@@ -90,6 +110,8 @@ interface AdapterInterface
      * @param array $filters
      *
      * @return AdapterInterface Current instance
+     *
+     * @since v2.2.0
      */
     public function setFilters(array $filters);
 
@@ -97,6 +119,8 @@ interface AdapterInterface
      * @param \Closure|integer $sort
      *
      * @return AdapterInterface Current instance
+     *
+     * @since v2.2.0
      */
     public function setSort($sort);
 
@@ -104,6 +128,8 @@ interface AdapterInterface
      * @param array $paths
      *
      * @return AdapterInterface Current instance
+     *
+     * @since v2.2.0
      */
     public function setPath(array $paths);
 
@@ -111,6 +137,8 @@ interface AdapterInterface
      * @param array $notPaths
      *
      * @return AdapterInterface Current instance
+     *
+     * @since v2.2.0
      */
     public function setNotPath(array $notPaths);
 
@@ -118,6 +146,8 @@ interface AdapterInterface
      * @param boolean $ignore
      *
      * @return AdapterInterface Current instance
+     *
+     * @since v2.3.0
      */
     public function ignoreUnreadableDirs($ignore = true);
 
@@ -125,6 +155,8 @@ interface AdapterInterface
      * @param string $dir
      *
      * @return \Iterator Result iterator
+     *
+     * @since v2.2.0
      */
     public function searchInDirectory($dir);
 
@@ -132,6 +164,8 @@ interface AdapterInterface
      * Tests adapter support for current platform.
      *
      * @return Boolean
+     *
+     * @since v2.2.0
      */
     public function isSupported();
 
@@ -139,6 +173,8 @@ interface AdapterInterface
      * Returns adapter name.
      *
      * @return string
+     *
+     * @since v2.2.0
      */
     public function getName();
 }

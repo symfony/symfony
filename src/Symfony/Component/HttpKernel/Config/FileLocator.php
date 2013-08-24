@@ -18,6 +18,8 @@ use Symfony\Component\HttpKernel\KernelInterface;
  * FileLocator uses the KernelInterface to locate resources in bundles.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class FileLocator extends BaseFileLocator
 {
@@ -30,6 +32,8 @@ class FileLocator extends BaseFileLocator
      * @param KernelInterface $kernel A KernelInterface instance
      * @param null|string     $path   The path the global resource directory
      * @param array           $paths  An array of paths where to look for resources
+     *
+     * @since v2.0.0
      */
     public function __construct(KernelInterface $kernel, $path = null, array $paths = array())
     {
@@ -44,6 +48,8 @@ class FileLocator extends BaseFileLocator
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function locate($file, $currentPath = null, $first = true)
     {

@@ -19,6 +19,8 @@ interface PrependExtensionInterface
      * Allow an extension to prepend the extension configurations.
      *
      * @param ContainerBuilder $container
+     *
+     * @since v2.2.0
      */
     public function prepend(ContainerBuilder $container);
 }

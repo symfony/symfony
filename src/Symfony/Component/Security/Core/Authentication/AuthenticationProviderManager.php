@@ -27,6 +27,8 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class AuthenticationProviderManager implements AuthenticationManagerInterface
 {
@@ -41,6 +43,8 @@ class AuthenticationProviderManager implements AuthenticationManagerInterface
      * @param Boolean                           $eraseCredentials Whether to erase credentials after authentication or not
      *
      * @throws \InvalidArgumentException
+     *
+     * @since v2.0.0
      */
     public function __construct(array $providers, $eraseCredentials = true)
     {
@@ -52,6 +56,9 @@ class AuthenticationProviderManager implements AuthenticationManagerInterface
         $this->eraseCredentials = (Boolean) $eraseCredentials;
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function setEventDispatcher(EventDispatcherInterface $dispatcher)
     {
         $this->eventDispatcher = $dispatcher;
@@ -59,6 +66,8 @@ class AuthenticationProviderManager implements AuthenticationManagerInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function authenticate(TokenInterface $token)
     {

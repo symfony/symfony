@@ -18,6 +18,8 @@ use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
  * Merges ACL schema into the given schema.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.1.0
  */
 class AclSchemaListener
 {
@@ -28,6 +30,9 @@ class AclSchemaListener
         $this->schema = $schema;
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function postGenerateSchema(GenerateSchemaEventArgs $args)
     {
         $schema = $args->getSchema();

@@ -19,6 +19,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Allows lazy loading of listener services.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.1.0
  */
 class ContainerAwareEventManager extends EventManager
 {
@@ -32,6 +34,9 @@ class ContainerAwareEventManager extends EventManager
     private $initialized = array();
     private $container;
 
+    /**
+     * @since v2.1.0
+     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
@@ -45,6 +50,8 @@ class ContainerAwareEventManager extends EventManager
      * @param EventArgs $eventArgs The event arguments to pass to the event handlers/listeners.
      *                             If not supplied, the single empty EventArgs instance is used.
      * @return boolean
+     *
+     * @since v2.1.0
      */
     public function dispatchEvent($eventName, EventArgs $eventArgs = null)
     {
@@ -70,6 +77,8 @@ class ContainerAwareEventManager extends EventManager
      * @param string $event The name of the event.
      *
      * @return array The event listeners for the specified event, or all event listeners.
+     *
+     * @since v2.1.0
      */
     public function getListeners($event = null)
     {
@@ -82,6 +91,8 @@ class ContainerAwareEventManager extends EventManager
      * @param string $event
      *
      * @return boolean TRUE if the specified event has any listeners, FALSE otherwise.
+     *
+     * @since v2.1.0
      */
     public function hasListeners($event)
     {
@@ -95,6 +106,8 @@ class ContainerAwareEventManager extends EventManager
      * @param object|string $listener The listener object.
      *
      * @throws \RuntimeException
+     *
+     * @since v2.1.0
      */
     public function addEventListener($events, $listener)
     {
@@ -121,6 +134,8 @@ class ContainerAwareEventManager extends EventManager
      *
      * @param string|array  $events
      * @param object|string $listener
+     *
+     * @since v2.1.0
      */
     public function removeEventListener($events, $listener)
     {

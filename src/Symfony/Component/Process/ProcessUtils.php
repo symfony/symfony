@@ -17,11 +17,15 @@ namespace Symfony\Component\Process;
  * This class contains static methods only and is not meant to be instantiated.
  *
  * @author Martin Hasoň <martin.hason@gmail.com>
+ *
+ * @since v2.3.0
  */
 class ProcessUtils
 {
     /**
      * This class should not be instantiated
+     *
+     * @since v2.3.0
      */
     private function __construct()
     {
@@ -33,6 +37,8 @@ class ProcessUtils
      * @param string $argument The argument that will be escaped
      *
      * @return string The escaped argument
+     *
+     * @since v2.3.0
      */
     public static function escapeArgument($argument)
     {

@@ -18,6 +18,8 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Alexander <iam.asm89@gmail.com>
+ *
+ * @since v2.0.0
  */
 class AuthenticationException extends \RuntimeException implements \Serializable
 {
@@ -27,6 +29,8 @@ class AuthenticationException extends \RuntimeException implements \Serializable
      * Get the token.
      *
      * @return TokenInterface
+     *
+     * @since v2.2.0
      */
     public function getToken()
     {
@@ -37,12 +41,17 @@ class AuthenticationException extends \RuntimeException implements \Serializable
      * Set the token.
      *
      * @param TokenInterface $token
+     *
+     * @since v2.2.0
      */
     public function setToken(TokenInterface $token)
     {
         $this->token = $token;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function serialize()
     {
         return serialize(array(
@@ -54,6 +63,9 @@ class AuthenticationException extends \RuntimeException implements \Serializable
         ));
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function unserialize($str)
     {
         list(
@@ -69,6 +81,8 @@ class AuthenticationException extends \RuntimeException implements \Serializable
      * Message key to be used by the translation component.
      *
      * @return string
+     *
+     * @since v2.2.0
      */
     public function getMessageKey()
     {
@@ -79,6 +93,8 @@ class AuthenticationException extends \RuntimeException implements \Serializable
      * Message data to be used by the translation component.
      *
      * @return array
+     *
+     * @since v2.2.0
      */
     public function getMessageData()
     {

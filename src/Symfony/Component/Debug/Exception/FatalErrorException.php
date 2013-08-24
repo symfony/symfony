@@ -15,6 +15,8 @@ namespace Symfony\Component\Debug\Exception;
  * Fatal Error Exception.
  *
  * @author Konstanton Myakshin <koc-dp@yandex.ru>
+ *
+ * @since v2.3.0
  */
 class FatalErrorException extends \ErrorException
 {

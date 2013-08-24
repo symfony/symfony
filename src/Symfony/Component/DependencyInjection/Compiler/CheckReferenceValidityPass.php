@@ -28,6 +28,8 @@ use Symfony\Component\DependencyInjection\Exception\ScopeWideningInjectionExcept
  * - target definitions are in the same scope hierarchy
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class CheckReferenceValidityPass implements CompilerPassInterface
 {
@@ -42,6 +44,8 @@ class CheckReferenceValidityPass implements CompilerPassInterface
      * Processes the ContainerBuilder to validate References.
      *
      * @param ContainerBuilder $container
+     *
+     * @since v2.0.0
      */
     public function process(ContainerBuilder $container)
     {
@@ -88,6 +92,8 @@ class CheckReferenceValidityPass implements CompilerPassInterface
      * @param array $arguments An array of Reference objects
      *
      * @throws RuntimeException when there is a reference to an abstract definition.
+     *
+     * @since v2.0.0
      */
     private function validateReferences(array $arguments)
     {
@@ -119,6 +125,8 @@ class CheckReferenceValidityPass implements CompilerPassInterface
      *
      * @throws ScopeWideningInjectionException when the definition references a service of a narrower scope
      * @throws ScopeCrossingInjectionException when the definition references a service of another scope hierarchy
+     *
+     * @since v2.0.0
      */
     private function validateScope(Reference $reference, Definition $definition = null)
     {
@@ -155,6 +163,8 @@ class CheckReferenceValidityPass implements CompilerPassInterface
      * @param string $id Definition identifier
      *
      * @return Definition
+     *
+     * @since v2.0.0
      */
     private function getDefinition($id)
     {

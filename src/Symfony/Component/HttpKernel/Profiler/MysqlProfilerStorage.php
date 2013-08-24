@@ -15,11 +15,15 @@ namespace Symfony\Component\HttpKernel\Profiler;
  * A ProfilerStorage for Mysql
  *
  * @author Jan Schumann <js@schumann-it.com>
+ *
+ * @since v2.0.0
  */
 class MysqlProfilerStorage extends PdoProfilerStorage
 {
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     protected function initDb()
     {
@@ -43,6 +47,8 @@ class MysqlProfilerStorage extends PdoProfilerStorage
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     protected function buildCriteria($ip, $url, $start, $end, $limit, $method)
     {

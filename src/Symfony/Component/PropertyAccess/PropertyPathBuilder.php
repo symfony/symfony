@@ -15,6 +15,8 @@ use Symfony\Component\PropertyAccess\Exception\OutOfBoundsException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.2.0
  */
 class PropertyPathBuilder
 {
@@ -33,6 +35,8 @@ class PropertyPathBuilder
      *
      * @param null|PropertyPathInterface|string $path The path to initially store
      *                                                in the builder. Optional.
+     *
+     * @since v2.3.0
      */
     public function __construct($path = null)
     {
@@ -49,6 +53,8 @@ class PropertyPathBuilder
      *                                             piece starts in $path.
      * @param integer                      $length The length of the appended piece.
      *                                             If 0, the full path is appended.
+     *
+     * @since v2.3.0
      */
     public function append($path, $offset = 0, $length = 0)
     {
@@ -72,6 +78,8 @@ class PropertyPathBuilder
      * Appends an index element to the current path.
      *
      * @param string $name The name of the appended index
+     *
+     * @since v2.2.0
      */
     public function appendIndex($name)
     {
@@ -83,6 +91,8 @@ class PropertyPathBuilder
      * Appends a property element to the current path.
      *
      * @param string $name The name of the appended property
+     *
+     * @since v2.2.0
      */
     public function appendProperty($name)
     {
@@ -97,6 +107,8 @@ class PropertyPathBuilder
      * @param integer $length The length of the removed piece
      *
      * @throws OutOfBoundsException if offset is invalid
+     *
+     * @since v2.2.0
      */
     public function remove($offset, $length = 1)
     {
@@ -119,6 +131,8 @@ class PropertyPathBuilder
      *                                                 If 0, the full path is inserted.
      *
      * @throws OutOfBoundsException If the offset is invalid
+     *
+     * @since v2.3.0
      */
     public function replace($offset, $length, $path, $pathOffset = 0, $pathLength = 0)
     {
@@ -151,6 +165,8 @@ class PropertyPathBuilder
      * @param string  $name   The new name of the element. Optional.
      *
      * @throws OutOfBoundsException If the offset is invalid
+     *
+     * @since v2.2.0
      */
     public function replaceByIndex($offset, $name = null)
     {
@@ -172,6 +188,8 @@ class PropertyPathBuilder
      * @param string  $name   The new name of the element. Optional.
      *
      * @throws OutOfBoundsException If the offset is invalid
+     *
+     * @since v2.2.0
      */
     public function replaceByProperty($offset, $name = null)
     {
@@ -190,6 +208,8 @@ class PropertyPathBuilder
      * Returns the length of the current path.
      *
      * @return integer The path length
+     *
+     * @since v2.2.0
      */
     public function getLength()
     {
@@ -200,6 +220,8 @@ class PropertyPathBuilder
      * Returns the current property path.
      *
      * @return PropertyPathInterface The constructed property path
+     *
+     * @since v2.2.0
      */
     public function getPropertyPath()
     {
@@ -212,6 +234,8 @@ class PropertyPathBuilder
      * Returns the current property path as string.
      *
      * @return string The property path as string
+     *
+     * @since v2.2.0
      */
     public function __toString()
     {
@@ -238,6 +262,8 @@ class PropertyPathBuilder
      * @param  integer $offset          The offset where the removed chunk starts
      * @param  integer $cutLength       The length of the removed chunk
      * @param  integer $insertionLength The length of the inserted chunk
+     *
+     * @since v2.2.0
      */
     private function resize($offset, $cutLength, $insertionLength)
     {

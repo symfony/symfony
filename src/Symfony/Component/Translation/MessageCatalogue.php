@@ -19,6 +19,8 @@ use Symfony\Component\Config\Resource\ResourceInterface;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.2.0
  */
 class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterface
 {
@@ -36,6 +38,8 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
      * @param array  $messages An array of messages classified by domain
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function __construct($locale, array $messages = array())
     {
@@ -47,6 +51,8 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getLocale()
     {
@@ -57,6 +63,8 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getDomains()
     {
@@ -67,6 +75,8 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function all($domain = null)
     {
@@ -81,6 +91,8 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function set($id, $translation, $domain = 'messages')
     {
@@ -91,6 +103,8 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function has($id, $domain = 'messages')
     {
@@ -107,6 +121,8 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.10
      */
     public function defines($id, $domain = 'messages')
     {
@@ -117,6 +133,8 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function get($id, $domain = 'messages')
     {
@@ -135,6 +153,8 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function replace($messages, $domain = 'messages')
     {
@@ -147,6 +167,8 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function add($messages, $domain = 'messages')
     {
@@ -161,6 +183,8 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function addCatalogue(MessageCatalogueInterface $catalogue)
     {
@@ -186,6 +210,8 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function addFallbackCatalogue(MessageCatalogueInterface $catalogue)
     {
@@ -209,6 +235,8 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function getFallbackCatalogue()
     {
@@ -219,6 +247,8 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getResources()
     {
@@ -229,6 +259,8 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function addResource(ResourceInterface $resource)
     {
@@ -237,6 +269,8 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function getMetadata($key = '', $domain = 'messages')
     {
@@ -259,6 +293,8 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function setMetadata($key, $value, $domain = 'messages')
     {
@@ -267,6 +303,8 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function deleteMetadata($key = '', $domain = 'messages')
     {
@@ -283,6 +321,8 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
      * Adds current values with the new values.
      *
      * @param array $values Values to add
+     *
+     * @since v2.2.0
      */
     private function addMetadata(array $values)
     {

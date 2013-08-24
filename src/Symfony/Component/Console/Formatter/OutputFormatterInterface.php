@@ -26,6 +26,8 @@ interface OutputFormatterInterface
      * @param Boolean $decorated Whether to decorate the messages or not
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function setDecorated($decorated);
 
@@ -35,6 +37,8 @@ interface OutputFormatterInterface
      * @return Boolean true if the output will decorate messages, false otherwise
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function isDecorated();
 
@@ -45,6 +49,8 @@ interface OutputFormatterInterface
      * @param OutputFormatterStyleInterface $style The style instance
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function setStyle($name, OutputFormatterStyleInterface $style);
 
@@ -56,6 +62,8 @@ interface OutputFormatterInterface
      * @return Boolean
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function hasStyle($name);
 
@@ -67,6 +75,8 @@ interface OutputFormatterInterface
      * @return OutputFormatterStyleInterface
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function getStyle($name);
 
@@ -78,6 +88,8 @@ interface OutputFormatterInterface
      * @return string The styled message
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function format($message);
 }

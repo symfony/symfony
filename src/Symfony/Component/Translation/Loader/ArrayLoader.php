@@ -19,6 +19,8 @@ use Symfony\Component\Translation\MessageCatalogue;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class ArrayLoader implements LoaderInterface
 {
@@ -26,6 +28,8 @@ class ArrayLoader implements LoaderInterface
      * {@inheritdoc}
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function load($resource, $locale, $domain = 'messages')
     {
@@ -49,6 +53,8 @@ class ArrayLoader implements LoaderInterface
      * @param array  &$messages The array that will be flattened
      * @param array  $subnode Current subnode being parsed, used internally for recursive calls
      * @param string $path    Current path being parsed, used internally for recursive calls
+     *
+     * @since v2.0.0
      */
     private function flatten(array &$messages, array $subnode = null, $path = null)
     {

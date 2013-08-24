@@ -15,6 +15,8 @@ use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.3.0
  */
 class StubbingContext implements StubbingContextInterface
 {
@@ -38,6 +40,9 @@ class StubbingContext implements StubbingContextInterface
      */
     private $icuVersion;
 
+    /**
+     * @since v2.3.0
+     */
     public function __construct($binaryDir, $stubDir, Filesystem $filesystem, $icuVersion)
     {
         $this->binaryDir = $binaryDir;
@@ -48,6 +53,8 @@ class StubbingContext implements StubbingContextInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getBinaryDir()
     {
@@ -56,6 +63,8 @@ class StubbingContext implements StubbingContextInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getStubDir()
     {
@@ -64,6 +73,8 @@ class StubbingContext implements StubbingContextInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getFilesystem()
     {
@@ -72,6 +83,8 @@ class StubbingContext implements StubbingContextInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getIcuVersion()
     {

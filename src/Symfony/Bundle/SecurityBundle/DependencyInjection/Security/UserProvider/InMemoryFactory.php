@@ -22,9 +22,14 @@ use Symfony\Component\DependencyInjection\Reference;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Christophe Coevoet <stof@notk.org>
+ *
+ * @since v2.1.0
  */
 class InMemoryFactory implements UserProviderFactoryInterface
 {
+    /**
+     * @since v2.1.0
+     */
     public function create(ContainerBuilder $container, $id, $config)
     {
         $definition = $container->setDefinition($id, new DefinitionDecorator('security.user.provider.in_memory'));
@@ -41,11 +46,17 @@ class InMemoryFactory implements UserProviderFactoryInterface
         }
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function getKey()
     {
         return 'memory';
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function addConfiguration(NodeDefinition $node)
     {
         $node

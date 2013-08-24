@@ -15,9 +15,14 @@ namespace Symfony\Component\PropertyAccess\Exception;
  * Thrown when a value does not match an expected type.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.2.0
  */
 class UnexpectedTypeException extends RuntimeException
 {
+    /**
+     * @since v2.2.0
+     */
     public function __construct($value, $expectedType)
     {
         parent::__construct(sprintf('Expected argument of type "%s", "%s" given', $expectedType, is_object($value) ? get_class($value) : gettype($value)));

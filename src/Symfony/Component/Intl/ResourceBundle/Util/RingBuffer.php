@@ -21,6 +21,8 @@ use Symfony\Component\Intl\Exception\OutOfBoundsException;
  * then the second and so on.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.3.0
  */
 class RingBuffer implements \ArrayAccess
 {
@@ -32,6 +34,9 @@ class RingBuffer implements \ArrayAccess
 
     private $size;
 
+    /**
+     * @since v2.3.0
+     */
     public function __construct($size)
     {
         $this->size = $size;
@@ -39,6 +44,8 @@ class RingBuffer implements \ArrayAccess
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function offsetExists($key)
     {
@@ -47,6 +54,8 @@ class RingBuffer implements \ArrayAccess
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function offsetGet($key)
     {
@@ -62,6 +71,8 @@ class RingBuffer implements \ArrayAccess
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function offsetSet($key, $value)
     {
@@ -77,6 +88,8 @@ class RingBuffer implements \ArrayAccess
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function offsetUnset($key)
     {

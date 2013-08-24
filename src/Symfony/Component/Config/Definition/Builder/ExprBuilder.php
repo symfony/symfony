@@ -17,6 +17,8 @@ use Symfony\Component\Config\Definition\Exception\UnsetKeyException;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  * @author Christophe Coevoet <stof@notk.org>
+ *
+ * @since v2.0.0
  */
 class ExprBuilder
 {
@@ -28,6 +30,8 @@ class ExprBuilder
      * Constructor
      *
      * @param NodeDefinition $node The related node
+     *
+     * @since v2.0.0
      */
     public function __construct(NodeDefinition $node)
     {
@@ -40,6 +44,8 @@ class ExprBuilder
      * @param \Closure $then
      *
      * @return ExprBuilder
+     *
+     * @since v2.0.0
      */
     public function always(\Closure $then = null)
     {
@@ -60,6 +66,8 @@ class ExprBuilder
      * @param \Closure $closure
      *
      * @return ExprBuilder
+     *
+     * @since v2.0.0
      */
     public function ifTrue(\Closure $closure = null)
     {
@@ -76,6 +84,8 @@ class ExprBuilder
      * Tests if the value is a string.
      *
      * @return ExprBuilder
+     *
+     * @since v2.0.0
      */
     public function ifString()
     {
@@ -88,6 +98,8 @@ class ExprBuilder
      * Tests if the value is null.
      *
      * @return ExprBuilder
+     *
+     * @since v2.0.0
      */
     public function ifNull()
     {
@@ -100,6 +112,8 @@ class ExprBuilder
      * Tests if the value is an array.
      *
      * @return ExprBuilder
+     *
+     * @since v2.0.0
      */
     public function ifArray()
     {
@@ -114,6 +128,8 @@ class ExprBuilder
      * @param array $array
      *
      * @return ExprBuilder
+     *
+     * @since v2.0.0
      */
     public function ifInArray(array $array)
     {
@@ -128,6 +144,8 @@ class ExprBuilder
      * @param array $array
      *
      * @return ExprBuilder
+     *
+     * @since v2.0.0
      */
     public function ifNotInArray(array $array)
     {
@@ -142,6 +160,8 @@ class ExprBuilder
      * @param \Closure $closure
      *
      * @return ExprBuilder
+     *
+     * @since v2.0.0
      */
     public function then(\Closure $closure)
     {
@@ -154,6 +174,8 @@ class ExprBuilder
      * Sets a closure returning an empty array.
      *
      * @return ExprBuilder
+     *
+     * @since v2.0.0
      */
     public function thenEmptyArray()
     {
@@ -172,6 +194,8 @@ class ExprBuilder
      * @return ExprBuilder
      *
      * @throws \InvalidArgumentException
+     *
+     * @since v2.0.0
      */
     public function thenInvalid($message)
     {
@@ -186,6 +210,8 @@ class ExprBuilder
      * @return ExprBuilder
      *
      * @throws UnsetKeyException
+     *
+     * @since v2.0.0
      */
     public function thenUnset()
     {
@@ -200,6 +226,8 @@ class ExprBuilder
      * @return NodeDefinition
      *
      * @throws \RuntimeException
+     *
+     * @since v2.0.0
      */
     public function end()
     {
@@ -219,6 +247,8 @@ class ExprBuilder
      * @param ExprBuilder[] $expressions An array of ExprBuilder instances to build
      *
      * @return array
+     *
+     * @since v2.1.0
      */
     public static function buildExpressions(array $expressions)
     {

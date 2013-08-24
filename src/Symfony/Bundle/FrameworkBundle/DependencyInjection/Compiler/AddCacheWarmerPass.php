@@ -19,11 +19,15 @@ use Symfony\Component\DependencyInjection\Reference;
  * Registers the cache warmers.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class AddCacheWarmerPass implements CompilerPassInterface
 {
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function process(ContainerBuilder $container)
     {

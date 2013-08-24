@@ -26,6 +26,8 @@ namespace Symfony\Component\EventDispatcher;
  * @author  Jordan Alliot <jordan.alliot@gmail.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class EventDispatcher implements EventDispatcherInterface
 {
@@ -36,6 +38,8 @@ class EventDispatcher implements EventDispatcherInterface
      * @see EventDispatcherInterface::dispatch
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function dispatch($eventName, Event $event = null)
     {
@@ -57,6 +61,8 @@ class EventDispatcher implements EventDispatcherInterface
 
     /**
      * @see EventDispatcherInterface::getListeners
+     *
+     * @since v2.0.0
      */
     public function getListeners($eventName = null)
     {
@@ -79,6 +85,8 @@ class EventDispatcher implements EventDispatcherInterface
 
     /**
      * @see EventDispatcherInterface::hasListeners
+     *
+     * @since v2.0.0
      */
     public function hasListeners($eventName = null)
     {
@@ -89,6 +97,8 @@ class EventDispatcher implements EventDispatcherInterface
      * @see EventDispatcherInterface::addListener
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function addListener($eventName, $listener, $priority = 0)
     {
@@ -98,6 +108,8 @@ class EventDispatcher implements EventDispatcherInterface
 
     /**
      * @see EventDispatcherInterface::removeListener
+     *
+     * @since v2.0.0
      */
     public function removeListener($eventName, $listener)
     {
@@ -116,6 +128,8 @@ class EventDispatcher implements EventDispatcherInterface
      * @see EventDispatcherInterface::addSubscriber
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function addSubscriber(EventSubscriberInterface $subscriber)
     {
@@ -134,6 +148,8 @@ class EventDispatcher implements EventDispatcherInterface
 
     /**
      * @see EventDispatcherInterface::removeSubscriber
+     *
+     * @since v2.0.0
      */
     public function removeSubscriber(EventSubscriberInterface $subscriber)
     {
@@ -157,6 +173,8 @@ class EventDispatcher implements EventDispatcherInterface
      * @param array[callback] $listeners The event listeners.
      * @param string          $eventName The name of the event to dispatch.
      * @param Event           $event     The event object to pass to the event handlers/listeners.
+     *
+     * @since v2.0.0
      */
     protected function doDispatch($listeners, $eventName, Event $event)
     {
@@ -172,6 +190,8 @@ class EventDispatcher implements EventDispatcherInterface
      * Sorts the internal list of listeners for the given event by priority.
      *
      * @param string $eventName The name of the event.
+     *
+     * @since v2.0.0
      */
     private function sortListeners($eventName)
     {

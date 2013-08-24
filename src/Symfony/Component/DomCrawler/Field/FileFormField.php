@@ -17,6 +17,8 @@ namespace Symfony\Component\DomCrawler\Field;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class FileFormField extends FormField
 {
@@ -26,6 +28,8 @@ class FileFormField extends FormField
      * @param integer $error The error code (one of UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE, UPLOAD_ERR_PARTIAL, UPLOAD_ERR_NO_FILE, UPLOAD_ERR_NO_TMP_DIR, UPLOAD_ERR_CANT_WRITE, or UPLOAD_ERR_EXTENSION)
      *
      * @throws \InvalidArgumentException When error code doesn't exist
+     *
+     * @since v2.0.0
      */
     public function setErrorCode($error)
     {
@@ -43,6 +47,8 @@ class FileFormField extends FormField
      * @param string $value The value of the field
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function upload($value)
     {
@@ -53,6 +59,8 @@ class FileFormField extends FormField
      * Sets the value of the field.
      *
      * @param string $value The value of the field
+     *
+     * @since v2.0.0
      */
     public function setValue($value)
     {
@@ -86,6 +94,8 @@ class FileFormField extends FormField
      * Sets path to the file as string for simulating HTTP request
      *
      * @param string $path The path to the file
+     *
+     * @since v2.2.0
      */
     public function setFilePath($path)
     {
@@ -96,6 +106,8 @@ class FileFormField extends FormField
      * Initializes the form field.
      *
      * @throws \LogicException When node type is incorrect
+     *
+     * @since v2.0.0
      */
     protected function initialize()
     {

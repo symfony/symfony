@@ -20,6 +20,8 @@ use Symfony\Component\HttpFoundation\Response;
  * Allows to execute logic after a response was sent
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
+ *
+ * @since v2.1.0
  */
 class PostResponseEvent extends Event
 {
@@ -33,6 +35,9 @@ class PostResponseEvent extends Event
 
     private $response;
 
+    /**
+     * @since v2.1.0
+     */
     public function __construct(HttpKernelInterface $kernel, Request $request, Response $response)
     {
         $this->kernel = $kernel;
@@ -44,6 +49,8 @@ class PostResponseEvent extends Event
      * Returns the kernel in which this event was thrown.
      *
      * @return HttpKernelInterface
+     *
+     * @since v2.1.0
      */
     public function getKernel()
     {
@@ -54,6 +61,8 @@ class PostResponseEvent extends Event
      * Returns the request for which this event was thrown.
      *
      * @return Request
+     *
+     * @since v2.1.0
      */
     public function getRequest()
     {
@@ -64,6 +73,8 @@ class PostResponseEvent extends Event
      * Returns the response for which this event was thrown.
      *
      * @return Response
+     *
+     * @since v2.1.0
      */
     public function getResponse()
     {

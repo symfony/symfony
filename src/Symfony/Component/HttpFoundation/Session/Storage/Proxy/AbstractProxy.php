@@ -15,6 +15,8 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Proxy;
  * AbstractProxy.
  *
  * @author Drak <drak@zikula.org>
+ *
+ * @since v2.1.0
  */
 abstract class AbstractProxy
 {
@@ -39,6 +41,8 @@ abstract class AbstractProxy
      * Gets the session.save_handler name.
      *
      * @return string
+     *
+     * @since v2.1.0
      */
     public function getSaveHandlerName()
     {
@@ -49,6 +53,8 @@ abstract class AbstractProxy
      * Is this proxy handler and instance of \SessionHandlerInterface.
      *
      * @return boolean
+     *
+     * @since v2.1.0
      */
     public function isSessionHandlerInterface()
     {
@@ -59,6 +65,8 @@ abstract class AbstractProxy
      * Returns true if this handler wraps an internal PHP session save handler using \SessionHandler.
      *
      * @return Boolean
+     *
+     * @since v2.1.0
      */
     public function isWrapper()
     {
@@ -69,6 +77,8 @@ abstract class AbstractProxy
      * Has a session started?
      *
      * @return Boolean
+     *
+     * @since v2.1.0
      */
     public function isActive()
     {
@@ -90,6 +100,8 @@ abstract class AbstractProxy
      * @param Boolean $flag
      *
      * @throws \LogicException
+     *
+     * @since v2.1.0
      */
     public function setActive($flag)
     {
@@ -104,6 +116,8 @@ abstract class AbstractProxy
      * Gets the session ID.
      *
      * @return string
+     *
+     * @since v2.1.0
      */
     public function getId()
     {
@@ -116,6 +130,8 @@ abstract class AbstractProxy
      * @param string $id
      *
      * @throws \LogicException
+     *
+     * @since v2.1.0
      */
     public function setId($id)
     {
@@ -130,6 +146,8 @@ abstract class AbstractProxy
      * Gets the session name.
      *
      * @return string
+     *
+     * @since v2.1.0
      */
     public function getName()
     {
@@ -142,6 +160,8 @@ abstract class AbstractProxy
      * @param string $name
      *
      * @throws \LogicException
+     *
+     * @since v2.1.0
      */
     public function setName($name)
     {

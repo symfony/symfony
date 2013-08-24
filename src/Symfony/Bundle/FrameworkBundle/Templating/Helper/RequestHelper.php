@@ -18,6 +18,8 @@ use Symfony\Component\HttpFoundation\Request;
  * RequestHelper provides access to the current request parameters.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class RequestHelper extends Helper
 {
@@ -27,6 +29,8 @@ class RequestHelper extends Helper
      * Constructor.
      *
      * @param Request $request A Request instance
+     *
+     * @since v2.0.0
      */
     public function __construct(Request $request)
     {
@@ -42,6 +46,8 @@ class RequestHelper extends Helper
      * @return mixed
      *
      * @see Symfony\Component\HttpFoundation\Request::get()
+     *
+     * @since v2.0.0
      */
     public function getParameter($key, $default = null)
     {
@@ -52,6 +58,8 @@ class RequestHelper extends Helper
      * Returns the locale
      *
      * @return string
+     *
+     * @since v2.1.0
      */
     public function getLocale()
     {
@@ -62,6 +70,8 @@ class RequestHelper extends Helper
      * Returns the canonical name of this helper.
      *
      * @return string The canonical name
+     *
+     * @since v2.0.0
      */
     public function getName()
     {

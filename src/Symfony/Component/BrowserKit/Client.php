@@ -27,6 +27,8 @@ use Symfony\Component\Process\PhpProcess;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 abstract class Client
 {
@@ -54,6 +56,8 @@ abstract class Client
      * @param CookieJar $cookieJar A CookieJar instance to store the cookies
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function __construct(array $server = array(), History $history = null, CookieJar $cookieJar = null)
     {
@@ -73,6 +77,8 @@ abstract class Client
      * @param Boolean $followRedirect Whether to follow redirects
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function followRedirects($followRedirect = true)
     {
@@ -83,6 +89,8 @@ abstract class Client
      * Sets the maximum number of requests that crawler can follow.
      *
      * @param integer $maxRedirects
+     *
+     * @since v2.3.0
      */
     public function setMaxRedirects($maxRedirects)
     {
@@ -98,6 +106,8 @@ abstract class Client
      * @throws \RuntimeException When Symfony Process Component is not installed
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function insulate($insulated = true)
     {
@@ -116,6 +126,8 @@ abstract class Client
      * @param array $server An array of server parameters
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setServerParameters(array $server)
     {
@@ -130,6 +142,8 @@ abstract class Client
      *
      * @param string $key   A key of the parameter
      * @param string $value A value of the parameter
+     *
+     * @since v2.0.0
      */
     public function setServerParameter($key, $value)
     {
@@ -143,6 +157,8 @@ abstract class Client
      * @param string $default A default value when key is undefined
      *
      * @return string A value of the parameter
+     *
+     * @since v2.0.0
      */
     public function getServerParameter($key, $default = '')
     {
@@ -155,6 +171,8 @@ abstract class Client
      * @return History A History instance
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getHistory()
     {
@@ -167,6 +185,8 @@ abstract class Client
      * @return CookieJar A CookieJar instance
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getCookieJar()
     {
@@ -179,6 +199,8 @@ abstract class Client
      * @return Crawler|null A Crawler instance
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getCrawler()
     {
@@ -191,6 +213,8 @@ abstract class Client
      * @return Response|null A BrowserKit Response instance
      *
      * @api
+     *
+     * @since v2.3.0
      */
     public function getInternalResponse()
     {
@@ -208,6 +232,8 @@ abstract class Client
      * @see doRequest
      *
      * @api
+     *
+     * @since v2.3.0
      */
     public function getResponse()
     {
@@ -220,6 +246,8 @@ abstract class Client
      * @return Request|null A BrowserKit Request instance
      *
      * @api
+     *
+     * @since v2.3.0
      */
     public function getInternalRequest()
     {
@@ -237,6 +265,8 @@ abstract class Client
      * @see doRequest
      *
      * @api
+     *
+     * @since v2.3.0
      */
     public function getRequest()
     {
@@ -251,6 +281,8 @@ abstract class Client
      * @return Crawler
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function click(Link $link)
     {
@@ -270,6 +302,8 @@ abstract class Client
      * @return Crawler
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function submit(Form $form, array $values = array())
     {
@@ -292,6 +326,8 @@ abstract class Client
      * @return Crawler
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function request($method, $uri, array $parameters = array(), array $files = array(), array $server = array(), $content = null, $changeHistory = true)
     {
@@ -351,6 +387,8 @@ abstract class Client
      * @return object An origin response instance
      *
      * @throws \RuntimeException When processing returns exit code
+     *
+     * @since v2.0.0
      */
     protected function doRequestInProcess($request)
     {
@@ -371,6 +409,8 @@ abstract class Client
      * @param object $request An origin request instance
      *
      * @return object An origin response instance
+     *
+     * @since v2.0.0
      */
     abstract protected function doRequest($request);
 
@@ -380,6 +420,8 @@ abstract class Client
      * @param object $request An origin request instance
      *
      * @throws \LogicException When this abstract class is not implemented
+     *
+     * @since v2.0.0
      */
     protected function getScript($request)
     {
@@ -394,6 +436,8 @@ abstract class Client
      * @param Request $request The BrowserKit Request to filter
      *
      * @return object An origin request instance
+     *
+     * @since v2.0.0
      */
     protected function filterRequest(Request $request)
     {
@@ -406,6 +450,8 @@ abstract class Client
      * @param object $response The origin response to filter
      *
      * @return Response An BrowserKit Response instance
+     *
+     * @since v2.0.0
      */
     protected function filterResponse($response)
     {
@@ -422,6 +468,8 @@ abstract class Client
      * @param string $type    Content type
      *
      * @return Crawler|null
+     *
+     * @since v2.0.0
      */
     protected function createCrawlerFromContent($uri, $content, $type)
     {
@@ -441,6 +489,8 @@ abstract class Client
      * @return Crawler
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function back()
     {
@@ -453,6 +503,8 @@ abstract class Client
      * @return Crawler
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function forward()
     {
@@ -465,6 +517,8 @@ abstract class Client
      * @return Crawler
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function reload()
     {
@@ -479,6 +533,8 @@ abstract class Client
      * @throws \LogicException If request was not a redirect
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function followRedirect()
     {
@@ -507,6 +563,8 @@ abstract class Client
      * It flushes history and all cookies.
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function restart()
     {
@@ -520,6 +578,8 @@ abstract class Client
      * @param string $uri A uri
      *
      * @return string An absolute uri
+     *
+     * @since v2.0.0
      */
     protected function getAbsoluteUri($uri)
     {
@@ -562,6 +622,8 @@ abstract class Client
      * @param Boolean $changeHistory Whether to update the history or not (only used internally for back(), forward(), and reload())
      *
      * @return Crawler
+     *
+     * @since v2.0.0
      */
     protected function requestFromRequest(Request $request, $changeHistory = true)
     {

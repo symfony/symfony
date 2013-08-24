@@ -17,6 +17,8 @@ use Symfony\Component\Finder\Adapter\AdapterInterface;
  * Base exception for all adapter failures.
  *
  * @author Jean-François Simon <contact@jfsimon.fr>
+ *
+ * @since v2.2.0
  */
 class AdapterFailureException extends \RuntimeException implements ExceptionInterface
 {
@@ -29,6 +31,8 @@ class AdapterFailureException extends \RuntimeException implements ExceptionInte
      * @param AdapterInterface $adapter
      * @param string|null      $message
      * @param \Exception|null  $previous
+     *
+     * @since v2.2.0
      */
     public function __construct(AdapterInterface $adapter, $message = null, \Exception $previous = null)
     {
@@ -38,6 +42,8 @@ class AdapterFailureException extends \RuntimeException implements ExceptionInte
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     public function getAdapter()
     {

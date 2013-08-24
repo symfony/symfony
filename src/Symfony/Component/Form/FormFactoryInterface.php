@@ -28,6 +28,8 @@ interface FormFactoryInterface
      * @return FormInterface The form named after the type
      *
      * @throws \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException if any given option is not applicable to the given type
+     *
+     * @since v2.3.0
      */
     public function create($type = 'form', $data = null, array $options = array());
 
@@ -44,6 +46,8 @@ interface FormFactoryInterface
      * @return FormInterface The form
      *
      * @throws \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException if any given option is not applicable to the given type
+     *
+     * @since v2.3.0
      */
     public function createNamed($name, $type = 'form', $data = null, array $options = array());
 
@@ -60,6 +64,8 @@ interface FormFactoryInterface
      * @return FormInterface The form named after the property
      *
      * @throws \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException if any given option is not applicable to the form type
+     *
+     * @since v2.3.0
      */
     public function createForProperty($class, $property, $data = null, array $options = array());
 
@@ -73,6 +79,8 @@ interface FormFactoryInterface
      * @return FormBuilderInterface The form builder
      *
      * @throws \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException if any given option is not applicable to the given type
+     *
+     * @since v2.3.0
      */
     public function createBuilder($type = 'form', $data = null, array $options = array());
 
@@ -87,6 +95,8 @@ interface FormFactoryInterface
      * @return FormBuilderInterface The form builder
      *
      * @throws \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException if any given option is not applicable to the given type
+     *
+     * @since v2.3.0
      */
     public function createNamedBuilder($name, $type = 'form', $data = null, array $options = array());
 
@@ -104,6 +114,8 @@ interface FormFactoryInterface
      * @return FormBuilderInterface The form builder named after the property
      *
      * @throws \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException if any given option is not applicable to the form type
+     *
+     * @since v2.3.0
      */
     public function createBuilderForProperty($class, $property, $data = null, array $options = array());
 }

@@ -25,6 +25,8 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
  * for a UsernamePasswordToken.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class DaoAuthenticationProvider extends UserAuthenticationProvider
 {
@@ -39,6 +41,8 @@ class DaoAuthenticationProvider extends UserAuthenticationProvider
      * @param string                  $providerKey                The provider key
      * @param EncoderFactoryInterface $encoderFactory             An EncoderFactoryInterface instance
      * @param Boolean                 $hideUserNotFoundExceptions Whether to hide user not found exception or not
+     *
+     * @since v2.0.0
      */
     public function __construct(UserProviderInterface $userProvider, UserCheckerInterface $userChecker, $providerKey, EncoderFactoryInterface $encoderFactory, $hideUserNotFoundExceptions = true)
     {
@@ -50,6 +54,8 @@ class DaoAuthenticationProvider extends UserAuthenticationProvider
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     protected function checkAuthentication(UserInterface $user, UsernamePasswordToken $token)
     {
@@ -71,6 +77,8 @@ class DaoAuthenticationProvider extends UserAuthenticationProvider
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     protected function retrieveUser($username, UsernamePasswordToken $token)
     {

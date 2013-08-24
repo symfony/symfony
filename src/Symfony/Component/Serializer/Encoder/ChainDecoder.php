@@ -20,12 +20,17 @@ use Symfony\Component\Serializer\Exception\RuntimeException;
  * @author Jordi Boggiano <j.boggiano@seld.be>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  * @author Lukas Kahwe Smith <smith@pooteeweet.org>
+ *
+ * @since v2.1.0
  */
 class ChainDecoder implements DecoderInterface
 {
     protected $decoders = array();
     protected $decoderByFormat = array();
 
+    /**
+     * @since v2.1.0
+     */
     public function __construct(array $decoders = array())
     {
         $this->decoders = $decoders;
@@ -33,6 +38,8 @@ class ChainDecoder implements DecoderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     final public function decode($data, $format, array $context = array())
     {
@@ -41,6 +48,8 @@ class ChainDecoder implements DecoderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function supportsDecoding($format)
     {
@@ -60,6 +69,8 @@ class ChainDecoder implements DecoderInterface
      *
      * @return DecoderInterface
      * @throws RuntimeException if no decoder is found
+     *
+     * @since v2.1.0
      */
     private function getDecoder($format)
     {

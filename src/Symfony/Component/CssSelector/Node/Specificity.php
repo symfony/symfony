@@ -20,6 +20,8 @@ namespace Symfony\Component\CssSelector\Node;
  * @see http://www.w3.org/TR/selectors/#specificity
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @since v2.3.0
  */
 class Specificity
 {
@@ -48,6 +50,8 @@ class Specificity
      * @param int $a
      * @param int $b
      * @param int $c
+     *
+     * @since v2.3.0
      */
     public function __construct($a, $b, $c)
     {
@@ -60,6 +64,8 @@ class Specificity
      * @param Specificity $specificity
      *
      * @return Specificity
+     *
+     * @since v2.3.0
      */
     public function plus(Specificity $specificity)
     {
@@ -70,6 +76,8 @@ class Specificity
      * Returns global specificity value.
      *
      * @return int
+     *
+     * @since v2.3.0
      */
     public function getValue()
     {

@@ -25,6 +25,8 @@ use Symfony\Component\Process\PhpExecutableFinder;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Martin Hasoň <martin.hason@gmail.com>
+ *
+ * @since v2.0.0
  */
 class Shell
 {
@@ -41,6 +43,8 @@ class Shell
      * a \RuntimeException exception is thrown.
      *
      * @param Application $application An application instance
+     *
+     * @since v2.0.0
      */
     public function __construct(Application $application)
     {
@@ -53,6 +57,8 @@ class Shell
 
     /**
      * Runs the shell.
+     *
+     * @since v2.0.0
      */
     public function run()
     {
@@ -124,6 +130,8 @@ EOF
      * Returns the shell header.
      *
      * @return string The header string
+     *
+     * @since v2.1.0
      */
     protected function getHeader()
     {
@@ -143,6 +151,8 @@ EOF;
      * Renders a prompt.
      *
      * @return string The prompt
+     *
+     * @since v2.3.0
      */
     protected function getPrompt()
     {
@@ -150,11 +160,17 @@ EOF;
         return $this->output->getFormatter()->format($this->application->getName().' > ');
     }
 
+    /**
+     * @since v2.3.0
+     */
     protected function getOutput()
     {
         return $this->output;
     }
 
+    /**
+     * @since v2.3.0
+     */
     protected function getApplication()
     {
         return $this->application;
@@ -166,6 +182,8 @@ EOF;
      * @param string $text The last segment of the entered text
      *
      * @return Boolean|array A list of guessed strings or true
+     *
+     * @since v2.1.0
      */
     private function autocompleter($text)
     {
@@ -200,6 +218,8 @@ EOF;
      * Reads a single line from standard input.
      *
      * @return string The single line from standard input
+     *
+     * @since v2.1.0
      */
     private function readline()
     {
@@ -214,11 +234,17 @@ EOF;
         return $line;
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function getProcessIsolation()
     {
         return $this->processIsolation;
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function setProcessIsolation($processIsolation)
     {
         $this->processIsolation = (Boolean) $processIsolation;

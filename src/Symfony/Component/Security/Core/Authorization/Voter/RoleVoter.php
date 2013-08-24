@@ -17,6 +17,8 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  * RoleVoter votes if any attribute starts with a given prefix.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class RoleVoter implements VoterInterface
 {
@@ -26,6 +28,8 @@ class RoleVoter implements VoterInterface
      * Constructor.
      *
      * @param string $prefix The role prefix
+     *
+     * @since v2.0.0
      */
     public function __construct($prefix = 'ROLE_')
     {
@@ -34,6 +38,8 @@ class RoleVoter implements VoterInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function supportsAttribute($attribute)
     {
@@ -42,6 +48,8 @@ class RoleVoter implements VoterInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function supportsClass($class)
     {
@@ -50,6 +58,8 @@ class RoleVoter implements VoterInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function vote(TokenInterface $token, $object, array $attributes)
     {
@@ -72,6 +82,9 @@ class RoleVoter implements VoterInterface
         return $result;
     }
 
+    /**
+     * @since v2.0.0
+     */
     protected function extractRoles(TokenInterface $token)
     {
         return $token->getRoles();

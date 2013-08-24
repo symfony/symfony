@@ -28,6 +28,8 @@ interface ConfigurationExtensionInterface
      * @param ContainerBuilder $container A ContainerBuilder instance
      *
      * @return ConfigurationInterface|null The configuration or null
+     *
+     * @since v2.1.0
      */
     public function getConfiguration(array $config, ContainerBuilder $container);
 }

@@ -17,6 +17,8 @@ use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.1.0
  */
 class ChoiceToValueTransformer implements DataTransformerInterface
 {
@@ -26,17 +28,25 @@ class ChoiceToValueTransformer implements DataTransformerInterface
      * Constructor.
      *
      * @param ChoiceListInterface $choiceList
+     *
+     * @since v2.1.0
      */
     public function __construct(ChoiceListInterface $choiceList)
     {
         $this->choiceList = $choiceList;
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function transform($choice)
     {
         return (string) current($this->choiceList->getValuesForChoices(array($choice)));
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function reverseTransform($value)
     {
         if (null !== $value && !is_scalar($value)) {

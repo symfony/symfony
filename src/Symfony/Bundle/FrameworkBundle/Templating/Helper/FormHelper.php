@@ -20,6 +20,8 @@ use Symfony\Component\Form\FormView;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.0.0
  */
 class FormHelper extends Helper
 {
@@ -30,6 +32,8 @@ class FormHelper extends Helper
 
     /**
      * @param FormRendererInterface $renderer
+     *
+     * @since v2.1.0
      */
     public function __construct(FormRendererInterface $renderer)
     {
@@ -38,6 +42,8 @@ class FormHelper extends Helper
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getName()
     {
@@ -51,6 +57,8 @@ class FormHelper extends Helper
      *
      * @param FormView     $view   A FormView instance
      * @param string|array $themes A theme or an array of theme
+     *
+     * @since v2.1.0
      */
     public function setTheme(FormView $view, $themes)
     {
@@ -80,6 +88,8 @@ class FormHelper extends Helper
      * @param array    $variables Additional variables passed to the template
      *
      * @return string The HTML markup
+     *
+     * @since v2.3.0
      */
     public function form(FormView $view, array $variables = array())
     {
@@ -97,6 +107,8 @@ class FormHelper extends Helper
      * @param array    $variables Additional variables passed to the template
      *
      * @return string The HTML markup
+     *
+     * @since v2.3.0
      */
     public function start(FormView $view, array $variables = array())
     {
@@ -114,6 +126,8 @@ class FormHelper extends Helper
      * @param array    $variables Additional variables passed to the template
      *
      * @return string The HTML markup
+     *
+     * @since v2.3.0
      */
     public function end(FormView $view, array $variables = array())
     {
@@ -133,6 +147,8 @@ class FormHelper extends Helper
      *
      * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
      *             {@link start} instead.
+     *
+     * @since v2.1.0
      */
     public function enctype(FormView $view)
     {
@@ -158,6 +174,8 @@ class FormHelper extends Helper
      * @param array    $variables Additional variables passed to the template
      *
      * @return string The HTML markup
+     *
+     * @since v2.1.0
      */
     public function widget(FormView $view, array $variables = array())
     {
@@ -171,6 +189,8 @@ class FormHelper extends Helper
      * @param array    $variables Additional variables passed to the template
      *
      * @return string The HTML markup
+     *
+     * @since v2.1.0
      */
     public function row(FormView $view, array $variables = array())
     {
@@ -185,6 +205,8 @@ class FormHelper extends Helper
      * @param array    $variables Additional variables passed to the template
      *
      * @return string The HTML markup
+     *
+     * @since v2.1.0
      */
     public function label(FormView $view, $label = null, array $variables = array())
     {
@@ -201,6 +223,8 @@ class FormHelper extends Helper
      * @param FormView $view The view to render the errors for
      *
      * @return string The HTML markup
+     *
+     * @since v2.1.0
      */
     public function errors(FormView $view)
     {
@@ -214,6 +238,8 @@ class FormHelper extends Helper
      * @param array    $variables An array of variables
      *
      * @return string The HTML markup
+     *
+     * @since v2.1.0
      */
     public function rest(FormView $view, array $variables = array())
     {
@@ -228,6 +254,8 @@ class FormHelper extends Helper
      * @param array    $variables The variable to pass to the template.
      *
      * @return string The HTML markup
+     *
+     * @since v2.1.0
      */
     public function block(FormView $view, $blockName, array $variables = array())
     {
@@ -258,12 +286,17 @@ class FormHelper extends Helper
      * @return string A CSRF token
      *
      * @throws \BadMethodCallException When no CSRF provider was injected in the constructor.
+     *
+     * @since v2.1.0
      */
     public function csrfToken($intention)
     {
         return $this->renderer->renderCsrfToken($intention);
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function humanize($text)
     {
         return $this->renderer->humanize($text);

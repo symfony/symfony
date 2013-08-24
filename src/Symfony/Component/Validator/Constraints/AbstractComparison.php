@@ -18,6 +18,8 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
  * Used for the comparison of values.
  *
  * @author Daniel Holmes <daniel@danielholmes.org>
+ *
+ * @since v2.3.0
  */
 abstract class AbstractComparison extends Constraint
 {
@@ -26,6 +28,8 @@ abstract class AbstractComparison extends Constraint
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.3.0
      */
     public function __construct($options = null)
     {
@@ -41,6 +45,8 @@ abstract class AbstractComparison extends Constraint
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.3.0
      */
     public function getDefaultOption()
     {

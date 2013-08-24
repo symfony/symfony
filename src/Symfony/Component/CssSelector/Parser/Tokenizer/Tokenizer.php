@@ -23,6 +23,8 @@ use Symfony\Component\CssSelector\Parser\TokenStream;
  * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @since v2.3.0
  */
 class Tokenizer
 {
@@ -33,6 +35,8 @@ class Tokenizer
 
     /**
      * Constructor.
+     *
+     * @since v2.3.0
      */
     public function __construct()
     {
@@ -55,6 +59,8 @@ class Tokenizer
      * @param Reader $reader
      *
      * @return TokenStream
+     *
+     * @since v2.3.0
      */
     public function tokenize(Reader $reader)
     {

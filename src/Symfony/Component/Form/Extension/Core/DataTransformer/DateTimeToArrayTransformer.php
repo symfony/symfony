@@ -19,6 +19,8 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Florian Eckerstorfer <florian@eckerstorfer.org>
+ *
+ * @since v2.0.0
  */
 class DateTimeToArrayTransformer extends BaseDateTimeTransformer
 {
@@ -35,6 +37,8 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
      * @param Boolean $pad            Whether to use padding
      *
      * @throws UnexpectedTypeException if a timezone is not a string
+     *
+     * @since v2.0.0
      */
     public function __construct($inputTimezone = null, $outputTimezone = null, array $fields = null, $pad = false)
     {
@@ -58,6 +62,8 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
      * @throws TransformationFailedException If the given value is not an
      *                                       instance of \DateTime or if the
      *                                       output timezone is not supported.
+     *
+     * @since v2.0.0
      */
     public function transform($dateTime)
     {
@@ -115,6 +121,8 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
      *                                       if the value could not be transformed
      *                                       or if the input timezone is not
      *                                       supported.
+     *
+     * @since v2.0.0
      */
     public function reverseTransform($value)
     {

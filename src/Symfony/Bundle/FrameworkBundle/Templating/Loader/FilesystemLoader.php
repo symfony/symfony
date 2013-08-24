@@ -20,6 +20,8 @@ use Symfony\Component\Templating\TemplateReferenceInterface;
  * FilesystemLoader is a loader that read templates from the filesystem.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class FilesystemLoader implements LoaderInterface
 {
@@ -29,6 +31,8 @@ class FilesystemLoader implements LoaderInterface
      * Constructor.
      *
      * @param FileLocatorInterface $locator A FileLocatorInterface instance
+     *
+     * @since v2.0.0
      */
     public function __construct(FileLocatorInterface $locator)
     {
@@ -41,6 +45,8 @@ class FilesystemLoader implements LoaderInterface
      * @param TemplateReferenceInterface $template A template
      *
      * @return FileStorage|Boolean false if the template cannot be loaded, a Storage instance otherwise
+     *
+     * @since v2.0.0
      */
     public function load(TemplateReferenceInterface $template)
     {
@@ -60,6 +66,8 @@ class FilesystemLoader implements LoaderInterface
      * @param integer                    $time     The last modification time of the cached template (timestamp)
      *
      * @return Boolean
+     *
+     * @since v2.0.0
      */
     public function isFresh(TemplateReferenceInterface $template, $time)
     {

@@ -29,6 +29,8 @@ use Symfony\Component\HttpFoundation\Request;
  * Initializes the context from the request and sets request attributes based on a matching route.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.1.0
  */
 class RouterListener implements EventSubscriberInterface
 {
@@ -45,6 +47,8 @@ class RouterListener implements EventSubscriberInterface
      * @param LoggerInterface|null                        $logger  The logger
      *
      * @throws \InvalidArgumentException
+     *
+     * @since v2.1.0
      */
     public function __construct($matcher, RequestContext $context = null, LoggerInterface $logger = null)
     {
@@ -70,6 +74,8 @@ class RouterListener implements EventSubscriberInterface
      * nested).
      *
      * @param Request|null $request A Request instance
+     *
+     * @since v2.3.0
      */
     public function setRequest(Request $request = null)
     {
@@ -79,6 +85,9 @@ class RouterListener implements EventSubscriberInterface
         $this->request = $request;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function onKernelRequest(GetResponseEvent $event)
     {
         $request = $event->getRequest();
@@ -125,6 +134,9 @@ class RouterListener implements EventSubscriberInterface
         }
     }
 
+    /**
+     * @since v2.0.0
+     */
     private function parametersToString(array $parameters)
     {
         $pieces = array();
@@ -135,6 +147,9 @@ class RouterListener implements EventSubscriberInterface
         return implode(', ', $pieces);
     }
 
+    /**
+     * @since v2.1.0
+     */
     public static function getSubscribedEvents()
     {
         return array(

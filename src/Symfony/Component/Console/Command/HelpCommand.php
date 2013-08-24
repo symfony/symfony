@@ -21,6 +21,8 @@ use Symfony\Component\Console\Output\OutputInterface;
  * HelpCommand displays the help for a given command.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class HelpCommand extends Command
 {
@@ -28,6 +30,8 @@ class HelpCommand extends Command
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     protected function configure()
     {
@@ -61,6 +65,8 @@ EOF
      * Sets the command
      *
      * @param Command $command The command to set
+     *
+     * @since v2.0.0
      */
     public function setCommand(Command $command)
     {
@@ -69,6 +75,8 @@ EOF
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {

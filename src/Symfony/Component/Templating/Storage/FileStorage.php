@@ -17,6 +17,8 @@ namespace Symfony\Component\Templating\Storage;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class FileStorage extends Storage
 {
@@ -26,6 +28,8 @@ class FileStorage extends Storage
      * @return string The template content
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getContent()
     {

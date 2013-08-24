@@ -31,6 +31,8 @@ interface DecoderInterface
      * phpdoc comment.
      *
      * @return mixed
+     *
+     * @since v2.2.0
      */
     public function decode($data, $format, array $context = array());
 
@@ -40,6 +42,8 @@ interface DecoderInterface
      * @param string $format format name
      *
      * @return Boolean
+     *
+     * @since v2.1.0
      */
     public function supportsDecoding($format);
 }

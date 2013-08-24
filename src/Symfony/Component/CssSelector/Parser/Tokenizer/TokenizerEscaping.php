@@ -18,6 +18,8 @@ namespace Symfony\Component\CssSelector\Parser\Tokenizer;
  * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @since v2.3.0
  */
 class TokenizerEscaping
 {
@@ -28,6 +30,8 @@ class TokenizerEscaping
 
     /**
      * @param TokenizerPatterns $patterns
+     *
+     * @since v2.3.0
      */
     public function __construct(TokenizerPatterns $patterns)
     {
@@ -38,6 +42,8 @@ class TokenizerEscaping
      * @param string $value
      *
      * @return string
+     *
+     * @since v2.3.0
      */
     public function escapeUnicode($value)
     {
@@ -50,6 +56,8 @@ class TokenizerEscaping
      * @param string $value
      *
      * @return string
+     *
+     * @since v2.3.0
      */
     public function escapeUnicodeAndNewLine($value)
     {
@@ -62,6 +70,8 @@ class TokenizerEscaping
      * @param string $value
      *
      * @return string
+     *
+     * @since v2.3.0
      */
     private function replaceUnicodeSequences($value)
     {

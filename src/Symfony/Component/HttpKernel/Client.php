@@ -28,6 +28,8 @@ use Symfony\Component\HttpKernel\TerminableInterface;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class Client extends BaseClient
 {
@@ -40,6 +42,8 @@ class Client extends BaseClient
      * @param array               $server    The server parameters (equivalent of $_SERVER)
      * @param History             $history   A History instance to store the browser history
      * @param CookieJar           $cookieJar A CookieJar instance to store the cookies
+     *
+     * @since v2.0.0
      */
     public function __construct(HttpKernelInterface $kernel, array $server = array(), History $history = null, CookieJar $cookieJar = null)
     {
@@ -54,6 +58,8 @@ class Client extends BaseClient
      * {@inheritdoc}
      *
      * @return Request|null A Request instance
+     *
+     * @since v2.3.0
      */
     public function getRequest()
     {
@@ -64,6 +70,8 @@ class Client extends BaseClient
      * {@inheritdoc}
      *
      * @return Response|null A Response instance
+     *
+     * @since v2.3.0
      */
     public function getResponse()
     {
@@ -76,6 +84,8 @@ class Client extends BaseClient
      * @param Request $request A Request instance
      *
      * @return Response A Response instance
+     *
+     * @since v2.0.0
      */
     protected function doRequest($request)
     {
@@ -94,6 +104,8 @@ class Client extends BaseClient
      * @param Request $request A Request instance
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     protected function getScript($request)
     {
@@ -124,6 +136,8 @@ EOF;
      * @param DomRequest $request A DomRequest instance
      *
      * @return Request A Request instance
+     *
+     * @since v2.0.0
      */
     protected function filterRequest(DomRequest $request)
     {
@@ -148,6 +162,8 @@ EOF;
      * @param array $files An array of files
      *
      * @return array An array with all uploaded files marked as already moved
+     *
+     * @since v2.0.0
      */
     protected function filterFiles(array $files)
     {
@@ -189,6 +205,8 @@ EOF;
      * @param Response $response A Response instance
      *
      * @return DomResponse A DomResponse instance
+     *
+     * @since v2.0.0
      */
     protected function filterResponse($response)
     {

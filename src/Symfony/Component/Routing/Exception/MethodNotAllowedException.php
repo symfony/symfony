@@ -19,6 +19,8 @@ namespace Symfony\Component\Routing\Exception;
  * @author Kris Wallsmith <kris@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class MethodNotAllowedException extends \RuntimeException implements ExceptionInterface
 {
@@ -27,6 +29,9 @@ class MethodNotAllowedException extends \RuntimeException implements ExceptionIn
      */
     protected $allowedMethods = array();
 
+    /**
+     * @since v2.0.0
+     */
     public function __construct(array $allowedMethods, $message = null, $code = 0, \Exception $previous = null)
     {
         $this->allowedMethods = array_map('strtoupper', $allowedMethods);
@@ -38,6 +43,8 @@ class MethodNotAllowedException extends \RuntimeException implements ExceptionIn
      * Gets the allowed HTTP methods.
      *
      * @return array
+     *
+     * @since v2.0.0
      */
     public function getAllowedMethods()
     {

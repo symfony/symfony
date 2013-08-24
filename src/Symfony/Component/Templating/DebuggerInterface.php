@@ -23,6 +23,8 @@ interface DebuggerInterface
      * Logs a message.
      *
      * @param string $message A message to log
+     *
+     * @since v2.1.0
      */
     public function log($message);
 }

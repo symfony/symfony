@@ -26,6 +26,8 @@ interface MetadataFactoryInterface
      * @return MetadataInterface The metadata for the value.
      *
      * @throws Exception\NoSuchMetadataException If no metadata exists for the value.
+     *
+     * @since v2.2.0
      */
     public function getMetadataFor($value);
 
@@ -35,6 +37,8 @@ interface MetadataFactoryInterface
      * @param mixed $value Some value.
      *
      * @return Boolean Whether metadata exists for the value.
+     *
+     * @since v2.2.0
      */
     public function hasMetadataFor($value);
 }

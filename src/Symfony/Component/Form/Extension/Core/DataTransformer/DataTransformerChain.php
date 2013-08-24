@@ -18,6 +18,8 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  * Passes a value through multiple value transformers
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.0.0
  */
 class DataTransformerChain implements DataTransformerInterface
 {
@@ -31,6 +33,8 @@ class DataTransformerChain implements DataTransformerInterface
      * Uses the given value transformers to transform values
      *
      * @param array $transformers
+     *
+     * @since v2.0.0
      */
     public function __construct(array $transformers)
     {
@@ -50,6 +54,8 @@ class DataTransformerChain implements DataTransformerInterface
      * @return mixed The transformed value
      *
      * @throws TransformationFailedException
+     *
+     * @since v2.0.0
      */
     public function transform($value)
     {
@@ -74,6 +80,8 @@ class DataTransformerChain implements DataTransformerInterface
      * @return mixed The reverse-transformed value
      *
      * @throws TransformationFailedException
+     *
+     * @since v2.0.0
      */
     public function reverseTransform($value)
     {

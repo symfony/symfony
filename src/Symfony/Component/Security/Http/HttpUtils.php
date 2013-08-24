@@ -25,6 +25,8 @@ use Symfony\Component\Routing\Exception\ResourceNotFoundException;
  * Encapsulates the logic needed to create sub-requests, redirect the user, and match URLs.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class HttpUtils
 {
@@ -36,6 +38,8 @@ class HttpUtils
      *
      * @param UrlGeneratorInterface                       $urlGenerator A UrlGeneratorInterface instance
      * @param UrlMatcherInterface|RequestMatcherInterface $urlMatcher   The Url or Request matcher
+     *
+     * @since v2.1.10
      */
     public function __construct(UrlGeneratorInterface $urlGenerator = null, $urlMatcher = null)
     {
@@ -54,6 +58,8 @@ class HttpUtils
      * @param integer $status  The status code
      *
      * @return Response A RedirectResponse instance
+     *
+     * @since v2.0.0
      */
     public function createRedirectResponse(Request $request, $path, $status = 302)
     {
@@ -67,6 +73,8 @@ class HttpUtils
      * @param string  $path    A path (an absolute path (/foo), an absolute URL (http://...), or a route name (foo))
      *
      * @return Request A Request instance
+     *
+     * @since v2.0.0
      */
     public function createRequest(Request $request, $path)
     {
@@ -95,6 +103,8 @@ class HttpUtils
      * @param string  $path    A path (an absolute path (/foo), an absolute URL (http://...), or a route name (foo))
      *
      * @return Boolean true if the path is the same as the one from the Request, false otherwise
+     *
+     * @since v2.0.0
      */
     public function checkRequestPath(Request $request, $path)
     {
@@ -125,6 +135,8 @@ class HttpUtils
      * @param string $path A path (an absolute path (/foo), an absolute URL (http://...), or a route name (foo))
      *
      * @return string An absolute URL
+     *
+     * @since v2.1.0
      */
     public function generateUri($request, $path)
     {

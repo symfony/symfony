@@ -21,9 +21,14 @@ use Symfony\Component\DependencyInjection\Reference;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class FormLoginFactory extends AbstractFactory
 {
+    /**
+     * @since v2.0.0
+     */
     public function __construct()
     {
         $this->addOption('username_parameter', '_username');
@@ -33,16 +38,25 @@ class FormLoginFactory extends AbstractFactory
         $this->addOption('post_only', true);
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getPosition()
     {
         return 'form';
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getKey()
     {
         return 'form-login';
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function addConfiguration(NodeDefinition $node)
     {
         parent::addConfiguration($node);
@@ -54,11 +68,17 @@ class FormLoginFactory extends AbstractFactory
         ;
     }
 
+    /**
+     * @since v2.0.0
+     */
     protected function getListenerId()
     {
         return 'security.authentication.listener.form';
     }
 
+    /**
+     * @since v2.0.0
+     */
     protected function createAuthProvider(ContainerBuilder $container, $id, $config, $userProviderId)
     {
         $provider = 'security.authentication.provider.dao.'.$id;
@@ -71,6 +91,9 @@ class FormLoginFactory extends AbstractFactory
         return $provider;
     }
 
+    /**
+     * @since v2.0.0
+     */
     protected function createListener($container, $id, $config, $userProvider)
     {
         $listenerId = parent::createListener($container, $id, $config, $userProvider);
@@ -85,6 +108,9 @@ class FormLoginFactory extends AbstractFactory
         return $listenerId;
     }
 
+    /**
+     * @since v2.0.0
+     */
     protected function createEntryPoint($container, $id, $config, $defaultEntryPoint)
     {
         $entryPointId = 'security.authentication.form_entry_point.'.$id;

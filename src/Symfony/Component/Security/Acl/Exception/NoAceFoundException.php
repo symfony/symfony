@@ -16,9 +16,14 @@ namespace Symfony\Component\Security\Acl\Exception;
  * combination of permission masks and security identities.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class NoAceFoundException extends Exception
 {
+    /**
+     * @since v2.0.0
+     */
     public function __construct()
     {
         parent::__construct('No applicable ACE was found.');

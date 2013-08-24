@@ -21,6 +21,8 @@ use Symfony\Component\Filesystem\Filesystem;
  * thanks to an array of ResourceInterface instances.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class ConfigCache
 {
@@ -32,6 +34,8 @@ class ConfigCache
      *
      * @param string  $file  The absolute cache path
      * @param Boolean $debug Whether debugging is enabled or not
+     *
+     * @since v2.0.0
      */
     public function __construct($file, $debug)
     {
@@ -43,6 +47,8 @@ class ConfigCache
      * Gets the cache file path.
      *
      * @return string The cache file path
+     *
+     * @since v2.0.0
      */
     public function __toString()
     {
@@ -56,6 +62,8 @@ class ConfigCache
      * cache file exists.
      *
      * @return Boolean true if the cache is fresh, false otherwise
+     *
+     * @since v2.0.0
      */
     public function isFresh()
     {
@@ -90,6 +98,8 @@ class ConfigCache
      * @param ResourceInterface[] $metadata An array of ResourceInterface instances
      *
      * @throws \RuntimeException When cache file can't be wrote
+     *
+     * @since v2.0.0
      */
     public function write($content, array $metadata = null)
     {
@@ -106,6 +116,8 @@ class ConfigCache
      * Gets the meta file path.
      *
      * @return string The meta file path
+     *
+     * @since v2.3.0
      */
     private function getMetaFile()
     {

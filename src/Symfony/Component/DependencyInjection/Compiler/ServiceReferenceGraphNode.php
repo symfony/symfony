@@ -20,6 +20,8 @@ use Symfony\Component\DependencyInjection\Alias;
  * Value is typically a definition, or an alias.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class ServiceReferenceGraphNode
 {
@@ -33,6 +35,8 @@ class ServiceReferenceGraphNode
      *
      * @param string $id    The node identifier
      * @param mixed  $value The node value
+     *
+     * @since v2.0.0
      */
     public function __construct($id, $value)
     {
@@ -46,6 +50,8 @@ class ServiceReferenceGraphNode
      * Adds an in edge to this node.
      *
      * @param ServiceReferenceGraphEdge $edge
+     *
+     * @since v2.0.0
      */
     public function addInEdge(ServiceReferenceGraphEdge $edge)
     {
@@ -56,6 +62,8 @@ class ServiceReferenceGraphNode
      * Adds an out edge to this node.
      *
      * @param ServiceReferenceGraphEdge $edge
+     *
+     * @since v2.0.0
      */
     public function addOutEdge(ServiceReferenceGraphEdge $edge)
     {
@@ -66,6 +74,8 @@ class ServiceReferenceGraphNode
      * Checks if the value of this node is an Alias.
      *
      * @return Boolean True if the value is an Alias instance
+     *
+     * @since v2.0.0
      */
     public function isAlias()
     {
@@ -76,6 +86,8 @@ class ServiceReferenceGraphNode
      * Checks if the value of this node is a Definition.
      *
      * @return Boolean True if the value is a Definition instance
+     *
+     * @since v2.0.0
      */
     public function isDefinition()
     {
@@ -86,6 +98,8 @@ class ServiceReferenceGraphNode
      * Returns the identifier.
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     public function getId()
     {
@@ -96,6 +110,8 @@ class ServiceReferenceGraphNode
      * Returns the in edges.
      *
      * @return array The in ServiceReferenceGraphEdge array
+     *
+     * @since v2.0.0
      */
     public function getInEdges()
     {
@@ -106,6 +122,8 @@ class ServiceReferenceGraphNode
      * Returns the out edges.
      *
      * @return array The out ServiceReferenceGraphEdge array
+     *
+     * @since v2.0.0
      */
     public function getOutEdges()
     {
@@ -116,6 +134,8 @@ class ServiceReferenceGraphNode
      * Returns the value of this Node
      *
      * @return mixed The value
+     *
+     * @since v2.0.0
      */
     public function getValue()
     {

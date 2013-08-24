@@ -18,6 +18,8 @@ use Symfony\Component\Translation\MessageCatalogueInterface;
  * Base catalogues binary operation class.
  *
  * @author Jean-François Simon <contact@jfsimon.fr>
+ *
+ * @since v2.3.0
  */
 abstract class AbstractOperation implements OperationInterface
 {
@@ -51,6 +53,8 @@ abstract class AbstractOperation implements OperationInterface
      * @param MessageCatalogueInterface $target
      *
      * @throws \LogicException
+     *
+     * @since v2.3.0
      */
     public function __construct(MessageCatalogueInterface $source, MessageCatalogueInterface $target)
     {
@@ -67,6 +71,8 @@ abstract class AbstractOperation implements OperationInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getDomains()
     {
@@ -79,6 +85,8 @@ abstract class AbstractOperation implements OperationInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getMessages($domain)
     {
@@ -95,6 +103,8 @@ abstract class AbstractOperation implements OperationInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getNewMessages($domain)
     {
@@ -111,6 +121,8 @@ abstract class AbstractOperation implements OperationInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getObsoleteMessages($domain)
     {
@@ -127,6 +139,8 @@ abstract class AbstractOperation implements OperationInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getResult()
     {
@@ -141,6 +155,8 @@ abstract class AbstractOperation implements OperationInterface
 
     /**
      * @param string $domain
+     *
+     * @since v2.3.0
      */
     abstract protected function processDomain($domain);
 }

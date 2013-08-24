@@ -17,6 +17,8 @@ namespace Symfony\Component\HttpFoundation;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class RedirectResponse extends Response
 {
@@ -34,6 +36,8 @@ class RedirectResponse extends Response
      * @see http://tools.ietf.org/html/rfc2616#section-10.3
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function __construct($url, $status = 302, $headers = array())
     {
@@ -52,6 +56,8 @@ class RedirectResponse extends Response
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public static function create($url = '', $status = 302, $headers = array())
     {
@@ -62,6 +68,8 @@ class RedirectResponse extends Response
      * Returns the target URL.
      *
      * @return string target URL
+     *
+     * @since v2.1.0
      */
     public function getTargetUrl()
     {
@@ -76,6 +84,8 @@ class RedirectResponse extends Response
      * @return RedirectResponse The current response.
      *
      * @throws \InvalidArgumentException
+     *
+     * @since v2.1.0
      */
     public function setTargetUrl($url)
     {

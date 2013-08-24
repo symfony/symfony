@@ -15,6 +15,8 @@ namespace Symfony\Component\HttpKernel\Exception;
  * MethodNotAllowedHttpException.
  *
  * @author Kris Wallsmith <kris@symfony.com>
+ *
+ * @since v2.0.0
  */
 class MethodNotAllowedHttpException extends HttpException
 {
@@ -25,6 +27,8 @@ class MethodNotAllowedHttpException extends HttpException
      * @param string     $message  The internal exception message
      * @param \Exception $previous The previous exception
      * @param integer    $code     The internal exception code
+     *
+     * @since v2.0.0
      */
     public function __construct(array $allow, $message = null, \Exception $previous = null, $code = 0)
     {

@@ -17,11 +17,15 @@ use Symfony\Component\Translation\MessageCatalogue;
  * QtFileDumper generates ts files from a message catalogue.
  *
  * @author Benjamin Eberlei <kontakt@beberlei.de>
+ *
+ * @since v2.1.0
  */
 class QtFileDumper extends FileDumper
 {
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function format(MessageCatalogue $messages, $domain)
     {
@@ -42,6 +46,8 @@ class QtFileDumper extends FileDumper
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     protected function getExtension()
     {

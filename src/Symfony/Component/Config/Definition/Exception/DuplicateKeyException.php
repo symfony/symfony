@@ -16,6 +16,8 @@ namespace Symfony\Component\Config\Definition\Exception;
  * only be the case if the configuration is coming from an XML file.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class DuplicateKeyException extends InvalidConfigurationException
 {

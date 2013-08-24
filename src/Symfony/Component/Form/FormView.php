@@ -15,6 +15,8 @@ use Symfony\Component\Form\Exception\BadMethodCallException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.1.0
  */
 class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
 {
@@ -50,6 +52,9 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      */
     private $rendered = false;
 
+    /**
+     * @since v2.1.0
+     */
     public function __construct(FormView $parent = null)
     {
         $this->parent = $parent;
@@ -59,6 +64,8 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      * Returns whether the view was already rendered.
      *
      * @return Boolean Whether this view's widget is rendered.
+     *
+     * @since v2.0.0
      */
     public function isRendered()
     {
@@ -85,6 +92,8 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      * Marks the view as rendered.
      *
      * @return FormView The view object.
+     *
+     * @since v2.0.0
      */
     public function setRendered()
     {
@@ -99,6 +108,8 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      * @param string $name The child name
      *
      * @return FormView The child view
+     *
+     * @since v2.0.0
      */
     public function offsetGet($name)
     {
@@ -111,6 +122,8 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      * @param string $name The child name
      *
      * @return Boolean Whether the child view exists
+     *
+     * @since v2.0.0
      */
     public function offsetExists($name)
     {
@@ -121,6 +134,8 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      * Implements \ArrayAccess.
      *
      * @throws BadMethodCallException always as setting a child by name is not allowed
+     *
+     * @since v2.0.0
      */
     public function offsetSet($name, $value)
     {
@@ -131,6 +146,8 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      * Removes a child (implements \ArrayAccess).
      *
      * @param string $name The child name
+     *
+     * @since v2.0.0
      */
     public function offsetUnset($name)
     {
@@ -141,6 +158,8 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      * Returns an iterator to iterate over children (implements \IteratorAggregate)
      *
      * @return \ArrayIterator The iterator
+     *
+     * @since v2.0.0
      */
     public function getIterator()
     {
@@ -151,6 +170,8 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      * Implements \Countable.
      *
      * @return integer The number of children views
+     *
+     * @since v2.0.0
      */
     public function count()
     {

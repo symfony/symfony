@@ -15,6 +15,8 @@ namespace Symfony\Component\Finder\Iterator;
  * SortableIterator applies a sort on a given Iterator.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class SortableIterator implements \IteratorAggregate
 {
@@ -34,6 +36,8 @@ class SortableIterator implements \IteratorAggregate
      * @param integer|callback $sort     The sort type (SORT_BY_NAME, SORT_BY_TYPE, or a PHP callback)
      *
      * @throws \InvalidArgumentException
+     *
+     * @since v2.0.0
      */
     public function __construct(\Traversable $iterator, $sort)
     {
@@ -72,6 +76,9 @@ class SortableIterator implements \IteratorAggregate
         }
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getIterator()
     {
         $array = iterator_to_array($this->iterator, true);

@@ -17,6 +17,8 @@ namespace Symfony\Component\DependencyInjection;
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class Scope implements ScopeInterface
 {
@@ -25,6 +27,8 @@ class Scope implements ScopeInterface
 
     /**
      * @api
+     *
+     * @since v2.0.0
      */
     public function __construct($name, $parentName = ContainerInterface::SCOPE_CONTAINER)
     {
@@ -34,6 +38,8 @@ class Scope implements ScopeInterface
 
     /**
      * @api
+     *
+     * @since v2.0.0
      */
     public function getName()
     {
@@ -42,6 +48,8 @@ class Scope implements ScopeInterface
 
     /**
      * @api
+     *
+     * @since v2.0.0
      */
     public function getParentName()
     {

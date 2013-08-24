@@ -20,6 +20,8 @@ namespace Symfony\Component\Templating\Helper;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 abstract class Helper implements HelperInterface
 {
@@ -31,6 +33,8 @@ abstract class Helper implements HelperInterface
      * @param string $charset The charset
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setCharset($charset)
     {
@@ -43,6 +47,8 @@ abstract class Helper implements HelperInterface
      * @return string The default charset
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getCharset()
     {

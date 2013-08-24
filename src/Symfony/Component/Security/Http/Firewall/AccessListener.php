@@ -24,6 +24,8 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
  * AccessListener enforces access control rules.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class AccessListener implements ListenerInterface
 {
@@ -33,6 +35,9 @@ class AccessListener implements ListenerInterface
     private $authManager;
     private $logger;
 
+    /**
+     * @since v2.1.0
+     */
     public function __construct(SecurityContextInterface $context, AccessDecisionManagerInterface $accessDecisionManager, AccessMapInterface $map, AuthenticationManagerInterface $authManager, LoggerInterface $logger = null)
     {
         $this->context = $context;
@@ -49,6 +54,8 @@ class AccessListener implements ListenerInterface
      *
      * @throws AccessDeniedException
      * @throws AuthenticationCredentialsNotFoundException
+     *
+     * @since v2.0.0
      */
     public function handle(GetResponseEvent $event)
     {

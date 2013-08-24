@@ -20,6 +20,8 @@ use Symfony\Component\Routing\Matcher\UrlMatcher;
  * TraceableUrlMatcher helps debug path info matching by tracing the match.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.1.0
  */
 class TraceableUrlMatcher extends UrlMatcher
 {
@@ -29,6 +31,9 @@ class TraceableUrlMatcher extends UrlMatcher
 
     protected $traces;
 
+    /**
+     * @since v2.1.0
+     */
     public function getTraces($pathinfo)
     {
         $this->traces = array();
@@ -41,6 +46,9 @@ class TraceableUrlMatcher extends UrlMatcher
         return $this->traces;
     }
 
+    /**
+     * @since v2.1.0
+     */
     protected function matchCollection($pathinfo, RouteCollection $routes)
     {
         foreach ($routes as $name => $route) {
@@ -109,6 +117,9 @@ class TraceableUrlMatcher extends UrlMatcher
         }
     }
 
+    /**
+     * @since v2.1.0
+     */
     private function addTrace($log, $level = self::ROUTE_DOES_NOT_MATCH, $name = null, $route = null)
     {
         $this->traces[] = array(

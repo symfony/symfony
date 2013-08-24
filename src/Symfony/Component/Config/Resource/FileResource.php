@@ -17,6 +17,8 @@ namespace Symfony\Component\Config\Resource;
  * The resource can be a file or a directory.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.1.0
  */
 class FileResource implements ResourceInterface, \Serializable
 {
@@ -26,6 +28,8 @@ class FileResource implements ResourceInterface, \Serializable
      * Constructor.
      *
      * @param string $resource The file path to the resource
+     *
+     * @since v2.0.0
      */
     public function __construct($resource)
     {
@@ -36,6 +40,8 @@ class FileResource implements ResourceInterface, \Serializable
      * Returns a string representation of the Resource.
      *
      * @return string A string representation of the Resource
+     *
+     * @since v2.0.0
      */
     public function __toString()
     {
@@ -46,6 +52,8 @@ class FileResource implements ResourceInterface, \Serializable
      * Returns the resource tied to this Resource.
      *
      * @return mixed The resource
+     *
+     * @since v2.0.0
      */
     public function getResource()
     {
@@ -58,6 +66,8 @@ class FileResource implements ResourceInterface, \Serializable
      * @param integer $timestamp The last time the resource was loaded
      *
      * @return Boolean true if the resource has not been updated, false otherwise
+     *
+     * @since v2.0.0
      */
     public function isFresh($timestamp)
     {
@@ -68,11 +78,17 @@ class FileResource implements ResourceInterface, \Serializable
         return filemtime($this->resource) < $timestamp;
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function serialize()
     {
         return serialize($this->resource);
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function unserialize($serialized)
     {
         $this->resource = unserialize($serialized);

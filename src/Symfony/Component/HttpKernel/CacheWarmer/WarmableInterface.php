@@ -22,6 +22,8 @@ interface WarmableInterface
      * Warms up the cache.
      *
      * @param string $cacheDir The cache directory
+     *
+     * @since v2.1.0
      */
     public function warmUp($cacheDir);
 }

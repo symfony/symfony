@@ -15,6 +15,8 @@ use Symfony\Component\DomCrawler\Field\FormField;
 
 /**
  * This is an internal class that must not be used directly.
+ *
+ * @since v2.2.0
  */
 class FormFieldRegistry
 {
@@ -28,6 +30,8 @@ class FormFieldRegistry
      * @param FormField $field The field
      *
      * @throws \InvalidArgumentException when the name is malformed
+     *
+     * @since v2.2.0
      */
     public function add(FormField $field)
     {
@@ -54,6 +58,8 @@ class FormFieldRegistry
      * @param string $name The fully qualified name of the base field
      *
      * @throws \InvalidArgumentException when the name is malformed
+     *
+     * @since v2.2.0
      */
     public function remove($name)
     {
@@ -78,6 +84,8 @@ class FormFieldRegistry
      *
      * @throws \InvalidArgumentException when the name is malformed
      * @throws \InvalidArgumentException if the field does not exist
+     *
+     * @since v2.2.0
      */
     public function &get($name)
     {
@@ -100,6 +108,8 @@ class FormFieldRegistry
      * @param string $name The fully qualified name of the field
      *
      * @return Boolean Whether the form has the given field
+     *
+     * @since v2.2.0
      */
     public function has($name)
     {
@@ -120,6 +130,8 @@ class FormFieldRegistry
      *
      * @throws \InvalidArgumentException when the name is malformed
      * @throws \InvalidArgumentException if the field does not exist
+     *
+     * @since v2.2.0
      */
     public function set($name, $value)
     {
@@ -138,6 +150,8 @@ class FormFieldRegistry
      * Returns the list of field with their value.
      *
      * @return array The list of fields as array((string) Fully qualified name => (mixed) value)
+     *
+     * @since v2.2.0
      */
     public function all()
     {
@@ -154,6 +168,8 @@ class FormFieldRegistry
      * @param array  $values The values of the fields
      *
      * @return FormFieldRegistry
+     *
+     * @since v2.2.0
      */
     private static function create($base, array $values)
     {
@@ -172,6 +188,8 @@ class FormFieldRegistry
      * @param array  $output The initial values
      *
      * @return array The list of fields as array((string) Fully qualified name => (mixed) value)
+     *
+     * @since v2.2.0
      */
     private function walk(array $array, $base = '', array &$output = array())
     {
@@ -199,6 +217,8 @@ class FormFieldRegistry
      * @return array The list of segments
      *
      * @throws \InvalidArgumentException when the name is malformed
+     *
+     * @since v2.2.0
      */
     private function getSegments($name)
     {

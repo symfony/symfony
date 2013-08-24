@@ -26,6 +26,8 @@ interface RegistryInterface extends ManagerRegistryInterface
      * Gets the default entity manager name.
      *
      * @return string The default entity manager name
+     *
+     * @since v2.1.0
      */
     public function getDefaultEntityManagerName();
 
@@ -35,6 +37,8 @@ interface RegistryInterface extends ManagerRegistryInterface
      * @param string $name The entity manager name (null for the default one)
      *
      * @return EntityManager
+     *
+     * @since v2.1.0
      */
     public function getEntityManager($name = null);
 
@@ -42,6 +46,8 @@ interface RegistryInterface extends ManagerRegistryInterface
      * Gets an array of all registered entity managers
      *
      * @return array An array of EntityManager instances
+     *
+     * @since v2.1.0
      */
     public function getEntityManagers();
 
@@ -61,6 +67,8 @@ interface RegistryInterface extends ManagerRegistryInterface
      * @param string $name The entity manager name (null for the default one)
      *
      * @return EntityManager
+     *
+     * @since v2.1.0
      */
     public function resetEntityManager($name = null);
 
@@ -74,6 +82,8 @@ interface RegistryInterface extends ManagerRegistryInterface
      * @return string The full namespace
      *
      * @see Configuration::getEntityNamespace
+     *
+     * @since v2.1.0
      */
     public function getEntityNamespace($alias);
 
@@ -81,6 +91,8 @@ interface RegistryInterface extends ManagerRegistryInterface
      * Gets all connection names.
      *
      * @return array An array of connection names
+     *
+     * @since v2.1.0
      */
     public function getEntityManagerNames();
 
@@ -90,6 +102,8 @@ interface RegistryInterface extends ManagerRegistryInterface
      * @param string $class A Doctrine Entity class name
      *
      * @return EntityManager|null
+     *
+     * @since v2.1.0
      */
     public function getEntityManagerForClass($class);
 }

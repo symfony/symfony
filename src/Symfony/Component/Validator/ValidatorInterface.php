@@ -37,6 +37,8 @@ interface ValidatorInterface
      *                                          list is empty, validation succeeded.
      *
      * @api
+     *
+     * @since v2.2.0
      */
     public function validate($value, $groups = null, $traverse = false, $deep = false);
 
@@ -54,6 +56,8 @@ interface ValidatorInterface
      *                                          list is empty, validation succeeded.
      *
      * @api
+     *
+     * @since v2.2.0
      */
     public function validateProperty($containingValue, $property, $groups = null);
 
@@ -73,6 +77,8 @@ interface ValidatorInterface
      *                                          list is empty, validation succeeded.
      *
      * @api
+     *
+     * @since v2.2.0
      */
     public function validatePropertyValue($containingValue, $property, $value, $groups = null);
 
@@ -87,6 +93,8 @@ interface ValidatorInterface
      *                                          list is empty, validation succeeded.
      *
      * @api
+     *
+     * @since v2.2.0
      */
     public function validateValue($value, $constraints, $groups = null);
 
@@ -96,6 +104,8 @@ interface ValidatorInterface
      * @return MetadataFactoryInterface The metadata factory.
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function getMetadataFactory();
 }

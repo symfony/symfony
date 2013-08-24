@@ -22,6 +22,8 @@ use Symfony\Component\HttpKernel\Profiler\Profiler;
  * RouterController.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.2.0
  */
 class RouterController
 {
@@ -30,6 +32,9 @@ class RouterController
     private $matcher;
     private $routes;
 
+    /**
+     * @since v2.3.0
+     */
     public function __construct(Profiler $profiler = null, \Twig_Environment $twig, UrlMatcherInterface $matcher = null, RouteCollection $routes = null)
     {
         $this->profiler = $profiler;
@@ -48,6 +53,8 @@ class RouterController
      * @param string $token The profiler token
      *
      * @return Response A Response instance
+     *
+     * @since v2.1.0
      */
     public function panelAction($token)
     {

@@ -26,6 +26,8 @@ interface EncoderInterface
      * @param array  $context options that normalizers/encoders have access to.
      *
      * @return scalar
+     *
+     * @since v2.2.0
      */
     public function encode($data, $format, array $context = array());
 
@@ -35,6 +37,8 @@ interface EncoderInterface
      * @param string $format format name
      *
      * @return Boolean
+     *
+     * @since v2.1.0
      */
     public function supportsEncoding($format);
 }

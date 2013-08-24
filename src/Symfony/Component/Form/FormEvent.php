@@ -15,6 +15,8 @@ use Symfony\Component\EventDispatcher\Event;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.3.0
  */
 class FormEvent extends Event
 {
@@ -26,6 +28,8 @@ class FormEvent extends Event
      *
      * @param FormInterface $form The associated form
      * @param mixed         $data The data
+     *
+     * @since v2.3.0
      */
     public function __construct(FormInterface $form, $data)
     {
@@ -37,6 +41,8 @@ class FormEvent extends Event
      * Returns the form at the source of the event.
      *
      * @return FormInterface
+     *
+     * @since v2.3.0
      */
     public function getForm()
     {
@@ -47,6 +53,8 @@ class FormEvent extends Event
      * Returns the data associated with this event.
      *
      * @return mixed
+     *
+     * @since v2.3.0
      */
     public function getData()
     {
@@ -57,6 +65,8 @@ class FormEvent extends Event
      * Allows updating with some filtered data.
      *
      * @param mixed $data
+     *
+     * @since v2.3.0
      */
     public function setData($data)
     {

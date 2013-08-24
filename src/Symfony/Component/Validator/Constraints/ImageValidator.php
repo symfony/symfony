@@ -19,11 +19,15 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
  * against minWidth, maxWidth, minHeight and maxHeight constraints
  *
  * @author Benjamin Dulau <benjamin.dulau@gmail.com>
+ *
+ * @since v2.1.0
  */
 class ImageValidator extends FileValidator
 {
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function validate($value, Constraint $constraint)
     {

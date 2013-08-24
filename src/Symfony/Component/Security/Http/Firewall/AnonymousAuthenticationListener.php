@@ -21,6 +21,8 @@ use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
  * already present.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class AnonymousAuthenticationListener implements ListenerInterface
 {
@@ -28,6 +30,9 @@ class AnonymousAuthenticationListener implements ListenerInterface
     private $key;
     private $logger;
 
+    /**
+     * @since v2.0.0
+     */
     public function __construct(SecurityContextInterface $context, $key, LoggerInterface $logger = null)
     {
         $this->context = $context;
@@ -39,6 +44,8 @@ class AnonymousAuthenticationListener implements ListenerInterface
      * Handles anonymous authentication.
      *
      * @param GetResponseEvent $event A GetResponseEvent instance
+     *
+     * @since v2.0.0
      */
     public function handle(GetResponseEvent $event)
     {

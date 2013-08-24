@@ -20,6 +20,8 @@ use Symfony\Component\Validator\Constraint;
  * This enforces the convention that the validatedBy() method on any
  * Constrain will return the class name of the ConstraintValidator that
  * should validate the Constraint.
+ *
+ * @since v2.0.0
  */
 class ConstraintValidatorFactory implements ConstraintValidatorFactoryInterface
 {
@@ -27,6 +29,8 @@ class ConstraintValidatorFactory implements ConstraintValidatorFactoryInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function getInstance(Constraint $constraint)
     {

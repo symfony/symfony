@@ -13,6 +13,8 @@ namespace Symfony\Component\Intl\Exception;
 
 /**
  * @author Eriksen Costa <eriksen.costa@infranology.com.br>
+ *
+ * @since v2.3.0
  */
 class MethodNotImplementedException extends NotImplementedException
 {
@@ -20,6 +22,8 @@ class MethodNotImplementedException extends NotImplementedException
      * Constructor
      *
      * @param string $methodName The name of the method
+     *
+     * @since v2.3.0
      */
     public function __construct($methodName)
     {

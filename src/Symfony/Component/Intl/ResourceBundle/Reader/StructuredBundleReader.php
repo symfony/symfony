@@ -19,6 +19,8 @@ use Symfony\Component\Intl\ResourceBundle\Util\RecursiveArrayAccess;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @see StructuredResourceBundleBundleReaderInterface
+ *
+ * @since v2.3.0
  */
 class StructuredBundleReader implements StructuredBundleReaderInterface
 {
@@ -31,6 +33,8 @@ class StructuredBundleReader implements StructuredBundleReaderInterface
      * Creates an entry reader based on the given resource bundle reader.
      *
      * @param BundleReaderInterface $reader A resource bundle reader to use.
+     *
+     * @since v2.3.0
      */
     public function __construct(BundleReaderInterface $reader)
     {
@@ -39,6 +43,8 @@ class StructuredBundleReader implements StructuredBundleReaderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function read($path, $locale)
     {
@@ -47,6 +53,8 @@ class StructuredBundleReader implements StructuredBundleReaderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function getLocales($path)
     {
@@ -55,6 +63,8 @@ class StructuredBundleReader implements StructuredBundleReaderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     public function readEntry($path, $locale, array $indices, $fallback = true)
     {
@@ -101,6 +111,8 @@ class StructuredBundleReader implements StructuredBundleReaderInterface
      * @param string $locale The locale to find the fallback for.
      *
      * @return string|null The fallback locale, or null if no parent exists
+     *
+     * @since v2.3.0
      */
     private function getFallbackLocale($locale)
     {

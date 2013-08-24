@@ -21,6 +21,8 @@ use Symfony\Component\Security\Acl\Model\PermissionGrantingStrategyInterface;
  * This class is a wrapper around the actual cache implementation.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class DoctrineAclCache implements AclCacheInterface
 {
@@ -38,6 +40,8 @@ class DoctrineAclCache implements AclCacheInterface
      * @param string                              $prefix
      *
      * @throws \InvalidArgumentException
+     *
+     * @since v2.0.0
      */
     public function __construct(Cache $cache, PermissionGrantingStrategyInterface $permissionGrantingStrategy, $prefix = self::PREFIX)
     {
@@ -52,6 +56,8 @@ class DoctrineAclCache implements AclCacheInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function clearCache()
     {
@@ -60,6 +66,8 @@ class DoctrineAclCache implements AclCacheInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function evictFromCacheById($aclId)
     {
@@ -78,6 +86,8 @@ class DoctrineAclCache implements AclCacheInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function evictFromCacheByIdentity(ObjectIdentityInterface $oid)
     {
@@ -91,6 +101,8 @@ class DoctrineAclCache implements AclCacheInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function getFromCacheById($aclId)
     {
@@ -111,6 +123,8 @@ class DoctrineAclCache implements AclCacheInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function getFromCacheByIdentity(ObjectIdentityInterface $oid)
     {
@@ -124,6 +138,8 @@ class DoctrineAclCache implements AclCacheInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function putInCache(AclInterface $acl)
     {
@@ -145,6 +161,8 @@ class DoctrineAclCache implements AclCacheInterface
      *
      * @param string $serialized
      * @return AclInterface
+     *
+     * @since v2.0.0
      */
     private function unserializeAcl($serialized)
     {
@@ -203,6 +221,8 @@ class DoctrineAclCache implements AclCacheInterface
      *
      * @param ObjectIdentityInterface $oid
      * @return string
+     *
+     * @since v2.0.0
      */
     private function getDataKeyByIdentity(ObjectIdentityInterface $oid)
     {
@@ -215,6 +235,8 @@ class DoctrineAclCache implements AclCacheInterface
      *
      * @param string $aclId
      * @return string
+     *
+     * @since v2.0.0
      */
     private function getAliasKeyForIdentity($aclId)
     {

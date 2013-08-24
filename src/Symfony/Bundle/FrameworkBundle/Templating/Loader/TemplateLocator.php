@@ -18,6 +18,8 @@ use Symfony\Component\Templating\TemplateReferenceInterface;
  * TemplateLocator locates templates in bundles.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class TemplateLocator implements FileLocatorInterface
 {
@@ -29,6 +31,8 @@ class TemplateLocator implements FileLocatorInterface
      *
      * @param FileLocatorInterface $locator  A FileLocatorInterface instance
      * @param string               $cacheDir The cache path
+     *
+     * @since v2.0.0
      */
     public function __construct(FileLocatorInterface $locator, $cacheDir = null)
     {
@@ -45,6 +49,8 @@ class TemplateLocator implements FileLocatorInterface
      * @param TemplateReferenceInterface $template A template
      *
      * @return string The full path for the file
+     *
+     * @since v2.1.0
      */
     protected function getCacheKey($template)
     {
@@ -62,6 +68,8 @@ class TemplateLocator implements FileLocatorInterface
      *
      * @throws \InvalidArgumentException When the template is not an instance of TemplateReferenceInterface
      * @throws \InvalidArgumentException When the template file can not be found
+     *
+     * @since v2.0.0
      */
     public function locate($template, $currentPath = null, $first = true)
     {

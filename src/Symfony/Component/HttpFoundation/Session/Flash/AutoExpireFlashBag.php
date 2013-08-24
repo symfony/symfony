@@ -15,6 +15,8 @@ namespace Symfony\Component\HttpFoundation\Session\Flash;
  * AutoExpireFlashBag flash message container.
  *
  * @author Drak <drak@zikula.org>
+ *
+ * @since v2.1.0
  */
 class AutoExpireFlashBag implements FlashBagInterface
 {
@@ -38,6 +40,8 @@ class AutoExpireFlashBag implements FlashBagInterface
      * Constructor.
      *
      * @param string $storageKey The key used to store flashes in the session.
+     *
+     * @since v2.1.0
      */
     public function __construct($storageKey = '_sf2_flashes')
     {
@@ -47,12 +51,17 @@ class AutoExpireFlashBag implements FlashBagInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getName()
     {
         return $this->name;
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function setName($name)
     {
         $this->name = $name;
@@ -60,6 +69,8 @@ class AutoExpireFlashBag implements FlashBagInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function initialize(array &$flashes)
     {
@@ -74,6 +85,8 @@ class AutoExpireFlashBag implements FlashBagInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function add($type, $message)
     {
@@ -82,6 +95,8 @@ class AutoExpireFlashBag implements FlashBagInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function peek($type, array $default = array())
     {
@@ -90,6 +105,8 @@ class AutoExpireFlashBag implements FlashBagInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function peekAll()
     {
@@ -98,6 +115,8 @@ class AutoExpireFlashBag implements FlashBagInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function get($type, array $default = array())
     {
@@ -117,6 +136,8 @@ class AutoExpireFlashBag implements FlashBagInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function all()
     {
@@ -128,6 +149,8 @@ class AutoExpireFlashBag implements FlashBagInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function setAll(array $messages)
     {
@@ -136,6 +159,8 @@ class AutoExpireFlashBag implements FlashBagInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function set($type, $messages)
     {
@@ -144,6 +169,8 @@ class AutoExpireFlashBag implements FlashBagInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function has($type)
     {
@@ -152,6 +179,8 @@ class AutoExpireFlashBag implements FlashBagInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function keys()
     {
@@ -160,6 +189,8 @@ class AutoExpireFlashBag implements FlashBagInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getStorageKey()
     {
@@ -168,6 +199,8 @@ class AutoExpireFlashBag implements FlashBagInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function clear()
     {

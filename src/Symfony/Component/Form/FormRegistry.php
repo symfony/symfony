@@ -19,6 +19,8 @@ use Symfony\Component\Form\Exception\InvalidArgumentException;
  * The central registry of the Form component.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.1.0
  */
 class FormRegistry implements FormRegistryInterface
 {
@@ -51,6 +53,8 @@ class FormRegistry implements FormRegistryInterface
      * @param ResolvedFormTypeFactoryInterface $resolvedTypeFactory The factory for resolved form types.
      *
      * @throws UnexpectedTypeException if any extension does not implement FormExtensionInterface
+     *
+     * @since v2.1.0
      */
     public function __construct(array $extensions, ResolvedFormTypeFactoryInterface $resolvedTypeFactory)
     {
@@ -66,6 +70,8 @@ class FormRegistry implements FormRegistryInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getType($name)
     {
@@ -102,6 +108,8 @@ class FormRegistry implements FormRegistryInterface
      * @param FormTypeInterface $type The type to resolve.
      *
      * @return ResolvedFormTypeInterface The resolved type.
+     *
+     * @since v2.1.0
      */
     private function resolveAndAddType(FormTypeInterface $type)
     {
@@ -131,6 +139,8 @@ class FormRegistry implements FormRegistryInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function hasType($name)
     {
@@ -149,6 +159,8 @@ class FormRegistry implements FormRegistryInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getTypeGuesser()
     {
@@ -172,6 +184,8 @@ class FormRegistry implements FormRegistryInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getExtensions()
     {

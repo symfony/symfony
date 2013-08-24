@@ -15,11 +15,15 @@ namespace Symfony\Component\HttpKernel\Profiler;
  * SqliteProfilerStorage stores profiling information in a SQLite database.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class SqliteProfilerStorage extends PdoProfilerStorage
 {
     /**
      * @throws \RuntimeException When neither of SQLite3 or PDO_SQLite extension is enabled
+     *
+     * @since v2.0.0
      */
     protected function initDb()
     {
@@ -54,6 +58,9 @@ class SqliteProfilerStorage extends PdoProfilerStorage
         return $this->db;
     }
 
+    /**
+     * @since v2.0.0
+     */
     protected function exec($db, $query, array $args = array())
     {
         if ($db instanceof \SQLite3) {
@@ -72,6 +79,9 @@ class SqliteProfilerStorage extends PdoProfilerStorage
         }
     }
 
+    /**
+     * @since v2.0.0
+     */
     protected function fetch($db, $query, array $args = array())
     {
         $return = array();
@@ -96,6 +106,8 @@ class SqliteProfilerStorage extends PdoProfilerStorage
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.2.0
      */
     protected function buildCriteria($ip, $url, $start, $end, $limit, $method)
     {
@@ -130,6 +142,9 @@ class SqliteProfilerStorage extends PdoProfilerStorage
         return array($criteria, $args);
     }
 
+    /**
+     * @since v2.0.0
+     */
     protected function close($db)
     {
         if ($db instanceof \SQLite3) {

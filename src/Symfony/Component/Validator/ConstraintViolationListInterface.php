@@ -26,6 +26,8 @@ interface ConstraintViolationListInterface extends \Traversable, \Countable, \Ar
      * @param ConstraintViolationInterface $violation The violation to add.
      *
      * @api
+     *
+     * @since v2.2.0
      */
     public function add(ConstraintViolationInterface $violation);
 
@@ -35,6 +37,8 @@ interface ConstraintViolationListInterface extends \Traversable, \Countable, \Ar
      * @param ConstraintViolationListInterface $otherList The list to merge.
      *
      * @api
+     *
+     * @since v2.2.0
      */
     public function addAll(ConstraintViolationListInterface $otherList);
 
@@ -48,6 +52,8 @@ interface ConstraintViolationListInterface extends \Traversable, \Countable, \Ar
      * @throws \OutOfBoundsException If the offset does not exist.
      *
      * @api
+     *
+     * @since v2.2.0
      */
     public function get($offset);
 
@@ -59,6 +65,8 @@ interface ConstraintViolationListInterface extends \Traversable, \Countable, \Ar
      * @return Boolean Whether the offset exists.
      *
      * @api
+     *
+     * @since v2.2.0
      */
     public function has($offset);
 
@@ -69,6 +77,8 @@ interface ConstraintViolationListInterface extends \Traversable, \Countable, \Ar
      * @param ConstraintViolationInterface $violation The violation.
      *
      * @api
+     *
+     * @since v2.2.0
      */
     public function set($offset, ConstraintViolationInterface $violation);
 
@@ -78,6 +88,8 @@ interface ConstraintViolationListInterface extends \Traversable, \Countable, \Ar
      * @param integer $offset The offset to remove.
      *
      * @api
+     *
+     * @since v2.2.0
      */
     public function remove($offset);
 }

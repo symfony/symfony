@@ -17,6 +17,8 @@ use Symfony\Bridge\Twig\Node\TransNode;
  * TranslationNodeVisitor extracts translation messages.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.1.0
  */
 class TranslationNodeVisitor implements \Twig_NodeVisitorInterface
 {
@@ -25,18 +27,27 @@ class TranslationNodeVisitor implements \Twig_NodeVisitorInterface
     private $enabled = false;
     private $messages = array();
 
+    /**
+     * @since v2.1.0
+     */
     public function enable()
     {
         $this->enabled = true;
         $this->messages = array();
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function disable()
     {
         $this->enabled = false;
         $this->messages = array();
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function getMessages()
     {
         return $this->messages;
@@ -44,6 +55,8 @@ class TranslationNodeVisitor implements \Twig_NodeVisitorInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function enterNode(\Twig_NodeInterface $node, \Twig_Environment $env)
     {
@@ -84,6 +97,8 @@ class TranslationNodeVisitor implements \Twig_NodeVisitorInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function leaveNode(\Twig_NodeInterface $node, \Twig_Environment $env)
     {
@@ -92,6 +107,8 @@ class TranslationNodeVisitor implements \Twig_NodeVisitorInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getPriority()
     {
@@ -103,6 +120,8 @@ class TranslationNodeVisitor implements \Twig_NodeVisitorInterface
      * @param int        $index
      *
      * @return string|null
+     *
+     * @since v2.1.10
      */
     private function getReadDomainFromArguments(\Twig_Node $arguments, $index)
     {
@@ -121,6 +140,8 @@ class TranslationNodeVisitor implements \Twig_NodeVisitorInterface
      * @param \Twig_Node $node
      *
      * @return string|null
+     *
+     * @since v2.1.10
      */
     private function getReadDomainFromNode(\Twig_Node $node = null)
     {

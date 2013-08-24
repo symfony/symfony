@@ -15,6 +15,8 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
  * MemcacheSessionHandler.
  *
  * @author Drak <drak@zikula.org>
+ *
+ * @since v2.1.0
  */
 class MemcacheSessionHandler implements \SessionHandlerInterface
 {
@@ -44,6 +46,8 @@ class MemcacheSessionHandler implements \SessionHandlerInterface
      * @param array     $options  An associative array of Memcache options
      *
      * @throws \InvalidArgumentException When unsupported options are passed
+     *
+     * @since v2.1.0
      */
     public function __construct(\Memcache $memcache, array $options = array())
     {
@@ -60,6 +64,8 @@ class MemcacheSessionHandler implements \SessionHandlerInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function open($savePath, $sessionName)
     {
@@ -68,6 +74,8 @@ class MemcacheSessionHandler implements \SessionHandlerInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function close()
     {
@@ -76,6 +84,8 @@ class MemcacheSessionHandler implements \SessionHandlerInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function read($sessionId)
     {
@@ -84,6 +94,8 @@ class MemcacheSessionHandler implements \SessionHandlerInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function write($sessionId, $data)
     {
@@ -92,6 +104,8 @@ class MemcacheSessionHandler implements \SessionHandlerInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function destroy($sessionId)
     {
@@ -100,6 +114,8 @@ class MemcacheSessionHandler implements \SessionHandlerInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function gc($lifetime)
     {

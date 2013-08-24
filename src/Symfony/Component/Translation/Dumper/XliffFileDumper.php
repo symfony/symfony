@@ -17,11 +17,15 @@ use Symfony\Component\Translation\MessageCatalogue;
  * XliffFileDumper generates xliff files from a message catalogue.
  *
  * @author Michel Salib <michelsalib@hotmail.com>
+ *
+ * @since v2.1.0
  */
 class XliffFileDumper extends FileDumper
 {
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     protected function format(MessageCatalogue $messages, $domain)
     {
@@ -58,6 +62,8 @@ class XliffFileDumper extends FileDumper
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     protected function getExtension()
     {

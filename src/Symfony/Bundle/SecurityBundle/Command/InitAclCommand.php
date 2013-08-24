@@ -20,11 +20,15 @@ use Doctrine\DBAL\Schema\SchemaException;
  * Installs the tables required by the ACL system
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class InitAclCommand extends ContainerAwareCommand
 {
     /**
      * @see Command
+     *
+     * @since v2.0.0
      */
     protected function configure()
     {
@@ -48,6 +52,8 @@ EOF
 
     /**
      * @see Command::execute()
+     *
+     * @since v2.0.0
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {

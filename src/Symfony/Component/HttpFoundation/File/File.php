@@ -22,6 +22,8 @@ use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class File extends \SplFileInfo
 {
@@ -34,6 +36,8 @@ class File extends \SplFileInfo
      * @throws FileNotFoundException If the given path is not a file
      *
      * @api
+     *
+     * @since v2.0.10
      */
     public function __construct($path, $checkPath = true)
     {
@@ -58,6 +62,8 @@ class File extends \SplFileInfo
      *
      * @see ExtensionGuesser
      * @see getMimeType()
+     *
+     * @since v2.0.0
      */
     public function guessExtension()
     {
@@ -79,6 +85,8 @@ class File extends \SplFileInfo
      * @see MimeTypeGuesser
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getMimeType()
     {
@@ -95,6 +103,8 @@ class File extends \SplFileInfo
      * @return string The extension
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getExtension()
     {
@@ -112,6 +122,8 @@ class File extends \SplFileInfo
      * @throws FileException if the target file could not be created
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function move($directory, $name = null)
     {
@@ -127,6 +139,9 @@ class File extends \SplFileInfo
         return $target;
     }
 
+    /**
+     * @since v2.0.20
+     */
     protected function getTargetFile($directory, $name = null)
     {
         if (!is_dir($directory)) {
@@ -148,6 +163,8 @@ class File extends \SplFileInfo
      * @param string $name The new file name
      *
      * @return string containing
+     *
+     * @since v2.0.19
      */
     protected function getName($name)
     {

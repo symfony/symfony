@@ -19,6 +19,8 @@ use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
  * Field-aware ACE implementation which is auditable
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class FieldEntry extends Entry implements FieldEntryInterface
 {
@@ -36,6 +38,8 @@ class FieldEntry extends Entry implements FieldEntryInterface
      * @param Boolean                   $granting
      * @param Boolean                   $auditFailure
      * @param Boolean                   $auditSuccess
+     *
+     * @since v2.0.0
      */
     public function __construct($id, AclInterface $acl, $field, SecurityIdentityInterface $sid, $strategy, $mask, $granting, $auditFailure, $auditSuccess)
     {
@@ -46,6 +50,8 @@ class FieldEntry extends Entry implements FieldEntryInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function getField()
     {
@@ -54,6 +60,8 @@ class FieldEntry extends Entry implements FieldEntryInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function serialize()
     {
@@ -65,6 +73,8 @@ class FieldEntry extends Entry implements FieldEntryInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function unserialize($serialized)
     {

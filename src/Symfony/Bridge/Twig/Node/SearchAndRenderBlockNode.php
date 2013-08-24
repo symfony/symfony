@@ -13,9 +13,14 @@ namespace Symfony\Bridge\Twig\Node;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.1.0
  */
 class SearchAndRenderBlockNode extends \Twig_Node_Expression_Function
 {
+    /**
+     * @since v2.1.0
+     */
     public function compile(\Twig_Compiler $compiler)
     {
         $compiler->addDebugInfo($this);

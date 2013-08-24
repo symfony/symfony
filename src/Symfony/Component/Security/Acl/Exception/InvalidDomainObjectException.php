@@ -16,6 +16,8 @@ namespace Symfony\Component\Security\Acl\Exception;
  * identity from the passed domain object.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class InvalidDomainObjectException extends Exception
 {

@@ -15,6 +15,8 @@ namespace Symfony\Component\PropertyAccess;
  * Creates singulars from plurals.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.2.0
  */
 class StringUtil
 {
@@ -107,6 +109,8 @@ class StringUtil
 
     /**
      * This class should not be instantiated
+     *
+     * @since v2.2.0
      */
     private function __construct() {}
 
@@ -119,6 +123,8 @@ class StringUtil
      * @param string $plural A word in plural form
      * @return string|array The singular form or an array of possible singular
      *                      forms
+     *
+     * @since v2.2.0
      */
     public static function singularify($plural)
     {

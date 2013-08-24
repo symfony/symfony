@@ -15,6 +15,8 @@ namespace Symfony\Component\Intl\Globals;
  * Provides fake static versions of the global functions in the intl extension
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.3.0
  */
 abstract class IntlGlobals
 {
@@ -70,6 +72,8 @@ abstract class IntlGlobals
      * @param integer $errorCode The error code returned by IntlGlobals::getErrorCode()
      *
      * @return Boolean
+     *
+     * @since v2.3.0
      */
     public static function isFailure($errorCode)
     {
@@ -83,6 +87,8 @@ abstract class IntlGlobals
      * Returns IntlGlobals::U_ZERO_ERROR if no error occurred.
      *
      * @return integer
+     *
+     * @since v2.3.0
      */
     public static function getErrorCode()
     {
@@ -95,6 +101,8 @@ abstract class IntlGlobals
      * Returns "U_ZERO_ERROR" if no error occurred.
      *
      * @return string
+     *
+     * @since v2.3.0
      */
     public static function getErrorMessage()
     {
@@ -107,6 +115,8 @@ abstract class IntlGlobals
      * @param integer $code The error code returned by IntlGlobals::getErrorCode()
      *
      * @return string
+     *
+     * @since v2.3.0
      */
     public static function getErrorName($code)
     {
@@ -124,6 +134,8 @@ abstract class IntlGlobals
      * @param string  $message The ICU class error message
      *
      * @throws \InvalidArgumentException If the code is not one of the error constants in this class
+     *
+     * @since v2.3.0
      */
     public static function setError($code, $message = '')
     {

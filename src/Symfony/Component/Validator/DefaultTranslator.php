@@ -44,6 +44,8 @@ use Symfony\Component\Translation\TranslatorInterface;
  * where translation is not required by default but should be optional.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.2.0
  */
 class DefaultTranslator implements TranslatorInterface
 {
@@ -70,6 +72,8 @@ class DefaultTranslator implements TranslatorInterface
      * @param string $locale     Ignored
      *
      * @return string The interpolated string
+     *
+     * @since v2.2.0
      */
     public function trans($id, array $parameters = array(), $domain = null, $locale = null)
     {
@@ -127,6 +131,8 @@ class DefaultTranslator implements TranslatorInterface
      *
      * @throws InvalidArgumentException If the message id does not have the format
      *                                  "singular|plural".
+     *
+     * @since v2.2.0
      */
     public function transChoice($id, $number, array $parameters = array(), $domain = null, $locale = null)
     {
@@ -149,6 +155,8 @@ class DefaultTranslator implements TranslatorInterface
      * @param string $locale The locale
      *
      * @throws BadMethodCallException
+     *
+     * @since v2.2.0
      */
     public function setLocale($locale)
     {
@@ -159,6 +167,8 @@ class DefaultTranslator implements TranslatorInterface
      * Returns the locale of the translator.
      *
      * @return string Always returns 'en'
+     *
+     * @since v2.2.0
      */
     public function getLocale()
     {

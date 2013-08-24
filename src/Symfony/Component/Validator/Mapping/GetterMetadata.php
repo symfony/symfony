@@ -13,6 +13,9 @@ namespace Symfony\Component\Validator\Mapping;
 
 use Symfony\Component\Validator\Exception\ValidatorException;
 
+/**
+ * @since v2.0.0
+ */
 class GetterMetadata extends MemberMetadata
 {
     /**
@@ -22,6 +25,8 @@ class GetterMetadata extends MemberMetadata
      * @param string $property The property which the getter returns
      *
      * @throws ValidatorException
+     *
+     * @since v2.0.0
      */
     public function __construct($class, $property)
     {
@@ -41,6 +46,8 @@ class GetterMetadata extends MemberMetadata
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.2.0
      */
     public function getPropertyValue($object)
     {
@@ -49,6 +56,8 @@ class GetterMetadata extends MemberMetadata
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.3.0
      */
     protected function newReflectionMember($objectOrClassName)
     {

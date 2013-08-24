@@ -21,6 +21,8 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class PassConfig
 {
@@ -39,6 +41,8 @@ class PassConfig
 
     /**
      * Constructor.
+     *
+     * @since v2.0.0
      */
     public function __construct()
     {
@@ -79,6 +83,8 @@ class PassConfig
      * @return array An array of all passes to process
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getPasses()
     {
@@ -101,6 +107,8 @@ class PassConfig
      * @throws InvalidArgumentException when a pass type doesn't exist
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function addPass(CompilerPassInterface $pass, $type = self::TYPE_BEFORE_OPTIMIZATION)
     {
@@ -119,6 +127,8 @@ class PassConfig
      * @return array An array of passes
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getAfterRemovingPasses()
     {
@@ -131,6 +141,8 @@ class PassConfig
      * @return array An array of passes
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getBeforeOptimizationPasses()
     {
@@ -143,6 +155,8 @@ class PassConfig
      * @return array An array of passes
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getBeforeRemovingPasses()
     {
@@ -155,6 +169,8 @@ class PassConfig
      * @return array An array of passes
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getOptimizationPasses()
     {
@@ -167,6 +183,8 @@ class PassConfig
      * @return array An array of passes
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getRemovingPasses()
     {
@@ -179,6 +197,8 @@ class PassConfig
      * @return array An array of passes
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getMergePass()
     {
@@ -191,6 +211,8 @@ class PassConfig
      * @param CompilerPassInterface $pass The merge pass
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setMergePass(CompilerPassInterface $pass)
     {
@@ -203,6 +225,8 @@ class PassConfig
      * @param array $passes An array of passes
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setAfterRemovingPasses(array $passes)
     {
@@ -215,6 +239,8 @@ class PassConfig
      * @param array $passes An array of passes
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setBeforeOptimizationPasses(array $passes)
     {
@@ -227,6 +253,8 @@ class PassConfig
      * @param array $passes An array of passes
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setBeforeRemovingPasses(array $passes)
     {
@@ -239,6 +267,8 @@ class PassConfig
      * @param array $passes An array of passes
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setOptimizationPasses(array $passes)
     {
@@ -251,6 +281,8 @@ class PassConfig
      * @param array $passes An array of passes
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setRemovingPasses(array $passes)
     {

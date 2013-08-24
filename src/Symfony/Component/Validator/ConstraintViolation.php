@@ -15,6 +15,8 @@ namespace Symfony\Component\Validator;
  * Default implementation of {@ConstraintViolationInterface}.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.2.0
  */
 class ConstraintViolation implements ConstraintViolationInterface
 {
@@ -75,6 +77,8 @@ class ConstraintViolation implements ConstraintViolationInterface
      * @param integer|null $messagePluralization  The pluralization parameter.
      * @param mixed        $code                  The error code of the
      *                                            violation, if any.
+     *
+     * @since v2.2.0
      */
     public function __construct($message, $messageTemplate, array $messageParameters, $root, $propertyPath, $invalidValue, $messagePluralization = null, $code = null)
     {
@@ -92,6 +96,8 @@ class ConstraintViolation implements ConstraintViolationInterface
      * Converts the violation into a string for debugging purposes.
      *
      * @return string The violation as string.
+     *
+     * @since v2.1.0
      */
     public function __toString()
     {
@@ -112,6 +118,8 @@ class ConstraintViolation implements ConstraintViolationInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function getMessageTemplate()
     {
@@ -120,6 +128,8 @@ class ConstraintViolation implements ConstraintViolationInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function getMessageParameters()
     {
@@ -128,6 +138,8 @@ class ConstraintViolation implements ConstraintViolationInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function getMessagePluralization()
     {
@@ -136,6 +148,8 @@ class ConstraintViolation implements ConstraintViolationInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function getMessage()
     {
@@ -144,6 +158,8 @@ class ConstraintViolation implements ConstraintViolationInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function getRoot()
     {
@@ -152,6 +168,8 @@ class ConstraintViolation implements ConstraintViolationInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function getPropertyPath()
     {
@@ -160,6 +178,8 @@ class ConstraintViolation implements ConstraintViolationInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function getInvalidValue()
     {
@@ -168,6 +188,8 @@ class ConstraintViolation implements ConstraintViolationInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function getCode()
     {

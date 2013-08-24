@@ -15,6 +15,8 @@ namespace Symfony\Component\Routing\Matcher\Dumper;
  * Prefix tree of routes preserving routes order.
  *
  * @author Arnaud Le Blanc <arnaud.lb@gmail.com>
+ *
+ * @since v2.2.0
  */
 class DumperPrefixCollection extends DumperCollection
 {
@@ -27,6 +29,8 @@ class DumperPrefixCollection extends DumperCollection
      * Returns the prefix.
      *
      * @return string The prefix
+     *
+     * @since v2.2.0
      */
     public function getPrefix()
     {
@@ -37,6 +41,8 @@ class DumperPrefixCollection extends DumperCollection
      * Sets the prefix.
      *
      * @param string $prefix The prefix
+     *
+     * @since v2.2.0
      */
     public function setPrefix($prefix)
     {
@@ -51,6 +57,8 @@ class DumperPrefixCollection extends DumperCollection
      * @return DumperPrefixCollection The node the route was added to
      *
      * @throws \LogicException
+     *
+     * @since v2.2.0
      */
     public function addPrefixRoute(DumperRoute $route)
     {
@@ -85,6 +93,8 @@ class DumperPrefixCollection extends DumperCollection
      * Merges nodes whose prefix ends with a slash
      *
      * Children of a node whose prefix ends with a slash are moved to the parent node
+     *
+     * @since v2.2.0
      */
     public function mergeSlashNodes()
     {

@@ -21,6 +21,8 @@ use Symfony\Component\HttpKernel\KernelInterface;
  * instances.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.1.0
  */
 class TemplateNameParser implements TemplateNameParserInterface
 {
@@ -31,6 +33,8 @@ class TemplateNameParser implements TemplateNameParserInterface
      * Constructor.
      *
      * @param KernelInterface $kernel A KernelInterface instance
+     *
+     * @since v2.0.0
      */
     public function __construct(KernelInterface $kernel)
     {
@@ -40,6 +44,8 @@ class TemplateNameParser implements TemplateNameParserInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function parse($name)
     {

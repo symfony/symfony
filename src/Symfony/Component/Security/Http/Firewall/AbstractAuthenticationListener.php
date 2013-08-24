@@ -46,6 +46,8 @@ use Symfony\Component\Security\Http\HttpUtils;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 abstract class AbstractAuthenticationListener implements ListenerInterface
 {
@@ -78,6 +80,8 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
      * @param EventDispatcherInterface               $dispatcher            An EventDispatcherInterface instance
      *
      * @throws \InvalidArgumentException
+     *
+     * @since v2.1.0
      */
     public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, HttpUtils $httpUtils, $providerKey, AuthenticationSuccessHandlerInterface $successHandler, AuthenticationFailureHandlerInterface $failureHandler, array $options = array(), LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
     {
@@ -111,6 +115,8 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
      * Sets the RememberMeServices implementation to use
      *
      * @param RememberMeServicesInterface $rememberMeServices
+     *
+     * @since v2.0.0
      */
     public function setRememberMeServices(RememberMeServicesInterface $rememberMeServices)
     {
@@ -124,6 +130,8 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
      *
      * @throws \RuntimeException
      * @throws SessionUnavailableException
+     *
+     * @since v2.1.0
      */
     final public function handle(GetResponseEvent $event)
     {
@@ -172,6 +180,8 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
      * @param Request $request
      *
      * @return Boolean
+     *
+     * @since v2.0.0
      */
     protected function requiresAuthentication(Request $request)
     {
@@ -186,9 +196,14 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
      * @return TokenInterface|Response|null The authenticated token, null if full authentication is not possible, or a Response
      *
      * @throws AuthenticationException if the authentication fails
+     *
+     * @since v2.0.0
      */
     abstract protected function attemptAuthentication(Request $request);
 
+    /**
+     * @since v2.0.0
+     */
     private function onFailure(GetResponseEvent $event, Request $request, AuthenticationException $failed)
     {
         if (null !== $this->logger) {
@@ -209,6 +224,9 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
         return $response;
     }
 
+    /**
+     * @since v2.0.0
+     */
     private function onSuccess(GetResponseEvent $event, Request $request, TokenInterface $token)
     {
         if (null !== $this->logger) {

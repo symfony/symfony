@@ -30,6 +30,8 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
  * It provides methods to common features needed in controllers.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class Controller extends ContainerAware
 {
@@ -43,6 +45,8 @@ class Controller extends ContainerAware
      * @return string The generated URL
      *
      * @see UrlGeneratorInterface
+     *
+     * @since v2.2.0
      */
     public function generateUrl($route, $parameters = array(), $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH)
     {
@@ -57,6 +61,8 @@ class Controller extends ContainerAware
      * @param array  $query      An array of query parameters
      *
      * @return Response A Response instance
+     *
+     * @since v2.0.0
      */
     public function forward($controller, array $path = array(), array $query = array())
     {
@@ -73,6 +79,8 @@ class Controller extends ContainerAware
      * @param integer $status The status code to use for the Response
      *
      * @return RedirectResponse
+     *
+     * @since v2.0.0
      */
     public function redirect($url, $status = 302)
     {
@@ -86,6 +94,8 @@ class Controller extends ContainerAware
      * @param array  $parameters An array of parameters to pass to the view
      *
      * @return string The rendered view
+     *
+     * @since v2.0.0
      */
     public function renderView($view, array $parameters = array())
     {
@@ -100,6 +110,8 @@ class Controller extends ContainerAware
      * @param Response $response   A response instance
      *
      * @return Response A Response instance
+     *
+     * @since v2.0.0
      */
     public function render($view, array $parameters = array(), Response $response = null)
     {
@@ -114,6 +126,8 @@ class Controller extends ContainerAware
      * @param StreamedResponse $response   A response instance
      *
      * @return StreamedResponse A StreamedResponse instance
+     *
+     * @since v2.1.0
      */
     public function stream($view, array $parameters = array(), StreamedResponse $response = null)
     {
@@ -143,6 +157,8 @@ class Controller extends ContainerAware
      * @param \Exception $previous The previous exception
      *
      * @return NotFoundHttpException
+     *
+     * @since v2.0.0
      */
     public function createNotFoundException($message = 'Not Found', \Exception $previous = null)
     {
@@ -157,6 +173,8 @@ class Controller extends ContainerAware
      * @param array                    $options Options for the form
      *
      * @return Form
+     *
+     * @since v2.0.0
      */
     public function createForm($type, $data = null, array $options = array())
     {
@@ -170,6 +188,8 @@ class Controller extends ContainerAware
      * @param array $options Options for the form
      *
      * @return FormBuilder
+     *
+     * @since v2.0.0
      */
     public function createFormBuilder($data = null, array $options = array())
     {
@@ -180,6 +200,8 @@ class Controller extends ContainerAware
      * Shortcut to return the request service.
      *
      * @return Request
+     *
+     * @since v2.0.0
      */
     public function getRequest()
     {
@@ -192,6 +214,8 @@ class Controller extends ContainerAware
      * @return Registry
      *
      * @throws \LogicException If DoctrineBundle is not available
+     *
+     * @since v2.0.0
      */
     public function getDoctrine()
     {
@@ -210,6 +234,8 @@ class Controller extends ContainerAware
      * @throws \LogicException If SecurityBundle is not available
      *
      * @see Symfony\Component\Security\Core\Authentication\Token\TokenInterface::getUser()
+     *
+     * @since v2.1.0
      */
     public function getUser()
     {
@@ -234,6 +260,8 @@ class Controller extends ContainerAware
      * @param string $id The service id
      *
      * @return Boolean true if the service id is defined, false otherwise
+     *
+     * @since v2.0.0
      */
     public function has($id)
     {
@@ -246,6 +274,8 @@ class Controller extends ContainerAware
      * @param string $id The service id
      *
      * @return object The service
+     *
+     * @since v2.0.0
      */
     public function get($id)
     {

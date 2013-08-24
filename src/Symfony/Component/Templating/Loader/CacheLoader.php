@@ -23,6 +23,8 @@ use Symfony\Component\Templating\TemplateReferenceInterface;
  * All other mechanism would imply the use of `eval()`.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class CacheLoader extends Loader
 {
@@ -34,6 +36,8 @@ class CacheLoader extends Loader
      *
      * @param LoaderInterface $loader A Loader instance
      * @param string          $dir    The directory where to store the cache files
+     *
+     * @since v2.0.0
      */
     public function __construct(LoaderInterface $loader, $dir)
     {
@@ -47,6 +51,8 @@ class CacheLoader extends Loader
      * @param TemplateReferenceInterface $template A template
      *
      * @return Storage|Boolean false if the template cannot be loaded, a Storage instance otherwise
+     *
+     * @since v2.0.0
      */
     public function load(TemplateReferenceInterface $template)
     {
@@ -89,6 +95,8 @@ class CacheLoader extends Loader
      * @param integer                    $time     The last modification time of the cached template (timestamp)
      *
      * @return Boolean
+     *
+     * @since v2.0.0
      */
     public function isFresh(TemplateReferenceInterface $template, $time)
     {

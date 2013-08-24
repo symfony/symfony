@@ -19,6 +19,8 @@ use Symfony\Component\Config\FileLocatorInterface;
  * FileLoader is the abstract class used by all built-in loaders that are file based.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 abstract class FileLoader extends BaseFileLoader
 {
@@ -29,6 +31,8 @@ abstract class FileLoader extends BaseFileLoader
      *
      * @param ContainerBuilder $container A ContainerBuilder instance
      * @param FileLocatorInterface      $locator   A FileLocator instance
+     *
+     * @since v2.1.0
      */
     public function __construct(ContainerBuilder $container, FileLocatorInterface $locator)
     {

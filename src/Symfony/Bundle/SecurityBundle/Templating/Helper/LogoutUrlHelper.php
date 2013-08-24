@@ -20,6 +20,8 @@ use Symfony\Component\Templating\Helper\Helper;
  * LogoutUrlHelper provides generator functions for the logout URL.
  *
  * @author Jeremy Mikola <jmikola@gmail.com>
+ *
+ * @since v2.1.0
  */
 class LogoutUrlHelper extends Helper
 {
@@ -32,6 +34,8 @@ class LogoutUrlHelper extends Helper
      *
      * @param ContainerInterface    $container A ContainerInterface instance
      * @param UrlGeneratorInterface $router    A Router instance
+     *
+     * @since v2.1.0
      */
     public function __construct(ContainerInterface $container, UrlGeneratorInterface $router)
     {
@@ -48,6 +52,8 @@ class LogoutUrlHelper extends Helper
      * @param string                $intention     The intention for CSRF token generation
      * @param string                $csrfParameter The CSRF token parameter name
      * @param CsrfProviderInterface $csrfProvider  A CsrfProviderInterface instance
+     *
+     * @since v2.1.0
      */
     public function registerListener($key, $logoutPath, $intention, $csrfParameter, CsrfProviderInterface $csrfProvider = null)
     {
@@ -60,6 +66,8 @@ class LogoutUrlHelper extends Helper
      * @param string $key The firewall key
      *
      * @return string The logout path
+     *
+     * @since v2.1.0
      */
     public function getLogoutPath($key)
     {
@@ -72,6 +80,8 @@ class LogoutUrlHelper extends Helper
      * @param string $key The firewall key
      *
      * @return string The logout URL
+     *
+     * @since v2.1.0
      */
     public function getLogoutUrl($key)
     {
@@ -87,6 +97,8 @@ class LogoutUrlHelper extends Helper
      * @return string The logout URL
      *
      * @throws \InvalidArgumentException if no LogoutListener is registered for the key
+     *
+     * @since v2.2.0
      */
     private function generateLogoutUrl($key, $referenceType)
     {
@@ -117,6 +129,8 @@ class LogoutUrlHelper extends Helper
      * Returns the canonical name of this helper.
      *
      * @return string The canonical name
+     *
+     * @since v2.1.0
      */
     public function getName()
     {

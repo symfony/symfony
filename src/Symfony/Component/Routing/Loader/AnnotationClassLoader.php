@@ -54,6 +54,8 @@ use Symfony\Component\Config\Loader\LoaderResolverInterface;
  *     }
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 abstract class AnnotationClassLoader implements LoaderInterface
 {
@@ -76,6 +78,8 @@ abstract class AnnotationClassLoader implements LoaderInterface
      * Constructor.
      *
      * @param Reader $reader
+     *
+     * @since v2.0.0
      */
     public function __construct(Reader $reader)
     {
@@ -86,6 +90,8 @@ abstract class AnnotationClassLoader implements LoaderInterface
      * Sets the annotation class to read route properties from.
      *
      * @param string $class A fully-qualified class name
+     *
+     * @since v2.0.0
      */
     public function setRouteAnnotationClass($class)
     {
@@ -101,6 +107,8 @@ abstract class AnnotationClassLoader implements LoaderInterface
      * @return RouteCollection A RouteCollection instance
      *
      * @throws \InvalidArgumentException When route can't be parsed
+     *
+     * @since v2.0.0
      */
     public function load($class, $type = null)
     {
@@ -171,6 +179,9 @@ abstract class AnnotationClassLoader implements LoaderInterface
         return $collection;
     }
 
+    /**
+     * @since v2.0.0
+     */
     protected function addRoute(RouteCollection $collection, $annot, $globals, \ReflectionClass $class, \ReflectionMethod $method)
     {
         $name = $annot->getName();
@@ -203,6 +214,8 @@ abstract class AnnotationClassLoader implements LoaderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function supports($resource, $type = null)
     {
@@ -211,6 +224,8 @@ abstract class AnnotationClassLoader implements LoaderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function setResolver(LoaderResolverInterface $resolver)
     {
@@ -218,6 +233,8 @@ abstract class AnnotationClassLoader implements LoaderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getResolver()
     {
@@ -230,6 +247,8 @@ abstract class AnnotationClassLoader implements LoaderInterface
      * @param \ReflectionMethod $method
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     protected function getDefaultRouteName(\ReflectionClass $class, \ReflectionMethod $method)
     {
@@ -242,5 +261,8 @@ abstract class AnnotationClassLoader implements LoaderInterface
         return $name;
     }
 
+    /**
+     * @since v2.0.0
+     */
     abstract protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, $annot);
 }

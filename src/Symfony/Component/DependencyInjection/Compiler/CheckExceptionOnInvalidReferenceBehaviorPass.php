@@ -22,12 +22,17 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  * Checks that all references are pointing to a valid service.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class CheckExceptionOnInvalidReferenceBehaviorPass implements CompilerPassInterface
 {
     private $container;
     private $sourceId;
 
+    /**
+     * @since v2.0.0
+     */
     public function process(ContainerBuilder $container)
     {
         $this->container = $container;
@@ -38,6 +43,9 @@ class CheckExceptionOnInvalidReferenceBehaviorPass implements CompilerPassInterf
         }
     }
 
+    /**
+     * @since v2.0.0
+     */
     private function processDefinition(Definition $definition)
     {
         $this->processReferences($definition->getArguments());
@@ -45,6 +53,9 @@ class CheckExceptionOnInvalidReferenceBehaviorPass implements CompilerPassInterf
         $this->processReferences($definition->getProperties());
     }
 
+    /**
+     * @since v2.0.0
+     */
     private function processReferences(array $arguments)
     {
         foreach ($arguments as $argument) {

@@ -32,6 +32,8 @@ interface ChoiceListInterface
      * Returns the list of choices
      *
      * @return array The choices with their indices as keys
+     *
+     * @since v2.1.0
      */
     public function getChoices();
 
@@ -39,6 +41,8 @@ interface ChoiceListInterface
      * Returns the values for the choices
      *
      * @return array The values with the corresponding choice indices as keys
+     *
+     * @since v2.1.0
      */
     public function getValues();
 
@@ -63,6 +67,8 @@ interface ChoiceListInterface
      * @return array A nested array containing the views with the corresponding
      *               choice indices as keys on the lowest levels and the choice
      *               group names in the keys of the higher levels
+     *
+     * @since v2.1.0
      */
     public function getPreferredViews();
 
@@ -89,6 +95,8 @@ interface ChoiceListInterface
      *               group names in the keys of the higher levels
      *
      * @see getPreferredValues
+     *
+     * @since v2.1.0
      */
     public function getRemainingViews();
 
@@ -101,6 +109,8 @@ interface ChoiceListInterface
      *                      this array are ignored
      *
      * @return array An array of choices with ascending, 0-based numeric keys
+     *
+     * @since v2.1.0
      */
     public function getChoicesForValues(array $values);
 
@@ -114,6 +124,8 @@ interface ChoiceListInterface
      *
      * @return array An array of choice values with ascending, 0-based numeric
      *               keys
+     *
+     * @since v2.1.0
      */
     public function getValuesForChoices(array $choices);
 
@@ -129,6 +141,8 @@ interface ChoiceListInterface
      *                       array are ignored
      *
      * @return array An array of indices with ascending, 0-based numeric keys
+     *
+     * @since v2.1.0
      */
     public function getIndicesForChoices(array $choices);
 
@@ -144,6 +158,8 @@ interface ChoiceListInterface
      *                      this array are ignored
      *
      * @return array An array of indices with ascending, 0-based numeric keys
+     *
+     * @since v2.1.0
      */
     public function getIndicesForValues(array $values);
 }

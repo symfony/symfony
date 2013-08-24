@@ -15,6 +15,8 @@ namespace Symfony\Component\Templating\Asset;
  * The URL packages adds a version and a base URL to asset URLs.
  *
  * @author Kris Wallsmith <kris@symfony.com>
+ *
+ * @since v2.0.0
  */
 class UrlPackage extends Package
 {
@@ -26,6 +28,8 @@ class UrlPackage extends Package
      * @param string|array $baseUrls Base asset URLs
      * @param string       $version  The package version
      * @param string       $format   The format used to apply the version
+     *
+     * @since v2.0.0
      */
     public function __construct($baseUrls = array(), $version = null, $format = null)
     {
@@ -41,6 +45,9 @@ class UrlPackage extends Package
         }
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getUrl($path)
     {
         if (false !== strpos($path, '://') || 0 === strpos($path, '//')) {
@@ -62,6 +69,8 @@ class UrlPackage extends Package
      * @param string $path
      *
      * @return string The base URL
+     *
+     * @since v2.0.0
      */
     public function getBaseUrl($path)
     {

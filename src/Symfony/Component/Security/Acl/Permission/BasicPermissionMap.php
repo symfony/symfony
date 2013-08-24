@@ -16,6 +16,8 @@ namespace Symfony\Component\Security\Acl\Permission;
  * on the standard implementation of the MaskBuilder.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class BasicPermissionMap implements PermissionMapInterface
 {
@@ -30,6 +32,9 @@ class BasicPermissionMap implements PermissionMapInterface
 
     protected $map;
 
+    /**
+     * @since v2.3.0
+     */
     public function __construct()
     {
         $this->map = array(
@@ -88,6 +93,8 @@ class BasicPermissionMap implements PermissionMapInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function getMasks($permission, $object)
     {
@@ -100,6 +107,8 @@ class BasicPermissionMap implements PermissionMapInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function contains($permission)
     {

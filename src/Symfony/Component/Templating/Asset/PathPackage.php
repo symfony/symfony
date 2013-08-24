@@ -15,6 +15,8 @@ namespace Symfony\Component\Templating\Asset;
  * The path packages adds a version and a base path to asset URLs.
  *
  * @author Kris Wallsmith <kris@symfony.com>
+ *
+ * @since v2.0.0
  */
 class PathPackage extends Package
 {
@@ -26,6 +28,8 @@ class PathPackage extends Package
      * @param string $basePath The base path to be prepended to relative paths
      * @param string $version  The package version
      * @param string $format   The format used to apply the version
+     *
+     * @since v2.0.0
      */
     public function __construct($basePath = null, $version = null, $format = null)
     {
@@ -42,6 +46,9 @@ class PathPackage extends Package
         }
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getUrl($path)
     {
         if (false !== strpos($path, '://') || 0 === strpos($path, '//')) {
@@ -62,6 +69,8 @@ class PathPackage extends Package
      * Returns the base path.
      *
      * @return string The base path
+     *
+     * @since v2.0.0
      */
     public function getBasePath()
     {

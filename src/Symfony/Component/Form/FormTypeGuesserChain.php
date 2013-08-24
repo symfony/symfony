@@ -14,6 +14,9 @@ namespace Symfony\Component\Form;
 use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
+/**
+ * @since v2.0.0
+ */
 class FormTypeGuesserChain implements FormTypeGuesserInterface
 {
     private $guessers = array();
@@ -24,6 +27,8 @@ class FormTypeGuesserChain implements FormTypeGuesserInterface
      * @param array $guessers Guessers as instances of FormTypeGuesserInterface
      *
      * @throws UnexpectedTypeException if any guesser does not implement FormTypeGuesserInterface
+     *
+     * @since v2.0.0
      */
     public function __construct(array $guessers)
     {
@@ -42,6 +47,8 @@ class FormTypeGuesserChain implements FormTypeGuesserInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function guessType($class, $property)
     {
@@ -52,6 +59,8 @@ class FormTypeGuesserChain implements FormTypeGuesserInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function guessRequired($class, $property)
     {
@@ -62,6 +71,8 @@ class FormTypeGuesserChain implements FormTypeGuesserInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function guessMaxLength($class, $property)
     {
@@ -72,6 +83,8 @@ class FormTypeGuesserChain implements FormTypeGuesserInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function guessPattern($class, $property)
     {
@@ -88,6 +101,8 @@ class FormTypeGuesserChain implements FormTypeGuesserInterface
      *                            as argument and should return a Guess instance
      *
      * @return Guess The guess with the highest confidence
+     *
+     * @since v2.0.0
      */
     private function guess(\Closure $closure)
     {

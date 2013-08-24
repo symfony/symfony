@@ -18,6 +18,8 @@ use Symfony\Component\Routing\Exception\MethodNotAllowedException;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Arnaud Le Blanc <arnaud.lb@gmail.com>
+ *
+ * @since v2.0.0
  */
 class ApacheUrlMatcher extends UrlMatcher
 {
@@ -31,6 +33,8 @@ class ApacheUrlMatcher extends UrlMatcher
      * @return array An array of parameters
      *
      * @throws MethodNotAllowedException If the current method is not allowed
+     *
+     * @since v2.0.0
      */
     public function match($pathinfo)
     {
@@ -98,6 +102,8 @@ class ApacheUrlMatcher extends UrlMatcher
      * @param string[] $values
      *
      * @return array
+     *
+     * @since v2.2.5
      */
     private function denormalizeValues(array $values)
     {

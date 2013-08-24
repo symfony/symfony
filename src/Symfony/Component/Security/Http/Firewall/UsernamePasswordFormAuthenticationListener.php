@@ -29,6 +29,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  * an authentication via a simple form composed of a username and a password.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class UsernamePasswordFormAuthenticationListener extends AbstractAuthenticationListener
 {
@@ -36,6 +38,8 @@ class UsernamePasswordFormAuthenticationListener extends AbstractAuthenticationL
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, HttpUtils $httpUtils, $providerKey, AuthenticationSuccessHandlerInterface $successHandler, AuthenticationFailureHandlerInterface $failureHandler, array $options = array(), LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, CsrfProviderInterface $csrfProvider = null)
     {
@@ -52,6 +56,8 @@ class UsernamePasswordFormAuthenticationListener extends AbstractAuthenticationL
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     protected function requiresAuthentication(Request $request)
     {
@@ -64,6 +70,8 @@ class UsernamePasswordFormAuthenticationListener extends AbstractAuthenticationL
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     protected function attemptAuthentication(Request $request)
     {

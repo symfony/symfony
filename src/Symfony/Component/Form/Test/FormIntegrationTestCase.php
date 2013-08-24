@@ -15,6 +15,8 @@ use Symfony\Component\Form\Forms;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.3.0
  */
 abstract class FormIntegrationTestCase extends \PHPUnit_Framework_TestCase
 {
@@ -23,6 +25,9 @@ abstract class FormIntegrationTestCase extends \PHPUnit_Framework_TestCase
      */
     protected $factory;
 
+    /**
+     * @since v2.3.0
+     */
     protected function setUp()
     {
         $this->factory = Forms::createFormFactoryBuilder()
@@ -30,6 +35,9 @@ abstract class FormIntegrationTestCase extends \PHPUnit_Framework_TestCase
             ->getFormFactory();
     }
 
+    /**
+     * @since v2.3.0
+     */
     protected function getExtensions()
     {
         return array();

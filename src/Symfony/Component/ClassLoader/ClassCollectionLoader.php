@@ -15,6 +15,8 @@ namespace Symfony\Component\ClassLoader;
  * ClassCollectionLoader.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class ClassCollectionLoader
 {
@@ -33,6 +35,8 @@ class ClassCollectionLoader
      * @param string  $extension  File extension of the resulting file
      *
      * @throws \InvalidArgumentException When class can't be loaded
+     *
+     * @since v2.1.0
      */
     public static function load($classes, $cacheDir, $name, $autoReload, $adaptive = false, $extension = '.php')
     {
@@ -133,6 +137,8 @@ class ClassCollectionLoader
      * @param string $source Namespace string
      *
      * @return string Namespaces with brackets
+     *
+     * @since v2.1.0
      */
     public static function fixNamespaceDeclarations($source)
     {
@@ -197,6 +203,8 @@ class ClassCollectionLoader
 
     /**
      * This method is only useful for testing.
+     *
+     * @since v2.2.0
      */
     public static function enableTokenizer($bool)
     {
@@ -209,6 +217,8 @@ class ClassCollectionLoader
      * @param string $code Original PHP code
      *
      * @return string compressed code
+     *
+     * @since v2.2.0
      */
     private static function compressCode($code)
     {
@@ -226,6 +236,8 @@ class ClassCollectionLoader
      * @param string $content Temporary file content
      *
      * @throws \RuntimeException when a cache file cannot be written
+     *
+     * @since v2.1.0
      */
     private static function writeCacheFile($file, $content)
     {
@@ -247,6 +259,8 @@ class ClassCollectionLoader
      * @return \ReflectionClass[] An array of sorted \ReflectionClass instances (dependencies added if needed)
      *
      * @throws \InvalidArgumentException When a class can't be loaded
+     *
+     * @since v2.1.0
      */
     private static function getOrderedClasses(array $classes)
     {
@@ -265,6 +279,9 @@ class ClassCollectionLoader
         return $map;
     }
 
+    /**
+     * @since v2.1.0
+     */
     private static function getClassHierarchy(\ReflectionClass $class)
     {
         if (isset(self::$seen[$class->getName()])) {
@@ -296,6 +313,9 @@ class ClassCollectionLoader
         return array_merge(self::getInterfaces($class), $traits, $classes);
     }
 
+    /**
+     * @since v2.1.0
+     */
     private static function getInterfaces(\ReflectionClass $class)
     {
         $classes = array();
@@ -313,6 +333,9 @@ class ClassCollectionLoader
         return $classes;
     }
 
+    /**
+     * @since v2.2.0
+     */
     private static function computeTraitDeps(\ReflectionClass $class)
     {
         $traits = $class->getTraits();
@@ -343,6 +366,8 @@ class ClassCollectionLoader
      * @return \ArrayObject The dependencies for the given node
      *
      * @throws \RuntimeException if a circular dependency is detected
+     *
+     * @since v2.2.0
      */
     private static function resolveDependencies(array $tree, $node, \ArrayObject $resolved = null, \ArrayObject $unresolved = null)
     {

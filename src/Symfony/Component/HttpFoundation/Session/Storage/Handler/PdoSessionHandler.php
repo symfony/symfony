@@ -16,6 +16,8 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Michael Williams <michael.williams@funsational.com>
+ *
+ * @since v2.1.0
  */
 class PdoSessionHandler implements \SessionHandlerInterface
 {
@@ -42,6 +44,8 @@ class PdoSessionHandler implements \SessionHandlerInterface
      * @param array $dbOptions An associative array of DB options
      *
      * @throws \InvalidArgumentException When "db_table" option is not provided
+     *
+     * @since v2.1.0
      */
     public function __construct(\PDO $pdo, array $dbOptions = array())
     {
@@ -61,6 +65,8 @@ class PdoSessionHandler implements \SessionHandlerInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function open($path, $name)
     {
@@ -69,6 +75,8 @@ class PdoSessionHandler implements \SessionHandlerInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function close()
     {
@@ -77,6 +85,8 @@ class PdoSessionHandler implements \SessionHandlerInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function destroy($id)
     {
@@ -100,6 +110,8 @@ class PdoSessionHandler implements \SessionHandlerInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function gc($lifetime)
     {
@@ -123,6 +135,8 @@ class PdoSessionHandler implements \SessionHandlerInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function read($id)
     {
@@ -157,6 +171,8 @@ class PdoSessionHandler implements \SessionHandlerInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.1.0
      */
     public function write($id, $data)
     {
@@ -219,6 +235,8 @@ class PdoSessionHandler implements \SessionHandlerInterface
      * @param string $data
      *
      * @return boolean True.
+     *
+     * @since v2.0.0
      */
     private function createNewSession($id, $data = '')
     {

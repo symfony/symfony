@@ -19,6 +19,8 @@ use Symfony\Component\Validator\Constraint;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class Type extends Constraint
 {
@@ -27,6 +29,8 @@ class Type extends Constraint
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function getDefaultOption()
     {
@@ -35,6 +39,8 @@ class Type extends Constraint
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.0.0
      */
     public function getRequiredOptions()
     {

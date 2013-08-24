@@ -17,6 +17,8 @@ namespace Symfony\Component\Validator;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 abstract class ConstraintValidator implements ConstraintValidatorInterface
 {
@@ -27,6 +29,8 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @since v2.2.0
      */
     public function initialize(ExecutionContextInterface $context)
     {

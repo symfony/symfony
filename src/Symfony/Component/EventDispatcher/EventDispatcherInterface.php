@@ -34,6 +34,8 @@ interface EventDispatcherInterface
      * @return Event
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function dispatch($eventName, Event $event = null);
 
@@ -46,6 +48,8 @@ interface EventDispatcherInterface
      *                            listener will be triggered in the chain (defaults to 0)
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function addListener($eventName, $listener, $priority = 0);
 
@@ -58,6 +62,8 @@ interface EventDispatcherInterface
      * @param EventSubscriberInterface $subscriber The subscriber.
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function addSubscriber(EventSubscriberInterface $subscriber);
 
@@ -66,6 +72,8 @@ interface EventDispatcherInterface
      *
      * @param string|array $eventName The event(s) to remove a listener from
      * @param callable     $listener  The listener to remove
+     *
+     * @since v2.1.0
      */
     public function removeListener($eventName, $listener);
 
@@ -73,6 +81,8 @@ interface EventDispatcherInterface
      * Removes an event subscriber.
      *
      * @param EventSubscriberInterface $subscriber The subscriber
+     *
+     * @since v2.1.0
      */
     public function removeSubscriber(EventSubscriberInterface $subscriber);
 
@@ -82,6 +92,8 @@ interface EventDispatcherInterface
      * @param string $eventName The name of the event
      *
      * @return array The event listeners for the specified event, or all event listeners by event name
+     *
+     * @since v2.1.0
      */
     public function getListeners($eventName = null);
 
@@ -91,6 +103,8 @@ interface EventDispatcherInterface
      * @param string $eventName The name of the event
      *
      * @return Boolean true if the specified event has any listeners, false otherwise
+     *
+     * @since v2.1.0
      */
     public function hasListeners($eventName = null);
 }

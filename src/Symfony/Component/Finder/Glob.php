@@ -32,6 +32,8 @@ namespace Symfony\Component\Finder;
  * @author     Richard Clamp <richardc@unixbeard.net> Perl version
  * @copyright  2004-2005 Fabien Potencier <fabien@symfony.com>
  * @copyright  2002 Richard Clamp <richardc@unixbeard.net>
+ *
+ * @since v2.0.0
  */
 class Glob
 {
@@ -43,6 +45,8 @@ class Glob
      * @param Boolean $strictWildcardSlash
      *
      * @return string regex The regexp
+     *
+     * @since v2.1.0
      */
     public static function toRegex($glob, $strictLeadingDot = true, $strictWildcardSlash = true)
     {

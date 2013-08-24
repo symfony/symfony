@@ -18,6 +18,8 @@ namespace Symfony\Component\CssSelector\Exception;
  * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @since v2.3.0
  */
 class InternalErrorException extends ParseException implements ExceptionInterface
 {

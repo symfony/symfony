@@ -13,11 +13,15 @@ namespace Symfony\Component\Form\Util;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.2.0
  */
 class FormUtil
 {
     /**
      * This class should not be instantiated
+     *
+     * @since v2.2.0
      */
     private function __construct() {}
 
@@ -31,6 +35,8 @@ class FormUtil
      * @param  mixed $data
      *
      * @return Boolean
+     *
+     * @since v2.1.0
      */
     public static function isEmpty($data)
     {

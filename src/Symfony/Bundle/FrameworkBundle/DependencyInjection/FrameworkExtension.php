@@ -26,6 +26,8 @@ use Symfony\Component\Config\FileLocator;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Jeremy Mikola <jmikola@gmail.com>
+ *
+ * @since v2.0.0
  */
 class FrameworkExtension extends Extension
 {
@@ -34,6 +36,8 @@ class FrameworkExtension extends Extension
      *
      * @param array            $configs
      * @param ContainerBuilder $container
+     *
+     * @since v2.0.0
      */
     public function load(array $configs, ContainerBuilder $container)
     {
@@ -139,6 +143,8 @@ class FrameworkExtension extends Extension
      * @param XmlFileLoader    $loader    An XmlFileLoader instance
      *
      * @throws \LogicException
+     *
+     * @since v2.0.0
      */
     private function registerFormConfiguration($config, ContainerBuilder $container, XmlFileLoader $loader)
     {
@@ -165,6 +171,8 @@ class FrameworkExtension extends Extension
      * @param array            $config    An ESI configuration array
      * @param ContainerBuilder $container A ContainerBuilder instance
      * @param XmlFileLoader    $loader    An XmlFileLoader instance
+     *
+     * @since v2.2.0
      */
     private function registerEsiConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
@@ -181,6 +189,8 @@ class FrameworkExtension extends Extension
      * @param array            $config    A fragments configuration array
      * @param ContainerBuilder $container A ContainerBuilder instance
      * @param XmlFileLoader    $loader    An XmlFileLoader instance
+     *
+     * @since v2.2.0
      */
     private function registerFragmentsConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
@@ -200,6 +210,8 @@ class FrameworkExtension extends Extension
      * @param XmlFileLoader    $loader    An XmlFileLoader instance
      *
      * @throws \LogicException
+     *
+     * @since v2.0.0
      */
     private function registerProfilerConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
@@ -270,6 +282,8 @@ class FrameworkExtension extends Extension
      * @param array            $config    A router configuration array
      * @param ContainerBuilder $container A ContainerBuilder instance
      * @param XmlFileLoader    $loader    An XmlFileLoader instance
+     *
+     * @since v2.0.0
      */
     private function registerRouterConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
@@ -303,6 +317,8 @@ class FrameworkExtension extends Extension
      * @param array            $config    A session configuration array
      * @param ContainerBuilder $container A ContainerBuilder instance
      * @param XmlFileLoader    $loader    An XmlFileLoader instance
+     *
+     * @since v2.0.0
      */
     private function registerSessionConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
@@ -354,6 +370,8 @@ class FrameworkExtension extends Extension
      * @param string           $ide
      * @param ContainerBuilder $container A ContainerBuilder instance
      * @param XmlFileLoader    $loader    An XmlFileLoader instance
+     *
+     * @since v2.0.0
      */
     private function registerTemplatingConfiguration(array $config, $ide, ContainerBuilder $container, XmlFileLoader $loader)
     {
@@ -456,6 +474,8 @@ class FrameworkExtension extends Extension
 
     /**
      * Returns a definition for an asset package.
+     *
+     * @since v2.0.0
      */
     private function createPackageDefinition(ContainerBuilder $container, array $httpUrls, array $sslUrls, $version, $format, $name = null)
     {
@@ -526,6 +546,8 @@ class FrameworkExtension extends Extension
      *
      * @param array            $config    A translator configuration array
      * @param ContainerBuilder $container A ContainerBuilder instance
+     *
+     * @since v2.0.0
      */
     private function registerTranslatorConfiguration(array $config, ContainerBuilder $container)
     {
@@ -599,6 +621,8 @@ class FrameworkExtension extends Extension
      * @param array            $config    A validation configuration array
      * @param ContainerBuilder $container A ContainerBuilder instance
      * @param XmlFileLoader    $loader    An XmlFileLoader instance
+     *
+     * @since v2.0.0
      */
     private function registerValidationConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
@@ -629,6 +653,9 @@ class FrameworkExtension extends Extension
         }
     }
 
+    /**
+     * @since v2.0.0
+     */
     private function getValidatorXmlMappingFiles(ContainerBuilder $container)
     {
         $reflClass = new \ReflectionClass('Symfony\Component\Form\FormInterface');
@@ -646,6 +673,9 @@ class FrameworkExtension extends Extension
         return $files;
     }
 
+    /**
+     * @since v2.0.0
+     */
     private function getValidatorYamlMappingFiles(ContainerBuilder $container)
     {
         $files = array();
@@ -661,6 +691,9 @@ class FrameworkExtension extends Extension
         return $files;
     }
 
+    /**
+     * @since v2.0.0
+     */
     private function registerAnnotationsConfiguration(array $config, ContainerBuilder $container,$loader)
     {
         $loader->load('annotations.xml');
@@ -691,12 +724,17 @@ class FrameworkExtension extends Extension
      * Returns the base path for the XSD files.
      *
      * @return string The XSD base path
+     *
+     * @since v2.0.0
      */
     public function getXsdValidationBasePath()
     {
         return __DIR__.'/../Resources/config/schema';
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function getNamespace()
     {
         return 'http://symfony.com/schema/dic/symfony';

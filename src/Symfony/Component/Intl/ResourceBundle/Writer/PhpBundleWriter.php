@@ -15,11 +15,15 @@ namespace Symfony\Component\Intl\ResourceBundle\Writer;
  * Writes .php resource bundles.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.3.0
  */
 class PhpBundleWriter implements BundleWriterInterface
 {
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.2
      */
     public function write($path, $locale, $data)
     {

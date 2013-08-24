@@ -17,6 +17,8 @@ namespace Symfony\Component\HttpFoundation;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class Response
 {
@@ -195,6 +197,8 @@ class Response
      * @throws \InvalidArgumentException When the HTTP status code is not valid
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function __construct($content = '', $status = 200, $headers = array())
     {
@@ -220,6 +224,8 @@ class Response
      * @param array   $headers An array of response headers
      *
      * @return Response
+     *
+     * @since v2.1.0
      */
     public static function create($content = '', $status = 200, $headers = array())
     {
@@ -236,6 +242,8 @@ class Response
      * @return string The Response as an HTTP string
      *
      * @see prepare()
+     *
+     * @since v2.0.0
      */
     public function __toString()
     {
@@ -247,6 +255,8 @@ class Response
 
     /**
      * Clones the current Response instance.
+     *
+     * @since v2.0.0
      */
     public function __clone()
     {
@@ -263,6 +273,8 @@ class Response
      * @param Request $request A Request instance
      *
      * @return Response The current response.
+     *
+     * @since v2.1.0
      */
     public function prepare(Request $request)
     {
@@ -323,6 +335,8 @@ class Response
      * Sends HTTP headers.
      *
      * @return Response
+     *
+     * @since v2.0.0
      */
     public function sendHeaders()
     {
@@ -353,6 +367,8 @@ class Response
      * Sends content for the current web response.
      *
      * @return Response
+     *
+     * @since v2.0.0
      */
     public function sendContent()
     {
@@ -367,6 +383,8 @@ class Response
      * @return Response
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function send()
     {
@@ -412,6 +430,8 @@ class Response
      * @throws \UnexpectedValueException
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setContent($content)
     {
@@ -430,6 +450,8 @@ class Response
      * @return string Content
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getContent()
     {
@@ -444,6 +466,8 @@ class Response
      * @return Response
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setProtocolVersion($version)
     {
@@ -458,6 +482,8 @@ class Response
      * @return string The HTTP protocol version
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getProtocolVersion()
     {
@@ -478,6 +504,8 @@ class Response
      * @throws \InvalidArgumentException When the HTTP status code is not valid
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setStatusCode($code, $text = null)
     {
@@ -509,6 +537,8 @@ class Response
      * @return integer Status code
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getStatusCode()
     {
@@ -523,6 +553,8 @@ class Response
      * @return Response
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setCharset($charset)
     {
@@ -537,6 +569,8 @@ class Response
      * @return string Character set
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getCharset()
     {
@@ -555,6 +589,8 @@ class Response
      * @return Boolean true if the response is worth caching, false otherwise
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function isCacheable()
     {
@@ -579,6 +615,8 @@ class Response
      * @return Boolean true if the response is fresh, false otherwise
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function isFresh()
     {
@@ -592,6 +630,8 @@ class Response
      * @return Boolean true if the response is validateable, false otherwise
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function isValidateable()
     {
@@ -606,6 +646,8 @@ class Response
      * @return Response
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setPrivate()
     {
@@ -623,6 +665,8 @@ class Response
      * @return Response
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setPublic()
     {
@@ -643,6 +687,8 @@ class Response
      * @return Boolean true if the response must be revalidated by a cache, false otherwise
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function mustRevalidate()
     {
@@ -657,6 +703,8 @@ class Response
      * @throws \RuntimeException When the header is not parseable
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getDate()
     {
@@ -671,6 +719,8 @@ class Response
      * @return Response
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setDate(\DateTime $date)
     {
@@ -684,6 +734,8 @@ class Response
      * Returns the age of the response.
      *
      * @return integer The age of the response in seconds
+     *
+     * @since v2.0.0
      */
     public function getAge()
     {
@@ -700,6 +752,8 @@ class Response
      * @return Response
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function expire()
     {
@@ -716,6 +770,8 @@ class Response
      * @return \DateTime|null A DateTime instance or null if the header does not exist
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getExpires()
     {
@@ -737,6 +793,8 @@ class Response
      * @return Response
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setExpires(\DateTime $date = null)
     {
@@ -761,6 +819,8 @@ class Response
      * @return integer|null Number of seconds
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getMaxAge()
     {
@@ -789,6 +849,8 @@ class Response
      * @return Response
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setMaxAge($value)
     {
@@ -807,6 +869,8 @@ class Response
      * @return Response
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setSharedMaxAge($value)
     {
@@ -827,6 +891,8 @@ class Response
      * @return integer|null The TTL in seconds
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getTtl()
     {
@@ -847,6 +913,8 @@ class Response
      * @return Response
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setTtl($seconds)
     {
@@ -865,6 +933,8 @@ class Response
      * @return Response
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setClientTtl($seconds)
     {
@@ -881,6 +951,8 @@ class Response
      * @throws \RuntimeException When the HTTP header is not parseable
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getLastModified()
     {
@@ -897,6 +969,8 @@ class Response
      * @return Response
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setLastModified(\DateTime $date = null)
     {
@@ -917,6 +991,8 @@ class Response
      * @return string|null The ETag HTTP header or null if it does not exist
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getEtag()
     {
@@ -932,6 +1008,8 @@ class Response
      * @return Response
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setEtag($etag = null, $weak = false)
     {
@@ -960,6 +1038,8 @@ class Response
      * @throws \InvalidArgumentException
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setCache(array $options)
     {
@@ -1013,6 +1093,8 @@ class Response
      * @see http://tools.ietf.org/html/rfc2616#section-10.3.5
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setNotModified()
     {
@@ -1033,6 +1115,8 @@ class Response
      * @return Boolean true if the response includes a Vary header, false otherwise
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function hasVary()
     {
@@ -1045,6 +1129,8 @@ class Response
      * @return array An array of Vary names
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getVary()
     {
@@ -1064,6 +1150,8 @@ class Response
      * @return Response
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setVary($headers, $replace = true)
     {
@@ -1084,6 +1172,8 @@ class Response
      * @return Boolean true if the Response validators match the Request, false otherwise
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function isNotModified(Request $request)
     {
@@ -1113,6 +1203,8 @@ class Response
      * @return Boolean
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function isInvalid()
     {
@@ -1125,6 +1217,8 @@ class Response
      * @return Boolean
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function isInformational()
     {
@@ -1137,6 +1231,8 @@ class Response
      * @return Boolean
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function isSuccessful()
     {
@@ -1149,6 +1245,8 @@ class Response
      * @return Boolean
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function isRedirection()
     {
@@ -1161,6 +1259,8 @@ class Response
      * @return Boolean
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function isClientError()
     {
@@ -1173,6 +1273,8 @@ class Response
      * @return Boolean
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function isServerError()
     {
@@ -1185,6 +1287,8 @@ class Response
      * @return Boolean
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function isOk()
     {
@@ -1197,6 +1301,8 @@ class Response
      * @return Boolean
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function isForbidden()
     {
@@ -1209,6 +1315,8 @@ class Response
      * @return Boolean
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function isNotFound()
     {
@@ -1223,6 +1331,8 @@ class Response
      * @return Boolean
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function isRedirect($location = null)
     {
@@ -1235,6 +1345,8 @@ class Response
      * @return Boolean
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function isEmpty()
     {
@@ -1245,6 +1357,8 @@ class Response
      * Check if we need to remove Cache-Control for ssl encrypted downloads when using IE < 9
      *
      * @link http://support.microsoft.com/kb/323308
+     *
+     * @since v2.2.2
      */
     protected function ensureIEOverSSLCompatibility(Request $request)
     {

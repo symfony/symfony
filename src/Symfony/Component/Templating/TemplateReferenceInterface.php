@@ -26,6 +26,8 @@ interface TemplateReferenceInterface
      * @return array An array of parameters
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function all();
 
@@ -40,6 +42,8 @@ interface TemplateReferenceInterface
      * @throws  \InvalidArgumentException if the parameter is not defined
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function set($name, $value);
 
@@ -53,6 +57,8 @@ interface TemplateReferenceInterface
      * @throws  \InvalidArgumentException if the parameter is not defined
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function get($name);
 
@@ -64,6 +70,8 @@ interface TemplateReferenceInterface
      * @return string A path to the template or a resource
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function getPath();
 
@@ -75,6 +83,8 @@ interface TemplateReferenceInterface
      * @return string The template name
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function getLogicalName();
 }

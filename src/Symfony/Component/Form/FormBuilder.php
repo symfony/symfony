@@ -20,6 +20,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  * A builder for creating {@link Form} instances.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.1.0
  */
 class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormBuilderInterface
 {
@@ -45,6 +47,8 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
      * @param EventDispatcherInterface $dispatcher
      * @param FormFactoryInterface     $factory
      * @param array                    $options
+     *
+     * @since v2.1.0
      */
     public function __construct($name, $dataClass, EventDispatcherInterface $dispatcher, FormFactoryInterface $factory, array $options = array())
     {
@@ -55,6 +59,8 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function add($child, $type = null, array $options = array())
     {
@@ -91,6 +97,8 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function create($name, $type = null, array $options = array())
     {
@@ -111,6 +119,8 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function get($name)
     {
@@ -131,6 +141,8 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function remove($name)
     {
@@ -149,6 +161,8 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function has($name)
     {
@@ -169,6 +183,8 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function all()
     {
@@ -183,6 +199,8 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function count()
     {
@@ -195,6 +213,8 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.10
      */
     public function getFormConfig()
     {
@@ -208,6 +228,8 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getForm()
     {
@@ -234,6 +256,8 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getIterator()
     {
@@ -250,6 +274,8 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
      * @param  string $name The name of the unresolved child.
      *
      * @return FormBuilder The created instance.
+     *
+     * @since v2.2.0
      */
     private function resolveChild($name)
     {
@@ -263,6 +289,8 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
 
     /**
      * Converts all unresolved children into {@link FormBuilder} instances.
+     *
+     * @since v2.2.0
      */
     private function resolveChildren()
     {

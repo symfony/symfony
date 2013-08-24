@@ -18,6 +18,8 @@ use Symfony\Component\Process\Exception\LogicException;
  * Process builder.
  *
  * @author Kris Wallsmith <kris@symfony.com>
+ *
+ * @since v2.1.0
  */
 class ProcessBuilder
 {
@@ -30,6 +32,9 @@ class ProcessBuilder
     private $inheritEnv;
     private $prefix = array();
 
+    /**
+     * @since v2.1.0
+     */
     public function __construct(array $arguments = array())
     {
         $this->arguments = $arguments;
@@ -40,6 +45,9 @@ class ProcessBuilder
         $this->inheritEnv = true;
     }
 
+    /**
+     * @since v2.1.0
+     */
     public static function create(array $arguments = array())
     {
         return new static($arguments);
@@ -51,6 +59,8 @@ class ProcessBuilder
      * @param string $argument A command argument
      *
      * @return ProcessBuilder
+     *
+     * @since v2.1.0
      */
     public function add($argument)
     {
@@ -67,6 +77,8 @@ class ProcessBuilder
      * @param string|array $prefix A command prefix or an array of command prefixes
      *
      * @return ProcessBuilder
+     *
+     * @since v2.3.0
      */
     public function setPrefix($prefix)
     {
@@ -79,6 +91,8 @@ class ProcessBuilder
      * @param array $arguments
      *
      * @return ProcessBuilder
+     *
+     * @since v2.2.0
      */
     public function setArguments(array $arguments)
     {
@@ -87,6 +101,9 @@ class ProcessBuilder
         return $this;
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function setWorkingDirectory($cwd)
     {
         $this->cwd = $cwd;
@@ -94,6 +111,9 @@ class ProcessBuilder
         return $this;
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function inheritEnvironmentVariables($inheritEnv = true)
     {
         $this->inheritEnv = $inheritEnv;
@@ -101,6 +121,9 @@ class ProcessBuilder
         return $this;
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function setEnv($name, $value)
     {
         $this->env[$name] = $value;
@@ -108,6 +131,9 @@ class ProcessBuilder
         return $this;
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function setInput($stdin)
     {
         $this->stdin = $stdin;
@@ -125,6 +151,8 @@ class ProcessBuilder
      * @return ProcessBuilder
      *
      * @throws InvalidArgumentException
+     *
+     * @since v2.1.0
      */
     public function setTimeout($timeout)
     {
@@ -145,6 +173,9 @@ class ProcessBuilder
         return $this;
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function setOption($name, $value)
     {
         $this->options[$name] = $value;
@@ -152,6 +183,9 @@ class ProcessBuilder
         return $this;
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function getProcess()
     {
         if (0 === count($this->prefix) && 0 === count($this->arguments)) {

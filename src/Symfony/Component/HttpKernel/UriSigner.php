@@ -15,6 +15,8 @@ namespace Symfony\Component\HttpKernel;
  * Signs URIs.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.2.0
  */
 class UriSigner
 {
@@ -24,6 +26,8 @@ class UriSigner
      * Constructor.
      *
      * @param string $secret A secret
+     *
+     * @since v2.2.0
      */
     public function __construct($secret)
     {
@@ -39,6 +43,8 @@ class UriSigner
      * @param string $uri A URI to sign
      *
      * @return string The signed URI
+     *
+     * @since v2.2.0
      */
     public function sign($uri)
     {
@@ -55,6 +61,8 @@ class UriSigner
      * @param string $uri A signed URI
      *
      * @return Boolean True if the URI is signed correctly, false otherwise
+     *
+     * @since v2.2.0
      */
     public function check($uri)
     {
@@ -65,6 +73,9 @@ class UriSigner
         return $this->computeHash($matches[1]) === $matches[2];
     }
 
+    /**
+     * @since v2.2.0
+     */
     private function computeHash($uri)
     {
         return urlencode(base64_encode(hash_hmac('sha1', $uri, $this->secret, true)));

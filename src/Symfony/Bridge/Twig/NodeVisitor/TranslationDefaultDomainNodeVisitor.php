@@ -18,6 +18,8 @@ use Symfony\Bridge\Twig\Node\TransDefaultDomainNode;
  * TranslationDefaultDomainNodeVisitor.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.1.0
  */
 class TranslationDefaultDomainNodeVisitor implements \Twig_NodeVisitorInterface
 {
@@ -28,6 +30,8 @@ class TranslationDefaultDomainNodeVisitor implements \Twig_NodeVisitorInterface
 
     /**
      * Constructor.
+     *
+     * @since v2.1.10
      */
     public function __construct()
     {
@@ -36,6 +40,8 @@ class TranslationDefaultDomainNodeVisitor implements \Twig_NodeVisitorInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function enterNode(\Twig_NodeInterface $node, \Twig_Environment $env)
     {
@@ -82,6 +88,8 @@ class TranslationDefaultDomainNodeVisitor implements \Twig_NodeVisitorInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function leaveNode(\Twig_NodeInterface $node, \Twig_Environment $env)
     {
@@ -98,6 +106,8 @@ class TranslationDefaultDomainNodeVisitor implements \Twig_NodeVisitorInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getPriority()
     {

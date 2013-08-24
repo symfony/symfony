@@ -43,6 +43,8 @@ interface ConstraintViolationInterface
      * @return string The violation message.
      *
      * @api
+     *
+     * @since v2.2.0
      */
     public function getMessage();
 
@@ -56,6 +58,8 @@ interface ConstraintViolationInterface
      * @return string The raw violation message.
      *
      * @api
+     *
+     * @since v2.2.0
      */
     public function getMessageTemplate();
 
@@ -68,6 +72,8 @@ interface ConstraintViolationInterface
      * @see getMessageTemplate
      *
      * @api
+     *
+     * @since v2.2.0
      */
     public function getMessageParameters();
 
@@ -86,6 +92,8 @@ interface ConstraintViolationInterface
      * pluralization form (in this case "choices").
      *
      * @return integer|null The number to use to pluralize of the message.
+     *
+     * @since v2.2.0
      */
     public function getMessagePluralization();
 
@@ -98,6 +106,8 @@ interface ConstraintViolationInterface
      *               is not necessarily the value that was originally validated.
      *
      * @api
+     *
+     * @since v2.2.0
      */
     public function getRoot();
 
@@ -114,6 +124,8 @@ interface ConstraintViolationInterface
      *                for example "addresses[1].street".
      *
      * @api
+     *
+     * @since v2.2.0
      */
     public function getPropertyPath();
 
@@ -124,6 +136,8 @@ interface ConstraintViolationInterface
      *               fail.
      *
      * @api
+     *
+     * @since v2.2.0
      */
     public function getInvalidValue();
 
@@ -131,6 +145,8 @@ interface ConstraintViolationInterface
      * Returns a machine-digestible error code for the violation.
      *
      * @return mixed The error code.
+     *
+     * @since v2.2.0
      */
     public function getCode();
 }

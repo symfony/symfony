@@ -17,6 +17,8 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.1.0
  */
 class ViolationPath implements \IteratorAggregate, PropertyPathInterface
 {
@@ -50,6 +52,8 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
      *
      * @param string $violationPath The property path of a {@link ConstraintViolation}
      *                              object.
+     *
+     * @since v2.1.0
      */
     public function __construct($violationPath)
     {
@@ -107,6 +111,8 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function __toString()
     {
@@ -115,6 +121,8 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getLength()
     {
@@ -123,6 +131,8 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getParent()
     {
@@ -144,6 +154,8 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getElements()
     {
@@ -152,6 +164,8 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getElement($index)
     {
@@ -164,6 +178,8 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function isProperty($index)
     {
@@ -176,6 +192,8 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function isIndex($index)
     {
@@ -203,6 +221,8 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
      * @return Boolean Whether the element maps to a form.
      *
      * @throws OutOfBoundsException If the offset is invalid.
+     *
+     * @since v2.1.0
      */
     public function mapsForm($index)
     {
@@ -217,6 +237,8 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
      * Returns a new iterator for this path
      *
      * @return ViolationPathIterator
+     *
+     * @since v2.1.0
      */
     public function getIterator()
     {
@@ -225,6 +247,8 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
 
     /**
      * Builds the string representation from the elements.
+     *
+     * @since v2.1.0
      */
     private function buildString()
     {

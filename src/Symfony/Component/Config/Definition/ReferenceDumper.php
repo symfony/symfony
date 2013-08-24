@@ -17,16 +17,24 @@ namespace Symfony\Component\Config\Definition;
  * Currently, only YML format is supported.
  *
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @since v2.2.0
  */
 class ReferenceDumper
 {
     private $reference;
 
+    /**
+     * @since v2.2.0
+     */
     public function dump(ConfigurationInterface $configuration)
     {
         return $this->dumpNode($configuration->getConfigTreeBuilder()->buildTree());
     }
 
+    /**
+     * @since v2.2.0
+     */
     public function dumpNode(NodeInterface $node)
     {
         $this->reference = '';
@@ -40,6 +48,8 @@ class ReferenceDumper
     /**
      * @param NodeInterface $node
      * @param integer       $depth
+     *
+     * @since v2.2.0
      */
     private function writeNode(NodeInterface $node, $depth = 0)
     {
@@ -159,6 +169,8 @@ class ReferenceDumper
      *
      * @param string $text
      * @param int    $indent
+     *
+     * @since v2.2.0
      */
     private function writeLine($text, $indent = 0)
     {
@@ -168,6 +180,9 @@ class ReferenceDumper
         $this->reference .= sprintf($format, $text)."\n";
     }
 
+    /**
+     * @since v2.2.0
+     */
     private function writeArray(array $array, $depth)
     {
         $isIndexed = array_values($array) === $array;

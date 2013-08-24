@@ -19,9 +19,14 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * Adds remember-me cookies to the Response.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.2.0
  */
 class ResponseListener implements EventSubscriberInterface
 {
+    /**
+     * @since v2.0.0
+     */
     public function onKernelResponse(FilterResponseEvent $event)
     {
         $request = $event->getRequest();
@@ -32,6 +37,9 @@ class ResponseListener implements EventSubscriberInterface
         }
     }
 
+    /**
+     * @since v2.2.0
+     */
     public static function getSubscribedEvents()
     {
         return array(KernelEvents::RESPONSE => 'onKernelResponse');

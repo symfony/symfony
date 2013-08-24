@@ -21,11 +21,15 @@ use Symfony\Component\Console\Input\InputOption;
  * JSON descriptor.
  *
  * @author Jean-François Simon <contact@jfsimon.fr>
+ *
+ * @since v2.3.0
  */
 class JsonDescriptor extends Descriptor
 {
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     protected function describeInputArgument(InputArgument $argument, array $options = array())
     {
@@ -34,6 +38,8 @@ class JsonDescriptor extends Descriptor
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     protected function describeInputOption(InputOption $option, array $options = array())
     {
@@ -42,6 +48,8 @@ class JsonDescriptor extends Descriptor
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     protected function describeInputDefinition(InputDefinition $definition, array $options = array())
     {
@@ -50,6 +58,8 @@ class JsonDescriptor extends Descriptor
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     protected function describeCommand(Command $command, array $options = array())
     {
@@ -58,6 +68,8 @@ class JsonDescriptor extends Descriptor
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.3.0
      */
     protected function describeApplication(Application $application, array $options = array())
     {

@@ -31,6 +31,8 @@ interface ExtensionInterface
      * @throws InvalidArgumentException When provided tag is not defined in this extension
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function load(array $config, ContainerBuilder $container);
 
@@ -40,6 +42,8 @@ interface ExtensionInterface
      * @return string The XML namespace
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function getNamespace();
 
@@ -49,6 +53,8 @@ interface ExtensionInterface
      * @return string The XSD base path
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function getXsdValidationBasePath();
 
@@ -60,6 +66,8 @@ interface ExtensionInterface
      * @return string The alias
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function getAlias();
 }

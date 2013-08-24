@@ -28,6 +28,8 @@ interface SessionInterface
      * @throws \RuntimeException If session fails to start.
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function start();
 
@@ -37,6 +39,8 @@ interface SessionInterface
      * @return string The session ID.
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function getId();
 
@@ -46,6 +50,8 @@ interface SessionInterface
      * @param string $id
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function setId($id);
 
@@ -55,6 +61,8 @@ interface SessionInterface
      * @return mixed The session name.
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function getName();
 
@@ -64,6 +72,8 @@ interface SessionInterface
      * @param string $name
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function setName($name);
 
@@ -81,6 +91,8 @@ interface SessionInterface
      * @return Boolean True if session invalidated, false if error.
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function invalidate($lifetime = null);
 
@@ -97,6 +109,8 @@ interface SessionInterface
      * @return Boolean True if session migrated, false if error.
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function migrate($destroy = false, $lifetime = null);
 
@@ -106,6 +120,8 @@ interface SessionInterface
      * This method is generally not required for real sessions as
      * the session will be automatically saved at the end of
      * code execution.
+     *
+     * @since v2.1.0
      */
     public function save();
 
@@ -117,6 +133,8 @@ interface SessionInterface
      * @return Boolean true if the attribute is defined, false otherwise
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function has($name);
 
@@ -129,6 +147,8 @@ interface SessionInterface
      * @return mixed
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function get($name, $default = null);
 
@@ -139,6 +159,8 @@ interface SessionInterface
      * @param mixed  $value
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function set($name, $value);
 
@@ -148,6 +170,8 @@ interface SessionInterface
      * @return array Attributes
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function all();
 
@@ -155,6 +179,8 @@ interface SessionInterface
      * Sets attributes.
      *
      * @param array $attributes Attributes
+     *
+     * @since v2.1.0
      */
     public function replace(array $attributes);
 
@@ -166,6 +192,8 @@ interface SessionInterface
      * @return mixed The removed value
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function remove($name);
 
@@ -173,6 +201,8 @@ interface SessionInterface
      * Clears all attributes.
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function clear();
 
@@ -180,6 +210,8 @@ interface SessionInterface
      * Checks if the session was started.
      *
      * @return Boolean
+     *
+     * @since v2.1.0
      */
     public function isStarted();
 
@@ -187,6 +219,8 @@ interface SessionInterface
      * Registers a SessionBagInterface with the session.
      *
      * @param SessionBagInterface $bag
+     *
+     * @since v2.1.0
      */
     public function registerBag(SessionBagInterface $bag);
 
@@ -196,6 +230,8 @@ interface SessionInterface
      * @param string $name
      *
      * @return SessionBagInterface
+     *
+     * @since v2.1.0
      */
     public function getBag($name);
 
@@ -203,6 +239,8 @@ interface SessionInterface
      * Gets session meta.
      *
      * @return MetadataBag
+     *
+     * @since v2.1.0
      */
     public function getMetadataBag();
 }

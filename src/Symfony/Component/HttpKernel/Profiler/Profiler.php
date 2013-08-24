@@ -21,6 +21,8 @@ use Psr\Log\LoggerInterface;
  * Profiler.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class Profiler
 {
@@ -49,6 +51,8 @@ class Profiler
      *
      * @param ProfilerStorageInterface $storage A ProfilerStorageInterface instance
      * @param LoggerInterface          $logger  A LoggerInterface instance
+     *
+     * @since v2.0.0
      */
     public function __construct(ProfilerStorageInterface $storage, LoggerInterface $logger = null)
     {
@@ -58,6 +62,8 @@ class Profiler
 
     /**
      * Disables the profiler.
+     *
+     * @since v2.0.0
      */
     public function disable()
     {
@@ -66,6 +72,8 @@ class Profiler
 
     /**
      * Enables the profiler.
+     *
+     * @since v2.2.0
      */
     public function enable()
     {
@@ -78,6 +86,8 @@ class Profiler
      * @param Response $response A Response instance
      *
      * @return Profile A Profile instance
+     *
+     * @since v2.0.0
      */
     public function loadProfileFromResponse(Response $response)
     {
@@ -94,6 +104,8 @@ class Profiler
      * @param string $token A token
      *
      * @return Profile A Profile instance
+     *
+     * @since v2.0.0
      */
     public function loadProfile($token)
     {
@@ -106,6 +118,8 @@ class Profiler
      * @param Profile $profile A Profile instance
      *
      * @return Boolean
+     *
+     * @since v2.0.0
      */
     public function saveProfile(Profile $profile)
     {
@@ -118,6 +132,8 @@ class Profiler
 
     /**
      * Purges all data from the storage.
+     *
+     * @since v2.0.0
      */
     public function purge()
     {
@@ -130,6 +146,8 @@ class Profiler
      * @param Profile $profile A Profile instance
      *
      * @return string The exported data
+     *
+     * @since v2.0.0
      */
     public function export(Profile $profile)
     {
@@ -142,6 +160,8 @@ class Profiler
      * @param string $data A data string as exported by the export() method
      *
      * @return Profile A Profile instance
+     *
+     * @since v2.0.0
      */
     public function import($data)
     {
@@ -169,6 +189,8 @@ class Profiler
      * @return array An array of tokens
      *
      * @see http://fr2.php.net/manual/en/datetime.formats.php for the supported date/time formats
+     *
+     * @since v2.2.0
      */
     public function find($ip, $url, $limit, $method, $start, $end)
     {
@@ -197,6 +219,8 @@ class Profiler
      * @param \Exception $exception An exception instance if the request threw one
      *
      * @return Profile|null A Profile instance or null if the profiler is disabled
+     *
+     * @since v2.0.0
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
@@ -226,6 +250,8 @@ class Profiler
      * Gets the Collectors associated with this profiler.
      *
      * @return array An array of collectors
+     *
+     * @since v2.0.0
      */
     public function all()
     {
@@ -236,6 +262,8 @@ class Profiler
      * Sets the Collectors associated with this profiler.
      *
      * @param DataCollectorInterface[] $collectors An array of collectors
+     *
+     * @since v2.0.0
      */
     public function set(array $collectors = array())
     {
@@ -249,6 +277,8 @@ class Profiler
      * Adds a Collector.
      *
      * @param DataCollectorInterface $collector A DataCollectorInterface instance
+     *
+     * @since v2.0.0
      */
     public function add(DataCollectorInterface $collector)
     {
@@ -261,6 +291,8 @@ class Profiler
      * @param string $name A collector name
      *
      * @return Boolean
+     *
+     * @since v2.0.0
      */
     public function has($name)
     {
@@ -275,6 +307,8 @@ class Profiler
      * @return DataCollectorInterface A DataCollectorInterface instance
      *
      * @throws \InvalidArgumentException if the collector does not exist
+     *
+     * @since v2.0.0
      */
     public function get($name)
     {

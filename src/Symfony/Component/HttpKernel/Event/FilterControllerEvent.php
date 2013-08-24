@@ -26,6 +26,8 @@ use Symfony\Component\HttpFoundation\Request;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class FilterControllerEvent extends KernelEvent
 {
@@ -35,6 +37,9 @@ class FilterControllerEvent extends KernelEvent
      */
     private $controller;
 
+    /**
+     * @since v2.0.0
+     */
     public function __construct(HttpKernelInterface $kernel, $controller, Request $request, $requestType)
     {
         parent::__construct($kernel, $request, $requestType);
@@ -48,6 +53,8 @@ class FilterControllerEvent extends KernelEvent
      * @return callable
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getController()
     {
@@ -62,6 +69,8 @@ class FilterControllerEvent extends KernelEvent
      * @throws \LogicException
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setController($controller)
     {
@@ -73,6 +82,9 @@ class FilterControllerEvent extends KernelEvent
         $this->controller = $controller;
     }
 
+    /**
+     * @since v2.0.0
+     */
     private function varToString($var)
     {
         if (is_object($var)) {

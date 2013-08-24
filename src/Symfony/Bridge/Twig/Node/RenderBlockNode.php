@@ -18,9 +18,14 @@ namespace Symfony\Bridge\Twig\Node;
  * is "foo", the block "foo" will be rendered.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @since v2.3.0
  */
 class RenderBlockNode extends \Twig_Node_Expression_Function
 {
+    /**
+     * @since v2.3.0
+     */
     public function compile(\Twig_Compiler $compiler)
     {
         $compiler->addDebugInfo($this);

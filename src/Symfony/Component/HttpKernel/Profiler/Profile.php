@@ -17,6 +17,8 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
  * Profile.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.1.0
  */
 class Profile
 {
@@ -46,6 +48,8 @@ class Profile
      * Constructor.
      *
      * @param string $token The token
+     *
+     * @since v2.0.0
      */
     public function __construct($token)
     {
@@ -56,6 +60,8 @@ class Profile
      * Sets the token.
      *
      * @param string $token The token
+     *
+     * @since v2.0.0
      */
     public function setToken($token)
     {
@@ -66,6 +72,8 @@ class Profile
      * Gets the token.
      *
      * @return string The token
+     *
+     * @since v2.0.0
      */
     public function getToken()
     {
@@ -76,6 +84,8 @@ class Profile
      * Sets the parent token
      *
      * @param Profile $parent The parent Profile
+     *
+     * @since v2.0.0
      */
     public function setParent(Profile $parent)
     {
@@ -86,6 +96,8 @@ class Profile
      * Returns the parent profile.
      *
      * @return Profile The parent profile
+     *
+     * @since v2.0.0
      */
     public function getParent()
     {
@@ -96,6 +108,8 @@ class Profile
      * Returns the parent token.
      *
      * @return null|string The parent token
+     *
+     * @since v2.1.0
      */
     public function getParentToken()
     {
@@ -106,6 +120,8 @@ class Profile
      * Returns the IP.
      *
      * @return string The IP
+     *
+     * @since v2.0.0
      */
     public function getIp()
     {
@@ -116,6 +132,8 @@ class Profile
      * Sets the IP.
      *
      * @param string $ip
+     *
+     * @since v2.0.0
      */
     public function setIp($ip)
     {
@@ -126,12 +144,17 @@ class Profile
      * Returns the request method.
      *
      * @return string The request method
+     *
+     * @since v2.1.0
      */
     public function getMethod()
     {
         return $this->method;
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function setMethod($method)
     {
         $this->method = $method;
@@ -141,12 +164,17 @@ class Profile
      * Returns the URL.
      *
      * @return string The URL
+     *
+     * @since v2.0.0
      */
     public function getUrl()
     {
         return $this->url;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function setUrl($url)
     {
         $this->url = $url;
@@ -156,6 +184,8 @@ class Profile
      * Returns the time.
      *
      * @return string The time
+     *
+     * @since v2.0.0
      */
     public function getTime()
     {
@@ -166,6 +196,9 @@ class Profile
         return $this->time;
     }
 
+    /**
+     * @since v2.0.0
+     */
     public function setTime($time)
     {
         $this->time = $time;
@@ -175,6 +208,8 @@ class Profile
      * Finds children profilers.
      *
      * @return Profile[] An array of Profile
+     *
+     * @since v2.0.0
      */
     public function getChildren()
     {
@@ -185,6 +220,8 @@ class Profile
      * Sets children profiler.
      *
      * @param Profile[] $children An array of Profile
+     *
+     * @since v2.0.0
      */
     public function setChildren(array $children)
     {
@@ -198,6 +235,8 @@ class Profile
      * Adds the child token
      *
      * @param Profile $child The child Profile
+     *
+     * @since v2.0.0
      */
     public function addChild(Profile $child)
     {
@@ -213,6 +252,8 @@ class Profile
      * @return DataCollectorInterface A DataCollectorInterface instance
      *
      * @throws \InvalidArgumentException if the collector does not exist
+     *
+     * @since v2.0.0
      */
     public function getCollector($name)
     {
@@ -227,6 +268,8 @@ class Profile
      * Gets the Collectors associated with this profile.
      *
      * @return DataCollectorInterface[]
+     *
+     * @since v2.0.0
      */
     public function getCollectors()
     {
@@ -237,6 +280,8 @@ class Profile
      * Sets the Collectors associated with this profile.
      *
      * @param DataCollectorInterface[] $collectors
+     *
+     * @since v2.0.0
      */
     public function setCollectors(array $collectors)
     {
@@ -250,6 +295,8 @@ class Profile
      * Adds a Collector.
      *
      * @param DataCollectorInterface $collector A DataCollectorInterface instance
+     *
+     * @since v2.0.0
      */
     public function addCollector(DataCollectorInterface $collector)
     {
@@ -262,12 +309,17 @@ class Profile
      * @param string $name A collector name
      *
      * @return Boolean
+     *
+     * @since v2.0.0
      */
     public function hasCollector($name)
     {
         return isset($this->collectors[$name]);
     }
 
+    /**
+     * @since v2.1.0
+     */
     public function __sleep()
     {
         return array('token', 'parent', 'children', 'collectors', 'ip', 'method', 'url', 'time');

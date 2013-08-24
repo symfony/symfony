@@ -59,6 +59,8 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  *
  * @api
+ *
+ * @since v2.1.0
  */
 class Container implements IntrospectableContainerInterface
 {
@@ -82,6 +84,8 @@ class Container implements IntrospectableContainerInterface
      * @param ParameterBagInterface $parameterBag A ParameterBagInterface instance
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function __construct(ParameterBagInterface $parameterBag = null)
     {
@@ -106,6 +110,8 @@ class Container implements IntrospectableContainerInterface
      *  * The parameter bag is frozen.
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function compile()
     {
@@ -120,6 +126,8 @@ class Container implements IntrospectableContainerInterface
      * @return Boolean true if the container parameter bag are frozen, false otherwise
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function isFrozen()
     {
@@ -132,6 +140,8 @@ class Container implements IntrospectableContainerInterface
      * @return ParameterBagInterface A ParameterBagInterface instance
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getParameterBag()
     {
@@ -148,6 +158,8 @@ class Container implements IntrospectableContainerInterface
      * @throws InvalidArgumentException if the parameter is not defined
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getParameter($name)
     {
@@ -162,6 +174,8 @@ class Container implements IntrospectableContainerInterface
      * @return Boolean The presence of parameter in container
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function hasParameter($name)
     {
@@ -175,6 +189,8 @@ class Container implements IntrospectableContainerInterface
      * @param mixed  $value The parameter value
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setParameter($name, $value)
     {
@@ -195,6 +211,8 @@ class Container implements IntrospectableContainerInterface
      * @throws InvalidArgumentException When trying to set a service in the prototype scope
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function set($id, $service, $scope = self::SCOPE_CONTAINER)
     {
@@ -235,6 +253,8 @@ class Container implements IntrospectableContainerInterface
      * @return Boolean true if the service is defined, false otherwise
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function has($id)
     {
@@ -264,6 +284,8 @@ class Container implements IntrospectableContainerInterface
      * @see Reference
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function get($id, $invalidBehavior = self::EXCEPTION_ON_INVALID_REFERENCE)
     {
@@ -336,6 +358,8 @@ class Container implements IntrospectableContainerInterface
      * @param string $id The service identifier
      *
      * @return Boolean true if service has already been initialized, false otherwise
+     *
+     * @since v2.1.0
      */
     public function initialized($id)
     {
@@ -346,6 +370,8 @@ class Container implements IntrospectableContainerInterface
      * Gets all service ids.
      *
      * @return array An array of all defined service ids
+     *
+     * @since v2.0.0
      */
     public function getServiceIds()
     {
@@ -369,6 +395,8 @@ class Container implements IntrospectableContainerInterface
      * @throws InvalidArgumentException When the scope does not exist
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function enterScope($name)
     {
@@ -417,6 +445,8 @@ class Container implements IntrospectableContainerInterface
      * @throws InvalidArgumentException if the scope is not active
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function leaveScope($name)
     {
@@ -459,6 +489,8 @@ class Container implements IntrospectableContainerInterface
      * @throws InvalidArgumentException
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function addScope(ScopeInterface $scope)
     {
@@ -493,6 +525,8 @@ class Container implements IntrospectableContainerInterface
      * @return Boolean
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function hasScope($name)
     {
@@ -509,6 +543,8 @@ class Container implements IntrospectableContainerInterface
      * @return Boolean
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function isScopeActive($name)
     {
@@ -521,6 +557,8 @@ class Container implements IntrospectableContainerInterface
      * @param string $id A string to camelize
      *
      * @return string The camelized string
+     *
+     * @since v2.1.0
      */
     public static function camelize($id)
     {
@@ -533,6 +571,8 @@ class Container implements IntrospectableContainerInterface
      * @param string $id The string to underscore
      *
      * @return string The underscored string
+     *
+     * @since v2.1.0
      */
     public static function underscore($id)
     {

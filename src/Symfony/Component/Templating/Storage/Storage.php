@@ -17,6 +17,8 @@ namespace Symfony\Component\Templating\Storage;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 abstract class Storage
 {
@@ -28,6 +30,8 @@ abstract class Storage
      * @param string $template The template name
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function __construct($template)
     {
@@ -38,6 +42,8 @@ abstract class Storage
      * Returns the object string representation.
      *
      * @return string The template name
+     *
+     * @since v2.0.0
      */
     public function __toString()
     {
@@ -50,6 +56,8 @@ abstract class Storage
      * @return string The template content
      *
      * @api
+     *
+     * @since v2.0.0
      */
     abstract public function getContent();
 }

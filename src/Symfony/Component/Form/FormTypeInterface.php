@@ -28,6 +28,8 @@ interface FormTypeInterface
      *
      * @param FormBuilderInterface $builder The form builder
      * @param array                $options The options
+     *
+     * @since v2.1.0
      */
     public function buildForm(FormBuilderInterface $builder, array $options);
 
@@ -46,6 +48,8 @@ interface FormTypeInterface
      * @param FormView $view    The view
      * @param FormInterface     $form    The form
      * @param array             $options The options
+     *
+     * @since v2.1.0
      */
     public function buildView(FormView $view, FormInterface $form, array $options);
 
@@ -65,6 +69,8 @@ interface FormTypeInterface
      * @param FormView $view    The view
      * @param FormInterface     $form    The form
      * @param array             $options The options
+     *
+     * @since v2.1.0
      */
     public function finishView(FormView $view, FormInterface $form, array $options);
 
@@ -72,6 +78,8 @@ interface FormTypeInterface
      * Sets the default options for this type.
      *
      * @param OptionsResolverInterface $resolver The resolver for the options.
+     *
+     * @since v2.1.0
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver);
 
@@ -83,6 +91,8 @@ interface FormTypeInterface
      * for returning type instances may be dropped from future releases.
      *
      * @return string|null|FormTypeInterface The name of the parent type if any, null otherwise.
+     *
+     * @since v2.1.0
      */
     public function getParent();
 
@@ -90,6 +100,8 @@ interface FormTypeInterface
      * Returns the name of this type.
      *
      * @return string The name of this type
+     *
+     * @since v2.1.0
      */
     public function getName();
 }

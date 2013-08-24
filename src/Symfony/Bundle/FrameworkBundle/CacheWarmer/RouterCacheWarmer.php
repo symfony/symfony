@@ -19,6 +19,8 @@ use Symfony\Component\Routing\RouterInterface;
  * Generates the router matcher and generator classes.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class RouterCacheWarmer implements CacheWarmerInterface
 {
@@ -28,6 +30,8 @@ class RouterCacheWarmer implements CacheWarmerInterface
      * Constructor.
      *
      * @param RouterInterface $router A Router instance
+     *
+     * @since v2.1.0
      */
     public function __construct(RouterInterface $router)
     {
@@ -38,6 +42,8 @@ class RouterCacheWarmer implements CacheWarmerInterface
      * Warms up the cache.
      *
      * @param string $cacheDir The cache directory
+     *
+     * @since v2.0.0
      */
     public function warmUp($cacheDir)
     {
@@ -50,6 +56,8 @@ class RouterCacheWarmer implements CacheWarmerInterface
      * Checks whether this warmer is optional or not.
      *
      * @return Boolean always true
+     *
+     * @since v2.0.0
      */
     public function isOptional()
     {

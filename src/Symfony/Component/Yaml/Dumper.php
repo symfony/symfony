@@ -15,6 +15,8 @@ namespace Symfony\Component\Yaml;
  * Dumper dumps PHP variables to YAML strings.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class Dumper
 {
@@ -29,6 +31,8 @@ class Dumper
      * Sets the indentation.
      *
      * @param integer $num The amount of spaces to use for indentation of nested nodes.
+     *
+     * @since v2.1.0
      */
     public function setIndentation($num)
     {
@@ -45,6 +49,8 @@ class Dumper
      * @param Boolean $objectSupport          true if object support is enabled, false otherwise
      *
      * @return string  The YAML representation of the PHP value
+     *
+     * @since v2.0.22
      */
     public function dump($input, $inline = 0, $indent = 0, $exceptionOnInvalidType = false, $objectSupport = false)
     {

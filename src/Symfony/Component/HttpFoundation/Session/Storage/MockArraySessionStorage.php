@@ -25,6 +25,8 @@ use Symfony\Component\HttpFoundation\Session\Storage\MetadataBag;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bulat Shakirzyanov <mallluhuct@gmail.com>
  * @author Drak <drak@zikula.org>
+ *
+ * @since v2.1.0
  */
 class MockArraySessionStorage implements SessionStorageInterface
 {
@@ -68,6 +70,8 @@ class MockArraySessionStorage implements SessionStorageInterface
      *
      * @param string      $name    Session name
      * @param MetadataBag $metaBag MetadataBag instance.
+     *
+     * @since v2.3.0
      */
     public function __construct($name = 'MOCKSESSID', MetadataBag $metaBag = null)
     {
@@ -79,6 +83,8 @@ class MockArraySessionStorage implements SessionStorageInterface
      * Sets the session data.
      *
      * @param array $array
+     *
+     * @since v2.1.0
      */
     public function setSessionData(array $array)
     {
@@ -87,6 +93,8 @@ class MockArraySessionStorage implements SessionStorageInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function start()
     {
@@ -105,6 +113,8 @@ class MockArraySessionStorage implements SessionStorageInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function regenerate($destroy = false, $lifetime = null)
     {
@@ -120,6 +130,8 @@ class MockArraySessionStorage implements SessionStorageInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getId()
     {
@@ -128,6 +140,8 @@ class MockArraySessionStorage implements SessionStorageInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function setId($id)
     {
@@ -140,6 +154,8 @@ class MockArraySessionStorage implements SessionStorageInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getName()
     {
@@ -148,6 +164,8 @@ class MockArraySessionStorage implements SessionStorageInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function setName($name)
     {
@@ -156,6 +174,8 @@ class MockArraySessionStorage implements SessionStorageInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function save()
     {
@@ -168,6 +188,8 @@ class MockArraySessionStorage implements SessionStorageInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function clear()
     {
@@ -185,6 +207,8 @@ class MockArraySessionStorage implements SessionStorageInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function registerBag(SessionBagInterface $bag)
     {
@@ -193,6 +217,8 @@ class MockArraySessionStorage implements SessionStorageInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function getBag($name)
     {
@@ -209,6 +235,8 @@ class MockArraySessionStorage implements SessionStorageInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function isStarted()
     {
@@ -219,6 +247,8 @@ class MockArraySessionStorage implements SessionStorageInterface
      * Sets the MetadataBag.
      *
      * @param MetadataBag $bag
+     *
+     * @since v2.1.0
      */
     public function setMetadataBag(MetadataBag $bag = null)
     {
@@ -233,6 +263,8 @@ class MockArraySessionStorage implements SessionStorageInterface
      * Gets the MetadataBag.
      *
      * @return MetadataBag
+     *
+     * @since v2.1.0
      */
     public function getMetadataBag()
     {
@@ -246,12 +278,17 @@ class MockArraySessionStorage implements SessionStorageInterface
      * a mock.
      *
      * @return string
+     *
+     * @since v2.1.0
      */
     protected function generateId()
     {
         return sha1(uniqid(mt_rand()));
     }
 
+    /**
+     * @since v2.1.0
+     */
     protected function loadSession()
     {
         $bags = array_merge($this->bags, array($this->metadataBag));

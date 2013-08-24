@@ -21,6 +21,8 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
  * container.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @since v2.0.0
  */
 class ResolveInvalidReferencesPass implements CompilerPassInterface
 {
@@ -30,6 +32,8 @@ class ResolveInvalidReferencesPass implements CompilerPassInterface
      * Process the ContainerBuilder to resolve invalid references.
      *
      * @param ContainerBuilder $container
+     *
+     * @since v2.0.0
      */
     public function process(ContainerBuilder $container)
     {
@@ -75,6 +79,8 @@ class ResolveInvalidReferencesPass implements CompilerPassInterface
      * @return array
      *
      * @throws RuntimeException When the config is invalid
+     *
+     * @since v2.0.0
      */
     private function processArguments(array $arguments, $inMethodCall = false)
     {

@@ -28,6 +28,8 @@ interface AccessMapInterface
      * @param Request $request The current request
      *
      * @return array A tuple of security attributes and the required channel
+     *
+     * @since v2.1.0
      */
     public function getPatterns(Request $request);
 }

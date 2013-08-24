@@ -18,9 +18,14 @@ use Symfony\Component\HttpFoundation\Response;
  * MemoryDataCollector.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.0.0
  */
 class MemoryDataCollector extends DataCollector
 {
+    /**
+     * @since v2.2.0
+     */
     public function __construct()
     {
         $this->data = array(
@@ -31,6 +36,8 @@ class MemoryDataCollector extends DataCollector
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
@@ -41,6 +48,8 @@ class MemoryDataCollector extends DataCollector
      * Gets the memory.
      *
      * @return integer The memory
+     *
+     * @since v2.0.0
      */
     public function getMemory()
     {
@@ -51,6 +60,8 @@ class MemoryDataCollector extends DataCollector
      * Gets the PHP memory limit.
      *
      * @return integer The memory limit
+     *
+     * @since v2.3.0
      */
     public function getMemoryLimit()
     {
@@ -59,6 +70,8 @@ class MemoryDataCollector extends DataCollector
 
     /**
      * Updates the memory usage data.
+     *
+     * @since v2.2.0
      */
     public function updateMemoryUsage()
     {
@@ -67,12 +80,17 @@ class MemoryDataCollector extends DataCollector
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getName()
     {
         return 'memory';
     }
 
+    /**
+     * @since v2.3.0
+     */
     private function convertToBytes($memoryLimit)
     {
         if ('-1' === $memoryLimit) {

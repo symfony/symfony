@@ -21,6 +21,8 @@ use Symfony\Component\Config\FileLocatorInterface;
  * Times the time spent to render a template.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @since v2.1.0
  */
 class TimedTwigEngine extends TwigEngine
 {
@@ -34,6 +36,8 @@ class TimedTwigEngine extends TwigEngine
      * @param FileLocatorInterface        $locator     A FileLocatorInterface instance
      * @param Stopwatch                   $stopwatch   A Stopwatch instance
      * @param GlobalVariables             $globals     A GlobalVariables instance
+     *
+     * @since v2.1.0
      */
     public function __construct(\Twig_Environment $environment, TemplateNameParserInterface $parser, FileLocatorInterface $locator, Stopwatch $stopwatch, GlobalVariables $globals = null)
     {
@@ -44,6 +48,8 @@ class TimedTwigEngine extends TwigEngine
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.1.0
      */
     public function render($name, array $parameters = array())
     {

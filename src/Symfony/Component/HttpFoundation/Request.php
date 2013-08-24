@@ -27,6 +27,8 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @since v2.0.0
  */
 class Request
 {
@@ -199,6 +201,8 @@ class Request
      * @param string $content    The raw body data
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function __construct(array $query = array(), array $request = array(), array $attributes = array(), array $cookies = array(), array $files = array(), array $server = array(), $content = null)
     {
@@ -219,6 +223,8 @@ class Request
      * @param string $content    The raw body data
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function initialize(array $query = array(), array $request = array(), array $attributes = array(), array $cookies = array(), array $files = array(), array $server = array(), $content = null)
     {
@@ -249,6 +255,8 @@ class Request
      * @return Request A new request
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public static function createFromGlobals()
     {
@@ -281,6 +289,8 @@ class Request
      * @return Request A Request instance
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public static function create($uri, $method = 'GET', $parameters = array(), $cookies = array(), $files = array(), $server = array(), $content = null)
     {
@@ -377,6 +387,8 @@ class Request
      * @return Request The duplicated request
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function duplicate(array $query = null, array $request = null, array $attributes = null, array $cookies = null, array $files = null, array $server = null)
     {
@@ -423,6 +435,8 @@ class Request
      *
      * Note that the session is not cloned as duplicated requests
      * are most of the time sub-requests of the main one.
+     *
+     * @since v2.0.0
      */
     public function __clone()
     {
@@ -439,6 +453,8 @@ class Request
      * Returns the request as a string.
      *
      * @return string The request
+     *
+     * @since v2.0.0
      */
     public function __toString()
     {
@@ -455,6 +471,8 @@ class Request
      * $_FILES is never override, see rfc1867
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function overrideGlobals()
     {
@@ -491,6 +509,8 @@ class Request
      * @param array $proxies A list of trusted proxies
      *
      * @api
+     *
+     * @since v2.0.19
      */
     public static function setTrustedProxies(array $proxies)
     {
@@ -501,6 +521,8 @@ class Request
      * Gets the list of trusted proxies.
      *
      * @return array An array of trusted proxies.
+     *
+     * @since v2.2.0
      */
     public static function getTrustedProxies()
     {
@@ -513,6 +535,8 @@ class Request
      * You should only list the hosts you manage using regexs.
      *
      * @param array $hostPatterns A list of trusted host patterns
+     *
+     * @since v2.0.24
      */
     public static function setTrustedHosts(array $hostPatterns)
     {
@@ -527,6 +551,8 @@ class Request
      * Gets the list of trusted host patterns.
      *
      * @return array An array of trusted host patterns.
+     *
+     * @since v2.0.24
      */
     public static function getTrustedHosts()
     {
@@ -549,6 +575,8 @@ class Request
      * @param string $value The header name
      *
      * @throws \InvalidArgumentException
+     *
+     * @since v2.0.19
      */
     public static function setTrustedHeaderName($key, $value)
     {
@@ -567,6 +595,8 @@ class Request
      * @return string The header name
      *
      * @throws \InvalidArgumentException
+     *
+     * @since v2.3.0
      */
     public static function getTrustedHeaderName($key)
     {
@@ -586,6 +616,8 @@ class Request
      * @param string $qs Query string
      *
      * @return string A normalized query string for the Request
+     *
+     * @since v2.1.0
      */
     public static function normalizeQueryString($qs)
     {
@@ -627,6 +659,8 @@ class Request
      * Check that you are using CSRF tokens when required.
      *
      * The HTTP method can only be overridden when the real HTTP method is POST.
+     *
+     * @since v2.2.0
      */
     public static function enableHttpMethodParameterOverride()
     {
@@ -637,6 +671,8 @@ class Request
      * Checks whether support for the _method request parameter is enabled.
      *
      * @return Boolean True when the _method request parameter is enabled, false otherwise
+     *
+     * @since v2.2.0
      */
     public static function getHttpMethodParameterOverride()
     {
@@ -663,6 +699,8 @@ class Request
      * @param Boolean $deep    is parameter deep in multidimensional array
      *
      * @return mixed
+     *
+     * @since v2.0.0
      */
     public function get($key, $default = null, $deep = false)
     {
@@ -675,6 +713,8 @@ class Request
      * @return SessionInterface|null The session
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getSession()
     {
@@ -688,6 +728,8 @@ class Request
      * @return Boolean
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function hasPreviousSession()
     {
@@ -705,6 +747,8 @@ class Request
      * @return Boolean true when the Request contains a Session object, false otherwise
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function hasSession()
     {
@@ -717,6 +761,8 @@ class Request
      * @param SessionInterface $session The Session
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function setSession(SessionInterface $session)
     {
@@ -735,6 +781,8 @@ class Request
      * @return array The client IP addresses
      *
      * @see getClientIp()
+     *
+     * @since v2.3.0
      */
     public function getClientIps()
     {
@@ -784,6 +832,8 @@ class Request
      * @see http://en.wikipedia.org/wiki/X-Forwarded-For
      *
      * @api
+     *
+     * @since v2.3.0
      */
     public function getClientIp()
     {
@@ -798,6 +848,8 @@ class Request
      * @return string
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getScriptName()
     {
@@ -819,6 +871,8 @@ class Request
      * @return string The raw path (i.e. not urldecoded)
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getPathInfo()
     {
@@ -842,6 +896,8 @@ class Request
      * @return string The raw path (i.e. not urldecoded)
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getBasePath()
     {
@@ -863,6 +919,8 @@ class Request
      * @return string The raw url (i.e. not urldecoded)
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getBaseUrl()
     {
@@ -879,6 +937,8 @@ class Request
      * @return string
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getScheme()
     {
@@ -899,6 +959,8 @@ class Request
      * @return string
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getPort()
     {
@@ -919,6 +981,8 @@ class Request
      * Returns the user.
      *
      * @return string|null
+     *
+     * @since v2.1.0
      */
     public function getUser()
     {
@@ -929,6 +993,8 @@ class Request
      * Returns the password.
      *
      * @return string|null
+     *
+     * @since v2.1.0
      */
     public function getPassword()
     {
@@ -939,6 +1005,8 @@ class Request
      * Gets the user info.
      *
      * @return string A user name and, optionally, scheme-specific information about how to gain authorization to access the server
+     *
+     * @since v2.1.0
      */
     public function getUserInfo()
     {
@@ -960,6 +1028,8 @@ class Request
      * @return string
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getHttpHost()
     {
@@ -979,6 +1049,8 @@ class Request
      * @return string The raw URI (i.e. not urldecoded)
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getRequestUri()
     {
@@ -996,6 +1068,8 @@ class Request
      * and the password are not added to the generated string.
      *
      * @return string The scheme and HTTP host
+     *
+     * @since v2.1.0
      */
     public function getSchemeAndHttpHost()
     {
@@ -1010,6 +1084,8 @@ class Request
      * @see getQueryString()
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getUri()
     {
@@ -1028,6 +1104,8 @@ class Request
      * @return string The normalized URI for the path
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getUriForPath($path)
     {
@@ -1043,6 +1121,8 @@ class Request
      * @return string|null A normalized query string for the Request
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getQueryString()
     {
@@ -1066,6 +1146,8 @@ class Request
      * @return Boolean
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function isSecure()
     {
@@ -1092,6 +1174,8 @@ class Request
      * @throws \UnexpectedValueException when the host name is invalid
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getHost()
     {
@@ -1142,6 +1226,8 @@ class Request
      * @param string $method
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setMethod($method)
     {
@@ -1165,6 +1251,8 @@ class Request
      * @api
      *
      * @see getRealMethod
+     *
+     * @since v2.0.0
      */
     public function getMethod()
     {
@@ -1189,6 +1277,8 @@ class Request
      * @return string The request method
      *
      * @see getMethod
+     *
+     * @since v2.2.0
      */
     public function getRealMethod()
     {
@@ -1203,6 +1293,8 @@ class Request
      * @return string The associated mime type (null if not found)
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getMimeType($format)
     {
@@ -1221,6 +1313,8 @@ class Request
      * @return string|null The format (null if not found)
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getFormat($mimeType)
     {
@@ -1248,6 +1342,8 @@ class Request
      * @param string|array $mimeTypes The associated mime types (the preferred one must be the first as it will be used as the content type)
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setFormat($format, $mimeTypes)
     {
@@ -1272,6 +1368,8 @@ class Request
      * @return string The request format
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getRequestFormat($default = 'html')
     {
@@ -1288,6 +1386,8 @@ class Request
      * @param string $format The request format.
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function setRequestFormat($format)
     {
@@ -1300,6 +1400,8 @@ class Request
      * @return string|null The format (null if no content type is present)
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function getContentType()
     {
@@ -1312,6 +1414,8 @@ class Request
      * @param string $locale
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function setDefaultLocale($locale)
     {
@@ -1328,6 +1432,8 @@ class Request
      * @param string $locale
      *
      * @api
+     *
+     * @since v2.1.0
      */
     public function setLocale($locale)
     {
@@ -1338,6 +1444,8 @@ class Request
      * Get the locale.
      *
      * @return string
+     *
+     * @since v2.1.0
      */
     public function getLocale()
     {
@@ -1350,6 +1458,8 @@ class Request
      * @param string $method Uppercase request method (GET, POST etc).
      *
      * @return Boolean
+     *
+     * @since v2.1.0
      */
     public function isMethod($method)
     {
@@ -1362,6 +1472,8 @@ class Request
      * @return Boolean
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function isMethodSafe()
     {
@@ -1376,6 +1488,8 @@ class Request
      * @return string|resource The request body content or a resource to read the body stream.
      *
      * @throws \LogicException
+     *
+     * @since v2.0.0
      */
     public function getContent($asResource = false)
     {
@@ -1400,6 +1514,8 @@ class Request
      * Gets the Etags.
      *
      * @return array The entity tags
+     *
+     * @since v2.0.0
      */
     public function getETags()
     {
@@ -1408,6 +1524,8 @@ class Request
 
     /**
      * @return Boolean
+     *
+     * @since v2.0.0
      */
     public function isNoCache()
     {
@@ -1422,6 +1540,8 @@ class Request
      * @return string|null The preferred locale
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getPreferredLanguage(array $locales = null)
     {
@@ -1457,6 +1577,8 @@ class Request
      * @return array Languages ordered in the user browser preferences
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getLanguages()
     {
@@ -1499,6 +1621,8 @@ class Request
      * @return array List of charsets in preferable order
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getCharsets()
     {
@@ -1529,6 +1653,8 @@ class Request
      * @return array List of content types in preferable order
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function getAcceptableContentTypes()
     {
@@ -1549,20 +1675,23 @@ class Request
      * @return Boolean true if the request is an XMLHttpRequest, false otherwise
      *
      * @api
+     *
+     * @since v2.0.0
      */
     public function isXmlHttpRequest()
     {
         return 'XMLHttpRequest' == $this->headers->get('X-Requested-With');
     }
 
-    /*
+    /**
      * The following methods are derived from code of the Zend Framework (1.10dev - 2010-01-24)
      *
      * Code subject to the new BSD license (http://framework.zend.com/license/new-bsd).
      *
      * Copyright (c) 2005-2010 Zend Technologies USA Inc. (http://www.zend.com)
+     *
+     * @since v2.0.0
      */
-
     protected function prepareRequestUri()
     {
         $requestUri = '';
@@ -1609,6 +1738,8 @@ class Request
      * Prepares the base URL.
      *
      * @return string
+     *
+     * @since v2.0.0
      */
     protected function prepareBaseUrl()
     {
@@ -1675,6 +1806,8 @@ class Request
      * Prepares the base path.
      *
      * @return string base path
+     *
+     * @since v2.0.0
      */
     protected function prepareBasePath()
     {
@@ -1701,6 +1834,8 @@ class Request
      * Prepares the path info.
      *
      * @return string path info
+     *
+     * @since v2.0.0
      */
     protected function preparePathInfo()
     {
@@ -1729,6 +1864,8 @@ class Request
 
     /**
      * Initializes HTTP request formats.
+     *
+     * @since v2.1.0
      */
     protected static function initializeFormats()
     {
@@ -1749,6 +1886,8 @@ class Request
      * Sets the default PHP locale.
      *
      * @param string $locale
+     *
+     * @since v2.1.0
      */
     private function setPhpDefaultLocale($locale)
     {
@@ -1771,6 +1910,8 @@ class Request
      * @param string $prefix The prefix not encoded
      *
      * @return string|false The prefix as it is encoded in $string, or false
+     *
+     * @since v2.1.0
      */
     private function getUrlencodedPrefix($string, $prefix)
     {

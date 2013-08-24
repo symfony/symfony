@@ -19,11 +19,15 @@ use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
  * DebugLogger.
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
+ *
+ * @since v2.0.0
  */
 class DebugHandler extends TestHandler implements DebugLoggerInterface
 {
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function getLogs()
     {
@@ -43,6 +47,8 @@ class DebugHandler extends TestHandler implements DebugLoggerInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @since v2.0.0
      */
     public function countErrors()
     {

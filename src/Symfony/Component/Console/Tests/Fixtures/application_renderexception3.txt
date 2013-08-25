@@ -8,10 +8,10 @@
 
 
 
-                   
-  [Exception]      
-  First exception  
-                   
+                                       
+  [Exception]                          
+  First exception <p>this is html</p>  
+                                       
 
 
 foo3:bar

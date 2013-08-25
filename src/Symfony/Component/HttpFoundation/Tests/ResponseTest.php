@@ -131,6 +131,46 @@ class ResponseTest extends ResponseTestCase
         $this->assertFalse($modified);
     }
 
+    public function testIsNotModifiedNotSafe()
+    {
+        $request = Request::create('/homepage', 'POST');
+
+        $response = new Response();
+        $this->assertFalse($response->isNotModified($request));
+    }
+
+    public function testIsNotModifiedLastModified()
+    {
+        $modified = 'Sun, 25 Aug 2013 18:33:31 GMT';
+
+        $request = new Request();
+        $request->headers->set('If-Modified-Since', $modified);
+
+        $response = new Response();
+        $response->headers->set('Last-Modified', $modified);
+
+        $this->assertTrue($response->isNotModified($request));
+
+        $response->headers->set('Last-Modified', '');
+        $this->assertFalse($response->isNotModified($request));
+    }
+
+    public function testIsNotModifiedEtag()
+    {
+        $modified = 'Sun, 25 Aug 2013 18:33:31 GMT';
+
+        $request = new Request();
+        $request->headers->set('If-Modified-Since', $modified);
+
+        $response = new Response();
+        $response->headers->set('Last-Modified', $modified);
+
+        $this->assertTrue($response->isNotModified($request));
+
+        $response->headers->set('Last-Modified', '');
+        $this->assertFalse($response->isNotModified($request));
+    }
+
     public function testIsValidateable()
     {
         $response = new Response('', 200, array('Last-Modified' => $this->createDateTimeOneHourAgo()->format(DATE_RFC2822)));

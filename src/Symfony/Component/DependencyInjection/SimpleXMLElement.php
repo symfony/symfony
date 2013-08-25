@@ -77,6 +77,9 @@ class SimpleXMLElement extends \SimpleXMLElement
 
                     $arguments[$key] = new Reference((string) $arg['id'], $invalidBehavior, $strict);
                     break;
+                case 'expression':
+                    $arguments[$key] = new Expression((string) $arg['id'], (string) $arg['path']);
+                    break;
                 case 'collection':
                     $arguments[$key] = $arg->getArgumentsAsPhp($name, false);
                     break;

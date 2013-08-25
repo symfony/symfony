@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Expression;
 use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -722,6 +723,7 @@ use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Parameter;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 $bagClass
 
 /**
@@ -732,6 +734,7 @@ $bagClass
  */
 class $class extends $baseClass
 {
+    private \$propertyAccessor;
 EOF;
     }
 
@@ -991,6 +994,18 @@ EOF;
     private function endClass()
     {
         return <<<EOF
+
+    private function getPropertyAccessor()
+    {
+        if (null === \$this->propertyAccessor) {
+            if (!class_exists('Symfony\Component\PropertyAccess\PropertyAccess')) {
+                throw new RuntimeException('Unable to use expressions as the Symfony PropertyAccess component is not installed.');
+            }
+            \$this->propertyAccessor = PropertyAccess::createPropertyAccessor();
+        }
+
+        return \$this->propertyAccessor;
+    }
 }
 
 EOF;
@@ -1197,6 +1212,8 @@ EOF;
             }
 
             return $this->getServiceCall((string) $value, $value);
+        } elseif ($value instanceof Expression) {
+            return sprintf("\$this->getPropertyAccessor()->getValue(%s, '%s')", $this->dumpValue(new Reference($value->getId())), $value->getPath());
         } elseif ($value instanceof Parameter) {
             return $this->dumpParameter($value);
         } elseif (true === $interpolate && is_string($value)) {

@@ -140,6 +140,7 @@
     <xsd:attribute name="key" type="xsd:string" />
     <xsd:attribute name="index" type="xsd:integer" />
     <xsd:attribute name="on-invalid" type="xsd:string" />
+    <xsd:attribute name="path" type="xsd:string" />
     <xsd:attribute name="strict" type="boolean" />
   </xsd:complexType>
 
@@ -164,6 +165,7 @@
     <xsd:restriction base="xsd:string">
       <xsd:enumeration value="collection" />
       <xsd:enumeration value="service" />
+      <xsd:enumeration value="expression" />
       <xsd:enumeration value="string" />
       <xsd:enumeration value="constant" />
     </xsd:restriction>

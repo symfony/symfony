@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Expression;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Yaml\Parser as YamlParser;
@@ -312,6 +313,11 @@ class YamlFileLoader extends FileLoader
         if (is_array($value)) {
             $value = array_map(array($this, 'resolveServices'), $value);
         } elseif (is_string($value) &&  0 === strpos($value, '@')) {
+            // is it an expression?
+            if (false !== $pos = strpos($value, '::')) {
+                return new Expression(substr($value, 1, $pos - 1), substr($value, $pos + 2));
+            }
+
             if (0 === strpos($value, '@@')) {
                 $value = substr($value, 1);
                 $invalidBehavior = null;

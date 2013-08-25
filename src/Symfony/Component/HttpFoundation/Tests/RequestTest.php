@@ -966,6 +966,12 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         $this->assertArrayHasKey('HTTP_X_FORWARDED_PROTO', $_SERVER);
 
+        $request->headers->set('CONTENT_TYPE', 'multipart/form-data');
+        $request->headers->set('CONTENT_LENGTH', 12345);
+        $request->overrideGlobals();
+        $this->assertArrayHasKey('CONTENT_TYPE', $_SERVER);
+        $this->assertArrayHasKey('CONTENT_LENGTH', $_SERVER);
+
         // restore initial $_SERVER array
         $_SERVER = $server;
     }

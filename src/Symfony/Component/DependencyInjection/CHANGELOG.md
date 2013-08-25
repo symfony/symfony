@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.4.0
+-----
+
+ * added support for expressions in service definitions
+
 2.2.0
 -----
 

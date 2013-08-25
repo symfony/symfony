@@ -24,6 +24,7 @@ use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\InstantiatorInterface;
 use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\RealServiceInstantiator;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 /**
  * ContainerBuilder is a DI container that provides an API to easily describe services.
@@ -77,6 +78,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @var InstantiatorInterface|null
      */
     private $proxyInstantiator;
+
+    /**
+     * @var PropertyAccess|null
+     */
+    private $propertyAccessor;
 
     /**
      * Sets the track resources flag.
@@ -993,11 +999,12 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
-     * Replaces service references by the real service instance.
+     * Replaces service references by the real service instance and evaluates expressions.
      *
      * @param mixed $value A value
      *
-     * @return mixed The same value with all service references replaced by the real service instances
+     * @return mixed The same value with all service references replaced by
+     *               the real service instances and all expressions evaluated
      */
     public function resolveServices($value)
     {
@@ -1009,6 +1016,15 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             $value = $this->get((string) $value, $value->getInvalidBehavior());
         } elseif ($value instanceof Definition) {
             $value = $this->createService($value, null);
+        } elseif ($value instanceof Expression) {
+            if (null === $this->propertyAccessor) {
+                if (!class_exists('Symfony\Component\PropertyAccess\PropertyAccess')) {
+                    throw new RuntimeException('Unable to use expressions as the Symfony PropertyAccess component is not installed.');
+                }
+                $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
+            }
+
+            $value = $this->propertyAccessor->getValue($this->get($value->getId()), $value->getPath());
         }
 
         return $value;

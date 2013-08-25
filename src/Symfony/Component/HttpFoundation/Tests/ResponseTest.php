@@ -79,6 +79,19 @@ class ResponseTest extends ResponseTestCase
         $this->assertFalse($response->isCacheable());
     }
 
+    public function testIsCacheableWithErrorCode()
+    {
+        $response = new Response('', 500);
+        $this->assertFalse($response->isCacheable());
+    }
+
+    public function testIsCacheableWithNoStoreDirective()
+    {
+        $response = new Response();
+        $response->headers->set('cache-control', 'private');
+        $this->assertFalse($response->isCacheable());
+    }
+
     public function testIsCacheableWithSetTtl()
     {
         $response = new Response();

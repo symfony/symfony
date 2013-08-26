@@ -60,49 +60,59 @@ class UniqueEntityValidator extends ConstraintValidator
             throw new ConstraintDefinitionException('At least one field has to be specified.');
         }
 
+        $actualClassName = $this->context->getClassName();
+        $validateClassName = $constraint->externalClass ? $constraint->externalClass : $actualClassName;
+
         if ($constraint->em) {
             $em = $this->registry->getManager($constraint->em);
         } else {
-            $em = $this->registry->getManagerForClass(get_class($entity));
+            $em = $this->registry->getManagerForClass($validateClassName);
         }
 
-        $className = $this->context->getClassName();
-        $class = $em->getClassMetadata($className);
-        /* @var $class \Doctrine\Common\Persistence\Mapping\ClassMetadata */
+        $validateClass = $em->getClassMetadata($validateClassName);
+        if (null === $constraint->externalClass) {
+            $reflFields = $validateClass->reflFields;
+        } else {
+            $refl = new \ReflectionObject($entity);
+            $reflFields = array();
+            foreach ($refl->getProperties() as $reflField) {
+                $reflFields[$reflField->getName()] = $reflField;
+            }
+        }
 
         $criteria = array();
         foreach ($fields as $fieldName) {
-            if (!$class->hasField($fieldName) && !$class->hasAssociation($fieldName)) {
+            if (!$validateClass->hasField($fieldName) && !$validateClass->hasAssociation($fieldName)) {
                 throw new ConstraintDefinitionException(sprintf("The field '%s' is not mapped by Doctrine, so it cannot be validated for uniqueness.", $fieldName));
             }
 
-            $criteria[$fieldName] = $class->reflFields[$fieldName]->getValue($entity);
+            $criteria[$fieldName] = $reflFields[$fieldName]->getValue($entity);
 
             if ($constraint->ignoreNull && null === $criteria[$fieldName]) {
                 return;
             }
 
-            if ($class->hasAssociation($fieldName)) {
+            if ($validateClass->hasAssociation($fieldName)) {
                 /* Ensure the Proxy is initialized before using reflection to
                  * read its identifiers. This is necessary because the wrapped
                  * getter methods in the Proxy are being bypassed.
                  */
                 $em->initializeObject($criteria[$fieldName]);
 
-                $relatedClass = $em->getClassMetadata($class->getAssociationTargetClass($fieldName));
+                $relatedClass = $em->getClassMetadata($validateClass->getAssociationTargetClass($fieldName));
                 $relatedId = $relatedClass->getIdentifierValues($criteria[$fieldName]);
 
                 if (count($relatedId) > 1) {
                     throw new ConstraintDefinitionException(
                         "Associated entities are not allowed to have more than one identifier field to be " .
-                        "part of a unique constraint in: ".$class->getName()."#".$fieldName
+                        "part of a unique constraint in: ".$validateClass->getName()."#".$fieldName
                     );
                 }
                 $criteria[$fieldName] = array_pop($relatedId);
             }
         }
 
-        $repository = $em->getRepository($className);
+        $repository = $em->getRepository($validateClassName);
         $result = $repository->{$constraint->repositoryMethod}($criteria);
 
         /* If the result is a MongoCursor, it must be advanced to the first

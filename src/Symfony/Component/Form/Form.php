@@ -832,7 +832,7 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * {@inheritdoc}
      */
-    public function &all()
+    public function all()
     {
         return $this->children;
     }

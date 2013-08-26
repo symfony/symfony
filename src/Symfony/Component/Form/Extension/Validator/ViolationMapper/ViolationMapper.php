@@ -167,7 +167,7 @@ class ViolationMapper implements ViolationMapperInterface
 
         // Skip forms inheriting their parent data when iterating the children
         $childIterator = new \RecursiveIteratorIterator(
-            new InheritDataAwareIterator($form->all())
+            new InheritDataAwareIterator($form)
         );
 
         // Make the path longer until we find a matching child

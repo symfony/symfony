@@ -100,7 +100,7 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
      * 
      * @param AuthenticationException $exception
      */
-    protected function clearToken(AuthenticationException $exception)
+    private function clearToken(AuthenticationException $exception)
     {
         $token = $this->securityContext->getToken();
         if ($token instanceof PreAuthenticatedToken && $this->providerKey === $token->getProviderKey()) {

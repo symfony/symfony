@@ -39,4 +39,20 @@ class FormUtil
         // not considered to be empty, ever.
         return null === $data || '' === $data;
     }
+
+    /**
+     * Makes a technical name human readable.
+     *
+     * Sequences of underscores are replaced by single spaces. The first letter
+     * of the resulting string is capitalized, while all other letters are
+     * turned to lowercase.
+     *
+     * @param string $text The text to humanize.
+     *
+     * @return string The humanized text.
+     */
+    public static function humanize($text)
+    {
+        return ucfirst(trim(strtolower(preg_replace(array('/([A-Z])/', '/[_\s]+/'), array('_$1', ' '), $text))));
+    }
 }

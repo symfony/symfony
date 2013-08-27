@@ -472,7 +472,7 @@ class ProcessManagerTest extends ProcessableTestCase
     {
         declare(ticks=1);
         $manager = new ProcessManager();
-        $manager->add(new Process('sleep 5'), 'test');
+        $manager->add(new Process('sleep 5'), 'test', INF);
         $manager->setDaemon(true);
         pcntl_signal(SIGALRM, function () use ($manager) {
             $manager->stop();

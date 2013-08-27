@@ -551,7 +551,7 @@ class ProcessManager implements ProcessableInterface, \Countable
                 }
             }
 
-            $canRun = $canRun || $process->canRun();
+            $canRun = $canRun || (false === $this->isStopping() && $process->canRun());
         }
 
         if (0 === $concurrent && false === $canRun) {

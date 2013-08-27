@@ -445,6 +445,14 @@ class Process implements ProcessInterface
     /**
      * {@inheritdoc}
      */
+    public function isStopping()
+    {
+        return $this->status === self::STATUS_STOPPING;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function isStarted()
     {
         return $this->status != self::STATUS_READY;

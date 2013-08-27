@@ -246,6 +246,14 @@ class ManagedProcess implements ProcessableInterface
     /**
      * {@inheritdoc}
      */
+    public function isStopping()
+    {
+        return $this->process->isStopping();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function isStarted()
     {
         return $this->process->isStarted();

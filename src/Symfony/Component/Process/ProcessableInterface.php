@@ -133,6 +133,13 @@ interface ProcessableInterface
     public function isRunning();
 
     /**
+     * Checks if the process is currently stopping.
+     *
+     * @return Boolean true if the process is currently stopping, false otherwise
+     */
+    public function isStopping();
+
+    /**
      * Checks if the process has been started with no regard to the current state.
      *
      * @return Boolean true if status is ready, false otherwise

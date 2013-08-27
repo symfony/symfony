@@ -444,6 +444,14 @@ class ProcessManager implements ProcessableInterface, \Countable
     /**
      * {@inheritdoc}
      */
+    public function isStopping()
+    {
+        return $this->status === self::STATUS_STOPPING;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function isTerminated()
     {
         $this->updateProcesses();
@@ -516,7 +524,7 @@ class ProcessManager implements ProcessableInterface, \Countable
         }
 
         $concurrent = 0;
-        $canRun = true === $this->isDaemon && static::STATUS_STARTED === $this->status;
+        $canRun = true === $this->isDaemon && false === $this->isStopping();
 
         foreach ($this->processes as $name => $process) {
             if ($concurrent >= $this->maxParallel) {
@@ -536,7 +544,7 @@ class ProcessManager implements ProcessableInterface, \Countable
                     $this->addFailureToProcess($process, new ProcessFailedException($process->getManagedProcess()), $this->failureStrategy);
                     $this->log('error', sprintf('Process %s failed. (failure #%d)', $name, count($process->getFailures())));
                 }
-                if (static::STATUS_STOPPING !== $this->status && $process->canRun()) {
+                if (false === $this->isStopping() && $process->canRun()) {
                     $this->doExecute($process, 'start', array($callback), 'Unable to start the managed process.');
                     $concurrent++;
                     $this->log('notice', sprintf('Process %s started.', $name));
@@ -550,9 +558,7 @@ class ProcessManager implements ProcessableInterface, \Countable
             $this->status = static::STATUS_TERMINATED;
         }
 
-        if (static::STATUS_STARTED === $this->status) {
-            $this->log('debug', sprintf('Currently running %d concurrent processes.', $concurrent));
-        }
+        $this->log('debug', sprintf('Currently running %d concurrent processes with status %s.', $concurrent, $this->status));
 
         return $this;
     }

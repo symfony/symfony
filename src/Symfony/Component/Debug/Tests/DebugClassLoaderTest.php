@@ -9,10 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\ClassLoader\Tests;
+namespace Symfony\Component\Debug\Tests;
 
-use Symfony\Component\ClassLoader\ClassLoader;
-use Symfony\Component\ClassLoader\DebugClassLoader;
+use Symfony\Component\Debug\DebugClassLoader;
 
 class DebugClassLoaderTest extends \PHPUnit_Framework_TestCase
 {
@@ -41,12 +40,27 @@ class DebugClassLoaderTest extends \PHPUnit_Framework_TestCase
                 $reflProp = $reflClass->getProperty('classFinder');
                 $reflProp->setAccessible(true);
 
-                $this->assertNotInstanceOf('Symfony\Component\ClassLoader\DebugClassLoader', $reflProp->getValue($function[0]));
+                $this->assertNotInstanceOf('Symfony\Component\Debug\DebugClassLoader', $reflProp->getValue($function[0]));
+
+                DebugClassLoader::disable();
 
                 return;
             }
         }
 
-        throw new \Exception('DebugClassLoader did not register');
+        DebugClassLoader::disable();
+
+        $this->fail('DebugClassLoader did not register');
+    }
+}
+
+class ClassLoader
+{
+    public function loadClass($class)
+    {
+    }
+
+    public function findFile($class)
+    {
     }
 }

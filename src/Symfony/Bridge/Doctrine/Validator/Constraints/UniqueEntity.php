@@ -28,6 +28,7 @@ class UniqueEntity extends Constraint
     public $fields = array();
     public $errorPath = null;
     public $ignoreNull = true;
+    public $externalClass = null;
 
     public function getRequiredOptions()
     {

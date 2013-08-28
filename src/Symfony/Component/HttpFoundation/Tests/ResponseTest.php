@@ -155,6 +155,26 @@ class ResponseTest extends ResponseTestCase
         $this->assertFalse($response->isNotModified($request));
     }
 
+    public function testIsNotModifiedEtag()
+    {
+        $etagOne = 'randomly_generated_etag';
+        $etagTwo = 'randomly_generated_etag_2';
+
+        $request = new Request();
+        $request->headers->set('if_none_match', sprintf('%s, %s, %s', $etagOne, $etagTwo, 'etagThree'));
+
+        $response = new Response();
+        
+        $response->headers->set('ETag', $etagOne);
+        $this->assertTrue($response->isNotModified($request));
+
+        $response->headers->set('ETag', $etagTwo);
+        $this->assertTrue($response->isNotModified($request));
+
+        $response->headers->set('ETag', '');
+        $this->assertFalse($response->isNotModified($request));
+    }
+
     public function testIsValidateable()
     {
         $response = new Response('', 200, array('Last-Modified' => $this->createDateTimeOneHourAgo()->format(DATE_RFC2822)));

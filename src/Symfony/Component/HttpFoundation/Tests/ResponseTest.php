@@ -164,7 +164,7 @@ class ResponseTest extends ResponseTestCase
         $request->headers->set('if_none_match', sprintf('%s, %s, %s', $etagOne, $etagTwo, 'etagThree'));
 
         $response = new Response();
-        
+
         $response->headers->set('ETag', $etagOne);
         $this->assertTrue($response->isNotModified($request));
 
@@ -421,6 +421,36 @@ class ResponseTest extends ResponseTestCase
         $response->prepare($request);
 
         $this->assertEquals('', $response->getContent());
+    }
+
+    public function testPrepareRemovesContentForInformationalResponse()
+    {
+        $response = new Response('foo');
+        $request = Request::create('/');
+
+        $response->setContent('content');
+        $response->setStatusCode(101);
+        $response->prepare($request);
+        $this->assertEquals('', $response->getContent());
+
+        $response->setContent('content');
+        $response->setStatusCode(304);
+        $response->prepare($request);
+        $this->assertEquals('', $response->getContent());
+    }
+
+    public function testPrepareRemovesContentLength()
+    {
+        $response = new Response('foo');
+        $request = Request::create('/');
+
+        $response->headers->set('Content-Length', 12345);
+        $response->prepare($request);
+        $this->assertEquals(12345, $response->headers->get('Content-Length'));
+
+        $response->headers->set('Transfer-Encoding', 'chunked');
+        $response->prepare($request);
+        $this->assertFalse($response->headers->has('Content-Length'));
     }
 
     public function testPrepareSetsPragmaOnHttp10Only()

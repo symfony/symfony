@@ -89,7 +89,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @return FormInterface[] An array of FormInterface instances
      */
-    public function all();
+    public function &all();
 
     /**
      * Returns all errors.

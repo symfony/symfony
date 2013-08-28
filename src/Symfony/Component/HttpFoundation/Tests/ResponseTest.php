@@ -418,9 +418,12 @@ class ResponseTest extends ResponseTestCase
         $response = new Response('foo');
         $request = Request::create('/', 'HEAD');
 
+        $length = 12345;
+        $response->headers->set('Content-Length', $length);
         $response->prepare($request);
 
         $this->assertEquals('', $response->getContent());
+        $this->assertEquals($length, $response->headers->get('Content-Length'), 'Content-Length should be as if it was GET; see RFC2616 14.13');
     }
 
     public function testPrepareRemovesContentForInformationalResponse()

@@ -114,6 +114,8 @@ class PropelTypeGuesserTest extends Propel1TestCase
             array('value',      'text',     Guess::MEDIUM_CONFIDENCE),
             array('price',      'number',   Guess::MEDIUM_CONFIDENCE),
             array('updated_at', 'datetime', Guess::HIGH_CONFIDENCE),
+            array('isActive',   'checkbox', Guess::HIGH_CONFIDENCE),
+            array('updatedAt',  'datetime', Guess::HIGH_CONFIDENCE),
         );
     }
 }

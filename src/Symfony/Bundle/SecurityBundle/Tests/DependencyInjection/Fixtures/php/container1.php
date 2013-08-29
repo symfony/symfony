@@ -71,6 +71,12 @@ $container->loadFromExtension('security', array(
             'x509' => true,
             'logout' => true,
         ),
+        'host' => array(
+            'pattern' => '/test',
+            'host' => 'foo\\.example\\.org',
+            'anonymous' => true,
+            'http_basic' => true,
+        ),
     ),
 
     'access_control' => array(

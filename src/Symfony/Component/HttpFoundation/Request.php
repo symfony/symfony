@@ -719,9 +719,9 @@ class Request
     /**
      * Returns the client IP addresses.
      *
-     * The most trusted IP address is first, and the less trusted one last.
-     * The "real" client IP address is the last one, but this is also the
-     * less trusted one.
+     * The least trusted IP address is first, and the most trusted one last.
+     * The "real" client IP address is the first one, but this is also the
+     * least trusted one.
      *
      * Use this method carefully; you should use getClientIp() instead.
      *

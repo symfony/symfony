@@ -887,6 +887,14 @@ class Request
             }
         }
 
+        if ($host = $this->headers->get('HOST')) {
+            if (preg_match('/:(\d+)$/', $host, $matches)) {
+                return intval($matches[1]);
+            }
+
+            return 'https' === $this->getScheme() ? 443 : 80;
+        }
+
         return $this->server->get('SERVER_PORT');
     }
 

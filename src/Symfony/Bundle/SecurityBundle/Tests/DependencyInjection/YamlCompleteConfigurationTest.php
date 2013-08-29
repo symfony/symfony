@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\Config\FileLocator;
 
-class YamlSecurityExtensionTest extends SecurityExtensionTest
+class YamlCompleteConfigurationTest extends CompleteConfigurationTest
 {
     protected function loadFromFile(ContainerBuilder $container, $file)
     {

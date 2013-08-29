@@ -28,7 +28,7 @@ class MemcachedSessionHandlerTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         if (!class_exists('Memcached')) {
-            $this->markTestSkipped('Skipped tests Memcache class is not present');
+            $this->markTestSkipped('Skipped tests Memcached class is not present');
         }
 
         $this->memcached = $this->getMock('Memcached');

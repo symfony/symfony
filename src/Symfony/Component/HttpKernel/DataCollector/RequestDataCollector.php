@@ -51,10 +51,14 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
         $attributes = array();
         foreach ($request->attributes->all() as $key => $value) {
             if ('_route' == $key && is_object($value)) {
-                $value = $value->getPath();
+                $attributes['_route'] = $this->varToString($value->getPath());
+            } elseif ('_route_params' == $key) {
+                foreach ($value as $key => $v) {
+                    $attributes['_route_params'][$key] = $this->varToString($v);
+                }
+            } else {
+                $attributes[$key] = $this->varToString($value);
             }
-
-            $attributes[$key] = $this->varToString($value);
         }
 
         $content = null;

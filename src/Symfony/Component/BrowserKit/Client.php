@@ -40,6 +40,8 @@ abstract class Client
     protected $redirect;
     protected $followRedirects;
 
+    private $internalRequest;
+
     /**
      * Constructor.
      *
@@ -250,7 +252,7 @@ abstract class Client
         $server['HTTP_HOST'] = parse_url($uri, PHP_URL_HOST);
         $server['HTTPS'] = 'https' == parse_url($uri, PHP_URL_SCHEME);
 
-        $request = new Request($uri, $method, $parameters, $files, $this->cookieJar->allValues($uri), $server, $content);
+        $this->internalRequest = $request = new Request($uri, $method, $parameters, $files, $this->cookieJar->allValues($uri), $server, $content);
 
         $this->request = $this->filterRequest($request);
 
@@ -420,7 +422,9 @@ abstract class Client
             throw new \LogicException('The request was not redirected.');
         }
 
-        return $this->request('get', $this->redirect, array(), array(), $this->history->current()->getServer());
+        $server = $this->internalRequest->getServer();
+
+        return $this->request('get', $this->redirect, array(), array(), $server);
     }
 
     /**

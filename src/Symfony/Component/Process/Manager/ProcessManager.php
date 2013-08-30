@@ -602,7 +602,7 @@ class ProcessManager implements ProcessableInterface, \Countable
      */
     private function handleException(ManagedProcess $process, \Exception $e, $errorMsg, $strategy)
     {
-        $this->log('error', $errorMsg);
+        $this->log('error', $errorMsg, array('error' => $e));
 
         if (static::STRATEGY_ABORT === $strategy) {
             $this->stop();
@@ -633,13 +633,14 @@ class ProcessManager implements ProcessableInterface, \Countable
      *
      * @param string $method  The logger method to use.
      * @param string $message The message to log.
+     * @param array  $context The context of the log message.
      *
      * @return ProcessManager
      */
-    private function log($method, $message)
+    private function log($method, $message, array $context = array())
     {
         if ($this->logger) {
-            call_user_func(array($this->logger, $method), $message);
+            call_user_func(array($this->logger, $method), $message, $context);
         }
 
         return $this;

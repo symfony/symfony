@@ -40,11 +40,12 @@ abstract class RoutableFragmentRenderer implements FragmentRendererInterface
      * Generates a fragment URI for a given controller.
      *
      * @param ControllerReference  $reference A ControllerReference instance
-     * @param Request              $request    A Request instance
+     * @param Request              $request   A Request instance
+     * @param Boolean              $absolute  Whether to generate an absolute URL or not
      *
      * @return string A fragment URI
      */
-    protected function generateFragmentUri(ControllerReference $reference, Request $request)
+    protected function generateFragmentUri(ControllerReference $reference, Request $request, $absolute = false)
     {
         // We need to forward the current _format and _locale values as we don't have
         // a proper routing pattern to do the job for us.
@@ -62,6 +63,12 @@ abstract class RoutableFragmentRenderer implements FragmentRendererInterface
 
         $reference->query['_path'] = http_build_query($reference->attributes, '', '&');
 
-        return $request->getUriForPath($this->fragmentPath.'?'.http_build_query($reference->query, '', '&'));
+        $path = $this->fragmentPath.'?'.http_build_query($reference->query, '', '&');
+
+        if ($absolute) {
+            return $request->getUriForPath($path);
+        }
+
+        return $request->getBaseUrl().$path;
     }
 }

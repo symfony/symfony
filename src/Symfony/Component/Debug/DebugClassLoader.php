@@ -9,12 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\ClassLoader;
+namespace Symfony\Component\Debug;
 
 /**
  * Autoloader checking if the class is really defined in the file found.
  *
- * The DebugClassLoader will wrap all registered autoloaders providing a
+ * The ClassLoader will wrap all registered autoloaders providing a
  * findFile method and will throw an exception if a file is found but does
  * not declare the class.
  *
@@ -22,8 +22,6 @@ namespace Symfony\Component\ClassLoader;
  * @author Christophe Coevoet <stof@notk.org>
  *
  * @api
- *
- * @deprecated Deprecated since version 2.4, to be removed in 3.0. Use the DebugClassLoader provided by the Debug component instead.
  */
 class DebugClassLoader
 {
@@ -74,11 +72,25 @@ class DebugClassLoader
     }
 
     /**
-     * Unregisters this instance as an autoloader.
+     * Disables the wrapping.
      */
-    public function unregister()
+    public static function disable()
     {
-        spl_autoload_unregister(array($this, 'loadClass'));
+        if (!is_array($functions = spl_autoload_functions())) {
+            return;
+        }
+
+        foreach ($functions as $function) {
+            spl_autoload_unregister($function);
+        }
+
+        foreach ($functions as $function) {
+            if (is_array($function) && $function[0] instanceof self) {
+                $function[0] = $function[0]->getClassLoader();
+            }
+
+            spl_autoload_register($function);
+        }
     }
 
     /**

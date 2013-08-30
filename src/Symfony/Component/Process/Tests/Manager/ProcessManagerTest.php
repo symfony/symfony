@@ -285,7 +285,7 @@ class ProcessManagerTest extends ProcessableTestCase
         $manager->run();
         $duration = microtime(true) - $start;
         // margin can be 0.1 second due to process start overhead
-        $this->assertLessThan(0.15, abs($duration - 0.5));
+        $this->assertLessThan(0.20, abs($duration - 0.5));
     }
 
     public function testFunctionalNonParallelTaskShouldNoRunParallelyWithRun()
@@ -346,7 +346,7 @@ class ProcessManagerTest extends ProcessableTestCase
         }
         $duration = microtime(true) - $start;
         // wider error margin due to process start overhead
-        $this->assertLessThan(0.25, abs($duration - 1.5));
+        $this->assertLessThan(0.30, abs($duration - 1.5));
     }
 
     public function testFunctionalMixedParallelismWithStart()

@@ -263,8 +263,8 @@ class Process
      *
      * @return Process The new process
      *
-     * @throws \RuntimeException When process can't be launch or is stopped
-     * @throws \RuntimeException When process is already running
+     * @throws RuntimeException When process can't be launch or is stopped
+     * @throws RuntimeException When process is already running
      *
      * @see start()
      */
@@ -291,8 +291,8 @@ class Process
      *
      * @return integer The exitcode of the process
      *
-     * @throws \RuntimeException When process timed out
-     * @throws \RuntimeException When process stopped after receiving signal
+     * @throws RuntimeException When process timed out
+     * @throws RuntimeException When process stopped after receiving signal
      */
     public function wait($callback = null)
     {

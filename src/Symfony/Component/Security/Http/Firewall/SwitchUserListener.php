@@ -68,11 +68,11 @@ class SwitchUserListener implements ListenerInterface
     }
 
     /**
-     * Handles digest authentication.
+     * Handles the switch to another user.
      *
      * @param GetResponseEvent $event A GetResponseEvent instance
      *
-     * @throws \LogicException
+     * @throws \LogicException if switching to a user failed
      */
     public function handle(GetResponseEvent $event)
     {

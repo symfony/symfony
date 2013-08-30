@@ -41,6 +41,7 @@ abstract class Client
     protected $followRedirects;
 
     private $internalRequest;
+    private $internalResponse;
 
     /**
      * Constructor.
@@ -266,7 +267,7 @@ abstract class Client
             $this->response = $this->doRequest($this->request);
         }
 
-        $response = $this->filterResponse($this->response);
+        $this->internalResponse = $response = $this->filterResponse($this->response);
 
         $this->cookieJar->updateFromResponse($response, $uri);
 
@@ -422,10 +423,22 @@ abstract class Client
             throw new \LogicException('The request was not redirected.');
         }
 
-        $server = $this->internalRequest->getServer();
+        $request = $this->internalRequest;
+
+        if (in_array($this->internalResponse->getStatus(), array(302, 303))) {
+            $method = 'get';
+            $files = array();
+            $content = null;
+        } else {
+            $method = $request->getMethod();
+            $files = $request->getFiles();
+            $content = $request->getContent();
+        }
+
+        $server = $request->getServer();
         unset($server['HTTP_IF_NONE_MATCH'], $server['HTTP_IF_MODIFIED_SINCE']);
 
-        return $this->request('get', $this->redirect, array(), array(), $server);
+        return $this->request($method, $this->redirect, $request->getParameters(), $files, $server, $content);
     }
 
     /**

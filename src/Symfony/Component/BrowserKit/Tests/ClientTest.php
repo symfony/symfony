@@ -326,6 +326,12 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $client->request('GET', 'http://www.example.com/foo/foobar');
 
         $this->assertEquals('http://www.example.com/redirected', $client->getRequest()->getUri(), '->followRedirect() automatically follows redirects if followRedirects is true');
+
+        $client = new TestClient();
+        $client->setNextResponse(new Response('', 302, array('Location' => 'http://www.example.com/redirected')));
+        $client->request('POST', 'http://www.example.com/foo/foobar');
+
+        $this->assertEquals('get', $client->getRequest()->getMethod(), '->followRedirect() uses a get for 302');
     }
 
     public function testFollowRedirectWithCookies()

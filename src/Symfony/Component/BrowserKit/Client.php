@@ -40,6 +40,9 @@ abstract class Client
     protected $redirect;
     protected $followRedirects;
 
+    private $internalRequest;
+    private $internalResponse;
+
     /**
      * Constructor.
      *
@@ -250,7 +253,7 @@ abstract class Client
         $server['HTTP_HOST'] = parse_url($uri, PHP_URL_HOST);
         $server['HTTPS'] = 'https' == parse_url($uri, PHP_URL_SCHEME);
 
-        $request = new Request($uri, $method, $parameters, $files, $this->cookieJar->allValues($uri), $server, $content);
+        $this->internalRequest = $request = new Request($uri, $method, $parameters, $files, $this->cookieJar->allValues($uri), $server, $content);
 
         $this->request = $this->filterRequest($request);
 
@@ -264,7 +267,7 @@ abstract class Client
             $this->response = $this->doRequest($this->request);
         }
 
-        $response = $this->filterResponse($this->response);
+        $this->internalResponse = $response = $this->filterResponse($this->response);
 
         $this->cookieJar->updateFromResponse($response, $uri);
 
@@ -420,7 +423,22 @@ abstract class Client
             throw new \LogicException('The request was not redirected.');
         }
 
-        return $this->request('get', $this->redirect, array(), array(), $this->history->current()->getServer());
+        $request = $this->internalRequest;
+
+        if (in_array($this->internalResponse->getStatus(), array(302, 303))) {
+            $method = 'get';
+            $files = array();
+            $content = null;
+        } else {
+            $method = $request->getMethod();
+            $files = $request->getFiles();
+            $content = $request->getContent();
+        }
+
+        $server = $request->getServer();
+        unset($server['HTTP_IF_NONE_MATCH'], $server['HTTP_IF_MODIFIED_SINCE']);
+
+        return $this->request($method, $this->redirect, $request->getParameters(), $files, $server, $content);
     }
 
     /**

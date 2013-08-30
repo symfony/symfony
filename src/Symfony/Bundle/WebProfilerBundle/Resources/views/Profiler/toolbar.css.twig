@@ -283,6 +283,24 @@
     line-height: 19px;
 }
 
+.ajax-request-error {
+    color: red;
+}
+.ajax-request-loading {
+    -webkit-animation: blink .5s linear infinite;
+    animation: blink .5s linear infinite;
+}
+@keyframes blink {
+    0% { color: black; }
+    50% { color: #bbb; }
+    100% { color: black; }
+}
+@-webkit-keyframes blink {
+    0% { color: black; }
+    50% { color: #bbb; }
+    100% { color: black; }
+}
+
 /***** Override the setting when the toolbar is on the top *****/
 {% if position == 'top' %}
     .sf-minitoolbar {

@@ -30,7 +30,7 @@ class ClassNotFoundFatalErrorHandler implements FatalErrorHandlerInterface
     public function handleError(array $error, FatalErrorException $exception)
     {
         $messageLen = strlen($error['message']);
-        $notFoundSuffix = '" not found';
+        $notFoundSuffix = '\' not found';
         $notFoundSuffixLen = strlen($notFoundSuffix);
         if ($notFoundSuffixLen > $messageLen) {
             return;
@@ -41,7 +41,7 @@ class ClassNotFoundFatalErrorHandler implements FatalErrorHandlerInterface
         }
 
         foreach (array('class', 'interface', 'trait') as $typeName) {
-            $prefix = ucfirst($typeName).' "';
+            $prefix = ucfirst($typeName).' \'';
             $prefixLen = strlen($prefix);
             if (0 !== strpos($error['message'], $prefix)) {
                 continue;

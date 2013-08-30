@@ -155,7 +155,7 @@ PHP
                     'type' => 1,
                     'line' => 12,
                     'file' => 'foo.php',
-                    'message' => 'Class "WhizBangFactory" not found',
+                    'message' => 'Class \'WhizBangFactory\' not found',
                 ),
                 'Symfony\Component\Debug\Exception\ClassNotFoundException',
                 'Attempted to load class "WhizBangFactory" from the global namespace in foo.php line 12. Did you forget a use statement for this class?',

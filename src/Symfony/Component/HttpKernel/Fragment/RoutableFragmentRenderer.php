@@ -41,11 +41,12 @@ abstract class RoutableFragmentRenderer implements FragmentRendererInterface
      *
      * @param ControllerReference  $reference A ControllerReference instance
      * @param Request              $request   A Request instance
+     * @param Boolean              $absolute  Whether to generate an absolute URL or not
      * @param Boolean              $strict    Whether to allow non-scalar attributes or not
      *
      * @return string A fragment URI
      */
-    protected function generateFragmentUri(ControllerReference $reference, Request $request, $strict = true)
+    protected function generateFragmentUri(ControllerReference $reference, Request $request, $absolute = false, $strict = true)
     {
         if ($strict) {
             $this->checkNonScalar($reference->attributes);
@@ -67,7 +68,13 @@ abstract class RoutableFragmentRenderer implements FragmentRendererInterface
 
         $reference->query['_path'] = http_build_query($reference->attributes, '', '&');
 
-        return $request->getUriForPath($this->fragmentPath.'?'.http_build_query($reference->query, '', '&'));
+        $path = $this->fragmentPath.'?'.http_build_query($reference->query, '', '&');
+
+        if ($absolute) {
+            return $request->getUriForPath($path);
+        }
+
+        return $request->getBaseUrl().$path;
     }
 
     private function checkNonScalar($values)

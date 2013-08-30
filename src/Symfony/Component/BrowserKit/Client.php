@@ -423,6 +423,7 @@ abstract class Client
         }
 
         $server = $this->internalRequest->getServer();
+        unset($server['HTTP_IF_NONE_MATCH'], $server['HTTP_IF_MODIFIED_SINCE']);
 
         return $this->request('get', $this->redirect, array(), array(), $server);
     }

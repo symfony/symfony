@@ -420,7 +420,7 @@ abstract class Client
             throw new \LogicException('The request was not redirected.');
         }
 
-        return $this->request('get', $this->redirect);
+        return $this->request('get', $this->redirect, array(), array(), $this->history->current()->getServer());
     }
 
     /**

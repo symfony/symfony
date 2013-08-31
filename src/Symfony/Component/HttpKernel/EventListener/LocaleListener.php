@@ -37,6 +37,27 @@ class LocaleListener implements EventSubscriberInterface
         $this->router = $router;
     }
 
+    /**
+     * Sets the current Request.
+     *
+     * This method was used to synchronize the Request, but as the HttpKernel
+     * is doing that automatically now, you should never be called it directly.
+     * It is kept public for BC with the 2.3 version.
+     *
+     * @param Request|null $request A Request instance
+     *
+     * @deprecated Deprecated since version 2.4, to be removed in 3.0.
+     */
+    public function setRequest(Request $request = null)
+    {
+        if (null === $request) {
+            return;
+        }
+
+        $this->setLocale($request);
+        $this->setRouterContext($request);
+    }
+
     public function onKernelRequest(GetResponseEvent $event)
     {
         $request = $event->getRequest();
@@ -48,22 +69,9 @@ class LocaleListener implements EventSubscriberInterface
 
     public function onKernelFinishRequest(FinishRequestEvent $event)
     {
-        $this->resetRouterContext();
-    }
-
-    private function resetRouterContext()
-    {
-        if ($this->requestContext === null) {
-            return;
+        if (null !== $parentRequest = $this->requestContext->getParentRequest()) {
+            $this->setRouterContext($parentRequest);
         }
-
-        $parentRequest = $this->requestContext->getParentRequest();
-
-        if ($parentRequest === null) {
-            return;
-        }
-
-        $this->setRouterContext($parentRequest);
     }
 
     private function setLocale(Request $request)

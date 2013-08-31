@@ -68,14 +68,15 @@ class RouterListener implements EventSubscriberInterface
     /**
      * Sets the current Request.
      *
-     * The application should call this method whenever the Request
-     * object changes (entering a Request scope for instance, but
-     * also when leaving a Request scope -- especially when they are
-     * nested).
+     * This method was used to synchronize the Request, but as the HttpKernel
+     * is doing that automatically now, you should never be called it directly.
+     * It is kept public for BC with the 2.3 version.
      *
      * @param Request|null $request A Request instance
+     *
+     * @deprecated Deprecated since version 2.4, to be moved to a private function in 3.0.
      */
-    private function populateRoutingContext(Request $request = null)
+    public function setRequest(Request $request = null)
     {
         if (null !== $request && $this->request !== $request) {
             $this->context->fromRequest($request);
@@ -83,10 +84,10 @@ class RouterListener implements EventSubscriberInterface
         $this->request = $request;
     }
 
-     public function onKernelFinishRequest(FinishRequestEvent $event)
-     {
-         $this->populateRoutingContext($this->kernelContext->getParentRequest());
-     }
+    public function onKernelFinishRequest(FinishRequestEvent $event)
+    {
+        $this->setRequest($this->kernelContext->getParentRequest());
+    }
 
     public function onKernelRequest(GetResponseEvent $event)
     {
@@ -95,7 +96,7 @@ class RouterListener implements EventSubscriberInterface
         // initialize the context that is also used by the generator (assuming matcher and generator share the same context instance)
         // we call setRequest even if most of the time, it has already been done to keep compatibility
         // with frameworks which do not use the Symfony service container
-        $this->populateRoutingContext($request);
+        $this->setRequest($request);
 
         if ($request->attributes->has('_controller')) {
             // routing is already done

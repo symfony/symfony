@@ -85,6 +85,10 @@ class FragmentHandler
             throw new \InvalidArgumentException(sprintf('The "%s" renderer does not exist.', $renderer));
         }
 
+        if (null === $this->context->getCurrentRequest()) {
+            throw new \LogicException('Rendering a fragment can only be done when handling a Request.');
+        }
+
         return $this->deliver($this->renderers[$renderer]->render($uri, $this->context->getCurrentRequest(), $options));
     }
 
@@ -103,8 +107,7 @@ class FragmentHandler
     protected function deliver(Response $response)
     {
         if (!$response->isSuccessful()) {
-            $request = $this->context->getCurrentRequest();
-            throw new \RuntimeException(sprintf('Error when rendering "%s" (Status code is %s).', $request->getUri(), $response->getStatusCode()));
+            throw new \RuntimeException(sprintf('Error when rendering "%s" (Status code is %s).', $this->context->getCurrentRequest()->getUri(), $response->getStatusCode()));
         }
 
         if (!$response instanceof StreamedResponse) {

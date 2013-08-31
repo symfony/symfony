@@ -37,9 +37,9 @@ class ContainerAwareHttpKernel extends HttpKernel
      * @param EventDispatcherInterface    $dispatcher         An EventDispatcherInterface instance
      * @param ContainerInterface          $container          A ContainerInterface instance
      * @param ControllerResolverInterface $controllerResolver A ControllerResolverInterface instance
-      * @param RequestStack               $requestStack       A stack for master/sub requests
+     * @param RequestStack                $requestStack       A stack for master/sub requests
      */
-    public function __construct(EventDispatcherInterface $dispatcher, ContainerInterface $container, ControllerResolverInterface $controllerResolver, RequestStack $requestStack)
+    public function __construct(EventDispatcherInterface $dispatcher, ContainerInterface $container, ControllerResolverInterface $controllerResolver, RequestStack $requestStack = null)
     {
         parent::__construct($dispatcher, $controllerResolver, $requestStack);
 

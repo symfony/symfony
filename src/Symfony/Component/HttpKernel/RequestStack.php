@@ -16,8 +16,6 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * Request stack that controls the lifecycle of requests.
  *
- * Notifies services of changes in the stack.
- *
  * @author Benjamin Eberlei <kontakt@beberlei.de>
  */
 class RequestStack
@@ -33,7 +31,7 @@ class RequestStack
     }
 
     /**
-     * Pop the current request from the stack.
+     * Pops the current request from the stack.
      *
      * This operation lets the current request go out of scope.
      *
@@ -41,6 +39,10 @@ class RequestStack
      */
     public function pop()
     {
+        if (!$this->requests) {
+            throw new \LogicException('Unable to pop a Request as the stack is already empty.');
+        }
+
         return array_pop($this->requests);
     }
 
@@ -65,11 +67,11 @@ class RequestStack
     }
 
     /**
-     * Return the parent request of the current.
+     * Returns the parent request of the current.
      *
-     * If current Request is the master request, method returns null.
+     * If current Request is the master request, it returns null.
      *
-     * @return Request
+     * @return Request|null
      */
     public function getParentRequest()
     {

@@ -64,9 +64,9 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
         try {
             return $this->handleRaw($request, $type);
         } catch (\Exception $e) {
-            $this->finishRequest($request, $type);
-
             if (false === $catch) {
+                $this->finishRequest($request, $type);
+
                 throw $e;
             }
 
@@ -170,16 +170,14 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
     }
 
     /**
-     * Publish event finished event, then pop the request from the stack.
+     * Publishes the finish request event, then pop the request from the stack.
      *
-     * Note: Order of the operations is important here, otherwise operations
-     * such as {@link RequestStack::getParentRequest()} can lead to weird
-     * results.
+     * Note that the order of the operations is important here, otherwise
+     * operations such as {@link RequestStack::getParentRequest()} can lead to
+     * weird results.
      *
      * @param Request $request
-     * @param int $type
-     *
-     * @return void
+     * @param int     $type
      */
     private function finishRequest(Request $request, $type)
     {
@@ -207,6 +205,8 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
         $e = $event->getException();
 
         if (!$event->hasResponse()) {
+            $this->finishRequest($request, $type);
+
             throw $e;
         }
 

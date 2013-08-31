@@ -30,7 +30,7 @@ class RequestContext
     }
 
     /**
-     * @return Request
+     * @return Request|null
      */
     public function getCurrentRequest()
     {
@@ -38,7 +38,7 @@ class RequestContext
     }
 
     /**
-     * @return Request
+     * @return Request|null
      */
     public function getMasterRequest()
     {

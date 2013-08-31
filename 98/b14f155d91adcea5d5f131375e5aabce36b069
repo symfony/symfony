@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by henrikbjorn at 2013-08-28T22:24:43Z
+
+why? it makes the line of code longer.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-08-29T05:08:02Z
+
+... and there is another one in the same file.
+
+---------------------------------------------------------------------------
+
+by pulzarraider at 2013-08-29T07:40:24Z
+
+@henrikbjorn See [coding standards](http://symfony.com/doc/current/contributing/code/standards.html#structure): Exception message strings should be concatenated using sprintf.
+
+---------------------------------------------------------------------------
+
+by pulzarraider at 2013-08-29T10:46:47Z
+
+@fabpot Fixed.
+
+---------------------------------------------------------------------------
+
+by henrikbjorn at 2013-08-29T10:57:06Z
+
+@pulzarraider it says "should be" not "must be" meaning it is optional.
+
+---------------------------------------------------------------------------
+
+by pulzarraider at 2013-08-29T11:28:04Z
+
+@henrikbjorn "Should" means "recommended". "May" means it`s optional. [rfc 2119](http://www.ietf.org/rfc/rfc2119.txt).

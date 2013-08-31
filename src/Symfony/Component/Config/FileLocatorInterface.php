@@ -25,7 +25,7 @@ interface FileLocatorInterface
      *
      * @return string|array The full path to the file|An array of file paths
      *
-     * @throws \InvalidArgumentException When file is not found
+     * @throws \Symfony\Component\Config\Exception\FileNotFoundException When file is not found
      */
     public function locate($name, $currentPath = null, $first = true);
 }

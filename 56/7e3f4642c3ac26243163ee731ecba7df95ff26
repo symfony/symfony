@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2013-07-01T17:09:25Z
+
+It only reduces the BC break. It doesn't fully return BC. There are still BC breaks. For example when you don't have a default for the parameter but one in the method signature. It can match totally different routes.
+The only way to return BC would be to remove the feature. The other option would be to document the bc break.
+
+---------------------------------------------------------------------------
+
+by stloyd at 2013-07-03T12:40:12Z
+
+@Tobion I think that this is best way for now (reduce BC), as I can't find (without removing this feature) full BC compatibility fix (at least now) and add to docs note about the missing BC.
+
+@fabpot what do you think about this?
+
+---------------------------------------------------------------------------
+
+by stloyd at 2013-08-08T12:22:30Z
+
+@fabpot Can you say something about this?
+
+---------------------------------------------------------------------------
+
+by stloyd at 2013-08-30T18:45:15Z
+
+@fabpot ping pong :panda_face:
+
+---------------------------------------------------------------------------
+
+by Tobion at 2013-08-30T20:25:06Z
+
+Seems ok to me.

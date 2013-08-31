@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Routing\Tests\Loader;
 
+use Symfony\Component\Routing\Annotation\Route;
+
 class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
 {
     protected $loader;
@@ -71,13 +73,18 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
         return array(
             array(
                 'Symfony\Component\Routing\Tests\Fixtures\AnnotatedClasses\BarClass',
-                array('name'=>'route1'),
-                array('arg2' => 'defaultValue2', 'arg3' =>'defaultValue3')
+                array('name' => 'route1'),
+                array('arg2' => 'defaultValue2', 'arg3' => 'defaultValue3')
             ),
             array(
                 'Symfony\Component\Routing\Tests\Fixtures\AnnotatedClasses\BarClass',
-                array('name'=>'route1', 'defaults' => array('arg2' => 'foo')),
-                array('arg2' => 'defaultValue2', 'arg3' =>'defaultValue3')
+                array('name' => 'route1', 'defaults' => array('arg2' => 'foo')),
+                array('arg2' => 'defaultValue2', 'arg3' => 'defaultValue3')
+            ),
+            array(
+                'Symfony\Component\Routing\Tests\Fixtures\AnnotatedClasses\BarClass',
+                array('name' => 'route1', 'defaults' => array('arg2' => 'foobar')),
+                array('arg2' => false, 'arg3' => 'defaultValue3')
             ),
         );
     }
@@ -108,12 +115,11 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
         $this->assertSame($routeDatas['path'], $route->getPath(), '->load preserves path annotation');
         $this->assertSame($routeDatas['requirements'],$route->getRequirements(), '->load preserves requirements annotation');
         $this->assertCount(0, array_intersect($route->getOptions(), $routeDatas['options']), '->load preserves options annotation');
-        $this->assertSame(array_replace($routeDatas['defaults'], $methodArgs), $route->getDefaults(), '->load preserves defaults annotation');
+        $this->assertSame(array_replace($methodArgs, $routeDatas['defaults']), $route->getDefaults(), '->load preserves defaults annotation');
     }
 
     private function getAnnotatedRoute($datas)
     {
-        return new \Symfony\Component\Routing\Annotation\Route($datas);
+        return new Route($datas);
     }
-
 }

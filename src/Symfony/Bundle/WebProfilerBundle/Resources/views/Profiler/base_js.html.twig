@@ -1,4 +1,83 @@
 <script>/*<![CDATA[*/
+    var requestStack = [];
+
+    var proxied = XMLHttpRequest.prototype.open;
+    XMLHttpRequest.prototype.open = function(method, url, async, user, pass) {
+        var self = this;
+
+        /* prevent logging AJAX calls to static and inline files, like templates */
+        if (url.charAt(0) === '/' && !url.substr(0, 8) !== '/bundles') {
+            var stackElement = {
+                loading: true,
+                error: false,
+                url: url,
+                method: method,
+                start: new Date()
+            };
+
+            requestStack.push(stackElement);
+
+            this.addEventListener("readystatechange", function() {
+                if (self.readyState == 4) {
+                    stackElement.duration = new Date() - stackElement.start;
+                    stackElement.loading = false;
+                    stackElement.error = self.status < 200 || self.status >= 400;
+                    stackElement.token = self.getResponseHeader("X-Debug-Token");
+
+                    updateAjaxRequests();
+                }
+            }, false);
+
+            updateAjaxRequests();
+        }
+
+        proxied.apply(this, [].slice.call(arguments));
+    };
+
+    var updateAjaxRequests = function() {
+        if (document.getElementsByClassName('sf-toolbar-ajax-requests').length) {
+            document.getElementsByClassName('sf-toolbar-ajax-requests')[0].innerHTML = requestStack.length;
+        }
+        var list = document.getElementsByClassName('sf-toolbar-ajax-request-list');
+        if (list.length) {
+
+            if (requestStack.length) {
+                var ul = document.createElement('ul');
+                for(var i in requestStack) {
+                    var request = requestStack[i];
+
+                    var li = document.createElement('li');
+
+                    var pathSpan = document.createElement('span');
+                    pathSpan.innerHTML = request.method + " " + request.url;
+                    li.appendChild(pathSpan);
+
+                    if (request.duration) {
+                        li.appendChild(document.createTextNode(' '));
+                        var durationSpan = document.createElement('time');
+                        durationSpan.innerText = request.duration + "ms";
+                        li.appendChild(durationSpan);
+                    }
+
+                    if (request.token) {
+                        li.appendChild(document.createTextNode(' '));
+                        var profilerA = document.createElement('a');
+                        profilerA.setAttribute('href', {{ path('_profiler_home') }} + request.token);
+                        profilerA.innerText = 'profiler';
+                        li.appendChild(profilerA);
+                    }
+                    li.className = request.error ? 'ajax-request-error' : (request.loading ? 'ajax-request-loading' : 'ajax-request-ok');
+                    ul.appendChild(li);
+                }
+
+                list[0].innerHTML = '';
+                list[0].appendChild(ul);
+            } else {
+                list[0].innerText = "No AJAX requests fired yet.";
+            }
+        }
+    };
+
     Sfjs = (function() {
         "use strict";
 

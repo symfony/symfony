@@ -103,7 +103,7 @@ class DigestDataTest extends \PHPUnit_Framework_TestCase
     {
         $time = microtime(true);
         $key = 'ThisIsAKey';
-        $nonce = base64_encode($time.':'.hash('sha256', $time.':'.$key));
+        $nonce = base64_encode($time.':'.md5($time.':'.$key));
 
         $digestAuth = new DigestData(
             'username="user", realm="Welcome, robot!", nonce="'.$nonce.'", ' .
@@ -143,7 +143,7 @@ class DigestDataTest extends \PHPUnit_Framework_TestCase
     {
         $time = microtime(true) + 10;
         $key = 'ThisIsAKey';
-        $nonce = base64_encode($time.':'.hash('sha256', $time.':'.$key));
+        $nonce = base64_encode($time.':'.md5($time.':'.$key));
 
         $digestAuth = new DigestData(
             'username="user", realm="Welcome, robot!", nonce="'.$nonce.'", ' .
@@ -164,10 +164,10 @@ class DigestDataTest extends \PHPUnit_Framework_TestCase
     private function calculateServerDigest($username, $realm, $password, $key, $nc, $cnonce, $qop, $method, $uri)
     {
         $time = microtime(true);
-        $nonce = base64_encode($time.':'.hash('sha256', $time.':'.$key));
+        $nonce = base64_encode($time.':'.md5($time.':'.$key));
 
-        $response = hash('sha256',
-            hash('sha256', $username.':'.$realm.':'.$password).':'.$nonce.':'.$nc.':'.$cnonce.':'.$qop.':'.hash('sha256', $method.':'.$uri)
+        $response = md5(
+            md5($username.':'.$realm.':'.$password).':'.$nonce.':'.$nc.':'.$cnonce.':'.$qop.':'.md5($method.':'.$uri)
         );
 
         $digest = sprintf('username="%s", realm="%s", nonce="%s", uri="%s", cnonce="%s", nc=%s, qop="%s", response="%s"',

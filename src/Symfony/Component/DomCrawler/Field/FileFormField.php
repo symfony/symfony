@@ -63,7 +63,7 @@ class FileFormField extends FormField
             $name = $info['basename'];
 
             // copy to a tmp location
-            $tmp = sys_get_temp_dir().'/'.hash('sha256', uniqid(mt_rand(), true));
+            $tmp = sys_get_temp_dir().'/'.sha1(uniqid(mt_rand(), true));
             if (array_key_exists('extension', $info)) {
                 $tmp .= '.'.$info['extension'];
             }

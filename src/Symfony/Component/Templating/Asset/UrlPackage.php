@@ -73,7 +73,7 @@ class UrlPackage extends Package
                 return $this->baseUrls[0];
 
             default:
-                return $this->baseUrls[fmod(hexdec(substr(md5($path), 0, 10)), $count)];
+                return $this->baseUrls[fmod(hexdec(substr(hash('sha256', $path), 0, 10)), $count)];
         }
     }
 }

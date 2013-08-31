@@ -35,10 +35,13 @@
     };
 
     var updateAjaxRequests = function() {
-        if (document.getElementsByClassName('sf-toolbar-ajax-requests').length) {
-            document.getElementsByClassName('sf-toolbar-ajax-requests')[0].innerHTML = requestStack.length;
+        var requestCounter = document.getElementsByClassName('sf-toolbar-ajax-requests');
+        if (!requestCounter.length) {
+            return;
         }
+
         var list = document.getElementsByClassName('sf-toolbar-ajax-request-list');
+        var state = 'ok';
         if (list.length) {
 
             if (requestStack.length) {
@@ -66,7 +69,17 @@
                         profilerA.innerText = 'profiler';
                         li.appendChild(profilerA);
                     }
-                    li.className = request.error ? 'ajax-request-error' : (request.loading ? 'ajax-request-loading' : 'ajax-request-ok');
+                    var requestState = 'ok';
+                    if (request.error) {
+                        requestState = 'error';
+                        if (state != "loading" && i > requestStack.length - 4) {
+                            state = 'error';
+                        }
+                    } else if (request.loading) {
+                        requestState = 'loading';
+                        state = 'loading'
+                    }
+                    li.className = 'ajax-request-' + requestState;
                     ul.appendChild(li);
                 }
 
@@ -76,6 +89,9 @@
                 list[0].innerText = "No AJAX requests fired yet.";
             }
         }
+
+        requestCounter[0].innerText = requestStack.length;
+        requestCounter[0].className = 'sf-toolbar-ajax-requests ajax-request-' + state;
     };
 
     Sfjs = (function() {

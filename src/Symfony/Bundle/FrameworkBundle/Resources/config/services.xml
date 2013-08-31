@@ -28,7 +28,7 @@
             <argument type="service" id="request_stack" />
         </service>
 
-        <service id="request_stack" class="%request_stack.class%">
+        <service id="request_stack" class="%request_stack.class%" public="false">
         </service>
 
         <service id="request_context" class="%request_context.class%">

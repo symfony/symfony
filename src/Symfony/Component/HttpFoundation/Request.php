@@ -1112,7 +1112,7 @@ class Request
         // as the host can come from the user (HTTP_HOST and depending on the configuration, SERVER_NAME too can come from the user)
         // check that it does not contain forbidden characters (see RFC 952 and RFC 2181)
         if ($host && !preg_match('/^\[?(?:[a-zA-Z0-9-:\]_]+\.?)+$/', $host)) {
-            throw new \UnexpectedValueException('Invalid Host "'.$host.'"');
+            throw new \UnexpectedValueException(sprintf('Invalid Host "%s"', $host));
         }
 
         if (count(self::$trustedHostPatterns) > 0) {
@@ -1130,7 +1130,7 @@ class Request
                 }
             }
 
-            throw new \UnexpectedValueException('Untrusted Host "'.$host.'"');
+            throw new \UnexpectedValueException(sprintf('Untrusted Host "%s"', $host));
         }
 
         return $host;

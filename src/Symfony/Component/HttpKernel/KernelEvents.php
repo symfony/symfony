@@ -111,5 +111,5 @@ final class KernelEvents
      *
      * @var string
      */
-    const REQUEST_FINISHED = 'kernel.request_finished';
+    const FINISH_REQUEST = 'kernel.finish_request';
 }

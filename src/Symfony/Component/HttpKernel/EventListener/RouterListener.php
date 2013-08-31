@@ -13,7 +13,7 @@ namespace Symfony\Component\HttpKernel\EventListener;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\HttpKernel\Event\RequestFinishedEvent;
+use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -83,7 +83,7 @@ class RouterListener implements EventSubscriberInterface
         $this->request = $request;
     }
 
-     public function onKernelRequestFinished(RequestFinishedEvent $event)
+     public function onKernelFinishRequest(FinishRequestEvent $event)
      {
          $this->populateRoutingContext($this->kernelContext->getParentRequest());
      }
@@ -148,7 +148,7 @@ class RouterListener implements EventSubscriberInterface
     {
         return array(
             KernelEvents::REQUEST => array(array('onKernelRequest', 32)),
-            KernelEvents::REQUEST_FINISHED => array(array('onKernelRequestFinished', 0)),
+            KernelEvents::FINISH_REQUEST => array(array('onKernelFinishRequest', 0)),
         );
     }
 }

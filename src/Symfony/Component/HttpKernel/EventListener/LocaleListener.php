@@ -12,7 +12,7 @@
 namespace Symfony\Component\HttpKernel\EventListener;
 
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\HttpKernel\Event\RequestFinishedEvent;
+use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\RequestContext;
 use Symfony\Component\HttpFoundation\Request;
@@ -46,7 +46,7 @@ class LocaleListener implements EventSubscriberInterface
         $this->setRouterContext($request);
     }
 
-    public function onKernelRequestFinished(RequestFinishedEvent $event)
+    public function onKernelFinishRequest(FinishRequestEvent $event)
     {
         $this->resetRouterContext();
     }
@@ -85,7 +85,7 @@ class LocaleListener implements EventSubscriberInterface
         return array(
             // must be registered after the Router to have access to the _locale
             KernelEvents::REQUEST => array(array('onKernelRequest', 16)),
-            KernelEvents::REQUEST_FINISHED => array(array('onKernelRequestFinished', 0)),
+            KernelEvents::FINISH_REQUEST => array(array('onKernelFinishRequest', 0)),
         );
     }
 }

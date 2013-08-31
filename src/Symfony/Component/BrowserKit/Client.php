@@ -492,9 +492,24 @@ abstract class Client
             }
         }
 
+        $request = $this->internalRequest;
+
+        if (in_array($this->internalResponse->getStatus(), array(302, 303))) {
+            $method = 'get';
+            $files = array();
+            $content = null;
+        } else {
+            $method = $request->getMethod();
+            $files = $request->getFiles();
+            $content = $request->getContent();
+        }
+
+        $server = $request->getServer();
+        unset($server['HTTP_IF_NONE_MATCH'], $server['HTTP_IF_MODIFIED_SINCE']);
+
         $this->isMainRequest = false;
 
-        $response = $this->request('get', $this->redirect);
+        $response = $this->request($method, $this->redirect, $request->getParameters(), $files, $server, $content);
 
         $this->isMainRequest = true;
 

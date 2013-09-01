@@ -241,6 +241,7 @@ class Container implements IntrospectableContainerInterface
         $id = strtolower($id);
 
         return isset($this->services[$id])
+            || array_key_exists($id, $this->services)
             || isset($this->aliases[$id])
             || method_exists($this, 'get'.strtr($id, array('_' => '', '.' => '_')).'Service')
         ;
@@ -275,7 +276,7 @@ class Container implements IntrospectableContainerInterface
         }
 
         // re-use shared service instance if it exists
-        if (isset($this->services[$id])) {
+        if (isset($this->services[$id]) || array_key_exists($id, $this->services)) {
             return $this->services[$id];
         }
 
@@ -339,7 +340,8 @@ class Container implements IntrospectableContainerInterface
      */
     public function initialized($id)
     {
-        return isset($this->services[strtolower($id)]);
+        $id = strtolower($id);
+        return isset($this->services[$id]) || array_key_exists($id, $this->services);
     }
 
     /**

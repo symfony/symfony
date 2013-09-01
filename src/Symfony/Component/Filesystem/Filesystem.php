@@ -18,7 +18,7 @@ use Symfony\Component\Filesystem\Exception\IOException;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Filesystem
+class Filesystem implements FilesystemInterface
 {
     /**
      * Copies a file.

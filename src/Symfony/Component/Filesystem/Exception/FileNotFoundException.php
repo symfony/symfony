@@ -1,2 +1,32 @@
 <?php
-/** To be written **/
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\Filesystem\Exception;
+
+/**
+ * Exception class thrown when a file couldn' t be found
+ *
+ * @author Christian Gärtner <christiangaertner.film@googlemail.com>
+ *
+ * @api
+ */
+class FileNotFoundException extends IOException
+{
+
+	public function __construct($path, $message = null, $code = 0, \Exception $previous = null)
+	{
+		if ($message === null) {
+			$message = sprintf('File "%s" couldnot be found', $path);
+		}
+
+		parent::__construct($path, $message, $code, $previous);
+	}
+}

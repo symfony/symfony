@@ -20,5 +20,7 @@ namespace Symfony\Component\Filesystem\Exception;
  */
 class IOException extends \RuntimeException implements ExceptionInterface, IOExceptionInterface
 {
-
+    public function getPath() {
+      return null;
+    }
 }

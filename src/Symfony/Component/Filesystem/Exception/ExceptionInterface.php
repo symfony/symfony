@@ -16,6 +16,7 @@ namespace Symfony\Component\Filesystem\Exception;
  *
  * @author Romain Neutron <imprec@gmail.com>
  *
+ * @api
  */
 interface ExceptionInterface
 {

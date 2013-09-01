@@ -12,6 +12,7 @@
 namespace Symfony\Component\Filesystem;
 
 use Symfony\Component\Filesystem\Exception\IOException;
+use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 
 /**
  * Provides basic utility to manipulate the file system.
@@ -21,22 +22,12 @@ use Symfony\Component\Filesystem\Exception\IOException;
 class Filesystem implements FilesystemInterface
 {
     /**
-     * Copies a file.
-     *
-     * This method only copies the file if the origin file is newer than the target file.
-     *
-     * By default, if the target already exists, it is not overridden.
-     *
-     * @param string  $originFile The original filename
-     * @param string  $targetFile The target filename
-     * @param boolean $override   Whether to override an existing file or not
-     *
-     * @throws IOException When copy fails
+     * {@inheritdoc}
      */
     public function copy($originFile, $targetFile, $override = false)
     {
         if (stream_is_local($originFile) && !is_file($originFile)) {
-            throw new IOException(sprintf('Failed to copy %s because file not exists', $originFile));
+            throw new FileNotFoundException($originFile, sprintf('Failed to copy %s because file not exists', $originFile));
         }
 
         $this->mkdir(dirname($targetFile));
@@ -57,18 +48,13 @@ class Filesystem implements FilesystemInterface
             unset($source, $target);
 
             if (!is_file($targetFile)) {
-                throw new IOException(sprintf('Failed to copy %s to %s', $originFile, $targetFile));
+                throw new IOException($originFile, sprintf('Failed to copy %s to %s', $originFile, $targetFile));
             }
         }
     }
 
     /**
-     * Creates a directory recursively.
-     *
-     * @param string|array|\Traversable $dirs The directory path
-     * @param integer                   $mode The directory mode
-     *
-     * @throws IOException On any directory creation failure
+     * {@inheritdoc}
      */
     public function mkdir($dirs, $mode = 0777)
     {
@@ -78,17 +64,13 @@ class Filesystem implements FilesystemInterface
             }
 
             if (true !== @mkdir($dir, $mode, true)) {
-                throw new IOException(sprintf('Failed to create %s', $dir));
+                throw new IOException($dir, sprintf('Failed to create %s', $dir));
             }
         }
     }
 
     /**
-     * Checks the existence of files or directories.
-     *
-     * @param string|array|\Traversable $files A filename, an array of files, or a \Traversable instance to check
-     *
-     * @return Boolean true if the file exists, false otherwise
+     * {@inheritdoc}
      */
     public function exists($files)
     {
@@ -102,30 +84,20 @@ class Filesystem implements FilesystemInterface
     }
 
     /**
-     * Sets access and modification time of file.
-     *
-     * @param string|array|\Traversable $files A filename, an array of files, or a \Traversable instance to create
-     * @param integer                   $time  The touch time as a unix timestamp
-     * @param integer                   $atime The access time as a unix timestamp
-     *
-     * @throws IOException When touch fails
+     * {@inheritdoc}
      */
     public function touch($files, $time = null, $atime = null)
     {
         foreach ($this->toIterator($files) as $file) {
             $touch = $time ? @touch($file, $time, $atime) : @touch($file);
             if (true !== $touch) {
-                throw new IOException(sprintf('Failed to touch %s', $file));
+                throw new IOException($file, sprintf('Failed to touch %s', $file));
             }
         }
     }
 
     /**
-     * Removes files or directories.
-     *
-     * @param string|array|\Traversable $files A filename, an array of files, or a \Traversable instance to remove
-     *
-     * @throws IOException When removal fails
+     * {@inheritdoc}
      */
     public function remove($files)
     {
@@ -140,17 +112,17 @@ class Filesystem implements FilesystemInterface
                 $this->remove(new \FilesystemIterator($file));
 
                 if (true !== @rmdir($file)) {
-                    throw new IOException(sprintf('Failed to remove directory %s', $file));
+                    throw new IOException($file, sprintf('Failed to remove directory %s', $file));
                 }
             } else {
                 // https://bugs.php.net/bug.php?id=52176
                 if (defined('PHP_WINDOWS_VERSION_MAJOR') && is_dir($file)) {
                     if (true !== @rmdir($file)) {
-                        throw new IOException(sprintf('Failed to remove file %s', $file));
+                        throw new IOException($file, sprintf('Failed to remove file %s', $file));
                     }
                 } else {
                     if (true !== @unlink($file)) {
-                        throw new IOException(sprintf('Failed to remove file %s', $file));
+                        throw new IOException($file, sprintf('Failed to remove file %s', $file));
                     }
                 }
             }
@@ -158,14 +130,7 @@ class Filesystem implements FilesystemInterface
     }
 
     /**
-     * Change mode for an array of files or directories.
-     *
-     * @param string|array|\Traversable $files     A filename, an array of files, or a \Traversable instance to change mode
-     * @param integer                   $mode      The new mode (octal)
-     * @param integer                   $umask     The mode mask (octal)
-     * @param Boolean                   $recursive Whether change the mod recursively or not
-     *
-     * @throws IOException When the change fail
+     * {@inheritdoc}
      */
     public function chmod($files, $mode, $umask = 0000, $recursive = false)
     {
@@ -174,19 +139,13 @@ class Filesystem implements FilesystemInterface
                 $this->chmod(new \FilesystemIterator($file), $mode, $umask, true);
             }
             if (true !== @chmod($file, $mode & ~$umask)) {
-                throw new IOException(sprintf('Failed to chmod file %s', $file));
+                throw new IOException($file, sprintf('Failed to chmod file %s', $file));
             }
         }
     }
 
     /**
-     * Change the owner of an array of files or directories
-     *
-     * @param string|array|\Traversable $files     A filename, an array of files, or a \Traversable instance to change owner
-     * @param string                    $user      The new owner user name
-     * @param Boolean                   $recursive Whether change the owner recursively or not
-     *
-     * @throws IOException When the change fail
+     * {@inheritdoc}
      */
     public function chown($files, $user, $recursive = false)
     {
@@ -196,24 +155,18 @@ class Filesystem implements FilesystemInterface
             }
             if (is_link($file) && function_exists('lchown')) {
                 if (true !== @lchown($file, $user)) {
-                    throw new IOException(sprintf('Failed to chown file %s', $file));
+                    throw new IOException($file, sprintf('Failed to chown file %s', $file));
                 }
             } else {
                 if (true !== @chown($file, $user)) {
-                    throw new IOException(sprintf('Failed to chown file %s', $file));
+                    throw new IOException($file, sprintf('Failed to chown file %s', $file));
                 }
             }
         }
     }
 
     /**
-     * Change the group of an array of files or directories
-     *
-     * @param string|array|\Traversable $files     A filename, an array of files, or a \Traversable instance to change group
-     * @param string                    $group     The group name
-     * @param Boolean                   $recursive Whether change the group recursively or not
-     *
-     * @throws IOException When the change fail
+     * {@inheritdoc}
      */
     public function chgrp($files, $group, $recursive = false)
     {
@@ -223,46 +176,33 @@ class Filesystem implements FilesystemInterface
             }
             if (is_link($file) && function_exists('lchgrp')) {
                 if (true !== @lchgrp($file, $group)) {
-                    throw new IOException(sprintf('Failed to chgrp file %s', $file));
+                    throw new IOException($file, sprintf('Failed to chgrp file %s', $file));
                 }
             } else {
                 if (true !== @chgrp($file, $group)) {
-                    throw new IOException(sprintf('Failed to chgrp file %s', $file));
+                    throw new IOException($file, sprintf('Failed to chgrp file %s', $file));
                 }
             }
         }
     }
 
     /**
-     * Renames a file or a directory.
-     *
-     * @param string  $origin    The origin filename or directory
-     * @param string  $target    The new filename or directory
-     * @param Boolean $overwrite Whether to overwrite the target if it already exists
-     *
-     * @throws IOException When target file or directory already exists
-     * @throws IOException When origin cannot be renamed
+     * {@inheritdoc}
      */
     public function rename($origin, $target, $overwrite = false)
     {
         // we check that target does not exist
         if (!$overwrite && is_readable($target)) {
-            throw new IOException(sprintf('Cannot rename because the target "%s" already exist.', $target));
+            throw new IOException($target, sprintf('Cannot rename because the target "%s" already exist.', $target));
         }
 
         if (true !== @rename($origin, $target)) {
-            throw new IOException(sprintf('Cannot rename "%s" to "%s".', $origin, $target));
+            throw new IOException($target, sprintf('Cannot rename "%s" to "%s".', $origin, $target));
         }
     }
 
     /**
-     * Creates a symbolic link or copy a directory.
-     *
-     * @param string  $originDir     The origin directory path
-     * @param string  $targetDir     The symbolic link name
-     * @param Boolean $copyOnWindows Whether to copy files if on Windows
-     *
-     * @throws IOException When symlink fails
+     * {@inheritdoc}
      */
     public function symlink($originDir, $targetDir, $copyOnWindows = false)
     {
@@ -288,21 +228,16 @@ class Filesystem implements FilesystemInterface
                 $report = error_get_last();
                 if (is_array($report)) {
                     if (defined('PHP_WINDOWS_VERSION_MAJOR') && false !== strpos($report['message'], 'error code(1314)')) {
-                        throw new IOException('Unable to create symlink due to error code 1314: \'A required privilege is not held by the client\'. Do you have the required Administrator-rights?');
+                        throw new IOException(null, 'Unable to create symlink due to error code 1314: \'A required privilege is not held by the client\'. Do you have the required Administrator-rights?');
                     }
                 }
-                throw new IOException(sprintf('Failed to create symbolic link from %s to %s', $originDir, $targetDir));
+                throw new IOException($targetDir, sprintf('Failed to create symbolic link from %s to %s', $originDir, $targetDir));
             }
         }
     }
 
     /**
-     * Given an existing path, convert it to a path relative to a given starting path
-     *
-     * @param string $endPath   Absolute path of target
-     * @param string $startPath Absolute path where traversal begins
-     *
-     * @return string Path of target relative to starting path
+     * {@inheritdoc}
      */
     public function makePathRelative($endPath, $startPath)
     {
@@ -337,18 +272,7 @@ class Filesystem implements FilesystemInterface
     }
 
     /**
-     * Mirrors a directory to another.
-     *
-     * @param string       $originDir The origin directory
-     * @param string       $targetDir The target directory
-     * @param \Traversable $iterator  A Traversable instance
-     * @param array        $options   An array of boolean options
-     *                               Valid options are:
-     *                                 - $options['override'] Whether to override an existing file on copy or not (see copy())
-     *                                 - $options['copy_on_windows'] Whether to copy files instead of links on Windows (see symlink())
-     *                                 - $options['delete'] Whether to delete files that are not in the source directory (defaults to false)
-     *
-     * @throws IOException When file type is unknown
+     * {@inheritdoc}
      */
     public function mirror($originDir, $targetDir, \Traversable $iterator = null, $options = array())
     {
@@ -389,7 +313,7 @@ class Filesystem implements FilesystemInterface
                 } elseif (is_dir($file)) {
                     $this->mkdir($target);
                 } else {
-                    throw new IOException(sprintf('Unable to guess "%s" file type.', $file));
+                    throw new IOException($file, sprintf('Unable to guess "%s" file type.', $file));
                 }
             } else {
                 if (is_link($file)) {
@@ -399,18 +323,14 @@ class Filesystem implements FilesystemInterface
                 } elseif (is_file($file)) {
                     $this->copy($file, $target, isset($options['override']) ? $options['override'] : false);
                 } else {
-                    throw new IOException(sprintf('Unable to guess "%s" file type.', $file));
+                    throw new IOException($file, sprintf('Unable to guess "%s" file type.', $file));
                 }
             }
         }
     }
 
     /**
-     * Returns whether the file path is an absolute path.
-     *
-     * @param string $file A file path
-     *
-     * @return Boolean
+     * {@inheritdoc}
      */
     public function isAbsolutePath($file)
     {
@@ -428,6 +348,29 @@ class Filesystem implements FilesystemInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function dumpFile($filename, $content, $mode = 0666)
+    {
+        $dir = dirname($filename);
+
+        if (!is_dir($dir)) {
+            $this->mkdir($dir);
+        } elseif (!is_writable($dir)) {
+            throw new IOException($dir, sprintf('Unable to write to the "%s" directory.', $dir));
+        }
+
+        $tmpFile = tempnam($dir, basename($filename));
+
+        if (false === @file_put_contents($tmpFile, $content)) {
+            throw new IOException($filename, sprintf('Failed to write file "%s".', $filename));
+        }
+
+        $this->rename($tmpFile, $filename, true);
+        $this->chmod($filename, $mode);
+    }
+
+    /**
      * @param mixed $files
      *
      * @return \Traversable
@@ -439,33 +382,5 @@ class Filesystem implements FilesystemInterface
         }
 
         return $files;
-    }
-
-    /**
-     * Atomically dumps content into a file.
-     *
-     * @param  string  $filename The file to be written to.
-     * @param  string  $content  The data to write into the file.
-     * @param  integer $mode     The file mode (octal).
-     * @throws IOException       If the file cannot be written to.
-     */
-    public function dumpFile($filename, $content, $mode = 0666)
-    {
-        $dir = dirname($filename);
-
-        if (!is_dir($dir)) {
-            $this->mkdir($dir);
-        } elseif (!is_writable($dir)) {
-            throw new IOException(sprintf('Unable to write to the "%s" directory.', $dir));
-        }
-
-        $tmpFile = tempnam($dir, basename($filename));
-
-        if (false === @file_put_contents($tmpFile, $content)) {
-            throw new IOException(sprintf('Failed to write file "%s".', $filename));
-        }
-
-        $this->rename($tmpFile, $filename, true);
-        $this->chmod($filename, $mode);
     }
 }

@@ -27,26 +27,26 @@ class ExceptionTest extends \PHPUnit_Framework_TestCase
 		$reflection = new \ReflectionProperty($e, 'path');
 		$reflection->setAccessible(true);
 
-		$this->assertEquals('/foo', $reflection->getValue($e));	
+		$this->assertEquals('/foo', $reflection->getValue($e), 'The path should get stored in the "path" property');	
 	}
 
 	public function testGetPath()
 	{
 		$e = new IOException('/foo');
-		$this->assertEquals('/foo', $e->getPath());
+		$this->assertEquals('/foo', $e->getPath(), 'The pass should be returned.');
 	}
 
 	public function testGeneratedMessage()
 	{
 		$e = new FileNotFoundException('/foo');
 		$this->assertEquals('/foo', $e->getPath());
-		$this->assertEquals('File "/foo" couldnot be found', $e->getMessage());
+		$this->assertEquals('File "/foo" couldnot be found', $e->getMessage(), 'A message should be generated.');
 	}
 
 	public function testCustomMessage()
 	{
 		$e = new FileNotFoundException('/foo', 'bar');
-		$this->assertEquals('bar', $e->getMessage());
+		$this->assertEquals('bar', $e->getMessage(), 'A custom message should be possible still.');
 	}
 
 }

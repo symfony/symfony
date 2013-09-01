@@ -16,7 +16,6 @@ namespace Symfony\Component\Filesystem\Exception;
  *
  * @author Christian Gärtner <christiangaertner.film@googlemail.com>
  *
- * @api
  */
 interface IOExceptionInterface
 {

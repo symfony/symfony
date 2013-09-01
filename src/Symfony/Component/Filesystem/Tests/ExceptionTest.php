@@ -20,33 +20,33 @@ use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 class ExceptionTest extends \PHPUnit_Framework_TestCase
 {
 
-	public function testSetPath()
-	{
-		$e = new IOException('/foo');
+    public function testSetPath()
+    {
+        $e = new IOException('/foo');
 
-		$reflection = new \ReflectionProperty($e, 'path');
-		$reflection->setAccessible(true);
+        $reflection = new \ReflectionProperty($e, 'path');
+        $reflection->setAccessible(true);
 
-		$this->assertEquals('/foo', $reflection->getValue($e), 'The path should get stored in the "path" property');	
-	}
+        $this->assertEquals('/foo', $reflection->getValue($e), 'The path should get stored in the "path" property');    
+    }
 
-	public function testGetPath()
-	{
-		$e = new IOException('/foo');
-		$this->assertEquals('/foo', $e->getPath(), 'The pass should be returned.');
-	}
+    public function testGetPath()
+    {
+        $e = new IOException('/foo');
+        $this->assertEquals('/foo', $e->getPath(), 'The pass should be returned.');
+    }
 
-	public function testGeneratedMessage()
-	{
-		$e = new FileNotFoundException('/foo');
-		$this->assertEquals('/foo', $e->getPath());
-		$this->assertEquals('File "/foo" couldnot be found', $e->getMessage(), 'A message should be generated.');
-	}
+    public function testGeneratedMessage()
+    {
+        $e = new FileNotFoundException('/foo');
+        $this->assertEquals('/foo', $e->getPath());
+        $this->assertEquals('File "/foo" couldnot be found', $e->getMessage(), 'A message should be generated.');
+    }
 
-	public function testCustomMessage()
-	{
-		$e = new FileNotFoundException('/foo', 'bar');
-		$this->assertEquals('bar', $e->getMessage(), 'A custom message should be possible still.');
-	}
+    public function testCustomMessage()
+    {
+        $e = new FileNotFoundException('/foo', 'bar');
+        $this->assertEquals('bar', $e->getMessage(), 'A custom message should be possible still.');
+    }
 
 }

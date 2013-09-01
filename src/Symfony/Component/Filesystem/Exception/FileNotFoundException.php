@@ -16,17 +16,16 @@ namespace Symfony\Component\Filesystem\Exception;
  *
  * @author Christian Gärtner <christiangaertner.film@googlemail.com>
  *
- * @api
  */
 class FileNotFoundException extends IOException
 {
 
-	public function __construct($path, $message = null, $code = 0, \Exception $previous = null)
-	{
-		if ($message === null) {
-			$message = sprintf('File "%s" couldnot be found', $path);
-		}
+    public function __construct($path, $message = null, $code = 0, \Exception $previous = null)
+    {
+        if ($message === null) {
+            $message = sprintf('File "%s" couldnot be found', $path);
+        }
 
-		parent::__construct($path, $message, $code, $previous);
-	}
+        parent::__construct($path, $message, $code, $previous);
+    }
 }

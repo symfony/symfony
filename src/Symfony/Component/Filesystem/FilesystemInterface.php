@@ -20,7 +20,7 @@ use Symfony\Component\Filesystem\Exception\IOException;
  */
 interface FilesystemInterface
 {
-	/**
+    /**
      * Copies a file.
      *
      * This method only copies the file if the origin file is newer than the target file.
@@ -31,12 +31,12 @@ interface FilesystemInterface
      * @param string  $targetFile The target filename
      * @param boolean $override   Whether to override an existing file or not
      *
-     * @throws FileNotFoundException	When orginFile doesn' t exists
-     * @throws IOException				When copy fails
+     * @throws FileNotFoundException    When orginFile doesn' t exists
+     * @throws IOException              When copy fails
      */
-	public function copy($originFile, $targetFile, $override = false);
+    public function copy($originFile, $targetFile, $override = false);
 
-	/**
+    /**
      * Creates a directory recursively.
      *
      * @param string|array|\Traversable $dirs The directory path

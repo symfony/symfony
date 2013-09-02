@@ -74,17 +74,16 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
     {
         $data = '';
 
-        $process = $this->getProcess('echo "foo";sleep 1;echo "foo"');
+        $process = $this->getProcess('echo foo && php -r "sleep(1);" && echo foo');
         $process->start(function ($type, $buffer) use (&$data) {
             $data .= $buffer;
         });
 
-        $start = microtime(true);
         while ($process->isRunning()) {
             usleep(10000);
         }
 
-        $this->assertEquals("foo\nfoo\n", $data);
+        $this->assertEquals(2, preg_match_all('/foo/', $data, $matches));
     }
 
     /**
@@ -178,7 +177,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testGetOutput()
     {
-        $p = new Process(sprintf('php -r %s', escapeshellarg('$n=0;while ($n<3) {echo \' foo \';$n++;}')));
+        $p = new Process(sprintf('php -r %s', escapeshellarg('$n=0;while ($n<3) {echo \' foo \';$n++; usleep(500); }')));
 
         $p->run();
         $this->assertEquals(3, preg_match_all('/foo/', $p->getOutput(), $matches));
@@ -300,7 +299,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testIsSuccessfulOnlyAfterTerminated()
     {
-        $process = $this->getProcess('sleep 1');
+        $process = $this->getProcess('php -r "sleep(1);"');
         $process->start();
         while ($process->isRunning()) {
             $this->assertFalse($process->isSuccessful());
@@ -402,7 +401,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
     public function testRunProcessWithTimeout()
     {
         $timeout = 0.5;
-        $process = $this->getProcess('sleep 3');
+        $process = $this->getProcess('php -r "sleep(3);"');
         $process->setTimeout($timeout);
         $start = microtime(true);
         try {
@@ -420,7 +419,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
     {
         $timeout = 0.5;
         $precision = 100000;
-        $process = $this->getProcess('sleep 3');
+        $process = $this->getProcess('php -r "sleep(3);"');
         $process->setTimeout($timeout);
         $start = microtime(true);
 

@@ -67,6 +67,8 @@
                 localStorage.setItem(profilerStorageKey + name, value);
             },
 
+            requestStack = [],
+
             renderAjaxRequests = function() {
                 var requestCounter = document.getElementsByClassName('sf-toolbar-ajax-requests');
                 if (!requestCounter.length) {
@@ -77,10 +79,10 @@
                 var state = 'ok';
                 if (list.length) {
 
-                    if (Sfjs.requestStack.length) {
+                    if (requestStack.length) {
                         var ul = document.createElement('ul');
-                        for(var i in Sfjs.requestStack) {
-                            var request = Sfjs.requestStack[i];
+                        for(var i in requestStack) {
+                            var request = requestStack[i];
 
                             var li = document.createElement('li');
 
@@ -105,7 +107,7 @@
                             var requestState = 'ok';
                             if (request.error) {
                                 requestState = 'error';
-                                if (state != "loading" && i > Sfjs.requestStack.length - 4) {
+                                if (state != "loading" && i > requestStack.length - 4) {
                                     state = 'error';
                                 }
                             } else if (request.loading) {
@@ -123,7 +125,7 @@
                     }
                 }
 
-                requestCounter[0].innerText = Sfjs.requestStack.length;
+                requestCounter[0].innerText = requestStack.length;
                 requestCounter[0].className = 'sf-toolbar-ajax-requests ajax-request-' + state;
             },
 
@@ -143,7 +145,7 @@
                             start: new Date()
                         };
 
-                        Sfjs.requestStack.push(stackElement);
+                        requestStack.push(stackElement);
 
                         this.addEventListener("readystatechange", function() {
                             if (self.readyState == 4) {
@@ -178,8 +180,6 @@
             request: request,
 
             renderAjaxRequests: renderAjaxRequests,
-
-            requestStack: [],
 
             load: function(selector, url, onSuccess, onError, options) {
                 createXHRLoadProxy();

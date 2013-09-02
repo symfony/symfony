@@ -4,6 +4,7 @@ CHANGELOG
 2.4.0
 -----
 
+ * added support for expressions in service definitions
  * added ContainerAwareTrait to add default container aware behavior to a class
 
 2.2.0

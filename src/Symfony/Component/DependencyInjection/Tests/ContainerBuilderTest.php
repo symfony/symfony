@@ -25,6 +25,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Scope;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
 {
@@ -377,6 +378,15 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $builder->get('foo');
     }
 
+    public function testCreateServiceWithExpression()
+    {
+        $builder = new ContainerBuilder();
+        $builder->setParameter('bar', 'bar');
+        $builder->register('bar', 'BarClass');
+        $builder->register('foo', 'FooClass')->addArgument(array('foo' => new Expression('service("bar").foo ~ parameter("bar")')));
+        $this->assertEquals('foobar', $builder->get('foo')->arguments['foo']);
+    }
+
     /**
      * @covers Symfony\Component\DependencyInjection\ContainerBuilder::resolveServices
      */
@@ -386,6 +396,7 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $builder->register('foo', 'FooClass');
         $this->assertEquals($builder->get('foo'), $builder->resolveServices(new Reference('foo')), '->resolveServices() resolves service references to service instances');
         $this->assertEquals(array('foo' => array('foo', $builder->get('foo'))), $builder->resolveServices(array('foo' => array('foo', new Reference('foo')))), '->resolveServices() resolves service references to service instances in nested arrays');
+        $this->assertEquals($builder->get('foo'), $builder->resolveServices(new Expression('service("foo")')), '->resolveServices() resolves expressions');
     }
 
     /**

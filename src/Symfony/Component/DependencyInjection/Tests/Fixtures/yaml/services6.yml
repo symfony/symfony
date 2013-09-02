@@ -15,6 +15,7 @@ services:
         calls:
             - [ setBar, [] ]
             - [ setBar ]
+            - [ setBar, ['@=service("foo").foo() ~ parameter("foo")'] ]
     method_call2:
         class: FooClass
         calls:

@@ -49,6 +49,9 @@
       <call method="setBar">
         <argument type="service" id="foobaz" on-invalid="ignore"/>
       </call>
+      <call method="setBar">
+        <argument type="expression">service("foo").foo() ~ parameter("foo")</argument>
+      </call>
     </service>
     <service id="factory_service" class="Bar" factory-method="getInstance" factory-service="foo.baz"/>
     <service id="foo_with_inline" class="Foo">

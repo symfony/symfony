@@ -24,6 +24,8 @@ use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\InstantiatorInterface;
 use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\RealServiceInstantiator;
+use Symfony\Component\DependencyInjection\ExpressionLanguage;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 /**
  * ContainerBuilder is a DI container that provides an API to easily describe services.
@@ -77,6 +79,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @var InstantiatorInterface|null
      */
     private $proxyInstantiator;
+
+    /**
+     * @var ExpressionLanguage|null
+     */
+    private $expressionLanguage;
 
     /**
      * Sets the track resources flag.
@@ -983,11 +990,12 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
-     * Replaces service references by the real service instance.
+     * Replaces service references by the real service instance and evaluates expressions.
      *
      * @param mixed $value A value
      *
-     * @return mixed The same value with all service references replaced by the real service instances
+     * @return mixed The same value with all service references replaced by
+     *               the real service instances and all expressions evaluated
      */
     public function resolveServices($value)
     {
@@ -999,6 +1007,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             $value = $this->get((string) $value, $value->getInvalidBehavior());
         } elseif ($value instanceof Definition) {
             $value = $this->createService($value, null);
+        } elseif ($value instanceof Expression) {
+            $value = $this->getExpressionLanguage()->evaluate($value, array('this' => $this));
         }
 
         return $value;
@@ -1148,5 +1158,17 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                 $this->scopedServices[$scope][$lowerId] = $service;
             }
         }
+    }
+
+    private function getExpressionLanguage()
+    {
+        if (null === $this->expressionLanguage) {
+            if (!class_exists('Symfony\Component\ExpressionLanguage\ExpressionLanguage')) {
+                throw new RuntimeException('Unable to use expressions as the Symfony ExpressionLanguage component is not installed.');
+            }
+            $this->expressionLanguage = new ExpressionLanguage();
+        }
+
+        return $this->expressionLanguage;
     }
 }

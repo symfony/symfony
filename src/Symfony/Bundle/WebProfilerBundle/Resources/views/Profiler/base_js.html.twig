@@ -24,17 +24,17 @@
                     stackElement.error = self.status < 200 || self.status >= 400;
                     stackElement.token = self.getResponseHeader("X-Debug-Token");
 
-                    updateAjaxRequests();
+                    renderAjaxRequests();
                 }
             }, false);
 
-            updateAjaxRequests();
+            renderAjaxRequests();
         }
 
         proxied.apply(this, [].slice.call(arguments));
     };
 
-    var updateAjaxRequests = function() {
+    var renderAjaxRequests = function() {
         var requestCounter = document.getElementsByClassName('sf-toolbar-ajax-requests');
         if (!requestCounter.length) {
             return;

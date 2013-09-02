@@ -1,99 +1,4 @@
 <script>/*<![CDATA[*/
-    var requestStack = [];
-
-    var proxied = XMLHttpRequest.prototype.open;
-    XMLHttpRequest.prototype.open = function(method, url, async, user, pass) {
-        var self = this;
-
-        /* prevent logging AJAX calls to static and inline files, like templates */
-        if (url.charAt(0) === '/' && !url.substr(0, 8) !== '/bundles') {
-            var stackElement = {
-                loading: true,
-                error: false,
-                url: url,
-                method: method,
-                start: new Date()
-            };
-
-            requestStack.push(stackElement);
-
-            this.addEventListener("readystatechange", function() {
-                if (self.readyState == 4) {
-                    stackElement.duration = new Date() - stackElement.start;
-                    stackElement.loading = false;
-                    stackElement.error = self.status < 200 || self.status >= 400;
-                    stackElement.token = self.getResponseHeader("X-Debug-Token");
-
-                    renderAjaxRequests();
-                }
-            }, false);
-
-            renderAjaxRequests();
-        }
-
-        proxied.apply(this, [].slice.call(arguments));
-    };
-
-    var renderAjaxRequests = function() {
-        var requestCounter = document.getElementsByClassName('sf-toolbar-ajax-requests');
-        if (!requestCounter.length) {
-            return;
-        }
-
-        var list = document.getElementsByClassName('sf-toolbar-ajax-request-list');
-        var state = 'ok';
-        if (list.length) {
-
-            if (requestStack.length) {
-                var ul = document.createElement('ul');
-                for(var i in requestStack) {
-                    var request = requestStack[i];
-
-                    var li = document.createElement('li');
-
-                    var pathSpan = document.createElement('span');
-                    pathSpan.innerHTML = request.method + " " + request.url;
-                    li.appendChild(pathSpan);
-
-                    if (request.duration) {
-                        li.appendChild(document.createTextNode(' '));
-                        var durationSpan = document.createElement('time');
-                        durationSpan.innerText = request.duration + "ms";
-                        li.appendChild(durationSpan);
-                    }
-
-                    if (request.token) {
-                        li.appendChild(document.createTextNode(' '));
-                        var profilerA = document.createElement('a');
-                        profilerA.setAttribute('href', '{{ path('_profiler_home') }}' + request.token);
-                        profilerA.innerText = 'profiler';
-                        li.appendChild(profilerA);
-                    }
-                    var requestState = 'ok';
-                    if (request.error) {
-                        requestState = 'error';
-                        if (state != "loading" && i > requestStack.length - 4) {
-                            state = 'error';
-                        }
-                    } else if (request.loading) {
-                        requestState = 'loading';
-                        state = 'loading'
-                    }
-                    li.className = 'ajax-request-' + requestState;
-                    ul.appendChild(li);
-                }
-
-                list[0].innerHTML = '';
-                list[0].appendChild(ul);
-            } else {
-                list[0].innerText = "No AJAX requests fired yet.";
-            }
-        }
-
-        requestCounter[0].innerText = requestStack.length;
-        requestCounter[0].className = 'sf-toolbar-ajax-requests ajax-request-' + state;
-    };
-
     Sfjs = (function() {
         "use strict";
 
@@ -160,7 +65,104 @@
                 }
 
                 localStorage.setItem(profilerStorageKey + name, value);
+            },
+
+            renderAjaxRequests = function() {
+                var requestCounter = document.getElementsByClassName('sf-toolbar-ajax-requests');
+                if (!requestCounter.length) {
+                    return;
+                }
+
+                var list = document.getElementsByClassName('sf-toolbar-ajax-request-list');
+                var state = 'ok';
+                if (list.length) {
+
+                    if (Sfjs.requestStack.length) {
+                        var ul = document.createElement('ul');
+                        for(var i in Sfjs.requestStack) {
+                            var request = Sfjs.requestStack[i];
+
+                            var li = document.createElement('li');
+
+                            var pathSpan = document.createElement('span');
+                            pathSpan.innerHTML = request.method + " " + request.url;
+                            li.appendChild(pathSpan);
+
+                            if (request.duration) {
+                                li.appendChild(document.createTextNode(' '));
+                                var durationSpan = document.createElement('time');
+                                durationSpan.innerText = request.duration + "ms";
+                                li.appendChild(durationSpan);
+                            }
+
+                            if (request.token) {
+                                li.appendChild(document.createTextNode(' '));
+                                var profilerA = document.createElement('a');
+                                profilerA.setAttribute('href', '{{ path('_profiler_home') }}' + request.token);
+                                profilerA.innerText = 'profiler';
+                                li.appendChild(profilerA);
+                            }
+                            var requestState = 'ok';
+                            if (request.error) {
+                                requestState = 'error';
+                                if (state != "loading" && i > Sfjs.requestStack.length - 4) {
+                                    state = 'error';
+                                }
+                            } else if (request.loading) {
+                                requestState = 'loading';
+                                state = 'loading'
+                            }
+                            li.className = 'ajax-request-' + requestState;
+                            ul.appendChild(li);
+                        }
+
+                        list[0].innerHTML = '';
+                        list[0].appendChild(ul);
+                    } else {
+                        list[0].innerText = "No AJAX requests fired yet.";
+                    }
+                }
+
+                requestCounter[0].innerText = Sfjs.requestStack.length;
+                requestCounter[0].className = 'sf-toolbar-ajax-requests ajax-request-' + state;
+            },
+
+            createXHRLoadProxy = function() {
+                var proxied = XMLHttpRequest.prototype.open;
+
+                XMLHttpRequest.prototype.open = function(method, url, async, user, pass) {
+                    var self = this;
+
+                    /* prevent logging AJAX calls to static and inline files, like templates */
+                    if (url.charAt(0) === '/' && !url.substr(0, 8) !== '/bundles') {
+                        var stackElement = {
+                            loading: true,
+                            error: false,
+                            url: url,
+                            method: method,
+                            start: new Date()
+                        };
+
+                        Sfjs.requestStack.push(stackElement);
+
+                        this.addEventListener("readystatechange", function() {
+                            if (self.readyState == 4) {
+                                stackElement.duration = new Date() - stackElement.start;
+                                stackElement.loading = false;
+                                stackElement.error = self.status < 200 || self.status >= 400;
+                                stackElement.token = self.getResponseHeader("X-Debug-Token");
+
+                                Sfjs.renderAjaxRequests();
+                            }
+                        }, false);
+
+                        Sfjs.renderAjaxRequests();
+                    }
+
+                    proxied.apply(this, [].slice.call(arguments));
+                };
             };
+
 
         return {
             hasClass: hasClass,
@@ -175,7 +177,13 @@
 
             request: request,
 
+            renderAjaxRequests: renderAjaxRequests,
+
+            requestStack: [],
+
             load: function(selector, url, onSuccess, onError, options) {
+                createXHRLoadProxy();
+
                 var el = document.getElementById(selector);
 
                 if (el && el.getAttribute('data-sfurl') !== url) {
@@ -213,4 +221,5 @@
             }
         }
     })();
-/*]]>*/</script>
+
+    /*]]>*/</script>

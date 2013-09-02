@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2013-09-02T08:14:45Z
+
+should go in 2.3 then
+
+---------------------------------------------------------------------------
+
+by enumag at 2013-09-02T08:17:33Z
+
+You mean I should create new PR against the 2.3 branch? No problem, sorry I didn't do it right away. I'm not yet familiar with symfony workflow.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2013-09-02T08:30:22Z
+
+No problem. Fabien, has a tool to merge it in 2.3 even when the PR is not for 2.3.
+
+---------------------------------------------------------------------------
+
+by stof at 2013-09-02T08:31:17Z
+
+This is OK for this time. Fabien will be able to apply it automatically in 2.3. But for bigger changes, it is easier to send them directly to the right branch. This means master for new features and the oldest affected (and maintained) branch for bug fixes.
+
+---------------------------------------------------------------------------
+
+by enumag at 2013-09-02T08:32:34Z
+
+Ok, I'll leave this as is and try to do better the next time. :-)

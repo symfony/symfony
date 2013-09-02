@@ -274,10 +274,10 @@ class Container implements IntrospectableContainerInterface
         // calling strotolower() unless necessary.
         foreach (array(FALSE, TRUE) as $strtolower) {
             if ($strtolower) {
-              $id = strtolower($id);
+                $id = strtolower($id);
             }
             if (isset($this->aliases[$id])) {
-              $id = $this->aliases[$id];
+                $id = $this->aliases[$id];
             }
             // Re-use shared service instance if it exists.
             if (isset($this->services[$id]) || array_key_exists($id, $this->services)) {

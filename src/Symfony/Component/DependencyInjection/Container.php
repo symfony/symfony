@@ -268,16 +268,21 @@ class Container implements IntrospectableContainerInterface
      */
     public function get($id, $invalidBehavior = self::EXCEPTION_ON_INVALID_REFERENCE)
     {
-        $id = strtolower($id);
-
-        // resolve aliases
-        if (isset($this->aliases[$id])) {
-            $id = $this->aliases[$id];
-        }
-
-        // re-use shared service instance if it exists
-        if (isset($this->services[$id]) || array_key_exists($id, $this->services)) {
-            return $this->services[$id];
+        // Attempt to retrieve the service by checking first aliases then
+        // available services. Service IDs are case insensitive, however since
+        // this method can be called thousands of times during a request, avoid
+        // calling strotolower() unless necessary.
+        foreach (array(FALSE, TRUE) as $strtolower) {
+            if ($strtolower) {
+              $id = strtolower($id);
+            }
+            if (isset($this->aliases[$id])) {
+              $id = $this->aliases[$id];
+            }
+            // Re-use shared service instance if it exists.
+            if (isset($this->services[$id]) || array_key_exists($id, $this->services)) {
+                return $this->services[$id];
+            }
         }
 
         if (isset($this->loading[$id])) {

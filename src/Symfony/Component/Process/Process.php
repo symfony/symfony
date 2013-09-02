@@ -231,14 +231,19 @@ class Process
         if (defined('PHP_WINDOWS_VERSION_BUILD')) {
             $this->fileHandles = array(
                 self::STDOUT => tmpfile(),
+                self::STDERR => tmpfile(),
             );
             if (false === $this->fileHandles[self::STDOUT]) {
                 throw new RuntimeException('A temporary file could not be opened to write the process output to, verify that your TEMP environment variable is writable');
             }
+            if (false === $this->fileHandles[self::STDERR]) {
+                throw new RuntimeException('A temporary file could not be opened to write the process output to, verify that your TEMP environment variable is writable');
+            }
             $this->readBytes = array(
                 self::STDOUT => 0,
+                self::STDERR => 0,
             );
-            $descriptors = array(array('pipe', 'r'), $this->fileHandles[self::STDOUT], array('pipe', 'w'));
+            $descriptors = array(array('pipe', 'r'), $this->fileHandles[self::STDOUT], $this->fileHandles[self::STDERR]);
         } else {
             $descriptors = array(
                 array('pipe', 'r'), // stdin
@@ -999,7 +1004,10 @@ class Process
         $fh = $this->fileHandles;
         foreach ($fh as $type => $fileHandle) {
             fseek($fileHandle, $this->readBytes[$type]);
-            $data = fread($fileHandle, 8192);
+            $data = '';
+            while (!feof($fileHandle)) {
+                $data .= fread($fileHandle, 8192);
+            }
             if (strlen($data) > 0) {
                 $this->readBytes[$type] += strlen($data);
                 call_user_func($this->callback, $type == 1 ? self::OUT : self::ERR, $data);

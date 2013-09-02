@@ -287,15 +287,10 @@
     color: red;
 }
 .ajax-request-loading {
-    animation: blink .5s ease-in-out infinite;
     -webkit-animation: blink .5s ease-in-out infinite;
     -o-animation: blink .5s ease-in-out infinite;
     -moz-animation: blink .5s ease-in-out infinite;
-}
-@keyframes blink {
-    0% { color: black; }
-    50% { color: #bbb; }
-    100% { color: black; }
+    animation: blink .5s ease-in-out infinite;
 }
 @-webkit-keyframes blink {
     0% { color: black; }
@@ -308,6 +303,11 @@
     100% { color: black; }
 }
 @-o-keyframes blink {
+    0% { color: black; }
+    50% { color: #bbb; }
+    100% { color: black; }
+}
+@keyframes blink {
     0% { color: black; }
     50% { color: #bbb; }
     100% { color: black; }

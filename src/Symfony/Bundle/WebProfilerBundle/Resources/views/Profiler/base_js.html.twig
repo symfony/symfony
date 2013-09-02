@@ -114,7 +114,7 @@
                                 requestState = 'loading';
                                 state = 'loading'
                             }
-                            li.className = 'ajax-request-' + requestState;
+                            li.className = 'sf-ajax-request-' + requestState;
                             ul.appendChild(li);
                         }
 
@@ -126,7 +126,7 @@
                 }
 
                 requestCounter[0].innerText = requestStack.length;
-                requestCounter[0].className = 'sf-toolbar-ajax-requests ajax-request-' + state;
+                requestCounter[0].className = 'sf-toolbar-ajax-requests sf-ajax-request-' + state;
             };
 
         var proxied = XMLHttpRequest.prototype.open;

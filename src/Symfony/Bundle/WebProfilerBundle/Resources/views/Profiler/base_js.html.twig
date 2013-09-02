@@ -127,44 +127,41 @@
 
                 requestCounter[0].innerText = requestStack.length;
                 requestCounter[0].className = 'sf-toolbar-ajax-requests ajax-request-' + state;
-            },
+            };
 
-            createXHRLoadProxy = function() {
-                var proxied = XMLHttpRequest.prototype.open;
+        var proxied = XMLHttpRequest.prototype.open;
 
-                XMLHttpRequest.prototype.open = function(method, url, async, user, pass) {
-                    var self = this;
+        XMLHttpRequest.prototype.open = function(method, url, async, user, pass) {
+            var self = this;
 
-                    /* prevent logging AJAX calls to static and inline files, like templates */
-                    if (url.charAt(0) === '/' && !url.substr(0, 8) !== '/bundles') {
-                        var stackElement = {
-                            loading: true,
-                            error: false,
-                            url: url,
-                            method: method,
-                            start: new Date()
-                        };
+            /* prevent logging AJAX calls to static and inline files, like templates */
+            if (url.charAt(0) === '/' && !url.substr(0, 8) !== '/bundles') {
+                var stackElement = {
+                    loading: true,
+                    error: false,
+                    url: url,
+                    method: method,
+                    start: new Date()
+                };
 
-                        requestStack.push(stackElement);
+                requestStack.push(stackElement);
 
-                        this.addEventListener("readystatechange", function() {
-                            if (self.readyState == 4) {
-                                stackElement.duration = new Date() - stackElement.start;
-                                stackElement.loading = false;
-                                stackElement.error = self.status < 200 || self.status >= 400;
-                                stackElement.token = self.getResponseHeader("X-Debug-Token");
-
-                                Sfjs.renderAjaxRequests();
-                            }
-                        }, false);
+                this.addEventListener("readystatechange", function() {
+                    if (self.readyState == 4) {
+                        stackElement.duration = new Date() - stackElement.start;
+                        stackElement.loading = false;
+                        stackElement.error = self.status < 200 || self.status >= 400;
+                        stackElement.token = self.getResponseHeader("X-Debug-Token");
 
                         Sfjs.renderAjaxRequests();
                     }
+                }, false);
 
-                    proxied.apply(this, [].slice.call(arguments));
-                };
-            };
+                Sfjs.renderAjaxRequests();
+            }
 
+            proxied.apply(this, [].slice.call(arguments));
+        };
 
         return {
             hasClass: hasClass,
@@ -182,7 +179,6 @@
             renderAjaxRequests: renderAjaxRequests,
 
             load: function(selector, url, onSuccess, onError, options) {
-                createXHRLoadProxy();
 
                 var el = document.getElementById(selector);
 

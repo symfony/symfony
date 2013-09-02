@@ -65,7 +65,7 @@
                     if (request.token) {
                         li.appendChild(document.createTextNode(' '));
                         var profilerA = document.createElement('a');
-                        profilerA.setAttribute('href', {{ path('_profiler_home') }} + request.token);
+                        profilerA.setAttribute('href', '{{ path('_profiler_home') }}' + request.token);
                         profilerA.innerText = 'profiler';
                         li.appendChild(profilerA);
                     }

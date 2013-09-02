@@ -22,6 +22,8 @@ class DependencyInjectionExtension implements FormExtensionInterface
 
     private $typeServiceIds;
 
+    private $typeExtensionServiceIds;
+
     private $guesserServiceIds;
 
     private $guesser;

@@ -272,7 +272,7 @@ class Container implements IntrospectableContainerInterface
         // available services. Service IDs are case insensitive, however since
         // this method can be called thousands of times during a request, avoid
         // calling strotolower() unless necessary.
-        foreach (array(FALSE, TRUE) as $strtolower) {
+        foreach (array(false, true) as $strtolower) {
             if ($strtolower) {
                 $id = strtolower($id);
             }

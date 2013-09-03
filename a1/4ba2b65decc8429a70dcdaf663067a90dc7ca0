@@ -1,0 +1,86 @@
+---------------------------------------------------------------------------
+
+by stof at 2013-06-11T13:08:09Z
+
+Please add a test for this method with a form containing a button, to avoid regressions
+
+---------------------------------------------------------------------------
+
+by mikeSimonson at 2013-06-11T21:16:13Z
+
+I am a bit at loss as to know where(in what file) to put that test ?
+
+---------------------------------------------------------------------------
+
+by mikeSimonson at 2013-07-05T14:44:34Z
+
+I wrote a test for it but it's a fatal error.
+That means that I have no way of catching the error nicely if the test fail.
+If the test fail, PHP crash everything.
+
+Do I add the test like that ?
+
+---------------------------------------------------------------------------
+
+by stof at 2013-07-05T15:14:20Z
+
+Yes. I will still ensure that there is no regression (a fatal error crashing the testsuite is a failure for the testsuite, not a successful build)
+
+---------------------------------------------------------------------------
+
+by mikeSimonson at 2013-07-05T15:25:44Z
+
+Done
+
+---------------------------------------------------------------------------
+
+by mikeSimonson at 2013-07-09T13:47:24Z
+
+Hi,
+
+Is there something else I need to do for the patch to be pulled ?
+
+---------------------------------------------------------------------------
+
+by mikeSimonson at 2013-09-03T13:05:28Z
+
+Hi,
+
+Any reason why this pull request is still pending ?
+What did I do wrong and how can I fix-it, if possible ?
+
+Thanks
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-09-03T13:22:02Z
+
+@mikeSimonson Sorry for the slow response. Could you please squash your commits into one? Please also rename the commit message to something more explicit, such as
+
+> [Form] Fixed getErrorsAsString() when the form contains buttons
+
+Otherwise this is good to merge. /cc @fabpot
+
+---------------------------------------------------------------------------
+
+by mikeSimonson at 2013-09-03T13:27:26Z
+
+I can still squash my commits while I have already pushed them ?
+
+What's the appropriate way to do that without braking everything ?
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-09-03T13:30:06Z
+
+Squash them and then do
+
+```
+git push -f origin patch-1
+```
+
+---------------------------------------------------------------------------
+
+by mikeSimonson at 2013-09-03T14:21:25Z
+
+I hope it's good now.

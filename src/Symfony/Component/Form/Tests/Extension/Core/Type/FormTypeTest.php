@@ -571,6 +571,20 @@ class FormTypeTest extends BaseTypeTest
         $this->assertSame('0', $view->vars['label']);
     }
 
+    public function testCanGetErrorsWhenButtonInForm()
+    {
+        $builder = $this->factory->createBuilder('form', null, array(
+            'data_class' => 'Symfony\Component\Form\Tests\Fixtures\Author',
+            'required' => false,
+        ));
+        $builder->add('foo', 'text');
+        $builder->add('submit', 'submit');
+        $form = $builder->getForm();
+
+        //This method should not throw a Fatal Error Exception.
+        $form->getErrorsAsString();
+    }
+
     protected function getTestedType()
     {
         return 'form';

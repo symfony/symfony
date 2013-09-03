@@ -78,13 +78,13 @@ class FormHelper extends Helper
      *
      * Example usage:
      *
-     *     <?php echo view['form']->widget() ?>
+     *     <?php echo $view['form']->widget() ?>
      *
      * You can pass options during the call:
      *
-     *     <?php echo view['form']->widget(array('attr' => array('class' => 'foo'))) ?>
+     *     <?php echo $view['form']->widget(array('attr' => array('class' => 'foo'))) ?>
      *
-     *     <?php echo view['form']->widget(array('separator' => '+++++')) ?>
+     *     <?php echo $view['form']->widget(array('separator' => '+++++')) ?>
      *
      * @param FormView $view      The view for which to render the widget
      * @param array    $variables Additional variables passed to the template

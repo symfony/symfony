@@ -23,7 +23,7 @@ class FileNotFoundException extends IOException
     public function __construct($path, $message = null, $code = 0, \Exception $previous = null)
     {
         if ($message === null) {
-            $message = sprintf('File "%s" couldnot be found', $path);
+            $message = sprintf('File "%s" could not be found', $path);
         }
 
         parent::__construct($path, $message, $code, $previous);

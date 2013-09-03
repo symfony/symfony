@@ -243,7 +243,11 @@ class Process
                 self::STDOUT => 0,
                 self::STDERR => 0,
             );
-            $descriptors = array(array('pipe', 'r'), $this->fileHandles[self::STDOUT], $this->fileHandles[self::STDERR]);
+            $descriptors = array(
+                array('pipe', 'r'), 
+                $this->fileHandles[self::STDOUT], 
+                $this->fileHandles[self::STDERR],
+            );
         } else {
             $descriptors = array(
                 array('pipe', 'r'), // stdin
@@ -276,10 +280,10 @@ class Process
         $this->status = self::STATUS_STARTED;
 
         foreach ($this->pipes as $pipe) {
-            stream_set_blocking($pipe, false);
+            stream_set_blocking($pipe, 0);
         }
 
-        $this->writePipes();
+        $this->writePipes(false);
         $this->updateStatus(false);
         $this->checkTimeout();
     }
@@ -1010,7 +1014,7 @@ class Process
             }
             if (strlen($data) > 0) {
                 $this->readBytes[$type] += strlen($data);
-                call_user_func($this->callback, $type == 1 ? self::OUT : self::ERR, $data);
+                call_user_func($this->callback, $type === self::STDOUT ? self::OUT : self::ERR, $data);
             }
             if (false === $data || ($closeEmptyHandles && '' === $data && feof($fileHandle))) {
                 fclose($fileHandle);
@@ -1073,7 +1077,7 @@ class Process
      *
      * @param Boolean $blocking Whether to use blocking calls or not.
      */
-    private function writePipes()
+    private function writePipes($blocking)
     {
         if (null === $this->stdin) {
             fclose($this->pipes[0]);
@@ -1140,7 +1144,7 @@ class Process
                 if (3 == $type) {
                     $this->fallbackExitcode = (int) $data;
                 } else {
-                    call_user_func($this->callback, $type == 1 ? self::OUT : self::ERR, $data);
+                    call_user_func($this->callback, $type === self::STDOUT ? self::OUT : self::ERR, $data);
                 }
             }
             if (false === $data || feof($pipe)) {

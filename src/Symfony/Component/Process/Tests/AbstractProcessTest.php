@@ -123,6 +123,12 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
     public function chainedCommandsOutputProvider()
     {
+        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+            return array(
+                array("2 \r\n2\r\n", '&&', '2')
+            );
+        }
+
         return array(
             array("1\n1\n", ';', '1'),
             array("2\n2\n", '&&', '2'),
@@ -135,10 +141,6 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
      */
     public function testChainedCommandsOutput($expected, $operator, $input)
     {
-        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
-            $this->markTestSkipped('Does it work on windows ?');
-        }
-
         $process = $this->getProcess(sprintf('echo %s %s echo %s', $input, $operator, $input));
         $process->run();
         $this->assertEquals($expected, $process->getOutput());

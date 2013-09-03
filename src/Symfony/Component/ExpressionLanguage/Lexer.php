@@ -27,26 +27,18 @@ class Lexer
      */
     public function tokenize($expression)
     {
-        $expression = str_replace(array("\r\n", "\r"), "\n", $expression);
+        $expression = str_replace(array("\r", "\n", "\t", "\v", "\f"), ' ', $expression);
         $cursor = 0;
         $tokens = array();
         $brackets = array();
-        $operatorRegex = $this->getOperatorRegex();
         $end = strlen($expression);
 
         while ($cursor < $end) {
-            if (preg_match('/\s+/A', $expression, $match, null, $cursor)) {
-                // whitespace
-                $cursor += strlen($match[0]);
-            } elseif (preg_match($operatorRegex, $expression, $match, null, $cursor)) {
-                // operators
-                $tokens[] = new Token(Token::OPERATOR_TYPE, $match[0], $cursor + 1);
-                $cursor += strlen($match[0]);
-            } elseif (preg_match('/[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/A', $expression, $match, null, $cursor)) {
-                // names
-                $tokens[] = new Token(Token::NAME_TYPE, $match[0], $cursor + 1);
-                $cursor += strlen($match[0]);
-            } elseif (preg_match('/[0-9]+(?:\.[0-9]+)?/A', $expression, $match, null, $cursor)) {
+            while (' ' == $expression[$cursor]) {
+                ++$cursor;
+            }
+
+            if (preg_match('/[0-9]+(?:\.[0-9]+)?/A', $expression, $match, null, $cursor)) {
                 // numbers
                 $number = (float) $match[0];  // floats
                 if (ctype_digit($match[0]) && $number <= PHP_INT_MAX) {
@@ -81,6 +73,14 @@ class Lexer
                 // strings
                 $tokens[] = new Token(Token::STRING_TYPE, stripcslashes(substr($match[0], 1, -1)), $cursor + 1);
                 $cursor += strlen($match[0]);
+            } elseif (preg_match('/not in(?=[\s(])|\!\=\=|not(?=[\s(])|and(?=[\s(])|\=\=\=|\>\=|or(?=[\s(])|\<\=|\*\*|\.\.|in(?=[\s(])|&&|\|\||\!~|\=~|\=\=|\!\=|\*|~|%|\/|\>|\||\!|\^|&|\+|\<|\-/A', $expression, $match, null, $cursor)) {
+                // operators
+                $tokens[] = new Token(Token::OPERATOR_TYPE, $match[0], $cursor + 1);
+                $cursor += strlen($match[0]);
+            } elseif (preg_match('/[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/A', $expression, $match, null, $cursor)) {
+                // names
+                $tokens[] = new Token(Token::NAME_TYPE, $match[0], $cursor + 1);
+                $cursor += strlen($match[0]);
             } else {
                 // unlexable
                 throw new SyntaxError(sprintf('Unexpected character "%s"', $expression[$cursor]), $cursor);
@@ -95,25 +95,5 @@ class Lexer
         }
 
         return new TokenStream($tokens);
-    }
-
-    private function getOperatorRegex()
-    {
-        $operators = array(
-            'not', '!', '-', '+',
-            'or', '||', '&&', 'and', '|', '^', '&', '==', '===', '!=', '!==', '<', '>', '>=', '<=', 'not in', 'in', '..', '+', '-', '~', '*', '/', '%', '=~', '!~', '**',
-        );
-
-        $operators = array_combine($operators, array_map('strlen', $operators));
-        arsort($operators);
-
-        $regex = array();
-        foreach ($operators as $operator => $length) {
-            // an operator that ends with a character must be followed by
-            // a whitespace or a parenthesis
-            $regex[] = preg_quote($operator, '/').(ctype_alpha($operator[$length - 1]) ? '(?=[\s()])' : '');
-        }
-
-        return '/'.implode('|', $regex).'/A';
     }
 }

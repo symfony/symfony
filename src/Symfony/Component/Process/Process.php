@@ -53,14 +53,13 @@ class Process
     private $stderr;
     private $enhanceWindowsCompatibility;
     private $enhanceSigchildCompatibility;
-    private $pipes;
     private $process;
     private $status = self::STATUS_READY;
     private $incrementalOutputOffset;
     private $incrementalErrorOutputOffset;
 
-    private $fileHandles;
-    private $readBytes;
+    private $useFileHandles = false;
+    private $processPipes;
 
     private static $sigchild;
 
@@ -152,6 +151,7 @@ class Process
         }
         $this->stdin = $stdin;
         $this->setTimeout($timeout);
+        $this->useFileHandles = defined('PHP_WINDOWS_VERSION_BUILD');
         $this->enhanceWindowsCompatibility = true;
         $this->enhanceSigchildCompatibility = !defined('PHP_WINDOWS_VERSION_BUILD') && $this->isSigchildEnabled();
         $this->options = array_replace(array('suppress_errors' => true, 'binary_pipes' => true), $options);
@@ -225,42 +225,14 @@ class Process
         $this->starttime = microtime(true);
         $this->callback = $this->buildCallback($callback);
 
-        //Fix for PHP bug #51800: reading from STDOUT pipe hangs forever on Windows if the output is too big.
-        //Workaround for this problem is to use temporary files instead of pipes on Windows platform.
-        //@see https://bugs.php.net/bug.php?id=51800
-        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
-            $this->fileHandles = array(
-                self::STDOUT => tmpfile(),
-                self::STDERR => tmpfile(),
-            );
-            if (false === $this->fileHandles[self::STDOUT]) {
-                throw new RuntimeException('A temporary file could not be opened to write the process output to, verify that your TEMP environment variable is writable');
-            }
-            if (false === $this->fileHandles[self::STDERR]) {
-                throw new RuntimeException('A temporary file could not be opened to write the process output to, verify that your TEMP environment variable is writable');
-            }
-            $this->readBytes = array(
-                self::STDOUT => 0,
-                self::STDERR => 0,
-            );
-            $descriptors = array(
-                array('pipe', 'r'), 
-                $this->fileHandles[self::STDOUT], 
-                $this->fileHandles[self::STDERR],
-            );
-        } else {
-            $descriptors = array(
-                array('pipe', 'r'), // stdin
-                array('pipe', 'w'), // stdout
-                array('pipe', 'w'), // stderr
-            );
+        $this->processPipes = new ProcessPipes($this->useFileHandles);
+        $descriptors = $this->processPipes->getDescriptors();
 
-            if ($this->enhanceSigchildCompatibility && $this->isSigchildEnabled()) {
-                // last exit code is output on the fourth pipe and caught to work around --enable-sigchild
-                $descriptors = array_merge($descriptors, array(array('pipe', 'w')));
+        if (!$this->useFileHandles && $this->enhanceSigchildCompatibility && $this->isSigchildEnabled()) {
+            // last exit code is output on the fourth pipe and caught to work around --enable-sigchild
+            $descriptors = array_merge($descriptors, array(array('pipe', 'w')));
 
-                $this->commandline = '('.$this->commandline.') 3>/dev/null; code=$?; echo $code >&3; exit $code';
-            }
+            $this->commandline = '('.$this->commandline.') 3>/dev/null; code=$?; echo $code >&3; exit $code';
         }
 
         $commandline = $this->commandline;
@@ -272,18 +244,15 @@ class Process
             }
         }
 
-        $this->process = proc_open($commandline, $descriptors, $this->pipes, $this->cwd, $this->env, $this->options);
+        $this->process = proc_open($commandline, $descriptors, $this->processPipes->pipes, $this->cwd, $this->env, $this->options);
 
         if (!is_resource($this->process)) {
             throw new RuntimeException('Unable to launch a new process.');
         }
         $this->status = self::STATUS_STARTED;
 
-        foreach ($this->pipes as $pipe) {
-            stream_set_blocking($pipe, 0);
-        }
-
-        $this->writePipes(false);
+        $this->processPipes->unblock();
+        $this->processPipes->write(false, $this->stdin);
         $this->updateStatus(false);
         $this->checkTimeout();
     }
@@ -335,24 +304,12 @@ class Process
         if (null !== $callback) {
             $this->callback = $this->buildCallback($callback);
         }
-        while ($this->pipes || (defined('PHP_WINDOWS_VERSION_BUILD') && $this->fileHandles)) {
+        while ($this->processInformation['running']) {
             $this->checkTimeout();
-            $this->readPipes(true);
+            $this->updateStatus(true);
         }
         $this->updateStatus(false);
-        if ($this->processInformation['signaled']) {
-            if ($this->isSigchildEnabled()) {
-                throw new RuntimeException('The process has been signaled.');
-            }
-
-            throw new RuntimeException(sprintf('The process has been signaled with signal "%s".', $this->processInformation['termsig']));
-        }
-
-        $time = 0;
-        while ($this->isRunning() && $time < 1000000) {
-            $time += 1000;
-            usleep(1000);
-        }
+        $this->processPipes->close();
 
         $exitcode = proc_close($this->process);
 
@@ -637,21 +594,10 @@ class Process
             if (!defined('PHP_WINDOWS_VERSION_BUILD') && $this->isRunning()) {
                 proc_terminate($this->process, SIGKILL);
             }
-
-            foreach ($this->pipes as $pipe) {
-                fclose($pipe);
-            }
-            $this->pipes = array();
+            $this->processPipes->close();
 
             $exitcode = proc_close($this->process);
             $this->exitcode = -1 === $this->processInformation['exitcode'] ? $exitcode : $this->processInformation['exitcode'];
-
-            if (defined('PHP_WINDOWS_VERSION_BUILD')) {
-                foreach ($this->fileHandles as $fileHandle) {
-                    fclose($fileHandle);
-                }
-                $this->fileHandles = array();
-            }
         }
         $this->status = self::STATUS_TERMINATED;
 
@@ -999,157 +945,17 @@ class Process
     }
 
     /**
-     * Handles the windows file handles fallbacks
-     *
-     * @param Boolean $closeEmptyHandles if true, handles that are empty will be assumed closed
-     */
-    private function processFileHandles($closeEmptyHandles = false)
-    {
-        $fh = $this->fileHandles;
-        foreach ($fh as $type => $fileHandle) {
-            fseek($fileHandle, $this->readBytes[$type]);
-            $data = '';
-            while (!feof($fileHandle)) {
-                $data .= fread($fileHandle, 8192);
-            }
-            if (strlen($data) > 0) {
-                $this->readBytes[$type] += strlen($data);
-                call_user_func($this->callback, $type === self::STDOUT ? self::OUT : self::ERR, $data);
-            }
-            if (false === $data || ($closeEmptyHandles && '' === $data && feof($fileHandle))) {
-                fclose($fileHandle);
-                unset($this->fileHandles[$type]);
-            }
-        }
-    }
-
-    /**
-     * Returns true if a system call has been interrupted.
-     *
-     * @return Boolean
-     */
-    private function hasSystemCallBeenInterrupted()
-    {
-        $lastError = error_get_last();
-
-        // stream_select returns false when the `select` system call is interrupted by an incoming signal
-        return isset($lastError['message']) && false !== stripos($lastError['message'], 'interrupted system call');
-    }
-
-    /**
      * Reads pipes, executes callback.
      *
      * @param Boolean $blocking Whether to use blocking calls or not.
      */
     private function readPipes($blocking)
     {
-        if (defined('PHP_WINDOWS_VERSION_BUILD') && $this->fileHandles) {
-            $this->processFileHandles(!$this->pipes);
-        }
-
-        if ($this->pipes) {
-            $r = $this->pipes;
-            $w = null;
-            $e = null;
-
-            // let's have a look if something changed in streams
-            if (false === $n = @stream_select($r, $w, $e, 0, $blocking ? ceil(self::TIMEOUT_PRECISION * 1E6) : 0)) {
-                // if a system call has been interrupted, forget about it, let's try again
-                // otherwise, an error occured, let's reset pipes
-                if (!$this->hasSystemCallBeenInterrupted()) {
-                    $this->pipes = array();
-                }
-
-                return;
-            }
-
-            // nothing has changed
-            if (0 === $n) {
-                return;
-            }
-
-            $this->processReadPipes($r);
-        }
-    }
-
-    /**
-     * Writes data to pipes.
-     *
-     * @param Boolean $blocking Whether to use blocking calls or not.
-     */
-    private function writePipes($blocking)
-    {
-        if (null === $this->stdin) {
-            fclose($this->pipes[0]);
-            unset($this->pipes[0]);
-
-            return;
-        }
-
-        $writePipes = array($this->pipes[0]);
-        unset($this->pipes[0]);
-        $stdinLen = strlen($this->stdin);
-        $stdinOffset = 0;
-
-        while ($writePipes) {
-            if (defined('PHP_WINDOWS_VERSION_BUILD')) {
-                $this->processFileHandles();
-            }
-
-            $r = $this->pipes;
-            $w = $writePipes;
-            $e = null;
-
-            if (false === $n = @stream_select($r, $w, $e, 0, $blocking ? ceil(static::TIMEOUT_PRECISION * 1E6) : 0)) {
-                // if a system call has been interrupted, forget about it, let's try again
-                if ($this->hasSystemCallBeenInterrupted()) {
-                    continue;
-                }
-                break;
-            }
-
-            // nothing has changed, let's wait until the process is ready
-            if (0 === $n) {
-                continue;
-            }
-
-            if ($w) {
-                $written = fwrite($writePipes[0], (binary) substr($this->stdin, $stdinOffset), 8192);
-                if (false !== $written) {
-                    $stdinOffset += $written;
-                }
-                if ($stdinOffset >= $stdinLen) {
-                    fclose($writePipes[0]);
-                    $writePipes = null;
-                }
-            }
-
-            $this->processReadPipes($r);
-        }
-    }
-
-    /**
-     * Processes read pipes, executes callback on it.
-     *
-     * @param array $pipes
-     */
-    private function processReadPipes(array $pipes)
-    {
-        foreach ($pipes as $pipe) {
-            $type = array_search($pipe, $this->pipes);
-            $data = fread($pipe, 8192);
-
-            if (strlen($data) > 0) {
-                // last exit code is output and caught to work around --enable-sigchild
-                if (3 == $type) {
-                    $this->fallbackExitcode = (int) $data;
-                } else {
-                    call_user_func($this->callback, $type === self::STDOUT ? self::OUT : self::ERR, $data);
-                }
-            }
-            if (false === $data || feof($pipe)) {
-                fclose($pipe);
-                unset($this->pipes[$type]);
+        foreach ($this->processPipes->read($blocking) as $type => $data) {
+            if (3 == $type) {
+                $this->fallbackExitcode = (int) $data;
+            } else {
+                call_user_func($this->callback, $type === self::STDOUT ? self::OUT : self::ERR, $data);
             }
         }
     }
@@ -1166,11 +972,8 @@ class Process
         $this->processInformation = null;
         $this->stdout = null;
         $this->stderr = null;
-        $this->pipes = null;
         $this->process = null;
         $this->status = self::STATUS_READY;
-        $this->fileHandles = null;
-        $this->readBytes = null;
         $this->incrementalOutputOffset = 0;
         $this->incrementalErrorOutputOffset = 0;
     }

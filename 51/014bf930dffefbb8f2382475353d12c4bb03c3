@@ -1,0 +1,76 @@
+---------------------------------------------------------------------------
+
+by stloyd at 2013-09-01T12:42:24Z
+
+This is wrong as some services can be `null` (synthetic, i.e. request). Just check broken build at Travis-CI.
+
+---------------------------------------------------------------------------
+
+by catch56 at 2013-09-01T13:06:40Z
+
+Yes I'm sure about xdebug being disabled (although it looks like you deleted your comment?).
+
+isset() || array_key_exists() handles the case of a null service, and still gives me significant reduction in calls.
+
+![screen shot 2013-09-01 at 2 03 37 pm](https://f.cloud.github.com/assets/116285/1064034/1f5a8336-1307-11e3-9cd8-8fa166d51d2f.png)
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2013-09-01T13:54:10Z
+
+didn't we go back and forth here before?
+
+---------------------------------------------------------------------------
+
+by catch56 at 2013-09-01T14:00:38Z
+
+Well remembered. I did a search and found it discussed here: https://github.com/symfony/symfony/pull/7007#discussion-diff-3378325
+
+But isset() || array_key_exists() wasn't mentioned in that exchange.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-09-01T16:02:41Z
+
+@catch56 Does it bring a noticeable performance improvement on a full page?
+
+---------------------------------------------------------------------------
+
+by catch56 at 2013-09-01T16:33:21Z
+
+It's 0.8 of a millisecond on my local install and 1/45th of the total function calls on the page.
+
+That's not huge but yes it's a measurable improvement (i.e. ten similar changes and they'd add up to 8ms).
+
+---------------------------------------------------------------------------
+
+by catch56 at 2013-09-02T14:47:19Z
+
+I think we can likely save some of the 1,200 or so strtolower() calls here as well - by checking for the string as passed in first in the common cases, then falling back to strtolower() later. That's roughly a millisecond on my machine as well - will put it in a new pull request but it'll need to depend on this one since it's the same lines of code.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-09-02T14:49:35Z
+
+@catch56 As this is also a performance optimization, feel free to do everything in this PR. That makes things easier for everyone. Thanks.
+
+---------------------------------------------------------------------------
+
+by catch56 at 2013-09-02T14:52:05Z
+
+OK sounds good, thanks!
+
+---------------------------------------------------------------------------
+
+by catch56 at 2013-09-02T15:17:01Z
+
+Pushed that commit. Here's before after xhprof UI screenshots showing the calls removed.
+
+![screen shot 2013-09-02 at 4 14 54 pm](https://f.cloud.github.com/assets/116285/1068060/a8e20152-13e2-11e3-9417-f0111754638a.png)
+![screen shot 2013-09-02 at 4 13 35 pm](https://f.cloud.github.com/assets/116285/1068063/af8e5ac8-13e2-11e3-8805-e52861f1153c.png)
+
+---------------------------------------------------------------------------
+
+by catch56 at 2013-09-03T10:08:33Z
+
+Because that's Drupal coding standards which my brain defaults to. Updated.

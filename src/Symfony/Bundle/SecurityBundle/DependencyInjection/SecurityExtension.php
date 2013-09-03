@@ -23,6 +23,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 /**
  * SecurityExtension.
@@ -33,6 +34,7 @@ use Symfony\Component\Config\FileLocator;
 class SecurityExtension extends Extension
 {
     private $requestMatchers = array();
+    private $expressions = array();
     private $contextListeners = array();
     private $listenerPositions = array('pre_auth', 'form', 'http', 'remember_me');
     private $factories = array();
@@ -188,8 +190,13 @@ class SecurityExtension extends Extension
                 $access['ips']
             );
 
+            $attributes = $access['roles'];
+            if ($access['allow_if']) {
+                $attributes[] = $this->createExpression($container, $access['allow_if']);
+            }
+
             $container->getDefinition('security.access_map')
-                      ->addMethodCall('add', array($matcher, $access['roles'], $access['requires_channel']));
+                      ->addMethodCall('add', array($matcher, $attributes, $access['requires_channel']));
         }
     }
 
@@ -594,6 +601,21 @@ class SecurityExtension extends Extension
         $listener->replaceArgument(7, $config['role']);
 
         return $switchUserListenerId;
+    }
+
+    private function createExpression($container, $expression)
+    {
+        if (isset($this->expressions[$id = 'security.expression.'.sha1($expression)])) {
+            return $this->expressions[$id];
+        }
+
+        $container
+            ->register($id, 'Symfony\Component\ExpressionLanguage\Expression')
+            ->setPublic(false)
+            ->addArgument($expression)
+        ;
+
+        return $this->expressions[$id] = new Reference($id);
     }
 
     private function createRequestMatcher($container, $path = null, $host = null, $methods = array(), $ip = null, array $attributes = array())

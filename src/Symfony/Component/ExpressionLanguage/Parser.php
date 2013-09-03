@@ -67,6 +67,8 @@ class Parser
             '*'      => array('precedence' => 60,  'associativity' => Parser::OPERATOR_LEFT),
             '/'      => array('precedence' => 60,  'associativity' => Parser::OPERATOR_LEFT),
             '%'      => array('precedence' => 60,  'associativity' => Parser::OPERATOR_LEFT),
+            '=~'     => array('precedence' => 70,  'associativity' => Parser::OPERATOR_LEFT),
+            '!~'     => array('precedence' => 70,  'associativity' => Parser::OPERATOR_LEFT),
             '**'     => array('precedence' => 200, 'associativity' => Parser::OPERATOR_RIGHT),
         );
     }

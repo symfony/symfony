@@ -38,6 +38,18 @@ class BinaryNode extends Node
     {
         $operator = $this->attributes['operator'];
 
+        if ('=~' == $operator || '!~' == $operator) {
+            $compiler
+                ->raw(('!~' == $operator ? '!' : '').'preg_match(')
+                ->compile($this->nodes['right'])
+                ->raw(', ')
+                ->compile($this->nodes['left'])
+                ->raw(')')
+            ;
+
+            return;
+        }
+
         if (isset($this->functions[$operator])) {
             $compiler
                 ->raw(sprintf('%s(', $this->functions[$operator]))
@@ -124,6 +136,10 @@ class BinaryNode extends Node
                 return $left / $right;
             case '%':
                 return $left % $right;
+            case '=~':
+                return preg_match($right, $left);
+            case '!~':
+                return !preg_match($right, $left);
         }
     }
 }

@@ -61,6 +61,9 @@ class BinaryNodeTest extends AbstractNodeTest
             array(false, new BinaryNode('not in', new ConstantNode('a'), $array)),
 
             array(array(1, 2, 3), new BinaryNode('..', new ConstantNode(1), new ConstantNode(3))),
+
+            array(1, new BinaryNode('=~', new ConstantNode('abc'), new ConstantNode('/^[a-z]+$/'))),
+            array(false, new BinaryNode('!~', new ConstantNode('abc'), new ConstantNode('/^[a-z]+$/'))),
         );
     }
 
@@ -108,6 +111,9 @@ class BinaryNodeTest extends AbstractNodeTest
             array('!in_array("a", array(0 => "a", 1 => "b"))', new BinaryNode('not in', new ConstantNode('a'), $array)),
 
             array('range(1, 3)', new BinaryNode('..', new ConstantNode(1), new ConstantNode(3))),
+
+            array('preg_match("/^[a-z]+/i\$/", "abc")', new BinaryNode('=~', new ConstantNode('abc'), new ConstantNode('/^[a-z]+/i$/'))),
+            array('!preg_match("/^[a-z]+\$/", "abc")', new BinaryNode('!~', new ConstantNode('abc'), new ConstantNode('/^[a-z]+$/'))),
         );
     }
 }

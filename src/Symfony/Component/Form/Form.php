@@ -938,7 +938,7 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Returns the iterator for this group.
      *
-     * @return \Iterator
+     * @return \Traversable
      */
     public function getIterator()
     {

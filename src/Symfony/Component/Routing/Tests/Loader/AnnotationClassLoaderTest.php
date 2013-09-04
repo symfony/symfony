@@ -84,7 +84,12 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
             array(
                 'Symfony\Component\Routing\Tests\Fixtures\AnnotatedClasses\BarClass',
                 array('name' => 'route1', 'defaults' => array('arg2' => 'foobar')),
-                array('arg2' => false, 'arg3' => 'defaultValue3')
+                array('arg2' => 'defaultValue2', 'arg3' =>'defaultValue3')
+            ),
+            array(
+                'Symfony\Component\Routing\Tests\Fixtures\AnnotatedClasses\BarClass',
+                array('name' => 'route1', 'defaults' => array('arg2' => 'foo'), 'condition' => 'context.getMethod() == "GET"'),
+                array('arg2' => 'defaultValue2', 'arg3' =>'defaultValue3')
             ),
         );
     }
@@ -102,6 +107,7 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
             'defaults'     => array(),
             'schemes'      => array(),
             'methods'      => array(),
+            'condition'    => null,
         ), $routeDatas);
 
         $this->reader
@@ -116,6 +122,7 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
         $this->assertSame($routeDatas['requirements'],$route->getRequirements(), '->load preserves requirements annotation');
         $this->assertCount(0, array_intersect($route->getOptions(), $routeDatas['options']), '->load preserves options annotation');
         $this->assertSame(array_replace($methodArgs, $routeDatas['defaults']), $route->getDefaults(), '->load preserves defaults annotation');
+        $this->assertEquals($routeDatas['condition'], $route->getCondition(), '->load preserves condition annotation');
     }
 
     private function getAnnotatedRoute($datas)

@@ -28,7 +28,7 @@ use Symfony\Component\Config\Loader\FileLoader;
 class YamlFileLoader extends FileLoader
 {
     private static $availableKeys = array(
-        'resource', 'type', 'prefix', 'pattern', 'path', 'host', 'schemes', 'methods', 'defaults', 'requirements', 'options',
+        'resource', 'type', 'prefix', 'pattern', 'path', 'host', 'schemes', 'methods', 'defaults', 'requirements', 'options', 'condition'
     );
     private $yamlParser;
 
@@ -123,8 +123,9 @@ class YamlFileLoader extends FileLoader
         $host = isset($config['host']) ? $config['host'] : '';
         $schemes = isset($config['schemes']) ? $config['schemes'] : array();
         $methods = isset($config['methods']) ? $config['methods'] : array();
+        $condition = isset($config['condition']) ? $config['condition'] : null;
 
-        $route = new Route($config['path'], $defaults, $requirements, $options, $host, $schemes, $methods);
+        $route = new Route($config['path'], $defaults, $requirements, $options, $host, $schemes, $methods, $condition);
 
         $collection->add($name, $route);
     }

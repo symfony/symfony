@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<symfony>
+<application>
   <commands namespace="foo">
     <command id="foo:bar" name="foo:bar">
   <usage>foo:bar</usage>
@@ -34,4 +34,4 @@
     </options>
 </command>
   </commands>
-</symfony>
+</application>

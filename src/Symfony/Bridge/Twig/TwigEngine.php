@@ -80,6 +80,8 @@ class TwigEngine implements EngineInterface, StreamingEngineInterface
         }
 
         try {
+            // cast possible TemplateReferenceInterface to string because the
+            // EngineInterface supports them but Twig_LoaderInterface does not
             $loader->getSource((string) $name);
         } catch (\Twig_Error_Loader $e) {
             return false;

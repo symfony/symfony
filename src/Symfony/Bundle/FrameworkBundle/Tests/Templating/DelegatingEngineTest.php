@@ -58,7 +58,7 @@ class DelegatingEngineTest extends \PHPUnit_Framework_TestCase
         $delegatingEngine->getEngine('template.php', array('foo' => 'bar'));
     }
 
-    public function testRenderResponse()
+    public function testRenderResponseWithFrameworkEngine()
     {
         $response = $this->getMock('Symfony\Component\HttpFoundation\Response');
         $engine = $this->getFrameworkEngineMock('template.php', true);
@@ -71,6 +71,15 @@ class DelegatingEngineTest extends \PHPUnit_Framework_TestCase
         $delegatingEngine = new DelegatingEngine($container, array('engine'));
 
         $this->assertSame($response, $delegatingEngine->renderResponse('template.php', array('foo' => 'bar')));
+    }
+
+    public function testRenderResponseWithTemplatingEngine()
+    {
+        $engine = $this->getEngineMock('template.php', true);
+        $container = $this->getContainerMock(array('engine' => $engine));
+        $delegatingEngine = new DelegatingEngine($container, array('engine'));
+
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $delegatingEngine->renderResponse('template.php', array('foo' => 'bar')));
     }
 
     private function getEngineMock($template, $supports)

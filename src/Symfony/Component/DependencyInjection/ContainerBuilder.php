@@ -1008,7 +1008,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         } elseif ($value instanceof Definition) {
             $value = $this->createService($value, null);
         } elseif ($value instanceof Expression) {
-            $value = $this->getExpressionLanguage()->evaluate($value, array('this' => $this));
+            $value = $this->getExpressionLanguage()->evaluate($value, array('container' => $this));
         }
 
         return $value;

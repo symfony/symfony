@@ -1201,7 +1201,7 @@ EOF;
 
             return $this->getServiceCall((string) $value, $value);
         } elseif ($value instanceof Expression) {
-            return $this->getExpressionLanguage()->compile((string) $value, array('this'));
+            return $this->getExpressionLanguage()->compile((string) $value, array('container'));
         } elseif ($value instanceof Parameter) {
             return $this->dumpParameter($value);
         } elseif (true === $interpolate && is_string($value)) {

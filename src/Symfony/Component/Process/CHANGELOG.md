@@ -5,6 +5,8 @@ CHANGELOG
 -----
 
  * added the ability to define an idle timeout
+ * added support for PTY mode
+ * added the convenience method "mustRun"
 
 2.3.0
 -----

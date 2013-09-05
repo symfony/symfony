@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="form.type_extension.form.data_collector.class">Symfony\Component\Form\Extension\DataCollector\Type\DataCollectorTypeExtension</parameter>
+        <parameter key="form.type_extension.form.data_collector.event_subscriber.class">Symfony\Component\Form\Extension\DataCollector\EventListener\DataCollectorSubscriber</parameter>
+    </parameters>
+
+    <services>
+        <!-- DataCollectorExtension -->
+        <service id="form.type_extension.form.data_collector" class="%form.type_extension.form.data_collector.class%">
+            <tag name="form.type_extension" alias="form" />
+            <argument type="service" id="form.type_extension.form.data_collector.event_subscriber" />
+        </service>
+        <service id="form.type_extension.form.data_collector.event_subscriber" class="%form.type_extension.form.data_collector.event_subscriber.class%" public="false">
+            <argument type="service" id="data_collector.form" />
+        </service>
+    </services>
+</container>

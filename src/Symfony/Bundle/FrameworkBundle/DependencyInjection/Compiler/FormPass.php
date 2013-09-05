@@ -51,13 +51,6 @@ class FormPass implements CompilerPassInterface
                 ? $tag[0]['alias']
                 : $serviceId;
 
-            //remove the data-collector-extension if data-collecting is disabled
-            if ('form.type_extension.form.data_collector' === $serviceId && !$container->getParameter('data_collector.templates')) {
-                $container->removeDefinition('form.type_extension.form.data_collector');
-                $container->removeDefinition('form.type_extension.form.data_collector.event_subscriber');
-                continue;
-            }
-
             $typeExtensions[$alias][] = $serviceId;
         }
 

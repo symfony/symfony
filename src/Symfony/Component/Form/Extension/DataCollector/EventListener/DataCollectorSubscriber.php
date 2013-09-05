@@ -12,11 +12,10 @@
 namespace Symfony\Component\Form\Extension\DataCollector\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Extension\DataCollector\Collector\FormCollector;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 
 /**
  * EventSubscriber for Form Validation Failures
@@ -26,11 +25,11 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 class DataCollectorSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var DataCollectorInterface
+     * @var FormCollector
      */
     private $collector;
 
-    public function __construct(DataCollectorInterface $collector)
+    public function __construct(FormCollector $collector)
     {
         $this->collector = $collector;
     }
@@ -54,12 +53,7 @@ class DataCollectorSubscriber implements EventSubscriberInterface
 
         if ($form->isRoot() && !$form->isValid()) {
             //add global errors
-            $this->addErrors($form, true);
-
-            //add field errors
-            foreach ($form->all() as $field) {
-                $this->addErrors($field);
-            }
+            $this->addErrors($form);
         }
     }
 
@@ -67,9 +61,8 @@ class DataCollectorSubscriber implements EventSubscriberInterface
      * adds errors to the collector
      *
      * @param FormInterface $form
-     * @param bool $global if collect errors as globals
      */
-    private function addErrors(FormInterface $form, $global = false)
+    private function addErrors(FormInterface $form)
     {
         if (!$form->getErrors()) {
             return;
@@ -80,7 +73,12 @@ class DataCollectorSubscriber implements EventSubscriberInterface
             'name'   => (string)$form->getPropertyPath(),
             'type'   => $form->getConfig()->getType()->getName(),
             'errors' => $form->getErrors(),
-            'value'  => $global ? 'global' : $form->getViewData()
+            'value'  => $form->getViewData()
         ));
+
+        //add field errors
+        foreach ($form->all() as $field) {
+            $this->addErrors($field);
+        }
     }
 }

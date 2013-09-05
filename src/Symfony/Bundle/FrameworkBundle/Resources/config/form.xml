@@ -155,16 +155,6 @@
             <tag name="form.type_extension" alias="form" />
         </service>
 
-        <!-- DataCollectorExtension -->
-        <service id="form.type_extension.form.data_collector" class="Symfony\Component\Form\Extension\DataCollector\Type\DataCollectorTypeExtension">
-            <tag name="form.type_extension" alias="form" />
-            <argument type="service" id="form.type_extension.form.data_collector.event_subscriber" />
-        </service>
-        <service id="form.type_extension.form.data_collector.event_subscriber" class="Symfony\Component\Form\Extension\DataCollector\EventListener\DataCollectorSubscriber">
-            <tag name="kernel.event_subscriber" />
-            <argument type="service" id="data_collector.form" />
-        </service>
-
         <!-- FormTypeValidatorExtension -->
         <service id="form.type_extension.form.validator" class="Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension">
             <tag name="form.type_extension" alias="form" />

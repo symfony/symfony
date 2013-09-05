@@ -14,8 +14,7 @@ namespace Symfony\Component\Form\Tests\Extension\DataCollector\EventListener;
 use Symfony\Component\Form\Extension\DataCollector\EventListener\DataCollectorSubscriber;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
-
+use Symfony\Component\Form\Extension\DataCollector\Collector\FormCollector;
 /**
  * @covers Symfony\Component\Form\Extension\DataCollector\EventListener\DataCollectorSubscriber
  */
@@ -27,13 +26,13 @@ class DataCollectorSubscriberTest extends \PHPUnit_Framework_TestCase
     private $eventSubscriber;
 
     /**
-     * @var DataCollectorInterface
+     * @var FormCollector
      */
     private $collector;
 
     public function setUp()
     {
-        $this->collector = $this->getMockBuilder('Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface')->setMethods(array('addError','collect','getName'))->getMock();
+        $this->collector = $this->getMockBuilder('Symfony\Component\Form\Extension\DataCollector\Collector\FormCollector')->setMethods(array('addError'))->getMock();
         $this->eventSubscriber = new DataCollectorSubscriber($this->collector);
     }
 
@@ -79,12 +78,12 @@ class DataCollectorSubscriberTest extends \PHPUnit_Framework_TestCase
         $form->expects($this->atLeastOnce())->method('getErrors')->will($this->returnValue(array('foo')));
         $form->expects($this->any())->method('getRoot')->will($this->returnSelf());
         $form->expects($this->any())->method('getConfig')->will($this->returnValue($config));
-        $form->expects($this->any())->method('all')->will($this->returnValue(array($form)));
+        $form->expects($this->once())->method('all')->will($this->returnValue(array()));
 
         $config->expects($this->atLeastOnce())->method('getType')->will($this->returnValue($type));
         $formEvent = new FormEvent($form, array());
 
-        $this->collector->expects($this->exactly(2))->method('addError')->with($this->isType('array'));
+        $this->collector->expects($this->atLeastOnce())->method('addError')->with($this->isType('array'));
         $this->eventSubscriber->addToProfiler($formEvent);
     }
 }

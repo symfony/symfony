@@ -55,18 +55,6 @@ class DataCollectorSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->eventSubscriber->addToProfiler($formEvent);
     }
 
-    public function testAddToProfilerWithValidForm()
-    {
-        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
-        $form->expects($this->atLeastOnce())->method('isRoot')->will($this->returnValue(true));
-        $form->expects($this->atLeastOnce())->method('isValid')->will($this->returnValue(true));
-
-        $formEvent = new FormEvent($form, array());
-
-        $this->collector->expects($this->never())->method('addError');
-        $this->eventSubscriber->addToProfiler($formEvent);
-    }
-
     public function testAddToProfilerWithInValidForm()
     {
         $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
@@ -74,7 +62,6 @@ class DataCollectorSubscriberTest extends \PHPUnit_Framework_TestCase
         $type = $this->getMock('Symfony\Component\Form\FormTypeInterface');
 
         $form->expects($this->atLeastOnce())->method('isRoot')->will($this->returnValue(true));
-        $form->expects($this->atLeastOnce())->method('isValid')->will($this->returnValue(false));
         $form->expects($this->atLeastOnce())->method('getErrors')->will($this->returnValue(array('foo')));
         $form->expects($this->any())->method('getRoot')->will($this->returnSelf());
         $form->expects($this->any())->method('getConfig')->will($this->returnValue($config));

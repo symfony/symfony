@@ -51,8 +51,7 @@ class DataCollectorSubscriber implements EventSubscriberInterface
     {
         $form = $event->getForm();
 
-        if ($form->isRoot() && !$form->isValid()) {
-            //add global errors
+        if ($form->isRoot()) {
             $this->addErrors($form);
         }
     }
@@ -64,19 +63,17 @@ class DataCollectorSubscriber implements EventSubscriberInterface
      */
     private function addErrors(FormInterface $form)
     {
-        if (!$form->getErrors()) {
-            return;
+        if ($form->getErrors()) {
+            $this->collector->addError(array(
+                'root'   => $form->getRoot()->getName(),
+                'name'   => (string)$form->getPropertyPath(),
+                'type'   => $form->getConfig()->getType()->getName(),
+                'errors' => $form->getErrors(),
+                'value'  => $form->getViewData()
+            ));
         }
 
-        $this->collector->addError(array(
-            'root'   => $form->getRoot()->getName(),
-            'name'   => (string)$form->getPropertyPath(),
-            'type'   => $form->getConfig()->getType()->getName(),
-            'errors' => $form->getErrors(),
-            'value'  => $form->getViewData()
-        ));
-
-        //add field errors
+        //recursivly add all child errors
         foreach ($form->all() as $field) {
             $this->addErrors($field);
         }

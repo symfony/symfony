@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.4.0
+-----
+
+ * Added 'host' option to firewall configuration
+
 2.3.0
 -----
 

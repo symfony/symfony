@@ -85,7 +85,39 @@ abstract class CompleteConfigurationTest extends \PHPUnit_Framework_TestCase
                 'security.access_listener',
                 'security.authentication.switchuser_listener.secure',
             ),
+            array(
+                'security.channel_listener',
+                'security.context_listener.0',
+                'security.authentication.listener.basic.host',
+                'security.authentication.listener.anonymous.host',
+                'security.access_listener',
+            ),
         ), $listeners);
+    }
+
+    public function testFirewallRequestMatchers()
+    {
+        $container = $this->getContainer('container1');
+
+        $arguments = $container->getDefinition('security.firewall.map')->getArguments();
+        $matchers = array();
+
+        foreach ($arguments[1] as $reference) {
+            if ($reference instanceof Reference) {
+                $definition = $container->getDefinition((string) $reference);
+                $matchers[] = $definition->getArguments();
+            }
+        }
+
+        $this->assertEquals(array(
+            array(
+                '/login',
+            ),
+            array(
+                '/test',
+                'foo\\.example\\.org',
+            ),
+        ), $matchers);
     }
 
     public function testAccess()

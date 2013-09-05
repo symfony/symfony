@@ -48,6 +48,9 @@ class ProjectServiceContainer extends Container
                 6 => 'false',
                 7 => 'null',
             ),
+            'object' => BarClass::__set_state(array(
+   'baz' => NULL,
+)),
         );
     }
 }

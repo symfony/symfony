@@ -13,6 +13,7 @@
         <parameter key="data_collector.time.class">Symfony\Component\HttpKernel\DataCollector\TimeDataCollector</parameter>
         <parameter key="data_collector.memory.class">Symfony\Component\HttpKernel\DataCollector\MemoryDataCollector</parameter>
         <parameter key="data_collector.router.class">Symfony\Bundle\FrameworkBundle\DataCollector\RouterDataCollector</parameter>
+        <parameter key="data_collector.form.class">Symfony\Component\Form\Extension\DataCollector\Collector\FormCollector</parameter>
     </parameters>
 
     <services>
@@ -53,5 +54,10 @@
             <tag name="kernel.event_listener" event="kernel.controller" method="onKernelController"/>
             <tag name="data_collector" template="@WebProfiler/Collector/router.html.twig" id="router" priority="255" />
         </service>
+
+        <service id="data_collector.form" class="%data_collector.form.class%" >
+            <tag name="data_collector" template="@WebProfiler/Collector/form.html.twig" id="form" priority="255" />
+        </service>
+
     </services>
 </container>

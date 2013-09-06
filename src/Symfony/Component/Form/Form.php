@@ -751,7 +751,7 @@ class Form implements \IteratorAggregate, FormInterface
 
         foreach ($this->children as $key => $child) {
             $errors .= str_repeat(' ', $level).$key.":\n";
-            if ($err = $child->getErrorsAsString($level + 4)) {
+            if ($child instanceof self && $err = $child->getErrorsAsString($level + 4)) {
                 $errors .= $err;
             } else {
                 $errors .= str_repeat(' ', $level + 4)."No errors\n";
@@ -938,7 +938,7 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Returns the iterator for this group.
      *
-     * @return \Iterator
+     * @return \Traversable
      */
     public function getIterator()
     {

@@ -84,6 +84,7 @@ class Configuration implements ConfigurationInterface
         $this->addProfilerSection($rootNode);
         $this->addRouterSection($rootNode);
         $this->addSessionSection($rootNode);
+        $this->addRequestSection($rootNode);
         $this->addTemplatingSection($rootNode);
         $this->addTranslatorSection($rootNode);
         $this->addValidationSection($rootNode);
@@ -222,6 +223,29 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('gc_probability')->end()
                         ->scalarNode('gc_maxlifetime')->end()
                         ->scalarNode('save_path')->defaultValue('%kernel.cache_dir%/sessions')->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addRequestSection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('request')
+                    ->info('request configuration')
+                    ->canBeUnset()
+                    ->children()
+                        ->arrayNode('additionnal_formats')
+                            ->prototype('array')
+                                ->beforeNormalization()
+                                    ->ifTrue(function($v) { return !is_array($v); })
+                                    ->then(function($v) { return array($v); })
+                                ->end()
+                                ->prototype('scalar')->end()
+                            ->end()
+                        ->end()
                     ->end()
                 ->end()
             ->end()

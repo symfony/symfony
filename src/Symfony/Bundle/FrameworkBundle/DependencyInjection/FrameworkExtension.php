@@ -81,6 +81,10 @@ class FrameworkExtension extends Extension
             $this->registerSessionConfiguration($config['session'], $container, $loader);
         }
 
+        if (isset($config['request'])) {
+            $this->registerRequestConfiguration($config['request'], $container, $loader);
+        }
+
         if ($this->isConfigEnabled($container, $config['form'])) {
             $this->registerFormConfiguration($config, $container, $loader);
             $config['validation']['enabled'] = true;
@@ -345,6 +349,20 @@ class FrameworkExtension extends Extension
                 $container->findDefinition('session.storage')->getClass(),
             ));
         }
+    }
+
+    /**
+     * Loads the request configuration.
+     *
+     * @param array            $config    A session configuration array
+     * @param ContainerBuilder $container A ContainerBuilder instance
+     * @param XmlFileLoader    $loader    An XmlFileLoader instance
+     */
+    private function registerRequestConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    {
+        $container->setParameter('request.additionnal_formats', $config['additionnal_formats']);
+
+        $loader->load('request.xml');
     }
 
     /**

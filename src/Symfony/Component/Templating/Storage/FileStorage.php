@@ -15,6 +15,8 @@ namespace Symfony\Component\Templating\Storage;
  * FileStorage represents a template stored on the filesystem.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 class FileStorage extends Storage
 {
@@ -22,6 +24,8 @@ class FileStorage extends Storage
      * Returns the content of the template.
      *
      * @return string The template content
+     *
+     * @api
      */
     public function getContent()
     {

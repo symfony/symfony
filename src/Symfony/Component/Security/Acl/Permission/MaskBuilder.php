@@ -73,7 +73,8 @@ class MaskBuilder
      * Constructor
      *
      * @param integer $mask optional; defaults to 0
-     * @return void
+     *
+     * @throws \InvalidArgumentException
      */
     public function __construct($mask = 0)
     {
@@ -88,13 +89,16 @@ class MaskBuilder
      * Adds a mask to the permission
      *
      * @param mixed $mask
-     * @return PermissionBuilder
+     *
+     * @return MaskBuilder
+     *
+     * @throws \InvalidArgumentException
      */
     public function add($mask)
     {
         if (is_string($mask) && defined($name = 'static::MASK_'.strtoupper($mask))) {
             $mask = constant($name);
-        } else if (!is_int($mask)) {
+        } elseif (!is_int($mask)) {
             throw new \InvalidArgumentException('$mask must be an integer.');
         }
 
@@ -141,13 +145,16 @@ class MaskBuilder
      * Removes a mask from the permission
      *
      * @param mixed $mask
-     * @return PermissionBuilder
+     *
+     * @return MaskBuilder
+     *
+     * @throws \InvalidArgumentException
      */
     public function remove($mask)
     {
         if (is_string($mask) && defined($name = 'static::MASK_'.strtoupper($mask))) {
             $mask = constant($name);
-        } else if (!is_int($mask)) {
+        } elseif (!is_int($mask)) {
             throw new \InvalidArgumentException('$mask must be an integer.');
         }
 
@@ -159,7 +166,7 @@ class MaskBuilder
     /**
      * Resets the PermissionBuilder
      *
-     * @return PermissionBuilder
+     * @return MaskBuilder
      */
     public function reset()
     {
@@ -176,7 +183,7 @@ class MaskBuilder
      * @throws \RuntimeException
      * @return string
      */
-    static public function getCode($mask)
+    public static function getCode($mask)
     {
         if (!is_int($mask)) {
             throw new \InvalidArgumentException('$mask must be an integer.');

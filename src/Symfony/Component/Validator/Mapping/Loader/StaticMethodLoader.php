@@ -28,16 +28,21 @@ class StaticMethodLoader implements LoaderInterface
      */
     public function loadClassMetadata(ClassMetadata $metadata)
     {
+        /** @var \ReflectionClass $reflClass */
         $reflClass = $metadata->getReflectionClass();
 
-        if ($reflClass->hasMethod($this->methodName)) {
+        if (!$reflClass->isInterface() && $reflClass->hasMethod($this->methodName)) {
             $reflMethod = $reflClass->getMethod($this->methodName);
 
-            if (!$reflMethod->isStatic()) {
-                throw new MappingException(sprintf('The method %s::%s should be static', $reflClass->getName(), $this->methodName));
+            if ($reflMethod->isAbstract()) {
+                return false;
             }
 
-            if ($reflMethod->getDeclaringClass()->getName() != $reflClass->getName()) {
+            if (!$reflMethod->isStatic()) {
+                throw new MappingException(sprintf('The method %s::%s should be static', $reflClass->name, $this->methodName));
+            }
+
+            if ($reflMethod->getDeclaringClass()->name != $reflClass->name) {
                 return false;
             }
 

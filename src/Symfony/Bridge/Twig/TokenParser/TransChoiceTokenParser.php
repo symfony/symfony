@@ -14,7 +14,7 @@ namespace Symfony\Bridge\Twig\TokenParser;
 use Symfony\Bridge\Twig\Node\TransNode;
 
 /**
- *
+ * Token Parser for the 'transchoice' tag.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -23,9 +23,11 @@ class TransChoiceTokenParser extends TransTokenParser
     /**
      * Parses a token and returns a node.
      *
-     * @param  \Twig_Token $token A Twig_Token instance
+     * @param \Twig_Token $token A Twig_Token instance
      *
      * @return \Twig_NodeInterface A Twig_NodeInterface instance
+     *
+     * @throws \Twig_Error_Syntax
      */
     public function parse(\Twig_Token $token)
     {
@@ -36,7 +38,8 @@ class TransChoiceTokenParser extends TransTokenParser
 
         $count = $this->parser->getExpressionParser()->parseExpression();
 
-        $domain = new \Twig_Node_Expression_Constant('messages', $lineno);
+        $domain = null;
+        $locale = null;
 
         if ($stream->test('with')) {
             // {% transchoice count with vars %}
@@ -50,6 +53,12 @@ class TransChoiceTokenParser extends TransTokenParser
             $domain = $this->parser->getExpressionParser()->parseExpression();
         }
 
+        if ($stream->test('into')) {
+            // {% transchoice count into "fr" %}
+            $stream->next();
+            $locale =  $this->parser->getExpressionParser()->parseExpression();
+        }
+
         $stream->expect(\Twig_Token::BLOCK_END_TYPE);
 
         $body = $this->parser->subparse(array($this, 'decideTransChoiceFork'), true);
@@ -60,7 +69,7 @@ class TransChoiceTokenParser extends TransTokenParser
 
         $stream->expect(\Twig_Token::BLOCK_END_TYPE);
 
-        return new TransNode($body, $domain, $count, $vars, $lineno, $this->getTag());
+        return new TransNode($body, $domain, $count, $vars, $locale, $lineno, $this->getTag());
     }
 
     public function decideTransChoiceFork($token)

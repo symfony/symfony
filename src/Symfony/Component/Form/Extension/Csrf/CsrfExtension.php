@@ -14,32 +14,42 @@ namespace Symfony\Component\Form\Extension\Csrf;
 use Symfony\Component\Form\Extension\Csrf\Type;
 use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Form\AbstractExtension;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
- * This extension protects forms by using a CSRF token
+ * This extension protects forms by using a CSRF token.
+ *
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class CsrfExtension extends AbstractExtension
 {
+    /**
+     * @var CsrfProviderInterface
+     */
     private $csrfProvider;
+
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @var null|string
+     */
+    private $translationDomain;
 
     /**
      * Constructor.
      *
-     * @param CsrfProviderInterface $csrfProvider The CSRF provider
+     * @param CsrfProviderInterface $csrfProvider      The CSRF provider
+     * @param TranslatorInterface   $translator        The translator for translating error messages.
+     * @param null|string           $translationDomain The translation domain for translating.
      */
-    public function __construct(CsrfProviderInterface $csrfProvider)
+    public function __construct(CsrfProviderInterface $csrfProvider, TranslatorInterface $translator = null, $translationDomain = null)
     {
         $this->csrfProvider = $csrfProvider;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected function loadTypes()
-    {
-        return array(
-            new Type\CsrfType($this->csrfProvider),
-        );
+        $this->translator = $translator;
+        $this->translationDomain = $translationDomain;
     }
 
     /**
@@ -48,12 +58,7 @@ class CsrfExtension extends AbstractExtension
     protected function loadTypeExtensions()
     {
         return array(
-            new Type\ChoiceTypeCsrfExtension(),
-            new Type\DateTypeCsrfExtension(),
-            new Type\FileTypeCsrfExtension(),
-            new Type\FormTypeCsrfExtension(),
-            new Type\RepeatedTypeCsrfExtension(),
-            new Type\TimeTypeCsrfExtension(),
+            new Type\FormTypeCsrfExtension($this->csrfProvider, true, '_token', $this->translator, $this->translationDomain),
         );
     }
 }

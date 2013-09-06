@@ -22,6 +22,7 @@ final class User implements AdvancedUserInterface
 {
     private $username;
     private $password;
+    private $enabled;
     private $accountNonExpired;
     private $credentialsNonExpired;
     private $accountNonLocked;
@@ -111,45 +112,5 @@ final class User implements AdvancedUserInterface
      */
     public function eraseCredentials()
     {
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function equals(UserInterface $user)
-    {
-        if (!$user instanceof User) {
-            return false;
-        }
-
-        if ($this->password !== $user->getPassword()) {
-            return false;
-        }
-
-        if ($this->getSalt() !== $user->getSalt()) {
-            return false;
-        }
-
-        if ($this->username !== $user->getUsername()) {
-            return false;
-        }
-
-        if ($this->accountNonExpired !== $user->isAccountNonExpired()) {
-            return false;
-        }
-
-        if ($this->accountNonLocked !== $user->isAccountNonLocked()) {
-            return false;
-        }
-
-        if ($this->credentialsNonExpired !== $user->isCredentialsNonExpired()) {
-            return false;
-        }
-
-        if ($this->enabled !== $user->isEnabled()) {
-            return false;
-        }
-
-        return true;
     }
 }

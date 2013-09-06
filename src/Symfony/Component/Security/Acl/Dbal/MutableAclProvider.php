@@ -17,7 +17,6 @@ use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
 use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
 use Symfony\Component\Security\Acl\Exception\AclAlreadyExistsException;
 use Symfony\Component\Security\Acl\Exception\ConcurrentModificationException;
-use Symfony\Component\Security\Acl\Exception\Exception;
 use Symfony\Component\Security\Acl\Model\AclCacheInterface;
 use Symfony\Component\Security\Acl\Model\AclInterface;
 use Symfony\Component\Security\Acl\Model\EntryInterface;
@@ -144,11 +143,12 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
      * This allows us to keep track of which values have been changed, so we don't
      * have to do a full introspection when ->updateAcl() is called.
      *
-     * @param mixed $sender
+     * @param mixed  $sender
      * @param string $propertyName
-     * @param mixed $oldValue
-     * @param mixed $newValue
-     * @return void
+     * @param mixed  $oldValue
+     * @param mixed  $newValue
+     *
+     * @throws \InvalidArgumentException
      */
     public function propertyChanged($sender, $propertyName, $oldValue, $newValue)
     {
@@ -398,16 +398,16 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
     /**
      * Constructs the SQL for inserting an ACE.
      *
-     * @param integer $classId
+     * @param integer      $classId
      * @param integer|null $objectIdentityId
-     * @param string|null $field
-     * @param integer $aceOrder
-     * @param integer $securityIdentityId
-     * @param string $strategy
-     * @param integer $mask
-     * @param Boolean $granting
-     * @param Boolean $auditSuccess
-     * @param Boolean $auditFailure
+     * @param string|null  $field
+     * @param integer      $aceOrder
+     * @param integer      $securityIdentityId
+     * @param string       $strategy
+     * @param integer      $mask
+     * @param Boolean      $granting
+     * @param Boolean      $auditSuccess
+     * @param Boolean      $auditFailure
      * @return string
      */
     protected function getInsertAccessControlEntrySql($classId, $objectIdentityId, $field, $aceOrder, $securityIdentityId, $strategy, $mask, $granting, $auditSuccess, $auditFailure)
@@ -479,7 +479,7 @@ QUERY;
     /**
      * Constructs the SQL for inserting an object identity.
      *
-     * @param string $identifier
+     * @param string  $identifier
      * @param integer $classId
      * @param Boolean $entriesInheriting
      * @return string
@@ -512,7 +512,7 @@ QUERY;
         if ($sid instanceof UserSecurityIdentity) {
             $identifier = $sid->getClass().'-'.$sid->getUsername();
             $username = true;
-        } else if ($sid instanceof RoleSecurityIdentity) {
+        } elseif ($sid instanceof RoleSecurityIdentity) {
             $identifier = $sid->getRole();
             $username = false;
         } else {
@@ -532,7 +532,7 @@ QUERY;
      *
      * @param integer $classId
      * @param integer $oid
-     * @param string $field
+     * @param string  $field
      * @param integer $order
      * @return string
      */
@@ -580,7 +580,7 @@ QUERY;
         if ($sid instanceof UserSecurityIdentity) {
             $identifier = $sid->getClass().'-'.$sid->getUsername();
             $username = true;
-        } else if ($sid instanceof RoleSecurityIdentity) {
+        } elseif ($sid instanceof RoleSecurityIdentity) {
             $identifier = $sid->getRole();
             $username = false;
         } else {
@@ -599,7 +599,7 @@ QUERY;
      * Constructs the SQL for updating an object identity.
      *
      * @param integer $pk
-     * @param array $changes
+     * @param array   $changes
      * @throws \InvalidArgumentException
      * @return string
      */
@@ -621,7 +621,7 @@ QUERY;
      * Constructs the SQL for updating an ACE.
      *
      * @param integer $pk
-     * @param array $sets
+     * @param array   $sets
      * @throws \InvalidArgumentException
      * @return string
      */
@@ -643,7 +643,6 @@ QUERY;
      * Creates the ACL for the passed object identity
      *
      * @param ObjectIdentityInterface $oid
-     * @return void
      */
     private function createObjectIdentity(ObjectIdentityInterface $oid)
     {
@@ -695,7 +694,6 @@ QUERY;
      * Deletes all ACEs for the given object identity primary key.
      *
      * @param integer $oidPK
-     * @return void
      */
     private function deleteAccessControlEntries($oidPK)
     {
@@ -706,7 +704,6 @@ QUERY;
      * Deletes the object identity from the database.
      *
      * @param integer $pk
-     * @return void
      */
     private function deleteObjectIdentity($pk)
     {
@@ -717,7 +714,6 @@ QUERY;
      * Deletes all entries from the relations table from the database.
      *
      * @param integer $pk
-     * @return void
      */
     private function deleteObjectIdentityRelations($pk)
     {
@@ -728,7 +724,6 @@ QUERY;
      * This regenerates the ancestor table which is used for fast read access.
      *
      * @param AclInterface $acl
-     * @return void
      */
     private function regenerateAncestorRelations(AclInterface $acl)
     {
@@ -748,8 +743,7 @@ QUERY;
      * This processes changes on an ACE related property (classFieldAces, or objectFieldAces).
      *
      * @param string $name
-     * @param array $changes
-     * @return void
+     * @param array  $changes
      */
     private function updateFieldAceProperty($name, array $changes)
     {
@@ -805,8 +799,7 @@ QUERY;
      * This processes changes on an ACE related property (classAces, or objectAces).
      *
      * @param string $name
-     * @param array $changes
-     * @return void
+     * @param array  $changes
      */
     private function updateAceProperty($name, array $changes)
     {
@@ -860,7 +853,6 @@ QUERY;
      * Persists the changes which were made to ACEs to the database.
      *
      * @param \SplObjectStorage $aces
-     * @return void
      */
     private function updateAces(\SplObjectStorage $aces)
     {

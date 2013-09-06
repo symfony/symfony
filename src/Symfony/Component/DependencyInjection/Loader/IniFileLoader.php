@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\DependencyInjection\Loader;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
 /**
  * IniFileLoader loads parameters from INI files.
@@ -24,10 +24,10 @@ class IniFileLoader extends FileLoader
     /**
      * Loads a resource.
      *
-     * @param mixed  $file     The resource
-     * @param string $type     The resource type
+     * @param mixed  $file The resource
+     * @param string $type The resource type
      *
-     * @throws \InvalidArgumentException When ini file is not valid
+     * @throws InvalidArgumentException When ini file is not valid
      */
     public function load($file, $type = null)
     {
@@ -37,7 +37,7 @@ class IniFileLoader extends FileLoader
 
         $result = parse_ini_file($path, true);
         if (false === $result || array() === $result) {
-            throw new \InvalidArgumentException(sprintf('The %s file is not valid.', $file));
+            throw new InvalidArgumentException(sprintf('The "%s" file is not valid.', $file));
         }
 
         if (isset($result['parameters']) && is_array($result['parameters'])) {

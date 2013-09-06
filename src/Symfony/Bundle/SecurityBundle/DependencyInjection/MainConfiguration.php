@@ -1,12 +1,12 @@
 <?php
 
 /*
- * This file is part of the Symfony framework.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien@symfony.com>
  *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection;
@@ -31,15 +31,18 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 class MainConfiguration implements ConfigurationInterface
 {
     private $factories;
+    private $userProviderFactories;
 
     /**
      * Constructor.
      *
      * @param array $factories
+     * @param array $userProviderFactories
      */
-    public function __construct(array $factories)
+    public function __construct(array $factories, array $userProviderFactories)
     {
         $this->factories = $factories;
+        $this->userProviderFactories = $userProviderFactories;
     }
 
     /**
@@ -54,10 +57,11 @@ class MainConfiguration implements ConfigurationInterface
 
         $rootNode
             ->children()
-                ->scalarNode('access_denied_url')->defaultNull()->end()
-                ->scalarNode('session_fixation_strategy')->cannotBeEmpty()->defaultValue('migrate')->end()
+                ->scalarNode('access_denied_url')->defaultNull()->example('/foo/error403')->end()
+                ->scalarNode('session_fixation_strategy')->cannotBeEmpty()->info('strategy can be: none, migrate, invalidate')->defaultValue('migrate')->end()
                 ->booleanNode('hide_user_not_found')->defaultTrue()->end()
                 ->booleanNode('always_authenticate_before_granting')->defaultFalse()->end()
+                ->booleanNode('erase_credentials')->defaultTrue()->end()
                 ->arrayNode('access_decision_manager')
                     ->addDefaultsIfNotSet()
                     ->children()
@@ -66,11 +70,6 @@ class MainConfiguration implements ConfigurationInterface
                         ->booleanNode('allow_if_equal_granted_denied')->defaultTrue()->end()
                     ->end()
                 ->end()
-            ->end()
-            // add a faux-entry for factories, so that no validation error is thrown
-            ->fixXmlConfig('factory', 'factories')
-            ->children()
-                ->arrayNode('factories')->ignoreExtraKeys()->end()
             ->end()
         ;
 
@@ -90,7 +89,10 @@ class MainConfiguration implements ConfigurationInterface
             ->children()
                 ->arrayNode('acl')
                     ->children()
-                        ->scalarNode('connection')->end()
+                        ->scalarNode('connection')
+                            ->defaultNull()
+                            ->info('any name configured in doctrine.dbal section')
+                        ->end()
                         ->arrayNode('cache')
                             ->addDefaultsIfNotSet()
                             ->children()
@@ -150,11 +152,19 @@ class MainConfiguration implements ConfigurationInterface
                 ->arrayNode('access_control')
                     ->cannotBeOverwritten()
                     ->prototype('array')
+                        ->fixXmlConfig('ip')
                         ->children()
                             ->scalarNode('requires_channel')->defaultNull()->end()
-                            ->scalarNode('path')->defaultNull()->end()
+                            ->scalarNode('path')
+                                ->defaultNull()
+                                ->info('use the urldecoded format')
+                                ->example('^/path to resource/')
+                            ->end()
                             ->scalarNode('host')->defaultNull()->end()
-                            ->scalarNode('ip')->defaultNull()->end()
+                            ->arrayNode('ips')
+                                ->beforeNormalization()->ifString()->then(function($v) { return array($v); })->end()
+                                ->prototype('scalar')->end()
+                            ->end()
                             ->arrayNode('methods')
                                 ->beforeNormalization()->ifString()->then(function($v) { return preg_split('/\s*,\s*/', $v); })->end()
                                 ->prototype('scalar')->end()
@@ -189,6 +199,7 @@ class MainConfiguration implements ConfigurationInterface
 
         $firewallNodeBuilder
             ->scalarNode('pattern')->end()
+            ->scalarNode('host')->end()
             ->booleanNode('security')->defaultTrue()->end()
             ->scalarNode('request_matcher')->end()
             ->scalarNode('access_denied_url')->end()
@@ -201,6 +212,9 @@ class MainConfiguration implements ConfigurationInterface
                 ->treatTrueLike(array())
                 ->canBeUnset()
                 ->children()
+                    ->scalarNode('csrf_parameter')->defaultValue('_csrf_token')->end()
+                    ->scalarNode('csrf_provider')->cannotBeEmpty()->end()
+                    ->scalarNode('intention')->defaultValue('logout')->end()
                     ->scalarNode('path')->defaultValue('/logout')->end()
                     ->scalarNode('target')->defaultValue('/')->end()
                     ->scalarNode('success_handler')->end()
@@ -268,14 +282,14 @@ class MainConfiguration implements ConfigurationInterface
                 ->ifTrue(function($v) {
                     return true === $v['security'] && isset($v['pattern']) && !isset($v['request_matcher']);
                 })
-                ->then(function($firewall) use($abstractFactoryKeys) {
+                ->then(function($firewall) use ($abstractFactoryKeys) {
                     foreach ($abstractFactoryKeys as $k) {
                         if (!isset($firewall[$k]['check_path'])) {
                             continue;
                         }
 
-                        if (!preg_match('#'.$firewall['pattern'].'#', $firewall[$k]['check_path'])) {
-                            throw new \Exception(sprintf('The check_path "%s" for login method "%s" is not matched by the firewall pattern "%s".', $firewall[$k]['check_path'], $k, $firewall['pattern']));
+                        if (false !== strpos($firewall[$k]['check_path'], '/') && !preg_match('#'.$firewall['pattern'].'#', $firewall[$k]['check_path'])) {
+                            throw new \LogicException(sprintf('The check_path "%s" for login method "%s" is not matched by the firewall pattern "%s".', $firewall[$k]['check_path'], $k, $firewall['pattern']));
                         }
                     }
 
@@ -287,51 +301,61 @@ class MainConfiguration implements ConfigurationInterface
 
     private function addProvidersSection(ArrayNodeDefinition $rootNode)
     {
-        $rootNode
+        $providerNodeBuilder = $rootNode
             ->fixXmlConfig('provider')
             ->children()
                 ->arrayNode('providers')
+                    ->example(array(
+                        'my_memory_provider' => array(
+                            'memory' => array(
+                                'users' => array(
+                                    'foo' => array('password' => 'foo', 'roles' => 'ROLE_USER'),
+                                    'bar' => array('password' => 'bar', 'roles' => '[ROLE_USER, ROLE_ADMIN]')
+                                ),
+                            )
+                        ),
+                        'my_entity_provider' => array('entity' => array('class' => 'SecurityBundle:User', 'property' => 'username'))
+                    ))
                     ->disallowNewKeysInSubsequentConfigs()
                     ->isRequired()
                     ->requiresAtLeastOneElement()
                     ->useAttributeAsKey('name')
                     ->prototype('array')
-                        ->children()
-                            ->scalarNode('id')->end()
-                            ->arrayNode('entity')
-                                ->children()
-                                    ->scalarNode('class')->isRequired()->cannotBeEmpty()->end()
-                                    ->scalarNode('property')->defaultNull()->end()
-                                ->end()
+        ;
+
+        $providerNodeBuilder
+            ->children()
+                ->scalarNode('id')->end()
+                ->arrayNode('chain')
+                    ->fixXmlConfig('provider')
+                    ->children()
+                        ->arrayNode('providers')
+                            ->beforeNormalization()
+                                ->ifString()
+                                ->then(function($v) { return preg_split('/\s*,\s*/', $v); })
                             ->end()
-                        ->end()
-                        ->fixXmlConfig('provider')
-                        ->children()
-                            ->arrayNode('providers')
-                                ->beforeNormalization()
-                                    ->ifString()
-                                    ->then(function($v) { return preg_split('/\s*,\s*/', $v); })
-                                ->end()
-                                ->prototype('scalar')->end()
-                            ->end()
-                        ->end()
-                        ->fixXmlConfig('user')
-                        ->children()
-                            ->arrayNode('users')
-                                ->useAttributeAsKey('name')
-                                ->prototype('array')
-                                    ->children()
-                                        ->scalarNode('password')->defaultValue(uniqid())->end()
-                                        ->arrayNode('roles')
-                                            ->beforeNormalization()->ifString()->then(function($v) { return preg_split('/\s*,\s*/', $v); })->end()
-                                            ->prototype('scalar')->end()
-                                        ->end()
-                                    ->end()
-                                ->end()
-                            ->end()
+                            ->prototype('scalar')->end()
                         ->end()
                     ->end()
                 ->end()
+            ->end()
+        ;
+
+        foreach ($this->userProviderFactories as $factory) {
+            $name = str_replace('-', '_', $factory->getKey());
+            $factoryNode = $providerNodeBuilder->children()->arrayNode($name)->canBeUnset();
+
+            $factory->addConfiguration($factoryNode);
+        }
+
+        $providerNodeBuilder
+            ->validate()
+                ->ifTrue(function($v){return count($v) > 1;})
+                ->thenInvalid('You cannot set multiple provider types for the same provider')
+            ->end()
+            ->validate()
+                ->ifTrue(function($v){return count($v) === 0;})
+                ->thenInvalid('You must set a provider definition for the provider.')
             ->end()
         ;
     }
@@ -342,6 +366,14 @@ class MainConfiguration implements ConfigurationInterface
             ->fixXmlConfig('encoder')
             ->children()
                 ->arrayNode('encoders')
+                    ->example(array(
+                        'Acme\DemoBundle\Entity\User1' => 'sha512',
+                        'Acme\DemoBundle\Entity\User2' => array(
+                            'algorithm' => 'sha512',
+                            'encode_as_base64' => 'true',
+                            'iterations'=> 5000
+                        )
+                    ))
                     ->requiresAtLeastOneElement()
                     ->useAttributeAsKey('class')
                     ->prototype('array')
@@ -350,9 +382,16 @@ class MainConfiguration implements ConfigurationInterface
                         ->beforeNormalization()->ifString()->then(function($v) { return array('algorithm' => $v); })->end()
                         ->children()
                             ->scalarNode('algorithm')->cannotBeEmpty()->end()
+                            ->scalarNode('hash_algorithm')->info('Name of hashing algorithm for PBKDF2 (i.e. sha256, sha512, etc..) See hash_algos() for a list of supported algorithms.')->defaultValue('sha512')->end()
+                            ->scalarNode('key_length')->defaultValue(40)->end()
                             ->booleanNode('ignore_case')->defaultFalse()->end()
                             ->booleanNode('encode_as_base64')->defaultTrue()->end()
                             ->scalarNode('iterations')->defaultValue(5000)->end()
+                            ->integerNode('cost')
+                                ->min(4)
+                                ->max(31)
+                                ->defaultValue(13)
+                            ->end()
                             ->scalarNode('id')->end()
                         ->end()
                     ->end()

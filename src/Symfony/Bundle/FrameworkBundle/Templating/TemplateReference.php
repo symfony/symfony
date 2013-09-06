@@ -52,6 +52,6 @@ class TemplateReference extends BaseTemplateReference
      */
     public function getLogicalName()
     {
-        return sprintf('%s:%s:%s.%s.%s', $this->get('bundle'), $this->get('controller'), $this->get('name'), $this->get('format'), $this->get('engine'));
+        return sprintf('%s:%s:%s.%s.%s', $this->parameters['bundle'], $this->parameters['controller'], $this->parameters['name'], $this->parameters['format'], $this->parameters['engine']);
     }
 }

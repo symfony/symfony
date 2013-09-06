@@ -11,10 +11,13 @@
 
 namespace Symfony\Component\Console\Command;
 
+use Symfony\Component\Console\Descriptor\TextDescriptor;
+use Symfony\Component\Console\Descriptor\XmlDescriptor;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Helper\HelperSet;
@@ -36,6 +39,7 @@ class Command
     private $description;
     private $ignoreValidationErrors;
     private $applicationDefinitionMerged;
+    private $applicationDefinitionMergedWithArgs;
     private $code;
     private $synopsis;
     private $helperSet;
@@ -54,6 +58,7 @@ class Command
         $this->definition = new InputDefinition();
         $this->ignoreValidationErrors = false;
         $this->applicationDefinitionMerged = false;
+        $this->applicationDefinitionMergedWithArgs = false;
         $this->aliases = array();
 
         if (null !== $name) {
@@ -68,6 +73,16 @@ class Command
     }
 
     /**
+     * Ignores validation errors.
+     *
+     * This is mainly useful for the help command.
+     */
+    public function ignoreValidationErrors()
+    {
+        $this->ignoreValidationErrors = true;
+    }
+
+    /**
      * Sets the application instance for this command.
      *
      * @param Application $application An Application instance
@@ -77,7 +92,11 @@ class Command
     public function setApplication(Application $application = null)
     {
         $this->application = $application;
-        $this->setHelperSet($application->getHelperSet());
+        if ($application) {
+            $this->setHelperSet($application->getHelperSet());
+        } else {
+            $this->helperSet = null;
+        }
     }
 
     /**
@@ -113,6 +132,19 @@ class Command
     }
 
     /**
+     * Checks whether the command is enabled or not in the current environment
+     *
+     * Override this to check for x or y and return false if the command can not
+     * run properly under the current conditions.
+     *
+     * @return Boolean
+     */
+    public function isEnabled()
+    {
+        return true;
+    }
+
+    /**
      * Configures the current command.
      */
     protected function configure()
@@ -130,7 +162,7 @@ class Command
      * @param InputInterface  $input  An InputInterface instance
      * @param OutputInterface $output An OutputInterface instance
      *
-     * @return integer 0 if everything went fine, or an error code
+     * @return null|integer null or 0 if everything went fine, or an error code
      *
      * @throws \LogicException When this abstract method is not implemented
      * @see    setCode()
@@ -173,6 +205,10 @@ class Command
      * @param InputInterface  $input  An InputInterface instance
      * @param OutputInterface $output An OutputInterface instance
      *
+     * @return integer The command exit code
+     *
+     * @throws \Exception
+     *
      * @see setCode()
      * @see execute()
      *
@@ -204,10 +240,12 @@ class Command
         $input->validate();
 
         if ($this->code) {
-            return call_user_func($this->code, $input, $output);
+            $statusCode = call_user_func($this->code, $input, $output);
+        } else {
+            $statusCode = $this->execute($input, $output);
         }
 
-        return $this->execute($input, $output);
+        return is_numeric($statusCode) ? (int) $statusCode : 0;
     }
 
     /**
@@ -216,16 +254,22 @@ class Command
      * If this method is used, it overrides the code defined
      * in the execute() method.
      *
-     * @param \Closure $code A \Closure
+     * @param callable $code A callable(InputInterface $input, OutputInterface $output)
      *
      * @return Command The current instance
+     *
+     * @throws \InvalidArgumentException
      *
      * @see execute()
      *
      * @api
      */
-    public function setCode(\Closure $code)
+    public function setCode($code)
     {
+        if (!is_callable($code)) {
+            throw new \InvalidArgumentException('Invalid callable provided to Command::setCode.');
+        }
+
         $this->code = $code;
 
         return $this;
@@ -233,27 +277,35 @@ class Command
 
     /**
      * Merges the application definition with the command definition.
+     *
+     * This method is not part of public API and should not be used directly.
+     *
+     * @param Boolean $mergeArgs Whether to merge or not the Application definition arguments to Command definition arguments
      */
-    private function mergeApplicationDefinition()
+    public function mergeApplicationDefinition($mergeArgs = true)
     {
-        if (null === $this->application || true === $this->applicationDefinitionMerged) {
+        if (null === $this->application || (true === $this->applicationDefinitionMerged && ($this->applicationDefinitionMergedWithArgs || !$mergeArgs))) {
             return;
         }
 
-        $this->definition->setArguments(array_merge(
-            $this->application->getDefinition()->getArguments(),
-            $this->definition->getArguments()
-        ));
+        if ($mergeArgs) {
+            $currentArguments = $this->definition->getArguments();
+            $this->definition->setArguments($this->application->getDefinition()->getArguments());
+            $this->definition->addArguments($currentArguments);
+        }
 
         $this->definition->addOptions($this->application->getDefinition()->getOptions());
 
         $this->applicationDefinitionMerged = true;
+        if ($mergeArgs) {
+            $this->applicationDefinitionMergedWithArgs = true;
+        }
     }
 
     /**
      * Sets an array of argument and option instances.
      *
-     * @param array|Definition $definition An array of argument and option instances or a definition instance
+     * @param array|InputDefinition $definition An array of argument and option instances or a definition instance
      *
      * @return Command The current instance
      *
@@ -285,6 +337,21 @@ class Command
     }
 
     /**
+     * Gets the InputDefinition to be used to create XML and Text representations of this Command.
+     *
+     * Can be overridden to provide the original command representation when it would otherwise
+     * be changed by merging with the application InputDefinition.
+     *
+     * This method is not part of public API and should not be used directly.
+     *
+     * @return InputDefinition An InputDefinition instance
+     */
+    public function getNativeDefinition()
+    {
+        return $this->getDefinition();
+    }
+
+    /**
      * Adds an argument.
      *
      * @param string  $name        The argument name
@@ -310,7 +377,7 @@ class Command
      * @param string  $shortcut    The shortcut (can be null)
      * @param integer $mode        The option mode: One of the InputOption::VALUE_* constants
      * @param string  $description A description text
-     * @param mixed   $default     The default value (must be null for InputOption::VALUE_REQUIRED or self::VALUE_NONE)
+     * @param mixed   $default     The default value (must be null for InputOption::VALUE_REQUIRED or InputOption::VALUE_NONE)
      *
      * @return Command The current instance
      *
@@ -504,27 +571,16 @@ class Command
      * Returns a text representation of the command.
      *
      * @return string A string representing the command
+     *
+     * @deprecated Deprecated since version 2.3, to be removed in 3.0.
      */
     public function asText()
     {
-        $messages = array(
-            '<comment>Usage:</comment>',
-            ' '.$this->getSynopsis(),
-            '',
-        );
-
-        if ($this->getAliases()) {
-            $messages[] = '<comment>Aliases:</comment> <info>'.implode(', ', $this->getAliases()).'</info>';
-        }
-
-        $messages[] = $this->definition->asText();
-
-        if ($help = $this->getProcessedHelp()) {
-            $messages[] = '<comment>Help:</comment>';
-            $messages[] = ' '.implode("\n ", explode("\n", $help))."\n";
-        }
-
-        return implode("\n", $messages);
+        $descriptor = new TextDescriptor();
+        $output = new BufferedOutput(BufferedOutput::VERBOSITY_NORMAL, true);
+        $descriptor->describe($output, $this, array('raw_output' => true));
+        
+        return $output->fetch();
     }
 
     /**
@@ -532,37 +588,22 @@ class Command
      *
      * @param Boolean $asDom Whether to return a DOM or an XML string
      *
-     * @return string|DOMDocument An XML string representing the command
+     * @return string|\DOMDocument An XML string representing the command
+     *
+     * @deprecated Deprecated since version 2.3, to be removed in 3.0.
      */
     public function asXml($asDom = false)
     {
-        $dom = new \DOMDocument('1.0', 'UTF-8');
-        $dom->formatOutput = true;
-        $dom->appendChild($commandXML = $dom->createElement('command'));
-        $commandXML->setAttribute('id', $this->name);
-        $commandXML->setAttribute('name', $this->name);
-
-        $commandXML->appendChild($usageXML = $dom->createElement('usage'));
-        $usageXML->appendChild($dom->createTextNode(sprintf($this->getSynopsis(), '')));
-
-        $commandXML->appendChild($descriptionXML = $dom->createElement('description'));
-        $descriptionXML->appendChild($dom->createTextNode(implode("\n ", explode("\n", $this->getDescription()))));
-
-        $commandXML->appendChild($helpXML = $dom->createElement('help'));
-        $help = $this->help;
-        $helpXML->appendChild($dom->createTextNode(implode("\n ", explode("\n", $help))));
-
-        $commandXML->appendChild($aliasesXML = $dom->createElement('aliases'));
-        foreach ($this->getAliases() as $alias) {
-            $aliasesXML->appendChild($aliasXML = $dom->createElement('alias'));
-            $aliasXML->appendChild($dom->createTextNode($alias));
+        $descriptor = new XmlDescriptor();
+        
+        if ($asDom) {
+            return $descriptor->getCommandDocument($this);
         }
-
-        $definition = $this->definition->asXml(true);
-        $commandXML->appendChild($dom->importNode($definition->getElementsByTagName('arguments')->item(0), true));
-        $commandXML->appendChild($dom->importNode($definition->getElementsByTagName('options')->item(0), true));
-
-        return $asDom ? $dom : $dom->saveXml();
+        
+        $output = new BufferedOutput();
+        $descriptor->describe($output, $this);
+        
+        return $output->fetch();
     }
 
     private function validateName($name)

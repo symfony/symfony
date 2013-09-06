@@ -12,15 +12,18 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class TextType extends AbstractType
 {
     /**
      * {@inheritdoc}
      */
-    public function getParent(array $options)
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        return 'field';
+        $resolver->setDefaults(array(
+            'compound' => false,
+        ));
     }
 
     /**

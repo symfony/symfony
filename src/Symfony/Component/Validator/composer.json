@@ -1,0 +1,45 @@
+{
+    "name": "symfony/validator",
+    "type": "library",
+    "description": "Symfony Validator Component",
+    "keywords": [],
+    "homepage": "http://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "http://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3",
+        "symfony/translation": "~2.0"
+    },
+    "require-dev": {
+        "symfony/http-foundation": "~2.1",
+        "symfony/intl": "~2.3",
+        "symfony/yaml": "~2.0",
+        "symfony/config": "~2.2"
+    },
+    "suggest": {
+        "doctrine/common": "",
+        "symfony/http-foundation": "",
+        "symfony/intl": "",
+        "symfony/yaml": "",
+        "symfony/config": ""
+    },
+    "autoload": {
+        "psr-0": { "Symfony\\Component\\Validator\\": "" }
+    },
+    "target-dir": "Symfony/Component/Validator",
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.4-dev"
+        }
+    }
+}

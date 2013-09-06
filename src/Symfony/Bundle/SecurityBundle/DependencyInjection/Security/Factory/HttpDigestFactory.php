@@ -62,7 +62,7 @@ class HttpDigestFactory implements SecurityFactoryInterface
             ->children()
                 ->scalarNode('provider')->end()
                 ->scalarNode('realm')->defaultValue('Secured Area')->end()
-                ->scalarNode('key')->cannotBeEmpty()->end()
+                ->scalarNode('key')->isRequired()->cannotBeEmpty()->end()
             ->end()
         ;
     }

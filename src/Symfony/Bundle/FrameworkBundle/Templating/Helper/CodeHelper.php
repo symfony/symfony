@@ -13,6 +13,10 @@ namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
 
 use Symfony\Component\Templating\Helper\Helper;
 
+if (!defined('ENT_SUBSTITUTE')) {
+    define('ENT_SUBSTITUTE', 8);
+}
+
 /**
  * CodeHelper.
  *
@@ -22,17 +26,20 @@ class CodeHelper extends Helper
 {
     protected $fileLinkFormat;
     protected $rootDir;
+    protected $charset;
 
     /**
      * Constructor.
      *
      * @param string $fileLinkFormat The format for links to source files
      * @param string $rootDir        The project root directory
+     * @param string $charset        The charset
      */
-    public function __construct($fileLinkFormat, $rootDir)
+    public function __construct($fileLinkFormat, $rootDir, $charset)
     {
         $this->fileLinkFormat = empty($fileLinkFormat) ? ini_get('xdebug.file_link_format') : $fileLinkFormat;
         $this->rootDir = str_replace('\\', '/', $rootDir).'/';
+        $this->charset = $charset;
     }
 
     /**
@@ -42,30 +49,9 @@ class CodeHelper extends Helper
      *
      * @return string
      */
-    public function formatArgsAsText($args)
+    public function formatArgsAsText(array $args)
     {
-        $result = array();
-        foreach ($args as $key => $item) {
-            if ('object' === $item[0]) {
-                $formattedValue = sprintf("object(%s)", $item[1]);
-            } elseif ('array' === $item[0]) {
-                $formattedValue = sprintf("array(%s)", $this->formatArgsAsText($item[1]));
-            } elseif ('string'  === $item[0]) {
-                $formattedValue = sprintf("'%s'", $item[1]);
-            } elseif ('null' === $item[0]) {
-                $formattedValue = 'null';
-            } elseif ('boolean' === $item[0]) {
-                $formattedValue = strtolower(var_export($item[1], true));
-            } elseif ('resource' === $item[0]) {
-                $formattedValue = 'resource';
-            } else {
-                $formattedValue = str_replace("\n", '', var_export((string) $item[1], true));
-            }
-
-            $result[] = is_int($key) ? $formattedValue : sprintf("'%s' => %s", $key, $formattedValue);
-        }
-
-        return implode(', ', $result);
+        return strip_tags($this->formatArgs($args));
     }
 
     public function abbrClass($class)
@@ -79,9 +65,9 @@ class CodeHelper extends Helper
     public function abbrMethod($method)
     {
         if (false !== strpos($method, '::')) {
-            list($class, $method) = explode('::', $method);
+            list($class, $method) = explode('::', $method, 2);
             $result = sprintf("%s::%s()", $this->abbrClass($class), $method);
-        } else if ('Closure' === $method) {
+        } elseif ('Closure' === $method) {
             $result = sprintf("<abbr title=\"%s\">%s</abbr>", $method, $method);
         } else {
             $result = sprintf("<abbr title=\"%s\">%s</abbr>()", $method, $method);
@@ -97,7 +83,7 @@ class CodeHelper extends Helper
      *
      * @return string
      */
-    public function formatArgs($args)
+    public function formatArgs(array $args)
     {
         $result = array();
         foreach ($args as $key => $item) {
@@ -106,7 +92,7 @@ class CodeHelper extends Helper
                 $short = array_pop($parts);
                 $formattedValue = sprintf("<em>object</em>(<abbr title=\"%s\">%s</abbr>)", $item[1], $short);
             } elseif ('array' === $item[0]) {
-                $formattedValue = sprintf("<em>array</em>(%s)", $this->formatArgs($item[1]));
+                $formattedValue = sprintf("<em>array</em>(%s)", is_array($item[1]) ? $this->formatArgs($item[1]) : $item[1]);
             } elseif ('string'  === $item[0]) {
                 $formattedValue = sprintf("'%s'", htmlspecialchars($item[1], ENT_QUOTES, $this->getCharset()));
             } elseif ('null' === $item[0]) {
@@ -128,15 +114,26 @@ class CodeHelper extends Helper
     /**
      * Returns an excerpt of a code file around the given line number.
      *
-     * @param string $file  A file path
-     * @param int    $line  The selected line number
+     * @param string $file A file path
+     * @param int    $line The selected line number
      *
      * @return string An HTML string
      */
     public function fileExcerpt($file, $line)
     {
         if (is_readable($file)) {
-            $code = highlight_file($file, true);
+            if (extension_loaded('fileinfo')) {
+                $finfo = new \Finfo();
+
+                // Check if the file is an application/octet-stream (eg. Phar file) because hightlight_file cannot parse these files
+                if ('application/octet-stream' === $finfo->file($file, FILEINFO_MIME_TYPE)) {
+                    return;
+                }
+            }
+
+            // highlight_file could throw warnings
+            // see https://bugs.php.net/bug.php?id=25725
+            $code = @highlight_file($file, true);
             // remove main code/span tags
             $code = preg_replace('#^<code.*?>\s*<span.*?>(.*)</span>\s*</code>#s', '\\1', $code);
             $content = preg_split('#<br />#', $code);
@@ -153,9 +150,9 @@ class CodeHelper extends Helper
     /**
      * Formats a file path.
      *
-     * @param  string  $file An absolute file path
-     * @param  integer $line The line number
-     * @param  string  $text Use this text for the link rather than the file path
+     * @param string  $file An absolute file path
+     * @param integer $line The line number
+     * @param string  $text Use this text for the link rather than the file path
      *
      * @return string
      */
@@ -173,7 +170,7 @@ class CodeHelper extends Helper
         }
 
         if (false !== $link = $this->getFileLink($file, $line)) {
-            return sprintf('<a href="%s" title="Click to open this file" class="file_link">%s</a>', $link, $text);
+            return sprintf('<a href="%s" title="Click to open this file" class="file_link">%s</a>', htmlspecialchars($link, ENT_QUOTES | ENT_SUBSTITUTE, $this->charset), $text);
         }
 
         return $text;
@@ -182,14 +179,14 @@ class CodeHelper extends Helper
     /**
      * Returns the link for a given file/line pair.
      *
-     * @param  string  $file An absolute file path
-     * @param  integer $line The line number
+     * @param string  $file An absolute file path
+     * @param integer $line The line number
      *
      * @return string A link of false
      */
     public function getFileLink($file, $line)
     {
-        if ($this->fileLinkFormat && file_exists($file)) {
+        if ($this->fileLinkFormat && is_file($file)) {
             return strtr($this->fileLinkFormat, array('%f' => $file, '%l' => $line));
         }
 
@@ -200,7 +197,7 @@ class CodeHelper extends Helper
     {
         $that = $this;
 
-        return preg_replace_callback('/in (")?(.*?)\1(?: +(?:on|at))? +line (\d+)/', function ($match) use ($that) {
+        return preg_replace_callback('/in ("|&quot;)?(.+?)\1(?: +(?:on|at))? +line (\d+)/s', function ($match) use ($that) {
             return 'in '.$that->formatFile($match[2], $match[3]);
         }, $text);
     }
@@ -215,7 +212,7 @@ class CodeHelper extends Helper
         return 'code';
     }
 
-    static protected function fixCodeMarkup($line)
+    protected static function fixCodeMarkup($line)
     {
         // </span> ending tag from previous line
         $opening = strpos($line, '<span');

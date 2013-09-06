@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\Form\Extension\Core\DataTransformer;
 
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\Exception\TransformationFailedException;
 
 /**
  * Transforms between a normalized format and a localized money string.
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Florian Eckerstorfer <florian@eckerstorfer.org>
  */
 class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransformer
@@ -46,18 +46,18 @@ class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransform
     /**
      * Transforms a normalized format into a localized money string.
      *
-     * @param  number $value  Normalized number
+     * @param number $value Normalized number
      *
-     * @return string         Localized money string.
+     * @return string Localized money string.
      *
-     * @throws UnexpectedTypeException if the given value is not numeric
-     * @throws TransformationFailedException if the value can not be transformed
+     * @throws TransformationFailedException If the given value is not numeric or
+     *                                       if the value can not be transformed.
      */
     public function transform($value)
     {
         if (null !== $value) {
             if (!is_numeric($value)) {
-                throw new UnexpectedTypeException($value, 'numeric');
+                throw new TransformationFailedException('Expected a numeric.');
             }
 
             $value /= $this->divisor;
@@ -73,8 +73,8 @@ class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransform
      *
      * @return number Normalized number
      *
-     * @throws UnexpectedTypeException if the given value is not a string
-     * @throws TransformationFailedException if the value can not be transformed
+     * @throws TransformationFailedException If the given value is not a string
+     *                                       or if the value can not be transformed.
      */
     public function reverseTransform($value)
     {

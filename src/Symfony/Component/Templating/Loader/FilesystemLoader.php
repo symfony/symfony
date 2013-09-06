@@ -19,6 +19,8 @@ use Symfony\Component\Templating\TemplateReferenceInterface;
  * FilesystemLoader is a loader that read templates from the filesystem.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 class FilesystemLoader extends Loader
 {
@@ -28,6 +30,8 @@ class FilesystemLoader extends Loader
      * Constructor.
      *
      * @param array $templatePathPatterns An array of path patterns to look for templates
+     *
+     * @api
      */
     public function __construct($templatePathPatterns)
     {
@@ -40,12 +44,14 @@ class FilesystemLoader extends Loader
      * @param TemplateReferenceInterface $template A template
      *
      * @return Storage|Boolean false if the template cannot be loaded, a Storage instance otherwise
+     *
+     * @api
      */
     public function load(TemplateReferenceInterface $template)
     {
         $file = $template->get('name');
 
-        if (self::isAbsolutePath($file) && file_exists($file)) {
+        if (self::isAbsolutePath($file) && is_file($file)) {
             return new FileStorage($file);
         }
 
@@ -83,6 +89,10 @@ class FilesystemLoader extends Loader
      *
      * @param TemplateReferenceInterface $template A template
      * @param integer                    $time     The last modification time of the cached template (timestamp)
+     *
+     * @return Boolean true if the template is still fresh, false otherwise
+     *
+     * @api
      */
     public function isFresh(TemplateReferenceInterface $template, $time)
     {
@@ -98,15 +108,16 @@ class FilesystemLoader extends Loader
      *
      * @param string $file A path
      *
-     * @return true if the path exists and is absolute, false otherwise
+     * @return Boolean true if the path exists and is absolute, false otherwise
      */
-    static protected function isAbsolutePath($file)
+    protected static function isAbsolutePath($file)
     {
         if ($file[0] == '/' || $file[0] == '\\'
             || (strlen($file) > 3 && ctype_alpha($file[0])
                 && $file[1] == ':'
                 && ($file[2] == '\\' || $file[2] == '/')
             )
+            || null !== parse_url($file, PHP_URL_SCHEME)
         ) {
             return true;
         }

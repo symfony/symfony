@@ -12,12 +12,11 @@
 namespace Symfony\Component\Config\Definition;
 
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
-use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 
 /**
- * This node represents a variable value in the config tree.
+ * This node represents a value of variable type in the config tree.
  *
- * This node is intended for arbitrary variables.
+ * This node is intended for values of arbitrary type.
  * Any PHP type is accepted as a value.
  *
  * @author Jeremy Mikola <jmikola@gmail.com>

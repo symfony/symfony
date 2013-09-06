@@ -12,6 +12,7 @@
             <xsd:element name="form" type="form" minOccurs="0" maxOccurs="1" />
             <xsd:element name="csrf-protection" type="csrf_protection" minOccurs="0" maxOccurs="1" />
             <xsd:element name="esi" type="esi" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="fragments" type="fragments" minOccurs="0" maxOccurs="1" />
             <xsd:element name="profiler" type="profiler" minOccurs="0" maxOccurs="1" />
             <xsd:element name="router" type="router" minOccurs="0" maxOccurs="1" />
             <xsd:element name="session" type="session" minOccurs="0" maxOccurs="1" />
@@ -21,11 +22,12 @@
             <xsd:element name="annotations" type="annotations" minOccurs="0" maxOccurs="1" />
         </xsd:all>
 
-        <xsd:attribute name="charset" type="xsd:string" />
-        <xsd:attribute name="error-handler" type="xsd:string" />
-        <xsd:attribute name="exception-controller" type="xsd:string" />
+        <xsd:attribute name="http-method-override" type="xsd:boolean" />
+        <xsd:attribute name="trusted-proxies" type="xsd:string" />
         <xsd:attribute name="ide" type="xsd:string" />
         <xsd:attribute name="secret" type="xsd:string" />
+        <xsd:attribute name="default-locale" type="xsd:string" />
+        <xsd:attribute name="test" type="xsd:boolean" />
     </xsd:complexType>
 
     <xsd:complexType name="form">
@@ -41,8 +43,9 @@
         <xsd:attribute name="enabled" type="xsd:boolean" />
     </xsd:complexType>
 
-    <xsd:complexType name="param_converter">
+    <xsd:complexType name="fragments">
         <xsd:attribute name="enabled" type="xsd:boolean" />
+        <xsd:attribute name="path" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="profiler">
@@ -50,8 +53,10 @@
             <xsd:element name="matcher" type="profiler_matcher" minOccurs="0" maxOccurs="1" />
         </xsd:all>
 
+        <xsd:attribute name="collect" type="xsd:string" />
         <xsd:attribute name="only-exceptions" type="xsd:string" />
         <xsd:attribute name="only-master-requests" type="xsd:string" />
+        <xsd:attribute name="enabled" type="xsd:string" />
         <xsd:attribute name="dsn" type="xsd:string" />
         <xsd:attribute name="username" type="xsd:string" />
         <xsd:attribute name="password" type="xsd:string" />
@@ -69,19 +74,23 @@
         <xsd:attribute name="type" type="xsd:string" />
         <xsd:attribute name="http-port" type="xsd:string" />
         <xsd:attribute name="https-port" type="xsd:string" />
+        <xsd:attribute name="strict-requirements" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="session">
         <xsd:attribute name="storage-id" type="xsd:string" />
-        <xsd:attribute name="default-locale" type="xsd:string" />
+        <xsd:attribute name="handler-id" type="xsd:string" />
         <xsd:attribute name="name" type="xsd:string" />
-        <xsd:attribute name="lifetime" type="xsd:integer" />
-        <xsd:attribute name="path" type="xsd:string" />
-        <xsd:attribute name="domain" type="xsd:string" />
-        <xsd:attribute name="secure" type="xsd:boolean" />
-        <xsd:attribute name="httponly" type="xsd:boolean" />
+        <xsd:attribute name="cookie-lifetime" type="xsd:string" />
+        <xsd:attribute name="cookie-path" type="xsd:string" />
+        <xsd:attribute name="cookie-domain" type="xsd:string" />
+        <xsd:attribute name="cookie-secure" type="xsd:boolean" />
+        <xsd:attribute name="cookie-httponly" type="xsd:boolean" />
         <xsd:attribute name="cache-limiter" type="xsd:string" />
-        <xsd:attribute name="auto-start" type="xsd:boolean" />
+        <xsd:attribute name="gc-maxlifetime" type="xsd:string" />
+        <xsd:attribute name="gc-divisor" type="xsd:string" />
+        <xsd:attribute name="gc-probability" type="xsd:string" />
+        <xsd:attribute name="save-path" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="templating">
@@ -90,11 +99,18 @@
             <xsd:element name="engine" type="xsd:string" minOccurs="1" maxOccurs="unbounded" />
             <xsd:element name="assets-base-url" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="package" type="package" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="form" type="form-resources" minOccurs="0" maxOccurs="1" />
         </xsd:sequence>
 
         <xsd:attribute name="assets-version" type="xsd:string" />
         <xsd:attribute name="assets-version-format" type="xsd:string" />
         <xsd:attribute name="cache" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="form-resources">
+        <xsd:choice minOccurs="1" maxOccurs="unbounded">
+            <xsd:element name="resource" type="xsd:string" />
+        </xsd:choice>
     </xsd:complexType>
 
     <xsd:complexType name="package">
@@ -117,7 +133,7 @@
         <xsd:attribute name="cache" type="xsd:string" />
         <xsd:attribute name="enable-annotations" type="xsd:boolean" />
     </xsd:complexType>
-    
+
     <xsd:complexType name="annotations">
         <xsd:attribute name="cache" type="xsd:string" />
         <xsd:attribute name="debug" type="xsd:string" />

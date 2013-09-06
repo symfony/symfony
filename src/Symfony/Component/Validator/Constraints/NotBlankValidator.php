@@ -14,16 +14,22 @@ namespace Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
+/**
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @api
+ */
 class NotBlankValidator extends ConstraintValidator
 {
-    public function isValid($value, Constraint $constraint)
+    /**
+     * {@inheritDoc}
+     */
+    public function validate($value, Constraint $constraint)
     {
-        if (null === $value || '' === $value) {
-            $this->setMessage($constraint->message);
-
-            return false;
+        if (false === $value || (empty($value) && '0' != $value)) {
+            $this->context->addViolation($constraint->message);
         }
-
-        return true;
     }
 }

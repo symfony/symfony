@@ -34,6 +34,8 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
      * @param string           $strategy                           The vote strategy
      * @param Boolean          $allowIfAllAbstainDecisions         Whether to grant access if all voters abstained or not
      * @param Boolean          $allowIfEqualGrantedDeniedDecisions Whether to grant access if result are equals
+     *
+     * @throws \InvalidArgumentException
      */
     public function __construct(array $voters, $strategy = 'affirmative', $allowIfAllAbstainDecisions = false, $allowIfEqualGrantedDeniedDecisions = true)
     {
@@ -41,8 +43,13 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
             throw new \InvalidArgumentException('You must at least add one voter.');
         }
 
+        $strategyMethod = 'decide'.ucfirst($strategy);
+        if (!is_callable(array($this, $strategyMethod))) {
+            throw new \InvalidArgumentException(sprintf('The strategy "%s" is not supported.', $strategy));
+        }
+
         $this->voters = $voters;
-        $this->strategy = 'decide'.ucfirst($strategy);
+        $this->strategy = $strategyMethod;
         $this->allowIfAllAbstainDecisions = (Boolean) $allowIfAllAbstainDecisions;
         $this->allowIfEqualGrantedDeniedDecisions = (Boolean) $allowIfEqualGrantedDeniedDecisions;
     }

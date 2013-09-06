@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\DependencyInjection;
 
+use Symfony\Component\DependencyInjection\Exception\InactiveScopeException;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -54,11 +57,19 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @api
  */
-class Container implements ContainerInterface
+class Container implements IntrospectableContainerInterface
 {
+    /**
+     * @var ParameterBagInterface
+     */
     protected $parameterBag;
+
     protected $services;
+    protected $methodMap;
+    protected $aliases;
     protected $scopes;
     protected $scopeChildren;
     protected $scopedServices;
@@ -69,12 +80,15 @@ class Container implements ContainerInterface
      * Constructor.
      *
      * @param ParameterBagInterface $parameterBag A ParameterBagInterface instance
+     *
+     * @api
      */
     public function __construct(ParameterBagInterface $parameterBag = null)
     {
         $this->parameterBag = null === $parameterBag ? new ParameterBag() : $parameterBag;
 
         $this->services       = array();
+        $this->aliases        = array();
         $this->scopes         = array();
         $this->scopeChildren  = array();
         $this->scopedServices = array();
@@ -90,6 +104,8 @@ class Container implements ContainerInterface
      *
      *  * Parameter values are resolved;
      *  * The parameter bag is frozen.
+     *
+     * @api
      */
     public function compile()
     {
@@ -102,6 +118,8 @@ class Container implements ContainerInterface
      * Returns true if the container parameter bag are frozen.
      *
      * @return Boolean true if the container parameter bag are frozen, false otherwise
+     *
+     * @api
      */
     public function isFrozen()
     {
@@ -112,6 +130,8 @@ class Container implements ContainerInterface
      * Gets the service container parameter bag.
      *
      * @return ParameterBagInterface A ParameterBagInterface instance
+     *
+     * @api
      */
     public function getParameterBag()
     {
@@ -121,11 +141,13 @@ class Container implements ContainerInterface
     /**
      * Gets a parameter.
      *
-     * @param  string $name The parameter name
+     * @param string $name The parameter name
      *
      * @return mixed  The parameter value
      *
-     * @throws  \InvalidArgumentException if the parameter is not defined
+     * @throws InvalidArgumentException if the parameter is not defined
+     *
+     * @api
      */
     public function getParameter($name)
     {
@@ -135,9 +157,11 @@ class Container implements ContainerInterface
     /**
      * Checks if a parameter exists.
      *
-     * @param  string $name The parameter name
+     * @param string $name The parameter name
      *
      * @return Boolean The presence of parameter in container
+     *
+     * @api
      */
     public function hasParameter($name)
     {
@@ -149,6 +173,8 @@ class Container implements ContainerInterface
      *
      * @param string $name  The parameter name
      * @param mixed  $value The parameter value
+     *
+     * @api
      */
     public function setParameter($name, $value)
     {
@@ -158,63 +184,98 @@ class Container implements ContainerInterface
     /**
      * Sets a service.
      *
+     * Setting a service to null resets the service: has() returns false and get()
+     * behaves in the same way as if the service was never created.
+     *
      * @param string $id      The service identifier
      * @param object $service The service instance
      * @param string $scope   The scope of the service
+     *
+     * @throws RuntimeException When trying to set a service in an inactive scope
+     * @throws InvalidArgumentException When trying to set a service in the prototype scope
+     *
+     * @api
      */
     public function set($id, $service, $scope = self::SCOPE_CONTAINER)
     {
         if (self::SCOPE_PROTOTYPE === $scope) {
-            throw new \InvalidArgumentException('You cannot set services of scope "prototype".');
+            throw new InvalidArgumentException(sprintf('You cannot set service "%s" of scope "prototype".', $id));
         }
 
         $id = strtolower($id);
 
         if (self::SCOPE_CONTAINER !== $scope) {
             if (!isset($this->scopedServices[$scope])) {
-                throw new \RuntimeException('You cannot set services of inactive scopes.');
+                throw new RuntimeException(sprintf('You cannot set service "%s" of inactive scope.', $id));
             }
 
             $this->scopedServices[$scope][$id] = $service;
         }
 
         $this->services[$id] = $service;
+
+        if (method_exists($this, $method = 'synchronize'.strtr($id, array('_' => '', '.' => '_')).'Service')) {
+            $this->$method();
+        }
+
+        if (self::SCOPE_CONTAINER !== $scope && null === $service) {
+            unset($this->scopedServices[$scope][$id]);
+        }
+
+        if (null === $service) {
+            unset($this->services[$id]);
+        }
     }
 
     /**
      * Returns true if the given service is defined.
      *
-     * @param  string  $id      The service identifier
+     * @param string $id The service identifier
      *
      * @return Boolean true if the service is defined, false otherwise
+     *
+     * @api
      */
     public function has($id)
     {
         $id = strtolower($id);
 
-        return isset($this->services[$id]) || method_exists($this, 'get'.strtr($id, array('_' => '', '.' => '_')).'Service');
+        return array_key_exists($id, $this->services)
+            || array_key_exists($id, $this->aliases)
+            || method_exists($this, 'get'.strtr($id, array('_' => '', '.' => '_')).'Service')
+        ;
     }
 
     /**
      * Gets a service.
      *
-     * If a service is both defined through a set() method and
-     * with a set*Service() method, the former has always precedence.
+     * If a service is defined both through a set() method and
+     * with a get{$id}Service() method, the former has always precedence.
      *
-     * @param  string  $id              The service identifier
-     * @param  integer $invalidBehavior The behavior when the service does not exist
+     * @param string  $id              The service identifier
+     * @param integer $invalidBehavior The behavior when the service does not exist
      *
      * @return object The associated service
      *
-     * @throws \InvalidArgumentException if the service is not defined
+     * @throws InvalidArgumentException if the service is not defined
+     * @throws ServiceCircularReferenceException When a circular reference is detected
+     * @throws ServiceNotFoundException When the service is not defined
      *
      * @see Reference
+     *
+     * @api
      */
     public function get($id, $invalidBehavior = self::EXCEPTION_ON_INVALID_REFERENCE)
     {
         $id = strtolower($id);
 
-        if (isset($this->services[$id])) {
+        // resolve aliases
+        if (isset($this->aliases[$id])) {
+            $id = $this->aliases[$id];
+        }
+
+        // re-use shared service instance if it exists
+        if (array_key_exists($id, $this->services)) {
             return $this->services[$id];
         }
 
@@ -222,24 +283,63 @@ class Container implements ContainerInterface
             throw new ServiceCircularReferenceException($id, array_keys($this->loading));
         }
 
-        if (method_exists($this, $method = 'get'.strtr($id, array('_' => '', '.' => '_')).'Service')) {
-            $this->loading[$id] = true;
+        if (isset($this->methodMap[$id])) {
+            $method = $this->methodMap[$id];
+        } elseif (method_exists($this, $method = 'get'.strtr($id, array('_' => '', '.' => '_')).'Service')) {
+            // $method is set to the right value, proceed
+        } else {
+            if (self::EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior) {
+                if (!$id) {
+                    throw new ServiceNotFoundException($id);
+                }
 
-            try {
-                $service = $this->$method();
-            } catch (\Exception $e) {
-                unset($this->loading[$id]);
-                throw $e;
+                $alternatives = array();
+                foreach (array_keys($this->services) as $key) {
+                    $lev = levenshtein($id, $key);
+                    if ($lev <= strlen($id) / 3 || false !== strpos($key, $id)) {
+                        $alternatives[] = $key;
+                    }
+                }
+
+                throw new ServiceNotFoundException($id, null, null, $alternatives);
             }
 
+            return null;
+        }
+
+        $this->loading[$id] = true;
+
+        try {
+            $service = $this->$method();
+        } catch (\Exception $e) {
             unset($this->loading[$id]);
 
-            return $service;
+            if (array_key_exists($id, $this->services)) {
+                unset($this->services[$id]);
+            }
+
+            if ($e instanceof InactiveScopeException && self::EXCEPTION_ON_INVALID_REFERENCE !== $invalidBehavior) {
+                return null;
+            }
+
+            throw $e;
         }
 
-        if (self::EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior) {
-            throw new ServiceNotFoundException($id);
-        }
+        unset($this->loading[$id]);
+
+        return $service;
+    }
+
+    /**
+     * Returns true if the given service has actually been initialized
+     *
+     * @param string $id The service identifier
+     *
+     * @return Boolean true if service has already been initialized, false otherwise
+     */
+    public function initialized($id)
+    {
+        return array_key_exists(strtolower($id), $this->services);
     }
 
     /**
@@ -252,7 +352,7 @@ class Container implements ContainerInterface
         $ids = array();
         $r = new \ReflectionClass($this);
         foreach ($r->getMethods() as $method) {
-            if (preg_match('/^get(.+)Service$/', $method->getName(), $match)) {
+            if (preg_match('/^get(.+)Service$/', $method->name, $match)) {
                 $ids[] = self::underscore($match[1]);
             }
         }
@@ -264,16 +364,20 @@ class Container implements ContainerInterface
      * This is called when you enter a scope
      *
      * @param string $name
-     * @return void
+     *
+     * @throws RuntimeException         When the parent scope is inactive
+     * @throws InvalidArgumentException When the scope does not exist
+     *
+     * @api
      */
     public function enterScope($name)
     {
         if (!isset($this->scopes[$name])) {
-            throw new \InvalidArgumentException(sprintf('The scope "%s" does not exist.', $name));
+            throw new InvalidArgumentException(sprintf('The scope "%s" does not exist.', $name));
         }
 
         if (self::SCOPE_CONTAINER !== $this->scopes[$name] && !isset($this->scopedServices[$this->scopes[$name]])) {
-            throw new \RuntimeException(sprintf('The parent scope "%s" must be active when entering this scope.', $this->scopes[$name]));
+            throw new RuntimeException(sprintf('The parent scope "%s" must be active when entering this scope.', $this->scopes[$name]));
         }
 
         // check if a scope of this name is already active, if so we need to
@@ -284,8 +388,10 @@ class Container implements ContainerInterface
             unset($this->scopedServices[$name]);
 
             foreach ($this->scopeChildren[$name] as $child) {
-                $services[$child] = $this->scopedServices[$child];
-                unset($this->scopedServices[$child]);
+                if (isset($this->scopedServices[$child])) {
+                    $services[$child] = $this->scopedServices[$child];
+                    unset($this->scopedServices[$child]);
+                }
             }
 
             // update global map
@@ -307,13 +413,15 @@ class Container implements ContainerInterface
      * scope.
      *
      * @param string $name The name of the scope to leave
-     * @return void
-     * @throws \InvalidArgumentException if the scope is not active
+     *
+     * @throws InvalidArgumentException if the scope is not active
+     *
+     * @api
      */
     public function leaveScope($name)
     {
         if (!isset($this->scopedServices[$name])) {
-            throw new \InvalidArgumentException(sprintf('The scope "%s" is not active.', $name));
+            throw new InvalidArgumentException(sprintf('The scope "%s" is not active.', $name));
         }
 
         // remove all services of this scope, or any of its child scopes from
@@ -335,8 +443,11 @@ class Container implements ContainerInterface
             $services = $this->scopeStacks[$name]->pop();
             $this->scopedServices += $services;
 
-            array_unshift($services, $this->services);
-            $this->services = call_user_func_array('array_merge', $services);
+            foreach ($services as $array) {
+                foreach ($array as $id => $service) {
+                    $this->set($id, $service, $name);
+                }
+            }
         }
     }
 
@@ -344,7 +455,10 @@ class Container implements ContainerInterface
      * Adds a scope to the container.
      *
      * @param ScopeInterface $scope
-     * @return void
+     *
+     * @throws InvalidArgumentException
+     *
+     * @api
      */
     public function addScope(ScopeInterface $scope)
     {
@@ -352,13 +466,13 @@ class Container implements ContainerInterface
         $parentScope = $scope->getParentName();
 
         if (self::SCOPE_CONTAINER === $name || self::SCOPE_PROTOTYPE === $name) {
-            throw new \InvalidArgumentException(sprintf('The scope "%s" is reserved.', $name));
+            throw new InvalidArgumentException(sprintf('The scope "%s" is reserved.', $name));
         }
         if (isset($this->scopes[$name])) {
-            throw new \InvalidArgumentException(sprintf('A scope with name "%s" already exists.', $name));
+            throw new InvalidArgumentException(sprintf('A scope with name "%s" already exists.', $name));
         }
         if (self::SCOPE_CONTAINER !== $parentScope && !isset($this->scopes[$parentScope])) {
-            throw new \InvalidArgumentException(sprintf('The parent scope "%s" does not exist, or is invalid.', $parentScope));
+            throw new InvalidArgumentException(sprintf('The parent scope "%s" does not exist, or is invalid.', $parentScope));
         }
 
         $this->scopes[$name] = $parentScope;
@@ -375,7 +489,10 @@ class Container implements ContainerInterface
      * Returns whether this container has a certain scope
      *
      * @param string $name The name of the scope
+     *
      * @return Boolean
+     *
+     * @api
      */
     public function hasScope($name)
     {
@@ -388,7 +505,10 @@ class Container implements ContainerInterface
      * This does not actually check if the passed scope actually exists.
      *
      * @param string $name
+     *
      * @return Boolean
+     *
+     * @api
      */
     public function isScopeActive($name)
     {
@@ -399,20 +519,22 @@ class Container implements ContainerInterface
      * Camelizes a string.
      *
      * @param string $id A string to camelize
+     *
      * @return string The camelized string
      */
-    static public function camelize($id)
+    public static function camelize($id)
     {
-        return preg_replace(array('/(?:^|_)+(.)/e', '/\.(.)/e'), array("strtoupper('\\1')", "'_'.strtoupper('\\1')"), $id);
+        return strtr(ucwords(strtr($id, array('_' => ' ', '.' => '_ '))), array(' ' => ''));
     }
 
     /**
      * A string to underscore.
      *
      * @param string $id The string to underscore
+     *
      * @return string The underscored string
      */
-    static public function underscore($id)
+    public static function underscore($id)
     {
         return strtolower(preg_replace(array('/([A-Z]+)([A-Z][a-z])/', '/([a-z\d])([A-Z])/'), array('\\1_\\2', '\\1_\\2'), strtr($id, '_', '.')));
     }

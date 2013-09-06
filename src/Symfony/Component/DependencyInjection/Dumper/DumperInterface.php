@@ -15,15 +15,19 @@ namespace Symfony\Component\DependencyInjection\Dumper;
  * DumperInterface is the interface implemented by service container dumper classes.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 interface DumperInterface
 {
     /**
      * Dumps the service container.
      *
-     * @param  array  $options An array of options
+     * @param array $options An array of options
      *
      * @return string The representation of the service container
+     *
+     * @api
      */
-    function dump(array $options = array());
+    public function dump(array $options = array());
 }

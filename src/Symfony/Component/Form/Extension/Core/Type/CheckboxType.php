@@ -12,51 +12,49 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Extension\Core\DataTransformer\BooleanToStringTransformer;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class CheckboxType extends AbstractType
 {
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilder $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->appendClientTransformer(new BooleanToStringTransformer())
-            ->setAttribute('value', $options['value'])
+            ->addViewTransformer(new BooleanToStringTransformer($options['value']))
         ;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function buildView(FormView $view, FormInterface $form)
+    public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view
-            ->set('value', $form->getAttribute('value'))
-            ->set('checked', (Boolean) $form->getData())
-        ;
+        $view->vars = array_replace($view->vars, array(
+            'value'   => $options['value'],
+            'checked' => null !== $form->getViewData(),
+        ));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getDefaultOptions(array $options)
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        return array(
-            'value' => '1',
-        );
-    }
+        $emptyData = function (FormInterface $form, $clientData) {
+            return $clientData;
+        };
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getParent(array $options)
-    {
-        return 'field';
+        $resolver->setDefaults(array(
+            'value'      => '1',
+            'empty_data' => $emptyData,
+            'compound'   => false,
+        ));
     }
 
     /**

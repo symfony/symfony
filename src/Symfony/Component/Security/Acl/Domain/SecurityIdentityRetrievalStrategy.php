@@ -13,7 +13,6 @@ namespace Symfony\Component\Security\Acl\Domain;
 
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityRetrievalStrategyInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
@@ -35,8 +34,6 @@ class SecurityIdentityRetrievalStrategy implements SecurityIdentityRetrievalStra
      *
      * @param RoleHierarchyInterface      $roleHierarchy
      * @param AuthenticationTrustResolver $authenticationTrustResolver
-     *
-     * @return void
      */
     public function __construct(RoleHierarchyInterface $roleHierarchy, AuthenticationTrustResolver $authenticationTrustResolver)
     {
@@ -70,10 +67,10 @@ class SecurityIdentityRetrievalStrategy implements SecurityIdentityRetrievalStra
             $sids[] = new RoleSecurityIdentity(AuthenticatedVoter::IS_AUTHENTICATED_FULLY);
             $sids[] = new RoleSecurityIdentity(AuthenticatedVoter::IS_AUTHENTICATED_REMEMBERED);
             $sids[] = new RoleSecurityIdentity(AuthenticatedVoter::IS_AUTHENTICATED_ANONYMOUSLY);
-        } else if ($this->authenticationTrustResolver->isRememberMe($token)) {
+        } elseif ($this->authenticationTrustResolver->isRememberMe($token)) {
             $sids[] = new RoleSecurityIdentity(AuthenticatedVoter::IS_AUTHENTICATED_REMEMBERED);
             $sids[] = new RoleSecurityIdentity(AuthenticatedVoter::IS_AUTHENTICATED_ANONYMOUSLY);
-        } else if ($this->authenticationTrustResolver->isAnonymous($token)) {
+        } elseif ($this->authenticationTrustResolver->isAnonymous($token)) {
             $sids[] = new RoleSecurityIdentity(AuthenticatedVoter::IS_AUTHENTICATED_ANONYMOUSLY);
         }
 

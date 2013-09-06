@@ -1,12 +1,12 @@
 <?php
 
 /*
- * This file is part of the Symfony framework.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien@symfony.com>
  *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 namespace Symfony\Component\Security\Core;
@@ -29,22 +29,22 @@ interface SecurityContextInterface
      *
      * @return TokenInterface|null A TokenInterface instance or null if no authentication information is available
      */
-    function getToken();
+    public function getToken();
 
     /**
      * Sets the authentication token.
      *
      * @param TokenInterface $token
-     * @return void
      */
-    function setToken(TokenInterface $token = null);
+    public function setToken(TokenInterface $token = null);
 
     /**
      * Checks if the attributes are granted against the current authentication token and optionally supplied object.
      *
      * @param array $attributes
      * @param mixed $object
+     *
      * @return Boolean
      */
-    function isGranted($attributes, $object = null);
+    public function isGranted($attributes, $object = null);
 }

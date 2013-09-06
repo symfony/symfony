@@ -15,6 +15,8 @@ namespace Symfony\Component\Templating\Helper;
  * HelperInterface is the interface all helpers must implement.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 interface HelperInterface
 {
@@ -22,20 +24,26 @@ interface HelperInterface
      * Returns the canonical name of this helper.
      *
      * @return string The canonical name
+     *
+     * @api
      */
-    function getName();
+    public function getName();
 
     /**
      * Sets the default charset.
      *
      * @param string $charset The charset
+     *
+     * @api
      */
-    function setCharset($charset);
+    public function setCharset($charset);
 
     /**
      * Gets the default charset.
      *
      * @return string The default charset
+     *
+     * @api
      */
-    function getCharset();
+    public function getCharset();
 }

@@ -35,24 +35,32 @@ class TemplateLocatorTest extends TestCase
         $this->assertEquals('/path/to/template', $locator->locate($template));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testThrowsExceptionWhenTemplateNotFound()
     {
         $template = new TemplateReference('bundle', 'controller', 'name', 'format', 'engine');
 
         $fileLocator = $this->getFileLocator();
 
+        $errorMessage = 'FileLocator exception message';
+
         $fileLocator
             ->expects($this->once())
             ->method('locate')
-            ->will($this->throwException(new \InvalidArgumentException()))
+            ->will($this->throwException(new \InvalidArgumentException($errorMessage)))
         ;
 
         $locator = new TemplateLocator($fileLocator);
 
-        $locator->locate($template);
+        try {
+            $locator->locate($template);
+            $this->fail('->locate() should throw an exception when the file is not found.');
+        } catch (\InvalidArgumentException $e) {
+            $this->assertContains(
+                $errorMessage,
+                $e->getMessage(),
+                'TemplateLocator exception should propagate the FileLocator exception message'
+            );
+        }
     }
 
     /**

@@ -11,74 +11,38 @@
 
 namespace Symfony\Component\Form;
 
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+
+/**
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ */
 abstract class AbstractTypeExtension implements FormTypeExtensionInterface
 {
     /**
-     * Builds the form.
-     *
-     * This method gets called after the extended type has built the form to
-     * further modify it.
-     *
-     * @see FormTypeInterface::buildForm()
-     *
-     * @param FormBuilder   $builder The form builder
-     * @param array         $options The options
+     * {@inheritdoc}
      */
-    public function buildForm(FormBuilder $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
     }
 
     /**
-     * Builds the view.
-     *
-     * This method gets called after the extended type has built the view to
-     * further modify it.
-     *
-     * @see FormTypeInterface::buildView()
-     *
-     * @param FormView      $view The view
-     * @param FormInterface $form The form
+     * {@inheritdoc}
      */
-    public function buildView(FormView $view, FormInterface $form)
+    public function buildView(FormView $view, FormInterface $form, array $options)
     {
     }
 
     /**
-     * Builds the view.
-     *
-     * This method gets called after the extended type has built the view to
-     * further modify it.
-     *
-     * @see FormTypeInterface::buildViewBottomUp()
-     *
-     * @param FormView      $view The view
-     * @param FormInterface $form The form
+     * {@inheritdoc}
      */
-    public function buildViewBottomUp(FormView $view, FormInterface $form)
+    public function finishView(FormView $view, FormInterface $form, array $options)
     {
     }
 
     /**
-     * Overrides the default options form the extended type.
-     *
-     * @param array $options
-     *
-     * @return array
+     * {@inheritdoc}
      */
-    public function getDefaultOptions(array $options)
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        return array();
-    }
-
-    /**
-     * Returns the allowed option values for each option (if any).
-     *
-     * @param array $options
-     *
-     * @return array The allowed option values
-     */
-    public function getAllowedOptionValues(array $options)
-    {
-        return array();
     }
 }

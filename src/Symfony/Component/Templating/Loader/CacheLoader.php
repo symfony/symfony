@@ -50,12 +50,12 @@ class CacheLoader extends Loader
      */
     public function load(TemplateReferenceInterface $template)
     {
-        $key = md5($template->getLogicalName());
+        $key = hash('sha256', $template->getLogicalName());
         $dir = $this->dir.DIRECTORY_SEPARATOR.substr($key, 0, 2);
         $file = substr($key, 2).'.tpl';
         $path = $dir.DIRECTORY_SEPARATOR.$file;
 
-        if (file_exists($path)) {
+        if (is_file($path)) {
             if (null !== $this->debugger) {
                 $this->debugger->log(sprintf('Fetching template "%s" from cache', $template->get('name')));
             }
@@ -69,7 +69,7 @@ class CacheLoader extends Loader
 
         $content = $storage->getContent();
 
-        if (!file_exists($dir)) {
+        if (!is_dir($dir)) {
             mkdir($dir, 0777, true);
         }
 
@@ -87,6 +87,8 @@ class CacheLoader extends Loader
      *
      * @param TemplateReferenceInterface $template A template
      * @param integer                    $time     The last modification time of the cached template (timestamp)
+     *
+     * @return Boolean
      */
     public function isFresh(TemplateReferenceInterface $template, $time)
     {

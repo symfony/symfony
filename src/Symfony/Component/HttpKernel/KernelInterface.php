@@ -22,41 +22,53 @@ use Symfony\Component\Config\Loader\LoaderInterface;
  * It manages an environment made of bundles.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 interface KernelInterface extends HttpKernelInterface, \Serializable
 {
     /**
      * Returns an array of bundles to registers.
      *
-     * @return array An array of bundle instances.
+     * @return BundleInterface[] An array of bundle instances.
+     *
+     * @api
      */
-    function registerBundles();
+    public function registerBundles();
 
     /**
      * Loads the container configuration
      *
      * @param LoaderInterface $loader A LoaderInterface instance
+     *
+     * @api
      */
-    function registerContainerConfiguration(LoaderInterface $loader);
+    public function registerContainerConfiguration(LoaderInterface $loader);
 
     /**
      * Boots the current kernel.
+     *
+     * @api
      */
-    function boot();
+    public function boot();
 
     /**
      * Shutdowns the kernel.
      *
      * This method is mainly useful when doing functional testing.
+     *
+     * @api
      */
-    function shutdown();
+    public function shutdown();
 
     /**
      * Gets the registered bundle instances.
      *
-     * @return array An array of registered bundle instances
+     * @return BundleInterface[] An array of registered bundle instances
+     *
+     * @api
      */
-    function getBundles();
+    public function getBundles();
 
     /**
      * Checks if a given class name belongs to an active bundle.
@@ -64,8 +76,10 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      * @param string $class A class name
      *
      * @return Boolean true if the class belongs to an active bundle, false otherwise
+     *
+     * @api
      */
-    function isClassInActiveBundle($class);
+    public function isClassInActiveBundle($class);
 
     /**
      * Returns a bundle and optionally its descendants by its name.
@@ -73,11 +87,13 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      * @param string  $name  Bundle name
      * @param Boolean $first Whether to return the first bundle only or together with its descendants
      *
-     * @return BundleInterface|Array A BundleInterface instance or an array of BundleInterface instances if $first is false
+     * @return BundleInterface|BundleInterface[] A BundleInterface instance or an array of BundleInterface instances if $first is false
      *
      * @throws \InvalidArgumentException when the bundle is not enabled
+     *
+     * @api
      */
-    function getBundle($name, $first = true);
+    public function getBundle($name, $first = true);
 
     /**
      * Returns the file path for a given resource.
@@ -104,62 +120,89 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      *
      * @throws \InvalidArgumentException if the file cannot be found or the name is not valid
      * @throws \RuntimeException         if the name contains invalid/unsafe characters
+     *
+     * @api
      */
-    function locateResource($name, $dir = null, $first = true);
+    public function locateResource($name, $dir = null, $first = true);
 
     /**
      * Gets the name of the kernel
      *
      * @return string The kernel name
+     *
+     * @api
      */
-    function getName();
+    public function getName();
 
     /**
      * Gets the environment.
      *
      * @return string The current environment
+     *
+     * @api
      */
-    function getEnvironment();
+    public function getEnvironment();
 
     /**
      * Checks if debug mode is enabled.
      *
      * @return Boolean true if debug mode is enabled, false otherwise
+     *
+     * @api
      */
-    function isDebug();
+    public function isDebug();
 
     /**
      * Gets the application root dir.
      *
      * @return string The application root dir
+     *
+     * @api
      */
-    function getRootDir();
+    public function getRootDir();
 
     /**
      * Gets the current container.
      *
      * @return ContainerInterface A ContainerInterface instance
+     *
+     * @api
      */
-    function getContainer();
+    public function getContainer();
 
     /**
      * Gets the request start time (not available if debug is disabled).
      *
      * @return integer The request start timestamp
+     *
+     * @api
      */
-    function getStartTime();
+    public function getStartTime();
 
     /**
      * Gets the cache directory.
      *
      * @return string The cache directory
+     *
+     * @api
      */
-    function getCacheDir();
+    public function getCacheDir();
 
     /**
      * Gets the log directory.
      *
      * @return string The log directory
+     *
+     * @api
      */
-    function getLogDir();
+    public function getLogDir();
+
+    /**
+     * Gets the charset of the application.
+     *
+     * @return string The charset
+     *
+     * @api
+     */
+    public function getCharset();
 }

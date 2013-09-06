@@ -12,73 +12,112 @@
 namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
 
 use Symfony\Component\Templating\Helper\Helper;
-use Symfony\Component\Templating\EngineInterface;
+use Symfony\Component\Form\FormRendererInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\Exception\FormException;
-use Symfony\Component\Form\Util\FormUtil;
 
 /**
- *
+ * FormHelper provides helpers to help display forms.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class FormHelper extends Helper
 {
-    static protected $cache = array();
+    /**
+     * @var FormRendererInterface
+     */
+    private $renderer;
 
-    protected $engine;
-
-    protected $varStack;
-
-    protected $viewStack = array();
-
-    public function __construct(EngineInterface $engine)
+    /**
+     * @param FormRendererInterface $renderer
+     */
+    public function __construct(FormRendererInterface $renderer)
     {
-        $this->engine = $engine;
-        $this->varStack = new \SplObjectStorage();
-    }
-
-    public function isChoiceGroup($label)
-    {
-        return FormUtil::isChoiceGroup($label);
-    }
-
-    public function isChoiceSelected(FormView $view, $choice)
-    {
-        return FormUtil::isChoiceSelected($choice, $view->get('value'));
+        $this->renderer = $renderer;
     }
 
     /**
-     * Renders the attributes for the current view.
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return 'form';
+    }
+
+    /**
+     * Sets a theme for a given view.
      *
-     * @param Boolean $includeId Whether to render the id attribute
+     * The theme format is "<Bundle>:<Controller>".
+     *
+     * @param FormView     $view   A FormView instance
+     * @param string|array $themes A theme or an array of theme
+     */
+    public function setTheme(FormView $view, $themes)
+    {
+        $this->renderer->setTheme($view, $themes);
+    }
+
+    /**
+     * Renders the HTML for a form.
+     *
+     * Example usage:
+     *
+     *     <?php echo view['form']->form($form) ?>
+     *
+     * You can pass options during the call:
+     *
+     *     <?php echo view['form']->form($form, array('attr' => array('class' => 'foo'))) ?>
+     *
+     *     <?php echo view['form']->form($form, array('separator' => '+++++')) ?>
+     *
+     * This method is mainly intended for prototyping purposes. If you want to
+     * control the layout of a form in a more fine-grained manner, you are
+     * advised to use the other helper methods for rendering the parts of the
+     * form individually. You can also create a custom form theme to adapt
+     * the look of the form.
+     *
+     * @param FormView $view      The view for which to render the form
+     * @param array    $variables Additional variables passed to the template
      *
      * @return string The HTML markup
      */
-    public function attributes($includeId = true)
+    public function form(FormView $view, array $variables = array())
     {
-        $html = '';
-        $attr = array();
+        return $this->renderer->renderBlock($view, 'form', $variables);
+    }
 
-        if (count($this->viewStack) > 0) {
-            $view = end($this->viewStack);
-            $vars = $this->varStack[$view];
+    /**
+     * Renders the form start tag.
+     *
+     * Example usage templates:
+     *
+     *     <?php echo $view['form']->start($form) ?>>
+     *
+     * @param FormView $view      The view for which to render the start tag
+     * @param array    $variables Additional variables passed to the template
+     *
+     * @return string The HTML markup
+     */
+    public function start(FormView $view, array $variables = array())
+    {
+        return $this->renderer->renderBlock($view, 'form_start', $variables);
+    }
 
-            if (isset($vars['attr'])) {
-                $attr = $vars['attr'];
-            }
-
-            if (true === $includeId && isset($vars['id'])) {
-                $attr['id'] = $vars['id'];
-            }
-        }
-
-        foreach ($attr as $k => $v) {
-            $html .= ' '.$this->engine->escape($k).'="'.$this->engine->escape($v).'"';
-        }
-
-        return $html;
+    /**
+     * Renders the form end tag.
+     *
+     * Example usage templates:
+     *
+     *     <?php echo $view['form']->end($form) ?>>
+     *
+     * @param FormView $view      The view for which to render the end tag
+     * @param array    $variables Additional variables passed to the template
+     *
+     * @return string The HTML markup
+     */
+    public function end(FormView $view, array $variables = array())
+    {
+        return $this->renderer->renderBlock($view, 'form_end', $variables);
     }
 
     /**
@@ -86,15 +125,20 @@ class FormHelper extends Helper
      *
      * Example usage templates:
      *
-     *     <form action="..." method="post" <?php echo $view['form']->enctype() ?>>
+     *     <form action="..." method="post" <?php echo $view['form']->enctype($form) ?>>
      *
-     * @param FormView $view  The view for which to render the encoding type
+     * @param FormView $view The view for which to render the encoding type
      *
-     * @return string The html markup
+     * @return string The HTML markup
+     *
+     * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
+     *             {@link start} instead.
      */
     public function enctype(FormView $view)
     {
-        return $this->renderSection($view, 'enctype');
+        // Uncomment this as soon as the deprecation note should be shown
+        // trigger_error('The form helper $view[\'form\']->enctype() is deprecated since version 2.3 and will be removed in 3.0. Use $view[\'form\']->start() instead.', E_USER_DEPRECATED);
+        return $this->renderer->searchAndRenderBlock($view, 'enctype');
     }
 
     /**
@@ -102,22 +146,22 @@ class FormHelper extends Helper
      *
      * Example usage:
      *
-     *     <?php echo view['form']->widget() ?>
+     *     <?php echo view['form']->widget($form) ?>
      *
      * You can pass options during the call:
      *
-     *     <?php echo view['form']->widget(array('attr' => array('class' => 'foo'))) ?>
+     *     <?php echo view['form']->widget($form, array('attr' => array('class' => 'foo'))) ?>
      *
-     *     <?php echo view['form']->widget(array('separator' => '+++++)) ?>
+     *     <?php echo view['form']->widget($form, array('separator' => '+++++')) ?>
      *
      * @param FormView $view      The view for which to render the widget
      * @param array    $variables Additional variables passed to the template
      *
-     * @return string The html markup
+     * @return string The HTML markup
      */
     public function widget(FormView $view, array $variables = array())
     {
-        return trim($this->renderSection($view, 'widget', $variables));
+        return $this->renderer->searchAndRenderBlock($view, 'widget', $variables);
     }
 
     /**
@@ -126,11 +170,11 @@ class FormHelper extends Helper
      * @param FormView $view      The view for which to render the row
      * @param array    $variables Additional variables passed to the template
      *
-     * @return string The html markup
+     * @return string The HTML markup
      */
     public function row(FormView $view, array $variables = array())
     {
-        return $this->renderSection($view, 'row', $variables);
+        return $this->renderer->searchAndRenderBlock($view, 'row', $variables);
     }
 
     /**
@@ -140,15 +184,15 @@ class FormHelper extends Helper
      * @param string   $label     The label
      * @param array    $variables Additional variables passed to the template
      *
-     * @return string The html markup
+     * @return string The HTML markup
      */
     public function label(FormView $view, $label = null, array $variables = array())
     {
-        if ($label !== null) {
+        if (null !== $label) {
             $variables += array('label' => $label);
         }
 
-        return $this->renderSection($view, 'label', $variables);
+        return $this->renderer->searchAndRenderBlock($view, 'label', $variables);
     }
 
     /**
@@ -156,11 +200,11 @@ class FormHelper extends Helper
      *
      * @param FormView $view The view to render the errors for
      *
-     * @return string The html markup
+     * @return string The HTML markup
      */
     public function errors(FormView $view)
     {
-        return $this->renderSection($view, 'errors');
+        return $this->renderer->searchAndRenderBlock($view, 'errors');
     }
 
     /**
@@ -169,109 +213,59 @@ class FormHelper extends Helper
      * @param FormView $view      The parent view
      * @param array    $variables An array of variables
      *
-     * @return string The html markup
+     * @return string The HTML markup
      */
     public function rest(FormView $view, array $variables = array())
     {
-        return $this->renderSection($view, 'rest', $variables);
+        return $this->renderer->searchAndRenderBlock($view, 'rest', $variables);
     }
 
     /**
-     * Renders a template.
+     * Renders a block of the template.
      *
-     * 1. This function first looks for a block named "_<view id>_<section>",
-     * 2. if such a block is not found the function will look for a block named
-     *    "<type name>_<section>",
-     * 3. the type name is recursively replaced by the parent type name until a
-     *    corresponding block is found
+     * @param FormView $view      The view for determining the used themes.
+     * @param string   $blockName The name of the block to render.
+     * @param array    $variables The variable to pass to the template.
      *
-     * @param FormView  $view       The form view
-     * @param string    $section    The section to render (i.e. 'row', 'widget', 'label', ...)
-     * @param array     $variables  Additional variables
-     *
-     * @return string The html markup
-     *
-     * @throws FormException if no template block exists to render the given section of the view
+     * @return string The HTML markup
      */
-    protected function renderSection(FormView $view, $section, array $variables = array())
+    public function block(FormView $view, $blockName, array $variables = array())
     {
-        $mainTemplate = in_array($section, array('row', 'widget'));
-        if ($mainTemplate && $view->isRendered()) {
-
-                return '';
-        }
-
-        $template = null;
-        $types = $view->get('types');
-        $types[] = '_'.$view->get('proto_id', $view->get('id'));
-
-        for ($i = count($types) - 1; $i >= 0; $i--) {
-            $types[$i] .= '_'.$section;
-            $template = $this->lookupTemplate($types[$i]);
-
-            if ($template) {
-                $html = $this->render($view, $template, $variables);
-
-                if ($mainTemplate) {
-                    $view->setRendered();
-                }
-
-                return $html;
-            }
-        }
-
-        throw new FormException(sprintf('Unable to render form as none of the following blocks exist: "%s".', implode('", "', $types)));
-    }
-
-    public function render(FormView $view, $template, array $variables = array())
-    {
-        $this->varStack[$view] = array_replace(
-            $view->all(),
-            isset($this->varStack[$view]) ? $this->varStack[$view] : array(),
-            $variables
-        );
-
-        $this->viewStack[] = $view;
-
-        $html = $this->engine->render($template, $this->varStack[$view]);
-
-        array_pop($this->viewStack);
-        unset($this->varStack[$view]);
-
-        return $html;
+        return $this->renderer->renderBlock($view, $blockName, $variables);
     }
 
     /**
-     * Returns the name of the template to use to render the block
+     * Returns a CSRF token.
      *
-     * @param string $blockName The name of the block
+     * Use this helper for CSRF protection without the overhead of creating a
+     * form.
      *
-     * @return string|Boolean The template logical name or false when no template is found
+     * <code>
+     * echo $view['form']->csrfToken('rm_user_'.$user->getId());
+     * </code>
+     *
+     * Check the token in your action using the same intention.
+     *
+     * <code>
+     * $csrfProvider = $this->get('form.csrf_provider');
+     * if (!$csrfProvider->isCsrfTokenValid('rm_user_'.$user->getId(), $token)) {
+     *     throw new \RuntimeException('CSRF attack detected.');
+     * }
+     * </code>
+     *
+     * @param string $intention The intention of the protected action
+     *
+     * @return string A CSRF token
+     *
+     * @throws \BadMethodCallException When no CSRF provider was injected in the constructor.
      */
-    protected function lookupTemplate($blockName)
+    public function csrfToken($intention)
     {
-        if (isset(self::$cache[$blockName])) {
-            return self::$cache[$blockName];
-        }
-
-        $template = $blockName.'.html.php';
-/*
-        if ($this->templateDir) {
-            $template = $this->templateDir.':'.$template;
-        }
-*/
-        $template = 'FrameworkBundle:Form:'.$template;
-        if (!$this->engine->exists($template)) {
-            $template = false;
-        }
-
-        self::$cache[$blockName] = $template;
-
-        return $template;
+        return $this->renderer->renderCsrfToken($intention);
     }
 
-    public function getName()
+    public function humanize($text)
     {
-        return 'form';
+        return $this->renderer->humanize($text);
     }
 }

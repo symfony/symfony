@@ -15,8 +15,8 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Routing\Matcher\Dumper\ApacheMatcherDumper;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * RouterApacheDumperCommand.
@@ -26,30 +26,46 @@ use Symfony\Component\Routing\Matcher\Dumper\ApacheMatcherDumper;
 class RouterApacheDumperCommand extends ContainerAwareCommand
 {
     /**
-     * @see Command
+     * {@inheritdoc}
+     */
+    public function isEnabled()
+    {
+        if (!$this->getContainer()->has('router')) {
+            return false;
+        }
+        $router = $this->getContainer()->get('router');
+        if (!$router instanceof RouterInterface) {
+            return false;
+        }
+
+        return parent::isEnabled();
+    }
+
+    /**
+     * {@inheritdoc}
      */
     protected function configure()
     {
         $this
+            ->setName('router:dump-apache')
             ->setDefinition(array(
                 new InputArgument('script_name', InputArgument::OPTIONAL, 'The script name of the application\'s front controller.'),
                 new InputOption('base-uri', null, InputOption::VALUE_REQUIRED, 'The base URI'),
             ))
-            ->setName('router:dump-apache')
             ->setDescription('Dumps all routes as Apache rewrite rules')
             ->setHelp(<<<EOF
-The <info>router:dump-apache</info> dumps all routes as Apache rewrite rules.
+The <info>%command.name%</info> dumps all routes as Apache rewrite rules.
 These can then be used with the ApacheUrlMatcher to use Apache for route
 matching.
 
-  <info>router:dump-apache</info>
+  <info>php %command.full_name%</info>
 EOF
             )
         ;
     }
 
     /**
-     * @see Command
+     * {@inheritdoc}
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {

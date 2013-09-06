@@ -25,7 +25,7 @@ namespace Symfony\Component\Console\Input;
  *     $input = new ArgvInput($_SERVER['argv']);
  *
  * If you pass it yourself, don't forget that the first element of the array
- * is the name of the running program.
+ * is the name of the running application.
  *
  * When passing an argument to the constructor, be sure that it respects
  * the same rules as the argv one. It's almost always better to use the
@@ -33,8 +33,8 @@ namespace Symfony\Component\Console\Input;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @see http://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html
- * @see http://www.opengroup.org/onlinepubs/009695399/basedefs/xbd_chap12.html#tag_12_02
+ * @see    http://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html
+ * @see    http://www.opengroup.org/onlinepubs/009695399/basedefs/xbd_chap12.html#tag_12_02
  *
  * @api
  */
@@ -46,7 +46,7 @@ class ArgvInput extends Input
     /**
      * Constructor.
      *
-     * @param array           $argv An array of parameters from the CLI (in the argv format)
+     * @param array           $argv       An array of parameters from the CLI (in the argv format)
      * @param InputDefinition $definition A InputDefinition instance
      *
      * @api
@@ -57,7 +57,7 @@ class ArgvInput extends Input
             $argv = $_SERVER['argv'];
         }
 
-        // strip the program name
+        // strip the application name
         array_shift($argv);
 
         $this->tokens = $argv;
@@ -75,11 +75,16 @@ class ArgvInput extends Input
      */
     protected function parse()
     {
+        $parseOptions = true;
         $this->parsed = $this->tokens;
         while (null !== $token = array_shift($this->parsed)) {
-            if ('--' === substr($token, 0, 2)) {
+            if ($parseOptions && '' == $token) {
+                $this->parseArgument($token);
+            } elseif ($parseOptions && '--' == $token) {
+                $parseOptions = false;
+            } elseif ($parseOptions && 0 === strpos($token, '--')) {
                 $this->parseLongOption($token);
-            } elseif ('-' === $token[0]) {
+            } elseif ($parseOptions && '-' === $token[0]) {
                 $this->parseShortOption($token);
             } else {
                 $this->parseArgument($token);
@@ -129,7 +134,7 @@ class ArgvInput extends Input
 
                 break;
             } else {
-                $this->addLongOption($option->getName(), true);
+                $this->addLongOption($option->getName(), null);
             }
         }
     }
@@ -210,12 +215,23 @@ class ArgvInput extends Input
 
         $option = $this->definition->getOption($name);
 
-        if (null === $value && $option->acceptValue()) {
+        // Convert false values (from a previous call to substr()) to null
+        if (false === $value) {
+            $value = null;
+        }
+
+        if (null !== $value && !$option->acceptValue()) {
+            throw new \RuntimeException(sprintf('The "--%s" option does not accept a value.', $name, $value));
+        }
+
+        if (null === $value && $option->acceptValue() && count($this->parsed)) {
             // if option accepts an optional or mandatory argument
             // let's see if there is one provided
             $next = array_shift($this->parsed);
-            if ('-' !== $next[0]) {
+            if (isset($next[0]) && '-' !== $next[0]) {
                 $value = $next;
+            } elseif (empty($next)) {
+                $value = '';
             } else {
                 array_unshift($this->parsed, $next);
             }
@@ -226,7 +242,9 @@ class ArgvInput extends Input
                 throw new \RuntimeException(sprintf('The "--%s" option requires a value.', $name));
             }
 
-            $value = $option->isValueOptional() ? $option->getDefault() : true;
+            if (!$option->isArray()) {
+                $value = $option->isValueOptional() ? $option->getDefault() : true;
+            }
         }
 
         if ($option->isArray()) {
@@ -253,10 +271,10 @@ class ArgvInput extends Input
     }
 
     /**
-     * Returns true if the raw parameters (not parsed) contains a value.
+     * Returns true if the raw parameters (not parsed) contain a value.
      *
      * This method is to be used to introspect the input parameters
-     * before it has been validated. It must be used carefully.
+     * before they have been validated. It must be used carefully.
      *
      * @param string|array $values The value(s) to look for in the raw parameters (can be an array)
      *
@@ -266,9 +284,11 @@ class ArgvInput extends Input
     {
         $values = (array) $values;
 
-        foreach ($this->tokens as $v) {
-            if (in_array($v, $values)) {
-                return true;
+        foreach ($this->tokens as $token) {
+            foreach ($values as $value) {
+                if ($token === $value || 0 === strpos($token, $value.'=')) {
+                    return true;
+                }
             }
         }
 
@@ -279,10 +299,11 @@ class ArgvInput extends Input
      * Returns the value of a raw option (not parsed).
      *
      * This method is to be used to introspect the input parameters
-     * before it has been validated. It must be used carefully.
+     * before they have been validated. It must be used carefully.
      *
-     * @param string|array $values The value(s) to look for in the raw parameters (can be an array)
-     * @param mixed $default The default value to return if no result is found
+     * @param string|array $values  The value(s) to look for in the raw parameters (can be an array)
+     * @param mixed        $default The default value to return if no result is found
+     *
      * @return mixed The option value
      */
     public function getParameterOption($values, $default = false)
@@ -292,7 +313,7 @@ class ArgvInput extends Input
         $tokens = $this->tokens;
         while ($token = array_shift($tokens)) {
             foreach ($values as $value) {
-                if (0 === strpos($token, $value)) {
+                if ($token === $value || 0 === strpos($token, $value.'=')) {
                     if (false !== $pos = strpos($token, '=')) {
                         return substr($token, $pos + 1);
                     }
@@ -303,5 +324,28 @@ class ArgvInput extends Input
         }
 
         return $default;
+    }
+
+    /**
+     * Returns a stringified representation of the args passed to the command
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        $self = $this;
+        $tokens = array_map(function ($token) use ($self) {
+            if (preg_match('{^(-[^=]+=)(.+)}', $token, $match)) {
+                return $match[1] . $self->escapeToken($match[2]);
+            }
+
+            if ($token && $token[0] !== '-') {
+                return $self->escapeToken($token);
+            }
+
+            return $token;
+        }, $this->tokens);
+
+        return implode(' ', $tokens);
     }
 }

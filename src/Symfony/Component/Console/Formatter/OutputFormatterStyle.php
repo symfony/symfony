@@ -20,7 +20,7 @@ namespace Symfony\Component\Console\Formatter;
  */
 class OutputFormatterStyle implements OutputFormatterStyleInterface
 {
-    static private $availableForegroundColors = array(
+    private static $availableForegroundColors = array(
         'black'     => 30,
         'red'       => 31,
         'green'     => 32,
@@ -30,7 +30,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
         'cyan'      => 36,
         'white'     => 37
     );
-    static private $availableBackgroundColors = array(
+    private static $availableBackgroundColors = array(
         'black'     => 40,
         'red'       => 41,
         'green'     => 42,
@@ -40,7 +40,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
         'cyan'      => 46,
         'white'     => 47
     );
-    static private $availableOptions = array(
+    private static $availableOptions = array(
         'bold'          => 1,
         'underscore'    => 4,
         'blink'         => 5,
@@ -55,9 +55,9 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
     /**
      * Initializes output formatter style.
      *
-     * @param   string  $foreground     style foreground color name
-     * @param   string  $background     style background color name
-     * @param   array   $options        style options
+     * @param string $foreground The style foreground color name
+     * @param string $background The style background color name
+     * @param array  $options    The style options
      *
      * @api
      */
@@ -77,7 +77,9 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
     /**
      * Sets style foreground color.
      *
-     * @param   string  $color  color name
+     * @param string $color The color name
+     *
+     * @throws \InvalidArgumentException When the color name isn't defined
      *
      * @api
      */
@@ -103,7 +105,9 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
     /**
      * Sets style background color.
      *
-     * @param   string  $color  color name
+     * @param string $color The color name
+     *
+     * @throws \InvalidArgumentException When the color name isn't defined
      *
      * @api
      */
@@ -129,7 +133,9 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
     /**
      * Sets some specific style option.
      *
-     * @param   string  $option     option name
+     * @param string $option The option name
+     *
+     * @throws \InvalidArgumentException When the option name isn't defined
      *
      * @api
      */
@@ -151,7 +157,10 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
     /**
      * Unsets some specific style option.
      *
-     * @param   string  $option     option name
+     * @param string $option The option name
+     *
+     * @throws \InvalidArgumentException When the option name isn't defined
+     *
      */
     public function unsetOption($option)
     {
@@ -170,9 +179,9 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
     }
 
     /**
-     * Set multiple style options at once.
+     * Sets multiple style options at once.
      *
-     * @param   array   $options
+     * @param array $options
      */
     public function setOptions(array $options)
     {
@@ -202,6 +211,10 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
         }
         if (count($this->options)) {
             $codes = array_merge($codes, $this->options);
+        }
+
+        if (0 === count($codes)) {
+            return $text;
         }
 
         return sprintf("\033[%sm%s\033[0m", implode(';', $codes), $text);

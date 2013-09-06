@@ -14,6 +14,8 @@ namespace Symfony\Bundle\TwigBundle\Extension;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
+ * Twig extension for Symfony assets helper
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class AssetsExtension extends \Twig_Extension
@@ -33,13 +35,13 @@ class AssetsExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            'asset' => new \Twig_Function_Method($this, 'getAssetUrl'),
-            'assets_version' => new \Twig_Function_Method($this, 'getAssetsVersion'),
+            new \Twig_SimpleFunction('asset', array($this, 'getAssetUrl')),
+            new \Twig_SimpleFunction('assets_version', array($this, 'getAssetsVersion')),
         );
     }
 
     /**
-     * Returns the public path of an asset
+     * Returns the public path of an asset.
      *
      * Absolute paths (i.e. http://...) are returned unmodified.
      *
@@ -54,9 +56,10 @@ class AssetsExtension extends \Twig_Extension
     }
 
     /**
-     * Returns the version of the assets in a package
+     * Returns the version of the assets in a package.
      *
      * @param string $packageName
+     *
      * @return int
      */
     public function getAssetsVersion($packageName = null)

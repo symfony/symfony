@@ -1,0 +1,43 @@
+{
+    "name": "symfony/form",
+    "type": "library",
+    "description": "Symfony Form Component",
+    "keywords": [],
+    "homepage": "http://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "http://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3",
+        "symfony/event-dispatcher": "~2.1",
+        "symfony/intl": "~2.3",
+        "symfony/options-resolver": "~2.1",
+        "symfony/property-access": "~2.2"
+    },
+    "require-dev": {
+        "symfony/validator": "~2.2",
+        "symfony/http-foundation": "~2.2"
+    },
+    "suggest": {
+        "symfony/validator": "",
+        "symfony/http-foundation": ""
+    },
+    "autoload": {
+        "psr-0": { "Symfony\\Component\\Form\\": "" }
+    },
+    "target-dir": "Symfony/Component/Form",
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.4-dev"
+        }
+    }
+}

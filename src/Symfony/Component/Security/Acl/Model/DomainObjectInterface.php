@@ -25,5 +25,5 @@ interface DomainObjectInterface
      *
      * @return string
      */
-    function getObjectIdentifier();
+    public function getObjectIdentifier();
 }

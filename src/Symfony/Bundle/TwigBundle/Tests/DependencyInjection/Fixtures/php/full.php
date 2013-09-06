@@ -9,6 +9,7 @@ $container->loadFromExtension('twig', array(
      'globals' => array(
          'foo' => '@bar',
          'pi'  => 3.14,
+         'bad' => array('key' => 'foo'),
      ),
      'auto_reload'         => true,
      'autoescape'          => true,
@@ -17,4 +18,10 @@ $container->loadFromExtension('twig', array(
      'charset'             => 'ISO-8859-1',
      'debug'               => true,
      'strict_variables'    => true,
+     'paths'               => array(
+         'path1',
+         'path2',
+         'namespaced_path1' => 'namespace',
+         'namespaced_path2' => 'namespace',
+      ),
 ));

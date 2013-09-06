@@ -19,14 +19,19 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 /**
  * Validator for Callback constraint
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @api
  */
 class CallbackValidator extends ConstraintValidator
 {
-    public function isValid($object, Constraint $constraint)
+    /**
+     * {@inheritDoc}
+     */
+    public function validate($object, Constraint $constraint)
     {
         if (null === $object) {
-            return true;
+            return;
         }
 
         // has to be an array so that we can differentiate between callables
@@ -36,13 +41,6 @@ class CallbackValidator extends ConstraintValidator
         }
 
         $methods = $constraint->methods;
-        $context = $this->context;
-
-        // save context state
-        $currentClass = $context->getCurrentClass();
-        $currentProperty = $context->getCurrentProperty();
-        $group = $context->getGroup();
-        $propertyPath = $context->getPropertyPath();
 
         foreach ($methods as $method) {
             if (is_array($method) || $method instanceof \Closure) {
@@ -50,22 +48,14 @@ class CallbackValidator extends ConstraintValidator
                     throw new ConstraintDefinitionException(sprintf('"%s::%s" targeted by Callback constraint is not a valid callable', $method[0], $method[1]));
                 }
 
-                call_user_func($method, $object, $context);
+                call_user_func($method, $object, $this->context);
             } else {
                 if (!method_exists($object, $method)) {
                     throw new ConstraintDefinitionException(sprintf('Method "%s" targeted by Callback constraint does not exist', $method));
                 }
 
-                $object->$method($context);
+                $object->$method($this->context);
             }
-
-            // restore context state
-            $context->setCurrentClass($currentClass);
-            $context->setCurrentProperty($currentProperty);
-            $context->setGroup($group);
-            $context->setPropertyPath($propertyPath);
         }
-
-        return true;
     }
 }

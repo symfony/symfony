@@ -86,6 +86,8 @@
     <xsd:attribute name="scope" type="xsd:string" />
     <xsd:attribute name="public" type="boolean" />
     <xsd:attribute name="synthetic" type="boolean" />
+    <xsd:attribute name="synchronized" type="boolean" />
+    <xsd:attribute name="lazy" type="boolean" />
     <xsd:attribute name="abstract" type="boolean" />
     <xsd:attribute name="factory-class" type="xsd:string" />
     <xsd:attribute name="factory-method" type="xsd:string" />
@@ -118,6 +120,9 @@
   </xsd:complexType>
 
   <xsd:complexType name="property" mixed="true">
+    <xsd:choice minOccurs="0" maxOccurs="1">
+      <xsd:element name="service" type="service" />
+    </xsd:choice>
     <xsd:attribute name="type" type="argument_type" />
     <xsd:attribute name="id" type="xsd:string" />
     <xsd:attribute name="name" type="xsd:string" />

@@ -1,0 +1,54 @@
+{
+    "name": "symfony/framework-bundle",
+    "type": "symfony-bundle",
+    "description": "Symfony FrameworkBundle",
+    "keywords": [],
+    "homepage": "http://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "http://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3",
+        "symfony/dependency-injection" : "~2.2",
+        "symfony/config" : "~2.2",
+        "symfony/event-dispatcher": "~2.1",
+        "symfony/http-kernel": "~2.3",
+        "symfony/filesystem": "~2.3",
+        "symfony/routing": "~2.2",
+        "symfony/stopwatch": "~2.3",
+        "symfony/templating": "~2.1",
+        "symfony/translation": "~2.3",
+        "doctrine/common": "~2.2"
+    },
+    "require-dev": {
+        "symfony/finder": "~2.0",
+        "symfony/security": "~2.3",
+        "symfony/form": "~2.3",
+        "symfony/class-loader": "~2.1",
+        "symfony/validator": "~2.1"
+    },
+    "suggest": {
+        "symfony/console": "",
+        "symfony/finder": "",
+        "symfony/form": "",
+        "symfony/validator": ""
+    },
+    "autoload": {
+        "psr-0": { "Symfony\\Bundle\\FrameworkBundle\\": "" }
+    },
+    "target-dir": "Symfony/Bundle/FrameworkBundle",
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.4-dev"
+        }
+    }
+}

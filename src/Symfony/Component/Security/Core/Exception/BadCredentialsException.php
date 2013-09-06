@@ -15,11 +15,15 @@ namespace Symfony\Component\Security\Core\Exception;
  * BadCredentialsException is thrown when the user credentials are invalid.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Alexander <iam.asm89@gmail.com>
  */
 class BadCredentialsException extends AuthenticationException
 {
-    public function __construct($message, $code = 0, \Exception $previous = null)
+    /**
+     * {@inheritDoc}
+     */
+    public function getMessageKey()
     {
-        parent::__construct($message, null, $code, $previous);
+        return 'Invalid credentials.';
     }
 }

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Security\Core\Authentication\Provider;
 
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
@@ -60,7 +59,7 @@ class DaoAuthenticationProvider extends UserAuthenticationProvider
                 throw new BadCredentialsException('The credentials were changed from another session.');
             }
         } else {
-            if (!$presentedPassword = $token->getCredentials()) {
+            if ("" === ($presentedPassword = $token->getCredentials())) {
                 throw new BadCredentialsException('The presented password cannot be empty.');
             }
 
@@ -84,14 +83,17 @@ class DaoAuthenticationProvider extends UserAuthenticationProvider
             $user = $this->userProvider->loadUserByUsername($username);
 
             if (!$user instanceof UserInterface) {
-                throw new AuthenticationServiceException('The user provider must return an UserInterface object.');
+                throw new AuthenticationServiceException('The user provider must return a UserInterface object.');
             }
 
             return $user;
         } catch (UsernameNotFoundException $notFound) {
+            $notFound->setUsername($username);
             throw $notFound;
         } catch (\Exception $repositoryProblem) {
-            throw new AuthenticationServiceException($repositoryProblem->getMessage(), $token, 0, $repositoryProblem);
+            $ex = new AuthenticationServiceException($repositoryProblem->getMessage(), 0, $repositoryProblem);
+            $ex->setToken($token);
+            throw $ex;
         }
     }
 }

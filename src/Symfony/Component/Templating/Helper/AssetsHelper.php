@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Templating\Helper;
 
-use Symfony\Component\Templating\Asset\Package;
 use Symfony\Component\Templating\Asset\PathPackage;
 use Symfony\Component\Templating\Asset\UrlPackage;
 

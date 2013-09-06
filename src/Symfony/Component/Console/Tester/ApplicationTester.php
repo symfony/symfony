@@ -13,9 +13,18 @@ namespace Symfony\Component\Console\Tester;
 
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
 
 /**
+ * Eases the testing of console applications.
+ *
+ * When testing an application, don't forget to disable the auto exit flag:
+ *
+ *     $application = new Application();
+ *     $application->setAutoExit(false);
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class ApplicationTester
@@ -23,6 +32,7 @@ class ApplicationTester
     private $application;
     private $input;
     private $output;
+    private $statusCode;
 
     /**
      * Constructor.
@@ -63,19 +73,27 @@ class ApplicationTester
             $this->output->setVerbosity($options['verbosity']);
         }
 
-        return $this->application->run($this->input, $this->output);
+        return $this->statusCode = $this->application->run($this->input, $this->output);
     }
 
     /**
      * Gets the display returned by the last execution of the application.
      *
+     * @param Boolean $normalize Whether to normalize end of lines to \n or not
+     *
      * @return string The display
      */
-    public function getDisplay()
+    public function getDisplay($normalize = false)
     {
         rewind($this->output->getStream());
 
-        return stream_get_contents($this->output->getStream());
+        $display = stream_get_contents($this->output->getStream());
+
+        if ($normalize) {
+            $display = str_replace(PHP_EOL, "\n", $display);
+        }
+
+        return $display;
     }
 
     /**
@@ -96,5 +114,15 @@ class ApplicationTester
     public function getOutput()
     {
         return $this->output;
+    }
+
+    /**
+     * Gets the status code returned by the last execution of the application.
+     *
+     * @return integer The status code
+     */
+    public function getStatusCode()
+    {
+        return $this->statusCode;
     }
 }

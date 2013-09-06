@@ -1,12 +1,12 @@
 <?php
 
 /*
- * This file is part of the Symfony framework.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien@symfony.com>
  *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 namespace Symfony\Component\Security\Core\User;
@@ -32,6 +32,14 @@ class ChainUserProvider implements UserProviderInterface
     }
 
     /**
+     * @return array
+     */
+    public function getProviders()
+    {
+        return $this->providers;
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function loadUserByUsername($username)
@@ -44,7 +52,9 @@ class ChainUserProvider implements UserProviderInterface
             }
         }
 
-        throw new UsernameNotFoundException(sprintf('There is no user with name "%s".', $username));
+        $ex = new UsernameNotFoundException(sprintf('There is no user with name "%s".', $username));
+        $ex->setUsername($username);
+        throw $ex;
     }
 
     /**
@@ -52,15 +62,26 @@ class ChainUserProvider implements UserProviderInterface
      */
     public function refreshUser(UserInterface $user)
     {
+        $supportedUserFound = false;
+
         foreach ($this->providers as $provider) {
             try {
                 return $provider->refreshUser($user);
             } catch (UnsupportedUserException $unsupported) {
                 // try next one
+            } catch (UsernameNotFoundException $notFound) {
+                $supportedUserFound = true;
+                // try next one
             }
         }
 
-        throw new UnsupportedUserException(sprintf('The account "%s" is not supported.', get_class($user)));
+        if ($supportedUserFound) {
+            $ex = new UsernameNotFoundException(sprintf('There is no user with name "%s".', $user->getUsername()));
+            $ex->setUsername($user->getUsername());
+            throw $ex;
+        } else {
+            throw new UnsupportedUserException(sprintf('The account "%s" is not supported.', get_class($user)));
+        }
     }
 
     /**

@@ -12,15 +12,13 @@
 namespace Symfony\Bridge\Twig\Node;
 
 /**
- *
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class TransNode extends \Twig_Node
 {
-    public function __construct(\Twig_NodeInterface $body, \Twig_NodeInterface $domain, \Twig_Node_Expression $count = null, \Twig_Node_Expression $vars = null, $lineno = 0, $tag = null)
+    public function __construct(\Twig_NodeInterface $body, \Twig_NodeInterface $domain = null, \Twig_Node_Expression $count = null, \Twig_Node_Expression $vars = null, \Twig_Node_Expression $locale = null, $lineno = 0, $tag = null)
     {
-        parent::__construct(array('count' => $count, 'body' => $body, 'domain' => $domain, 'vars' => $vars), array(), $lineno, $tag);
+        parent::__construct(array('count' => $count, 'body' => $body, 'domain' => $domain, 'vars' => $vars, 'locale' => $locale), array(), $lineno, $tag);
     }
 
     /**
@@ -57,36 +55,32 @@ class TransNode extends \Twig_Node
         }
 
         if (null !== $vars) {
-            $compiler->raw('array_merge(');
-            $this->compileDefaults($compiler, $defaults);
             $compiler
+                ->raw('array_merge(')
+                ->subcompile($defaults)
                 ->raw(', ')
                 ->subcompile($this->getNode('vars'))
                 ->raw(')')
             ;
         } else {
-            $this->compileDefaults($compiler, $defaults);
+            $compiler->subcompile($defaults);
         }
 
-        $compiler
-            ->raw(', ')
-            ->subcompile($this->getNode('domain'))
-            ->raw(");\n")
-        ;
-    }
+        $compiler->raw(', ');
 
-    protected function compileDefaults(\Twig_Compiler $compiler, \Twig_Node_Expression_Array $defaults)
-    {
-        $compiler->raw('array(');
-        foreach ($defaults as $name => $default) {
+        if (null === $this->getNode('domain')) {
+            $compiler->repr('messages');
+        } else {
+            $compiler->subcompile($this->getNode('domain'));
+        }
+
+        if (null !== $this->getNode('locale')) {
             $compiler
-                ->repr($name)
-                ->raw(' => ')
-                ->subcompile($default)
                 ->raw(', ')
+                ->subcompile($this->getNode('locale'))
             ;
         }
-        $compiler->raw(')');
+        $compiler->raw(");\n");
     }
 
     protected function compileString(\Twig_NodeInterface $body, \Twig_Node_Expression_Array $vars)
@@ -99,15 +93,24 @@ class TransNode extends \Twig_Node
             return array($body, $vars);
         }
 
-        $current = array();
-        foreach ($vars as $name => $var) {
-            $current[$name] = true;
-        }
-
         preg_match_all('/(?<!%)%([^%]+)%/', $msg, $matches);
-        foreach ($matches[1] as $var) {
-            if (!isset($current['%'.$var.'%'])) {
-                $vars->setNode('%'.$var.'%', new \Twig_Node_Expression_Name($var, $body->getLine()));
+
+        if (version_compare(\Twig_Environment::VERSION, '1.5', '>=')) {
+            foreach ($matches[1] as $var) {
+                $key = new \Twig_Node_Expression_Constant('%'.$var.'%', $body->getLine());
+                if (!$vars->hasElement($key)) {
+                    $vars->addElement(new \Twig_Node_Expression_Name($var, $body->getLine()), $key);
+                }
+            }
+        } else {
+            $current = array();
+            foreach ($vars as $name => $var) {
+                $current[$name] = true;
+            }
+            foreach ($matches[1] as $var) {
+                if (!isset($current['%'.$var.'%'])) {
+                    $vars->setNode('%'.$var.'%', new \Twig_Node_Expression_Name($var, $body->getLine()));
+                }
             }
         }
 

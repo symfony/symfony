@@ -17,7 +17,7 @@ namespace Symfony\Component\ClassLoader;
  * It is able to load classes that use either:
  *
  *  * The technical interoperability standards for PHP 5.3 namespaces and
- *    class names (http://groups.google.com/group/php-standards/web/psr-0-final-proposal);
+ *    class names (https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-0.md);
  *
  *  * The PEAR naming convention for classes (http://pear.php.net/).
  *
@@ -41,6 +41,10 @@ namespace Symfony\Component\ClassLoader;
  *         'Swift_' => __DIR__.'/Swift',
  *     ));
  *
+ *
+ *     // to enable searching the include path (e.g. for PEAR packages)
+ *     $loader->useIncludePath(true);
+ *
  *     // activate the autoloader
  *     $loader->register();
  *
@@ -60,6 +64,29 @@ class UniversalClassLoader
     private $prefixes = array();
     private $namespaceFallbacks = array();
     private $prefixFallbacks = array();
+    private $useIncludePath = false;
+
+    /**
+     * Turns on searching the include for class files. Allows easy loading
+     * of installed PEAR packages
+     *
+     * @param Boolean $useIncludePath
+     */
+    public function useIncludePath($useIncludePath)
+    {
+        $this->useIncludePath = $useIncludePath;
+    }
+
+    /**
+     * Can be used to check if the autoloader uses the include path to check
+     * for classes.
+     *
+     * @return Boolean
+     */
+    public function getUseIncludePath()
+    {
+        return $this->useIncludePath;
+    }
 
     /**
      * Gets the configured namespaces.
@@ -114,7 +141,17 @@ class UniversalClassLoader
     }
 
     /**
-     * Registers the directory to use as a fallback for class prefixes.
+     * Registers a directory to use as a fallback for namespaces.
+     *
+     * @param string $dir A directory
+     */
+    public function registerNamespaceFallback($dir)
+    {
+        $this->namespaceFallbacks[] = $dir;
+    }
+
+    /**
+     * Registers directories to use as a fallback for class prefixes.
      *
      * @param array $dirs An array of directories
      *
@@ -123,6 +160,16 @@ class UniversalClassLoader
     public function registerPrefixFallbacks(array $dirs)
     {
         $this->prefixFallbacks = $dirs;
+    }
+
+    /**
+     * Registers a directory to use as a fallback for class prefixes.
+     *
+     * @param string $dir A directory
+     */
+    public function registerPrefixFallback($dir)
+    {
+        $this->prefixFallbacks[] = $dir;
     }
 
     /**
@@ -169,8 +216,8 @@ class UniversalClassLoader
     /**
      * Registers a set of classes using the PEAR naming convention.
      *
-     * @param string       $prefix  The classes prefix
-     * @param array|string $paths   The location(s) of the classes
+     * @param string       $prefix The classes prefix
+     * @param array|string $paths  The location(s) of the classes
      *
      * @api
      */
@@ -195,11 +242,15 @@ class UniversalClassLoader
      * Loads the given class or interface.
      *
      * @param string $class The name of the class
+     *
+     * @return Boolean|null True, if loaded
      */
     public function loadClass($class)
     {
         if ($file = $this->findFile($class)) {
             require $file;
+
+            return true;
         }
     }
 
@@ -212,50 +263,57 @@ class UniversalClassLoader
      */
     public function findFile($class)
     {
-        if ('\\' == $class[0]) {
-            $class = substr($class, 1);
-        }
-
         if (false !== $pos = strrpos($class, '\\')) {
             // namespaced class name
             $namespace = substr($class, 0, $pos);
+            $className = substr($class, $pos + 1);
+            $normalizedClass = str_replace('\\', DIRECTORY_SEPARATOR, $namespace).DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $className).'.php';
             foreach ($this->namespaces as $ns => $dirs) {
+                if (0 !== strpos($namespace, $ns)) {
+                    continue;
+                }
+
                 foreach ($dirs as $dir) {
-                    if (0 === strpos($namespace, $ns)) {
-                        $className = substr($class, $pos + 1);
-                        $file = $dir.DIRECTORY_SEPARATOR.str_replace('\\', DIRECTORY_SEPARATOR, $namespace).DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $className).'.php';
-                        if (file_exists($file)) {
-                            return $file;
-                        }
+                    $file = $dir.DIRECTORY_SEPARATOR.$normalizedClass;
+                    if (is_file($file)) {
+                        return $file;
                     }
                 }
             }
 
             foreach ($this->namespaceFallbacks as $dir) {
-                $file = $dir.DIRECTORY_SEPARATOR.str_replace('\\', DIRECTORY_SEPARATOR, $class).'.php';
-                if (file_exists($file)) {
+                $file = $dir.DIRECTORY_SEPARATOR.$normalizedClass;
+                if (is_file($file)) {
                     return $file;
                 }
             }
+
         } else {
             // PEAR-like class name
+            $normalizedClass = str_replace('_', DIRECTORY_SEPARATOR, $class).'.php';
             foreach ($this->prefixes as $prefix => $dirs) {
+                if (0 !== strpos($class, $prefix)) {
+                    continue;
+                }
+
                 foreach ($dirs as $dir) {
-                    if (0 === strpos($class, $prefix)) {
-                        $file = $dir.DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $class).'.php';
-                        if (file_exists($file)) {
-                            return $file;
-                        }
+                    $file = $dir.DIRECTORY_SEPARATOR.$normalizedClass;
+                    if (is_file($file)) {
+                        return $file;
                     }
                 }
             }
 
             foreach ($this->prefixFallbacks as $dir) {
-                $file = $dir.DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $class).'.php';
-                if (file_exists($file)) {
+                $file = $dir.DIRECTORY_SEPARATOR.$normalizedClass;
+                if (is_file($file)) {
                     return $file;
                 }
             }
+        }
+
+        if ($this->useIncludePath && $file = stream_resolve_include_path($normalizedClass)) {
+            return $file;
         }
     }
 }

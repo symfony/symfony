@@ -1,6 +1,0 @@
-{% if exception.trace|length %}
-{% for trace in exception.trace %}
-{% include 'FrameworkBundle:Exception:trace.txt.twig' with { 'trace': trace } only %}
-
-{% endfor %}
-{% endif %}

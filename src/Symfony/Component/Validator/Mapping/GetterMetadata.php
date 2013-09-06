@@ -20,6 +20,8 @@ class GetterMetadata extends MemberMetadata
      *
      * @param string $class    The class the getter is defined on
      * @param string $property The property which the getter returns
+     *
+     * @throws ValidatorException
      */
     public function __construct($class, $property)
     {
@@ -28,7 +30,7 @@ class GetterMetadata extends MemberMetadata
 
         if (method_exists($class, $getMethod)) {
             $method = $getMethod;
-        } else if (method_exists($class, $isMethod)) {
+        } elseif (method_exists($class, $isMethod)) {
             $method = $isMethod;
         } else {
             throw new ValidatorException(sprintf('Neither method %s nor %s exists in class %s', $getMethod, $isMethod, $class));
@@ -40,16 +42,16 @@ class GetterMetadata extends MemberMetadata
     /**
      * {@inheritDoc}
      */
-    public function getValue($object)
+    public function getPropertyValue($object)
     {
-        return $this->getReflectionMember()->invoke($object);
+        return $this->newReflectionMember($object)->invoke($object);
     }
 
     /**
      * {@inheritDoc}
      */
-    protected function newReflectionMember()
+    protected function newReflectionMember($objectOrClassName)
     {
-        return new \ReflectionMethod($this->getClassName(), $this->getName());
+        return new \ReflectionMethod($objectOrClassName, $this->getName());
     }
 }

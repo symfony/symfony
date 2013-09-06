@@ -22,8 +22,14 @@ use Symfony\Component\DomCrawler\Field\FormField;
  */
 class Form extends Link implements \ArrayAccess
 {
-    private $document;
+    /**
+     * @var \DOMNode
+     */
     private $button;
+
+    /**
+     * @var Field\FormField[]
+     */
     private $fields;
 
     /**
@@ -59,12 +65,14 @@ class Form extends Link implements \ArrayAccess
      *
      * @param array $values An array of field values
      *
+     * @return Form
+     *
      * @api
      */
     public function setValues(array $values)
     {
         foreach ($values as $name => $value) {
-            $this[$name] = $value;
+            $this->fields->set($name, $value);
         }
 
         return $this;
@@ -82,7 +90,11 @@ class Form extends Link implements \ArrayAccess
     public function getValues()
     {
         $values = array();
-        foreach ($this->fields as $name => $field) {
+        foreach ($this->fields->all() as $name => $field) {
+            if ($field->isDisabled()) {
+                continue;
+            }
+
             if (!$field instanceof Field\FileFormField && $field->hasValue()) {
                 $values[$name] = $field->getValue();
             }
@@ -100,12 +112,17 @@ class Form extends Link implements \ArrayAccess
      */
     public function getFiles()
     {
-        if (!in_array($this->getMethod(), array('POST', 'PUT', 'DELETE'))) {
+        if (!in_array($this->getMethod(), array('POST', 'PUT', 'DELETE', 'PATCH'))) {
             return array();
         }
 
         $files = array();
-        foreach ($this->fields as $name => $field) {
+
+        foreach ($this->fields->all() as $name => $field) {
+            if ($field->isDisabled()) {
+                continue;
+            }
+
             if ($field instanceof Field\FileFormField) {
                 $files[$name] = $field->getValue();
             }
@@ -117,7 +134,7 @@ class Form extends Link implements \ArrayAccess
     /**
      * Gets the field values as PHP.
      *
-     * This method converts fields with th array notation
+     * This method converts fields with the array notation
      * (like foo[bar] to arrays) like PHP does.
      *
      * @return array An array of field values.
@@ -126,7 +143,7 @@ class Form extends Link implements \ArrayAccess
      */
     public function getPhpValues()
     {
-        $qs = http_build_query($this->getValues());
+        $qs = http_build_query($this->getValues(), '', '&');
         parse_str($qs, $values);
 
         return $values;
@@ -135,7 +152,7 @@ class Form extends Link implements \ArrayAccess
     /**
      * Gets the file field values as PHP.
      *
-     * This method converts fields with th array notation
+     * This method converts fields with the array notation
      * (like foo[bar] to arrays) like PHP does.
      *
      * @return array An array of field values.
@@ -144,7 +161,7 @@ class Form extends Link implements \ArrayAccess
      */
     public function getPhpFiles()
     {
-        $qs = http_build_query($this->getFiles());
+        $qs = http_build_query($this->getFiles(), '', '&');
         parse_str($qs, $values);
 
         return $values;
@@ -165,7 +182,7 @@ class Form extends Link implements \ArrayAccess
     {
         $uri = parent::getUri();
 
-        if (!in_array($this->getMethod(), array('POST', 'PUT', 'DELETE')) && $queryString = http_build_query($this->getValues(), null, '&')) {
+        if (!in_array($this->getMethod(), array('POST', 'PUT', 'DELETE', 'PATCH')) && $queryString = http_build_query($this->getValues(), null, '&')) {
             $sep = false === strpos($uri, '?') ? '?' : '&';
             $uri .= $sep.$queryString;
         }
@@ -207,7 +224,7 @@ class Form extends Link implements \ArrayAccess
      */
     public function has($name)
     {
-        return isset($this->fields[$name]);
+        return $this->fields->has($name);
     }
 
     /**
@@ -215,11 +232,13 @@ class Form extends Link implements \ArrayAccess
      *
      * @param string $name The field name
      *
+     * @throws \InvalidArgumentException when the name is malformed
+     *
      * @api
      */
     public function remove($name)
     {
-        unset($this->fields[$name]);
+        $this->fields->remove($name);
     }
 
     /**
@@ -235,76 +254,31 @@ class Form extends Link implements \ArrayAccess
      */
     public function get($name)
     {
-        if (!$this->has($name)) {
-            throw new \InvalidArgumentException(sprintf('The form has no "%s" field', $name));
-        }
-
-        return $this->fields[$name];
+        return $this->fields->get($name);
     }
 
     /**
      * Sets a named field.
      *
-     * @param Field\FormField $field The field
-     *
-     * @return FormField The field instance
+     * @param FormField $field The field
      *
      * @api
      */
-    public function set(Field\FormField $field)
+    public function set(FormField $field)
     {
-        $this->fields[$field->getName()] = $field;
+        $this->fields->add($field);
     }
 
     /**
      * Gets all fields.
      *
-     * @return array An array of fields
+     * @return FormField[] An array of fields
      *
      * @api
      */
     public function all()
     {
-        return $this->fields;
-    }
-
-    private function initialize()
-    {
-        $this->fields = array();
-
-        $document = new \DOMDocument('1.0', 'UTF-8');
-        $node = $document->importNode($this->node, true);
-        $button = $document->importNode($this->button, true);
-        $root = $document->appendChild($document->createElement('_root'));
-        $root->appendChild($node);
-        $root->appendChild($button);
-        $xpath = new \DOMXPath($document);
-
-        foreach ($xpath->query('descendant::input | descendant::textarea | descendant::select', $root) as $node) {
-            if ($node->hasAttribute('disabled') || !$node->hasAttribute('name')) {
-                continue;
-            }
-
-            $nodeName = $node->nodeName;
-
-            if ($node === $button) {
-                $this->set(new Field\InputFormField($node));
-            } elseif ('select' == $nodeName || 'input' == $nodeName && 'checkbox' == $node->getAttribute('type')) {
-                $this->set(new Field\ChoiceFormField($node));
-            } elseif ('input' == $nodeName && 'radio' == $node->getAttribute('type')) {
-                if ($this->has($node->getAttribute('name'))) {
-                    $this->get($node->getAttribute('name'))->addChoice($node);
-                } else {
-                    $this->set(new Field\ChoiceFormField($node));
-                }
-            } elseif ('input' == $nodeName && 'file' == $node->getAttribute('type')) {
-                $this->set(new Field\FileFormField($node));
-            } elseif ('input' == $nodeName && !in_array($node->getAttribute('type'), array('submit', 'button', 'image'))) {
-                $this->set(new Field\InputFormField($node));
-            } elseif ('textarea' == $nodeName) {
-                $this->set(new Field\TextareaFormField($node));
-            }
-        }
+        return $this->fields->all();
     }
 
     /**
@@ -330,11 +304,7 @@ class Form extends Link implements \ArrayAccess
      */
     public function offsetGet($name)
     {
-        if (!$this->has($name)) {
-            throw new \InvalidArgumentException(sprintf('The form field "%s" does not exist', $name));
-        }
-
-        return $this->fields[$name];
+        return $this->fields->get($name);
     }
 
     /**
@@ -347,11 +317,7 @@ class Form extends Link implements \ArrayAccess
      */
     public function offsetSet($name, $value)
     {
-        if (!$this->has($name)) {
-            throw new \InvalidArgumentException(sprintf('The form field "%s" does not exist', $name));
-        }
-
-        $this->fields[$name]->setValue($value);
+        $this->fields->set($name, $value);
     }
 
     /**
@@ -361,23 +327,99 @@ class Form extends Link implements \ArrayAccess
      */
     public function offsetUnset($name)
     {
-        $this->remove($name);
+        $this->fields->remove($name);
     }
 
+    /**
+     * Sets the node for the form.
+     *
+     * Expects a 'submit' button \DOMNode and finds the corresponding form element.
+     *
+     * @param \DOMNode $node A \DOMNode instance
+     *
+     * @throws \LogicException If given node is not a button or input or does not have a form ancestor
+     */
     protected function setNode(\DOMNode $node)
     {
         $this->button = $node;
         if ('button' == $node->nodeName || ('input' == $node->nodeName && in_array($node->getAttribute('type'), array('submit', 'button', 'image')))) {
+            if ($node->hasAttribute('form')) {
+                // if the node has the HTML5-compliant 'form' attribute, use it
+                $formId = $node->getAttribute('form');
+                $form = $node->ownerDocument->getElementById($formId);
+                if (null === $form) {
+                    throw new \LogicException(sprintf('The selected node has an invalid form attribute (%s).', $formId));
+                }
+                $this->node = $form;
+
+                return;
+            }
+            // we loop until we find a form ancestor
             do {
-                // use the ancestor form element
                 if (null === $node = $node->parentNode) {
                     throw new \LogicException('The selected node does not have a form ancestor.');
                 }
             } while ('form' != $node->nodeName);
-        } else {
+        } elseif ('form' != $node->nodeName) {
             throw new \LogicException(sprintf('Unable to submit on a "%s" tag.', $node->nodeName));
         }
 
         $this->node = $node;
+    }
+
+    private function initialize()
+    {
+        $this->fields = new FormFieldRegistry();
+
+        $document = new \DOMDocument('1.0', 'UTF-8');
+        $node = $document->importNode($this->node, true);
+        $button = $document->importNode($this->button, true);
+        $root = $document->appendChild($document->createElement('_root'));
+        $root->appendChild($node);
+        $root->appendChild($button);
+        $xpath = new \DOMXPath($document);
+
+        // add descendant elements to the form
+        $fieldNodes = $xpath->query('descendant::input | descendant::button | descendant::textarea | descendant::select', $root);
+        foreach ($fieldNodes as $node) {
+            $this->addField($node, $button);
+        }
+
+        // find form elements corresponding to the current form by the HTML5 form attribute
+        if ($this->node->hasAttribute('id')) {
+            $formId = Crawler::xpathLiteral($this->node->getAttribute('id'));
+            $xpath = new \DOMXPath($this->node->ownerDocument);
+            $fieldNodes = $xpath->query(sprintf('descendant::input[@form=%s] | descendant::button[@form=%s] | descendant::textarea[@form=%s] | descendant::select[@form=%s]', $formId, $formId, $formId, $formId));
+            foreach ($fieldNodes as $node) {
+                $this->addField($node, $button);
+            }
+        }
+    }
+
+    private function addField(\DOMNode $node, \DOMNode $button)
+    {
+        if (!$node->hasAttribute('name') || !$node->getAttribute('name')) {
+            return;
+        }
+
+        $nodeName = $node->nodeName;
+
+        if ($node === $button) {
+            $this->set(new Field\InputFormField($node));
+        } elseif ('select' == $nodeName || 'input' == $nodeName && 'checkbox' == $node->getAttribute('type')) {
+            $this->set(new Field\ChoiceFormField($node));
+        } elseif ('input' == $nodeName && 'radio' == $node->getAttribute('type')) {
+            if ($this->has($node->getAttribute('name'))) {
+                $this->get($node->getAttribute('name'))->addChoice($node);
+            } else {
+                $this->set(new Field\ChoiceFormField($node));
+            }
+        } elseif ('input' == $nodeName && 'file' == $node->getAttribute('type')) {
+            $this->set(new Field\FileFormField($node));
+        } elseif ('input' == $nodeName && !in_array($node->getAttribute('type'), array('submit', 'button', 'image'))) {
+            $this->set(new Field\InputFormField($node));
+        } elseif ('textarea' == $nodeName) {
+            $this->set(new Field\TextareaFormField($node));
+        }
     }
 }

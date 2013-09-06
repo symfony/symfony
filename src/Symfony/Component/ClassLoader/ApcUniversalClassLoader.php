@@ -17,7 +17,7 @@ namespace Symfony\Component\ClassLoader;
  * It is able to load classes that use either:
  *
  *  * The technical interoperability standards for PHP 5.3 namespaces and
- *    class names (http://groups.google.com/group/php-standards/web/psr-0-final-proposal);
+ *    class names (https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-0.md);
  *
  *  * The PEAR naming convention for classes (http://pear.php.net/).
  *
@@ -69,6 +69,8 @@ class ApcUniversalClassLoader extends UniversalClassLoader
      *
      * @param string $prefix A prefix to create a namespace in APC
      *
+     * @throws \RuntimeException
+     *
      * @api
      */
     public function __construct($prefix)
@@ -84,6 +86,8 @@ class ApcUniversalClassLoader extends UniversalClassLoader
      * Finds a file by class name while caching lookups to APC.
      *
      * @param string $class A class name to resolve to file
+     *
+     * @return string|null The path, if found
      */
     public function findFile($class)
     {

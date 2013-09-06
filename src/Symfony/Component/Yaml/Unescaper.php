@@ -48,7 +48,7 @@ class Unescaper
     public function unescapeDoubleQuotedString($value)
     {
         $self = $this;
-        $callback = function($match) use($self) {
+        $callback = function($match) use ($self) {
             return $self->unescapeCharacter($match[0]);
         };
 
@@ -130,16 +130,16 @@ class Unescaper
      *
      * @return string The string with the new encoding
      *
-     * @throws \RuntimeException if no suitable encoding function is found (iconv or mbstring)
+     * @throws RuntimeException if no suitable encoding function is found (iconv or mbstring)
      */
     private function convertEncoding($value, $to, $from)
     {
-        if (function_exists('iconv')) {
-            return iconv($from, $to, $value);
-        } elseif (function_exists('mb_convert_encoding')) {
+        if (function_exists('mb_convert_encoding')) {
             return mb_convert_encoding($value, $to, $from);
+        } elseif (function_exists('iconv')) {
+            return iconv($from, $to, $value);
         }
 
-        throw new \RuntimeException('No suitable convert encoding function (install the iconv or mbstring extension).');
+        throw new RuntimeException('No suitable convert encoding function (install the iconv or mbstring extension).');
     }
 }

@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Alias;
-use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
@@ -37,7 +34,6 @@ class RemoveUnusedDefinitionsPass implements RepeatablePassInterface
      * Processes the ContainerBuilder to remove unused definitions.
      *
      * @param ContainerBuilder $container
-     * @return void
      */
     public function process(ContainerBuilder $container)
     {
@@ -60,7 +56,7 @@ class RemoveUnusedDefinitionsPass implements RepeatablePassInterface
                     $sourceIds[] = $node->getId();
 
                     if ($node->isAlias()) {
-                        $referencingAlias[] = $node->getValue();
+                        $referencingAliases[] = $node->getValue();
                     }
                 }
                 $isReferenced = (count(array_unique($sourceIds)) - count($referencingAliases)) > 0;
@@ -74,7 +70,7 @@ class RemoveUnusedDefinitionsPass implements RepeatablePassInterface
                 $definition->setPublic(true);
                 $container->removeDefinition($id);
                 $compiler->addLogMessage($formatter->formatRemoveService($this, $id, 'replaces alias '.reset($referencingAliases)));
-            } else if (0 === count($referencingAliases) && false === $isReferenced) {
+            } elseif (0 === count($referencingAliases) && false === $isReferenced) {
                 $container->removeDefinition($id);
                 $compiler->addLogMessage($formatter->formatRemoveService($this, $id, 'unused'));
                 $hasChanged = true;

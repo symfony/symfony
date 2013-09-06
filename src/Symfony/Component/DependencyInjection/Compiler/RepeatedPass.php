@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
 /**
  * A pass that might be run repeatedly.
@@ -20,19 +21,28 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class RepeatedPass implements CompilerPassInterface
 {
-    private $repeat;
+    /**
+     * @var Boolean
+     */
+    private $repeat = false;
+
+    /**
+     * @var RepeatablePassInterface[]
+     */
     private $passes;
 
     /**
      * Constructor.
      *
-     * @param array $passes An array of RepeatablePassInterface objects
+     * @param RepeatablePassInterface[] $passes An array of RepeatablePassInterface objects
+     *
+     * @throws InvalidArgumentException when the passes don't implement RepeatablePassInterface
      */
     public function __construct(array $passes)
     {
         foreach ($passes as $pass) {
             if (!$pass instanceof RepeatablePassInterface) {
-                throw new \InvalidArgumentException('$passes must be an array of RepeatablePassInterface.');
+                throw new InvalidArgumentException('$passes must be an array of RepeatablePassInterface.');
             }
 
             $pass->setRepeatedPass($this);
@@ -48,7 +58,6 @@ class RepeatedPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        $compiler = $container->getCompiler();
         $this->repeat = false;
         foreach ($this->passes as $pass) {
             $pass->process($container);
@@ -70,7 +79,7 @@ class RepeatedPass implements CompilerPassInterface
     /**
      * Returns the passes
      *
-     * @return array An array of RepeatablePassInterface objects
+     * @return RepeatablePassInterface[] An array of RepeatablePassInterface objects
      */
     public function getPasses()
     {

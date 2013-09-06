@@ -34,9 +34,9 @@ class Esi
      * Constructor.
      *
      * @param array $contentTypes An array of content-type that should be parsed for ESI information.
-     *                           (default: text/html, text/xml, and application/xml)
+     *                           (default: text/html, text/xml, application/xhtml+xml, and application/xml)
      */
-    public function __construct(array $contentTypes = array('text/html', 'text/xml', 'application/xml'))
+    public function __construct(array $contentTypes = array('text/html', 'text/xml', 'application/xhtml+xml', 'application/xml'))
     {
         $this->contentTypes = $contentTypes;
     }
@@ -64,7 +64,7 @@ class Esi
             return false;
         }
 
-        return (Boolean) preg_match('#ESI/1.0#', $value);
+        return false !== strpos($value, 'ESI/1.0');
     }
 
     /**
@@ -117,6 +117,8 @@ class Esi
      * @param string  $alt          An alternate URI
      * @param Boolean $ignoreErrors Whether to ignore errors or not
      * @param string  $comment      A comment to add as an esi:include tag
+     *
+     * @return string
      */
     public function renderIncludeTag($uri, $alt = null, $ignoreErrors = true, $comment = '')
     {
@@ -138,6 +140,8 @@ class Esi
      *
      * @param Request  $request  A Request instance
      * @param Response $response A Response instance
+     *
+     * @return Response
      */
     public function process(Request $request, Response $response)
     {
@@ -154,8 +158,9 @@ class Esi
 
         // we don't use a proper XML parser here as we can have ESI tags in a plain text response
         $content = $response->getContent();
-        $content = preg_replace_callback('#<esi\:include\s+(.*?)\s*/>#', array($this, 'handleEsiIncludeTag'), $content);
-        $content = preg_replace('#<esi\:comment[^>]*/>#', '', $content);
+        $content = str_replace(array('<?', '<%'), array('<?php echo "<?"; ?>', '<?php echo "<%"; ?>'), $content);
+        $content = preg_replace_callback('#<esi\:include\s+(.*?)\s*(?:/|</esi\:include)>#', array($this, 'handleEsiIncludeTag'), $content);
+        $content = preg_replace('#<esi\:comment[^>]*(?:/|</esi\:comment)>#', '', $content);
         $content = preg_replace('#<esi\:remove>.*?</esi\:remove>#', '', $content);
 
         $response->setContent($content);
@@ -181,6 +186,11 @@ class Esi
      * @param string    $uri          The main URI
      * @param string    $alt          An alternative URI
      * @param Boolean   $ignoreErrors Whether to ignore errors or not
+     *
+     * @return string
+     *
+     * @throws \RuntimeException
+     * @throws \Exception
      */
     public function handle(HttpCache $cache, $uri, $alt, $ignoreErrors)
     {
@@ -211,6 +221,8 @@ class Esi
      * @param array $attributes An array containing the attributes.
      *
      * @return string The response content for the include.
+     *
+     * @throws \RuntimeException
      */
     private function handleEsiIncludeTag($attributes)
     {

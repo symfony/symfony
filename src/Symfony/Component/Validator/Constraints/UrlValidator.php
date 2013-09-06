@@ -15,6 +15,11 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
+/**
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @api
+ */
 class UrlValidator extends ConstraintValidator
 {
     const PATTERN = '~^
@@ -32,10 +37,13 @@ class UrlValidator extends ConstraintValidator
             (/?|/\S+)                               # a /, nothing or a / with something
         $~ixu';
 
-    public function isValid($value, Constraint $constraint)
+    /**
+     * {@inheritDoc}
+     */
+    public function validate($value, Constraint $constraint)
     {
         if (null === $value || '' === $value) {
-            return true;
+            return;
         }
 
         if (!is_scalar($value) && !(is_object($value) && method_exists($value, '__toString'))) {
@@ -44,14 +52,10 @@ class UrlValidator extends ConstraintValidator
 
         $value = (string) $value;
 
-        $pattern = sprintf(self::PATTERN, implode('|', $constraint->protocols));
+        $pattern = sprintf(static::PATTERN, implode('|', $constraint->protocols));
 
         if (!preg_match($pattern, $value)) {
-            $this->setMessage($constraint->message, array('{{ value }}' => $value));
-
-            return false;
+            $this->context->addViolation($constraint->message, array('{{ value }}' => $value));
         }
-
-        return true;
     }
 }

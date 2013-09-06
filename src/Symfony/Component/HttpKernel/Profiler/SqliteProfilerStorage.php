@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\HttpKernel\Profiler;
 
-use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
-
 /**
  * SqliteProfilerStorage stores profiling information in a SQLite database.
  *
@@ -26,8 +24,8 @@ class SqliteProfilerStorage extends PdoProfilerStorage
     protected function initDb()
     {
         if (null === $this->db || $this->db instanceof \SQLite3) {
-            if ('sqlite' !== substr($this->dsn, 0, 6 )) {
-                throw new \RuntimeException('You are trying to use Sqlite with a wrong dsn. "'.$this->dsn.'"');
+            if (0 !== strpos($this->dsn, 'sqlite')) {
+                throw new \RuntimeException(sprintf('Please check your configuration. You are trying to use Sqlite with an invalid dsn "%s". The expected format is "sqlite:/path/to/the/db/file".', $this->dsn));
             }
             if (class_exists('SQLite3')) {
                 $db = new \SQLite3(substr($this->dsn, 7, strlen($this->dsn)), \SQLITE3_OPEN_READWRITE | \SQLITE3_OPEN_CREATE);
@@ -41,9 +39,11 @@ class SqliteProfilerStorage extends PdoProfilerStorage
                 throw new \RuntimeException('You need to enable either the SQLite3 or PDO_SQLite extension for the profiler to run properly.');
             }
 
-            $db->exec('CREATE TABLE IF NOT EXISTS sf_profiler_data (token STRING, data STRING, ip STRING, url STRING, time INTEGER, parent STRING, created_at INTEGER)');
+            $db->exec('PRAGMA temp_store=MEMORY; PRAGMA journal_mode=MEMORY;');
+            $db->exec('CREATE TABLE IF NOT EXISTS sf_profiler_data (token STRING, data STRING, ip STRING, method STRING, url STRING, time INTEGER, parent STRING, created_at INTEGER)');
             $db->exec('CREATE INDEX IF NOT EXISTS data_created_at ON sf_profiler_data (created_at)');
             $db->exec('CREATE INDEX IF NOT EXISTS data_ip ON sf_profiler_data (ip)');
+            $db->exec('CREATE INDEX IF NOT EXISTS data_method ON sf_profiler_data (method)');
             $db->exec('CREATE INDEX IF NOT EXISTS data_url ON sf_profiler_data (url)');
             $db->exec('CREATE INDEX IF NOT EXISTS data_parent ON sf_profiler_data (parent)');
             $db->exec('CREATE UNIQUE INDEX IF NOT EXISTS data_token ON sf_profiler_data (token)');
@@ -97,7 +97,7 @@ class SqliteProfilerStorage extends PdoProfilerStorage
     /**
      * {@inheritdoc}
      */
-    protected function buildCriteria($ip, $url, $limit)
+    protected function buildCriteria($ip, $url, $start, $end, $limit, $method)
     {
         $criteria = array();
         $args = array();
@@ -110,6 +110,21 @@ class SqliteProfilerStorage extends PdoProfilerStorage
         if ($url) {
             $criteria[] = 'url LIKE :url ESCAPE "\"';
             $args[':url'] = '%'.addcslashes($url, '%_\\').'%';
+        }
+
+        if ($method) {
+            $criteria[] = 'method = :method';
+            $args[':method'] = $method;
+        }
+
+        if (!empty($start)) {
+            $criteria[] = 'time >= :start';
+            $args[':start'] = $start;
+        }
+
+        if (!empty($end)) {
+            $criteria[] = 'time <= :end';
+            $args[':end'] = $end;
         }
 
         return array($criteria, $args);

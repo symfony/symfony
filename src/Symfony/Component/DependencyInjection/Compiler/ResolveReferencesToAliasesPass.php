@@ -52,9 +52,10 @@ class ResolveReferencesToAliasesPass implements CompilerPassInterface
     }
 
     /**
-     * Processes the arguments to replace aliases
+     * Processes the arguments to replace aliases.
      *
      * @param array $arguments An array of References
+     *
      * @return array An array of References
      */
     private function processArguments(array $arguments)
@@ -75,9 +76,10 @@ class ResolveReferencesToAliasesPass implements CompilerPassInterface
     }
 
     /**
-     * Resolve an alias into a definition id
+     * Resolves an alias into a definition id.
      *
      * @param string $id The definition or alias id to resolve
+     *
      * @return string The definition id with aliases resolved
      */
     private function getDefinitionId($id)

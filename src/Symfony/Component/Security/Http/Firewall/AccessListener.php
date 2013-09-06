@@ -11,11 +11,11 @@
 
 namespace Symfony\Component\Security\Http\Firewall;
 
-use Symfony\Component\Security\Core\SecurityContext;
+use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
-use Symfony\Component\Security\Http\AccessMap;
+use Symfony\Component\Security\Http\AccessMapInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
@@ -33,7 +33,7 @@ class AccessListener implements ListenerInterface
     private $authManager;
     private $logger;
 
-    public function __construct(SecurityContext $context, AccessDecisionManagerInterface $accessDecisionManager, AccessMap $map, AuthenticationManagerInterface $authManager, LoggerInterface $logger = null)
+    public function __construct(SecurityContextInterface $context, AccessDecisionManagerInterface $accessDecisionManager, AccessMapInterface $map, AuthenticationManagerInterface $authManager, LoggerInterface $logger = null)
     {
         $this->context = $context;
         $this->accessDecisionManager = $accessDecisionManager;
@@ -46,6 +46,9 @@ class AccessListener implements ListenerInterface
      * Handles access authorization.
      *
      * @param GetResponseEvent $event A GetResponseEvent instance
+     *
+     * @throws AccessDeniedException
+     * @throws AuthenticationCredentialsNotFoundException
      */
     public function handle(GetResponseEvent $event)
     {

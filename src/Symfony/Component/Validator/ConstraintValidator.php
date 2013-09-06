@@ -11,50 +11,25 @@
 
 namespace Symfony\Component\Validator;
 
+/**
+ * Base class for constraint validators
+ *
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @api
+ */
 abstract class ConstraintValidator implements ConstraintValidatorInterface
 {
     /**
-     * @var ExecutionContext
+     * @var ExecutionContextInterface
      */
     protected $context;
-    /**
-     * @var string
-     */
-    private $messageTemplate;
-    /**
-     * @var array
-     */
-    private $messageParameters;
 
     /**
      * {@inheritDoc}
      */
-    public function initialize(ExecutionContext $context)
+    public function initialize(ExecutionContextInterface $context)
     {
         $this->context = $context;
-        $this->messageTemplate = '';
-        $this->messageParameters = array();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getMessageTemplate()
-    {
-        return $this->messageTemplate;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getMessageParameters()
-    {
-        return $this->messageParameters;
-    }
-
-    protected function setMessage($template, array $parameters = array())
-    {
-        $this->messageTemplate = $template;
-        $this->messageParameters = $parameters;
     }
 }

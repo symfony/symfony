@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Acl\Domain;
 
+use Symfony\Component\Security\Core\Util\ClassUtils;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 use Symfony\Component\Security\Acl\Model\DomainObjectInterface;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
@@ -30,7 +31,8 @@ final class ObjectIdentity implements ObjectIdentityInterface
      *
      * @param string $identifier
      * @param string $type
-     * @return void
+     *
+     * @throws \InvalidArgumentException
      */
     public function __construct($identifier, $type)
     {
@@ -49,10 +51,10 @@ final class ObjectIdentity implements ObjectIdentityInterface
      * Constructs an ObjectIdentity for the given domain object
      *
      * @param object $domainObject
-     * @throws \InvalidArgumentException
+     * @throws InvalidDomainObjectException
      * @return ObjectIdentity
      */
-    static public function fromDomainObject($domainObject)
+    public static function fromDomainObject($domainObject)
     {
         if (!is_object($domainObject)) {
             throw new InvalidDomainObjectException('$domainObject must be an object.');
@@ -60,9 +62,9 @@ final class ObjectIdentity implements ObjectIdentityInterface
 
         try {
             if ($domainObject instanceof DomainObjectInterface) {
-                return new self($domainObject->getObjectIdentifier(), get_class($domainObject));
-            } else if (method_exists($domainObject, 'getId')) {
-                return new self($domainObject->getId(), get_class($domainObject));
+                return new self($domainObject->getObjectIdentifier(), ClassUtils::getRealClass($domainObject));
+            } elseif (method_exists($domainObject, 'getId')) {
+                return new self($domainObject->getId(), ClassUtils::getRealClass($domainObject));
             }
         } catch (\InvalidArgumentException $invalid) {
             throw new InvalidDomainObjectException($invalid->getMessage(), 0, $invalid);

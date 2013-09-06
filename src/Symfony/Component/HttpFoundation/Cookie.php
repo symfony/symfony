@@ -15,6 +15,8 @@ namespace Symfony\Component\HttpFoundation;
  * Represents a cookie
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @api
  */
 class Cookie
 {
@@ -29,23 +31,23 @@ class Cookie
     /**
      * Constructor.
      *
-     * @param string                    $name       The name of the cookie
-     * @param string                    $value      The value of the cookie
-     * @param integer|string|\DateTime  $expire     The time the cookie expires
-     * @param string                    $path       The path on the server in which the cookie will be available on
-     * @param string                    $domain     The domain that the cookie is available to
-     * @param Boolean                   $secure     Whether the cookie should only be transmitted over a secure HTTPS connection from the client
-     * @param Boolean                   $httpOnly   Whether the cookie will be made accessible only through the HTTP protocol
+     * @param string                   $name     The name of the cookie
+     * @param string                   $value    The value of the cookie
+     * @param integer|string|\DateTime $expire   The time the cookie expires
+     * @param string                   $path     The path on the server in which the cookie will be available on
+     * @param string                   $domain   The domain that the cookie is available to
+     * @param Boolean                  $secure   Whether the cookie should only be transmitted over a secure HTTPS connection from the client
+     * @param Boolean                  $httpOnly Whether the cookie will be made accessible only through the HTTP protocol
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @api
      */
     public function __construct($name, $value = null, $expire = 0, $path = '/', $domain = null, $secure = false, $httpOnly = true)
     {
         // from PHP source code
         if (preg_match("/[=,; \t\r\n\013\014]/", $name)) {
             throw new \InvalidArgumentException(sprintf('The cookie name "%s" contains invalid characters.', $name));
-        }
-
-        if (preg_match("/[,; \t\r\n\013\014]/", $value)) {
-            throw new \InvalidArgumentException(sprintf('The cookie value "%s" contains invalid characters.', $value));
         }
 
         if (empty($name)) {
@@ -67,11 +69,16 @@ class Cookie
         $this->value = $value;
         $this->domain = $domain;
         $this->expire = $expire;
-        $this->path = $path;
+        $this->path = empty($path) ? '/' : $path;
         $this->secure = (Boolean) $secure;
         $this->httpOnly = (Boolean) $httpOnly;
     }
 
+    /**
+     * Returns the cookie as a string.
+     *
+     * @return string The cookie
+     */
     public function __toString()
     {
         $str = urlencode($this->getName()).'=';
@@ -86,11 +93,11 @@ class Cookie
             }
         }
 
-        if (null !== $this->getPath()) {
-            $str .= '; path='.$this->getPath();
+        if ($this->path) {
+            $str .= '; path='.$this->path;
         }
 
-        if (null !== $this->getDomain()) {
+        if ($this->getDomain()) {
             $str .= '; domain='.$this->getDomain();
         }
 
@@ -109,6 +116,8 @@ class Cookie
      * Gets the name of the cookie.
      *
      * @return string
+     *
+     * @api
      */
     public function getName()
     {
@@ -119,6 +128,8 @@ class Cookie
      * Gets the value of the cookie.
      *
      * @return string
+     *
+     * @api
      */
     public function getValue()
     {
@@ -129,6 +140,8 @@ class Cookie
      * Gets the domain that the cookie is available to.
      *
      * @return string
+     *
+     * @api
      */
     public function getDomain()
     {
@@ -139,6 +152,8 @@ class Cookie
      * Gets the time the cookie expires.
      *
      * @return integer
+     *
+     * @api
      */
     public function getExpiresTime()
     {
@@ -149,6 +164,8 @@ class Cookie
      * Gets the path on the server in which the cookie will be available on.
      *
      * @return string
+     *
+     * @api
      */
     public function getPath()
     {
@@ -159,6 +176,8 @@ class Cookie
      * Checks whether the cookie should only be transmitted over a secure HTTPS connection from the client.
      *
      * @return Boolean
+     *
+     * @api
      */
     public function isSecure()
     {
@@ -169,6 +188,8 @@ class Cookie
      * Checks whether the cookie will be made accessible only through the HTTP protocol.
      *
      * @return Boolean
+     *
+     * @api
      */
     public function isHttpOnly()
     {
@@ -179,6 +200,8 @@ class Cookie
      * Whether this cookie is about to be cleared
      *
      * @return Boolean
+     *
+     * @api
      */
     public function isCleared()
     {

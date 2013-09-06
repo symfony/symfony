@@ -15,6 +15,8 @@ namespace Symfony\Component\DependencyInjection;
  * Reference represents a service reference.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 class Reference
 {
@@ -33,7 +35,7 @@ class Reference
      */
     public function __construct($id, $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $strict = true)
     {
-        $this->id = $id;
+        $this->id = strtolower($id);
         $this->invalidBehavior = $invalidBehavior;
         $this->strict = $strict;
     }
@@ -45,7 +47,7 @@ class Reference
      */
     public function __toString()
     {
-        return (string) $this->id;
+        return $this->id;
     }
 
     /**

@@ -13,17 +13,21 @@ namespace Symfony\Component\HttpKernel;
 
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\BrowserKit\Client as BaseClient;
 use Symfony\Component\BrowserKit\Request as DomRequest;
 use Symfony\Component\BrowserKit\Response as DomResponse;
 use Symfony\Component\BrowserKit\Cookie as DomCookie;
 use Symfony\Component\BrowserKit\History;
 use Symfony\Component\BrowserKit\CookieJar;
+use Symfony\Component\HttpKernel\TerminableInterface;
 
 /**
  * Client simulates a browser and makes requests to a Kernel object.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 class Client extends BaseClient
 {
@@ -47,39 +51,66 @@ class Client extends BaseClient
     }
 
     /**
+     * {@inheritdoc}
+     *
+     * @return Request|null A Request instance
+     */
+    public function getRequest()
+    {
+        return parent::getRequest();
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return Response|null A Response instance
+     */
+    public function getResponse()
+    {
+        return parent::getResponse();
+    }
+
+    /**
      * Makes a request.
      *
-     * @param Request  $request A Request instance
+     * @param Request $request A Request instance
      *
      * @return Response A Response instance
      */
     protected function doRequest($request)
     {
-        return $this->kernel->handle($request);
+        $response = $this->kernel->handle($request);
+
+        if ($this->kernel instanceof TerminableInterface) {
+            $this->kernel->terminate($request, $response);
+        }
+
+        return $response;
     }
 
     /**
      * Returns the script to execute when the request must be insulated.
      *
      * @param Request $request A Request instance
+     *
+     * @return string
      */
     protected function getScript($request)
     {
-        $kernel = serialize($this->kernel);
-        $request = serialize($request);
+        $kernel = str_replace("'", "\\'", serialize($this->kernel));
+        $request = str_replace("'", "\\'", serialize($request));
 
-        $r = new \ReflectionClass('\\Symfony\\Component\\ClassLoader\\UniversalClassLoader');
-        $requirePath = $r->getFileName();
-
-        $symfonyPath = realpath(__DIR__.'/../../..');
+        $r = new \ReflectionClass('\\Symfony\\Component\\ClassLoader\\ClassLoader');
+        $requirePath = str_replace("'", "\\'", $r->getFileName());
+        $symfonyPath = str_replace("'", "\\'", realpath(__DIR__.'/../../..'));
 
         return <<<EOF
 <?php
 
 require_once '$requirePath';
 
-\$loader = new Symfony\Component\ClassLoader\UniversalClassLoader();
-\$loader->registerNamespaces(array('Symfony' => '$symfonyPath'));
+\$loader = new Symfony\Component\ClassLoader\ClassLoader();
+\$loader->addPrefix('Symfony', '$symfonyPath');
 \$loader->register();
 
 \$kernel = unserialize('$kernel');
@@ -90,7 +121,7 @@ EOF;
     /**
      * Converts the BrowserKit request to a HttpKernel request.
      *
-     * @param DomRequest $request A Request instance
+     * @param DomRequest $request A DomRequest instance
      *
      * @return Request A Request instance
      */
@@ -106,8 +137,13 @@ EOF;
     /**
      * Filters an array of files.
      *
-     * This method marks all uploaded files as already moved thus avoiding
-     * UploadedFile's call to move_uploaded_file(), which would otherwise fail.
+     * This method created test instances of UploadedFile so that the move()
+     * method can be called on those instances.
+     *
+     * If the size of a file is greater than the allowed size (from php.ini) then
+     * an invalid UploadedFile is returned with an error set to UPLOAD_ERR_INI_SIZE.
+     *
+     * @see Symfony\Component\HttpFoundation\File\UploadedFile
      *
      * @param array $files An array of files
      *
@@ -120,15 +156,25 @@ EOF;
             if (is_array($value)) {
                 $filtered[$key] = $this->filterFiles($value);
             } elseif ($value instanceof UploadedFile) {
-                // Create a test mode UploadedFile
-                $filtered[$key] = new UploadedFile(
-                    $value->getPathname(),
-                    $value->getClientOriginalName(),
-                    $value->getClientMimeType(),
-                    $value->getClientSize(),
-                    $value->getError(),
-                    true
-                );
+                if ($value->isValid() && $value->getSize() > UploadedFile::getMaxFilesize()) {
+                    $filtered[$key] = new UploadedFile(
+                        '',
+                        $value->getClientOriginalName(),
+                        $value->getClientMimeType(),
+                        0,
+                        UPLOAD_ERR_INI_SIZE,
+                        true
+                    );
+                } else {
+                    $filtered[$key] = new UploadedFile(
+                        $value->getPathname(),
+                        $value->getClientOriginalName(),
+                        $value->getClientMimeType(),
+                        $value->getClientSize(),
+                        $value->getError(),
+                        true
+                    );
+                }
             } else {
                 $filtered[$key] = $value;
             }
@@ -142,7 +188,7 @@ EOF;
      *
      * @param Response $response A Response instance
      *
-     * @return Response A Response instance
+     * @return DomResponse A DomResponse instance
      */
     protected function filterResponse($response)
     {
@@ -152,9 +198,14 @@ EOF;
             foreach ($response->headers->getCookies() as $cookie) {
                 $cookies[] = new DomCookie($cookie->getName(), $cookie->getValue(), $cookie->getExpiresTime(), $cookie->getPath(), $cookie->getDomain(), $cookie->isSecure(), $cookie->isHttpOnly());
             }
-            $headers['Set-Cookie'] = implode(', ', $cookies);
+            $headers['Set-Cookie'] = $cookies;
         }
 
-        return new DomResponse($response->getContent(), $response->getStatusCode(), $headers);
+        // this is needed to support StreamedResponse
+        ob_start();
+        $response->sendContent();
+        $content = ob_get_clean();
+
+        return new DomResponse($content, $response->getStatusCode(), $headers);
     }
 }

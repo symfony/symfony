@@ -15,7 +15,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\Config\Definition\Processor;
+use Symfony\Bundle\WebProfilerBundle\EventListener\WebDebugToolbarListener;
 
 /**
  * WebProfilerExtension.
@@ -39,16 +39,17 @@ class WebProfilerExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $processor = new Processor();
-        $configuration = new Configuration();
-        $config = $processor->processConfiguration($configuration, $configs);
+        $configuration = $this->getConfiguration($configs, $container);
+        $config = $this->processConfiguration($configuration, $configs);
 
-        if ($config['toolbar']) {
-            $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader->load('profiler.xml');
+        $container->setParameter('web_profiler.debug_toolbar.position', $config['position']);
+
+        if ($config['toolbar'] || $config['intercept_redirects']) {
             $loader->load('toolbar.xml');
-
             $container->setParameter('web_profiler.debug_toolbar.intercept_redirects', $config['intercept_redirects']);
-            $container->setParameter('web_profiler.debug_toolbar.verbose', $config['verbose']);
+            $container->setParameter('web_profiler.debug_toolbar.mode', $config['toolbar'] ? WebDebugToolbarListener::ENABLED : WebDebugToolbarListener::DISABLED);
         }
     }
 

@@ -12,7 +12,8 @@
 namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
 
 use Symfony\Component\Templating\Helper\Helper;
-use Symfony\Bundle\FrameworkBundle\HttpKernel;
+use Symfony\Component\HttpKernel\Fragment\FragmentHandler;
+use Symfony\Component\HttpKernel\Controller\ControllerReference;
 
 /**
  * ActionsHelper manages action inclusions.
@@ -21,32 +22,39 @@ use Symfony\Bundle\FrameworkBundle\HttpKernel;
  */
 class ActionsHelper extends Helper
 {
-    protected $kernel;
+    private $handler;
 
     /**
      * Constructor.
      *
-     * @param HttpKernel $kernel A HttpKernel instance
+     * @param FragmentHandler $handler A FragmentHandler instance
      */
-    public function __construct(HttpKernel $kernel)
+    public function __construct(FragmentHandler $handler)
     {
-        $this->kernel = $kernel;
+        $this->handler = $handler;
     }
 
     /**
-     * Returns the Response content for a given controller or URI.
+     * Returns the fragment content for a given URI.
      *
-     * @param string $controller A controller name to execute (a string like BlogBundle:Post:index), or a relative URI
-     * @param array  $attributes An array of request attributes
-     * @param array  $options    An array of options
+     * @param string $uri     A URI
+     * @param array  $options An array of options
      *
-     * @see Symfony\Bundle\FrameworkBundle\HttpKernel::render()
+     * @return string The fragment content
+     *
+     * @see Symfony\Component\HttpKernel\Fragment\FragmentHandler::render()
      */
-    public function render($controller, array $attributes = array(), array $options = array())
+    public function render($uri, array $options = array())
     {
-        $options['attributes'] = $attributes;
+        $strategy = isset($options['strategy']) ? $options['strategy'] : 'inline';
+        unset($options['strategy']);
 
-        return $this->kernel->render($controller, $options);
+        return $this->handler->render($uri, $strategy, $options);
+    }
+
+    public function controller($controller, $attributes = array(), $query = array())
+    {
+        return new ControllerReference($controller, $attributes, $query);
     }
 
     /**

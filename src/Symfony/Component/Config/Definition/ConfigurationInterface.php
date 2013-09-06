@@ -23,5 +23,5 @@ interface ConfigurationInterface
      *
      * @return \Symfony\Component\Config\Definition\Builder\TreeBuilder The tree builder
      */
-    function getConfigTreeBuilder();
+    public function getConfigTreeBuilder();
 }

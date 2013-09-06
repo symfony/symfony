@@ -17,7 +17,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 /**
  * Transforms between a normalized time and a localized time string/array.
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Florian Eckerstorfer <florian@eckerstorfer.org>
  */
 class DateTimeToArrayTransformer extends BaseDateTimeTransformer
@@ -29,10 +29,10 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
     /**
      * Constructor.
      *
-     * @param string  $inputTimezone    The input timezone
-     * @param string  $outputTimezone   The output timezone
-     * @param array   $fields           The date fields
-     * @param Boolean $pad              Whether to use padding
+     * @param string  $inputTimezone  The input timezone
+     * @param string  $outputTimezone The output timezone
+     * @param array   $fields         The date fields
+     * @param Boolean $pad            Whether to use padding
      *
      * @throws UnexpectedTypeException if a timezone is not a string
      */
@@ -51,12 +51,13 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
     /**
      * Transforms a normalized date into a localized date.
      *
-     * @param  DateTime $dateTime  Normalized date.
+     * @param \DateTime $dateTime Normalized date.
      *
-     * @return array               Localized date.
+     * @return array Localized date.
      *
-     * @throws UnexpectedTypeException if the given value is not an instance of \DateTime
-     * @throws TransformationFailedException if the output timezone is not supported
+     * @throws TransformationFailedException If the given value is not an
+     *                                       instance of \DateTime or if the
+     *                                       output timezone is not supported.
      */
     public function transform($dateTime)
     {
@@ -72,7 +73,7 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
         }
 
         if (!$dateTime instanceof \DateTime) {
-            throw new UnexpectedTypeException($dateTime, '\DateTime');
+            throw new TransformationFailedException('Expected a \DateTime.');
         }
 
         $dateTime = clone $dateTime;
@@ -106,13 +107,14 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
     /**
      * Transforms a localized date into a normalized date.
      *
-     * @param  array $value  Localized date
+     * @param array $value Localized date
      *
-     * @return DateTime      Normalized date
+     * @return \DateTime Normalized date
      *
-     * @throws UnexpectedTypeException if the given value is not an array
-     * @throws TransformationFailedException if the value could not bet transformed
-     * @throws TransformationFailedException if the input timezone is not supported
+     * @throws TransformationFailedException If the given value is not an array,
+     *                                       if the value could not be transformed
+     *                                       or if the input timezone is not
+     *                                       supported.
      */
     public function reverseTransform($value)
     {
@@ -121,10 +123,10 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
         }
 
         if (!is_array($value)) {
-            throw new UnexpectedTypeException($value, 'array');
+            throw new TransformationFailedException('Expected an array.');
         }
 
-        if (implode('', $value) === '') {
+        if ('' === implode('', $value)) {
             return null;
         }
 
@@ -140,6 +142,22 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
             throw new TransformationFailedException(
                 sprintf('The fields "%s" should not be empty', implode('", "', $emptyFields)
             ));
+        }
+
+        if (isset($value['month']) && !ctype_digit($value['month']) && !is_int($value['month'])) {
+            throw new TransformationFailedException('This month is invalid');
+        }
+
+        if (isset($value['day']) && !ctype_digit($value['day']) && !is_int($value['day'])) {
+            throw new TransformationFailedException('This day is invalid');
+        }
+
+        if (isset($value['year']) && !ctype_digit($value['year']) && !is_int($value['year'])) {
+            throw new TransformationFailedException('This year is invalid');
+        }
+
+        if (!empty($value['month']) && !empty($value['day']) && !empty($value['year']) && false === checkdate($value['month'], $value['day'], $value['year'])) {
+            throw new TransformationFailedException('This is an invalid date');
         }
 
         try {

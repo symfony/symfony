@@ -22,63 +22,67 @@ use Symfony\Component\Console\Formatter\OutputFormatterInterface;
  */
 interface OutputInterface
 {
-    const VERBOSITY_QUIET   = 0;
-    const VERBOSITY_NORMAL  = 1;
-    const VERBOSITY_VERBOSE = 2;
+    const VERBOSITY_QUIET        = 0;
+    const VERBOSITY_NORMAL       = 1;
+    const VERBOSITY_VERBOSE      = 2;
+    const VERBOSITY_VERY_VERBOSE = 3;
+    const VERBOSITY_DEBUG        = 4;
 
     const OUTPUT_NORMAL = 0;
-    const OUTPUT_RAW = 1;
-    const OUTPUT_PLAIN = 2;
+    const OUTPUT_RAW    = 1;
+    const OUTPUT_PLAIN  = 2;
 
     /**
      * Writes a message to the output.
      *
-     * @param string|array $messages The message as an array of lines of a single string
-     * @param Boolean      $newline  Whether to add a newline or not
-     * @param integer      $type     The type of output
+     * @param string|array $messages The message as an array of lines or a single string
+     * @param Boolean      $newline  Whether to add a newline
+     * @param integer      $type     The type of output (one of the OUTPUT constants)
      *
      * @throws \InvalidArgumentException When unknown output type is given
      *
      * @api
      */
-    function write($messages, $newline = false, $type = 0);
+    public function write($messages, $newline = false, $type = self::OUTPUT_NORMAL);
 
     /**
      * Writes a message to the output and adds a newline at the end.
      *
      * @param string|array $messages The message as an array of lines of a single string
-     * @param integer      $type     The type of output
+     * @param integer      $type     The type of output (one of the OUTPUT constants)
+     *
+     * @throws \InvalidArgumentException When unknown output type is given
      *
      * @api
      */
-    function writeln($messages, $type = 0);
+    public function writeln($messages, $type = self::OUTPUT_NORMAL);
 
     /**
      * Sets the verbosity of the output.
      *
-     * @param integer $level The level of verbosity
+     * @param integer $level The level of verbosity (one of the VERBOSITY constants)
      *
      * @api
      */
-    function setVerbosity($level);
+    public function setVerbosity($level);
 
     /**
      * Gets the current verbosity of the output.
      *
-     * @return integer The current level of verbosity
+     * @return integer The current level of verbosity (one of the VERBOSITY constants)
      *
      * @api
      */
-    function getVerbosity();
+    public function getVerbosity();
 
     /**
      * Sets the decorated flag.
      *
-     * @param Boolean $decorated Whether to decorated the messages or not
+     * @param Boolean $decorated Whether to decorate the messages
      *
      * @api
      */
-    function setDecorated($decorated);
+    public function setDecorated($decorated);
 
     /**
      * Gets the decorated flag.
@@ -87,7 +91,7 @@ interface OutputInterface
      *
      * @api
      */
-    function isDecorated();
+    public function isDecorated();
 
     /**
      * Sets output formatter.
@@ -96,7 +100,7 @@ interface OutputInterface
      *
      * @api
      */
-    function setFormatter(OutputFormatterInterface $formatter);
+    public function setFormatter(OutputFormatterInterface $formatter);
 
     /**
      * Returns current output formatter instance.
@@ -105,5 +109,5 @@ interface OutputInterface
      *
      * @api
      */
-    function getFormatter();
+    public function getFormatter();
 }

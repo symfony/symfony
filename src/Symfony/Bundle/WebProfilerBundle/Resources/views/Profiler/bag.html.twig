@@ -1,12 +1,17 @@
-<table>
-    <tr>
-        <th>Key</th>
-        <th>Value</th>
-    </tr>
-    {% for key in bag.keys|sort %}
+<table {% if class is defined %}class='{{ class }}'{% endif %} >
+    <thead>
         <tr>
-            <th>{{ key }}</th>
-            <td>{{ bag.get(key)|yaml_dump }}</td>
+            <th scope="col">Key</th>
+            <th scope="col">Value</th>
         </tr>
-    {% endfor %}
+    </thead>
+    <tbody>
+        {% for key in bag.keys|sort %}
+            <tr>
+                <th>{{ key }}</th>
+                {# JSON_UNESCAPED_SLASHES = 64, JSON_UNESCAPED_UNICODE = 256 #}
+                <td>{{ bag.get(key)|json_encode(64 b-or 256) }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
 </table>

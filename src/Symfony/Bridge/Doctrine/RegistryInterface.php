@@ -11,53 +11,23 @@
 
 namespace Symfony\Bridge\Doctrine;
 
-use Doctrine\DBAL\Connection;
+use Doctrine\Common\Persistence\ManagerRegistry as ManagerRegistryInterface;
 use Doctrine\ORM\Configuration;
-use Doctrine\ORM\ORMException;
+use Doctrine\ORM\EntityManager;
 
 /**
  * References Doctrine connections and entity managers.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-interface RegistryInterface
+interface RegistryInterface extends ManagerRegistryInterface
 {
-    /**
-     * Gets the default connection name.
-     *
-     * @return string The default connection name
-     */
-    function getDefaultConnectionName();
-
-    /**
-     * Gets the named connection.
-     *
-     * @param string $name The connection name (null for the default one)
-     *
-     * @return Connection
-     */
-    function getConnection($name = null);
-
-    /**
-     * Gets an array of all registered connections
-     *
-     * @return array An array of Connection instances
-     */
-    function getConnections();
-
-    /**
-     * Gets all connection names.
-     *
-     * @return array An array of connection names
-     */
-    function getConnectionNames();
-
     /**
      * Gets the default entity manager name.
      *
      * @return string The default entity manager name
      */
-    function getDefaultEntityManagerName();
+    public function getDefaultEntityManagerName();
 
     /**
      * Gets a named entity manager.
@@ -66,14 +36,14 @@ interface RegistryInterface
      *
      * @return EntityManager
      */
-    function getEntityManager($name = null);
+    public function getEntityManager($name = null);
 
     /**
      * Gets an array of all registered entity managers
      *
      * @return array An array of EntityManager instances
      */
-    function getEntityManagers();
+    public function getEntityManagers();
 
     /**
      * Resets a named entity manager.
@@ -92,7 +62,7 @@ interface RegistryInterface
      *
      * @return EntityManager
      */
-    function resetEntityManager($name = null);
+    public function resetEntityManager($name = null);
 
     /**
      * Resolves a registered namespace alias to the full namespace.
@@ -105,22 +75,21 @@ interface RegistryInterface
      *
      * @see Configuration::getEntityNamespace
      */
-    function getEntityNamespace($alias);
+    public function getEntityNamespace($alias);
 
     /**
      * Gets all connection names.
      *
      * @return array An array of connection names
      */
-    function getEntityManagerNames();
+    public function getEntityManagerNames();
 
     /**
-     * Gets the EntityRepository for an entity.
+     * Gets the entity manager associated with a given class.
      *
-     * @param string $entityName        The name of the entity.
-     * @param string $entityManagerNAme The entity manager name (null for the default one)
+     * @param string $class A Doctrine Entity class name
      *
-     * @return Doctrine\ORM\EntityRepository
+     * @return EntityManager|null
      */
-    function getRepository($entityName, $entityManagerName = null);
+    public function getEntityManagerForClass($class);
 }

@@ -24,7 +24,9 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
  *
  * Constraint instances are immutable and serializable.
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @api
  */
 abstract class Constraint
 {
@@ -77,6 +79,8 @@ abstract class Constraint
      * @throws ConstraintDefinitionException When you don't pass an associative
      *                                       array, but getDefaultOption() returns
      *                                       NULL
+     *
+     * @api
      */
     public function __construct($options = null)
     {
@@ -96,7 +100,7 @@ abstract class Constraint
                     $invalidOptions[] = $option;
                 }
             }
-        } else if (null !== $options && ! (is_array($options) && count($options) === 0)) {
+        } elseif (null !== $options && ! (is_array($options) && count($options) === 0)) {
             $option = $this->getDefaultOption();
 
             if (null === $option) {
@@ -142,6 +146,8 @@ abstract class Constraint
      * Adds the given group if this constraint is in the Default group
      *
      * @param string $group
+     *
+     * @api
      */
     public function addImplicitGroupName($group)
     {
@@ -157,6 +163,8 @@ abstract class Constraint
      *
      * @return string
      * @see __construct()
+     *
+     * @api
      */
     public function getDefaultOption()
     {
@@ -170,6 +178,8 @@ abstract class Constraint
      *
      * @return array
      * @see __construct()
+     *
+     * @api
      */
     public function getRequiredOptions()
     {
@@ -184,6 +194,8 @@ abstract class Constraint
      * behaviour.
      *
      * @return string
+     *
+     * @api
      */
     public function validatedBy()
     {
@@ -198,6 +210,8 @@ abstract class Constraint
      * Constraint::CLASS_CONSTRAINT and Constraint::PROPERTY_CONSTRAINT.
      *
      * @return string|array  One or more constant values
+     *
+     * @api
      */
     public function getTargets()
     {

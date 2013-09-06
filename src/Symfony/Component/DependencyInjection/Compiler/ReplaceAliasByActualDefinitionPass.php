@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -30,6 +31,8 @@ class ReplaceAliasByActualDefinitionPass implements CompilerPassInterface
      * Process the Container to replace aliases with service definitions.
      *
      * @param ContainerBuilder $container
+     *
+     * @throws InvalidArgumentException if the service definition does not exist
      */
     public function process(ContainerBuilder $container)
     {
@@ -39,7 +42,11 @@ class ReplaceAliasByActualDefinitionPass implements CompilerPassInterface
         foreach ($container->getAliases() as $id => $alias) {
             $aliasId = (string) $alias;
 
-            $definition = $container->getDefinition($aliasId);
+            try {
+                $definition = $container->getDefinition($aliasId);
+            } catch (InvalidArgumentException $e) {
+                throw new InvalidArgumentException(sprintf('Unable to replace alias "%s" with "%s".', $alias, $id), null, $e);
+            }
 
             if ($definition->isPublic()) {
                 continue;
@@ -63,8 +70,8 @@ class ReplaceAliasByActualDefinitionPass implements CompilerPassInterface
      * Updates references to remove aliases.
      *
      * @param ContainerBuilder $container The container
-     * @param string $currentId The alias identifier being replaced
-     * @param string $newId The id of the service the alias points to
+     * @param string           $currentId The alias identifier being replaced
+     * @param string           $newId     The id of the service the alias points to
      */
     private function updateReferences($container, $currentId, $newId)
     {
@@ -94,16 +101,18 @@ class ReplaceAliasByActualDefinitionPass implements CompilerPassInterface
     /**
      * Updates argument references.
      *
-     * @param array $arguments An array of Arguments
+     * @param array  $arguments An array of Arguments
      * @param string $currentId The alias identifier
-     * @param string $newId The identifier the alias points to
+     * @param string $newId     The identifier the alias points to
+     *
+     * @return array
      */
     private function updateArgumentReferences(array $arguments, $currentId, $newId)
     {
         foreach ($arguments as $k => $argument) {
             if (is_array($argument)) {
                 $arguments[$k] = $this->updateArgumentReferences($argument, $currentId, $newId);
-            } else if ($argument instanceof Reference) {
+            } elseif ($argument instanceof Reference) {
                 if ($currentId === (string) $argument) {
                     $arguments[$k] = new Reference($newId, $argument->getInvalidBehavior());
                     $this->compiler->addLogMessage($this->formatter->formatUpdateReference($this, $this->sourceId, $currentId, $newId));

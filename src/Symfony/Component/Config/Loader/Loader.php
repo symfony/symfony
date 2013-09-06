@@ -25,7 +25,7 @@ abstract class Loader implements LoaderInterface
     /**
      * Gets the loader resolver.
      *
-     * @return LoaderResolver A LoaderResolver instance
+     * @return LoaderResolverInterface A LoaderResolverInterface instance
      */
     public function getResolver()
     {
@@ -35,9 +35,9 @@ abstract class Loader implements LoaderInterface
     /**
      * Sets the loader resolver.
      *
-     * @param LoaderResolver $resolver A LoaderResolver instance
+     * @param LoaderResolverInterface $resolver A LoaderResolverInterface instance
      */
-    public function setResolver(LoaderResolver $resolver)
+    public function setResolver(LoaderResolverInterface $resolver)
     {
         $this->resolver = $resolver;
     }
@@ -47,10 +47,12 @@ abstract class Loader implements LoaderInterface
      *
      * @param mixed  $resource A Resource
      * @param string $type     The resource type
+     *
+     * @return mixed
      */
     public function import($resource, $type = null)
     {
-        $this->resolve($resource)->load($resource, $type);
+        return $this->resolve($resource, $type)->load($resource, $type);
     }
 
     /**

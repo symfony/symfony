@@ -16,15 +16,19 @@
 namespace Symfony\Component\HttpKernel\HttpCache;
 
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\TerminableInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\HttpCache\Esi;
 
 /**
  * Cache provides HTTP caching.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
-class HttpCache implements HttpKernelInterface
+class HttpCache implements HttpKernelInterface, TerminableInterface
 {
     private $kernel;
     private $store;
@@ -55,7 +59,7 @@ class HttpCache implements HttpKernelInterface
      *
      *   * allow_revalidate       Specifies whether the client can force a cache revalidate by including
      *                            a Cache-Control "max-age=0" directive in the request. Set it to ``true``
-      *                            for compliance with RFC 2616. (default: false)
+     *                            for compliance with RFC 2616. (default: false)
      *
      *   * stale_while_revalidate Specifies the default number of seconds (the granularity is the second as the
      *                            Response TTL precision is a second) during which the cache can immediately return
@@ -95,6 +99,16 @@ class HttpCache implements HttpKernelInterface
     }
 
     /**
+     * Gets the current store.
+     *
+     * @return StoreInterface $store A StoreInterface instance
+     */
+    public function getStore()
+    {
+        return $this->store;
+    }
+
+    /**
      * Returns an array of events that took place during processing of the last request.
      *
      * @return array An array of events
@@ -122,7 +136,7 @@ class HttpCache implements HttpKernelInterface
     /**
      * Gets the Request instance associated with the master request.
      *
-     * @return Symfony\Component\HttpFoundation\Request A Request instance
+     * @return Request A Request instance
      */
     public function getRequest()
     {
@@ -132,7 +146,7 @@ class HttpCache implements HttpKernelInterface
     /**
      * Gets the Kernel instance
      *
-     * @return Symfony\Component\HttpKernel\HttpKernelInterface An HttpKernelInterface instance
+     * @return HttpKernelInterface An HttpKernelInterface instance
      */
     public function getKernel()
     {
@@ -143,7 +157,7 @@ class HttpCache implements HttpKernelInterface
     /**
      * Gets the Esi instance
      *
-     * @return Symfony\Component\HttpKernel\HttpCache\Esi An Esi instance
+     * @return Esi An Esi instance
      */
     public function getEsi()
     {
@@ -152,6 +166,8 @@ class HttpCache implements HttpKernelInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @api
      */
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
@@ -178,8 +194,6 @@ class HttpCache implements HttpKernelInterface
             $response = $this->lookup($request, $catch);
         }
 
-        $response->isNotModified($request);
-
         $this->restoreResponseBody($request, $response);
 
         $response->setDate(new \DateTime(null, new \DateTimeZone('UTC')));
@@ -189,14 +203,30 @@ class HttpCache implements HttpKernelInterface
         }
 
         if (null !== $this->esi) {
-            $this->esiCacheStrategy->add($response);
-
             if (HttpKernelInterface::MASTER_REQUEST === $type) {
                 $this->esiCacheStrategy->update($response);
+            } else {
+                $this->esiCacheStrategy->add($response);
             }
         }
 
+        $response->prepare($request);
+
+        $response->isNotModified($request);
+
         return $response;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @api
+     */
+    public function terminate(Request $request, Response $response)
+    {
+        if ($this->getKernel() instanceof TerminableInterface) {
+            $this->getKernel()->terminate($request, $response);
+        }
     }
 
     /**
@@ -222,6 +252,8 @@ class HttpCache implements HttpKernelInterface
      *
      * @return Response A Response instance
      *
+     * @throws \Exception
+     *
      * @see RFC2616 13.10
      */
     protected function invalidate(Request $request, $catch = false)
@@ -232,6 +264,15 @@ class HttpCache implements HttpKernelInterface
         if ($response->isSuccessful() || $response->isRedirect()) {
             try {
                 $this->store->invalidate($request, $catch);
+
+                // As per the RFC, invalidate Location and Content-Location URLs if present
+                foreach (array('Location', 'Content-Location') as $header) {
+                    if ($uri = $response->headers->get($header)) {
+                        $subRequest = $request::create($uri, 'get', array(), array(), array(), $request->server->all());
+
+                        $this->store->invalidate($subRequest);
+                    }
+                }
 
                 $this->record($request, 'invalidate');
             } catch (\Exception $e) {
@@ -259,6 +300,8 @@ class HttpCache implements HttpKernelInterface
      * @param Boolean $catch   whether to process exceptions
      *
      * @return Response A Response instance
+     *
+     * @throws \Exception
      */
     protected function lookup(Request $request, $catch = false)
     {
@@ -317,7 +360,7 @@ class HttpCache implements HttpKernelInterface
         $subRequest = clone $request;
 
         // send no head requests because we want content
-        $subRequest->setMethod('get');
+        $subRequest->setMethod('GET');
 
         // add our cached last-modified validator
         $subRequest->headers->set('if_modified_since', $entry->headers->get('Last-Modified'));
@@ -378,7 +421,7 @@ class HttpCache implements HttpKernelInterface
         $subRequest = clone $request;
 
         // send no head requests because we want content
-        $subRequest->setMethod('get');
+        $subRequest->setMethod('GET');
 
         // avoid that the backend sends no content
         $subRequest->headers->remove('if_modified_since');
@@ -413,6 +456,18 @@ class HttpCache implements HttpKernelInterface
         if ($this->esi) {
             $this->esi->addSurrogateEsiCapability($request);
         }
+
+        // modify the X-Forwarded-For header if needed
+        $forwardedFor = $request->headers->get('X-Forwarded-For');
+        if ($forwardedFor) {
+            $request->headers->set('X-Forwarded-For', $forwardedFor.', '.$request->server->get('REMOTE_ADDR'));
+        } else {
+            $request->headers->set('X-Forwarded-For', $request->server->get('REMOTE_ADDR'));
+        }
+
+        // fix the client IP address by setting it to 127.0.0.1 as HttpCache
+        // is always called from the same process as the backend.
+        $request->server->set('REMOTE_ADDR', '127.0.0.1');
 
         // always a "master" request (as the real master request can be in cache)
         $response = $this->kernel->handle($request, HttpKernelInterface::MASTER_REQUEST, $catch);
@@ -486,8 +541,9 @@ class HttpCache implements HttpKernelInterface
 
             // wait for the lock to be released
             $wait = 0;
-            while (file_exists($lock) && $wait < 5000000) {
-                usleep($wait += 50000);
+            while ($this->store->isLocked($request) && $wait < 5000000) {
+                usleep(50000);
+                $wait += 50000;
             }
 
             if ($wait < 2000000) {
@@ -519,6 +575,8 @@ class HttpCache implements HttpKernelInterface
      *
      * @param Request  $request  A Request instance
      * @param Response $response A Response instance
+     *
+     * @throws \Exception
      */
     protected function store(Request $request, Response $response)
     {
@@ -550,8 +608,8 @@ class HttpCache implements HttpKernelInterface
      */
     private function restoreResponseBody(Request $request, Response $response)
     {
-        if ('head' === strtolower($request->getMethod())) {
-            $response->setContent('');
+        if ($request->isMethod('HEAD') || 304 === $response->getStatusCode()) {
+            $response->setContent(null);
             $response->headers->remove('X-Body-Eval');
             $response->headers->remove('X-Body-File');
 
@@ -569,6 +627,9 @@ class HttpCache implements HttpKernelInterface
 
             $response->setContent(ob_get_clean());
             $response->headers->remove('X-Body-Eval');
+            if (!$response->headers->has('Transfer-Encoding')) {
+                $response->headers->set('Content-Length', strlen($response->getContent()));
+            }
         } elseif ($response->headers->has('X-Body-File')) {
             $response->setContent(file_get_contents($response->headers->get('X-Body-File')));
         } else {
@@ -576,10 +637,6 @@ class HttpCache implements HttpKernelInterface
         }
 
         $response->headers->remove('X-Body-File');
-
-        if (!$response->headers->has('Transfer-Encoding')) {
-            $response->headers->set('Content-Length', strlen($response->getContent()));
-        }
     }
 
     protected function processResponseBody(Request $request, Response $response)
@@ -618,7 +675,7 @@ class HttpCache implements HttpKernelInterface
      * Records that an event took place.
      *
      * @param Request $request A Request instance
-     * @param string  $event The event name
+     * @param string  $event   The event name
      */
     private function record(Request $request, $event)
     {

@@ -13,7 +13,6 @@ namespace Symfony\Component\Security\Http\EntryPoint;
 
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -40,7 +39,7 @@ class RetryAuthenticationEntryPoint implements AuthenticationEntryPointInterface
         $scheme = $request->isSecure() ? 'http' : 'https';
         if ('http' === $scheme && 80 != $this->httpPort) {
             $port = ':'.$this->httpPort;
-        } elseif ('https' === $scheme && 443 != $this->httpPort) {
+        } elseif ('https' === $scheme && 443 != $this->httpsPort) {
             $port = ':'.$this->httpsPort;
         } else {
             $port = '';

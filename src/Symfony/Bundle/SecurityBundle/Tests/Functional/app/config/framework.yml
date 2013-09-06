@@ -1,5 +1,4 @@
 framework:
-    charset:       UTF-8
     secret:        test
     csrf_protection:
         enabled: true
@@ -7,11 +6,10 @@ framework:
     validation:    { enabled: true, enable_annotations: true }
     form: ~
     test: ~
+    default_locale: en
     session:
-        default_locale: en
-        lifetime:       3600
-        auto_start:     true
-        storage_id: session.storage.filesystem
+        storage_id:     session.storage.mock_file
+    profiler: { only_exceptions: false }
 
 services:
     logger: { class: Symfony\Component\HttpKernel\Log\NullLogger }

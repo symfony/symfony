@@ -11,55 +11,32 @@
 
 namespace Symfony\Component\Form\Util;
 
-abstract class FormUtil
+/**
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ */
+class FormUtil
 {
-    static public function toArrayKey($value)
-    {
-        if ((string) (int) $value === (string) $value) {
-            return (int) $value;
-        }
-
-        if (is_bool($value)) {
-            return (int) $value;
-        }
-
-        return (string) $value;
-    }
-
-    static public function toArrayKeys(array $array)
-    {
-        return array_map(array(__CLASS__, 'toArrayKey'), $array);
-    }
+    /**
+     * This class should not be instantiated
+     */
+    private function __construct() {}
 
     /**
-     * Returns whether the given choice is a group.
+     * Returns whether the given data is empty.
      *
-     * @param mixed $choice A choice
+     * This logic is reused multiple times throughout the processing of
+     * a form and needs to be consistent. PHP's keyword `empty` cannot
+     * be used as it also considers 0 and "0" to be empty.
      *
-     * @return Boolean Whether the choice is a group
+     * @param  mixed $data
+     *
+     * @return Boolean
      */
-    static public function isChoiceGroup($choice)
+    public static function isEmpty($data)
     {
-        return is_array($choice) || $choice instanceof \Traversable;
-    }
-
-    /**
-     * Returns whether the given choice is selected.
-     *
-     * @param mixed $choice The choice
-     *
-     * @return Boolean Whether the choice is selected
-     */
-    static public function isChoiceSelected($choice, $value)
-    {
-        $choice = FormUtil::toArrayKey($choice);
-
-        // The value should already have been converted by value transformers,
-        // otherwise we had to do the conversion on every call of this method
-        if (is_array($value)) {
-            return false !== array_search($choice, $value, true);
-        }
-
-        return $choice === $value;
+        // Should not do a check for array() === $data!!!
+        // This method is used in occurrences where arrays are
+        // not considered to be empty, ever.
+        return null === $data || '' === $data;
     }
 }

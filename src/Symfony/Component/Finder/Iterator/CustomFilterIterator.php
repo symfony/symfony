@@ -19,7 +19,7 @@ namespace Symfony\Component\Finder\Iterator;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class CustomFilterIterator extends \FilterIterator
+class CustomFilterIterator extends FilterIterator
 {
     private $filters = array();
 
@@ -28,6 +28,8 @@ class CustomFilterIterator extends \FilterIterator
      *
      * @param \Iterator $iterator The Iterator to filter
      * @param array     $filters  An array of PHP callbacks
+     *
+     * @throws \InvalidArgumentException
      */
     public function __construct(\Iterator $iterator, array $filters)
     {

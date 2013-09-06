@@ -14,7 +14,7 @@ namespace Symfony\Component\Security\Http\Firewall;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\EntryPoint\DigestAuthenticationEntryPoint;
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
@@ -54,6 +54,8 @@ class DigestAuthenticationListener implements ListenerInterface
      * Handles digest authentication.
      *
      * @param GetResponseEvent $event A GetResponseEvent instance
+     *
+     * @throws AuthenticationServiceException
      */
     public function handle(GetResponseEvent $event)
     {
@@ -122,7 +124,10 @@ class DigestAuthenticationListener implements ListenerInterface
 
     private function fail(GetResponseEvent $event, Request $request, AuthenticationException $authException)
     {
-        $this->securityContext->setToken(null);
+        $token = $this->securityContext->getToken();
+        if ($token instanceof UsernamePasswordToken && $this->providerKey === $token->getProviderKey()) {
+            $this->securityContext->setToken(null);
+        }
 
         if (null !== $this->logger) {
             $this->logger->info($authException);
@@ -141,11 +146,12 @@ class DigestData
     public function __construct($header)
     {
         $this->header = $header;
-        $parts = preg_split('/, /', $header);
+        preg_match_all('/(\w+)=("((?:[^"\\\\]|\\\\.)+)"|([^\s,$]+))/', $header, $matches, PREG_SET_ORDER);
         $this->elements = array();
-        foreach ($parts as $part) {
-            list($key, $value) = explode('=', $part);
-            $this->elements[$key] = '"' === $value[0] ? substr($value, 1, -1) : $value;
+        foreach ($matches as $match) {
+            if (isset($match[1]) && isset($match[3])) {
+                $this->elements[$match[1]] = isset($match[4]) ? $match[4] : $match[3];
+            }
         }
     }
 
@@ -156,7 +162,7 @@ class DigestData
 
     public function getUsername()
     {
-        return $this->elements['username'];
+        return strtr($this->elements['username'], array("\\\"" => "\"", "\\\\" => "\\"));
     }
 
     public function validateAndDecode($entryPointKey, $expectedRealm)
@@ -188,7 +194,7 @@ class DigestData
         $this->nonceExpiryTime = $nonceTokens[0];
 
         if (md5($this->nonceExpiryTime.':'.$entryPointKey) !== $nonceTokens[1]) {
-            new BadCredentialsException(sprintf('Nonce token compromised "%s".', $nonceAsPlainText));
+            throw new BadCredentialsException(sprintf('Nonce token compromised "%s".', $nonceAsPlainText));
         }
     }
 

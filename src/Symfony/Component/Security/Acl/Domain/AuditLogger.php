@@ -27,7 +27,6 @@ abstract class AuditLogger implements AuditLoggerInterface
      *
      * @param Boolean        $granted
      * @param EntryInterface $ace
-     * @return void
      */
     public function logIfNeeded($granted, EntryInterface $ace)
     {
@@ -37,7 +36,7 @@ abstract class AuditLogger implements AuditLoggerInterface
 
         if ($granted && $ace->isAuditSuccess()) {
             $this->doLog($granted, $ace);
-        } else if (!$granted && $ace->isAuditFailure()) {
+        } elseif (!$granted && $ace->isAuditFailure()) {
             $this->doLog($granted, $ace);
         }
     }
@@ -47,7 +46,6 @@ abstract class AuditLogger implements AuditLoggerInterface
      *
      * @param Boolean        $granted
      * @param EntryInterface $ace
-     * @return void
      */
     abstract protected function doLog($granted, EntryInterface $ace);
 }

@@ -12,19 +12,22 @@
 namespace Symfony\Bridge\Doctrine\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * Constraint for the Unique Entity validator
  *
+ * @Annotation
  * @author Benjamin Eberlei <kontakt@beberlei.de>
  */
 class UniqueEntity extends Constraint
 {
     public $message = 'This value is already used.';
+    public $service = 'doctrine.orm.validator.unique';
     public $em = null;
+    public $repositoryMethod = 'findBy';
     public $fields = array();
+    public $errorPath = null;
+    public $ignoreNull = true;
 
     public function getRequiredOptions()
     {
@@ -38,7 +41,7 @@ class UniqueEntity extends Constraint
      */
     public function validatedBy()
     {
-        return 'doctrine.orm.validator.unique';
+        return $this->service;
     }
 
     /**

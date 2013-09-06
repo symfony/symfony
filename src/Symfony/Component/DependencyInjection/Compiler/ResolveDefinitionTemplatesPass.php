@@ -1,12 +1,12 @@
 <?php
 
 /*
- * This file is part of the Symfony framework.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien@symfony.com>
  *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 namespace Symfony\Component\DependencyInjection\Compiler;
@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 /**
  * This replaces all DefinitionDecorator instances with their equivalent fully
@@ -55,12 +56,15 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
      *
      * @param string              $id         The definition identifier
      * @param DefinitionDecorator $definition
+     *
      * @return Definition
+     *
+     * @throws \RuntimeException When the definition is invalid
      */
     private function resolveDefinition($id, DefinitionDecorator $definition)
     {
         if (!$this->container->hasDefinition($parent = $definition->getParent())) {
-            throw new \RuntimeException(sprintf('The parent definition "%s" defined for definition "%s" does not exist.', $parent, $id));
+            throw new RuntimeException(sprintf('The parent definition "%s" defined for definition "%s" does not exist.', $parent, $id));
         }
 
         $parentDef = $this->container->getDefinition($parent);
@@ -83,6 +87,7 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
         $def->setConfigurator($parentDef->getConfigurator());
         $def->setFile($parentDef->getFile());
         $def->setPublic($parentDef->isPublic());
+        $def->setLazy($parentDef->isLazy());
 
         // overwrite with values specified in the decorator
         $changes = $definition->getChanges();
@@ -107,6 +112,9 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
         if (isset($changes['public'])) {
             $def->setPublic($definition->isPublic());
         }
+        if (isset($changes['lazy'])){
+            $def->setLazy($definition->isLazy());
+        }
 
         // merge arguments
         foreach ($definition->getArguments() as $k => $v) {
@@ -116,7 +124,7 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
             }
 
             if (0 !== strpos($k, 'index_')) {
-                throw new \RuntimeException(sprintf('Invalid argument key "%s" found.', $k));
+                throw new RuntimeException(sprintf('Invalid argument key "%s" found.', $k));
             }
 
             $index = (integer) substr($k, strlen('index_'));

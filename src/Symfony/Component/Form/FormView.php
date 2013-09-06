@@ -11,16 +11,33 @@
 
 namespace Symfony\Component\Form;
 
+use Symfony\Component\Form\Exception\BadMethodCallException;
+
+/**
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ */
 class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
 {
-    private $vars = array(
+    /**
+     * The variables assigned to this view.
+     * @var array
+     */
+    public $vars = array(
         'value' => null,
         'attr'  => array(),
     );
 
-    private $parent;
+    /**
+     * The parent view.
+     * @var FormView
+     */
+    public $parent;
 
-    private $children = array();
+    /**
+     * The child views.
+     * @var array
+     */
+    public $children = array();
 
     /**
      * Is the form attached to this renderer rendered?
@@ -33,80 +50,15 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      */
     private $rendered = false;
 
-    /**
-     * @param string $name
-     * @param mixed $value
-     *
-     * @return FormView The current view
-     */
-    public function set($name, $value)
+    public function __construct(FormView $parent = null)
     {
-        $this->vars[$name] = $value;
-
-        return $this;
+        $this->parent = $parent;
     }
 
     /**
-     * @param $name
-     * @return Boolean
-     */
-    public function has($name)
-    {
-        return array_key_exists($name, $this->vars);
-    }
-
-    /**
-     * @param $name
-     * @param $default
+     * Returns whether the view was already rendered.
      *
-     * @return mixed
-     */
-    public function get($name, $default = null)
-    {
-        if (false === $this->has($name)) {
-            return $default;
-        }
-
-        return $this->vars[$name];
-    }
-
-    /**
-     * @return array
-     */
-    public function all()
-    {
-        return $this->vars;
-    }
-
-    /**
-     * Alias of all so it is possible to do `form.vars.foo`
-     *
-     * @return array
-     */
-    public function getVars()
-    {
-        return $this->all();
-    }
-
-    /**
-     * Sets the value for an attribute.
-     *
-     * @param string $name  The name of the attribute
-     * @param string $value The value
-     *
-     * @return FormView The current view
-     */
-    public function setAttribute($name, $value)
-    {
-        $this->vars['attr'][$name] = $value;
-
-        return $this;
-    }
-
-    /**
-     * Returns whether the attached form is rendered.
-     *
-     * @return Boolean Whether the form is rendered
+     * @return Boolean Whether this view's widget is rendered.
      */
     public function isRendered()
     {
@@ -130,95 +82,15 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     }
 
     /**
-     * Marks the attached form as rendered
+     * Marks the view as rendered.
      *
-     * @return FormView The current view
+     * @return FormView The view object.
      */
     public function setRendered()
     {
         $this->rendered = true;
 
         return $this;
-    }
-
-    /**
-     * Sets the parent view.
-     *
-     * @param FormView $parent The parent view
-     *
-     * @return FormView The current view
-     */
-    public function setParent(FormView $parent = null)
-    {
-        $this->parent = $parent;
-
-        return $this;
-    }
-
-    /**
-     * Returns the parent view.
-     *
-     * @return FormView The parent view
-     */
-    public function getParent()
-    {
-        return $this->parent;
-    }
-
-    /**
-     * Returns whether this view has a parent.
-     *
-     * @return Boolean Whether this view has a parent
-     */
-    public function hasParent()
-    {
-        return null !== $this->parent;
-    }
-
-    /**
-     * Sets the children view.
-     *
-     * @param array $children The children as instances of FormView
-     *
-     * @return FormView The current view
-     */
-    public function setChildren(array $children)
-    {
-        $this->children = $children;
-
-        return $this;
-    }
-
-    /**
-     * Returns the children.
-     *
-     * @return array The children as instances of FormView
-     */
-    public function getChildren()
-    {
-        return $this->children;
-    }
-
-    /**
-     * Returns a given child.
-     *
-     * @param string name The name of the child
-     *
-     * @return FormView The child view
-     */
-    public function getChild($name)
-    {
-        return $this->children[$name];
-    }
-
-    /**
-     * Returns whether this view has children.
-     *
-     * @return Boolean Whether this view has children
-     */
-    public function hasChildren()
-    {
-        return count($this->children) > 0;
     }
 
     /**
@@ -230,7 +102,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      */
     public function offsetGet($name)
     {
-        return $this->getChild($name);
+        return $this->children[$name];
     }
 
     /**
@@ -248,11 +120,11 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * Implements \ArrayAccess.
      *
-     * @throws \BadMethodCallException always as setting a child by name is not allowed
+     * @throws BadMethodCallException always as setting a child by name is not allowed
      */
     public function offsetSet($name, $value)
     {
-        throw new \BadMethodCallException('Not supported');
+        throw new BadMethodCallException('Not supported');
     }
 
     /**

@@ -33,9 +33,30 @@ class FilesystemLoader extends \Twig_Loader_Filesystem
      */
     public function __construct(FileLocatorInterface $locator, TemplateNameParserInterface $parser)
     {
+        parent::__construct(array());
+
         $this->locator = $locator;
         $this->parser = $parser;
         $this->cache = array();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function exists($template)
+    {
+        if (parent::exists($template)) {
+            return true;
+        }
+
+        // same logic as findTemplate below for the fallback
+        try {
+            $this->cache[(string) $template] = $this->locator->locate($this->parser->parse($template));
+        } catch (\Exception $e) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -62,16 +83,19 @@ class FilesystemLoader extends \Twig_Loader_Filesystem
         $file = null;
         $previous = null;
         try {
-            $template = $this->parser->parse($template);
+            $file = parent::findTemplate($template);
+        } catch (\Twig_Error_Loader $e) {
+            $previous = $e;
+
+            // for BC
             try {
-                $file = $this->locator->locate($template);
-            } catch (\InvalidArgumentException $e) {
-                $previous = $e;
-            }
-        } catch (\Exception $e) {
-            try {
-                $file = parent::findTemplate($template);
-            } catch (\Twig_Error_Loader $e) {
+                $template = $this->parser->parse($template);
+                try {
+                    $file = $this->locator->locate($template);
+                } catch (\InvalidArgumentException $e) {
+                    $previous = $e;
+                }
+            } catch (\Exception $e) {
                 $previous = $e;
             }
         }

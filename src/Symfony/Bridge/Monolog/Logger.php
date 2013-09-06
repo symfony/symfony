@@ -23,6 +23,38 @@ use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 class Logger extends BaseLogger implements LoggerInterface, DebugLoggerInterface
 {
     /**
+     * @deprecated since 2.2, to be removed in 3.0. Use emergency() which is PSR-3 compatible.
+     */
+    public function emerg($message, array $context = array())
+    {
+        return parent::addRecord(BaseLogger::EMERGENCY, $message, $context);
+    }
+
+    /**
+     * @deprecated since 2.2, to be removed in 3.0. Use critical() which is PSR-3 compatible.
+     */
+    public function crit($message, array $context = array())
+    {
+        return parent::addRecord(BaseLogger::CRITICAL, $message, $context);
+    }
+
+    /**
+     * @deprecated since 2.2, to be removed in 3.0. Use error() which is PSR-3 compatible.
+     */
+    public function err($message, array $context = array())
+    {
+        return parent::addRecord(BaseLogger::ERROR, $message, $context);
+    }
+
+    /**
+     * @deprecated since 2.2, to be removed in 3.0. Use warning() which is PSR-3 compatible.
+     */
+    public function warn($message, array $context = array())
+    {
+        return parent::addRecord(BaseLogger::WARNING, $message, $context);
+    }
+
+    /**
      * @see Symfony\Component\HttpKernel\Log\DebugLoggerInterface
      */
     public function getLogs()
@@ -30,6 +62,8 @@ class Logger extends BaseLogger implements LoggerInterface, DebugLoggerInterface
         if ($logger = $this->getDebugLogger()) {
             return $logger->getLogs();
         }
+
+        return array();
     }
 
     /**
@@ -40,12 +74,14 @@ class Logger extends BaseLogger implements LoggerInterface, DebugLoggerInterface
         if ($logger = $this->getDebugLogger()) {
             return $logger->countErrors();
         }
+
+        return 0;
     }
 
     /**
      * Returns a DebugLoggerInterface instance if one is registered with this logger.
      *
-     * @return DebugLoggerInterface A DebugLoggerInterface instance or null if none is registered
+     * @return DebugLoggerInterface|null A DebugLoggerInterface instance or null if none is registered
      */
     private function getDebugLogger()
     {

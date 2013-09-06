@@ -18,7 +18,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 /**
  * Transforms between a normalized format (integer or float) and a percentage value.
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Florian Eckerstorfer <florian@eckerstorfer.org>
  */
 class PercentToLocalizedStringTransformer implements DataTransformerInterface
@@ -42,6 +42,8 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
      *
      * @param integer $precision The precision
      * @param string  $type      One of the supported types
+     *
+     * @throws UnexpectedTypeException if the given value of type is unknown
      */
     public function __construct($precision = null, $type = null)
     {
@@ -64,12 +66,12 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
     /**
      * Transforms between a normalized format (integer or float) into a percentage value.
      *
-     * @param  number $value  Normalized value
+     * @param number $value Normalized value
      *
-     * @return number         Percentage value
+     * @return number Percentage value
      *
-     * @throws UnexpectedTypeException if the given value is not numeric
-     * @throws TransformationFailedException if the value could not be transformed
+     * @throws TransformationFailedException If the given value is not numeric or
+     *                                       if the value could not be transformed.
      */
     public function transform($value)
     {
@@ -78,7 +80,7 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
         }
 
         if (!is_numeric($value)) {
-            throw new UnexpectedTypeException($value, 'numeric');
+            throw new TransformationFailedException('Expected a numeric.');
         }
 
         if (self::FRACTIONAL == $this->type) {
@@ -99,17 +101,17 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
     /**
      * Transforms between a percentage value into a normalized format (integer or float).
      *
-     * @param  number $value  Percentage value.
+     * @param number $value Percentage value.
      *
-     * @return number         Normalized value.
+     * @return number Normalized value.
      *
-     * @throws UnexpectedTypeException if the given value is not a string
-     * @throws TransformationFailedException if the value could not be transformed
+     * @throws TransformationFailedException If the given value is not a string or
+     *                                       if the value could not be transformed.
      */
     public function reverseTransform($value)
     {
         if (!is_string($value)) {
-            throw new UnexpectedTypeException($value, 'string');
+            throw new TransformationFailedException('Expected a string.');
         }
 
         if ('' === $value) {

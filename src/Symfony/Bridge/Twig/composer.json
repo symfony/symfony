@@ -1,0 +1,50 @@
+{
+    "name": "symfony/twig-bridge",
+    "type": "symfony-bridge",
+    "description": "Symfony Twig Bridge",
+    "keywords": [],
+    "homepage": "http://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "http://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3",
+        "twig/twig": "~1.11"
+    },
+    "require-dev": {
+        "symfony/form": "~2.2",
+        "symfony/http-kernel": "~2.2",
+        "symfony/routing": "~2.2",
+        "symfony/templating": "~2.1",
+        "symfony/translation": "~2.2",
+        "symfony/yaml": "~2.0",
+        "symfony/security": "~2.0"
+    },
+    "suggest": {
+        "symfony/form": "",
+        "symfony/http-kernel": "",
+        "symfony/routing": "",
+        "symfony/templating": "",
+        "symfony/translation": "",
+        "symfony/yaml": "",
+        "symfony/security": ""
+    },
+    "autoload": {
+        "psr-0": { "Symfony\\Bridge\\Twig\\": "" }
+    },
+    "target-dir": "Symfony/Bridge/Twig",
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.4-dev"
+        }
+    }
+}

@@ -33,6 +33,11 @@ class PhpExecutableFinder
      */
     public function find()
     {
+        // PHP_BINARY return the current sapi executable
+        if (defined('PHP_BINARY') && PHP_BINARY && ('cli' === PHP_SAPI) && is_file(PHP_BINARY)) {
+            return PHP_BINARY;
+        }
+
         if ($php = getenv('PHP_PATH')) {
             if (!is_executable($php)) {
                 return false;
@@ -41,19 +46,17 @@ class PhpExecutableFinder
             return $php;
         }
 
-        $suffixes = DIRECTORY_SEPARATOR == '\\' ? (getenv('PATHEXT') ? explode(PATH_SEPARATOR, getenv('PATHEXT')) : array('.exe', '.bat', '.cmd', '.com')) : array('');
-        foreach ($suffixes as $suffix) {
-            if (is_executable($php = PHP_BINDIR.DIRECTORY_SEPARATOR.'php'.$suffix)) {
-                return $php;
-            }
-        }
-
         if ($php = getenv('PHP_PEAR_PHP_BIN')) {
             if (is_executable($php)) {
                 return $php;
             }
         }
 
-        return $this->executableFinder->find('php');
+        $dirs = array(PHP_BINDIR);
+        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+            $dirs[] = 'C:\xampp\php\\';
+        }
+
+        return $this->executableFinder->find('php', false, $dirs);
     }
 }

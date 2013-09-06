@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpKernel;
 
+use Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator;
+use Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
@@ -20,21 +22,17 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\IniFileLoader;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
-use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\Config\FileLocator;
 use Symfony\Component\HttpKernel\DependencyInjection\MergeExtensionConfigurationPass;
 use Symfony\Component\HttpKernel\DependencyInjection\AddClassesToCachePass;
-use Symfony\Component\HttpKernel\DependencyInjection\Extension as DIExtension;
-use Symfony\Component\HttpKernel\Debug\ErrorHandler;
-use Symfony\Component\HttpKernel\Debug\ExceptionHandler;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\Loader\DelegatingLoader;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\ClassLoader\ClassCollectionLoader;
-use Symfony\Component\ClassLoader\DebugUniversalClassLoader;
 
 /**
  * The Kernel is the heart of the Symfony system.
@@ -42,10 +40,16 @@ use Symfony\Component\ClassLoader\DebugUniversalClassLoader;
  * It manages an environment made of bundles.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
-abstract class Kernel implements KernelInterface
+abstract class Kernel implements KernelInterface, TerminableInterface
 {
+    /**
+     * @var BundleInterface[]
+     */
     protected $bundles;
+
     protected $bundleMap;
     protected $container;
     protected $rootDir;
@@ -54,15 +58,23 @@ abstract class Kernel implements KernelInterface
     protected $booted;
     protected $name;
     protected $startTime;
-    protected $classes;
+    protected $loadClassCache;
+    protected $errorReportingLevel;
 
-    const VERSION = '2.0.0-RC1-DEV';
+    const VERSION         = '2.4.0-DEV';
+    const VERSION_ID      = '20400';
+    const MAJOR_VERSION   = '2';
+    const MINOR_VERSION   = '4';
+    const RELEASE_VERSION = '0';
+    const EXTRA_VERSION   = 'DEV';
 
     /**
      * Constructor.
      *
      * @param string  $environment The environment
      * @param Boolean $debug       Whether to enable debugging or not
+     *
+     * @api
      */
     public function __construct($environment, $debug)
     {
@@ -70,8 +82,8 @@ abstract class Kernel implements KernelInterface
         $this->debug = (Boolean) $debug;
         $this->booted = false;
         $this->rootDir = $this->getRootDir();
-        $this->name = preg_replace('/[^a-zA-Z0-9_]+/', '', basename($this->rootDir));
-        $this->classes = array();
+        $this->name = $this->getName();
+        $this->bundles = array();
 
         if ($this->debug) {
             $this->startTime = microtime(true);
@@ -80,20 +92,11 @@ abstract class Kernel implements KernelInterface
         $this->init();
     }
 
+    /**
+     * @deprecated Deprecated since version 2.3, to be removed in 3.0. Move your logic in the constructor instead.
+     */
     public function init()
     {
-        if ($this->debug) {
-            ini_set('display_errors', 1);
-            error_reporting(-1);
-
-            DebugUniversalClassLoader::enable();
-            ErrorHandler::register();
-            if ('cli' !== php_sapi_name()) {
-                ExceptionHandler::register();
-            }
-        } else {
-            ini_set('display_errors', 0);
-        }
     }
 
     public function __clone()
@@ -108,11 +111,17 @@ abstract class Kernel implements KernelInterface
 
     /**
      * Boots the current kernel.
+     *
+     * @api
      */
     public function boot()
     {
         if (true === $this->booted) {
             return;
+        }
+
+        if ($this->loadClassCache) {
+            $this->doLoadClassCache($this->loadClassCache[0], $this->loadClassCache[1]);
         }
 
         // init bundles
@@ -130,9 +139,25 @@ abstract class Kernel implements KernelInterface
     }
 
     /**
-     * Shutdowns the kernel.
+     * {@inheritdoc}
      *
-     * This method is mainly useful when doing functional testing.
+     * @api
+     */
+    public function terminate(Request $request, Response $response)
+    {
+        if (false === $this->booted) {
+            return;
+        }
+
+        if ($this->getHttpKernel() instanceof TerminableInterface) {
+            $this->getHttpKernel()->terminate($request, $response);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @api
      */
     public function shutdown()
     {
@@ -152,6 +177,8 @@ abstract class Kernel implements KernelInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @api
      */
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
@@ -173,9 +200,9 @@ abstract class Kernel implements KernelInterface
     }
 
     /**
-     * Gets the registered bundle instances.
+     * {@inheritdoc}
      *
-     * @return array An array of registered bundle instances
+     * @api
      */
     public function getBundles()
     {
@@ -183,11 +210,9 @@ abstract class Kernel implements KernelInterface
     }
 
     /**
-     * Checks if a given class name belongs to an active bundle.
+     * {@inheritdoc}
      *
-     * @param string $class A class name
-     *
-     * @return Boolean true if the class belongs to an active bundle, false otherwise
+     * @api
      */
     public function isClassInActiveBundle($class)
     {
@@ -201,19 +226,14 @@ abstract class Kernel implements KernelInterface
     }
 
     /**
-     * Returns a bundle and optionally its descendants by its name.
+     * {@inheritdoc}
      *
-     * @param string  $name  Bundle name
-     * @param Boolean $first Whether to return the first bundle only or together with its descendants
-     *
-     * @return BundleInterface|Array A BundleInterface instance or an array of BundleInterface instances if $first is false
-     *
-     * @throws \InvalidArgumentException when the bundle is not enabled
+     * @api
      */
     public function getBundle($name, $first = true)
     {
         if (!isset($this->bundleMap[$name])) {
-            throw new \InvalidArgumentException(sprintf('Bundle "%s" does not exist or it is not enabled. Maybe you forgot to add it in the registerBundles() function of your %s.php file?', $name, get_class($this)));
+            throw new \InvalidArgumentException(sprintf('Bundle "%s" does not exist or it is not enabled. Maybe you forgot to add it in the registerBundles() method of your %s.php file?', $name, get_class($this)));
         }
 
         if (true === $first) {
@@ -251,6 +271,8 @@ abstract class Kernel implements KernelInterface
      * @throws \InvalidArgumentException if the file cannot be found or the name is not valid
      * @throws \RuntimeException         if the name contains invalid/unsafe
      * @throws \RuntimeException         if a custom resource is hidden by a resource in a derived bundle
+     *
+     * @api
      */
     public function locateResource($name, $dir = null, $first = true)
     {
@@ -307,19 +329,23 @@ abstract class Kernel implements KernelInterface
     }
 
     /**
-     * Gets the name of the kernel
+     * {@inheritdoc}
      *
-     * @return string The kernel name
+     * @api
      */
     public function getName()
     {
+        if (null === $this->name) {
+            $this->name = preg_replace('/[^a-zA-Z0-9_]+/', '', basename($this->rootDir));
+        }
+
         return $this->name;
     }
 
     /**
-     * Gets the environment.
+     * {@inheritdoc}
      *
-     * @return string The current environment
+     * @api
      */
     public function getEnvironment()
     {
@@ -327,9 +353,9 @@ abstract class Kernel implements KernelInterface
     }
 
     /**
-     * Checks if debug mode is enabled.
+     * {@inheritdoc}
      *
-     * @return Boolean true if debug mode is enabled, false otherwise
+     * @api
      */
     public function isDebug()
     {
@@ -337,24 +363,24 @@ abstract class Kernel implements KernelInterface
     }
 
     /**
-     * Gets the application root dir.
+     * {@inheritdoc}
      *
-     * @return string The application root dir
+     * @api
      */
     public function getRootDir()
     {
         if (null === $this->rootDir) {
             $r = new \ReflectionObject($this);
-            $this->rootDir = dirname($r->getFileName());
+            $this->rootDir = str_replace('\\', '/', dirname($r->getFileName()));
         }
 
         return $this->rootDir;
     }
 
     /**
-     * Gets the current container.
+     * {@inheritdoc}
      *
-     * @return ContainerInterface A ContainerInterface instance
+     * @api
      */
     public function getContainer()
     {
@@ -364,29 +390,32 @@ abstract class Kernel implements KernelInterface
     /**
      * Loads the PHP class cache.
      *
-     * @param string  $name      The cache name prefix
-     * @param string  $extension File extension of the resulting file
+     * This methods only registers the fact that you want to load the cache classes.
+     * The cache will actually only be loaded when the Kernel is booted.
+     *
+     * That optimization is mainly useful when using the HttpCache class in which
+     * case the class cache is not loaded if the Response is in the cache.
+     *
+     * @param string $name      The cache name prefix
+     * @param string $extension File extension of the resulting file
      */
     public function loadClassCache($name = 'classes', $extension = '.php')
     {
-        if (!$this->booted) {
-            $this->boot();
-        }
-
-        if ($this->classes) {
-            ClassCollectionLoader::load($this->classes, $this->getCacheDir(), $name, $this->debug, true, $extension);
-        }
-    }
-
-    public function addClassesToCache(array $classes)
-    {
-        $this->classes = array_unique(array_merge($this->classes, $classes));
+        $this->loadClassCache = array($name, $extension);
     }
 
     /**
-     * Gets the request start time (not available if debug is disabled).
+     * Used internally.
+     */
+    public function setClassCache(array $classes)
+    {
+        file_put_contents($this->getCacheDir().'/classes.map', sprintf('<?php return %s;', var_export($classes, true)));
+    }
+
+    /**
+     * {@inheritdoc}
      *
-     * @return integer The request start timestamp
+     * @api
      */
     public function getStartTime()
     {
@@ -394,9 +423,9 @@ abstract class Kernel implements KernelInterface
     }
 
     /**
-     * Gets the cache directory.
+     * {@inheritdoc}
      *
-     * @return string The cache directory
+     * @api
      */
     public function getCacheDir()
     {
@@ -404,13 +433,30 @@ abstract class Kernel implements KernelInterface
     }
 
     /**
-     * Gets the log directory.
+     * {@inheritdoc}
      *
-     * @return string The log directory
+     * @api
      */
     public function getLogDir()
     {
         return $this->rootDir.'/logs';
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @api
+     */
+    public function getCharset()
+    {
+        return 'UTF-8';
+    }
+
+    protected function doLoadClassCache($name, $extension)
+    {
+        if (!$this->booted && is_file($this->getCacheDir().'/classes.map')) {
+            ClassCollectionLoader::load(include($this->getCacheDir().'/classes.map'), $this->getCacheDir(), $name, $this->debug, false, $extension);
+        }
     }
 
     /**
@@ -511,6 +557,7 @@ abstract class Kernel implements KernelInterface
         $fresh = true;
         if (!$cache->isFresh()) {
             $container = $this->buildContainer();
+            $container->compile();
             $this->dumpContainer($cache, $container, $class, $this->getContainerBaseClass());
 
             $fresh = false;
@@ -521,7 +568,7 @@ abstract class Kernel implements KernelInterface
         $this->container = new $class();
         $this->container->set('kernel', $this);
 
-        if (!$fresh) {
+        if (!$fresh && $this->container->has('cache_warmer')) {
             $this->container->get('cache_warmer')->warmUp($this->container->getParameter('kernel.cache_dir'));
         }
     }
@@ -547,7 +594,7 @@ abstract class Kernel implements KernelInterface
                 'kernel.cache_dir'       => $this->getCacheDir(),
                 'kernel.logs_dir'        => $this->getLogDir(),
                 'kernel.bundles'         => $bundles,
-                'kernel.charset'         => 'UTF-8',
+                'kernel.charset'         => $this->getCharset(),
                 'kernel.container_class' => $this->getContainerClass(),
             ),
             $this->getEnvParameters()
@@ -565,7 +612,7 @@ abstract class Kernel implements KernelInterface
     {
         $parameters = array();
         foreach ($_SERVER as $key => $value) {
-            if ('SYMFONY__' === substr($key, 0, 9)) {
+            if (0 === strpos($key, 'SYMFONY__')) {
                 $parameters[strtolower(str_replace('__', '.', substr($key, 9)))] = $value;
             }
         }
@@ -577,24 +624,43 @@ abstract class Kernel implements KernelInterface
      * Builds the service container.
      *
      * @return ContainerBuilder The compiled service container
+     *
+     * @throws \RuntimeException
      */
     protected function buildContainer()
     {
         foreach (array('cache' => $this->getCacheDir(), 'logs' => $this->getLogDir()) as $name => $dir) {
             if (!is_dir($dir)) {
                 if (false === @mkdir($dir, 0777, true)) {
-                    throw new \RuntimeException(sprintf("Unable to create the %s directory (%s)\n", $name, dirname($dir)));
+                    throw new \RuntimeException(sprintf("Unable to create the %s directory (%s)\n", $name, $dir));
                 }
             } elseif (!is_writable($dir)) {
                 throw new \RuntimeException(sprintf("Unable to write in the %s directory (%s)\n", $name, $dir));
             }
         }
 
-        $container = new ContainerBuilder(new ParameterBag($this->getKernelParameters()));
+        $container = $this->getContainerBuilder();
+        $container->addObjectResource($this);
+        $this->prepareContainer($container);
+
+        if (null !== $cont = $this->registerContainerConfiguration($this->getContainerLoader($container))) {
+            $container->merge($cont);
+        }
+
+        $container->addCompilerPass(new AddClassesToCachePass($this));
+
+        return $container;
+    }
+
+    /**
+     * Prepares the ContainerBuilder before it is compiled.
+     *
+     * @param ContainerBuilder $container A ContainerBuilder instance
+     */
+    protected function prepareContainer(ContainerBuilder $container)
+    {
         $extensions = array();
         foreach ($this->bundles as $bundle) {
-            $bundle->build($container);
-
             if ($extension = $bundle->getContainerExtension()) {
                 $container->registerExtension($extension);
                 $extensions[] = $extension->getAlias();
@@ -604,19 +670,26 @@ abstract class Kernel implements KernelInterface
                 $container->addObjectResource($bundle);
             }
         }
-        $container->addObjectResource($this);
+        foreach ($this->bundles as $bundle) {
+            $bundle->build($container);
+        }
 
         // ensure these extensions are implicitly loaded
         $container->getCompilerPassConfig()->setMergePass(new MergeExtensionConfigurationPass($extensions));
+    }
 
-        if (null !== $cont = $this->registerContainerConfiguration($this->getContainerLoader($container))) {
-            $container->merge($cont);
+    /**
+     * Gets a new ContainerBuilder instance used to build the service container.
+     *
+     * @return ContainerBuilder
+     */
+    protected function getContainerBuilder()
+    {
+        $container = new ContainerBuilder(new ParameterBag($this->getKernelParameters()));
+
+        if (class_exists('ProxyManager\Configuration')) {
+            $container->setProxyInstantiator(new RuntimeInstantiator());
         }
-
-        $container->addCompilerPass(new AddClassesToCachePass($this));
-        $container->compile();
-
-        $this->addClassesToCache($container->getParameter('kernel.compiled_classes'));
 
         return $container;
     }
@@ -633,6 +706,11 @@ abstract class Kernel implements KernelInterface
     {
         // cache the container
         $dumper = new PhpDumper($container);
+
+        if (class_exists('ProxyManager\Configuration')) {
+            $dumper->setProxyDumper(new ProxyDumper());
+        }
+
         $content = $dumper->dump(array('class' => $class, 'base_class' => $baseClass));
         if (!$this->debug) {
             $content = self::stripComments($content);
@@ -672,23 +750,32 @@ abstract class Kernel implements KernelInterface
      *
      * @return string The PHP string with the comments removed
      */
-    static public function stripComments($source)
+    public static function stripComments($source)
     {
         if (!function_exists('token_get_all')) {
             return $source;
         }
 
+        $rawChunk = '';
         $output = '';
-        foreach (token_get_all($source) as $token) {
+        $tokens = token_get_all($source);
+        for (reset($tokens); false !== $token = current($tokens); next($tokens)) {
             if (is_string($token)) {
-                $output .= $token;
+                $rawChunk .= $token;
+            } elseif (T_START_HEREDOC === $token[0]) {
+                $output .= preg_replace(array('/\s+$/Sm', '/\n+/S'), "\n", $rawChunk).$token[1];
+                do {
+                    $token = next($tokens);
+                    $output .= $token[1];
+                } while ($token[0] !== T_END_HEREDOC);
+                $rawChunk = '';
             } elseif (!in_array($token[0], array(T_COMMENT, T_DOC_COMMENT))) {
-                $output .= $token[1];
+                $rawChunk .= $token[1];
             }
         }
 
         // replace multiple new lines with a single newline
-        $output = preg_replace(array('/\s+$/Sm', '/\n+/S'), "\n", $output);
+        $output .= preg_replace(array('/\s+$/Sm', '/\n+/S'), "\n", $rawChunk);
 
         return $output;
     }

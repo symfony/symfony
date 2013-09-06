@@ -11,46 +11,17 @@
 
 namespace Symfony\Component\Locale\Stub\DateFormat;
 
+use Symfony\Component\Intl\DateFormatter\DateFormat\YearTransformer as BaseYearTransformer;
+
 /**
- * Parser and formatter for year format
+ * Alias of {@link \Symfony\Component\Intl\DateFormatter\DateFormat\YearTransformer}.
  *
- * @author Igor Wiedler <igor@wiedler.ch>
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
+ *             {@link \Symfony\Component\Intl\DateFormatter\DateFormat\YearTransformer}
+ *             instead.
  */
-class YearTransformer extends Transformer
+class YearTransformer extends BaseYearTransformer
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function format(\DateTime $dateTime, $length)
-    {
-        if (2 == $length) {
-            return $dateTime->format('y');
-        } else {
-            return $this->padLeft($dateTime->format('Y'), $length);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getReverseMatchingRegExp($length)
-    {
-        if (2 == $length) {
-            $regExp = '\d{2}';
-        } else {
-            $regExp = '\d{4}';
-        }
-
-        return $regExp;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function extractDateOptions($matched, $length)
-    {
-        return array(
-            'year' => (int) $matched,
-        );
-    }
 }

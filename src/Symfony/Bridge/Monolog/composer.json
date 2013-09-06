@@ -1,0 +1,41 @@
+{
+    "name": "symfony/monolog-bridge",
+    "type": "symfony-bridge",
+    "description": "Symfony Monolog Bridge",
+    "keywords": [],
+    "homepage": "http://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "http://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3",
+        "monolog/monolog": "~1.3"
+    },
+    "require-dev": {
+        "symfony/http-kernel": "~2.2",
+        "symfony/console": "~2.3",
+        "symfony/event-dispatcher": "~2.2"
+    },
+    "suggest": {
+        "symfony/http-kernel": "For using the debugging handlers together with the response life cycle of the HTTP kernel.",
+        "symfony/console": "For the possibility to show log messages in console commands depending on verbosity settings. You need version ~2.3 of the console for it."
+     },
+    "autoload": {
+        "psr-0": { "Symfony\\Bridge\\Monolog\\": "" }
+    },
+    "target-dir": "Symfony/Bridge/Monolog",
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.4-dev"
+        }
+    }
+}

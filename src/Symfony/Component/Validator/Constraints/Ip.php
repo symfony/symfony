@@ -17,8 +17,12 @@ use Symfony\Component\Validator\Constraint;
 /**
  * Validates that a value is a valid IP address
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @Annotation
+ *
+ * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Joseph Bielawski <stloyd@gmail.com>
+ *
+ * @api
  */
 class Ip extends Constraint
 {
@@ -41,7 +45,7 @@ class Ip extends Constraint
     const V6_ONLY_PUBLIC = '6_public';
     const ALL_ONLY_PUBLIC = 'all_public';
 
-    static protected $versions = array(
+    protected static $versions = array(
         self::V4,
         self::V6,
         self::ALL,
@@ -61,7 +65,7 @@ class Ip extends Constraint
 
     public $version = self::V4;
 
-    public $message = 'This is not a valid IP address';
+    public $message = 'This is not a valid IP address.';
 
     /**
      * {@inheritDoc}

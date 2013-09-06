@@ -22,7 +22,7 @@ use Symfony\Component\Config\Exception\FileLoaderImportCircularReferenceExceptio
  */
 abstract class FileLoader extends Loader
 {
-    static protected $loading = array();
+    protected static $loading = array();
 
     protected $locator;
 
@@ -57,6 +57,9 @@ abstract class FileLoader extends Loader
      * @param string  $sourceResource The original resource importing the new resource
      *
      * @return mixed
+     *
+     * @throws FileLoaderLoadException
+     * @throws FileLoaderImportCircularReferenceException
      */
     public function import($resource, $type = null, $ignoreErrors = false, $sourceResource = null)
     {
@@ -64,15 +67,23 @@ abstract class FileLoader extends Loader
             $loader = $this->resolve($resource, $type);
 
             if ($loader instanceof FileLoader && null !== $this->currentDir) {
-                $resource = $this->locator->locate($resource, $this->currentDir);
+                $resource = $this->locator->locate($resource, $this->currentDir, false);
             }
 
-            if (isset(self::$loading[$resource])) {
-                throw new FileLoaderImportCircularReferenceException(array_keys(self::$loading));
+            $resources = is_array($resource) ? $resource : array($resource);
+            for ($i = 0; $i < $resourcesCount = count($resources); $i++ ) {
+                if (isset(self::$loading[$resources[$i]])) {
+                    if ($i == $resourcesCount-1) {
+                        throw new FileLoaderImportCircularReferenceException(array_keys(self::$loading));
+                    }
+                } else {
+                    $resource = $resources[$i];
+                    break;
+                }
             }
             self::$loading[$resource] = true;
 
-            $ret = $loader->load($resource);
+            $ret = $loader->load($resource, $type);
 
             unset(self::$loading[$resource]);
 

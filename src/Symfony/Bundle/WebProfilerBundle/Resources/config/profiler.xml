@@ -1,0 +1,34 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="web_profiler.controller.profiler.class">Symfony\Bundle\WebProfilerBundle\Controller\ProfilerController</parameter>
+        <parameter key="web_profiler.controller.router.class">Symfony\Bundle\WebProfilerBundle\Controller\RouterController</parameter>
+        <parameter key="web_profiler.controller.exception.class">Symfony\Bundle\WebProfilerBundle\Controller\ExceptionController</parameter>
+    </parameters>
+
+    <services>
+        <service id="web_profiler.controller.profiler" class="%web_profiler.controller.profiler.class%">
+            <argument type="service" id="router" on-invalid="null" />
+            <argument type="service" id="profiler" on-invalid="null" />
+            <argument type="service" id="twig" />
+            <argument>%data_collector.templates%</argument>
+            <argument>%web_profiler.debug_toolbar.position%</argument>
+        </service>
+
+        <service id="web_profiler.controller.router" class="%web_profiler.controller.router.class%">
+            <argument type="service" id="profiler" on-invalid="null" />
+            <argument type="service" id="twig" />
+            <argument type="service" id="router" on-invalid="null" />
+        </service>
+
+        <service id="web_profiler.controller.exception" class="%web_profiler.controller.exception.class%">
+            <argument type="service" id="profiler" on-invalid="null" />
+            <argument type="service" id="twig" />
+            <argument>%kernel.debug%</argument>
+        </service>
+    </services>
+</container>

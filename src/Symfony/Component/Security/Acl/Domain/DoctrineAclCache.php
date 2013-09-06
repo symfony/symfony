@@ -37,7 +37,7 @@ class DoctrineAclCache implements AclCacheInterface
      * @param PermissionGrantingStrategyInterface $permissionGrantingStrategy
      * @param string                              $prefix
      *
-     * @return void
+     * @throws \InvalidArgumentException
      */
     public function __construct(Cache $cache, PermissionGrantingStrategyInterface $permissionGrantingStrategy, $prefix = self::PREFIX)
     {
@@ -165,7 +165,7 @@ class DoctrineAclCache implements AclCacheInterface
         $reflectionProperty->setValue($acl, $this->permissionGrantingStrategy);
         $reflectionProperty->setAccessible(false);
 
-        $aceAclProperty = new \ReflectionProperty('Symfony\Component\Security\Acl\Domain\Entry', 'id');
+        $aceAclProperty = new \ReflectionProperty('Symfony\Component\Security\Acl\Domain\Entry', 'acl');
         $aceAclProperty->setAccessible(true);
 
         foreach ($acl->getObjectAces() as $ace) {

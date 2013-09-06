@@ -31,11 +31,11 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     public function getDebugModes()
     {
         return array(
-            array(array(), array('intercept_redirects' => false, 'toolbar' => false, 'verbose' => true)),
-            array(array('intercept_redirects' => true), array('intercept_redirects' => true, 'toolbar' => false, 'verbose' => true)),
-            array(array('intercept_redirects' => false), array('intercept_redirects' => false, 'toolbar' => false, 'verbose' => true)),
-            array(array('toolbar' => true), array('intercept_redirects' => false, 'toolbar' => true, 'verbose' => true)),
-            array(array('verbose' => false), array('intercept_redirects' => false, 'toolbar' => false, 'verbose' => false)),
+            array(array(), array('intercept_redirects' => false, 'toolbar' => false, 'position' => 'bottom')),
+            array(array('intercept_redirects' => true), array('intercept_redirects' => true, 'toolbar' => false, 'position' => 'bottom')),
+            array(array('intercept_redirects' => false), array('intercept_redirects' => false, 'toolbar' => false, 'position' => 'bottom')),
+            array(array('toolbar' => true), array('intercept_redirects' => false, 'toolbar' => true, 'position' => 'bottom')),
+            array(array('position' => 'top'), array('intercept_redirects' => false, 'toolbar' => false, 'position' => 'top')),
         );
     }
 }

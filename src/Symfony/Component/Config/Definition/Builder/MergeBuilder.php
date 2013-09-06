@@ -38,6 +38,7 @@ class MergeBuilder
      * Sets whether the node can be unset.
      *
      * @param Boolean $allow
+     *
      * @return MergeBuilder
      */
     public function allowUnset($allow = true)

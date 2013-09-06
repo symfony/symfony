@@ -1,7 +1,0 @@
-[exception] {{ status_code ~ ' | ' ~ status_text ~ ' | ' ~ exception.class }}
-[message] {{ exception.message }}
-{% for i, e in exception.toarray %}
-[{{ i + 1 }}] {{ e.class }}: {{ e.message }}
-{% include 'FrameworkBundle:Exception:traces.txt.twig' with { 'exception': e } only %}
-
-{% endfor %}

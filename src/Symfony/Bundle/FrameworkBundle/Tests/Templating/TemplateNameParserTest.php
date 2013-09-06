@@ -62,6 +62,7 @@ class TemplateNameParserTest extends TestCase
             array('SensioCmsFooBundle:Post:index.html.php', new TemplateReference('SensioCmsFooBundle', 'Post', 'index', 'html', 'php')),
             array(':Post:index.html.php', new TemplateReference('', 'Post', 'index', 'html', 'php')),
             array('::index.html.php', new TemplateReference('', '', 'index', 'html', 'php')),
+            array('FooBundle:Post:foo.bar.index.html.php', new TemplateReference('FooBundle', 'Post', 'foo.bar.index', 'html', 'php')),
         );
     }
 
@@ -81,33 +82,6 @@ class TemplateNameParserTest extends TestCase
             array('FooBundle:Post:index'),
             array('FooBundle:Post'),
             array('FooBundle:Post:foo:bar'),
-            array('FooBundle:Post:index.foo.bar.foobar'),
         );
     }
-
-    /**
-     * @dataProvider getFilenameToTemplateProvider
-     */
-    public function testParseFromFilename($file, $ref)
-    {
-        $template = $this->parser->parseFromFilename($file);
-
-        if ($ref === false) {
-            $this->assertFalse($template);
-        } else {
-            $this->assertEquals($template->getLogicalName(), $ref->getLogicalName());
-        }
-    }
-
-    public function getFilenameToTemplateProvider()
-    {
-        return array(
-            array('/path/to/section/name.format.engine', new TemplateReference('', '/path/to/section', 'name', 'format', 'engine')),
-            array('\\path\\to\\section\\name.format.engine', new TemplateReference('', '/path/to/section', 'name', 'format', 'engine')),
-            array('name.format.engine', new TemplateReference('', '', 'name', 'format', 'engine')),
-            array('name.format', false),
-            array('name', false),
-        );
-    }
-
 }

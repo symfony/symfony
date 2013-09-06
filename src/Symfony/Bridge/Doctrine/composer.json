@@ -1,0 +1,50 @@
+{
+    "name": "symfony/doctrine-bridge",
+    "type": "symfony-bridge",
+    "description": "Symfony Doctrine Bridge",
+    "keywords": [],
+    "homepage": "http://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "http://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3",
+        "doctrine/common": "~2.2"
+    },
+    "require-dev": {
+        "symfony/stopwatch": "~2.2",
+        "symfony/dependency-injection": "~2.0",
+        "symfony/form": "~2.2",
+        "symfony/http-kernel": "~2.2",
+        "symfony/security": "~2.2",
+        "symfony/validator": "~2.2",
+        "doctrine/data-fixtures": "1.0.*",
+        "doctrine/dbal": "~2.2",
+        "doctrine/orm": "~2.2,>=2.2.3"
+    },
+    "suggest": {
+        "symfony/form": "",
+        "symfony/validator": "",
+        "doctrine/data-fixtures": "",
+        "doctrine/dbal": "",
+        "doctrine/orm": ""
+    },
+    "autoload": {
+        "psr-0": { "Symfony\\Bridge\\Doctrine\\": "" }
+    },
+    "target-dir": "Symfony/Bridge/Doctrine",
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.4-dev"
+        }
+    }
+}

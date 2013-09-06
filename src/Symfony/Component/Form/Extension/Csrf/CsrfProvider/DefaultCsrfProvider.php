@@ -12,12 +12,12 @@
 namespace Symfony\Component\Form\Extension\Csrf\CsrfProvider;
 
 /**
- * Default implementation of CsrfProviderInterface
+ * Default implementation of CsrfProviderInterface.
  *
  * This provider uses the session ID returned by session_id() as well as a
  * user-defined secret value to secure the CSRF token.
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class DefaultCsrfProvider implements CsrfProviderInterface
 {
@@ -33,7 +33,7 @@ class DefaultCsrfProvider implements CsrfProviderInterface
      * A recommended value for the secret is a generated value with at least
      * 32 characters and mixed letters, digits and special characters.
      *
-     * @param string $secret  A secret value included in the CSRF token
+     * @param string $secret A secret value included in the CSRF token
      */
     public function __construct($secret)
     {
@@ -57,15 +57,19 @@ class DefaultCsrfProvider implements CsrfProviderInterface
     }
 
     /**
-     * Returns the ID of the user session
+     * Returns the ID of the user session.
      *
      * Automatically starts the session if necessary.
      *
-     * @return string  The session ID
+     * @return string The session ID
      */
     protected function getSessionId()
     {
-        if (!session_id()) {
+        if (version_compare(PHP_VERSION, '5.4', '>=')) {
+            if (PHP_SESSION_NONE === session_status()) {
+                session_start();
+            }
+        } elseif (!session_id()) {
             session_start();
         }
 

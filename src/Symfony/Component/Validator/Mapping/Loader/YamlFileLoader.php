@@ -11,15 +11,17 @@
 
 namespace Symfony\Component\Validator\Mapping\Loader;
 
-use Symfony\Component\Validator\Exception\MappingException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\Yaml\Parser as YamlParser;
 
 class YamlFileLoader extends FileLoader
 {
+    private $yamlParser;
+
     /**
      * An array of YAML class descriptions
-     * @val array
+     *
+     * @var array
      */
     protected $classes = null;
 
@@ -29,7 +31,19 @@ class YamlFileLoader extends FileLoader
     public function loadClassMetadata(ClassMetadata $metadata)
     {
         if (null === $this->classes) {
-            $this->classes = Yaml::parse($this->file);
+            if (!stream_is_local($this->file)) {
+                throw new \InvalidArgumentException(sprintf('This is not a local file "%s".', $this->file));
+            }
+
+            if (!file_exists($this->file)) {
+                throw new \InvalidArgumentException(sprintf('File "%s" not found.', $this->file));
+            }
+
+            if (null === $this->yamlParser) {
+                $this->yamlParser = new YamlParser();
+            }
+
+            $this->classes = $this->yamlParser->parse(file_get_contents($this->file));
 
             // empty file
             if (null === $this->classes) {
@@ -42,8 +56,8 @@ class YamlFileLoader extends FileLoader
             }
 
             if (isset($this->classes['namespaces'])) {
-                foreach ($this->classes['namespaces'] as $prefix => $namespace) {
-                    $this->namespaces[$prefix] = $namespace;
+                foreach ($this->classes['namespaces'] as $alias => $namespace) {
+                    $this->addNamespaceAlias($alias, $namespace);
                 }
 
                 unset($this->classes['namespaces']);
@@ -55,24 +69,36 @@ class YamlFileLoader extends FileLoader
         if (isset($this->classes[$metadata->getClassName()])) {
             $yaml = $this->classes[$metadata->getClassName()];
 
-            if (isset($yaml['constraints'])) {
+            if (isset($yaml['group_sequence_provider'])) {
+                $metadata->setGroupSequenceProvider((bool) $yaml['group_sequence_provider']);
+            }
+
+            if (isset($yaml['group_sequence'])) {
+                $metadata->setGroupSequence($yaml['group_sequence']);
+            }
+
+            if (isset($yaml['constraints']) && is_array($yaml['constraints'])) {
                 foreach ($this->parseNodes($yaml['constraints']) as $constraint) {
                     $metadata->addConstraint($constraint);
                 }
             }
 
-            if (isset($yaml['properties'])) {
+            if (isset($yaml['properties']) && is_array($yaml['properties'])) {
                 foreach ($yaml['properties'] as $property => $constraints) {
-                    foreach ($this->parseNodes($constraints) as $constraint) {
-                        $metadata->addPropertyConstraint($property, $constraint);
+                    if (null !== $constraints) {
+                        foreach ($this->parseNodes($constraints) as $constraint) {
+                            $metadata->addPropertyConstraint($property, $constraint);
+                        }
                     }
                 }
             }
 
-            if (isset($yaml['getters'])) {
+            if (isset($yaml['getters']) && is_array($yaml['getters'])) {
                 foreach ($yaml['getters'] as $getter => $constraints) {
-                    foreach ($this->parseNodes($constraints) as $constraint) {
-                        $metadata->addGetterConstraint($getter, $constraint);
+                    if (null !== $constraints) {
+                        foreach ($this->parseNodes($constraints) as $constraint) {
+                            $metadata->addGetterConstraint($getter, $constraint);
+                        }
                     }
                 }
             }

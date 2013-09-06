@@ -11,67 +11,195 @@
 
 namespace Symfony\Component\Form\Extension\Core\Type;
 
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\Extension\Core\EventListener\TrimListener;
 use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
+use Symfony\Component\Form\Exception\LogicException;
+use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
-class FormType extends AbstractType
+class FormType extends BaseType
 {
     /**
-     * {@inheritdoc}
+     * @var PropertyAccessorInterface
      */
-    public function buildForm(FormBuilder $builder, array $options)
+    private $propertyAccessor;
+
+    public function __construct(PropertyAccessorInterface $propertyAccessor = null)
     {
-        $builder
-            ->setAttribute('virtual', $options['virtual'])
-            ->setDataMapper(new PropertyPathMapper($options['data_class']))
-        ;
+        $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::getPropertyAccessor();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function buildViewBottomUp(FormView $view, FormInterface $form)
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        parent::buildForm($builder, $options);
+
+        $builder
+            ->setRequired($options['required'])
+            ->setErrorBubbling($options['error_bubbling'])
+            ->setEmptyData($options['empty_data'])
+            ->setPropertyPath($options['property_path'])
+            ->setMapped($options['mapped'])
+            ->setByReference($options['by_reference'])
+            ->setInheritData($options['inherit_data'])
+            ->setCompound($options['compound'])
+            ->setData(isset($options['data']) ? $options['data'] : null)
+            ->setDataLocked(isset($options['data']))
+            ->setDataMapper($options['compound'] ? new PropertyPathMapper($this->propertyAccessor) : null)
+            ->setMethod($options['method'])
+            ->setAction($options['action'])
+        ;
+
+        if ($options['trim']) {
+            $builder->addEventSubscriber(new TrimListener());
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildView(FormView $view, FormInterface $form, array $options)
+    {
+        parent::buildView($view, $form, $options);
+
+        $name = $form->getName();
+        $readOnly = $options['read_only'];
+
+        if ($view->parent) {
+            if ('' === $name) {
+                throw new LogicException('Form node with empty name can be used only as root form node.');
+            }
+
+            // Complex fields are read-only if they themselves or their parents are.
+            if (!$readOnly) {
+                $readOnly = $view->parent->vars['read_only'];
+            }
+        }
+
+        $view->vars = array_replace($view->vars, array(
+            'read_only'  => $readOnly,
+            'errors'     => $form->getErrors(),
+            'valid'      => $form->isSubmitted() ? $form->isValid() : true,
+            'value'      => $form->getViewData(),
+            'data'       => $form->getNormData(),
+            'required'   => $form->isRequired(),
+            'max_length' => $options['max_length'],
+            'pattern'    => $options['pattern'],
+            'size'       => null,
+            'label_attr' => $options['label_attr'],
+            'compound'   => $form->getConfig()->getCompound(),
+            'method'     => $form->getConfig()->getMethod(),
+            'action'     => $form->getConfig()->getAction(),
+        ));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function finishView(FormView $view, FormInterface $form, array $options)
     {
         $multipart = false;
 
-        foreach ($view->getChildren() as $child) {
-            if ($child->get('multipart')) {
+        foreach ($view->children as $child) {
+            if ($child->vars['multipart']) {
                 $multipart = true;
                 break;
             }
         }
 
-        $view->set('multipart', $multipart);
+        $view->vars['multipart'] = $multipart;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getDefaultOptions(array $options)
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $defaultOptions = array(
-            'virtual'           => false,
-            // Errors in forms bubble by default, so that form errors will
-            // end up as global errors in the root form
-            'error_bubbling'    => true,
-        );
+        parent::setDefaultOptions($resolver);
 
-        if (empty($options['data_class'])) {
-            $defaultOptions['empty_data'] = array();
-        }
+        // Derive "data_class" option from passed "data" object
+        $dataClass = function (Options $options) {
+            return isset($options['data']) && is_object($options['data']) ? get_class($options['data']) : null;
+        };
 
-        return $defaultOptions;
+        // Derive "empty_data" closure from "data_class" option
+        $emptyData = function (Options $options) {
+            $class = $options['data_class'];
+
+            if (null !== $class) {
+                return function (FormInterface $form) use ($class) {
+                    return $form->isEmpty() && !$form->isRequired() ? null : new $class();
+                };
+            }
+
+            return function (FormInterface $form) {
+                return $form->getConfig()->getCompound() ? array() : '';
+            };
+        };
+
+        // For any form that is not represented by a single HTML control,
+        // errors should bubble up by default
+        $errorBubbling = function (Options $options) {
+            return $options['compound'];
+        };
+
+        // BC with old "virtual" option
+        $inheritData = function (Options $options) {
+            if (null !== $options['virtual']) {
+                // Uncomment this as soon as the deprecation note should be shown
+                // trigger_error('The form option "virtual" is deprecated since version 2.3 and will be removed in 3.0. Use "inherit_data" instead.', E_USER_DEPRECATED);
+                return $options['virtual'];
+            }
+
+            return false;
+        };
+
+        // If data is given, the form is locked to that data
+        // (independent of its value)
+        $resolver->setOptional(array(
+            'data',
+        ));
+
+        $resolver->setDefaults(array(
+            'data_class'         => $dataClass,
+            'empty_data'         => $emptyData,
+            'trim'               => true,
+            'required'           => true,
+            'read_only'          => false,
+            'max_length'         => null,
+            'pattern'            => null,
+            'property_path'      => null,
+            'mapped'             => true,
+            'by_reference'       => true,
+            'error_bubbling'     => $errorBubbling,
+            'label_attr'         => array(),
+            'virtual'            => null,
+            'inherit_data'       => $inheritData,
+            'compound'           => true,
+            'method'             => 'POST',
+            // According to RFC 2396 (http://www.ietf.org/rfc/rfc2396.txt)
+            // section 4.2., empty URIs are considered same-document references
+            'action'             => '',
+        ));
+
+        $resolver->setAllowedTypes(array(
+            'label_attr' => 'array',
+        ));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getParent(array $options)
+    public function getParent()
     {
-        return 'field';
+        return null;
     }
 
     /**

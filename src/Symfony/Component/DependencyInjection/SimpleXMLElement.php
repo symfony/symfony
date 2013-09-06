@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\DependencyInjection;
 
+use Symfony\Component\Config\Util\XmlUtils;
+
 /**
  * SimpleXMLElement class.
  *
@@ -22,6 +24,7 @@ class SimpleXMLElement extends \SimpleXMLElement
      * Converts an attribute as a php type.
      *
      * @param string $name
+     *
      * @return mixed
      */
     public function getAttributeAsPhp($name)
@@ -95,28 +98,11 @@ class SimpleXMLElement extends \SimpleXMLElement
      * Converts an xml value to a php type.
      *
      * @param mixed $value
+     *
      * @return mixed
      */
-    static public function phpize($value)
+    public static function phpize($value)
     {
-        $value = (string) $value;
-        $lowercaseValue = strtolower($value);
-
-        switch (true) {
-            case 'null' === $lowercaseValue:
-                return null;
-            case ctype_digit($value):
-                return '0' == $value[0] ? octdec($value) : intval($value);
-            case 'true' === $lowercaseValue:
-                return true;
-            case 'false' === $lowercaseValue:
-                return false;
-            case is_numeric($value):
-                return '0x' == $value[0].$value[1] ? hexdec($value) : floatval($value);
-            case preg_match('/^(-|\+)?[0-9,]+(\.[0-9]+)?$/', $value):
-                return floatval(str_replace(',', '', $value));
-            default:
-                return $value;
-        }
+        return XmlUtils::phpize($value);
     }
 }

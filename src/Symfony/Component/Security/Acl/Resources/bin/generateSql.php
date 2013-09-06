@@ -1,22 +1,22 @@
 <?php
 
 /*
- * This file is part of the Symfony framework.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien@symfony.com>
  *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
-require_once __DIR__.'/../../../../ClassLoader/UniversalClassLoader.php';
+require_once __DIR__.'/../../../../ClassLoader/ClassLoader.php';
 
-use Symfony\Component\ClassLoader\UniversalClassLoader;
+use Symfony\Component\ClassLoader\ClassLoader;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Security\Acl\Dbal\Schema;
 
-$loader = new UniversalClassLoader();
-$loader->registerNamespaces(array(
+$loader = new ClassLoader();
+$loader->addPrefixes(array(
     'Symfony'                    => __DIR__.'/../../../../../..',
     'Doctrine\\Common'           => __DIR__.'/../../../../../../../vendor/doctrine-common/lib',
     'Doctrine\\DBAL\\Migrations' => __DIR__.'/../../../../../../../vendor/doctrine-migrations/lib',
@@ -24,7 +24,6 @@ $loader->registerNamespaces(array(
     'Doctrine'                   => __DIR__.'/../../../../../../../vendor/doctrine/lib',
 ));
 $loader->register();
-
 
 $schema = new Schema(array(
     'class_table_name'         => 'acl_classes',
@@ -39,7 +38,7 @@ $finder = new Finder();
 $finder->name('*Platform.php')->in(dirname($reflection->getFileName()));
 foreach ($finder as $file) {
     require_once $file->getPathName();
-    $className = 'Doctrine\\DBAL\\Platforms\\' . $file->getBasename('.php');
+    $className = 'Doctrine\\DBAL\\Platforms\\'.$file->getBasename('.php');
 
     $reflection = new ReflectionClass($className);
     if ($reflection->isAbstract()) {
@@ -47,6 +46,6 @@ foreach ($finder as $file) {
     }
 
     $platform = $reflection->newInstance();
-    $targetFile = sprintf(__DIR__.'/../schema/%s.sql', $platform->getName());
+    $targetFile = sprintf(__DIR__.'/../schema/%s.sql', $platform->name);
     file_put_contents($targetFile, implode("\n\n", $schema->toSql($platform)));
 }

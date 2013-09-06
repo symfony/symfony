@@ -18,12 +18,14 @@ use Symfony\Component\Console\Command\Command;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class HelperSet
+class HelperSet implements \IteratorAggregate
 {
     private $helpers;
     private $command;
 
     /**
+     * Constructor.
+     *
      * @param Helper[] $helpers An array of helper.
      */
     public function __construct(array $helpers = array())
@@ -53,7 +55,7 @@ class HelperSet
     /**
      * Returns true if the helper if defined.
      *
-     * @param string  $name The helper name
+     * @param string $name The helper name
      *
      * @return Boolean true if the helper is defined, false otherwise
      */
@@ -98,5 +100,10 @@ class HelperSet
     public function getCommand()
     {
         return $this->command;
+    }
+
+    public function getIterator()
+    {
+        return new \ArrayIterator($this->helpers);
     }
 }

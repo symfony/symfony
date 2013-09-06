@@ -1,0 +1,22 @@
+{% if trace.function %}
+    at
+    <strong>
+        <abbr title="{{ trace.class }}">{{ trace.short_class }}</abbr>
+        {{ trace.type ~ trace.function }}
+    </strong>
+    ({{ trace.args|format_args }})
+{% endif %}
+
+{% if trace.file is defined and trace.file and trace.line is defined and trace.line %}
+    {{ trace.function ? '<br />' : '' }}
+    in {{ trace.file|format_file(trace.line) }}&nbsp;
+    {% spaceless %}
+    <a href="#" onclick="toggle('trace-{{ prefix ~ '-' ~ i }}'); switchIcons('icon-{{ prefix ~ '-' ~ i }}-open', 'icon-{{ prefix ~ '-' ~ i }}-close'); return false;">
+        <img class="toggle" id="icon-{{ prefix ~ '-' ~ i }}-close" alt="-" src="data:image/gif;base64,R0lGODlhEgASAMQSANft94TG57Hb8GS44ez1+mC24IvK6ePx+Wa44dXs92+942e54o3L6W2844/M6dnu+P/+/l614P///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAABIALAAAAAASABIAQAVCoCQBTBOd6Kk4gJhGBCTPxysJb44K0qD/ER/wlxjmisZkMqBEBW5NHrMZmVKvv9hMVsO+hE0EoNAstEYGxG9heIhCADs=" style="display: {{ 0 == i ? 'inline' : 'none' }}" />
+        <img class="toggle" id="icon-{{ prefix ~ '-' ~ i }}-open" alt="+" src="data:image/gif;base64,R0lGODlhEgASAMQTANft99/v+Ga44bHb8ITG52S44dXs9+z1+uPx+YvK6WC24G+944/M6W28443L6dnu+Ge54v/+/l614P///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAABMALAAAAAASABIAQAVS4DQBTiOd6LkwgJgeUSzHSDoNaZ4PU6FLgYBA5/vFID/DbylRGiNIZu74I0h1hNsVxbNuUV4d9SsZM2EzWe1qThVzwWFOAFCQFa1RQq6DJB4iIQA7" style="display: {{ 0 == i ? 'none' : 'inline' }}" />
+    </a>
+    {% endspaceless %}
+    <div id="trace-{{ prefix ~ '-' ~ i }}" style="display: {{ 0 == i ? 'block' : 'none' }}" class="trace">
+        {{ trace.file|file_excerpt(trace.line) }}
+    </div>
+{% endif %}

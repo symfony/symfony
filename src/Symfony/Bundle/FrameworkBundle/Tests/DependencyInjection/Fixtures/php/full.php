@@ -2,7 +2,10 @@
 
 $container->loadFromExtension('framework', array(
     'secret' => 's3cr3t',
+    'default_locale' => 'fr',
     'form' => null,
+    'http_method_override' => false,
+    'trusted_proxies' => array('127.0.0.1', '10.0.0.1'),
     'csrf_protection' => array(
         'enabled'    => true,
         'field_name' => '_csrf',
@@ -12,21 +15,25 @@ $container->loadFromExtension('framework', array(
     ),
     'profiler' => array(
         'only_exceptions' => true,
+        'enabled' => false,
     ),
     'router' => array(
         'resource'     => '%kernel.root_dir%/config/routing.xml',
         'type'         => 'xml',
     ),
     'session' => array(
-        'auto_start'     => true,
-        'default_locale' => 'fr',
-        'storage_id'     => 'session.storage.native',
-        'name'           => '_SYMFONY',
-        'lifetime'       => 86400,
-        'path'           => '/',
-        'domain'         => 'example.com',
-        'secure'         => true,
-        'httponly'       => true,
+        'storage_id'      => 'session.storage.native',
+        'handler_id'      => 'session.handler.native_file',
+        'name'            => '_SYMFONY',
+        'cookie_lifetime' => 86400,
+        'cookie_path'     => '/',
+        'cookie_domain'   => 'example.com',
+        'cookie_secure'   => true,
+        'cookie_httponly' => true,
+        'gc_maxlifetime'  => 90000,
+        'gc_divisor'      => 108,
+        'gc_probability'  => 1,
+        'save_path'       => '/path/to/sessions',
     ),
     'templating' => array(
         'assets_version'   => 'SomeVersionScheme',
@@ -46,6 +53,9 @@ $container->loadFromExtension('framework', array(
                 'base_urls' => array('http://bar1.example.com', 'http://bar2.example.com'),
             ),
         ),
+        'form'              => array(
+            'resources'     => array('theme1', 'theme2')
+        ),
     ),
     'translator' => array(
         'enabled'  => true,
@@ -60,4 +70,5 @@ $container->loadFromExtension('framework', array(
         'debug' => true,
         'file_cache_dir' => '%kernel.cache_dir%/annotations',
     ),
+    'ide' => 'file%%link%%format'
 ));

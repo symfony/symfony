@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Profiler\ProfilerStorageInterface;
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * Profiler.
@@ -24,10 +24,25 @@ use Symfony\Component\HttpKernel\Log\LoggerInterface;
  */
 class Profiler
 {
+    /**
+     * @var ProfilerStorageInterface
+     */
     private $storage;
-    private $collectors;
+
+    /**
+     * @var DataCollectorInterface[]
+     */
+    private $collectors = array();
+
+    /**
+     * @var LoggerInterface
+     */
     private $logger;
-    private $enabled;
+
+    /**
+     * @var Boolean
+     */
+    private $enabled = true;
 
     /**
      * Constructor.
@@ -39,8 +54,6 @@ class Profiler
     {
         $this->storage = $storage;
         $this->logger = $logger;
-        $this->collectors = array();
-        $this->enabled = true;
     }
 
     /**
@@ -49,6 +62,14 @@ class Profiler
     public function disable()
     {
         $this->enabled = false;
+    }
+
+    /**
+     * Enables the profiler.
+     */
+    public function enable()
+    {
+        $this->enabled = true;
     }
 
     /**
@@ -82,14 +103,14 @@ class Profiler
     /**
      * Saves a Profile.
      *
-     * @param Profile A Profile instance
+     * @param Profile $profile A Profile instance
      *
      * @return Boolean
      */
     public function saveProfile(Profile $profile)
     {
         if (!($ret = $this->storage->write($profile)) && null !== $this->logger) {
-            $this->logger->warn('Unable to store the profiler information.');
+            $this->logger->warning('Unable to store the profiler information.');
         }
 
         return $ret;
@@ -105,6 +126,8 @@ class Profiler
 
     /**
      * Exports the current profiler data.
+     *
+     * @param Profile $profile A Profile instance
      *
      * @return string The exported data
      */
@@ -136,15 +159,34 @@ class Profiler
     /**
      * Finds profiler tokens for the given criteria.
      *
-     * @param string $ip    The IP
-     * @param string $url   The URL
-     * @param string $limit The maximum number of tokens to return
+     * @param string $ip     The IP
+     * @param string $url    The URL
+     * @param string $limit  The maximum number of tokens to return
+     * @param string $method The request method
+     * @param string $start  The start date to search from
+     * @param string $end    The end date to search to
      *
      * @return array An array of tokens
+     *
+     * @see http://fr2.php.net/manual/en/datetime.formats.php for the supported date/time formats
      */
-    public function find($ip, $url, $limit)
+    public function find($ip, $url, $limit, $method, $start, $end)
     {
-        return $this->storage->find($ip, $url, $limit);
+        if ('' != $start && null !== $start) {
+            $start = new \DateTime($start);
+            $start = $start->getTimestamp();
+        } else {
+            $start = null;
+        }
+
+        if ('' != $end && null !== $end) {
+            $end = new \DateTime($end);
+            $end = $end->getTimestamp();
+        } else {
+            $end = null;
+        }
+
+        return $this->storage->find($ip, $url, $limit, $method, $start, $end);
     }
 
     /**
@@ -154,7 +196,7 @@ class Profiler
      * @param Response   $response  A Response instance
      * @param \Exception $exception An exception instance if the request threw one
      *
-     * @return Profile|false A Profile instance or false if the profiler is disabled
+     * @return Profile|null A Profile instance or null if the profiler is disabled
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
@@ -162,15 +204,15 @@ class Profiler
             return;
         }
 
-        $profile = new Profile(uniqid());
+        $profile = new Profile(substr(hash('sha256', uniqid(mt_rand(), true)), 0, 6));
         $profile->setTime(time());
         $profile->setUrl($request->getUri());
-        $profile->setIp($request->server->get('REMOTE_ADDR'));
+        $profile->setIp($request->getClientIp());
+        $profile->setMethod($request->getMethod());
 
         $response->headers->set('X-Debug-Token', $profile->getToken());
 
-        $collectors = array();
-        foreach ($this->collectors as $name => $collector) {
+        foreach ($this->collectors as $collector) {
             $collector->collect($request, $response, $exception);
 
             // forces collectors to become "read/only" (they loose their object dependencies)
@@ -193,7 +235,7 @@ class Profiler
     /**
      * Sets the Collectors associated with this profiler.
      *
-     * @param array $collectors An array of collectors
+     * @param DataCollectorInterface[] $collectors An array of collectors
      */
     public function set(array $collectors = array())
     {
@@ -217,6 +259,8 @@ class Profiler
      * Returns true if a Collector for the given name exists.
      *
      * @param string $name A collector name
+     *
+     * @return Boolean
      */
     public function has($name)
     {

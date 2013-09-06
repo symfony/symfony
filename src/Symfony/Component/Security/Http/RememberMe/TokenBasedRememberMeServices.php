@@ -1,15 +1,5 @@
 <?php
 
-namespace Symfony\Component\Security\Http\RememberMe;
-
-use Symfony\Component\HttpFoundation\Cookie;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
-use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\User\UserInterface;
-
 /*
  * This file is part of the Symfony package.
  *
@@ -18,6 +8,15 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+namespace Symfony\Component\Security\Http\RememberMe;
+
+use Symfony\Component\HttpFoundation\Cookie;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Concrete implementation of the RememberMeServicesInterface providing
@@ -44,7 +43,7 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
             $user = $this->getUserProvider($class)->loadUserByUsername($username);
         } catch (\Exception $ex) {
             if (!$ex instanceof AuthenticationException) {
-                $ex = new AuthenticationException($ex->getMessage(), null, $ex->getCode(), $ex);
+                $ex = new AuthenticationException($ex->getMessage(), $ex->getCode(), $ex);
             }
 
             throw $ex;
@@ -137,15 +136,17 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
     /**
      * Generates a hash for the cookie to ensure it is not being tempered with
      *
-     * @param string $class
-     * @param string $username The username
-     * @param integer $expires The unixtime when the cookie expires
-     * @param string $password The encoded password
+     * @param string  $class
+     * @param string  $username The username
+     * @param integer $expires  The unixtime when the cookie expires
+     * @param string  $password The encoded password
+     *
      * @throws \RuntimeException when the private key is empty
+     *
      * @return string
      */
     protected function generateCookieHash($class, $username, $expires, $password)
     {
-        return hash('sha256', $class.$username.$expires.$password.$this->getKey());
+        return hash_hmac('sha256', $class.$username.$expires.$password, $this->getKey());
     }
 }

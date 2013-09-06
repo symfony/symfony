@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Console\Output;
 
-use Symfony\Component\Console\Formatter\OutputFormatter;
+use Symfony\Component\Console\Formatter\OutputFormatterInterface;
 
 /**
  * StreamOutput writes the output to a given stream.
@@ -35,17 +35,16 @@ class StreamOutput extends Output
     /**
      * Constructor.
      *
-     * @param mixed           $stream    A stream resource
-     * @param integer         $verbosity The verbosity level (self::VERBOSITY_QUIET, self::VERBOSITY_NORMAL,
-     *                                   self::VERBOSITY_VERBOSE)
-     * @param Boolean         $decorated Whether to decorate messages or not (null for auto-guessing)
-     * @param OutputFormatter $formatter Output formatter instance
+     * @param mixed                         $stream    A stream resource
+     * @param integer                       $verbosity The verbosity level (one of the VERBOSITY constants in OutputInterface)
+     * @param Boolean|null                  $decorated Whether to decorate messages (null for auto-guessing)
+     * @param OutputFormatterInterface|null $formatter Output formatter instance (null to use default OutputFormatter)
      *
      * @throws \InvalidArgumentException When first argument is not a real stream
      *
      * @api
      */
-    public function __construct($stream, $verbosity = self::VERBOSITY_NORMAL, $decorated = null, OutputFormatter $formatter = null)
+    public function __construct($stream, $verbosity = self::VERBOSITY_NORMAL, $decorated = null, OutputFormatterInterface $formatter = null)
     {
         if (!is_resource($stream) || 'stream' !== get_resource_type($stream)) {
             throw new \InvalidArgumentException('The StreamOutput class needs a stream as its first argument.');
@@ -54,7 +53,7 @@ class StreamOutput extends Output
         $this->stream = $stream;
 
         if (null === $decorated) {
-            $decorated = $this->hasColorSupport($decorated);
+            $decorated = $this->hasColorSupport();
         }
 
         parent::__construct($verbosity, $decorated, $formatter);
@@ -71,14 +70,9 @@ class StreamOutput extends Output
     }
 
     /**
-     * Writes a message to the output.
-     *
-     * @param string  $message A message to write to the output
-     * @param Boolean $newline Whether to add a newline or not
-     *
-     * @throws \RuntimeException When unable to write output (should never happen)
+     * {@inheritdoc}
      */
-    public function doWrite($message, $newline)
+    protected function doWrite($message, $newline)
     {
         if (false === @fwrite($this->stream, $message.($newline ? PHP_EOL : ''))) {
             // @codeCoverageIgnoreStart
@@ -95,7 +89,7 @@ class StreamOutput extends Output
      *
      * Colorization is disabled if not supported by the stream:
      *
-     *  -  windows without ansicon
+     *  -  windows without ansicon and ConEmu
      *  -  non tty consoles
      *
      * @return Boolean true if the stream supports colorization, false otherwise
@@ -104,7 +98,7 @@ class StreamOutput extends Output
     {
         // @codeCoverageIgnoreStart
         if (DIRECTORY_SEPARATOR == '\\') {
-            return false !== getenv('ANSICON');
+            return false !== getenv('ANSICON') || 'ON' === getenv('ConEmuANSI');
         }
 
         return function_exists('posix_isatty') && @posix_isatty($this->stream);

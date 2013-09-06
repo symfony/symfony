@@ -11,13 +11,28 @@
 
 namespace Symfony\Component\Form;
 
+/**
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ */
 interface DataMapperInterface
 {
-    function mapDataToForms($data, array $forms);
+    /**
+     * Maps properties of some data to a list of forms.
+     *
+     * @param mixed           $data  Structured data.
+     * @param FormInterface[] $forms A list of {@link FormInterface} instances.
+     *
+     * @throws Exception\UnexpectedTypeException if the type of the data parameter is not supported.
+     */
+    public function mapDataToForms($data, $forms);
 
-    function mapDataToForm($data, FormInterface $form);
-
-    function mapFormsToData(array $forms, &$data);
-
-    function mapFormToData(FormInterface $form, &$data);
+    /**
+     * Maps the data of a list of forms into the properties of some data.
+     *
+     * @param FormInterface[] $forms A list of {@link FormInterface} instances.
+     * @param mixed           $data  Structured data.
+     *
+     * @throws Exception\UnexpectedTypeException if the type of the data parameter is not supported.
+     */
+    public function mapFormsToData($forms, &$data);
 }

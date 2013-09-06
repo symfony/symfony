@@ -15,6 +15,7 @@ use Doctrine\Common\Annotations\Reader;
 use Symfony\Component\Validator\Exception\MappingException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints\GroupSequence;
+use Symfony\Component\Validator\Constraints\GroupSequenceProvider;
 use Symfony\Component\Validator\Constraint;
 
 class AnnotationLoader implements LoaderInterface
@@ -32,12 +33,14 @@ class AnnotationLoader implements LoaderInterface
     public function loadClassMetadata(ClassMetadata $metadata)
     {
         $reflClass = $metadata->getReflectionClass();
-        $className = $reflClass->getName();
+        $className = $reflClass->name;
         $loaded = false;
 
         foreach ($this->reader->getClassAnnotations($reflClass) as $constraint) {
             if ($constraint instanceof GroupSequence) {
                 $metadata->setGroupSequence($constraint->groups);
+            } elseif ($constraint instanceof GroupSequenceProvider) {
+                $metadata->setGroupSequenceProvider(true);
             } elseif ($constraint instanceof Constraint) {
                 $metadata->addConstraint($constraint);
             }
@@ -46,10 +49,10 @@ class AnnotationLoader implements LoaderInterface
         }
 
         foreach ($reflClass->getProperties() as $property) {
-            if ($property->getDeclaringClass()->getName() == $className) {
+            if ($property->getDeclaringClass()->name == $className) {
                 foreach ($this->reader->getPropertyAnnotations($property) as $constraint) {
                     if ($constraint instanceof Constraint) {
-                        $metadata->addPropertyConstraint($property->getName(), $constraint);
+                        $metadata->addPropertyConstraint($property->name, $constraint);
                     }
 
                     $loaded = true;
@@ -58,13 +61,13 @@ class AnnotationLoader implements LoaderInterface
         }
 
         foreach ($reflClass->getMethods() as $method) {
-            if ($method->getDeclaringClass()->getName() ==  $className) {
+            if ($method->getDeclaringClass()->name ==  $className) {
                 foreach ($this->reader->getMethodAnnotations($method) as $constraint) {
                     if ($constraint instanceof Constraint) {
-                        if (preg_match('/^(get|is)(.+)$/i', $method->getName(), $matches)) {
+                        if (preg_match('/^(get|is)(.+)$/i', $method->name, $matches)) {
                             $metadata->addGetterConstraint(lcfirst($matches[2]), $constraint);
                         } else {
-                            throw new MappingException(sprintf('The constraint on "%s::%s" cannot be added. Constraints can only be added on methods beginning with "get" or "is".', $className, $method->getName()));
+                            throw new MappingException(sprintf('The constraint on "%s::%s" cannot be added. Constraints can only be added on methods beginning with "get" or "is".', $className, $method->name));
                         }
                     }
 

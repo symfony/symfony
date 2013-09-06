@@ -1,0 +1,44 @@
+<h2>Routing for "{{ request.pathinfo }}"</h2>
+
+<ul>
+    <li>
+        <strong>Route:&nbsp;</strong>
+        {% if request.route %}
+            {{ request.route }}
+        {% else %}
+            <em>No matching route</em>
+        {% endif %}
+    </li>
+    <li>
+        <strong>Route parameters:&nbsp;</strong>
+        {% if request.routeParams|length %}
+            {% include '@WebProfiler/Profiler/table.html.twig' with { 'data': request.routeParams, 'class': 'inline' } only %}
+        {% else %}
+            <em>No parameters</em>
+        {% endif %}
+    </li>
+    {% if router.redirect %}
+    <li>
+        <strong>Redirecting to:&nbsp;</strong> "{{ router.targetUrl }}" {% if router.targetRoute %}(route: "{{ router.targetRoute }}"){% endif %}
+    <li>
+    {% endif %}
+    <li>
+        <strong>Route matching logs</strong>
+        <table class="routing inline">
+            <tr>
+                <th>Route name</th>
+                <th>Pattern</th>
+                <th>Log</th>
+            </tr>
+            {% for trace in traces %}
+                <tr class="{{ 1 == trace.level ? 'almost' : 2 == trace.level ? 'matches' : '' }}">
+                    <td>{{ trace.name }}</td>
+                    <td>{{ trace.path }}</td>
+                    <td>{{ trace.log }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+        <em><small>Note: The above matching is based on the configuration for the current router which might differ from
+        the configuration used while routing this request.</small></em>
+    </li>
+</ul>

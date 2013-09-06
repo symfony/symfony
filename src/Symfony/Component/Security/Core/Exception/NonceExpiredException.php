@@ -12,16 +12,21 @@
 namespace Symfony\Component\Security\Core\Exception;
 
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
 
 /**
  * NonceExpiredException is thrown when an authentication is rejected because
  * the digest nonce has expired.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Alexander <iam.asm89@gmail.com>
  */
 class NonceExpiredException extends AuthenticationException
 {
+    /**
+     * {@inheritDoc}
+     */
+    public function getMessageKey()
+    {
+        return 'Digest nonce has expired.';
+    }
 }

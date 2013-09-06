@@ -1,0 +1,52 @@
+{
+    "name": "symfony/security",
+    "type": "library",
+    "description": "Symfony Security Component",
+    "keywords": [],
+    "homepage": "http://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "http://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3",
+        "symfony/event-dispatcher": "~2.1",
+        "symfony/http-foundation": "~2.1",
+        "symfony/http-kernel": "~2.1"
+    },
+    "require-dev": {
+        "symfony/form": "~2.0",
+        "symfony/routing": "~2.2",
+        "symfony/validator": "~2.2",
+        "doctrine/common": "~2.2",
+        "doctrine/dbal": "~2.2",
+        "psr/log": "~1.0",
+        "ircmaxell/password-compat": "1.0.*"
+    },
+    "suggest": {
+        "symfony/class-loader": "",
+        "symfony/finder": "",
+        "symfony/form": "",
+        "symfony/validator": "",
+        "symfony/routing": "",
+        "doctrine/dbal": "to use the built-in ACL implementation",
+        "ircmaxell/password-compat": ""
+    },
+    "autoload": {
+        "psr-0": { "Symfony\\Component\\Security\\": "" }
+    },
+    "target-dir": "Symfony/Component/Security",
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.4-dev"
+        }
+    }
+}

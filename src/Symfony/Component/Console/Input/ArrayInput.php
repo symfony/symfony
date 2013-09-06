@@ -58,10 +58,10 @@ class ArrayInput extends Input
     }
 
     /**
-     * Returns true if the raw parameters (not parsed) contains a value.
+     * Returns true if the raw parameters (not parsed) contain a value.
      *
      * This method is to be used to introspect the input parameters
-     * before it has been validated. It must be used carefully.
+     * before they have been validated. It must be used carefully.
      *
      * @param string|array $values The values to look for in the raw parameters (can be an array)
      *
@@ -88,10 +88,10 @@ class ArrayInput extends Input
      * Returns the value of a raw option (not parsed).
      *
      * This method is to be used to introspect the input parameters
-     * before it has been validated. It must be used carefully.
+     * before they have been validated. It must be used carefully.
      *
-     * @param string|array $values The value(s) to look for in the raw parameters (can be an array)
-     * @param mixed $default The default value to return if no result is found
+     * @param string|array $values  The value(s) to look for in the raw parameters (can be an array)
+     * @param mixed        $default The default value to return if no result is found
      *
      * @return mixed The option value
      */
@@ -111,12 +111,31 @@ class ArrayInput extends Input
     }
 
     /**
+     * Returns a stringified representation of the args passed to the command
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        $params = array();
+        foreach ($this->parameters as $param => $val) {
+            if ($param && '-' === $param[0]) {
+                $params[] = $param . ('' != $val ? '='.$this->escapeToken($val) : '');
+            } else {
+                $params[] = $this->escapeToken($val);
+            }
+        }
+
+        return implode(' ', $params);
+    }
+
+    /**
      * Processes command line arguments.
      */
     protected function parse()
     {
         foreach ($this->parameters as $key => $value) {
-            if ('--' === substr($key, 0, 2)) {
+            if (0 === strpos($key, '--')) {
                 $this->addLongOption(substr($key, 2), $value);
             } elseif ('-' === $key[0]) {
                 $this->addShortOption(substr($key, 1), $value);
@@ -132,7 +151,7 @@ class ArrayInput extends Input
      * @param string $shortcut The short option key
      * @param mixed  $value    The value for the option
      *
-     * @throws \RuntimeException When option given doesn't exist
+     * @throws \InvalidArgumentException When option given doesn't exist
      */
     private function addShortOption($shortcut, $value)
     {

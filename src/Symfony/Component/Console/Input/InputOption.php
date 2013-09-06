@@ -34,11 +34,11 @@ class InputOption
     /**
      * Constructor.
      *
-     * @param string  $name        The option name
-     * @param string  $shortcut    The shortcut (can be null)
-     * @param integer $mode        The option mode: One of the VALUE_* constants
-     * @param string  $description A description text
-     * @param mixed   $default     The default value (must be null for self::VALUE_REQUIRED or self::VALUE_NONE)
+     * @param string       $name        The option name
+     * @param string|array $shortcut    The shortcuts, can be null, a string of shortcuts delimited by | or an array of shortcuts
+     * @param integer      $mode        The option mode: One of the VALUE_* constants
+     * @param string       $description A description text
+     * @param mixed        $default     The default value (must be null for self::VALUE_REQUIRED or self::VALUE_NONE)
      *
      * @throws \InvalidArgumentException If option mode is invalid or incompatible
      *
@@ -46,8 +46,12 @@ class InputOption
      */
     public function __construct($name, $shortcut = null, $mode = null, $description = '', $default = null)
     {
-        if ('--' === substr($name, 0, 2)) {
+        if (0 === strpos($name, '--')) {
             $name = substr($name, 2);
+        }
+
+        if (empty($name)) {
+            throw new \InvalidArgumentException('An option name cannot be empty.');
         }
 
         if (empty($shortcut)) {
@@ -55,14 +59,21 @@ class InputOption
         }
 
         if (null !== $shortcut) {
-            if ('-' === $shortcut[0]) {
-                $shortcut = substr($shortcut, 1);
+            if (is_array($shortcut)) {
+                $shortcut = implode('|', $shortcut);
+            }
+            $shortcuts = preg_split('{(\|)-?}', ltrim($shortcut, '-'));
+            $shortcuts = array_filter($shortcuts);
+            $shortcut = implode('|', $shortcuts);
+
+            if (empty($shortcut)) {
+                throw new \InvalidArgumentException('An option shortcut cannot be empty.');
             }
         }
 
         if (null === $mode) {
             $mode = self::VALUE_NONE;
-        } else if (!is_int($mode) || $mode > 15) {
+        } elseif (!is_int($mode) || $mode > 15 || $mode < 1) {
             throw new \InvalidArgumentException(sprintf('Option mode "%s" is not valid.', $mode));
         }
 
@@ -79,7 +90,7 @@ class InputOption
     }
 
     /**
-     * Returns the shortcut.
+     * Returns the option shortcut.
      *
      * @return string The shortcut
      */
@@ -89,7 +100,7 @@ class InputOption
     }
 
     /**
-     * Returns the name.
+     * Returns the option name.
      *
      * @return string The name
      */
@@ -142,11 +153,13 @@ class InputOption
      * Sets the default value.
      *
      * @param mixed $default The default value
+     *
+     * @throws \LogicException When incorrect default value is given
      */
     public function setDefault($default = null)
     {
         if (self::VALUE_NONE === (self::VALUE_NONE & $this->mode) && null !== $default) {
-            throw new \LogicException('Cannot set a default value when using Option::VALUE_NONE mode.');
+            throw new \LogicException('Cannot set a default value when using InputOption::VALUE_NONE mode.');
         }
 
         if ($this->isArray()) {
@@ -178,5 +191,22 @@ class InputOption
     public function getDescription()
     {
         return $this->description;
+    }
+
+    /**
+     * Checks whether the given option equals this one
+     *
+     * @param InputOption $option option to compare
+     * @return Boolean
+     */
+    public function equals(InputOption $option)
+    {
+        return $option->getName() === $this->getName()
+            && $option->getShortcut() === $this->getShortcut()
+            && $option->getDefault() === $this->getDefault()
+            && $option->isArray() === $this->isArray()
+            && $option->isValueRequired() === $this->isValueRequired()
+            && $option->isValueOptional() === $this->isValueOptional()
+        ;
     }
 }

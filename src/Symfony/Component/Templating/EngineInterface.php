@@ -27,6 +27,8 @@ namespace Symfony\Component\Templating;
  * the template.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 interface EngineInterface
 {
@@ -39,8 +41,10 @@ interface EngineInterface
      * @return string The evaluated template as a string
      *
      * @throws \RuntimeException if the template cannot be rendered
+     *
+     * @api
      */
-    function render($name, array $parameters = array());
+    public function render($name, array $parameters = array());
 
     /**
      * Returns true if the template exists.
@@ -48,8 +52,10 @@ interface EngineInterface
      * @param mixed $name A template name or a TemplateReferenceInterface instance
      *
      * @return Boolean true if the template exists, false otherwise
+     *
+     * @api
      */
-    function exists($name);
+    public function exists($name);
 
     /**
      * Returns true if this class is able to render the given template.
@@ -57,6 +63,8 @@ interface EngineInterface
      * @param mixed $name A template name or a TemplateReferenceInterface instance
      *
      * @return Boolean true if this class supports the given template, false otherwise
+     *
+     * @api
      */
-    function supports($name);
+    public function supports($name);
 }

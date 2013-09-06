@@ -1,0 +1,46 @@
+session_welcome:
+    path:     /session
+    defaults: { _controller: TestBundle:Session:welcome }
+
+session_welcome_name:
+    path:     /session/{name}
+    defaults: { _controller: TestBundle:Session:welcome }
+
+session_logout:
+    path:     /session_logout
+    defaults: { _controller: TestBundle:Session:logout}
+
+session_setflash:
+    path:     /session_setflash/{message}
+    defaults: { _controller: TestBundle:Session:setFlash}
+
+session_showflash:
+    path:     /session_showflash
+    defaults: { _controller: TestBundle:Session:showFlash}
+
+profiler:
+    path:     /profiler
+    defaults: { _controller: TestBundle:Profiler:index }
+
+subrequest_index:
+    path:     /subrequest/{_locale}.{_format}
+    defaults: { _controller: TestBundle:SubRequest:index, _format: "html" }
+    schemes:  [https]
+
+subrequest_fragment_error:
+    path:     /subrequest/fragment/error/{_locale}.{_format}
+    defaults: { _controller: TestBundle:SubRequest:fragmentError, _format: "html" }
+    schemes:  [http]
+
+subrequest_fragment:
+    path:     /subrequest/fragment/{_locale}.{_format}
+    defaults: { _controller: TestBundle:SubRequest:fragment, _format: "html" }
+    schemes:  [http]
+
+fragment_home:
+    path:     /fragment_home
+    defaults: { _controller: TestBundle:Fragment:index, _format: txt }
+
+fragment_inlined:
+    path:     /fragment_inlined
+    defaults: { _controller: TestBundle:Fragment:inlined }

@@ -27,9 +27,9 @@ namespace Symfony\Component\Translation;
  * The right delimiter can be [ (exclusive) or ] (inclusive).
  * Beside numbers, you can use -Inf and +Inf for the infinite.
  *
- * @see http://en.wikipedia.org/wiki/Interval_%28mathematics%29#The_ISO_notation
- *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @see    http://en.wikipedia.org/wiki/Interval_%28mathematics%29#The_ISO_notation
  */
 class Interval
 {
@@ -38,8 +38,12 @@ class Interval
      *
      * @param integer $number   A number
      * @param string  $interval An interval
+     *
+     * @return Boolean
+     *
+     * @throws \InvalidArgumentException
      */
-    static public function test($number, $interval)
+    public static function test($number, $interval)
     {
         $interval = trim($interval);
 
@@ -71,26 +75,26 @@ class Interval
      *
      * @return string A Regexp (without the delimiters)
      */
-    static public function getIntervalRegexp()
+    public static function getIntervalRegexp()
     {
         return <<<EOF
         ({\s*
-            (\-?\d+[\s*,\s*\-?\d+]*)
+            (\-?\d+(\.\d+)?[\s*,\s*\-?\d+(\.\d+)?]*)
         \s*})
 
             |
 
-        (?<left_delimiter>[\[\]])
+        (?P<left_delimiter>[\[\]])
             \s*
-            (?<left>-Inf|\-?\d+)
+            (?P<left>-Inf|\-?\d+(\.\d+)?)
             \s*,\s*
-            (?<right>\+?Inf|\-?\d+)
+            (?P<right>\+?Inf|\-?\d+(\.\d+)?)
             \s*
-        (?<right_delimiter>[\[\]])
+        (?P<right_delimiter>[\[\]])
 EOF;
     }
 
-    static private function convertNumber($number)
+    private static function convertNumber($number)
     {
         if ('-Inf' === $number) {
             return log(0);
@@ -98,6 +102,6 @@ EOF;
             return -log(0);
         }
 
-        return (int) $number;
+        return (float) $number;
     }
 }

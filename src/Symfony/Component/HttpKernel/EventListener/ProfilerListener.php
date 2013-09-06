@@ -135,6 +135,8 @@ class ProfilerListener implements EventSubscriberInterface
 
         if ($master) {
             $this->saveProfiles($profile);
+
+            unset($this->children);
         }
     }
 

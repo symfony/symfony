@@ -50,6 +50,8 @@ class RouterDataCollector extends DataCollector
                 $this->data['route'] = $this->guessRoute($request, $this->controllers[$request]);
             }
         }
+
+        unset($this->controllers[$request]);
     }
 
     protected function guessRoute(Request $request, $controller)

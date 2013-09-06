@@ -861,7 +861,7 @@ class Application
             $input->setInteractive(false);
         } elseif (function_exists('posix_isatty') && $this->getHelperSet()->has('dialog')) {
             $inputStream = $this->getHelperSet()->get('dialog')->getInputStream();
-            if (!posix_isatty($inputStream)) {
+            if (!@posix_isatty($inputStream)) {
                 $input->setInteractive(false);
             }
         }

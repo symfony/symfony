@@ -24,6 +24,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\Security\Core\Authorization\ExpressionLanguage;
 
 /**
  * SecurityExtension.
@@ -39,6 +40,7 @@ class SecurityExtension extends Extension
     private $listenerPositions = array('pre_auth', 'form', 'http', 'remember_me');
     private $factories = array();
     private $userProviderFactories = array();
+    private $expressionLanguage;
 
     public function __construct()
     {
@@ -610,9 +612,10 @@ class SecurityExtension extends Extension
         }
 
         $container
-            ->register($id, 'Symfony\Component\ExpressionLanguage\Expression')
+            ->register($id, 'Symfony\Component\ExpressionLanguage\SerializedParsedExpression')
             ->setPublic(false)
             ->addArgument($expression)
+            ->addArgument(serialize($this->getExpressionLanguage()->parse($expression, array('token', 'user', 'object', 'roles', 'request'))))
         ;
 
         return $this->expressions[$id] = new Reference($id);
@@ -675,5 +678,17 @@ class SecurityExtension extends Extension
     {
         // first assemble the factories
         return new MainConfiguration($this->factories, $this->userProviderFactories);
+    }
+
+    private function getExpressionLanguage()
+    {
+        if (null === $this->expressionLanguage) {
+            if (!class_exists('Symfony\Component\ExpressionLanguage\ExpressionLanguage')) {
+                throw new RuntimeException('Unable to use expressions as the Symfony ExpressionLanguage component is not installed.');
+            }
+            $this->expressionLanguage = new ExpressionLanguage();
+        }
+
+        return $this->expressionLanguage;
     }
 }

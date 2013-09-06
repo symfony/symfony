@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\ExpressionLanguage;
 
+use Symfony\Component\ExpressionLanguage\Node\Node;
+
 /**
  * Allows to compile and evaluate expressions written in your own DSL.
  *
@@ -44,9 +46,41 @@ class ExpressionLanguage
         return $this->getCompiler()->compile($this->parse($expression, $names))->getSource();
     }
 
+    /**
+     * Evaluate an expression.
+     *
+     * @param Expression|string $expression The expression to compile
+     * @param array             $values     An array of values
+     *
+     * @return string The result of the evaluation of the expression
+     */
     public function evaluate($expression, $values = array())
     {
-        return $this->parse($expression, array_keys($values))->evaluate($this->functions, $values);
+        if ($expression instanceof ParsedExpression) {
+            $expression = $expression->getNodes();
+        } else {
+            $expression = $this->parse($expression, array_keys($values));
+        }
+
+        return $expression->evaluate($this->functions, $values);
+    }
+
+    /**
+     * Parses an expression.
+     *
+     * @param Expression|string $expression The expression to parse
+     *
+     * @return Node A Node tree
+     */
+    public function parse($expression, $names)
+    {
+        $key = $expression.'//'.implode('-', $names);
+
+        if (!isset($this->cache[$key])) {
+            $this->cache[$key] = $this->getParser()->parse($this->getLexer()->tokenize((string) $expression), $names);
+        }
+
+        return $this->cache[$key];
     }
 
     public function addFunction($name, $compiler, $evaluator)
@@ -88,16 +122,5 @@ class ExpressionLanguage
         }
 
         return $this->compiler->reset();
-    }
-
-    private function parse($expression, $names)
-    {
-        $key = $expression.'//'.implode('-', $names);
-
-        if (!isset($this->cache[$key])) {
-            $this->cache[$key] = $this->getParser()->parse($this->getLexer()->tokenize((string) $expression), $names);
-        }
-
-        return $this->cache[$key];
     }
 }

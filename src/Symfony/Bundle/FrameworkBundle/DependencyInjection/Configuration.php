@@ -237,7 +237,7 @@ class Configuration implements ConfigurationInterface
                     ->info('request configuration')
                     ->canBeUnset()
                     ->children()
-                        ->arrayNode('additionnal_formats')
+                        ->arrayNode('additional_formats')
                             ->prototype('array')
                                 ->beforeNormalization()
                                     ->ifTrue(function($v) { return !is_array($v); })

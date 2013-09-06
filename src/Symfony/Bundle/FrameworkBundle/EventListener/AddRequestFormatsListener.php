@@ -16,7 +16,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
 /**
- * Set additionnal formats into the request
+ * Set additional formats into the request
  *
  * @author Gildas Quemener <gildas.quemener@gmail.com>
  */

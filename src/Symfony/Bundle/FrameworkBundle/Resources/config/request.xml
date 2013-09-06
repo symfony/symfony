@@ -11,7 +11,7 @@
     <services>
         <service id="add_request_formats_listener" class="%add_request_formats_listener.class%">
             <tag name="kernel.event_subscriber" />
-            <argument>%request.additionnal_formats%</argument>
+            <argument>%request.additional_formats%</argument>
         </service>
     </services>
 </container>

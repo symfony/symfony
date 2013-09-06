@@ -38,6 +38,7 @@ class ContextListener implements ListenerInterface
     private $logger;
     private $userProviders;
     private $dispatcher;
+    private $registered;
 
     public function __construct(SecurityContextInterface $context, array $userProviders, $contextKey, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
     {
@@ -65,8 +66,9 @@ class ContextListener implements ListenerInterface
      */
     public function handle(GetResponseEvent $event)
     {
-        if (null !== $this->dispatcher && HttpKernelInterface::MASTER_REQUEST === $event->getRequestType()) {
+        if (!$this->registered && null !== $this->dispatcher && HttpKernelInterface::MASTER_REQUEST === $event->getRequestType()) {
             $this->dispatcher->addListener(KernelEvents::RESPONSE, array($this, 'onKernelResponse'));
+            $this->registered = true;
         }
 
         $request = $event->getRequest();

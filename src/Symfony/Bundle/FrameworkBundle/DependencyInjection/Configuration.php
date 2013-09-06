@@ -236,6 +236,7 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('request')
                     ->info('request configuration')
                     ->canBeUnset()
+                    ->fixXmlConfig('additionnal_format')
                     ->children()
                         ->arrayNode('additional_formats')
                             ->prototype('array')

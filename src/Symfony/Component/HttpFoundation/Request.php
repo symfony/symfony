@@ -888,8 +888,8 @@ class Request
         }
 
         if ($host = $this->headers->get('HOST')) {
-            if (preg_match('/:(\d+)$/', $host, $matches)) {
-                return intval($matches[1]);
+            if (false !== $pos = strrpos($host, ':')) {
+                return intval(substr($host, $pos + 1));
             }
 
             return 'https' === $this->getScheme() ? 443 : 80;

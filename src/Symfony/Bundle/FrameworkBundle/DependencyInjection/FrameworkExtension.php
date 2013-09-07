@@ -360,9 +360,10 @@ class FrameworkExtension extends Extension
      */
     private function registerRequestConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
-        $container->setParameter('request.additional_formats', $config['additional_formats']);
-
-        $loader->load('request.xml');
+        if ($config['additional_formats']) {
+            $container->setParameter('request.additional_formats', $config['additional_formats']);
+            $loader->load('request.xml');
+        }
     }
 
     /**

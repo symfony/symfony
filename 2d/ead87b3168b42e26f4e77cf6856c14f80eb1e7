@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by Koc at 2013-09-03T18:30:09Z
+
+Does it also workaround for https://bugs.php.net/bug.php?id=60120 ?
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2013-09-03T18:33:18Z
+
+@Koc yes, but as I previously mentioned : this workaround may produce corrupted output/error output in some race conditions.
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2013-09-03T18:34:39Z
+
+For the record, I did not add a workaround in this PR, it already existed. I just fixed the tests and decouples the file handling in a sub class.
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2013-09-06T20:18:14Z
+
+@fabpot is anything missing / wrong in this one ?

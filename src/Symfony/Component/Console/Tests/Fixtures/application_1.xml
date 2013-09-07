@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<application>
+<symfony>
   <commands>
     <command id="help" name="help">
       <usage>help [--xml] [--format="..."] [--raw] [command_name]</usage>
@@ -105,4 +105,4 @@
       <command>list</command>
     </namespace>
   </namespaces>
-</application>
+</symfony>

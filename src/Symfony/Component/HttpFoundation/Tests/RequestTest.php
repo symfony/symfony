@@ -1465,7 +1465,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedRequestUri, $request->getRequestUri(), '->getRequestUri() is correct');
 
         $subRequestUri = '/bar/foo';
-        $subRequest = $request::create($subRequestUri, 'get', array(), array(), array(), $request->server->all());
+        $subRequest = Request::create($subRequestUri, 'get', array(), array(), array(), $request->server->all());
         $this->assertEquals($subRequestUri, $subRequest->getRequestUri(), '->getRequestUri() is correct in sub request');
     }
 
@@ -1572,6 +1572,15 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         // reset request for following tests
         Request::setTrustedHosts(array());
     }
+
+    public function testFactory()
+    {
+        Request::setFactory(function (array $query = array(), array $request = array(), array $attributes = array(), array $cookies = array(), array $files = array(), array $server = array(), $content = null) {
+            return new NewRequest();
+        });
+
+        $this->assertEquals('foo', Request::create('/')->getFoo());
+    }
 }
 
 class RequestContentProxy extends Request
@@ -1579,5 +1588,13 @@ class RequestContentProxy extends Request
     public function getContent($asResource = false)
     {
         return http_build_query(array('_method' => 'PUT', 'content' => 'mycontent'));
+    }
+}
+
+class NewRequest extends Request
+{
+    public function getFoo()
+    {
+        return 'foo';
     }
 }

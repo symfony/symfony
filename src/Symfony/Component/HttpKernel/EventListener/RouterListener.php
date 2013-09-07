@@ -30,6 +30,11 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * Initializes the context from the request and sets request attributes based on a matching route.
  *
+ * This listener works in 2 modes:
+ *
+ *  * 2.3 compatibility mode where you must call setRequest whenever the Request changes.
+ *  * 2.4+ mode where you must pass a RequestContext instance in the constructor.
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class RouterListener implements EventSubscriberInterface
@@ -43,13 +48,15 @@ class RouterListener implements EventSubscriberInterface
     /**
      * Constructor.
      *
+     * RequestContext will become required in 3.0.
+     *
      * @param UrlMatcherInterface|RequestMatcherInterface $matcher The Url or Request matcher
      * @param RequestContext|null                         $context The RequestContext (can be null when $matcher implements RequestContextAwareInterface)
      * @param LoggerInterface|null                        $logger  The logger
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct($matcher, KernelRequestContext $kernelContext, RequestContext $context = null, LoggerInterface $logger = null)
+    public function __construct($matcher, RequestContext $context = null, LoggerInterface $logger = null, KernelRequestContext $kernelContext = null)
     {
         if (!$matcher instanceof UrlMatcherInterface && !$matcher instanceof RequestMatcherInterface) {
             throw new \InvalidArgumentException('Matcher must either implement UrlMatcherInterface or RequestMatcherInterface.');
@@ -86,6 +93,10 @@ class RouterListener implements EventSubscriberInterface
 
     public function onKernelFinishRequest(FinishRequestEvent $event)
     {
+        if (null === $this->kernelContext) {
+            throw new \LogicException('You must pass a RequestContext.');
+        }
+
         $this->setRequest($this->kernelContext->getParentRequest());
     }
 
@@ -96,7 +107,10 @@ class RouterListener implements EventSubscriberInterface
         // initialize the context that is also used by the generator (assuming matcher and generator share the same context instance)
         // we call setRequest even if most of the time, it has already been done to keep compatibility
         // with frameworks which do not use the Symfony service container
-        $this->setRequest($request);
+        // when we have a RequestContext, no need to do it
+        if (null !== $this->kernelContext) {
+            $this->setRequest($request);
+        }
 
         if ($request->attributes->has('_controller')) {
             // routing is already done

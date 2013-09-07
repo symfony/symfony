@@ -37,7 +37,7 @@ class FragmentHandlerTest extends \PHPUnit_Framework_TestCase
      */
     public function testRenderWhenRendererDoesNotExist()
     {
-        $handler = new FragmentHandler($this->context);
+        $handler = new FragmentHandler(array(), null, $this->context);
         $handler->render('/', 'foo');
     }
 
@@ -87,7 +87,7 @@ class FragmentHandlerTest extends \PHPUnit_Framework_TestCase
             call_user_func_array(array($e, 'with'), $arguments);
         }
 
-        $handler = new FragmentHandler($this->context);
+        $handler = new FragmentHandler(array(), null, $this->context);
         $handler->addRenderer($renderer);
 
         return $handler;

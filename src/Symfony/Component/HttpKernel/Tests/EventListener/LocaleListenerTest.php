@@ -28,7 +28,7 @@ class LocaleListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testDefaultLocaleWithoutSession()
     {
-        $listener = new LocaleListener('fr', $this->context);
+        $listener = new LocaleListener('fr', null, $this->context);
         $event = $this->getEvent($request = Request::create('/'));
 
         $listener->onKernelRequest($event);
@@ -42,7 +42,7 @@ class LocaleListenerTest extends \PHPUnit_Framework_TestCase
         $request->cookies->set('foo', 'value');
 
         $request->attributes->set('_locale', 'es');
-        $listener = new LocaleListener('fr', $this->context);
+        $listener = new LocaleListener('fr', null, $this->context);
         $event = $this->getEvent($request);
 
         $listener->onKernelRequest($event);
@@ -61,7 +61,7 @@ class LocaleListenerTest extends \PHPUnit_Framework_TestCase
         $request = Request::create('/');
 
         $request->attributes->set('_locale', 'es');
-        $listener = new LocaleListener('fr', $this->context, $router);
+        $listener = new LocaleListener('fr', $router, $this->context);
         $listener->onKernelRequest($this->getEvent($request));
     }
 
@@ -85,7 +85,7 @@ class LocaleListenerTest extends \PHPUnit_Framework_TestCase
 
         $event = $this->getMock('Symfony\Component\HttpKernel\Event\FinishRequestEvent', array(), array(), '', false);
 
-        $listener = new LocaleListener('fr', $this->context, $router);
+        $listener = new LocaleListener('fr', $router, $this->context);
         $listener->onKernelFinishRequest($event);
     }
 
@@ -93,7 +93,7 @@ class LocaleListenerTest extends \PHPUnit_Framework_TestCase
     {
         $request = Request::create('/');
         $request->setLocale('de');
-        $listener = new LocaleListener('fr', $this->context);
+        $listener = new LocaleListener('fr', null, $this->context);
         $event = $this->getEvent($request);
 
         $listener->onKernelRequest($event);

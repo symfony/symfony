@@ -22,6 +22,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 /**
  * Initializes the locale based on the current request.
  *
+ * This listener works in 2 modes:
+ *
+ *  * 2.3 compatibility mode where you must call setRequest whenever the Request changes.
+ *  * 2.4+ mode where you must pass a RequestContext instance in the constructor.
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class LocaleListener implements EventSubscriberInterface
@@ -30,7 +35,10 @@ class LocaleListener implements EventSubscriberInterface
     private $defaultLocale;
     private $requestContext;
 
-    public function __construct($defaultLocale = 'en', RequestContext $requestContext, RequestContextAwareInterface $router = null)
+    /**
+     * RequestContext will become required in 3.0.
+     */
+    public function __construct($defaultLocale = 'en', RequestContextAwareInterface $router = null, RequestContext $requestContext = null)
     {
         $this->defaultLocale = $defaultLocale;
         $this->requestContext = $requestContext;
@@ -69,6 +77,10 @@ class LocaleListener implements EventSubscriberInterface
 
     public function onKernelFinishRequest(FinishRequestEvent $event)
     {
+        if (null === $this->requestContext) {
+            throw new \LogicException('You must pass a RequestContext.');
+        }
+
         if (null !== $parentRequest = $this->requestContext->getParentRequest()) {
             $this->setRouterContext($parentRequest);
         }

@@ -15,9 +15,9 @@
 
     <services>
         <service id="fragment.handler" class="%fragment.handler.class%">
-            <argument type="service" id="request_context" />
             <argument type="collection" />
             <argument>%kernel.debug%</argument>
+            <argument type="service" id="request_context" />
         </service>
 
         <service id="fragment.renderer.inline" class="%fragment.renderer.inline.class%">

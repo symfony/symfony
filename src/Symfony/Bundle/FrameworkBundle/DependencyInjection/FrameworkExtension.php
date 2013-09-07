@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
@@ -371,6 +372,15 @@ class FrameworkExtension extends Extension
 
         if ($container->getParameter('kernel.debug')) {
             $loader->load('templating_debug.xml');
+
+            $logger = new Reference('logger', ContainerInterface::IGNORE_ON_INVALID_REFERENCE);
+
+            $container->getDefinition('templating.loader.cache')
+                ->addTag('monolog.logger', array('channel' => 'templating'))
+                ->addMethodCall('setLogger', array($logger));
+            $container->getDefinition('templating.loader.chain')
+                ->addTag('monolog.logger', array('channel' => 'templating'))
+                ->addMethodCall('setLogger', array($logger));
 
             $container->setDefinition('templating.engine.php', $container->findDefinition('debug.templating.engine.php'));
             $container->setAlias('debug.templating.engine.php', 'templating.engine.php');

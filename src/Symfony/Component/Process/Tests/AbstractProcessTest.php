@@ -507,7 +507,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
      */
     public function testIdleTimeoutNotExceededWhenOutputIsSent()
     {
-        $process = $this->getProcess('echo "foo"; sleep 1; echo "foo"; sleep 1; echo "foo"; sleep 1; echo "foo"; sleep 5;');
+        $process = $this->getProcess('echo "foo" && sleep 1 && echo "foo" && sleep 1 && echo "foo" && sleep 1 && echo "foo" && sleep 5');
         $process->setTimeout(5);
         $process->setIdleTimeout(3);
 

@@ -8,9 +8,9 @@ define('ERR_WRITE_FAILED', 4);
 $read = array(STDIN);
 $write = array(STDOUT, STDERR);
 
-stream_set_blocking(STDIN, false);
-stream_set_blocking(STDOUT, false);
-stream_set_blocking(STDERR, false);
+stream_set_blocking(STDIN, 0);
+stream_set_blocking(STDOUT, 0);
+stream_set_blocking(STDERR, 0);
 
 $out = $err = '';
 while ($read || $write) {
@@ -26,7 +26,7 @@ while ($read || $write) {
     }
 
     if (in_array(STDOUT, $w) && strlen($out) > 0) {
-         $written = fwrite(STDOUT, (binary) $out, 1024);
+         $written = fwrite(STDOUT, (binary) $out, 32768);
          if (false === $written) {
              die(ERR_WRITE_FAILED);
          }
@@ -37,7 +37,7 @@ while ($read || $write) {
     }
 
     if (in_array(STDERR, $w) && strlen($err) > 0) {
-         $written = fwrite(STDERR, (binary) $err, 1024);
+         $written = fwrite(STDERR, (binary) $err, 32768);
          if (false === $written) {
              die(ERR_WRITE_FAILED);
          }
@@ -48,7 +48,7 @@ while ($read || $write) {
     }
 
     if ($r) {
-        $str = fread(STDIN, 1024);
+        $str = fread(STDIN, 32768);
         if (false !== $str) {
             $out .= $str;
             $err .= $str;

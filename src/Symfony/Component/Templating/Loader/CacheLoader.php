@@ -56,7 +56,10 @@ class CacheLoader extends Loader
         $path = $dir.DIRECTORY_SEPARATOR.$file;
 
         if (is_file($path)) {
-            if (null !== $this->debugger) {
+            if (null !== $this->logger) {
+                $this->logger->debug(sprintf('Fetching template "%s" from cache', $template->get('name')));
+            } elseif (null !== $this->debugger) {
+                // just for BC, to be removed in 3.0
                 $this->debugger->log(sprintf('Fetching template "%s" from cache', $template->get('name')));
             }
 
@@ -75,7 +78,10 @@ class CacheLoader extends Loader
 
         file_put_contents($path, $content);
 
-        if (null !== $this->debugger) {
+        if (null !== $this->logger) {
+            $this->logger->debug(sprintf('Storing template "%s" in cache', $template->get('name')));
+        } elseif (null !== $this->debugger) {
+            // just for BC, to be removed in 3.0
             $this->debugger->log(sprintf('Storing template "%s" in cache', $template->get('name')));
         }
 

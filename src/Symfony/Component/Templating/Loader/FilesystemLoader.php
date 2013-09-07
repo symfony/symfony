@@ -63,20 +63,25 @@ class FilesystemLoader extends Loader
         $logs = array();
         foreach ($this->templatePathPatterns as $templatePathPattern) {
             if (is_file($file = strtr($templatePathPattern, $replacements)) && is_readable($file)) {
-                if (null !== $this->debugger) {
+                if (null !== $this->logger) {
+                    $this->logger->debug(sprintf('Loaded template file "%s"', $file));
+                } elseif (null !== $this->debugger) {
+                    // just for BC, to be removed in 3.0
                     $this->debugger->log(sprintf('Loaded template file "%s"', $file));
                 }
 
                 return new FileStorage($file);
             }
 
-            if (null !== $this->debugger) {
+            if (null !== $this->logger || null !== $this->debugger) {
                 $logs[] = sprintf('Failed loading template file "%s"', $file);
             }
         }
 
-        if (null !== $this->debugger) {
-            foreach ($logs as $log) {
+        foreach ($logs as $log) {
+            if (null !== $this->logger) {
+                $this->logger->debug($log);
+            } elseif (null !== $this->debugger) {
                 $this->debugger->log($log);
             }
         }

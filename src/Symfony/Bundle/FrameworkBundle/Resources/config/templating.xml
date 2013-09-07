@@ -52,11 +52,9 @@
         <service id="templating.loader.cache" class="%templating.loader.cache.class%" public="false">
             <argument type="service" id="templating.loader.wrapped" />
             <argument>%templating.loader.cache.path%</argument>
-            <call method="setDebugger"><argument type="service" id="templating.debugger" on-invalid="ignore" /></call>
         </service>
 
         <service id="templating.loader.chain" class="%templating.loader.chain.class%" public="false">
-            <call method="setDebugger"><argument type="service" id="templating.debugger" on-invalid="ignore" /></call>
         </service>
 
         <service id="templating.loader" alias="templating.loader.filesystem" />

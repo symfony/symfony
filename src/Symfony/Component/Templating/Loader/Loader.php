@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Templating\Loader;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Templating\DebuggerInterface;
 
 /**
@@ -20,12 +21,32 @@ use Symfony\Component\Templating\DebuggerInterface;
  */
 abstract class Loader implements LoaderInterface
 {
+    /**
+     * @var LoggerInterface|null
+     */
+    protected $logger;
+
+    /**
+     * @deprecated Deprecated in 2.4, to be removed in 3.0. Use $this->logger instead.
+     */
     protected $debugger;
+
+    /**
+     * Sets the debug logger to use for this loader.
+     *
+     * @param LoggerInterface $logger A logger instance
+     */
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
 
     /**
      * Sets the debugger to use for this loader.
      *
      * @param DebuggerInterface $debugger A debugger instance
+     *
+     * @deprecated Deprecated in 2.4, to be removed in 3.0. Use $this->setLogger() instead.
      */
     public function setDebugger(DebuggerInterface $debugger)
     {

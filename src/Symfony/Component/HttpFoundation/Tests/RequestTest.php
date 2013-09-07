@@ -1526,6 +1526,18 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         // trusted hosts
         $request->headers->set('host', 'trusted.com');
         $this->assertEquals('trusted.com', $request->getHost());
+        $this->assertEquals(80, $request->getPort());
+
+        $request->server->set('HTTPS', true);
+        $request->headers->set('host', 'trusted.com');
+        $this->assertEquals('trusted.com', $request->getHost());
+        $this->assertEquals(443, $request->getPort());
+        $request->server->set('HTTPS', false);
+
+        $request->headers->set('host', 'trusted.com:8000');
+        $this->assertEquals('trusted.com', $request->getHost());
+        $this->assertEquals(8000, $request->getPort());
+
         $request->headers->set('host', 'subdomain.trusted.com');
         $this->assertEquals('subdomain.trusted.com', $request->getHost());
 

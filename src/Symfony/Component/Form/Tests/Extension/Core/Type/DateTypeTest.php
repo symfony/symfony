@@ -295,7 +295,7 @@ class DateTypeTest extends TypeTestCase
     }
 
     /**
-     * This test is to check that the strings '0', '1', '2', '3' are no accepted
+     * This test is to check that the strings '0', '1', '2', '3' are not accepted
      * as valid IntlDateFormatter constants for FULL, LONG, MEDIUM or SHORT respectively.
      *
      * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException

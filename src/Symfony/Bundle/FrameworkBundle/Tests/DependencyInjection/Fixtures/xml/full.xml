@@ -36,5 +36,11 @@
         <framework:translator enabled="true" fallback="fr" />
         <framework:validation enabled="true" cache="apc" />
         <framework:annotations cache="file" debug="true" file-cache-dir="%kernel.cache_dir%/annotations" />
+        <framework:request>
+            <framework:additional-format name="csv">
+                <framework:mime-type>text/csv</framework:mime-type>
+                <framework:mime-type>text/plain</framework:mime-type>
+            </framework:additional-format>
+        </framework:request>
     </framework:config>
 </container>

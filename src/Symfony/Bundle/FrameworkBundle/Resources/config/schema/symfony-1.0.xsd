@@ -101,9 +101,9 @@
     </xsd:complexType>
 
     <xsd:complexType name="additional-format">
-        <xsd:all>
-            <xsd:element name="mime-type" type="xsd:string" minOccurs="1" maxOccurs="unbounded" />
-        </xsd:all>
+        <xsd:choice  minOccurs="1" maxOccurs="unbounded">
+            <xsd:element name="mime-type" type="xsd:string" />
+        </xsd:choice>
         <xsd:attribute name="name" type="xsd:string" />
     </xsd:complexType>
 

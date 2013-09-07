@@ -22,13 +22,24 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
  */
 class AddRequestFormatsListener implements EventSubscriberInterface
 {
+    /**
+     * @var array
+     */
     protected $formats;
 
+    /**
+     * @param array $formats
+     */
     public function __construct(array $formats)
     {
         $this->formats = $formats;
     }
 
+    /**
+     * Set additionnal request formats
+     *
+     * @param GetResponseEvent $event
+     */
     public function onKernelRequest(GetResponseEvent $event)
     {
         foreach ($this->formats as $format => $mimeTypes) {
@@ -36,6 +47,9 @@ class AddRequestFormatsListener implements EventSubscriberInterface
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public static function getSubscribedEvents()
     {
         return array(

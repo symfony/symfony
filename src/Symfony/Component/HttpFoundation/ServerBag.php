@@ -63,8 +63,8 @@ class ServerBag extends ParameterBag
                 $authorizationHeader = $this->parameters['REDIRECT_HTTP_AUTHORIZATION'];
             }
 
-            if ((null !== $authorizationHeader)) {
-                if ((0 === stripos($authorizationHeader, 'basic'))) {
+            if (null !== $authorizationHeader) {
+                if (0 === stripos($authorizationHeader, 'basic')) {
                     // Decode AUTHORIZATION header into PHP_AUTH_USER and PHP_AUTH_PW when authorization header is basic
                     $exploded = explode(':', base64_decode(substr($authorizationHeader, 6)));
                     if (count($exploded) == 2) {

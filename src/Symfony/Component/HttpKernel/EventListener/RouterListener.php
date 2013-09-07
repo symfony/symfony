@@ -17,7 +17,7 @@ use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\HttpKernel\RequestContext as KernelRequestContext;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
@@ -33,7 +33,7 @@ use Symfony\Component\HttpFoundation\Request;
  * This listener works in 2 modes:
  *
  *  * 2.3 compatibility mode where you must call setRequest whenever the Request changes.
- *  * 2.4+ mode where you must pass a RequestContext instance in the constructor.
+ *  * 2.4+ mode where you must pass a RequestStack instance in the constructor.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -43,12 +43,12 @@ class RouterListener implements EventSubscriberInterface
     private $context;
     private $logger;
     private $request;
-    private $kernelContext;
+    private $requestStack;
 
     /**
      * Constructor.
      *
-     * RequestContext will become required in 3.0.
+     * RequestStack will become required in 3.0.
      *
      * @param UrlMatcherInterface|RequestMatcherInterface $matcher The Url or Request matcher
      * @param RequestContext|null                         $context The RequestContext (can be null when $matcher implements RequestContextAwareInterface)
@@ -56,7 +56,7 @@ class RouterListener implements EventSubscriberInterface
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct($matcher, RequestContext $context = null, LoggerInterface $logger = null, KernelRequestContext $kernelContext = null)
+    public function __construct($matcher, RequestContext $context = null, LoggerInterface $logger = null, RequestStack $requestStack = null)
     {
         if (!$matcher instanceof UrlMatcherInterface && !$matcher instanceof RequestMatcherInterface) {
             throw new \InvalidArgumentException('Matcher must either implement UrlMatcherInterface or RequestMatcherInterface.');
@@ -68,7 +68,7 @@ class RouterListener implements EventSubscriberInterface
 
         $this->matcher = $matcher;
         $this->context = $context ?: $matcher->getContext();
-        $this->kernelContext = $kernelContext;
+        $this->requestStack = $requestStack;
         $this->logger = $logger;
     }
 
@@ -93,11 +93,11 @@ class RouterListener implements EventSubscriberInterface
 
     public function onKernelFinishRequest(FinishRequestEvent $event)
     {
-        if (null === $this->kernelContext) {
-            throw new \LogicException('You must pass a RequestContext.');
+        if (null === $this->requestStack) {
+            throw new \LogicException('You must pass a RequestStack.');
         }
 
-        $this->setRequest($this->kernelContext->getParentRequest());
+        $this->setRequest($this->requestStack->getParentRequest());
     }
 
     public function onKernelRequest(GetResponseEvent $event)
@@ -107,8 +107,8 @@ class RouterListener implements EventSubscriberInterface
         // initialize the context that is also used by the generator (assuming matcher and generator share the same context instance)
         // we call setRequest even if most of the time, it has already been done to keep compatibility
         // with frameworks which do not use the Symfony service container
-        // when we have a RequestContext, no need to do it
-        if (null !== $this->kernelContext) {
+        // when we have a RequestStack, no need to do it
+        if (null !== $this->requestStack) {
             $this->setRequest($request);
         }
 

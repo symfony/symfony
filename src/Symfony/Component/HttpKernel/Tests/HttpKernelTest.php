@@ -242,7 +242,7 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
     {
         $request = new Request();
 
-        $stack = $this->getMock('Symfony\Component\HttpKernel\RequestStack', array('push', 'pop'));
+        $stack = $this->getMock('Symfony\Component\HttpFoundation\RequestStack', array('push', 'pop'));
         $stack->expects($this->at(0))->method('push')->with($this->equalTo($request));
         $stack->expects($this->at(1))->method('pop');
 

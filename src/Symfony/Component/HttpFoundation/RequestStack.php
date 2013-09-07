@@ -9,9 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpKernel;
-
-use Symfony\Component\HttpFoundation\Request;
+namespace Symfony\Component\HttpFoundation;
 
 /**
  * Request stack that controls the lifecycle of requests.
@@ -25,6 +23,12 @@ class RequestStack
      */
     private $requests = array();
 
+    /**
+     * Pushes a Request on the stack.
+     *
+     * This method should generally not be called directly as the stack
+     * management should be taken care of by the application itself.
+     */
     public function push(Request $request)
     {
         $this->requests[] = $request;
@@ -34,6 +38,9 @@ class RequestStack
      * Pops the current request from the stack.
      *
      * This operation lets the current request go out of scope.
+     *
+     * This method should generally not be called directly as the stack
+     * management should be taken care of by the application itself.
      *
      * @return Request
      */
@@ -55,6 +62,12 @@ class RequestStack
     }
 
     /**
+     * Gets the master Request.
+     *
+     * Be warned that making your code aware of the master request
+     * might make it un-compatible with other features of your framework
+     * like ESI support.
+     *
      * @return Request|null
      */
     public function getMasterRequest()
@@ -68,6 +81,10 @@ class RequestStack
 
     /**
      * Returns the parent request of the current.
+     *
+     * Be warned that making your code aware of the parent request
+     * might make it un-compatible with other features of your framework
+     * like ESI support.
      *
      * If current Request is the master request, it returns null.
      *

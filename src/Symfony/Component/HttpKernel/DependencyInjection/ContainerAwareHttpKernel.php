@@ -12,9 +12,9 @@
 namespace Symfony\Component\HttpKernel\DependencyInjection;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\HttpKernel;
-use Symfony\Component\HttpKernel\RequestStack;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -29,7 +29,6 @@ use Symfony\Component\DependencyInjection\Scope;
 class ContainerAwareHttpKernel extends HttpKernel
 {
     protected $container;
-    protected $requestStack;
 
     /**
      * Constructor.

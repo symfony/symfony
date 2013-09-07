@@ -14,8 +14,8 @@ namespace Symfony\Component\HttpKernel\Fragment;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
-use Symfony\Component\HttpKernel\RequestContext;
 
 /**
  * Renders a URI that represents a resource fragment.
@@ -26,7 +26,7 @@ use Symfony\Component\HttpKernel\RequestContext;
  * This listener works in 2 modes:
  *
  *  * 2.3 compatibility mode where you must call setRequest whenever the Request changes.
- *  * 2.4+ mode where you must pass a RequestContext instance in the constructor.
+ *  * 2.4+ mode where you must pass a RequestStack instance in the constructor.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
@@ -37,19 +37,19 @@ class FragmentHandler
     private $debug;
     private $renderers;
     private $request;
-    private $context;
+    private $requestStack;
 
     /**
      * Constructor.
      *
-     * RequestContext will become required in 3.0.
+     * RequestStack will become required in 3.0.
      *
      * @param FragmentRendererInterface[] $renderers An array of FragmentRendererInterface instances
      * @param Boolean                     $debug     Whether the debug mode is enabled or not
      */
-    public function __construct(array $renderers = array(), $debug = false, RequestContext $context = null)
+    public function __construct(array $renderers = array(), $debug = false, RequestStack $requestStack = null)
     {
-        $this->context = $context;
+        $this->requestStack = $requestStack;
         $this->renderers = array();
         foreach ($renderers as $renderer) {
             $this->addRenderer($renderer);
@@ -143,6 +143,6 @@ class FragmentHandler
 
     private function getRequest()
     {
-        return $this->context ? $this->context->getCurrentRequest() : $this->request;
+        return $this->requestStack ? $this->requestStack->getCurrentRequest() : $this->request;
     }
 }

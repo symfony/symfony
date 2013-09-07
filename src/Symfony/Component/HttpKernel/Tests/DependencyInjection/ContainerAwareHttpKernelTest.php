@@ -13,7 +13,7 @@ namespace Symfony\Component\HttpKernel\Tests\DependencyInjection;
 
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\ContainerAwareHttpKernel;
-use Symfony\Component\HttpKernel\RequestStack;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -60,7 +60,7 @@ class ContainerAwareHttpKernelTest extends \PHPUnit_Framework_TestCase
             return $expected;
         };
 
-        $stack = $this->getMock('Symfony\Component\HttpKernel\RequestStack', array('push', 'pop'));
+        $stack = $this->getMock('Symfony\Component\HttpFoundation\RequestStack', array('push', 'pop'));
         $stack->expects($this->at(0))->method('push')->with($this->equalTo($request));
         $stack->expects($this->at(1))->method('pop');
 

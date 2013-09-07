@@ -15,8 +15,8 @@ use Symfony\Bridge\Twig\Extension\HttpKernelExtension;
 use Symfony\Bridge\Twig\Tests\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Fragment\FragmentHandler;
-use Symfony\Component\HttpKernel\RequestContext;
 
 class HttpKernelExtensionTest extends TestCase
 {
@@ -41,7 +41,7 @@ class HttpKernelExtensionTest extends TestCase
 
     public function testUnknownFragmentRenderer()
     {
-        $context = $this->getMockBuilder('Symfony\\Component\\HttpKernel\\RequestContext')
+        $context = $this->getMockBuilder('Symfony\\Component\\HttpFoundation\\RequestStack')
             ->disableOriginalConstructor()
             ->getMock()
         ;
@@ -57,7 +57,7 @@ class HttpKernelExtensionTest extends TestCase
         $strategy->expects($this->once())->method('getName')->will($this->returnValue('inline'));
         $strategy->expects($this->once())->method('render')->will($return);
 
-        $context = $this->getMockBuilder('Symfony\\Component\\HttpKernel\\RequestContext')
+        $context = $this->getMockBuilder('Symfony\\Component\\HttpFoundation\\RequestStack')
             ->disableOriginalConstructor()
             ->getMock()
         ;

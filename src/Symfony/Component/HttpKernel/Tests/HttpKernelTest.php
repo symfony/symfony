@@ -238,6 +238,20 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($response, $capturedResponse);
     }
 
+    public function testVerifyRequestStackPushPopDuringHandle()
+    {
+        $request = new Request();
+
+        $stack = $this->getMock('Symfony\Component\HttpFoundation\RequestStack', array('push', 'pop'));
+        $stack->expects($this->at(0))->method('push')->with($this->equalTo($request));
+        $stack->expects($this->at(1))->method('pop');
+
+        $dispatcher = new EventDispatcher();
+        $kernel = new HttpKernel($dispatcher, $this->getResolver(), $stack);
+
+        $kernel->handle($request, HttpKernelInterface::MASTER_REQUEST);
+    }
+
     protected function getResolver($controller = null)
     {
         if (null === $controller) {

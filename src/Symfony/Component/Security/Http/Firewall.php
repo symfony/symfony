@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Http;
 
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -30,6 +31,7 @@ class Firewall implements EventSubscriberInterface
 {
     private $map;
     private $dispatcher;
+    private $exceptionListeners;
 
     /**
      * Constructor.
@@ -41,6 +43,7 @@ class Firewall implements EventSubscriberInterface
     {
         $this->map = $map;
         $this->dispatcher = $dispatcher;
+        $this->exceptionListeners = new \SplObjectStorage();
     }
 
     /**
@@ -57,6 +60,7 @@ class Firewall implements EventSubscriberInterface
         // register listeners for this firewall
         list($listeners, $exception) = $this->map->getListeners($event->getRequest());
         if (null !== $exception) {
+            $this->exceptionListeners[$event->getRequest()] = $exception;
             $exception->register($this->dispatcher);
         }
 
@@ -70,8 +74,21 @@ class Firewall implements EventSubscriberInterface
         }
     }
 
+    public function onKernelFinishRequest(FinishRequestEvent $event)
+    {
+        $request = $event->getRequest();
+
+        if (isset($this->exceptionListeners[$request])) {
+            $this->exceptionListeners[$request]->unregister($this->dispatcher);
+            unset($this->exceptionListeners[$request]);
+        }
+    }
+
     public static function getSubscribedEvents()
     {
-        return array(KernelEvents::REQUEST => array('onKernelRequest', 8));
+        return array(
+            KernelEvents::REQUEST => array('onKernelRequest', 8),
+            KernelEvents::FINISH_REQUEST => 'onKernelFinishRequest',
+        );
     }
 }

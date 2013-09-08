@@ -1,0 +1,121 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2013-08-31T19:42:11Z
+
+Some alternative names for `REQUEST_FINSHED`:
+* `REQUEST_COMPLETE`
+* `REQUEST_HANDLED`
+* `REQUEST_PROCESSED`
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-08-31T19:52:05Z
+
+@jakzal hehe, I was also thinking about a better name, especially because the event name does not match the other ones. Naming the event `PostRequestEvent` would be consistent with `PostResponseEvent` but the post request event happens for all requests, whereas the response one only happens once for the response that is sent.
+
+So, perhaps `FinishRequestEvent` would be better or `TerminateRequestEvent`. Or?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-08-31T20:02:55Z
+
+I've renamed the event to `REQUEST_FINISH/kernel.finish_request` and the event to `FinishRequestEvent`.
+
+---------------------------------------------------------------------------
+
+by liuggio at 2013-08-31T20:40:24Z
+
+for me the name of the events should be in past tense, an event is something happened in the past, should be also written in the doc under best practice :).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-08-31T20:45:29Z
+
+@liuggio hmmm, an event is something that is happening right now, so present. If you have a look at the names of events for the DOM for instance, we have click, load, drag, ...
+
+---------------------------------------------------------------------------
+
+by liuggio at 2013-08-31T21:04:29Z
+
+@fabpot, I'm not convinced, because makes more sense to me the definition that is something that is happened and then is fired, and also for the Domain Event [DE](http://codebetter.com/gregyoung/2010/04/11/what-is-a-domain-event/) the event is something of the past, and make sense to me.
+
+About the DOM I suppose  they have used it in favor of the name of the "Attribute"(listener)...
+
+btw good feature.
+
+---------------------------------------------------------------------------
+
+by odino at 2013-09-01T07:05:53Z
+
++1 for the past tense
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-09-01T07:25:26Z
+
+Let me say it again, the present tense makes more sense because:
+
+ * The listeners are the ones that finish the request;
+ * The other example we have is `terminate` for the response and again, it's using the present as the listeners are in charge of terminating the response.
+
+---------------------------------------------------------------------------
+
+by odino at 2013-09-01T07:37:31Z
+
+In general, my guess is that events, since they are fired after something happened, should have past tense.
+
+Googling around I also found [this](http://thinkbeforecoding.com/tag/Domain%20Driven%20Design) in addition of what @liuggio posted, I think we should rely on what the DDD community has already discussed - I might lack of context here, so it might be that you need consistency as you can't rename `terminate`. They also mention that events use past tennse **in general**, so no big deal.
+
+---------------------------------------------------------------------------
+
+by fmeynard at 2013-09-02T01:01:23Z
+
+You can use past or present tense for events, for me it's just depends of the event itself. For example if you want to persist entity, you could have an event named "persist" allowing the modification of the entity BEFORE the save in database and you could also have another event "persisted" which one is raised after the save. ( For the same goal doctrine use "pre" & "post" prefix to be clear )
+
+---------------------------------------------------------------------------
+
+by beberlei at 2013-09-02T06:36:08Z
+
+Still +1 on this feature :-)
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-09-02T10:38:21Z
+
+do not rely on past tense for naming, what about  irregular verbs? thereby post and pre prefixes.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2013-09-02T10:41:07Z
+
+Guys, can we close the discussion about past/present tense? Symfony uses both versions, depending on circumstances. Both sides presented their views but it's unlikely that existing names change in Symfony for BC reasons.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-09-07T18:08:02Z
+
+I still have some open questions:
+
+ - Shall we move RequestStack and RequestContext to HttpFoundation? My opinion is yes as these classes can be used without HttpKernel.
+
+ - Do we deprecate the synchronize feature (and remove it in 3.0)? Don't have a strong opinion on this one.
+
+ - Do we need to rename RequestContext to something else (and what would it be) as we already have a class with the same name in the Routing component?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-09-07T20:23:28Z
+
+For the RequestContext name conflict, I think that having 2 classes (RequestContext and RequestStack) can be confusing anyway and protecting users from doing stupid things is probably not needed. So, I propose to remove the ReqeustContext class in favor of only RequestStack and move it into HttpFoundation. Sounds good?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-09-07T20:39:50Z
+
+I've done the name change and the move in the last commit.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-09-08T06:33:24Z
+
+Documentation has been updated now. I'm ready to merge this PR. Any other thoughts?

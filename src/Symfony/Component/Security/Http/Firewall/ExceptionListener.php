@@ -70,16 +70,22 @@ class ExceptionListener
     }
 
     /**
+     * Unregisters the dispatcher.
+     *
+     * @param EventDispatcherInterface $dispatcher An EventDispatcherInterface instance
+     */
+    public function unregister(EventDispatcherInterface $dispatcher)
+    {
+        $dispatcher->removeListener(KernelEvents::EXCEPTION, array($this, 'onKernelException'));
+    }
+
+    /**
      * Handles security related exceptions.
      *
      * @param GetResponseForExceptionEvent $event An GetResponseForExceptionEvent instance
      */
     public function onKernelException(GetResponseForExceptionEvent $event)
     {
-        // we need to remove ourselves as the exception listener can be
-        // different depending on the Request
-        $event->getDispatcher()->removeListener(KernelEvents::EXCEPTION, array($this, 'onKernelException'));
-
         $exception = $event->getException();
         $request = $event->getRequest();
 

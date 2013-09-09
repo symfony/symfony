@@ -9,18 +9,18 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Config\Tests\Definition;
+namespace Symfony\Component\Config\Tests\Definition\Dumper;
 
-use Symfony\Component\Config\Definition\ReferenceDumper;
+use Symfony\Component\Config\Definition\Dumper\YamlReferenceDumper;
 use Symfony\Component\Config\Tests\Fixtures\Configuration\ExampleConfiguration;
 
-class ReferenceDumperTest extends \PHPUnit_Framework_TestCase
+class YamlReferenceDumperTest extends \PHPUnit_Framework_TestCase
 {
     public function testDumper()
     {
         $configuration = new ExampleConfiguration();
 
-        $dumper = new ReferenceDumper();
+        $dumper = new YamlReferenceDumper();
         $this->assertEquals($this->getConfigurationAsString(), $dumper->dump($configuration));
     }
 

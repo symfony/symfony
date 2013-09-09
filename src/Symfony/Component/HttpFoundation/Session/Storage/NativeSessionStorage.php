@@ -220,6 +220,8 @@ class NativeSessionStorage implements SessionStorageInterface
                 session_start();
             }
         }
+        
+        $this->loadSession();
 
         return $ret;
     }

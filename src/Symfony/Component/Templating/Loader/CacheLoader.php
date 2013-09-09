@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Templating\Loader;
 
-use Symfony\Component\Templating\Storage\Storage;
 use Symfony\Component\Templating\Storage\FileStorage;
 use Symfony\Component\Templating\TemplateReferenceInterface;
 
@@ -46,7 +45,7 @@ class CacheLoader extends Loader
      *
      * @param TemplateReferenceInterface $template A template
      *
-     * @return Storage|Boolean false if the template cannot be loaded, a Storage instance otherwise
+     * @return \Symfony\Component\Templating\Storage\Storage|Boolean false if the template cannot be loaded, a Storage instance otherwise
      */
     public function load(TemplateReferenceInterface $template)
     {

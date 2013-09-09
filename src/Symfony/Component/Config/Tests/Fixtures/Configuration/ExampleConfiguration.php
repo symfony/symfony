@@ -19,7 +19,7 @@ class ExampleConfiguration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('root');
+        $rootNode = $treeBuilder->root('acme_root');
 
         $rootNode
             ->children()

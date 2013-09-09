@@ -40,6 +40,8 @@ acme_root:
         # Defaults:
         - elem1
         - elem2
+    scalar_required:      ~ # Required
+    enum:                 ~ # One of 'this'; 'that'.
 
     # some info
     array:
@@ -50,12 +52,13 @@ acme_root:
         # multi-line info text
         # which should be indented
         child3:               ~ # Example: example setting
-    array_prototype:
-        parameters:
+    parameters:
 
-            # Prototype
-            name:
-                value:                ~ # Required
+        # Prototype
+        name:                 ~
+    connections:
+        # Prototype
+        - { user: ~, pass: ~ }
 
 EOL;
     }

@@ -48,6 +48,7 @@ class XmlReferenceDumperTest extends \PHPUnit_Framework_TestCase
     scalar-array-empty=""
     scalar-array-defaults="elem1,elem2"
     scalar-required=""
+    enum=""
 >
 
     <!-- some info -->
@@ -63,12 +64,14 @@ class XmlReferenceDumperTest extends \PHPUnit_Framework_TestCase
         child3=""
     />
 
-    <array-prototype>
+    <!-- prototype -->
+    <parameter name="parameter name">scalar value</parameter>
 
-        <!-- prototype -->
-        <parameter name="parameter name">scalar value</parameter>
-
-    </array-prototype>
+    <!-- prototype -->
+    <connection
+        user=""
+        pass=""
+    />
 
 </config>
 

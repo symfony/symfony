@@ -113,7 +113,7 @@ class XmlReferenceDumper
                                 break;
 
                             case 'Symfony\Component\Config\Definition\EnumNode':
-                                $prototypeValue = implode('|', $prototype->getValues());
+                                $prototypeValue = implode('|', array_map('json_encode', $prototype->getValues()));
                                 break;
 
                             default:

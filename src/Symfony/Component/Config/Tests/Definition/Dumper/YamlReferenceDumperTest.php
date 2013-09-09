@@ -41,7 +41,7 @@ acme_root:
         - elem1
         - elem2
     scalar_required:      ~ # Required
-    enum:                 ~ # One of 'this'; 'that'.
+    enum:                 ~ # One of "this"; "that"
 
     # some info
     array:

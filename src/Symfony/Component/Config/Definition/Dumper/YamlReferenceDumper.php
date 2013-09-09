@@ -14,6 +14,8 @@ namespace Symfony\Component\Config\Definition\Dumper;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\NodeInterface;
 use Symfony\Component\Config\Definition\ArrayNode;
+use Symfony\Component\Config\Definition\ScalarNode;
+use Symfony\Component\Config\Definition\EnumNode;
 use Symfony\Component\Config\Definition\PrototypedArrayNode;
 
 /**
@@ -65,7 +67,8 @@ class YamlReferenceDumper
 
                 // check for attribute as key
                 if ($key = $node->getKeyAttribute()) {
-                    $keyNode = new ArrayNode($key, $node);
+                    $keyNodeClass = 'Symfony\Component\Config\Definition\\'.($prototype instanceof ArrayNode ? 'ArrayNode' : 'ScalarNode');
+                    $keyNode = new $keyNodeClass($key, $node);
                     $keyNode->setInfo('Prototype');
 
                     // add children
@@ -83,6 +86,9 @@ class YamlReferenceDumper
                     $default = '[]';
                 }
             }
+        } elseif ($node instanceof EnumNode) {
+            $comments[] = 'One of '.implode('; ', array_map('json_encode', $node->getValues()));
+            $default = '~';
         } else {
             $default = '~';
 

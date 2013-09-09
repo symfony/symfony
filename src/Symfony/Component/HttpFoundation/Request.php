@@ -1218,7 +1218,7 @@ class Request
     public function getRequestFormat($default = 'html')
     {
         if (null === $this->format) {
-            $this->format = $this->get('_format', $default);
+            $this->format = $this->attributes->get('_format', $default);
         }
 
         return $this->format;

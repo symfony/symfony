@@ -15,6 +15,7 @@
         <parameter key="templating.helper.code.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\CodeHelper</parameter>
         <parameter key="templating.helper.translator.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\TranslatorHelper</parameter>
         <parameter key="templating.helper.form.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\FormHelper</parameter>
+        <parameter key="templating.helper.stopwatch.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\StopwatchHelper</parameter>
         <parameter key="templating.form.engine.class">Symfony\Component\Form\Extension\Templating\TemplatingRendererEngine</parameter>
         <parameter key="templating.form.renderer.class">Symfony\Component\Form\FormRenderer</parameter>
         <parameter key="templating.globals.class">Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables</parameter>
@@ -99,6 +100,11 @@
         <service id="templating.helper.form" class="%templating.helper.form.class%">
             <tag name="templating.helper" alias="form" />
             <argument type="service" id="templating.form.renderer" />
+        </service>
+
+        <service id="templating.helper.stopwatch" class="%templating.helper.stopwatch.class%">
+            <tag name="templating.helper" alias="stopwatch" />
+            <argument type="service" id="debug.stopwatch" on-invalid="ignore" />
         </service>
 
         <service id="templating.form.engine" class="%templating.form.engine.class%" public="false">

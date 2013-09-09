@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by peterrehm at 2013-08-05T14:15:16Z
+
+@stof Thanks for the feedback. Has just been updated. Any further suggestions?
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2013-08-05T16:03:36Z
+
+@stof Sorry, I committed the wrong version. I added now the support for objects if it is not a Closure in case an object will be returned. However I think this could be removed, since I saw just the response like Main\UserAdminBundle\Controller\UserController::newAction which is_callable but also a valid string. Do I miss any other possible return value?
+
+---------------------------------------------------------------------------
+
+by hacfi at 2013-08-08T14:39:20Z
+
+@peterrehm Good idea..would be quite useful especially on big projects.

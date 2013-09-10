@@ -40,7 +40,7 @@ class ExceptionTest extends \PHPUnit_Framework_TestCase
     {
         $e = new FileNotFoundException('/foo');
         $this->assertEquals('/foo', $e->getPath());
-        $this->assertEquals('File "/foo" couldnot be found', $e->getMessage(), 'A message should be generated.');
+        $this->assertEquals('File "/foo" could not be found', $e->getMessage(), 'A message should be generated.');
     }
 
     public function testCustomMessage()

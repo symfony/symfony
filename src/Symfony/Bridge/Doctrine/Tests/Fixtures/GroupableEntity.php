@@ -16,21 +16,21 @@ use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 
 /** @Entity */
-class DoubleIdentEntity
+class GroupableEntity
 {
     /** @Id @Column(type="integer") */
     protected $id;
 
-    /** @Column(type="string") */
+    /** @Column(type="string", nullable=true) */
     public $name;
 
     /** @Column(type="string", nullable=true) */
-    public $name2;
+    public $groupName;
 
-    public function __construct($id, $name, $name2)
+    public function __construct($id, $name, $groupName)
     {
         $this->id = $id;
         $this->name = $name;
-        $this->name2 = $name2;
+        $this->groupName = $groupName;
     }
 }

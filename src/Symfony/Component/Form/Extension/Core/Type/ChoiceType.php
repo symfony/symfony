@@ -104,7 +104,7 @@ class ChoiceType extends AbstractType
 
         // Check if the choices already contain the empty value
         // Only add the empty value option if this is not the case
-        if (0 === count($options['choice_list']->getIndicesForValues(array('')))) {
+        if (0 === count($options['choice_list']->getChoicesForValues(array('')))) {
             $view->vars['empty_value'] = $options['empty_value'];
         }
 

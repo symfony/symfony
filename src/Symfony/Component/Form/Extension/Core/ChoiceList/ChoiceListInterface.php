@@ -95,6 +95,11 @@ interface ChoiceListInterface
     /**
      * Returns the choices corresponding to the given values.
      *
+     * The choices can have any data type.
+     *
+     * The choices must be returned with the same keys and in the same order
+     * as the corresponding values in the given array.
+     *
      * @param array $values An array of choice values. Not existing values in
      *                      this array are ignored.
      *
@@ -104,6 +109,11 @@ interface ChoiceListInterface
 
     /**
      * Returns the values corresponding to the given choices.
+     *
+     * The values must be strings.
+     *
+     * The values must be returned with the same keys and in the same order
+     * as the corresponding choices in the given array.
      *
      * @param array $choices An array of choices. Not existing choices in this
      *                       array are ignored.
@@ -116,6 +126,12 @@ interface ChoiceListInterface
     /**
      * Returns the indices corresponding to the given choices.
      *
+     * The indices must be positive integers or strings accepted by
+     * {@link FormConfigBuilder::validateName()}.
+     *
+     * The indices must be returned with the same keys and in the same order
+     * as the corresponding choices in the given array.
+     *
      * @param array $choices An array of choices. Not existing choices in this
      *                       array are ignored.
      *
@@ -125,6 +141,14 @@ interface ChoiceListInterface
 
     /**
      * Returns the indices corresponding to the given values.
+     *
+     * The indices must be positive integers or strings accepted by
+     * {@link FormConfigBuilder::validateName()}.
+     *
+     * The index "placeholder" is internally reserved.
+     *
+     * The indices must be returned with the same keys and in the same order
+     * as the corresponding values in the given array.
      *
      * @param array $values An array of choice values. Not existing values in
      *                      this array are ignored.

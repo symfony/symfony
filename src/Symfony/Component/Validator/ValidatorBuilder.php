@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator;
 
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadataFactory;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
@@ -83,6 +85,11 @@ class ValidatorBuilder implements ValidatorBuilderInterface
      * @var null|string
      */
     private $translationDomain;
+
+    /**
+     * @var PropertyAccessorInterface
+     */
+    private $propertyAccessor;
 
     /**
      * {@inheritdoc}
@@ -253,6 +260,10 @@ class ValidatorBuilder implements ValidatorBuilderInterface
      */
     public function setConstraintValidatorFactory(ConstraintValidatorFactoryInterface $validatorFactory)
     {
+        if (null !== $this->propertyAccessor) {
+            throw new ValidatorException('You cannot set a validator factory after setting a custom property accessor. Remove the call to setPropertyAccessor() if you want to call setConstraintValidatorFactory().');
+        }
+
         $this->validatorFactory = $validatorFactory;
 
         return $this;
@@ -274,6 +285,20 @@ class ValidatorBuilder implements ValidatorBuilderInterface
     public function setTranslationDomain($translationDomain)
     {
         $this->translationDomain = $translationDomain;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setPropertyAccessor(PropertyAccessorInterface $propertyAccessor)
+    {
+        if (null !== $this->validatorFactory) {
+            throw new ValidatorException('You cannot set a property accessor after setting a custom validator factory. Configure your validator factory instead.');
+        }
+
+        $this->propertyAccessor = $propertyAccessor;
 
         return $this;
     }
@@ -319,7 +344,8 @@ class ValidatorBuilder implements ValidatorBuilderInterface
             $metadataFactory = new ClassMetadataFactory($loader, $this->metadataCache);
         }
 
-        $validatorFactory = $this->validatorFactory ?: new ConstraintValidatorFactory();
+        $propertyAccessor = $this->propertyAccessor ?: PropertyAccess::createPropertyAccessor();
+        $validatorFactory = $this->validatorFactory ?: new ConstraintValidatorFactory($propertyAccessor);
         $translator = $this->translator ?: new DefaultTranslator();
 
         return new Validator($metadataFactory, $validatorFactory, $translator, $this->translationDomain, $this->initializers);

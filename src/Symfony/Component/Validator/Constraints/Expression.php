@@ -17,18 +17,19 @@ use Symfony\Component\Validator\Constraint;
  * @Annotation
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class Condition extends Constraint
+class Expression extends Constraint
 {
     public $message = 'This value is not valid.';
-    public $condition;
+    public $expression;
 
     /**
      * {@inheritDoc}
      */
     public function getDefaultOption()
     {
-        return 'condition';
+        return 'expression';
     }
 
     /**
@@ -36,13 +37,22 @@ class Condition extends Constraint
      */
     public function getRequiredOptions()
     {
-        return array('condition');
+        return array('expression');
     }
+
     /**
      * {@inheritDoc}
      */
     public function getTargets()
     {
-        return self::CLASS_CONSTRAINT;
+        return array(self::CLASS_CONSTRAINT, self::PROPERTY_CONSTRAINT);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function validatedBy()
+    {
+        return 'validator.expression';
     }
 }

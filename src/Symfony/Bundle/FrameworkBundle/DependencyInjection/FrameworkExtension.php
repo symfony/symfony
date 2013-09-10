@@ -48,6 +48,9 @@ class FrameworkExtension extends Extension
         // will be used and everything will still work as expected.
         $loader->load('translation.xml');
 
+        // Property access is used by both the Form and the Validator component
+        $loader->load('property_access.xml');
+
         $loader->load('debug_prod.xml');
 
         if ($container->getParameter('kernel.debug')) {

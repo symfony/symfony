@@ -38,7 +38,7 @@ class Filesystem
     public function copy($originFile, $targetFile, $override = false)
     {
         if (stream_is_local($originFile) && !is_file($originFile)) {
-            throw new FileNotFoundException($originFile, sprintf('Failed to copy %s because file not exists', $originFile));
+            throw new FileNotFoundException($originFile, sprintf('Failed to copy %s because file does not exists', $originFile));
         }
 
         $this->mkdir(dirname($targetFile));

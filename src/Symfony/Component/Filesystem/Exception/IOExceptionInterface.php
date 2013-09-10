@@ -13,7 +13,6 @@ namespace Symfony\Component\Filesystem\Exception;
 
 /**
  * IOException interface for all exceptions thrown by the component.
- *
  * @author Christian Gärtner <christiangaertner.film@googlemail.com>
  *
  */

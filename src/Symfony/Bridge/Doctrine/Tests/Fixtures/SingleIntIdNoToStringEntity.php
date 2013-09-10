@@ -16,7 +16,7 @@ use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 
 /** @Entity */
-class NoToStringSingleIdentEntity
+class SingleIntIdNoToStringEntity
 {
     /** @Id @Column(type="integer") */
     protected $id;

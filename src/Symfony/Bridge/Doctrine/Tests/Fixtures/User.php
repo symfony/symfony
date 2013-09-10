@@ -17,7 +17,7 @@ use Doctrine\ORM\Mapping\Entity;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /** @Entity */
-class CompositeIdentEntity implements UserInterface
+class User implements UserInterface
 {
     /** @Id @Column(type="integer") */
     protected $id1;

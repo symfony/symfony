@@ -46,10 +46,12 @@
 
 {% block choice_widget %}
 {% spaceless %}
-    {% if expanded %}
+    {% if widget == 'checkbox' or widget == 'radio' %}
         {{ block('choice_widget_expanded') }}
+    {% elseif widget == 'select' %}
+        {{ block('choice_widget_select') }}
     {% else %}
-        {{ block('choice_widget_collapsed') }}
+        {{ block('form_widget_simple') }}
     {% endif %}
 {% endspaceless %}
 {% endblock choice_widget %}
@@ -65,7 +67,7 @@
 {% endspaceless %}
 {% endblock choice_widget_expanded %}
 
-{% block choice_widget_collapsed %}
+{% block choice_widget_select %}
 {% spaceless %}
     <select {{ block('widget_attributes') }}{% if multiple %} multiple="multiple"{% endif %}>
         {% if empty_value is not none %}
@@ -82,7 +84,7 @@
         {{ block('choice_widget_options') }}
     </select>
 {% endspaceless %}
-{% endblock choice_widget_collapsed %}
+{% endblock choice_widget_select %}
 
 {% block choice_widget_options %}
 {% spaceless %}
@@ -388,3 +390,7 @@
     {% for attrname, attrvalue in attr %}{{ attrname }}="{{ attrvalue }}" {% endfor %}
 {% endspaceless %}
 {% endblock button_attributes %}
+
+{# Deprecated in Symfony 2.4, to be removed in 3.0 #}
+
+{% block choice_widget_collapsed %}{{ block('choice_widget_select') }}{% endblock %}

@@ -410,6 +410,10 @@ class Request
             $dup->attributes->set('_format', $this->get('_format'));
         }
 
+        if (!$dup->getRequestFormat(null)) {
+            $dup->setRequestFormat($format = $this->getRequestFormat(null));
+        }
+
         return $dup;
     }
 

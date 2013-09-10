@@ -42,10 +42,22 @@ class FixRadioInputListener implements EventSubscriberInterface
 
     public function preSubmit(FormEvent $event)
     {
-        $value = $event->getData();
-        $index = current($this->choiceList->getIndicesForValues(array($value)));
+        $data = $event->getData();
 
-        $event->setData(false !== $index ? array($index => $value) : ($this->placeholderPresent ? array('placeholder' => '') : array()))   ;
+        // Since expanded choice fields are completely loaded anyway, we
+        // can just as well get the values again without losing performance.
+        $existingValues = $this->choiceList->getValues();
+
+        if (false !== ($index = array_search($data, $existingValues, true))) {
+            $data = array($index => $data);
+        } elseif ('' === $data || null === $data) {
+            // Empty values are always accepted.
+            $data = $this->placeholderPresent ? array('placeholder' => '') : array();
+        }
+
+        // Else leave the data unchanged to provoke an error during submission
+
+        $event->setData($data);
     }
 
     /**

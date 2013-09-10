@@ -133,7 +133,7 @@ UPGRADE FROM 2.x to 3.0
    ```
 
  * The `TypeTestCase` class was moved from the `Symfony\Component\Form\Tests\Extension\Core\Type` namespace to the `Symfony\Component\Form\Test` namespace.
- 
+
    Before:
 
    ```
@@ -161,6 +161,12 @@ UPGRADE FROM 2.x to 3.0
  * The constants `ROUND_HALFEVEN`, `ROUND_HALFUP` and `ROUND_HALFDOWN` in class
    `NumberToLocalizedStringTransformer` were renamed to `ROUND_HALF_EVEN`,
    `ROUND_HALF_UP` and `ROUND_HALF_DOWN`.
+
+ * The methods `ChoiceListInterface::getIndicesForChoices()` and
+   `ChoiceListInterface::getIndicesForValues()` were removed. No direct
+   replacement exists, although in most cases
+   `ChoiceListInterface::getChoicesForValues()` and
+   `ChoiceListInterface::getValuesForChoices()` should be sufficient.
 
 
 ### FrameworkBundle
@@ -249,7 +255,7 @@ UPGRADE FROM 2.x to 3.0
  * The Locale component was removed and replaced by the Intl component.
    Instead of the methods in `Symfony\Component\Locale\Locale`, you should use
    these equivalent methods in `Symfony\Component\Intl\Intl` now:
-   
+
     * `Locale::getDisplayCountries()` -> `Intl::getRegionBundle()->getCountryNames()`
     * `Locale::getCountries()` -> `array_keys(Intl::getRegionBundle()->getCountryNames())`
     * `Locale::getDisplayLanguages()` -> `Intl::getLanguageBundle()->getLanguageNames()`

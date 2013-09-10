@@ -73,7 +73,7 @@ class EntityTypePerformanceTest extends FormPerformanceTestCase
 
         foreach ($ids as $id) {
             $name = 65 + chr($id % 57);
-            $this->em->persist(new SingleIdentEntity($id, $name));
+            $this->em->persist(new SingleIntIdEntity($id, $name));
         }
 
         $this->em->flush();

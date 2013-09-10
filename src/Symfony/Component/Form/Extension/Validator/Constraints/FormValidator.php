@@ -23,6 +23,11 @@ use Symfony\Component\Validator\ConstraintValidator;
 class FormValidator extends ConstraintValidator
 {
     /**
+     * @var \SplObjectStorage
+     */
+    private static $clickedButtons;
+
+    /**
      * @var ServerParams
      */
     private $serverParams;
@@ -45,6 +50,16 @@ class FormValidator extends ConstraintValidator
     {
         if (!$form instanceof FormInterface) {
             return;
+        }
+
+        if (null === static::$clickedButtons) {
+            static::$clickedButtons = new \SplObjectStorage();
+        }
+
+        // If the form was previously validated, remove it from the cache in
+        // case the clicked button has changed
+        if (static::$clickedButtons->contains($form)) {
+            static::$clickedButtons->detach($form);
         }
 
         /* @var FormInterface $form */
@@ -172,7 +187,17 @@ class FormValidator extends ConstraintValidator
      */
     private static function getValidationGroups(FormInterface $form)
     {
-        $button = self::findClickedButton($form->getRoot());
+        $root = $form->getRoot();
+
+        // Determine the clicked button of the complete form tree
+        if (!static::$clickedButtons->contains($root)) {
+            // Only call findClickedButton() once to prevent an exponential
+            // runtime
+            // https://github.com/symfony/symfony/issues/8317
+            static::$clickedButtons->attach($root, self::findClickedButton($root));
+        }
+
+        $button = static::$clickedButtons->offsetGet($root);
 
         if (null !== $button) {
             $groups = $button->getConfig()->getOption('validation_groups');

@@ -64,7 +64,7 @@ interface UserInterface
      *
      * This can return null if the password was not encoded using a salt.
      *
-     * @return string The salt
+     * @return string|null The salt
      */
     public function getSalt();
 

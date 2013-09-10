@@ -101,10 +101,6 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcessPipes($code, $size)
     {
-        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
-            $this->markTestSkipped('Test hangs on Windows & PHP due to https://bugs.php.net/bug.php?id=60120 and https://bugs.php.net/bug.php?id=51800');
-        }
-
         $expected = str_repeat(str_repeat('*', 1024), $size) . '!';
         $expectedLength = (1024 * $size) + 1;
 
@@ -598,11 +594,18 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
     {
         $variations = array(
             'fwrite(STDOUT, $in = file_get_contents(\'php://stdin\')); fwrite(STDERR, $in);',
-            'include \''.__DIR__.'/ProcessTestHelper.php\';',
+            'include \''.__DIR__.'/PipeStdinInStdoutStdErrStreamSelect.php\';',
         );
 
+        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+            // Avoid XL buffers on Windows because of https://bugs.php.net/bug.php?id=65650
+            $sizes = array(1, 2, 4, 8);
+        } else {
+            $sizes = array(1, 16, 64, 1024, 4096);
+        }
+
         $codes = array();
-        foreach (array(1, 16, 64, 1024, 4096) as $size) {
+        foreach ($sizes as $size) {
             foreach ($variations as $code) {
                 $codes[] = array($code, $size);
             }

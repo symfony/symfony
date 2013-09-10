@@ -92,7 +92,7 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
             }
 
             // we need to sign the absolute URI, but want to return the path only.
-            $uri = str_replace($request->getSchemeAndHttpHost(), '', $this->signer->sign($this->generateFragmentUri($uri, $request, true)));
+            $uri = substr($this->signer->sign($this->generateFragmentUri($uri, $request, true)), strlen($request->getSchemeAndHttpHost()));
         }
 
         // We need to replace ampersands in the URI with the encoded form in order to return valid html/xml content.

@@ -302,7 +302,18 @@ class Process
             $this->updateStatus(true);
         }
         $this->updateStatus(false);
-        $this->processPipes->close();
+
+        while ($this->processPipes->hasOpenHandles()) {
+            usleep(100);
+            foreach ($this->processPipes->readAndCloseHandles(true) as $type => $data) {
+                if (3 == $type) {
+                    $this->fallbackExitcode = (int) $data;
+                } else {
+                    call_user_func($this->callback, $type === self::STDOUT ? self::OUT : self::ERR, $data);
+                }
+            }
+        }
+        $this->close();
 
         if ($this->processInformation['signaled']) {
             if ($this->isSigchildEnabled()) {

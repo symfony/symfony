@@ -114,23 +114,23 @@ class CheckboxTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $this->assertNull($form->getViewData());
     }
 
-    public function testBindWithEmptyValueAndFalseUnchecked()
+    public function testSubmitWithEmptyValueAndFalseUnchecked()
     {
         $form = $this->factory->create('checkbox', null, array(
             'value' => '',
         ));
-        $form->bind(false);
+        $form->submit(false);
 
         $this->assertFalse($form->getData());
         $this->assertNull($form->getViewData());
     }
 
-    public function testBindWithEmptyValueAndTrueChecked()
+    public function testSubmitWithEmptyValueAndTrueChecked()
     {
         $form = $this->factory->create('checkbox', null, array(
             'value' => '',
         ));
-        $form->bind(true);
+        $form->submit(true);
 
         $this->assertTrue($form->getData());
         $this->assertSame('', $form->getViewData());

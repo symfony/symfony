@@ -67,7 +67,7 @@ class ChoiceToBooleanArrayTransformer implements DataTransformerInterface
         }
 
         if ($this->placeholderPresent) {
-            $values['placeholder'] = false === $index;
+            $values['placeholder'] = 0 === count($valueMap);
         }
 
         return $values;

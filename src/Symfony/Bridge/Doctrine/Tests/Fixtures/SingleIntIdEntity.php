@@ -16,21 +16,22 @@ use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 
 /** @Entity */
-class CompositeStringIdentEntity
+class SingleIntIdEntity
 {
-    /** @Id @Column(type="string") */
-    protected $id1;
+    /** @Id @Column(type="integer") */
+    protected $id;
 
-    /** @Id @Column(type="string") */
-    protected $id2;
-
-    /** @Column(type="string") */
+    /** @Column(type="string", nullable=true) */
     public $name;
 
-    public function __construct($id1, $id2, $name)
+    public function __construct($id, $name)
     {
-        $this->id1 = $id1;
-        $this->id2 = $id2;
+        $this->id = $id;
         $this->name = $name;
+    }
+
+    public function __toString()
+    {
+        return (string) $this->name;
     }
 }

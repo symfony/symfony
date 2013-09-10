@@ -158,6 +158,7 @@ class FrameworkExtension extends Extension
         } else {
             $container->setParameter('form.type_extension.csrf.enabled', false);
         }
+        $container->setParameter('property_accessor.magic_call.enabled', $config['property_accessor']['magic_call']);
     }
 
     /**

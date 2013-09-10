@@ -275,6 +275,12 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('json', $dup->getRequestFormat());
         $this->assertEquals('json', $dup->attributes->get('_format'));
+
+        $request = new Request();
+        $request->setRequestFormat('xml');
+        $dup = $request->duplicate();
+
+        $this->assertEquals('xml', $dup->getRequestFormat());
     }
 
     /**

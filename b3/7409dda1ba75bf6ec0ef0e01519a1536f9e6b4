@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-05-06T10:03:48Z
+
+#7939 has been merged now.
+
+---------------------------------------------------------------------------
+
+by gnutix at 2013-06-30T20:26:17Z
+
+@bschussek Is there any help we could bring for this to get merged ?
+
+---------------------------------------------------------------------------
+
+by caponica at 2013-08-28T23:20:30Z
+
+@bscussek - anything more that can be done to get this one merged?
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-09-10T13:01:05Z
+
+I finished this PR now. I did not improve the test coverage of ModelChoiceList since currently none of our Propel tests uses a temporary database, which is needed here, but I don't know how to set it up. I propose to merge this PR as is and improve the ModelChoiceList test suite later on in cooperation with the propel guys. /cc @willdurand
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-09-10T14:43:48Z
+
+If this is a but fix with no BC beaks, this PR should be merged into 2.2, right?
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-09-10T15:34:42Z
+
+I'll check whether this is possible
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-09-10T16:25:54Z
+
+Ok, here are three versions now:
+
+* #8980 is based on 2.2
+* #8981 contains the same commits as #8980, but based on 2.3 and with merged conflicts (hence the commits differ)
+* this PR contains the same commits as #8981, plus one more which deprecates a few methods, and is based on master

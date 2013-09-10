@@ -29,7 +29,7 @@ class ObjectChoiceListTest_EntityWithToString
     }
 }
 
-class ObjectChoiceListTest extends \PHPUnit_Framework_TestCase
+class ObjectChoiceListTest extends AbstractChoiceListTest
 {
     private $obj1;
 
@@ -39,39 +39,14 @@ class ObjectChoiceListTest extends \PHPUnit_Framework_TestCase
 
     private $obj4;
 
-    /**
-     * @var ObjectChoiceList
-     */
-    private $list;
-
     protected function setUp()
     {
-        parent::setUp();
-
         $this->obj1 = (object) array('name' => 'A');
         $this->obj2 = (object) array('name' => 'B');
         $this->obj3 = (object) array('name' => 'C');
         $this->obj4 = (object) array('name' => 'D');
 
-        $this->list = new ObjectChoiceList(
-            array(
-                'Group 1' => array($this->obj1, $this->obj2),
-                'Group 2' => array($this->obj3, $this->obj4),
-            ),
-            'name',
-            array($this->obj2, $this->obj3)
-        );
-    }
-
-    protected function tearDown()
-    {
-        parent::tearDown();
-
-        $this->obj1 = null;
-        $this->obj2 = null;
-        $this->obj3 = null;
-        $this->obj4 = null;
-        $this->list = null;
+        parent::setUp();
     }
 
     public function testInitArray()
@@ -208,5 +183,40 @@ class ObjectChoiceListTest extends \PHPUnit_Framework_TestCase
         new ObjectChoiceList(
             array($this->obj1, $this->obj2, $this->obj3, $this->obj4)
         );
+    }
+
+    /**
+     * @return \Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     */
+    protected function createChoiceList()
+    {
+        return new ObjectChoiceList(
+            array(
+                'Group 1' => array($this->obj1, $this->obj2),
+                'Group 2' => array($this->obj3, $this->obj4),
+            ),
+            'name',
+            array($this->obj2, $this->obj3)
+        );
+    }
+
+    protected function getChoices()
+    {
+        return array(0 => $this->obj1, 1 => $this->obj2, 2 => $this->obj3, 3 => $this->obj4);
+    }
+
+    protected function getLabels()
+    {
+        return array(0 => 'A', 1 => 'B', 2 => 'C', 3 => 'D');
+    }
+
+    protected function getValues()
+    {
+        return array(0 => '0', 1 => '1', 2 => '2', 3 => '3');
+    }
+
+    protected function getIndices()
+    {
+        return array(0, 1, 2, 3);
     }
 }

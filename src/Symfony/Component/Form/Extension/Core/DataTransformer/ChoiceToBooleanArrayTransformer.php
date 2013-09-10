@@ -56,10 +56,10 @@ class ChoiceToBooleanArrayTransformer implements DataTransformerInterface
             throw new TransformationFailedException('Can not get the choice list', $e->getCode(), $e);
         }
 
-        $index = current($this->choiceList->getIndicesForChoices(array($choice)));
+        $valueMap = array_flip($this->choiceList->getValuesForChoices(array($choice)));
 
         foreach ($values as $i => $value) {
-            $values[$i] = $i === $index;
+            $values[$i] = isset($valueMap[$value]);
         }
 
         return $values;

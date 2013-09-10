@@ -177,6 +177,21 @@ class ChoiceTypeTest extends TypeTestCase
         $this->assertEquals('b', $form->getViewData());
     }
 
+    public function testBindSingleNonExpandedInvalidChoice()
+    {
+        $form = $this->factory->create('choice', null, array(
+            'multiple' => false,
+            'expanded' => false,
+            'choices' => $this->choices,
+        ));
+
+        $form->bind('foobar');
+
+        $this->assertNull($form->getData());
+        $this->assertEquals('foobar', $form->getViewData());
+        $this->assertFalse($form->isSynchronized());
+    }
+
     public function testBindSingleNonExpandedObjectChoices()
     {
         $form = $this->factory->create('choice', null, array(
@@ -214,6 +229,36 @@ class ChoiceTypeTest extends TypeTestCase
         $this->assertEquals(array('a', 'b'), $form->getViewData());
     }
 
+    public function testBindMultipleNonExpandedInvalidScalarChoice()
+    {
+        $form = $this->factory->create('choice', null, array(
+            'multiple' => true,
+            'expanded' => false,
+            'choices' => $this->choices,
+        ));
+
+        $form->bind('foobar');
+
+        $this->assertNull($form->getData());
+        $this->assertEquals('foobar', $form->getViewData());
+        $this->assertFalse($form->isSynchronized());
+    }
+
+    public function testBindMultipleNonExpandedInvalidArrayChoice()
+    {
+        $form = $this->factory->create('choice', null, array(
+            'multiple' => true,
+            'expanded' => false,
+            'choices' => $this->choices,
+        ));
+
+        $form->bind(array('a', 'foobar'));
+
+        $this->assertNull($form->getData());
+        $this->assertEquals(array('a', 'foobar'), $form->getViewData());
+        $this->assertFalse($form->isSynchronized());
+    }
+
     public function testBindMultipleNonExpandedObjectChoices()
     {
         $form = $this->factory->create('choice', null, array(
@@ -236,17 +281,28 @@ class ChoiceTypeTest extends TypeTestCase
         $this->assertEquals(array('2', '3'), $form->getViewData());
     }
 
-    public function testBindSingleExpanded()
+    public function testBindSingleExpandedRequired()
     {
         $form = $this->factory->create('choice', null, array(
             'multiple' => false,
             'expanded' => true,
+            'required' => true,
             'choices' => $this->choices,
         ));
 
         $form->bind('b');
 
         $this->assertSame('b', $form->getData());
+        $this->assertSame(array(
+            0 => false,
+            1 => true,
+            2 => false,
+            3 => false,
+            4 => false,
+        ), $form->getViewData());
+        $this->assertEmpty($form->getExtraData());
+        $this->assertTrue($form->isSynchronized());
+
         $this->assertFalse($form[0]->getData());
         $this->assertTrue($form[1]->getData());
         $this->assertFalse($form[2]->getData());
@@ -259,17 +315,22 @@ class ChoiceTypeTest extends TypeTestCase
         $this->assertNull($form[4]->getViewData());
     }
 
-    public function testBindSingleExpandedNothingChecked()
+    public function testBindSingleExpandedRequiredInvalidChoice()
     {
         $form = $this->factory->create('choice', null, array(
             'multiple' => false,
             'expanded' => true,
+            'required' => true,
             'choices' => $this->choices,
         ));
 
-        $form->bind(null);
+        $form->bind('foobar');
 
-        $this->assertNull($form->getData());
+        $this->assertSame(null, $form->getData());
+        $this->assertSame('foobar', $form->getViewData());
+        $this->assertEmpty($form->getExtraData());
+        $this->assertFalse($form->isSynchronized());
+
         $this->assertFalse($form[0]->getData());
         $this->assertFalse($form[1]->getData());
         $this->assertFalse($form[2]->getData());
@@ -282,7 +343,7 @@ class ChoiceTypeTest extends TypeTestCase
         $this->assertNull($form[4]->getViewData());
     }
 
-    public function testBindSingleExpandedWithFalseDoesNotHaveExtraChildren()
+    public function testBindSingleExpandedNonRequired()
     {
         $form = $this->factory->create('choice', null, array(
             'multiple' => false,
@@ -290,10 +351,259 @@ class ChoiceTypeTest extends TypeTestCase
             'choices' => $this->choices,
         ));
 
+        $form->bind('b');
+
+        $this->assertSame('b', $form->getData());
+        $this->assertSame(array(
+            0 => false,
+            1 => true,
+            2 => false,
+            3 => false,
+            4 => false,
+        ), $form->getViewData());
+        $this->assertEmpty($form->getExtraData());
+        $this->assertTrue($form->isSynchronized());
+
+        $this->assertFalse($form[0]->getData());
+        $this->assertTrue($form[1]->getData());
+        $this->assertFalse($form[2]->getData());
+        $this->assertFalse($form[3]->getData());
+        $this->assertFalse($form[4]->getData());
+        $this->assertNull($form[0]->getViewData());
+        $this->assertSame('b', $form[1]->getViewData());
+        $this->assertNull($form[2]->getViewData());
+        $this->assertNull($form[3]->getViewData());
+        $this->assertNull($form[4]->getViewData());
+    }
+
+    public function testBindSingleExpandedNonRequiredInvalidChoice()
+    {
+        $form = $this->factory->create('choice', null, array(
+            'multiple' => false,
+            'expanded' => true,
+            'required' => false,
+            'choices' => $this->choices,
+        ));
+
+        $form->bind('foobar');
+
+        $this->assertSame(null, $form->getData());
+        $this->assertSame('foobar', $form->getViewData());
+        $this->assertEmpty($form->getExtraData());
+        $this->assertFalse($form->isSynchronized());
+
+        $this->assertFalse($form[0]->getData());
+        $this->assertFalse($form[1]->getData());
+        $this->assertFalse($form[2]->getData());
+        $this->assertFalse($form[3]->getData());
+        $this->assertFalse($form[4]->getData());
+        $this->assertNull($form[0]->getViewData());
+        $this->assertNull($form[1]->getViewData());
+        $this->assertNull($form[2]->getViewData());
+        $this->assertNull($form[3]->getViewData());
+        $this->assertNull($form[4]->getViewData());
+    }
+
+    public function testBindSingleExpandedRequiredNull()
+    {
+        $form = $this->factory->create('choice', null, array(
+            'multiple' => false,
+            'expanded' => true,
+            'choices' => $this->choices,
+        ));
+
+        $form->bind(null);
+
+        $this->assertNull($form->getData());
+        $this->assertSame(array(
+            0 => false,
+            1 => false,
+            2 => false,
+            3 => false,
+            4 => false,
+        ), $form->getViewData());
+        $this->assertEmpty($form->getExtraData());
+        $this->assertTrue($form->isSynchronized());
+
+        $this->assertFalse($form[0]->getData());
+        $this->assertFalse($form[1]->getData());
+        $this->assertFalse($form[2]->getData());
+        $this->assertFalse($form[3]->getData());
+        $this->assertFalse($form[4]->getData());
+        $this->assertNull($form[0]->getViewData());
+        $this->assertNull($form[1]->getViewData());
+        $this->assertNull($form[2]->getViewData());
+        $this->assertNull($form[3]->getViewData());
+        $this->assertNull($form[4]->getViewData());
+    }
+
+    public function testBindSingleExpandedRequiredEmpty()
+    {
+        $form = $this->factory->create('choice', null, array(
+            'multiple' => false,
+            'expanded' => true,
+            'required' => true,
+            'choices' => $this->choices,
+        ));
+
+        $form->bind('');
+
+        $this->assertNull($form->getData());
+        $this->assertSame(array(
+            0 => false,
+            1 => false,
+            2 => false,
+            3 => false,
+            4 => false,
+        ), $form->getViewData());
+        $this->assertEmpty($form->getExtraData());
+        $this->assertTrue($form->isSynchronized());
+
+        $this->assertFalse($form[0]->getData());
+        $this->assertFalse($form[1]->getData());
+        $this->assertFalse($form[2]->getData());
+        $this->assertFalse($form[3]->getData());
+        $this->assertFalse($form[4]->getData());
+        $this->assertNull($form[0]->getViewData());
+        $this->assertNull($form[1]->getViewData());
+        $this->assertNull($form[2]->getViewData());
+        $this->assertNull($form[3]->getViewData());
+        $this->assertNull($form[4]->getViewData());
+    }
+
+    public function testBindSingleExpandedRequiredFalse()
+    {
+        $form = $this->factory->create('choice', null, array(
+            'multiple' => false,
+            'expanded' => true,
+            'required' => true,
+            'choices' => $this->choices,
+        ));
+
         $form->bind(false);
 
-        $this->assertEmpty($form->getExtraData());
         $this->assertNull($form->getData());
+        $this->assertSame(array(
+            0 => false,
+            1 => false,
+            2 => false,
+            3 => false,
+            4 => false,
+        ), $form->getViewData());
+        $this->assertEmpty($form->getExtraData());
+        $this->assertTrue($form->isSynchronized());
+
+        $this->assertFalse($form[0]->getData());
+        $this->assertFalse($form[1]->getData());
+        $this->assertFalse($form[2]->getData());
+        $this->assertFalse($form[3]->getData());
+        $this->assertFalse($form[4]->getData());
+        $this->assertNull($form[0]->getViewData());
+        $this->assertNull($form[1]->getViewData());
+        $this->assertNull($form[2]->getViewData());
+        $this->assertNull($form[3]->getViewData());
+        $this->assertNull($form[4]->getViewData());
+    }
+
+    public function testBindSingleExpandedNonRequiredNull()
+    {
+        $form = $this->factory->create('choice', null, array(
+            'multiple' => false,
+            'expanded' => true,
+            'choices' => $this->choices,
+        ));
+
+        $form->bind(null);
+
+        $this->assertNull($form->getData());
+        $this->assertSame(array(
+            0 => false,
+            1 => false,
+            2 => false,
+            3 => false,
+            4 => false,
+        ), $form->getViewData());
+        $this->assertEmpty($form->getExtraData());
+        $this->assertTrue($form->isSynchronized());
+
+        $this->assertFalse($form[0]->getData());
+        $this->assertFalse($form[1]->getData());
+        $this->assertFalse($form[2]->getData());
+        $this->assertFalse($form[3]->getData());
+        $this->assertFalse($form[4]->getData());
+        $this->assertNull($form[0]->getViewData());
+        $this->assertNull($form[1]->getViewData());
+        $this->assertNull($form[2]->getViewData());
+        $this->assertNull($form[3]->getViewData());
+        $this->assertNull($form[4]->getViewData());
+    }
+
+    public function testBindSingleExpandedNonRequiredEmpty()
+    {
+        $form = $this->factory->create('choice', null, array(
+            'multiple' => false,
+            'expanded' => true,
+            'required' => false,
+            'choices' => $this->choices,
+        ));
+
+        $form->bind('');
+
+        $this->assertNull($form->getData());
+        $this->assertSame(array(
+            0 => false,
+            1 => false,
+            2 => false,
+            3 => false,
+            4 => false,
+        ), $form->getViewData());
+        $this->assertEmpty($form->getExtraData());
+        $this->assertTrue($form->isSynchronized());
+
+        $this->assertFalse($form[0]->getData());
+        $this->assertFalse($form[1]->getData());
+        $this->assertFalse($form[2]->getData());
+        $this->assertFalse($form[3]->getData());
+        $this->assertFalse($form[4]->getData());
+        $this->assertNull($form[0]->getViewData());
+        $this->assertNull($form[1]->getViewData());
+        $this->assertNull($form[2]->getViewData());
+        $this->assertNull($form[3]->getViewData());
+        $this->assertNull($form[4]->getViewData());
+    }
+
+    public function testBindSingleExpandedNonRequiredFalse()
+    {
+        $form = $this->factory->create('choice', null, array(
+            'multiple' => false,
+            'expanded' => true,
+            'required' => false,
+            'choices' => $this->choices,
+        ));
+
+        $form->bind(false);
+
+        $this->assertNull($form->getData());
+        $this->assertSame(array(
+            0 => false,
+            1 => false,
+            2 => false,
+            3 => false,
+            4 => false,
+        ), $form->getViewData());
+        $this->assertEmpty($form->getExtraData());
+        $this->assertTrue($form->isSynchronized());
+
+        $this->assertFalse($form[0]->getData());
+        $this->assertFalse($form[1]->getData());
+        $this->assertFalse($form[2]->getData());
+        $this->assertFalse($form[3]->getData());
+        $this->assertFalse($form[4]->getData());
+        $this->assertNull($form[0]->getViewData());
+        $this->assertNull($form[1]->getViewData());
+        $this->assertNull($form[2]->getViewData());
+        $this->assertNull($form[3]->getViewData());
+        $this->assertNull($form[4]->getViewData());
     }
 
     public function testBindSingleExpandedWithEmptyChild()
@@ -381,6 +691,16 @@ class ChoiceTypeTest extends TypeTestCase
         $form->bind(array('a', 'c'));
 
         $this->assertSame(array('a', 'c'), $form->getData());
+        $this->assertSame(array(
+            0 => true,
+            1 => false,
+            2 => true,
+            3 => false,
+            4 => false,
+        ), $form->getViewData());
+        $this->assertEmpty($form->getExtraData());
+        $this->assertTrue($form->isSynchronized());
+
         $this->assertTrue($form[0]->getData());
         $this->assertFalse($form[1]->getData());
         $this->assertTrue($form[2]->getData());
@@ -389,6 +709,60 @@ class ChoiceTypeTest extends TypeTestCase
         $this->assertSame('a', $form[0]->getViewData());
         $this->assertNull($form[1]->getViewData());
         $this->assertSame('c', $form[2]->getViewData());
+        $this->assertNull($form[3]->getViewData());
+        $this->assertNull($form[4]->getViewData());
+    }
+
+    public function testBindMultipleExpandedInvalidScalarChoice()
+    {
+        $form = $this->factory->create('choice', null, array(
+            'multiple' => true,
+            'expanded' => true,
+            'choices' => $this->choices,
+        ));
+
+        $form->bind('foobar');
+
+        $this->assertNull($form->getData());
+        $this->assertSame('foobar', $form->getViewData());
+        $this->assertEmpty($form->getExtraData());
+        $this->assertFalse($form->isSynchronized());
+
+        $this->assertFalse($form[0]->getData());
+        $this->assertFalse($form[1]->getData());
+        $this->assertFalse($form[2]->getData());
+        $this->assertFalse($form[3]->getData());
+        $this->assertFalse($form[4]->getData());
+        $this->assertNull($form[0]->getViewData());
+        $this->assertNull($form[1]->getViewData());
+        $this->assertNull($form[2]->getViewData());
+        $this->assertNull($form[3]->getViewData());
+        $this->assertNull($form[4]->getViewData());
+    }
+
+    public function testBindMultipleExpandedInvalidArrayChoice()
+    {
+        $form = $this->factory->create('choice', null, array(
+            'multiple' => true,
+            'expanded' => true,
+            'choices' => $this->choices,
+        ));
+
+        $form->bind(array('a', 'foobar'));
+
+        $this->assertNull($form->getData());
+        $this->assertSame(array('a', 'foobar'), $form->getViewData());
+        $this->assertEmpty($form->getExtraData());
+        $this->assertFalse($form->isSynchronized());
+
+        $this->assertFalse($form[0]->getData());
+        $this->assertFalse($form[1]->getData());
+        $this->assertFalse($form[2]->getData());
+        $this->assertFalse($form[3]->getData());
+        $this->assertFalse($form[4]->getData());
+        $this->assertNull($form[0]->getViewData());
+        $this->assertNull($form[1]->getViewData());
+        $this->assertNull($form[2]->getViewData());
         $this->assertNull($form[3]->getViewData());
         $this->assertNull($form[4]->getViewData());
     }

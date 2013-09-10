@@ -531,68 +531,73 @@ class Form implements \IteratorAggregate, FormInterface
 
         $dispatcher = $this->config->getEventDispatcher();
 
-        // Hook to change content of the data bound by the browser
-        if ($dispatcher->hasListeners(FormEvents::PRE_BIND) || $dispatcher->hasListeners(FormEvents::BIND_CLIENT_DATA)) {
-            $event = new FormEvent($this, $submittedData);
-            $dispatcher->dispatch(FormEvents::PRE_BIND, $event);
-            // BC until 2.3
-            if ($dispatcher->hasListeners(FormEvents::BIND_CLIENT_DATA)) {
-                trigger_error('The FormEvents::BIND_CLIENT_DATA event is deprecated since 2.1 and will be removed in 2.3. Use the FormEvents::PRE_BIND event instead.', E_USER_DEPRECATED);
-            }
-            $dispatcher->dispatch(FormEvents::BIND_CLIENT_DATA, $event);
-            $submittedData = $event->getData();
-        }
-
-        // Check whether the form is compound.
-        // This check is preferable over checking the number of children,
-        // since forms without children may also be compound.
-        // (think of empty collection forms)
-        if ($this->config->getCompound()) {
-            if (!is_array($submittedData)) {
-                $submittedData = array();
-            }
-
-            for (reset($this->children); false !== current($this->children); next($this->children)) {
-                $child = current($this->children);
-                $name = key($this->children);
-
-                $child->bind(isset($submittedData[$name]) ? $submittedData[$name] : null);
-                unset($submittedData[$name]);
-            }
-
-            $this->extraData = $submittedData;
-
-            // If the form is compound, the default data in view format
-            // is reused. The data of the children is merged into this
-            // default data using the data mapper.
-            $viewData = $this->viewData;
-        } else {
-            // If the form is not compound, the submitted data is also the data in view format.
-            $viewData = $submittedData;
-        }
-
-        if (FormUtil::isEmpty($viewData)) {
-            $emptyData = $this->config->getEmptyData();
-
-            if ($emptyData instanceof \Closure) {
-                /* @var \Closure $emptyData */
-                $emptyData = $emptyData($this, $viewData);
-            }
-
-            $viewData = $emptyData;
-        }
-
-        // Merge form data from children into existing view data
-        // It is not necessary to invoke this method if the form has no children,
-        // even if it is compound.
-        if (count($this->children) > 0) {
-            $this->config->getDataMapper()->mapFormsToData($this->children, $viewData);
-        }
-
         $modelData = null;
         $normData = null;
+        $viewData = null;
 
         try {
+            // Hook to change content of the data bound by the browser
+            if ($dispatcher->hasListeners(FormEvents::PRE_BIND) || $dispatcher->hasListeners(FormEvents::BIND_CLIENT_DATA)) {
+                $event = new FormEvent($this, $submittedData);
+                $dispatcher->dispatch(FormEvents::PRE_BIND, $event);
+                // BC until 2.3
+                if ($dispatcher->hasListeners(FormEvents::BIND_CLIENT_DATA)) {
+                    trigger_error('The FormEvents::BIND_CLIENT_DATA event is deprecated since 2.1 and will be removed in 2.3. Use the FormEvents::PRE_BIND event instead.', E_USER_DEPRECATED);
+                }
+                $dispatcher->dispatch(FormEvents::BIND_CLIENT_DATA, $event);
+                $submittedData = $event->getData();
+            }
+
+            // Check whether the form is compound.
+            // This check is preferable over checking the number of children,
+            // since forms without children may also be compound.
+            // (think of empty collection forms)
+            if ($this->config->getCompound()) {
+                if (null === $submittedData) {
+                    $submittedData = array();
+                }
+
+                if (!is_array($submittedData)) {
+                    throw new TransformationFailedException('Compound forms expect an array or NULL on submission.');
+                }
+
+                for (reset($this->children); false !== current($this->children); next($this->children)) {
+                    $child = current($this->children);
+                    $name = key($this->children);
+
+                    $child->bind(isset($submittedData[$name]) ? $submittedData[$name] : null);
+                    unset($submittedData[$name]);
+                }
+
+                $this->extraData = $submittedData;
+
+                // If the form is compound, the default data in view format
+                // is reused. The data of the children is merged into this
+                // default data using the data mapper.
+                $viewData = $this->viewData;
+            } else {
+                // If the form is not compound, the submitted data is also the data in view format.
+                $viewData = $submittedData;
+            }
+
+            if (FormUtil::isEmpty($viewData)) {
+                $emptyData = $this->config->getEmptyData();
+
+                if ($emptyData instanceof \Closure) {
+                    /* @var \Closure $emptyData */
+                    $emptyData = $emptyData($this, $viewData);
+                }
+
+                $viewData = $emptyData;
+            }
+
+            // Merge form data from children into existing view data
+            // It is not necessary to invoke this method if the form has no children,
+            // even if it is compound.
+            if (count($this->children) > 0) {
+                $this->config->getDataMapper()->mapFormsToData($this->children, $viewData);
+            }
+
             // Normalize data to unified representation
             $normData = $this->viewToNorm($viewData);
 
@@ -614,6 +619,12 @@ class Form implements \IteratorAggregate, FormInterface
             $viewData = $this->normToView($normData);
         } catch (TransformationFailedException $e) {
             $this->synchronized = false;
+
+            // If $viewData was not yet set, set it to $submittedData so that
+            // the erroneous data is accessible on the form.
+            if (null === $viewData) {
+                $viewData = $submittedData;
+            }
         }
 
         $this->bound = true;

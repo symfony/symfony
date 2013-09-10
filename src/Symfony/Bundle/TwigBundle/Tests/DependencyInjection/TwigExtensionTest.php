@@ -63,13 +63,15 @@ class TwigExtensionTest extends TestCase
         $this->assertEquals(new Reference('templating.globals'), $calls[0][1][1]);
         $this->assertEquals('foo', $calls[1][1][0], '->load() registers services as Twig globals');
         $this->assertEquals(new Reference('bar'), $calls[1][1][1], '->load() registers services as Twig globals');
-        $this->assertEquals('pi', $calls[2][1][0], '->load() registers variables as Twig globals');
-        $this->assertEquals(3.14, $calls[2][1][1], '->load() registers variables as Twig globals');
+        $this->assertEquals('baz', $calls[2][1][0], '->load() registers variables as Twig globals');
+        $this->assertEquals('@qux', $calls[2][1][1], '->load() allows escaping of service identifiers');
+        $this->assertEquals('pi', $calls[3][1][0], '->load() registers variables as Twig globals');
+        $this->assertEquals(3.14, $calls[3][1][1], '->load() registers variables as Twig globals');
 
         // Yaml and Php specific configs
         if (in_array($format, array('yml', 'php'))) {
-            $this->assertEquals('bad', $calls[3][1][0], '->load() registers variables as Twig globals');
-            $this->assertEquals(array('key' => 'foo'), $calls[3][1][1], '->load() registers variables as Twig globals');
+            $this->assertEquals('bad', $calls[4][1][0], '->load() registers variables as Twig globals');
+            $this->assertEquals(array('key' => 'foo'), $calls[4][1][1], '->load() registers variables as Twig globals');
         }
 
         // Twig options

@@ -122,6 +122,32 @@ class ProcessPipes
     }
 
     /**
+     * Reads data in file handles and pipes, closes them if EOF is reached.
+     *
+     * @param Boolean $blocking Whether to use blocking calls or not.
+     *
+     * @return array An array of read data indexed by their fd.
+     */
+    public function readAndCloseHandles($blocking)
+    {
+        return array_replace($this->readStreams($blocking, true), $this->readFileHandles(true));
+    }
+
+    /**
+     * Returns if the current state has open file handles or pipes.
+     *
+     * @return Boolean
+     */
+    public function hasOpenHandles()
+    {
+        if ($this->useFiles) {
+            return (Boolean) $this->fileHandles;
+        }
+
+        return (Boolean) $this->pipes;
+    }
+
+    /**
      * Writes stdin data.
      *
      * @param Boolean $blocking Whether to use blocking calls or not.
@@ -177,19 +203,28 @@ class ProcessPipes
      *
      * @return array An array of read data indexed by their fd.
      */
-    private function readFileHandles()
+    private function readFileHandles($close = false)
     {
         $read = array();
-
-        foreach ($this->fileHandles as $type => $fileHandle) {
-            fseek($fileHandle, $this->readBytes[$type]);
+        $fh = $this->fileHandles;
+        foreach ($fh as $type => $fileHandle) {
+            if (0 !== fseek($fileHandle, $this->readBytes[$type])) {
+                continue;
+            }
             $data = '';
             while (!feof($fileHandle)) {
-                $data .= fread($fileHandle, 8192);
+                if (false !== $dataread = fread($fileHandle, 16392)) {
+                    $data .= $dataread;
+                }
             }
             if (0 < $length = strlen($data)) {
                 $this->readBytes[$type] += $length;
                 $read[$type] = $data;
+            }
+
+            if (true === $close && feof($fileHandle)) {
+                fclose($this->fileHandles[$type]);
+                unset($this->fileHandles[$type]);
             }
         }
 
@@ -203,7 +238,7 @@ class ProcessPipes
      *
      * @return array An array of read data indexed by their fd.
      */
-    private function readStreams($blocking)
+    private function readStreams($blocking, $close = false)
     {
         $read = array();
 
@@ -233,6 +268,11 @@ class ProcessPipes
 
             if (strlen($data) > 0) {
                 $read[$type] = $data;
+            }
+
+            if (true === $close && feof($pipe)) {
+                fclose($this->pipes[$type]);
+                unset($this->pipes[$type]);
             }
         }
 

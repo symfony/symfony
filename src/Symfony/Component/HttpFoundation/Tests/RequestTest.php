@@ -250,9 +250,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo=bar', $request->getQueryString());
     }
 
-    /**
-     * @covers Symfony\Component\HttpFoundation\Request::duplicate
-     */
     public function testDuplicate()
     {
         $request = new Request(array('foo' => 'bar'), array('foo' => 'bar'), array('foo' => 'bar'), array(), array(), array('HTTP_FOO' => 'bar'));
@@ -269,6 +266,15 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('foo' => 'foobar'), $dup->request->all(), '->duplicate() overrides the request parameters if provided');
         $this->assertEquals(array('foo' => 'foobar'), $dup->attributes->all(), '->duplicate() overrides the attributes if provided');
         $this->assertEquals(array('foo' => array('foobar')), $dup->headers->all(), '->duplicate() overrides the HTTP header if provided');
+    }
+
+    public function testDuplicateWithFormat()
+    {
+        $request = new Request(array(), array(), array('_format' => 'json'));
+        $dup = $request->duplicate();
+
+        $this->assertEquals('json', $dup->getRequestFormat());
+        $this->assertEquals('json', $dup->attributes->get('_format'));
     }
 
     /**

@@ -411,9 +411,8 @@ class Request
         $dup->method = null;
         $dup->format = null;
 
-        if (!$dup->get('_format')) {
-            // we set the request format to null if the current request is not known
-            $dup->setRequestFormat($this->getRequestFormat(null));
+        if (!$dup->get('_format') && $this->get('_format')) {
+            $dup->attributes->set('_format', $this->get('_format'));
         }
 
         return $dup;

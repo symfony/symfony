@@ -16,12 +16,12 @@ use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 
 /** @Entity */
-class SingleIdentEntity
+class SingleStringIdEntity
 {
-    /** @Id @Column(type="integer") */
+    /** @Id @Column(type="string") */
     protected $id;
 
-    /** @Column(type="string", nullable=true) */
+    /** @Column(type="string") */
     public $name;
 
     public function __construct($id, $name)
@@ -32,6 +32,6 @@ class SingleIdentEntity
 
     public function __toString()
     {
-        return (string) $this->name;
+        return $this->name;
     }
 }

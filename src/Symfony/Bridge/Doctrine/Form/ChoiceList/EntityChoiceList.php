@@ -279,6 +279,8 @@ class EntityChoiceList extends ObjectChoiceList
      * @return array
      *
      * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     *
+     * @deprecated Deprecated since version 2.4, to be removed in 3.0.
      */
     public function getIndicesForChoices(array $entities)
     {
@@ -314,6 +316,8 @@ class EntityChoiceList extends ObjectChoiceList
      * @return array
      *
      * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     *
+     * @deprecated Deprecated since version 2.4, to be removed in 3.0.
      */
     public function getIndicesForValues(array $values)
     {

@@ -13,9 +13,9 @@ namespace Symfony\Component\Debug\FatalErrorHandler;
 
 use Symfony\Component\Debug\Exception\ClassNotFoundException;
 use Symfony\Component\Debug\Exception\FatalErrorException;
+use Symfony\Component\Debug\DebugClassLoader;
 use Composer\Autoload\ClassLoader as ComposerClassLoader;
 use Symfony\Component\ClassLoader as SymfonyClassLoader;
-use Symfony\Component\ClassLoader\DebugClassLoader;
 
 /**
  * ErrorHandler for classes that do not exist.

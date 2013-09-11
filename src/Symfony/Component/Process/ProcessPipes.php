@@ -77,14 +77,24 @@ class ProcessPipes
      */
     public function close()
     {
-        foreach ($this->pipes as $offset => $pipe) {
-            fclose($pipe);
-        }
-
+        $this->closeUnixPipes();
         foreach ($this->fileHandles as $offset => $handle) {
             fclose($handle);
         }
-        $this->fileHandles = $this->pipes = array();
+        $this->fileHandles = array();
+    }
+
+    /**
+     * Closes unix pipes.
+     *
+     * Nothing happens in case file handles are used.
+     */
+    public function closeUnixPipes()
+    {
+        foreach ($this->pipes as $pipe) {
+            fclose($pipe);
+        }
+        $this->pipes = array();
     }
 
     /**

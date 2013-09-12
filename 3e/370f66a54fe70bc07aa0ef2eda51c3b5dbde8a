@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by stof at 2013-09-09T16:14:13Z
+
+This implementation has a big drawback compared to the Twig extension: you must remove all stopwatch calls before going into prod, otherwise you get a fatal error when rendering your template calling stopwatch (or you need to check all the time in your template whether ``$view['stopwatch']->getStopwatch()`` is ``null`` or not). On the other hand, the Twig extension handles this case gracefully when compiling the template.
+
+IMO, the templating helper should provide proxy methods for the Stopwatch features (being no-ops if there is no Stopwatch in the helper) instead of exposing the Stopwatch itself.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2013-09-10T19:42:44Z
+
+@stof I've fixed it by using a proxy class, like you suggested.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2013-09-10T19:48:49Z
+
+After writing the docs I decided to do it different without a proxy class.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2013-09-11T20:42:58Z
+
+@fabpot I fixed the comments

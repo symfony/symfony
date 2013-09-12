@@ -4,6 +4,7 @@ CHANGELOG
 2.4.0
 -----
 
+ * added DecoratorServicePass and a way to override a service definition (Definition::setDecoratedService())
  * added ContainerAwareTrait to add default container aware behavior to a class
 
 2.2.0

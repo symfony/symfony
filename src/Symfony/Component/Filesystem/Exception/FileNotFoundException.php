@@ -15,11 +15,9 @@ namespace Symfony\Component\Filesystem\Exception;
  * Exception class thrown when a file couldn' t be found
  *
  * @author Christian Gärtner <christiangaertner.film@googlemail.com>
- *
  */
 class FileNotFoundException extends IOException
 {
-
     public function __construct($path, $message = null, $code = 0, \Exception $previous = null)
     {
         if ($message === null) {

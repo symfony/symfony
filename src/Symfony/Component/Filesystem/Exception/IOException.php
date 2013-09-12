@@ -22,15 +22,12 @@ namespace Symfony\Component\Filesystem\Exception;
 class IOException extends \RuntimeException implements ExceptionInterface, IOExceptionInterface
 {
 
-    /**
-     * The associated path of this exception
-     * @var string
-     */
-    protected $path;
+    private $path;
 
     public function __construct($path, $message = null, $code = 0, \Exception $previous = null)
     {
         $this->path = $path;
+
         parent::__construct($message, $code, $previous);
     }
 

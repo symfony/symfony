@@ -155,4 +155,19 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame($bar, $container->get('foo')->bar, '->set() overrides an already defined service');
     }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
+     */
+    public function testCircularReference()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', 'stdClass')->addArgument(new Reference('bar'));
+        $container->register('bar', 'stdClass')->setPublic(false)->addMethodCall('setA', array(new Reference('baz')));
+        $container->register('baz', 'stdClass')->addMethodCall('setA', array(new Reference('foo')));
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        $dumper->dump();
+    }
 }

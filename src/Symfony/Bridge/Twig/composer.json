@@ -26,7 +26,8 @@
         "symfony/templating": "~2.1",
         "symfony/translation": "~2.2",
         "symfony/yaml": "~2.0",
-        "symfony/security": "~2.0"
+        "symfony/security": "~2.0",
+        "symfony/stopwatch": "~2.2"
     },
     "suggest": {
         "symfony/form": "",
@@ -35,7 +36,8 @@
         "symfony/templating": "",
         "symfony/translation": "",
         "symfony/yaml": "",
-        "symfony/security": ""
+        "symfony/security": "",
+        "symfony/stopwatch": ""
     },
     "autoload": {
         "psr-0": { "Symfony\\Bridge\\Twig\\": "" }

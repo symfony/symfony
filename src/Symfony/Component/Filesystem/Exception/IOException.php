@@ -24,11 +24,18 @@ class IOException extends \RuntimeException implements ExceptionInterface, IOExc
 
     private $path;
 
-    public function __construct($path, $message = null, $code = 0, \Exception $previous = null)
-    {
-        $this->path = $path;
+    public static function makeWithPath($path, $message = null, $code = 0, \Exception $previous = null) {
+        $e = new self($message, $code, $previous);
+        $e->setPath($path);
+        return $e;
+    }
 
-        parent::__construct($message, $code, $previous);
+    /**
+     * Set the path associated with this IOException
+     * @param string $path The path
+     */
+    public function setPath($path) {
+        $this->path = $path;
     }
 
     /**

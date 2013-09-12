@@ -20,10 +20,17 @@ use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 class ExceptionTest extends \PHPUnit_Framework_TestCase
 {
 
+    public function testFactory()
+    {
+        $e = IOException::makeWithPath('/foo');
+
+        $this->assertInstanceOf('\Symfony\Component\Filesystem\Exception\IOException', $e);
+    }
+
     public function testSetPath()
     {
-        $e = new IOException('/foo');
-
+        $e = new IOException();
+        $e->setPath('/foo');
         $reflection = new \ReflectionProperty($e, 'path');
         $reflection->setAccessible(true);
 
@@ -32,7 +39,8 @@ class ExceptionTest extends \PHPUnit_Framework_TestCase
 
     public function testGetPath()
     {
-        $e = new IOException('/foo');
+        $e = new IOException();
+        $e->setPath('/foo');
         $this->assertEquals('/foo', $e->getPath(), 'The pass should be returned.');
     }
 

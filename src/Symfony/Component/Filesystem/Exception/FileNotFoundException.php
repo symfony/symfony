@@ -24,6 +24,8 @@ class FileNotFoundException extends IOException
             $message = sprintf('File "%s" could not be found', $path);
         }
 
-        parent::__construct($path, $message, $code, $previous);
+        $this->setPath($path);
+
+        parent::__construct($message, $code, $previous);
     }
 }

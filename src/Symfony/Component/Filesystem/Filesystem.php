@@ -59,7 +59,7 @@ class Filesystem
             unset($source, $target);
 
             if (!is_file($targetFile)) {
-                throw new IOException($originFile, sprintf('Failed to copy %s to %s', $originFile, $targetFile));
+                throw IOException::makeWithPath($originFile, sprintf('Failed to copy %s to %s', $originFile, $targetFile));
             }
         }
     }
@@ -80,7 +80,7 @@ class Filesystem
             }
 
             if (true !== @mkdir($dir, $mode, true)) {
-                throw new IOException($dir, sprintf('Failed to create %s', $dir));
+                throw IOException::makeWithPath($dir, sprintf('Failed to create %s', $dir));
             }
         }
     }
@@ -117,7 +117,7 @@ class Filesystem
         foreach ($this->toIterator($files) as $file) {
             $touch = $time ? @touch($file, $time, $atime) : @touch($file);
             if (true !== $touch) {
-                throw new IOException($file, sprintf('Failed to touch %s', $file));
+                throw IOException::makeWithPath($file, sprintf('Failed to touch %s', $file));
             }
         }
     }
@@ -142,17 +142,17 @@ class Filesystem
                 $this->remove(new \FilesystemIterator($file));
 
                 if (true !== @rmdir($file)) {
-                    throw new IOException($file, sprintf('Failed to remove directory %s', $file));
+                    throw IOException::makeWithPath($file, sprintf('Failed to remove directory %s', $file));
                 }
             } else {
                 // https://bugs.php.net/bug.php?id=52176
                 if (defined('PHP_WINDOWS_VERSION_MAJOR') && is_dir($file)) {
                     if (true !== @rmdir($file)) {
-                        throw new IOException($file, sprintf('Failed to remove file %s', $file));
+                        throw IOException::makeWithPath($file, sprintf('Failed to remove file %s', $file));
                     }
                 } else {
                     if (true !== @unlink($file)) {
-                        throw new IOException($file, sprintf('Failed to remove file %s', $file));
+                        throw IOException::makeWithPath($file, sprintf('Failed to remove file %s', $file));
                     }
                 }
             }
@@ -176,7 +176,7 @@ class Filesystem
                 $this->chmod(new \FilesystemIterator($file), $mode, $umask, true);
             }
             if (true !== @chmod($file, $mode & ~$umask)) {
-                throw new IOException($file, sprintf('Failed to chmod file %s', $file));
+                throw IOException::makeWithPath($file, sprintf('Failed to chmod file %s', $file));
             }
         }
     }
@@ -198,11 +198,11 @@ class Filesystem
             }
             if (is_link($file) && function_exists('lchown')) {
                 if (true !== @lchown($file, $user)) {
-                    throw new IOException($file, sprintf('Failed to chown file %s', $file));
+                    throw IOException::makeWithPath($file, sprintf('Failed to chown file %s', $file));
                 }
             } else {
                 if (true !== @chown($file, $user)) {
-                    throw new IOException($file, sprintf('Failed to chown file %s', $file));
+                    throw IOException::makeWithPath($file, sprintf('Failed to chown file %s', $file));
                 }
             }
         }
@@ -225,11 +225,11 @@ class Filesystem
             }
             if (is_link($file) && function_exists('lchgrp')) {
                 if (true !== @lchgrp($file, $group)) {
-                    throw new IOException($file, sprintf('Failed to chgrp file %s', $file));
+                    throw IOException::makeWithPath($file, sprintf('Failed to chgrp file %s', $file));
                 }
             } else {
                 if (true !== @chgrp($file, $group)) {
-                    throw new IOException($file, sprintf('Failed to chgrp file %s', $file));
+                    throw IOException::makeWithPath($file, sprintf('Failed to chgrp file %s', $file));
                 }
             }
         }
@@ -249,11 +249,11 @@ class Filesystem
     {
         // we check that target does not exist
         if (!$overwrite && is_readable($target)) {
-            throw new IOException($target, sprintf('Cannot rename because the target "%s" already exist.', $target));
+            throw IOException::makeWithPath($target, sprintf('Cannot rename because the target "%s" already exist.', $target));
         }
 
         if (true !== @rename($origin, $target)) {
-            throw new IOException($target, sprintf('Cannot rename "%s" to "%s".', $origin, $target));
+            throw IOException::makeWithPath($target, sprintf('Cannot rename "%s" to "%s".', $origin, $target));
         }
     }
 
@@ -290,10 +290,10 @@ class Filesystem
                 $report = error_get_last();
                 if (is_array($report)) {
                     if (defined('PHP_WINDOWS_VERSION_MAJOR') && false !== strpos($report['message'], 'error code(1314)')) {
-                        throw new IOException(null, 'Unable to create symlink due to error code 1314: \'A required privilege is not held by the client\'. Do you have the required Administrator-rights?');
+                        throw IOException::makeWithPath(null, 'Unable to create symlink due to error code 1314: \'A required privilege is not held by the client\'. Do you have the required Administrator-rights?');
                     }
                 }
-                throw new IOException($targetDir, sprintf('Failed to create symbolic link from %s to %s', $originDir, $targetDir));
+                throw IOException::makeWithPath($targetDir, sprintf('Failed to create symbolic link from %s to %s', $originDir, $targetDir));
             }
         }
     }
@@ -391,7 +391,7 @@ class Filesystem
                 } elseif (is_dir($file)) {
                     $this->mkdir($target);
                 } else {
-                    throw new IOException($file, sprintf('Unable to guess "%s" file type.', $file));
+                    throw IOException::makeWithPath($file, sprintf('Unable to guess "%s" file type.', $file));
                 }
             } else {
                 if (is_link($file)) {
@@ -401,7 +401,7 @@ class Filesystem
                 } elseif (is_file($file)) {
                     $this->copy($file, $target, isset($options['override']) ? $options['override'] : false);
                 } else {
-                    throw new IOException($file, sprintf('Unable to guess "%s" file type.', $file));
+                    throw IOException::makeWithPath($file, sprintf('Unable to guess "%s" file type.', $file));
                 }
             }
         }
@@ -444,13 +444,13 @@ class Filesystem
         if (!is_dir($dir)) {
             $this->mkdir($dir);
         } elseif (!is_writable($dir)) {
-            throw new IOException($dir, sprintf('Unable to write to the "%s" directory.', $dir));
+            throw IOException::makeWithPath($dir, sprintf('Unable to write to the "%s" directory.', $dir));
         }
 
         $tmpFile = tempnam($dir, basename($filename));
 
         if (false === @file_put_contents($tmpFile, $content)) {
-            throw new IOException($filename, sprintf('Failed to write file "%s".', $filename));
+            throw IOException::makeWithPath($filename, sprintf('Failed to write file "%s".', $filename));
         }
 
         $this->rename($tmpFile, $filename, true);

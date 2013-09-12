@@ -204,6 +204,16 @@ class EntityChoiceList extends ObjectChoiceList
      */
     public function getChoicesForValues(array $values)
     {
+        // Performance optimization
+        // Also prevents the generation of "WHERE id IN ()" queries through the
+        // entity loader. At least with MySQL and on the development machine
+        // this was tested on, no exception was thrown for such invalid
+        // statements, consequently no test fails when this code is removed.
+        // https://github.com/symfony/symfony/pull/8981#issuecomment-24230557
+        if (empty($values)) {
+            return array();
+        }
+
         if (!$this->loaded) {
             // Optimize performance in case we have an entity loader and
             // a single-field identifier
@@ -247,6 +257,11 @@ class EntityChoiceList extends ObjectChoiceList
      */
     public function getValuesForChoices(array $entities)
     {
+        // Performance optimization
+        if (empty($entities)) {
+            return array();
+        }
+
         if (!$this->loaded) {
             // Optimize performance for single-field identifiers. We already
             // know that the IDs are used as values
@@ -284,6 +299,11 @@ class EntityChoiceList extends ObjectChoiceList
      */
     public function getIndicesForChoices(array $entities)
     {
+        // Performance optimization
+        if (empty($entities)) {
+            return array();
+        }
+
         if (!$this->loaded) {
             // Optimize performance for single-field identifiers. We already
             // know that the IDs are used as indices
@@ -321,6 +341,11 @@ class EntityChoiceList extends ObjectChoiceList
      */
     public function getIndicesForValues(array $values)
     {
+        // Performance optimization
+        if (empty($values)) {
+            return array();
+        }
+
         if (!$this->loaded) {
             // Optimize performance for single-field identifiers.
 

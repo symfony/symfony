@@ -20,7 +20,7 @@ class FileResourceTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->file = sys_get_temp_dir().'/tmp.xml';
+        $this->file = realpath(sys_get_temp_dir()).'/tmp.xml';
         touch($this->file);
         $this->resource = new FileResource($this->file);
     }

@@ -378,7 +378,7 @@ class PhpDumper extends Dumper
                 continue;
             }
 
-            if ($sDefinition->getMethodCalls() || $sDefinition->getProperties() || $sDefinition->getConfigurator()) {
+            if ($sDefinition->getMethodCalls() || $sDefinition->getProperties() || $sDefinition->getConfigurator() || $sDefinition->isSynchronized()) {
                 return false;
             }
         }
@@ -416,6 +416,18 @@ class PhpDumper extends Dumper
         foreach ($definition->getProperties() as $name => $value) {
             $code .= sprintf("        \$%s->%s = %s;\n", $variableName, $name, $this->dumpValue($value));
         }
+
+        return $code;
+    }
+
+    private function addServiceSynchronizeCall($id, Definition $definition)
+    {
+        if (!$definition->isSynchronized()) {
+            return '';
+        }
+
+        $name = 'synchronize'.$this->camelize($id).'Service';
+        $code = sprintf("        \$this->%s();\n", $name);
 
         return $code;
     }
@@ -585,6 +597,7 @@ EOF;
                 $this->addServiceMethodCalls($id, $definition).
                 $this->addServiceProperties($id, $definition).
                 $this->addServiceConfigurator($id, $definition).
+                $this->addServiceSynchronizeCall($id, $definition).
                 $this->addServiceReturn($id, $definition)
             ;
         }

@@ -181,4 +181,21 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame($bar, $container->get('foo')->bar, '->set() overrides an already defined service');
     }
+
+    public function testSynchronizedServiceUpdatesDependencies()
+    {
+        require_once self::$fixturesPath.'/includes/foo.php';
+        require_once self::$fixturesPath.'/includes/classes.php';
+        require_once self::$fixturesPath.'/php/services15.php';
+
+        $container = new \AnotherProjectServiceContainer();
+        $dependentService = $container->get('depends_on_synchronized');
+        $this->assertNull($dependentService->bar);
+
+        $container->enterScope('request');
+        $synchronizedService = $container->get('synchronized_service');
+
+        $this->assertEquals($dependentService->bar, $synchronizedService);
+
+    }
 }

@@ -38,12 +38,10 @@ class BooleanToStringTransformerTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($this->transformer->transform(false));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     */
-    public function testTransformFailsIfNull()
+    // https://github.com/symfony/symfony/issues/8989
+    public function testTransformAcceptsNull()
     {
-        $this->transformer->transform(null);
+        $this->assertNull($this->transformer->transform(null));
     }
 
     /**

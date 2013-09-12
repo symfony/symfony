@@ -49,6 +49,10 @@ class BooleanToStringTransformer implements DataTransformerInterface
      */
     public function transform($value)
     {
+        if (null === $value) {
+            return null;
+        }
+
         if (!is_bool($value)) {
             throw new TransformationFailedException('Expected a Boolean.');
         }

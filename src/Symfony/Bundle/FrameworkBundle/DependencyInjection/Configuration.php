@@ -36,7 +36,7 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->scalarNode('secret')->end()
                 ->scalarNode('http_method_override')
-                    ->info("Set true to enable support for the '_method' request parameter to determine the intended HTTP method on POST requests.")
+                    ->info("Set true to enable support for the '_method' request parameter to determine the intended HTTP method on POST requests. Note: When using the HttpCache, you need to call the method in your front controller instead")
                     ->defaultTrue()
                 ->end()
                 ->arrayNode('trusted_proxies')

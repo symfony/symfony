@@ -310,8 +310,13 @@ class Process
         }
         $this->updateStatus(false);
 
+        // Unix pipes must be closed before calling proc_close to void deadlock
+        // see manual http://php.net/manual/en/function.proc-close.php
+        $this->processPipes->closeUnixPipes();
         $exitcode = proc_close($this->process);
 
+        // Windows only : when using file handles, some activity may occur after
+        // calling proc_close
         while($this->processPipes->hasOpenHandles()) {
             usleep(100);
             foreach ($this->processPipes->readAndCloseHandles(true) as $type => $data) {

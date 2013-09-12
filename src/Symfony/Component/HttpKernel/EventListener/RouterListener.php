@@ -76,7 +76,7 @@ class RouterListener implements EventSubscriberInterface
      * Sets the current Request.
      *
      * This method was used to synchronize the Request, but as the HttpKernel
-     * is doing that automatically now, you should never be called it directly.
+     * is doing that automatically now, you should never call it directly.
      * It is kept public for BC with the 2.3 version.
      *
      * @param Request|null $request A Request instance

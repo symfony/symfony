@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by digitalkaoz at 2013-09-05T12:17:49Z
+
+ok fixed the issues
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-09-12T20:17:43Z
+
+@bschussek Can you have a look at this PR?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-09-12T20:24:09Z
+
+This PR can only be merged on maser of course as this is a new feature.

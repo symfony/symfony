@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.5.0
+-----
+
+* added DecoratorServicePass and a way to override a service definition (Definition::setDecoratedService())
+
 2.4.0
 -----
 

@@ -38,6 +38,7 @@ class Definition
     private $abstract = false;
     private $synchronized = false;
     private $lazy = false;
+    private $decoratedService;
 
     protected $arguments;
 
@@ -98,6 +99,31 @@ class Definition
         $this->factoryMethod = $factoryMethod;
 
         return $this;
+    }
+
+    /**
+     * Sets the service that this service is decorating.
+     *
+     * @param string $id        The decorated service id
+     * @param string $renamedId The new decorated service id
+     */
+    public function setDecoratedService($id, $renamedId = null)
+    {
+        if ($renamedId && $id == $renamedId) {
+            throw new \LogicException(sprintf('The decorated service parent name for "%s" must be different than the service name itself.', $id));
+        }
+
+        $this->decoratedService = array($id, $renamedId);
+    }
+
+    /**
+     * Gets the service that decorates this service.
+     *
+     * @return array An array composed of the decorated service id and the new id for it
+     */
+    public function getDecoratedService()
+    {
+        return $this->decoratedService;
     }
 
     /**

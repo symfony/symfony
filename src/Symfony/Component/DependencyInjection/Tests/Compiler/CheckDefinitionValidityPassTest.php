@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 class CheckDefinitionValidityPassTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @expectedException \RuntimeException
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
      */
     public function testProcessDetectsSyntheticNonPublicDefinitions()
     {
@@ -29,7 +29,7 @@ class CheckDefinitionValidityPassTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \RuntimeException
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
      */
     public function testProcessDetectsSyntheticPrototypeDefinitions()
     {
@@ -40,7 +40,7 @@ class CheckDefinitionValidityPassTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \RuntimeException
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
      */
     public function testProcessDetectsNonSyntheticNonAbstractDefinitionWithoutClass()
     {
@@ -57,6 +57,17 @@ class CheckDefinitionValidityPassTest extends \PHPUnit_Framework_TestCase
         $container->register('b', 'class')->setSynthetic(true)->setPublic(true);
         $container->register('c', 'class')->setAbstract(true);
         $container->register('d', 'class')->setSynthetic(true);
+
+        $this->process($container);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     */
+    public function testInvalidTags()
+    {
+        $container = new ContainerBuilder();
+        $container->register('a', 'class')->addTag('foo', array('bar' => array('baz' => 'baz')));
 
         $this->process($container);
     }

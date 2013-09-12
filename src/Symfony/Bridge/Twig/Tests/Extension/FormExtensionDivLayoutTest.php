@@ -64,6 +64,8 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         $environment = new \Twig_Environment($loader, array('strict_variables' => true));
         $environment->addExtension(new TranslationExtension(new StubTranslator()));
         $environment->addGlobal('global', '');
+        // the value can be any template that exists
+        $environment->addGlobal('dynamic_template_name', 'child_label');
         $environment->addExtension($this->extension);
 
         $this->extension->initRuntime($environment);
@@ -104,6 +106,18 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
             $this->renderWidget($view),
             '/input[@type="email"][@rel="theme"]'
         );
+    }
+
+    public function testThemeBlockInheritanceUsingDynamicExtend()
+    {
+        $view = $this->factory
+            ->createNamed('name', 'email')
+            ->createView()
+        ;
+
+        $renderer = $this->extension->renderer;
+        $renderer->setTheme($view, array('page_dynamic_extends.html.twig'));
+        $renderer->searchAndRenderBlock($view, 'row');
     }
 
     public function isSelectedChoiceProvider()

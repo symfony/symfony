@@ -20,7 +20,6 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToArrayTransfo
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToStringTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToTimestampTransformer;
 use Symfony\Component\Form\ReversedTransformer;
-use Symfony\Component\Intl\Intl;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
@@ -247,7 +246,8 @@ class DateType extends AbstractType
     {
         $pattern = $formatter->getPattern();
         $timezone = $formatter->getTimezoneId();
-        $intlVersion = Intl::getIcuVersion();
+        $reflectionExtension = new \ReflectionExtension('intl');
+        $intlVersion = $reflectionExtension->getVersion();
 
         if (version_compare($intlVersion, '3.0.0', '>=')) {
             $formatter->setTimeZone('UTC');

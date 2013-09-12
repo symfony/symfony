@@ -20,6 +20,7 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToArrayTransfo
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToStringTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToTimestampTransformer;
 use Symfony\Component\Form\ReversedTransformer;
+use Symfony\Component\Intl\Intl;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
@@ -244,10 +245,11 @@ class DateType extends AbstractType
 
     private function formatTimestamps(\IntlDateFormatter $formatter, $regex, array $timestamps)
     {
-        $pattern = $formatter->getPattern();
-        $timezone = $formatter->getTimezoneId();
+        $pattern     = $formatter->getPattern();
+        $timezone    = $formatter->getTimezoneId();
+        $intlVersion = Intl::getIcuVersion();
 
-        if (version_compare(\PHP_VERSION, '5.5.0-dev', '>=')) {
+        if (version_compare($intlVersion, '3.0.0', '>=')) {
             $formatter->setTimeZone('UTC');
         } else {
             $formatter->setTimeZoneId('UTC');
@@ -265,7 +267,7 @@ class DateType extends AbstractType
             $formatter->setPattern($pattern);
         }
 
-        if (version_compare(\PHP_VERSION, '5.5.0-dev', '>=')) {
+        if (version_compare($intlVersion, '3.0.0', '>=')) {
             $formatter->setTimeZone($timezone);
         } else {
             $formatter->setTimeZoneId($timezone);

@@ -245,8 +245,8 @@ class DateType extends AbstractType
 
     private function formatTimestamps(\IntlDateFormatter $formatter, $regex, array $timestamps)
     {
-        $pattern     = $formatter->getPattern();
-        $timezone    = $formatter->getTimezoneId();
+        $pattern = $formatter->getPattern();
+        $timezone = $formatter->getTimezoneId();
         $intlVersion = Intl::getIcuVersion();
 
         if (version_compare($intlVersion, '3.0.0', '>=')) {

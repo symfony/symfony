@@ -267,8 +267,10 @@ class DateType extends AbstractType
     {
         $pattern = $formatter->getPattern();
         $timezone = $formatter->getTimezoneId();
+        // Use it, if exists.
+        $setTimeZone = method_exists($formatter, 'setTimeZone');
 
-        if (version_compare(\PHP_VERSION, '5.5.0-dev', '>=')) {
+        if ($setTimeZone) {
             $formatter->setTimeZone('UTC');
         } else {
             $formatter->setTimeZoneId('UTC');
@@ -286,7 +288,7 @@ class DateType extends AbstractType
             $formatter->setPattern($pattern);
         }
 
-        if (version_compare(\PHP_VERSION, '5.5.0-dev', '>=')) {
+        if ($setTimeZone) {
             $formatter->setTimeZone($timezone);
         } else {
             $formatter->setTimeZoneId($timezone);

@@ -137,7 +137,7 @@ class ErrorHandler
             return;
         }
 
-        unset($this->reservedMemory);
+        $this->reservedMemory = '';
         $type = $error['type'];
         if (0 === $this->level || !in_array($type, array(E_ERROR, E_CORE_ERROR, E_COMPILE_ERROR, E_PARSE))) {
             return;

@@ -157,8 +157,8 @@ class ReferenceDumper
     /**
      * Outputs a single config reference line
      *
-     * @param string $text
-     * @param int    $indent
+     * @param string  $text
+     * @param integer $indent
      */
     private function writeLine($text, $indent = 0)
     {

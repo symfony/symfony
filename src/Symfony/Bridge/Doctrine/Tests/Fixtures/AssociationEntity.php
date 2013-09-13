@@ -19,7 +19,7 @@ use Doctrine\ORM\Mapping AS ORM;
 class AssociationEntity
 {
     /**
-     * @var int
+     * @var integer
      * @ORM\Id @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      */

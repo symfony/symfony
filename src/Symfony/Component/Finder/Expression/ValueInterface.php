@@ -40,7 +40,7 @@ interface ValueInterface
     /**
      * Returns expression type.
      *
-     * @return int
+     * @return integer
      */
     public function getType();
 

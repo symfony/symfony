@@ -622,7 +622,7 @@ class Application
      * Returns a text representation of the Application.
      *
      * @param string  $namespace An optional namespace name
-     * @param boolean $raw       Whether to return raw command list
+     * @param Boolean $raw       Whether to return raw command list
      *
      * @return string A string representing the Application
      *
@@ -746,7 +746,7 @@ class Application
     /**
      * Tries to figure out the terminal width in which this application runs
      *
-     * @return int|null
+     * @return integer|null
      */
     protected function getTerminalWidth()
     {
@@ -758,7 +758,7 @@ class Application
     /**
      * Tries to figure out the terminal height in which this application runs
      *
-     * @return int|null
+     * @return integer|null
      */
     protected function getTerminalHeight()
     {

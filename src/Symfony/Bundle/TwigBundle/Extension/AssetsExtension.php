@@ -60,7 +60,7 @@ class AssetsExtension extends \Twig_Extension
      *
      * @param string $packageName
      *
-     * @return int
+     * @return integer
      */
     public function getAssetsVersion($packageName = null)
     {

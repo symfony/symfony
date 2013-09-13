@@ -258,7 +258,7 @@ class UploadedFile extends File
     /**
      * Returns the maximum size of an uploaded file as configured in php.ini
      *
-     * @return int The maximum size of an uploaded file in bytes
+     * @return integer The maximum size of an uploaded file in bytes
      */
     public static function getMaxFilesize()
     {

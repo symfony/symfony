@@ -30,8 +30,8 @@ class StopwatchPeriod
      */
     public function __construct($start, $end)
     {
-        $this->start = (integer) $start;
-        $this->end = (integer) $end;
+        $this->start = (int) $start;
+        $this->end = (int) $end;
         $this->memory = memory_get_usage(true);
     }
 

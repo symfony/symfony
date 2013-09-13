@@ -35,7 +35,7 @@ class RedisMock
      * @param integer $port
      * @param float   $timeout
      *
-     * @return boolean
+     * @return Boolean
      */
     public function connect($host, $port = 6379, $timeout = 0)
     {
@@ -54,7 +54,7 @@ class RedisMock
      * @param integer $name
      * @param integer $value
      *
-     * @return boolean
+     * @return Boolean
      */
     public function setOption($name, $value)
     {
@@ -70,7 +70,7 @@ class RedisMock
      *
      * @param string $key
      *
-     * @return boolean
+     * @return Boolean
      */
     public function exists($key)
     {
@@ -88,7 +88,7 @@ class RedisMock
      * @param integer $ttl
      * @param mixed   $value
      *
-     * @return boolean
+     * @return Boolean
      */
     public function setex($key, $ttl, $value)
     {
@@ -107,7 +107,7 @@ class RedisMock
      * @param string  $key
      * @param integer $ttl
      *
-     * @return boolean
+     * @return Boolean
      */
     public function setTimeout($key, $ttl)
     {
@@ -127,7 +127,7 @@ class RedisMock
      *
      * @param string $key
      *
-     * @return boolean
+     * @return Boolean
      */
     public function get($key)
     {
@@ -198,7 +198,7 @@ class RedisMock
     /**
      * Flush all existing items from all databases at the server.
      *
-     * @return boolean
+     * @return Boolean
      */
     public function flushAll()
     {
@@ -214,7 +214,7 @@ class RedisMock
     /**
      * Close Redis server connection
      *
-     * @return boolean
+     * @return Boolean
      */
     public function close()
     {

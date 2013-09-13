@@ -35,7 +35,7 @@ class NodeExtension extends AbstractExtension
     private $translator;
 
     /**
-     * @var int
+     * @var integer
      */
     private $flags;
 
@@ -43,7 +43,7 @@ class NodeExtension extends AbstractExtension
      * Constructor.
      *
      * @param Translator $translator
-     * @param int        $flags
+     * @param integer    $flags
      */
     public function __construct(Translator $translator, $flags = 0)
     {
@@ -52,8 +52,8 @@ class NodeExtension extends AbstractExtension
     }
 
     /**
-     * @param int     $flag
-     * @param boolean $on
+     * @param integer $flag
+     * @param Boolean $on
      *
      * @return NodeExtension
      */
@@ -71,9 +71,9 @@ class NodeExtension extends AbstractExtension
     }
 
     /**
-     * @param int $flag
+     * @param integer $flag
      *
-     * @return boolean
+     * @return Boolean
      */
     public function hasFlag($flag)
     {
@@ -261,7 +261,7 @@ class NodeExtension extends AbstractExtension
      *
      * @param string $name
      *
-     * @return boolean
+     * @return Boolean
      */
     private function isSafeName($name)
     {

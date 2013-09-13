@@ -218,7 +218,7 @@ class PdoSessionHandler implements \SessionHandlerInterface
      * @param string $id
      * @param string $data
      *
-     * @return boolean True.
+     * @return Boolean True.
      */
     private function createNewSession($id, $data = '')
     {

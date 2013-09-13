@@ -114,8 +114,8 @@ class CodeHelper extends Helper
     /**
      * Returns an excerpt of a code file around the given line number.
      *
-     * @param string $file A file path
-     * @param int    $line The selected line number
+     * @param string  $file A file path
+     * @param integer $line The selected line number
      *
      * @return string An HTML string
      */

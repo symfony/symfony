@@ -61,7 +61,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
     /**
      * Gets the number of Routes in this collection.
      *
-     * @return int The number of routes
+     * @return integer The number of routes
      */
     public function count()
     {

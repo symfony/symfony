@@ -906,7 +906,7 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
      * @param $datetype
      * @param $timetype
      * @param null $timezone
-     * @param int $calendar
+     * @param integer $calendar
      * @param null $pattern
      *
      * @return mixed

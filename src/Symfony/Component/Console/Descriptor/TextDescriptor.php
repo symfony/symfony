@@ -216,7 +216,7 @@ class TextDescriptor extends Descriptor
     /**
      * @param Command[] $commands
      *
-     * @return int
+     * @return integer
      */
     private function getColumnWidth(array $commands)
     {

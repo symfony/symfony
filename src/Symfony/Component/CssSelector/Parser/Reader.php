@@ -27,12 +27,12 @@ class Reader
     private $source;
 
     /**
-     * @var int
+     * @var integer
      */
     private $length;
 
     /**
-     * @var int
+     * @var integer
      */
     private $position;
 
@@ -55,7 +55,7 @@ class Reader
     }
 
     /**
-     * @return int
+     * @return integer
      */
     public function getPosition()
     {
@@ -63,7 +63,7 @@ class Reader
     }
 
     /**
-     * @return int
+     * @return integer
      */
     public function getRemainingLength()
     {
@@ -71,8 +71,8 @@ class Reader
     }
 
     /**
-     * @param int $length
-     * @param int $offset
+     * @param integer $length
+     * @param integer $offset
      *
      * @return string
      */
@@ -84,7 +84,7 @@ class Reader
     /**
      * @param string $string
      *
-     * @return int
+     * @return integer
      */
     public function getOffset($string)
     {
@@ -110,7 +110,7 @@ class Reader
     }
 
     /**
-     * @param int $length
+     * @param integer $length
      */
     public function moveForward($length)
     {

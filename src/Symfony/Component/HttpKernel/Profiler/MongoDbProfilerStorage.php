@@ -87,7 +87,7 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
 
         $result = $this->getMongo()->update(array('_id' => $profile->getToken()), array_filter($record, function ($v) { return !empty($v); }), array('upsert' => true));
 
-        return (boolean) (isset($result['ok']) ? $result['ok'] : $result);
+        return (Boolean) (isset($result['ok']) ? $result['ok'] : $result);
     }
 
     /**
@@ -160,11 +160,11 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
     }
 
     /**
-     * @param string $ip
-     * @param string $url
-     * @param string $method
-     * @param int    $start
-     * @param int    $end
+     * @param string  $ip
+     * @param string  $url
+     * @param string  $method
+     * @param integer $start
+     * @param integer $end
      *
      * @return array
      */

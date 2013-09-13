@@ -28,26 +28,26 @@ class Specificity
     const C_FACTOR = 1;
 
     /**
-     * @var int
+     * @var integer
      */
     private $a;
 
     /**
-     * @var int
+     * @var integer
      */
     private $b;
 
     /**
-     * @var int
+     * @var integer
      */
     private $c;
 
     /**
      * Constructor.
      *
-     * @param int $a
-     * @param int $b
-     * @param int $c
+     * @param integer $a
+     * @param integer $b
+     * @param integer $c
      */
     public function __construct($a, $b, $c)
     {
@@ -69,7 +69,7 @@ class Specificity
     /**
      * Returns global specificity value.
      *
-     * @return int
+     * @return integer
      */
     public function getValue()
     {

@@ -39,7 +39,7 @@ class LazyServiceProjectServiceContainer extends Container
      * This service is shared.
      * This method always returns the same instance of the service.
      *
-     * @param boolean $lazyLoad whether to try lazy-loading the service with a proxy
+     * @param Boolean $lazyLoad whether to try lazy-loading the service with a proxy
      *
      * @return stdClass A stdClass instance.
      */

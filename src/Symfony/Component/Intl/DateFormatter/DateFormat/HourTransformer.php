@@ -21,10 +21,10 @@ abstract class HourTransformer extends Transformer
     /**
      * Returns a normalized hour value suitable for the hour transformer type
      *
-     * @param int    $hour   The hour value
-     * @param string $marker An optional AM/PM marker
+     * @param integer $hour   The hour value
+     * @param string  $marker An optional AM/PM marker
      *
-     * @return int              The normalized hour value
+     * @return integer The normalized hour value
      */
     abstract public function normalizeHour($hour, $marker = null);
 }

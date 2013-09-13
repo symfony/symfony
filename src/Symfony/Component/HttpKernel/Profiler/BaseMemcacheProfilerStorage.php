@@ -26,10 +26,10 @@ abstract class BaseMemcacheProfilerStorage implements ProfilerStorageInterface
     /**
      * Constructor.
      *
-     * @param string $dsn      A data source name
-     * @param string $username
-     * @param string $password
-     * @param int    $lifetime The lifetime to use for the purge
+     * @param string  $dsn      A data source name
+     * @param string  $username
+     * @param string  $password
+     * @param integer $lifetime The lifetime to use for the purge
      */
     public function __construct($dsn, $username = '', $password = '', $lifetime = 86400)
     {
@@ -201,11 +201,11 @@ abstract class BaseMemcacheProfilerStorage implements ProfilerStorageInterface
     /**
      * Store an item on the memcache server under the specified key
      *
-     * @param string $key
-     * @param mixed  $value
-     * @param int    $expiration
+     * @param string  $key
+     * @param mixed   $value
+     * @param integer $expiration
      *
-     * @return boolean
+     * @return Boolean
      */
     abstract protected function setValue($key, $value, $expiration = 0);
 
@@ -214,17 +214,17 @@ abstract class BaseMemcacheProfilerStorage implements ProfilerStorageInterface
      *
      * @param string $key
      *
-     * @return boolean
+     * @return Boolean
      */
     abstract protected function delete($key);
 
     /**
      * Append data to an existing item on the memcache server
-     * @param string $key
-     * @param string $value
-     * @param int    $expiration
+     * @param string  $key
+     * @param string  $value
+     * @param integer $expiration
      *
-     * @return boolean
+     * @return Boolean
      */
     abstract protected function appendValue($key, $value, $expiration = 0);
 

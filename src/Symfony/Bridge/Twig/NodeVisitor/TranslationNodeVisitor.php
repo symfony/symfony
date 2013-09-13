@@ -100,7 +100,7 @@ class TranslationNodeVisitor implements \Twig_NodeVisitorInterface
 
     /**
      * @param \Twig_Node $arguments
-     * @param int        $index
+     * @param integer    $index
      *
      * @return string|null
      */

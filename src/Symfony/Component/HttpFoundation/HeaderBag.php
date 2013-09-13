@@ -279,7 +279,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
     /**
      * Returns the number of headers.
      *
-     * @return int The number of headers
+     * @return integer The number of headers
      */
     public function count()
     {

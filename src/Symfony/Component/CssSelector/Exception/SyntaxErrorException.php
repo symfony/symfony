@@ -46,7 +46,7 @@ class SyntaxErrorException extends ParseException implements ExceptionInterface
     }
 
     /**
-     * @param int $position
+     * @param integer $position
      *
      * @return SyntaxErrorException
      */

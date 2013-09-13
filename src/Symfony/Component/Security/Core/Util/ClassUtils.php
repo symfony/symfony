@@ -32,7 +32,7 @@ class ClassUtils
     /**
      * Length of the proxy marker
      *
-     * @var int
+     * @var integer
      */
     const MARKER_LENGTH = 6;
 

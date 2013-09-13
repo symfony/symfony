@@ -41,7 +41,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
     {
         $this->twig = $twig;
         $this->interceptRedirects = (Boolean) $interceptRedirects;
-        $this->mode = (integer) $mode;
+        $this->mode = (int) $mode;
         $this->position = $position;
     }
 

@@ -39,10 +39,10 @@ class RedisProfilerStorage implements ProfilerStorageInterface
     /**
      * Constructor.
      *
-     * @param string $dsn      A data source name
-     * @param string $username Not used
-     * @param string $password Not used
-     * @param int    $lifetime The lifetime to use for the purge
+     * @param string  $dsn      A data source name
+     * @param string  $username Not used
+     * @param string  $password Not used
+     * @param integer $lifetime The lifetime to use for the purge
      */
     public function __construct($dsn, $username = '', $password = '', $lifetime = 86400)
     {
@@ -325,8 +325,8 @@ class RedisProfilerStorage implements ProfilerStorageInterface
     /**
      * Retrieves an item from the Redis server.
      *
-     * @param string $key
-     * @param int    $serializer
+     * @param string  $key
+     * @param integer $serializer
      *
      * @return mixed
      */
@@ -341,10 +341,10 @@ class RedisProfilerStorage implements ProfilerStorageInterface
     /**
      * Stores an item on the Redis server under the specified key.
      *
-     * @param string $key
-     * @param mixed  $value
-     * @param int    $expiration
-     * @param int    $serializer
+     * @param string  $key
+     * @param mixed   $value
+     * @param integer $expiration
+     * @param integer $serializer
      *
      * @return Boolean
      */
@@ -359,9 +359,9 @@ class RedisProfilerStorage implements ProfilerStorageInterface
     /**
      * Appends data to an existing item on the Redis server.
      *
-     * @param string $key
-     * @param string $value
-     * @param int    $expiration
+     * @param string  $key
+     * @param string  $value
+     * @param integer $expiration
      *
      * @return Boolean
      */

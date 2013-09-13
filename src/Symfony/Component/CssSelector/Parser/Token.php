@@ -30,7 +30,7 @@ class Token
     const TYPE_STRING     = 'string';
 
     /**
-     * @var int
+     * @var integer
      */
     private $type;
 
@@ -40,14 +40,14 @@ class Token
     private $value;
 
     /**
-     * @var int
+     * @var integer
      */
     private $position;
 
     /**
-     * @param int    $type
-     * @param string $value
-     * @param int    $position
+     * @param integer $type
+     * @param string  $value
+     * @param integer $position
      */
     public function __construct($type, $value, $position)
     {
@@ -57,7 +57,7 @@ class Token
     }
 
     /**
-     * @return int
+     * @return integer
      */
     public function getType()
     {
@@ -73,7 +73,7 @@ class Token
     }
 
     /**
-     * @return int
+     * @return integer
      */
     public function getPosition()
     {
@@ -81,7 +81,7 @@ class Token
     }
 
     /**
-     * @return boolean
+     * @return Boolean
      */
     public function isFileEnd()
     {
@@ -91,7 +91,7 @@ class Token
     /**
      * @param array $values
      *
-     * @return boolean
+     * @return Boolean
      */
     public function isDelimiter(array $values = array())
     {
@@ -107,7 +107,7 @@ class Token
     }
 
     /**
-     * @return boolean
+     * @return Boolean
      */
     public function isWhitespace()
     {
@@ -115,7 +115,7 @@ class Token
     }
 
     /**
-     * @return boolean
+     * @return Boolean
      */
     public function isIdentifier()
     {
@@ -123,7 +123,7 @@ class Token
     }
 
     /**
-     * @return boolean
+     * @return Boolean
      */
     public function isHash()
     {
@@ -131,7 +131,7 @@ class Token
     }
 
     /**
-     * @return boolean
+     * @return Boolean
      */
     public function isNumber()
     {
@@ -139,7 +139,7 @@ class Token
     }
 
     /**
-     * @return boolean
+     * @return Boolean
      */
     public function isString()
     {

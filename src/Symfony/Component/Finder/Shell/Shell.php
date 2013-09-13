@@ -30,7 +30,7 @@ class Shell
     /**
      * Returns guessed OS type.
      *
-     * @return int
+     * @return integer
      */
     public function getType()
     {
@@ -68,7 +68,7 @@ class Shell
     /**
      * Guesses OS type.
      *
-     * @return int
+     * @return integer
      */
     private function guessType()
     {

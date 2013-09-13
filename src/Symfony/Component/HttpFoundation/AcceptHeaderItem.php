@@ -29,7 +29,7 @@ class AcceptHeaderItem
     private $quality = 1.0;
 
     /**
-     * @var int
+     * @var integer
      */
     private $index = 0;
 
@@ -149,7 +149,7 @@ class AcceptHeaderItem
     /**
      * Set the item index.
      *
-     * @param int $index
+     * @param integer $index
      *
      * @return AcceptHeaderItem
      */
@@ -163,7 +163,7 @@ class AcceptHeaderItem
     /**
      * Returns the item index.
      *
-     * @return int
+     * @return integer
      */
     public function getIndex()
     {

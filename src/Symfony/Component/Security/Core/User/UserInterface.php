@@ -81,7 +81,7 @@ interface UserInterface
      * This is important if, at any given point, sensitive information like
      * the plain-text password is stored on this object.
      *
-     * @return void
+     * @return null
      */
     public function eraseCredentials();
 }

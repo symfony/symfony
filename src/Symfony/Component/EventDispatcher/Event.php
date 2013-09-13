@@ -76,7 +76,7 @@ class Event
      *
      * @param EventDispatcherInterface $dispatcher
      *
-     * @deprecated since 2.3 remove in 3.0
+     * @deprecated Deprecated in 2.4, to be removed in 3.0. The event dispatcher is passed to the listener call.
      *
      * @api
      */
@@ -90,7 +90,7 @@ class Event
      *
      * @return EventDispatcherInterface
      *
-     * @deprecated since 2.3 remove in 3.0
+     * @deprecated Deprecated in 2.4, to be removed in 3.0. The event dispatcher is passed to the listener call.
      *
      * @api
      */
@@ -104,7 +104,7 @@ class Event
      *
      * @return string
      *
-     * @deprecated since 2.3 remove in 3.0
+     * @deprecated Deprecated in 2.4, to be removed in 3.0. The event name is passed to the listener call.
      *
      * @api
      */
@@ -118,7 +118,7 @@ class Event
      *
      * @param string $name The event name.
      *
-     * @deprecated since 2.3 remove in 3.0
+     * @deprecated Deprecated in 2.4, to be removed in 3.0. The event name is passed to the listener call.
      *
      * @api
      */

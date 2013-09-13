@@ -49,7 +49,7 @@ class GlobalVariables
     /**
      * Returns the current user.
      *
-     * @return mixed|null
+     * @return mixed
      *
      * @see TokenInterface::getUser()
      */

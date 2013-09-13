@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DomCrawler\Tests;
 
+use Symfony\Component\CssSelector\CssSelector;
 use Symfony\Component\DomCrawler\Crawler;
 
 class CrawlerTest extends \PHPUnit_Framework_TestCase
@@ -374,6 +375,7 @@ EOF
     {
         $crawler = $this->createTestXmlCrawler()->filterXPath('//entry/id');
         $this->assertCount(1, $crawler, '->filterXPath() automatically registers a namespace');
+        $this->assertSame('tag:youtube.com,2008:video:kgZRZmEc9j4', $crawler->text());
     }
 
     public function testFilterXPathWithNamespace()
@@ -386,6 +388,7 @@ EOF
     {
         $crawler = $this->createTestXmlCrawler()->filterXPath('//media:group/yt:aspectRatio');
         $this->assertCount(1, $crawler, '->filterXPath() automatically registers multiple namespaces');
+        $this->assertSame('widescreen', $crawler->text());
     }
 
     /**
@@ -404,12 +407,34 @@ EOF
         $this->assertCount(6, $crawler->filter('li'), '->filter() filters the node list with the CSS selector');
     }
 
+    public function testFilterWithDefaultNamespace()
+    {
+        $this->markSkippedIfCssSelectorNotPresent();
+
+        $crawler = $this->createTestXmlCrawler()->filter('entry id');
+        $this->assertCount(1, $crawler, '->filter() automatically registers namespaces');
+        $this->assertSame('tag:youtube.com,2008:video:kgZRZmEc9j4', $crawler->text());
+    }
+
     public function testFilterWithNamespace()
     {
         $this->markSkippedIfCssSelectorNotPresent();
 
+        CssSelector::disableHtmlExtension();
+
         $crawler = $this->createTestXmlCrawler()->filter('yt|accessControl');
         $this->assertCount(2, $crawler, '->filter() automatically registers namespaces');
+    }
+
+    public function testFilterWithMultipleNamespaces()
+    {
+        $this->markSkippedIfCssSelectorNotPresent();
+
+        CssSelector::disableHtmlExtension();
+
+        $crawler = $this->createTestXmlCrawler()->filter('media|group yt|aspectRatio');
+        $this->assertCount(1, $crawler, '->filter() automatically registers namespaces');
+        $this->assertSame('widescreen', $crawler->text());
     }
 
     public function testSelectLink()

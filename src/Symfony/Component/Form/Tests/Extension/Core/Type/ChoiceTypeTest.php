@@ -1050,6 +1050,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $view = $form->createView();
 
         $this->assertEquals($viewValue, $view->vars['empty_value']);
+        $this->assertFalse($view->vars['empty_value_in_choices']);
     }
 
     /**
@@ -1067,6 +1068,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $view = $form->createView();
 
         $this->assertNull($view->vars['empty_value']);
+        $this->assertTrue($view->vars['empty_value_in_choices']);
     }
 
     public function getOptionsWithEmptyValue()

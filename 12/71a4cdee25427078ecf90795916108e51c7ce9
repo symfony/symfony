@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by stof at 2013-09-09T18:03:27Z
+
+shouldn't this be done only when the workaround is applied ?
+
+---------------------------------------------------------------------------
+
+by lancergr at 2013-09-10T10:53:42Z
+
+do you mean we should call the loadSession inside the <pre>if ('files' === $this->getSaveHandler()->getSaveHandlerName())</pre>  block?
+
+---------------------------------------------------------------------------
+
+by drak at 2013-09-12T07:21:10Z
+
+Yeah, maybe try putting it at line 221.

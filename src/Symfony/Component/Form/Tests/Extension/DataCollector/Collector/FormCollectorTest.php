@@ -20,13 +20,28 @@ class FormCollectorTest extends \PHPUnit_Framework_TestCase
 {
     public function testAddError()
     {
-        $c = new FormCollector();
+        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
 
-        $c->addError(array('value'=>'bazz','root'=>'foo','name'=>'bar'));
+        $type = $this->getMock('Symfony\Component\Form\FormTypeInterface');
+        $type->expects($this->atLeastOnce())->method('getName')->will($this->returnValue('fizz'));
+
+        $config = $this->getMock('Symfony\Component\Form\FormConfigInterface');
+        $config->expects($this->atLeastOnce())->method('getType')->will($this->returnValue($type));
+
+        $form->expects($this->atLeastOnce())->method('getRoot')->will($this->returnSelf());
+        $form->expects($this->atLeastOnce())->method('getPropertyPath')->will($this->returnValue('bar'));
+        $form->expects($this->atLeastOnce())->method('getName')->will($this->returnValue('foo'));
+        $form->expects($this->atLeastOnce())->method('getViewData')->will($this->returnValue('bazz'));
+        $form->expects($this->atLeastOnce())->method('getErrors')->will($this->returnValue(array('foo')));
+        $form->expects($this->atLeastOnce())->method('getConfig')->will($this->returnValue($config));
+
+
+        $c = new FormCollector();
+        $c->addError($form);
 
         $this->assertInternalType('array', $c->getData());
         $this->assertEquals(1, $c->getDataCount());
-        $this->assertEquals(array('foo'=>array('bar'=>array('value'=>'bazz','root'=>'foo','name'=>'bar'))), $c->getData());
+        $this->assertEquals(array('foo'=>array('bar'=>array('value'=>'bazz','root'=>'foo','type'=>'fizz','name'=>'bar','errors'=>array('foo')))), $c->getData());
     }
 }
  

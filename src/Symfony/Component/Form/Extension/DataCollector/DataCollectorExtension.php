@@ -15,7 +15,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\AbstractExtension;
 
 /**
- * DataCollectorExtension for Form Validation Failures
+ * DataCollectorExtension for collecting Form Validation Failures.
  *
  * @author Robert Schönthal <robert.schoenthal@gmail.com>
  */

@@ -16,7 +16,7 @@ use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * DataCollector Type Extension for Forms
+ * DataCollector Type Extension for collecting invalid Forms.
  *
  * @author Robert Schönthal <robert.schoenthal@gmail.com>
  */

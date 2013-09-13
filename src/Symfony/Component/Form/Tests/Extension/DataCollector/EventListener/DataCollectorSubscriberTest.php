@@ -10,11 +10,11 @@
 
 namespace Symfony\Component\Form\Tests\Extension\DataCollector\EventListener;
 
-
 use Symfony\Component\Form\Extension\DataCollector\EventListener\DataCollectorSubscriber;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\Extension\DataCollector\Collector\FormCollector;
+
 /**
  * @covers Symfony\Component\Form\Extension\DataCollector\EventListener\DataCollectorSubscriber
  */
@@ -58,19 +58,13 @@ class DataCollectorSubscriberTest extends \PHPUnit_Framework_TestCase
     public function testAddToProfilerWithInValidForm()
     {
         $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
-        $config = $this->getMock('Symfony\Component\Form\FormConfigInterface');
-        $type = $this->getMock('Symfony\Component\Form\FormTypeInterface');
-
         $form->expects($this->atLeastOnce())->method('isRoot')->will($this->returnValue(true));
         $form->expects($this->atLeastOnce())->method('getErrors')->will($this->returnValue(array('foo')));
-        $form->expects($this->any())->method('getRoot')->will($this->returnSelf());
-        $form->expects($this->any())->method('getConfig')->will($this->returnValue($config));
         $form->expects($this->once())->method('all')->will($this->returnValue(array()));
 
-        $config->expects($this->atLeastOnce())->method('getType')->will($this->returnValue($type));
         $formEvent = new FormEvent($form, array());
 
-        $this->collector->expects($this->atLeastOnce())->method('addError')->with($this->isType('array'));
+        $this->collector->expects($this->atLeastOnce())->method('addError')->with($form);
         $this->eventSubscriber->addToProfiler($formEvent);
     }
 }

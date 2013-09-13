@@ -24,31 +24,33 @@
 {% block panel %}
     <h2>Invalid Forms</h2>
 
-        {% for formName, fields in collector.data %}
-            <h3>{{ formName }}</h3>
-            <table>
+    {% for formName, fields in collector.data %}
+        <h3>{{ formName }}</h3>
+        <table>
+        <tr>
+            <th>Field</th>
+            <th>Type</th>
+            <th>Value</th>
+            <th>Messages</th>
+        </tr>
+        {% for fieldName, field in fields %}
             <tr>
-                <th>Field</th>
-                <th>Type</th>
-                <th>Value</th>
-                <th>Messages</th>
+                <td><b>{{ fieldName }}</b></td>
+                <td>{{ field.type }}</td>
+                <td>{{ field.value }}</td>
+                <td>
+                    <ul>
+                    {% for errorMessage in field.errors %}
+                        <li>
+                            {{ errorMessage.message }}
+                        </li>
+                    {% endfor %}
+                    </ul>
+                </td>
             </tr>
-            {% for fieldName, field in fields %}
-                <tr>
-                    <td><b>{{ fieldName }}</b></td>
-                    <td>{{ field.type }}</td>
-                    <td>{{ field.value }}</td>
-                    <td>
-                        <ul>
-                        {% for errorMessage in field.errors %}
-                            <li>
-                                {{ errorMessage.message }}
-                            </li>
-                        {% endfor %}
-                        </ul>
-                    </td>
-                </tr>
-            {% endfor %}
-            </table>
         {% endfor %}
+        </table>
+    {% else %}
+        <p>no invalid Forms collected</p>
+    {% endfor %}
 {% endblock %}

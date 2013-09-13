@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\Form\Extension\DataCollector\Collector;
 
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector as BaseCollector;
 
 /**
- * DataCollector for Form Validation Failures
+ * DataCollector for Form Validation Failures.
  *
  * @author Robert Schönthal <robert.schoenthal@gmail.com>
  */
@@ -31,14 +32,21 @@ class FormCollector extends BaseCollector
     }
 
     /**
-     * adds a form error to the collector
+     * Adds a Form-Error to the Collector.
      *
-     * @param array $data
+     * @param FormInterface $form
      */
-    public function addError(array $data)
+    public function addError(FormInterface $form)
     {
-        $data['value'] = $this->varToString($data['value']);
-        $this->data[$data['root']][$data['name']] = $data;
+        $storeData = array(
+            'root'   => $form->getRoot()->getName(),
+            'name'   => (string)$form->getPropertyPath(),
+            'type'   => $form->getConfig()->getType()->getName(),
+            'errors' => $form->getErrors(),
+            'value'  => $this->varToString($form->getViewData())
+        );
+
+        $this->data[$storeData['root']][$storeData['name']] = $storeData;
     }
 
     /**
@@ -49,13 +57,18 @@ class FormCollector extends BaseCollector
         return 'form';
     }
 
+    /**
+     * Returns all collected Data.
+     *
+     * @return array
+     */
     public function getData()
     {
         return $this->data;
     }
 
     /**
-     * returns the number of invalid forms
+     * Returns the number of invalid Forms.
      *
      * @return int
      */

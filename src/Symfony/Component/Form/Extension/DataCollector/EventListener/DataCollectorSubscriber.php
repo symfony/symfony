@@ -18,7 +18,7 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 
 /**
- * EventSubscriber for Form Validation Failures
+ * EventSubscriber for adding Form Validation Failures to the DataCollector.
  *
  * @author Robert Schönthal <robert.schoenthal@gmail.com>
  */
@@ -43,7 +43,7 @@ class DataCollectorSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Validates the form and its domain object.
+     * Searches for invalid Form-Data and adds them to the Collector.
      *
      * @param FormEvent $event The event object
      */
@@ -57,20 +57,14 @@ class DataCollectorSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * adds errors to the collector
+     * Adds an invalid Form-Element to the Collector.
      *
      * @param FormInterface $form
      */
     private function addErrors(FormInterface $form)
     {
         if ($form->getErrors()) {
-            $this->collector->addError(array(
-                'root'   => $form->getRoot()->getName(),
-                'name'   => (string)$form->getPropertyPath(),
-                'type'   => $form->getConfig()->getType()->getName(),
-                'errors' => $form->getErrors(),
-                'value'  => $form->getViewData()
-            ));
+            $this->collector->addError($form);
         }
 
         //recursivly add all child errors

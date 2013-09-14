@@ -39,6 +39,7 @@ class NotEqualToValidatorTest extends AbstractComparisonValidatorTestCase
             array(1, 2),
             array('22', '333'),
             array(new \DateTime('2001-01-01'), new \DateTime('2000-01-01')),
+            array(new ComparisonTest_Class(6), new ComparisonTest_Class(5)),
             array(null, 1),
         );
     }
@@ -52,7 +53,8 @@ class NotEqualToValidatorTest extends AbstractComparisonValidatorTestCase
             array(3, 3, '3', 'integer'),
             array('2', 2, '2', 'integer'),
             array('a', 'a', "'a'", 'string'),
-            array(new \DateTime('2000-01-01'), new \DateTime('2000-01-01'), '2000-01-01 00:00:00', 'DateTime')
+            array(new \DateTime('2000-01-01'), new \DateTime('2000-01-01'), '2000-01-01 00:00:00', 'DateTime'),
+            array(new ComparisonTest_Class(5), new ComparisonTest_Class(5), '5', __NAMESPACE__.'\ComparisonTest_Class'),
         );
     }
 }

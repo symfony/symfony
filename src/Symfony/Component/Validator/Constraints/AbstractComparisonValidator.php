@@ -60,6 +60,10 @@ abstract class AbstractComparisonValidator extends ConstraintValidator
      */
     private function valueToString($value)
     {
+        if (is_object($value) && method_exists($value, '__toString')) {
+            return (string) $value;
+        }
+
         if ($value instanceof \DateTime) {
             return $value->format('Y-m-d H:i:s');
         }

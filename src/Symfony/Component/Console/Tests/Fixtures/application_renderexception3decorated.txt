@@ -2,6 +2,14 @@
 
 [37;41m                                              [0m
 [37;41m  [Exception]                                 [0m
+[37;41m  Third exception <fg=blue;bg=red>comment</>  [0m
+[37;41m                                              [0m
+
+
+
+
+[37;41m                                              [0m
+[37;41m  [Exception]                                 [0m
 [37;41m  Second exception <comment>comment<comment>  [0m
 [37;41m                                              [0m
 

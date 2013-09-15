@@ -157,11 +157,9 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
         $this->remove($offset);
     }
 	
-	/**
-	 * Returns whether the validate class has errors.
-     *
-     * @return Boolean
-	 */
+    /**
+     * {@inheritDoc}
+     */
 	public function isValid()
 	{
 		return count($this->violations) === 0;

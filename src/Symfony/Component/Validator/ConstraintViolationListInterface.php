@@ -80,4 +80,13 @@ interface ConstraintViolationListInterface extends \Traversable, \Countable, \Ar
      * @api
      */
     public function remove($offset);
+	
+	/**
+	 * Returns whether the validate class has errors.
+     *
+     * @return Boolean
+     *
+     * @api
+     */
+    public function isValid();
 }

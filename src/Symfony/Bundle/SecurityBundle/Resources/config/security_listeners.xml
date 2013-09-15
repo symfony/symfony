@@ -12,9 +12,9 @@
         <parameter key="security.authentication.form_entry_point.class">Symfony\Component\Security\Http\EntryPoint\FormAuthenticationEntryPoint</parameter>
         <parameter key="security.authentication.listener.form.class">Symfony\Component\Security\Http\Firewall\UsernamePasswordFormAuthenticationListener</parameter>
 
-        <parameter key="security.authentication.listener.simple_form.class">Symfony\Component\Security\Http\Firewall\SimpleFormAuthenticationListener</parameter>
+        <parameter key="security.authentication.listener.simple_form.class">Symfony\Component\Security\Http\Firewall\SimplePasswordAuthenticationListener</parameter>
 
-        <parameter key="security.authentication.listener.simple_preauth.class">Symfony\Component\Security\Http\Firewall\SimplePreAuthenticationListener</parameter>
+        <parameter key="security.authentication.listener.simple_preauth.class">Symfony\Component\Security\Http\Firewall\SimpleRequestAuthenticationListener</parameter>
 
         <parameter key="security.authentication.listener.basic.class">Symfony\Component\Security\Http\Firewall\BasicAuthenticationListener</parameter>
         <parameter key="security.authentication.basic_entry_point.class">Symfony\Component\Security\Http\EntryPoint\BasicAuthenticationEntryPoint</parameter>

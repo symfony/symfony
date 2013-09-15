@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\Reference;
 /**
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
-class SimplePreAuthenticationFactory implements SecurityFactoryInterface
+class SimpleRequestAuthenticationFactory implements SecurityFactoryInterface
 {
     public function getPosition()
     {
@@ -28,7 +28,7 @@ class SimplePreAuthenticationFactory implements SecurityFactoryInterface
 
     public function getKey()
     {
-        return 'simple-preauth';
+        return 'simple-request';
     }
 
     public function addConfiguration(NodeDefinition $node)

@@ -18,7 +18,7 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerI
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
-use Symfony\Component\Security\Core\Authentication\SimpleFormAuthenticatorInterface;
+use Symfony\Component\Security\Core\Authentication\SimplePasswordAuthenticatorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\SessionUnavailableException;
@@ -33,7 +33,7 @@ use Psr\Log\LoggerInterface;
 /**
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
-class SimpleFormAuthenticationListener extends AbstractAuthenticationListener
+class SimplePasswordAuthenticationListener extends AbstractAuthenticationListener
 {
     private $simpleAuthenticator;
     private $csrfProvider;
@@ -52,10 +52,10 @@ class SimpleFormAuthenticationListener extends AbstractAuthenticationListener
      *                                                                      successful, or failed authentication attempt
      * @param LoggerInterface                        $logger                A LoggerInterface instance
      * @param EventDispatcherInterface               $dispatcher            An EventDispatcherInterface instance
-     * @param SimpleFormAuthenticatorInterface       $simpleAuthenticator   A SimpleFormAuthenticatorInterface instance
+     * @param SimplePasswordAuthenticatorInterface   $simpleAuthenticator   A SimplePasswordAuthenticatorInterface instance
      * @param CsrfProviderInterface                  $csrfProvider          A CsrfProviderInterface instance
      */
-    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, HttpUtils $httpUtils, $providerKey, AuthenticationSuccessHandlerInterface $successHandler, AuthenticationFailureHandlerInterface $failureHandler, array $options = array(), LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, CsrfProviderInterface $csrfProvider = null, SimpleFormAuthenticatorInterface $simpleAuthenticator = null)
+    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, HttpUtils $httpUtils, $providerKey, AuthenticationSuccessHandlerInterface $successHandler, AuthenticationFailureHandlerInterface $failureHandler, array $options = array(), LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, CsrfProviderInterface $csrfProvider = null, SimplePasswordAuthenticatorInterface $simpleAuthenticator = null)
     {
         if (!$simpleAuthenticator) {
             throw new \InvalidArgumentException('Missing simple authenticator');

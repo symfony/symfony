@@ -1,17 +1,25 @@
 
 
-                    
-  [Exception]       
-  Second exception  
-                    
+                                              
+  [Exception]                                 
+  Third exception <fg=blue;bg=red>comment</>  
+                                              
 
 
 
 
-                   
-  [Exception]      
-  First exception  
-                   
+                                              
+  [Exception]                                 
+  Second exception <comment>comment<comment>  
+                                              
+
+
+
+
+                                       
+  [Exception]                          
+  First exception <p>this is html</p>  
+                                       
 
 
 foo3:bar

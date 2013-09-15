@@ -27,6 +27,7 @@ use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\HelpCommand;
 use Symfony\Component\Console\Command\ListCommand;
+use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Helper\DialogHelper;
@@ -704,7 +705,7 @@ class Application
             $output->writeln("");
             $output->writeln("");
             foreach ($messages as $message) {
-                $output->writeln('<error>'.$message.'</error>');
+                $output->writeln('<error>'.OutputFormatter::escape($message).'</error>');
             }
             $output->writeln("");
             $output->writeln("");

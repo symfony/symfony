@@ -19,14 +19,6 @@ use Symfony\Component\Filesystem\Exception\FileNotFoundException;
  */
 class ExceptionTest extends \PHPUnit_Framework_TestCase
 {
-
-    public function testFactory()
-    {
-        $e = IOException::makeWithPath('/foo');
-
-        $this->assertInstanceOf('\Symfony\Component\Filesystem\Exception\IOException', $e);
-    }
-
     public function testSetPath()
     {
         $e = new IOException();

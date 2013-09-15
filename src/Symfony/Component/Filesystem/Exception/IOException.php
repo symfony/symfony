@@ -24,12 +24,6 @@ class IOException extends \RuntimeException implements ExceptionInterface, IOExc
 
     private $path;
 
-    public static function makeWithPath($path, $message = null, $code = 0, \Exception $previous = null) {
-        $e = new self($message, $code, $previous);
-        $e->setPath($path);
-        return $e;
-    }
-
     /**
      * Set the path associated with this IOException
      * @param string $path The path

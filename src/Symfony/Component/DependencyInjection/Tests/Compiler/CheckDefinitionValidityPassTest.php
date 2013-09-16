@@ -61,6 +61,17 @@ class CheckDefinitionValidityPassTest extends \PHPUnit_Framework_TestCase
         $this->process($container);
     }
 
+    public function testValidTags()
+    {
+        $container = new ContainerBuilder();
+        $container->register('a', 'class')->addTag('foo', array('bar' => 'baz'));
+        $container->register('b', 'class')->addTag('foo', array('bar' => null));
+        $container->register('c', 'class')->addTag('foo', array('bar' => 1));
+        $container->register('d', 'class')->addTag('foo', array('bar' => 1.1));
+
+        $this->process($container);
+    }
+
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
      */

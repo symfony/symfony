@@ -224,7 +224,7 @@ class YamlFileLoader extends FileLoader
                 unset($tag['name']);
 
                 foreach ($tag as $attribute => $value) {
-                    if (!is_scalar($value)) {
+                    if (!is_scalar($value) && null !== $value) {
                         throw new InvalidArgumentException(sprintf('A "tags" attribute must be of a scalar-type for service "%s", tag "%s", attribute "%s" in %s.', $id, $name, $attribute, $file));
                     }
                 }

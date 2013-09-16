@@ -40,4 +40,4 @@ class DataCollectorExtension extends AbstractExtension
             new Type\DataCollectorTypeExtension($this->eventSubscriber)
         );
     }
-} 
+}

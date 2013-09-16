@@ -25,7 +25,7 @@ class MemoryDataCollector extends DataCollector
     {
         $this->data = array(
             'memory'       => 0,
-            'memory_limit' => $this->convertToBytes(strtolower(ini_get('memory_limit'))),
+            'memory_limit' => $this->convertToBytes(ini_get('memory_limit')),
         );
     }
 
@@ -79,13 +79,22 @@ class MemoryDataCollector extends DataCollector
             return -1;
         }
 
-        if (preg_match('#^\+?(0x?)?(.*?)([kmg]?)$#', $memoryLimit, $match)) {
-            $shifts = array('' => 0, 'k' => 10, 'm' => 20, 'g' => 30);
-            $bases = array('' => 10, '0' => 8, '0x' => 16);
-
-            return intval($match[2], $bases[$match[1]]) << $shifts[$match[3]];
+        $max = strtolower(ltrim($memoryLimit, '+'));
+        if (0 === strpos($max, '0x')) {
+            $max = intval($max, 16);
+        } elseif (0 === strpos($max, '0')) {
+            $max = intval($max, 8);
+        } else {
+            $max = intval($max);
         }
 
-        return 0;
+        switch (substr($memoryLimit, -1)) {
+            case 't': $max *= 1024;
+            case 'g': $max *= 1024;
+            case 'm': $max *= 1024;
+            case 'k': $max *= 1024;
+        }
+
+        return $max;
     }
 }

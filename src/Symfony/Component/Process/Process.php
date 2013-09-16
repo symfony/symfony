@@ -626,9 +626,13 @@ class Process
                     $this->signal($signal ?: SIGKILL);
                 }
             }
-
-            $this->updateStatus(false);
         }
+
+        $this->updateStatus(false);
+        if ($this->processInformation['running']) {
+            $this->close();
+        }
+
         $this->status = self::STATUS_TERMINATED;
 
         return $this->exitcode;

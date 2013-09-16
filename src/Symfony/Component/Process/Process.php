@@ -24,19 +24,8 @@ use Symfony\Component\Process\Exception\RuntimeException;
  *
  * @api
  */
-class Process
+class Process implements ProcessInterface
 {
-    const ERR = 'err';
-    const OUT = 'out';
-
-    const STATUS_READY = 'ready';
-    const STATUS_STARTED = 'started';
-    const STATUS_TERMINATED = 'terminated';
-
-    const STDIN = 0;
-    const STDOUT = 1;
-    const STDERR = 2;
-
     // Timeout Precision in seconds.
     const TIMEOUT_PRECISION = 0.2;
 
@@ -174,23 +163,7 @@ class Process
     }
 
     /**
-     * Runs the process.
-     *
-     * The callback receives the type of output (out or err) and
-     * some bytes from the output in real-time. It allows to have feedback
-     * from the independent process during execution.
-     *
-     * The STDOUT and STDERR are also available after the process is finished
-     * via the getOutput() and getErrorOutput() methods.
-     *
-     * @param callback|null $callback A PHP callback to run whenever there is some
-     *                                output available on STDOUT or STDERR
-     *
-     * @return integer The exit status code
-     *
-     * @throws RuntimeException When process can't be launch or is stopped
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function run($callback = null)
     {
@@ -200,27 +173,7 @@ class Process
     }
 
     /**
-     * Starts the process and returns after sending the STDIN.
-     *
-     * This method blocks until all STDIN data is sent to the process then it
-     * returns while the process runs in the background.
-     *
-     * The termination of the process can be awaited with wait().
-     *
-     * The callback receives the type of output (out or err) and some bytes from
-     * the output in real-time while writing the standard input to the process.
-     * It allows to have feedback from the independent process during execution.
-     * If there is no callback passed, the wait() method can be called
-     * with true as a second parameter then the callback will get all data occurred
-     * in (and since) the start call.
-     *
-     * @param callback|null $callback A PHP callback to run whenever there is some
-     *                                output available on STDOUT or STDERR
-     *
-     * @return Process The process itself
-     *
-     * @throws RuntimeException When process can't be launch or is stopped
-     * @throws RuntimeException When process is already running
+     * {@inheritdoc}
      */
     public function start($callback = null)
     {
@@ -256,19 +209,7 @@ class Process
     }
 
     /**
-     * Restarts the process.
-     *
-     * Be warned that the process is cloned before being started.
-     *
-     * @param callable $callback A PHP callback to run whenever there is some
-     *                           output available on STDOUT or STDERR
-     *
-     * @return Process The new process
-     *
-     * @throws RuntimeException When process can't be launch or is stopped
-     * @throws RuntimeException When process is already running
-     *
-     * @see start()
+     * {@inheritdoc}
      */
     public function restart($callback = null)
     {
@@ -283,18 +224,7 @@ class Process
     }
 
     /**
-     * Waits for the process to terminate.
-     *
-     * The callback receives the type of output (out or err) and some bytes
-     * from the output in real-time while writing the standard input to the process.
-     * It allows to have feedback from the independent process during execution.
-     *
-     * @param callback|null $callback A valid PHP callback
-     *
-     * @return integer The exitcode of the process
-     *
-     * @throws RuntimeException When process timed out
-     * @throws RuntimeException When process stopped after receiving signal
+     * {@inheritdoc}
      */
     public function wait($callback = null)
     {
@@ -320,11 +250,7 @@ class Process
     }
 
     /**
-     * Returns the Pid (process identifier), if applicable.
-     *
-     * @return integer|null The process id if running, null otherwise
-     *
-     * @throws RuntimeException In case --enable-sigchild is activated
+     * {@inheritdoc}
      */
     public function getPid()
     {
@@ -338,14 +264,7 @@ class Process
     }
 
     /**
-     * Sends a posix signal to the process.
-     *
-     * @param  integer $signal A valid posix signal (see http://www.php.net/manual/en/pcntl.constants.php)
-     * @return Process
-     *
-     * @throws LogicException   In case the process is not running
-     * @throws RuntimeException In case --enable-sigchild is activated
-     * @throws RuntimeException In case of failure
+     * {@inheritdoc}
      */
     public function signal($signal)
     {
@@ -365,11 +284,7 @@ class Process
     }
 
     /**
-     * Returns the current output of the process (STDOUT).
-     *
-     * @return string The process output
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function getOutput()
     {
@@ -397,11 +312,7 @@ class Process
     }
 
     /**
-     * Returns the current error output of the process (STDERR).
-     *
-     * @return string The process error output
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function getErrorOutput()
     {
@@ -430,13 +341,7 @@ class Process
     }
 
     /**
-     * Returns the exit code returned by the process.
-     *
-     * @return integer The exit status code
-     *
-     * @throws RuntimeException In case --enable-sigchild is activated and the sigchild compatibility mode is disabled
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function getExitCode()
     {
@@ -468,11 +373,7 @@ class Process
     }
 
     /**
-     * Checks if the process ended successfully.
-     *
-     * @return Boolean true if the process ended successfully, false otherwise
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function isSuccessful()
     {
@@ -480,15 +381,7 @@ class Process
     }
 
     /**
-     * Returns true if the child process has been terminated by an uncaught signal.
-     *
-     * It always returns false on Windows.
-     *
-     * @return Boolean
-     *
-     * @throws RuntimeException In case --enable-sigchild is activated
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function hasBeenSignaled()
     {
@@ -502,15 +395,7 @@ class Process
     }
 
     /**
-     * Returns the number of the signal that caused the child process to terminate its execution.
-     *
-     * It is only meaningful if hasBeenSignaled() returns true.
-     *
-     * @return integer
-     *
-     * @throws RuntimeException In case --enable-sigchild is activated
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function getTermSignal()
     {
@@ -524,13 +409,7 @@ class Process
     }
 
     /**
-     * Returns true if the child process has been stopped by a signal.
-     *
-     * It always returns false on Windows.
-     *
-     * @return Boolean
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function hasBeenStopped()
     {
@@ -540,13 +419,7 @@ class Process
     }
 
     /**
-     * Returns the number of the signal that caused the child process to stop its execution.
-     *
-     * It is only meaningful if hasBeenStopped() returns true.
-     *
-     * @return integer
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function getStopSignal()
     {
@@ -556,9 +429,7 @@ class Process
     }
 
     /**
-     * Checks if the process is currently running.
-     *
-     * @return Boolean true if the process is currently running, false otherwise
+     * {@inheritdoc}
      */
     public function isRunning()
     {
@@ -572,9 +443,15 @@ class Process
     }
 
     /**
-     * Checks if the process has been started with no regard to the current state.
-     *
-     * @return Boolean true if status is ready, false otherwise
+     * {@inheritdoc}
+     */
+    public function isStopping()
+    {
+        return $this->status === self::STATUS_STOPPING;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function isStarted()
     {
@@ -582,9 +459,7 @@ class Process
     }
 
     /**
-     * Checks if the process is terminated.
-     *
-     * @return Boolean true if process is terminated, false otherwise
+     * {@inheritdoc}
      */
     public function isTerminated()
     {
@@ -594,11 +469,7 @@ class Process
     }
 
     /**
-     * Gets the process status.
-     *
-     * The status is one of: ready, started, terminated.
-     *
-     * @return string The current process status
+     * {@inheritdoc}
      */
     public function getStatus()
     {
@@ -608,14 +479,7 @@ class Process
     }
 
     /**
-     * Stops the process.
-     *
-     * @param integer|float $timeout The timeout in seconds
-     * @param integer       $signal  A posix signal to send in case the process has not stop at timeout, default is SIGKILL
-     *
-     * @return integer The exit-code of the process
-     *
-     * @throws RuntimeException if the process got signaled
+     * {@inheritdoc}
      */
     public function stop($timeout = 10, $signal = null)
     {
@@ -686,9 +550,7 @@ class Process
     }
 
     /**
-     * Gets the process timeout.
-     *
-     * @return float|null The timeout in seconds or null if it's disabled
+     * {@inheritdoc}
      */
     public function getTimeout()
     {
@@ -696,9 +558,7 @@ class Process
     }
 
     /**
-     * Gets the process idle timeout.
-     *
-     * @return float|null
+     * {@inheritdoc}
      */
     public function getIdleTimeout()
     {
@@ -706,15 +566,7 @@ class Process
     }
 
     /**
-     * Sets the process timeout.
-     *
-     * To disable the timeout, set this value to null.
-     *
-     * @param integer|float|null $timeout The timeout in seconds
-     *
-     * @return self The current Process instance
-     *
-     * @throws InvalidArgumentException if the timeout is negative
+     * {@inheritdoc}
      */
     public function setTimeout($timeout)
     {
@@ -724,13 +576,7 @@ class Process
     }
 
     /**
-     * Sets the process idle timeout.
-     *
-     * @param integer|float|null $timeout
-     *
-     * @return self The current Process instance.
-     *
-     * @throws InvalidArgumentException if the timeout is negative
+     * {@inheritdoc}
      */
     public function setIdleTimeout($timeout)
     {
@@ -933,12 +779,7 @@ class Process
     }
 
     /**
-     * Performs a check between the timeout definition and the time the process started.
-     *
-     * In case you run a background process (with the start method), you should
-     * trigger this method regularly to ensure the process timeout
-     *
-     * @throws ProcessTimedOutException In case the timeout was reached
+     * {@inheritdoc}
      */
     public function checkTimeout()
     {

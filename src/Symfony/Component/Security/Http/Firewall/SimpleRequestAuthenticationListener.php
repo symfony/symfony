@@ -17,7 +17,7 @@ use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Authentication\SimplePreAuthenticatorInterface;
+use Symfony\Component\Security\Core\Authentication\SimpleRequestAuthenticatorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -25,11 +25,11 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerI
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
 
 /**
- * SimplePreAuthenticationListener implements simple proxying to an authenticator.
+ * SimpleRequestAuthenticationListener implements simple proxying to an authenticator.
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
-class SimplePreAuthenticationListener implements ListenerInterface
+class SimpleRequestAuthenticationListener implements ListenerInterface
 {
     private $securityContext;
     private $authenticationManager;
@@ -40,13 +40,13 @@ class SimplePreAuthenticationListener implements ListenerInterface
     /**
      * Constructor.
      *
-     * @param SecurityContextInterface         $securityContext       A SecurityContext instance
-     * @param AuthenticationManagerInterface   $authenticationManager An AuthenticationManagerInterface instance
-     * @param string                           $providerKey
-     * @param SimplePreAuthenticatorInterface  $simpleAuthenticator   A SimplePreAuthenticatorInterface instance
-     * @param LoggerInterface                  $logger                A LoggerInterface instance
+     * @param SecurityContextInterface             $securityContext       A SecurityContext instance
+     * @param AuthenticationManagerInterface       $authenticationManager An AuthenticationManagerInterface instance
+     * @param string                               $providerKey
+     * @param SimpleRequestAuthenticatorInterface  $simpleAuthenticator   A SimpleRequestAuthenticationListener instance
+     * @param LoggerInterface                      $logger                A LoggerInterface instance
      */
-    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, $providerKey, SimplePreAuthenticatorInterface $simpleAuthenticator, LoggerInterface $logger = null)
+    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, $providerKey, SimpleRequestAuthenticatorInterface $simpleAuthenticator, LoggerInterface $logger = null)
     {
         if (empty($providerKey)) {
             throw new \InvalidArgumentException('$providerKey must not be empty.');

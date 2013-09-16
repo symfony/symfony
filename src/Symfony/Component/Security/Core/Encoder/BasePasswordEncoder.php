@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Core\Encoder;
 
 use Symfony\Component\Security\Core\Util\StringUtils;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 
 /**
  * BasePasswordEncoder is the base class for all password encoders.
@@ -20,6 +21,8 @@ use Symfony\Component\Security\Core\Util\StringUtils;
  */
 abstract class BasePasswordEncoder implements PasswordEncoderInterface
 {
+    const MAX_PASSWORD_LENGTH = 4096;
+
     /**
      * Demerges a merge password and salt string.
      *
@@ -82,5 +85,12 @@ abstract class BasePasswordEncoder implements PasswordEncoderInterface
     protected function comparePasswords($password1, $password2)
     {
         return StringUtils::equals($password1, $password2);
+    }
+
+    protected function checkPasswordLength($password)
+    {
+        if (strlen($password) > self::MAX_PASSWORD_LENGTH) {
+            throw new BadCredentialsException('Invalid password.');
+        }
     }
 }

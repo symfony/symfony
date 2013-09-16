@@ -54,6 +54,8 @@ class Pbkdf2PasswordEncoder extends BasePasswordEncoder
      */
     public function encodePassword($raw, $salt)
     {
+        $this->checkPasswordLength($raw);
+
         if (!in_array($this->algorithm, hash_algos(), true)) {
             throw new \LogicException(sprintf('The algorithm "%s" is not supported.', $this->algorithm));
         }
@@ -72,6 +74,8 @@ class Pbkdf2PasswordEncoder extends BasePasswordEncoder
      */
     public function isPasswordValid($encoded, $raw, $salt)
     {
+        $this->checkPasswordLength($raw);
+
         return $this->comparePasswords($encoded, $this->encodePassword($raw, $salt));
     }
 

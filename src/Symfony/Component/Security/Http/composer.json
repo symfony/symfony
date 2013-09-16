@@ -1,7 +1,7 @@
 {
-    "name": "symfony/security",
+    "name": "symfony/security-http",
     "type": "library",
-    "description": "Symfony Security Component",
+    "description": "Symfony Security Component - HTTP Integration",
     "keywords": [],
     "homepage": "http://symfony.com",
     "license": "MIT",
@@ -17,37 +17,24 @@
     ],
     "require": {
         "php": ">=5.3.3",
+        "symfony/security-core": "~2.4",
         "symfony/event-dispatcher": "~2.1",
         "symfony/http-foundation": "~2.4",
         "symfony/http-kernel": "~2.4"
     },
-    "replace": {
-        "symfony/security-acl": "self.version",
-        "symfony/security-core": "self.version",
-        "symfony/security-http": "self.version"
-    },
     "require-dev": {
         "symfony/form": "~2.0",
         "symfony/routing": "~2.2",
-        "symfony/validator": "~2.2",
-        "doctrine/common": "~2.2",
-        "doctrine/dbal": "~2.2",
-        "psr/log": "~1.0",
-        "ircmaxell/password-compat": "1.0.*"
+        "psr/log": "~1.0"
     },
     "suggest": {
-        "symfony/class-loader": "",
-        "symfony/finder": "",
         "symfony/form": "",
-        "symfony/validator": "",
-        "symfony/routing": "",
-        "doctrine/dbal": "to use the built-in ACL implementation",
-        "ircmaxell/password-compat": ""
+        "symfony/routing": ""
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\Security\\": "" }
+        "psr-0": { "Symfony\\Component\\Security\\Http\\": "" }
     },
-    "target-dir": "Symfony/Component/Security",
+    "target-dir": "Symfony/Component/Security/Http",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {

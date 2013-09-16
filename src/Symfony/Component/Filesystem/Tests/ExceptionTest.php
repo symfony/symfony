@@ -48,5 +48,4 @@ class ExceptionTest extends \PHPUnit_Framework_TestCase
         $e = new FileNotFoundException('/foo', 'bar');
         $this->assertEquals('bar', $e->getMessage(), 'A custom message should be possible still.');
     }
-
 }

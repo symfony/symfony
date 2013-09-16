@@ -32,13 +32,13 @@ class Filesystem
      * @param string  $targetFile The target filename
      * @param boolean $override   Whether to override an existing file or not
      *
-     * @throws FileNotFoundException    When orginFile doesn' t exist
+     * @throws FileNotFoundException    When orginFile doesn't exist
      * @throws IOException              When copy fails
      */
     public function copy($originFile, $targetFile, $override = false)
     {
         if (stream_is_local($originFile) && !is_file($originFile)) {
-            throw new FileNotFoundException($originFile, sprintf('Failed to copy %s because file does not exists', $originFile));
+            throw new FileNotFoundException($originFile, sprintf('Failed to copy %s because file does not exist', $originFile));
         }
 
         $this->mkdir(dirname($targetFile));
@@ -271,7 +271,7 @@ class Filesystem
     {
         // we check that target does not exist
         if (!$overwrite && is_readable($target)) {
-            $e = new IOException(sprintf('Cannot rename because the target "%s" already exist.', $target));
+            $e = new IOException(sprintf('Cannot rename because the target "%s" already exists.', $target));
             $e->setPath($target);
             throw $e;
         }

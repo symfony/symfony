@@ -28,7 +28,8 @@ class IOException extends \RuntimeException implements ExceptionInterface, IOExc
      * Set the path associated with this IOException
      * @param string $path The path
      */
-    public function setPath($path) {
+    public function setPath($path)
+    {
         $this->path = $path;
     }
 
@@ -37,6 +38,6 @@ class IOException extends \RuntimeException implements ExceptionInterface, IOExc
      */
     public function getPath()
     {
-      return $this->path;
+        return $this->path;
     }
 }

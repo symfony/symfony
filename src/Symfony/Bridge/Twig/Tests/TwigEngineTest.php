@@ -13,7 +13,7 @@ namespace Symfony\Bridge\Twig\Tests;
 
 use Symfony\Bridge\Twig\TwigEngine;
 
-class TwigEngineTest extends TestCase
+class TwigEngineTest extends \PHPUnit_Framework_TestCase
 {
     public function testExistsWithTemplateInstances()
     {

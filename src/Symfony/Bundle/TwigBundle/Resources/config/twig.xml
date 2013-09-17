@@ -81,7 +81,7 @@
 
         <service id="twig.extension.routing" class="%twig.extension.routing.class%" public="false">
             <argument type="service" id="router" />
-            <call method="setRequest"><argument type="service" id="request" on-invalid="null" strict="false" /></call>
+            <argument type="service" id="request_stack" />
         </service>
 
         <service id="twig.extension.yaml" class="%twig.extension.yaml.class%" public="false">

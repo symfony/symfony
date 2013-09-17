@@ -13,6 +13,7 @@ namespace Symfony\Bridge\Twig\Tests\Extension;
 
 use Symfony\Bridge\Twig\Extension\RoutingExtension;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGenerator;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
@@ -31,12 +32,14 @@ class RoutingExtensionTest extends \PHPUnit_Framework_TestCase
         $request->attributes->set('_route', 'page');
         $request->attributes->set('_route_params', array('dir' => 'dir', 'page' => 'page', '_format' => 'html'));
 
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+
         $context = new RequestContext();
         $context->fromRequest($request);
         $generator = new UrlGenerator($routes, $context);
 
-        $extension = new RoutingExtension($generator);
-        $extension->setRequest($request);
+        $extension = new RoutingExtension($generator, $requestStack);
 
         $this->assertSame('http://example.com/dir/page/comments', $extension->getUrl('comments', array('dir' => 'dir', 'page' => 'page')));
         $this->assertSame('//example.com/dir/page/comments', $extension->getUrl('comments', array('dir' => 'dir', 'page' => 'page'), true));
@@ -68,12 +71,14 @@ class RoutingExtensionTest extends \PHPUnit_Framework_TestCase
         $request->attributes->set('_route', 'page');
         $request->attributes->set('_route_params', array('page' => 'mypage'));
 
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+
         $context = new RequestContext();
         $context->fromRequest($request);
         $generator = new UrlGenerator($routes, $context);
 
-        $extension = new RoutingExtension($generator);
-        $extension->setRequest($request);
+        $extension = new RoutingExtension($generator, $requestStack);
 
         $this->assertStringStartsNotWith('querypage', $extension->getSubPath('', array(), true),
             'when the request query string has a parameter with the same name as a placeholder, the query param is ignored when includeQuery=true'
@@ -110,6 +115,8 @@ class RoutingExtensionTest extends \PHPUnit_Framework_TestCase
             array('{{ path(name = "foo", parameters = { foo: ["foo", "bar"] }) }}', true),
             array('{{ path(name = "foo", parameters = { foo: foo }) }}', true),
             array('{{ path(name = "foo", parameters = { foo: "foo", bar: "bar" }) }}', true),
+
+            array('{{ subpath("foo") }}', true),
         );
     }
 }

@@ -11,7 +11,7 @@
 
 namespace Symfony\Bridge\Twig\Extension;
 
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
@@ -27,18 +27,20 @@ class RoutingExtension extends \Twig_Extension
     private $generator;
 
     /**
-     * @var Request|null
+     * @var RequestStack|null
      */
-    private $request;
+    private $requestStack;
 
     /**
      * Constructor.
      *
-     * @param UrlGeneratorInterface $generator A UrlGeneratorInterface instance
+     * @param UrlGeneratorInterface $generator    A UrlGeneratorInterface instance
+     * @param RequestStack|null     $requestStack An optional stack containing master/sub requests
      */
-    public function __construct(UrlGeneratorInterface $generator)
+    public function __construct(UrlGeneratorInterface $generator, RequestStack $requestStack = null)
     {
         $this->generator = $generator;
+        $this->requestStack = $requestStack;
     }
 
     /**
@@ -66,22 +68,16 @@ class RoutingExtension extends \Twig_Extension
     }
 
     /**
-     * Sets the current request that is needed for the subpath function.
-     *
-     * @param Request|null $request
-     */
-    public function setRequest(Request $request = null)
-    {
-        $this->request = $request;
-    }
-
-    /**
      * Returns the relative path to a route (defaults to current route) with all current route parameters merged
      * with the passed params. 
      *
      * Optionally one can also include the params of the query string. It's also possible to remove existing
      * params by passing null as value of a specific parameter. The path is a relative path to the
      * target URL, e.g. "../slug", based on the current request path.
+     *
+     * Beware when using this method in a subrequest as it will use the params of the subrequest and will
+     * also generate a relative path based on it. The resulting relative reference is probably the wrong
+     * target when resolved by the user agent (browser) based on the main request.
      *
      * @param string  $name         The route name (when empty it defaults to the current route)
      * @param array   $parameters   The parameters that should be added or overwrite existing params
@@ -93,20 +89,20 @@ class RoutingExtension extends \Twig_Extension
      */
     public function getSubPath($name = '', array $parameters = array(), $includeQuery = false)
     {
-        if (null === $this->request) {
-            throw new \LogicException('The subpath function needs the current request to be set via setRequest().');
+        if (null === $this->requestStack || null === $request = $this->requestStack->getCurrentRequest()) {
+            throw new \LogicException('The subpath function needs the request to be set in the request stack.');
         }
 
         $parameters = array_replace(
-            $includeQuery ? $this->request->query->all() : array(),
-            $this->request->attributes->get('_route_params', array()),
+            $includeQuery ? $request->query->all() : array(),
+            $request->attributes->get('_route_params', array()),
             $parameters
         );
         $parameters = array_filter($parameters, function ($value) { 
             return null !== $value; 
         });
 
-        return $this->generator->generate($name ?: $this->request->attributes->get('_route', ''), $parameters, UrlGeneratorInterface::RELATIVE_PATH);
+        return $this->generator->generate($name ?: $request->attributes->get('_route', ''), $parameters, UrlGeneratorInterface::RELATIVE_PATH);
     }
 
     /**

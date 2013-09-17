@@ -367,46 +367,59 @@ class Form extends Link implements \ArrayAccess
         $this->node = $node;
     }
 
+    /**
+     * Adds form elements related to this form.
+     *
+     * Creates an internal copy of the submitted 'button' element and
+     * the form node or the entire document depending on whether we need
+     * to find non-descendant elements through HTML5 'form' attribute.
+     */
     private function initialize()
     {
         $this->fields = new FormFieldRegistry();
 
         $document = new \DOMDocument('1.0', 'UTF-8');
-        $node = $document->importNode($this->node, true);
-        $button = $document->importNode($this->button, true);
-        $root = $document->appendChild($document->createElement('_root'));
-        $root->appendChild($node);
-        $root->appendChild($button);
         $xpath = new \DOMXPath($document);
+        $root = $document->appendChild($document->createElement('_root'));
 
-        // add descendant elements to the form
-        $fieldNodes = $xpath->query('descendant::input | descendant::button | descendant::textarea | descendant::select', $root);
-        foreach ($fieldNodes as $node) {
-            $this->addField($node, $button);
+        // add submitted button if it has a valid name
+        if ($this->button->hasAttribute('name') && $this->button->getAttribute('name')) {
+            $this->set(new Field\InputFormField($document->importNode($this->button, true)));
         }
 
-        // find form elements corresponding to the current form by the HTML5 form attribute
+        // find form elements corresponding to the current form
         if ($this->node->hasAttribute('id')) {
+            // traverse through the whole document
+            $node = $document->importNode($this->node->ownerDocument->documentElement, true);
+            $root->appendChild($node);
+
+            // corresponding elements are either descendants or have a matching HTML5 form attribute
             $formId = Crawler::xpathLiteral($this->node->getAttribute('id'));
-            $xpath = new \DOMXPath($this->node->ownerDocument);
-            $fieldNodes = $xpath->query(sprintf('descendant::input[@form=%s] | descendant::button[@form=%s] | descendant::textarea[@form=%s] | descendant::select[@form=%s]', $formId, $formId, $formId, $formId));
+            $fieldNodes = $xpath->query(sprintf('descendant::input[@form=%s] | descendant::button[@form=%s] | descendant::textarea[@form=%s] | descendant::select[@form=%s] | //form[@id=%s]/input[not(@form)] | //form[@id=%s]/button[not(@form)] | //form[@id=%s]/textarea[not(@form)] | //form[@id=%s]/select[not(@form)]', $formId, $formId, $formId, $formId, $formId, $formId, $formId, $formId), $root);
             foreach ($fieldNodes as $node) {
-                $this->addField($node, $button);
+                $this->addField($node);
+            }
+        } else {
+            // parent form has no id, add descendant elements only
+            $node = $document->importNode($this->node, true);
+            $root->appendChild($node);
+
+            // descendant elements with form attribute are not part of this form
+            $fieldNodes = $xpath->query('descendant::input[not(@form)] | descendant::button[not(@form)] | descendant::textarea[not(@form)] | descendant::select[not(@form)]', $root);
+            foreach ($fieldNodes as $node) {
+                $this->addField($node);
             }
         }
     }
 
-    private function addField(\DOMNode $node, \DOMNode $button)
+    private function addField(\DOMNode $node)
     {
         if (!$node->hasAttribute('name') || !$node->getAttribute('name')) {
             return;
         }
 
         $nodeName = $node->nodeName;
-
-        if ($node === $button) {
-            $this->set(new Field\InputFormField($node));
-        } elseif ('select' == $nodeName || 'input' == $nodeName && 'checkbox' == $node->getAttribute('type')) {
+        if ('select' == $nodeName || 'input' == $nodeName && 'checkbox' == $node->getAttribute('type')) {
             $this->set(new Field\ChoiceFormField($node));
         } elseif ('input' == $nodeName && 'radio' == $node->getAttribute('type')) {
             if ($this->has($node->getAttribute('name'))) {

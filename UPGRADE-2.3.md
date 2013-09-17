@@ -170,6 +170,9 @@ Form
    $form = $builder->getForm();
    ```
 
+ * The BIND_CLIENT_DATA, BIND_NORM_DATA, and SET_DATA events have been replaced
+   by PRE_BIND, BIND, and PRE_SET_DATA, respectively.
+
 PropertyAccess
 --------------
 

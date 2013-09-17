@@ -577,16 +577,8 @@ class Crawler extends \SplObjectStorage
             $root->appendChild($document->importNode($node, true));
         }
 
-        $domxpath = new \DOMXPath($document);
-        if (preg_match_all('/(?P<prefix>[a-zA-Z_][a-zA-Z_0-9\-\.]+):[^:]/', $xpath, $matches)) {
-            foreach ($matches['prefix'] as $prefix) {
-                // ask for one namespace, otherwise we'd get a collection with an item for each node
-                $namespaces = $domxpath->query(sprintf('(//namespace::*[name()="%s"])[last()]', $prefix));
-                foreach ($namespaces as $node) {
-                    $domxpath->registerNamespace($node->prefix, $node->nodeValue);
-                }
-            }
-        }
+        $prefixes = $this->findNamespacePrefixes($xpath);
+        $domxpath = $this->createDOMXPath($document, $prefixes);
 
         return new static($domxpath->query($xpath), $this->uri);
     }
@@ -798,5 +790,44 @@ class Crawler extends \SplObjectStorage
         } while ($node = $node->$siblingDir);
 
         return $nodes;
+    }
+
+    /**
+     * @param \DOMDocument $document
+     * @param array        $prefixes
+     *
+     * @return \DOMXPath
+     *
+     * @throws \InvalidArgumentException
+     */
+    private function createDOMXPath(\DOMDocument $document, array $prefixes = array())
+    {
+        $domxpath = new \DOMXPath($document);
+
+        foreach ($prefixes as $prefix) {
+            // ask for one namespace, otherwise we'd get a collection with an item for each node
+            $namespaces = $domxpath->query(sprintf('(//namespace::*[name()="%s"])[last()]', 'default' === $prefix ? '' : $prefix));
+            if ($node = $namespaces->item(0)) {
+                $domxpath->registerNamespace($prefix, $node->nodeValue);
+            } else {
+                throw new \InvalidArgumentException(sprintf('Could not find a namespace for the prefix: "%s"', $prefix));
+            }
+        }
+
+        return $domxpath;
+    }
+
+    /**
+     * @param $xpath
+     *
+     * @return array
+     */
+    private function findNamespacePrefixes($xpath)
+    {
+        if (preg_match_all('/(?P<prefix>[a-zA-Z_][a-zA-Z_0-9\-\.]+):[^:]/', $xpath, $matches)) {
+            return array_unique($matches['prefix']);
+        }
+
+        return array();
     }
 }

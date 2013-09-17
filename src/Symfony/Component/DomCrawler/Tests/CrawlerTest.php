@@ -373,7 +373,7 @@ EOF
 
     public function testFilterXPathWithDefaultNamespace()
     {
-        $crawler = $this->createTestXmlCrawler()->filterXPath('//entry/id');
+        $crawler = $this->createTestXmlCrawler()->filterXPath('//default:entry/default:id');
         $this->assertCount(1, $crawler, '->filterXPath() automatically registers a namespace');
         $this->assertSame('tag:youtube.com,2008:video:kgZRZmEc9j4', $crawler->text());
     }
@@ -389,6 +389,15 @@ EOF
         $crawler = $this->createTestXmlCrawler()->filterXPath('//media:group/yt:aspectRatio');
         $this->assertCount(1, $crawler, '->filterXPath() automatically registers multiple namespaces');
         $this->assertSame('widescreen', $crawler->text());
+    }
+
+    /**
+     * @expectedException        \InvalidArgumentException
+     * @expectedExceptionMessage Could not find a namespace for the prefix: "foo"
+     */
+    public function testFilterXPathWithAnInvalidNamespace()
+    {
+        $this->createTestXmlCrawler()->filterXPath('//media:group/foo:aspectRatio');
     }
 
     /**
@@ -411,7 +420,7 @@ EOF
     {
         $this->markSkippedIfCssSelectorNotPresent();
 
-        $crawler = $this->createTestXmlCrawler()->filter('entry id');
+        $crawler = $this->createTestXmlCrawler()->filter('default|entry default|id');
         $this->assertCount(1, $crawler, '->filter() automatically registers namespaces');
         $this->assertSame('tag:youtube.com,2008:video:kgZRZmEc9j4', $crawler->text());
     }

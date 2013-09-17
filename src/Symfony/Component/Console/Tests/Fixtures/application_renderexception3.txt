@@ -1,17 +1,17 @@
 
 
-                                              
-  [Exception]                                 
-  Third exception <fg=blue;bg=red>comment</>  
-                                              
+                           
+  [Exception]              
+  Third exception comment  
+                           
 
 
 
 
-                                              
-  [Exception]                                 
-  Second exception <comment>comment<comment>  
-                                              
+                            
+  [Exception]               
+  Second exception comment  
+                            
 
 
 

@@ -1,24 +1,24 @@
 
 
-[37;41m                                              [0m
-[37;41m  [Exception]                                 [0m
-[37;41m  Third exception <fg=blue;bg=red>comment</>  [0m
-[37;41m                                              [0m
+[37;41m                           [0m
+[37;41m  [Exception]              [0m
+[37;41m  Third exception [0m[34;41mcomment[0m[37;41m  [0m
+[37;41m                           [0m
 
 
 
 
-[37;41m                                              [0m
-[37;41m  [Exception]                                 [0m
-[37;41m  Second exception <comment>comment<comment>  [0m
-[37;41m                                              [0m
+[37;41m                            [0m
+[37;41m  [Exception]               [0m
+[37;41m  Second exception [0m[33mcomment[0m[37;41m  [0m
+[37;41m                            [0m
 
 
 
 
 [37;41m                                       [0m
 [37;41m  [Exception]                          [0m
-[37;41m  First exception <p>this is html</p>  [0m
+[37;41m  First exception [0m[37;41m<p>this is html[0m[37;41m</p>  [0m
 [37;41m                                       [0m
 
 

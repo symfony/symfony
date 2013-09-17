@@ -20,7 +20,7 @@ class Foo3Command extends Command
             try {
                 throw new \Exception("First exception <p>this is html</p>");
             } catch (\Exception $e) {
-                throw new \Exception("Second exception <comment>comment<comment>", 0, $e);
+                throw new \Exception("Second exception <comment>comment</comment>", 0, $e);
             }
         } catch (\Exception $e) {
             throw new \Exception("Third exception <fg=blue;bg=red>comment</>", 0, $e);

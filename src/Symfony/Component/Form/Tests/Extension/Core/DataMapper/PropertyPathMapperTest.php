@@ -318,6 +318,9 @@ class PropertyPathMapperTest extends \PHPUnit_Framework_TestCase
 
         $this->propertyAccessor->expects($this->never())
             ->method('setValue');
+        $this->propertyAccessor->expects($this->any())
+            ->method('getValue')
+            ->will($this->returnValue(new \stdClass));
 
         $config = new FormConfigBuilder('name', '\stdClass', $this->dispatcher);
         $config->setByReference(true);
@@ -360,6 +363,26 @@ class PropertyPathMapperTest extends \PHPUnit_Framework_TestCase
         $config->setPropertyPath($propertyPath);
         $config->setData($engine);
         $config->setDisabled(true);
+        $form = $this->getForm($config);
+
+        $this->mapper->mapFormsToData(array($form), $car);
+    }
+
+    public function testMapFormsToDataScalarsNotByReference()
+    {
+        $car = new \stdClass;
+        $propertyPath = $this->getPropertyPath('brand');
+
+        $this->propertyAccessor->expects($this->atLeastOnce())
+            ->method('setValue');
+        $this->propertyAccessor->expects($this->any())
+            ->method('getValue')
+            ->will($this->returnValue('FooCar'));
+
+        $config = new FormConfigBuilder('name', null, $this->dispatcher);
+        $config->setByReference(true);
+        $config->setPropertyPath($propertyPath);
+        $config->setData('FooCar');
         $form = $this->getForm($config);
 
         $this->mapper->mapFormsToData(array($form), $car);

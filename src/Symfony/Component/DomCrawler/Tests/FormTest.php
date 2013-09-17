@@ -90,21 +90,53 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $dom = new \DOMDocument();
         $dom->loadHTML('
             <html>
-                <form id="bar">
-                    <input type="submit" form="bar" />
+                <form id="form_1" action="" method="POST">
+                    <input type="checkbox" name="apples[]" value="1" checked />
+                    <input form="form_2" type="checkbox" name="oranges[]" value="1" checked />
+                    <input form="form_1" type="hidden" name="form_name" value="form_1" />
+                    <input form="form_1" type="submit" name="button_1" value="Capture fields" />
+                    <button form="form_2" type="submit" name="button_2">Submit form_2</button>
                 </form>
-                <input type="submit" form="bar" />
+                <input form="form_1" type="checkbox" name="apples[]" value="2" checked />
+                <form id="form_2" action="" method="POST">
+                    <input type="checkbox" name="oranges[]" value="2" checked />
+                    <input type="checkbox" name="oranges[]" value="3" checked />
+                    <input form="form_2" type="hidden" name="form_name" value="form_2" />
+                    <input form="form_1" type="hidden" name="outer_field" value="success" />
+                    <button form="form_1" type="submit" name="button_3">Submit from outside the form</button>
+                </form>
                 <button />
             </html>
         ');
 
-        $nodes = $dom->getElementsByTagName('input');
+        $inputElements = $dom->getElementsByTagName('input');
+        $buttonElements = $dom->getElementsByTagName('button');
 
-        $form = new Form($nodes->item(0), 'http://example.com');
-        $this->assertSame($dom->getElementsByTagName('form')->item(0), $form->getFormNode(), 'HTML5-compliant form attribute handled incorrectly');
+        // Tests if submit buttons are correctly assigned to forms
+        $form1 = new Form($buttonElements->item(1), 'http://example.com');
+        $this->assertSame($dom->getElementsByTagName('form')->item(0), $form1->getFormNode(), 'HTML5-compliant form attribute handled incorrectly');
 
-        $form = new Form($nodes->item(1), 'http://example.com');
-        $this->assertSame($dom->getElementsByTagName('form')->item(0), $form->getFormNode(), 'HTML5-compliant form attribute handled incorrectly');
+        $form1 = new Form($inputElements->item(3), 'http://example.com');
+        $this->assertSame($dom->getElementsByTagName('form')->item(0), $form1->getFormNode(), 'HTML5-compliant form attribute handled incorrectly');
+
+        $form2 = new Form($buttonElements->item(0), 'http://example.com');
+        $this->assertSame($dom->getElementsByTagName('form')->item(1), $form2->getFormNode(), 'HTML5-compliant form attribute handled incorrectly');
+
+        // Tests if form elements are correctly assigned to forms
+        $values1 = array(
+            'apples' => array('1', '2'),
+            'form_name' => 'form_1',
+            'button_1' => 'Capture fields',
+            'outer_field' => 'success'
+        );
+        $values2 = array(
+            'oranges' => array('1', '2', '3'),
+            'form_name' => 'form_2',
+            'button_2' => '',
+        );
+        $this->assertEquals($values1, $form1->getPhpValues(), 'HTML5-compliant form attribute handled incorrectly');
+        $this->assertEquals($values2, $form2->getPhpValues(), 'HTML5-compliant form attribute handled incorrectly');
+
     }
 
     public function testMultiValuedFields()

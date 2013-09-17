@@ -12,14 +12,15 @@
 namespace Symfony\Component\Filesystem\Exception;
 
 /**
- * IOException interface for all exceptions thrown by the component.
+ * IOException interface for file and input/output stream releated exceptions thrown by the component.
  *
  * @author Christian Gärtner <christiangaertner.film@googlemail.com>
  */
-interface IOExceptionInterface
+interface IOExceptionInterface extends ExceptionInterface
 {
     /**
      * Returns the associated path for the exception
+     * 
      * @return string The path.
      */
     public function getPath();

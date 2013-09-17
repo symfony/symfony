@@ -19,7 +19,7 @@ use Symfony\Component\Yaml\Exception\ParseException;
  */
 class Parser
 {
-    const FOLDED_SCALAR_PATTERN = '(?P<separator>\||>)(?P<modifiers>\+|\-|\d+|\+\d+|\-\d+|\d+\+|\d+\-)?(?P<comments> +#.*)?';
+    const FOLDED_SCALAR_PATTERN = '(?:(?P<tag>!!?\w+)\s+)?(?P<separator>\||>)(?P<modifiers>\+|\-|\d+|\+\d+|\-\d+|\d+\+|\d+\-)?(?P<comments> +#.*)?';
 
     private $offset         = 0;
     private $lines          = array();
@@ -76,7 +76,7 @@ class Parser
             }
 
             $isRef = $isInPlace = $isProcessed = false;
-            if (preg_match('#^\-((?P<leadspaces>\s+)(?P<value>.+?))?\s*$#u', $this->currentLine, $values)) {
+            if (preg_match('#^\-((?P<leadspaces>\s+)(?:(?P<tag>!!?\w+)\s+)?(?P<value>.+?))?\s*$#u', $this->currentLine, $values)) {
                 if ($context && 'mapping' == $context) {
                     throw new ParseException('You cannot define a sequence item when in a mapping');
                 }
@@ -113,7 +113,7 @@ class Parser
                         $data[] = $this->parseValue($values['value'], $exceptionOnInvalidType, $objectSupport);
                     }
                 }
-            } elseif (preg_match('#^(?P<key>'.Inline::REGEX_QUOTED_STRING.'|[^ \'"\[\{].*?) *\:(\s+(?P<value>.+?))?\s*$#u', $this->currentLine, $values) && false === strpos($values['key'],' #')) {
+            } elseif (preg_match('#^(?P<key>'.Inline::REGEX_QUOTED_STRING.'|[^ \'"\[\{].*?) *\:(\s+(?:(?P<tag>!!?\w+)\s+)?(?P<value>.+?))?\s*$#u', $this->currentLine, $values) && false === strpos($values['key'],' #')) {
                 if ($context && 'sequence' == $context) {
                     throw new ParseException('You cannot define a mapping item when in a sequence');
                 }

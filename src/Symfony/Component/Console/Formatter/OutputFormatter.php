@@ -163,6 +163,8 @@ class OutputFormatter implements OutputFormatterInterface
     /**
      * Replaces style of the output.
      *
+     * All escaped tags and tags that reference unknown styles are kept as is.
+     *
      * @param array $match
      *
      * @return string The replaced style

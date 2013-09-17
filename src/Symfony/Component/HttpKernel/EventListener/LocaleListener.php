@@ -78,7 +78,7 @@ class LocaleListener implements EventSubscriberInterface
     public function onKernelFinishRequest(FinishRequestEvent $event)
     {
         if (null === $this->requestStack) {
-            throw new \LogicException('You must pass a RequestStack.');
+            return; // removed when requestStack is required
         }
 
         if (null !== $parentRequest = $this->requestStack->getParentRequest()) {

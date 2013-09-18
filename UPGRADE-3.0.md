@@ -328,6 +328,10 @@ UPGRADE FROM 2.x to 3.0
    $route->setSchemes('https');
    ```
 
+### Security
+
+ * The `Resources/` directory was moved to `Core/Resources/`
+
 ### Translator
 
  * The `Translator::setFallbackLocale()` method has been removed in favor of

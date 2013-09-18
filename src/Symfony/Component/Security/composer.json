@@ -21,6 +21,11 @@
         "symfony/http-foundation": "~2.1",
         "symfony/http-kernel": "~2.4"
     },
+    "replace": {
+        "symfony/security-acl": "self.version",
+        "symfony/security-core": "self.version",
+        "symfony/security-http": "self.version"
+    },
     "require-dev": {
         "symfony/form": "~2.0",
         "symfony/routing": "~2.2",

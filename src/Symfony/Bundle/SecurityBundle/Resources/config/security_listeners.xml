@@ -206,7 +206,6 @@
             <argument type="service" id="security.access.decision_manager" />
             <argument type="service" id="security.access_map" />
             <argument type="service" id="security.authentication.manager" />
-            <argument type="service" id="logger" on-invalid="null" />
         </service>
     </services>
 </container>

@@ -144,7 +144,7 @@ class Form implements \IteratorAggregate, FormInterface
      *
      * @param FormConfigInterface $config The form configuration.
      *
-     * @throws FormException if a data mapper is not provided for a compound form
+     * @throws Exception if a data mapper is not provided for a compound form
      */
     public function __construct(FormConfigInterface $config)
     {

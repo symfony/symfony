@@ -10,6 +10,8 @@
  */
 
 namespace Symfony\Component\CssSelector\Node;
+use Symfony\Component\CssSelector\XPathExpr;
+use Symfony\Component\CssSelector\Exception\ParseException;
 
 /**
  * ClassNode represents a "selector.className" node.

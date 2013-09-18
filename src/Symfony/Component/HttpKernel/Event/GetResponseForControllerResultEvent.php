@@ -56,7 +56,7 @@ class GetResponseForControllerResultEvent extends GetResponseEvent
     /**
      * Assigns the return value of the controller.
      *
-     * @param mixed The controller return value
+     * @param mixed $controllerResult The controller return value
      *
      * @api
      */

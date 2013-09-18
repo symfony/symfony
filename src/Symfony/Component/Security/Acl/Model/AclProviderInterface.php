@@ -10,6 +10,7 @@
  */
 
 namespace Symfony\Component\Security\Acl\Model;
+use Symfony\Component\Security\Acl\Exception\AclNotFoundException;
 
 /**
  * Provides a common interface for retrieving ACLs.

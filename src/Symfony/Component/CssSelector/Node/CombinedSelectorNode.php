@@ -12,6 +12,7 @@
 namespace Symfony\Component\CssSelector\Node;
 
 use Symfony\Component\CssSelector\Exception\ParseException;
+use Symfony\Component\CssSelector\XPathExpr;
 
 /**
  * CombinedSelectorNode represents a combinator node.

@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Command;
 use Symfony\Component\Config\Definition\Dumper\YamlReferenceDumper;
 use Symfony\Component\Config\Definition\Dumper\XmlReferenceDumper;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -34,25 +35,21 @@ class ConfigDumpReferenceCommand extends ContainerDebugCommand
         $this
             ->setName('config:dump-reference')
             ->setDefinition(array(
-                new InputArgument('name', InputArgument::OPTIONAL, 'The Bundle or extension alias'),
+                new InputArgument('name', InputArgument::OPTIONAL, 'The Bundle name or the extension alias'),
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The format, either yaml or xml', 'yaml'),
             ))
-            ->setDescription('Dumps default configuration for an extension')
+            ->setDescription('Dumps the default configuration for an extension')
             ->setHelp(<<<EOF
-The <info>%command.name%</info> command dumps the default configuration for an extension/bundle.
+The <info>%command.name%</info> command dumps the default configuration for an
+extension/bundle.
 
 The extension alias or bundle name can be used:
 
-Example:
-
   <info>php %command.full_name% framework</info>
-
-or
-
   <info>php %command.full_name% FrameworkBundle</info>
 
-With the <info>format</info> option specifies the format of the configuration, this is either yaml
-or xml. When the option is not provided, yaml is used.
+With the <info>format</info> option specifies the format of the configuration,
+this is either <comment>yaml</comment> or <comment>xml</comment>. When the option is not provided, <comment>yaml</comment> is used.
 EOF
             )
         ;
@@ -122,16 +119,17 @@ EOF
             throw new \LogicException(sprintf('Configuration class "%s" should implement ConfigurationInterface in order to be dumpable', get_class($configuration)));
         }
 
-        $output->writeln($message);
-
         switch ($input->getOption('format')) {
             case 'yaml':
+                $output->writeln(sprintf('# %s', $message));
                 $dumper = new YamlReferenceDumper();
                 break;
             case 'xml':
+                $output->writeln(sprintf('<!-- %s -->', $message));
                 $dumper = new XmlReferenceDumper();
                 break;
             default:
+                $output->writeln($message);
                 throw new \InvalidArgumentException('Only the yaml and xml formats are supported.');
         }
 

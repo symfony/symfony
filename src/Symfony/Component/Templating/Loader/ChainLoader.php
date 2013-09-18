@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Templating\Loader;
 
-use Symfony\Component\Templating\Storage;
 use Symfony\Component\Templating\TemplateReferenceInterface;
+use Symfony\Component\Templating\Storage\Storage;
 
 /**
  * ChainLoader is a loader that calls other loaders to load templates.

@@ -42,12 +42,12 @@ class RequestStack
      * This method should generally not be called directly as the stack
      * management should be taken care of by the application itself.
      *
-     * @return Request
+     * @return Request|null
      */
     public function pop()
     {
         if (!$this->requests) {
-            throw new \LogicException('Unable to pop a Request as the stack is already empty.');
+            return null;
         }
 
         return array_pop($this->requests);

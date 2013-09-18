@@ -46,7 +46,7 @@ Tests
 You can run the unit tests with the following command:
 
     $ cd path/to/Symfony/Component/Console/
-    $ composer.phar install --dev
+    $ composer.phar install
     $ phpunit
 
 Third Party

@@ -11,7 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
-use Symfony\Component\Config\Definition\ReferenceDumper;
+use Symfony\Component\Config\Definition\Dumper\YamlReferenceDumper;
+use Symfony\Component\Config\Definition\Dumper\XmlReferenceDumper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -21,6 +22,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  * A console command for dumping available configuration reference
  *
  * @author Kevin Bond <kevinbond@gmail.com>
+ * @author Wouter J <waldio.webdesign@gmail.com>
  */
 class ConfigDumpReferenceCommand extends ContainerDebugCommand
 {
@@ -32,7 +34,8 @@ class ConfigDumpReferenceCommand extends ContainerDebugCommand
         $this
             ->setName('config:dump-reference')
             ->setDefinition(array(
-                new InputArgument('name', InputArgument::OPTIONAL, 'The Bundle or extension alias')
+                new InputArgument('name', InputArgument::OPTIONAL, 'The Bundle or extension alias'),
+                new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The format, either yaml or xml', 'yaml'),
             ))
             ->setDescription('Dumps default configuration for an extension')
             ->setHelp(<<<EOF
@@ -47,6 +50,9 @@ Example:
 or
 
   <info>php %command.full_name% FrameworkBundle</info>
+
+With the <info>format</info> option specifies the format of the configuration, this is either yaml
+or xml. When the option is not provided, yaml is used.
 EOF
             )
         ;
@@ -118,7 +124,17 @@ EOF
 
         $output->writeln($message);
 
-        $dumper = new ReferenceDumper();
-        $output->writeln($dumper->dump($configuration));
+        switch ($input->getOption('format')) {
+            case 'yaml':
+                $dumper = new YamlReferenceDumper();
+                break;
+            case 'xml':
+                $dumper = new XmlReferenceDumper();
+                break;
+            default:
+                throw new \InvalidArgumentException('Only the yaml and xml formats are supported.');
+        }
+
+        $output->writeln($dumper->dump($configuration), $extension->getNamespace());
     }
 }

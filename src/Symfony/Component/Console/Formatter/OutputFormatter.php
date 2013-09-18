@@ -23,7 +23,7 @@ class OutputFormatter implements OutputFormatterInterface
     /**
      * The pattern to phrase the format.
      */
-    const FORMAT_PATTERN = '#(\\\\?)<(/?)([a-z][a-z0-9_=;-]+)?>((?: [^<\\\\]+ | (?!<(?:/?[a-z]|/>)). | .(?<=\\\\<) )*)#isx';
+    const FORMAT_PATTERN = '#(\\\\?)<(/?)([a-z][a-z0-9_=;-]*)?>((?: [^<\\\\]+ | (?!<(?:/?[a-z]|/>)). | .(?<=\\\\<) )*)#isx';
 
     private $decorated;
     private $styles = array();
@@ -162,6 +162,8 @@ class OutputFormatter implements OutputFormatterInterface
 
     /**
      * Replaces style of the output.
+     *
+     * All escaped tags and tags that reference unknown styles are kept as is.
      *
      * @param array $match
      *

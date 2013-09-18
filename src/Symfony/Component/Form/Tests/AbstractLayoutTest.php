@@ -369,10 +369,22 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
             'expanded' => false,
         ));
 
+        // If the field is collapsed, has no "multiple" attribute, is required but
+        // has *no* empty value, the "required" must not be added, otherwise
+        // the resulting HTML is invalid.
+        // https://github.com/symfony/symfony/issues/8942
+
+        // HTML 5 spec
+        // http://www.w3.org/html/wg/drafts/html/master/forms.html#placeholder-label-option
+
+        // "If a select element has a required attribute specified, does not
+        //  have a multiple attribute specified, and has a display size of 1,
+        //  then the select element must have a placeholder label option."
+
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/select
     [@name="name"]
-    [@required="required"]
+    [not(@required)]
     [
         ./option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
         /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
@@ -394,7 +406,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         $this->assertWidgetMatchesXpath($form->createView(), array('separator' => '-- sep --'),
 '/select
     [@name="name"]
-    [@required="required"]
+    [not(@required)]
     [
         ./option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
         /following-sibling::option[@disabled="disabled"][not(@selected)][.="-- sep --"]
@@ -417,7 +429,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         $this->assertWidgetMatchesXpath($form->createView(), array('separator' => null),
 '/select
     [@name="name"]
-    [@required="required"]
+    [not(@required)]
     [
         ./option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
         /following-sibling::option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
@@ -439,7 +451,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         $this->assertWidgetMatchesXpath($form->createView(), array('separator' => ''),
 '/select
     [@name="name"]
-    [@required="required"]
+    [not(@required)]
     [
         ./option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
         /following-sibling::option[@disabled="disabled"][not(@selected)][.=""]
@@ -1704,7 +1716,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/select
     [@name="name"]
-    [@required="required"]
+    [not(@required)]
     [./optgroup
         [@label="[trans]Europe[/trans]"]
         [./option[@value="Europe/Vienna"][@selected="selected"][.="[trans]Vienna[/trans]"]]

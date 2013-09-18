@@ -504,12 +504,19 @@ abstract class Client
             $content = $request->getContent();
         }
 
+        if ('get' === strtolower($method)) {
+            // Don't forward parameters for GET request as it should reach the redirection URI
+            $parameters = array();
+        } else {
+            $parameters = $request->getParameters();
+        }
+
         $server = $request->getServer();
         unset($server['HTTP_IF_NONE_MATCH'], $server['HTTP_IF_MODIFIED_SINCE']);
 
         $this->isMainRequest = false;
 
-        $response = $this->request($method, $this->redirect, $request->getParameters(), $files, $server, $content);
+        $response = $this->request($method, $this->redirect, $parameters, $files, $server, $content);
 
         $this->isMainRequest = true;
 

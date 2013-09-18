@@ -88,8 +88,6 @@ class Crawler extends \SplObjectStorage
      *
      * @param string      $content A string to parse as HTML/XML
      * @param null|string $type    The content type of the string
-     *
-     * @return null|void
      */
     public function addContent($content, $type = null)
     {
@@ -749,6 +747,11 @@ class Crawler extends \SplObjectStorage
         return sprintf("concat(%s)", implode($parts, ', '));
     }
 
+    /**
+     * @param integer $position
+     *
+     * @return \DOMElement|null
+     */
     protected function getNode($position)
     {
         foreach ($this as $i => $node) {
@@ -762,6 +765,12 @@ class Crawler extends \SplObjectStorage
         // @codeCoverageIgnoreEnd
     }
 
+    /**
+     * @param \DOMElement $node
+     * @param string      $siblingDir
+     *
+     * @return array
+     */
     protected function sibling($node, $siblingDir = 'nextSibling')
     {
         $nodes = array();

@@ -106,6 +106,16 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     }
 
     /**
+     * Gets the xml remappings that should be performed.
+     *
+     * @return array $remappings an array of the form array(array(string, string))
+     */
+    public function getXmlRemappings()
+    {
+        return $this->xmlRemappings;
+    }
+
+    /**
      * Sets whether to add default values for this array if it has not been
      * defined in any of the configuration files.
      *

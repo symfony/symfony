@@ -28,6 +28,11 @@ class Crawler extends \SplObjectStorage
     protected $uri;
 
     /**
+     * @var string The default namespace prefix to be used with XPath and CSS expressions
+     */
+    private $defaultNamespacePrefix = 'default';
+
+    /**
      * Constructor.
      *
      * @param mixed  $node A Node to use as the base for the crawling
@@ -709,6 +714,16 @@ class Crawler extends \SplObjectStorage
     }
 
     /**
+     * Overloads a default namespace prefix to be used with XPath and CSS expressions.
+     *
+     * @param string $prefix
+     */
+    public function setDefaultNamespacePrefix($prefix)
+    {
+        $this->defaultNamespacePrefix = $prefix;
+    }
+
+    /**
      * Converts string for XPath expressions.
      *
      * Escaped characters are: quotes (") and apostrophe (').
@@ -806,7 +821,7 @@ class Crawler extends \SplObjectStorage
 
         foreach ($prefixes as $prefix) {
             // ask for one namespace, otherwise we'd get a collection with an item for each node
-            $namespaces = $domxpath->query(sprintf('(//namespace::*[name()="%s"])[last()]', 'default' === $prefix ? '' : $prefix));
+            $namespaces = $domxpath->query(sprintf('(//namespace::*[name()="%s"])[last()]', $this->defaultNamespacePrefix === $prefix ? '' : $prefix));
             if ($node = $namespaces->item(0)) {
                 $domxpath->registerNamespace($prefix, $node->nodeValue);
             } else {
@@ -824,7 +839,7 @@ class Crawler extends \SplObjectStorage
      */
     private function findNamespacePrefixes($xpath)
     {
-        if (preg_match_all('/(?P<prefix>[a-zA-Z_][a-zA-Z_0-9\-\.]+):[^:]/', $xpath, $matches)) {
+        if (preg_match_all('/(?P<prefix>[a-zA-Z_][a-zA-Z_0-9\-\.]*):[^:]/', $xpath, $matches)) {
             return array_unique($matches['prefix']);
         }
 

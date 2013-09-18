@@ -378,6 +378,16 @@ EOF
         $this->assertSame('tag:youtube.com,2008:video:kgZRZmEc9j4', $crawler->text());
     }
 
+    public function testFilterXPathWithCustomDefaultNamespace()
+    {
+        $crawler = $this->createTestXmlCrawler();
+        $crawler->setDefaultNamespacePrefix('x');
+        $crawler = $crawler->filterXPath('//x:entry/x:id');
+
+        $this->assertCount(1, $crawler, '->filterXPath() automatically registers a namespace');
+        $this->assertSame('tag:youtube.com,2008:video:kgZRZmEc9j4', $crawler->text());
+    }
+
     public function testFilterXPathWithNamespace()
     {
         $crawler = $this->createTestXmlCrawler()->filterXPath('//yt:accessControl');

@@ -475,7 +475,7 @@ class InputDefinition
      *
      * @param Boolean $asDom Whether to return a DOM or an XML string
      *
-     * @return string|DOMDocument An XML string representing the InputDefinition
+     * @return string|\DOMDocument An XML string representing the InputDefinition
      */
     public function asXml($asDom = false)
     {

@@ -20,6 +20,7 @@ use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Encapsulates the logic needed to create sub-requests, redirect the user, and match URLs.

@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Templating\Asset;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Templating\Asset\PackageInterface;
 
 /**
  * Creates packages based on whether the current request is secure.

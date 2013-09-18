@@ -736,7 +736,7 @@ class Application
      * @param string  $namespace An optional namespace name
      * @param Boolean $asDom     Whether to return a DOM or an XML string
      *
-     * @return string|DOMDocument An XML string representing the Application
+     * @return string|\DOMDocument An XML string representing the Application
      */
     public function asXml($namespace = null, $asDom = false)
     {
@@ -787,7 +787,7 @@ class Application
     /**
      * Renders a caught exception.
      *
-     * @param Exception       $e      An exception instance
+     * @param \Exception       $e      An exception instance
      * @param OutputInterface $output An OutputInterface instance
      */
     public function renderException($e, $output)

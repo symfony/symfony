@@ -13,8 +13,8 @@ Documentation:
 
 http://symfony.com/doc/2.4/book/security.html
 
-Resources
----------
+Tests
+-----
 
 You can run the unit tests with the following command:
 

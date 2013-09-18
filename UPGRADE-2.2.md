@@ -482,8 +482,9 @@
    }
    ```
 
- * The method `ExecutionContext::addViolationAtSubPath()` was deprecated and
-   will be removed in Symfony 2.3. You should use `addViolationAt()` instead.
+ * The methods `ExecutionContext::addViolationAtSubPath()` and
+   `ExecutionContext::addViolationAtPath()` were deprecated and will be
+   removed in Symfony 2.3. You should use `addViolationAt()` instead.
 
    Before:
 

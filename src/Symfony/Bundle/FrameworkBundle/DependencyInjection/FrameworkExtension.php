@@ -51,12 +51,14 @@ class FrameworkExtension extends Extension
         if ($container->getParameter('kernel.debug')) {
             $loader->load('debug.xml');
 
-            // only HttpKernel needs the debug event dispatcher
             $definition = $container->findDefinition('http_kernel');
-            $arguments = $definition->getArguments();
-            $arguments[0] = new Reference('debug.event_dispatcher');
-            $arguments[2] = new Reference('debug.controller_resolver');
-            $definition->setArguments($arguments);
+            $definition->replaceArgument(2, new Reference('debug.controller_resolver'));
+
+            // replace the regular event_dispatcher service with the debug one
+            $definition = $container->findDefinition('event_dispatcher');
+            $definition->setPublic(false);
+            $container->setDefinition('debug.event_dispatcher.parent', $definition);
+            $container->setAlias('event_dispatcher', 'debug.event_dispatcher');
         }
 
         $configuration = $this->getConfiguration($configs, $container);

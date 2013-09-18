@@ -1,0 +1,42 @@
+---------------------------------------------------------------------------
+
+by WouterJ at 2013-08-20T09:39:31Z
+
+I fixed the comments and added support for comments in XML.
+
+The only thing missing now is correct prototyped arrays, but I don't know the correct format for that. Can someone confirm my format is correct? Or can someone provide a correct format?
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2013-09-09T15:13:56Z
+
+I changed the example to use a more common prototype example and fixed the dumpers.
+
+@fabpot I think it's ready to merge now
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2013-09-09T18:49:43Z
+
+Thank you @stof! I've fixed most of your comments. I've also added support for enum nodes in both dumpers.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2013-09-10T08:07:16Z
+
+I did some more stuff:
+
+ - Added namespace support
+ - Added (failing) test for array prototypes without a key
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2013-09-17T15:56:09Z
+
+@fabpot I think I'm done now. The only problem is rendering the prototype values in Yaml. The Dumper needs an almost complete rewrite to fix that test and that's out of scope for this PR. I've marked the test for the YamlDumper as incomplete, so we can still safely merge this PR for 2.4.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2013-09-17T15:56:32Z
+
+btw, the test failure is just a random symfony failure which has nothing to do with this PR

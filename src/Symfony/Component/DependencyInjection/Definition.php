@@ -38,6 +38,7 @@ class Definition
     private $abstract;
     private $synchronized;
     private $lazy;
+    private $decoratedService;
 
     protected $arguments;
 
@@ -62,6 +63,20 @@ class Definition
         $this->lazy = false;
         $this->abstract = false;
         $this->properties = array();
+    }
+
+    public function setDecoratedService($id, $renamedId = null)
+    {
+        if ($renamedId && $id == $renamedId) {
+            throw new \LogicException(sprintf('The decorated service parent name for "%s" must be different than the service name itself.', $id));
+        }
+
+        $this->decoratedService = array($id, $renamedId);
+    }
+
+    public function getDecoratedService()
+    {
+        return $this->decoratedService;
     }
 
     /**

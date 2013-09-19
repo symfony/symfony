@@ -216,6 +216,7 @@ class FrameworkExtension extends Extension
             return;
         }
 
+        $loader->load('form_debug.xml');
         $loader->load('profiling.xml');
         $loader->load('collectors.xml');
 

@@ -109,7 +109,7 @@ class Crawler extends \SplObjectStorage
             $charset = $matches[1];
         }
 
-        if ($charset === null) {
+        if (null === $charset) {
             $charset = 'ISO-8859-1';
         }
 

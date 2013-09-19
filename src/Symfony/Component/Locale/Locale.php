@@ -94,11 +94,8 @@ class Locale extends \Locale
      * Returns all available language codes
      *
      * @return array              The language codes
-<<<<<<< HEAD
+     *
      * @throws \RuntimeException  When the resource bundles cannot be loaded
-=======
-     * @throws \RuntimeException   When the resource bundles cannot be loaded
->>>>>>> 2.2
      */
     public static function getLanguages()
     {
@@ -127,11 +124,8 @@ class Locale extends \Locale
      * Returns all available locale codes
      *
      * @return array              The locale codes
-<<<<<<< HEAD
+     *
      * @throws \RuntimeException  When the resource bundles cannot be loaded
-=======
-     * @throws \RuntimeException   When the resource bundles cannot be loaded
->>>>>>> 2.2
      */
     public static function getLocales()
     {
@@ -182,14 +176,9 @@ class Locale extends \Locale
     /**
      * Returns the fallback locale for a given locale, if any
      *
-<<<<<<< HEAD
      * @param string $locale The locale to find the fallback for.
      *
      * @return string|null The fallback locale, or null if no parent exists
-=======
-     * @param string $locale      The locale to find the fallback for
-     * @return string|null        The fallback locale, or null if no parent exists
->>>>>>> 2.2
      */
     protected static function getFallbackLocale($locale)
     {

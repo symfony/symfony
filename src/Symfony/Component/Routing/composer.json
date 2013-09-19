@@ -21,6 +21,7 @@
     "require-dev": {
         "symfony/config": "~2.2",
         "symfony/yaml": "~2.0",
+        "symfony/expression-language": "~2.4",
         "doctrine/common": "~2.2",
         "psr/log": "~1.0"
     },

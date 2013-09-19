@@ -28,6 +28,7 @@ class Route
     private $host;
     private $methods;
     private $schemes;
+    private $condition;
 
     /**
      * Constructor.
@@ -152,5 +153,15 @@ class Route
     public function getMethods()
     {
         return $this->methods;
+    }
+
+    public function setCondition($condition)
+    {
+        $this->condition = $condition;
+    }
+
+    public function getCondition()
+    {
+        return $this->condition;
     }
 }

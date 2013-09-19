@@ -4,7 +4,8 @@ CHANGELOG
 2.4.0
 -----
 
-  * added `minRatio`, `maxRatio`, `allowSquare`, `allowLandscape`, and `allowPortrait` to Image validator
+ * added a constraint the uses the expression language
+ * added `minRatio`, `maxRatio`, `allowSquare`, `allowLandscape`, and `allowPortrait` to Image validator
 
 2.3.0
 -----

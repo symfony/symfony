@@ -33,6 +33,7 @@
         "symfony/doctrine-bridge": "self.version",
         "symfony/dom-crawler": "self.version",
         "symfony/event-dispatcher": "self.version",
+        "symfony/expression-language": "self.version",
         "symfony/filesystem": "self.version",
         "symfony/finder": "self.version",
         "symfony/form": "self.version",

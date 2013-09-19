@@ -15,20 +15,22 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\AbstractExtension;
 
 /**
- * DataCollectorExtension for collecting Form Validation Failures.
+ * Extension for collecting data of the forms on a page.
  *
+ * @since  2.4
  * @author Robert Schönthal <robert.schoenthal@gmail.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class DataCollectorExtension extends AbstractExtension
 {
     /**
      * @var EventSubscriberInterface
      */
-    private $eventSubscriber;
+    private $dataCollector;
 
-    public function __construct(EventSubscriberInterface $eventSubscriber)
+    public function __construct(FormDataCollectorInterface $dataCollector)
     {
-        $this->eventSubscriber = $eventSubscriber;
+        $this->dataCollector = $dataCollector;
     }
 
     /**
@@ -37,7 +39,7 @@ class DataCollectorExtension extends AbstractExtension
     protected function loadTypeExtensions()
     {
         return array(
-            new Type\DataCollectorTypeExtension($this->eventSubscriber)
+            new Type\DataCollectorTypeExtension($this->dataCollector)
         );
     }
 }

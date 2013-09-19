@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Form\Tests\Extension\DataCollector;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Extension\DataCollector\DataCollectorExtension;
 
 /**
@@ -25,14 +24,14 @@ class DataCollectorExtensionTest extends \PHPUnit_Framework_TestCase
     private $extension;
 
     /**
-     * @var EventSubscriberInterface
+     * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    private $eventSubscriber;
+    private $dataCollector;
 
     public function setUp()
     {
-        $this->eventSubscriber = $this->getMock('Symfony\Component\EventDispatcher\EventSubscriberInterface');
-        $this->extension = new DataCollectorExtension($this->eventSubscriber);
+        $this->dataCollector = $this->getMock('Symfony\Component\Form\Extension\DataCollector\FormDataCollectorInterface');
+        $this->extension = new DataCollectorExtension($this->dataCollector);
     }
 
     public function testLoadTypeExtensions()
@@ -44,4 +43,3 @@ class DataCollectorExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Symfony\Component\Form\Extension\DataCollector\Type\DataCollectorTypeExtension', array_shift($typeExtensions));
     }
 }
- 

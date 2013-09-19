@@ -11,25 +11,28 @@
 
 namespace Symfony\Component\Form\Extension\DataCollector\Type;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\AbstractTypeExtension;
+use Symfony\Component\Form\Extension\DataCollector\EventListener\DataCollectorListener;
+use Symfony\Component\Form\Extension\DataCollector\FormDataCollectorInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * DataCollector Type Extension for collecting invalid Forms.
+ * Type extension for collecting data of a form with this type.
  *
+ * @since  2.4
  * @author Robert Schönthal <robert.schoenthal@gmail.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class DataCollectorTypeExtension extends AbstractTypeExtension
 {
     /**
-     * @var EventSubscriberInterface
+     * @var \Symfony\Component\EventDispatcher\EventSubscriberInterface
      */
-    private $eventSubscriber;
+    private $listener;
 
-    public function __construct(EventSubscriberInterface $eventSubscriber)
+    public function __construct(FormDataCollectorInterface $dataCollector)
     {
-        $this->eventSubscriber = $eventSubscriber;
+        $this->listener = new DataCollectorListener($dataCollector);
     }
 
     /**
@@ -37,7 +40,7 @@ class DataCollectorTypeExtension extends AbstractTypeExtension
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber($this->eventSubscriber);
+        $builder->addEventSubscriber($this->listener);
     }
 
     /**

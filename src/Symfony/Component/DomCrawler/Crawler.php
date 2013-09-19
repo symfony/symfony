@@ -104,10 +104,9 @@ class Crawler extends \SplObjectStorage
             }
         }
 
-        if ($charset === null) {
-            if (preg_match('/\<meta[^\>]+charset *= *["\']?([a-zA-Z\-0-9]+)/i', $content, $matches)) {
-                $charset = $matches[1];
-            }
+        if (null === $charset &&
+            preg_match('/\<meta[^\>]+charset *= *["\']?([a-zA-Z\-0-9]+)/i', $content, $matches)) {
+            $charset = $matches[1];
         }
 
         if ($charset === null) {

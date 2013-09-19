@@ -43,9 +43,10 @@ class FragmentHandler
      * Constructor.
      *
      * RequestStack will become required in 3.0.
-     *
-     * @param FragmentRendererInterface[] $renderers An array of FragmentRendererInterface instances
-     * @param Boolean                     $debug     Whether the debug mode is enabled or not
+     * 
+     * @param FragmentRendererInterface[] $renderers    An array of FragmentRendererInterface instances
+     * @param Boolean                     $debug        Whether the debug mode is enabled or not
+     * @param RequestStack|null           $requestStack The Request stack that controls the lifecycle of requests
      */
     public function __construct(array $renderers = array(), $debug = false, RequestStack $requestStack = null)
     {
@@ -97,7 +98,7 @@ class FragmentHandler
      * @return string|null The Response content or null when the Response is streamed
      *
      * @throws \InvalidArgumentException when the renderer does not exist
-     * @throws \RuntimeException         when the Response is not successful
+     * @throws \LogicException           when the Request is not successful
      */
     public function render($uri, $renderer = 'inline', array $options = array())
     {

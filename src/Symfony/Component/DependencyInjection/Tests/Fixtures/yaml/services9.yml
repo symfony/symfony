@@ -38,6 +38,7 @@ services:
             - [setBar, ['@?foo2']]
             - [setBar, ['@?foo3']]
             - [setBar, ['@?foobaz']]
+            - [setBar, ['@=service("foo").foo() ~ parameter("foo")']]
 
     factory_service:
         class: Bar

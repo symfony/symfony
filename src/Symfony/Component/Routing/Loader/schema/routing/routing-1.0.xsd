@@ -29,6 +29,7 @@
       <xsd:element name="default" nillable="true" type="element" />
       <xsd:element name="requirement" type="element" />
       <xsd:element name="option" type="element" />
+      <xsd:element name="condition" type="condition" />
     </xsd:choice>
   </xsd:group>
 
@@ -61,4 +62,9 @@
       </xsd:extension>
     </xsd:simpleContent>
   </xsd:complexType>
+
+  <xsd:simpleType name="condition">
+    <xsd:restriction base="xsd:string">
+    </xsd:restriction>
+  </xsd:simpleType>
 </xsd:schema>

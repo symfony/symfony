@@ -45,6 +45,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
             $this->assertSame('RouteCompiler', $route->getOption('compiler_class'));
             $this->assertEquals(array('GET', 'POST', 'PUT', 'OPTIONS'), $route->getMethods());
             $this->assertEquals(array('https'), $route->getSchemes());
+            $this->assertEquals('context.getMethod() == "GET"', $route->getCondition());
         }
     }
 

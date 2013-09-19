@@ -169,6 +169,7 @@ class MainConfiguration implements ConfigurationInterface
                                 ->beforeNormalization()->ifString()->then(function($v) { return preg_split('/\s*,\s*/', $v); })->end()
                                 ->prototype('scalar')->end()
                             ->end()
+                            ->scalarNode('allow_if')->defaultNull()->end()
                         ->end()
                         ->fixXmlConfig('role')
                         ->children()

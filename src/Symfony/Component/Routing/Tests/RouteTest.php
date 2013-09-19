@@ -24,9 +24,10 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $route->getOption('foo'), '__construct() takes options as its fourth argument');
         $this->assertEquals('{locale}.example.com', $route->getHost(), '__construct() takes a host pattern as its fifth argument');
 
-        $route = new Route('/', array(), array(), array(), '', array('Https'), array('POST', 'put'));
+        $route = new Route('/', array(), array(), array(), '', array('Https'), array('POST', 'put'), 'context.getMethod() == "GET"');
         $this->assertEquals(array('https'), $route->getSchemes(), '__construct() takes schemes as its sixth argument and lowercases it');
         $this->assertEquals(array('POST', 'PUT'), $route->getMethods(), '__construct() takes methods as its seventh argument and uppercases it');
+        $this->assertEquals('context.getMethod() == "GET"', $route->getCondition(), '__construct() takes a condition as its eight argument');
 
         $route = new Route('/', array(), array(), array(), '', 'Https', 'Post');
         $this->assertEquals(array('https'), $route->getSchemes(), '__construct() takes a single scheme as its sixth argument');
@@ -179,6 +180,14 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('GET', $route->getRequirement('_method'));
         $route->setMethods(array());
         $this->assertNull($route->getRequirement('_method'));
+    }
+
+    public function testCondition()
+    {
+        $route = new Route('/');
+        $this->assertEquals(null, $route->getCondition());
+        $route->setCondition('context.getMethod() == "GET"');
+        $this->assertEquals('context.getMethod() == "GET"', $route->getCondition());
     }
 
     public function testCompile()

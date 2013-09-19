@@ -10,6 +10,7 @@
  */
 
 namespace Symfony\Component\Config\Definition\Builder;
+
 use Symfony\Component\Config\Definition\Exception\UnsetKeyException;
 
 /**

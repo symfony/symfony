@@ -14,5 +14,5 @@ Resources
 You can run the unit tests with the following command:
 
     $ cd path/to/Symfony/Component/Templating/
-    $ composer.phar install --dev
+    $ composer.phar install
     $ phpunit

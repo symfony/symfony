@@ -664,7 +664,7 @@ class Application
     /**
      * Renders a caught exception.
      *
-     * @param Exception       $e      An exception instance
+     * @param \Exception       $e      An exception instance
      * @param OutputInterface $output An OutputInterface instance
      */
     public function renderException($e, $output)

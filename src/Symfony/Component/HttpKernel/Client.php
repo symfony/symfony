@@ -21,6 +21,7 @@ use Symfony\Component\BrowserKit\Cookie as DomCookie;
 use Symfony\Component\BrowserKit\History;
 use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\HttpKernel\TerminableInterface;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Client simulates a browser and makes requests to a Kernel object.

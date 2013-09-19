@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor;
 
 use Symfony\Component\Console\Descriptor\DescriptorInterface;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -22,9 +23,9 @@ use Symfony\Component\Routing\RouteCollection;
 abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
 {
     /** @dataProvider getDescribeRouteCollectionTestData */
-    public function testDescribeRouteCollection(DescriptorInterface $descriptor, RouteCollection $routes, $expectedDescription)
+    public function testDescribeRouteCollection(RouteCollection $routes, $expectedDescription)
     {
-        $this->assertEquals(trim($expectedDescription), trim($descriptor->describe($routes)));
+        $this->assertDescription($expectedDescription, $routes);
     }
 
     public function getDescribeRouteCollectionTestData()
@@ -33,9 +34,9 @@ abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @dataProvider getDescribeRouteTestData */
-    public function testDescribeRoute(DescriptorInterface $descriptor, Route $route, $expectedDescription)
+    public function testDescribeRoute(Route $route, $expectedDescription)
     {
-        $this->assertEquals(trim($expectedDescription), trim($descriptor->describe($route)));
+        $this->assertDescription($expectedDescription, $route);
     }
 
     public function getDescribeRouteTestData()
@@ -44,9 +45,9 @@ abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @dataProvider getDescribeContainerParametersTestData */
-    public function testDescribeContainerParameters(DescriptorInterface $descriptor, ParameterBag $parameters, $expectedDescription)
+    public function testDescribeContainerParameters(ParameterBag $parameters, $expectedDescription)
     {
-        $this->assertEquals(trim($expectedDescription), trim($descriptor->describe($parameters)));
+        $this->assertDescription($expectedDescription, $parameters);
     }
 
     public function getDescribeContainerParametersTestData()
@@ -55,9 +56,9 @@ abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @dataProvider getDescribeContainerBuilderTestData */
-    public function testDescribeContainerBuilder(DescriptorInterface $descriptor, ContainerBuilder $builder, array $options, $expectedDescription)
+    public function testDescribeContainerBuilder(ContainerBuilder $builder, $expectedDescription, array $options)
     {
-        $this->assertEquals(trim($expectedDescription), trim($descriptor->describe($builder, $options)));
+        $this->assertDescription($expectedDescription, $builder, $options);
     }
 
     public function getDescribeContainerBuilderTestData()
@@ -66,9 +67,9 @@ abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @dataProvider getDescribeContainerDefinitionTestData */
-    public function testDescribeContainerDefinition(DescriptorInterface $descriptor, Definition $definition, $expectedDescription)
+    public function testDescribeContainerDefinition(Definition $definition, $expectedDescription)
     {
-        $this->assertEquals(trim($expectedDescription), trim($descriptor->describe($definition)));
+        $this->assertDescription($expectedDescription, $definition);
     }
 
     public function getDescribeContainerDefinitionTestData()
@@ -77,9 +78,9 @@ abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @dataProvider getDescribeContainerAliasTestData */
-    public function testDescribeContainerAlias(DescriptorInterface $descriptor, Alias $alias, $expectedDescription)
+    public function testDescribeContainerAlias(Alias $alias, $expectedDescription)
     {
-        $this->assertEquals(trim($expectedDescription), trim($descriptor->describe($alias)));
+        $this->assertDescription($expectedDescription, $alias);
     }
 
     public function getDescribeContainerAliasTestData()
@@ -90,12 +91,20 @@ abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
     abstract protected function getDescriptor();
     abstract protected function getFormat();
 
+    private function assertDescription($expectedDescription, $describedObject, array $options = array())
+    {
+        $options['raw_output'] = true;
+        $output = new BufferedOutput(BufferedOutput::VERBOSITY_NORMAL, true);
+        $this->getDescriptor()->describe($output, $describedObject, $options);
+        $this->assertEquals(trim($expectedDescription), trim(str_replace(PHP_EOL, "\n", $output->fetch())));
+    }
+
     private function getDescriptionTestData(array $objects)
     {
         $data = array();
         foreach ($objects as $name => $object) {
             $description = file_get_contents(sprintf('%s/../../Fixtures/Descriptor/%s.%s', __DIR__, $name, $this->getFormat()));
-            $data[] = array($this->getDescriptor(), $object, $description);
+            $data[] = array($object, $description);
         }
 
         return $data;
@@ -114,7 +123,7 @@ abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
         foreach ($objects as $name => $object) {
             foreach ($variations as $suffix => $options) {
                 $description = file_get_contents(sprintf('%s/../../Fixtures/Descriptor/%s_%s.%s', __DIR__, $name, $suffix, $this->getFormat()));
-                $data[] = array($this->getDescriptor(), $object, $options, $description);
+                $data[] = array($object, $description, $options);
             }
         }
 

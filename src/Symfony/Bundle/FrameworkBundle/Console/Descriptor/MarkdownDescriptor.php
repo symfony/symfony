@@ -19,12 +19,15 @@ class MarkdownDescriptor extends Descriptor
      */
     protected function describeRouteCollection(RouteCollection $routes, array $options = array())
     {
-        $outputs = array();
+        $first = true;
         foreach ($routes->all() as $name => $route) {
-            $outputs[] = $this->describeRoute($route, array('name' => $name));
+            if ($first) {
+                $first = false;
+            } else {
+                $this->write("\n\n");
+            }
+            $this->describeRoute($route, array('name' => $name));
         }
-
-        return implode("\n\n", $outputs);
     }
 
     /**
@@ -45,9 +48,9 @@ class MarkdownDescriptor extends Descriptor
             ."\n".'- Options: '.$this->formatRouterConfig($route->getOptions())
             ."\n".'- Path-Regex: '.$route->compile()->getRegex();
 
-        return isset($options['name'])
+        $this->write(isset($options['name'])
             ? $options['name']."\n".str_repeat('-', strlen($options['name']))."\n".$output
-            : $output;
+            : $output);
     }
 
     /**
@@ -55,12 +58,10 @@ class MarkdownDescriptor extends Descriptor
      */
     protected function describeContainerParameters(ParameterBag $parameters, array $options = array())
     {
-        $output = "Container parameters\n====================\n";
+        $this->write("Container parameters\n====================\n");
         foreach ($this->sortParameters($parameters) as $key => $value) {
-            $output .= sprintf("\n- `%s`: `%s`", $key, $this->formatParameter($value));
+            $this->write(sprintf("\n- `%s`: `%s`", $key, $this->formatParameter($value)));
         }
-
-        return $output;
     }
 
     /**
@@ -69,17 +70,15 @@ class MarkdownDescriptor extends Descriptor
     protected function describeContainerTags(ContainerBuilder $builder, array $options = array())
     {
         $showPrivate = isset($options['show_private']) && $options['show_private'];
-        $output = "Container tags\n==============";
+        $this->write("Container tags\n==============");
 
         foreach ($this->findDefinitionsByTag($builder, $showPrivate) as $tag => $definitions) {
-            $output .= "\n\n".$tag."\n".str_repeat('-', strlen($tag));
+            $this->write("\n\n".$tag."\n".str_repeat('-', strlen($tag)));
             foreach ($definitions as $serviceId => $definition) {
-                $output .= "\n\n";
-                $output .= $this->describeContainerDefinition($definition, array('omit_tags' => true, 'id' => $serviceId));
+                $this->write("\n\n");
+                $this->describeContainerDefinition($definition, array('omit_tags' => true, 'id' => $serviceId));
             }
         }
-
-        return $output;
     }
 
     /**
@@ -94,14 +93,12 @@ class MarkdownDescriptor extends Descriptor
         $childOptions = array('id' => $options['id'], 'as_array' => true);
 
         if ($service instanceof Alias) {
-            return $this->describeContainerAlias($service, $childOptions);
+            $this->describeContainerAlias($service, $childOptions);
+        } elseif ($service instanceof Definition) {
+            $this->describeContainerDefinition($service, $childOptions);
+        } else {
+            $this->write(sprintf("**`%s`:** `%s`", $options['id'], get_class($service)));
         }
-
-        if ($service instanceof Definition) {
-            return $this->describeContainerDefinition($service, $childOptions);
-        }
-
-        return sprintf("**`%s`:** `%s`", $options['id'], get_class($service));
     }
 
     /**
@@ -115,35 +112,49 @@ class MarkdownDescriptor extends Descriptor
         if (isset($options['tag'])) {
             $title .= ' with tag `'.$options['tag'].'`';
         }
-        $title .= "\n".str_repeat('=', strlen($title));
+        $this->write($title."\n".str_repeat('=', strlen($title)));
 
         $serviceIds = isset($options['tag']) && $options['tag'] ? array_keys($builder->findTaggedServiceIds($options['tag'])) : $builder->getServiceIds();
         $showPrivate = isset($options['show_private']) && $options['show_private'];
-        $output = array('definitions' => array(), 'aliases' => array(), 'services' => array());
+        $services = array('definitions' => array(), 'aliases' => array(), 'services' => array());
 
         foreach ($this->sortServiceIds($serviceIds) as $serviceId) {
             $service = $this->resolveServiceDefinition($builder, $serviceId);
-            $childOptions = array('id' => $serviceId);
 
             if ($service instanceof Alias) {
-                $output['aliases'][] = $this->describeContainerAlias($service, $childOptions);
+                $services['aliases'][$serviceId] = $service;
             } elseif ($service instanceof Definition) {
                 if (($showPrivate || $service->isPublic())) {
-                    $output['definitions'][] = $this->describeContainerDefinition($service, $childOptions);
+                    $services['definitions'][$serviceId] = $service;
                 }
             } else {
-                $output['services'][] = sprintf('- `%s`: `%s`', $serviceId, get_class($service));
+                $services['services'][$serviceId] = $service;
             }
         }
 
-        $format = function ($items, $title) {
-            return empty($items) ? '' : "\n\n".$title."\n".str_repeat('-', strlen($title))."\n\n".implode("\n\n", $items);
-        };
+        if (!empty($services['definitions'])) {
+            $this->write("\n\nDefinitions\n-----------");
+            foreach ($services['definitions'] as $id => $service) {
+                $this->write("\n\n");
+                $this->describeContainerDefinition($service, array('id' => $id));
+            }
+        }
 
-        return $title
-            .$format($output['definitions'], 'Definitions')
-            .$format($output['aliases'], 'Aliases')
-            .$format($output['services'], 'Services');
+        if (!empty($services['aliases'])) {
+            $this->write("\n\nAliases\n-------");
+            foreach ($services['aliases'] as $id => $service) {
+                $this->write("\n\n");
+                $this->describeContainerAlias($service, array('id' => $id));
+            }
+        }
+
+        if (!empty($services['services'])) {
+            $this->write("\n\nServices\n--------\n");
+            foreach ($services['services'] as $id => $service) {
+                $this->write("\n");
+                $this->write(sprintf('- `%s`: `%s`', $id, get_class($service)));
+            }
+        }
     }
 
     /**
@@ -171,7 +182,7 @@ class MarkdownDescriptor extends Descriptor
             }
         }
 
-        return isset($options['id']) ? sprintf("**`%s`:**\n%s", $options['id'], $output) : $output;
+        $this->write(isset($options['id']) ? sprintf("**`%s`:**\n%s", $options['id'], $output) : $output);
     }
 
     /**
@@ -182,7 +193,7 @@ class MarkdownDescriptor extends Descriptor
         $output = '- Service: `'.$alias.'`'
             ."\n".'- Public: '.($alias->isPublic() ? 'yes' : 'no');
 
-        return isset($options['id']) ? sprintf("**`%s`:**\n%s", $options['id'], $output) : $output;
+        $this->write(isset($options['id']) ? sprintf("**`%s`:**\n%s", $options['id'], $output) : $output);
     }
 
     private function formatRouterConfig(array $array)

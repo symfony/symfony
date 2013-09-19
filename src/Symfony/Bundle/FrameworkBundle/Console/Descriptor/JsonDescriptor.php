@@ -21,10 +21,10 @@ class JsonDescriptor extends Descriptor
     {
         $data = array();
         foreach ($routes->all() as $name => $route) {
-            $data[$name] = $this->describeRoute($route, array('as_array' => true));
+            $data[$name] = $this->getRouteData($route);
         }
 
-        return $this->output($data, $options);
+        $this->writeData($data, $options);
     }
 
     /**
@@ -32,20 +32,7 @@ class JsonDescriptor extends Descriptor
      */
     protected function describeRoute(Route $route, array $options = array())
     {
-        $requirements = $route->getRequirements();
-        unset($requirements['_scheme'], $requirements['_method']);
-
-        return $this->output(array(
-            'path'         => $route->getPath(),
-            'host'         => '' !== $route->getHost() ? $route->getHost() : 'ANY',
-            'scheme'       => $route->getSchemes() ? implode('|', $route->getSchemes()) : 'ANY',
-            'method'       => $route->getMethods() ? implode('|', $route->getMethods()) : 'ANY',
-            'class'        => get_class($route),
-            'defaults'     => $route->getDefaults(),
-            'requirements' => $requirements ?: 'NO CUSTOM',
-            'options'      => $route->getOptions(),
-            'pathRegex'    => $route->compile()->getRegex(),
-        ), $options);
+        $this->writeData($this->getRouteData($route), $options);
     }
 
     /**
@@ -53,7 +40,7 @@ class JsonDescriptor extends Descriptor
      */
     protected function describeContainerParameters(ParameterBag $parameters, array $options = array())
     {
-        return $this->output($this->sortParameters($parameters), $options);
+        $this->writeData($this->sortParameters($parameters), $options);
     }
 
     /**
@@ -62,16 +49,16 @@ class JsonDescriptor extends Descriptor
     protected function describeContainerTags(ContainerBuilder $builder, array $options = array())
     {
         $showPrivate = isset($options['show_private']) && $options['show_private'];
-        $output = array();
+        $data = array();
 
         foreach ($this->findDefinitionsByTag($builder, $showPrivate) as $tag => $definitions) {
-            $output[$tag] = array();
-            foreach ($definitions as $serviceId => $definition) {
-                $output[$tag][] = $this->describeContainerDefinition($definition, array('as_array' => true, 'omit_tags' => true, 'id' => $serviceId));
+            $data[$tag] = array();
+            foreach ($definitions as $definition) {
+                $data[$tag][] = $this->getContainerDefinitionData($definition, true);
             }
         }
 
-        return $this->output($output, $options);
+        $this->writeData($data, $options);
     }
 
     /**
@@ -83,17 +70,13 @@ class JsonDescriptor extends Descriptor
             throw new \InvalidArgumentException('An "id" option must be provided.');
         }
 
-        $childOptions = array('id' => $options['id'], 'as_array' => true);
-
         if ($service instanceof Alias) {
-            return $this->output($this->describeContainerAlias($service, $childOptions), $options);
+            $this->writeData($this->getContainerAliasData($service), $options);
+        } elseif ($service instanceof Definition) {
+            $this->writeData($this->getContainerDefinitionData($service), $options);
+        } else {
+            $this->writeData(get_class($service), $options);
         }
-
-        if ($service instanceof Definition) {
-            return $this->output($this->describeContainerDefinition($service, $childOptions), $options);
-        }
-
-        return $this->output(get_class($service), $options);
     }
 
     /**
@@ -103,24 +86,23 @@ class JsonDescriptor extends Descriptor
     {
         $serviceIds = isset($options['tag']) && $options['tag'] ? array_keys($builder->findTaggedServiceIds($options['tag'])) : $builder->getServiceIds();
         $showPrivate = isset($options['show_private']) && $options['show_private'];
-        $output = array('definitions' => array(), 'aliases' => array(), 'services' => array());
+        $data = array('definitions' => array(), 'aliases' => array(), 'services' => array());
 
         foreach ($this->sortServiceIds($serviceIds) as $serviceId) {
             $service = $this->resolveServiceDefinition($builder, $serviceId);
-            $childOptions = array('as_array' => true);
 
             if ($service instanceof Alias) {
-                $output['aliases'][$serviceId] = $this->describeContainerAlias($service, $childOptions);
+                $data['aliases'][$serviceId] = $this->getContainerAliasData($service);
             } elseif ($service instanceof Definition) {
                 if (($showPrivate || $service->isPublic())) {
-                    $output['definitions'][$serviceId] = $this->describeContainerDefinition($service, $childOptions);
+                    $data['definitions'][$serviceId] = $this->getContainerDefinitionData($service);
                 }
             } else {
-                $output['services'][$serviceId] = get_class($service);
+                $data['services'][$serviceId] = get_class($service);
             }
         }
 
-        return $this->output($output, $options);
+        $this->writeData($data, $options);
     }
 
     /**
@@ -128,26 +110,7 @@ class JsonDescriptor extends Descriptor
      */
     protected function describeContainerDefinition(Definition $definition, array $options = array())
     {
-        $output = array(
-            'class'     => (string) $definition->getClass(),
-            'scope'     => $definition->getScope(),
-            'public'    => $definition->isPublic(),
-            'synthetic' => $definition->isSynthetic(),
-            'file'      => $definition->getFile(),
-        );
-
-        if (!(isset($options['omit_tags']) && $options['omit_tags'])) {
-            $output['tags'] = array();
-            if (count($definition->getTags())) {
-                foreach ($definition->getTags() as $tagName => $tagData) {
-                    foreach ($tagData as $parameters) {
-                        $output['tags'][] = array('name' => $tagName, 'parameters' => $parameters);
-                    }
-                }
-            }
-        }
-
-        return $this->output($output, $options);
+        $this->writeData($this->getContainerDefinitionData($definition, isset($options['omit_tags']) && $options['omit_tags']), $options);
     }
 
     /**
@@ -155,26 +118,85 @@ class JsonDescriptor extends Descriptor
      */
     protected function describeContainerAlias(Alias $alias, array $options = array())
     {
-        return $this->output(array(
-            'service' => (string) $alias,
-            'public'  => $alias->isPublic(),
-        ), $options);
+        $this->writeData($this->getContainerAliasData($alias), $options);
     }
 
     /**
-     * Outputs data as array or string according to options.
+     * Writes data as json.
      *
      * @param array $data
      * @param array $options
      *
      * @return array|string
      */
-    private function output(array $data, array $options)
+    private function writeData(array $data, array $options)
     {
-        if (isset($options['as_array']) && $options['as_array']) {
-            return $data;
+        $this->write(json_encode($data, isset($options['json_encoding']) ? $options['json_encoding'] : 0));
+    }
+
+    /**
+     * @param Route $route
+     *
+     * @return array
+     */
+    protected function getRouteData(Route $route)
+    {
+        $requirements = $route->getRequirements();
+        unset($requirements['_scheme'], $requirements['_method']);
+
+        return array(
+            'path'         => $route->getPath(),
+            'host'         => '' !== $route->getHost() ? $route->getHost() : 'ANY',
+            'scheme'       => $route->getSchemes() ? implode('|', $route->getSchemes()) : 'ANY',
+            'method'       => $route->getMethods() ? implode('|', $route->getMethods()) : 'ANY',
+            'class'        => get_class($route),
+            'defaults'     => $route->getDefaults(),
+            'requirements' => $requirements ?: 'NO CUSTOM',
+            'options'      => $route->getOptions(),
+            'pathRegex'    => $route->compile()->getRegex(),
+        );
+    }
+
+    /**
+     * @param Definition $definition
+     * @param boolean    $omitTags
+     *
+     * @return array
+     */
+    private function getContainerDefinitionData(Definition $definition, $omitTags = false)
+    {
+        $data = array(
+            'class'     => (string) $definition->getClass(),
+            'scope'     => $definition->getScope(),
+            'public'    => $definition->isPublic(),
+            'synthetic' => $definition->isSynthetic(),
+            'file'      => $definition->getFile(),
+        );
+
+        if (!$omitTags) {
+            $data['tags'] = array();
+            if (count($definition->getTags())) {
+                foreach ($definition->getTags() as $tagName => $tagData) {
+                    foreach ($tagData as $parameters) {
+                        $data['tags'][] = array('name' => $tagName, 'parameters' => $parameters);
+                    }
+                }
+            }
         }
 
-        return json_encode($data, isset($options['json_encoding']) ? $options['json_encoding'] : 0);
+        return $data;
+    }
+
+    /**
+     * @param Alias $alias
+     *
+     * @return array
+     */
+    private function getContainerAliasData(Alias $alias)
+    {
+        return array(
+            'service' => (string) $alias,
+            'public'  => $alias->isPublic(),
+        );
     }
 }

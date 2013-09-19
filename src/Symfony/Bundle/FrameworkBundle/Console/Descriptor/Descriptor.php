@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Console\Descriptor;
 
 use Symfony\Component\Console\Descriptor\DescriptorInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -25,32 +26,59 @@ use Symfony\Component\Routing\RouteCollection;
 abstract class Descriptor implements DescriptorInterface
 {
     /**
+     * @var OutputInterface
+     */
+    private $output;
+
+    /**
      * {@inheritdoc}
      */
-    public function describe($object, array $options = array())
+    public function describe(OutputInterface $output, $object, array $options = array())
     {
+        $this->output = $output;
+
         switch (true) {
             case $object instanceof RouteCollection:
-                return $this->describeRouteCollection($object, $options);
+                $this->describeRouteCollection($object, $options);
+                break;
             case $object instanceof Route:
-                return $this->describeRoute($object, $options);
+                $this->describeRoute($object, $options);
+                break;
             case $object instanceof ParameterBag:
-                return $this->describeContainerParameters($object, $options);
+                $this->describeContainerParameters($object, $options);
+                break;
             case $object instanceof ContainerBuilder && isset($options['group_by']) && 'tags' === $options['group_by']:
-                return $this->describeContainerTags($object, $options);
+                $this->describeContainerTags($object, $options);
+                break;
             case $object instanceof ContainerBuilder && isset($options['id']):
-                return $this->describeContainerService($this->resolveServiceDefinition($object, $options['id']), $options);
+                $this->describeContainerService($this->resolveServiceDefinition($object, $options['id']), $options);
+                break;
             case $object instanceof ContainerBuilder && isset($options['parameter']):
-                return $this->formatParameter($object->getParameter($options['parameter']));
+                $this->formatParameter($object->getParameter($options['parameter']));
+                break;
             case $object instanceof ContainerBuilder:
-                return $this->describeContainerServices($object, $options);
+                $this->describeContainerServices($object, $options);
+                break;
             case $object instanceof Definition:
-                return $this->describeContainerDefinition($object, $options);
+                $this->describeContainerDefinition($object, $options);
+                break;
             case $object instanceof Alias:
-                return $this->describeContainerAlias($object, $options);
+                $this->describeContainerAlias($object, $options);
+                break;
+            default:
+                throw new \InvalidArgumentException(sprintf('Object of type "%s" is not describable.', get_class($object)));
         }
+    }
 
-        throw new \InvalidArgumentException(sprintf('Object of type "%s" is not describable.', get_class($object)));
+    /**
+     * Writes content to output.
+     *
+     * @param string  $content
+     * @param boolean $decorated
+     */
+    protected function write($content, $decorated = false)
+    {
+        $this->output->write($content, false, $decorated ? OutputInterface::OUTPUT_NORMAL : OutputInterface::OUTPUT_RAW);
     }
 
     /**
@@ -58,8 +86,6 @@ abstract class Descriptor implements DescriptorInterface
      *
      * @param RouteCollection $routes
      * @param array           $options
-     *
-     * @return string|mixed
      */
     abstract protected function describeRouteCollection(RouteCollection $routes, array $options = array());
 
@@ -68,8 +94,6 @@ abstract class Descriptor implements DescriptorInterface
      *
      * @param Route $route
      * @param array $options
-     *
-     * @return string|mixed
      */
     abstract protected function describeRoute(Route $route, array $options = array());
 
@@ -78,8 +102,6 @@ abstract class Descriptor implements DescriptorInterface
      *
      * @param ParameterBag $parameters
      * @param array        $options
-     *
-     * @return string|mixed
      */
     abstract protected function describeContainerParameters(ParameterBag $parameters, array $options = array());
 
@@ -88,8 +110,6 @@ abstract class Descriptor implements DescriptorInterface
      *
      * @param ContainerBuilder $builder
      * @param array            $options
-     *
-     * @return string|mixed
      */
     abstract protected function describeContainerTags(ContainerBuilder $builder, array $options = array());
 
@@ -101,8 +121,6 @@ abstract class Descriptor implements DescriptorInterface
      *
      * @param Definition|Alias|object $service
      * @param array                   $options
-     *
-     * @return string|mixed
      */
     abstract protected function describeContainerService($service, array $options = array());
 
@@ -114,8 +132,6 @@ abstract class Descriptor implements DescriptorInterface
      *
      * @param ContainerBuilder $builder
      * @param array            $options
-     *
-     * @return string|mixed
      */
     abstract protected function describeContainerServices(ContainerBuilder $builder, array $options = array());
 
@@ -124,8 +140,6 @@ abstract class Descriptor implements DescriptorInterface
      *
      * @param Definition $definition
      * @param array      $options
-     *
-     * @return string|mixed
      */
     abstract protected function describeContainerDefinition(Definition $definition, array $options = array());
 
@@ -134,8 +148,6 @@ abstract class Descriptor implements DescriptorInterface
      *
      * @param Alias $alias
      * @param array $options
-     *
-     * @return string|mixed
      */
     abstract protected function describeContainerAlias(Alias $alias, array $options = array());
 

@@ -11,6 +11,11 @@
 
 namespace Symfony\Component\Console\Input;
 
+if (!defined('JSON_UNESCAPED_UNICODE')) {
+    define('JSON_UNESCAPED_SLASHES', 64);
+    define('JSON_UNESCAPED_UNICODE', 256);
+}
+
 /**
  * A InputDefinition represents a set of valid command line arguments and options.
  *

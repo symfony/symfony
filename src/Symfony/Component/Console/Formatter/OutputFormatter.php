@@ -45,7 +45,7 @@ class OutputFormatter implements OutputFormatterInterface
      * Initializes console output formatter.
      *
      * @param Boolean          $decorated Whether this formatter should actually decorate strings
-     * @param FormatterStyle[] $styles    Array of "name => FormatterStyle" instances
+     * @param OutputFormatterStyleInterface[] $styles    Array of "name => FormatterStyle" instances
      *
      * @api
      */

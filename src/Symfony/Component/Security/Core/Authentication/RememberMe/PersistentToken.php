@@ -100,7 +100,7 @@ final class PersistentToken implements PersistentTokenInterface
     /**
      * Returns the time the token was last used
      *
-     * @return DateTime
+     * @return \DateTime
      */
     public function getLastUsed()
     {

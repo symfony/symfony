@@ -148,7 +148,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
     }
 
     /**
-     * @param DOMNode $node
+     * @param \DOMNode $node
      * @param string  $val
      *
      * @return Boolean

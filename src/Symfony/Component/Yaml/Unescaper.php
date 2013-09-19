@@ -130,7 +130,7 @@ class Unescaper
      *
      * @return string The string with the new encoding
      *
-     * @throws RuntimeException if no suitable encoding function is found (iconv or mbstring)
+     * @throws \RuntimeException if no suitable encoding function is found (iconv or mbstring)
      */
     private function convertEncoding($value, $to, $from)
     {
@@ -140,6 +140,6 @@ class Unescaper
             return iconv($from, $to, $value);
         }
 
-        throw new RuntimeException('No suitable convert encoding function (install the iconv or mbstring extension).');
+        throw new \RuntimeException('No suitable convert encoding function (install the iconv or mbstring extension).');
     }
 }

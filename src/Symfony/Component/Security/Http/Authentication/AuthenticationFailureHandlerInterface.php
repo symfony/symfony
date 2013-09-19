@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Http\Authentication;
 
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Interface for custom authentication failure handlers.

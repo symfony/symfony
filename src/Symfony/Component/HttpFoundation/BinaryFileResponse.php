@@ -34,7 +34,7 @@ class BinaryFileResponse extends Response
     /**
      * Constructor.
      *
-     * @param SplFileInfo|string $file               The file to stream
+     * @param \SplFileInfo|string $file               The file to stream
      * @param integer            $status             The response status code
      * @param array              $headers            An array of response headers
      * @param boolean            $public             Files are public by default
@@ -64,7 +64,7 @@ class BinaryFileResponse extends Response
     /**
      * Sets the file to stream.
      *
-     * @param SplFileInfo|string $file The file to stream
+     * @param \SplFileInfo|string $file The file to stream
      * @param string             $contentDisposition
      * @param Boolean            $autoEtag
      * @param Boolean            $autoLastModified

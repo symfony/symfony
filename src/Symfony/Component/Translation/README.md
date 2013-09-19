@@ -31,5 +31,5 @@ http://symfony.com/doc/2.3/book/translation.html
 You can run the unit tests with the following command:
 
     $ cd path/to/Symfony/Component/Translation/
-    $ composer.phar install --dev
+    $ composer.phar install
     $ phpunit

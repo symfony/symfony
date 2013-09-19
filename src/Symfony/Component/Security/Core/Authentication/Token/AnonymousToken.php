@@ -10,6 +10,7 @@
  */
 
 namespace Symfony\Component\Security\Core\Authentication\Token;
+
 use Symfony\Component\Security\Core\Role\RoleInterface;
 
 /**

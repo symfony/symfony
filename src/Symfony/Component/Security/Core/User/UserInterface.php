@@ -10,6 +10,7 @@
  */
 
 namespace Symfony\Component\Security\Core\User;
+
 use Symfony\Component\Security\Core\Role\Role;
 
 /**

@@ -81,6 +81,10 @@ class RegisterListenersPassTest extends \PHPUnit_Framework_TestCase
             ->will($this->onConsecutiveCalls(array(), $services));
 
         $builder->expects($this->atLeastOnce())
+            ->method('getDefinition')
+            ->will($this->returnValue($definition));
+
+        $builder->expects($this->atLeastOnce())
             ->method('findDefinition')
             ->will($this->returnValue($definition));
 

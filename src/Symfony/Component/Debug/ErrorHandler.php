@@ -58,7 +58,7 @@ class ErrorHandler
      * @param integer $level The level at which the conversion to Exception is done (null to use the error_reporting() value and 0 to disable)
      * @param Boolean $displayErrors Display errors (for dev environment) or just log they (production usage)
      *
-     * @return The registered error handler
+     * @return ErrorHandler The registered error handler
      */
     public static function register($level = null, $displayErrors = true)
     {

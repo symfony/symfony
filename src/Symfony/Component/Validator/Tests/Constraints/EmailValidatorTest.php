@@ -100,7 +100,19 @@ class EmailValidatorTest extends \PHPUnit_Framework_TestCase
             array('example'),
             array('example@'),
             array('example@localhost'),
-            array('example@example.com@example.com'),
         );
+    }
+
+    /**
+     * testStrict
+     * For more tests see
+     * https://github.com/egulias/EmailValidator/blob/master/tests/egulias/Tests/EmailValidator/EmailValidatorTest.php
+     */
+    public function testStrict()
+    {
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
+        $this->validator->validate('example@localhost', new Email(array('strict' => true)));
     }
 }

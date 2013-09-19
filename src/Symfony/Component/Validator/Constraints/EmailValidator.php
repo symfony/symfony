@@ -36,17 +36,20 @@ class EmailValidator extends ConstraintValidator
         }
 
         $value = (string) $value;
-        $valid = filter_var($value, FILTER_VALIDATE_EMAIL);
 
-        if ($valid) {
+        if ($constraint->strict === true && class_exists('\Egulias\EmailValidator\EmailValidator')) {
+            $strictValidator = new \Egulias\EmailValidator\EmailValidator();
+            $valid = $strictValidator->isValid($value, $constraint->checkMX);
+        } elseif ($constraint->strict === true) {
+            throw new \RuntimeException('Strict email validation requires egulias/email-validator');
+        } else {
+            $valid = preg_match('/.+\@.+\..+/', $value);
+        }
+
+        if ($valid && $constraint->checkHost) {
             $host = substr($value, strpos($value, '@') + 1);
-
             // Check for host DNS resource records
-            if ($valid && $constraint->checkMX) {
-                $valid = $this->checkMX($host);
-            } elseif ($valid && $constraint->checkHost) {
-                $valid = $this->checkHost($host);
-            }
+            $valid = $this->checkHost($host);
         }
 
         if (!$valid) {
@@ -54,17 +57,6 @@ class EmailValidator extends ConstraintValidator
         }
     }
 
-    /**
-     * Check DNS Records for MX type.
-     *
-     * @param string $host Host
-     *
-     * @return Boolean
-     */
-    private function checkMX($host)
-    {
-        return checkdnsrr($host, 'MX');
-    }
 
     /**
      * Check if one of MX, A or AAAA DNS RR exists.

@@ -16,7 +16,7 @@ namespace Symfony\Component\ExpressionLanguage;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Expression
+class Expression implements \Serializable
 {
     protected $expression;
 
@@ -38,5 +38,25 @@ class Expression
     public function __toString()
     {
         return $this->expression;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function serialize()
+    {
+        return serialize(array(
+            $this->expression,
+        ));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function unserialize($serialized)
+    {
+        list(
+            $this->expression
+        ) = unserialize($serialized);
     }
 }

@@ -18,7 +18,7 @@ use Symfony\Component\ExpressionLanguage\Compiler;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Node
+class Node implements \Serializable
 {
     public $nodes = array();
     public $attributes = array();
@@ -74,5 +74,27 @@ class Node
         }
 
         return $results;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function serialize()
+    {
+        return serialize(array(
+            $this->nodes,
+            $this->attributes,
+        ));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function unserialize($serialized)
+    {
+        list(
+            $this->nodes,
+            $this->attributes
+        ) = unserialize($serialized);
     }
 }

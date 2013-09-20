@@ -39,4 +39,28 @@ class ParsedExpression extends Expression
     {
         return $this->nodes;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function serialize()
+    {
+        return serialize(array(
+            $this->nodes,
+            parent::serialize(),
+        ));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function unserialize($serialized)
+    {
+        list(
+            $this->nodes,
+            $parentStr
+        ) = unserialize($serialized);
+
+        parent::unserialize($parentStr);
+    }
 }

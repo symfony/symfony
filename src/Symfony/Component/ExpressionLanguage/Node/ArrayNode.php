@@ -82,4 +82,28 @@ class ArrayNode extends Node
             $compiler->compile($pair['value']);
         }
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function serialize()
+    {
+        return serialize(array(
+            $this->index,
+            parent::serialize(),
+        ));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function unserialize($serialized)
+    {
+        list(
+            $this->index,
+            $parentStr
+        ) = unserialize($serialized);
+
+        parent::unserialize($parentStr);
+    }
 }

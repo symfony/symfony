@@ -82,14 +82,21 @@ class ExpressionLanguage
         return $this->cache[$key];
     }
 
-    public function addFunction($name, $compiler, $evaluator)
+    /**
+     * Registers a function.
+     *
+     * @param string   $name      The function name
+     * @param callable $compiler  A callable able to compile the function
+     * @param callable $evaluator A callable able to evaluate the function
+     */
+    public function register($name, $compiler, $evaluator)
     {
         $this->functions[$name] = array('compiler' => $compiler, 'evaluator' => $evaluator);
     }
 
     protected function registerFunctions()
     {
-        $this->addFunction('constant', function ($constant) {
+        $this->register('constant', function ($constant) {
             return sprintf('constant(%s)', $constant);
         }, function (array $values, $constant) {
             return constant($constant);

@@ -3,35 +3,37 @@ ExpressionLanguage Component
 
 The ExpressionLanguage component provides an engine that can compile and
 evaluate expressions:
+```php
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
-    use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+$language = new ExpressionLanguage();
 
-    $language = new ExpressionLanguage();
+echo $language->evaluate('1 + foo', array('foo' => 2));
+// would output 3
 
-    echo $language->evaluate('1 + foo', array('foo' => 2));
-    // would output 3
-
-    echo $language->compile('1 + foo');
-    // would output (1 + $foo)
+echo $language->compile('1 + foo');
+// would output (1 + $foo)
+```
 
 By default, the engine implements simple math and logic functions, method
 calls, property accesses, and array accesses.
 
 You can extend your DSL with functions:
+```php
+$compiler = function ($arg) {
+    return sprintf('strtoupper(%s)', $arg);
+};
+$evaluator = function (array $variables, $value) {
+    return strtoupper($value);
+};
+$language->addFunction('upper', $compiler, $evaluator);
 
-    $compiler = function ($arg) {
-        return sprintf('strtoupper(%s)', $arg);
-    };
-    $evaluator = function (array $variables, $value) {
-        return strtoupper($value);
-    };
-    $language->addFunction('upper', $compiler, $evaluator);
+echo $language->evaluate('"foo" ~ upper(foo)', array('foo' => 'bar'));
+// would output fooBAR
 
-    echo $language->evaluate('"foo" ~ upper(foo)', array('foo' => 'bar'));
-    // would output fooBAR
-
-    echo $language->compile('"foo" ~ upper(foo)');
-    // would output ("foo" . strtoupper($foo))
+echo $language->compile('"foo" ~ upper(foo)');
+// would output ("foo" . strtoupper($foo))
+```
 
 Resources
 ---------

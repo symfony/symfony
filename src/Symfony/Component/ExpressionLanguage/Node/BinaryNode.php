@@ -15,13 +15,13 @@ use Symfony\Component\ExpressionLanguage\Compiler;
 
 class BinaryNode extends Node
 {
-    private $operators = array(
+    private static $operators = array(
         '~'     => '.',
         'and'   => '&&',
         'or'    => '||',
     );
 
-    private $functions = array(
+    private static $functions = array(
         '**'     => 'pow',
         '..'     => 'range',
         'in'     => 'in_array',
@@ -50,9 +50,9 @@ class BinaryNode extends Node
             return;
         }
 
-        if (isset($this->functions[$operator])) {
+        if (isset(self::$functions[$operator])) {
             $compiler
-                ->raw(sprintf('%s(', $this->functions[$operator]))
+                ->raw(sprintf('%s(', self::$functions[$operator]))
                 ->compile($this->nodes['left'])
                 ->raw(', ')
                 ->compile($this->nodes['right'])
@@ -62,8 +62,8 @@ class BinaryNode extends Node
             return;
         }
 
-        if (isset($this->operators[$operator])) {
-            $operator = $this->operators[$operator];
+        if (isset(self::$operators[$operator])) {
+            $operator = self::$operators[$operator];
         }
 
         $compiler
@@ -83,12 +83,12 @@ class BinaryNode extends Node
         $left = $this->nodes['left']->evaluate($functions, $values);
         $right = $this->nodes['right']->evaluate($functions, $values);
 
-        if (isset($this->functions[$operator])) {
+        if (isset(self::$functions[$operator])) {
             if ('not in' == $operator) {
                 return !call_user_func('in_array', $left, $right);
             }
 
-            return call_user_func($this->functions[$operator], $left, $right);
+            return call_user_func(self::$functions[$operator], $left, $right);
         }
 
         switch ($operator) {

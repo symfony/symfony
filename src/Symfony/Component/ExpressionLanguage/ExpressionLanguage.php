@@ -36,14 +36,14 @@ class ExpressionLanguage
     /**
      * Compiles an expression source code.
      *
-     * @param string $expression The expression to compile
-     * @param array  $names      An array of valid names
+     * @param Expression|string $expression The expression to compile
+     * @param array             $names      An array of valid names
      *
      * @return string The compiled PHP source code
      */
     public function compile($expression, $names = array())
     {
-        return $this->getCompiler()->compile($this->parse($expression, $names))->getSource();
+        return $this->getCompiler()->compile($this->parse($expression, $names)->getNodes())->getSource();
     }
 
     /**
@@ -56,13 +56,7 @@ class ExpressionLanguage
      */
     public function evaluate($expression, $values = array())
     {
-        if ($expression instanceof ParsedExpression) {
-            $expression = $expression->getNodes();
-        } else {
-            $expression = $this->parse($expression, array_keys($values));
-        }
-
-        return $expression->evaluate($this->functions, $values);
+        return $this->parse($expression, array_keys($values))->getNodes()->evaluate($this->functions, $values);
     }
 
     /**
@@ -70,14 +64,19 @@ class ExpressionLanguage
      *
      * @param Expression|string $expression The expression to parse
      *
-     * @return Node A Node tree
+     * @return ParsedExpression A ParsedExpression instance
      */
     public function parse($expression, $names)
     {
+        if ($expression instanceof ParsedExpression) {
+            return $expression;
+        }
+
         $key = $expression.'//'.implode('-', $names);
 
         if (!isset($this->cache[$key])) {
-            $this->cache[$key] = $this->getParser()->parse($this->getLexer()->tokenize((string) $expression), $names);
+            $nodes = $this->getParser()->parse($this->getLexer()->tokenize((string) $expression), $names);
+            $this->cache[$key] = new ParsedExpression((string) $expression, $nodes);
         }
 
         return $this->cache[$key];

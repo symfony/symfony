@@ -79,7 +79,7 @@ class TextDescriptor extends Descriptor
             $description[] = vsprintf($format, $args);
         }
 
-        return $this->output(implode("\n", $description), $options);
+        $this->writeText(implode("\n", $description), $options);
     }
 
     /**
@@ -112,7 +112,7 @@ class TextDescriptor extends Descriptor
             $description[] = '<comment>Host-Regex</comment>   '.$route->compile()->getHostRegex();
         }
 
-        return $this->output(implode("\n", $description), $options);
+        $this->writeText(implode("\n", $description), $options);
     }
 
     /**
@@ -155,7 +155,7 @@ class TextDescriptor extends Descriptor
             }
         }
 
-        return $this->output($this->formatSection('container', 'List of parameters')."\n".implode("\n", $output));
+        $this->writeText($this->formatSection('container', 'List of parameters')."\n".implode("\n", $output), $options);
     }
 
     /**
@@ -172,7 +172,7 @@ class TextDescriptor extends Descriptor
             $description[] = '';
         }
 
-        return $this->output(implode("\n", $description), $options);
+        $this->writeText(implode("\n", $description), $options);
     }
 
     /**
@@ -185,18 +185,16 @@ class TextDescriptor extends Descriptor
         }
 
         if ($service instanceof Alias) {
-            return $this->describeContainerAlias($service, $options);
+            $this->describeContainerAlias($service, $options);
+        } elseif ($service instanceof Definition) {
+            $this->describeContainerDefinition($service, $options);
+        } else {
+            $description = $this->formatSection('container', sprintf('Information for service <info>%s</info>', $options['id']))
+                ."\n".sprintf('<comment>Service Id</comment>       %s', isset($options['id']) ? $options['id'] : '-')
+                ."\n".sprintf('<comment>Class</comment>            %s', get_class($service));
+
+            $this->writeText($description, $options);
         }
-
-        if ($service instanceof Definition) {
-            return $this->describeContainerDefinition($service, $options);
-        }
-
-        $description = $this->formatSection('container', sprintf('Information for service <info>%s</info>', $options['id']))
-            ."\n".sprintf('<comment>Service Id</comment>       %s', isset($options['id']) ? $options['id'] : '-')
-            ."\n".sprintf('<comment>Class</comment>            %s', get_class($service));
-
-        return $this->output($description, $options);
     }
 
     /**
@@ -216,9 +214,9 @@ class TextDescriptor extends Descriptor
         }
 
         $serviceIds = isset($options['tag']) && $options['tag'] ? array_keys($builder->findTaggedServiceIds($options['tag'])) : $builder->getServiceIds();
-        $description = $this->describeServices($builder, $serviceIds, $showPrivate, isset($options['tag']) ? $options['tag'] : null);
+        $description = $this->getServiceDescription($builder, $serviceIds, $showPrivate, isset($options['tag']) ? $options['tag'] : null);
 
-        return $this->output($this->formatSection('container', $label)."\n".implode("\n", $description), $options);
+        $this->writeText($this->formatSection('container', $label)."\n".implode("\n", $description), $options);
     }
 
     /**
@@ -252,7 +250,7 @@ class TextDescriptor extends Descriptor
         $description[] = sprintf('<comment>Synthetic</comment>        %s', $definition->isSynthetic() ? 'yes' : 'no');
         $description[] = sprintf('<comment>Required File</comment>    %s', $definition->getFile() ? $definition->getFile() : '-');
 
-        return $this->output(implode("\n", $description), $options);
+        $this->writeText(implode("\n", $description), $options);
     }
 
     /**
@@ -260,7 +258,7 @@ class TextDescriptor extends Descriptor
      */
     protected function describeContainerAlias(Alias $alias, array $options = array())
     {
-        return $this->output(sprintf('This service is an alias for the service <info>%s</info>', (string) $alias), $options);
+        $this->writeText(sprintf('This service is an alias for the service <info>%s</info>', (string) $alias), $options);
     }
 
 
@@ -272,7 +270,7 @@ class TextDescriptor extends Descriptor
      *
      * @return array
      */
-    private function describeServices(ContainerBuilder $builder, array $serviceIds, $showPrivate, $showTag)
+    private function getServiceDescription(ContainerBuilder $builder, array $serviceIds, $showPrivate, $showTag)
     {
         // loop through to get space needed and filter private services
         $maxName = 4;
@@ -417,13 +415,14 @@ class TextDescriptor extends Descriptor
     }
 
     /**
-     * @param string $description
+     * @param string $content
      * @param array  $options
-     *
-     * @return string
      */
-    private function output($description, array $options = array())
+    private function writeText($content, array $options = array())
     {
-        return isset($options['raw_text']) && $options['raw_text'] ? strip_tags($description) : $description;
+        $this->write(
+            isset($options['raw_text']) && $options['raw_text'] ? strip_tags($content) : $content,
+            isset($options['raw_output']) ? !$options['raw_output'] : true
+        );
     }
 }

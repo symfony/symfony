@@ -19,15 +19,7 @@ class XmlDescriptor extends Descriptor
      */
     protected function describeRouteCollection(RouteCollection $routes, array $options = array())
     {
-        $dom = new \DOMDocument('1.0', 'UTF-8');
-        $dom->appendChild($routesXML = $dom->createElement('routes'));
-
-        foreach ($routes->all() as $name => $route) {
-            $routeXML = $this->describeRoute($route, array('as_dom' => true, 'name' => $name));
-            $routesXML->appendChild($routesXML->ownerDocument->importNode($routeXML->childNodes->item(0), true));
-        }
-
-        return $this->output($dom, $options);
+        $this->writeDocument($this->getRouteCollectionDocument($routes));
     }
 
     /**
@@ -35,11 +27,105 @@ class XmlDescriptor extends Descriptor
      */
     protected function describeRoute(Route $route, array $options = array())
     {
+        $this->writeDocument($this->getRouteDocument($route, isset($options['name']) ? $options['name'] : null));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function describeContainerParameters(ParameterBag $parameters, array $options = array())
+    {
+        $this->writeDocument($this->getContainerParametersDocument($parameters));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function describeContainerTags(ContainerBuilder $builder, array $options = array())
+    {
+        $this->writeDocument($this->getContainerTagsDocument($builder, isset($options['show_private']) && $options['show_private']));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function describeContainerService($service, array $options = array())
+    {
+        if (!isset($options['id'])) {
+            throw new \InvalidArgumentException('An "id" option must be provided.');
+        }
+
+        $this->writeDocument($this->getContainerServiceDocument($service, $options['id']));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function describeContainerServices(ContainerBuilder $builder, array $options = array())
+    {
+        $this->writeDocument($this->getContainerServicesDocument($builder, isset($options['tag']) ? $options['tag'] : null, isset($options['show_private']) && $options['show_private']));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function describeContainerDefinition(Definition $definition, array $options = array())
+    {
+        $this->writeDocument($this->getContainerDefinitionDocument($definition, isset($options['id']) ? $options['id'] : null, isset($options['omit_tags']) && $options['omit_tags']));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function describeContainerAlias(Alias $alias, array $options = array())
+    {
+        $this->writeDocument($this->getContainerAliasDocument($alias, isset($options['id']) ? $options['id'] : null));
+    }
+
+    /**
+     * Writes DOM document.
+     *
+     * @param \DOMDocument $dom
+     *
+     * @return \DOMDocument|string
+     */
+    private function writeDocument(\DOMDocument $dom)
+    {
+        $dom->formatOutput = true;
+        $this->write($dom->saveXML());
+    }
+
+    /**
+     * @param RouteCollection $routes
+     *
+     * @return \DOMDocument
+     */
+    private function getRouteCollectionDocument(RouteCollection $routes)
+    {
+        $dom = new \DOMDocument('1.0', 'UTF-8');
+        $dom->appendChild($routesXML = $dom->createElement('routes'));
+
+        foreach ($routes->all() as $name => $route) {
+            $routeXML = $this->getRouteDocument($route, $name);
+            $routesXML->appendChild($routesXML->ownerDocument->importNode($routeXML->childNodes->item(0), true));
+        }
+
+        return $dom;
+    }
+
+    /**
+     * @param Route       $route
+     * @param string|null $name
+     *
+     * @return \DOMDocument
+     */
+    private function getRouteDocument(Route $route, $name = null)
+    {
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->appendChild($routeXML = $dom->createElement('route'));
 
-        if (isset($options['name'])) {
-            $routeXML->setAttribute('name', $options['name']);
+        if ($name) {
+            $routeXML->setAttribute('name', $name);
         }
 
         $routeXML->setAttribute('path', $route->getPath());
@@ -90,13 +176,15 @@ class XmlDescriptor extends Descriptor
             }
         }
 
-        return $this->output($dom, $options);
+        return $dom;
     }
 
     /**
-     * {@inheritdoc}
+     * @param ParameterBag $parameters
+     *
+     * @return \DOMDocument
      */
-    protected function describeContainerParameters(ParameterBag $parameters, array $options = array())
+    private function getContainerParametersDocument(ParameterBag $parameters)
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->appendChild($parametersXML = $dom->createElement('parameters'));
@@ -107,68 +195,69 @@ class XmlDescriptor extends Descriptor
             $parameterXML->appendChild(new \DOMText($this->formatParameter($value)));
         }
 
-        return $this->output($dom, $options);
+        return $dom;
     }
 
     /**
-     * {@inheritdoc}
+     * @param ContainerBuilder $builder
+     * @param boolean          $showPrivate
+     *
+     * @return \DOMDocument
      */
-    protected function describeContainerTags(ContainerBuilder $builder, array $options = array())
+    private function getContainerTagsDocument(ContainerBuilder $builder, $showPrivate = false)
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->appendChild($containerXML = $dom->createElement('container'));
-
-        $showPrivate = isset($options['show_private']) && $options['show_private'];
 
         foreach ($this->findDefinitionsByTag($builder, $showPrivate) as $tag => $definitions) {
             $containerXML->appendChild($tagXML = $dom->createElement('tag'));
             $tagXML->setAttribute('name', $tag);
 
             foreach ($definitions as $serviceId => $definition) {
-                $definitionXML = $this->describeContainerDefinition($definition, array('as_dom' => true, 'id' => $serviceId, 'omit_tags' => true));
+                $definitionXML = $this->getContainerDefinitionDocument($definition, $serviceId, true);
                 $tagXML->appendChild($dom->importNode($definitionXML->childNodes->item(0), true));
             }
         }
 
-        return $this->output($dom, $options);
+        return $dom;
     }
 
     /**
-     * {@inheritdoc}
+     * @param mixed  $service
+     * @param string $id
+     *
+     * @return \DOMDocument
      */
-    protected function describeContainerService($service, array $options = array())
+    private function getContainerServiceDocument($service, $id)
     {
-        if (!isset($options['id'])) {
-            throw new \InvalidArgumentException('An "id" option must be provided.');
-        }
-
         $dom = new \DOMDocument('1.0', 'UTF-8');
 
-        $childOptions = array('id' => $options['id'], 'as_dom' => true);
-
         if ($service instanceof Alias) {
-            $dom->appendChild($dom->importNode($this->describeContainerAlias($service, $childOptions)->childNodes->item(0), true));
+            $dom->appendChild($dom->importNode($this->getContainerAliasDocument($service, $id)->childNodes->item(0), true));
         } elseif ($service instanceof Definition) {
-            $dom->appendChild($dom->importNode($this->describeContainerDefinition($service, $childOptions)->childNodes->item(0), true));
+            $dom->appendChild($dom->importNode($this->getContainerDefinitionDocument($service, $id)->childNodes->item(0), true));
         } else {
             $dom->appendChild($serviceXML = $dom->createElement('service'));
-            $serviceXML->setAttribute('id', $options['id']);
+            $serviceXML->setAttribute('id', $id);
             $serviceXML->setAttribute('class', get_class($service));
         }
 
-        return $this->output($dom, $options);
+        return $dom;
     }
 
     /**
-     * {@inheritdoc}
+     * @param ContainerBuilder $builder
+     * @param string|null      $tag
+     * @param boolean          $showPrivate
+     *
+     * @return \DOMDocument
      */
-    protected function describeContainerServices(ContainerBuilder $builder, array $options = array())
+    private function getContainerServicesDocument(ContainerBuilder $builder, $tag = null, $showPrivate = false)
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->appendChild($containerXML = $dom->createElement('container'));
 
-        $serviceIds = isset($options['tag']) && $options['tag'] ? array_keys($builder->findTaggedServiceIds($options['tag'])) : $builder->getServiceIds();
-        $showPrivate = isset($options['show_private']) && $options['show_private'];
+        $serviceIds = $tag ? array_keys($builder->findTaggedServiceIds($tag)) : $builder->getServiceIds();
 
         foreach ($this->sortServiceIds($serviceIds) as $serviceId) {
             $service = $this->resolveServiceDefinition($builder, $serviceId);
@@ -177,23 +266,27 @@ class XmlDescriptor extends Descriptor
                 continue;
             }
 
-            $serviceXML = $this->describeContainerService($service, array_merge($options, array('id' => $serviceId, 'as_dom' => true)));
+            $serviceXML = $this->getContainerServiceDocument($service, $serviceId);
             $containerXML->appendChild($containerXML->ownerDocument->importNode($serviceXML->childNodes->item(0), true));
         }
 
-        return $this->output($dom, $options);
+        return $dom;
     }
 
     /**
-     * {@inheritdoc}
+     * @param Definition  $definition
+     * @param string|null $id
+     * @param boolean     $omitTags
+     *
+     * @return \DOMDocument
      */
-    protected function describeContainerDefinition(Definition $definition, array $options = array())
+    private function getContainerDefinitionDocument(Definition $definition, $id = null, $omitTags = false)
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->appendChild($serviceXML = $dom->createElement('definition'));
 
-        if (isset($options['id'])) {
-            $serviceXML->setAttribute('id', $options['id']);
+        if ($id) {
+            $serviceXML->setAttribute('id', $id);
         }
 
         $serviceXML->setAttribute('class', $definition->getClass());
@@ -202,9 +295,9 @@ class XmlDescriptor extends Descriptor
         $serviceXML->setAttribute('synthetic', $definition->isSynthetic() ? 'true' : 'false');
         $serviceXML->setAttribute('file', $definition->getFile());
 
-        if (!(isset($options['omit_tags']) && $options['omit_tags'])) {
+        if (!$omitTags) {
             $tags = $definition->getTags();
-            
+
             if (count($tags) > 0) {
                 $serviceXML->appendChild($tagsXML = $dom->createElement('tags'));
                 foreach ($tags as $tagName => $tagData) {
@@ -221,43 +314,27 @@ class XmlDescriptor extends Descriptor
             }
         }
 
-        return $this->output($dom, $options);
+        return $dom;
     }
 
     /**
-     * {@inheritdoc}
+     * @param Alias       $alias
+     * @param string|null $id
+     *
+     * @return \DOMDocument
      */
-    protected function describeContainerAlias(Alias $alias, array $options = array())
+    private function getContainerAliasDocument(Alias $alias, $id = null)
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->appendChild($aliasXML = $dom->createElement('alias'));
 
-        if (isset($options['id'])) {
-            $aliasXML->setAttribute('id', $options['id']);
+        if ($id) {
+            $aliasXML->setAttribute('id', $id);
         }
 
         $aliasXML->setAttribute('service', (string) $alias);
         $aliasXML->setAttribute('public', $alias->isPublic() ? 'true' : 'false');
 
-        return $this->output($dom, $options);
-    }
-
-    /**
-     * Outputs document as DOMDocument or string according to options.
-     *
-     * @param \DOMDocument $dom
-     * @param array        $options
-     *
-     * @return \DOMDocument|string
-     */
-    private function output(\DOMDocument $dom, array $options)
-    {
-        if (isset($options['as_dom']) && $options['as_dom']) {
-            return $dom;
-        }
-
-        $dom->formatOutput = true;
-
-        return $dom->saveXML();
+        return $dom;
     }
 }

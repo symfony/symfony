@@ -27,13 +27,13 @@ class ExpressionLanguage extends BaseExpressionLanguage
     {
         parent::registerFunctions();
 
-        $this->addFunction('service', function ($arg) {
+        $this->register('service', function ($arg) {
             return sprintf('$this->get(%s)', $arg);
         }, function (array $variables, $value) {
             return $variables['container']->get($value);
         });
 
-        $this->addFunction('parameter', function ($arg) {
+        $this->register('parameter', function ($arg) {
             return sprintf('$this->getParameter(%s)', $arg);
         }, function (array $variables, $value) {
             return $variables['container']->getParameter($value);

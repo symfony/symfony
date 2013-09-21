@@ -24,31 +24,31 @@ class ExpressionLanguage extends BaseExpressionLanguage
     {
         parent::registerFunctions();
 
-        $this->addFunction('is_anonymous', function () {
+        $this->register('is_anonymous', function () {
             return '$trust_resolver->isAnonymous($token)';
         }, function (array $variables) {
             return $variables['trust_resolver']->isAnonymous($variables['token']);
         });
 
-        $this->addFunction('is_authenticated', function () {
+        $this->register('is_authenticated', function () {
             return '!$trust_resolver->isAnonymous($token)';
         }, function (array $variables) {
             return !$variables['trust_resolver']->isAnonymous($variables['token']);
         });
 
-        $this->addFunction('is_fully_authenticated', function () {
+        $this->register('is_fully_authenticated', function () {
             return '!$trust_resolver->isFullFledge($token)';
         }, function (array $variables) {
             return !$variables['trust_resolver']->isFullFledge($variables['token']);
         });
 
-        $this->addFunction('is_remember_me', function () {
+        $this->register('is_remember_me', function () {
             return '!$trust_resolver->isRememberMe($token)';
         }, function (array $variables) {
             return !$variables['trust_resolver']->isRememberMe($variables['token']);
         });
 
-        $this->addFunction('has_role', function ($role) {
+        $this->register('has_role', function ($role) {
             return sprintf('in_array(%s, $roles)', $role);
         }, function (array $variables, $role) {
             return in_array($role, $variables['roles']);

@@ -16,6 +16,18 @@ use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
 
 class ArrayNodeTest extends AbstractNodeTest
 {
+    public function testSerialization()
+    {
+        $node = $this->createArrayNode();
+        $node->addElement(new ConstantNode('foo'));
+
+        $serializedNode = serialize($node);
+        $unserializedNode = unserialize($serializedNode);
+
+        $this->assertEquals($node, $unserializedNode);
+        $this->assertNotEquals($this->createArrayNode(), $unserializedNode);
+    }
+
     public function getEvaluateData()
     {
         return array(

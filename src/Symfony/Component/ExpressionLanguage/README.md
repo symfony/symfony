@@ -25,7 +25,7 @@ You can extend your DSL with functions:
     $evaluator = function (array $variables, $value) {
         return strtoupper($value);
     };
-    $language->addFunction('upper', $compiler, $evaluator);
+    $language->register('upper', $compiler, $evaluator);
 
     echo $language->evaluate('"foo" ~ upper(foo)', array('foo' => 'bar'));
     // would output fooBAR

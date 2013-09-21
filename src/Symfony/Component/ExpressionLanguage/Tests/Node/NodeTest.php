@@ -27,4 +27,14 @@ Node(
 EOF
         , (string) $node);
     }
+
+    public function testSerialization()
+    {
+        $node = new Node(array('foo' => 'bar'), array('bar' => 'foo'));
+
+        $serializedNode = serialize($node);
+        $unserializedNode = unserialize($serializedNode);
+
+        $this->assertEquals($node, $unserializedNode);
+    }
 }

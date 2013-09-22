@@ -707,22 +707,36 @@ class StubNumberFormatterTest extends LocaleTestCase
         $formatter->getPattern();
     }
 
-    /**
-     * @expectedException \Symfony\Component\Locale\Exception\MethodNotImplementedException
-     */
     public function testGetSymbol()
     {
-        $formatter = $this->getStubFormatterWithDecimalStyle();
-        $formatter->getSymbol(null);
+        $this->skipIfIntlExtensionIsNotLoaded();
+
+        $intlDecimalFormatter = new \NumberFormatter('en', \NumberFormatter::DECIMAL);
+        $intlCurrencyFormatter = new \NumberFormatter('en', \NumberFormatter::CURRENCY);
+
+        $stubDecimalFormatter = $this->getStubFormatterWithDecimalStyle();
+        $stubCurrencyFormatter = $this->getStubFormatterWithCurrencyStyle();
+
+        for ($i = 0; $i <= 17; $i++) {
+            $this->assertSame($stubDecimalFormatter->getSymbol($i), $intlDecimalFormatter->getSymbol($i), $i);
+            $this->assertSame($stubCurrencyFormatter->getSymbol($i), $intlCurrencyFormatter->getSymbol($i), $i);
+        }
     }
 
-    /**
-     * @expectedException \Symfony\Component\Locale\Exception\MethodNotImplementedException
-     */
     public function testGetTextAttribute()
     {
-        $formatter = $this->getStubFormatterWithDecimalStyle();
-        $formatter->getTextAttribute(null);
+        $this->skipIfIntlExtensionIsNotLoaded();
+
+        $intlDecimalFormatter = new \NumberFormatter('en', \NumberFormatter::DECIMAL);
+        $intlCurrencyFormatter = new \NumberFormatter('en', \NumberFormatter::CURRENCY);
+
+        $stubDecimalFormatter = $this->getStubFormatterWithDecimalStyle();
+        $stubCurrencyFormatter = $this->getStubFormatterWithCurrencyStyle();
+
+        for ($i = 0; $i <= 5; $i++) {
+            $this->assertSame($stubDecimalFormatter->getTextAttribute($i), $intlDecimalFormatter->getTextAttribute($i), $i);
+            $this->assertSame($stubCurrencyFormatter->getTextAttribute($i), $intlCurrencyFormatter->getTextAttribute($i), 'fooo '.$i);
+        }
     }
 
     /**

@@ -221,6 +221,16 @@ class StubNumberFormatter
         'negative' => -9223372036854775808
     );
 
+    private static $enSymbols = array(
+        self::DECIMAL => array('.', ',', ';', '%', '0', '#', '-', '+', '¤', '¤¤', '.', 'E', '‰', '*', '∞', 'NaN', '@', ','),
+        self::CURRENCY => array('.', ',', ';', '%', '0', '#', '-', '+', '¤', '¤¤', '.', 'E', '‰', '*', '∞', 'NaN', '@', ','),
+    );
+
+    private static $enTextAttributes = array(
+        self::DECIMAL => array('', '', '-', '', '*', '', ''),
+        self::CURRENCY => array('¤', '', '(¤', ')', '*', ''),
+    );
+
     /**
      * Constructor
      *
@@ -435,12 +445,10 @@ class StubNumberFormatter
      * @return Boolean|string        The symbol value or false on error
      *
      * @see    http://www.php.net/manual/en/numberformatter.getsymbol.php
-     *
-     * @throws MethodNotImplementedException
      */
     public function getSymbol($attr)
     {
-        throw new MethodNotImplementedException(__METHOD__);
+        return array_key_exists($this->style, self::$enSymbols) && array_key_exists($attr, self::$enSymbols[$this->style]) ? self::$enSymbols[$this->style][$attr] : false;
     }
 
     /**
@@ -451,12 +459,10 @@ class StubNumberFormatter
      * @return Boolean|string        The attribute value or false on error
      *
      * @see    http://www.php.net/manual/en/numberformatter.gettextattribute.php
-     *
-     * @throws MethodNotImplementedException
      */
     public function getTextAttribute($attr)
     {
-        throw new MethodNotImplementedException(__METHOD__);
+        return array_key_exists($this->style, self::$enTextAttributes) && array_key_exists($attr, self::$enTextAttributes[$this->style]) ? self::$enTextAttributes[$this->style][$attr] : false;
     }
 
     /**

@@ -33,6 +33,11 @@ class Crawler extends \SplObjectStorage
     private $defaultNamespacePrefix = 'default';
 
     /**
+     * @var array A map of manually registered namespaces
+     */
+    private $namespaces = array();
+
+    /**
      * Constructor.
      *
      * @param mixed  $node A Node to use as the base for the crawling
@@ -724,6 +729,15 @@ class Crawler extends \SplObjectStorage
     }
 
     /**
+     * @param string $prefix
+     * @param string $namespace
+     */
+    public function registerNamespace($prefix, $namespace)
+    {
+        $this->namespaces[$prefix] = $namespace;
+    }
+
+    /**
      * Converts string for XPath expressions.
      *
      * Escaped characters are: quotes (") and apostrophe (').
@@ -820,16 +834,35 @@ class Crawler extends \SplObjectStorage
         $domxpath = new \DOMXPath($document);
 
         foreach ($prefixes as $prefix) {
-            // ask for one namespace, otherwise we'd get a collection with an item for each node
-            $namespaces = $domxpath->query(sprintf('(//namespace::*[name()="%s"])[last()]', $this->defaultNamespacePrefix === $prefix ? '' : $prefix));
-            if ($node = $namespaces->item(0)) {
-                $domxpath->registerNamespace($prefix, $node->nodeValue);
-            } else {
-                throw new \InvalidArgumentException(sprintf('Could not find a namespace for the prefix: "%s"', $prefix));
-            }
+            $namespace = $this->discoverNamespace($domxpath, $prefix);
+            $domxpath->registerNamespace($prefix, $namespace);
         }
 
         return $domxpath;
+    }
+
+    /**
+     * @param \DOMXPath $domxpath
+     * @param string    $prefix
+     *
+     * @return string
+     *
+     * @throws \InvalidArgumentException
+     */
+    private function discoverNamespace(\DOMXPath $domxpath, $prefix)
+    {
+        if (isset($this->namespaces[$prefix])) {
+            return $this->namespaces[$prefix];
+        }
+
+        // ask for one namespace, otherwise we'd get a collection with an item for each node
+        $namespaces = $domxpath->query(sprintf('(//namespace::*[name()="%s"])[last()]', $this->defaultNamespacePrefix === $prefix ? '' : $prefix));
+
+        if ($node = $namespaces->item(0)) {
+            return $node->nodeValue;
+        }
+
+        throw new \InvalidArgumentException(sprintf('Could not find a namespace for the prefix: "%s"', $prefix));
     }
 
     /**

@@ -384,7 +384,7 @@ EOF
         $crawler->setDefaultNamespacePrefix('x');
         $crawler = $crawler->filterXPath('//x:entry/x:id');
 
-        $this->assertCount(1, $crawler, '->filterXPath() automatically registers a namespace');
+        $this->assertCount(1, $crawler, '->filterXPath() lets to override the default namespace prefix');
         $this->assertSame('tag:youtube.com,2008:video:kgZRZmEc9j4', $crawler->text());
     }
 
@@ -408,6 +408,16 @@ EOF
     public function testFilterXPathWithAnInvalidNamespace()
     {
         $this->createTestXmlCrawler()->filterXPath('//media:group/foo:aspectRatio');
+    }
+
+    public function testFilterXPathWithManuallyRegisteredNamespace()
+    {
+        $crawler = $this->createTestXmlCrawler();
+        $crawler->registerNamespace('m', 'http://search.yahoo.com/mrss/');
+
+        $crawler = $crawler->filterXPath('//m:group/yt:aspectRatio');
+        $this->assertCount(1, $crawler, '->filterXPath() uses manually registered namespace');
+        $this->assertSame('widescreen', $crawler->text());
     }
 
     /**

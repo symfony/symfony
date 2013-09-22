@@ -4,9 +4,11 @@ CHANGELOG
 2.4.0
 -----
 
- * added auto-registration of document namespaces for `Crawler::filterXPath()` and `Crawler::filter()`
+ * added support for automatic discovery and explicit registration of document
+   namespaces for `Crawler::filterXPath()` and `Crawler::filter()`
  * improved content type guessing in `Crawler::addContent()`
- * [BC BREAK] `Crawler::addXmlContent()` no longer removes the default document namespace
+ * [BC BREAK] `Crawler::addXmlContent()` no longer removes the default document
+   namespace
 
 2.3.0
 -----

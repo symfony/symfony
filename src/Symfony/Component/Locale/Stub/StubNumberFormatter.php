@@ -493,10 +493,8 @@ class StubNumberFormatter
      * @return Boolean|string                               The parsed value of false on error
      *
      * @see    http://www.php.net/manual/en/numberformatter.parse.php
-     *
-     * @throws MethodArgumentNotImplementedException        When $position different than null, behavior not implemented
      */
-    public function parse($value, $type = self::TYPE_DOUBLE, &$position = null)
+    public function parse($value, $type = self::TYPE_DOUBLE, &$position = 0)
     {
         if ($type == self::TYPE_DEFAULT || $type == self::TYPE_CURRENCY) {
             trigger_error(__METHOD__.'(): Unsupported format type '.$type, \E_USER_WARNING);
@@ -504,25 +502,22 @@ class StubNumberFormatter
             return false;
         }
 
-        // We don't calculate the position when parsing the value
-        if (null !== $position) {
-            throw new MethodArgumentNotImplementedException(__METHOD__, 'position');
-        }
-
-        preg_match('/^([^0-9\-]{0,})(.*)/', $value, $matches);
+        preg_match('/^([^0-9\-\.]{0,})(.*)/', $value, $matches);
 
         // Any string before the numeric value causes error in the parsing
         if (isset($matches[1]) && !empty($matches[1])) {
             StubIntl::setError(StubIntl::U_PARSE_ERROR, 'Number parsing failed');
             $this->errorCode = StubIntl::getErrorCode();
             $this->errorMessage = StubIntl::getErrorMessage();
+            $position = 0;
 
             return false;
         }
 
-        // Remove everything that is not number or dot (.)
-        $value = preg_replace('/[^0-9\.\-]/', '', $value);
+        preg_match('/^[0-9\-\.\,]*/', $value, $matches);
+        $value = preg_replace('/[^0-9\.\-]/', '', $matches[0]);
         $value = $this->convertValueDataType($value, $type);
+        $position = strlen($matches[0]);
 
         // behave like the intl extension
         $this->resetError();

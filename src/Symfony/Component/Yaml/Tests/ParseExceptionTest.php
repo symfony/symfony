@@ -19,7 +19,7 @@ class ParseExceptionTest extends \PHPUnit_Framework_TestCase
     public function testGetMessage()
     {
         $exception = new ParseException('Error message', 42, 'foo: bar', '/var/www/app/config.yml');
-        if (version_compare(PHP_VERSION, '5.4.0', '>=') {
+        if (version_compare(PHP_VERSION, '5.4.0', '>=')) {
             $message = 'Error message in "/var/www/app/config.yml" at line 42 (near "foo: bar")';
         } else {
             $message = 'Error message in "\\/var\\/www\\/app\\/config.yml" at line 42 (near "foo: bar")';

@@ -221,6 +221,16 @@ class StubNumberFormatter
         'negative' => -9223372036854775808
     );
 
+    private static $enSymbols = array(
+        self::DECIMAL => array('.', ',', ';', '%', '0', '#', '-', '+', '¤', '¤¤', '.', 'E', '‰', '*', '∞', 'NaN', '@', ','),
+        self::CURRENCY => array('.', ',', ';', '%', '0', '#', '-', '+', '¤', '¤¤', '.', 'E', '‰', '*', '∞', 'NaN', '@', ','),
+    );
+
+    private static $enTextAttributes = array(
+        self::DECIMAL => array('', '', '-', '', '*', '', ''),
+        self::CURRENCY => array('¤', '', '(¤', ')', '*', ''),
+    );
+
     /**
      * Constructor
      *
@@ -435,12 +445,10 @@ class StubNumberFormatter
      * @return Boolean|string        The symbol value or false on error
      *
      * @see    http://www.php.net/manual/en/numberformatter.getsymbol.php
-     *
-     * @throws MethodNotImplementedException
      */
     public function getSymbol($attr)
     {
-        throw new MethodNotImplementedException(__METHOD__);
+        return array_key_exists($this->style, self::$enSymbols) && array_key_exists($attr, self::$enSymbols[$this->style]) ? self::$enSymbols[$this->style][$attr] : false;
     }
 
     /**
@@ -451,12 +459,10 @@ class StubNumberFormatter
      * @return Boolean|string        The attribute value or false on error
      *
      * @see    http://www.php.net/manual/en/numberformatter.gettextattribute.php
-     *
-     * @throws MethodNotImplementedException
      */
     public function getTextAttribute($attr)
     {
-        throw new MethodNotImplementedException(__METHOD__);
+        return array_key_exists($this->style, self::$enTextAttributes) && array_key_exists($attr, self::$enTextAttributes[$this->style]) ? self::$enTextAttributes[$this->style][$attr] : false;
     }
 
     /**
@@ -487,10 +493,8 @@ class StubNumberFormatter
      * @return Boolean|string                               The parsed value of false on error
      *
      * @see    http://www.php.net/manual/en/numberformatter.parse.php
-     *
-     * @throws MethodArgumentNotImplementedException        When $position different than null, behavior not implemented
      */
-    public function parse($value, $type = self::TYPE_DOUBLE, &$position = null)
+    public function parse($value, $type = self::TYPE_DOUBLE, &$position = 0)
     {
         if ($type == self::TYPE_DEFAULT || $type == self::TYPE_CURRENCY) {
             trigger_error(__METHOD__.'(): Unsupported format type '.$type, \E_USER_WARNING);
@@ -498,25 +502,22 @@ class StubNumberFormatter
             return false;
         }
 
-        // We don't calculate the position when parsing the value
-        if (null !== $position) {
-            throw new MethodArgumentNotImplementedException(__METHOD__, 'position');
-        }
-
-        preg_match('/^([^0-9\-]{0,})(.*)/', $value, $matches);
+        preg_match('/^([^0-9\-\.]{0,})(.*)/', $value, $matches);
 
         // Any string before the numeric value causes error in the parsing
         if (isset($matches[1]) && !empty($matches[1])) {
             StubIntl::setError(StubIntl::U_PARSE_ERROR, 'Number parsing failed');
             $this->errorCode = StubIntl::getErrorCode();
             $this->errorMessage = StubIntl::getErrorMessage();
+            $position = 0;
 
             return false;
         }
 
-        // Remove everything that is not number or dot (.)
-        $value = preg_replace('/[^0-9\.\-]/', '', $value);
+        preg_match('/^[0-9\-\.\,]*/', $value, $matches);
+        $value = preg_replace('/[^0-9\.\-]/', '', $matches[0]);
         $value = $this->convertValueDataType($value, $type);
+        $position = strlen($matches[0]);
 
         // behave like the intl extension
         $this->resetError();

@@ -707,22 +707,36 @@ class StubNumberFormatterTest extends LocaleTestCase
         $formatter->getPattern();
     }
 
-    /**
-     * @expectedException \Symfony\Component\Locale\Exception\MethodNotImplementedException
-     */
     public function testGetSymbol()
     {
-        $formatter = $this->getStubFormatterWithDecimalStyle();
-        $formatter->getSymbol(null);
+        $this->skipIfIntlExtensionIsNotLoaded();
+
+        $intlDecimalFormatter = new \NumberFormatter('en', \NumberFormatter::DECIMAL);
+        $intlCurrencyFormatter = new \NumberFormatter('en', \NumberFormatter::CURRENCY);
+
+        $stubDecimalFormatter = $this->getStubFormatterWithDecimalStyle();
+        $stubCurrencyFormatter = $this->getStubFormatterWithCurrencyStyle();
+
+        for ($i = 0; $i <= 17; $i++) {
+            $this->assertSame($stubDecimalFormatter->getSymbol($i), $intlDecimalFormatter->getSymbol($i), $i);
+            $this->assertSame($stubCurrencyFormatter->getSymbol($i), $intlCurrencyFormatter->getSymbol($i), $i);
+        }
     }
 
-    /**
-     * @expectedException \Symfony\Component\Locale\Exception\MethodNotImplementedException
-     */
     public function testGetTextAttribute()
     {
-        $formatter = $this->getStubFormatterWithDecimalStyle();
-        $formatter->getTextAttribute(null);
+        $this->skipIfIntlExtensionIsNotLoaded();
+
+        $intlDecimalFormatter = new \NumberFormatter('en', \NumberFormatter::DECIMAL);
+        $intlCurrencyFormatter = new \NumberFormatter('en', \NumberFormatter::CURRENCY);
+
+        $stubDecimalFormatter = $this->getStubFormatterWithDecimalStyle();
+        $stubCurrencyFormatter = $this->getStubFormatterWithCurrencyStyle();
+
+        for ($i = 0; $i <= 5; $i++) {
+            $this->assertSame($stubDecimalFormatter->getTextAttribute($i), $intlDecimalFormatter->getTextAttribute($i), $i);
+            $this->assertSame($stubCurrencyFormatter->getTextAttribute($i), $intlCurrencyFormatter->getTextAttribute($i), 'fooo '.$i);
+        }
     }
 
     /**
@@ -737,11 +751,13 @@ class StubNumberFormatterTest extends LocaleTestCase
     /**
      * @dataProvider parseProvider
      */
-    public function testParseStub($value, $expected, $message = '')
+    public function testParseStub($value, $expected, $message, $expectedPosition)
     {
         $formatter = $this->getStubFormatterWithDecimalStyle();
-        $parsedValue = $formatter->parse($value, StubNumberFormatter::TYPE_DOUBLE);
+        $position = 0;
+        $parsedValue = $formatter->parse($value, StubNumberFormatter::TYPE_DOUBLE, $position);
         $this->assertSame($expected, $parsedValue, $message);
+        $this->assertSame($expectedPosition, $position, $message);
 
         if ($expected === false) {
             $errorCode = StubIntl::U_PARSE_ERROR;
@@ -762,14 +778,16 @@ class StubNumberFormatterTest extends LocaleTestCase
     /**
      * @dataProvider parseProvider
      */
-    public function testParseIntl($value, $expected, $message = '')
+    public function testParseIntl($value, $expected, $message, $expectedPosition)
     {
         $this->skipIfIntlExtensionIsNotLoaded();
         $this->skipIfICUVersionIsTooOld();
 
         $formatter = $this->getIntlFormatterWithDecimalStyle();
-        $parsedValue = $formatter->parse($value, \NumberFormatter::TYPE_DOUBLE);
+        $position = 0;
+        $parsedValue = $formatter->parse($value, \NumberFormatter::TYPE_DOUBLE, $position);
         $this->assertSame($expected, $parsedValue, $message);
+        $this->assertSame($expectedPosition, $position, $message);
 
         if ($expected === false) {
             $errorCode = StubIntl::U_PARSE_ERROR;
@@ -790,8 +808,8 @@ class StubNumberFormatterTest extends LocaleTestCase
     public function parseProvider()
     {
         return array(
-            array('prefix1', false, '->parse() does not parse a number with a string prefix.'),
-            array('1suffix', (float) 1, '->parse() parses a number with a string suffix.'),
+            array('prefix1', false, '->parse() does not parse a number with a string prefix.', 0),
+            array('1.4suffix', (float) 1.4, '->parse() parses a number with a string suffix.', 3),
         );
     }
 
@@ -840,6 +858,7 @@ class StubNumberFormatterTest extends LocaleTestCase
         return array(
             array('1', 1),
             array('1.1', 1),
+            array('.1', 0),
             array('2,147,483,647', 2147483647),
             array('-2,147,483,648', -2147483647 - 1),
             array('2,147,483,648', false, '->parse() TYPE_INT32 returns false when the number is greater than the integer positive range.'),
@@ -1104,10 +1123,10 @@ class StubNumberFormatterTest extends LocaleTestCase
 
     public function testParseWithNullPositionValueStub()
     {
-        $position = null;
+        $position = 0;
         $formatter = $this->getStubFormatterWithDecimalStyle();
         $formatter->parse('123', StubNumberFormatter::TYPE_INT32, $position);
-        $this->assertNull($position);
+        $this->assertEquals(3, $position);
     }
 
     public function testParseWithNullPositionValueIntl()
@@ -1119,14 +1138,12 @@ class StubNumberFormatterTest extends LocaleTestCase
         $this->assertEquals(3, $position);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Locale\Exception\MethodArgumentNotImplementedException
-     */
     public function testParseWithNotNullPositionValueStub()
     {
         $position = 1;
         $formatter = $this->getStubFormatterWithDecimalStyle();
         $formatter->parse('123', StubNumberFormatter::TYPE_INT32, $position);
+        $this->assertEquals(3, $position);
     }
 
     public function testParseWithNotNullPositionValueIntl()

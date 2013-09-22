@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by TerjeBr at 2013-09-22T15:18:37Z
+
+Remember also https://github.com/symfony/symfony/issues/6045#issuecomment-23319231
+In the PR https://github.com/symfony/symfony/pull/5943 the reverse transform in NumberToLocalizedStringTransformer became broken for those without the 'intl' php-extension installed. That is because StubNumberFormatter::parse() do not handle <code>$position != null</code>
+
+---------------------------------------------------------------------------
+
+by TerjeBr at 2013-09-22T15:25:22Z
+
+It was also commented in my PR https://github.com/symfony/symfony/pull/8588#issuecomment-22324215
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-09-22T17:27:48Z
+
+@TerjeBr Yep, everything should work fine now.

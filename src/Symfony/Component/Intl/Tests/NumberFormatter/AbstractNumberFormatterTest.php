@@ -472,14 +472,46 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('en', $formatter->getLocale());
     }
 
+    public function testGetSymbol()
+    {
+        $decimalFormatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
+        $currencyFormatter = $this->getNumberFormatter('en', NumberFormatter::CURRENCY);
+
+        $r = new \ReflectionProperty('Symfony\Component\Intl\NumberFormatter\NumberFormatter', 'enSymbols');
+        $r->setAccessible(true);
+        $expected = $r->getValue('Symfony\Component\Intl\NumberFormatter\NumberFormatter');
+
+        for ($i = 0; $i <= 17; $i++) {
+            $this->assertSame($expected[1][$i], $decimalFormatter->getSymbol($i));
+            $this->assertSame($expected[2][$i], $currencyFormatter->getSymbol($i));
+        }
+    }
+
+    public function testGetTextAttribute()
+    {
+        $decimalFormatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
+        $currencyFormatter = $this->getNumberFormatter('en', NumberFormatter::CURRENCY);
+
+        $r = new \ReflectionProperty('Symfony\Component\Intl\NumberFormatter\NumberFormatter', 'enTextAttributes');
+        $r->setAccessible(true);
+        $expected = $r->getValue('Symfony\Component\Intl\NumberFormatter\NumberFormatter');
+
+        for ($i = 0; $i <= 5; $i++) {
+            $this->assertSame($expected[1][$i], $decimalFormatter->getTextAttribute($i));
+            $this->assertSame($expected[2][$i], $currencyFormatter->getTextAttribute($i));
+        }
+    }
+
     /**
      * @dataProvider parseProvider
      */
-    public function testParse($value, $expected, $message = '')
+    public function testParse($value, $expected, $message, $expectedPosition)
     {
+        $position = 0;
         $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
-        $parsedValue = $formatter->parse($value, NumberFormatter::TYPE_DOUBLE);
+        $parsedValue = $formatter->parse($value, NumberFormatter::TYPE_DOUBLE, $position);
         $this->assertSame($expected, $parsedValue, $message);
+        $this->assertSame($expectedPosition, $position, $message);
 
         if ($expected === false) {
             $errorCode = IntlGlobals::U_PARSE_ERROR;
@@ -500,8 +532,8 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
     public function parseProvider()
     {
         return array(
-            array('prefix1', false, '->parse() does not parse a number with a string prefix.'),
-            array('1suffix', (float) 1, '->parse() parses a number with a string suffix.'),
+            array('prefix1', false, '->parse() does not parse a number with a string prefix.', 0),
+            array('1.4suffix', (float) 1.4, '->parse() parses a number with a string suffix.', 3),
         );
     }
 
@@ -529,6 +561,7 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
         return array(
             array('1', 1),
             array('1.1', 1),
+            array('.1', 0),
             array('2,147,483,647', 2147483647),
             array('-2,147,483,648', -2147483647 - 1),
             array('2,147,483,648', false, '->parse() TYPE_INT32 returns false when the number is greater than the integer positive range.'),
@@ -661,14 +694,6 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
     {
         $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
         $formatter->parse('1', NumberFormatter::TYPE_CURRENCY);
-    }
-
-    public function testParseWithNullPositionValue()
-    {
-        $position = null;
-        $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
-        $formatter->parse('123', NumberFormatter::TYPE_INT32, $position);
-        $this->assertNull($position);
     }
 
     public function testParseWithNotNullPositionValue()

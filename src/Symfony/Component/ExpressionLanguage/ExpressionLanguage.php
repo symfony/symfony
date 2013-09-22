@@ -11,7 +11,8 @@
 
 namespace Symfony\Component\ExpressionLanguage;
 
-use Symfony\Component\ExpressionLanguage\Node\Node;
+use Symfony\Component\ExpressionLanguage\ParserCache\ArrayParserCache;
+use Symfony\Component\ExpressionLanguage\ParserCache\ParserCacheInterface;
 
 /**
  * Allows to compile and evaluate expressions written in your own DSL.
@@ -20,15 +21,20 @@ use Symfony\Component\ExpressionLanguage\Node\Node;
  */
 class ExpressionLanguage
 {
+    /**
+     * @var ParserCacheInterface
+     */
+    private $parserCache;
+
     private $lexer;
     private $parser;
     private $compiler;
-    private $cache;
 
     protected $functions;
 
-    public function __construct()
+    public function __construct(ParserCacheInterface $parserCache = null)
     {
+        $this->parserCache = $parserCache ?: new ArrayParserCache();
         $this->functions = array();
         $this->registerFunctions();
     }
@@ -74,12 +80,14 @@ class ExpressionLanguage
 
         $key = $expression.'//'.implode('-', $names);
 
-        if (!isset($this->cache[$key])) {
+        if (null === $parsedExpression = $this->parserCache->fetch($key)) {
             $nodes = $this->getParser()->parse($this->getLexer()->tokenize((string) $expression), $names);
-            $this->cache[$key] = new ParsedExpression((string) $expression, $nodes);
+            $parsedExpression = new ParsedExpression((string) $expression, $nodes);
+
+            $this->parserCache->save($key, $parsedExpression);
         }
 
-        return $this->cache[$key];
+        return $parsedExpression;
     }
 
     /**

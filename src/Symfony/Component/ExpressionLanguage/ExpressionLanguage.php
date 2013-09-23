@@ -24,17 +24,16 @@ class ExpressionLanguage
     /**
      * @var ParserCacheInterface
      */
-    private $parserCache;
-
+    private $cache;
     private $lexer;
     private $parser;
     private $compiler;
 
     protected $functions;
 
-    public function __construct(ParserCacheInterface $parserCache = null)
+    public function __construct(ParserCacheInterface $cache = null)
     {
-        $this->parserCache = $parserCache ?: new ArrayParserCache();
+        $this->cache = $cache ?: new ArrayParserCache();
         $this->functions = array();
         $this->registerFunctions();
     }
@@ -80,11 +79,11 @@ class ExpressionLanguage
 
         $key = $expression.'//'.implode('-', $names);
 
-        if (null === $parsedExpression = $this->parserCache->fetch($key)) {
+        if (null === $parsedExpression = $this->cache->fetch($key)) {
             $nodes = $this->getParser()->parse($this->getLexer()->tokenize((string) $expression), $names);
             $parsedExpression = new ParsedExpression((string) $expression, $nodes);
 
-            $this->parserCache->save($key, $parsedExpression);
+            $this->cache->save($key, $parsedExpression);
         }
 
         return $parsedExpression;

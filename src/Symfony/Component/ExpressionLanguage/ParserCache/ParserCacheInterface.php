@@ -19,13 +19,18 @@ use Symfony\Component\ExpressionLanguage\ParsedExpression;
 interface ParserCacheInterface
 {
     /**
-     * @param  string                $key
-     * @param  ParsedExpression      $data
+     * Saves an expression in the cache.
+     *
+     * @param string           $key  The cache key
+     * @param ParsedExpression $data A ParsedExpression instance to store in the cache
      */
     public function save($key, ParsedExpression $expression);
 
     /**
-     * @param  string                $key
+     * Fetches an expression from the cache.
+     *
+     * @param string $key The cache key
+     *
      * @return ParsedExpression|null
      */
     public function fetch($key);

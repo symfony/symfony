@@ -35,6 +35,8 @@ class PlaintextPasswordEncoder extends BasePasswordEncoder
      */
     public function encodePassword($raw, $salt)
     {
+        $this->checkPasswordLength($raw);
+
         return $this->mergePasswordAndSalt($raw, $salt);
     }
 
@@ -43,6 +45,8 @@ class PlaintextPasswordEncoder extends BasePasswordEncoder
      */
     public function isPasswordValid($encoded, $raw, $salt)
     {
+        $this->checkPasswordLength($raw);
+
         $pass2 = $this->mergePasswordAndSalt($raw, $salt);
 
         if (!$this->ignorePasswordCase) {

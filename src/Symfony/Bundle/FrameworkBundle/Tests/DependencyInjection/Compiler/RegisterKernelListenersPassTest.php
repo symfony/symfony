@@ -84,10 +84,6 @@ class RegisterKernelListenersPassTest extends \PHPUnit_Framework_TestCase
             ->method('getDefinition')
             ->will($this->returnValue($definition));
 
-        $builder->expects($this->atLeastOnce())
-            ->method('findDefinition')
-            ->will($this->returnValue($definition));
-
         $registerListenersPass = new RegisterKernelListenersPass();
         $registerListenersPass->process($builder);
     }

@@ -64,6 +64,8 @@ class BCryptPasswordEncoder extends BasePasswordEncoder
      */
     public function encodePassword($raw, $salt)
     {
+        $this->checkPasswordLength($raw);
+
         $options = array('cost' => $this->cost);
 
         if ($salt) {
@@ -78,6 +80,8 @@ class BCryptPasswordEncoder extends BasePasswordEncoder
      */
     public function isPasswordValid($encoded, $raw, $salt)
     {
+        $this->checkPasswordLength($raw);
+
         return password_verify($raw, $encoded);
     }
 }

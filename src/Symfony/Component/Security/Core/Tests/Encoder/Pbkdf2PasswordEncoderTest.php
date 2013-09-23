@@ -42,4 +42,24 @@ class Pbkdf2PasswordEncoderTest extends \PHPUnit_Framework_TestCase
         $encoder = new Pbkdf2PasswordEncoder('foobar');
         $encoder->encodePassword('password', '');
     }
+
+    /**
+     * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
+     */
+    public function testEncodePasswordLength()
+    {
+        $encoder = new Pbkdf2PasswordEncoder();
+
+        $encoder->encodePassword(str_repeat('a', 5000), 'salt');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
+     */
+    public function testCheckPasswordLength()
+    {
+        $encoder = new Pbkdf2PasswordEncoder();
+
+        $encoder->isPasswordValid('encoded', str_repeat('a', 5000), 'salt');
+    }
 }

@@ -1,0 +1,38 @@
+<?php
+
+namespace Symfony\Bridge\Doctrine\Tests\ExpressionLanguage;
+
+use Symfony\Bridge\Doctrine\ExpressionLanguage\DoctrineParserCache;
+
+class DoctrineParserCacheTest extends \PHPUnit_Framework_TestCase
+{
+    public function testFetch()
+    {
+        $doctrineCacheMock = $this->getMock('Doctrine\Common\Cache\Cache');
+        $parserCache = new DoctrineParserCache($doctrineCacheMock);
+
+        $doctrineCacheMock->expects($this->once())
+            ->method('fetch')
+            ->will($this->returnValue('bar'));
+
+        $result = $parserCache->fetch('foo');
+
+        $this->assertEquals('bar', $result);
+    }
+
+    public function testSave()
+    {
+        $doctrineCacheMock = $this->getMock('Doctrine\Common\Cache\Cache');
+        $parserCache = new DoctrineParserCache($doctrineCacheMock);
+
+        $expression = $this->getMockBuilder('Symfony\Component\ExpressionLanguage\ParsedExpression')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $doctrineCacheMock->expects($this->once())
+            ->method('save')
+            ->with('foo', $expression);
+
+        $parserCache->save('foo', $expression);
+    }
+}

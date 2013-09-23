@@ -57,7 +57,11 @@ class FrameworkExtension extends Extension
         if ($container->getParameter('kernel.debug')) {
             $loader->load('debug.xml');
 
-            // only HttpKernel needs the debug event dispatcher
+            // we can't replace the event_dispatcher service with the debug
+            // one as it would lead to circular references (mainly because the debug
+            // event dispatcher needs the profiler, which triggers the creation of many
+            // other services that can depend on the dispatcher itself -- CLI commands
+            // like assetic:dump and twig:lint exhibits this issue for instance)
             $definition = $container->findDefinition('http_kernel');
             $arguments = $definition->getArguments();
             $arguments[0] = new Reference('debug.event_dispatcher');

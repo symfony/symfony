@@ -1,4 +1,7 @@
 <info>[router]</info> Current routes
-<comment>Name</comment>    <comment>Method</comment>   <comment>Scheme</comment>     <comment>Host</comment>      <comment>Path</comment>
-route_1 GET|HEAD http|https localhost /hello/{name}
-route_2 PUT|POST http|https localhost /name/add
++---------+----------+------------+-----------+---------------+
+| Name    | Method   | Scheme     | Host      | Path          |
++---------+----------+------------+-----------+---------------+
+| route_1 | GET|HEAD | http|https | localhost | /hello/{name} |
+| route_2 | PUT|POST | http|https | localhost | /name/add     |
++---------+----------+------------+-----------+---------------+

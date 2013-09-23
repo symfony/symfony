@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Console\Descriptor;
 
 use Symfony\Component\Console\Descriptor\DescriptorInterface;
+use Symfony\Component\Console\Helper\TableHelper;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -79,6 +80,22 @@ abstract class Descriptor implements DescriptorInterface
     protected function write($content, $decorated = false)
     {
         $this->output->write($content, false, $decorated ? OutputInterface::OUTPUT_NORMAL : OutputInterface::OUTPUT_RAW);
+    }
+
+    /**
+     * Writes content to output.
+     *
+     * @param TableHelper $table
+     * @param boolean     $decorated
+     */
+    protected function renderTable(TableHelper $table, $decorated = false)
+    {
+        if (!$decorated) {
+            $table->setCellRowFormat('%s');
+            $table->setCellHeaderFormat('%s');
+        }
+
+        $table->render($this->output);
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Console\Descriptor;
 
+use Symfony\Component\Console\Helper\TableHelper;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -19,41 +20,13 @@ class TextDescriptor extends Descriptor
      */
     protected function describeRouteCollection(RouteCollection $routes, array $options = array())
     {
-        $maxName = strlen('name');
-        $maxMethod = strlen('method');
-        $maxScheme = strlen('scheme');
-        $maxHost = strlen('host');
-        $maxPath = strlen('path');
+        $showControllers = isset($options['show_controllers']) && $options['show_controllers'];
+        $headers = array('Name', 'Method', 'Scheme', 'Host', 'Path');
+        $table = new TableHelper();
+        $table->setHeaders($showControllers ? array_merge($headers, array('Controller')) : $headers);
 
         foreach ($routes->all() as $name => $route) {
-            $method = $route->getMethods() ? implode('|', $route->getMethods()) : 'ANY';
-            $scheme = $route->getSchemes() ? implode('|', $route->getSchemes()) : 'ANY';
-            $host = '' !== $route->getHost() ? $route->getHost() : 'ANY';
-            $path = $route->getPath();
-            $maxName = max($maxName, strlen($name));
-            $maxMethod = max($maxMethod, strlen($method));
-            $maxScheme = max($maxScheme, strlen($scheme));
-            $maxHost = max($maxHost, strlen($host));
-            $maxPath = max($maxPath, strlen($path));
-        }
-
-        $format = '%-'.$maxName.'s %-'.$maxMethod.'s %-'.$maxScheme.'s %-'.$maxHost.'s %s';
-        $headerFormat = '%-'.($maxName + 19).'s %-'.($maxMethod + 19).'s %-'.($maxScheme + 19).'s %-'.($maxHost + 19).'s %s';
-        $headerArgs = array('<comment>Name</comment>', '<comment>Method</comment>', '<comment>Scheme</comment>', '<comment>Host</comment>', '<comment>Path</comment>');
-
-        if ($showControllers = isset($options['show_controllers']) && $options['show_controllers']) {
-            $format = str_replace('s %s', 's %-'.$maxPath.'s %s', $format);
-            $headerFormat = $headerFormat.' %s';
-            $headerArgs[] = '<comment>Controller</comment>';
-        }
-
-        $description = array(
-            $this->formatSection('router', 'Current routes'),
-            vsprintf($headerFormat, $headerArgs),
-        );
-
-        foreach ($routes->all() as $name => $route) {
-            $args = array(
+            $row = array(
                 $name,
                 $route->getMethods() ? implode('|', $route->getMethods()) : 'ANY',
                 $route->getSchemes() ? implode('|', $route->getSchemes()) : 'ANY',
@@ -71,15 +44,14 @@ class TextDescriptor extends Descriptor
                         $controller = get_class($controller);
                     }
                 }
-
-                $args[] = $controller;
+                $row[] = $controller;
             }
 
-            // fixme: this line was originally written as raw
-            $description[] = vsprintf($format, $args);
+            $table->addRow($row);
         }
 
-        $this->writeText(implode("\n", $description), $options);
+        $this->writeText($this->formatSection('router', 'Current routes')."\n", $options);
+        $this->renderTable($table, !(isset($options['raw_output']) && $options['raw_output']));
     }
 
     /**
@@ -120,42 +92,15 @@ class TextDescriptor extends Descriptor
      */
     protected function describeContainerParameters(ParameterBag $parameters, array $options = array())
     {
-        $maxParameterWidth = 0;
-        $maxValueWidth = 0;
-
-        // Determine max parameter & value length
-        foreach ($parameters->all() as $parameter => $value) {
-            $parameterWidth = strlen($parameter);
-            if ($parameterWidth > $maxParameterWidth) {
-                $maxParameterWidth = $parameterWidth;
-            }
-
-            $valueWith = strlen($this->formatParameter($value));
-            if ($valueWith > $maxValueWidth) {
-                $maxValueWidth = $valueWith;
-            }
-        }
-
-        $maxValueWidth = min($maxValueWidth, (isset($options['max_width']) ? $options['max_width'] : PHP_INT_MAX) - $maxParameterWidth - 1);
-
-        $formatTitle = '%-'.($maxParameterWidth + 19).'s %s';
-        $format = '%-'.$maxParameterWidth.'s %s';
-
-        $output = array(sprintf($formatTitle, '<comment>Parameter</comment>', '<comment>Value</comment>'));
+        $table = new TableHelper();
+        $table->setHeaders(array('Parameter', 'Value'));
 
         foreach ($this->sortParameters($parameters) as $parameter => $value) {
-            $splits = str_split($this->formatParameter($value), $maxValueWidth);
-
-            foreach ($splits as $index => $split) {
-                if (0 === $index) {
-                    $output[] = sprintf($format, $parameter, $split);
-                } else {
-                    $output[] = sprintf($format, ' ', $split);
-                }
-            }
+            $table->addRow(array($parameter, $this->formatParameter($value)));
         }
 
-        $this->writeText($this->formatSection('container', 'List of parameters')."\n".implode("\n", $output), $options);
+        $this->writeText($this->formatSection('container', 'List of parameters')."\n", $options);
+        $this->renderTable($table, !(isset($options['raw_output']) && $options['raw_output']));
     }
 
     /**
@@ -203,20 +148,81 @@ class TextDescriptor extends Descriptor
     protected function describeContainerServices(ContainerBuilder $builder, array $options = array())
     {
         $showPrivate = isset($options['show_private']) && $options['show_private'];
+        $showTag = isset($options['tag']) ? $options['tag'] : null;
+
         if ($showPrivate) {
             $label = '<comment>Public</comment> and <comment>private</comment> services';
         } else {
             $label = '<comment>Public</comment> services';
         }
 
-        if (isset($options['tag'])) {
+        if ($showTag) {
             $label .= ' with tag <info>'.$options['tag'].'</info>';
         }
 
-        $serviceIds = isset($options['tag']) && $options['tag'] ? array_keys($builder->findTaggedServiceIds($options['tag'])) : $builder->getServiceIds();
-        $description = $this->getServiceDescription($builder, $serviceIds, $showPrivate, isset($options['tag']) ? $options['tag'] : null);
+        $this->writeText($this->formatSection('container', $label)."\n", $options);
 
-        $this->writeText($this->formatSection('container', $label)."\n".implode("\n", $description), $options);
+        $serviceIds = isset($options['tag']) && $options['tag'] ? array_keys($builder->findTaggedServiceIds($options['tag'])) : $builder->getServiceIds();
+        $maxTags = array();
+
+        foreach ($serviceIds as $key =>  $serviceId) {
+            $definition = $this->resolveServiceDefinition($builder, $serviceId);
+            if ($definition instanceof Definition) {
+                // filter out private services unless shown explicitly
+                if (!$showPrivate && !$definition->isPublic()) {
+                    unset($serviceIds[$key]);
+                    continue;
+                }
+                if ($showTag) {
+                    $tags = $definition->getTag($showTag);
+                    foreach ($tags as $tag) {
+                        foreach ($tag as $key => $value) {
+                            if (!isset($maxTags[$key])) {
+                                $maxTags[$key] = strlen($key);
+                            }
+                            if (strlen($value) > $maxTags[$key]) {
+                                $maxTags[$key] = strlen($value);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        $tagsCount = count($maxTags);
+        $tagsNames = array_keys($maxTags);
+
+        $table = new TableHelper();
+        $table->setHeaders(array_merge(array('Service ID'), $tagsNames, array('Scope', 'Class name')));
+
+        foreach ($this->sortServiceIds($serviceIds) as $serviceId) {
+            $definition = $this->resolveServiceDefinition($builder, $serviceId);
+            if ($definition instanceof Definition) {
+                if ($showTag) {
+                    foreach ($definition->getTag($showTag) as $key => $tag) {
+                        $tagValues = array();
+                        foreach ($tagsNames as $tagName) {
+                            $tagValues[] = isset($tag[$tagName]) ? $tag[$tagName] : "";
+                        }
+                        if (0 === $key) {
+                            $table->addRow(array_merge(array($serviceId), $tagValues, array($definition->getScope(), $definition->getClass())));
+                        } else {
+                            $table->addRow(array_merge(array('  "'), $tagValues, array('', '')));
+                        }
+                    }
+                } else {
+                    $table->addRow(array($serviceId, $definition->getScope(), $definition->getClass()));
+                }
+            } elseif ($definition instanceof Alias) {
+                $alias = $definition;
+                $table->addRow(array_merge(array($serviceId, 'n/a', sprintf('alias for "%s"', $alias)), $tagsCount ? array_fill(0, $tagsCount, "") : array()));
+            } else {
+                // we have no information (happens with "service_container")
+                $table->addRow(array_merge(array($serviceId, '', get_class($definition)), $tagsCount ? array_fill(0, $tagsCount, "") : array()));
+            }
+        }
+
+        $this->renderTable($table);
     }
 
     /**
@@ -259,132 +265,6 @@ class TextDescriptor extends Descriptor
     protected function describeContainerAlias(Alias $alias, array $options = array())
     {
         $this->writeText(sprintf('This service is an alias for the service <info>%s</info>', (string) $alias), $options);
-    }
-
-
-    /**
-     * @param ContainerBuilder $builder
-     * @param array            $serviceIds
-     * @param boolean          $showPrivate
-     * @param boolean          $showTag
-     *
-     * @return array
-     */
-    private function getServiceDescription(ContainerBuilder $builder, array $serviceIds, $showPrivate, $showTag)
-    {
-        // loop through to get space needed and filter private services
-        $maxName = 4;
-        $maxScope = 6;
-        $maxTags = array();
-        $serviceIds = $this->sortServiceIds($serviceIds);
-
-        foreach ($serviceIds as $key => $serviceId) {
-            $definition = $this->resolveServiceDefinition($builder, $serviceId);
-
-            if ($definition instanceof Definition) {
-                // filter out private services unless shown explicitly
-                if (!$showPrivate && !$definition->isPublic()) {
-                    unset($serviceIds[$key]);
-                    continue;
-                }
-
-                if (strlen($definition->getScope()) > $maxScope) {
-                    $maxScope = strlen($definition->getScope());
-                }
-
-                if (null !== $showTag) {
-                    $tags = $definition->getTag($showTag);
-                    foreach ($tags as $tag) {
-                        foreach ($tag as $key => $value) {
-                            if (!isset($maxTags[$key])) {
-                                $maxTags[$key] = strlen($key);
-                            }
-                            if (strlen($value) > $maxTags[$key]) {
-                                $maxTags[$key] = strlen($value);
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (strlen($serviceId) > $maxName) {
-                $maxName = strlen($serviceId);
-            }
-        }
-
-        $format  = '%-'.$maxName.'s ';
-        $format .= implode('', array_map(function($length) { return '%-'.$length.'s '; }, $maxTags));
-        $format .= '%-'.$maxScope.'s %s';
-
-        $maxTagsCount = count($maxTags);
-
-        $formatter = function ($format, $serviceId, $scope, $className, array $tagAttributes = array()) use ($format) {
-            $arguments = array($serviceId);
-            foreach ($tagAttributes as $tagAttribute) {
-                $arguments[] = $tagAttribute;
-            }
-            $arguments[] = $scope;
-            $arguments[] = $className;
-
-            return vsprintf($format, $arguments);
-        };
-
-        $tags = array();
-        foreach (array_keys($maxTags) as $tagName) {
-            $tags[] = '<comment>'.$tagName.'</comment>';
-        }
-
-        $description = array($formatter(
-            '%-'.($maxName + 19).'s '.implode('', array_map(function($length) {
-                return '%-'.($length + 19).'s ';
-            }, $maxTags)).'%-'.($maxScope + 19).'s %s',
-            '<comment>Service Id</comment>',
-            '<comment>Scope</comment>',
-            '<comment>Class Name</comment>',
-            $tags
-        ));
-
-        foreach ($serviceIds as $serviceId) {
-            $definition = $this->resolveServiceDefinition($builder, $serviceId);
-            if ($definition instanceof Definition) {
-                if (null !== $showTag) {
-                    foreach ($definition->getTag($showTag) as $key => $tag) {
-                        $tagValues = array();
-                        foreach (array_keys($maxTags) as $tagName) {
-                            $tagValues[] = isset($tag[$tagName]) ? $tag[$tagName] : "";
-                        }
-                        if (0 === $key) {
-                            $description[] = vsprintf($format, array_merge(array($serviceId), $tagValues, array($definition->getScope(), $definition->getClass())));
-                        } else {
-                            $description[] = vsprintf($format, array_merge(array('  "'), $tagValues, array('', '')));
-                        }
-                    }
-                } else {
-                    $description[] = sprintf($format, $serviceId, $definition->getScope(), $definition->getClass());
-                }
-            } elseif ($definition instanceof Alias) {
-                $alias = $definition;
-                $description[] = $formatter(
-                    $format,
-                    $serviceId,
-                    'n/a',
-                    sprintf('<comment>alias for</comment> <info>%s</info>', $alias),
-                    $maxTagsCount ? array_fill(0, $maxTagsCount, "") : array()
-                );
-            } else {
-                // we have no information (happens with "service_container")
-                $service = $definition;
-                $description[] = $formatter(
-                    $format,
-                    $serviceId,
-                    '',
-                    get_class($service),
-                    $maxTagsCount ? array_fill(0, $maxTagsCount, "") : array()
-                );
-            }
-        }
-
-        return $description;
     }
 
     /**

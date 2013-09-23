@@ -1,6 +1,9 @@
 <info>[container]</info> <comment>Public</comment> services
-<comment>Service Id</comment> <comment>Scope</comment> <comment>Class Name</comment>
-alias_1           n/a       <comment>alias for</comment> <info>service_1</info>
-alias_2           n/a       <comment>alias for</comment> <info>service_2</info>
-definition_1      container Full\Qualified\Class1
-service_container           Symfony\Component\DependencyInjection\ContainerBuilder
++-------------------+-----------+--------------------------------------------------------+
+| Service ID        | Scope     | Class name                                             |
++-------------------+-----------+--------------------------------------------------------+
+| alias_1           | n/a       | alias for "service_1"                                  |
+| alias_2           | n/a       | alias for "service_2"                                  |
+| definition_1      | container | Full\Qualified\Class1                                  |
+| service_container |           | Symfony\Component\DependencyInjection\ContainerBuilder |
++-------------------+-----------+--------------------------------------------------------+

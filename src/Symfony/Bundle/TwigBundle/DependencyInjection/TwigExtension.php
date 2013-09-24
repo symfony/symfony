@@ -156,7 +156,7 @@ class TwigExtension extends Extension
             $reflection = new \ReflectionClass($class);
 
             $bundleInstance = $reflection->newInstance();
-            if (null === $parentBundle = $bundleInstance->getParent()) {
+            if (null === $bundleInstance->getParent()) {
                 $parentBundles[$bundle] = $reflection;
             } else {
                 $childBundles[$bundle] = $reflection;

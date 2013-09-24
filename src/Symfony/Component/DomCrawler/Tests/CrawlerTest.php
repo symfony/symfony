@@ -425,8 +425,6 @@ EOF
      */
     public function testFilter()
     {
-        $this->markSkippedIfCssSelectorNotPresent();
-
         $crawler = $this->createTestCrawler();
         $this->assertNotSame($crawler, $crawler->filter('li'), '->filter() returns a new instance of a crawler');
         $this->assertInstanceOf('Symfony\\Component\\DomCrawler\\Crawler', $crawler, '->filter() returns a new instance of a crawler');
@@ -438,8 +436,6 @@ EOF
 
     public function testFilterWithDefaultNamespace()
     {
-        $this->markSkippedIfCssSelectorNotPresent();
-
         $crawler = $this->createTestXmlCrawler()->filter('default|entry default|id');
         $this->assertCount(1, $crawler, '->filter() automatically registers namespaces');
         $this->assertSame('tag:youtube.com,2008:video:kgZRZmEc9j4', $crawler->text());
@@ -447,8 +443,6 @@ EOF
 
     public function testFilterWithNamespace()
     {
-        $this->markSkippedIfCssSelectorNotPresent();
-
         CssSelector::disableHtmlExtension();
 
         $crawler = $this->createTestXmlCrawler()->filter('yt|accessControl');
@@ -457,8 +451,6 @@ EOF
 
     public function testFilterWithMultipleNamespaces()
     {
-        $this->markSkippedIfCssSelectorNotPresent();
-
         CssSelector::disableHtmlExtension();
 
         $crawler = $this->createTestXmlCrawler()->filter('media|group yt|aspectRatio');
@@ -769,12 +761,5 @@ EOF
         $domxpath = new \DOMXPath($dom);
 
         return $domxpath->query('//div');
-    }
-
-    protected function markSkippedIfCssSelectorNotPresent()
-    {
-        if (!class_exists('Symfony\Component\CssSelector\CssSelector')) {
-            $this->markTestSkipped('The "CssSelector" component is not available');
-        }
     }
 }

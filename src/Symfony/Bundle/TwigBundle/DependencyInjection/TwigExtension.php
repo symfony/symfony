@@ -79,13 +79,11 @@ class TwigExtension extends Extension
                 $this->addTwigPath($twigFilesystemLoaderDefinition, $dir, $bundle);
             }
 
-            if ($reflection->hasMethod('getParent')) {
-                $bundleInstance = $reflection->newInstance();
+            $bundleInstance = $reflection->newInstance();
 
-                if (null !== $parentBundle = $bundleInstance->getParent()) {
-                    if (is_dir($dir = dirname($reflection->getFilename()).'/Resources/views')) {
-                        $this->prependTwigPath($twigFilesystemLoaderDefinition, $dir, $parentBundle);
-                    }
+            if (null !== $parentBundle = $bundleInstance->getParent()) {
+                if (is_dir($dir = dirname($reflection->getFilename()).'/Resources/views')) {
+                    $this->prependTwigPath($twigFilesystemLoaderDefinition, $dir, $parentBundle);
                 }
             }
         }

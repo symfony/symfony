@@ -69,21 +69,24 @@ class TwigExtension extends Extension
         }
 
         // register bundles as Twig namespaces
-        foreach ($container->getParameter('kernel.bundles') as $bundle => $class) {
-            if (is_dir($dir = $container->getParameter('kernel.root_dir').'/Resources/'.$bundle.'/views')) {
-                $this->addTwigPath($twigFilesystemLoaderDefinition, $dir, $bundle);
-            }
-
-            $reflection = new \ReflectionClass($class);
-            if (is_dir($dir = dirname($reflection->getFilename()).'/Resources/views')) {
-                $this->addTwigPath($twigFilesystemLoaderDefinition, $dir, $bundle);
-            }
-
-            $bundleInstance = $reflection->newInstance();
-            if (null !== $parentBundle = $bundleInstance->getParent()) {
-                if (is_dir($dir = dirname($reflection->getFilename()).'/Resources/views')) {
-                    $this->prependTwigPath($twigFilesystemLoaderDefinition, $dir, $parentBundle);
+        $bundles = $this->getBundlesByChildPriority($container);
+        foreach ($bundles as $bundle => $bundleReflection) {
+            if (null !== $parentBundle = $bundleReflection->newInstance()->getParent()) {
+                if (is_dir($dir = $container->getParameter('kernel.root_dir').'/Resources/'.$bundle.'/views')) {
+                    $this->addTwigPath($twigFilesystemLoaderDefinition, $dir, $bundle);
                 }
+
+                if (is_dir($dir = $container->getParameter('kernel.root_dir').'/Resources/'.$parentBundle.'/views')) {
+                    $this->addTwigPath($twigFilesystemLoaderDefinition, $dir, $parentBundle);
+                }
+
+                if (is_dir($dir = dirname($bundleReflection->getFilename()).'/Resources/views')) {
+                    $this->addTwigPath($twigFilesystemLoaderDefinition, $dir, $parentBundle);
+                }
+            }
+
+            if (is_dir($dir = dirname($bundleReflection->getFilename()).'/Resources/views')) {
+                $this->addTwigPath($twigFilesystemLoaderDefinition, $dir, $bundle);
             }
         }
 
@@ -137,28 +140,37 @@ class TwigExtension extends Extension
         ));
     }
 
+    /**
+     * @param ContainerBuilder $container
+     * @return array | \ReflectionClass[]
+     */
+    private function getBundlesByChildPriority(ContainerBuilder $container)
+    {
+        $childBundles = array();
+        $parentBundles = array();
+
+        foreach ($container->getParameter('kernel.bundles') as $bundle => $class) {
+            $reflection = new \ReflectionClass($class);
+
+            $bundleInstance = $reflection->newInstance();
+            if (null === $parentBundle = $bundleInstance->getParent()) {
+                $parentBundles[$bundle] = $reflection;
+            } else {
+                $childBundles[$bundle] = $reflection;
+            }
+        }
+
+        return array_merge($childBundles, $parentBundles);
+    }
+
     private function addTwigPath($twigFilesystemLoaderDefinition, $dir, $bundle)
-    {
-        $name = $this->getShortBundleName($bundle);
-
-        $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($dir, $name));
-    }
-
-    private function prependTwigPath($twigFilesystemLoaderDefinition, $dir, $bundle)
-    {
-        $name = $this->getShortBundleName($bundle);
-
-        $twigFilesystemLoaderDefinition->addMethodCall('prependPath', array($dir, $name));
-    }
-
-    private function getShortBundleName($bundle)
     {
         $name = $bundle;
         if ('Bundle' === substr($name, -6)) {
             $name = substr($name, 0, -6);
         }
 
-        return $name;
+        $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($dir, $name));
     }
 
     /**

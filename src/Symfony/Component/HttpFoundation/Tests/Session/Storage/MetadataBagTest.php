@@ -43,27 +43,23 @@ class MetadataBagTest extends \PHPUnit_Framework_TestCase
 
     public function testInitialize()
     {
-        $p = new \ReflectionProperty('Symfony\Component\HttpFoundation\Session\Storage\MetadataBag', 'meta');
-        $p->setAccessible(true);
+        $sessionMetadata = array();
 
         $bag1 = new MetadataBag();
-        $array = array();
-        $bag1->initialize($array);
+        $bag1->initialize($sessionMetadata);
         $this->assertGreaterThanOrEqual(time(), $bag1->getCreated());
         $this->assertEquals($bag1->getCreated(), $bag1->getLastUsed());
 
         sleep(1);
         $bag2 = new MetadataBag();
-        $array2 = $p->getValue($bag1);
-        $bag2->initialize($array2);
+        $bag2->initialize($sessionMetadata);
         $this->assertEquals($bag1->getCreated(), $bag2->getCreated());
         $this->assertEquals($bag1->getLastUsed(), $bag2->getLastUsed());
         $this->assertEquals($bag2->getCreated(), $bag2->getLastUsed());
 
         sleep(1);
         $bag3 = new MetadataBag();
-        $array3 = $p->getValue($bag2);
-        $bag3->initialize($array3);
+        $bag3->initialize($sessionMetadata);
         $this->assertEquals($bag1->getCreated(), $bag3->getCreated());
         $this->assertGreaterThan($bag2->getLastUsed(), $bag3->getLastUsed());
         $this->assertNotEquals($bag3->getCreated(), $bag3->getLastUsed());

@@ -86,10 +86,6 @@ class TwigExtension extends Extension
                     if (is_dir($dir = dirname($reflection->getFilename()).'/Resources/views')) {
                         $this->prependTwigPath($twigFilesystemLoaderDefinition, $dir, $parentBundle);
                     }
-
-                    if (is_dir($dir = $container->getParameter('kernel.root_dir').'/Resources/'.$bundle.'/views')) {
-                        $this->prependTwigPath($twigFilesystemLoaderDefinition, $dir, $parentBundle);
-                    }
                 }
             }
         }

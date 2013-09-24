@@ -71,21 +71,24 @@ class TwigExtension extends Extension
         // register bundles as Twig namespaces
         $bundles = $this->getBundlesByChildPriority($container);
         foreach ($bundles as $bundle => $bundleReflection) {
-            if (null !== $parentBundle = $bundleReflection->newInstance()->getParent()) {
-                if (is_dir($dir = $container->getParameter('kernel.root_dir').'/Resources/'.$bundle.'/views')) {
-                    $this->addTwigPath($twigFilesystemLoaderDefinition, $dir, $bundle);
-                }
+            /** @var \Symfony\Component\HttpKernel\Bundle\BundleInterface $bundleInstance */
+            $bundleInstance = $bundleReflection->newInstance();
 
-                if (is_dir($dir = $container->getParameter('kernel.root_dir').'/Resources/'.$parentBundle.'/views')) {
+            if (null !== $parentBundle = $bundleInstance->getParent()) {
+                if (is_dir($dir = $container->getParameter('kernel.root_dir').'/Resources/'.$bundle.'/views')) {
                     $this->addTwigPath($twigFilesystemLoaderDefinition, $dir, $parentBundle);
                 }
 
-                if (is_dir($dir = dirname($bundleReflection->getFilename()).'/Resources/views')) {
+                if (is_dir($dir = $bundleInstance->getPath().'/Resources/views')) {
                     $this->addTwigPath($twigFilesystemLoaderDefinition, $dir, $parentBundle);
                 }
             }
 
-            if (is_dir($dir = dirname($bundleReflection->getFilename()).'/Resources/views')) {
+            if (is_dir($dir = $container->getParameter('kernel.root_dir').'/Resources/'.$bundle.'/views')) {
+                $this->addTwigPath($twigFilesystemLoaderDefinition, $dir, $bundle);
+            }
+
+            if (is_dir($dir = $bundleInstance->getPath().'/Resources/views')) {
                 $this->addTwigPath($twigFilesystemLoaderDefinition, $dir, $bundle);
             }
         }

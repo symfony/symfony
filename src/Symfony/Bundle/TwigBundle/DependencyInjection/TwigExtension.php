@@ -80,7 +80,6 @@ class TwigExtension extends Extension
             }
 
             $bundleInstance = $reflection->newInstance();
-
             if (null !== $parentBundle = $bundleInstance->getParent()) {
                 if (is_dir($dir = dirname($reflection->getFilename()).'/Resources/views')) {
                     $this->prependTwigPath($twigFilesystemLoaderDefinition, $dir, $parentBundle);

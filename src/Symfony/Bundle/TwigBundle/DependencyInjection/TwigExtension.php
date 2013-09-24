@@ -78,6 +78,20 @@ class TwigExtension extends Extension
             if (is_dir($dir = dirname($reflection->getFilename()).'/Resources/views')) {
                 $this->addTwigPath($twigFilesystemLoaderDefinition, $dir, $bundle);
             }
+
+            if ($reflection->hasMethod('getParent')) {
+                $bundleInstance = $reflection->newInstance();
+
+                if (null !== $parentBundle = $bundleInstance->getParent()) {
+                    if (is_dir($dir = $container->getParameter('kernel.root_dir').'/Resources/'.$bundle.'/views')) {
+                        $this->prependTwigPath($twigFilesystemLoaderDefinition, $dir, $parentBundle);
+                    }
+
+                    if (is_dir($dir = dirname($reflection->getFilename()).'/Resources/views')) {
+                        $this->prependTwigPath($twigFilesystemLoaderDefinition, $dir, $parentBundle);
+                    }
+                }
+            }
         }
 
         if (is_dir($dir = $container->getParameter('kernel.root_dir').'/Resources/views')) {
@@ -132,11 +146,26 @@ class TwigExtension extends Extension
 
     private function addTwigPath($twigFilesystemLoaderDefinition, $dir, $bundle)
     {
+        $name = $this->getShortBundleName($bundle);
+
+        $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($dir, $name));
+    }
+
+    private function prependTwigPath($twigFilesystemLoaderDefinition, $dir, $bundle)
+    {
+        $name = $this->getShortBundleName($bundle);
+
+        $twigFilesystemLoaderDefinition->addMethodCall('prependPath', array($dir, $name));
+    }
+
+    private function getShortBundleName($bundle)
+    {
         $name = $bundle;
         if ('Bundle' === substr($name, -6)) {
             $name = substr($name, 0, -6);
         }
-        $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($dir, $name));
+
+        return $name;
     }
 
     /**

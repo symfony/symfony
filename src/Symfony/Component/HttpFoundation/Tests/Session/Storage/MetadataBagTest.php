@@ -100,4 +100,36 @@ class MetadataBagTest extends \PHPUnit_Framework_TestCase
     {
         $this->bag->clear();
     }
+
+    public function testSkipLastUsedUpdate()
+    {
+        $bag = new MetadataBag('', 30);
+        $timeStamp = time();
+
+        $created = $timeStamp - 15;
+        $sessionMetadata = array(
+            MetadataBag::CREATED => $created,
+            MetadataBag::UPDATED => $created,
+            MetadataBag::LIFETIME => 1000
+        );
+        $bag->initialize($sessionMetadata);
+
+        $this->assertEquals($created, $sessionMetadata[MetadataBag::UPDATED]);
+    }
+
+    public function testDoesNotSkipLastUsedUpdate()
+    {
+        $bag = new MetadataBag('', 30);
+        $timeStamp = time();
+
+        $created = $timeStamp - 45;
+        $sessionMetadata = array(
+            MetadataBag::CREATED => $created,
+            MetadataBag::UPDATED => $created,
+            MetadataBag::LIFETIME => 1000
+        );
+        $bag->initialize($sessionMetadata);
+
+        $this->assertEquals($timeStamp, $sessionMetadata[MetadataBag::UPDATED]);
+    }
 }

@@ -94,6 +94,9 @@ class DialogHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('FooBundle', $dialog->ask($this->getOutputStream(), 'Please select a bundle', 'FrameworkBundle', $bundles));
     }
 
+    /**
+     * @group tty
+     */
     public function testAskHiddenResponse()
     {
         if (defined('PHP_WINDOWS_VERSION_BUILD')) {

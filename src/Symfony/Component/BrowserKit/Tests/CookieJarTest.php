@@ -195,4 +195,13 @@ class CookieJarTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('foo' => 'bar1'), $cookieJar->allValues('http://foo.example.com/'));
         $this->assertEquals(array('foo' => 'bar2'), $cookieJar->allValues('http://bar.example.com/'));
     }
+
+    public function testCookieWithWildcardDomain()
+    {
+        $cookieJar = new CookieJar();
+        $cookieJar->set(new Cookie('foo', 'bar', null, '/', '.example.com'));
+
+        $this->assertEquals(array('foo' => 'bar'), $cookieJar->allValues('http://www.example.com'));
+        $this->assertEmpty($cookieJar->allValues('http://wwwexample.com'));
+    }
 }

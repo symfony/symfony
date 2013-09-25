@@ -60,9 +60,9 @@ abstract class AbstractFormTest extends \PHPUnit_Framework_TestCase
      *
      * @return FormBuilder
      */
-    protected function getBuilder($name = 'name', EventDispatcherInterface $dispatcher = null, $dataClass = null)
+    protected function getBuilder($name = 'name', EventDispatcherInterface $dispatcher = null, $dataClass = null, array $options = array())
     {
-        return new FormBuilder($name, $dataClass, $dispatcher ?: $this->dispatcher, $this->factory);
+        return new FormBuilder($name, $dataClass, $dispatcher ?: $this->dispatcher, $this->factory, $options);
     }
 
     /**

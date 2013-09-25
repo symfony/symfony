@@ -412,7 +412,16 @@ class Button implements \IteratorAggregate, FormInterface
             $parent = $this->parent->createView();
         }
 
-        return $this->config->getType()->createView($this, $parent);
+
+        $type = $this->config->getType();
+        $options = $this->config->getOptions();
+
+        $view = $type->createView($this, $parent);
+
+        $type->buildView($view, $this, $options);
+        $type->finishView($view, $this, $options);
+
+        return $view;
     }
 
     /**

@@ -28,6 +28,16 @@ class Crawler extends \SplObjectStorage
     protected $uri;
 
     /**
+     * @var string The default namespace prefix to be used with XPath and CSS expressions
+     */
+    private $defaultNamespacePrefix = 'default';
+
+    /**
+     * @var array A map of manually registered namespaces
+     */
+    private $namespaces = array();
+
+    /**
      * Constructor.
      *
      * @param mixed  $node A Node to use as the base for the crawling
@@ -92,7 +102,7 @@ class Crawler extends \SplObjectStorage
     public function addContent($content, $type = null)
     {
         if (empty($type)) {
-            $type = 'text/html';
+            $type = 0 === strpos($content, '<?xml') ? 'application/xml' : 'text/html';
         }
 
         // DOM only for HTML/XML content
@@ -195,9 +205,7 @@ class Crawler extends \SplObjectStorage
 
         $dom = new \DOMDocument('1.0', $charset);
         $dom->validateOnParse = true;
-
-        // remove the default namespace to make XPath expressions simpler
-        @$dom->loadXML(str_replace('xmlns', 'ns', $content), LIBXML_NONET);
+        @$dom->loadXML($content, LIBXML_NONET);
 
         libxml_use_internal_errors($current);
         libxml_disable_entity_loader($disableEntities);
@@ -579,7 +587,8 @@ class Crawler extends \SplObjectStorage
             $root->appendChild($document->importNode($node, true));
         }
 
-        $domxpath = new \DOMXPath($document);
+        $prefixes = $this->findNamespacePrefixes($xpath);
+        $domxpath = $this->createDOMXPath($document, $prefixes);
 
         return new static($domxpath->query($xpath), $this->uri);
     }
@@ -710,6 +719,25 @@ class Crawler extends \SplObjectStorage
     }
 
     /**
+     * Overloads a default namespace prefix to be used with XPath and CSS expressions.
+     *
+     * @param string $prefix
+     */
+    public function setDefaultNamespacePrefix($prefix)
+    {
+        $this->defaultNamespacePrefix = $prefix;
+    }
+
+    /**
+     * @param string $prefix
+     * @param string $namespace
+     */
+    public function registerNamespace($prefix, $namespace)
+    {
+        $this->namespaces[$prefix] = $namespace;
+    }
+
+    /**
      * Converts string for XPath expressions.
      *
      * Escaped characters are: quotes (") and apostrophe (').
@@ -791,5 +819,63 @@ class Crawler extends \SplObjectStorage
         } while ($node = $node->$siblingDir);
 
         return $nodes;
+    }
+
+    /**
+     * @param \DOMDocument $document
+     * @param array        $prefixes
+     *
+     * @return \DOMXPath
+     *
+     * @throws \InvalidArgumentException
+     */
+    private function createDOMXPath(\DOMDocument $document, array $prefixes = array())
+    {
+        $domxpath = new \DOMXPath($document);
+
+        foreach ($prefixes as $prefix) {
+            $namespace = $this->discoverNamespace($domxpath, $prefix);
+            $domxpath->registerNamespace($prefix, $namespace);
+        }
+
+        return $domxpath;
+    }
+
+    /**
+     * @param \DOMXPath $domxpath
+     * @param string    $prefix
+     *
+     * @return string
+     *
+     * @throws \InvalidArgumentException
+     */
+    private function discoverNamespace(\DOMXPath $domxpath, $prefix)
+    {
+        if (isset($this->namespaces[$prefix])) {
+            return $this->namespaces[$prefix];
+        }
+
+        // ask for one namespace, otherwise we'd get a collection with an item for each node
+        $namespaces = $domxpath->query(sprintf('(//namespace::*[name()="%s"])[last()]', $this->defaultNamespacePrefix === $prefix ? '' : $prefix));
+
+        if ($node = $namespaces->item(0)) {
+            return $node->nodeValue;
+        }
+
+        throw new \InvalidArgumentException(sprintf('Could not find a namespace for the prefix: "%s"', $prefix));
+    }
+
+    /**
+     * @param $xpath
+     *
+     * @return array
+     */
+    private function findNamespacePrefixes($xpath)
+    {
+        if (preg_match_all('/(?P<prefix>[a-zA-Z_][a-zA-Z_0-9\-\.]*):[^:]/', $xpath, $matches)) {
+            return array_unique($matches['prefix']);
+        }
+
+        return array();
     }
 }

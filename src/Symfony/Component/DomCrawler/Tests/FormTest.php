@@ -87,27 +87,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     public function testConstructorHandlesFormAttribute()
     {
-        $dom = new \DOMDocument();
-        $dom->loadHTML('
-            <html>
-                <form id="form_1" action="" method="POST">
-                    <input type="checkbox" name="apples[]" value="1" checked />
-                    <input form="form_2" type="checkbox" name="oranges[]" value="1" checked />
-                    <input form="form_1" type="hidden" name="form_name" value="form_1" />
-                    <input form="form_1" type="submit" name="button_1" value="Capture fields" />
-                    <button form="form_2" type="submit" name="button_2">Submit form_2</button>
-                </form>
-                <input form="form_1" type="checkbox" name="apples[]" value="2" checked />
-                <form id="form_2" action="" method="POST">
-                    <input type="checkbox" name="oranges[]" value="2" checked />
-                    <input type="checkbox" name="oranges[]" value="3" checked />
-                    <input form="form_2" type="hidden" name="form_name" value="form_2" />
-                    <input form="form_1" type="hidden" name="outer_field" value="success" />
-                    <button form="form_1" type="submit" name="button_3">Submit from outside the form</button>
-                </form>
-                <button />
-            </html>
-        ');
+        $dom = $this->createTestHtml5Form();
 
         $inputElements = $dom->getElementsByTagName('input');
         $buttonElements = $dom->getElementsByTagName('button');
@@ -121,11 +101,22 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
         $form2 = new Form($buttonElements->item(0), 'http://example.com');
         $this->assertSame($dom->getElementsByTagName('form')->item(1), $form2->getFormNode(), 'HTML5-compliant form attribute handled incorrectly');
+    }
 
-        // Tests if form elements are correctly assigned to forms
+    public function testConstructorHandlesFormValues()
+    {
+        $dom = $this->createTestHtml5Form();
+
+        $inputElements = $dom->getElementsByTagName('input');
+        $buttonElements = $dom->getElementsByTagName('button');
+
+        $form1 = new Form($inputElements->item(3), 'http://example.com');
+        $form2 = new Form($buttonElements->item(0), 'http://example.com');
+
+        // Tests if form values are correctly assigned to forms
         $values1 = array(
             'apples' => array('1', '2'),
-            'form_name' => 'form_1',
+            'form_name' => 'form-1',
             'button_1' => 'Capture fields',
             'outer_field' => 'success'
         );
@@ -133,10 +124,11 @@ class FormTest extends \PHPUnit_Framework_TestCase
             'oranges' => array('1', '2', '3'),
             'form_name' => 'form_2',
             'button_2' => '',
+            'app_frontend_form_type_contact_form_type' => array('contactType' => '', 'firstName' => 'John')
         );
+
         $this->assertEquals($values1, $form1->getPhpValues(), 'HTML5-compliant form attribute handled incorrectly');
         $this->assertEquals($values2, $form2->getPhpValues(), 'HTML5-compliant form attribute handled incorrectly');
-
     }
 
     public function testMultiValuedFields()
@@ -776,5 +768,41 @@ class FormTest extends \PHPUnit_Framework_TestCase
         }
 
         return new Form($nodes->item($nodes->length - 1), $currentUri, $method);
+    }
+
+    protected function createTestHtml5Form() {
+        $dom = new \DOMDocument();
+        $dom->loadHTML('
+        <html>
+            <h1>Hello form</h1>
+            <form id="form-1" action="" method="POST">
+                <div><input type="checkbox" name="apples[]" value="1" checked /></div>
+                <input form="form_2" type="checkbox" name="oranges[]" value="1" checked />
+                <div><label></label><input form="form-1" type="hidden" name="form_name" value="form-1" /></div>
+                <input form="form-1" type="submit" name="button_1" value="Capture fields" />
+                <button form="form_2" type="submit" name="button_2">Submit form_2</button>
+            </form>
+            <input form="form-1" type="checkbox" name="apples[]" value="2" checked />
+            <form id="form_2" action="" method="POST">
+                <div><div><input type="checkbox" name="oranges[]" value="2" checked />
+                <input type="checkbox" name="oranges[]" value="3" checked /></div></div>
+                <input form="form_2" type="hidden" name="form_name" value="form_2" />
+                <input form="form-1" type="hidden" name="outer_field" value="success" />
+                <button form="form-1" type="submit" name="button_3">Submit from outside the form</button>
+                <div>
+                    <label for="app_frontend_form_type_contact_form_type_contactType">Message subject</label>
+                    <div>
+                        <select name="app_frontend_form_type_contact_form_type[contactType]" id="app_frontend_form_type_contact_form_type_contactType"><option selected="selected" value="">Please select subject</option><option id="1">Test type</option></select>
+                    </div>
+                </div>
+                <div>
+                    <label for="app_frontend_form_type_contact_form_type_firstName">Firstname</label>
+                    <input type="text" name="app_frontend_form_type_contact_form_type[firstName]" value="John" id="app_frontend_form_type_contact_form_type_firstName"/>
+                </div>
+            </form>
+            <button />
+        </html>');
+
+        return $dom;
     }
 }

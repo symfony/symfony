@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Symfony2" default="travis">
+    <target name="travis" depends="tests-parallel,show-test-results" />
+
+    <target name="clean" description="Cleanup build artifacts">
+        <delete dir="${basedir}/build"/>
+    </target>
+
+    <target name="prepare" depends="clean" description="Prepare for build">
+        <mkdir dir="${basedir}/build/test-results"/>
+    </target>
+
+    <target name="composer-install" description="Installs dependencies via composer install">
+        <exec executable="composer" failonerror="true">
+            <env key="COMPOSER_ROOT_VERSION" value="dev-master"/>
+            <arg value="install" />
+            <arg value="--dev" />
+            <arg value="--prefer-source" />
+        </exec>
+    </target>
+
+    <target
+        name="tests-parallel"
+        depends="prepare,composer-install"
+        description="Run tests for the various components in parallel"
+    >
+        <parallel threadCount="8">
+            <!--
+                If there's a way of having this without the explicit component
+                list, please PR
+            -->
+            <bridge-test bridge="Doctrine"/>
+            <bridge-test bridge="Monolog"/>
+            <bridge-test bridge="Propel1"/>
+            <bridge-test bridge="Swiftmailer"/>
+            <bridge-test bridge="Twig"/>
+            <bundle-test bundle="FrameworkBundle"/>
+            <bundle-test bundle="SecurityBundle"/>
+            <bundle-test bundle="TwigBundle"/>
+            <bundle-test bundle="WebProfilerBundle"/>
+            <component-test component="BrowserKit"/>
+            <component-test component="ClassLoader"/>
+            <component-test component="Config"/>
+            <component-test component="Console"/>
+            <component-test component="CssSelector"/>
+            <component-test component="Debug"/>
+            <component-test component="DependencyInjection"/>
+            <component-test component="DomCrawler"/>
+            <component-test component="EventDispatcher"/>
+            <component-test component="Filesystem"/>
+            <component-test component="Finder"/>
+            <component-test component="Form"/>
+            <component-test component="HttpFoundation"/>
+            <component-test component="HttpKernel"/>
+            <component-test component="Intl"/>
+            <component-test component="Locale"/>
+            <component-test component="OptionsResolver"/>
+            <component-test component="Process"/>
+            <component-test component="PropertyAccess"/>
+            <component-test component="Routing"/>
+            <component-test component="Security"/>
+            <component-test component="Serializer"/>
+            <component-test component="Stopwatch"/>
+            <component-test component="Templating"/>
+            <component-test component="Translation"/>
+            <component-test component="Validator"/>
+            <component-test component="Yaml"/>
+        </parallel>
+    </target>
+
+    <target name="show-test-results" description="Display logged test results">
+        <concat>
+            <fileset dir="${basedir}/build/test-results/"/>
+        </concat>
+    </target>
+
+    <macrodef name="bridge-test">
+        <attribute name="bridge"/>
+        <sequential>
+            <echo output="${basedir}/build/test-results/@{bridge}.log" level="debug">
+
+                Symfony/Bridge/@{bridge}
+
+            </echo>
+            <exec
+                    executable="phpunit"
+                    output="${basedir}/build/test-results/@{bridge}.log"
+                    error="${basedir}/build/test-results/@{bridge}.log"
+                    failonerror="true"
+                    append="true"
+                    >
+                <arg value="${basedir}/src/Symfony/Bridge/@{bridge}" />
+            </exec>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="bundle-test">
+        <attribute name="bundle"/>
+        <sequential>
+            <echo output="${basedir}/build/test-results/@{bundle}.log" level="debug">
+
+                Symfony/Bundle/@{bundle}
+
+            </echo>
+            <exec
+                    executable="phpunit"
+                    output="${basedir}/build/test-results/@{bundle}.log"
+                    error="${basedir}/build/test-results/@{bundle}.log"
+                    failonerror="true"
+                    append="true"
+                    >
+                <arg value="${basedir}/src/Symfony/Bundle/@{bundle}" />
+            </exec>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="component-test">
+        <attribute name="component"/>
+        <sequential>
+            <echo output="${basedir}/build/test-results/@{component}.log" level="debug">
+
+                Symfony/Component/@{component}
+
+            </echo>
+            <exec
+                    executable="phpunit"
+                    output="${basedir}/build/test-results/@{component}.log"
+                    error="${basedir}/build/test-results/@{component}.log"
+                    failonerror="true"
+                    append="true"
+                    >
+                <arg value="${basedir}/src/Symfony/Component/@{component}" />
+            </exec>
+        </sequential>
+    </macrodef>
+</project>

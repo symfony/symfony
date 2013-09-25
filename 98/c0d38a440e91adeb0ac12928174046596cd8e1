@@ -1,0 +1,308 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-03-23T13:23:19Z
+
+@jakzal Any news on this PR. I would love to have this in 2.3.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2013-03-26T10:38:38Z
+
+@fabpot I stumbled across few issues, some of them already reported by @arryon. Let me do a brain dump here. Note that we'll have similar problems with #5886.
+
+XML content is loaded in different ways depending on a method we use.
+
+Consider simple XML below:
+
+    <?xml version="1.0" encoding="UTF-8"?>
+    <entry xmlns="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/" xmlns:yt="http://gdata.youtube.com/schemas/2007">
+        <id>tag:youtube.com,2008:video:kgZRZmEc9j4</id>
+        <yt:accessControl action="comment" permission="allowed"/>
+        <yt:accessControl action="videoRespond" permission="moderated"/>
+        <media:group>
+            <media:title type="plain">Chordates - CrashCourse Biology #24</media:title>
+            <yt:aspectRatio>widescreen</yt:aspectRatio>
+        </media:group>
+    </entry>
+
+Most of the time XML is loaded as html, since this is a default type in the [addContent()](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/DomCrawler/Crawler.php#L86) method. `addContent` is also used when calling [add()](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/DomCrawler/Crawler.php#L65) or using [the constructor](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/DomCrawler/Crawler.php#L38).
+
+When loading the XML with one of the mentioned methods:
+
+    $crawler = new Crawler(file_get_contents('entry.xml'));
+
+    foreach ($crawler as $domElement) {
+        echo $domElement->ownerDocument->saveXML();
+    }
+
+we end up with the following result:
+
+    <?xml version="1.0" standalone="yes"?>
+    <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+    <?xml version="1.0" encoding="UTF-8"??>
+    <html>
+        <body>
+            <entry xmlns="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/" xmlns:yt="http://gdata.youtube.com/schemas/2007">
+                <id>tag:youtube.com,2008:video:kgZRZmEc9j4</id>
+                <accesscontrol action="comment" permission="allowed"/>
+                <accesscontrol action="videoRespond" permission="moderated"/>
+                <group>
+                    <title type="plain">Chordates - CrashCourse Biology #24</title>
+                    <aspectratio>widescreen</aspectratio>
+                </group>
+            </entry>
+        </body>
+    </html>
+
+Notice that namespace attributes remain unchanged on the entry tag, but nodes are not namespaced anymore. Our XML is embedded in an html now. I'm not sure if this was an intended behaviour. If so, it might be worth documenting and advising loading XMLs with [addXmlContent()](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/DomCrawler/Crawler.php#L169).
+
+At the moment only way to load XML with `addXmlContent` is to call it directly:
+
+    $crawler = new Crawler();
+    $crawler->addXmlContent(file_get_contents('entry.xml'));
+
+    foreach ($crawler as $domElement) {
+        echo $domElement->ownerDocument->saveXML();
+    }
+
+`addXmlContent` removes all the namespaces to simplify xpath expressions, so we end up with:
+
+    <?xml version="1.0" encoding="UTF-8"?>
+    <entry ns="http://www.w3.org/2005/Atom" media="http://search.yahoo.com/mrss/" yt="http://gdata.youtube.com/schemas/2007">
+        <id>tag:youtube.com,2008:video:kgZRZmEc9j4</id>
+        <accessControl action="comment" permission="allowed"/>
+        <accessControl action="videoRespond" permission="moderated"/>
+        <group>
+            <title type="plain">Chordates - CrashCourse Biology #24</title>
+            <aspectRatio>widescreen</aspectRatio>
+        </group>
+    </entry>
+
+It indeed makes xpath expressions simpler, since we no longer have to use prefixes. However, it might cause problems with complex XMLs where we might get the same node in multiple namespaces. Namespaces are there to prevent name collisions, by removing them we're exposing ourselves to this issue.
+
+Only way to keep the original XML is to use DOMDocument:
+
+    $dom = new \DOMDocument();
+    $dom->loadXML(file_get_contents('entry.xml'));
+
+    $crawler = new Crawler($dom);
+
+    foreach ($crawler as $domElement) {
+        echo $domElement->ownerDocument->saveXML();
+    }
+
+My solution only works if we load the XML with DOMDocument. In other cases either namespace definitions or nodes are modified.
+
+Furthermore, at the moment my solution doesn't work with a default namespace (oh irony). Just because we have a default namespace, doesn't mean we can drop it from xpath expressions. That's probably the reason why code in `addXmlContent` is removing it.
+
+In other words, even if we fixed issues with variate of ways we can load XML, we'd have to register a default namespace in some way (either by convention, or explicitly).
+
+Imho we have to problems to solve here:
+* consistency in loading XMLs
+* providing users with a way to use namespace prefixes in xpath expressions
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-04-21T07:04:41Z
+
+@jakzal Are you closing because you think there are no good solutions? If that's the case, can we also close #5886 and #4845?
+
+---------------------------------------------------------------------------
+
+by jakzal at 2013-04-21T07:45:30Z
+
+@fabpot I can't find a good solution for autodiscovery. Main reason is that even the default namespace has to be registered before querying with xpath. I'm not sure what would be a good prefix for a default namespace (or if we should be doing this at all).
+
+#5886 is not a serious problem, since we can actually work around it (i've posted an update there, it's possible to skip the namespace in xpath). It could become a problem with complex XMLs, with multiple namespaces containing the same nodes.
+
+If we decided that solution for #5886 is good enough, than we could close #4845 as well.
+
+Otherwise we'd probably need to make a BC break, to avoid [playing with namespaces](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/DomCrawler/Crawler.php#L184) when loading XMLs:
+```php
+// remove the default namespace to make XPath expressions simpler
+@$dom->loadXML(str_replace('xmlns', 'ns', $content), LIBXML_NONET);
+```
+
+I'm not sure what was the intention, but it actually removes ALL the namespaces (which is not what comment says). We definitely have to document it.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-04-25T12:43:15Z
+
+@jakzal Would it be possible to only remove the default namespace and keep the other ones? That would be the best option I think.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2013-04-25T15:41:26Z
+
+Removing the default namespace would actually work. We'd only need to make sure it's removed consistently (no matter how you load an XML).
+
+I'll continue working on this.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2013-04-25T16:29:29Z
+
+[Filtering with CSS expressions fails](https://github.com/jakzal/symfony/commit/1c6fc323f2bac870d509158eeacabf20ed66e51f#L1R394) because ``CssSelector::toXPath()`` converts nodes to lowercase. Instead of ``descendant-or-self::yt:accessControl`` it generates ``descendant-or-self::yt:accesscontrol``.
+
+@jfsimon any reason why [node names are lowercased](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/CssSelector/Node/SelectorNode.php#L41)?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-04-25T16:47:11Z
+
+@jakzal see SimonSapin/cssselect@c192fcb
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-04-25T16:47:34Z
+
+or even better: http://www.w3.org/TR/selectors/#casesens
+
+---------------------------------------------------------------------------
+
+by jakzal at 2013-04-25T20:17:22Z
+
+@fabpot while that's perfectly valid for css selectors, XPath expressions are case sensitive. That's why calling ``CssSelectors::toXPath()`` yields invalid results in some cases (in my case original *accessControl* becomes *accesscontrol*).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-04-25T20:39:16Z
+
+@jakzal I think we can just safely remove the `strtolower` call then, no?
+
+---------------------------------------------------------------------------
+
+by jfsimon at 2013-04-25T20:41:20Z
+
+It seems that documents loaded as HTML are case-lowered (http://fr2.php.net/manual/fr/domxpath.query.php#77048) so in this case xpath must be case-lowered too. In the case of XML (which is the one here), they're not.
+
+Case-insensitive search can be performed
+* with `XPATH 2.0` using th `i` flag with the `match()` function, or the `lower-case()` function (http://stackoverflow.com/questions/2893551/case-insensitive-matching-in-xpath);
+* with `XPATH 1.0` (which seems to be used by `DOMXPath`), we have have to use the `translate()` function (http://stackoverflow.com/questions/625986/how-can-i-use-xpath-to-perform-a-case-insensitive-search-and-support-non-english).
+
+---------------------------------------------------------------------------
+
+by jfsimon at 2013-04-25T20:50:34Z
+
+Note that the `CssSelector` component already supports some differences between HTML and XML.
+The case could be lowered for HTML documents only.
+That said, the `DomCrawler` component would have to be aware of the loaded document type (HTML or XML).
+
+---------------------------------------------------------------------------
+
+by jakzal at 2013-04-25T21:00:34Z
+
+@jfsimon Calling ``CssSelector::disableHtmlExtension()`` before ``CssSelector::toXPath()`` makes that my example works. However, it's probably not what we want with html.
+
+---------------------------------------------------------------------------
+
+by jfsimon at 2013-04-25T21:08:54Z
+
+@jakzal exactly. The `HtmlExtension` must be enabled for HTML queries and disabled for XML ones.
+I guess this wont be easy to implement in the `DomCrawler` component.
+That's why I talked about case-insensitive search, which could be a "cross-type" solution (but not a perfect one).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-08-09T06:46:59Z
+
+Any news on this one?
+
+---------------------------------------------------------------------------
+
+by arryon at 2013-08-09T08:44:45Z
+
+For my own use I 'solved' this problem by naming the default namespace 'default', and keeping a registry of all other namespaces. Xpath queries using the default namespace must then begin with 'default', or any other sensible name that you could come up with.
+
+I haven't followed this discussing since, but here's my own commit implementing adding namespaces, could be a starting point for someone to pick this issue up:
+https://github.com/arryon/DomCrawler/commit/7c4a774b531110ad8516d3bcdb5052d3f439418e
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-09-13T10:35:48Z
+
+@jakzal I need to take a decision about this one: can we rely on auto-detection or do we allow people to register namespaces?
+
+---------------------------------------------------------------------------
+
+by jakzal at 2013-09-13T11:13:03Z
+
+Auto-detection seems to be working fine and there's no need for special treatment of a default namespace. See
+* [`filterXPath()` tests](https://github.com/symfony/symfony/pull/6650/files#L1R370)
+* [`filter()` tests](https://github.com/symfony/symfony/pull/6650/files#L1R406)
+
+I'd appreciate if someone reviewed it to make sure I'm not missing anything (ping @jfsimon @stof).
+
+Notice I had to manually disable the html extension for css selector with `CssSelector::disableHtmlExtension()` to make `filter()` work. Does it make sense to query XML with a css selector? I could update the `filter()` tests to query an HTML document instead.
+
+---------------------------------------------------------------------------
+
+by stof at 2013-09-13T11:19:48Z
+
+@jakzal I think it makes sense to be able to use CssSelector for XML documents (this is exactly why we allow disabling the HTML extension of the CssSelector component btw).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-09-13T13:16:05Z
+
+The CssSelector and the DomCrawler components must support both XML and HTML.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-09-13T13:19:56Z
+
+@jakzal Can you make a PR to update the docs?
+
+---------------------------------------------------------------------------
+
+by jakzal at 2013-09-13T13:20:55Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by jakzal at 2013-09-13T21:16:06Z
+
+There's an inconsistency in the way XMLs are loaded to the Crawler, I'm not sure if it should be addressed here or as a separate issue.
+
+If an XML is loaded directly from string, the `Crawler::addXmlContent` is used, which removes the default namespace. If an XML is loaded from a `DOMDocument`, the default namespace is not removed.
+
+Implication for the current PR is that if we load `DOMDocument` filtering by default namespace doesn't work atm. I think inconsistency should be solved first, otherwise we'd have two behaviours depending on method used to load the document.
+
+Options we have:
+* Make that `addXmlContent` doesn't remove the default namespace and register the namespace under a fixed alias (default?) when calling `filterXPath`
+* Make that `addDocument` removes the default namespace just like `addXmlContent` (probably would require dumping to string and loading it again or `$dom->documentElement->removeAttributeNS($dom->documentElement->getAttributeNode('xmlns')->nodeValue, '');`). This wouldn't involve further changes in `filterXPath`.
+* Document differences in behaviour between `addXmlContent` and `addDocument`
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-09-15T10:44:16Z
+
+For the inconsistency you found, I would go with option 1. If that's not too complex, I would like to get the fix in this PR, if not, let's create an issue.
+
+Also, can you add a note in the component CHANGELOG file about this new feature?
+
+---------------------------------------------------------------------------
+
+by jakzal at 2013-09-17T17:30:47Z
+
+Updated this PR with changes described in the option 1.
+
+Note that the outcome is we HAVE to use prefixes once there's at least one non-default namespace in the document (that's how it works in php).
+
+We could still improve this PR by:
+* letting users change the default namespace prefix (`Crawler::setDefaultNamespacePrefix()`) - this would be very easy
+* allowing users to register namespaces manually - not much harder
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-09-17T19:52:02Z
+
+The 2 suggestions make sense.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2013-09-22T22:48:02Z
+
+@fabpot both suggestions are now implemented.

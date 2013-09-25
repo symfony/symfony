@@ -1,0 +1,72 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2013-09-13T16:12:34Z
+
+There's only [one remaining failing test now](https://travis-ci.org/jakzal/symfony/jobs/11328691#L256):
+
+```
+Running src/Symfony/Component/Console tests
+PHPUnit 3.7.21 by Sebastian Bergmann.
+Configuration read from /home/travis/build/jakzal/symfony/phpunit.xml.dist
+...............................................................  63 / 391 ( 16%)
+............................................................... 126 / 391 ( 32%)
+.............................................SF................ 189 / 391 ( 48%)
+............................................................... 252 / 391 ( 64%)
+............................................................... 315 / 391 ( 80%)
+............................................................... 378 / 391 ( 96%)
+.............
+Time: 2 seconds, Memory: 20.50Mb
+There was 1 failure:
+1) Symfony\Component\Console\Tests\Helper\DialogHelperTest::testAskHiddenResponse
+Failed asserting that two strings are equal.
+--- Expected
++++ Actual
+@@ @@
+-'8AM'
++''
+/home/travis/build/jakzal/symfony/src/Symfony/Component/Console/Tests/Helper/DialogHelperTest.php:108
+```
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-09-13T16:13:38Z
+
+... which makes for a beautiful `....SF....` pattern ;)
+
+---------------------------------------------------------------------------
+
+by jakzal at 2013-09-13T16:14:19Z
+
+Ok. Let's leave it this way ;)
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-09-13T16:18:46Z
+
+the amount of skipped ones is alarming though, did you check the whole output? is symfony suite skipping that many?
+
+---------------------------------------------------------------------------
+
+by stof at 2013-09-13T16:24:23Z
+
+@cordoval this is exactly the same than for non-parallelized builds: https://travis-ci.org/symfony/symfony/jobs/11326965
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-09-19T16:34:21Z
+
+So, what is the status of this one? Does it work? It not, let's close it.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2013-09-19T22:46:11Z
+
+@fabpot it almost works, I need to only figure out why one of the tests is failing.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2013-09-24T20:48:03Z
+
+All tests are passing now. However, I needed to run one test in separation, since gnu parallel is not able to provide a tty for parallelised processes.
+
+I've introduced a *tty* group which is run at the end. Doesn't look good to be honest, but I can't see any other options.

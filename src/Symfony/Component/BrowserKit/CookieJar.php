@@ -195,8 +195,8 @@ class CookieJar
         $cookies = array();
         foreach ($this->cookieJar as $domain => $pathCookies) {
             if ($domain) {
-                $domain = ltrim($domain, '.');
-                if ($domain != substr($parts['host'], -strlen($domain))) {
+                $domain = '.'.ltrim($domain, '.');
+                if ($domain != substr('.'.$parts['host'], -strlen($domain))) {
                     continue;
                 }
             }

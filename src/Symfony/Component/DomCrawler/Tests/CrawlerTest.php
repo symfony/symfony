@@ -401,15 +401,6 @@ EOF
         $this->assertSame('widescreen', $crawler->text());
     }
 
-    /**
-     * @expectedException        \InvalidArgumentException
-     * @expectedExceptionMessage Could not find a namespace for the prefix: "foo"
-     */
-    public function testFilterXPathWithAnInvalidNamespace()
-    {
-        $this->createTestXmlCrawler()->filterXPath('//media:group/foo:aspectRatio');
-    }
-
     public function testFilterXPathWithManuallyRegisteredNamespace()
     {
         $crawler = $this->createTestXmlCrawler();
@@ -418,6 +409,15 @@ EOF
         $crawler = $crawler->filterXPath('//m:group/yt:aspectRatio');
         $this->assertCount(1, $crawler, '->filterXPath() uses manually registered namespace');
         $this->assertSame('widescreen', $crawler->text());
+    }
+
+    public function testFilterXPathWithAnUrl()
+    {
+        $crawler = $this->createTestXmlCrawler();
+
+        $crawler = $crawler->filterXPath('//media:category[@scheme="http://gdata.youtube.com/schemas/2007/categories.cat"]');
+        $this->assertCount(1, $crawler);
+        $this->assertSame('Music', $crawler->text());
     }
 
     /**
@@ -741,6 +741,7 @@ EOF
                     <media:title type="plain">Chordates - CrashCourse Biology #24</media:title>
                     <yt:aspectRatio>widescreen</yt:aspectRatio>
                 </media:group>
+                <media:category label="Music" scheme="http://gdata.youtube.com/schemas/2007/categories.cat">Music</media:category>
             </entry>';
 
         return new Crawler($xml, $uri);

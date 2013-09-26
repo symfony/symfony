@@ -425,6 +425,64 @@ UPGRADE FROM 2.x to 3.0
    private $property;
    ```
 
+ * The option "methods" of the `Callback` constraint was removed. You should
+   use the option "callback" instead. If you have multiple callbacks, add
+   multiple callback constraints instead.
+
+   Before (YAML):
+
+   ```
+   constraints:
+     - Callback: [firstCallback, secondCallback]
+   ```
+
+   After (YAML):
+
+   ```
+   constraints:
+     - Callback: firstCallback
+     - Callback: secondCallback
+   ```
+
+   When using annotations, you can now put the Callback constraint directly on
+   the method that should be executed.
+
+   Before (Annotations):
+
+   ```
+   use Symfony\Component\Validator\Constraints as Assert;
+   use Symfony\Component\Validator\ExecutionContextInterface;
+
+   /**
+    * @Assert\Callback({"callback"})
+    */
+   class MyClass
+   {
+       public function callback(ExecutionContextInterface $context)
+       {
+           // ...
+       }
+   }
+   ```
+
+   After (Annotations):
+
+   ```
+   use Symfony\Component\Validator\Constraints as Assert;
+   use Symfony\Component\Validator\ExecutionContextInterface;
+
+   class MyClass
+   {
+       /**
+        * @Assert\Callback
+        */
+       public function callback(ExecutionContextInterface $context)
+       {
+           // ...
+       }
+   }
+   ```
+
 ### Yaml
 
  * The ability to pass file names to `Yaml::parse()` has been removed.

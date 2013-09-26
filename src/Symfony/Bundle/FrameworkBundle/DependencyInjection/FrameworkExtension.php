@@ -30,6 +30,8 @@ use Symfony\Component\Config\FileLocator;
  */
 class FrameworkExtension extends Extension
 {
+    private $formConfigEnabled = false;
+
     /**
      * Responds to the app.config configuration parameter.
      *
@@ -90,6 +92,7 @@ class FrameworkExtension extends Extension
         }
 
         if ($this->isConfigEnabled($container, $config['form'])) {
+            $this->formConfigEnabled = true;
             $this->registerFormConfiguration($config, $container, $loader);
             $config['validation']['enabled'] = true;
         }
@@ -218,7 +221,10 @@ class FrameworkExtension extends Extension
             return;
         }
 
-        $loader->load('form_debug.xml');
+        if (true === $this->formConfigEnabled) {
+            $loader->load('form_debug.xml');
+        }
+        
         $loader->load('profiling.xml');
         $loader->load('collectors.xml');
 

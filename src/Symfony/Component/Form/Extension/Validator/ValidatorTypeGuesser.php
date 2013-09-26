@@ -195,17 +195,14 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
     public function guessMaxLengthForConstraint(Constraint $constraint)
     {
         switch (get_class($constraint)) {
-            case 'Symfony\Component\Validator\Constraints\MaxLength':
-                return new ValueGuess($constraint->limit, Guess::HIGH_CONFIDENCE);
+            case 'Symfony\Component\Validator\Constraints\Length':
+                return new ValueGuess($constraint->max, Guess::HIGH_CONFIDENCE);
 
             case 'Symfony\Component\Validator\Constraints\Type':
                 if (in_array($constraint->type, array('double', 'float', 'numeric', 'real'))) {
                         return new ValueGuess(null, Guess::MEDIUM_CONFIDENCE);
                 }
                 break;
-
-            case 'Symfony\Component\Validator\Constraints\Max':
-                return new ValueGuess(strlen((string) $constraint->limit), Guess::LOW_CONFIDENCE);
         }
 
         return null;

@@ -536,8 +536,8 @@ EOF
         $this->assertEquals($crawler->form()->getFormNode()->getAttribute('id'), $crawler2->form()->getFormNode()->getAttribute('id'), '->form() works on elements with form attribute');
 
         $this->assertEquals(array('FooName' => 'FooBar', 'TextName' => 'TextValue', 'FooTextName' => 'FooTextValue'), $crawler->form(array('FooName' => 'FooBar'))->getValues(), '->form() takes an array of values to submit as its first argument');
-        $this->assertEquals(array('FooName' => 'FooValue', 'TextName' => 'TextValue', 'FooTextName' => 'FooTextValue'), $crawler->form()->getValues(), '->form() takes an array of values to submit as its first argument');
-        $this->assertEquals(array('FooBarName' => 'FooBarValue', 'TextName' => 'TextValue', 'FooTextName' => 'FooTextValue'), $crawler2->form()->getValues(), '->form() takes an array of values to submit as its first argument');
+        $this->assertEquals(array('FooName' => 'FooValue', 'TextName' => 'TextValue', 'FooTextName' => 'FooTextValue'), $crawler->form()->getValues(), '->getValues() returns correct form values');
+        $this->assertEquals(array('FooBarName' => 'FooBarValue', 'TextName' => 'TextValue', 'FooTextName' => 'FooTextValue'), $crawler2->form()->getValues(), '->getValues() returns correct form values');
 
         try {
             $this->createTestCrawler()->filterXPath('//ol')->form();

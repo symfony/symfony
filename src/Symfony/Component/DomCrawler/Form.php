@@ -395,7 +395,7 @@ class Form extends Link implements \ArrayAccess
 
             // corresponding elements are either descendants or have a matching HTML5 form attribute
             $formId = Crawler::xpathLiteral($this->node->getAttribute('id'));
-            $fieldNodes = $xpath->query(sprintf('descendant::input[@form=%s] | descendant::button[@form=%s] | descendant::textarea[@form=%s] | descendant::select[@form=%s] | //form[@id=%s]/input[not(@form)] | //form[@id=%s]/button[not(@form)] | //form[@id=%s]/textarea[not(@form)] | //form[@id=%s]/select[not(@form)]', $formId, $formId, $formId, $formId, $formId, $formId, $formId, $formId), $root);
+            $fieldNodes = $xpath->query(sprintf('descendant::input[@form=%s] | descendant::button[@form=%s] | descendant::textarea[@form=%s] | descendant::select[@form=%s] | //form[@id=%s]//input[not(@form)] | //form[@id=%s]//button[not(@form)] | //form[@id=%s]//textarea[not(@form)] | //form[@id=%s]//select[not(@form)]', $formId, $formId, $formId, $formId, $formId, $formId, $formId, $formId), $root);
             foreach ($fieldNodes as $node) {
                 $this->addField($node);
             }

@@ -835,7 +835,9 @@ class Crawler extends \SplObjectStorage
 
         foreach ($prefixes as $prefix) {
             $namespace = $this->discoverNamespace($domxpath, $prefix);
-            $domxpath->registerNamespace($prefix, $namespace);
+            if (null !== $namespace) {
+                $domxpath->registerNamespace($prefix, $namespace);
+            }
         }
 
         return $domxpath;
@@ -861,8 +863,6 @@ class Crawler extends \SplObjectStorage
         if ($node = $namespaces->item(0)) {
             return $node->nodeValue;
         }
-
-        throw new \InvalidArgumentException(sprintf('Could not find a namespace for the prefix: "%s"', $prefix));
     }
 
     /**
@@ -872,7 +872,7 @@ class Crawler extends \SplObjectStorage
      */
     private function findNamespacePrefixes($xpath)
     {
-        if (preg_match_all('/(?P<prefix>[a-zA-Z_][a-zA-Z_0-9\-\.]*):[^:]/', $xpath, $matches)) {
+        if (preg_match_all('/(?P<prefix>[a-z_][a-z_0-9\-\.]*):[^"\/]/i', $xpath, $matches)) {
             return array_unique($matches['prefix']);
         }
 

@@ -169,6 +169,15 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testFlushErrorOutput()
+    {
+        $p = new Process(sprintf('php -r %s', escapeshellarg('$n = 0; while ($n < 3) { file_put_contents(\'php://stderr\', \'ERROR\'); $n++; }')));
+
+        $p->run();
+        $p->flushErrorOutput();
+        $this->assertEmpty($p->getErrorOutput());
+    }
+
     public function testGetOutput()
     {
         $p = new Process(sprintf('php -r %s', escapeshellarg('$n=0;while ($n<3) {echo \' foo \';$n++; usleep(500); }')));
@@ -186,6 +195,15 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
             $this->assertLessThanOrEqual(1, preg_match_all('/foo/', $p->getIncrementalOutput(), $matches));
             usleep(20000);
         }
+    }
+
+    public function testFlushOutput()
+    {
+        $p = new Process(sprintf('php -r %s', escapeshellarg('$n=0;while ($n<3) {echo \' foo \';$n++;}')));
+
+        $p->run();
+        $p->flushOutput();
+        $this->assertEmpty($p->getOutput());
     }
 
     public function testExitCodeCommandFailed()

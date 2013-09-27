@@ -12,6 +12,7 @@
 namespace Symfony\Component\PropertyAccess;
 
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
+use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
 use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
 
 /**
@@ -24,15 +25,24 @@ class PropertyAccessor implements PropertyAccessorInterface
     const VALUE = 0;
     const IS_REF = 1;
 
+    /**
+     * @var Boolean
+     */
     private $magicCall;
+
+    /**
+     * @var Boolean
+     */
+    private $throwExceptionOnInvalidIndex;
 
     /**
      * Should not be used by application code. Use
      * {@link PropertyAccess::createPropertyAccessor()} instead.
      */
-    public function __construct($magicCall = false)
+    public function __construct($magicCall = false, $throwExceptionOnInvalidIndex = false)
     {
         $this->magicCall = $magicCall;
+        $this->throwExceptionOnInvalidIndex = $throwExceptionOnInvalidIndex;
     }
 
     /**
@@ -46,7 +56,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             throw new UnexpectedTypeException($propertyPath, 'string or Symfony\Component\PropertyAccess\PropertyPathInterface');
         }
 
-        $propertyValues =& $this->readPropertiesUntil($objectOrArray, $propertyPath, $propertyPath->getLength());
+        $propertyValues =& $this->readPropertiesUntil($objectOrArray, $propertyPath, $propertyPath->getLength(), $this->throwExceptionOnInvalidIndex);
 
         return $propertyValues[count($propertyValues) - 1][self::VALUE];
     }
@@ -106,7 +116,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      *
      * @throws UnexpectedTypeException If a value within the path is neither object nor array.
      */
-    private function &readPropertiesUntil(&$objectOrArray, PropertyPathInterface $propertyPath, $lastIndex)
+    private function &readPropertiesUntil(&$objectOrArray, PropertyPathInterface $propertyPath, $lastIndex, $throwExceptionOnNonexistantIndex = false)
     {
         $propertyValues = array();
 
@@ -121,6 +131,9 @@ class PropertyAccessor implements PropertyAccessorInterface
 
             // Create missing nested arrays on demand
             if ($isIndex && $isArrayAccess && !isset($objectOrArray[$property])) {
+                if ($throwExceptionOnNonexistantIndex) {
+                    throw new NoSuchIndexException(sprintf('Cannot read property "%s". Available properties are "%s"', $property, print_r(array_keys($objectOrArray), true)));
+                }
                 $objectOrArray[$property] = $i + 1 < $propertyPath->getLength() ? array() : null;
             }
 

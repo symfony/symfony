@@ -12,10 +12,10 @@
 namespace Symfony\Component\PropertyAccess\Exception;
 
 /**
- * Thrown when a property cannot be found.
+ * Thrown when an index cannot be found.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+ * @author Stéphane Escandell <stephane.escandell@gmail.com>
  */
-class NoSuchPropertyException extends AccessException
+class NoSuchIndexException extends AccessException
 {
 }

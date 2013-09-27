@@ -16,17 +16,19 @@ namespace Symfony\Component\HttpKernel\HttpCache;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Finder\Finder;
 
 /**
  * Store implements all the logic for storing cache metadata (Request and Response headers).
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Store implements StoreInterface
+class Store implements StoreInterface, StoreHousekeepingInterface
 {
     protected $root;
     private $keyCache;
     private $locks;
+    private $responseContentList;
 
     /**
      * Constructor.
@@ -41,6 +43,107 @@ class Store implements StoreInterface
         }
         $this->keyCache = new \SplObjectStorage();
         $this->locks = array();
+        $this->responseContentList = array();
+    }
+
+    /**
+     * Deletes from disk all the stale response-header files and the response-content files.
+     *
+     * @return integer The number of the cleared entries
+     */
+    public function clear()
+    {
+        $finder = new Finder();
+        $finder->depth('< 5')->files()->notName('*.lck')->in($this->root . DIRECTORY_SEPARATOR . 'md');
+        $counter = 0;
+        foreach ($finder as $file) {
+            $counter += $this->purgeKey($this->getKeyByPath($file->getPathname()));
+        }
+        foreach ($this->getResponseContentList() as $key => $isNeeded) {
+            if (!$isNeeded) {
+                $file = $this->getPath($key);
+                if ($this->deleteFile($file)) {
+                    $counter++;
+                }
+            }
+        }
+
+        return $counter;
+    }
+
+    /**
+     * When the Response is stale it deletes the header file and add its response content file into the black list.
+     *
+     * @param string $key The cached key
+     *
+     * @return integer the number of file deleted
+     */
+    protected function purgeKey($key)
+    {
+        $metadata = $this->getMetadata($key);
+        $expiredResponse = 0;
+        $contentDeleted = 0;
+        foreach ($metadata as $entry) {
+            $response = $this->restoreResponse($entry[1]);
+            $ResponseContentKey = $response->headers->get('x-content-digest');
+            if (!$response->isFresh()) {
+                $this->addToResponseContentList($ResponseContentKey, false);
+                $expiredResponse++;
+            } else {
+                $this->addToResponseContentList($ResponseContentKey, true);
+            }
+        }
+        // removes the file, only if all entries are expired
+        if (count($metadata) == $expiredResponse) {
+            $file = $this->getPath($key);
+            if ($this->deleteFile($file, false)) {
+                $contentDeleted++;
+            }
+            // deletes locks
+            $this->deleteFile($this->getPath($key . '.lck'), false);
+        }
+
+        return $contentDeleted;
+    }
+
+    /**
+     * Add a key of a response in the ResponseContentList.
+     *
+     * @param string  $key
+     * @param Boolean $need
+     *
+     * @return Store
+     */
+    private function addToResponseContentList($key, $need = true)
+    {
+        if (array_key_exists($key, $this->responseContentList)) {
+           $this->responseContentList[$key] = $this->responseContentList[$key] || $need;
+        } else {
+            $this->responseContentList[$key] = $need;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Deletes a file.
+     *
+     * @param string  $file
+     * @param Boolean $ignoreError
+     *
+     * @return Boolean
+     */
+    protected function deleteFile($file, $ignoreError = true)
+    {
+        if (is_file($file)) {
+            if ($ignoreError) {
+                return @unlink($file);
+            }
+
+            return unlink($file);
+        }
+
+        return false;
     }
 
     /**
@@ -99,7 +202,7 @@ class Store implements StoreInterface
     {
         $file = $this->getPath($this->getCacheKey($request).'.lck');
 
-        return is_file($file) ? @unlink($file) : false;
+        return $this->deleteFile($file);
     }
 
     public function isLocked(Request $request)
@@ -359,9 +462,40 @@ class Store implements StoreInterface
         @chmod($path, 0666 & ~umask());
     }
 
+    /**
+     * Get the Path given the cache-key.
+     *
+     * @param string $key
+     *
+     * @return string
+     */
     public function getPath($key)
     {
         return $this->root.DIRECTORY_SEPARATOR.substr($key, 0, 2).DIRECTORY_SEPARATOR.substr($key, 2, 2).DIRECTORY_SEPARATOR.substr($key, 4, 2).DIRECTORY_SEPARATOR.substr($key, 6);
+    }
+
+    /**
+     * Get the cache key given the path.
+     *
+     * @param string $path The absolute path
+     *
+     * @return string
+     */
+    public function getKeyByPath($path)
+    {
+        $path = substr($path, strlen($this->root.DIRECTORY_SEPARATOR));
+
+        return str_replace(DIRECTORY_SEPARATOR, '', $path);
+    }
+
+    /**
+     * Get the responseContentList.
+     *
+     * @return array
+     */
+    public function getResponseContentList()
+    {
+        return $this->responseContentList;
     }
 
     /**

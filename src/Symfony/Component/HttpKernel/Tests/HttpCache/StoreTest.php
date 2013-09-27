@@ -221,6 +221,123 @@ class StoreTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->store->isLocked($req));
     }
 
+
+    public function testClearSimpleEntryNotExpired()
+    {
+        $key = $this->storeSimpleEntry();
+        $deletedItems = $this->store->clear();
+
+        $this->assertEquals($deletedItems, 0);
+        $this->assertFileExists($this->store->getPath($key));
+    }
+
+
+    public function testClearSimpleEntryExpired()
+    {
+        $key = $this->storeSimpleEntry();
+
+        $this->store->invalidate($this->request);
+        $deletedItems = $this->store->clear();
+
+        $this->assertEquals($deletedItems, 2);
+        $this->assertFileNotExists($this->store->getPath($key));
+        // the content file shouldn't exist
+        $r = new \ReflectionObject($this->store);
+        $m = $r->getMethod('generateContentDigest');
+        $m->setAccessible(true);
+        $contentDigest = $m->invoke($this->store, $this->response);
+        $this->assertFileNotExists($this->store->getPath($contentDigest));
+    }
+
+    public function testClearWithOneVaryExpired()
+    {
+        $req1 = Request::create('/test', 'get', array(), array(), array(), array('HTTP_FOO' => 'Foo', 'HTTP_BAR' => 'Bar'));
+        $res1 = new Response('test 1', 200, array('Vary' => 'Foo Bar'));
+        $res1->setTtl(100);
+        $key = $this->store->write($req1, $res1);
+
+        $req2 = Request::create('/test', 'get', array(), array(), array(), array('HTTP_FOO' => 'Bling', 'HTTP_BAR' => 'Bam'));
+        $res2 = new Response('test 2', 200, array('Vary' => 'Foo Bar'));
+        $res2->setTtl(0);
+        $key2 = $this->store->write($req2, $res2);
+
+        $req3 = Request::create('/test', 'get', array(), array(), array(), array('HTTP_FOO' => 'Baz', 'HTTP_BAR' => 'Boom'));
+        $res3 = new Response('test 3', 200, array('Vary' => 'Foo Bar'));
+        $res3->setTtl(100);
+        $key3 = $this->store->write($req3, $res3);
+
+        $deletedItems = $this->store->clear();
+
+        $this->assertEquals($deletedItems, 1);
+        $this->assertNull($this->store->lookup($req2));
+        $this->assertNotNull($this->store->lookup($req1));
+        $this->assertNotNull($this->store->lookup($req3));
+
+        $this->assertFileExists($this->store->getPath($key2));
+    }
+
+
+    public function testClearSameResponseDifferentRequest()
+    {
+        $req1 = Request::create('/test', 'get', array(), array(), array(), array());
+        $req2 = Request::create('/test.number-2', 'get', array(), array(), array(), array());
+        $res1 = new Response('test 3', 200, array('Vary' => 'Foo Bar'));
+        $res1->setTtl(100);
+
+        $key1 = $this->store->write($req1, $res1);
+        $key2 = $this->store->write($req2, $res1);
+
+        $this->store->invalidate($req1);
+
+        $deletedItems = $this->store->clear();
+
+        $this->assertEquals($deletedItems, 1);
+        $this->assertFileNotExists($this->store->getPath($key1));
+        $this->assertFileExists($this->store->getPath($key2));
+    }
+
+    public function testPurgeKey()
+    {
+        $cacheKey = $this->storeSimpleEntry();
+        $r = new \ReflectionObject($this->store);
+        $m = $r->getMethod('purgeKey');
+        $m->setAccessible(true);
+
+        $this->store->invalidate($this->request);
+        $this->assertEquals($m->invoke($this->store, $cacheKey), 1);
+        $this->assertFileNotExists($this->store->getPath($cacheKey));
+    }
+
+    public function testAddToResponseContentList()
+    {
+        $r = new \ReflectionObject($this->store);
+        $m = $r->getMethod('addToResponseContentList');
+        $m->setAccessible(true);
+        $key = 'key-start-true';
+        $result = $m->invoke($this->store, $key, true);
+        $responseList = $result->getResponseContentList();
+        $this->assertTrue($responseList[$key]);
+        $result = $m->invoke($result, $key, false);
+        $responseList = $result->getResponseContentList();
+        $this->assertTrue($responseList[$key]);
+
+        $key = 'key-start-false';
+        $result = $m->invoke($this->store, $key, false);
+        $responseList = $result->getResponseContentList();
+        $this->assertFalse($responseList[$key]);
+
+        $result = $m->invoke($this->store, $key, true);
+        $responseList = $result->getResponseContentList();
+        $this->assertTrue($responseList[$key]);
+    }
+
+    public function testGetKeyByPath()
+    {
+        $key = 'en5ed68c8380c7fd0ba2db6242f9ec06ac1dd2acf9';
+        $path = $this->store->getPath($key);
+        $this->assertEquals($key, $this->store->getKeyByPath($path));
+    }
+
     protected function storeSimpleEntry($path = null, $headers = array())
     {
         if (null === $path) {

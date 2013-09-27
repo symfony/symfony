@@ -108,6 +108,13 @@ class ProcessBuilder
         return $this;
     }
 
+    public function addEnvironmentVariables(array $variables)
+    {
+        $this->env = array_replace($this->env, $variables);
+
+        return $this;
+    }
+
     public function setInput($stdin)
     {
         $this->stdin = $stdin;

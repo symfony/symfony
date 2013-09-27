@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Http;
 
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
@@ -37,6 +38,8 @@ class HttpUtils
      *
      * @param UrlGeneratorInterface                       $urlGenerator A UrlGeneratorInterface instance
      * @param UrlMatcherInterface|RequestMatcherInterface $urlMatcher   The Url or Request matcher
+     *
+     * @throws \InvalidArgumentException
      */
     public function __construct(UrlGeneratorInterface $urlGenerator = null, $urlMatcher = null)
     {
@@ -123,9 +126,11 @@ class HttpUtils
      * Generates a URI, based on the given path or absolute URL.
      *
      * @param Request $request A Request instance
-     * @param string $path A path (an absolute path (/foo), an absolute URL (http://...), or a route name (foo))
+     * @param string  $path    A path (an absolute path (/foo), an absolute URL (http://...), or a route name (foo))
      *
      * @return string An absolute URL
+     *
+     * @throws \LogicException
      */
     public function generateUri($request, $path)
     {

@@ -64,7 +64,7 @@ class DefaultAuthenticationFailureHandler implements AuthenticationFailureHandle
     {
         if ($failureUrl = $request->get($this->options['failure_path_parameter'], null, true)) {
              $this->options['failure_path'] = $failureUrl;
-         }
+        }
 
         if (null === $this->options['failure_path']) {
             $this->options['failure_path'] = $this->options['login_path'];

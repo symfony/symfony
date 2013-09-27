@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by imobilis at 2013-06-16T10:47:19Z
+
+I've submitted the doc changes for this PR. Now working on the failed test on travis.
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2013-07-03T23:34:37Z
+
+Hey,
+
+I like the feature, but I think adding more methods is not a good idea for the api. It results in `getOutput`, `getAndFlushIncrementalOutput`, `getIncrementalOutput`, `getAndFlushOutput` for the output.
+
+What about adding a boolean `$flush` parameter like `Process::getOutput($flush = false)` / `Process::getIncrementalOutput($flush = false)` and keep the `flushOutput` method private ?
+
+---------------------------------------------------------------------------
+
+by imobilis at 2013-07-10T10:45:10Z
+
+Hi,
+
+I like your suggestion, and I'll modify the PR as soon as I can ;-)
+
+Thank you!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-08-09T14:18:33Z
+
+In PHP, arguments as Boolean as hard to understand when using the code: `XXX::do(true, false)`. So, I would rather just keep the `flushOutput()` and `flushErrorOutput()` methods and remove the other ones.
+
+---------------------------------------------------------------------------
+
+by imobilis at 2013-08-09T15:05:10Z
+
+I've updated the PR addresing your suggestion, Fabien. Thank you.

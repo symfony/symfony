@@ -15,10 +15,29 @@ namespace Symfony\Component\Filesystem\Exception;
  * Exception class thrown when a filesystem operation failure happens
  *
  * @author Romain Neutron <imprec@gmail.com>
+ * @author Christian Gärtner <christiangaertner.film@googlemail.com>
  *
  * @api
  */
-class IOException extends \RuntimeException implements ExceptionInterface
+class IOException extends \RuntimeException implements IOExceptionInterface
 {
 
+    private $path;
+
+    /**
+     * Set the path associated with this IOException
+     * @param string $path The path
+     */
+    public function setPath($path)
+    {
+        $this->path = $path;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPath()
+    {
+        return $this->path;
+    }
 }

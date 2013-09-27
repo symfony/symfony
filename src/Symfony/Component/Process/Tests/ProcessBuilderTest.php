@@ -41,6 +41,7 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
             ->add('command')
             ->setEnv('foo', 'bar2')
             ->addEnvironmentVariables($env)
+            ->inheritEnvironmentVariables(false)
             ->getProcess()
         ;
 

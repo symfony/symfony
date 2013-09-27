@@ -14,6 +14,7 @@ namespace Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
+use Egulias\EmailValidator\EmailValidator as StrictEmailValidator;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -38,7 +39,7 @@ class EmailValidator extends ConstraintValidator
         $value = (string) $value;
 
         if ($constraint->strict === true && class_exists('\Egulias\EmailValidator\EmailValidator')) {
-            $strictValidator = new \Egulias\EmailValidator\EmailValidator();
+            $strictValidator = new StrictEmailValidator();
             $valid = $strictValidator->isValid($value, $constraint->checkMX);
         } elseif ($constraint->strict === true) {
             throw new \RuntimeException('Strict email validation requires egulias/email-validator');

@@ -19,7 +19,6 @@
         "php": ">=5.3.3",
         "symfony/translation": "~2.0",
         "symfony/property-access": "~2.2"
-        "egulias/email-validator": "dev-master"
     },
     "require-dev": {
         "symfony/http-foundation": "~2.1",
@@ -28,6 +27,7 @@
         "symfony/config": "~2.2",
         "doctrine/annotations": "~1.0",
         "doctrine/cache": "~1.0"
+        "egulias/email-validator": "~1.0"
     },
     "suggest": {
         "doctrine/annotations": "For using the annotation mapping. You will also need doctrine/cache.",
@@ -35,7 +35,8 @@
         "symfony/http-foundation": "",
         "symfony/intl": "",
         "symfony/yaml": "",
-        "symfony/config": ""
+        "symfony/config": "",
+        "egulias/email-validator": "Strict (RFC compilant) email validation"
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\Validator\\": "" }

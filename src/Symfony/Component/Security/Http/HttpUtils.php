@@ -13,7 +13,6 @@ namespace Symfony\Component\Security\Http;
 
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
@@ -21,7 +20,6 @@ use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Encapsulates the logic needed to create sub-requests, redirect the user, and match URLs.
@@ -57,7 +55,7 @@ class HttpUtils
      * @param string  $path    A path (an absolute path (/foo), an absolute URL (http://...), or a route name (foo))
      * @param integer $status  The status code
      *
-     * @return Response A RedirectResponse instance
+     * @return RedirectResponse A RedirectResponse instance
      */
     public function createRedirectResponse(Request $request, $path, $status = 302)
     {

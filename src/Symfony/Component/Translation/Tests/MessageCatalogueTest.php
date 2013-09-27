@@ -44,7 +44,10 @@ class MessageCatalogueTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($catalogue->has('foo', 'domain1'));
         $this->assertFalse($catalogue->has('bar', 'domain1'));
+        $this->assertTrue($catalogue->has('bar', array('domain1', 'domain2')));
+        $this->assertFalse($catalogue->has('baz', array('domain1', 'domain2')));
         $this->assertFalse($catalogue->has('foo', 'domain88'));
+        $this->assertFalse($catalogue->has('foo', array('domain69', 'domain88')));
     }
 
     public function testGetSet()
@@ -54,6 +57,7 @@ class MessageCatalogueTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('foo', $catalogue->get('foo', 'domain1'));
         $this->assertEquals('foo1', $catalogue->get('foo1', 'domain1'));
+        $this->assertEquals('foo1', $catalogue->get('foo1', array('domain2', 'domain1')));
     }
 
     public function testAdd()

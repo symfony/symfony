@@ -94,8 +94,12 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
      */
     public function has($id, $domain = 'messages')
     {
-        if (isset($this->messages[$domain][$id])) {
-            return true;
+        $domains = is_array($domain) ? $domain : array($domain);
+
+        foreach ($domains as $domain) {
+            if (isset($this->messages[$domain][$id])) {
+                return true;
+            }
         }
 
         if (null !== $this->fallbackCatalogue) {
@@ -110,7 +114,15 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
      */
     public function defines($id, $domain = 'messages')
     {
-        return isset($this->messages[$domain][$id]);
+        $domains = is_array($domain) ? $domain : array($domain);
+
+        foreach ($domains as $domain) {
+            if (isset($this->messages[$domain][$id])) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -120,12 +132,17 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
      */
     public function get($id, $domain = 'messages')
     {
-        if (isset($this->messages[$domain][$id])) {
-            return $this->messages[$domain][$id];
+        $domains = is_array($domain) ? $domain : array($domain);
+
+        foreach ($domains as $domain) {
+            if (isset($this->messages[$domain][$id])) {
+                return $this->messages[$domain][$id];
+            }
+
         }
 
         if (null !== $this->fallbackCatalogue) {
-            return $this->fallbackCatalogue->get($id, $domain);
+            return $this->fallbackCatalogue->get($id, $domains);
         }
 
         return $id;

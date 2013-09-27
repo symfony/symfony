@@ -68,7 +68,7 @@ interface MessageCatalogueInterface
      * Checks if a message has a translation.
      *
      * @param string $id     The message id
-     * @param string $domain The domain name
+     * @param string $domain The domain name, or an array of domain names
      *
      * @return Boolean true if the message has a translation, false otherwise
      *
@@ -80,7 +80,7 @@ interface MessageCatalogueInterface
      * Checks if a message has a translation (it does not take into account the fallback mechanism).
      *
      * @param string $id     The message id
-     * @param string $domain The domain name
+     * @param string $domain The domain name, or an array of domain names
      *
      * @return Boolean true if the message has a translation, false otherwise
      *
@@ -91,8 +91,8 @@ interface MessageCatalogueInterface
     /**
      * Gets a message translation.
      *
-     * @param string $id     The message id
-     * @param string $domain The domain name
+     * @param string       $id     The message id
+     * @param array|string $domain The domain name, or an array of domain names
      *
      * @return string The message translation
      *

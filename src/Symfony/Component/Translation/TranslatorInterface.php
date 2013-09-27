@@ -23,10 +23,10 @@ interface TranslatorInterface
     /**
      * Translates the given message.
      *
-     * @param string $id         The message id (may also be an object that can be cast to string)
-     * @param array  $parameters An array of parameters for the message
-     * @param string $domain     The domain for the message
-     * @param string $locale     The locale
+     * @param string       $id         The message id (may also be an object that can be cast to string)
+     * @param array        $parameters An array of parameters for the message
+     * @param array|string $domain     The domain for the message or an array of domains for cascading lookup
+     * @param string       $locale     The locale
      *
      * @return string The translated string
      *
@@ -37,11 +37,11 @@ interface TranslatorInterface
     /**
      * Translates the given choice message by choosing a translation according to a number.
      *
-     * @param string  $id         The message id (may also be an object that can be cast to string)
-     * @param integer $number     The number to use to find the indice of the message
-     * @param array   $parameters An array of parameters for the message
-     * @param string  $domain     The domain for the message
-     * @param string  $locale     The locale
+     * @param string       $id         The message id (may also be an object that can be cast to string)
+     * @param integer      $number     The number to use to find the indice of the message
+     * @param array        $parameters An array of parameters for the message
+     * @param array|string $domain     The domain for the message or an array of domains for cascading lookup
+     * @param string       $locale     The locale
      *
      * @return string The translated string
      *

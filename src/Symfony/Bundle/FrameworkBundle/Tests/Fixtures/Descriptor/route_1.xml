@@ -6,14 +6,14 @@
   <method>GET</method>
   <method>HEAD</method>
   <defaults>
-    <default attribute="name">Joseph</default>
+    <default key="name">Joseph</default>
   </defaults>
   <requirements>
-    <requirement attribute="name">[a-z]+</requirement>
+    <requirement key="name">[a-z]+</requirement>
   </requirements>
   <options>
-    <option name="compiler_class">Symfony\Component\Routing\RouteCompiler</option>
-    <option name="opt1">val1</option>
-    <option name="opt2">val2</option>
+    <option key="compiler_class">Symfony\Component\Routing\RouteCompiler</option>
+    <option key="opt1">val1</option>
+    <option key="opt2">val2</option>
   </options>
 </route>

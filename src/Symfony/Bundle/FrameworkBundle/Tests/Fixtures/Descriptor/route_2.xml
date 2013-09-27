@@ -6,8 +6,8 @@
   <method>PUT</method>
   <method>POST</method>
   <options>
-    <option name="compiler_class">Symfony\Component\Routing\RouteCompiler</option>
-    <option name="opt1">val1</option>
-    <option name="opt2">val2</option>
+    <option key="compiler_class">Symfony\Component\Routing\RouteCompiler</option>
+    <option key="opt1">val1</option>
+    <option key="opt2">val2</option>
   </options>
 </route>

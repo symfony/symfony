@@ -151,7 +151,7 @@ class XmlDescriptor extends Descriptor
             $routeXML->appendChild($defaultsXML = $dom->createElement('defaults'));
             foreach ($route->getDefaults() as $attribute => $value) {
                 $defaultsXML->appendChild($defaultXML = $dom->createElement('default'));
-                $defaultXML->setAttribute('attribute', $attribute);
+                $defaultXML->setAttribute('key', $attribute);
                 $defaultXML->appendChild(new \DOMText($this->formatValue($value)));
             }
         }
@@ -162,7 +162,7 @@ class XmlDescriptor extends Descriptor
             $routeXML->appendChild($requirementsXML = $dom->createElement('requirements'));
             foreach ($requirements as $attribute => $pattern) {
                 $requirementsXML->appendChild($requirementXML = $dom->createElement('requirement'));
-                $requirementXML->setAttribute('attribute', $attribute);
+                $requirementXML->setAttribute('key', $attribute);
                 $requirementXML->appendChild(new \DOMText($pattern));
             }
         }
@@ -171,7 +171,7 @@ class XmlDescriptor extends Descriptor
             $routeXML->appendChild($optionsXML = $dom->createElement('options'));
             foreach ($route->getOptions() as $name => $value) {
                 $optionsXML->appendChild($optionXML = $dom->createElement('option'));
-                $optionXML->setAttribute('name', $name);
+                $optionXML->setAttribute('key', $name);
                 $optionXML->appendChild(new \DOMText($this->formatValue($value)));
             }
         }

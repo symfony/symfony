@@ -15,10 +15,14 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\EventDispatcher\Event;
 
+/**
+ * SwitchUserEvent
+ *
+ * @author Fabien Potencier <fabien@symfony.com>
+ */
 class SwitchUserEvent extends Event
 {
     private $request;
-
     private $targetUser;
 
     public function __construct(Request $request, UserInterface $targetUser)
@@ -27,11 +31,17 @@ class SwitchUserEvent extends Event
         $this->targetUser = $targetUser;
     }
 
+    /**
+     * @return Request
+     */
     public function getRequest()
     {
         return $this->request;
     }
 
+    /**
+     * @return UserInterface
+     */
     public function getTargetUser()
     {
         return $this->targetUser;

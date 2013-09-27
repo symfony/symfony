@@ -12,10 +12,8 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use Symfony\Component\DependencyInjection\Scope;
-
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Compiler\AnalyzeServiceReferencesPass;
-use Symfony\Component\DependencyInjection\Compiler\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\RepeatedPass;
 use Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass;
 use Symfony\Component\DependencyInjection\Reference;
@@ -124,6 +122,26 @@ class InlineServiceDefinitionsPassTest extends \PHPUnit_Framework_TestCase
         $arguments = $b->getArguments();
         $this->assertEquals(new Reference('a'), $arguments[0]);
         $this->assertTrue($container->hasDefinition('a'));
+    }
+
+    public function testProcessDoesNotInlineWhenServiceIsPrivateButLazy()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register('foo')
+            ->setPublic(false)
+            ->setLazy(true)
+        ;
+
+        $container
+            ->register('service')
+            ->setArguments(array($ref = new Reference('foo')))
+        ;
+
+        $this->process($container);
+
+        $arguments = $container->getDefinition('service')->getArguments();
+        $this->assertSame($ref, $arguments[0]);
     }
 
     protected function process(ContainerBuilder $container)

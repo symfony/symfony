@@ -10,9 +10,7 @@
       <default attribute="name">Joseph</default>
     </defaults>
     <requirements>
-      <requirement attribute="compiler_class">Symfony\Component\Routing\RouteCompiler</requirement>
-      <requirement attribute="opt1">val1</requirement>
-      <requirement attribute="opt2">val2</requirement>
+      <requirement attribute="name">[a-z]+</requirement>
     </requirements>
     <options>
       <option name="compiler_class">Symfony\Component\Routing\RouteCompiler</option>

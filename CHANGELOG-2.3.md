@@ -7,6 +7,59 @@ in 2.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.3.0...v2.3.1
 
+* 2.3.5 (2013-09-27)
+
+ * 8980954: bugix: CookieJar returns cookies with domain "domain.com" for domain "foodomain.com"
+ * bb59ac2: fixed HTML5 form attribute handling XPath query
+ * 3108c71: [Locale] added support for the position argument to NumberFormatter::parse()
+ * 0774c79: [Locale] added some more stubs for the number formatter
+ * e5282e8: [DomCrawler]Crawler guess charset from html
+ * 0e80d88: fixes RequestDataCollector bug, visible when used on Drupal8
+ * c8d0342: [Console] fixed exception rendering when nested styles
+ * a47d663: [Console] fixed the formatter for single-char tags
+ * c6c35b3: [Console] Escape exception message during the rendering of an exception
+ * 04e730e: [DomCrawler] fixed HTML5 form attribute handling
+ * 0e437c5: [BrowserKit] Fixed the handling of parameters when redirecting
+ * d84df4c: [Process] Properly close pipes after a Process::stop call
+ * b3ae29d: fixed bytes conversion when used on 32-bits systems
+ * a273e79: [Form] Fixed: "required" attribute is not added to <select> tag if no empty value
+ * 958ec09: NativeSessionStorage regenerate
+ * 0d6af5c: Use setTimeZone if this method exists.
+ * 42019f6: [Console] Fixed argument parsing when a single dash is passed.
+ * 097b376: [WebProfilerBundle] fixed toolbar for IE8 (refs #8380)
+ * 4f5b8f0: [HttpFoundation] tried to keep the original Request URI as much as possible to avoid different behavior between ::createFromGlobals() and ::create()
+ * 4c1dbc7: [TwigBridge] fixed form rendering when used in a template with dynamic inheritance
+ * 8444339: [HttpKernel] added a check for private event listeners/subscribers
+ * 427ee19: [FrameworkBundle] fixed registration of the register listener pass
+ * ce7de37: [DependencyInjection] fixed a non-detected circular reference in PhpDumper (closes #8425)
+ * 37102dc: [Process] Close unix pipes before calling `proc_close` to avoid a deadlock
+ * 8c2a733: [HttpFoundation] fixed format duplication in Request
+ * 1e75cf9: [Process] Fix #8970 : read output once the process is finished, enable pipe tests on Windows
+ * 9542d72: [Form] Fixed expanded choice field to be marked invalid when unknown choices are submitted
+ * 72b8807: [Form] Fixed ChoiceList::get*By*() methods to preserve order and array keys
+ * b65a515: [Form] Fixed FormValidator::findClickedButton() not to be called exponentially
+ * 49f5027: [HttpKernel] fixer HInclude src (closes #8951)
+ * c567262: Fixed escaping of service identifiers in configuration
+ * 4a76c76: [Process][2.2] Fix Process component on windows
+ * 65814ba: Request->getPort() should prefer HTTP_HOST over SERVER_PORT
+ * e75d284: Fixing broken http auth digest in some circumstances (php-fpm + apache).
+ * 970405f: fixed some circular references
+ * 899f176: [Security] fixed a leak in ExceptionListener
+ * 2fd8a7a: [Security] fixed a leak in the ContextListener
+ * 6362fa4: Button missing getErrorsAsString() fixes #8084 Debug: Not calling undefined method anymore. If the form contained a submit button the call would fail and the debug of the form wasn't possible. Now it will work in all cases. This fixes #8084
+ * e4b3039: Use isset() instead of array_key_exists() in DIC
+ * 2d34e78: [BrowserKit] fixed method/files/content when redirecting a request
+ * 64e1655: [BrowserKit] removed some headers when redirecting a request
+ * 96a4b00: [BrowserKit] fixed headers when redirecting if history is set to false (refs #8697)
+ * c931eb7: [HttpKernel] fixed route parameters storage in the Request data collector (closes #8867)
+ * 96bb731: optimized circular reference checker
+ * 39b610d: Clear lazy loading initializer after the service is successfully initialized
+ * 91234cd: [HttpKernel] changed fragment URLs to be relative by default (closes #8458)
+ * 4922a80: [FrameworkBundle] added support for double-quoted strings in the extractor (closes #8797)
+ * 52d8676: [Intl] made RegionBundle and LanguageBundle merge fallback data when using a country-specific locale
+ * 0d07af8: [BrowserKit] Pass headers when `followRedirect()` is called
+ * d400b5a: Return BC compatibility for `@Route` parameters and default values
+
 * 2.3.4 (2013-08-27)
 
  * f936b41: clearToken exception is thrown at wrong place.

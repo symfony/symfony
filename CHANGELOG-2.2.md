@@ -7,6 +7,53 @@ in 2.2 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.2.0...v2.2.1
 
+* 2.2.8 (2013-09-25)
+
+ * same as 2.2.7
+
+* 2.2.7 (2013-09-25)
+
+ * 8980954: bugix: CookieJar returns cookies with domain "domain.com" for domain "foodomain.com"
+ * 3108c71: [Locale] added support for the position argument to NumberFormatter::parse()
+ * 0774c79: [Locale] added some more stubs for the number formatter
+ * e5282e8: [DomCrawler]Crawler guess charset from html
+ * 0e80d88: fixes RequestDataCollector bug, visible when used on Drupal8
+ * c8d0342: [Console] fixed exception rendering when nested styles
+ * a47d663: [Console] fixed the formatter for single-char tags
+ * c6c35b3: [Console] Escape exception message during the rendering of an exception
+ * 0e437c5: [BrowserKit] Fixed the handling of parameters when redirecting
+ * 958ec09: NativeSessionStorage regenerate
+ * 0d6af5c: Use setTimeZone if this method exists.
+ * 773e716: [HttpFoundation] Fixed the way path to directory is trimmed.
+ * 42019f6: [Console] Fixed argument parsing when a single dash is passed.
+ * b591419: [HttpFoundation] removed double-slashes (closes #8388)
+ * 4f5b8f0: [HttpFoundation] tried to keep the original Request URI as much as possible to avoid different behavior between ::createFromGlobals() and ::create()
+ * 4c1dbc7: [TwigBridge] fixed form rendering when used in a template with dynamic inheritance
+ * 8444339: [HttpKernel] added a check for private event listeners/subscribers
+ * ce7de37: [DependencyInjection] fixed a non-detected circular reference in PhpDumper (closes #8425)
+ * 37102dc: [Process] Close unix pipes before calling `proc_close` to avoid a deadlock
+ * 8c2a733: [HttpFoundation] fixed format duplication in Request
+ * 1e75cf9: [Process] Fix #8970 : read output once the process is finished, enable pipe tests on Windows
+ * ed83752: [Form] Fixed expanded choice field to be marked invalid when unknown choices are submitted
+ * 30aa1de: [Form] Fixed ChoiceList::get*By*() methods to preserve order and array keys
+ * 49f5027: [HttpKernel] fixer HInclude src (closes #8951)
+ * c567262: Fixed escaping of service identifiers in configuration
+ * 4a76c76: [Process][2.2] Fix Process component on windows
+ * 65814ba: Request->getPort() should prefer HTTP_HOST over SERVER_PORT
+ * e75d284: Fixing broken http auth digest in some circumstances (php-fpm + apache).
+ * 899f176: [Security] fixed a leak in ExceptionListener
+ * 2fd8a7a: [Security] fixed a leak in the ContextListener
+ * 4e9d990: Ignore posix_istatty warnings
+ * 2d34e78: [BrowserKit] fixed method/files/content when redirecting a request
+ * 64e1655: [BrowserKit] removed some headers when redirecting a request
+ * 96a4b00: [BrowserKit] fixed headers when redirecting if history is set to false (refs #8697)
+ * c931eb7: [HttpKernel] fixed route parameters storage in the Request data collector (closes #8867)
+ * 96bb731: optimized circular reference checker
+ * 91234cd: [HttpKernel] changed fragment URLs to be relative by default (closes #8458)
+ * 4922a80: [FrameworkBundle] added support for double-quoted strings in the extractor (closes #8797)
+ * 0d07af8: [BrowserKit] Pass headers when `followRedirect()` is called
+ * d400b5a: Return BC compatibility for `@Route` parameters and default values
+
 * 2.2.6 (2013-08-26)
 
  * f936b41: clearToken exception is thrown at wrong place.

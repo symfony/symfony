@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Scope;
 use Symfony\Component\DependencyInjection\SimpleXMLElement;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -49,6 +50,9 @@ class XmlFileLoader extends FileLoader
 
         // imports
         $this->parseImports($xml, $path);
+
+        // scopes
+        $this->parseScopes($xml);
 
         // parameters
         $this->parseParameters($xml, $path);
@@ -103,6 +107,26 @@ class XmlFileLoader extends FileLoader
         foreach ($imports as $import) {
             $this->setCurrentDir(dirname($file));
             $this->import((string) $import['resource'], null, (Boolean) $import->getAttributeAsPhp('ignore-errors'), $file);
+        }
+    }
+
+    /**
+     * Parses scopes
+     *
+     * @param SimpleXMLElement $xml
+     */
+    private function parseScopes(SimpleXMLElement $xml)
+    {
+        if (false === $scopes = $xml->xpath('//container:scopes/container:scope')) {
+            return;
+        }
+
+        foreach ($scopes as $scope) {
+            $parentName = isset($scope['parent']) ? (string) $scope['parent'] : ContainerInterface::SCOPE_CONTAINER;
+            $name = (string) $scope['name'];
+            if (!$this->container->hasScope($name)) {
+                $this->container->addScope(new Scope($name, $parentName));
+            }
         }
     }
 

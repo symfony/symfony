@@ -37,12 +37,11 @@ class JsonFileLoader extends ArrayLoader implements LoaderInterface
 
         $messages = json_decode(file_get_contents($resource), true);
 
-        if (($errorCode = json_last_error()) > 0) {
-            $message = $this->getJSONErrorMessage($errorCode);
-            throw new InvalidResourceException(sprintf('Error parsing JSON - %s', $message));
+        if (0 < $errorCode = json_last_error()) {
+            throw new InvalidResourceException(sprintf('Error parsing JSON - %s', $this->getJSONErrorMessage($errorCode)));
         }
 
-        if ($messages === null) {
+        if (null === $messages) {
             $messages = array();
         }
 
@@ -53,35 +52,27 @@ class JsonFileLoader extends ArrayLoader implements LoaderInterface
     }
 
     /**
-     * Translates JSON_ERROR_* constant into meaningful message
+     * Translates JSON_ERROR_* constant into meaningful message.
      *
      * @param  integer $errorCode Error code returned by json_last_error() call
+     *
      * @return string  Message string
      */
     private function getJSONErrorMessage($errorCode)
     {
-        $errorMsg = null;
         switch ($errorCode) {
             case JSON_ERROR_DEPTH:
-                $errorMsg = 'Maximum stack depth exceeded';
-                break;
+                return 'Maximum stack depth exceeded';
             case JSON_ERROR_STATE_MISMATCH:
-                $errorMsg = 'Underflow or the modes mismatch';
-                break;
+                return 'Underflow or the modes mismatch';
             case JSON_ERROR_CTRL_CHAR:
-                $errorMsg = 'Unexpected control character found';
-                break;
+                return 'Unexpected control character found';
             case JSON_ERROR_SYNTAX:
-                $errorMsg = 'Syntax error, malformed JSON';
-                break;
+                return 'Syntax error, malformed JSON';
             case JSON_ERROR_UTF8:
-                $errorMsg = 'Malformed UTF-8 characters, possibly incorrectly encoded';
-                break;
+                return 'Malformed UTF-8 characters, possibly incorrectly encoded';
             default:
-                $errorMsg = 'Unknown error';
-            break;
+                return 'Unknown error';
         }
-
-        return $errorMsg;
     }
 }

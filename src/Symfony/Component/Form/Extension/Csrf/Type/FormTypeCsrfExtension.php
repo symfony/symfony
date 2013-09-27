@@ -12,12 +12,13 @@
 namespace Symfony\Component\Form\Extension\Csrf\Type;
 
 use Symfony\Component\Form\AbstractTypeExtension;
-use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Form\Extension\Csrf\EventListener\CsrfValidationListener;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Security\Csrf\CsrfTokenGeneratorInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
@@ -26,9 +27,9 @@ use Symfony\Component\Translation\TranslatorInterface;
 class FormTypeCsrfExtension extends AbstractTypeExtension
 {
     /**
-     * @var CsrfProviderInterface
+     * @var CsrfTokenGeneratorInterface
      */
-    private $defaultCsrfProvider;
+    private $defaultTokenGenerator;
 
     /**
      * @var Boolean
@@ -50,9 +51,9 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
      */
     private $translationDomain;
 
-    public function __construct(CsrfProviderInterface $defaultCsrfProvider, $defaultEnabled = true, $defaultFieldName = '_token', TranslatorInterface $translator = null, $translationDomain = null)
+    public function __construct(CsrfTokenGeneratorInterface $defaultTokenGenerator, $defaultEnabled = true, $defaultFieldName = '_token', TranslatorInterface $translator = null, $translationDomain = null)
     {
-        $this->defaultCsrfProvider = $defaultCsrfProvider;
+        $this->defaultTokenGenerator = $defaultTokenGenerator;
         $this->defaultEnabled = $defaultEnabled;
         $this->defaultFieldName = $defaultFieldName;
         $this->translator = $translator;
@@ -74,8 +75,8 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
         $builder
             ->addEventSubscriber(new CsrfValidationListener(
                 $options['csrf_field_name'],
-                $options['csrf_provider'],
-                $options['intention'],
+                $options['csrf_token_generator'],
+                $options['csrf_token_id'],
                 $options['csrf_message'],
                 $this->translator,
                 $this->translationDomain
@@ -94,7 +95,7 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
     {
         if ($options['csrf_protection'] && !$view->parent && $options['compound']) {
             $factory = $form->getConfig()->getFormFactory();
-            $data = $options['csrf_provider']->generateCsrfToken($options['intention']);
+            $data = $options['csrf_token_generator']->generateCsrfToken($options['csrf_token_id']);
 
             $csrfForm = $factory->createNamed($options['csrf_field_name'], 'hidden', $data, array(
                 'mapped' => false,
@@ -109,12 +110,24 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
+        // BC clause for the "intention" option
+        $csrfTokenId = function (Options $options) {
+            return $options['intention'];
+        };
+
+        // BC clause for the "csrf_provider" option
+        $csrfTokenGenerator = function (Options $options) {
+            return $options['csrf_provider'];
+        };
+
         $resolver->setDefaults(array(
-            'csrf_protection'   => $this->defaultEnabled,
-            'csrf_field_name'   => $this->defaultFieldName,
-            'csrf_provider'     => $this->defaultCsrfProvider,
-            'csrf_message'      => 'The CSRF token is invalid. Please try to resubmit the form.',
-            'intention'         => 'unknown',
+            'csrf_protection'      => $this->defaultEnabled,
+            'csrf_field_name'      => $this->defaultFieldName,
+            'csrf_message'         => 'The CSRF token is invalid. Please try to resubmit the form.',
+            'csrf_token_generator' => $csrfTokenGenerator,
+            'csrf_token_id'        => $csrfTokenId,
+            'csrf_provider'        => $this->defaultTokenGenerator,
+            'intention'            => 'unknown',
         ));
     }
 

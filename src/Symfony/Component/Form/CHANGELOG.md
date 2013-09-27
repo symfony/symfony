@@ -1,9 +1,15 @@
 CHANGELOG
 =========
 
+2.4.0
+-----
+
+ * moved CSRF implementation to the new Security CSRF sub-component
+ * deprecated CsrfProviderInterface and its implementations
+ * deprecated options "csrf_provider" and "intention" in favor of the new options "csrf_token_generator" and "csrf_token_id"
 
 2.3.0
-------
+-----
 
  * deprecated FormPerformanceTestCase and FormIntegrationTestCase in the Symfony\Component\Form\Tests namespace and moved them to the Symfony\Component\Form\Test namespace
  * deprecated TypeTestCase in the Symfony\Component\Form\Tests\Extension\Core\Type namespace and moved it to the Symfony\Component\Form\Test namespace

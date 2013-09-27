@@ -15,7 +15,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
+use Symfony\Component\Security\Csrf\CsrfTokenGeneratorInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
@@ -30,20 +30,20 @@ class CsrfValidationListener implements EventSubscriberInterface
     private $fieldName;
 
     /**
-     * The provider for generating and validating CSRF tokens
-     * @var CsrfProviderInterface
+     * The generator for CSRF tokens
+     * @var CsrfTokenGeneratorInterface
      */
-    private $csrfProvider;
+    private $tokenGenerator;
 
     /**
-     * A text mentioning the intention of the CSRF token
+     * A text mentioning the tokenId of the CSRF token
      *
      * Validation of the token will only succeed if it was generated in the
-     * same session and with the same intention.
+     * same session and with the same tokenId.
      *
      * @var string
      */
-    private $intention;
+    private $tokenId;
 
     /**
      * The message displayed in case of an error.
@@ -68,11 +68,11 @@ class CsrfValidationListener implements EventSubscriberInterface
         );
     }
 
-    public function __construct($fieldName, CsrfProviderInterface $csrfProvider, $intention, $errorMessage, TranslatorInterface $translator = null, $translationDomain = null)
+    public function __construct($fieldName, CsrfTokenGeneratorInterface $tokenGenerator, $tokenId, $errorMessage, TranslatorInterface $translator = null, $translationDomain = null)
     {
         $this->fieldName = $fieldName;
-        $this->csrfProvider = $csrfProvider;
-        $this->intention = $intention;
+        $this->tokenGenerator = $tokenGenerator;
+        $this->tokenId = $tokenId;
         $this->errorMessage = $errorMessage;
         $this->translator = $translator;
         $this->translationDomain = $translationDomain;
@@ -84,7 +84,7 @@ class CsrfValidationListener implements EventSubscriberInterface
         $data = $event->getData();
 
         if ($form->isRoot() && $form->getConfig()->getOption('compound')) {
-            if (!isset($data[$this->fieldName]) || !$this->csrfProvider->isCsrfTokenValid($this->intention, $data[$this->fieldName])) {
+            if (!isset($data[$this->fieldName]) || !$this->tokenGenerator->isCsrfTokenValid($this->tokenId, $data[$this->fieldName])) {
                 $errorMessage = $this->errorMessage;
 
                 if (null !== $this->translator) {

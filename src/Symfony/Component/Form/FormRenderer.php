@@ -13,7 +13,7 @@ namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\Exception\BadMethodCallException;
-use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
+use Symfony\Component\Security\Csrf\CsrfTokenGeneratorInterface;
 
 /**
  * Renders a form into HTML using a rendering engine.
@@ -30,9 +30,9 @@ class FormRenderer implements FormRendererInterface
     private $engine;
 
     /**
-     * @var CsrfProviderInterface
+     * @var CsrfTokenGeneratorInterface
      */
-    private $csrfProvider;
+    private $csrfTokenGenerator;
 
     /**
      * @var array
@@ -49,10 +49,10 @@ class FormRenderer implements FormRendererInterface
      */
     private $variableStack = array();
 
-    public function __construct(FormRendererEngineInterface $engine, CsrfProviderInterface $csrfProvider = null)
+    public function __construct(FormRendererEngineInterface $engine, CsrfTokenGeneratorInterface $csrfTokenGenerator = null)
     {
         $this->engine = $engine;
-        $this->csrfProvider = $csrfProvider;
+        $this->csrfTokenGenerator = $csrfTokenGenerator;
     }
 
     /**
@@ -74,13 +74,13 @@ class FormRenderer implements FormRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function renderCsrfToken($intention)
+    public function renderCsrfToken($tokenId)
     {
-        if (null === $this->csrfProvider) {
-            throw new BadMethodCallException('CSRF token can only be generated if a CsrfProviderInterface is injected in the constructor.');
+        if (null === $this->csrfTokenGenerator) {
+            throw new BadMethodCallException('CSRF tokens can only be generated if a CsrfTokenGeneratorInterface is injected in FormRenderer::__construct().');
         }
 
-        return $this->csrfProvider->generateCsrfToken($intention);
+        return $this->csrfTokenGenerator->generateCsrfToken($tokenId);
     }
 
     /**

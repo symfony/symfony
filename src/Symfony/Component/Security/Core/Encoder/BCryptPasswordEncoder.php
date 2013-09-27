@@ -42,7 +42,7 @@ class BCryptPasswordEncoder extends BasePasswordEncoder
             throw new \InvalidArgumentException('Cost must be in the range of 4-31.');
         }
 
-        $this->cost = sprintf('%02d', $cost);
+        $this->cost = $cost;
     }
 
     /**

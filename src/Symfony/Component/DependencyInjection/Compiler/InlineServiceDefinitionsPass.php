@@ -117,7 +117,7 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
             return true;
         }
 
-        if ($definition->isPublic()) {
+        if ($definition->isPublic() || $definition->isLazy()) {
             return false;
         }
 

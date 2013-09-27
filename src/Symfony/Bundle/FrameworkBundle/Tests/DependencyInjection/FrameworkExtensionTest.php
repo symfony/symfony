@@ -30,7 +30,6 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals('%form.type_extension.csrf.enabled%', $def->getArgument(1));
         $this->assertEquals('_csrf', $container->getParameter('form.type_extension.csrf.field_name'));
         $this->assertEquals('%form.type_extension.csrf.field_name%', $def->getArgument(2));
-        $this->assertEquals('s3cr3t', $container->getParameterBag()->resolveValue($container->findDefinition('form.csrf_provider')->getArgument(1)));
     }
 
     public function testProxies()

@@ -23,7 +23,6 @@
     "require-dev": {
         "symfony/framework-bundle": "~2.2",
         "symfony/twig-bundle": "~2.2",
-        "symfony/form": "~2.1",
         "symfony/validator": "~2.2",
         "symfony/yaml": "~2.0",
         "symfony/expression-language": "~2.4"

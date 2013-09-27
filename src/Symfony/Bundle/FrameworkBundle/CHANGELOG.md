@@ -6,6 +6,8 @@ CHANGELOG
 
  * allowed multiple IP addresses in profiler matcher settings
  * added stopwatch helper to time templates with the WebProfilerBundle
+ * added service definition for "security.secure_random" service
+ * added service definitions for the new Security CSRF sub-component
 
 2.3.0
 -----

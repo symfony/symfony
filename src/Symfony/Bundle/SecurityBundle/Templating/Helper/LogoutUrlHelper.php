@@ -12,8 +12,8 @@
 namespace Symfony\Bundle\SecurityBundle\Templating\Helper;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Csrf\CsrfTokenGeneratorInterface;
 use Symfony\Component\Templating\Helper\Helper;
 
 /**
@@ -43,15 +43,15 @@ class LogoutUrlHelper extends Helper
     /**
      * Registers a firewall's LogoutListener, allowing its URL to be generated.
      *
-     * @param string                $key           The firewall key
-     * @param string                $logoutPath    The path that starts the logout process
-     * @param string                $intention     The intention for CSRF token generation
-     * @param string                $csrfParameter The CSRF token parameter name
-     * @param CsrfProviderInterface $csrfProvider  A CsrfProviderInterface instance
+     * @param string                      $key                The firewall key
+     * @param string                      $logoutPath         The path that starts the logout process
+     * @param string                      $csrfTokenId        The ID of the CSRF token
+     * @param string                      $csrfParameter      The CSRF token parameter name
+     * @param CsrfTokenGeneratorInterface $csrfTokenGenerator A CsrfTokenGeneratorInterface instance
      */
-    public function registerListener($key, $logoutPath, $intention, $csrfParameter, CsrfProviderInterface $csrfProvider = null)
+    public function registerListener($key, $logoutPath, $csrfTokenId, $csrfParameter, CsrfTokenGeneratorInterface $csrfTokenGenerator = null)
     {
-        $this->listeners[$key] = array($logoutPath, $intention, $csrfParameter, $csrfProvider);
+        $this->listeners[$key] = array($logoutPath, $csrfTokenId, $csrfParameter, $csrfTokenGenerator);
     }
 
     /**
@@ -94,9 +94,9 @@ class LogoutUrlHelper extends Helper
             throw new \InvalidArgumentException(sprintf('No LogoutListener found for firewall key "%s".', $key));
         }
 
-        list($logoutPath, $intention, $csrfParameter, $csrfProvider) = $this->listeners[$key];
+        list($logoutPath, $csrfTokenId, $csrfParameter, $csrfTokenGenerator) = $this->listeners[$key];
 
-        $parameters = null !== $csrfProvider ? array($csrfParameter => $csrfProvider->generateCsrfToken($intention)) : array();
+        $parameters = null !== $csrfTokenGenerator ? array($csrfParameter => $csrfTokenGenerator->generateCsrfToken($csrfTokenId)) : array();
 
         if ('/' === $logoutPath[0]) {
             $request = $this->container->get('request');

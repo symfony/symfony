@@ -56,6 +56,10 @@ class FrameworkExtension extends Extension
 
         $loader->load('debug_prod.xml');
 
+        // Enable services for CSRF protection (even without forms)
+        $loader->load('security.xml');
+        $loader->load('security_csrf.xml');
+
         if ($container->getParameter('kernel.debug')) {
             $loader->load('debug.xml');
 
@@ -158,9 +162,7 @@ class FrameworkExtension extends Extension
             if (!isset($config['session'])) {
                 throw new \LogicException('CSRF protection needs that sessions are enabled.');
             }
-            if (!isset($config['secret'])) {
-                throw new \LogicException('CSRF protection needs a secret to be set.');
-            }
+
             $loader->load('form_csrf.xml');
 
             $container->setParameter('form.type_extension.csrf.enabled', true);

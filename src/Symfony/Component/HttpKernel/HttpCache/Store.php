@@ -365,6 +365,25 @@ class Store implements StoreInterface
     }
 
     /**
+     * Generates a cache key for the given Request.
+     *
+     * This method should return a key that must only depend on a
+     * normalized version of the request URI.
+     *
+     * If the same URI can have more than one representation, based on some
+     * headers, use a Vary header to indicate them, and each representation will
+     * be stored independently under the same cache key.
+     *
+     * @param Request $request A Request instance
+     *
+     * @return string A key for the given Request
+     */
+    protected function generateCacheKey(Request $request)
+    {
+        return 'md'.hash('sha256', $request->getUri());
+    }
+
+    /**
      * Returns a cache key for the given Request.
      *
      * @param Request $request A Request instance
@@ -377,7 +396,7 @@ class Store implements StoreInterface
             return $this->keyCache[$request];
         }
 
-        return $this->keyCache[$request] = 'md'.hash('sha256', $request->getUri());
+        return $this->keyCache[$request] = $this->generateCacheKey($request);
     }
 
     /**

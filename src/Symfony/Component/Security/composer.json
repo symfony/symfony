@@ -24,6 +24,7 @@
     "replace": {
         "symfony/security-acl": "self.version",
         "symfony/security-core": "self.version",
+        "symfony/security-csrf": "self.version",
         "symfony/security-http": "self.version"
     },
     "require-dev": {

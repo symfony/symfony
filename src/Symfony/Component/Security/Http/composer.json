@@ -28,7 +28,7 @@
         "psr/log": "~1.0"
     },
     "suggest": {
-        "symfony/form": "",
+        "symfony/security-csrf": "",
         "symfony/routing": ""
     },
     "autoload": {

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Exception\InvalidConfigurationException;
 
 /**
  * @Annotation
@@ -24,4 +25,19 @@ use Symfony\Component\Validator\Constraint;
 class Time extends Constraint
 {
     public $message = 'This value is not a valid time.';
+    public $withMinutes = true;
+    public $withSeconds = true;
+
+    public function __construct($options = null)
+    {
+        parent::__construct($options);
+
+        if (isset($options['withMinutes']) && !isset($options['withSeconds']) && $options['withMinutes'] == false) {
+            $this->withSeconds = false;
+        }
+
+        if ($this->withSeconds == true && $this->withMinutes == false) {
+            throw new InvalidConfigurationException('You can not disable minutes if you have enabled seconds.');
+        }
+    }
 }

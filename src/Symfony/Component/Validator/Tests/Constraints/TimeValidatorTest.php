@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Time;
 use Symfony\Component\Validator\Constraints\TimeValidator;
+use Symfony\Component\Validator\Tests\Fixtures\InvalidConstraint;
 
 class TimeValidatorTest extends \PHPUnit_Framework_TestCase
 {
@@ -30,6 +31,17 @@ class TimeValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $this->context = null;
         $this->validator = null;
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Validator\Exception\InvalidConfigurationException
+     */
+    public function testThrowsExceptionIfConfigurationIsInvalid()
+    {
+        new Time(array(
+            'withMinutes' => false,
+            'withSeconds' => true,
+        ));
     }
 
     public function testNullIsValid()
@@ -85,6 +97,50 @@ class TimeValidatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider getValidTimesWithoutMinutes
+     */
+    public function testValidTimesWithoutMinutes($time)
+    {
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
+        $this->validator->validate($time, new Time(array(
+            'withMinutes' => false,
+        )));
+    }
+
+    public function getValidTimesWithoutMinutes()
+    {
+        return array(
+            array('01'),
+            array('00'),
+            array('23'),
+        );
+    }
+
+    /**
+     * @dataProvider getValidTimesWithoutSeconds
+     */
+    public function testValidTimesWithoutSeconds($time)
+    {
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
+        $this->validator->validate($time, new Time(array(
+            'withSeconds' => false,
+        )));
+    }
+
+    public function getValidTimesWithoutSeconds()
+    {
+        return array(
+            array('01:02'),
+            array('00:00'),
+            array('23:59'),
+        );
+    }
+
+    /**
      * @dataProvider getInvalidTimes
      */
     public function testInvalidTimes($time)
@@ -112,6 +168,67 @@ class TimeValidatorTest extends \PHPUnit_Framework_TestCase
             array('24:00:00'),
             array('00:60:00'),
             array('00:00:60'),
+        );
+    }
+
+    /**
+     * @dataProvider getInvalidTimesWithoutMinutes
+     */
+    public function testInvalidTimesWithoutMinutes($time)
+    {
+        $constraint = new Time(array(
+            'message' => 'myMessage',
+            'withMinutes' => false,
+        ));
+
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('myMessage', array(
+                '{{ value }}' => $time,
+            ));
+
+        $this->validator->validate($time, $constraint);
+    }
+
+    public function getInvalidTimesWithoutMinutes()
+    {
+        return array(
+            array('foobar'),
+            array('foobar 12'),
+            array('12 foobar'),
+            array('24'),
+            array('60'),
+        );
+    }
+
+    /**
+     * @dataProvider getInvalidTimesWithoutSeconds
+     */
+    public function testInvalidTimesWithoutSeconds($time)
+    {
+        $constraint = new Time(array(
+            'message' => 'myMessage',
+            'withSeconds' => false,
+        ));
+
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('myMessage', array(
+                '{{ value }}' => $time,
+            ));
+
+        $this->validator->validate($time, $constraint);
+    }
+
+    public function getInvalidTimesWithoutSeconds()
+    {
+        return array(
+            array('foobar'),
+            array('foobar 12:34'),
+            array('12:34 foobar'),
+            array('01:02:03'),
+            array('24:00'),
+            array('00:60'),
         );
     }
 }

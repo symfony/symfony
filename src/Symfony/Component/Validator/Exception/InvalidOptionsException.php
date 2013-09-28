@@ -15,9 +15,9 @@ class InvalidOptionsException extends ValidatorException
 {
     private $options;
 
-    public function __construct($message, array $options)
+    public function __construct($message, array $options, \Exception $previous = null)
     {
-        parent::__construct($message);
+        parent::__construct($message, 0, $previous);
 
         $this->options = $options;
     }

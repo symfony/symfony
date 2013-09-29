@@ -134,6 +134,7 @@ class XmlDescriptor extends Descriptor
 
         if ('' !== $route->getHost()) {
             $routeXML->appendChild($hostXML = $dom->createElement('host'));
+            $hostXML->setAttribute('regex', $route->compile()->getHostRegex());
             $hostXML->appendChild(new \DOMText($route->getHost()));
         }
 

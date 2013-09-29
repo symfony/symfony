@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <routes>
   <route name="route_1" path="/hello/{name}" class="Symfony\Component\Routing\Route" path_regex="#^/hello(?:/(?P&lt;name&gt;[a-z]+))?$#s">
-    <host>localhost</host>
+    <host regex="#^localhost$#s">localhost</host>
     <scheme>http</scheme>
     <scheme>https</scheme>
     <method>GET</method>
@@ -19,7 +19,7 @@
     </options>
   </route>
   <route name="route_2" path="/name/add" class="Symfony\Component\Routing\Route" path_regex="#^/name/add$#s">
-    <host>localhost</host>
+    <host regex="#^localhost$#s">localhost</host>
     <scheme>http</scheme>
     <scheme>https</scheme>
     <method>PUT</method>

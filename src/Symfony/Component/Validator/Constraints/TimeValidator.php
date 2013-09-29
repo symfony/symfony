@@ -51,8 +51,8 @@ class TimeValidator extends ConstraintValidator
     /**
      * Returns the regex pattern for validating
      *
-     * @param $withMinutes
-     * @param $withSeconds
+     * @param Boolean $withMinutes
+     * @param Boolean $withSeconds
      * @return string
      */
     protected function getPattern($withMinutes, $withSeconds)
@@ -60,13 +60,11 @@ class TimeValidator extends ConstraintValidator
         // pattern for hours
         $pattern = "(0[0-9]|1[0-9]|2[0-3])";
 
-        if ($withMinutes)
-        {
+        if ($withMinutes) {
             // pattern for minutes
             $pattern .= "(:([0-5][0-9]))";
 
-            if ($withSeconds)
-            {
+            if ($withSeconds) {
                 // because the pattern for seconds is the same as that for minutes, we repeat it twice
                 $pattern .= "{2}";
             }

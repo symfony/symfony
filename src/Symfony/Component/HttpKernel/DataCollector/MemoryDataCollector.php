@@ -65,6 +65,13 @@ class MemoryDataCollector extends DataCollector
         $this->data['memory'] = memory_get_peak_usage(true);
     }
 
+    public function serialize()
+    {
+        $this->updateMemoryUsage();
+
+        return parent::serialize();
+    }
+
     /**
      * {@inheritdoc}
      */

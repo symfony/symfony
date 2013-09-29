@@ -19,7 +19,6 @@
             <argument type="service" id="event_dispatcher" />
             <argument type="service" id="debug.stopwatch" />
             <argument type="service" id="logger" on-invalid="null" />
-            <call method="setProfiler"><argument type="service" id="profiler" on-invalid="null" /></call>
         </service>
 
         <service id="debug.controller_resolver" class="%debug.controller_resolver.class%">

@@ -15,6 +15,7 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
  * TimeDataCollector.
@@ -24,10 +25,12 @@ use Symfony\Component\HttpFoundation\Response;
 class TimeDataCollector extends DataCollector
 {
     protected $kernel;
+    protected $stopwatch;
 
-    public function __construct(KernelInterface $kernel = null)
+    public function __construct(KernelInterface $kernel = null, $stopwatch = null)
     {
         $this->kernel = $kernel;
+        $this->stopwatch = $stopwatch;
     }
 
     /**
@@ -42,6 +45,7 @@ class TimeDataCollector extends DataCollector
         }
 
         $this->data = array(
+            'token'      => $response->headers->get('X-Debug-Token'),
             'start_time' => $startTime * 1000,
             'events'     => array(),
         );
@@ -111,6 +115,16 @@ class TimeDataCollector extends DataCollector
     public function getStartTime()
     {
         return $this->data['start_time'];
+    }
+
+    public function serialize()
+    {
+        if (null !== $this->stopwatch && isset($this->data['token'])) {
+            $this->setEvents($this->stopwatch->getSectionEvents($this->data['token']));
+        }
+        unset($this->data['token']);
+
+        return parent::serialize();
     }
 
     /**

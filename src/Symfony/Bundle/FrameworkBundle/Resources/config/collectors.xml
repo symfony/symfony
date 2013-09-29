@@ -34,6 +34,7 @@
 
         <service id="data_collector.events" class="%data_collector.events.class%" public="false">
             <tag name="data_collector" template="@WebProfiler/Collector/events.html.twig" id="events" priority="255" />
+            <argument type="service" id="event_dispatcher" on-invalid="ignore" />
         </service>
 
         <service id="data_collector.logger" class="%data_collector.logger.class%" public="false">
@@ -45,6 +46,7 @@
         <service id="data_collector.time" class="%data_collector.time.class%" public="false">
             <tag name="data_collector" template="@WebProfiler/Collector/time.html.twig" id="time" priority="255" />
             <argument type="service" id="kernel" on-invalid="ignore" />
+            <argument type="service" id="debug.stopwatch" on-invalid="ignore" />
         </service>
 
         <service id="data_collector.memory" class="%data_collector.memory.class%" public="false">

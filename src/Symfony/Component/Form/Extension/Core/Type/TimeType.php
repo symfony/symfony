@@ -114,7 +114,7 @@ class TimeType extends AbstractType
 
         if ('string' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
-                new DateTimeToStringTransformer($options['model_timezone'], $options['model_timezone'], 'H:i:s')
+                new DateTimeToStringTransformer($options['model_timezone'], $options['model_timezone'], $format)
             ));
         } elseif ('timestamp' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(

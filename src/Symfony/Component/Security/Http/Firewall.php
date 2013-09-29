@@ -84,6 +84,9 @@ class Firewall implements EventSubscriberInterface
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public static function getSubscribedEvents()
     {
         return array(

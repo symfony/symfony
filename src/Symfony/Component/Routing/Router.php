@@ -266,8 +266,13 @@ class Router implements RouterInterface
         } else {
             $class = $this->options['generator_cache_class'];
             $cache = new ConfigCache($this->options['cache_dir'].'/'.$class.'.php', $this->options['debug']);
+<<<<<<< HEAD
             if (!$cache->isFresh($class)) {
                 $dumper = $this->getGeneratorDumperInstance();
+=======
+            if (!$cache->isFresh()) {
+                $dumper = new $this->options['generator_dumper_class']($this->getRouteCollection());
+>>>>>>> 2.3
 
                 $options = array(
                     'class'      => $class,

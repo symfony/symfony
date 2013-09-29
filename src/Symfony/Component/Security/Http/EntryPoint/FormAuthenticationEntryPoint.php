@@ -30,7 +30,7 @@ class FormAuthenticationEntryPoint implements AuthenticationEntryPointInterface
     private $httpUtils;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param HttpKernelInterface $kernel
      * @param HttpUtils           $httpUtils  An HttpUtils instance

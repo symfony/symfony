@@ -36,6 +36,9 @@ class X509AuthenticationListener extends AbstractPreAuthenticatedListener
         $this->credentialKey = $credentialKey;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function getPreAuthenticatedData(Request $request)
     {
         if (!$request->server->has($this->userKey)) {

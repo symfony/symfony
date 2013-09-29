@@ -36,7 +36,7 @@ class Time extends Constraint
             $this->withSeconds = false;
         }
 
-        if ($this->withSeconds == true && $this->withMinutes == false) {
+        if ($this->withSeconds && !$this->withMinutes) {
             throw new InvalidConfigurationException('You can not disable minutes if you have enabled seconds.');
         }
     }

@@ -446,7 +446,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
         return function (Event $event) use ($self, $eventName, $listener) {
             $e = $self->preListenerCall($eventName, $listener);
 
-            call_user_func($listener, $event);
+            call_user_func($listener, $event, $eventName, $this);
 
             $e->stop();
 

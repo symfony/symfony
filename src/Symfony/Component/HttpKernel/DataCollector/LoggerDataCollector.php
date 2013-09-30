@@ -37,6 +37,14 @@ class LoggerDataCollector extends DataCollector
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
+        // everything is done as late as possible
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function collect(Request $request, Response $response, \Exception $exception = null)
+    {
         if (null !== $this->logger) {
             $this->data = array(
                 'error_count'       => $this->logger->countErrors(),

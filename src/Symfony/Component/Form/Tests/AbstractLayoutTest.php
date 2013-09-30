@@ -302,8 +302,9 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         );
     }
 
-    public function testWidgetById()
+    public function testOverrideWidgetBlock()
     {
+        // see custom_widgets.html.twig
         $form = $this->factory->createNamed('text_id', 'text');
         $html = $this->renderWidget($form->createView());
 
@@ -1890,5 +1891,83 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         ));
 
         $this->assertSame('<form name="form" method="get" action="http://example.com/directory" class="foobar">', $html);
+    }
+
+    public function testWidgetAttributes()
+    {
+        $form = $this->factory->createNamed('text', 'text', 'value', array(
+            'required' => true,
+            'disabled' => true,
+            'read_only' => true,
+            'max_length' => 10,
+            'pattern' => '\d+',
+            'attr' => array('class' => 'foobar', 'data-foo' => 'bar'),
+        ));
+
+        $html = $this->renderWidget($form->createView());
+
+        // compare plain HTML to check the whitespace
+        $this->assertSame('<input type="text" id="text" name="text" readonly="readonly" disabled="disabled" required="required" maxlength="10" pattern="\d+" class="foobar" data-foo="bar" value="value" />', $html);
+    }
+
+    public function testWidgetAttributeNameRepeatedIfTrue()
+    {
+        $form = $this->factory->createNamed('text', 'text', 'value', array(
+            'attr' => array('foo' => true),
+        ));
+
+        $html = $this->renderWidget($form->createView());
+
+        // foo="foo"
+        $this->assertSame('<input type="text" id="text" name="text" required="required" foo="foo" value="value" />', $html);
+    }
+
+    public function testWidgetAttributeHiddenIfFalse()
+    {
+        $form = $this->factory->createNamed('text', 'text', 'value', array(
+            'attr' => array('foo' => false),
+        ));
+
+        $html = $this->renderWidget($form->createView());
+
+        // no foo
+        $this->assertSame('<input type="text" id="text" name="text" required="required" value="value" />', $html);
+    }
+
+    public function testButtonAttributes()
+    {
+        $form = $this->factory->createNamed('button', 'button', null, array(
+            'disabled' => true,
+            'attr' => array('class' => 'foobar', 'data-foo' => 'bar'),
+        ));
+
+        $html = $this->renderWidget($form->createView());
+
+        // compare plain HTML to check the whitespace
+        $this->assertSame('<button type="button" id="button" name="button" disabled="disabled" class="foobar" data-foo="bar">[trans]Button[/trans]</button>', $html);
+    }
+
+    public function testButtonAttributeNameRepeatedIfTrue()
+    {
+        $form = $this->factory->createNamed('button', 'button', null, array(
+            'attr' => array('foo' => true),
+        ));
+
+        $html = $this->renderWidget($form->createView());
+
+        // foo="foo"
+        $this->assertSame('<button type="button" id="button" name="button" foo="foo">[trans]Button[/trans]</button>', $html);
+    }
+
+    public function testButtonAttributeHiddenIfFalse()
+    {
+        $form = $this->factory->createNamed('button', 'button', null, array(
+            'attr' => array('foo' => false),
+        ));
+
+        $html = $this->renderWidget($form->createView());
+
+        // no foo
+        $this->assertSame('<button type="button" id="button" name="button">[trans]Button[/trans]</button>', $html);
     }
 }

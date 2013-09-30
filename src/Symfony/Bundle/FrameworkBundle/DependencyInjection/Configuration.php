@@ -224,7 +224,7 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('save_path')->defaultValue('%kernel.cache_dir%/sessions')->end()
                         ->integerNode('metadata_update_threshold')
                             ->defaultValue('0')
-                            ->info('time to wait between 2 session metadata updates, it will also prevent the session handler to write if the session has not changed')
+                            ->info('seconds to wait between 2 session metadata updates, it will also prevent the session handler to write if the session has not changed')
                         ->end()
                     ->end()
                 ->end()

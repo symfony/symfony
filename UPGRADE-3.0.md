@@ -168,6 +168,13 @@ UPGRADE FROM 2.x to 3.0
    `ChoiceListInterface::getChoicesForValues()` and
    `ChoiceListInterface::getValuesForChoices()` should be sufficient.
 
+ * The interface `Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface`
+   and all of its implementations were removed. Use the new interface
+   `Symfony\Component\Security\Csrf\CsrfTokenGeneratorInterface` instead.
+
+ * The options "csrf_provider" and "intention" were renamed to "csrf_token_generator"
+   and "csrf_token_id".
+
 
 ### FrameworkBundle
 

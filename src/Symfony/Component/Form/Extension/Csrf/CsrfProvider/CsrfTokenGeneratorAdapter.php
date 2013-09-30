@@ -11,16 +11,16 @@
 
 namespace Symfony\Component\Form\Extension\Csrf\CsrfProvider;
 
-use Symfony\Component\Security\Csrf\CsrfTokenGeneratorInterface;
+use Symfony\Component\Security\Csrf\CsrfTokenGenerator;
 
 /**
- * Alias interface of {@link CsrfTokenGeneratorInterface}.
+ * Adapter for using the new token generator with the old interface.
  *
+ * @since  2.4
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @deprecated Deprecated since version 2.4, to be removed in Symfony 3.0. Use
- *             {@link CsrfTokenGeneratorInterface} instead.
+ * @deprecated Deprecated since version 2.4, to be removed in Symfony 3.0.
  */
-interface CsrfProviderInterface extends CsrfTokenGeneratorInterface
+class CsrfTokenGeneratorAdapter extends CsrfTokenGenerator implements CsrfProviderInterface
 {
 }

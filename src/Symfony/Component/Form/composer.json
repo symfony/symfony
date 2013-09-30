@@ -24,11 +24,14 @@
     },
     "require-dev": {
         "symfony/validator": "~2.2",
-        "symfony/http-foundation": "~2.2"
+        "symfony/http-foundation": "~2.2",
+        "symfony/security-csrf": "~2.4"
     },
     "suggest": {
         "symfony/validator": "For form validation.",
-        "symfony/security-csrf": "For protecting forms against CSRF attacks."
+        "symfony/security-csrf": "For protecting forms against CSRF attacks.",
+        "symfony/twig-bridge": "For templating with Twig.",
+        "symfony/framework-bundle": "For templating with PHP."
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\Form\\": "" }

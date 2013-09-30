@@ -23,6 +23,8 @@
         "symfony/http-kernel": "~2.3",
         "symfony/filesystem": "~2.3",
         "symfony/routing": "~2.2",
+        "symfony/security-core": "~2.4",
+        "symfony/security-csrf": "~2.4",
         "symfony/stopwatch": "~2.3",
         "symfony/templating": "~2.1",
         "symfony/translation": "~2.3",
@@ -30,7 +32,7 @@
     },
     "require-dev": {
         "symfony/finder": "~2.0",
-        "symfony/security": "~2.3",
+        "symfony/security": "~2.4",
         "symfony/form": "~2.3",
         "symfony/class-loader": "~2.1",
         "symfony/validator": "~2.1"

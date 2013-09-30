@@ -16,10 +16,14 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3"
+        "php": ">=5.3.3",
+        "symfony/security-core": "~2.4"
     },
     "require-dev": {
-        "symfony/security-core": "~2.4"
+        "symfony/http-foundation": "~2.1"
+    },
+    "suggest": {
+        "symfony/http-foundation": "For using the class SessionTokenStorage."
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\Security\\Csrf\\": "" }

@@ -148,7 +148,12 @@
 
         <!-- FormTypeHttpFoundationExtension -->
         <service id="form.type_extension.form.http_foundation" class="Symfony\Component\Form\Extension\HttpFoundation\Type\FormTypeHttpFoundationExtension">
+            <argument type="service" id="form.type_extension.form.request_handler" />
             <tag name="form.type_extension" alias="form" />
+        </service>
+
+        <!-- HttpFoundationRequestHandler -->
+        <service id="form.type_extension.form.request_handler" class="Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationRequestHandler">
         </service>
 
         <!-- FormTypeValidatorExtension -->

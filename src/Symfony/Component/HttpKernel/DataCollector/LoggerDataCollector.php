@@ -15,13 +15,14 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Debug\ErrorHandler;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
+use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
 
 /**
  * LogDataCollector.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class LoggerDataCollector extends DataCollector
+class LoggerDataCollector extends DataCollector implements LateDataCollectorInterface
 {
     private $logger;
 
@@ -43,7 +44,7 @@ class LoggerDataCollector extends DataCollector
     /**
      * {@inheritdoc}
      */
-    public function collect(Request $request, Response $response, \Exception $exception = null)
+    public function lateCollect()
     {
         if (null !== $this->logger) {
             $this->data = array(

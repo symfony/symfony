@@ -35,6 +35,8 @@ interface CsrfTokenGeneratorInterface
      * Generates a CSRF token with the given token ID.
      *
      * @param string $tokenId An ID that identifies the token
+     *
+     * @return string The generated CSRF token
      */
     public function generateCsrfToken($tokenId);
 

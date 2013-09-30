@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\DataCollector;
 
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
+use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,7 +23,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class TimeDataCollector extends DataCollector
+class TimeDataCollector extends DataCollector implements LateDataCollectorInterface
 {
     protected $kernel;
     protected $stopwatch;
@@ -49,6 +50,17 @@ class TimeDataCollector extends DataCollector
             'start_time' => $startTime * 1000,
             'events'     => array(),
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function lateCollect()
+    {
+        if (null !== $this->stopwatch && isset($this->data['token'])) {
+            $this->setEvents($this->stopwatch->getSectionEvents($this->data['token']));
+        }
+        unset($this->data['token']);
     }
 
     /**
@@ -115,16 +127,6 @@ class TimeDataCollector extends DataCollector
     public function getStartTime()
     {
         return $this->data['start_time'];
-    }
-
-    public function serialize()
-    {
-        if (null !== $this->stopwatch && isset($this->data['token'])) {
-            $this->setEvents($this->stopwatch->getSectionEvents($this->data['token']));
-        }
-        unset($this->data['token']);
-
-        return parent::serialize();
     }
 
     /**

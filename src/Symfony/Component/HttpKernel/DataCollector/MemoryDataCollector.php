@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\DataCollector;
 
+use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -19,7 +20,7 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class MemoryDataCollector extends DataCollector
+class MemoryDataCollector extends DataCollector implements LateDataCollectorInterface
 {
     public function __construct()
     {
@@ -33,6 +34,14 @@ class MemoryDataCollector extends DataCollector
      * {@inheritdoc}
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
+    {
+        $this->updateMemoryUsage();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function lateCollect()
     {
         $this->updateMemoryUsage();
     }
@@ -63,13 +72,6 @@ class MemoryDataCollector extends DataCollector
     public function updateMemoryUsage()
     {
         $this->data['memory'] = memory_get_peak_usage(true);
-    }
-
-    public function serialize()
-    {
-        $this->updateMemoryUsage();
-
-        return parent::serialize();
     }
 
     /**

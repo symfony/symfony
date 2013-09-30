@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Profiler\ProfilerStorageInterface;
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
+use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -109,6 +110,13 @@ class Profiler
      */
     public function saveProfile(Profile $profile)
     {
+        // late collect
+        foreach ($profile->getCollectors() as $collector) {
+            if ($collector instanceof LateDataCollectorInterface) {
+                $collector->lateCollect();
+            }
+        }
+
         if (!($ret = $this->storage->write($profile)) && null !== $this->logger) {
             $this->logger->warning('Unable to store the profiler information.');
         }

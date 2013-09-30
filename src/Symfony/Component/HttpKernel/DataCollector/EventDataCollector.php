@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\DataCollector;
 
+use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -21,7 +22,7 @@ use Symfony\Component\EventDispatcher\Debug\TraceableEventDispatcherInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class EventDataCollector extends DataCollector
+class EventDataCollector extends DataCollector implements LateDataCollectorInterface
 {
     protected $dispatcher;
 
@@ -39,6 +40,14 @@ class EventDataCollector extends DataCollector
             'called_listeners'     => array(),
             'not_called_listeners' => array(),
         );
+    }
+
+    public function lateCollect()
+    {
+        if ($this->dispatcher instanceof TraceableEventDispatcherInterface) {
+            $this->setCalledListeners($this->dispatcher->getCalledListeners());
+            $this->setNotCalledListeners($this->dispatcher->getNotCalledListeners());
+        }
     }
 
     /**
@@ -87,16 +96,6 @@ class EventDataCollector extends DataCollector
     public function getNotCalledListeners()
     {
         return $this->data['not_called_listeners'];
-    }
-
-    public function serialize()
-    {
-        if ($this->dispatcher instanceof TraceableEventDispatcherInterface) {
-            $this->setCalledListeners($this->dispatcher->getCalledListeners());
-            $this->setNotCalledListeners($this->dispatcher->getNotCalledListeners());
-        }
-
-        return parent::serialize();
     }
 
     /**

@@ -1,0 +1,229 @@
+---------------------------------------------------------------------------
+
+by mvrhov at 2013-01-04T16:00:27Z
+
+IMO we do not need cryptographic safe tokens here.
+What I'm afraid of is emptying a entropy pretty quickly. Now when there is no more entropy the application WILL block.
+This could pose a big problem on a busy server. AFAIK only a couple of bytes of entropy s generated each second.
+
+---------------------------------------------------------------------------
+
+by vicb at 2013-01-05T14:37:51Z
+
+@mvrhov good catch! This could indeed slow the server pretty badly _(I was not aware of the problem until I read a forum post explaining why [Android sometimes lags](http://forum.xda-developers.com/showthread.php?t=1987032) - same root cause)_
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-01-05T16:40:25Z
+
+@mvrhov I made the tokens URI safe now.
+
+---------------------------------------------------------------------------
+
+by vicb at 2013-01-07T11:11:03Z
+
+> Backwards compatibility break: no
+
+Really ?
+
+---------------------------------------------------------------------------
+
+by padraic at 2013-01-07T14:39:52Z
+
+@mvrhov You're correct, the randomness need not be very cryptographically secure. The CSRF token is already a sub-unit of a randomly generated session ID though even that has some predictive weaknesses (needs better entropy) due to be improved in PHP 5.4.
+
+The options currently in favour are to use openssl_pseudo_random_bytes() under PHP 5.3.4+ or fall back to a (concatenated) token generated using mt_rand(). Neither is, as far as I'm aware, blocking and mt_rand() is better than you'd expect if Suhosin is installed. I think openssl seeds itself using /dev/urandom intelligently (i.e. the non-blocking but lower entropy partner to /dev/random).
+
+Only thing you have to watch for is that openssl's random functions were blocking under Windows due to an openssl bug. This was fixed but you should avoid using openssl_pseudo_random_bytes() under PHP 5.3.3 or less and go straight to mt_rand().
+
+CSRF tokens need to be random - just not as crazily random as if we needed a high value long-term key :P.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-01-08T12:31:22Z
+
+Postponed to 2.3
+
+---------------------------------------------------------------------------
+
+by vicb at 2013-01-08T12:41:04Z
+
+@bschussek I have created a 2.3 milestone, you can set it in the PR header (which I've done for this one).
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-01-08T12:49:58Z
+
+Thanks! :)
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-04-18T10:56:38Z
+
+I'm currently trying to get this into 2.3. I'm not sure which way to go though:
+
+##### (a) As is, plus a new parameter `$blocking` in `SecureRandomInterface`:
+
+```php
+public function nextBytes($nbBytes, $blocking = true)
+```
+
+This parameter would guarantee a non-blocking behavior when set to false (at the cost of cryptographic security).
+
+Advantage: `SecureRandom` can be reused
+Disadvantage: dependency on the Security component in Form and FrameworkBundle
+
+##### (b) Copy code from `SecureRandom` and `StringUtil` to `AbstractCsrfProvider`
+
+The code in question is:
+
+```php
+// initialize seed
+if (null === $this->seed) {
+    if (null === $this->seedFile) {
+        throw new \RuntimeException('You need to specify a file path to store the seed.');
+    }
+
+    if (is_file($this->seedFile)) {
+        list($this->seed, $this->seedLastUpdatedAt) = $this->readSeed();
+    } else {
+        $this->seed = uniqid(mt_rand(), true);
+        $this->updateSeed();
+    }
+}
+
+$bytes = '';
+while (strlen($bytes) < $nbBytes) {
+    static $incr = 1;
+    $bytes .= hash('sha512', $incr++.$this->seed.uniqid(mt_rand(), true).$nbBytes, true);
+    $this->seed = base64_encode(hash('sha512', $this->seed.$bytes.$nbBytes, true));
+    $this->updateSeed();
+}
+
+return substr($bytes, 0, $nbBytes);
+```
+
+and
+
+```php
+public static function equals($knownString, $userInput)
+{
+    // Prevent issues if string length is 0
+    $knownString .= chr(0);
+    $userInput .= chr(0);
+
+    $knownLen = strlen($knownString);
+    $userLen = strlen($userInput);
+
+    // Set the result to the difference between the lengths
+    $result = $knownLen - $userLen;
+
+    // Note that we ALWAYS iterate over the user-supplied length
+    // This is to prevent leaking length information
+    for ($i = 0; $i < $userLen; $i++) {
+        // Using % here is a trick to prevent notices
+        // It's safe, since if the lengths are different
+        // $result is already non-0
+        $result |= (ord($knownString[$i % $knownLen]) ^ ord($userInput[$i]));
+    }
+
+    // They are only identical strings if $result is exactly 0...
+    return 0 === $result;
+}
+```
+
+Advantage: no dependency on Security in Form and FrameworkBundle
+Disadvantage: code duplication, increased code complexity and maintenance costs, higher security risks
+
+##### (c) As in (b), but use `===` instead of constant-time comparison; don't use seeds
+
+Advantage: no dependency on Security in Form and FrameworkBundle
+Disadvantage: less cryptographic security
+
+Your opinions please?
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-04-21T11:34:21Z
+
+@fabpot @padraic Do you have an opinion on this?
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-04-30T06:55:40Z
+
+@fabpot @padraic Since today is feature freeze for the 2.3 LTS and this was on the top-priority list of tickets, can you please help me to resolve it? Which direction do we go?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-05-06T09:35:52Z
+
+I'm for option (c)
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-09-27T07:42:12Z
+
+I updated this PR now. I deprecated the old CSRF implementation in the Form component and added a new Security CSRF sub-component with a better implementation that depends on Security Core. See the CHANGELOGs in the diff for more information.
+
+I need some feedback regarding the service wiring.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-09-27T07:47:38Z
+
+You can also remove `symfony/form` from the SecurityBundle `composer.json` file.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-09-27T07:51:00Z
+
+I just updated the PR description above for more information.
+
+---------------------------------------------------------------------------
+
+by stof at 2013-09-27T07:52:42Z
+
+the root composer.json needs to replace the component too
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-09-27T08:19:21Z
+
+Fixed all mentioned issues.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-09-27T08:32:30Z
+
+The SecurityBundle currently features the configuration values "csrf_provider" and "intention". Is it possible to add aliases "csrf_token_generator" and "csrf_token_id" for these settings?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2013-09-27T11:43:58Z
+
+You need to update the require(-dev) sections for all libraries/bundles that use the new CsrfTokenGeneratorInterface to ~2.4, e.g. twigbridge, frameworkbundle, securitybundle.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-09-30T12:24:11Z
+
+Updated.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2013-09-30T12:37:23Z
+
+FrameworkBundle also needs the security for security_csrf.xml.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-09-30T12:39:25Z
+
+Updated.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2013-09-30T14:33:02Z
+
+:+1:

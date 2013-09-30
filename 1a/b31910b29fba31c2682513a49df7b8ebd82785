@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-08-30T12:30:08Z
+
+That's weird because `$warmupDir` is created from `$realCacheDir`, so they do have either \\ or /.
+
+---------------------------------------------------------------------------
+
+by caponica at 2013-08-30T12:50:20Z
+
+Sorry, just noticed that github removed the extra back-slashes from my comment. I've updated it above.
+
+The problem is that they are written into the cache file with **double** backslashes but the search/replace is looking for single backslashes, so it doesn't find anything.

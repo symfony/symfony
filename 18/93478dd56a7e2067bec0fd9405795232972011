@@ -1,0 +1,161 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-09-26T04:59:36Z
+
+ping @drak
+
+---------------------------------------------------------------------------
+
+by drak at 2013-09-26T07:22:48Z
+
+This PR is an interesting concept - without accepting or rejecting here are some thoughts:
+
+The problem is that once a session starts, technically it should always be written after each request because if not, the meta-data would not be updated accurately. That would lead to unpredictable results for code that relies on metadata - like session idle time expiry (which could be really important in secure applications). That is my big objection to the other PRs I've seen that try to limit session writes only if the session attributes/flashes are updated - the session is always updated each session, so it should be written each time.
+
+I'm a big fan of feature configurability, and something like this could be useful in some less security critical applications so long as it's not on by default because it would be unsuitable for some applications, e.g. a session idle period could be longer than expected because of update threshold setting. This would have to be well documented.
+
+It's certainly the best idea I've seen yet. There are other possibilities too, again using a proxy on the session handler to limit writes under certain conditions. In Zikula we do that for guest sessions (where our userid=0).
+
+Remember proxies work in all cases except for native session handlers under PHP 5.3: mostly we use user handlers anyway. Just a point for documentation.
+
+---------------------------------------------------------------------------
+
+by adrienbrault at 2013-09-26T07:41:00Z
+
+@drak This should only make the session last less time in some cases, but not longer.
+
+---------------------------------------------------------------------------
+
+by drak at 2013-09-26T08:51:50Z
+
+I must say, that I certainly don't oppose this PR. I've been quite against the other proposals in this area so far, but this seems quite reasonable. It's clean, optional, and it will be well documented. I need more time to review the code and digest it, but in principal it seems ok to me.
+
+---------------------------------------------------------------------------
+
+by drak at 2013-09-27T20:43:25Z
+
+@fabpot - I spent a long while thinking about this PR and I do think it's really good. It would make a nice addition. It's completely BC, nothing breaks as far as I can see.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-09-27T20:49:58Z
+
+@adrienbrault Can you work on adding some docs for it?
+
+---------------------------------------------------------------------------
+
+by adrienbrault at 2013-09-27T22:20:46Z
+
+Sure.
+
+Btw, do you have another name idea for the `wrap_handler_write_check` config name ?
+
+---------------------------------------------------------------------------
+
+by adrienbrault at 2013-09-27T22:54:34Z
+
+Doc PR: https://github.com/symfony/symfony-docs/pull/3017
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-09-28T05:48:20Z
+
+@adrienbrault docs look good to me except that you forgot to mention @drak warning ("Remember proxies work in all cases except for native session handlers under PHP 5.3: mostly we use user handlers anyway.")
+
+@drak just that to double-check your above comment:
+
+ * You says there are other possibilities like using a proxy. AFAIU, this is the approach used here. Can you elaborate on the other possibilities?
+
+ * You say that the session must be written each time because of the metadata. But if you configure the threshold to a value under the session expiration limit, I don't see any drawbacks. Do I miss something here?
+
+---------------------------------------------------------------------------
+
+by drak at 2013-09-28T06:48:01Z
+
+@fabpot Regarding the proxy mechanism and PHP 5.3 maybe I will point this out in the Sessions docs more clearly. I added proxy to mimic the PHP 5.4 feature of the `SessionHandler` class which always proxies the session handler interface (native or userland) directly in C. Under PHP 5.3 our proxy intercepts any userland save handler and also but only exposes some metadata for native savehandlers since it cant do any more.
+
+I mean there are other uses of the proxy to reduce session writes, for example in Zikula the proxy is useraware and does not persist unauthenticated users. You could also make it user-agent aware and not persist sessions for google-bot et al. This is the best place because code still relies on sessions to be started. Preventing the persist is the best strategy in those cases.
+
+Regarding the meta-data, @adrienbrault  answered my questions, so yes, I do not see any drawbacks. This is a really nice use of the proxy mechanism and I don't see any drawbacks. I was just being cautious. I still believe it must be well documented because it does alter expected behaviour, but that's not a criticism, just a good for the developer to know what the codes effects are.
+
+Basically this PR will cause the session to be updated if the content has changed, but not if there only a metadata change AND a certain time period has elapsed. It's brilliant.
+
+---------------------------------------------------------------------------
+
+by drak at 2013-09-28T06:57:08Z
+
+@adrienbrault how about `write_frequency_check`?
+
+---------------------------------------------------------------------------
+
+by adrienbrault at 2013-09-28T07:33:02Z
+
+The WriteCheckSessionHandler has nothing to do with frequency. Hmm
+
+What about `prevent_unmodified_writes` ? `skip_unmodified_writes`
+
+---------------------------------------------------------------------------
+
+by drak at 2013-09-28T08:37:28Z
+
+@adrienbrault That's misleading IMO because what you are doing is changing the granularity at which the metadata is updated and thus changing the session data. It's not just a matter of whether other session data has been modified, it's all about the timing and frequency - so something that reflects that would be better.
+
+---------------------------------------------------------------------------
+
+by adrienbrault at 2013-09-28T18:10:52Z
+
+@Drak but there are 2 different settings that can be used in different
+cases, or I may be missing something ?
+
+On Saturday, September 28, 2013, Drak wrote:
+
+> @adrienbrault <https://github.com/adrienbrault> That's misleading IMO
+> because what you are doing is changing the granularity at which the
+> metadata is updated and thus changing the session data. It's not just a
+> matter of whether other session data has been modified, it's all about the
+> timing and frequency - so something that reflects that would be better.
+>
+> —
+> Reply to this email directly or view it on GitHub<https://github.com/symfony/symfony/pull/9119#issuecomment-25294289>
+> .
+>
+
+---------------------------------------------------------------------------
+
+by drak at 2013-09-28T18:14:07Z
+
+@adrienbrault as I understand it, one enables the feature, the other configures the threshold. So the enable toggle should be named `write_frequency_check (boolean)` and the timing with `metadata_update_threshold (integer)` - you should be clear in the documentation about the units. or, am I missing something?
+
+---------------------------------------------------------------------------
+
+by adrienbrault at 2013-09-28T18:21:56Z
+
+@drak `metadata_update_threshold` will change how often the metadata updated field will be updated, even if `wrap_handler_write_check` is not configured. On the other hand, `wrap_handler_write_check` will prevent the session from being written if it has not been modified; even though it should always be modified if `metadata_update_threshold` is not configured.
+
+I created 2 different settings because the `WriteCheckSessionHandler` could be useful and used in a context where the `Session` class is not used (so no metadata). But is that possible with the FrameworkBundle ?
+
+Maybe we should only have 1 setting in the FrameworkBundle configuration ? `metadata_update_threshold` false would disable the whole thing, and if `metadata_update_threshold` is an integer it will enable both the WriteCheckSessionHandler and the metadata stuff.
+
+---------------------------------------------------------------------------
+
+by drak at 2013-09-28T18:27:52Z
+
+@adrienbrault sure, but in reality `metadata_update_threshold` doesn't make sense without the proxy being enabled since it will still be written (which is normal). It has to be used in-conjunction with the proxy. Your cookbook entry is OK for the framework bundle, but you also need example code and how to instantiate for people just using the HttpFoundation component.
+
+---------------------------------------------------------------------------
+
+by drak at 2013-09-28T18:31:08Z
+
+@adrienbrault Sorry I didn't answer the last part. I think it would be better to have one setting, which when false or 0 does nothing, and if you set a value, it sets up the proxy and also sets the threshold in the metadata object.
+
+---------------------------------------------------------------------------
+
+by adrienbrault at 2013-09-28T19:13:28Z
+
+@drak Thanks, will do that
+
+---------------------------------------------------------------------------
+
+by adrienbrault at 2013-09-30T17:37:57Z
+
+Updated along with the documentation PR

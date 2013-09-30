@@ -153,8 +153,7 @@
         </service>
 
         <!-- HttpFoundationRequestHandler -->
-        <service id="form.type_extension.form.request_handler" class="Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationRequestHandler" public="false">
-        </service>
+        <service id="form.type_extension.form.request_handler" class="Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationRequestHandler" public="false" />
 
         <!-- FormTypeValidatorExtension -->
         <service id="form.type_extension.form.validator" class="Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension">

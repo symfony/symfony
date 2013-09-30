@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Security\Http\Firewall;
 
-use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Security\Csrf\CsrfTokenGeneratorInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface;
@@ -32,12 +32,12 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class UsernamePasswordFormAuthenticationListener extends AbstractAuthenticationListener
 {
-    private $csrfProvider;
+    private $csrfTokenGenerator;
 
     /**
      * {@inheritdoc}
      */
-    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, HttpUtils $httpUtils, $providerKey, AuthenticationSuccessHandlerInterface $successHandler, AuthenticationFailureHandlerInterface $failureHandler, array $options = array(), LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, CsrfProviderInterface $csrfProvider = null)
+    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, HttpUtils $httpUtils, $providerKey, AuthenticationSuccessHandlerInterface $successHandler, AuthenticationFailureHandlerInterface $failureHandler, array $options = array(), LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, CsrfTokenGeneratorInterface $csrfTokenGenerator = null)
     {
         parent::__construct($securityContext, $authenticationManager, $sessionStrategy, $httpUtils, $providerKey, $successHandler, $failureHandler, array_merge(array(
             'username_parameter' => '_username',
@@ -47,7 +47,7 @@ class UsernamePasswordFormAuthenticationListener extends AbstractAuthenticationL
             'post_only'          => true,
         ), $options), $logger, $dispatcher);
 
-        $this->csrfProvider = $csrfProvider;
+        $this->csrfTokenGenerator = $csrfTokenGenerator;
     }
 
     /**
@@ -67,10 +67,10 @@ class UsernamePasswordFormAuthenticationListener extends AbstractAuthenticationL
      */
     protected function attemptAuthentication(Request $request)
     {
-        if (null !== $this->csrfProvider) {
+        if (null !== $this->csrfTokenGenerator) {
             $csrfToken = $request->get($this->options['csrf_parameter'], null, true);
 
-            if (false === $this->csrfProvider->isCsrfTokenValid($this->options['intention'], $csrfToken)) {
+            if (false === $this->csrfTokenGenerator->isCsrfTokenValid($this->options['intention'], $csrfToken)) {
                 throw new InvalidCsrfTokenException('Invalid CSRF token.');
             }
         }

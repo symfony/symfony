@@ -17,6 +17,7 @@
     ],
     "require": {
         "php": ">=5.3.3",
+        "symfony/security-csrf": "~2.4",
         "twig/twig": "~1.11"
     },
     "require-dev": {
@@ -26,7 +27,7 @@
         "symfony/templating": "~2.1",
         "symfony/translation": "~2.2",
         "symfony/yaml": "~2.0",
-        "symfony/security": "~2.0",
+        "symfony/security": "~2.4",
         "symfony/stopwatch": "~2.2"
     },
     "suggest": {

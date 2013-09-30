@@ -12,7 +12,7 @@
 namespace Symfony\Bridge\Twig\Form;
 
 use Symfony\Component\Form\FormRenderer;
-use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
+use Symfony\Component\Security\Csrf\CsrfTokenGeneratorInterface;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -24,9 +24,9 @@ class TwigRenderer extends FormRenderer implements TwigRendererInterface
      */
     private $engine;
 
-    public function __construct(TwigRendererEngineInterface $engine, CsrfProviderInterface $csrfProvider = null)
+    public function __construct(TwigRendererEngineInterface $engine, CsrfTokenGeneratorInterface $csrfTokenGenerator = null)
     {
-        parent::__construct($engine, $csrfProvider);
+        parent::__construct($engine, $csrfTokenGenerator);
 
         $this->engine = $engine;
     }

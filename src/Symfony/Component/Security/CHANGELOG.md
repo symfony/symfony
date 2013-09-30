@@ -7,6 +7,9 @@ CHANGELOG
  * The switch user listener now preserves the query string when switching a user
  * The remember-me cookie hashes now use HMAC, which means that current cookies will be invalidated
  * added simpler customization options
+ * structured component into three sub-components Acl, Core and Http
+ * added Csrf sub-component
+ * changed Http sub-component to depend on Csrf sub-component instead of the Form component
 
 2.3.0
 -----

@@ -471,7 +471,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 
     public function testCsrf()
     {
-        $this->csrfProvider->expects($this->any())
+        $this->csrfTokenGenerator->expects($this->any())
             ->method('generateCsrfToken')
             ->will($this->returnValue('foo&bar'));
 

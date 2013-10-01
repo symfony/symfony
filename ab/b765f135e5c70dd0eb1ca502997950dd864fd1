@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2013-09-04T21:40:14Z
+
+@fabpot this is ready. You might want to merge this into previous branches.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2013-09-06T14:19:55Z
+
+@stof maybe you can review, so fabpot is not scared to merge this ;)
+
+---------------------------------------------------------------------------
+
+by Tobion at 2013-09-30T15:29:19Z
+
+rebased and ready
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-10-01T05:30:05Z
+
+Apart from the 2 small comments that I've made (the removal of the __tostring() method being the most important), everything else looks good to me.

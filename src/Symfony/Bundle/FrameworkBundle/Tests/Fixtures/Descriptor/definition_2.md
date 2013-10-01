@@ -1,0 +1,11 @@
+- Class: `Full\Qualified\Class2`
+- Scope: `container`
+- Public: no
+- Synthetic: yes
+- File: `/path/to/file`
+- Tag: `tag1`
+    - Attr1: val1
+    - Attr2: val2
+- Tag: `tag1`
+    - Attr3: val3
+- Tag: `tag2`

@@ -69,10 +69,14 @@ EOF
 
         if (empty($name)) {
             $output->writeln('Available registered bundles with their extension alias if available:');
+
+            $table = $this->getHelperSet()->get('table');
+            $table->setHeaders(array('Bundle name','Extension alias'));
             foreach ($bundles as $bundle) {
                 $extension = $bundle->getContainerExtension();
-                $output->writeln($bundle->getName().($extension ? ': '.$extension->getAlias() : ''));
+                $table->addRow(array($bundle->getName(), $extension ? $extension->getAlias() : ''));
             }
+            $table->render($output);
 
             return;
         }

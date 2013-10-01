@@ -164,8 +164,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
             case 'Symfony\Component\Validator\Constraints\Range':
                 return new TypeGuess('number', array(), Guess::LOW_CONFIDENCE);
 
-            case 'Symfony\Component\Validator\Constraints\MinCount':
-            case 'Symfony\Component\Validator\Constraints\MaxCount':
+            case 'Symfony\Component\Validator\Constraints\Count':
                 return new TypeGuess('collection', array(), Guess::LOW_CONFIDENCE);
 
             case 'Symfony\Component\Validator\Constraints\True':

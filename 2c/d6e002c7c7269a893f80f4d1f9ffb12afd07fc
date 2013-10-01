@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2013-09-09T09:46:58Z
+
+A PR to the doc should be created too, to document how this can be used
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-09-09T10:31:20Z
+
+Before updating the docs, we first need to decide which way we want to go.

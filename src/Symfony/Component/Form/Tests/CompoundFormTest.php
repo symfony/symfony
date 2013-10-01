@@ -82,6 +82,19 @@ class CompoundFormTest extends AbstractFormTest
         $this->assertTrue($form->isValid());
     }
 
+    public function testSubmitForwardsNullIfNotClearMissingButValueIsExplicitlyNull()
+    {
+        $child = $this->getMockForm('firstName');
+
+        $this->form->add($child);
+
+        $child->expects($this->once())
+            ->method('submit')
+            ->with($this->equalTo(null));
+
+        $this->form->submit(array('firstName' => null), false);
+    }
+
     public function testSubmitForwardsNullIfValueIsMissing()
     {
         $child = $this->getMockForm('firstName');

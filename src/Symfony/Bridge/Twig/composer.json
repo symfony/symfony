@@ -22,6 +22,7 @@
     },
     "require-dev": {
         "symfony/form": "~2.2",
+        "symfony/http-foundation": "~2.4",
         "symfony/http-kernel": "~2.2",
         "symfony/routing": "~2.2",
         "symfony/templating": "~2.1",
@@ -32,6 +33,7 @@
     },
     "suggest": {
         "symfony/form": "",
+        "symfony/http-foundation": "",
         "symfony/http-kernel": "",
         "symfony/routing": "",
         "symfony/templating": "",

@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Twig\Extension;
 
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
@@ -20,11 +21,26 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class RoutingExtension extends \Twig_Extension
 {
+    /**
+     * @var UrlGeneratorInterface
+     */
     private $generator;
 
-    public function __construct(UrlGeneratorInterface $generator)
+    /**
+     * @var RequestStack|null
+     */
+    private $requestStack;
+
+    /**
+     * Constructor.
+     *
+     * @param UrlGeneratorInterface $generator    A UrlGeneratorInterface instance
+     * @param RequestStack|null     $requestStack An optional stack containing master/sub requests
+     */
+    public function __construct(UrlGeneratorInterface $generator, RequestStack $requestStack = null)
     {
         $this->generator = $generator;
+        $this->requestStack = $requestStack;
     }
 
     /**
@@ -37,7 +53,13 @@ class RoutingExtension extends \Twig_Extension
         return array(
             new \Twig_SimpleFunction('url', array($this, 'getUrl'), array('is_safe_callback' => array($this, 'isUrlGenerationSafe'))),
             new \Twig_SimpleFunction('path', array($this, 'getPath'), array('is_safe_callback' => array($this, 'isUrlGenerationSafe'))),
+            new \Twig_SimpleFunction('subpath', array($this, 'getSubPath')),
         );
+    }
+
+    public function getUrl($name, $parameters = array(), $schemeRelative = false)
+    {
+        return $this->generator->generate($name, $parameters, $schemeRelative ? UrlGeneratorInterface::NETWORK_PATH : UrlGeneratorInterface::ABSOLUTE_URL);
     }
 
     public function getPath($name, $parameters = array(), $relative = false)
@@ -45,9 +67,42 @@ class RoutingExtension extends \Twig_Extension
         return $this->generator->generate($name, $parameters, $relative ? UrlGeneratorInterface::RELATIVE_PATH : UrlGeneratorInterface::ABSOLUTE_PATH);
     }
 
-    public function getUrl($name, $parameters = array(), $schemeRelative = false)
+    /**
+     * Returns the relative path to a route (defaults to current route) with all current route parameters merged
+     * with the passed params. 
+     *
+     * Optionally one can also include the params of the query string. It's also possible to remove existing
+     * params by passing null as value of a specific parameter. The path is a relative path to the
+     * target URL, e.g. "../slug", based on the current request path.
+     *
+     * Beware when using this method in a subrequest as it will use the params of the subrequest and will
+     * also generate a relative path based on it. The resulting relative reference is probably the wrong
+     * target when resolved by the user agent (browser) based on the main request.
+     *
+     * @param string  $name         The route name (when empty it defaults to the current route)
+     * @param array   $parameters   The parameters that should be added or overwrite existing params
+     * @param Boolean $includeQuery Whether the current params in the query string should be included (disabled by default)
+     *
+     * @return string The path to the route with given parameters
+     *
+     * @throws \LogicException when the request is not set
+     */
+    public function getSubPath($name = '', array $parameters = array(), $includeQuery = false)
     {
-        return $this->generator->generate($name, $parameters, $schemeRelative ? UrlGeneratorInterface::NETWORK_PATH : UrlGeneratorInterface::ABSOLUTE_URL);
+        if (null === $this->requestStack || null === $request = $this->requestStack->getCurrentRequest()) {
+            throw new \LogicException('The subpath function needs the request to be set in the request stack.');
+        }
+
+        $parameters = array_replace(
+            $includeQuery ? $request->query->all() : array(),
+            $request->attributes->get('_route_params', array()),
+            $parameters
+        );
+        $parameters = array_filter($parameters, function ($value) { 
+            return null !== $value; 
+        });
+
+        return $this->generator->generate($name ?: $request->attributes->get('_route', ''), $parameters, UrlGeneratorInterface::RELATIVE_PATH);
     }
 
     /**

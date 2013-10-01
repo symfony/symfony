@@ -128,9 +128,11 @@ class XmlDescriptor extends Descriptor
             $routeXML->setAttribute('name', $name);
         }
 
-        $routeXML->setAttribute('path', $route->getPath());
         $routeXML->setAttribute('class', get_class($route));
-        $routeXML->setAttribute('path_regex', $route->compile()->getRegex());
+
+        $routeXML->appendChild($pathXML = $dom->createElement('path'));
+        $pathXML->setAttribute('regex', $route->compile()->getRegex());
+        $pathXML->appendChild(new \DOMText($route->getPath()));
 
         if ('' !== $route->getHost()) {
             $routeXML->appendChild($hostXML = $dom->createElement('host'));

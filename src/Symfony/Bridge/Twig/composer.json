@@ -31,14 +31,14 @@
         "symfony/stopwatch": "~2.2"
     },
     "suggest": {
-        "symfony/form": "",
-        "symfony/http-kernel": "",
-        "symfony/routing": "",
-        "symfony/templating": "",
-        "symfony/translation": "",
-        "symfony/yaml": "",
-        "symfony/security": "",
-        "symfony/stopwatch": ""
+        "symfony/form": "For using the FormExtension",
+        "symfony/http-kernel": "For using the HttpKernelExtension",
+        "symfony/routing": "For using the RoutingExtension",
+        "symfony/templating": "For using the TwigEngine",
+        "symfony/translation": "For using the TranslationExtension",
+        "symfony/yaml": "For using the YamlExtension",
+        "symfony/security": "For using the SecurityExtension",
+        "symfony/stopwatch": "For using the StopwatchExtension"
     },
     "autoload": {
         "psr-0": { "Symfony\\Bridge\\Twig\\": "" }

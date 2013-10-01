@@ -145,14 +145,10 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
             case 'Symfony\Component\Validator\Constraints\Ip':
                 return new TypeGuess('text', array(), Guess::MEDIUM_CONFIDENCE);
 
-            case 'Symfony\Component\Validator\Constraints\MaxLength':
-            case 'Symfony\Component\Validator\Constraints\MinLength':
             case 'Symfony\Component\Validator\Constraints\Length':
             case 'Symfony\Component\Validator\Constraints\Regex':
                 return new TypeGuess('text', array(), Guess::LOW_CONFIDENCE);
 
-            case 'Symfony\Component\Validator\Constraints\Min':
-            case 'Symfony\Component\Validator\Constraints\Max':
             case 'Symfony\Component\Validator\Constraints\Range':
                 return new TypeGuess('number', array(), Guess::LOW_CONFIDENCE);
 
@@ -197,9 +193,6 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
     public function guessMaxLengthForConstraint(Constraint $constraint)
     {
         switch (get_class($constraint)) {
-            case 'Symfony\Component\Validator\Constraints\MaxLength':
-                return new ValueGuess($constraint->limit, Guess::HIGH_CONFIDENCE);
-
             case 'Symfony\Component\Validator\Constraints\Length':
                 if (is_numeric($constraint->max)) {
                     return new ValueGuess($constraint->max, Guess::HIGH_CONFIDENCE);
@@ -211,9 +204,6 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
                         return new ValueGuess(null, Guess::MEDIUM_CONFIDENCE);
                 }
                 break;
-
-            case 'Symfony\Component\Validator\Constraints\Max':
-                return new ValueGuess(strlen((string) $constraint->limit), Guess::LOW_CONFIDENCE);
 
             case 'Symfony\Component\Validator\Constraints\Range':
                 if (is_numeric($constraint->max)) {
@@ -235,9 +225,6 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
     public function guessPatternForConstraint(Constraint $constraint)
     {
         switch (get_class($constraint)) {
-            case 'Symfony\Component\Validator\Constraints\MinLength':
-                return new ValueGuess(sprintf('.{%s,}', (string) $constraint->limit), Guess::LOW_CONFIDENCE);
-
             case 'Symfony\Component\Validator\Constraints\Length':
                 if (is_numeric($constraint->min)) {
                     return new ValueGuess(sprintf('.{%s,}', (string) $constraint->min), Guess::LOW_CONFIDENCE);
@@ -251,9 +238,6 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
                     return new ValueGuess($htmlPattern, Guess::HIGH_CONFIDENCE);
                 }
                 break;
-
-            case 'Symfony\Component\Validator\Constraints\Min':
-                return new ValueGuess(sprintf('.{%s,}', strlen((string) $constraint->limit)), Guess::LOW_CONFIDENCE);
 
             case 'Symfony\Component\Validator\Constraints\Range':
                 if (is_numeric($constraint->min)) {

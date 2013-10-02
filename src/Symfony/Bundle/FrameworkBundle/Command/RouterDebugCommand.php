@@ -17,6 +17,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Routing\Route;
 
 /**
  * A console command for retrieving information about routes
@@ -80,6 +81,7 @@ EOF
             if (!$route) {
                 throw new \InvalidArgumentException(sprintf('The route "%s" does not exist.', $name));
             }
+            $this->convertController($route);
             $helper->describe($output, $route, array(
                 'format'   => $input->getOption('format'),
                 'raw_text' => $input->getOption('raw'),
@@ -87,11 +89,27 @@ EOF
             ));
         } else {
             $routes = $this->getContainer()->get('router')->getRouteCollection();
+
+            foreach ($routes as $route) {
+                $this->convertController($route);
+            }
+
             $helper->describe($output, $routes, array(
                 'format'           => $input->getOption('format'),
                 'raw_text'         => $input->getOption('raw'),
                 'show_controllers' => $input->getOption('show-controllers'),
             ));
+        }
+    }
+
+    private function convertController(Route $route)
+    {
+        $nameParser = $this->getContainer()->get('controller_name_converter');
+        if ($route->hasDefault('_controller')) {
+            try {
+                $route->setDefault('_controller', $nameParser->build($route->getDefault('_controller')));
+            } catch (\InvalidArgumentException $e) {
+            }
         }
     }
 }

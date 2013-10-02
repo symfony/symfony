@@ -35,14 +35,11 @@ class TextDescriptor extends Descriptor
             );
 
             if ($showControllers) {
-                $defaultData = $route->getDefaults();
-                $controller = $defaultData['_controller'] ? $defaultData['_controller'] : '';
+                $controller = $route->getDefault('_controller');
                 if ($controller instanceof \Closure) {
                     $controller = 'Closure';
-                } else {
-                    if (is_object($controller)) {
-                        $controller = get_class($controller);
-                    }
+                } elseif (is_object($controller)) {
+                    $controller = get_class($controller);
                 }
                 $row[] = $controller;
             }

@@ -64,4 +64,15 @@ class TextBundleWriterTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFileEquals(__DIR__ . '/Fixtures/en.txt', $this->directory . '/en.txt');
     }
+
+    public function testWriteNoFallback()
+    {
+        $data = array(
+            'Entry' => 'Value'
+        );
+
+        $this->writer->write($this->directory, 'en_nofallback', $data, $fallback = false);
+
+        $this->assertFileEquals(__DIR__ . '/Fixtures/en_nofallback.txt', $this->directory . '/en_nofallback.txt');
+    }
 }

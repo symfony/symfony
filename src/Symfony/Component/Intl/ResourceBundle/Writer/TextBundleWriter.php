@@ -26,11 +26,11 @@ class TextBundleWriter implements BundleWriterInterface
     /**
      * {@inheritdoc}
      */
-    public function write($path, $locale, $data)
+    public function write($path, $locale, $data, $fallback = true)
     {
         $file = fopen($path.'/'.$locale.'.txt', 'w');
 
-        $this->writeResourceBundle($file, $locale, $data);
+        $this->writeResourceBundle($file, $locale, $data, $fallback);
 
         fclose($file);
     }
@@ -41,14 +41,16 @@ class TextBundleWriter implements BundleWriterInterface
      * @param resource $file       The file handle to write to.
      * @param string   $bundleName The name of the bundle.
      * @param mixed    $value      The value of the node.
+     * @param Boolean  $fallback   Whether the resource bundle should be merged
+     *                             with the fallback locale.
      *
      * @see http://source.icu-project.org/repos/icu/icuhtml/trunk/design/bnf_rb.txt
      */
-    private function writeResourceBundle($file, $bundleName, $value)
+    private function writeResourceBundle($file, $bundleName, $value, $fallback)
     {
         fwrite($file, $bundleName);
 
-        $this->writeTable($file, $value, 0);
+        $this->writeTable($file, $value, 0, $fallback);
 
         fwrite($file, "\n");
     }
@@ -183,9 +185,15 @@ class TextBundleWriter implements BundleWriterInterface
      * @param resource $file        The file handle to write to.
      * @param array    $value       The value of the node.
      * @param integer  $indentation The number of levels to indent.
+     * @param Boolean  $fallback    Whether the table should be merged with the
+     *                              fallback locale.
      */
-    private function writeTable($file, array $value, $indentation)
+    private function writeTable($file, array $value, $indentation, $fallback = true)
     {
+        if (!$fallback) {
+            fwrite($file, ":table(nofallback)");
+        }
+
         fwrite($file, "{\n");
 
         foreach ($value as $key => $entry) {

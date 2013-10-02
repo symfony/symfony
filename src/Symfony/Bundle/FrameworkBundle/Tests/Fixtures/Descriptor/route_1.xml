@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<route path="/hello/{name}" class="Symfony\Component\Routing\Route" path_regex="#^/hello(?:/(?P&lt;name&gt;[a-z]+))?$#s">
+<route class="Symfony\Component\Routing\Route">
+  <path regex="#^/hello(?:/(?P&lt;name&gt;[a-z]+))?$#s">/hello/{name}</path>
   <host regex="#^localhost$#s">localhost</host>
   <scheme>http</scheme>
   <scheme>https</scheme>

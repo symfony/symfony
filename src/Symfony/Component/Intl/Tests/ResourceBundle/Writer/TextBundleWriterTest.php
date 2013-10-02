@@ -65,6 +65,24 @@ class TextBundleWriterTest extends \PHPUnit_Framework_TestCase
         $this->assertFileEquals(__DIR__ . '/Fixtures/en.txt', $this->directory . '/en.txt');
     }
 
+    public function testWriteTraversable()
+    {
+        $this->writer->write($this->directory, 'en', new \ArrayIterator(array(
+            'Entry1' => new \ArrayIterator(array(
+                'Array' => array('foo', 'bar', array('Key' => 'value')),
+                'Integer' => 5,
+                'IntVector' => array(0, 1, 2, 3),
+                'FalseBoolean' => false,
+                'TrueBoolean' => true,
+                'Null' => null,
+                'Float' => 1.23,
+            )),
+            'Entry2' => 'String',
+        )));
+
+        $this->assertFileEquals(__DIR__ . '/Fixtures/en.txt', $this->directory . '/en.txt');
+    }
+
     public function testWriteNoFallback()
     {
         $data = array(

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Intl\ResourceBundle\Writer;
 
+use Symfony\Component\Intl\Exception\UnexpectedTypeException;
+
 /**
  * Writes .txt resource bundles.
  *
@@ -72,6 +74,10 @@ class TextBundleWriter implements BundleWriterInterface
             $this->writeInteger($file, $value);
 
             return;
+        }
+
+        if ($value instanceof \Traversable) {
+            $value = iterator_to_array($value);
         }
 
         if (is_array($value)) {
@@ -182,14 +188,21 @@ class TextBundleWriter implements BundleWriterInterface
     /**
      * Writes a "table" node.
      *
-     * @param resource $file        The file handle to write to.
-     * @param array    $value       The value of the node.
-     * @param integer  $indentation The number of levels to indent.
-     * @param Boolean  $fallback    Whether the table should be merged with the
-     *                              fallback locale.
+     * @param resource           $file        The file handle to write to.
+     * @param array|\Traversable $value       The value of the node.
+     * @param integer            $indentation The number of levels to indent.
+     * @param Boolean            $fallback    Whether the table should be merged
+     *                                        with the fallback locale.
+     *
+     * @throws UnexpectedTypeException When $value is not an array and not a
+     *                                 \Traversable instance.
      */
-    private function writeTable($file, array $value, $indentation, $fallback = true)
+    private function writeTable($file, $value, $indentation, $fallback = true)
     {
+        if (!is_array($value) && !$value instanceof \Traversable) {
+            throw new UnexpectedTypeException($value, 'array or \Traversable');
+        }
+
         if (!$fallback) {
             fwrite($file, ":table(nofallback)");
         }

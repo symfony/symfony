@@ -81,7 +81,7 @@ class LocaleScanner
             $content = file_get_contents($sourceDir.'/'.$locale.'.txt');
 
             // Aliases contain the text "%%ALIAS" followed by the aliased locale
-            if (preg_match('/"%%ALIAS"{"([^"]+)"}/', $content, $matches)) {
+            if (preg_match('/"%%ALIAS"\{"([^"]+)"\}/', $content, $matches)) {
                 $aliases[$locale] = $matches[1];
             }
         }

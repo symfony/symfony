@@ -100,8 +100,8 @@ class Application extends BaseApplication
     {
         $container = $this->kernel->getContainer();
 
-        if ($container->hasParameter('console.commands')) {
-            foreach ($container->getParameter('console.commands') as $id) {
+        if ($container->hasParameter('console.command.ids')) {
+            foreach ($container->getParameter('console.command.ids') as $id) {
                 $this->add($container->get($id));
             }
         }

@@ -60,13 +60,22 @@ class LocaleBundleTransformationRule implements TransformationRuleInterface
         $context->getFilesystem()->mkdir($tempDir);
 
         $locales = $context->getLocaleScanner()->scanLocales($context->getSourceDir().'/locales');
+        $aliases = $context->getLocaleScanner()->scanAliases($context->getSourceDir().'/locales');
 
-        $this->generateTextFiles($tempDir, $locales);
+        $writer = new TextBundleWriter();
+
+        $this->generateTextFiles($writer, $tempDir, $locales, $aliases);
+
+        // Generate aliases, needed to enable proper fallback from alias to its
+        // target
+        foreach ($aliases as $alias => $aliasOf) {
+            $writer->write($tempDir, $alias, array('%%ALIAS' => $aliasOf));
+        }
 
         // Create misc file with all available locales
-        $writer = new TextBundleWriter();
         $writer->write($tempDir, 'misc', array(
             'Locales' => $locales,
+            'Aliases' => $aliases,
         ), false);
 
         return $tempDir;
@@ -97,47 +106,86 @@ class LocaleBundleTransformationRule implements TransformationRuleInterface
     {
     }
 
-    private function generateTextFiles($targetDirectory, array $locales)
+    private function generateTextFiles(TextBundleWriter $writer, $targetDirectory, array $locales, array $aliases)
     {
+        // Collect locales for which translations exist
         $displayLocales = array_unique(array_merge(
             $this->languageBundle->getLocales(),
             $this->regionBundle->getLocales()
         ));
 
-        $txtWriter = new TextBundleWriter();
+        // Flip to facilitate lookup
+        $displayLocales = array_flip($displayLocales);
+        $locales = array_flip($locales);
 
-        // Generate a list of locale names in the language of each display locale
-        // Each locale name has the form: "Language (Script, Region, Variant1, ...)
-        // Script, Region and Variants are optional. If none of them is available,
-        // the braces are not printed.
-        foreach ($displayLocales as $displayLocale) {
-            // Don't include ICU's root resource bundle
-            if ('root' === $displayLocale) {
-                continue;
-            }
+        // Don't generate names for aliases (names will be generated for the
+        // locale they are duplicating)
+        $displayLocales = array_diff_key($displayLocales, $aliases);
 
-            $names = array();
+        // Generate a list of (existing) locale fallbacks
+        $fallbacks = array();
 
-            foreach ($locales as $locale) {
-                // Don't include ICU's root resource bundle
-                if ($locale === 'root') {
-                    continue;
+        foreach ($displayLocales as $displayLocale => $_) {
+            $fallbacks[$displayLocale] = null;
+            $fallback = $displayLocale;
+
+            // Recursively search for a fallback locale until one is found
+            while (null !== ($fallback = Intl::getFallbackLocale($fallback))) {
+                // Currently, no locale has an alias as fallback locale.
+                // If this starts to be the case, we need to add code here.
+                assert(!isset($aliases[$fallback]));
+
+                // Check whether the fallback exists
+                if (isset($displayLocales[$fallback])) {
+                    $fallbacks[$displayLocale] = $fallback;
+                    break;
                 }
+            }
+        }
 
+        // Since fallbacks are always shorter than their source, we can sort
+        // the display locales so that fallbacks are always processed before
+        // their variants
+        ksort($displayLocales);
+
+        $localeNames = array();
+
+        // Generate locale names for all locales that have translations in
+        // at least the language or the region bundle
+        foreach ($displayLocales as $displayLocale => $_) {
+            $localeNames[$displayLocale] = array();
+
+            foreach ($locales as $locale => $__) {
                 try {
+                    // Generate a locale name in the language of each display locale
+                    // Each locale name has the form: "Language (Script, Region, Variant1, ...)
+                    // Script, Region and Variants are optional. If none of them is
+                    // available, the braces are not printed.
                     if (null !== ($name = $this->generateLocaleName($locale, $displayLocale))) {
-                        $names[$locale] = $name;
+                        $localeNames[$displayLocale][$locale] = $name;
                     }
                 } catch (NoSuchEntryException $e) {
                 }
             }
 
-            // If no names could be generated for the current locale, skip it
-            if (0 === count($names)) {
+            // Compare names with the names of the fallback locales and only
+            // keep the differences
+            $fallback = $displayLocale;
+
+            while (isset($fallbacks[$fallback])) {
+                $fallback = $fallbacks[$fallback];
+                $localeNames[$displayLocale] = array_diff(
+                    $localeNames[$displayLocale],
+                    $localeNames[$fallback]
+                );
+            }
+
+            // If no names remain to be saved for the current locale, skip it
+            if (0 === count($localeNames[$displayLocale])) {
                 continue;
             }
 
-            $txtWriter->write($targetDirectory, $displayLocale, array('Locales' => $names));
+            $writer->write($targetDirectory, $displayLocale, array('Locales' => $localeNames[$displayLocale]));
         }
     }
 

@@ -38,7 +38,7 @@ class PhpBundleReaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Intl\Exception\InvalidArgumentException
+     * @expectedException \Symfony\Component\Intl\Exception\NoSuchLocaleException
      */
     public function testReadFailsIfLocaleOtherThanEn()
     {

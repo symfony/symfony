@@ -33,7 +33,7 @@ class BinaryBundleReaderTest extends \PHPUnit_Framework_TestCase
 
     public function testReadReturnsArrayAccess()
     {
-        $data = $this->reader->read(__DIR__ . '/Fixtures', 'en');
+        $data = $this->reader->read(__DIR__.'/Fixtures', 'en');
 
         $this->assertInstanceOf('\ArrayAccess', $data);
         $this->assertSame('Bar', $data['Foo']);
@@ -41,11 +41,11 @@ class BinaryBundleReaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Intl\Exception\RuntimeException
+     * @expectedException \Symfony\Component\Intl\Exception\NoSuchLocaleException
      */
     public function testReadFailsIfNonExistingLocale()
     {
-        $this->reader->read(__DIR__ . '/Fixtures', 'foo');
+        $this->reader->read(__DIR__.'/Fixtures', 'foo');
     }
 
     /**
@@ -53,6 +53,6 @@ class BinaryBundleReaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testReadFailsIfNonExistingDirectory()
     {
-        $this->reader->read(__DIR__ . '/foo', 'en');
+        $this->reader->read(__DIR__.'/foo', 'en');
     }
 }

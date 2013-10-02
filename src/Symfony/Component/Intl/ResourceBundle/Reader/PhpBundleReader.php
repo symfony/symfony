@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Intl\ResourceBundle\Reader;
 
-use Symfony\Component\Intl\Exception\InvalidArgumentException;
+use Symfony\Component\Intl\Exception\NoSuchLocaleException;
 use Symfony\Component\Intl\Exception\RuntimeException;
 
 /**
@@ -27,7 +27,7 @@ class PhpBundleReader extends AbstractBundleReader implements BundleReaderInterf
     public function read($path, $locale)
     {
         if ('en' !== $locale) {
-            throw new InvalidArgumentException('Only the locale "en" is supported.');
+            throw new NoSuchLocaleException('Only the locale "en" is supported.');
         }
 
         $fileName = $path . '/' . $locale . '.php';

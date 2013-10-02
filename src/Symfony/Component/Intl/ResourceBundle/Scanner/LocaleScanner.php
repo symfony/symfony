@@ -52,11 +52,12 @@ class LocaleScanner
     {
         $locales = glob($sourceDir.'/*.txt');
 
+        // Remove file extension and sort
+        array_walk($locales, function (&$locale) { $locale = basename($locale, '.txt'); });
+
         // Remove non-locales
         $locales = array_diff($locales, static::$blackList);
 
-        // Remove file extension and sort
-        array_walk($locales, function (&$locale) { $locale = basename($locale, '.txt'); });
         sort($locales);
 
         return $locales;

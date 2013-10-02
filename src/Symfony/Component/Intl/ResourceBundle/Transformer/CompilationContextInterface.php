@@ -53,4 +53,11 @@ interface CompilationContextInterface
      * @return string The ICU version string.
      */
     public function getIcuVersion();
+
+    /**
+     * Returns a locale scanner.
+     *
+     * @return \Symfony\Component\Intl\ResourceBundle\Scanner\LocaleScanner The locale scanner.
+     */
+    public function getLocaleScanner();
 }

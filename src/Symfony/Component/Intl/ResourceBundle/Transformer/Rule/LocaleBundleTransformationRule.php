@@ -59,7 +59,15 @@ class LocaleBundleTransformationRule implements TransformationRuleInterface
         $context->getFilesystem()->remove($tempDir);
         $context->getFilesystem()->mkdir($tempDir);
 
-        $this->generateTextFiles($tempDir, $this->scanLocales($context));
+        $locales = $context->getLocaleScanner()->scanLocales($context->getSourceDir().'/locales');
+
+        $this->generateTextFiles($tempDir, $locales);
+
+        // Create misc file with all available locales
+        $writer = new TextBundleWriter();
+        $writer->write($tempDir, 'misc', array(
+            'Locales' => $locales,
+        ), false);
 
         return $tempDir;
     }
@@ -87,55 +95,6 @@ class LocaleBundleTransformationRule implements TransformationRuleInterface
      */
     public function afterCreateStub(StubbingContextInterface $context)
     {
-    }
-
-    private function scanLocales(CompilationContextInterface $context)
-    {
-        $tempDir = sys_get_temp_dir() . '/icu-data-locales-source';
-
-        $context->getFilesystem()->remove($tempDir);
-        $context->getFilesystem()->mkdir($tempDir);
-
-        // Temporarily generate the resource bundles
-        $context->getCompiler()->compile($context->getSourceDir() . '/locales', $tempDir);
-
-        // Discover the list of supported locales, which are the names of the resource
-        // bundles in the "locales" directory
-        $locales = glob($tempDir . '/*.res');
-
-        // Remove file extension and sort
-        array_walk($locales, function (&$locale) { $locale = basename($locale, '.res'); });
-        sort($locales);
-
-        // Delete unneeded locales
-        foreach ($locales as $key => $locale) {
-            // Delete all aliases from the list
-            // i.e., "az_AZ" is an alias for "az_Latn_AZ"
-            $content = file_get_contents($context->getSourceDir() . '/locales/' . $locale . '.txt');
-
-            // The key "%%ALIAS" is not accessible through the \ResourceBundle class,
-            // so look in the original .txt file instead
-            if (strpos($content, '%%ALIAS') !== false) {
-                unset($locales[$key]);
-            }
-
-            // Delete locales that have no content (i.e. only "Version" key)
-            $bundle = new \ResourceBundle($locale, $tempDir);
-
-            if (null === $bundle) {
-                throw new RuntimeException('The resource bundle for locale ' . $locale . ' could not be loaded from directory ' . $tempDir);
-            }
-
-            // There seems to be no other way for identifying all keys in this specific
-            // resource bundle
-            if (array_keys(iterator_to_array($bundle)) === array('Version')) {
-                unset($locales[$key]);
-            }
-        }
-
-        $context->getFilesystem()->remove($tempDir);
-
-        return $locales;
     }
 
     private function generateTextFiles($targetDirectory, array $locales)

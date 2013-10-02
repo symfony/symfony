@@ -14,6 +14,7 @@ namespace Symfony\Component\Intl\ResourceBundle\Transformer\Rule;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\Intl\ResourceBundle\Transformer\CompilationContextInterface;
 use Symfony\Component\Intl\ResourceBundle\Transformer\StubbingContextInterface;
+use Symfony\Component\Intl\ResourceBundle\Writer\TextBundleWriter;
 use Symfony\Component\Intl\Util\IcuVersion;
 
 /**
@@ -38,10 +39,18 @@ class LanguageBundleTransformationRule implements TransformationRuleInterface
     {
         // The language data is contained in the locales bundle in ICU <= 4.2
         if (IcuVersion::compare($context->getIcuVersion(), '4.2', '<=', 1)) {
-            return $context->getSourceDir() . '/locales';
+            $sourceDir = $context->getSourceDir() . '/locales';
+        } else {
+            $sourceDir = $context->getSourceDir() . '/lang';
         }
 
-        return $context->getSourceDir() . '/lang';
+        // Create misc file with all available locales
+        $writer = new TextBundleWriter();
+        $writer->write($sourceDir, 'misc', array(
+            'Locales' => $context->getLocaleScanner()->scanLocales($sourceDir),
+        ), false);
+
+        return $sourceDir;
     }
 
     /**

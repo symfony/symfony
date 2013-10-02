@@ -13,8 +13,10 @@ namespace Symfony\Component\Intl\ResourceBundle\Transformer\Rule;
 
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\Intl\ResourceBundle\CurrencyBundle;
+use Symfony\Component\Intl\ResourceBundle\Reader\BinaryBundleReader;
 use Symfony\Component\Intl\ResourceBundle\Transformer\CompilationContextInterface;
 use Symfony\Component\Intl\ResourceBundle\Transformer\StubbingContextInterface;
+use Symfony\Component\Intl\ResourceBundle\Writer\TextBundleWriter;
 use Symfony\Component\Intl\Util\IcuVersion;
 
 /**
@@ -37,16 +39,44 @@ class CurrencyBundleTransformationRule implements TransformationRuleInterface
      */
     public function beforeCompile(CompilationContextInterface $context)
     {
+        $tempDir = sys_get_temp_dir() . '/icu-data-currencies-source';
+
         // The currency data is contained in the locales and misc bundles
         // in ICU <= 4.2
         if (IcuVersion::compare($context->getIcuVersion(), '4.2', '<=', 1)) {
-            return array(
-                $context->getSourceDir() . '/misc/supplementalData.txt',
-                $context->getSourceDir() . '/locales'
-            );
+            $supplementalData = $context->getSourceDir().'/misc/supplementalData.txt';
+            $sourceDir = $context->getSourceDir().'/locales';
+        } else {
+            $supplementalData = $context->getSourceDir().'/curr/supplementalData.txt';
+            $sourceDir = $context->getSourceDir().'/curr';
         }
 
-        return $context->getSourceDir() . '/curr';
+        $context->getFilesystem()->remove($tempDir);
+        $context->getFilesystem()->mkdir(array(
+            $tempDir,
+            $tempDir.'/txt',
+            $tempDir.'/res'
+        ));
+        $context->getFilesystem()->copy($supplementalData, $tempDir.'/txt/misc.txt');
+
+        // Replace "supplementalData" in the file by "misc" before compilation
+        file_put_contents($tempDir.'/txt/misc.txt', str_replace('supplementalData', 'misc', file_get_contents($tempDir.'/txt/misc.txt')));
+
+        $context->getCompiler()->compile($tempDir.'/txt', $tempDir.'/res');
+
+        // Read file, add locales and write again
+        $reader = new BinaryBundleReader();
+        $data = iterator_to_array($reader->read($tempDir.'/res', 'misc'));
+
+        // Key must not exist
+        assert(!isset($data['Locales']));
+
+        $data['Locales'] = $context->getLocaleScanner()->scanLocales($sourceDir);
+
+        $writer = new TextBundleWriter();
+        $writer->write($sourceDir, 'misc', $data, false);
+
+        return $sourceDir;
     }
 
     /**
@@ -54,13 +84,8 @@ class CurrencyBundleTransformationRule implements TransformationRuleInterface
      */
     public function afterCompile(CompilationContextInterface $context)
     {
-        // \ResourceBundle does not like locale names with uppercase chars, so rename
-        // the resource file
-        // See: http://bugs.php.net/bug.php?id=54025
-        $fileName = $context->getBinaryDir() . '/curr/supplementalData.res';
-        $fileNameLower = $context->getBinaryDir() . '/curr/supplementaldata.res';
-
-        $context->getFilesystem()->rename($fileName, $fileNameLower);
+        // Remove supplementalData.res, whose content is contained within misc.res
+        $context->getFilesystem()->remove($context->getBinaryDir().'/curr/supplementalData.res');
     }
 
     /**

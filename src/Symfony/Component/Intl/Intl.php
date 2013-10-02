@@ -188,6 +188,22 @@ class Intl
     }
 
     /**
+     * Returns the fallback locale for a given locale, if any
+     *
+     * @param string $locale The locale to find the fallback for.
+     *
+     * @return string|null The fallback locale, or null if no parent exists
+     */
+    public static function getFallbackLocale($locale)
+    {
+        if (false === $pos = strrpos($locale, '_')) {
+            return null;
+        }
+
+        return substr($locale, 0, $pos);
+    }
+
+    /**
      * Returns a resource bundle reader for .php resource bundle files.
      *
      * @return ResourceBundle\Reader\StructuredBundleReaderInterface The resource reader.

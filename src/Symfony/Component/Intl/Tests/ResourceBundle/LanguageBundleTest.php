@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Intl\Tests\ResourceBundle;
 
+use Symfony\Component\Intl\Exception\NoSuchEntryException;
 use Symfony\Component\Intl\ResourceBundle\LanguageBundle;
 
 /**
@@ -38,46 +39,35 @@ class LanguageBundleTest extends \PHPUnit_Framework_TestCase
 
     public function testGetLanguageName()
     {
-        $languages = array(
-            'de' => 'German',
-            'en' => 'English',
-        );
-
         $this->reader->expects($this->once())
             ->method('readEntry')
-            ->with(self::RES_DIR, 'en', array('Languages'))
-            ->will($this->returnValue($languages));
+            ->with(self::RES_DIR, 'en', array('Languages', 'de'))
+            ->will($this->returnValue('German'));
 
         $this->assertSame('German', $this->bundle->getLanguageName('de', null, 'en'));
     }
 
     public function testGetLanguageNameWithRegion()
     {
-        $languages = array(
-            'de' => 'German',
-            'en' => 'English',
-            'en_GB' => 'British English',
-        );
-
         $this->reader->expects($this->once())
             ->method('readEntry')
-            ->with(self::RES_DIR, 'en', array('Languages'))
-            ->will($this->returnValue($languages));
+            ->with(self::RES_DIR, 'en', array('Languages', 'en_GB'))
+            ->will($this->returnValue('British English'));
 
         $this->assertSame('British English', $this->bundle->getLanguageName('en', 'GB', 'en'));
     }
 
     public function testGetLanguageNameWithUntranslatedRegion()
     {
-        $languages = array(
-            'de' => 'German',
-            'en' => 'English',
-        );
-
-        $this->reader->expects($this->once())
+        $this->reader->expects($this->at(0))
             ->method('readEntry')
-            ->with(self::RES_DIR, 'en', array('Languages'))
-            ->will($this->returnValue($languages));
+            ->with(self::RES_DIR, 'en', array('Languages', 'en_US'))
+            ->will($this->throwException(new NoSuchEntryException()));
+
+        $this->reader->expects($this->at(1))
+            ->method('readEntry')
+            ->with(self::RES_DIR, 'en', array('Languages', 'en'))
+            ->will($this->returnValue('English'));
 
         $this->assertSame('English', $this->bundle->getLanguageName('en', 'US', 'en'));
     }
@@ -99,85 +89,24 @@ class LanguageBundleTest extends \PHPUnit_Framework_TestCase
 
     public function testGetScriptName()
     {
-        $data = array(
-            'Languages' => array(
-                'de' => 'German',
-                'en' => 'English',
-            ),
-            'Scripts' => array(
-                'Latn' => 'latin',
-                'Cyrl' => 'cyrillique',
-            ),
-        );
-
         $this->reader->expects($this->once())
-            ->method('read')
-            ->with(self::RES_DIR, 'en')
-            ->will($this->returnValue($data));
+            ->method('readEntry')
+            ->with(self::RES_DIR, 'en', array('Scripts', 'Latn'))
+            ->will($this->returnValue('Latin'));
 
-        $this->assertSame('latin', $this->bundle->getScriptName('Latn', null, 'en'));
+        $this->assertSame('Latin', $this->bundle->getScriptName('Latn', null, 'en'));
     }
 
-    public function testGetScriptNameIncludedInLanguage()
+    public function testGetScriptNameIncludedInLanguageBC()
     {
-        $data = array(
-            'Languages' => array(
-                'de' => 'German',
-                'en' => 'English',
-                'zh_Hans' => 'Simplified Chinese',
-            ),
-            'Scripts' => array(
-                'Latn' => 'latin',
-                'Cyrl' => 'cyrillique',
-            ),
-        );
-
         $this->reader->expects($this->once())
-            ->method('read')
-            ->with(self::RES_DIR, 'en')
-            ->will($this->returnValue($data));
+            ->method('readEntry')
+            ->with(self::RES_DIR, 'en', array('Scripts', 'Latn'))
+            ->will($this->returnValue('Latin'));
 
-        // Null because the script is included in the language anyway
-        $this->assertNull($this->bundle->getScriptName('Hans', 'zh', 'en'));
-    }
-
-    public function testGetScriptNameIncludedInLanguageInBraces()
-    {
-        $data = array(
-            'Languages' => array(
-                'de' => 'German',
-                'en' => 'English',
-                'zh_Hans' => 'Chinese (simplified)',
-            ),
-            'Scripts' => array(
-                'Latn' => 'latin',
-                'Cyrl' => 'cyrillique',
-            ),
-        );
-
-        $this->reader->expects($this->once())
-            ->method('read')
-            ->with(self::RES_DIR, 'en')
-            ->will($this->returnValue($data));
-
-        $this->assertSame('simplified', $this->bundle->getScriptName('Hans', 'zh', 'en'));
-    }
-
-    public function testGetScriptNameNoScriptsBlock()
-    {
-        $data = array(
-            'Languages' => array(
-                'de' => 'German',
-                'en' => 'English',
-            ),
-        );
-
-        $this->reader->expects($this->once())
-            ->method('read')
-            ->with(self::RES_DIR, 'en')
-            ->will($this->returnValue($data));
-
-        $this->assertNull($this->bundle->getScriptName('Latn', null, 'en'));
+        // the second argument once was used, but is now ignored since it
+        // doesn't make a difference anyway
+        $this->assertSame('Latin', $this->bundle->getScriptName('Latn', 'zh', 'en'));
     }
 
     public function testGetScriptNames()

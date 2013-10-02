@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Intl\ResourceBundle\Transformer\Rule;
 
+use Symfony\Component\Intl\Exception\NoSuchEntryException;
 use Symfony\Component\Intl\Exception\RuntimeException;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\Intl\ResourceBundle\Transformer\CompilationContextInterface;
@@ -164,8 +165,11 @@ class LocaleBundleTransformationRule implements TransformationRuleInterface
                     continue;
                 }
 
-                if (null !== ($name = $this->generateLocaleName($locale, $displayLocale))) {
-                    $names[$locale] = $name;
+                try {
+                    if (null !== ($name = $this->generateLocaleName($locale, $displayLocale))) {
+                        $names[$locale] = $name;
+                    }
+                } catch (NoSuchEntryException $e) {
                 }
             }
 

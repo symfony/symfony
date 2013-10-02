@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Intl\ResourceBundle;
 
+use Symfony\Component\Intl\Exception\NoSuchEntryException;
+
 /**
  * Default implementation of {@link LanguageBundleInterface}.
  *
@@ -27,17 +29,16 @@ class LanguageBundle extends AbstractBundle implements LanguageBundleInterface
             $locale = \Locale::getDefault();
         }
 
-        if (null === ($languages = $this->readEntry($locale, array('Languages'), true))) {
-            return null;
-        }
-
         // Some languages are translated together with their region,
         // i.e. "en_GB" is translated as "British English"
-        if (null !== $region && isset($languages[$lang.'_'.$region])) {
-            return $languages[$lang.'_'.$region];
+        if (null !== $region) {
+            try {
+                return $this->readEntry($locale, array('Languages', $lang.'_'.$region), true);
+            } catch (NoSuchEntryException $e) {
+            }
         }
 
-        return $languages[$lang];
+        return $this->readEntry($locale, array('Languages', $lang), true);
     }
 
     /**
@@ -69,28 +70,7 @@ class LanguageBundle extends AbstractBundle implements LanguageBundleInterface
             $locale = \Locale::getDefault();
         }
 
-        $data = $this->read($locale);
-
-        // Some languages are translated together with their script,
-        // e.g. "zh_Hans" is translated as "Simplified Chinese"
-        if (null !== $lang && isset($data['Languages'][$lang.'_'.$script])) {
-            $langName = $data['Languages'][$lang.'_'.$script];
-
-            // If the script is appended in braces, extract it, e.g. "zh_Hans"
-            // is translated as "Chinesisch (vereinfacht)" in locale "de"
-            if (strpos($langName, '(') !== false) {
-                list($langName, $scriptName) = preg_split('/[\s()]/', $langName, null, PREG_SPLIT_NO_EMPTY);
-
-                return $scriptName;
-            }
-        }
-
-        // "af" (Afrikaans) has no "Scripts" block
-        if (!isset($data['Scripts'][$script])) {
-            return null;
-        }
-
-        return $data['Scripts'][$script];
+        return $this->readEntry($locale, array('Scripts', $script));
     }
 
     /**

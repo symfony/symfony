@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Intl\ResourceBundle\Reader;
 
+use Symfony\Component\Intl\Intl;
+use Symfony\Component\Intl\Exception\NoSuchEntryException;
+use Symfony\Component\Intl\Exception\OutOfBoundsException;
 use Symfony\Component\Intl\ResourceBundle\Util\RecursiveArrayAccess;
 
 /**
@@ -58,56 +61,96 @@ class StructuredBundleReader implements StructuredBundleReaderInterface
      */
     public function readEntry($path, $locale, array $indices, $fallback = true)
     {
-        $data = $this->reader->read($path, $locale);
+        $entry = null;
+        $isMultiValued = false;
+        $readSucceeded = false;
+        $exception = null;
+        $currentLocale = $locale;
+        $testedLocales = array();
 
-        $entry = RecursiveArrayAccess::get($data, $indices);
-        $multivalued = is_array($entry) || $entry instanceof \Traversable;
+        while (null !== $currentLocale) {
+            try {
+                $data = $this->reader->read($path, $currentLocale);
+                $currentEntry = RecursiveArrayAccess::get($data, $indices);
+                $readSucceeded = true;
 
-        if (!($fallback && (null === $entry || $multivalued))) {
+                $isCurrentTraversable = $currentEntry instanceof \Traversable;
+                $isCurrentMultiValued = $isCurrentTraversable || is_array($currentEntry);
+
+                // Return immediately if fallback is disabled or we are dealing
+                // with a scalar non-null entry
+                if (!$fallback || (!$isCurrentMultiValued && null !== $currentEntry)) {
+                    return $currentEntry;
+                }
+
+                // =========================================================
+                // Fallback is enabled, entry is either multi-valued or NULL
+                // =========================================================
+
+                // If entry is multi-valued, convert to array
+                if ($isCurrentTraversable) {
+                    $currentEntry = iterator_to_array($currentEntry);
+                }
+
+                // If previously read entry was multi-valued too, merge them
+                if ($isCurrentMultiValued && $isMultiValued) {
+                    $currentEntry = array_merge($currentEntry, $entry);
+                }
+
+                // Keep the previous entry if the current entry is NULL
+                if (null !== $currentEntry) {
+                    $entry = $currentEntry;
+                }
+
+                // If this or the previous entry was multi-valued, we are dealing
+                // with a merged, multi-valued entry now
+                $isMultiValued = $isMultiValued || $isCurrentMultiValued;
+            } catch (OutOfBoundsException $e) {
+                // Remember exception and rethrow if we cannot find anything in
+                // the fallback locales either
+                if (null === $exception) {
+                    $exception = $e;
+                }
+            }
+
+            // Remember which locales we tried
+            $testedLocales[] = $currentLocale.'.res';
+
+            // Go to fallback locale
+            $currentLocale = Intl::getFallbackLocale($currentLocale);
+        }
+
+        // Multi-valued entry was merged
+        if ($isMultiValued) {
             return $entry;
         }
 
-        if (null !== ($fallbackLocale = $this->getFallbackLocale($locale))) {
-            $parentEntry = $this->readEntry($path, $fallbackLocale, $indices, true);
-
-            if ($entry || $parentEntry) {
-                $multivalued = $multivalued || is_array($parentEntry) || $parentEntry instanceof \Traversable;
-
-                if ($multivalued) {
-                    if ($entry instanceof \Traversable) {
-                        $entry = iterator_to_array($entry);
-                    }
-
-                    if ($parentEntry instanceof \Traversable) {
-                        $parentEntry = iterator_to_array($parentEntry);
-                    }
-
-                    $entry = array_merge(
-                        $parentEntry ?: array(),
-                        $entry ?: array()
-                    );
-                } else {
-                    $entry = null === $entry ? $parentEntry : $entry;
-                }
-            }
+        // Entry is still NULL, but no read error occurred
+        if ($readSucceeded) {
+            return $entry;
         }
 
-        return $entry;
-    }
+        // Entry is still NULL, read error occurred. Throw an exception
+        // containing the detailed path and locale
+        $errorMessage = sprintf(
+            'Error while reading the indices [%s] in "%s/%s.res": %s.',
+            implode('][', $indices),
+            $path,
+            $locale,
+            $exception->getMessage()
+        );
 
-    /**
-     * Returns the fallback locale for a given locale, if any
-     *
-     * @param string $locale The locale to find the fallback for.
-     *
-     * @return string|null The fallback locale, or null if no parent exists
-     */
-    private function getFallbackLocale($locale)
-    {
-        if (false === $pos = strrpos($locale, '_')) {
-            return null;
+        // Append fallback locales, if any
+        if (count($testedLocales) > 1) {
+            // Remove original locale
+            array_shift($testedLocales);
+
+            $errorMessage .= sprintf(
+                ' The index could also be found in neither of the fallback locales: "%s".',
+                implode('", "', $testedLocales)
+            );
         }
 
-        return substr($locale, 0, $pos);
+        throw new NoSuchEntryException($errorMessage, 0, $exception);
     }
 }

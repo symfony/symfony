@@ -46,7 +46,7 @@ class ContainerDebugCommand extends ContainerAwareCommand
                 new InputOption('tags', null, InputOption::VALUE_NONE, 'Displays tagged services for an application'),
                 new InputOption('parameter', null, InputOption::VALUE_REQUIRED, 'Displays a specific parameter for an application'),
                 new InputOption('parameters', null, InputOption::VALUE_NONE, 'Displays parameters for an application'),
-                new InputOption('format', null, InputOption::VALUE_REQUIRED, 'To output description in other formats'),
+                new InputOption('format', null, InputOption::VALUE_REQUIRED, 'To output description in other formats', 'txt'),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw description'),
             ))
             ->setDescription('Displays current services for an application')
@@ -114,7 +114,9 @@ EOF
         }
 
         $helper = new DescriptorHelper();
-        $helper->describe($output, $object, $input->getOption('format'), $input->getOption('raw'), $options);
+        $options['format'] = $input->getOption('format');
+        $options['raw_text'] = $input->getOption('raw');
+        $helper->describe($output, $object, $options);
     }
 
     /**

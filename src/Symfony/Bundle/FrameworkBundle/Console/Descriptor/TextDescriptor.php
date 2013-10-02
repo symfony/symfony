@@ -23,6 +23,7 @@ class TextDescriptor extends Descriptor
         $showControllers = isset($options['show_controllers']) && $options['show_controllers'];
         $headers = array('Name', 'Method', 'Scheme', 'Host', 'Path');
         $table = new TableHelper();
+        $table->setLayout(TableHelper::LAYOUT_COMPACT);
         $table->setHeaders($showControllers ? array_merge($headers, array('Controller')) : $headers);
 
         foreach ($routes->all() as $name => $route) {
@@ -35,14 +36,11 @@ class TextDescriptor extends Descriptor
             );
 
             if ($showControllers) {
-                $defaultData = $route->getDefaults();
-                $controller = $defaultData['_controller'] ? $defaultData['_controller'] : '';
+                $controller = $route->getDefault('_controller');
                 if ($controller instanceof \Closure) {
                     $controller = 'Closure';
-                } else {
-                    if (is_object($controller)) {
-                        $controller = get_class($controller);
-                    }
+                } elseif (is_object($controller)) {
+                    $controller = get_class($controller);
                 }
                 $row[] = $controller;
             }
@@ -84,7 +82,7 @@ class TextDescriptor extends Descriptor
             $description[] = '<comment>Host-Regex</comment>   '.$route->compile()->getHostRegex();
         }
 
-        $this->writeText(implode("\n", $description), $options);
+        $this->writeText(implode("\n", $description)."\n", $options);
     }
 
     /**
@@ -93,6 +91,7 @@ class TextDescriptor extends Descriptor
     protected function describeContainerParameters(ParameterBag $parameters, array $options = array())
     {
         $table = new TableHelper();
+        $table->setLayout(TableHelper::LAYOUT_COMPACT);
         $table->setHeaders(array('Parameter', 'Value'));
 
         foreach ($this->sortParameters($parameters) as $parameter => $value) {
@@ -193,6 +192,7 @@ class TextDescriptor extends Descriptor
         $tagsNames = array_keys($maxTags);
 
         $table = new TableHelper();
+        $table->setLayout(TableHelper::LAYOUT_COMPACT);
         $table->setHeaders(array_merge(array('Service ID'), $tagsNames, array('Scope', 'Class name')));
 
         foreach ($this->sortServiceIds($serviceIds) as $serviceId) {
@@ -256,7 +256,7 @@ class TextDescriptor extends Descriptor
         $description[] = sprintf('<comment>Synthetic</comment>        %s', $definition->isSynthetic() ? 'yes' : 'no');
         $description[] = sprintf('<comment>Required File</comment>    %s', $definition->getFile() ? $definition->getFile() : '-');
 
-        $this->writeText(implode("\n", $description), $options);
+        $this->writeText(implode("\n", $description)."\n", $options);
     }
 
     /**

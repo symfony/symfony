@@ -28,6 +28,7 @@ class MarkdownDescriptor extends Descriptor
             }
             $this->describeRoute($route, array('name' => $name));
         }
+        $this->write("\n");
     }
 
     /**
@@ -49,8 +50,9 @@ class MarkdownDescriptor extends Descriptor
             ."\n".'- Path-Regex: '.$route->compile()->getRegex();
 
         $this->write(isset($options['name'])
-            ? $options['name']."\n".str_repeat('-', strlen($options['name']))."\n".$output
+            ? $options['name']."\n".str_repeat('-', strlen($options['name']))."\n\n".$output
             : $output);
+        $this->write("\n");
     }
 
     /**
@@ -133,17 +135,17 @@ class MarkdownDescriptor extends Descriptor
         }
 
         if (!empty($services['definitions'])) {
-            $this->write("\n\nDefinitions\n-----------");
+            $this->write("\n\nDefinitions\n-----------\n");
             foreach ($services['definitions'] as $id => $service) {
-                $this->write("\n\n");
+                $this->write("\n");
                 $this->describeContainerDefinition($service, array('id' => $id));
             }
         }
 
         if (!empty($services['aliases'])) {
-            $this->write("\n\nAliases\n-------");
+            $this->write("\n\nAliases\n-------\n");
             foreach ($services['aliases'] as $id => $service) {
-                $this->write("\n\n");
+                $this->write("\n");
                 $this->describeContainerAlias($service, array('id' => $id));
             }
         }
@@ -182,7 +184,7 @@ class MarkdownDescriptor extends Descriptor
             }
         }
 
-        $this->write(isset($options['id']) ? sprintf("**`%s`:**\n%s", $options['id'], $output) : $output);
+        $this->write(isset($options['id']) ? sprintf("%s\n%s\n\n%s\n", $options['id'], str_repeat('~', strlen($options['id'])), $output) : $output);
     }
 
     /**
@@ -193,7 +195,7 @@ class MarkdownDescriptor extends Descriptor
         $output = '- Service: `'.$alias.'`'
             ."\n".'- Public: '.($alias->isPublic() ? 'yes' : 'no');
 
-        $this->write(isset($options['id']) ? sprintf("**`%s`:**\n%s", $options['id'], $output) : $output);
+        $this->write(isset($options['id']) ? sprintf("%s\n%s\n\n%s\n", $options['id'], str_repeat('~', strlen($options['id'])), $output) : $output);
     }
 
     private function formatRouterConfig(array $array)

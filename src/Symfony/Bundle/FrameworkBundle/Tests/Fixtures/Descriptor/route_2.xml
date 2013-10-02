@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<route path="/name/add" class="Symfony\Component\Routing\Route" path_regex="#^/name/add$#s">
+<route class="Symfony\Component\Routing\Route">
+  <path regex="#^/name/add$#s">/name/add</path>
   <host regex="#^localhost$#s">localhost</host>
   <scheme>http</scheme>
   <scheme>https</scheme>

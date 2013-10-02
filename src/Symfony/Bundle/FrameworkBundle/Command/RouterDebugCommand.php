@@ -17,6 +17,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Routing\Route;
 
 /**
  * A console command for retrieving information about routes
@@ -52,7 +53,7 @@ class RouterDebugCommand extends ContainerAwareCommand
             ->setDefinition(array(
                 new InputArgument('name', InputArgument::OPTIONAL, 'A route name'),
                 new InputOption('show-controllers', null,  InputOption::VALUE_NONE, 'Show assigned controllers in overview'),
-                new InputOption('format', null, InputOption::VALUE_REQUIRED, 'To output route(s) in other formats'),
+                new InputOption('format', null, InputOption::VALUE_REQUIRED, 'To output route(s) in other formats', 'txt'),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw route(s)'),
             ))
             ->setDescription('Displays current routes for an application')
@@ -80,14 +81,35 @@ EOF
             if (!$route) {
                 throw new \InvalidArgumentException(sprintf('The route "%s" does not exist.', $name));
             }
-            $helper->describe($output, $route, $input->getOption('format'), $input->getOption('raw'), array('name' => $name));
+            $this->convertController($route);
+            $helper->describe($output, $route, array(
+                'format'   => $input->getOption('format'),
+                'raw_text' => $input->getOption('raw'),
+                'name'     => $name,
+            ));
         } else {
             $routes = $this->getContainer()->get('router')->getRouteCollection();
+
+            foreach ($routes as $route) {
+                $this->convertController($route);
+            }
+
             $helper->describe($output, $routes, array(
                 'format'           => $input->getOption('format'),
                 'raw_text'         => $input->getOption('raw'),
                 'show_controllers' => $input->getOption('show-controllers'),
             ));
+        }
+    }
+
+    private function convertController(Route $route)
+    {
+        $nameParser = $this->getContainer()->get('controller_name_converter');
+        if ($route->hasDefault('_controller')) {
+            try {
+                $route->setDefault('_controller', $nameParser->build($route->getDefault('_controller')));
+            } catch (\InvalidArgumentException $e) {
+            }
         }
     }
 }

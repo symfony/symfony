@@ -38,9 +38,9 @@ class BinaryNode extends Node
     {
         $operator = $this->attributes['operator'];
 
-        if ('=~' == $operator || '!~' == $operator) {
+        if ('matches' == $operator) {
             $compiler
-                ->raw(('!~' == $operator ? '!' : '').'preg_match(')
+                ->raw('preg_match(')
                 ->compile($this->nodes['right'])
                 ->raw(', ')
                 ->compile($this->nodes['left'])
@@ -136,7 +136,7 @@ class BinaryNode extends Node
                 return $left / $right;
             case '%':
                 return $left % $right;
-            case '=~':
+            case 'matches':
                 return preg_match($right, $left);
             case '!~':
                 return !preg_match($right, $left);

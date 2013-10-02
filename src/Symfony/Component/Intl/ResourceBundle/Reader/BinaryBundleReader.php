@@ -20,7 +20,7 @@ use Symfony\Component\Intl\ResourceBundle\Util\ArrayAccessibleResourceBundle;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class BinaryBundleReader extends AbstractBundleReader implements BundleReaderInterface
+class BinaryBundleReader implements BundleReaderInterface
 {
     /**
      * {@inheritdoc}
@@ -58,13 +58,5 @@ class BinaryBundleReader extends AbstractBundleReader implements BundleReaderInt
         // which are OK for us.
 
         return new ArrayAccessibleResourceBundle($bundle);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getFileExtension()
-    {
-        return 'res';
     }
 }

@@ -46,14 +46,6 @@ abstract class AbstractBundle implements ResourceBundleInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getLocales()
-    {
-        return $this->reader->getLocales($this->path);
-    }
-
-    /**
      * Proxy method for {@link StructuredBundleReaderInterface#read}.
      */
     protected function read($locale)

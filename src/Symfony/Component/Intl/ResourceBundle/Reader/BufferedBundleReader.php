@@ -51,12 +51,4 @@ class BufferedBundleReader implements BundleReaderInterface
 
         return $this->buffer[$hash];
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getLocales($path)
-    {
-        return $this->reader->getLocales($path);
-    }
 }

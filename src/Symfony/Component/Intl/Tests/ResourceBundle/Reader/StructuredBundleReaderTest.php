@@ -36,18 +36,6 @@ class StructuredBundleReaderTest extends \PHPUnit_Framework_TestCase
         $this->reader = new StructuredBundleReader($this->readerImpl);
     }
 
-    public function testGetLocales()
-    {
-        $locales = array('en', 'de', 'fr');
-
-        $this->readerImpl->expects($this->once())
-            ->method('getLocales')
-            ->with(self::RES_DIR)
-            ->will($this->returnValue($locales));
-
-        $this->assertSame($locales, $this->reader->getLocales(self::RES_DIR));
-    }
-
     public function testForwardCallToRead()
     {
         $data = array('foo', 'bar');

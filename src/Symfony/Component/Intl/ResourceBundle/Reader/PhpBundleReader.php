@@ -19,7 +19,7 @@ use Symfony\Component\Intl\Exception\RuntimeException;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class PhpBundleReader extends AbstractBundleReader implements BundleReaderInterface
+class PhpBundleReader implements BundleReaderInterface
 {
     /**
      * {@inheritdoc}
@@ -49,13 +49,5 @@ class PhpBundleReader extends AbstractBundleReader implements BundleReaderInterf
         }
 
         return include $fileName;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getFileExtension()
-    {
-        return 'php';
     }
 }

@@ -29,6 +29,20 @@ class CurrencyBundle extends AbstractBundle implements CurrencyBundleInterface
     /**
      * {@inheritdoc}
      */
+    public function getLocales()
+    {
+        $locales = $this->readEntry('misc', array('Locales'));
+
+        if ($locales instanceof \Traversable) {
+            $locales = iterator_to_array($locales);
+        }
+
+        return $locales;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getCurrencySymbol($currency, $locale = null)
     {
         if (null === $locale) {

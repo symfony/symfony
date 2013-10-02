@@ -23,6 +23,20 @@ class LanguageBundle extends AbstractBundle implements LanguageBundleInterface
     /**
      * {@inheritdoc}
      */
+    public function getLocales()
+    {
+        $locales = $this->readEntry('misc', array('Locales'));
+
+        if ($locales instanceof \Traversable) {
+            $locales = iterator_to_array($locales);
+        }
+
+        return $locales;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getLanguageName($lang, $region = null, $locale = null)
     {
         if (null === $locale) {

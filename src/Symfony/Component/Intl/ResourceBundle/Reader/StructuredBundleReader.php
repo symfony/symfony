@@ -51,14 +51,6 @@ class StructuredBundleReader implements StructuredBundleReaderInterface
     /**
      * {@inheritdoc}
      */
-    public function getLocales($path)
-    {
-        return $this->reader->getLocales($path);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function readEntry($path, $locale, array $indices, $fallback = true)
     {
         $entry = null;

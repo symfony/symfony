@@ -28,13 +28,4 @@ interface BundleReaderInterface
      *               complex data, a scalar value otherwise.
      */
     public function read($path, $locale);
-
-    /**
-     * Reads the available locales of a resource bundle.
-     *
-     * @param string $path The path to the resource bundle.
-     *
-     * @return string[] A list of supported locale codes.
-     */
-    public function getLocales($path);
 }

@@ -21,6 +21,20 @@ class LocaleBundle extends AbstractBundle implements LocaleBundleInterface
     /**
      * {@inheritdoc}
      */
+    public function getLocales()
+    {
+        $locales = $this->readEntry('misc', array('Locales'));
+
+        if ($locales instanceof \Traversable) {
+            $locales = iterator_to_array($locales);
+        }
+
+        return $locales;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getLocaleName($ofLocale, $locale = null)
     {
         if (null === $locale) {
@@ -39,7 +53,7 @@ class LocaleBundle extends AbstractBundle implements LocaleBundleInterface
             $locale = \Locale::getDefault();
         }
 
-        if (null === ($locales = $this->readEntry($locale, array('Locales')))) {
+        if (null === ($locales = $this->readEntry($locale, array('Locales'), true))) {
             return array();
         }
 

@@ -21,6 +21,20 @@ class RegionBundle extends AbstractBundle implements RegionBundleInterface
     /**
      * {@inheritdoc}
      */
+    public function getLocales()
+    {
+        $locales = $this->readEntry('misc', array('Locales'));
+
+        if ($locales instanceof \Traversable) {
+            $locales = iterator_to_array($locales);
+        }
+
+        return $locales;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getCountryName($country, $locale = null)
     {
         if (null === $locale) {

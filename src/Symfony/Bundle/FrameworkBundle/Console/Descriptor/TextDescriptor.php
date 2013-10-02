@@ -84,7 +84,7 @@ class TextDescriptor extends Descriptor
             $description[] = '<comment>Host-Regex</comment>   '.$route->compile()->getHostRegex();
         }
 
-        $this->writeText(implode("\n", $description), $options);
+        $this->writeText(implode("\n", $description)."\n", $options);
     }
 
     /**
@@ -256,7 +256,7 @@ class TextDescriptor extends Descriptor
         $description[] = sprintf('<comment>Synthetic</comment>        %s', $definition->isSynthetic() ? 'yes' : 'no');
         $description[] = sprintf('<comment>Required File</comment>    %s', $definition->getFile() ? $definition->getFile() : '-');
 
-        $this->writeText(implode("\n", $description), $options);
+        $this->writeText(implode("\n", $description)."\n", $options);
     }
 
     /**

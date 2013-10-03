@@ -13,6 +13,7 @@ namespace Symfony\Component\Intl\ResourceBundle\Reader;
 
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\Intl\Exception\NoSuchEntryException;
+use Symfony\Component\Intl\Exception\NoSuchLocaleException;
 use Symfony\Component\Intl\Exception\OutOfBoundsException;
 use Symfony\Component\Intl\ResourceBundle\Util\RecursiveArrayAccess;
 
@@ -83,6 +84,11 @@ class StructuredBundleReader implements StructuredBundleReaderInterface
         $testedLocales = array();
 
         while (null !== $currentLocale) {
+            // Resolve any aliases to their target locales
+            if (isset($this->localeAliases[$currentLocale])) {
+                $currentLocale = $this->localeAliases[$currentLocale];
+            }
+
             try {
                 $data = $this->reader->read($path, $currentLocale);
                 $currentEntry = RecursiveArrayAccess::get($data, $indices);
@@ -119,20 +125,22 @@ class StructuredBundleReader implements StructuredBundleReaderInterface
                 // If this or the previous entry was multi-valued, we are dealing
                 // with a merged, multi-valued entry now
                 $isMultiValued = $isMultiValued || $isCurrentMultiValued;
+            } catch (NoSuchLocaleException $e) {
+                // Continue if there is a fallback locale for the current
+                // locale
+                $exception = $e;
             } catch (OutOfBoundsException $e) {
                 // Remember exception and rethrow if we cannot find anything in
                 // the fallback locales either
-                if (null === $exception) {
-                    $exception = $e;
-                }
+                $exception = $e;
             }
 
             // Remember which locales we tried
             $testedLocales[] = $currentLocale.'.res';
 
-            // First check whether the locale is an alias
-            if (isset($this->localeAliases[$currentLocale])) {
-                $currentLocale = $this->localeAliases[$currentLocale];
+            // Check whether fallback is allowed
+            if (!$fallback) {
+                break;
             }
 
             // Then determine fallback locale
@@ -152,11 +160,10 @@ class StructuredBundleReader implements StructuredBundleReaderInterface
         // Entry is still NULL, read error occurred. Throw an exception
         // containing the detailed path and locale
         $errorMessage = sprintf(
-            'Error while reading the indices [%s] in "%s/%s.res": %s.',
+            'Couldn\'t read the indices [%s] from "%s/%s.res".',
             implode('][', $indices),
             $path,
-            $locale,
-            $exception->getMessage()
+            $locale
         );
 
         // Append fallback locales, if any
@@ -165,7 +172,7 @@ class StructuredBundleReader implements StructuredBundleReaderInterface
             array_shift($testedLocales);
 
             $errorMessage .= sprintf(
-                ' The index could also be found in neither of the fallback locales: "%s".',
+                ' The indices also couldn\'t be found in the fallback locale(s) "%s".',
                 implode('", "', $testedLocales)
             );
         }

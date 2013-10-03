@@ -23,7 +23,7 @@ class RecursiveArrayAccess
         foreach ($indices as $index) {
             // Use array_key_exists() for arrays, isset() otherwise
             if (is_array($array) && !array_key_exists($index, $array) || !is_array($array) && !isset($array[$index])) {
-                throw new OutOfBoundsException('The index '.$index.' does not exist');
+                throw new OutOfBoundsException('The index '.$index.' does not exist.');
             }
 
             $array = $array[$index];

@@ -17,7 +17,7 @@ use Symfony\Component\Icu\IcuLanguageBundle;
 use Symfony\Component\Icu\IcuLocaleBundle;
 use Symfony\Component\Icu\IcuRegionBundle;
 use Symfony\Component\Intl\ResourceBundle\Reader\BufferedBundleReader;
-use Symfony\Component\Intl\ResourceBundle\Reader\StructuredBundleReader;
+use Symfony\Component\Intl\ResourceBundle\Reader\BundleEntryReader;
 
 /**
  * Gives access to internationalization data.
@@ -63,7 +63,7 @@ class Intl
     private static $icuDataVersion = false;
 
     /**
-     * @var ResourceBundle\Reader\StructuredBundleReaderInterface
+     * @var BundleEntryReader
      */
     private static $bundleReader;
 
@@ -206,12 +206,12 @@ class Intl
     /**
      * Returns a resource bundle reader for .php resource bundle files.
      *
-     * @return ResourceBundle\Reader\StructuredBundleReaderInterface The resource reader.
+     * @return ResourceBundle\Reader\BundleEntryReaderInterface The resource reader.
      */
     private static function getBundleReader()
     {
         if (null === self::$bundleReader) {
-            self::$bundleReader = new StructuredBundleReader(new BufferedBundleReader(
+            self::$bundleReader = new BundleEntryReader(new BufferedBundleReader(
                 IcuData::getBundleReader(),
                 self::BUFFER_SIZE
             ));

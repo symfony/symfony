@@ -59,7 +59,7 @@ Intl
 
  * The `$fallback` argument of the protected method `AbstractBundle::readEntry()`
    was changed to be `true` by default. This way the signature is consistent
-   with the proxied `StructuredBundleReaderInterface::readEntry()` method.
+   with the proxied `BundleEntryReaderInterface::readEntry()` method.
    Consequently, if an entry cannot be found for the accessed locale (e.g. "en_GB"),
    it is looked for in the fallback locale (if any, e.g. "en").
 

@@ -281,6 +281,46 @@ UPGRADE FROM 2.x to 3.0
    $compiler = new GenrbBundleCompiler($genrb, $genrbEnv);
    ```
 
+ * The class `StructuredBundleReader` was renamed to `BundleEntryReader`. The
+   corresponding interface `StructuredBundleReaderInterface` was renamed to
+   `BundleEntryReaderInterface`.
+
+   Before:
+
+   ```
+   class MyEntryReader extends StructuredBundleReader
+   {
+       // ...
+   }
+   ```
+
+   After:
+
+   ```
+   class MyEntryReader extends BundleEntryReader
+   {
+       // ...
+   }
+   ```
+
+   Before:
+
+   ```
+   public function __construct(StructuredBundleReaderInterface $entryReader)
+   {
+       // ...
+   }
+   ```
+
+   After:
+
+   ```
+   public function __construct(BundleEntryReaderInterface $entryReader)
+   {
+       // ...
+   }
+   ```
+
 ### Locale
 
  * The Locale component was removed and replaced by the Intl component.

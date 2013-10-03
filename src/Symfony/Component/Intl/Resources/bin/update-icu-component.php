@@ -17,7 +17,7 @@ use Symfony\Component\Icu\IcuRegionBundle;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\Intl\ResourceBundle\Compiler\GenrbBundleCompiler;
 use Symfony\Component\Intl\ResourceBundle\Reader\BinaryBundleReader;
-use Symfony\Component\Intl\ResourceBundle\Reader\StructuredBundleReader;
+use Symfony\Component\Intl\ResourceBundle\Reader\BundleEntryReader;
 use Symfony\Component\Intl\ResourceBundle\Scanner\LocaleScanner;
 use Symfony\Component\Intl\ResourceBundle\Transformer\BundleTransformer;
 use Symfony\Component\Intl\ResourceBundle\Transformer\CompilationContext;
@@ -182,7 +182,7 @@ $context = new CompilationContext(
     new LocaleScanner()
 );
 
-$reader = new StructuredBundleReader(new BinaryBundleReader());
+$reader = new BundleEntryReader(new BinaryBundleReader());
 
 $localeBundle = new IcuLocaleBundle($reader);
 $languageBundle = new IcuLanguageBundle($reader);

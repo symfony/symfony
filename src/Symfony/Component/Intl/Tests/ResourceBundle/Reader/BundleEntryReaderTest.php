@@ -17,7 +17,7 @@ use Symfony\Component\Intl\ResourceBundle\Reader\StructuredBundleReader;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class StructuredBundleReaderTest extends \PHPUnit_Framework_TestCase
+class BundleEntryReaderTest extends \PHPUnit_Framework_TestCase
 {
     const RES_DIR = '/res/dir';
 

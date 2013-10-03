@@ -54,7 +54,7 @@ class LocaleBundleTransformationRule implements TransformationRuleInterface
      */
     public function beforeCompile(CompilationContextInterface $context)
     {
-        $tempDir = sys_get_temp_dir() . '/icu-data-locales';
+        $tempDir = sys_get_temp_dir().'/icu-data-locales';
 
         $context->getFilesystem()->remove($tempDir);
         $context->getFilesystem()->mkdir($tempDir);
@@ -86,7 +86,7 @@ class LocaleBundleTransformationRule implements TransformationRuleInterface
      */
     public function afterCompile(CompilationContextInterface $context)
     {
-        $context->getFilesystem()->remove(sys_get_temp_dir() . '/icu-data-locales');
+        $context->getFilesystem()->remove(sys_get_temp_dir().'/icu-data-locales');
     }
 
     /**

@@ -35,7 +35,7 @@ class BinaryBundleReader implements BundleReaderInterface
         // (i.e. contain a bunch of *.res files)
         if (null === $bundle) {
             throw new RuntimeException(sprintf(
-                'Could not load the resource bundle "%s/%s.res".',
+                'The resource bundle "%s/%s.res" could not be found.',
                 $path,
                 $locale
             ));
@@ -48,7 +48,7 @@ class BinaryBundleReader implements BundleReaderInterface
         // a root.res file.
         if (in_array($bundle->getErrorCode(), array(U_USING_DEFAULT_WARNING, U_USING_FALLBACK_WARNING), true)) {
             throw new NoSuchLocaleException(sprintf(
-                'Could not load the resource bundle "%s" for locale "%s".',
+                'The resource bundle "%s/%s.res" could not be found.',
                 $path,
                 $locale
             ));

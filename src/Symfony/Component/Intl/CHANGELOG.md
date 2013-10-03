@@ -16,3 +16,6 @@ CHANGELOG
    the time of this writing
  * `StructuredBundleReader` now follows aliases when looking for fallback locales
  * [BC BREAK] a new method `getLocaleAliases()` was added to `LocaleBundleInterface`
+ * [BC BREAK] changed default value of the argument `$fallback` in the protected
+   method `AbstractBundle::readEntry()` to `true` in order to be consistent with
+   the proxied `StructuredBundleReaderInterface::readEntry()` method

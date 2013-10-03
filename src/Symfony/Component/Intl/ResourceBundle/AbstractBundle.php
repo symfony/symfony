@@ -56,8 +56,8 @@ abstract class AbstractBundle implements ResourceBundleInterface
     /**
      * Proxy method for {@link StructuredBundleReaderInterface#readEntry}.
      */
-    protected function readEntry($locale, array $indices, $mergeFallback = false)
+    protected function readEntry($locale, array $indices, $fallback = true)
     {
-        return $this->reader->readEntry($this->path, $locale, $indices, $mergeFallback);
+        return $this->reader->readEntry($this->path, $locale, $indices, $fallback);
     }
 }

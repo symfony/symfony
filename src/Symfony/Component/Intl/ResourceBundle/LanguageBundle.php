@@ -47,12 +47,12 @@ class LanguageBundle extends AbstractBundle implements LanguageBundleInterface
         // i.e. "en_GB" is translated as "British English"
         if (null !== $region) {
             try {
-                return $this->readEntry($locale, array('Languages', $lang.'_'.$region), true);
+                return $this->readEntry($locale, array('Languages', $lang.'_'.$region));
             } catch (NoSuchEntryException $e) {
             }
         }
 
-        return $this->readEntry($locale, array('Languages', $lang), true);
+        return $this->readEntry($locale, array('Languages', $lang));
     }
 
     /**
@@ -64,7 +64,7 @@ class LanguageBundle extends AbstractBundle implements LanguageBundleInterface
             $locale = \Locale::getDefault();
         }
 
-        if (null === ($languages = $this->readEntry($locale, array('Languages'), true))) {
+        if (null === ($languages = $this->readEntry($locale, array('Languages')))) {
             return array();
         }
 
@@ -96,7 +96,7 @@ class LanguageBundle extends AbstractBundle implements LanguageBundleInterface
             $locale = \Locale::getDefault();
         }
 
-        if (null === ($scripts = $this->readEntry($locale, array('Scripts'), true))) {
+        if (null === ($scripts = $this->readEntry($locale, array('Scripts')))) {
             return array();
         }
 

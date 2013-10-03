@@ -138,8 +138,6 @@ class BinaryNode extends Node
                 return $left % $right;
             case 'matches':
                 return preg_match($right, $left);
-            case '!~':
-                return !preg_match($right, $left);
         }
     }
 }

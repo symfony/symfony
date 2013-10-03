@@ -12,6 +12,7 @@
 namespace Symfony\Component\Intl\ResourceBundle\Transformer\Rule;
 
 use Symfony\Component\Intl\Exception\NoSuchEntryException;
+use Symfony\Component\Intl\Exception\NoSuchLocaleException;
 use Symfony\Component\Intl\Exception\RuntimeException;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\Intl\ResourceBundle\LanguageBundleInterface;
@@ -86,6 +87,9 @@ class LocaleBundleTransformationRule implements TransformationRuleInterface
             'Locales' => $locales,
             'Aliases' => $aliases,
         ), false);
+
+        // Create empty root file, other wise locale fallback is not working
+        $writer->write($tempDir, 'root', array('___' => ''));
 
         return $tempDir;
     }

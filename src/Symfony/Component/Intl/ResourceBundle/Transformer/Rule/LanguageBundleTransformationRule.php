@@ -12,6 +12,7 @@
 namespace Symfony\Component\Intl\ResourceBundle\Transformer\Rule;
 
 use Symfony\Component\Intl\Intl;
+use Symfony\Component\Intl\ResourceBundle\LanguageBundleInterface;
 use Symfony\Component\Intl\ResourceBundle\Transformer\CompilationContextInterface;
 use Symfony\Component\Intl\ResourceBundle\Transformer\StubbingContextInterface;
 use Symfony\Component\Intl\ResourceBundle\Writer\TextBundleWriter;
@@ -24,6 +25,16 @@ use Symfony\Component\Intl\Util\IcuVersion;
  */
 class LanguageBundleTransformationRule implements TransformationRuleInterface
 {
+    /**
+     * @var LanguageBundleInterface
+     */
+    private $languageBundle;
+
+    public function __construct(LanguageBundleInterface $languageBundle)
+    {
+        $this->languageBundle = $languageBundle;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -66,8 +77,8 @@ class LanguageBundleTransformationRule implements TransformationRuleInterface
     public function beforeCreateStub(StubbingContextInterface $context)
     {
         return array(
-            'Languages' => Intl::getLanguageBundle()->getLanguageNames('en'),
-            'Scripts' => Intl::getLanguageBundle()->getScriptNames('en'),
+            'Languages' => $this->languageBundle->getLanguageNames('en'),
+            'Scripts' => $this->languageBundle->getScriptNames('en'),
         );
     }
 

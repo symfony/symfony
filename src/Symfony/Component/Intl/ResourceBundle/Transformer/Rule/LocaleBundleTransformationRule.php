@@ -14,6 +14,9 @@ namespace Symfony\Component\Intl\ResourceBundle\Transformer\Rule;
 use Symfony\Component\Intl\Exception\NoSuchEntryException;
 use Symfony\Component\Intl\Exception\RuntimeException;
 use Symfony\Component\Intl\Intl;
+use Symfony\Component\Intl\ResourceBundle\LanguageBundleInterface;
+use Symfony\Component\Intl\ResourceBundle\LocaleBundleInterface;
+use Symfony\Component\Intl\ResourceBundle\RegionBundleInterface;
 use Symfony\Component\Intl\ResourceBundle\Transformer\CompilationContextInterface;
 use Symfony\Component\Intl\ResourceBundle\Transformer\StubbingContextInterface;
 use Symfony\Component\Intl\ResourceBundle\Writer\TextBundleWriter;
@@ -26,19 +29,25 @@ use Symfony\Component\Intl\ResourceBundle\Writer\TextBundleWriter;
 class LocaleBundleTransformationRule implements TransformationRuleInterface
 {
     /**
-     * @var \Symfony\Component\Intl\ResourceBundle\LanguageBundleInterface
+     * @var LocaleBundleInterface
+     */
+    private $localeBundle;
+
+    /**
+     * @var LanguageBundleInterface
      */
     private $languageBundle;
 
     /**
-     * @var \Symfony\Component\Intl\ResourceBundle\RegionBundleInterface
+     * @var RegionBundleInterface
      */
     private $regionBundle;
 
-    public function __construct()
+    public function __construct(LocaleBundleInterface $localeBundle, LanguageBundleInterface $languageBundle, RegionBundleInterface $regionBundle)
     {
-        $this->languageBundle = Intl::getLanguageBundle();
-        $this->regionBundle = Intl::getRegionBundle();
+        $this->localeBundle = $localeBundle;
+        $this->languageBundle = $languageBundle;
+        $this->regionBundle = $regionBundle;
     }
 
     /**
@@ -95,7 +104,7 @@ class LocaleBundleTransformationRule implements TransformationRuleInterface
     public function beforeCreateStub(StubbingContextInterface $context)
     {
         return array(
-            'Locales' => Intl::getLocaleBundle()->getLocaleNames('en'),
+            'Locales' => $this->localeBundle->getLocaleNames('en'),
         );
     }
 

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Intl\ResourceBundle\Transformer\Rule;
 
 use Symfony\Component\Intl\Intl;
+use Symfony\Component\Intl\ResourceBundle\RegionBundleInterface;
 use Symfony\Component\Intl\ResourceBundle\Transformer\CompilationContextInterface;
 use Symfony\Component\Intl\ResourceBundle\Transformer\StubbingContextInterface;
 use Symfony\Component\Intl\ResourceBundle\Writer\TextBundleWriter;
@@ -24,6 +25,16 @@ use Symfony\Component\Intl\Util\IcuVersion;
  */
 class RegionBundleTransformationRule implements TransformationRuleInterface
 {
+    /**
+     * @var RegionBundleInterface
+     */
+    private $regionBundle;
+
+    public function __construct(RegionBundleInterface $regionBundle)
+    {
+        $this->regionBundle = $regionBundle;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -66,7 +77,7 @@ class RegionBundleTransformationRule implements TransformationRuleInterface
     public function beforeCreateStub(StubbingContextInterface $context)
     {
         return array(
-            'Countries' => Intl::getRegionBundle()->getCountryNames('en'),
+            'Countries' => $this->regionBundle->getCountryNames('en'),
         );
     }
 

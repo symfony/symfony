@@ -13,6 +13,7 @@ namespace Symfony\Component\Intl\ResourceBundle\Transformer\Rule;
 
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\Intl\ResourceBundle\CurrencyBundle;
+use Symfony\Component\Intl\ResourceBundle\CurrencyBundleInterface;
 use Symfony\Component\Intl\ResourceBundle\Reader\BinaryBundleReader;
 use Symfony\Component\Intl\ResourceBundle\Transformer\CompilationContextInterface;
 use Symfony\Component\Intl\ResourceBundle\Transformer\StubbingContextInterface;
@@ -26,6 +27,16 @@ use Symfony\Component\Intl\Util\IcuVersion;
  */
 class CurrencyBundleTransformationRule implements TransformationRuleInterface
 {
+    /**
+     * @var CurrencyBundleInterface
+     */
+    private $currencyBundle;
+
+    public function __construct(CurrencyBundleInterface $currencyBundle)
+    {
+        $this->currencyBundle = $currencyBundle;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -97,14 +108,13 @@ class CurrencyBundleTransformationRule implements TransformationRuleInterface
     public function beforeCreateStub(StubbingContextInterface $context)
     {
         $currencies = array();
-        $currencyBundle = Intl::getCurrencyBundle();
 
-        foreach ($currencyBundle->getCurrencyNames('en') as $code => $name) {
+        foreach ($this->currencyBundle->getCurrencyNames('en') as $code => $name) {
             $currencies[$code] = array(
                 CurrencyBundle::INDEX_NAME => $name,
-                CurrencyBundle::INDEX_SYMBOL => $currencyBundle->getCurrencySymbol($code, 'en'),
-                CurrencyBundle::INDEX_FRACTION_DIGITS => $currencyBundle->getFractionDigits($code),
-                CurrencyBundle::INDEX_ROUNDING_INCREMENT => $currencyBundle->getRoundingIncrement($code),
+                CurrencyBundle::INDEX_SYMBOL => $this->currencyBundle->getCurrencySymbol($code, 'en'),
+                CurrencyBundle::INDEX_FRACTION_DIGITS => $this->currencyBundle->getFractionDigits($code),
+                CurrencyBundle::INDEX_ROUNDING_INCREMENT => $this->currencyBundle->getRoundingIncrement($code),
             );
         }
 

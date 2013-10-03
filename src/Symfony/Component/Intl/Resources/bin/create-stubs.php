@@ -10,8 +10,14 @@
  */
 
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Icu\IcuCurrencyBundle;
 use Symfony\Component\Icu\IcuData;
+use Symfony\Component\Icu\IcuLanguageBundle;
+use Symfony\Component\Icu\IcuLocaleBundle;
+use Symfony\Component\Icu\IcuRegionBundle;
 use Symfony\Component\Intl\Intl;
+use Symfony\Component\Intl\ResourceBundle\Reader\BinaryBundleReader;
+use Symfony\Component\Intl\ResourceBundle\Reader\StructuredBundleReader;
 use Symfony\Component\Intl\ResourceBundle\Transformer\BundleTransformer;
 use Symfony\Component\Intl\ResourceBundle\Transformer\Rule\CurrencyBundleTransformationRule;
 use Symfony\Component\Intl\ResourceBundle\Transformer\Rule\LanguageBundleTransformationRule;
@@ -87,11 +93,22 @@ $context = new StubbingContext(
     $icuVersionInIcuComponent
 );
 
+$reader = new StructuredBundleReader(new BinaryBundleReader());
+
+$localeBundle = new IcuLocaleBundle($reader);
+$languageBundle = new IcuLanguageBundle($reader);
+$regionBundle = new IcuRegionBundle($reader);
+$currencyBundle = new IcuCurrencyBundle($reader);
+
+// Make sure that the lookup of fallback locales follows locale aliases
+// correctly (see setLocaleAliases())
+$reader->setLocaleAliases($localeBundle->getLocaleAliases());
+
 $transformer = new BundleTransformer();
-$transformer->addRule(new LanguageBundleTransformationRule());
-$transformer->addRule(new RegionBundleTransformationRule());
-$transformer->addRule(new CurrencyBundleTransformationRule());
-$transformer->addRule(new LocaleBundleTransformationRule());
+$transformer->addRule(new LanguageBundleTransformationRule($languageBundle));
+$transformer->addRule(new RegionBundleTransformationRule($regionBundle));
+$transformer->addRule(new CurrencyBundleTransformationRule($currencyBundle));
+$transformer->addRule(new LocaleBundleTransformationRule($localeBundle, $languageBundle, $regionBundle));
 
 echo "Starting stub creation...\n";
 

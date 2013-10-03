@@ -67,3 +67,20 @@ function get_icu_version_from_genrb($genrb)
 
     return $matches[1];
 }
+
+set_exception_handler(function (\Exception $exception) {
+    echo "\n";
+
+    $cause = $exception;
+    $introduction = 'Uncaught exception';
+
+    while (null !== $cause) {
+        echo $introduction." '".get_class($cause)."' with message '".$cause->getMessage()."'\n";
+        echo "\n";
+        echo $cause->getTraceAsString();
+        echo "\n\n";
+
+        $cause = $cause->getPrevious();
+        $introduction = 'Caused by';
+    }
+});

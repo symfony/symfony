@@ -39,7 +39,7 @@ class CurrencyBundleTransformationRule implements TransformationRuleInterface
      */
     public function beforeCompile(CompilationContextInterface $context)
     {
-        $tempDir = sys_get_temp_dir() . '/icu-data-currencies-source';
+        $tempDir = sys_get_temp_dir().'/icu-data-currencies-source';
 
         // The currency data is contained in the locales and misc bundles
         // in ICU <= 4.2
@@ -86,6 +86,9 @@ class CurrencyBundleTransformationRule implements TransformationRuleInterface
     {
         // Remove supplementalData.res, whose content is contained within misc.res
         $context->getFilesystem()->remove($context->getBinaryDir().'/curr/supplementalData.res');
+
+        // Remove the temporary directory
+        $context->getFilesystem()->remove(sys_get_temp_dir().'/icu-data-currencies-source');
     }
 
     /**

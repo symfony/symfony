@@ -72,15 +72,22 @@ set_exception_handler(function (\Exception $exception) {
     echo "\n";
 
     $cause = $exception;
-    $introduction = 'Uncaught exception';
+    $root = true;
 
     while (null !== $cause) {
-        echo $introduction." '".get_class($cause)."' with message '".$cause->getMessage()."'\n";
+        if (!$root) {
+            echo "Caused by\n";
+        }
+
+        echo get_class($cause).": ".$cause->getMessage()."\n";
         echo "\n";
-        echo $cause->getTraceAsString();
-        echo "\n\n";
+        echo $cause->getFile().":".$cause->getLine()."\n";
+        foreach ($cause->getTrace() as $trace) {
+            echo $trace['file'].":".$trace['line']."\n";
+        }
+        echo "\n";
 
         $cause = $cause->getPrevious();
-        $introduction = 'Caused by';
+        $root = false;
     }
 });

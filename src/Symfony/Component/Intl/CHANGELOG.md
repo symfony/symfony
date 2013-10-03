@@ -19,3 +19,4 @@ CHANGELOG
  * [BC BREAK] changed default value of the argument `$fallback` in the protected
    method `AbstractBundle::readEntry()` to `true` in order to be consistent with
    the proxied `StructuredBundleReaderInterface::readEntry()` method
+ * deprecated `BundleCompiler` in favor of `GenrbBundleCompiler`

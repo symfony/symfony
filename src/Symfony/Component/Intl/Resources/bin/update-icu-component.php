@@ -15,7 +15,7 @@ use Symfony\Component\Icu\IcuLanguageBundle;
 use Symfony\Component\Icu\IcuLocaleBundle;
 use Symfony\Component\Icu\IcuRegionBundle;
 use Symfony\Component\Intl\Intl;
-use Symfony\Component\Intl\ResourceBundle\Compiler\BundleCompiler;
+use Symfony\Component\Intl\ResourceBundle\Compiler\GenrbBundleCompiler;
 use Symfony\Component\Intl\ResourceBundle\Reader\BinaryBundleReader;
 use Symfony\Component\Intl\ResourceBundle\Reader\StructuredBundleReader;
 use Symfony\Component\Intl\ResourceBundle\Scanner\LocaleScanner;
@@ -177,7 +177,7 @@ $context = new CompilationContext(
     $sourceDir . '/data',
     IcuData::getResourceDirectory(),
     $filesystem,
-    new BundleCompiler($genrb, $genrbEnv),
+    new GenrbBundleCompiler($genrb, $genrbEnv),
     $icuVersionInDownload,
     new LocaleScanner()
 );

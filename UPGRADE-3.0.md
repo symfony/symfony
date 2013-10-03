@@ -257,6 +257,30 @@ UPGRADE FROM 2.x to 3.0
  * The `Symfony\Component\HttpKernel\EventListener\ExceptionListener` now
    passes the Request format as the `_format` argument instead of `format`.
 
+### Intl
+
+ * The class `BundleCompiler` was renamed to `GenrbBundleCompiler`.
+
+   Before:
+
+   ```
+   use Symfony\Component\Intl\ResourceBundle\Compiler\BundleCompiler;
+
+   $genrb = '/path/to/icu/build/bin/genrb';
+   $genrbEnv = 'LD_LIBRARY_PATH=/path/to/icu/build/lib'
+   $compiler = new BundleCompiler($genrb, $genrbEnv);
+   ```
+
+   After:
+
+   ```
+   use Symfony\Component\Intl\ResourceBundle\Compiler\GenrbBundleCompiler;
+
+   $genrb = '/path/to/icu/build/bin/genrb';
+   $genrbEnv = 'LD_LIBRARY_PATH=/path/to/icu/build/lib'
+   $compiler = new GenrbBundleCompiler($genrb, $genrbEnv);
+   ```
+
 ### Locale
 
  * The Locale component was removed and replaced by the Intl component.

@@ -29,6 +29,7 @@
     <groups>
         <exclude>
             <group>benchmark</group>
+            <group>icu-consistency</group>
         </exclude>
     </groups>
 

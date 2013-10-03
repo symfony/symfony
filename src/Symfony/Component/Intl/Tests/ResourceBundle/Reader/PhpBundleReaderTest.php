@@ -30,7 +30,7 @@ class PhpBundleReaderTest extends \PHPUnit_Framework_TestCase
 
     public function testReadReturnsArray()
     {
-        $data = $this->reader->read(__DIR__ . '/Fixtures', 'en');
+        $data = $this->reader->read(__DIR__ . '/Fixtures/php', 'en');
 
         $this->assertTrue(is_array($data));
         $this->assertSame('Bar', $data['Foo']);
@@ -42,7 +42,7 @@ class PhpBundleReaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testReadFailsIfLocaleOtherThanEn()
     {
-        $this->reader->read(__DIR__ . '/Fixtures', 'foo');
+        $this->reader->read(__DIR__ . '/Fixtures/php', 'foo');
     }
 
     /**

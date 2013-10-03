@@ -46,7 +46,7 @@ class BinaryBundleReader implements BundleReaderInterface
         // instead.
         // Note that fallback to default is only working when a bundle contains
         // a root.res file.
-        if (U_USING_DEFAULT_WARNING === $bundle->getErrorCode()) {
+        if (in_array($bundle->getErrorCode(), array(U_USING_DEFAULT_WARNING, U_USING_FALLBACK_WARNING), true)) {
             throw new NoSuchLocaleException(sprintf(
                 'Could not load the resource bundle "%s" for locale "%s".',
                 $path,

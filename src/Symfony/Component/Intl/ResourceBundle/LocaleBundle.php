@@ -35,6 +35,20 @@ class LocaleBundle extends AbstractBundle implements LocaleBundleInterface
     /**
      * {@inheritdoc}
      */
+    public function getLocaleAliases()
+    {
+        $aliases = $this->readEntry('misc', array('Aliases'));
+
+        if ($aliases instanceof \Traversable) {
+            $aliases = iterator_to_array($aliases);
+        }
+
+        return $aliases;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getLocaleName($ofLocale, $locale = null)
     {
         if (null === $locale) {

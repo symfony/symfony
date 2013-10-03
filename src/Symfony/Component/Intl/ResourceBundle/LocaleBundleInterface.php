@@ -38,4 +38,12 @@ interface LocaleBundleInterface extends ResourceBundleInterface
      * @return string[] A list of locale names indexed by locale codes.
      */
     public function getLocaleNames($locale = null);
+
+    /**
+     * Returns a list of locale aliases.
+     *
+     * @return array An array with aliases as keys and aliased locales as
+     *               values.
+     */
+    public function getLocaleAliases();
 }

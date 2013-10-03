@@ -250,4 +250,27 @@ class StructuredBundleReaderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame($result, $this->reader->readEntry(self::RES_DIR, 'en_GB', array('Foo', 'Bar'), true));
     }
+
+    /**
+     * @dataProvider provideMergeableValues
+     */
+    public function testFollowLocaleAliases($childData, $parentData, $result)
+    {
+        $this->reader->setLocaleAliases(array('mo' => 'ro_MD'));
+
+        $this->readerImpl->expects($this->at(0))
+            ->method('read')
+            ->with(self::RES_DIR, 'mo')
+            ->will($this->returnValue(array('Foo' => array('Bar' => $childData))));
+
+        if (null === $childData || is_array($childData)) {
+            // Read fallback locale of aliased locale ("ro_MD" -> "ro")
+            $this->readerImpl->expects($this->at(1))
+                ->method('read')
+                ->with(self::RES_DIR, 'ro')
+                ->will($this->returnValue(array('Foo' => array('Bar' => $parentData))));
+        }
+
+        $this->assertSame($result, $this->reader->readEntry(self::RES_DIR, 'mo', array('Foo', 'Bar'), true));
+    }
 }

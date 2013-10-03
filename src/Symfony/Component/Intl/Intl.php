@@ -215,6 +215,10 @@ class Intl
                 IcuData::getBundleReader(),
                 self::BUFFER_SIZE
             ));
+
+            // Make sure that self::$bundleReader is already set to prevent
+            // a cycle
+            self::$bundleReader->setLocaleAliases(self::getLocaleBundle()->getLocaleAliases());
         }
 
         return self::$bundleReader;

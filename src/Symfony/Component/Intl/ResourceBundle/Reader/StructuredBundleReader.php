@@ -31,6 +31,13 @@ class StructuredBundleReader implements StructuredBundleReaderInterface
     private $reader;
 
     /**
+     * A mapping of locale aliases to locales
+     *
+     * @var array
+     */
+    private $localeAliases = array();
+
+    /**
      * Creates an entry reader based on the given resource bundle reader.
      *
      * @param BundleReaderInterface $reader A resource bundle reader to use.
@@ -38,6 +45,21 @@ class StructuredBundleReader implements StructuredBundleReaderInterface
     public function __construct(BundleReaderInterface $reader)
     {
         $this->reader = $reader;
+    }
+
+    /**
+     * Stores a mapping of locale aliases to locales.
+     *
+     * This mapping is used when reading entries and merging them with their
+     * fallback locales. If an entry is read for a locale alias (e.g. "mo")
+     * that points to a locale with a fallback locale ("ro_MD"), the reader
+     * can continue at the correct fallback locale ("ro").
+     *
+     * @param array $localeAliases A mapping of locale aliases to locales
+     */
+    public function setLocaleAliases($localeAliases)
+    {
+        $this->localeAliases = $localeAliases;
     }
 
     /**
@@ -108,7 +130,12 @@ class StructuredBundleReader implements StructuredBundleReaderInterface
             // Remember which locales we tried
             $testedLocales[] = $currentLocale.'.res';
 
-            // Go to fallback locale
+            // First check whether the locale is an alias
+            if (isset($this->localeAliases[$currentLocale])) {
+                $currentLocale = $this->localeAliases[$currentLocale];
+            }
+
+            // Then determine fallback locale
             $currentLocale = Intl::getFallbackLocale($currentLocale);
         }
 

@@ -2,7 +2,7 @@ Security Component - CSRF
 =========================
 
 The Security CSRF (cross-site request forgery) component provides a class
-`CsrfTokenGenerator` for generating and validating CSRF tokens.
+`CsrfTokenManager` for generating and validating CSRF tokens.
 
 Resources
 ---------

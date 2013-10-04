@@ -12,9 +12,13 @@
 namespace Symfony\Component\Security\Http\Firewall;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderAdapter;
+use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Exception\InvalidArgumentException;
 use Symfony\Component\Security\Core\Exception\InvalidCsrfTokenException;
-use Symfony\Component\Security\Csrf\CsrfTokenGeneratorInterface;
+use Symfony\Component\Security\Csrf\CsrfToken;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
@@ -30,7 +34,7 @@ use Psr\Log\LoggerInterface;
 class SimpleFormAuthenticationListener extends AbstractAuthenticationListener
 {
     private $simpleAuthenticator;
-    private $csrfTokenGenerator;
+    private $csrfTokenManager;
 
     /**
      * Constructor.
@@ -47,16 +51,22 @@ class SimpleFormAuthenticationListener extends AbstractAuthenticationListener
      * @param LoggerInterface                        $logger                A LoggerInterface instance
      * @param EventDispatcherInterface               $dispatcher            An EventDispatcherInterface instance
      * @param SimpleFormAuthenticatorInterface       $simpleAuthenticator   A SimpleFormAuthenticatorInterface instance
-     * @param CsrfTokenGeneratorInterface            $csrfTokenGenerator    A CsrfTokenGeneratorInterface instance
+     * @param CsrfTokenManagerInterface              $csrfTokenManager      A CsrfTokenManagerInterface instance
      */
-    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, HttpUtils $httpUtils, $providerKey, AuthenticationSuccessHandlerInterface $successHandler, AuthenticationFailureHandlerInterface $failureHandler, array $options = array(), LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, CsrfTokenGeneratorInterface $csrfTokenGenerator = null, SimpleFormAuthenticatorInterface $simpleAuthenticator = null)
+    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, HttpUtils $httpUtils, $providerKey, AuthenticationSuccessHandlerInterface $successHandler, AuthenticationFailureHandlerInterface $failureHandler, array $options = array(), LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, CsrfTokenManagerInterface $csrfTokenManager = null, SimpleFormAuthenticatorInterface $simpleAuthenticator = null)
     {
         if (!$simpleAuthenticator) {
             throw new \InvalidArgumentException('Missing simple authenticator');
         }
 
+        if ($csrfTokenManager instanceof CsrfProviderInterface) {
+            $csrfTokenManager = new CsrfProviderAdapter($csrfTokenManager);
+        } elseif (null !== $csrfTokenManager && !$csrfTokenManager instanceof CsrfTokenManagerInterface) {
+            throw new InvalidArgumentException('The CSRF token manager should be an instance of CsrfProviderInterface or CsrfTokenManagerInterface.');
+        }
+
         $this->simpleAuthenticator = $simpleAuthenticator;
-        $this->csrfTokenGenerator = $csrfTokenGenerator;
+        $this->csrfTokenManager = $csrfTokenManager;
 
         $options = array_merge(array(
             'username_parameter' => '_username',
@@ -85,10 +95,10 @@ class SimpleFormAuthenticationListener extends AbstractAuthenticationListener
      */
     protected function attemptAuthentication(Request $request)
     {
-        if (null !== $this->csrfTokenGenerator) {
+        if (null !== $this->csrfTokenManager) {
             $csrfToken = $request->get($this->options['csrf_parameter'], null, true);
 
-            if (false === $this->csrfTokenGenerator->isCsrfTokenValid($this->options['intention'], $csrfToken)) {
+            if (false === $this->csrfTokenManager->isTokenValid(new CsrfToken($this->options['intention'], $csrfToken))) {
                 throw new InvalidCsrfTokenException('Invalid CSRF token.');
             }
         }

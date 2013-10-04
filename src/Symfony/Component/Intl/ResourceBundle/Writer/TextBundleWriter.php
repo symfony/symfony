@@ -212,6 +212,12 @@ class TextBundleWriter implements BundleWriterInterface
 
         foreach ($value as $key => $entry) {
             fwrite($file, str_repeat('    ', $indentation + 1));
+
+            // escape colons, otherwise they are interpreted as resource types
+            if (false !== strpos($key, ':')) {
+                $key = '"'.$key.'"';
+            }
+
             fwrite($file, $key);
 
             $this->writeResource($file, $entry, $indentation + 1);

@@ -36,7 +36,7 @@ class TextBundleWriterTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->writer = new TextBundleWriter();
-        $this->directory = sys_get_temp_dir() . '/TextBundleWriterTest/' . rand(1000, 9999);
+        $this->directory = sys_get_temp_dir().'/TextBundleWriterTest/'.rand(1000, 9999);
         $this->filesystem = new Filesystem();
 
         $this->filesystem->mkdir($this->directory);
@@ -62,7 +62,7 @@ class TextBundleWriterTest extends \PHPUnit_Framework_TestCase
             'Entry2' => 'String',
         ));
 
-        $this->assertFileEquals(__DIR__ . '/Fixtures/en.txt', $this->directory . '/en.txt');
+        $this->assertFileEquals(__DIR__.'/Fixtures/en.txt', $this->directory.'/en.txt');
     }
 
     public function testWriteTraversable()
@@ -80,7 +80,7 @@ class TextBundleWriterTest extends \PHPUnit_Framework_TestCase
             'Entry2' => 'String',
         )));
 
-        $this->assertFileEquals(__DIR__ . '/Fixtures/en.txt', $this->directory . '/en.txt');
+        $this->assertFileEquals(__DIR__.'/Fixtures/en.txt', $this->directory.'/en.txt');
     }
 
     public function testWriteNoFallback()
@@ -91,6 +91,17 @@ class TextBundleWriterTest extends \PHPUnit_Framework_TestCase
 
         $this->writer->write($this->directory, 'en_nofallback', $data, $fallback = false);
 
-        $this->assertFileEquals(__DIR__ . '/Fixtures/en_nofallback.txt', $this->directory . '/en_nofallback.txt');
+        $this->assertFileEquals(__DIR__.'/Fixtures/en_nofallback.txt', $this->directory.'/en_nofallback.txt');
+    }
+
+    public function testEscapeKeysIfNecessary()
+    {
+        $this->writer->write($this->directory, 'escaped', array(
+            // Keys with colons must be escaped, otherwise the part after the
+            // colon is interpreted as resource type
+            'EntryWith:Colon' => 'Value',
+        ));
+
+        $this->assertFileEquals(__DIR__.'/Fixtures/escaped.txt', $this->directory.'/escaped.txt');
     }
 }

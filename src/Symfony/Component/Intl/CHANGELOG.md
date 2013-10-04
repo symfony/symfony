@@ -20,3 +20,4 @@ CHANGELOG
    method `AbstractBundle::readEntry()` to `true` in order to be consistent with
    the proxied `BundleEntryReaderInterface::readEntry()` method
  * deprecated `BundleCompiler` in favor of `GenrbBundleCompiler`
+ * fixed `TextBundleWriter` to correctly escape keys that contain colons (":")

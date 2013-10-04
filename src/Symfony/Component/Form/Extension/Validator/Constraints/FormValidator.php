@@ -23,9 +23,9 @@ use Symfony\Component\Validator\ConstraintValidator;
 class FormValidator extends ConstraintValidator
 {
     /**
-     * @var \SplObjectStorage
+     * @var array
      */
-    private static $clickedButtons;
+    private static $clickedButtons = array();
 
     /**
      * @var ServerParams
@@ -52,15 +52,9 @@ class FormValidator extends ConstraintValidator
             return;
         }
 
-        if (null === static::$clickedButtons) {
-            static::$clickedButtons = new \SplObjectStorage();
-        }
-
         // If the form was previously validated, remove it from the cache in
         // case the clicked button has changed
-        if (static::$clickedButtons->contains($form)) {
-            static::$clickedButtons->detach($form);
-        }
+        unset(self::$clickedButtons[spl_object_hash($form)]);
 
         /* @var FormInterface $form */
         $config = $form->getConfig();
@@ -188,16 +182,17 @@ class FormValidator extends ConstraintValidator
     private static function getValidationGroups(FormInterface $form)
     {
         $root = $form->getRoot();
+        $rootHash = spl_object_hash($root);
 
         // Determine the clicked button of the complete form tree
-        if (!static::$clickedButtons->contains($root)) {
+        if (!array_key_exists($rootHash, self::$clickedButtons)) {
             // Only call findClickedButton() once to prevent an exponential
             // runtime
             // https://github.com/symfony/symfony/issues/8317
-            static::$clickedButtons->attach($root, self::findClickedButton($root));
+            self::$clickedButtons[$rootHash] = self::findClickedButton($root);
         }
 
-        $button = static::$clickedButtons->offsetGet($root);
+        $button = self::$clickedButtons[$rootHash];
 
         if (null !== $button) {
             $groups = $button->getConfig()->getOption('validation_groups');

@@ -115,6 +115,20 @@ class RegisterKernelListenersPassTest extends \PHPUnit_Framework_TestCase
         $registerListenersPass = new RegisterKernelListenersPass();
         $registerListenersPass->process($container);
     }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage The service "foo" must not be abstract as event listeners are lazy-loaded.
+     */
+    public function testAbstractEventListener()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', 'stdClass')->setAbstract(true)->addTag('kernel.event_listener', array());
+        $container->register('event_dispatcher', 'stdClass');
+
+        $registerListenersPass = new RegisterKernelListenersPass();
+        $registerListenersPass->process($container);
+    }
 }
 
 class SubscriberService implements \Symfony\Component\EventDispatcher\EventSubscriberInterface

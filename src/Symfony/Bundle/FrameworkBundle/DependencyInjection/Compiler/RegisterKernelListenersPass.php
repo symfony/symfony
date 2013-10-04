@@ -30,6 +30,10 @@ class RegisterKernelListenersPass implements CompilerPassInterface
                 throw new \InvalidArgumentException(sprintf('The service "%s" must be public as event listeners are lazy-loaded.', $id));
             }
 
+            if ($def->isAbstract()) {
+                throw new \InvalidArgumentException(sprintf('The service "%s" must not be abstract as event listeners are lazy-loaded.', $id));
+            }
+
             foreach ($events as $event) {
                 $priority = isset($event['priority']) ? $event['priority'] : 0;
 

@@ -120,6 +120,10 @@ class ParserTest extends \PHPUnit_Framework_TestCase
                 new Node\ConditionalNode(new Node\ConstantNode(true), new Node\ConstantNode(true), new Node\ConstantNode(false)),
                 'true ? true : false',
             ),
+            array(
+                new Node\BinaryNode('matches', new Node\ConstantNode('foo'), new Node\ConstantNode('/foo/')),
+                '"foo" matches "/foo/"',
+            ),
 
             // chained calls
             array(

@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-10-02T15:12:53Z
+
+@lyrixx I will let you add tests and docs.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2013-10-04T12:53:41Z
+
+I opened an new PR against @fabpot repo: https://github.com/fabpot/symfony/pull/777
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2013-10-04T13:06:10Z
+
+And the doc pr: https://github.com/symfony/symfony-docs/pull/3031

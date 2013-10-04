@@ -48,6 +48,8 @@ class LanguageBundleTransformationRule implements TransformationRuleInterface
      */
     public function beforeCompile(CompilationContextInterface $context)
     {
+        $tempDir = sys_get_temp_dir().'/icu-data-languages';
+
         // The language data is contained in the locales bundle in ICU <= 4.2
         if (IcuVersion::compare($context->getIcuVersion(), '4.2', '<=', 1)) {
             $sourceDir = $context->getSourceDir() . '/locales';
@@ -55,13 +57,16 @@ class LanguageBundleTransformationRule implements TransformationRuleInterface
             $sourceDir = $context->getSourceDir() . '/lang';
         }
 
+        $context->getFilesystem()->remove($tempDir);
+        $context->getFilesystem()->mirror($sourceDir, $tempDir);
+
         // Create misc file with all available locales
         $writer = new TextBundleWriter();
-        $writer->write($sourceDir, 'misc', array(
-            'Locales' => $context->getLocaleScanner()->scanLocales($sourceDir),
+        $writer->write($tempDir, 'misc', array(
+            'Locales' => $context->getLocaleScanner()->scanLocales($tempDir),
         ), false);
 
-        return $sourceDir;
+        return $tempDir;
     }
 
     /**

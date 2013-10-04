@@ -50,30 +50,25 @@ class CurrencyBundleTransformationRule implements TransformationRuleInterface
      */
     public function beforeCompile(CompilationContextInterface $context)
     {
-        $tempDir = sys_get_temp_dir().'/icu-data-currencies-source';
+        $tempDir = sys_get_temp_dir().'/icu-data-currencies';
+
+        $context->getFilesystem()->remove($tempDir);
+        $context->getFilesystem()->mkdir(array($tempDir, $tempDir.'/res'));
 
         // The currency data is contained in the locales and misc bundles
         // in ICU <= 4.2
         if (IcuVersion::compare($context->getIcuVersion(), '4.2', '<=', 1)) {
-            $supplementalData = $context->getSourceDir().'/misc/supplementalData.txt';
-            $sourceDir = $context->getSourceDir().'/locales';
+            $context->getFilesystem()->mirror($context->getSourceDir().'/locales', $tempDir.'/txt');
+            $context->getFilesystem()->copy($context->getSourceDir().'/misc/supplementalData.txt', $tempDir.'/txt/misc.txt');
         } else {
-            $supplementalData = $context->getSourceDir().'/curr/supplementalData.txt';
-            $sourceDir = $context->getSourceDir().'/curr';
+            $context->getFilesystem()->mirror($context->getSourceDir().'/curr', $tempDir.'/txt');
+            $context->getFilesystem()->rename($tempDir.'/txt/supplementalData.txt', $tempDir.'/txt/misc.txt');
         }
-
-        $context->getFilesystem()->remove($tempDir);
-        $context->getFilesystem()->mkdir(array(
-            $tempDir,
-            $tempDir.'/txt',
-            $tempDir.'/res'
-        ));
-        $context->getFilesystem()->copy($supplementalData, $tempDir.'/txt/misc.txt');
 
         // Replace "supplementalData" in the file by "misc" before compilation
         file_put_contents($tempDir.'/txt/misc.txt', str_replace('supplementalData', 'misc', file_get_contents($tempDir.'/txt/misc.txt')));
 
-        $context->getCompiler()->compile($tempDir.'/txt', $tempDir.'/res');
+        $context->getCompiler()->compile($tempDir.'/txt/misc.txt', $tempDir.'/res');
 
         // Read file, add locales and write again
         $reader = new BinaryBundleReader();
@@ -82,12 +77,13 @@ class CurrencyBundleTransformationRule implements TransformationRuleInterface
         // Key must not exist
         assert(!isset($data['Locales']));
 
-        $data['Locales'] = $context->getLocaleScanner()->scanLocales($sourceDir);
+        $data['Locales'] = $context->getLocaleScanner()->scanLocales($tempDir.'/txt');
 
         $writer = new TextBundleWriter();
-        $writer->write($sourceDir, 'misc', $data, false);
+        $writer->write($tempDir.'/txt', 'misc', $data, false);
 
-        return $sourceDir;
+        // The temporary directory now contains all sources to be compiled
+        return $tempDir.'/txt';
     }
 
     /**
@@ -95,9 +91,6 @@ class CurrencyBundleTransformationRule implements TransformationRuleInterface
      */
     public function afterCompile(CompilationContextInterface $context)
     {
-        // Remove supplementalData.res, whose content is contained within misc.res
-        $context->getFilesystem()->remove($context->getBinaryDir().'/curr/supplementalData.res');
-
         // Remove the temporary directory
         $context->getFilesystem()->remove(sys_get_temp_dir().'/icu-data-currencies-source');
     }

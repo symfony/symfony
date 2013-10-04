@@ -1,1 +1,4 @@
-{"service":"service_2","public":false}
+{
+    "service": "service_2",
+    "public": false
+}

@@ -18,8 +18,8 @@ use Symfony\Component\Intl\Intl;
 use Symfony\Component\Intl\ResourceBundle\LanguageBundleInterface;
 use Symfony\Component\Intl\ResourceBundle\LocaleBundleInterface;
 use Symfony\Component\Intl\ResourceBundle\RegionBundleInterface;
-use Symfony\Component\Intl\ResourceBundle\Transformer\CompilationContextInterface;
-use Symfony\Component\Intl\ResourceBundle\Transformer\StubbingContextInterface;
+use Symfony\Component\Intl\ResourceBundle\Transformer\CompilationContext;
+use Symfony\Component\Intl\ResourceBundle\Transformer\StubbingContext;
 use Symfony\Component\Intl\ResourceBundle\Writer\TextBundleWriter;
 
 /**
@@ -62,7 +62,7 @@ class LocaleBundleTransformationRule implements TransformationRuleInterface
     /**
      * {@inheritdoc}
      */
-    public function beforeCompile(CompilationContextInterface $context)
+    public function beforeCompile(CompilationContext $context)
     {
         $tempDir = sys_get_temp_dir().'/icu-data-locales';
 
@@ -97,7 +97,7 @@ class LocaleBundleTransformationRule implements TransformationRuleInterface
     /**
      * {@inheritdoc}
      */
-    public function afterCompile(CompilationContextInterface $context)
+    public function afterCompile(CompilationContext $context)
     {
         $context->getFilesystem()->remove(sys_get_temp_dir().'/icu-data-locales');
     }
@@ -105,7 +105,7 @@ class LocaleBundleTransformationRule implements TransformationRuleInterface
     /**
      * {@inheritdoc}
      */
-    public function beforeCreateStub(StubbingContextInterface $context)
+    public function beforeCreateStub(StubbingContext $context)
     {
         return array(
             'Locales' => $this->localeBundle->getLocaleNames('en'),
@@ -115,7 +115,7 @@ class LocaleBundleTransformationRule implements TransformationRuleInterface
     /**
      * {@inheritdoc}
      */
-    public function afterCreateStub(StubbingContextInterface $context)
+    public function afterCreateStub(StubbingContext $context)
     {
     }
 

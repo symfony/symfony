@@ -13,8 +13,8 @@ namespace Symfony\Component\Intl\ResourceBundle\Transformer\Rule;
 
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\Intl\ResourceBundle\RegionBundleInterface;
-use Symfony\Component\Intl\ResourceBundle\Transformer\CompilationContextInterface;
-use Symfony\Component\Intl\ResourceBundle\Transformer\StubbingContextInterface;
+use Symfony\Component\Intl\ResourceBundle\Transformer\CompilationContext;
+use Symfony\Component\Intl\ResourceBundle\Transformer\StubbingContext;
 use Symfony\Component\Intl\ResourceBundle\Writer\TextBundleWriter;
 use Symfony\Component\Intl\Util\IcuVersion;
 
@@ -46,7 +46,7 @@ class RegionBundleTransformationRule implements TransformationRuleInterface
     /**
      * {@inheritdoc}
      */
-    public function beforeCompile(CompilationContextInterface $context)
+    public function beforeCompile(CompilationContext $context)
     {
         $tempDir = sys_get_temp_dir().'/icu-data-languages';
 
@@ -72,14 +72,14 @@ class RegionBundleTransformationRule implements TransformationRuleInterface
     /**
      * {@inheritdoc}
      */
-    public function afterCompile(CompilationContextInterface $context)
+    public function afterCompile(CompilationContext $context)
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function beforeCreateStub(StubbingContextInterface $context)
+    public function beforeCreateStub(StubbingContext $context)
     {
         return array(
             'Countries' => $this->regionBundle->getCountryNames('en'),
@@ -89,7 +89,7 @@ class RegionBundleTransformationRule implements TransformationRuleInterface
     /**
      * {@inheritdoc}
      */
-    public function afterCreateStub(StubbingContextInterface $context)
+    public function afterCreateStub(StubbingContext $context)
     {
     }
 }

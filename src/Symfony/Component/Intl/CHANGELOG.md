@@ -22,3 +22,5 @@ CHANGELOG
  * deprecated `BundleCompiler` in favor of `GenrbBundleCompiler`
  * fixed `TextBundleWriter` to correctly escape keys that contain colons (":")
  * fixed `TextBundleWriter` to correctly escape keys that contain spaces (" ")
+ * [BC BREAK] removed the pointless interfaces `CompilationContextInterface`
+   and `StubbingContextInterface`. You can depend on their implementation instead

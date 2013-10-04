@@ -16,11 +16,11 @@ use Symfony\Component\Intl\ResourceBundle\Compiler\BundleCompilerInterface;
 use Symfony\Component\Intl\ResourceBundle\Scanner\LocaleScanner;
 
 /**
- * Default implementation of {@link CompilationContextInterface}.
+ * Stores contextual information for resource bundle compilation.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class CompilationContext implements CompilationContextInterface
+class CompilationContext
 {
     /**
      * @var string
@@ -63,7 +63,10 @@ class CompilationContext implements CompilationContextInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Returns the directory where the source versions of the resource bundles
+     * are stored.
+     *
+     * @return string An absolute path to a directory.
      */
     public function getSourceDir()
     {
@@ -71,7 +74,9 @@ class CompilationContext implements CompilationContextInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Returns the directory where the binary resource bundles are stored.
+     *
+     * @return string An absolute path to a directory.
      */
     public function getBinaryDir()
     {
@@ -79,7 +84,9 @@ class CompilationContext implements CompilationContextInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Returns a tool for manipulating the filesystem.
+     *
+     * @return \Symfony\Component\Filesystem\Filesystem The filesystem manipulator.
      */
     public function getFilesystem()
     {
@@ -87,7 +94,9 @@ class CompilationContext implements CompilationContextInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Returns a resource bundle compiler.
+     *
+     * @return \Symfony\Component\Intl\ResourceBundle\Compiler\BundleCompilerInterface The loaded resource bundle compiler.
      */
     public function getCompiler()
     {
@@ -95,7 +104,9 @@ class CompilationContext implements CompilationContextInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Returns the ICU version of the bundles being converted.
+     *
+     * @return string The ICU version string.
      */
     public function getIcuVersion()
     {
@@ -103,7 +114,9 @@ class CompilationContext implements CompilationContextInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Returns a locale scanner.
+     *
+     * @return \Symfony\Component\Intl\ResourceBundle\Scanner\LocaleScanner The locale scanner.
      */
     public function getLocaleScanner()
     {

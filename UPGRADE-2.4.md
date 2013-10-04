@@ -94,3 +94,41 @@ Intl
        }
    }
    ```
+
+ * The interfaces `CompilationContextInterface` and `StubbingContextInterface`
+   were removed. Code against their implementations `CompilationContext` and
+   `StubbingContext` in the same namespace instead.
+
+   Before:
+
+   ```
+   use Symfony\Component\Intl\ResourceBundle\Transformation\CompilationContextInterface;
+   use Symfony\Component\Intl\ResourceBundle\Transformation\StubbingContextInterface;
+
+   public function beforeCompile(CompilationContextInterface $context)
+   {
+       // ...
+   }
+
+   public function beforeCreateStub(StubbingContextInterface $context)
+   {
+       // ...
+   }
+   ```
+
+   After:
+
+   ```
+   use Symfony\Component\Intl\ResourceBundle\Transformation\CompilationContext;
+   use Symfony\Component\Intl\ResourceBundle\Transformation\StubbingContext;
+
+   public function beforeCompile(CompilationContext $context)
+   {
+       // ...
+   }
+
+   public function beforeCreateStub(StubbingContext $context)
+   {
+       // ...
+   }
+   ```

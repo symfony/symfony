@@ -15,8 +15,8 @@ use Symfony\Component\Intl\Intl;
 use Symfony\Component\Intl\ResourceBundle\CurrencyBundle;
 use Symfony\Component\Intl\ResourceBundle\CurrencyBundleInterface;
 use Symfony\Component\Intl\ResourceBundle\Reader\BinaryBundleReader;
-use Symfony\Component\Intl\ResourceBundle\Transformer\CompilationContextInterface;
-use Symfony\Component\Intl\ResourceBundle\Transformer\StubbingContextInterface;
+use Symfony\Component\Intl\ResourceBundle\Transformer\CompilationContext;
+use Symfony\Component\Intl\ResourceBundle\Transformer\StubbingContext;
 use Symfony\Component\Intl\ResourceBundle\Writer\TextBundleWriter;
 use Symfony\Component\Intl\Util\IcuVersion;
 
@@ -48,7 +48,7 @@ class CurrencyBundleTransformationRule implements TransformationRuleInterface
     /**
      * {@inheritdoc}
      */
-    public function beforeCompile(CompilationContextInterface $context)
+    public function beforeCompile(CompilationContext $context)
     {
         $tempDir = sys_get_temp_dir().'/icu-data-currencies';
 
@@ -89,7 +89,7 @@ class CurrencyBundleTransformationRule implements TransformationRuleInterface
     /**
      * {@inheritdoc}
      */
-    public function afterCompile(CompilationContextInterface $context)
+    public function afterCompile(CompilationContext $context)
     {
         // Remove the temporary directory
         $context->getFilesystem()->remove(sys_get_temp_dir().'/icu-data-currencies-source');
@@ -98,7 +98,7 @@ class CurrencyBundleTransformationRule implements TransformationRuleInterface
     /**
      * {@inheritdoc}
      */
-    public function beforeCreateStub(StubbingContextInterface $context)
+    public function beforeCreateStub(StubbingContext $context)
     {
         $currencies = array();
 
@@ -119,7 +119,7 @@ class CurrencyBundleTransformationRule implements TransformationRuleInterface
     /**
      * {@inheritdoc}
      */
-    public function afterCreateStub(StubbingContextInterface $context)
+    public function afterCreateStub(StubbingContext $context)
     {
     }
 }

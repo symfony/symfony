@@ -23,9 +23,9 @@ class AddConsoleCommandPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
-        $commandServices = $container->findTaggedids('console.command');
+        $commandServices = $container->findTaggedServiceIds('console.command');
 
-        foreach ($commandServices as $id => $tag) {
+        foreach ($commandServices as $id => $tags) {
             $class = $container->getParameterBag()->resolveValue($container->getDefinition($id)->getClass());
             $r = new \ReflectionClass($class);
             if (!$r->isSubclassOf('Symfony\\Component\\Console\\Command\\Command')) {

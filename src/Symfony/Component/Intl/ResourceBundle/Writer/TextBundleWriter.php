@@ -214,7 +214,7 @@ class TextBundleWriter implements BundleWriterInterface
             fwrite($file, str_repeat('    ', $indentation + 1));
 
             // escape colons, otherwise they are interpreted as resource types
-            if (false !== strpos($key, ':')) {
+            if (false !== strpos($key, ':') || false !== strpos($key, ' ')) {
                 $key = '"'.$key.'"';
             }
 

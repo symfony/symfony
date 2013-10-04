@@ -21,3 +21,4 @@ CHANGELOG
    the proxied `BundleEntryReaderInterface::readEntry()` method
  * deprecated `BundleCompiler` in favor of `GenrbBundleCompiler`
  * fixed `TextBundleWriter` to correctly escape keys that contain colons (":")
+ * fixed `TextBundleWriter` to correctly escape keys that contain spaces (" ")

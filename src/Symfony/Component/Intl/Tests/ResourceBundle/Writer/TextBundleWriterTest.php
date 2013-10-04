@@ -100,6 +100,8 @@ class TextBundleWriterTest extends \PHPUnit_Framework_TestCase
             // Keys with colons must be escaped, otherwise the part after the
             // colon is interpreted as resource type
             'EntryWith:Colon' => 'Value',
+            // Keys with spaces must be escaped
+            'Entry With Spaces' => 'Value',
         ));
 
         $this->assertFileEquals(__DIR__.'/Fixtures/escaped.txt', $this->directory.'/escaped.txt');

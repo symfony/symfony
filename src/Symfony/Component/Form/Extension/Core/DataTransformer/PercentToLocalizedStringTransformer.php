@@ -130,7 +130,7 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
             $value /= 100;
         }
 
-        if (self::INTEGER == $this->type) {
+        if (self::INTEGER === $this->type) {
             $value = (int) $value;
         }
 

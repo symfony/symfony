@@ -14,7 +14,7 @@ namespace Symfony\Component\Translation\Tests\Dumper;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Dumper\PotFileDumper;
 
-class PoFileDumperTest extends \PHPUnit_Framework_TestCase
+class PotFileDumperTest extends \PHPUnit_Framework_TestCase
 {
     public function testDump()
     {

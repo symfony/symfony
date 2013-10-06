@@ -100,7 +100,7 @@ EOF
         $output->writeln(sprintf('Generating "<info>%s</info>" translation files for "<info>%s</info>"', $input->getArgument('locale'), $foundBundle->getName()));
 
         // load any messages from templates
-        $extractedCatalogue = new MessageCatalogue($input->getArgument('locale'));
+        $extractedCatalogue = new MessageCatalogue(null);
         $output->writeln('Parsing templates');
         $extractor = $this->getContainer()->get('translation.extractor');
         $extractor->setPrefix($input->getOption('prefix'));

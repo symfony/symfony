@@ -107,10 +107,15 @@ EOF
         $extractor->extract($foundBundle->getPath().'/Resources/views/', $extractedCatalogue);
 
         // load any existing messages from the translation files
-        $currentCatalogue = new MessageCatalogue($input->getArgument('locale'));
         $output->writeln('Loading translation files');
         $loader = $this->getContainer()->get('translation.loader');
+
+        $fallbackCatalogue = new MessageCatalogue(null);
+        $loader->loadMessages($bundleTransPath, $fallbackCatalogue);
+
+        $currentCatalogue = new MessageCatalogue($input->getArgument('locale'));
         $loader->loadMessages($bundleTransPath, $currentCatalogue);
+        $currentCatalogue->addFallbackCatalogue($fallbackCatalogue);
 
         // process catalogues
         $operation = $input->getOption('clean')

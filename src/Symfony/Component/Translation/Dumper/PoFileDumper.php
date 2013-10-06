@@ -29,6 +29,7 @@ class PoFileDumper extends FileDumper
         $output .= 'msgstr ""'."\n";
         $output .= '"Content-Type: text/plain; charset=UTF-8\n"'."\n";
         $output .= '"Content-Transfer-Encoding: 8bit\n"'."\n";
+        $output .= '"Language: '.$messages->getLocale().'\n"'."\n";
         $output .= "\n";
 
         $newLine = false;

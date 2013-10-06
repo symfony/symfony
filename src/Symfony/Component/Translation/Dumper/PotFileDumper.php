@@ -45,14 +45,6 @@ class PotFileDumper extends PoFileDumper
     /**
      * {@inheritDoc}
      */
-    public function format(MessageCatalogue $messages, $domain = 'messages')
-    {
-        return parent::format($messages, $domain);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     protected function getExtension()
     {
         return 'pot';

@@ -22,6 +22,7 @@
         <parameter key="translation.dumper.php.class">Symfony\Component\Translation\Dumper\PhpFileDumper</parameter>
         <parameter key="translation.dumper.xliff.class">Symfony\Component\Translation\Dumper\XliffFileDumper</parameter>
         <parameter key="translation.dumper.po.class">Symfony\Component\Translation\Dumper\PoFileDumper</parameter>
+        <parameter key="translation.dumper.pot.class">Symfony\Component\Translation\Dumper\PotFileDumper</parameter>
         <parameter key="translation.dumper.mo.class">Symfony\Component\Translation\Dumper\MoFileDumper</parameter>
         <parameter key="translation.dumper.yml.class">Symfony\Component\Translation\Dumper\YamlFileDumper</parameter>
         <parameter key="translation.dumper.qt.class">Symfony\Component\Translation\Dumper\QtFileDumper</parameter>
@@ -106,6 +107,10 @@
 
         <service id="translation.dumper.po" class="%translation.dumper.po.class%">
             <tag name="translation.dumper" alias="po" />
+        </service>
+
+        <service id="translation.dumper.pot" class="%translation.dumper.pot.class%">
+            <tag name="translation.dumper" alias="pot" />
         </service>
 
         <service id="translation.dumper.mo" class="%translation.dumper.mo.class%">

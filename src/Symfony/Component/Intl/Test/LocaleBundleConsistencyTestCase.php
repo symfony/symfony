@@ -9,32 +9,28 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Intl\Tests\ResourceBundle;
+namespace Symfony\Component\Intl\Test;
 
 use Symfony\Component\Intl\Intl;
-use Symfony\Component\Intl\Test\ConsistencyTest;
+use Symfony\Component\Intl\Test\ConsistencyTestCase;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class LocaleBundleConsistencyTest extends ConsistencyTest
+abstract class LocaleBundleConsistencyTestCase extends ConsistencyTestCase
 {
-    // The below arrays document the current state of the ICU data.
-    // This state is verified in the tests below.
-    // You can add arbitrary rules here if you want to document the availability
-    // of other locale names.
-    private static $localesWithoutTranslationForThemselves = array('nmg');
-    private static $localesWithoutTranslationForEnglish = array('as', 'bo', 'dua', 'fo', 'gv', 'kl', 'kw', 'mgo', 'uz');
-    private static $localesWithoutTranslationForFrench = array('as', 'bo', 'dua', 'fo', 'gv', 'kl', 'kw', 'mgo', 'uz');
-    private static $localesWithoutTranslationForSpanish = array('as', 'bo', 'dua', 'fo', 'gv', 'jgo', 'kl', 'kw', 'lo', 'mgo', 'ps', 'uz');
-    private static $localesWithoutTranslationForRussian = array('as', 'dua', 'fo', 'gv', 'jgo', 'kl', 'kw', 'mgo', 'pa', 'uz');
-    private static $localesWithoutTranslationForChinese = array('as', 'dua', 'fo', 'gv', 'kl', 'kw', 'mgo', 'pa', 'rw', 'ti', 'uz');
-    private static $localesWithoutTranslationForGerman = array('as', 'bo', 'dua', 'fo', 'gv', 'kl', 'kw', 'mgo', 'uz');
+    protected static $localesWithoutTranslationForThemselves = array('nmg');
+    protected static $localesWithoutTranslationForEnglish = array('as', 'bo', 'dua', 'fo', 'gv', 'kl', 'kw', 'mgo', 'uz');
+    protected static $localesWithoutTranslationForFrench = array('as', 'bo', 'dua', 'fo', 'gv', 'kl', 'kw', 'mgo', 'uz');
+    protected static $localesWithoutTranslationForSpanish = array('as', 'bo', 'dua', 'fo', 'gv', 'jgo', 'kl', 'kw', 'lo', 'mgo', 'ps', 'uz');
+    protected static $localesWithoutTranslationForRussian = array('as', 'dua', 'fo', 'gv', 'jgo', 'kl', 'kw', 'mgo', 'pa', 'uz');
+    protected static $localesWithoutTranslationForChinese = array('as', 'dua', 'fo', 'gv', 'kl', 'kw', 'mgo', 'pa', 'rw', 'ti', 'uz');
+    protected static $localesWithoutTranslationForGerman = array('as', 'bo', 'dua', 'fo', 'gv', 'kl', 'kw', 'mgo', 'uz');
 
     /**
      * @var \Symfony\Component\Intl\ResourceBundle\LocaleBundleInterface
      */
-    private static $localeBundle;
+    protected static $localeBundle;
 
     public static function setUpBeforeClass()
     {
@@ -93,6 +89,7 @@ class LocaleBundleConsistencyTest extends ConsistencyTest
 
     /**
      * @dataProvider provideLocaleAliases
+     * @group locale-alias-based
      */
     public function testGetLocaleNamesSupportsAliases($alias, $ofLocale)
     {
@@ -104,7 +101,6 @@ class LocaleBundleConsistencyTest extends ConsistencyTest
 
     /**
      * @dataProvider provideLocales
-     * @group icu-consistency
      */
     public function testGetLocaleNamesAndGetLocaleNameAreConsistent($displayLocale)
     {

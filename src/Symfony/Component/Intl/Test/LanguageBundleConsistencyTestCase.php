@@ -9,48 +9,34 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Intl\Tests\ResourceBundle;
+namespace Symfony\Component\Intl\Test;
 
 use Symfony\Component\Intl\Exception\NoSuchEntryException;
 use Symfony\Component\Intl\Intl;
-use Symfony\Component\Intl\Test\ConsistencyTest;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class LanguageBundleConsistencyTest extends ConsistencyTest
+abstract class LanguageBundleConsistencyTestCase extends ConsistencyTestCase
 {
-    // The below arrays document the current state of the ICU data.
-    // This state is verified in the tests below.
-    // You can add arbitrary rules here if you want to document the availability
-    // of other languages.
-    private static $localesWithoutTranslationForThemselves = array('nmg');
-    private static $localesWithoutTranslationForEnglish = array('as', 'bo', 'dua', 'fo', 'gv', 'kl', 'kw', 'mgo', 'uz');
-    private static $localesWithoutTranslationForFrench = array('as', 'bo', 'dua', 'fo', 'gv', 'kl', 'kw', 'mgo', 'uz');
-    private static $localesWithoutTranslationForSpanish = array('as', 'bo', 'dua', 'fo', 'gv', 'jgo', 'kl', 'kw', 'lo', 'mgo', 'ps', 'uz');
-    private static $localesWithoutTranslationForRussian = array('as', 'dua', 'fo', 'gv', 'jgo', 'kl', 'kw', 'mgo', 'pa', 'uz');
-    private static $localesWithoutTranslationForChinese = array('as', 'dua', 'fo', 'gv', 'kl', 'kw', 'mgo', 'pa', 'rw', 'ti', 'uz');
-    private static $localesWithoutTranslationForGerman = array('as', 'bo', 'dua', 'fo', 'gv', 'kl', 'kw', 'mgo', 'uz');
+    protected static $localesWithoutTranslationForThemselves = array();
+    protected static $localesWithoutTranslationForEnglish = array();
+    protected static $localesWithoutTranslationForFrench = array();
+    protected static $localesWithoutTranslationForSpanish = array();
+    protected static $localesWithoutTranslationForRussian = array();
+    protected static $localesWithoutTranslationForChinese = array();
+    protected static $localesWithoutTranslationForGerman = array();
 
-    private static $localesWithoutTranslationForAnyScript = array(
-        'agq', 'ak', 'asa', 'bas', 'bem', 'bez', 'bm', 'cgg', 'dav', 'dje', 'dua',
-        'dyo', 'ebu', 'eo', 'ewo', 'ff', 'fo', 'ga', 'guz', 'gv', 'ha', 'haw',
-        'ig', 'jmc', 'kab', 'kam', 'kde', 'khq', 'ki', 'kl', 'kln', 'kok', 'ksb',
-        'ksf', 'kw', 'lag', 'lg', 'ln', 'lu', 'luo', 'luy', 'mas', 'mer', 'mfe',
-        'mg', 'mgh', 'mua', 'naq', 'nd', 'nmg', 'nus', 'nyn', 'pa', 'rn', 'rof',
-        'rw', 'rwk', 'saq', 'sbp', 'seh', 'ses', 'sg', 'shi', 'sn', 'swc', 'teo',
-        'twq', 'tzm', 'uz', 'vai', 'vun', 'xog', 'yav', 'yo'
-    );
-
-    private static $localesWithoutTranslationForLatinScript = array('as', 'bo', 'lo', 'ps', 'so');
-    private static $localesWithoutTranslationForSimplifiedScript = array('as', 'bo', 'jgo', 'mgo', 'om', 'ps', 'so', 'sq', 'ti');
-    private static $localesWithoutTranslationForTraditionalScript = array('as', 'bo', 'jgo', 'mgo', 'om', 'ps', 'so', 'sq', 'ti');
-    private static $localesWithoutTranslationForCyrillicScript = array('as', 'bo', 'jgo', 'lo', 'mgo', 'om', 'ps', 'so', 'mt', 'sq', 'ti');
+    protected static $localesWithoutTranslationForAnyScript = array();
+    protected static $localesWithoutTranslationForLatinScript = array();
+    protected static $localesWithoutTranslationForSimplifiedScript = array();
+    protected static $localesWithoutTranslationForTraditionalScript = array();
+    protected static $localesWithoutTranslationForCyrillicScript = array();
 
     /**
      * @var \Symfony\Component\Intl\ResourceBundle\LanguageBundleInterface
      */
-    private static $languageBundle;
+    protected static $languageBundle;
 
     public static function setUpBeforeClass()
     {
@@ -211,6 +197,7 @@ class LanguageBundleConsistencyTest extends ConsistencyTest
 
     /**
      * @dataProvider provideLocaleAliases
+     * @group locale-alias-based
      */
     public function testGetLanguageNamesSupportsAliases($alias, $ofLocale)
     {
@@ -222,6 +209,7 @@ class LanguageBundleConsistencyTest extends ConsistencyTest
 
     /**
      * @dataProvider provideLocaleAliasesWithScripts
+     * @group locale-alias-based
      */
     public function testGetScriptNamesSupportsAliases($alias, $ofLocale)
     {
@@ -233,7 +221,6 @@ class LanguageBundleConsistencyTest extends ConsistencyTest
 
     /**
      * @dataProvider provideLocales
-     * @group icu-consistency
      */
     public function testGetLanguageNamesAndGetLanguageNameAreConsistent($displayLocale)
     {
@@ -246,7 +233,6 @@ class LanguageBundleConsistencyTest extends ConsistencyTest
 
     /**
      * @dataProvider provideLocalesWithScripts
-     * @group icu-consistency
      */
     public function testGetScriptNamesAndGetScriptNameAreConsistent($displayLocale)
     {

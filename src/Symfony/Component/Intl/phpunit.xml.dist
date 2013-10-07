@@ -17,12 +17,6 @@
         </testsuite>
     </testsuites>
 
-    <groups>
-        <exclude>
-            <group>icu-consistency</group>
-        </exclude>
-    </groups>
-
     <filter>
         <whitelist>
             <directory>./</directory>

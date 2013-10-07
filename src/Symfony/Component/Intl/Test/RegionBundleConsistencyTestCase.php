@@ -9,35 +9,31 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Intl\Tests\ResourceBundle;
+namespace Symfony\Component\Intl\Test;
 
 use Symfony\Component\Intl\Exception\NoSuchEntryException;
 use Symfony\Component\Intl\Intl;
-use Symfony\Component\Intl\Test\ConsistencyTest;
+use Symfony\Component\Intl\Test\ConsistencyTestCase;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class RegionBundleConsistencyTest extends ConsistencyTest
+abstract class RegionBundleConsistencyTestCase extends ConsistencyTestCase
 {
-    // The below arrays document the current state of the ICU data.
-    // This state is verified in the tests below.
-    // You can add arbitrary rules here if you want to document the availability
-    // of other countries.
-    private static $localesWithoutTranslationForAnyCountry = array('ti');
-    private static $localesWithoutTranslationForUS = array('bem', 'dua', 'dyo', 'gv', 'ig', 'jgo', 'kl', 'kok', 'kw', 'mgo', 'nus', 'pa', 'ps', 'rw', 'uz');
-    private static $localesWithoutTranslationForDE = array('bem', 'dua', 'gv', 'ig', 'kl', 'kok', 'kw', 'mgh', 'mgo', 'nus', 'pa', 'rw', 'uz');
-    private static $localesWithoutTranslationForGB = array('bem', 'dua', 'dyo', 'fo', 'ig', 'jgo', 'kl', 'kok', 'mgh', 'mgo', 'nus', 'pa', 'rw', 'uz');
-    private static $localesWithoutTranslationForFR = array('bem', 'bo', 'dua', 'gv', 'ig', 'kl', 'kok', 'kw', 'mgo', 'nus', 'pa', 'rw', 'uz');
-    private static $localesWithoutTranslationForIT = array('bem', 'dua', 'gv', 'ig', 'kl', 'kok', 'kw', 'mgo', 'nus', 'pa', 'rw', 'uz');
-    private static $localesWithoutTranslationForBR = array('bem', 'bo', 'dua', 'gv', 'haw', 'ig', 'kl', 'kok', 'kw', 'mgh', 'mgo', 'pa', 'ps', 'rw', 'uz');
-    private static $localesWithoutTranslationForRU = array('bem', 'dua', 'dyo', 'gv', 'ig', 'kl', 'kok', 'kw', 'mgh', 'mgo', 'nus', 'pa', 'rw', 'uz');
-    private static $localesWithoutTranslationForCN = array('bem', 'dua', 'gv', 'kl', 'kok', 'kw', 'mgo', 'pa', 'rw', 'uz');
+    protected static $localesWithoutTranslationForAnyCountry = array('ti');
+    protected static $localesWithoutTranslationForUS = array('bem', 'dua', 'dyo', 'gv', 'ig', 'jgo', 'kl', 'kok', 'kw', 'mgo', 'nus', 'pa', 'ps', 'rw', 'uz');
+    protected static $localesWithoutTranslationForDE = array('bem', 'dua', 'gv', 'ig', 'kl', 'kok', 'kw', 'mgh', 'mgo', 'nus', 'pa', 'rw', 'uz');
+    protected static $localesWithoutTranslationForGB = array('bem', 'dua', 'dyo', 'fo', 'ig', 'jgo', 'kl', 'kok', 'mgh', 'mgo', 'nus', 'pa', 'rw', 'uz');
+    protected static $localesWithoutTranslationForFR = array('bem', 'bo', 'dua', 'gv', 'ig', 'kl', 'kok', 'kw', 'mgo', 'nus', 'pa', 'rw', 'uz');
+    protected static $localesWithoutTranslationForIT = array('bem', 'dua', 'gv', 'ig', 'kl', 'kok', 'kw', 'mgo', 'nus', 'pa', 'rw', 'uz');
+    protected static $localesWithoutTranslationForBR = array('bem', 'bo', 'dua', 'gv', 'haw', 'ig', 'kl', 'kok', 'kw', 'mgh', 'mgo', 'pa', 'ps', 'rw', 'uz');
+    protected static $localesWithoutTranslationForRU = array('bem', 'dua', 'dyo', 'gv', 'ig', 'kl', 'kok', 'kw', 'mgh', 'mgo', 'nus', 'pa', 'rw', 'uz');
+    protected static $localesWithoutTranslationForCN = array('bem', 'dua', 'gv', 'kl', 'kok', 'kw', 'mgo', 'pa', 'rw', 'uz');
 
     /**
      * @var \Symfony\Component\Intl\ResourceBundle\RegionBundleInterface
      */
-    private static $regionBundle;
+    protected static $regionBundle;
 
     public static function setUpBeforeClass()
     {
@@ -172,6 +168,7 @@ class RegionBundleConsistencyTest extends ConsistencyTest
 
     /**
      * @dataProvider provideLocaleAliasesWithCountries
+     * @group locale-alias-based
      */
     public function testGetCountryNamesSupportsAliases($alias, $ofLocale)
     {
@@ -183,7 +180,6 @@ class RegionBundleConsistencyTest extends ConsistencyTest
 
     /**
      * @dataProvider provideLocalesWithCountries
-     * @group icu-consistency
      */
     public function testGetCountryNamesAndGetCountryNameAreConsistent($displayLocale)
     {

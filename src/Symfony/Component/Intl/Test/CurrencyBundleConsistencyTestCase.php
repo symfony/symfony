@@ -9,30 +9,25 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Intl\Tests\ResourceBundle;
+namespace Symfony\Component\Intl\Test;
 
 use Symfony\Component\Intl\Intl;
-use Symfony\Component\Intl\Test\ConsistencyTest;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class CurrencyBundleConsistencyTest extends ConsistencyTest
+abstract class CurrencyBundleConsistencyTestCase extends ConsistencyTestCase
 {
-    // The below arrays document the current state of the ICU data.
-    // This state is verified in the tests below.
-    // You can add arbitrary rules here if you want to document the availability
-    // of other currencies.
-    private static $localesWithoutTranslationForUSD = array('as', 'bem', 'bo', 'dua', 'dyo', 'eo', 'fo', 'gv', 'ig', 'ii', 'kl', 'kok', 'kw', 'mgh', 'mgo', 'mt', 'nus', 'or', 'pa', 'ps', 'to', 'rw', 'uz', 'yav');
-    private static $localesWithoutTranslationForEUR = array('as', 'bem', 'bo', 'dua', 'eo', 'fo', 'gv', 'haw', 'ig', 'ii', 'kok', 'kw', 'mgh', 'mgo', 'nus', 'or', 'pa', 'ps', 'to', 'rw', 'uz');
-    private static $localesWithoutTranslationForGBP = array('as', 'bem', 'bo', 'dua', 'dyo', 'eo', 'fo', 'gv', 'haw', 'ig', 'ii', 'jgo', 'kl', 'kok', 'kw', 'mgh', 'mgo', 'mt', 'nus', 'or', 'pa', 'ps', 'so', 'to', 'rw', 'uz');
-    private static $localesWithoutTranslationForJPY = array('as', 'bem', 'bo', 'dua', 'eo', 'fo', 'gv', 'haw', 'ig', 'ii', 'jgo', 'kl', 'kok', 'kw', 'mgh', 'mgo', 'mt', 'nus', 'or', 'pa', 'ps', 'so', 'to', 'rw', 'uz');
-    private static $localesWithoutTranslationForCNY = array('as', 'bem', 'dua', 'eo', 'fo', 'gv', 'haw', 'ig', 'jgo', 'kl', 'kok', 'kw', 'mgh', 'mgo', 'mt', 'nus', 'or', 'pa', 'ps', 'so', 'to', 'rw', 'uz');
+    protected static $localesWithoutTranslationForUSD = array();
+    protected static $localesWithoutTranslationForEUR = array();
+    protected static $localesWithoutTranslationForGBP = array();
+    protected static $localesWithoutTranslationForJPY = array();
+    protected static $localesWithoutTranslationForCNY = array();
 
     /**
      * @var \Symfony\Component\Intl\ResourceBundle\CurrencyBundleInterface
      */
-    private static $currencyBundle;
+    protected static $currencyBundle;
 
     public static function setUpBeforeClass()
     {
@@ -107,6 +102,7 @@ class CurrencyBundleConsistencyTest extends ConsistencyTest
 
     /**
      * @dataProvider provideLocaleAliases
+     * @group locale-alias-based
      */
     public function testGetCurrencyNamesSupportsAliases($alias, $ofLocale)
     {
@@ -134,7 +130,6 @@ class CurrencyBundleConsistencyTest extends ConsistencyTest
 
     /**
      * @dataProvider provideLocales
-     * @group icu-consistency
      */
     public function testGetCurrencyNamesAndGetCurrencyNameAreConsistent($displayLocale)
     {
@@ -147,7 +142,6 @@ class CurrencyBundleConsistencyTest extends ConsistencyTest
 
     /**
      * @dataProvider provideLocales
-     * @group icu-consistency
      */
     public function testGetCurrencyNamesAndGetCurrencySymbolAreConsistent($displayLocale)
     {

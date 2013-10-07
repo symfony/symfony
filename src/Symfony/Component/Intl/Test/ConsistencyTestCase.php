@@ -16,7 +16,7 @@ use Symfony\Component\Intl\Intl;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class ConsistencyTest extends \PHPUnit_Framework_TestCase
+abstract class ConsistencyTestCase extends \PHPUnit_Framework_TestCase
 {
     public function provideLocales()
     {

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Intl\Test;
 
+use Symfony\Component\Intl\Exception\NoSuchEntryException;
 use Symfony\Component\Intl\Intl;
 
 /**
@@ -18,86 +19,75 @@ use Symfony\Component\Intl\Intl;
  */
 abstract class CurrencyBundleConsistencyTestCase extends ConsistencyTestCase
 {
-    protected static $localesWithoutTranslationForUSD = array();
-    protected static $localesWithoutTranslationForEUR = array();
-    protected static $localesWithoutTranslationForGBP = array();
-    protected static $localesWithoutTranslationForJPY = array();
-    protected static $localesWithoutTranslationForCNY = array();
+    protected static $localesWithoutTranslationForAnyCurrency = array();
+    protected static $localesWithoutTranslationForCurrency = array();
 
-    /**
-     * @var \Symfony\Component\Intl\ResourceBundle\CurrencyBundleInterface
-     */
-    protected static $currencyBundle;
-
-    public static function setUpBeforeClass()
-    {
-        static::$currencyBundle = Intl::getCurrencyBundle();
-    }
+    protected static $currencies = array();
 
     public function provideCurrencies()
     {
-        $locales = Intl::getLocaleBundle()->getLocales();
-        $aliases = Intl::getLocaleBundle()->getLocaleAliases();
+        $aliases = $this->getLocaleAliases();
 
-        // Filter non-root locales
-        $locales = array_filter($locales, function ($locale) use ($aliases) {
+        // Filter non-root and alias locales
+        $locales = array_filter($this->getLocales(), function ($locale) use ($aliases) {
             return false === strpos($locale, '_') && !isset($aliases[$locale]);
         });
 
-        $currencies = array();
-        $currencyBundle = Intl::getCurrencyBundle();
+        return array_map(
+            function ($currency) { return array($currency); },
+            static::$currencies
+        );
+    }
 
-        // Merge all currency codes that can be found for any locale
-        foreach ($locales as $locale) {
-            $currencies = array_replace($currencies, $currencyBundle->getCurrencyNames($locale));
+    public function testGetCurrencyNames()
+    {
+        $translatedLocales = array();
+        $rootLocales = $this->getRootLocales();
+
+        foreach ($rootLocales as $displayLocale) {
+            try {
+                Intl::getCurrencyBundle()->getCurrencyNames($displayLocale);
+                $translatedLocales[] = $displayLocale;
+            } catch (NoSuchEntryException $e) {
+            }
         }
 
-        $currencies = array_keys($currencies);
-        $parameters = array();
+        $untranslatedLocales = array_diff($rootLocales, $translatedLocales);
 
-        foreach ($currencies as $currency) {
-            $parameters[] = array($currency);
-        }
+        sort($untranslatedLocales);
 
-        return $parameters;
+        $this->assertEquals(static::$localesWithoutTranslationForAnyCurrency, $untranslatedLocales);
+    }
+
+    public function provideTestedCurrencies()
+    {
+        return array_map(
+            function ($currency) { return array($currency); },
+            array_keys(static::$localesWithoutTranslationForCurrency)
+        );
     }
 
     /**
-     * @dataProvider provideRootLocales
+     * @dataProvider provideTestedCurrencies
      */
-    public function testGetCurrencyNames($displayLocale)
+    public function testGetCurrencyName($currency)
     {
-        $currencyNames = static::$currencyBundle->getCurrencyNames($displayLocale);
+        $translatedLocales = array();
+        $rootLocales = $this->getRootLocales();
 
-        if (in_array($displayLocale, static::$localesWithoutTranslationForUSD)) {
-            $this->assertArrayNotHasKey('USD', $currencyNames);
-        } else {
-            $this->assertArrayHasKey('USD', $currencyNames);
+        foreach ($rootLocales as $displayLocale) {
+            try {
+                Intl::getCurrencyBundle()->getCurrencyName($currency, $displayLocale);
+                $translatedLocales[] = $displayLocale;
+            } catch (NoSuchEntryException $e) {
+            }
         }
 
-        if (in_array($displayLocale, static::$localesWithoutTranslationForEUR)) {
-            $this->assertArrayNotHasKey('EUR', $currencyNames);
-        } else {
-            $this->assertArrayHasKey('EUR', $currencyNames);
-        }
+        $untranslatedLocales = array_diff($rootLocales, static::$localesWithoutTranslationForAnyCurrency, $translatedLocales);
 
-        if (in_array($displayLocale, static::$localesWithoutTranslationForGBP)) {
-            $this->assertArrayNotHasKey('GBP', $currencyNames);
-        } else {
-            $this->assertArrayHasKey('GBP', $currencyNames);
-        }
+        sort($untranslatedLocales);
 
-        if (in_array($displayLocale, static::$localesWithoutTranslationForJPY)) {
-            $this->assertArrayNotHasKey('JPY', $currencyNames);
-        } else {
-            $this->assertArrayHasKey('JPY', $currencyNames);
-        }
-
-        if (in_array($displayLocale, static::$localesWithoutTranslationForCNY)) {
-            $this->assertArrayNotHasKey('CNY', $currencyNames);
-        } else {
-            $this->assertArrayHasKey('CNY', $currencyNames);
-        }
+        $this->assertEquals(static::$localesWithoutTranslationForCurrency[$currency], $untranslatedLocales);
     }
 
     /**
@@ -107,8 +97,8 @@ abstract class CurrencyBundleConsistencyTestCase extends ConsistencyTestCase
     public function testGetCurrencyNamesSupportsAliases($alias, $ofLocale)
     {
         $this->assertEquals(
-            static::$currencyBundle->getCurrencyNames($ofLocale),
-            static::$currencyBundle->getCurrencyNames($alias)
+            Intl::getCurrencyBundle()->getCurrencyNames($ofLocale),
+            Intl::getCurrencyBundle()->getCurrencyNames($alias)
         );
     }
 
@@ -117,7 +107,7 @@ abstract class CurrencyBundleConsistencyTestCase extends ConsistencyTestCase
      */
     public function testGetFractionDigits($currency)
     {
-        $this->assertTrue(is_numeric(static::$currencyBundle->getFractionDigits($currency)));
+        $this->assertTrue(is_numeric(Intl::getCurrencyBundle()->getFractionDigits($currency)));
     }
 
     /**
@@ -125,7 +115,7 @@ abstract class CurrencyBundleConsistencyTestCase extends ConsistencyTestCase
      */
     public function testGetRoundingIncrement($currency)
     {
-        $this->assertTrue(is_numeric(static::$currencyBundle->getRoundingIncrement($currency)));
+        $this->assertTrue(is_numeric(Intl::getCurrencyBundle()->getRoundingIncrement($currency)));
     }
 
     /**
@@ -133,10 +123,10 @@ abstract class CurrencyBundleConsistencyTestCase extends ConsistencyTestCase
      */
     public function testGetCurrencyNamesAndGetCurrencyNameAreConsistent($displayLocale)
     {
-        $names = static::$currencyBundle->getCurrencyNames($displayLocale);
+        $names = Intl::getCurrencyBundle()->getCurrencyNames($displayLocale);
 
         foreach ($names as $currency => $name) {
-            $this->assertSame($name, static::$currencyBundle->getCurrencyName($currency, $displayLocale));
+            $this->assertSame($name, Intl::getCurrencyBundle()->getCurrencyName($currency, $displayLocale));
         }
     }
 
@@ -145,10 +135,10 @@ abstract class CurrencyBundleConsistencyTestCase extends ConsistencyTestCase
      */
     public function testGetCurrencyNamesAndGetCurrencySymbolAreConsistent($displayLocale)
     {
-        $names = static::$currencyBundle->getCurrencyNames($displayLocale);
+        $names = Intl::getCurrencyBundle()->getCurrencyNames($displayLocale);
 
         foreach ($names as $currency => $name) {
-            $this->assertGreaterThan(0, mb_strlen(static::$currencyBundle->getCurrencySymbol($currency, $displayLocale)));
+            $this->assertGreaterThan(0, mb_strlen(Intl::getCurrencyBundle()->getCurrencySymbol($currency, $displayLocale)));
         }
     }
 }

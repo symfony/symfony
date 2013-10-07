@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Intl\Test;
 
+use Symfony\Component\Intl\Exception\NoSuchEntryException;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\Intl\Test\ConsistencyTestCase;
 
@@ -19,72 +20,68 @@ use Symfony\Component\Intl\Test\ConsistencyTestCase;
  */
 abstract class LocaleBundleConsistencyTestCase extends ConsistencyTestCase
 {
-    protected static $localesWithoutTranslationForThemselves = array('nmg');
-    protected static $localesWithoutTranslationForEnglish = array('as', 'bo', 'dua', 'fo', 'gv', 'kl', 'kw', 'mgo', 'uz');
-    protected static $localesWithoutTranslationForFrench = array('as', 'bo', 'dua', 'fo', 'gv', 'kl', 'kw', 'mgo', 'uz');
-    protected static $localesWithoutTranslationForSpanish = array('as', 'bo', 'dua', 'fo', 'gv', 'jgo', 'kl', 'kw', 'lo', 'mgo', 'ps', 'uz');
-    protected static $localesWithoutTranslationForRussian = array('as', 'dua', 'fo', 'gv', 'jgo', 'kl', 'kw', 'mgo', 'pa', 'uz');
-    protected static $localesWithoutTranslationForChinese = array('as', 'dua', 'fo', 'gv', 'kl', 'kw', 'mgo', 'pa', 'rw', 'ti', 'uz');
-    protected static $localesWithoutTranslationForGerman = array('as', 'bo', 'dua', 'fo', 'gv', 'kl', 'kw', 'mgo', 'uz');
+    protected static $localesWithoutTranslationForAnyLocale = array();
+    protected static $localesWithoutTranslationForLocale = array();
 
-    /**
-     * @var \Symfony\Component\Intl\ResourceBundle\LocaleBundleInterface
-     */
-    protected static $localeBundle;
-
-    public static function setUpBeforeClass()
+    public function testGetLocales()
     {
-        static::$localeBundle = Intl::getLocaleBundle();
+        $this->assertEquals($this->getLocales(), Intl::getLocaleBundle()->getLocales());
+    }
+
+    public function testGetLocaleAliases()
+    {
+        $this->assertEquals($this->getLocaleAliases(), Intl::getLocaleBundle()->getLocaleAliases());
+    }
+
+    public function testGetLocaleNames()
+    {
+        $translatedLocales = array();
+        $rootLocales = $this->getRootLocales();
+
+        foreach ($rootLocales as $displayLocale) {
+            try {
+                Intl::getLocaleBundle()->getLocaleNames($displayLocale);
+                $translatedLocales[] = $displayLocale;
+            } catch (NoSuchEntryException $e) {
+            }
+        }
+
+        $untranslatedLocales = array_diff($rootLocales, $translatedLocales);
+
+        sort($untranslatedLocales);
+
+        $this->assertEquals(static::$localesWithoutTranslationForAnyLocale, $untranslatedLocales);
+    }
+
+    public function provideTestedLocales()
+    {
+        return array_map(
+            function ($locale) { return array($locale); },
+            array_keys(static::$localesWithoutTranslationForLocale)
+        );
     }
 
     /**
-     * @dataProvider provideRootLocales
+     * @dataProvider provideTestedLocales
      */
-    public function testGetLocaleNames($displayLocale)
+    public function testGetLocaleName($locale)
     {
-        $locales = static::$localeBundle->getLocaleNames($displayLocale);
+        $translatedLocales = array();
+        $rootLocales = $this->getRootLocales();
 
-        if (in_array($displayLocale, static::$localesWithoutTranslationForThemselves)) {
-            $this->assertArrayNotHasKey($displayLocale, $locales);
-        } else {
-            $this->assertArrayHasKey($displayLocale, $locales);
+        foreach ($rootLocales as $displayLocale) {
+            try {
+                Intl::getLocaleBundle()->getLocaleName($locale ?: $displayLocale, $displayLocale);
+                $translatedLocales[] = $displayLocale;
+            } catch (NoSuchEntryException $e) {
+            }
         }
 
-        if (in_array($displayLocale, static::$localesWithoutTranslationForEnglish)) {
-            $this->assertArrayNotHasKey('en', $locales);
-        } else {
-            $this->assertArrayHasKey('en', $locales);
-        }
+        $untranslatedLocales = array_diff($rootLocales, static::$localesWithoutTranslationForAnyLocale, $translatedLocales);
 
-        if (in_array($displayLocale, static::$localesWithoutTranslationForFrench)) {
-            $this->assertArrayNotHasKey('fr', $locales);
-        } else {
-            $this->assertArrayHasKey('fr', $locales);
-        }
+        sort($untranslatedLocales);
 
-        if (in_array($displayLocale, static::$localesWithoutTranslationForSpanish)) {
-            $this->assertArrayNotHasKey('es', $locales);
-        } else {
-            $this->assertArrayHasKey('es', $locales);
-        }
-
-        if (in_array($displayLocale, static::$localesWithoutTranslationForRussian)) {
-            $this->assertArrayNotHasKey('ru', $locales);
-        } else {
-            $this->assertArrayHasKey('ru', $locales);
-        }
-
-        if (in_array($displayLocale, static::$localesWithoutTranslationForChinese)) {
-            $this->assertArrayNotHasKey('zh', $locales);
-        } else {
-            $this->assertArrayHasKey('zh', $locales);
-        }
-
-        if (in_array($displayLocale, static::$localesWithoutTranslationForGerman)) {
-            $this->assertArrayNotHasKey('de', $locales);
-        } else {
-            $this->assertArrayHasKey('de', $locales);
-        }
+        $this->assertEquals(static::$localesWithoutTranslationForLocale[$locale], $untranslatedLocales);
     }
 
     /**
@@ -94,8 +91,8 @@ abstract class LocaleBundleConsistencyTestCase extends ConsistencyTestCase
     public function testGetLocaleNamesSupportsAliases($alias, $ofLocale)
     {
         $this->assertEquals(
-            static::$localeBundle->getLocaleNames($ofLocale),
-            static::$localeBundle->getLocaleNames($alias)
+            Intl::getLocaleBundle()->getLocaleNames($ofLocale),
+            Intl::getLocaleBundle()->getLocaleNames($alias)
         );
     }
 
@@ -104,10 +101,10 @@ abstract class LocaleBundleConsistencyTestCase extends ConsistencyTestCase
      */
     public function testGetLocaleNamesAndGetLocaleNameAreConsistent($displayLocale)
     {
-        $names = static::$localeBundle->getLocaleNames($displayLocale);
+        $names = Intl::getLocaleBundle()->getLocaleNames($displayLocale);
 
         foreach ($names as $locale => $name) {
-            $this->assertSame($name, static::$localeBundle->getLocaleName($locale, $displayLocale));
+            $this->assertSame($name, Intl::getLocaleBundle()->getLocaleName($locale, $displayLocale));
         }
     }
 }

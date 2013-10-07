@@ -19,43 +19,21 @@ use Symfony\Component\Intl\Intl;
  */
 abstract class LanguageBundleConsistencyTestCase extends ConsistencyTestCase
 {
+    protected static $localesWithoutTranslationForAnyLanguage = array();
     protected static $localesWithoutTranslationForThemselves = array();
-    protected static $localesWithoutTranslationForEnglish = array();
-    protected static $localesWithoutTranslationForFrench = array();
-    protected static $localesWithoutTranslationForSpanish = array();
-    protected static $localesWithoutTranslationForRussian = array();
-    protected static $localesWithoutTranslationForChinese = array();
-    protected static $localesWithoutTranslationForGerman = array();
+    protected static $localesWithoutTranslationForLanguage = array();
 
     protected static $localesWithoutTranslationForAnyScript = array();
-    protected static $localesWithoutTranslationForLatinScript = array();
-    protected static $localesWithoutTranslationForSimplifiedScript = array();
-    protected static $localesWithoutTranslationForTraditionalScript = array();
-    protected static $localesWithoutTranslationForCyrillicScript = array();
-
-    /**
-     * @var \Symfony\Component\Intl\ResourceBundle\LanguageBundleInterface
-     */
-    protected static $languageBundle;
-
-    public static function setUpBeforeClass()
-    {
-        static::$languageBundle = Intl::getLanguageBundle();
-    }
+    protected static $localesWithoutTranslationForScript = array();
 
     public function provideLocalesWithScripts()
     {
-        $parameters = array();
-
         $localesWithoutScript = array_flip(static::$localesWithoutTranslationForAnyScript);
-        $aliasesWithoutScripts = Intl::getLocaleBundle()->getLocaleAliases();
-        $aliasesWithoutScripts = array_intersect_assoc($aliasesWithoutScripts, static::$localesWithoutTranslationForAnyScript);
-
-        $locales = Intl::getLocaleBundle()->getLocales();
+        $aliasesWithoutScripts = array_intersect_assoc($this->getLocaleAliases(), static::$localesWithoutTranslationForAnyScript);
 
         // remove locales that have no "Scripts" block or are an alias to a locale
         // without "Scripts" block
-        $locales = array_filter($locales, function ($locale) use ($localesWithoutScript, $aliasesWithoutScripts) {
+        $locales = array_filter($this->getLocales(), function ($locale) use ($localesWithoutScript, $aliasesWithoutScripts) {
             while (null !== $locale) {
                 if (isset($localesWithoutScript[$locale]) || isset($aliasesWithoutScripts[$locale])) {
                     return false;
@@ -67,22 +45,18 @@ abstract class LanguageBundleConsistencyTestCase extends ConsistencyTestCase
             return true;
         });
 
-        foreach ($locales as $locale) {
-            $parameters[] = array($locale);
-        }
-
-        return $parameters;
+        return array_map(
+            function ($locale) { return array($locale); },
+            $locales
+        );
     }
 
     public function provideLocaleAliasesWithScripts()
     {
-        $parameters = array();
-
-        $aliases = Intl::getLocaleBundle()->getLocaleAliases();
         $localesWithoutScript = array_flip(static::$localesWithoutTranslationForAnyScript);
 
         // Remove aliases that point to a locale without "Scripts" block
-        $aliases = array_filter($aliases, function ($targetLocale) use ($localesWithoutScript) {
+        $aliases = array_filter($this->getLocaleAliases(), function ($targetLocale) use ($localesWithoutScript) {
             while (null !== $targetLocale) {
                 if (isset($localesWithoutScript[$targetLocale])) {
                     return false;
@@ -94,105 +68,113 @@ abstract class LanguageBundleConsistencyTestCase extends ConsistencyTestCase
             return true;
         });
 
-        foreach ($aliases as $alias => $ofLocale) {
-            $parameters[] = array($alias, $ofLocale);
+        return array_map(
+            function ($alias, $ofLocale) { return array($alias, $ofLocale); },
+            array_keys($aliases),
+            $aliases
+        );
+    }
+
+    public function testGetLanguageNames()
+    {
+        $translatedLocales = array();
+        $rootLocales = $this->getRootLocales();
+
+        foreach ($rootLocales as $displayLocale) {
+            try {
+                Intl::getLanguageBundle()->getLanguageNames($displayLocale);
+                $translatedLocales[] = $displayLocale;
+            } catch (NoSuchEntryException $e) {
+            }
         }
 
-        return $parameters;
+        $untranslatedLocales = array_diff($rootLocales, $translatedLocales);
+
+        sort($untranslatedLocales);
+
+        $this->assertEquals(static::$localesWithoutTranslationForAnyLanguage, $untranslatedLocales);
+    }
+
+    public function provideTestedLanguages()
+    {
+        return array_map(
+            function ($language) { return array($language); },
+            array_keys(static::$localesWithoutTranslationForLanguage)
+        );
     }
 
     /**
-     * @dataProvider provideRootLocales
+     * @dataProvider provideTestedLanguages
      */
-    public function testGetLanguageNames($displayLocale)
+    public function testGetLanguageName($language)
     {
-        $languageNames = static::$languageBundle->getLanguageNames($displayLocale);
+        $translatedLocales = array();
+        $rootLocales = $this->getRootLocales();
 
-        if (in_array($displayLocale, static::$localesWithoutTranslationForThemselves)) {
-            $this->assertArrayNotHasKey($displayLocale, $languageNames);
-        } else {
-            $this->assertArrayHasKey($displayLocale, $languageNames);
+        foreach ($rootLocales as $displayLocale) {
+            try {
+                Intl::getLanguageBundle()->getLanguageName($language ?: $displayLocale, null, $displayLocale);
+                $translatedLocales[] = $displayLocale;
+            } catch (NoSuchEntryException $e) {
+            }
         }
 
-        if (in_array($displayLocale, static::$localesWithoutTranslationForEnglish)) {
-            $this->assertArrayNotHasKey('en', $languageNames);
-        } else {
-            $this->assertArrayHasKey('en', $languageNames);
+        $untranslatedLocales = array_diff($rootLocales, static::$localesWithoutTranslationForAnyLanguage, $translatedLocales);
+
+        sort($untranslatedLocales);
+
+        $this->assertEquals(static::$localesWithoutTranslationForLanguage[$language], $untranslatedLocales);
+    }
+
+    public function testGetScriptNames()
+    {
+        $translatedLocales = array();
+        $rootLocales = $this->getRootLocales();
+
+        foreach ($rootLocales as $displayLocale) {
+            try {
+                Intl::getLanguageBundle()->getScriptNames($displayLocale);
+                $translatedLocales[] = $displayLocale;
+            } catch (NoSuchEntryException $e) {
+            }
         }
 
-        if (in_array($displayLocale, static::$localesWithoutTranslationForFrench)) {
-            $this->assertArrayNotHasKey('fr', $languageNames);
-        } else {
-            $this->assertArrayHasKey('fr', $languageNames);
-        }
+        $untranslatedLocales = array_diff($rootLocales, $translatedLocales);
 
-        if (in_array($displayLocale, static::$localesWithoutTranslationForSpanish)) {
-            $this->assertArrayNotHasKey('es', $languageNames);
-        } else {
-            $this->assertArrayHasKey('es', $languageNames);
-        }
+        sort($untranslatedLocales);
 
-        if (in_array($displayLocale, static::$localesWithoutTranslationForRussian)) {
-            $this->assertArrayNotHasKey('ru', $languageNames);
-        } else {
-            $this->assertArrayHasKey('ru', $languageNames);
-        }
+        $this->assertEquals(static::$localesWithoutTranslationForAnyScript, $untranslatedLocales);
+    }
 
-        if (in_array($displayLocale, static::$localesWithoutTranslationForChinese)) {
-            $this->assertArrayNotHasKey('zh', $languageNames);
-        } else {
-            $this->assertArrayHasKey('zh', $languageNames);
-        }
-
-        if (in_array($displayLocale, static::$localesWithoutTranslationForGerman)) {
-            $this->assertArrayNotHasKey('de', $languageNames);
-        } else {
-            $this->assertArrayHasKey('de', $languageNames);
-        }
+    public function provideTestedScripts()
+    {
+        return array_map(
+            function ($script) { return array($script); },
+            array_keys(static::$localesWithoutTranslationForScript)
+        );
     }
 
     /**
-     * @dataProvider provideRootLocales
+     * @dataProvider provideTestedScripts
      */
-    public function testGetScriptNames($displayLocale)
+    public function testGetScriptName($script)
     {
-        try {
-            $scriptNames = static::$languageBundle->getScriptNames($displayLocale);
+        $translatedLocales = array();
+        $rootLocales = $this->getRootLocales();
 
-            if (in_array($displayLocale, static::$localesWithoutTranslationForAnyScript)) {
-                $this->fail('Did not expect any script translations for locale '.$displayLocale);
+        foreach ($rootLocales as $displayLocale) {
+            try {
+                Intl::getLanguageBundle()->getScriptName($script, null, $displayLocale);
+                $translatedLocales[] = $displayLocale;
+            } catch (NoSuchEntryException $e) {
             }
-        } catch (NoSuchEntryException $e) {
-            if (in_array($displayLocale, static::$localesWithoutTranslationForAnyScript)) {
-                return;
-            }
-
-            throw $e;
         }
 
-        if (in_array($displayLocale, static::$localesWithoutTranslationForLatinScript)) {
-            $this->assertArrayNotHasKey('Latn', $scriptNames);
-        } else {
-            $this->assertArrayHasKey('Latn', $scriptNames);
-        }
+        $untranslatedLocales = array_diff($rootLocales, static::$localesWithoutTranslationForAnyScript, $translatedLocales);
 
-        if (in_array($displayLocale, static::$localesWithoutTranslationForSimplifiedScript)) {
-            $this->assertArrayNotHasKey('Hans', $scriptNames);
-        } else {
-            $this->assertArrayHasKey('Hans', $scriptNames);
-        }
+        sort($untranslatedLocales);
 
-        if (in_array($displayLocale, static::$localesWithoutTranslationForTraditionalScript)) {
-            $this->assertArrayNotHasKey('Hant', $scriptNames);
-        } else {
-            $this->assertArrayHasKey('Hant', $scriptNames);
-        }
-
-        if (in_array($displayLocale, static::$localesWithoutTranslationForCyrillicScript)) {
-            $this->assertArrayNotHasKey('Cyrl', $scriptNames);
-        } else {
-            $this->assertArrayHasKey('Cyrl', $scriptNames);
-        }
+        $this->assertEquals(static::$localesWithoutTranslationForScript[$script], $untranslatedLocales);
     }
 
     /**
@@ -202,8 +184,8 @@ abstract class LanguageBundleConsistencyTestCase extends ConsistencyTestCase
     public function testGetLanguageNamesSupportsAliases($alias, $ofLocale)
     {
         $this->assertEquals(
-            static::$languageBundle->getLanguageNames($ofLocale),
-            static::$languageBundle->getLanguageNames($alias)
+            Intl::getLanguageBundle()->getLanguageNames($ofLocale),
+            Intl::getLanguageBundle()->getLanguageNames($alias)
         );
     }
 
@@ -214,8 +196,8 @@ abstract class LanguageBundleConsistencyTestCase extends ConsistencyTestCase
     public function testGetScriptNamesSupportsAliases($alias, $ofLocale)
     {
         $this->assertEquals(
-            static::$languageBundle->getScriptNames($ofLocale),
-            static::$languageBundle->getScriptNames($alias)
+            Intl::getLanguageBundle()->getScriptNames($ofLocale),
+            Intl::getLanguageBundle()->getScriptNames($alias)
         );
     }
 
@@ -224,10 +206,10 @@ abstract class LanguageBundleConsistencyTestCase extends ConsistencyTestCase
      */
     public function testGetLanguageNamesAndGetLanguageNameAreConsistent($displayLocale)
     {
-        $names = static::$languageBundle->getLanguageNames($displayLocale);
+        $names = Intl::getLanguageBundle()->getLanguageNames($displayLocale);
 
         foreach ($names as $language => $name) {
-            $this->assertSame($name, static::$languageBundle->getLanguageName($language, null, $displayLocale));
+            $this->assertSame($name, Intl::getLanguageBundle()->getLanguageName($language, null, $displayLocale));
         }
     }
 
@@ -236,10 +218,10 @@ abstract class LanguageBundleConsistencyTestCase extends ConsistencyTestCase
      */
     public function testGetScriptNamesAndGetScriptNameAreConsistent($displayLocale)
     {
-        $names = static::$languageBundle->getScriptNames($displayLocale);
+        $names = Intl::getLanguageBundle()->getScriptNames($displayLocale);
 
         foreach ($names as $script => $name) {
-            $this->assertSame($name, static::$languageBundle->getScriptName($script, null, $displayLocale));
+            $this->assertSame($name, Intl::getLanguageBundle()->getScriptName($script, null, $displayLocale));
         }
     }
 }

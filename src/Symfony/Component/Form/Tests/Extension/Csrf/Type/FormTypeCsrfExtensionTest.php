@@ -16,6 +16,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
+use Symfony\Component\Security\Csrf\CsrfToken;
 
 class FormTypeCsrfExtensionTest_ChildType extends AbstractType
 {
@@ -37,7 +38,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $tokenGenerator;
+    protected $tokenManager;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -46,7 +47,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
 
     protected function setUp()
     {
-        $this->tokenGenerator = $this->getMock('Symfony\Component\Security\Csrf\CsrfTokenGeneratorInterface');
+        $this->tokenManager = $this->getMock('Symfony\Component\Security\Csrf\CsrfTokenManagerInterface');
         $this->translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
 
         parent::setUp();
@@ -54,7 +55,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
 
     protected function tearDown()
     {
-        $this->tokenGenerator = null;
+        $this->tokenManager = null;
         $this->translator = null;
 
         parent::tearDown();
@@ -63,7 +64,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
     protected function getExtensions()
     {
         return array_merge(parent::getExtensions(), array(
-            new CsrfExtension($this->tokenGenerator, $this->translator),
+            new CsrfExtension($this->tokenManager, $this->translator),
         ));
     }
 
@@ -123,16 +124,16 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
 
     public function testGenerateCsrfToken()
     {
-        $this->tokenGenerator->expects($this->once())
-            ->method('generateCsrfToken')
-            ->with('%INTENTION%')
-            ->will($this->returnValue('token'));
+        $this->tokenManager->expects($this->once())
+            ->method('getToken')
+            ->with('TOKEN_ID')
+            ->will($this->returnValue(new CsrfToken('TOKEN_ID', 'token')));
 
         $view = $this->factory
             ->create('form', null, array(
                 'csrf_field_name' => 'csrf',
-                'csrf_provider' => $this->tokenGenerator,
-                'intention' => '%INTENTION%',
+                'csrf_token_manager' => $this->tokenManager,
+                'csrf_token_id' => 'TOKEN_ID',
                 'compound' => true,
             ))
             ->createView();
@@ -153,16 +154,16 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
      */
     public function testValidateTokenOnSubmitIfRootAndCompound($valid)
     {
-        $this->tokenGenerator->expects($this->once())
-            ->method('isCsrfTokenValid')
-            ->with('%INTENTION%', 'token')
+        $this->tokenManager->expects($this->once())
+            ->method('isTokenValid')
+            ->with(new CsrfToken('TOKEN_ID', 'token'))
             ->will($this->returnValue($valid));
 
         $form = $this->factory
             ->createBuilder('form', null, array(
                 'csrf_field_name' => 'csrf',
-                'csrf_provider' => $this->tokenGenerator,
-                'intention' => '%INTENTION%',
+                'csrf_token_manager' => $this->tokenManager,
+                'csrf_token_id' => 'TOKEN_ID',
                 'compound' => true,
             ))
             ->add('child', 'text')
@@ -182,14 +183,14 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
 
     public function testFailIfRootAndCompoundAndTokenMissing()
     {
-        $this->tokenGenerator->expects($this->never())
-            ->method('isCsrfTokenValid');
+        $this->tokenManager->expects($this->never())
+            ->method('isTokenValid');
 
         $form = $this->factory
             ->createBuilder('form', null, array(
                 'csrf_field_name' => 'csrf',
-                'csrf_provider' => $this->tokenGenerator,
-                'intention' => '%INTENTION%',
+                'csrf_token_manager' => $this->tokenManager,
+                'csrf_token_id' => 'TOKEN_ID',
                 'compound' => true,
             ))
             ->add('child', 'text')
@@ -209,16 +210,16 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
 
     public function testDontValidateTokenIfCompoundButNoRoot()
     {
-        $this->tokenGenerator->expects($this->never())
-            ->method('isCsrfTokenValid');
+        $this->tokenManager->expects($this->never())
+            ->method('isTokenValid');
 
         $form = $this->factory
             ->createNamedBuilder('root', 'form')
             ->add($this->factory
                 ->createNamedBuilder('form', 'form', null, array(
                     'csrf_field_name' => 'csrf',
-                    'csrf_provider' => $this->tokenGenerator,
-                    'intention' => '%INTENTION%',
+                    'csrf_token_manager' => $this->tokenManager,
+                    'csrf_token_id' => 'TOKEN_ID',
                     'compound' => true,
                 ))
             )
@@ -233,14 +234,14 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
 
     public function testDontValidateTokenIfRootButNotCompound()
     {
-        $this->tokenGenerator->expects($this->never())
-            ->method('isCsrfTokenValid');
+        $this->tokenManager->expects($this->never())
+            ->method('isTokenValid');
 
         $form = $this->factory
             ->create('form', null, array(
                 'csrf_field_name' => 'csrf',
-                'csrf_provider' => $this->tokenGenerator,
-                'intention' => '%INTENTION%',
+                'csrf_token_manager' => $this->tokenManager,
+                'csrf_token_id' => 'TOKEN_ID',
                 'compound' => false,
             ));
 
@@ -269,9 +270,9 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
 
     public function testsTranslateCustomErrorMessage()
     {
-        $this->tokenGenerator->expects($this->once())
-            ->method('isCsrfTokenValid')
-            ->with('%INTENTION%', 'token')
+        $this->tokenManager->expects($this->once())
+            ->method('isTokenValid')
+            ->with(new CsrfToken('TOKEN_ID', 'token'))
             ->will($this->returnValue(false));
 
         $this->translator->expects($this->once())
@@ -282,9 +283,9 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
         $form = $this->factory
             ->createBuilder('form', null, array(
                 'csrf_field_name' => 'csrf',
-                'csrf_provider' => $this->tokenGenerator,
+                'csrf_token_manager' => $this->tokenManager,
                 'csrf_message' => 'Foobar',
-                'intention' => '%INTENTION%',
+                'csrf_token_id' => 'TOKEN_ID',
                 'compound' => true,
             ))
             ->getForm();

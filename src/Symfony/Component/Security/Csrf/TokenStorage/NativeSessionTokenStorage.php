@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Security\Csrf\TokenStorage;
 
+use Symfony\Component\Security\Csrf\Exception\TokenNotFoundException;
+
 /**
  * Token storage that uses PHP's native session handling.
  *
@@ -49,17 +51,17 @@ class NativeSessionTokenStorage implements TokenStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function getToken($tokenId, $default = null)
+    public function getToken($tokenId)
     {
         if (!$this->sessionStarted) {
             $this->startSession();
         }
 
-        if (isset($_SESSION[$this->namespace][$tokenId])) {
-            return $_SESSION[$this->namespace][$tokenId];
+        if (!isset($_SESSION[$this->namespace][$tokenId])) {
+            throw new TokenNotFoundException('The CSRF token with ID '.$tokenId.' does not exist.');
         }
 
-        return $default;
+        return (string) $_SESSION[$this->namespace][$tokenId];
     }
 
     /**
@@ -71,7 +73,7 @@ class NativeSessionTokenStorage implements TokenStorageInterface
             $this->startSession();
         }
 
-        $_SESSION[$this->namespace][$tokenId] = $token;
+        $_SESSION[$this->namespace][$tokenId] = (string) $token;
     }
 
     /**
@@ -84,6 +86,24 @@ class NativeSessionTokenStorage implements TokenStorageInterface
         }
 
         return isset($_SESSION[$this->namespace][$tokenId]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function removeToken($tokenId)
+    {
+        if (!$this->sessionStarted) {
+            $this->startSession();
+        }
+
+        $token = isset($_SESSION[$this->namespace][$tokenId])
+            ? $_SESSION[$this->namespace][$tokenId]
+            : null;
+
+        unset($_SESSION[$this->namespace][$tokenId]);
+
+        return $token;
     }
 
     private function startSession()

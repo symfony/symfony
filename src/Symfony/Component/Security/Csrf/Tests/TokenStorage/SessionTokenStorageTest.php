@@ -108,7 +108,7 @@ class SessionTokenStorageTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('RESULT', $this->storage->hasToken('token_id'));
     }
 
-    public function testGetTokenFromClosedSession()
+    public function testGetExistingTokenFromClosedSession()
     {
         $this->session->expects($this->any())
             ->method('isStarted')
@@ -118,14 +118,19 @@ class SessionTokenStorageTest extends \PHPUnit_Framework_TestCase
             ->method('start');
 
         $this->session->expects($this->once())
+            ->method('has')
+            ->with(self::SESSION_NAMESPACE.'/token_id')
+            ->will($this->returnValue(true));
+
+        $this->session->expects($this->once())
             ->method('get')
-            ->with(self::SESSION_NAMESPACE.'/token_id', 'DEFAULT')
+            ->with(self::SESSION_NAMESPACE.'/token_id')
             ->will($this->returnValue('RESULT'));
 
-        $this->assertSame('RESULT', $this->storage->getToken('token_id', 'DEFAULT'));
+        $this->assertSame('RESULT', $this->storage->getToken('token_id'));
     }
 
-    public function testGetTokenFromActiveSession()
+    public function testGetExistingTokenFromActiveSession()
     {
         $this->session->expects($this->any())
             ->method('isStarted')
@@ -135,10 +140,123 @@ class SessionTokenStorageTest extends \PHPUnit_Framework_TestCase
             ->method('start');
 
         $this->session->expects($this->once())
+            ->method('has')
+            ->with(self::SESSION_NAMESPACE.'/token_id')
+            ->will($this->returnValue(true));
+
+        $this->session->expects($this->once())
             ->method('get')
-            ->with(self::SESSION_NAMESPACE.'/token_id', 'DEFAULT')
+            ->with(self::SESSION_NAMESPACE.'/token_id')
             ->will($this->returnValue('RESULT'));
 
-        $this->assertSame('RESULT', $this->storage->getToken('token_id', 'DEFAULT'));
+        $this->assertSame('RESULT', $this->storage->getToken('token_id'));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Security\Csrf\Exception\TokenNotFoundException
+     */
+    public function testGetNonExistingTokenFromClosedSession()
+    {
+        $this->session->expects($this->any())
+            ->method('isStarted')
+            ->will($this->returnValue(false));
+
+        $this->session->expects($this->once())
+            ->method('start');
+
+        $this->session->expects($this->once())
+            ->method('has')
+            ->with(self::SESSION_NAMESPACE.'/token_id')
+            ->will($this->returnValue(false));
+
+        $this->storage->getToken('token_id');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Security\Csrf\Exception\TokenNotFoundException
+     */
+    public function testGetNonExistingTokenFromActiveSession()
+    {
+        $this->session->expects($this->any())
+            ->method('isStarted')
+            ->will($this->returnValue(true));
+
+        $this->session->expects($this->never())
+            ->method('start');
+
+        $this->session->expects($this->once())
+            ->method('has')
+            ->with(self::SESSION_NAMESPACE.'/token_id')
+            ->will($this->returnValue(false));
+
+        $this->storage->getToken('token_id');
+    }
+
+    public function testRemoveNonExistingTokenFromClosedSession()
+    {
+        $this->session->expects($this->any())
+            ->method('isStarted')
+            ->will($this->returnValue(false));
+
+        $this->session->expects($this->once())
+            ->method('start');
+
+        $this->session->expects($this->once())
+            ->method('remove')
+            ->with(self::SESSION_NAMESPACE.'/token_id')
+            ->will($this->returnValue(null));
+
+        $this->assertNull($this->storage->removeToken('token_id'));
+    }
+
+    public function testRemoveNonExistingTokenFromActiveSession()
+    {
+        $this->session->expects($this->any())
+            ->method('isStarted')
+            ->will($this->returnValue(true));
+
+        $this->session->expects($this->never())
+            ->method('start');
+
+        $this->session->expects($this->once())
+            ->method('remove')
+            ->with(self::SESSION_NAMESPACE.'/token_id')
+            ->will($this->returnValue(null));
+
+        $this->assertNull($this->storage->removeToken('token_id'));
+    }
+
+    public function testRemoveExistingTokenFromClosedSession()
+    {
+        $this->session->expects($this->any())
+            ->method('isStarted')
+            ->will($this->returnValue(false));
+
+        $this->session->expects($this->once())
+            ->method('start');
+
+        $this->session->expects($this->once())
+            ->method('remove')
+            ->with(self::SESSION_NAMESPACE.'/token_id')
+            ->will($this->returnValue('TOKEN'));
+
+        $this->assertSame('TOKEN', $this->storage->removeToken('token_id'));
+    }
+
+    public function testRemoveExistingTokenFromActiveSession()
+    {
+        $this->session->expects($this->any())
+            ->method('isStarted')
+            ->will($this->returnValue(true));
+
+        $this->session->expects($this->never())
+            ->method('start');
+
+        $this->session->expects($this->once())
+            ->method('remove')
+            ->with(self::SESSION_NAMESPACE.'/token_id')
+            ->will($this->returnValue('TOKEN'));
+
+        $this->assertSame('TOKEN', $this->storage->removeToken('token_id'));
     }
 }

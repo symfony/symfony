@@ -96,8 +96,31 @@ class NativeSessionTokenStorageTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('TOKEN', $this->storage->getToken('token_id'));
     }
 
+    /**
+     * @expectedException \Symfony\Component\Security\Csrf\Exception\TokenNotFoundException
+     */
     public function testGetNonExistingToken()
     {
-        $this->assertSame('DEFAULT', $this->storage->getToken('token_id', 'DEFAULT'));
+        $this->storage->getToken('token_id');
+    }
+
+    /**
+     * @depends testCheckToken
+     */
+    public function testRemoveNonExistingToken()
+    {
+        $this->assertNull($this->storage->removeToken('token_id'));
+        $this->assertFalse($this->storage->hasToken('token_id'));
+    }
+
+    /**
+     * @depends testCheckToken
+     */
+    public function testRemoveExistingToken()
+    {
+        $this->storage->setToken('token_id', 'TOKEN');
+
+        $this->assertSame('TOKEN', $this->storage->removeToken('token_id'));
+        $this->assertFalse($this->storage->hasToken('token_id'));
     }
 }

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Csrf\TokenStorage;
 
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\Security\Csrf\Exception\TokenNotFoundException;
 
 /**
  * Token storage that uses a Symfony2 Session object.
@@ -54,13 +55,17 @@ class SessionTokenStorage implements TokenStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function getToken($tokenId, $default = null)
+    public function getToken($tokenId)
     {
         if (!$this->session->isStarted()) {
             $this->session->start();
         }
 
-        return $this->session->get($this->namespace . '/' . $tokenId, $default);
+        if (!$this->session->has($this->namespace.'/'.$tokenId)) {
+            throw new TokenNotFoundException('The CSRF token with ID '.$tokenId.' does not exist.');
+        }
+
+        return (string) $this->session->get($this->namespace.'/'.$tokenId);
     }
 
     /**
@@ -72,7 +77,7 @@ class SessionTokenStorage implements TokenStorageInterface
             $this->session->start();
         }
 
-        $this->session->set($this->namespace . '/' . $tokenId, $token);
+        $this->session->set($this->namespace.'/'.$tokenId, (string) $token);
     }
 
     /**
@@ -84,6 +89,18 @@ class SessionTokenStorage implements TokenStorageInterface
             $this->session->start();
         }
 
-        return $this->session->has($this->namespace . '/' . $tokenId);
+        return $this->session->has($this->namespace.'/'.$tokenId);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function removeToken($tokenId)
+    {
+        if (!$this->session->isStarted()) {
+            $this->session->start();
+        }
+
+        return $this->session->remove($this->namespace.'/'.$tokenId);
     }
 }

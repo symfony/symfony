@@ -13,6 +13,7 @@ namespace Symfony\Component\Form\Tests;
 
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\Tests\Fixtures\AlternatingRowType;
+use Symfony\Component\Security\Csrf\CsrfToken;
 
 abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 {
@@ -471,9 +472,9 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 
     public function testCsrf()
     {
-        $this->csrfTokenGenerator->expects($this->any())
-            ->method('generateCsrfToken')
-            ->will($this->returnValue('foo&bar'));
+        $this->csrfTokenManager->expects($this->any())
+            ->method('getToken')
+            ->will($this->returnValue(new CsrfToken('token_id', 'foo&bar')));
 
         $form = $this->factory->createNamedBuilder('name', 'form')
             ->add($this->factory

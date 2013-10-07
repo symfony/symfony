@@ -382,7 +382,7 @@ class Request
      * to keep BC with an existing system. It should not be used for any
      * other purpose.
      *
-     * @param callable $callable A PHP callable
+     * @param callable|null $callable A PHP callable
      */
     public static function setFactory($callable)
     {

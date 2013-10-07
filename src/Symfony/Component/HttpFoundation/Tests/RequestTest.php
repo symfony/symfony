@@ -1634,6 +1634,8 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         });
 
         $this->assertEquals('foo', Request::create('/')->getFoo());
+
+        Request::setFactory(null);
     }
 }
 

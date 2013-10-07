@@ -12,10 +12,14 @@
 namespace Symfony\Component\Form\Extension\Csrf\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderAdapter;
+use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Security\Csrf\CsrfTokenGeneratorInterface;
+use Symfony\Component\Security\Csrf\CsrfToken;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
@@ -31,9 +35,9 @@ class CsrfValidationListener implements EventSubscriberInterface
 
     /**
      * The generator for CSRF tokens
-     * @var CsrfTokenGeneratorInterface
+     * @var CsrfTokenManagerInterface
      */
-    private $tokenGenerator;
+    private $tokenManager;
 
     /**
      * A text mentioning the tokenId of the CSRF token
@@ -68,10 +72,16 @@ class CsrfValidationListener implements EventSubscriberInterface
         );
     }
 
-    public function __construct($fieldName, CsrfTokenGeneratorInterface $tokenGenerator, $tokenId, $errorMessage, TranslatorInterface $translator = null, $translationDomain = null)
+    public function __construct($fieldName, $tokenManager, $tokenId, $errorMessage, TranslatorInterface $translator = null, $translationDomain = null)
     {
+        if ($tokenManager instanceof CsrfProviderInterface) {
+            $tokenManager = new CsrfProviderAdapter($tokenManager);
+        } elseif (!$tokenManager instanceof CsrfTokenManagerInterface) {
+            throw new UnexpectedTypeException($tokenManager, 'CsrfProviderInterface or CsrfTokenManagerInterface');
+        }
+
         $this->fieldName = $fieldName;
-        $this->tokenGenerator = $tokenGenerator;
+        $this->tokenManager = $tokenManager;
         $this->tokenId = $tokenId;
         $this->errorMessage = $errorMessage;
         $this->translator = $translator;
@@ -84,7 +94,7 @@ class CsrfValidationListener implements EventSubscriberInterface
         $data = $event->getData();
 
         if ($form->isRoot() && $form->getConfig()->getOption('compound')) {
-            if (!isset($data[$this->fieldName]) || !$this->tokenGenerator->isCsrfTokenValid($this->tokenId, $data[$this->fieldName])) {
+            if (!isset($data[$this->fieldName]) || !$this->tokenManager->isTokenValid(new CsrfToken($this->tokenId, $data[$this->fieldName]))) {
                 $errorMessage = $this->errorMessage;
 
                 if (null !== $this->translator) {

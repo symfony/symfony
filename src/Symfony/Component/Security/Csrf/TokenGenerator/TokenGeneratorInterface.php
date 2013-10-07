@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Security\Csrf;
+namespace Symfony\Component\Security\Csrf\TokenGenerator;
 
 /**
  * Generates and validates CSRF tokens.
@@ -29,24 +29,12 @@ namespace Symfony\Component\Security\Csrf;
  * @since  2.4
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-interface CsrfTokenGeneratorInterface
+interface TokenGeneratorInterface
 {
     /**
-     * Generates a CSRF token with the given token ID.
-     *
-     * @param string $tokenId An ID that identifies the token
+     * Generates a CSRF token.
      *
      * @return string The generated CSRF token
      */
-    public function generateCsrfToken($tokenId);
-
-    /**
-     * Validates a CSRF token.
-     *
-     * @param string $tokenId The token ID used when generating the token
-     * @param string $token   The token supplied by the client
-     *
-     * @return Boolean Whether the token supplied by the client is correct
-     */
-    public function isCsrfTokenValid($tokenId, $token);
+    public function generateToken();
 }

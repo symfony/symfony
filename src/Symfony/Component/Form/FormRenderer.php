@@ -13,7 +13,7 @@ namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\Exception\BadMethodCallException;
-use Symfony\Component\Security\Csrf\CsrfTokenGeneratorInterface;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 /**
  * Renders a form into HTML using a rendering engine.
@@ -30,9 +30,9 @@ class FormRenderer implements FormRendererInterface
     private $engine;
 
     /**
-     * @var CsrfTokenGeneratorInterface
+     * @var CsrfTokenManagerInterface
      */
-    private $csrfTokenGenerator;
+    private $csrfTokenManager;
 
     /**
      * @var array
@@ -49,10 +49,16 @@ class FormRenderer implements FormRendererInterface
      */
     private $variableStack = array();
 
-    public function __construct(FormRendererEngineInterface $engine, CsrfTokenGeneratorInterface $csrfTokenGenerator = null)
+    public function __construct(FormRendererEngineInterface $engine, $csrfTokenManager = null)
     {
+        if ($csrfTokenManager instanceof CsrfProviderInterface) {
+            $csrfTokenManager = new CsrfProviderAdapter($csrfTokenManager);
+        } elseif (null !== $csrfTokenManager && !$csrfTokenManager instanceof CsrfTokenManagerInterface) {
+            throw new UnexpectedTypeException($csrfTokenManager, 'CsrfProviderInterface or CsrfTokenManagerInterface');
+        }
+
         $this->engine = $engine;
-        $this->csrfTokenGenerator = $csrfTokenGenerator;
+        $this->csrfTokenManager = $csrfTokenManager;
     }
 
     /**
@@ -76,11 +82,11 @@ class FormRenderer implements FormRendererInterface
      */
     public function renderCsrfToken($tokenId)
     {
-        if (null === $this->csrfTokenGenerator) {
-            throw new BadMethodCallException('CSRF tokens can only be generated if a CsrfTokenGeneratorInterface is injected in FormRenderer::__construct().');
+        if (null === $this->csrfTokenManager) {
+            throw new BadMethodCallException('CSRF tokens can only be generated if a CsrfTokenManagerInterface is injected in FormRenderer::__construct().');
         }
 
-        return $this->csrfTokenGenerator->generateCsrfToken($tokenId);
+        return $this->csrfTokenManager->getToken($tokenId)->getValue();
     }
 
     /**

@@ -17,7 +17,7 @@ use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 
 abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormIntegrationTestCase
 {
-    protected $csrfTokenGenerator;
+    protected $csrfTokenManager;
 
     protected function setUp()
     {
@@ -27,7 +27,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
         \Locale::setDefault('en');
 
-        $this->csrfTokenGenerator = $this->getMock('Symfony\Component\Security\Csrf\CsrfTokenGeneratorInterface');
+        $this->csrfTokenManager = $this->getMock('Symfony\Component\Security\Csrf\CsrfTokenManagerInterface');
 
         parent::setUp();
     }
@@ -35,13 +35,13 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
     protected function getExtensions()
     {
         return array(
-            new CsrfExtension($this->csrfTokenGenerator),
+            new CsrfExtension($this->csrfTokenManager),
         );
     }
 
     protected function tearDown()
     {
-        $this->csrfTokenGenerator = null;
+        $this->csrfTokenManager = null;
 
         parent::tearDown();
     }

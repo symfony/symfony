@@ -23,27 +23,37 @@ interface TokenStorageInterface
      * Reads a stored CSRF token.
      *
      * @param string $tokenId The token ID
-     * @param mixed  $default The value to be returned if no token is set
      *
-     * @return mixed The stored token or the default value, if no token is set
+     * @return string The stored token
+     *
+     * @throws \Symfony\Component\Security\Csrf\Exception\TokenNotFoundException If the token ID does not exist
      */
-    public function getToken($tokenId, $default = null);
+    public function getToken($tokenId);
 
     /**
      * Stores a CSRF token.
      *
      * @param string $tokenId The token ID
-     * @param mixed  $token   The CSRF token
+     * @param string $token   The CSRF token
      */
     public function setToken($tokenId, $token);
+
+    /**
+     * Removes a CSRF token.
+     *
+     * @param string $tokenId The token ID
+     *
+     * @return string|null Returns the removed token if one existed, NULL
+     *                     otherwise
+     */
+    public function removeToken($tokenId);
 
     /**
      * Checks whether a token with the given token ID exists.
      *
      * @param string $tokenId The token ID
      *
-     * @return Boolean Returns true if a token is stored for the given token ID,
-     *                 false otherwise.
+     * @return Boolean Whether a token exists with the given ID
      */
     public function hasToken($tokenId);
 }

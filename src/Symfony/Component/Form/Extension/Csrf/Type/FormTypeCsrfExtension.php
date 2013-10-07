@@ -12,13 +12,17 @@
 namespace Symfony\Component\Form\Extension\Csrf\Type;
 
 use Symfony\Component\Form\AbstractTypeExtension;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderAdapter;
+use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
+use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfTokenManagerAdapter;
 use Symfony\Component\Form\Extension\Csrf\EventListener\CsrfValidationListener;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\Security\Csrf\CsrfTokenGeneratorInterface;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
@@ -27,9 +31,9 @@ use Symfony\Component\Translation\TranslatorInterface;
 class FormTypeCsrfExtension extends AbstractTypeExtension
 {
     /**
-     * @var CsrfTokenGeneratorInterface
+     * @var CsrfTokenManagerInterface
      */
-    private $defaultTokenGenerator;
+    private $defaultTokenManager;
 
     /**
      * @var Boolean
@@ -51,9 +55,15 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
      */
     private $translationDomain;
 
-    public function __construct(CsrfTokenGeneratorInterface $defaultTokenGenerator, $defaultEnabled = true, $defaultFieldName = '_token', TranslatorInterface $translator = null, $translationDomain = null)
+    public function __construct($defaultTokenManager, $defaultEnabled = true, $defaultFieldName = '_token', TranslatorInterface $translator = null, $translationDomain = null)
     {
-        $this->defaultTokenGenerator = $defaultTokenGenerator;
+        if ($defaultTokenManager instanceof CsrfProviderInterface) {
+            $defaultTokenManager = new CsrfProviderAdapter($defaultTokenManager);
+        } elseif (!$defaultTokenManager instanceof CsrfTokenManagerInterface) {
+            throw new UnexpectedTypeException($defaultTokenManager, 'CsrfProviderInterface or CsrfTokenManagerInterface');
+        }
+
+        $this->defaultTokenManager = $defaultTokenManager;
         $this->defaultEnabled = $defaultEnabled;
         $this->defaultFieldName = $defaultFieldName;
         $this->translator = $translator;
@@ -75,7 +85,7 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
         $builder
             ->addEventSubscriber(new CsrfValidationListener(
                 $options['csrf_field_name'],
-                $options['csrf_token_generator'],
+                $options['csrf_token_manager'],
                 $options['csrf_token_id'],
                 $options['csrf_message'],
                 $this->translator,
@@ -95,7 +105,7 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
     {
         if ($options['csrf_protection'] && !$view->parent && $options['compound']) {
             $factory = $form->getConfig()->getFormFactory();
-            $data = $options['csrf_token_generator']->generateCsrfToken($options['csrf_token_id']);
+            $data = (string) $options['csrf_token_manager']->getToken($options['csrf_token_id']);
 
             $csrfForm = $factory->createNamed($options['csrf_field_name'], 'hidden', $data, array(
                 'mapped' => false,
@@ -116,18 +126,20 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
         };
 
         // BC clause for the "csrf_provider" option
-        $csrfTokenGenerator = function (Options $options) {
-            return $options['csrf_provider'];
+        $csrfTokenManager = function (Options $options) {
+            return $options['csrf_provider'] instanceof CsrfTokenManagerAdapter
+                ? $options['csrf_provider']->getTokenManager()
+                : new CsrfProviderAdapter($options['csrf_provider']);
         };
 
         $resolver->setDefaults(array(
-            'csrf_protection'      => $this->defaultEnabled,
-            'csrf_field_name'      => $this->defaultFieldName,
-            'csrf_message'         => 'The CSRF token is invalid. Please try to resubmit the form.',
-            'csrf_token_generator' => $csrfTokenGenerator,
-            'csrf_token_id'        => $csrfTokenId,
-            'csrf_provider'        => $this->defaultTokenGenerator,
-            'intention'            => 'unknown',
+            'csrf_protection'    => $this->defaultEnabled,
+            'csrf_field_name'    => $this->defaultFieldName,
+            'csrf_message'       => 'The CSRF token is invalid. Please try to resubmit the form.',
+            'csrf_token_manager' => $csrfTokenManager,
+            'csrf_token_id'      => $csrfTokenId,
+            'csrf_provider'      => new CsrfTokenManagerAdapter($this->defaultTokenManager),
+            'intention'          => 'unknown',
         ));
     }
 

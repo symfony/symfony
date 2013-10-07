@@ -892,16 +892,20 @@ class Application
         $event = new ConsoleCommandEvent($command, $input, $output);
         $this->dispatcher->dispatch(ConsoleEvents::COMMAND, $event);
 
-        try {
-            $exitCode = $command->run($input, $output);
-        } catch (\Exception $e) {
-            $event = new ConsoleTerminateEvent($command, $input, $output, $e->getCode());
-            $this->dispatcher->dispatch(ConsoleEvents::TERMINATE, $event);
+        if ($event->commandShouldRun()) {
+            try {
+                $exitCode = $command->run($input, $output);
+            } catch (\Exception $e) {
+                $event = new ConsoleTerminateEvent($command, $input, $output, $e->getCode());
+                $this->dispatcher->dispatch(ConsoleEvents::TERMINATE, $event);
 
-            $event = new ConsoleExceptionEvent($command, $input, $output, $e, $event->getExitCode());
-            $this->dispatcher->dispatch(ConsoleEvents::EXCEPTION, $event);
+                $event = new ConsoleExceptionEvent($command, $input, $output, $e, $event->getExitCode());
+                $this->dispatcher->dispatch(ConsoleEvents::EXCEPTION, $event);
 
-            throw $event->getException();
+                throw $event->getException();
+            }
+        } else {
+            $exitCode = ConsoleCommandEvent::RETURN_CODE_DISABLED;
         }
 
         $event = new ConsoleTerminateEvent($command, $input, $output, $exitCode);

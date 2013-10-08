@@ -15,5 +15,5 @@ before_script:
     - export USE_INTL_ICU_DATA_VERSION=1
 
 script:
-    - ls -d src/Symfony/*/* | parallel --gnu --keep-order 'echo "Running {} tests"; phpunit --exclude-group tty,benchmark {};' || exit 1
-    - echo "Running tests requiring tty"; phpunit --group tty
+    - ls -d src/Symfony/*/* | parallel --gnu --keep-order 'echo "Running {} tests"; phpunit --exclude-group noparallel,benchmark {};' || exit 1
+    - echo "Running non-parallel tests"; phpunit --group noparallel

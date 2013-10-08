@@ -238,6 +238,7 @@ class NativeSessionStorage implements SessionStorageInterface
             $this->saveHandler->setActive(false);
         }
 
+        $this->started = false;
         $this->closed = true;
     }
 
@@ -255,7 +256,13 @@ class NativeSessionStorage implements SessionStorageInterface
         $_SESSION = array();
 
         // reconnect the bags to the session
-        $this->loadSession();
+        $bags = array_merge($this->bags, array($this->metadataBag));
+
+        foreach ($bags as $bag) {
+            $key = $bag->getStorageKey();
+            $_SESSION[$key] = array();
+            $bag->initialize($_SESSION[$key]);
+        }
     }
 
     /**

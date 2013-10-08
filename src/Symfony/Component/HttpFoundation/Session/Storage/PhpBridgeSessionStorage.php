@@ -64,6 +64,12 @@ class PhpBridgeSessionStorage extends NativeSessionStorage
         }
 
         // reconnect the bags to the session
-        $this->loadSession();
+        $bags = array_merge($this->bags, array($this->metadataBag));
+
+        foreach ($bags as $bag) {
+            $key = $bag->getStorageKey();
+            $_SESSION[$key] = isset($_SESSION[$key]) ? $_SESSION[$key] : array();
+            $bag->initialize($_SESSION[$key]);
+        }
     }
 }

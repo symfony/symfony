@@ -180,7 +180,13 @@ class MockArraySessionStorage implements SessionStorageInterface
         $this->data = array();
 
         // reconnect the bags to the session
-        $this->loadSession();
+        $bags = array_merge($this->bags, array($this->metadataBag));
+
+        foreach ($bags as $bag) {
+            $key = $bag->getStorageKey();
+            $this->data[$key] = array();
+            $bag->initialize($this->data[$key]);
+        }
     }
 
     /**

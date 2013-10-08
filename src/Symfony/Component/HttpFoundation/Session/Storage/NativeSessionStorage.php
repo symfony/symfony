@@ -236,6 +236,7 @@ class NativeSessionStorage implements SessionStorageInterface
         }
 
         $this->closed = true;
+        $this->started = false;
     }
 
     /**

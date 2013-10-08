@@ -408,7 +408,7 @@ class Application
         }
 
         if (null === $command->getAliases()) {
-            throw new \InvalidArgumentException(sprintf('You must call the parent constructor in "%s::__construct()"', get_class($command)));
+            throw new \LogicException(sprintf('You must call the parent constructor in "%s::__construct()"', get_class($command)));
         }
 
         $this->commands[$command->getName()] = $command;

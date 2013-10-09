@@ -64,6 +64,7 @@ class Process
     private $tty;
 
     private $useFileHandles = false;
+    /** @var ProcessPipes */
     private $processPipes;
 
     private static $sigchild;
@@ -302,11 +303,20 @@ class Process
         if (null !== $callback) {
             $this->callback = $this->buildCallback($callback);
         }
-        while ($this->processInformation['running']) {
+        
+        do {
             $this->checkTimeout();
-            $this->updateStatus(true);
+            $running = defined('PHP_WINDOWS_VERSION_BUILD') ? $this->isRunning() : $this->processPipes->hasOpenHandles();
+            $close = !defined('PHP_WINDOWS_VERSION_BUILD') || !$running;;
+            $this->readPipes(true, $close);
+        } while ($running);
+        
+        while ($this->isRunning()) {
+            usleep(1000);
         }
-        $this->updateStatus(false);
+
+        $this->processPipes->close();
+        $exitcode = proc_close($this->process);
 
         if ($this->processInformation['signaled']) {
             if ($this->isSigchildEnabled()) {
@@ -373,7 +383,7 @@ class Process
      */
     public function getOutput()
     {
-        $this->readPipes(false);
+        $this->readPipes(false, defined('PHP_WINDOWS_VERSION_BUILD') ? !$this->processInformation['running'] : true);
 
         return $this->stdout;
     }
@@ -418,7 +428,7 @@ class Process
      */
     public function getErrorOutput()
     {
-        $this->readPipes(false);
+        $this->readPipes(false, defined('PHP_WINDOWS_VERSION_BUILD') ? !$this->processInformation['running'] : true);
 
         return $this->stderr;
     }
@@ -1046,10 +1056,11 @@ class Process
             return;
         }
 
-        $this->readPipes($blocking);
-
         $this->processInformation = proc_get_status($this->process);
         $this->captureExitCode();
+
+        $this->readPipes($blocking, defined('PHP_WINDOWS_VERSION_BUILD') ? !$this->processInformation['running'] : true);
+
         if (!$this->processInformation['running']) {
             $this->close();
             $this->status = self::STATUS_TERMINATED;
@@ -1100,9 +1111,15 @@ class Process
      *
      * @param Boolean $blocking Whether to use blocking calls or not.
      */
-    private function readPipes($blocking)
+    private function readPipes($blocking, $close)
     {
-        foreach ($this->processPipes->read($blocking) as $type => $data) {
+        if ($close) {
+            $result = $this->processPipes->readAndCloseHandles($blocking);
+        } else {
+            $result = $this->processPipes->read($blocking);
+        }
+        
+        foreach ($result as $type => $data) {
             if (3 == $type) {
                 $this->fallbackExitcode = (int) $data;
             } else {

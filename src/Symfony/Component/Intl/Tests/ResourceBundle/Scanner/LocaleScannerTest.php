@@ -48,7 +48,7 @@ class LocaleScannerTest extends \PHPUnit_Framework_TestCase
         $this->filesystem->touch($this->directory.'/root.txt');
         $this->filesystem->touch($this->directory.'/supplementalData.txt');
         $this->filesystem->touch($this->directory.'/supplementaldata.txt');
-        $this->filesystem->touch($this->directory.'/misc.txt');
+        $this->filesystem->touch($this->directory.'/meta.txt');
 
         file_put_contents($this->directory.'/en_alias.txt', 'en_alias{"%%ALIAS"{"en"}}');
         file_put_contents($this->directory.'/de_alias.txt', 'de_alias{"%%ALIAS"{"de"}}');

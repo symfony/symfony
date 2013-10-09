@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Intl\ResourceBundle\Transformer\Rule;
 
+use Symfony\Component\Intl\Exception\RuntimeException;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\Intl\ResourceBundle\CurrencyBundle;
 use Symfony\Component\Intl\ResourceBundle\CurrencyBundleInterface;
@@ -55,32 +56,57 @@ class CurrencyBundleTransformationRule implements TransformationRuleInterface
         $context->getFilesystem()->remove($tempDir);
         $context->getFilesystem()->mkdir(array($tempDir, $tempDir.'/res'));
 
-        // The currency data is contained in the locales and misc bundles
+        // The currency data is contained in the locales and meta bundles
         // in ICU <= 4.2
         if (IcuVersion::compare($context->getIcuVersion(), '4.2', '<=', 1)) {
             $context->getFilesystem()->mirror($context->getSourceDir().'/locales', $tempDir.'/txt');
-            $context->getFilesystem()->copy($context->getSourceDir().'/misc/supplementalData.txt', $tempDir.'/txt/misc.txt');
+            $context->getFilesystem()->copy($context->getSourceDir().'/misc/supplementalData.txt', $tempDir.'/txt/meta.txt');
         } else {
             $context->getFilesystem()->mirror($context->getSourceDir().'/curr', $tempDir.'/txt');
-            $context->getFilesystem()->rename($tempDir.'/txt/supplementalData.txt', $tempDir.'/txt/misc.txt');
+            $context->getFilesystem()->rename($tempDir.'/txt/supplementalData.txt', $tempDir.'/txt/meta.txt');
         }
 
-        // Replace "supplementalData" in the file by "misc" before compilation
-        file_put_contents($tempDir.'/txt/misc.txt', str_replace('supplementalData', 'misc', file_get_contents($tempDir.'/txt/misc.txt')));
+        // Replace "supplementalData" in the file by "meta" before compilation
+        file_put_contents($tempDir.'/txt/meta.txt', str_replace('supplementalData', 'meta', file_get_contents($tempDir.'/txt/meta.txt')));
 
-        $context->getCompiler()->compile($tempDir.'/txt/misc.txt', $tempDir.'/res');
+        $context->getCompiler()->compile($tempDir.'/txt', $tempDir.'/res');
 
-        // Read file, add locales and write again
+        // Read file, add locales and currencies and write again
         $reader = new BinaryBundleReader();
-        $data = iterator_to_array($reader->read($tempDir.'/res', 'misc'));
+        $meta = iterator_to_array($reader->read($tempDir.'/res', 'meta'));
 
         // Key must not exist
-        assert(!isset($data['Locales']));
+        if (isset($meta['AvailableLocales'])) {
+            throw new RuntimeException('The key "AvailableLocales" should not exist.');
+        }
 
-        $data['Locales'] = $context->getLocaleScanner()->scanLocales($tempDir.'/txt');
+        if (isset($meta['Currencies'])) {
+            throw new RuntimeException('The key "Currencies" should not exist.');
+        }
+
+        // Collect supported locales of the bundle
+        $meta['AvailableLocales'] = $context->getLocaleScanner()->scanLocales($tempDir.'/txt');
+
+        // Collect complete list of currencies in all locales
+        $meta['Currencies'] = array();
+
+        foreach ($meta['AvailableLocales'] as $locale) {
+            $bundle = $reader->read($tempDir.'/res', $locale);
+
+            // isset() on \ResourceBundle returns true even if the value is null
+            if (isset($bundle['Currencies']) && null !== $bundle['Currencies']) {
+                $meta['Currencies'] = array_merge(
+                    $meta['Currencies'],
+                    array_keys(iterator_to_array($bundle['Currencies']))
+                );
+            }
+        }
+
+        $meta['Currencies'] = array_unique($meta['Currencies']);
+        sort($meta['Currencies']);
 
         $writer = new TextBundleWriter();
-        $writer->write($tempDir.'/txt', 'misc', $data, false);
+        $writer->write($tempDir.'/txt', 'meta', $meta, false);
 
         // The temporary directory now contains all sources to be compiled
         return $tempDir.'/txt';

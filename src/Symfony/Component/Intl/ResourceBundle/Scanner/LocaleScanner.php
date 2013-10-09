@@ -33,7 +33,7 @@ class LocaleScanner
      */
     private static $blackList = array(
         'root',
-        'misc',
+        'meta',
         'supplementalData',
         'supplementaldata',
     );

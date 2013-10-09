@@ -17,6 +17,7 @@ use Symfony\Component\Intl\Exception\RuntimeException;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\Intl\ResourceBundle\LanguageBundleInterface;
 use Symfony\Component\Intl\ResourceBundle\LocaleBundleInterface;
+use Symfony\Component\Intl\ResourceBundle\Reader\BinaryBundleReader;
 use Symfony\Component\Intl\ResourceBundle\RegionBundleInterface;
 use Symfony\Component\Intl\ResourceBundle\Transformer\CompilationContext;
 use Symfony\Component\Intl\ResourceBundle\Transformer\StubbingContext;
@@ -82,11 +83,13 @@ class LocaleBundleTransformationRule implements TransformationRuleInterface
             $writer->write($tempDir, $alias, array('%%ALIAS' => $aliasOf));
         }
 
-        // Create misc file with all available locales
-        $writer->write($tempDir, 'misc', array(
+        $meta = array(
             'Locales' => $locales,
             'Aliases' => $aliases,
-        ), false);
+        );
+
+        // Create meta file with all available locales
+        $writer->write($tempDir, 'meta', $meta, false);
 
         // Create empty root file, other wise locale fallback is not working
         $writer->write($tempDir, 'root', array('___' => ''));

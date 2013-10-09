@@ -23,7 +23,7 @@ class RegionBundle extends AbstractBundle implements RegionBundleInterface
      */
     public function getLocales()
     {
-        $locales = $this->readEntry('misc', array('Locales'));
+        $locales = $this->readEntry('meta', array('Locales'));
 
         if ($locales instanceof \Traversable) {
             $locales = iterator_to_array($locales);

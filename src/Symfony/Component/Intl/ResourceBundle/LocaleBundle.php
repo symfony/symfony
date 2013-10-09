@@ -23,7 +23,7 @@ class LocaleBundle extends AbstractBundle implements LocaleBundleInterface
      */
     public function getLocales()
     {
-        $locales = $this->readEntry('misc', array('Locales'));
+        $locales = $this->readEntry('meta', array('Locales'));
 
         if ($locales instanceof \Traversable) {
             $locales = iterator_to_array($locales);
@@ -37,7 +37,7 @@ class LocaleBundle extends AbstractBundle implements LocaleBundleInterface
      */
     public function getLocaleAliases()
     {
-        $aliases = $this->readEntry('misc', array('Aliases'));
+        $aliases = $this->readEntry('meta', array('Aliases'));
 
         if ($aliases instanceof \Traversable) {
             $aliases = iterator_to_array($aliases);

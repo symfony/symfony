@@ -11,8 +11,10 @@
 
 namespace Symfony\Component\Intl\ResourceBundle\Transformer\Rule;
 
+use Symfony\Component\DependencyInjection\Tests\DefinitionDecoratorTest;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\Intl\ResourceBundle\LanguageBundleInterface;
+use Symfony\Component\Intl\ResourceBundle\Reader\BinaryBundleReader;
 use Symfony\Component\Intl\ResourceBundle\Transformer\CompilationContext;
 use Symfony\Component\Intl\ResourceBundle\Transformer\StubbingContext;
 use Symfony\Component\Intl\ResourceBundle\Writer\TextBundleWriter;
@@ -58,15 +60,50 @@ class LanguageBundleTransformationRule implements TransformationRuleInterface
         }
 
         $context->getFilesystem()->remove($tempDir);
-        $context->getFilesystem()->mirror($sourceDir, $tempDir);
+        $context->getFilesystem()->mkdir(array($tempDir, $tempDir.'/res'));
+        $context->getFilesystem()->mirror($sourceDir, $tempDir.'/txt');
 
-        // Create misc file with all available locales
+        $context->getCompiler()->compile($tempDir.'/txt', $tempDir.'/res');
+
+        $meta = array(
+            'AvailableLocales' => $context->getLocaleScanner()->scanLocales($tempDir.'/txt'),
+            'Languages' => array(),
+            'Scripts' => array(),
+        );
+
+        $reader = new BinaryBundleReader();
+
+        // Collect complete list of languages and scripts in all locales
+        foreach ($meta['AvailableLocales'] as $locale) {
+            $bundle = $reader->read($tempDir.'/res', $locale);
+
+            // isset() on \ResourceBundle returns true even if the value is null
+            if (isset($bundle['Languages']) && null !== $bundle['Languages']) {
+                $meta['Languages'] = array_merge(
+                    $meta['Languages'],
+                    array_keys(iterator_to_array($bundle['Languages']))
+                );
+            }
+
+            if (isset($bundle['Scripts']) && null !== $bundle['Scripts']) {
+                $meta['Scripts'] = array_merge(
+                    $meta['Scripts'],
+                    array_keys(iterator_to_array($bundle['Scripts']))
+                );
+            }
+        }
+
+        $meta['Languages'] = array_unique($meta['Languages']);
+        sort($meta['Languages']);
+
+        $meta['Scripts'] = array_unique($meta['Scripts']);
+        sort($meta['Scripts']);
+
+        // Create meta file with all available locales
         $writer = new TextBundleWriter();
-        $writer->write($tempDir, 'misc', array(
-            'Locales' => $context->getLocaleScanner()->scanLocales($tempDir),
-        ), false);
+        $writer->write($tempDir.'/txt', 'meta', $meta, false);
 
-        return $tempDir;
+        return $tempDir.'/txt';
     }
 
     /**
@@ -74,6 +111,8 @@ class LanguageBundleTransformationRule implements TransformationRuleInterface
      */
     public function afterCompile(CompilationContext $context)
     {
+        // Remove the temporary directory
+        $context->getFilesystem()->remove(sys_get_temp_dir().'/icu-data-languages');
     }
 
     /**

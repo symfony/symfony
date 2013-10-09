@@ -31,6 +31,7 @@ use Symfony\Component\Config\FileLocator;
 class FrameworkExtension extends Extension
 {
     private $formConfigEnabled = false;
+    private $sessionConfigEnabled = false;
 
     /**
      * Responds to the app.config configuration parameter.
@@ -55,10 +56,6 @@ class FrameworkExtension extends Extension
         $loader->load('property_access.xml');
 
         $loader->load('debug_prod.xml');
-
-        // Enable services for CSRF protection (even without forms)
-        $loader->load('security.xml');
-        $loader->load('security_csrf.xml');
 
         if ($container->getParameter('kernel.debug')) {
             $loader->load('debug.xml');
@@ -92,8 +89,13 @@ class FrameworkExtension extends Extension
         }
 
         if (isset($config['session'])) {
+            $this->sessionConfigEnabled = true;
             $this->registerSessionConfiguration($config['session'], $container, $loader);
         }
+
+        $loader->load('security.xml');
+
+        $this->registerSecurityCsrfConfiguration($config['csrf_protection'], $container, $loader);
 
         if ($this->isConfigEnabled($container, $config['form'])) {
             $this->formConfigEnabled = true;
@@ -158,15 +160,20 @@ class FrameworkExtension extends Extension
     private function registerFormConfiguration($config, ContainerBuilder $container, XmlFileLoader $loader)
     {
         $loader->load('form.xml');
-        if ($this->isConfigEnabled($container, $config['csrf_protection'])) {
-            if (!isset($config['session'])) {
-                throw new \LogicException('CSRF protection needs that sessions are enabled.');
+        if ($this->isConfigEnabled($container, $config['form']['csrf_protection'])) {
+            if (!$this->isConfigEnabled($container, $config['csrf_protection'])) {
+                throw new \LogicException('CSRF protection needs to be enabled in order to use CSRF protection for forms.');
             }
 
             $loader->load('form_csrf.xml');
 
             $container->setParameter('form.type_extension.csrf.enabled', true);
-            $container->setParameter('form.type_extension.csrf.field_name', $config['csrf_protection']['field_name']);
+
+            if (null !== $config['form']['csrf_protection']['field_name']) {
+                $container->setParameter('form.type_extension.csrf.field_name', $config['form']['csrf_protection']['field_name']);
+            } else {
+                $container->setParameter('form.type_extension.csrf.field_name', $config['csrf_protection']['field_name']);
+            }
         } else {
             $container->setParameter('form.type_extension.csrf.enabled', false);
         }
@@ -696,7 +703,7 @@ class FrameworkExtension extends Extension
         return $files;
     }
 
-    private function registerAnnotationsConfiguration(array $config, ContainerBuilder $container,$loader)
+    private function registerAnnotationsConfiguration(array $config, ContainerBuilder $container, $loader)
     {
         $loader->load('annotations.xml');
 
@@ -720,6 +727,29 @@ class FrameworkExtension extends Extension
             ;
             $container->setAlias('annotation_reader', 'annotations.cached_reader');
         }
+    }
+
+    /**
+     * Loads the security configuration.
+     *
+     * @param array            $config    A CSRF configuration array
+     * @param ContainerBuilder $container A ContainerBuilder instance
+     * @param XmlFileLoader    $loader    An XmlFileLoader instance
+     *
+     * @throws \LogicException
+     */
+    private function registerSecurityCsrfConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    {
+        if (!$this->isConfigEnabled($container, $config)) {
+            return;
+        }
+
+        if (!$this->sessionConfigEnabled) {
+            throw new \LogicException('CSRF protection needs sessions to be enabled.');
+        }
+
+        // Enable services for CSRF protection (even without forms)
+        $loader->load('security_csrf.xml');
     }
 
     /**

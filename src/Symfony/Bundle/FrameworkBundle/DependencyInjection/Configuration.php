@@ -78,6 +78,7 @@ class Configuration implements ConfigurationInterface
             ->end()
         ;
 
+        $this->addCsrfSection($rootNode);
         $this->addFormSection($rootNode);
         $this->addEsiSection($rootNode);
         $this->addFragmentsSection($rootNode);
@@ -93,6 +94,23 @@ class Configuration implements ConfigurationInterface
         return $treeBuilder;
     }
 
+    private function addCsrfSection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('csrf_protection')
+                    ->canBeEnabled()
+                    ->children()
+                        ->scalarNode('field_name')
+                            ->defaultValue('_token')
+                            ->info('Deprecated: use form.csrf_protection.field_name instead.')
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
     private function addFormSection(ArrayNodeDefinition $rootNode)
     {
         $rootNode
@@ -100,11 +118,13 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('form')
                     ->info('form configuration')
                     ->canBeEnabled()
-                ->end()
-                ->arrayNode('csrf_protection')
-                    ->canBeDisabled()
                     ->children()
-                        ->scalarNode('field_name')->defaultValue('_token')->end()
+                        ->arrayNode('csrf_protection')
+                            ->canBeDisabled()
+                            ->children()
+                                ->scalarNode('field_name')->defaultNull()->end()
+                            ->end()
+                        ->end()
                     ->end()
                 ->end()
             ->end()

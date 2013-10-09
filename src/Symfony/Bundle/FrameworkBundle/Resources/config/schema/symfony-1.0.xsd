@@ -31,7 +31,15 @@
     </xsd:complexType>
 
     <xsd:complexType name="form">
+        <xsd:all>
+            <xsd:element name="csrf-protection" type="form_csrf_protection" minOccurs="0" maxOccurs="1" />
+        </xsd:all>
         <xsd:attribute name="enabled" type="xsd:boolean" />
+    </xsd:complexType>
+
+    <xsd:complexType name="form_csrf_protection">
+        <xsd:attribute name="enabled" type="xsd:boolean" />
+        <xsd:attribute name="field-name" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="csrf_protection">

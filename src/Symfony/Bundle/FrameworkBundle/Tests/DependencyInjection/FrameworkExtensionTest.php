@@ -32,6 +32,22 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals('%form.type_extension.csrf.field_name%', $def->getArgument(2));
     }
 
+    /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage CSRF protection needs that sessions are enabled.
+     */
+    public function testCsrfProtectionNeedsSessionToBeEnabled()
+    {
+        $container = $this->createContainerFromFile('csrf_needs_session');
+
+        $def = $container->getDefinition('form.type_extension.csrf');
+
+        $this->assertTrue($container->getParameter('form.type_extension.csrf.enabled'));
+        $this->assertEquals('%form.type_extension.csrf.enabled%', $def->getArgument(1));
+        $this->assertEquals('_csrf', $container->getParameter('form.type_extension.csrf.field_name'));
+        $this->assertEquals('%form.type_extension.csrf.field_name%', $def->getArgument(2));
+    }
+
     public function testProxies()
     {
         $container = $this->createContainerFromFile('full');

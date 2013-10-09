@@ -99,7 +99,7 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->arrayNode('csrf_protection')
-                    ->canBeDisabled()
+                    ->canBeEnabled()
                     ->children()
                         ->scalarNode('field_name')->defaultValue('_token')->end()
                     ->end()

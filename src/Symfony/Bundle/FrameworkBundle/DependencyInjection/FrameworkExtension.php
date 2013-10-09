@@ -425,19 +425,6 @@ class FrameworkExtension extends Extension
             $namedPackages,
         ));
 
-        // Apply request scope to assets helper if one or more packages are request-scoped
-        $requireRequestScope = array_reduce(
-            $namedPackages,
-            function($v, Reference $ref) use ($container) {
-                return $v || 'request' === $container->getDefinition($ref)->getScope();
-            },
-            'request' === $defaultPackage->getScope()
-        );
-
-        if ($requireRequestScope) {
-            $container->getDefinition('templating.helper.assets')->setScope('request');
-        }
-
         if (!empty($config['loaders'])) {
             $loaders = array_map(function($loader) { return new Reference($loader); }, $config['loaders']);
 
@@ -498,7 +485,6 @@ class FrameworkExtension extends Extension
             $package = new DefinitionDecorator('templating.asset.path_package');
             $package
                 ->setPublic(false)
-                ->setScope('request')
                 ->replaceArgument(1, $version)
                 ->replaceArgument(2, $format)
             ;
@@ -538,7 +524,6 @@ class FrameworkExtension extends Extension
         } else {
             $sslPackage = new DefinitionDecorator('templating.asset.path_package');
             $sslPackage
-                ->setScope('request')
                 ->replaceArgument(1, $version)
                 ->replaceArgument(2, $format)
             ;
@@ -548,7 +533,6 @@ class FrameworkExtension extends Extension
         $package = new DefinitionDecorator('templating.asset.request_aware_package');
         $package
             ->setPublic(false)
-            ->setScope('request')
             ->replaceArgument(1, $prefix.'.http')
             ->replaceArgument(2, $prefix.'.ssl')
         ;

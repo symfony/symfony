@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
 
 use Symfony\Component\Templating\Helper\Helper;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * RequestHelper provides access to the current request parameters.
@@ -21,16 +21,16 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class RequestHelper extends Helper
 {
-    protected $request;
+    protected $requestStack;
 
     /**
      * Constructor.
      *
-     * @param Request $request A Request instance
+     * @param RequestStack $requestStack A RequestStack instance
      */
-    public function __construct(Request $request)
+    public function __construct(RequestStack $requestStack)
     {
-        $this->request = $request;
+        $this->requestStack = $requestStack;
     }
 
     /**
@@ -45,7 +45,7 @@ class RequestHelper extends Helper
      */
     public function getParameter($key, $default = null)
     {
-        return $this->request->get($key, $default);
+        return $this->requestStack->getCurrentRequest()->get($key, $default);
     }
 
     /**
@@ -55,7 +55,7 @@ class RequestHelper extends Helper
      */
     public function getLocale()
     {
-        return $this->request->getLocale();
+        return $this->requestStack->getCurrentRequest()->getLocale();
     }
 
     /**

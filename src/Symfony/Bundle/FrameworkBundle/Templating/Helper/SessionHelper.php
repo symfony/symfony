@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
 
 use Symfony\Component\Templating\Helper\Helper;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * SessionHelper provides read-only access to the session attributes.
@@ -26,11 +26,11 @@ class SessionHelper extends Helper
     /**
      * Constructor.
      *
-     * @param Request $request A Request instance
+     * @param RequestStack $requestStack A RequestStack instance
      */
-    public function __construct(Request $request)
+    public function __construct(RequestStack $requestStack)
     {
-        $this->session = $request->getSession();
+        $this->session = $requestStack->getMasterRequest()->getSession();
     }
 
     /**

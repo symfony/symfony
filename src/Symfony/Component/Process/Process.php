@@ -305,14 +305,14 @@ class Process
         if (null !== $callback) {
             $this->callback = $this->buildCallback($callback);
         }
-        
+
         do {
             $this->checkTimeout();
             $running = defined('PHP_WINDOWS_VERSION_BUILD') ? $this->isRunning() : $this->processPipes->hasOpenHandles();
             $close = !defined('PHP_WINDOWS_VERSION_BUILD') || !$running;;
             $this->readPipes(true, $close);
         } while ($running);
-        
+
         while ($this->isRunning()) {
             usleep(1000);
         }
@@ -963,7 +963,7 @@ class Process
         } else {
             $result = $this->processPipes->read($blocking);
         }
-        
+
         foreach ($result as $type => $data) {
             if (3 == $type) {
                 $this->fallbackExitcode = (int) $data;

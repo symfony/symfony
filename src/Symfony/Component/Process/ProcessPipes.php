@@ -222,6 +222,7 @@ class ProcessPipes
                 continue;
             }
             $data = '';
+            $dataread = null;
             while (!feof($fileHandle)) {
                 if (false !== $dataread = fread($fileHandle, 16392)) {
                     $data .= $dataread;
@@ -232,7 +233,7 @@ class ProcessPipes
                 $read[$type] = $data;
             }
 
-            if (true === $close && feof($fileHandle)) {
+            if (false === $dataread || (true === $close && feof($fileHandle) && '' === $data)) {
                 fclose($this->fileHandles[$type]);
                 unset($this->fileHandles[$type]);
             }
@@ -280,7 +281,7 @@ class ProcessPipes
                 $read[$type] = $data;
             }
 
-            if (true === $close && feof($pipe)) {
+            if (false === $data || (true === $close && feof($pipe) && '' === $data)) {
                 fclose($this->pipes[$type]);
                 unset($this->pipes[$type]);
             }

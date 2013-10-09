@@ -56,10 +56,6 @@ class FrameworkExtension extends Extension
 
         $loader->load('debug_prod.xml');
 
-        // Enable services for CSRF protection (even without forms)
-        $loader->load('security.xml');
-        $loader->load('security_csrf.xml');
-
         if ($container->getParameter('kernel.debug')) {
             $loader->load('debug.xml');
 
@@ -89,6 +85,13 @@ class FrameworkExtension extends Extension
 
         if (!empty($config['test'])) {
             $loader->load('test.xml');
+        }
+
+        $loader->load('security.xml');
+
+        if ($this->isConfigEnabled($container, $config['csrf_protection'])) {
+            // Enable services for CSRF protection (even without forms)
+            $loader->load('security_csrf.xml');
         }
 
         if (isset($config['session'])) {

@@ -833,6 +833,9 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
     public function testGetClientIpsProvider()
     {
+        // in each case, 88.88.88.88 is our user's address
+        $human = '88.88.88.88';
+
         // $expected
         // $remoteAddr
         // $httpForwardedFor
@@ -841,82 +844,82 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         return array(
             // simple
             array(
-                array('88.88.88.88'),
-                '88.88.88.88',
+                array($human),
+                $human,
                 null,
                 null,
             ),
 
-            // trust the remote addr
+            // trust the remote addr, no FF
             array(
-                array('88.88.88.88'),
-                '88.88.88.88',
+                array($human),
+                $human,
                 null,
-                array('88.88.88.88'),
+                array($human),
             ),
 
-            // forwarded for with remote addr not trusted
+            // FF with proxy support disabled
             array(
+                array($human),
+                $human,
+                '127.0.0.1',
+                null,
+            ),
+
+            // FF with remote addr trusted
+            array(
+                array($human),
+                '127.0.0.1',
+                $human,
                 array('127.0.0.1'),
-                '127.0.0.1',
-                '88.88.88.88',
-                null,
             ),
 
-            // forwarded for with remote addr trusted
+            // FF with remote and all FF addrs trusted
             array(
-                array('88.88.88.88'),
+                array($human),
                 '127.0.0.1',
-                '88.88.88.88',
-                array('127.0.0.1'),
+                $human,
+                array('127.0.0.1', $human),
             ),
 
-            // forwarded for with remote and all FF addrs trusted
+            // FF with remote range trusted
             array(
-                array('88.88.88.88'),
-                '127.0.0.1',
-                '88.88.88.88',
-                array('127.0.0.1', '88.88.88.88'),
-            ),
-
-            // forwarded for with remote range trusted
-            array(
-                array('88.88.88.88'),
+                array($human),
                 '123.45.67.89',
-                '88.88.88.88',
-                array('123.45.67.0/24'),
+                $human,
+                array("123.45.67.0/24"),
             ),
 
-            // multiple forwarded for with remote addr trusted
+            // multiple FF with remote addr trusted
             array(
-                array('88.88.88.88', '87.65.43.21', '127.0.0.1'),
+                array($human, "87.65.43.21", '127.0.0.1'),
                 '123.45.67.89',
-                '127.0.0.1, 87.65.43.21, 88.88.88.88',
+                "$human, 87.65.43.21, 127.0.0.1",
                 array('123.45.67.89'),
             ),
 
-            // multiple forwarded for with remote addr and some reverse proxies trusted
+            // multiple FF with remote addr and some reverse proxies trusted
             array(
-                array('87.65.43.21', '127.0.0.1'),
+                array($human, '127.0.0.1'),
                 '123.45.67.89',
-                '127.0.0.1, 87.65.43.21, 88.88.88.88',
-                array('123.45.67.89', '88.88.88.88'),
-            ),
-
-            // multiple forwarded for with remote addr and some reverse proxies trusted but in the middle
-            array(
-                array('88.88.88.88', '127.0.0.1'),
-                '123.45.67.89',
-                '127.0.0.1, 87.65.43.21, 88.88.88.88',
+                "$human, 127.0.0.1, 87.65.43.21",
                 array('123.45.67.89', '87.65.43.21'),
             ),
 
-            // multiple forwarded for with remote addr and all reverse proxies trusted
+            // multiple FF with remote addr and some reverse proxies trusted but in the middle
             array(
-                array('127.0.0.1'),
+                array($human, '127.0.0.1'),
                 '123.45.67.89',
-                '127.0.0.1, 87.65.43.21, 88.88.88.88',
-                array('123.45.67.89', '87.65.43.21', '88.88.88.88', '127.0.0.1'),
+                "$human, 127.0.0.1, 87.65.43.21",
+                array('123.45.67.89', "87.65.43.21"),
+            ),
+
+            // multiple FF with remote addr and all reverse proxies trusted
+            array(
+                array($human),
+                '123.45.67.89',
+                "$human, 127.0.0.1, 87.65.43.21",
+                array('123.45.67.89', "87.65.43.21", $human, '127.0.0.1'),
             ),
         );
     }

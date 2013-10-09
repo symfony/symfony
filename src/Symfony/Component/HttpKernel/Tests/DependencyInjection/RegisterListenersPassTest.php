@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpKernel\Tests\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\HttpKernel\DependencyInjection\RegisterListenersPass;
 
 class RegisterListenersPassTest extends \PHPUnit_Framework_TestCase
@@ -127,7 +126,7 @@ class RegisterListenersPassTest extends \PHPUnit_Framework_TestCase
         $container->register('foo', 'stdClass')->setAbstract(true)->addTag('kernel.event_listener', array());
         $container->register('event_dispatcher', 'stdClass');
 
-        $registerListenersPass = new RegisterKernelListenersPass();
+        $registerListenersPass = new RegisterListenersPass();
         $registerListenersPass->process($container);
     }
 }

@@ -15,6 +15,9 @@ namespace Symfony\Component\Intl\ResourceBundle;
  * Gives access to locale-related ICU data.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+ *             Use {@link \Symfony\Component\Icu\LocaleDataProvider} instead.
  */
 interface LocaleBundleInterface extends ResourceBundleInterface
 {

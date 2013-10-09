@@ -12,12 +12,10 @@
 namespace Symfony\Component\Intl\ResourceBundle\Transformer\Rule;
 
 use Symfony\Component\Intl\Exception\NoSuchEntryException;
-use Symfony\Component\Intl\Exception\NoSuchLocaleException;
-use Symfony\Component\Intl\Exception\RuntimeException;
+use Symfony\Component\Intl\Exception\ResourceBundleNotFoundException;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\Intl\ResourceBundle\LanguageBundleInterface;
 use Symfony\Component\Intl\ResourceBundle\LocaleBundleInterface;
-use Symfony\Component\Intl\ResourceBundle\Reader\BinaryBundleReader;
 use Symfony\Component\Intl\ResourceBundle\RegionBundleInterface;
 use Symfony\Component\Intl\ResourceBundle\Transformer\CompilationContext;
 use Symfony\Component\Intl\ResourceBundle\Transformer\StubbingContext;
@@ -83,16 +81,11 @@ class LocaleBundleTransformationRule implements TransformationRuleInterface
             $writer->write($tempDir, $alias, array('%%ALIAS' => $aliasOf));
         }
 
-        $meta = array(
-            'Locales' => $locales,
+        // Create root file which maps locale codes to locale codes, for fallback
+        $writer->write($tempDir, 'root', array(
+            'Locales' => array_combine($locales, $locales),
             'Aliases' => $aliases,
-        );
-
-        // Create meta file with all available locales
-        $writer->write($tempDir, 'meta', $meta, false);
-
-        // Create empty root file, other wise locale fallback is not working
-        $writer->write($tempDir, 'root', array('___' => ''));
+        ));
 
         return $tempDir;
     }
@@ -124,45 +117,20 @@ class LocaleBundleTransformationRule implements TransformationRuleInterface
 
     private function generateTextFiles(TextBundleWriter $writer, $targetDirectory, array $locales, array $aliases)
     {
-        // Collect locales for which translations exist
-        $displayLocales = array_unique(array_merge(
-            $this->languageBundle->getLocales(),
-            $this->regionBundle->getLocales()
-        ));
-
         // Flip to facilitate lookup
-        $displayLocales = array_flip($displayLocales);
         $locales = array_flip($locales);
 
         // Don't generate names for aliases (names will be generated for the
         // locale they are duplicating)
-        $displayLocales = array_diff_key($displayLocales, $aliases);
-
-        // Generate a list of (existing) locale fallbacks
-        $fallbacks = array();
-
-        foreach ($displayLocales as $displayLocale => $_) {
-            $fallbacks[$displayLocale] = null;
-            $fallback = $displayLocale;
-
-            // Recursively search for a fallback locale until one is found
-            while (null !== ($fallback = Intl::getFallbackLocale($fallback))) {
-                // Currently, no locale has an alias as fallback locale.
-                // If this starts to be the case, we need to add code here.
-                assert(!isset($aliases[$fallback]));
-
-                // Check whether the fallback exists
-                if (isset($displayLocales[$fallback])) {
-                    $fallbacks[$displayLocale] = $fallback;
-                    break;
-                }
-            }
-        }
+        $displayLocales = array_diff_key($locales, $aliases);
 
         // Since fallbacks are always shorter than their source, we can sort
         // the display locales so that fallbacks are always processed before
         // their variants
         ksort($displayLocales);
+
+        // Generate a list of (existing) locale fallbacks
+        $fallbackMapping = $this->generateFallbackMapping($displayLocales, $aliases);
 
         $localeNames = array();
 
@@ -181,6 +149,7 @@ class LocaleBundleTransformationRule implements TransformationRuleInterface
                         $localeNames[$displayLocale][$locale] = $name;
                     }
                 } catch (NoSuchEntryException $e) {
+                } catch (ResourceBundleNotFoundException $e) {
                 }
             }
 
@@ -188,8 +157,8 @@ class LocaleBundleTransformationRule implements TransformationRuleInterface
             // keep the differences
             $fallback = $displayLocale;
 
-            while (isset($fallbacks[$fallback])) {
-                $fallback = $fallbacks[$fallback];
+            while (isset($fallbackMapping[$fallback])) {
+                $fallback = $fallbackMapping[$fallback];
                 $localeNames[$displayLocale] = array_diff(
                     $localeNames[$displayLocale],
                     $localeNames[$fallback]
@@ -274,5 +243,30 @@ class LocaleBundleTransformationRule implements TransformationRuleInterface
         }
 
         return $name;
+    }
+
+    private function generateFallbackMapping(array $displayLocales, array $aliases)
+    {
+        $mapping = array();
+
+        foreach ($displayLocales as $displayLocale => $_) {
+            $mapping[$displayLocale] = null;
+            $fallback = $displayLocale;
+
+            // Recursively search for a fallback locale until one is found
+            while (null !== ($fallback = Intl::getFallbackLocale($fallback))) {
+                // Currently, no locale has an alias as fallback locale.
+                // If this starts to be the case, we need to add code here.
+                assert(!isset($aliases[$fallback]));
+
+                // Check whether the fallback exists
+                if (isset($displayLocales[$fallback])) {
+                    $mapping[$displayLocale] = $fallback;
+                    break;
+                }
+            }
+        }
+
+        return $mapping;
     }
 }

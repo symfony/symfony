@@ -50,7 +50,9 @@ class Store implements StoreInterface
     {
         // unlock everything
         foreach ($this->locks as $lock) {
-            @unlink($lock);
+            if (file_exists($lock)) {
+                @unlink($lock);
+            }
         }
 
         $error = error_get_last();

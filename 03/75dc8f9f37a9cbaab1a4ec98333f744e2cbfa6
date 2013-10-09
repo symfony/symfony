@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by FineWolf at 2013-10-09T14:23:26Z
+
+Ping @fabpot @jalliot
+
+Also, for @jalliot, this change still ignores VCS files when mirroring the folders.

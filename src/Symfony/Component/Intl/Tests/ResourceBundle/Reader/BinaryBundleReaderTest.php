@@ -50,32 +50,32 @@ class BinaryBundleReaderTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse(isset($data['ExistsNot']));
     }
 
-    public function testReadFollowsFallback()
+    public function testReadDoesNotFollowFallback()
     {
         // "ro_MD" -> "ro"
         $data = $this->reader->read(__DIR__.'/Fixtures/res', 'ro_MD');
 
         $this->assertInstanceOf('\ArrayAccess', $data);
         $this->assertSame('Bam', $data['Baz']);
-        $this->assertTrue(isset($data['Foo']), 'entries from the fallback locale are reported to be set...');
-        $this->assertNull($data['Foo'], '...but are always NULL. WTF.');
+        $this->assertFalse(isset($data['Foo']));
+        $this->assertNull($data['Foo']);
         $this->assertFalse(isset($data['ExistsNot']));
     }
 
-    public function testReadFollowsFallbackAlias()
+    public function testReadDoesNotFollowFallbackAlias()
     {
         // "mo" = "ro_MD" -> "ro"
         $data = $this->reader->read(__DIR__.'/Fixtures/res', 'mo');
 
         $this->assertInstanceOf('\ArrayAccess', $data);
         $this->assertSame('Bam', $data['Baz'], 'data from the aliased locale can be accessed');
-        $this->assertTrue(isset($data['Foo']), 'entries from the fallback locale are reported to be set...');
-        $this->assertNull($data['Foo'], '...but are always NULL. WTF.');
+        $this->assertFalse(isset($data['Foo']));
+        $this->assertNull($data['Foo']);
         $this->assertFalse(isset($data['ExistsNot']));
     }
 
     /**
-     * @expectedException \Symfony\Component\Intl\Exception\NoSuchLocaleException
+     * @expectedException \Symfony\Component\Intl\Exception\ResourceBundleNotFoundException
      */
     public function testReadFailsIfNonExistingLocale()
     {
@@ -83,7 +83,7 @@ class BinaryBundleReaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Intl\Exception\NoSuchLocaleException
+     * @expectedException \Symfony\Component\Intl\Exception\ResourceBundleNotFoundException
      */
     public function testReadFailsIfNonExistingFallbackLocale()
     {

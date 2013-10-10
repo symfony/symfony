@@ -12,10 +12,8 @@
 namespace Symfony\Component\Intl\Exception;
 
 /**
- * Thrown when an invalid locale was requested.
- * 
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class NoSuchLocaleException extends RuntimeException
+class ResourceBundleNotFoundException extends RuntimeException
 {
 }

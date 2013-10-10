@@ -38,9 +38,9 @@ class PhpBundleReaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Intl\Exception\NoSuchLocaleException
+     * @expectedException \Symfony\Component\Intl\Exception\ResourceBundleNotFoundException
      */
-    public function testReadFailsIfLocaleOtherThanEn()
+    public function testReadFailsIfNonExistingLocale()
     {
         $this->reader->read(__DIR__ . '/Fixtures/php', 'foo');
     }

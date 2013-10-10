@@ -11,8 +11,7 @@
 
 namespace Symfony\Component\Intl\ResourceBundle\Reader;
 
-use Symfony\Component\Intl\Exception\RuntimeException;
-use Symfony\Component\Intl\Exception\NoSuchLocaleException;
+use Symfony\Component\Intl\Exception\ResourceBundleNotFoundException;
 use Symfony\Component\Intl\ResourceBundle\Util\ArrayAccessibleResourceBundle;
 
 /**
@@ -29,25 +28,14 @@ class BinaryBundleReader implements BundleReaderInterface
     {
         // Point for future extension: Modify this class so that it works also
         // if the \ResourceBundle class is not available.
-        $bundle = new \ResourceBundle($locale, $path);
+
+        // Never enable fallback. We want to know if a bundle cannot be found
+        $bundle = new \ResourceBundle($locale, $path, false);
 
         // The bundle is NULL if the path does not look like a resource bundle
         // (i.e. contain a bunch of *.res files)
         if (null === $bundle) {
-            throw new RuntimeException(sprintf(
-                'The resource bundle "%s/%s.res" could not be found.',
-                $path,
-                $locale
-            ));
-        }
-
-        // The error U_USING_DEFAULT_WARNING appears if the locale is not found,
-        // no fallback can be used and the current default locale is used
-        // instead.
-        // Note that fallback to default is only working when a bundle contains
-        // a root.res file.
-        if (in_array($bundle->getErrorCode(), array(U_USING_DEFAULT_WARNING, U_USING_FALLBACK_WARNING), true)) {
-            throw new NoSuchLocaleException(sprintf(
+            throw new ResourceBundleNotFoundException(sprintf(
                 'The resource bundle "%s/%s.res" could not be found.',
                 $path,
                 $locale

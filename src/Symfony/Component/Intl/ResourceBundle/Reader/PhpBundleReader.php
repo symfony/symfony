@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Intl\ResourceBundle\Reader;
 
-use Symfony\Component\Intl\Exception\NoSuchLocaleException;
+use Symfony\Component\Intl\Exception\ResourceBundleNotFoundException;
 use Symfony\Component\Intl\Exception\RuntimeException;
 
 /**
@@ -26,14 +26,10 @@ class PhpBundleReader implements BundleReaderInterface
      */
     public function read($path, $locale)
     {
-        if ('en' !== $locale) {
-            throw new NoSuchLocaleException('Only the locale "en" is supported.');
-        }
-
         $fileName = $path . '/' . $locale . '.php';
 
         if (!file_exists($fileName)) {
-            throw new RuntimeException(sprintf(
+            throw new ResourceBundleNotFoundException(sprintf(
                 'The resource bundle "%s/%s.php" does not exist.',
                 $path,
                 $locale

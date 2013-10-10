@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Intl\Tests\ResourceBundle\Reader;
 
-use Symfony\Component\Intl\Exception\NoSuchLocaleException;
+use Symfony\Component\Intl\Exception\ResourceBundleNotFoundException;
 use Symfony\Component\Intl\ResourceBundle\Reader\StructuredBundleReader;
 
 /**
@@ -31,6 +31,35 @@ class BundleEntryReaderTest extends \PHPUnit_Framework_TestCase
      */
     private $readerImpl;
 
+    private static $data = array(
+        'Entries' => array(
+            'Foo' => 'Bar',
+            'Bar' => 'Baz',
+        ),
+        'Foo' => 'Bar',
+        'Version' => '2.0',
+    );
+
+    private static $fallbackData = array(
+        'Entries' => array(
+            'Foo' => 'Foo',
+            'Bam' => 'Lah',
+        ),
+        'Baz' => 'Foo',
+        'Version' => '1.0',
+    );
+
+    private static $mergedData = array(
+        // no recursive merging -> too complicated
+        'Entries' => array(
+            'Foo' => 'Bar',
+            'Bar' => 'Baz',
+        ),
+        'Baz' => 'Foo',
+        'Version' => '2.0',
+        'Foo' => 'Bar',
+    );
+
     protected function setUp()
     {
         $this->readerImpl = $this->getMock('Symfony\Component\Intl\ResourceBundle\Reader\StructuredBundleReaderInterface');
@@ -39,38 +68,37 @@ class BundleEntryReaderTest extends \PHPUnit_Framework_TestCase
 
     public function testForwardCallToRead()
     {
-        $data = array('foo', 'bar');
-
         $this->readerImpl->expects($this->once())
             ->method('read')
-            ->with(self::RES_DIR, 'en')
-            ->will($this->returnValue($data));
+            ->with(self::RES_DIR, 'root')
+            ->will($this->returnValue(self::$data));
 
-        $this->assertSame($data, $this->reader->read(self::RES_DIR, 'en'));
+        $this->assertSame(self::$data, $this->reader->read(self::RES_DIR, 'root'));
     }
 
     public function testReadEntireDataFileIfNoIndicesGiven()
     {
-        $data = array('foo', 'bar');
-
-        $this->readerImpl->expects($this->once())
+        $this->readerImpl->expects($this->at(0))
             ->method('read')
             ->with(self::RES_DIR, 'en')
-            ->will($this->returnValue($data));
+            ->will($this->returnValue(self::$data));
 
-        $this->assertSame($data, $this->reader->readEntry(self::RES_DIR, 'en', array()));
+        $this->readerImpl->expects($this->at(1))
+            ->method('read')
+            ->with(self::RES_DIR, 'root')
+            ->will($this->returnValue(self::$fallbackData));
+
+        $this->assertSame(self::$mergedData, $this->reader->readEntry(self::RES_DIR, 'en', array()));
     }
 
     public function testReadExistingEntry()
     {
-        $data = array('Foo' => array('Bar' => 'Baz'));
-
         $this->readerImpl->expects($this->once())
             ->method('read')
-            ->with(self::RES_DIR, 'en')
-            ->will($this->returnValue($data));
+            ->with(self::RES_DIR, 'root')
+            ->will($this->returnValue(self::$data));
 
-        $this->assertSame('Baz', $this->reader->readEntry(self::RES_DIR, 'en', array('Foo', 'Bar')));
+        $this->assertSame('Bar', $this->reader->readEntry(self::RES_DIR, 'root', array('Entries', 'Foo')));
     }
 
     /**
@@ -78,33 +106,27 @@ class BundleEntryReaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testReadNonExistingEntry()
     {
-        $data = array('Foo' => 'Baz');
-
         $this->readerImpl->expects($this->once())
             ->method('read')
-            ->with(self::RES_DIR, 'en')
-            ->will($this->returnValue($data));
+            ->with(self::RES_DIR, 'root')
+            ->will($this->returnValue(self::$data));
 
-        $this->reader->readEntry(self::RES_DIR, 'en', array('Foo', 'Bar'));
+        $this->reader->readEntry(self::RES_DIR, 'root', array('Entries', 'NonExisting'));
     }
 
     public function testFallbackIfEntryDoesNotExist()
     {
-        $data = array('Foo' => 'Bar');
-
         $this->readerImpl->expects($this->at(0))
             ->method('read')
             ->with(self::RES_DIR, 'en_GB')
-            ->will($this->returnValue($data));
-
-        $fallbackData = array('Foo' => array('Bar' => 'Baz'));
+            ->will($this->returnValue(self::$data));
 
         $this->readerImpl->expects($this->at(1))
             ->method('read')
             ->with(self::RES_DIR, 'en')
-            ->will($this->returnValue($fallbackData));
+            ->will($this->returnValue(self::$fallbackData));
 
-        $this->assertSame('Baz', $this->reader->readEntry(self::RES_DIR, 'en_GB', array('Foo', 'Bar')));
+        $this->assertSame('Lah', $this->reader->readEntry(self::RES_DIR, 'en_GB', array('Entries', 'Bam')));
     }
 
     /**
@@ -112,14 +134,12 @@ class BundleEntryReaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testDontFallbackIfEntryDoesNotExistAndFallbackDisabled()
     {
-        $data = array('Foo' => 'Bar');
-
         $this->readerImpl->expects($this->once())
             ->method('read')
             ->with(self::RES_DIR, 'en_GB')
-            ->will($this->returnValue($data));
+            ->will($this->returnValue(self::$data));
 
-        $this->reader->readEntry(self::RES_DIR, 'en_GB', array('Foo', 'Bar'), false);
+        $this->reader->readEntry(self::RES_DIR, 'en_GB', array('Entries', 'Bam'), false);
     }
 
     public function testFallbackIfLocaleDoesNotExist()
@@ -127,16 +147,14 @@ class BundleEntryReaderTest extends \PHPUnit_Framework_TestCase
         $this->readerImpl->expects($this->at(0))
             ->method('read')
             ->with(self::RES_DIR, 'en_GB')
-            ->will($this->throwException(new NoSuchLocaleException()));
-
-        $fallbackData = array('Foo' => array('Bar' => 'Baz'));
+            ->will($this->throwException(new ResourceBundleNotFoundException()));
 
         $this->readerImpl->expects($this->at(1))
             ->method('read')
             ->with(self::RES_DIR, 'en')
-            ->will($this->returnValue($fallbackData));
+            ->will($this->returnValue(self::$fallbackData));
 
-        $this->assertSame('Baz', $this->reader->readEntry(self::RES_DIR, 'en_GB', array('Foo', 'Bar')));
+        $this->assertSame('Lah', $this->reader->readEntry(self::RES_DIR, 'en_GB', array('Entries', 'Bam')));
     }
 
     /**
@@ -147,9 +165,9 @@ class BundleEntryReaderTest extends \PHPUnit_Framework_TestCase
         $this->readerImpl->expects($this->once())
             ->method('read')
             ->with(self::RES_DIR, 'en_GB')
-            ->will($this->throwException(new NoSuchLocaleException()));
+            ->will($this->throwException(new ResourceBundleNotFoundException()));
 
-        $this->reader->readEntry(self::RES_DIR, 'en_GB', array('Foo', 'Bar'), false);
+        $this->reader->readEntry(self::RES_DIR, 'en_GB', array('Entries', 'Bam'), false);
     }
 
     public function provideMergeableValues()
@@ -173,21 +191,21 @@ class BundleEntryReaderTest extends \PHPUnit_Framework_TestCase
         if (null === $childData || is_array($childData)) {
             $this->readerImpl->expects($this->at(0))
                 ->method('read')
-                ->with(self::RES_DIR, 'en_GB')
+                ->with(self::RES_DIR, 'en')
                 ->will($this->returnValue($childData));
 
             $this->readerImpl->expects($this->at(1))
                 ->method('read')
-                ->with(self::RES_DIR, 'en')
+                ->with(self::RES_DIR, 'root')
                 ->will($this->returnValue($parentData));
         } else {
             $this->readerImpl->expects($this->once())
                 ->method('read')
-                ->with(self::RES_DIR, 'en_GB')
+                ->with(self::RES_DIR, 'en')
                 ->will($this->returnValue($childData));
         }
 
-        $this->assertSame($result, $this->reader->readEntry(self::RES_DIR, 'en_GB', array(), true));
+        $this->assertSame($result, $this->reader->readEntry(self::RES_DIR, 'en', array(), true));
     }
 
     /**
@@ -211,21 +229,21 @@ class BundleEntryReaderTest extends \PHPUnit_Framework_TestCase
         if (null === $childData || is_array($childData)) {
             $this->readerImpl->expects($this->at(0))
                 ->method('read')
-                ->with(self::RES_DIR, 'en_GB')
+                ->with(self::RES_DIR, 'en')
                 ->will($this->returnValue(array('Foo' => array('Bar' => $childData))));
 
             $this->readerImpl->expects($this->at(1))
                 ->method('read')
-                ->with(self::RES_DIR, 'en')
+                ->with(self::RES_DIR, 'root')
                 ->will($this->returnValue(array('Foo' => array('Bar' => $parentData))));
         } else {
             $this->readerImpl->expects($this->once())
                 ->method('read')
-                ->with(self::RES_DIR, 'en_GB')
+                ->with(self::RES_DIR, 'en')
                 ->will($this->returnValue(array('Foo' => array('Bar' => $childData))));
         }
 
-        $this->assertSame($result, $this->reader->readEntry(self::RES_DIR, 'en_GB', array('Foo', 'Bar'), true));
+        $this->assertSame($result, $this->reader->readEntry(self::RES_DIR, 'en', array('Foo', 'Bar'), true));
     }
 
     /**

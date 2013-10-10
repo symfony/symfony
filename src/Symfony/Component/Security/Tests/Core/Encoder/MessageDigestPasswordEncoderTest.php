@@ -42,4 +42,21 @@ class MessageDigestPasswordEncoderTest extends \PHPUnit_Framework_TestCase
         $encoder = new MessageDigestPasswordEncoder('foobar');
         $encoder->encodePassword('password', '');
     }
+
+    /**
+     * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
+     */
+    public function testEncodePasswordLength()
+    {
+        $encoder = new MessageDigestPasswordEncoder();
+
+        $encoder->encodePassword(str_repeat('a', 5000), 'salt');
+    }
+
+    public function testCheckPasswordLength()
+    {
+        $encoder = new MessageDigestPasswordEncoder();
+
+        $this->assertFalse($encoder->isPasswordValid('encoded', str_repeat('a', 5000), 'salt'));
+    }
 }

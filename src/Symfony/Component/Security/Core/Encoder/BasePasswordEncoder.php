@@ -18,6 +18,8 @@ namespace Symfony\Component\Security\Core\Encoder;
  */
 abstract class BasePasswordEncoder implements PasswordEncoderInterface
 {
+    const MAX_PASSWORD_LENGTH = 4096;
+
     /**
      * Demerges a merge password and salt string.
      *
@@ -87,5 +89,15 @@ abstract class BasePasswordEncoder implements PasswordEncoderInterface
         }
 
         return 0 === $result;
+    }
+
+    /**
+     * Checks if the password is too long.
+     *
+     * @return Boolean true if the password is too long, false otherwise
+     */
+    protected function isPasswordTooLong($password)
+    {
+        return strlen($password) > self::MAX_PASSWORD_LENGTH;
     }
 }

@@ -168,7 +168,12 @@ class FrameworkExtension extends Extension
             $loader->load('form_csrf.xml');
 
             $container->setParameter('form.type_extension.csrf.enabled', true);
-            $container->setParameter('form.type_extension.csrf.field_name', $config['csrf_protection']['field_name']);
+
+            if (null !== $config['form']['csrf_protection']['field_name']) {
+                $container->setParameter('form.type_extension.csrf.field_name', $config['form']['csrf_protection']['field_name']);
+            } else {
+                $container->setParameter('form.type_extension.csrf.field_name', $config['csrf_protection']['field_name']);
+            }
         } else {
             $container->setParameter('form.type_extension.csrf.enabled', false);
         }

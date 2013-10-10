@@ -122,7 +122,7 @@ class ClassNotFoundFatalErrorHandler implements FatalErrorHandlerInterface
     private function findClassInPath($loader, $path, $class)
     {
         if (!$path = realpath($path)) {
-            continue;
+            return array();
         }
 
         $classes = array();

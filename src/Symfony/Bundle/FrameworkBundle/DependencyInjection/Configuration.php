@@ -115,6 +115,9 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('form')
                     ->info('form configuration')
                     ->canBeEnabled()
+                    ->children()
+                        ->scalarNode('csrf_protection')->defaultTrue()->end()
+                    ->end()
                 ->end()
             ->end()
         ;

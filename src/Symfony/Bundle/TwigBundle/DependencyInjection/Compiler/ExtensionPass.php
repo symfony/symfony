@@ -13,6 +13,7 @@ namespace Symfony\Bundle\TwigBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 /**
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
@@ -23,6 +24,16 @@ class ExtensionPass implements CompilerPassInterface
     {
         if ($container->has('form.extension')) {
             $container->getDefinition('twig.extension.form')->addTag('twig.extension');
+
+            foreach ($container->getExtensions() as $extension) {
+                if ($extension instanceof Extension && in_array('Symfony\Bridge\Twig\Extension\FormExtension', $extension->getClassesToCompile(), true)) {
+                    throw new \RuntimeException(sprintf(
+                        'The "%s" extension cannot add "Symfony\Bridge\Twig\Extension\FormExtension" class to the class cache, because it is necessary to know the path to the original file.',
+                        $extension->getAlias()
+                    ));
+                }
+            }
+
             $reflClass = new \ReflectionClass('Symfony\Bridge\Twig\Extension\FormExtension');
             $container->getDefinition('twig.loader.filesystem')->addMethodCall('addPath', array(dirname(dirname($reflClass->getFileName())).'/Resources/views/Form'));
         }

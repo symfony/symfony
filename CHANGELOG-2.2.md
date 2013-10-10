@@ -7,6 +7,24 @@ in 2.2 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.2.0...v2.2.1
 
+* 2.2.9 (2013-10-10)
+
+ * [Security] limited the password length passed to encoders
+ * bug #9237 [FrameworkBundle] assets:install command should mirror .dotfiles (.htaccess) (FineWolf)
+ * bug #9223 [Translator] PoFileDumper - PO headers (Padam87)
+ * bug #9257 [Process] Fix 9182 : random failure on pipes tests (romainneutron)
+ * bug #9222 [Bridge] [Propel1] Fixed guessed relations (ClementGautier)
+ * bug #9214 [FramworkBundle] Check event listener services are not abstract (lyrixx)
+ * bug #9207 [HttpKernel] Check for lock existence before unlinking (ollietb)
+ * bug #9184 Fixed cache warmup of paths which contain back-slashes (fabpot)
+ * bug #9192 [Form] remove MinCount and MaxCount constraints in ValidatorTypeGuesser (franek)
+ * bug #9190 Fix: duplicate usage of Symfony\Component\HttpFoundation\Response (realsim)
+ * bug #9188 [Form] add support for Length and Range constraint in ValidatorTypeGuesser (franek)
+ * bug #8809 [Form] enforce correct timezone (Burgov)
+ * bug #9169 Fixed client insulation when using the terminable event (fabpot)
+ * bug #9154 Fix problem with Windows file links (backslash in JavaScript string) (fabpot)
+ * bug #9103 [HttpFoundation] Header `HTTP_X_FORWARDED_PROTO` can contain various values (stloyd)
+
 * 2.2.8 (2013-09-25)
 
  * same as 2.2.7

@@ -74,6 +74,10 @@ EOF
             $this->command = $this->getApplication()->find($input->getArgument('command_name'));
         }
 
+        if ($this->command instanceof self) {
+            $this->command->configure();
+        }
+
         if ($input->getOption('xml')) {
             $output->writeln($this->command->asXml(), OutputInterface::OUTPUT_RAW);
         } else {

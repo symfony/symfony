@@ -303,20 +303,17 @@ class Process
         if (null !== $callback) {
             $this->callback = $this->buildCallback($callback);
         }
-        
+
         do {
             $this->checkTimeout();
             $running = defined('PHP_WINDOWS_VERSION_BUILD') ? $this->isRunning() : $this->processPipes->hasOpenHandles();
             $close = !defined('PHP_WINDOWS_VERSION_BUILD') || !$running;;
             $this->readPipes(true, $close);
         } while ($running);
-        
+
         while ($this->isRunning()) {
             usleep(1000);
         }
-
-        $this->processPipes->close();
-        $exitcode = proc_close($this->process);
 
         if ($this->processInformation['signaled']) {
             if ($this->isSigchildEnabled()) {
@@ -1118,7 +1115,7 @@ class Process
         } else {
             $result = $this->processPipes->read($blocking);
         }
-        
+
         foreach ($result as $type => $data) {
             if (3 == $type) {
                 $this->fallbackExitcode = (int) $data;
@@ -1148,26 +1145,10 @@ class Process
     {
         $exitcode = -1;
 
+        $this->processPipes->close();
         if (is_resource($this->process)) {
-            // Unix pipes must be closed before calling proc_close to void deadlock
-            // see manual http://php.net/manual/en/function.proc-close.php
-            $this->processPipes->closeUnixPipes();
             $exitcode = proc_close($this->process);
         }
-
-        // Windows only : when using file handles, some activity may occur after
-        // calling proc_close
-        while ($this->processPipes->hasOpenHandles()) {
-            usleep(100);
-            foreach ($this->processPipes->readAndCloseHandles(true) as $type => $data) {
-                if (3 == $type) {
-                    $this->fallbackExitcode = (int) $data;
-                } else {
-                    call_user_func($this->callback, $type === self::STDOUT ? self::OUT : self::ERR, $data);
-                }
-            }
-        }
-        $this->processPipes->close();
 
         $this->exitcode = $this->exitcode !== null ? $this->exitcode : -1;
         $this->exitcode = -1 != $exitcode ? $exitcode : $this->exitcode;

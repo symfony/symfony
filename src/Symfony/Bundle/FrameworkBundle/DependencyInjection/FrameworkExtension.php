@@ -93,8 +93,10 @@ class FrameworkExtension extends Extension
             $this->registerSessionConfiguration($config['session'], $container, $loader);
         }
 
+        $loader->load('security.xml');
+
         if (isset($config['csrf_protection'])) {
-            $this->registerSecurityConfiguration($config['csrf_protection'], $container, $loader);
+            $this->registerSecurityCsrfConfiguration($config['csrf_protection'], $container, $loader);
         }
 
         if ($this->isConfigEnabled($container, $config['form'])) {
@@ -731,10 +733,8 @@ class FrameworkExtension extends Extension
      *
      * @throws \LogicException
      */
-    private function registerSecurityConfiguration(array $config, ContainerBuilder $container, $loader)
+    private function registerSecurityCsrfConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
-        $loader->load('security.xml');
-
         if ($this->isConfigEnabled($container, $config)) {
             if (!$this->sessionConfigEnabled) {
                 throw new \LogicException('CSRF protection needs that sessions are enabled.');

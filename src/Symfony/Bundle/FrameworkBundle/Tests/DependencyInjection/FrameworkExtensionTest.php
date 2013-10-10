@@ -50,6 +50,13 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->createContainerFromFile('csrf');
     }
 
+    public function testSecureRandomIsAvailableIfCsrfIsDisabled()
+    {
+        $container = $this->createContainerFromFile('csrf_disabled');
+
+        $this->assertTrue($container->hasDefinition('security.secure_random'));
+    }
+
     public function testProxies()
     {
         $container = $this->createContainerFromFile('full');

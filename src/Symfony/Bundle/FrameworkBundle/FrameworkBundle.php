@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddConstraintValidatorsPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddValidatorInitializersPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddConsoleCommandPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ClassesToCompilePass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\FormPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TemplatingPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RoutingResolverPass;
@@ -81,6 +82,7 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new TranslationDumperPass());
         $container->addCompilerPass(new FragmentRendererPass(), PassConfig::TYPE_AFTER_REMOVING);
         $container->addCompilerPass(new SerializerPass());
+        $container->addCompilerPass(new ClassesToCompilePass());
 
         if ($container->getParameter('kernel.debug')) {
             $container->addCompilerPass(new ContainerBuilderDebugDumpPass(), PassConfig::TYPE_AFTER_REMOVING);

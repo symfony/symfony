@@ -82,15 +82,16 @@ class TextBundleWriter implements BundleWriterInterface
         }
 
         if (is_array($value)) {
-            if (count($value) === count(array_filter($value, 'is_int'))) {
+            $intValues = count($value) === count(array_filter($value, 'is_int'));
+            $intKeys = count($value) === count(array_filter(array_keys($value), 'is_int'));
+
+            if ($intValues && $intKeys) {
                 $this->writeIntVector($file, $value, $indentation);
 
                 return;
             }
 
-            $keys = array_keys($value);
-
-            if (count($keys) === count(array_filter($keys, 'is_int'))) {
+            if ($intKeys) {
                 $this->writeArray($file, $value, $indentation);
 
                 return;

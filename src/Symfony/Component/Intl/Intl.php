@@ -197,7 +197,11 @@ class Intl
     public static function getFallbackLocale($locale)
     {
         if (false === $pos = strrpos($locale, '_')) {
-            return null;
+            if ('root' === $locale) {
+                return null;
+            }
+
+            return 'root';
         }
 
         return substr($locale, 0, $pos);

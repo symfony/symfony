@@ -53,13 +53,10 @@ class MessageDigestPasswordEncoderTest extends \PHPUnit_Framework_TestCase
         $encoder->encodePassword(str_repeat('a', 5000), 'salt');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
-     */
     public function testCheckPasswordLength()
     {
         $encoder = new MessageDigestPasswordEncoder();
 
-        $encoder->isPasswordValid('encoded', str_repeat('a', 5000), 'salt');
+        $this->assertFalse($encoder->isPasswordValid('encoded', str_repeat('a', 5000), 'salt'));
     }
 }

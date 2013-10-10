@@ -25,7 +25,13 @@ class PoFileDumper extends FileDumper
      */
     public function format(MessageCatalogue $messages, $domain = 'messages')
     {
-        $output = '';
+        $output = 'msgid ""'."\n";
+        $output .= 'msgstr ""'."\n";
+        $output .= '"Content-Type: text/plain; charset=UTF-8\n"'."\n";
+        $output .= '"Content-Transfer-Encoding: 8bit\n"'."\n";
+        $output .= '"Language: '.$messages->getLocale().'\n"'."\n";
+        $output .= "\n";
+
         $newLine = false;
         foreach ($messages->all($domain) as $source => $target) {
             if ($newLine) {

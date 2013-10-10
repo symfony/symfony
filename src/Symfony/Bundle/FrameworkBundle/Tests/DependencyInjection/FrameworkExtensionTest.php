@@ -38,14 +38,7 @@ abstract class FrameworkExtensionTest extends TestCase
      */
     public function testCsrfProtectionNeedsSessionToBeEnabled()
     {
-        $container = $this->createContainerFromFile('csrf_needs_session');
-
-        $def = $container->getDefinition('form.type_extension.csrf');
-
-        $this->assertTrue($container->getParameter('form.type_extension.csrf.enabled'));
-        $this->assertEquals('%form.type_extension.csrf.enabled%', $def->getArgument(1));
-        $this->assertEquals('_csrf', $container->getParameter('form.type_extension.csrf.field_name'));
-        $this->assertEquals('%form.type_extension.csrf.field_name%', $def->getArgument(2));
+        $this->createContainerFromFile('csrf_needs_session');
     }
 
     /**
@@ -54,9 +47,7 @@ abstract class FrameworkExtensionTest extends TestCase
      */
     public function testCsrfProtectionForFormsNeedCsrfProtectionToBeEnabled()
     {
-        $container = $this->createContainerFromFile('csrf');
-
-        $this->assertFalse($container->getParameter('form.type_extension.csrf.enabled'));
+        $this->createContainerFromFile('csrf');
     }
 
     public function testProxies()
@@ -304,6 +295,13 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertCount(2, $xmlArgs);
         $this->assertStringEndsWith('Component'.DIRECTORY_SEPARATOR.'Form/Resources/config/validation.xml', $xmlArgs[0]);
         $this->assertStringEndsWith('TestBundle'.DIRECTORY_SEPARATOR.'Resources'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'validation.xml', $xmlArgs[1]);
+    }
+
+    public function testFormsCanBeEnabledWithoutCsrfProtection()
+    {
+        $container = $this->createContainerFromFile('form_no_csrf');
+
+        $this->assertFalse($container->getParameter('form.type_extension.csrf.enabled'));
     }
 
     protected function createContainer(array $data = array())

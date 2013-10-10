@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by tPl0ch at 2013-10-07T19:16:59Z
+
+@stof Actually getting totally rid of `array_merge` is the best in this scenario. Since array_merge is only appending for numeric keys, but still creates a copy of the original array, just passing in an array reference would be the best.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-10-09T20:54:58Z
+
+Can you revert the passing by reference as we never do that?
+
+---------------------------------------------------------------------------
+
+by tPl0ch at 2013-10-09T23:13:05Z
+
+@fabpot done

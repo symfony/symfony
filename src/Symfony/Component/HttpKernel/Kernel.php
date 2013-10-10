@@ -56,11 +56,11 @@ abstract class Kernel implements KernelInterface
     protected $startTime;
     protected $classes;
 
-    const VERSION         = '2.0.24';
-    const VERSION_ID      = '20024';
+    const VERSION         = '2.0.25';
+    const VERSION_ID      = '20025';
     const MAJOR_VERSION   = '2';
     const MINOR_VERSION   = '0';
-    const RELEASE_VERSION = '24';
+    const RELEASE_VERSION = '25';
     const EXTRA_VERSION   = '';
 
     /**

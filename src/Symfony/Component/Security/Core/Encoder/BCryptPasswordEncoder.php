@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Core\Encoder;
 
 use Symfony\Component\Security\Core\Encoder\BasePasswordEncoder;
 use Symfony\Component\Security\Core\Util\SecureRandomInterface;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 
 /**
  * @author Elnur Abdurrakhimov <elnur@elnur.pro>
@@ -60,6 +61,10 @@ class BCryptPasswordEncoder extends BasePasswordEncoder
      */
     public function encodePassword($raw, $salt)
     {
+        if ($this->isPasswordTooLong($raw)) {
+            throw new BadCredentialsException('Invalid password.');
+        }
+
         if (function_exists('password_hash')) {
             return password_hash($raw, PASSWORD_BCRYPT, array('cost' => $this->cost));
         }
@@ -78,6 +83,10 @@ class BCryptPasswordEncoder extends BasePasswordEncoder
      */
     public function isPasswordValid($encoded, $raw, $salt)
     {
+        if ($this->isPasswordTooLong($raw)) {
+            return false;
+        }
+
         if (function_exists('password_verify')) {
             return password_verify($raw, $encoded);
         }

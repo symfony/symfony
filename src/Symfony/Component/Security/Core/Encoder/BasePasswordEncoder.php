@@ -20,6 +20,8 @@ use Symfony\Component\Security\Core\Util\StringUtils;
  */
 abstract class BasePasswordEncoder implements PasswordEncoderInterface
 {
+    const MAX_PASSWORD_LENGTH = 4096;
+
     /**
      * Demerges a merge password and salt string.
      *
@@ -82,5 +84,15 @@ abstract class BasePasswordEncoder implements PasswordEncoderInterface
     protected function comparePasswords($password1, $password2)
     {
         return StringUtils::equals($password1, $password2);
+    }
+
+    /**
+     * Checks if the password is too long.
+     *
+     * @return Boolean true if the password is too long, false otherwise
+     */
+    protected function isPasswordTooLong($password)
+    {
+        return strlen($password) > self::MAX_PASSWORD_LENGTH;
     }
 }

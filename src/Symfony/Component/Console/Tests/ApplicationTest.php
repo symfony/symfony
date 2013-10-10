@@ -127,7 +127,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException LogicException
+     * @expectedException InvalidArgumentException
      * @expectedExceptionMessage You must call the parent constructor in "Foo5Command::__construct()"
      */
     public function testAddCommandWithEmptyContructor()

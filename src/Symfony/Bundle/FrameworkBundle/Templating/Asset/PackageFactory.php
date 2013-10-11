@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Templating\Asset;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Templating\Asset\PackageInterface;
 
 /**
@@ -32,14 +32,14 @@ class PackageFactory
     /**
      * Returns either the HTTP or SSL version of an asset package.
      *
-     * @param Request $request The current request
-     * @param string  $httpId  The id for the package to use when the current request is HTTP
-     * @param string  $sslId   The id for the package to use when the current request is SSL
+     * @param Request $requestStack A RequestStack instance
+     * @param string  $httpId       The id for the package to use when the current request is HTTP
+     * @param string  $sslId        The id for the package to use when the current request is SSL
      *
      * @return PackageInterface The package
      */
-    public function getPackage(Request $request, $httpId, $sslId)
+    public function getPackage(RequestStack $requestStack, $httpId, $sslId)
     {
-        return $this->container->get($request->isSecure() ? $sslId : $httpId);
+        return $this->container->get($requestStack->getMasterRequest()->isSecure() ? $sslId : $httpId);
     }
 }

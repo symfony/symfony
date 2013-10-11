@@ -178,6 +178,9 @@ UPGRADE FROM 2.x to 3.0
 
 ### FrameworkBundle
 
+ * The `request` service was removed. You must inject the `request_stack`
+   service instead.
+
  * The `enctype` method of the `form` helper was removed. You should use the
    new method `start` instead.
 

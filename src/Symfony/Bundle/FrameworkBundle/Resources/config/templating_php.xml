@@ -44,7 +44,7 @@
         </service>
 
         <service id="templating.asset.path_package" class="%templating.asset.path_package.class%" abstract="true">
-            <argument type="service" id="request" />
+            <argument type="service" id="request_stack" />
             <argument /> <!-- version -->
             <argument /> <!-- version format -->
         </service>
@@ -56,7 +56,7 @@
         </service>
 
         <service id="templating.asset.request_aware_package" class="Symfony\Component\Templating\Asset\PackageInterface" factory-service="templating.asset.package_factory" factory-method="getPackage" abstract="true">
-            <argument type="service" id="request" strict="false" />
+            <argument type="service" id="request_stack" strict="false" />
             <argument /> <!-- http id -->
             <argument /> <!-- ssl id -->
         </service>
@@ -67,12 +67,12 @@
 
         <service id="templating.helper.request" class="%templating.helper.request.class%">
             <tag name="templating.helper" alias="request" />
-            <argument type="service" id="request" strict="false" />
+            <argument type="service" id="request_stack" strict="false" />
         </service>
 
         <service id="templating.helper.session" class="%templating.helper.session.class%">
             <tag name="templating.helper" alias="session" />
-            <argument type="service" id="request" strict="false" />
+            <argument type="service" id="request_stack" strict="false" />
         </service>
 
         <service id="templating.helper.router" class="%templating.helper.router.class%">

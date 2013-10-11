@@ -786,8 +786,6 @@ class Request
         foreach ($clientIps as $key => $clientIp) {
             if (IpUtils::checkIp($clientIp, $trustedProxies)) {
                 unset($clientIps[$key]);
-
-                continue;
             }
         }
 

@@ -23,6 +23,19 @@ use Egulias\EmailValidator\EmailValidator as StrictEmailValidator;
  */
 class EmailValidator extends ConstraintValidator
 {
+
+    /**
+     * isStrict
+     *
+     * @var boolean
+     */
+    protected $isStrict;
+
+    public function __construct($strict)
+    {
+        $this->isStrict = $strict;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -37,6 +50,9 @@ class EmailValidator extends ConstraintValidator
         }
 
         $value = (string) $value;
+        if ($constraint->strict === null) {
+            $constraint->strict = $this->isStrict;
+        }
 
         if ($constraint->strict === true && class_exists('\Egulias\EmailValidator\EmailValidator')) {
             $strictValidator = new StrictEmailValidator();
@@ -57,7 +73,6 @@ class EmailValidator extends ConstraintValidator
             $this->context->addViolation($constraint->message, array('{{ value }}' => $value));
         }
     }
-
 
     /**
      * Check if one of MX, A or AAAA DNS RR exists.

@@ -75,7 +75,7 @@ class Currency
             throw new InvalidArgumentException('The currency "' . $currency . '" does not exist.');
         }
 
-        if (null !== $displayLocale && !in_array($displayLocale, Locale::getLocales(), true)) {
+        if (null !== $displayLocale && !Locale::exists($displayLocale)) {
             throw new InvalidArgumentException('The locale "' . $displayLocale . '" does not exist.');
         }
 
@@ -111,7 +111,7 @@ class Currency
             throw new InvalidArgumentException('The currency "' . $currency . '" does not exist.');
         }
 
-        if (null !== $displayLocale && !in_array($displayLocale, Locale::getLocales(), true)) {
+        if (null !== $displayLocale && !Locale::exists($displayLocale)) {
             throw new InvalidArgumentException('The locale "' . $displayLocale . '" does not exist.');
         }
 
@@ -141,7 +141,7 @@ class Currency
      */
     public static function getNames($displayLocale = null)
     {
-        if (null !== $displayLocale && !in_array($displayLocale, Locale::getLocales(), true)) {
+        if (null !== $displayLocale && !Locale::exists($displayLocale)) {
             throw new InvalidArgumentException('The locale "' . $displayLocale . '" does not exist.');
         }
 

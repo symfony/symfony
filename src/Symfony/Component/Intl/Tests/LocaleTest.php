@@ -23,6 +23,37 @@ class LocaleTest extends \PHPUnit_Framework_TestCase
         Locale::setDefault('en');
     }
 
+    public function existsProvider()
+    {
+        return array(
+            array(true, 'de'),
+            array(true, 'de_AT'),
+            // scripts are supported in some cases
+            array(true, 'zh_Hant_TW'),
+            // but not in others
+            array(false, 'de_Latn_AT'),
+            // different casing is not supported
+            array(false, 'De_AT'),
+            // hyphens are not supported
+            array(false, 'de-AT'),
+            // aliases with individual translations are supported
+            array(true, 'mo'),
+            // ISO 936-2 is not supported if an equivalent exists in ISO 936-1
+            array(false, 'deu'),
+            array(false, 'deu_AT'),
+            // country aliases are not supported
+            array(false, 'de_AUT'),
+        );
+    }
+
+    /**
+     * @dataProvider existsProvider
+     */
+    public function testExists($exists, $language)
+    {
+        $this->assertSame($exists, Locale::exists($language));
+    }
+
     public function testGetName()
     {
         $this->assertSame('English', Locale::getName('en', 'en'));

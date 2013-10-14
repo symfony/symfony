@@ -12,12 +12,18 @@
 namespace Symfony\Component\Intl\Tests;
 
 use Symfony\Component\Intl\Language;
+use Symfony\Component\Intl\Locale;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class LanguageTest extends \PHPUnit_Framework_TestCase
 {
+    protected function setUp()
+    {
+        Locale::setDefault('en');
+    }
+
     public function existsProvider()
     {
         return array(

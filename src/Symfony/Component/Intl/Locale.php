@@ -35,6 +35,11 @@ class Locale extends \Locale
     private static $locales;
 
     /**
+     * @var integer[]|null
+     */
+    private static $lookupTable;
+
+    /**
      * Returns all available locales.
      *
      * @return string[] A list of ICU locale codes
@@ -48,6 +53,35 @@ class Locale extends \Locale
         }
 
         return self::$locales;
+    }
+
+    /**
+     * Returns whether the given ICU locale exists.
+     *
+     * This method does not canonicalize the given locale. Specifically, it will
+     * return false if the locale is not correctly cased or uses hyphens ("-")
+     * as separators between the subtags instead of underscores ("_"). For
+     * example, this method returns false for "en-Latn-GB", but true for
+     * "en_Latn_GB".
+     *
+     * If you want to support the above cases, you should manually canonicalize
+     * the locale prior to calling this method.
+     *
+     * @param string $locale A canonicalized ICU locale (e.g. "en_Latn_GB")
+     *
+     * @return Boolean Whether the locale exists
+     *
+     * @see canonicalize
+     *
+     * @api
+     */
+    public static function exists($locale)
+    {
+        if (null === self::$lookupTable) {
+            self::$lookupTable = array_flip(static::getLocales());
+        }
+
+        return isset(self::$lookupTable[$locale]);
     }
 
     /**
@@ -74,7 +108,7 @@ class Locale extends \Locale
      */
     public static function getName($locale, $displayLocale = null)
     {
-        if (!in_array($locale, self::getLocales(), true)) {
+        if (!static::exists($locale)) {
             throw new InvalidArgumentException('The locale "' . $locale . '" does not exist.');
         }
 
@@ -108,7 +142,7 @@ class Locale extends \Locale
      */
     public static function getNames($displayLocale = null)
     {
-        if (null !== $displayLocale && !in_array($displayLocale, Locale::getLocales(), true)) {
+        if (null !== $displayLocale && !Locale::exists($displayLocale)) {
             throw new InvalidArgumentException('The locale "' . $displayLocale . '" does not exist.');
         }
 

@@ -80,7 +80,7 @@ class Language
      * provided where an equivalent ISO 639-1 two-letter code exists.
      *
      * If you want to support the above cases, you should manually canonicalize
-     * the language code in prior to calling this method.
+     * the language code prior to calling this method.
      *
      * @param string $language A canonicalized ISO 639 language code (e.g. "en")
      *
@@ -184,7 +184,7 @@ class Language
             throw new InvalidArgumentException('The language "' . $language . '" does not exist.');
         }
 
-        if (null !== $displayLocale && !in_array($displayLocale, Locale::getLocales(), true)) {
+        if (null !== $displayLocale && !Locale::exists($displayLocale)) {
             throw new InvalidArgumentException('The locale "' . $displayLocale . '" does not exist.');
         }
 
@@ -215,7 +215,7 @@ class Language
      */
     public static function getNames($displayLocale = null)
     {
-        if (null !== $displayLocale && !in_array($displayLocale, Locale::getLocales(), true)) {
+        if (null !== $displayLocale && !Locale::exists($displayLocale)) {
             throw new InvalidArgumentException('The locale "' . $displayLocale . '" does not exist.');
         }
 

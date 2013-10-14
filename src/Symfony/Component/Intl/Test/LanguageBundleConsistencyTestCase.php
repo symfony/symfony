@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Intl\Test;
 
-use Symfony\Component\Intl\Exception\NoSuchEntryException;
+use Symfony\Component\Intl\Exception\MissingResourceException;
 use Symfony\Component\Intl\Intl;
 
 /**
@@ -84,7 +84,7 @@ abstract class LanguageBundleConsistencyTestCase extends ConsistencyTestCase
             try {
                 Intl::getLanguageBundle()->getLanguageNames($displayLocale);
                 $translatedLocales[] = $displayLocale;
-            } catch (NoSuchEntryException $e) {
+            } catch (MissingResourceException $e) {
             }
         }
 
@@ -115,7 +115,7 @@ abstract class LanguageBundleConsistencyTestCase extends ConsistencyTestCase
             try {
                 Intl::getLanguageBundle()->getLanguageName($language ?: $displayLocale, null, $displayLocale);
                 $translatedLocales[] = $displayLocale;
-            } catch (NoSuchEntryException $e) {
+            } catch (MissingResourceException $e) {
             }
         }
 
@@ -135,7 +135,7 @@ abstract class LanguageBundleConsistencyTestCase extends ConsistencyTestCase
             try {
                 Intl::getLanguageBundle()->getScriptNames($displayLocale);
                 $translatedLocales[] = $displayLocale;
-            } catch (NoSuchEntryException $e) {
+            } catch (MissingResourceException $e) {
             }
         }
 
@@ -166,7 +166,7 @@ abstract class LanguageBundleConsistencyTestCase extends ConsistencyTestCase
             try {
                 Intl::getLanguageBundle()->getScriptName($script, null, $displayLocale);
                 $translatedLocales[] = $displayLocale;
-            } catch (NoSuchEntryException $e) {
+            } catch (MissingResourceException $e) {
             }
         }
 

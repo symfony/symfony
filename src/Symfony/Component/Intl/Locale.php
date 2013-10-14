@@ -13,7 +13,6 @@ namespace Symfony\Component\Intl;
 
 use Symfony\Component\Icu\LocaleDataProvider;
 use Symfony\Component\Intl\Exception\InvalidArgumentException;
-use Symfony\Component\Intl\Exception\NoSuchEntryException;
 
 /**
  * Provides access to locale-related data.

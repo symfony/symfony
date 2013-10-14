@@ -102,7 +102,7 @@ class BundleEntryReaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Intl\Exception\NoSuchEntryException
+     * @expectedException \Symfony\Component\Intl\Exception\MissingResourceException
      */
     public function testReadNonExistingEntry()
     {
@@ -130,7 +130,7 @@ class BundleEntryReaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Intl\Exception\NoSuchEntryException
+     * @expectedException \Symfony\Component\Intl\Exception\MissingResourceException
      */
     public function testDontFallbackIfEntryDoesNotExistAndFallbackDisabled()
     {
@@ -158,7 +158,7 @@ class BundleEntryReaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Intl\Exception\NoSuchEntryException
+     * @expectedException \Symfony\Component\Intl\Exception\MissingResourceException
      */
     public function testDontFallbackIfLocaleDoesNotExistAndFallbackDisabled()
     {
@@ -290,7 +290,7 @@ class BundleEntryReaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Intl\Exception\NoSuchEntryException
+     * @expectedException \Symfony\Component\Intl\Exception\MissingResourceException
      */
     public function testFailIfEntryFoundNeitherInParentNorChild()
     {

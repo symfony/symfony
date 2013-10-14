@@ -17,7 +17,7 @@ Intl
 
  * The methods in the various resource bundles of the `Intl` class used to
    return `null` when invalid arguments were given. These methods throw a
-   `NoSuchEntryException` now.
+   `MissingResourceException` now.
 
    Before:
 
@@ -39,7 +39,7 @@ Intl
 
    ```
    use Symfony\Component\Intl\Intl;
-   use Symfony\Component\Intl\Exception\NoSuchEntryException;
+   use Symfony\Component\Intl\Exception\MissingResourceException;
    use Symfony\Component\Intl\Exception\NoSuchLocaleException;
 
    try {
@@ -48,7 +48,7 @@ Intl
 
        // invalid locale
        $language = Intl::getLanguageBundle()->getLanguageName('de', null, 'foo');
-   } catch (NoSuchEntryException $e) {
+   } catch (MissingResourceException $e) {
        if ($e->getPrevious() instanceof NoSuchLocaleException) {
            // locale was invalid...
        } else {

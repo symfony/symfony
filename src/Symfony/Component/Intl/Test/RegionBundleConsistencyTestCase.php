@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Intl\Test;
 
-use Symfony\Component\Intl\Exception\NoSuchEntryException;
+use Symfony\Component\Intl\Exception\MissingResourceException;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\Intl\Test\ConsistencyTestCase;
 
@@ -81,7 +81,7 @@ abstract class RegionBundleConsistencyTestCase extends ConsistencyTestCase
             try {
                 Intl::getRegionBundle()->getCountryNames($displayLocale);
                 $translatedLocales[] = $displayLocale;
-            } catch (NoSuchEntryException $e) {
+            } catch (MissingResourceException $e) {
             }
         }
 
@@ -112,7 +112,7 @@ abstract class RegionBundleConsistencyTestCase extends ConsistencyTestCase
             try {
                 Intl::getRegionBundle()->getCountryName($country, $displayLocale);
                 $translatedLocales[] = $displayLocale;
-            } catch (NoSuchEntryException $e) {
+            } catch (MissingResourceException $e) {
             }
         }
 

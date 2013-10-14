@@ -12,7 +12,7 @@
 namespace Symfony\Component\Intl\ResourceBundle;
 
 use Symfony\Component\Icu\LanguageDataProvider;
-use Symfony\Component\Intl\Exception\NoSuchEntryException;
+use Symfony\Component\Intl\Exception\MissingResourceException;
 use Symfony\Component\Intl\Locale;
 use Symfony\Component\Intl\ResourceBundle\Reader\BundleEntryReaderInterface;
 
@@ -67,7 +67,7 @@ class LanguageBundle extends AbstractBundle implements LanguageBundleInterface
         if (null !== $region) {
             try {
                 return $this->languageDataProvider->getName($lang.'_'.$region, $locale);
-            } catch (NoSuchEntryException $e) {
+            } catch (MissingResourceException $e) {
             }
         }
 

@@ -65,8 +65,7 @@ class Currency
      *
      * @return string The currency symbol for the specified locale
      *
-     * @throws Exception\InvalidArgumentException If the currency or the locale
-     *                                            is invalid
+     * @throws InvalidArgumentException If the currency or the locale is invalid
      *
      * @api
      */
@@ -84,11 +83,7 @@ class Currency
             $displayLocale = \Locale::getDefault();
         }
 
-        try {
-            return self::getDataProvider()->getSymbol($currency, $displayLocale);
-        } catch (NoSuchEntryException $e) {
-            return $currency;
-        }
+        return self::getDataProvider()->getSymbol($currency, $displayLocale);
     }
 
     /**
@@ -106,8 +101,7 @@ class Currency
      *
      * @return string The name of the currency
      *
-     * @throws Exception\InvalidArgumentException If the currency or the locale
-     *                                            is invalid
+     * @throws InvalidArgumentException If the currency or the locale is invalid
      *
      * @api
      */
@@ -125,11 +119,7 @@ class Currency
             $displayLocale = \Locale::getDefault();
         }
 
-        try {
-            return self::getDataProvider()->getName($currency, $displayLocale);
-        } catch (NoSuchEntryException $e) {
-            return $currency;
-        }
+        return self::getDataProvider()->getName($currency, $displayLocale);
     }
 
     /**
@@ -145,7 +135,7 @@ class Currency
      *
      * @return string[] An array of currency names indexed by currency codes
      *
-     * @throws Exception\InvalidArgumentException If the locale is invalid
+     * @throws InvalidArgumentException If the locale is invalid
      *
      * @api
      */
@@ -172,7 +162,7 @@ class Currency
      *
      * @return integer The number of digits after the comma
      *
-     * @throws Exception\InvalidArgumentException If the currency is invalid
+     * @throws InvalidArgumentException If the currency is invalid
      *
      * @api
      */
@@ -196,7 +186,7 @@ class Currency
      *
      * @return integer The rounding increment
      *
-     * @throws Exception\InvalidArgumentException If the currency is invalid
+     * @throws InvalidArgumentException If the currency is invalid
      *
      * @api
      */
@@ -219,7 +209,7 @@ class Currency
      *
      * @return integer The numeric code
      *
-     * @throws Exception\InvalidArgumentException If the currency is invalid
+     * @throws InvalidArgumentException If the currency is invalid
      *
      * @api
      */

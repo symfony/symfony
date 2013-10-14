@@ -13,7 +13,6 @@ namespace Symfony\Component\Intl;
 
 use Symfony\Component\Icu\LanguageDataProvider;
 use Symfony\Component\Intl\Exception\InvalidArgumentException;
-use Symfony\Component\Intl\Exception\NoSuchEntryException;
 
 /**
  * Provides access to language-related data.
@@ -193,11 +192,7 @@ class Language
             $displayLocale = \Locale::getDefault();
         }
 
-        try {
-            return self::getDataProvider()->getName($language, $displayLocale);
-        } catch (NoSuchEntryException $e) {
-            return $language;
-        }
+        return self::getDataProvider()->getName($language, $displayLocale);
     }
 
     /**
@@ -238,7 +233,9 @@ class Language
      *
      * @return string The ISO 639-2 three-letter code of the language
      *
-     * @throws InvalidArgumentException If the language is invalid
+     * @throws Exception\InvalidArgumentException If the language is invalid
+     * @throws Exception\MissingResourceException If the language has no
+     *                                            corresponding three-letter code
      *
      * @api
      */
@@ -248,7 +245,7 @@ class Language
             throw new InvalidArgumentException('The language "' . $language . '" does not exist.');
         }
 
-        return self::getDataProvider->getAlpha3Code($language);
+        return self::getDataProvider()->getAlpha3Code($language);
     }
 
     /**

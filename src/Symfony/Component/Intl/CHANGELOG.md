@@ -4,7 +4,7 @@ CHANGELOG
 2.4.0
 -----
 
- * [BC BREAK] the various Intl methods now throw a `NoSuchEntryException`
+ * [BC BREAK] the various Intl methods now throw a `MissingResourceException`
    whenever a non-existing locale, language, currency, etc. is accessed
  * the available locales of each resource bundle are now stored in a generic
    "misc.res" file in order to improve reading performance

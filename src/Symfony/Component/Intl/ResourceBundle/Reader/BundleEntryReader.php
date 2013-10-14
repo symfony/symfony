@@ -12,7 +12,7 @@
 namespace Symfony\Component\Intl\ResourceBundle\Reader;
 
 use Symfony\Component\Intl\Intl;
-use Symfony\Component\Intl\Exception\NoSuchEntryException;
+use Symfony\Component\Intl\Exception\MissingResourceException;
 use Symfony\Component\Intl\Exception\ResourceBundleNotFoundException;
 use Symfony\Component\Intl\Exception\OutOfBoundsException;
 use Symfony\Component\Intl\ResourceBundle\Util\RecursiveArrayAccess;
@@ -177,6 +177,6 @@ class BundleEntryReader implements BundleEntryReaderInterface, StructuredBundleR
             );
         }
 
-        throw new NoSuchEntryException($errorMessage, 0, $exception);
+        throw new MissingResourceException($errorMessage, 0, $exception);
     }
 }

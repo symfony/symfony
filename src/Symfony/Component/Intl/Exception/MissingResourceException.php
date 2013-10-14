@@ -16,6 +16,6 @@ namespace Symfony\Component\Intl\Exception;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class NoSuchEntryException extends RuntimeException
+class MissingResourceException extends RuntimeException
 {
 }

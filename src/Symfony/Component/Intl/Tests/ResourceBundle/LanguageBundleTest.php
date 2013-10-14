@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Intl\Tests\ResourceBundle;
 
-use Symfony\Component\Intl\Exception\NoSuchEntryException;
+use Symfony\Component\Intl\Exception\MissingResourceException;
 use Symfony\Component\Intl\ResourceBundle\LanguageBundle;
 
 /**
@@ -62,7 +62,7 @@ class LanguageBundleTest extends \PHPUnit_Framework_TestCase
         $this->reader->expects($this->at(0))
             ->method('readEntry')
             ->with(self::RES_DIR, 'en', array('Languages', 'en_US'))
-            ->will($this->throwException(new NoSuchEntryException()));
+            ->will($this->throwException(new MissingResourceException()));
 
         $this->reader->expects($this->at(1))
             ->method('readEntry')

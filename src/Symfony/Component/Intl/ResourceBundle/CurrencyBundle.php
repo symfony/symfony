@@ -53,7 +53,7 @@ class CurrencyBundle extends CurrencyDataProvider implements CurrencyBundleInter
             $locale = \Locale::getDefault();
         }
 
-        return $this->getDisplayName($currency, $locale);
+        return $this->getName($currency, $locale);
     }
 
     /**
@@ -65,6 +65,6 @@ class CurrencyBundle extends CurrencyDataProvider implements CurrencyBundleInter
             $locale = \Locale::getDefault();
         }
 
-        return $this->getDisplayNames($locale);
+        return $this->getNames($locale);
     }
 }

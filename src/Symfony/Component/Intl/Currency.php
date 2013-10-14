@@ -111,7 +111,7 @@ class Currency
      *
      * @api
      */
-    public static function getDisplayName($currency, $displayLocale = null)
+    public static function getName($currency, $displayLocale = null)
     {
         if (!in_array($currency, self::getCurrencies(), true)) {
             throw new InvalidArgumentException('The currency "' . $currency . '" does not exist.');
@@ -126,7 +126,7 @@ class Currency
         }
 
         try {
-            return self::getDataProvider()->getDisplayName($currency, $displayLocale);
+            return self::getDataProvider()->getName($currency, $displayLocale);
         } catch (NoSuchEntryException $e) {
             return $currency;
         }
@@ -149,7 +149,7 @@ class Currency
      *
      * @api
      */
-    public static function getDisplayNames($displayLocale = null)
+    public static function getNames($displayLocale = null)
     {
         if (null !== $displayLocale && !in_array($displayLocale, Locale::getLocales(), true)) {
             throw new InvalidArgumentException('The locale "' . $displayLocale . '" does not exist.');
@@ -159,7 +159,7 @@ class Currency
             $displayLocale = \Locale::getDefault();
         }
 
-        return self::getDataProvider()->getDisplayNames($displayLocale);
+        return self::getDataProvider()->getNames($displayLocale);
     }
 
     /**

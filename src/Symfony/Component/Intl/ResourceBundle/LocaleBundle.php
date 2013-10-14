@@ -24,19 +24,19 @@ use Symfony\Component\Icu\LocaleDataProvider;
 class LocaleBundle extends LocaleDataProvider implements LocaleBundleInterface
 {
     /**
-     * Alias of {@link getDisplayNames()}.
+     * Alias of {@link getNames()}.
      */
     public function getLocaleNames($locale = null)
     {
-        return $this->getDisplayNames($locale);
+        return $this->getNames($locale);
     }
 
     /**
-     * Alias of {@link getDisplayName()}.
+     * Alias of {@link getName()}.
      */
     public function getLocaleName($ofLocale, $locale = null)
     {
-        return $this->getDisplayName($ofLocale, $locale);
+        return $this->getName($ofLocale, $locale);
     }
 
     /**

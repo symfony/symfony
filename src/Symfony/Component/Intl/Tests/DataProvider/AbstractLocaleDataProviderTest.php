@@ -41,9 +41,9 @@ abstract class AbstractLocaleDataProviderTest extends AbstractDataProviderTest
     /**
      * @dataProvider provideLocales
      */
-    public function testGetDisplayNames($displayLocale)
+    public function testGetNames($displayLocale)
     {
-        $locales = array_keys($this->dataProvider->getDisplayNames($displayLocale));
+        $locales = array_keys($this->dataProvider->getNames($displayLocale));
 
         sort($locales);
 
@@ -54,23 +54,23 @@ abstract class AbstractLocaleDataProviderTest extends AbstractDataProviderTest
      * @dataProvider provideLocaleAliases
      * @group locale-alias-based
      */
-    public function testGetDisplayNamesSupportsAliases($alias, $ofLocale)
+    public function testGetNamesSupportsAliases($alias, $ofLocale)
     {
         $this->assertEquals(
-            $this->dataProvider->getDisplayNames($ofLocale),
-            $this->dataProvider->getDisplayNames($alias)
+            $this->dataProvider->getNames($ofLocale),
+            $this->dataProvider->getNames($alias)
         );
     }
 
     /**
      * @dataProvider provideLocales
      */
-    public function testGetDisplayName($displayLocale)
+    public function testGetName($displayLocale)
     {
-        $names = $this->dataProvider->getDisplayNames($displayLocale);
+        $names = $this->dataProvider->getNames($displayLocale);
 
         foreach ($names as $locale => $name) {
-            $this->assertSame($name, $this->dataProvider->getDisplayName($locale, $displayLocale));
+            $this->assertSame($name, $this->dataProvider->getName($locale, $displayLocale));
         }
     }
 }

@@ -146,7 +146,7 @@ class Locale
      *
      * @throws MethodNotImplementedException
      */
-    public static function getDisplayName($locale, $inLocale = null)
+    public static function getName($locale, $inLocale = null)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }

@@ -61,9 +61,9 @@ class LocaleTest extends AbstractLocaleTest
     /**
      * @expectedException \Symfony\Component\Intl\Exception\MethodNotImplementedException
      */
-    public function testGetDisplayName()
+    public function testGetName()
     {
-        $this->call('getDisplayName', 'pt-Latn-BR', 'en');
+        $this->call('getName', 'pt-Latn-BR', 'en');
     }
 
     /**

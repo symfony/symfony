@@ -39,30 +39,30 @@ class CurrencyTest extends \PHPUnit_Framework_TestCase
         Currency::getSymbol('EUR', 'foo');
     }
 
-    public function testGetDisplayName()
+    public function testGetName()
     {
-        $this->assertSame('Euro', Currency::getDisplayName('EUR', 'en'));
+        $this->assertSame('Euro', Currency::getName('EUR', 'en'));
     }
 
     /**
      * @expectedException \Symfony\Component\Intl\Exception\InvalidArgumentException
      */
-    public function testGetDisplayNameFailsOnInvalidCurrency()
+    public function testGetNameFailsOnInvalidCurrency()
     {
-        Currency::getDisplayName('FOO');
+        Currency::getName('FOO');
     }
 
     /**
      * @expectedException \Symfony\Component\Intl\Exception\InvalidArgumentException
      */
-    public function testGetDisplayNameFailsOnInvalidDisplayLocale()
+    public function testGetNameFailsOnInvalidDisplayLocale()
     {
-        Currency::getDisplayName('EUR', 'foo');
+        Currency::getName('EUR', 'foo');
     }
 
-    public function testGetDisplayNames()
+    public function testGetNames()
     {
-        $names = Currency::getDisplayNames('en');
+        $names = Currency::getNames('en');
 
         $this->assertArrayHasKey('EUR', $names);
         $this->assertSame('Euro', $names['EUR']);
@@ -71,9 +71,9 @@ class CurrencyTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \Symfony\Component\Intl\Exception\InvalidArgumentException
      */
-    public function testGetDisplayNamesFailsOnInvalidDisplayLocale()
+    public function testGetNamesFailsOnInvalidDisplayLocale()
     {
-        Currency::getDisplayNames('foo');
+        Currency::getNames('foo');
     }
 
     public function testGetFractionDigits()

@@ -51,9 +51,9 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
     /**
      * @dataProvider provideLocales
      */
-    public function testGetDisplayNames($displayLocale)
+    public function testGetNames($displayLocale)
     {
-        $names = $this->dataProvider->getDisplayNames($displayLocale);
+        $names = $this->dataProvider->getNames($displayLocale);
 
         $keys = array_keys($names);
 
@@ -73,23 +73,23 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
      * @dataProvider provideLocaleAliases
      * @group locale-alias-based
      */
-    public function testGetDisplayNamesSupportsAliases($alias, $ofLocale)
+    public function testGetNamesSupportsAliases($alias, $ofLocale)
     {
         $this->assertEquals(
-            $this->dataProvider->getDisplayNames($ofLocale),
-            $this->dataProvider->getDisplayNames($alias)
+            $this->dataProvider->getNames($ofLocale),
+            $this->dataProvider->getNames($alias)
         );
     }
 
     /**
      * @dataProvider provideLocales
      */
-    public function testGetDisplayName($displayLocale)
+    public function testGetName($displayLocale)
     {
-        $names = $this->dataProvider->getDisplayNames($displayLocale);
+        $names = $this->dataProvider->getNames($displayLocale);
 
         foreach ($names as $currency => $name) {
-            $this->assertSame($name, $this->dataProvider->getDisplayName($currency, $displayLocale));
+            $this->assertSame($name, $this->dataProvider->getName($currency, $displayLocale));
         }
     }
 
@@ -98,7 +98,7 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
      */
     public function testGetSymbol($displayLocale)
     {
-        $names = $this->dataProvider->getDisplayNames($displayLocale);
+        $names = $this->dataProvider->getNames($displayLocale);
 
         foreach ($names as $currency => $name) {
             $this->assertGreaterThan(0, mb_strlen($this->dataProvider->getSymbol($currency, $displayLocale)));

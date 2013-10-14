@@ -23,30 +23,30 @@ class LocaleTest extends \PHPUnit_Framework_TestCase
         Locale::setDefault('en');
     }
 
-    public function testGetDisplayName()
+    public function testGetName()
     {
-        $this->assertSame('English', Locale::getDisplayName('en', 'en'));
+        $this->assertSame('English', Locale::getName('en', 'en'));
     }
 
     /**
      * @expectedException \Symfony\Component\Intl\Exception\InvalidArgumentException
      */
-    public function testGetDisplayNameFailsOnInvalidLocale()
+    public function testGetNameFailsOnInvalidLocale()
     {
-        Locale::getDisplayName('foo');
+        Locale::getName('foo');
     }
 
     /**
      * @expectedException \Symfony\Component\Intl\Exception\InvalidArgumentException
      */
-    public function testGetDisplayNameFailsOnInvalidDisplayLocale()
+    public function testGetNameFailsOnInvalidDisplayLocale()
     {
-        Locale::getDisplayName('en', 'foo');
+        Locale::getName('en', 'foo');
     }
 
-    public function testGetDisplayNames()
+    public function testGetNames()
     {
-        $names = Locale::getDisplayNames('en');
+        $names = Locale::getNames('en');
 
         $this->assertArrayHasKey('en', $names);
         $this->assertSame('English', $names['en']);
@@ -55,8 +55,8 @@ class LocaleTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \Symfony\Component\Intl\Exception\InvalidArgumentException
      */
-    public function testGetDisplayNamesFailsOnInvalidDisplayLocale()
+    public function testGetNamesFailsOnInvalidDisplayLocale()
     {
-        Locale::getDisplayNames('foo');
+        Locale::getNames('foo');
     }
 }

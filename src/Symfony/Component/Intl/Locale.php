@@ -60,14 +60,20 @@ class Locale extends \Locale
      * If <code>null</code> is passed as display locale, the result of
      * {@link \Locale::getDefault()} is used instead.
      *
-     * @param string $locale        The ICU locale code to return the name of (e.g. "de_AT")
+     * @param string $locale        The ICU locale code to return the name of
+     *                              (e.g. "de_AT")
      * @param string $displayLocale The ICU locale code to return the name in
      *
      * @return string The name of the locale
      *
+     * @throws InvalidArgumentException If the locale or the display locale is
+     *                                  invalid
+     *
+     * @see getNames
+     *
      * @api
      */
-    public static function getDisplayName($locale, $displayLocale = null)
+    public static function getName($locale, $displayLocale = null)
     {
         if (!in_array($locale, self::getLocales(), true)) {
             throw new InvalidArgumentException('The locale "' . $locale . '" does not exist.');
@@ -81,7 +87,7 @@ class Locale extends \Locale
             $displayLocale = \Locale::getDefault();
         }
 
-        return self::getDataProvider()->getDisplayName($locale, $displayLocale);
+        return self::getDataProvider()->getName($locale, $displayLocale);
     }
 
     /**
@@ -95,9 +101,13 @@ class Locale extends \Locale
      * @return string[] A list of locale names indexed by the corresponding ICU
      *                  locale codes
      *
+     * @throws InvalidArgumentException If the display locale is invalid
+     *
+     * @see getName
+     *
      * @api
      */
-    public static function getDisplayNames($displayLocale = null)
+    public static function getNames($displayLocale = null)
     {
         if (null !== $displayLocale && !in_array($displayLocale, Locale::getLocales(), true)) {
             throw new InvalidArgumentException('The locale "' . $displayLocale . '" does not exist.');
@@ -107,7 +117,47 @@ class Locale extends \Locale
             $displayLocale = \Locale::getDefault();
         }
 
-        return self::getDataProvider()->getDisplayNames($displayLocale);
+        return self::getDataProvider()->getNames($displayLocale);
+    }
+
+    /**
+     * Alias of {@link getName()}.
+     *
+     * This method exists for compatibility with the {@link \Locale} class.
+     *
+     * @param string $locale        The ICU locale code to return the name of
+     *                              (e.g. "de_AT")
+     * @param string $displayLocale The ICU locale code to return the name in
+     *
+     * @return string The name of the locale
+     *
+     * @throws InvalidArgumentException If the locale or the display locale is
+     *                                  invalid
+     *
+     * @see getName
+     */
+    public static function getDisplayName($locale, $displayLocale = null)
+    {
+        return static::getName($locale, $displayLocale);
+    }
+
+    /**
+     * Alias of {@link getNames()}.
+     *
+     * This method exists for compatibility with the {@link \Locale} class.
+     *
+     * @param string $displayLocale The ICU locale code to return the names in
+     *
+     * @return string[] A list of locale names indexed by the corresponding ICU
+     *                  locale codes
+     *
+     * @throws InvalidArgumentException If the display locale is invalid
+     *
+     * @see getNames
+     */
+    public static function getDisplayNames($locale, $displayLocale = null)
+    {
+        return static::getNames($locale, $displayLocale);
     }
 
     /**

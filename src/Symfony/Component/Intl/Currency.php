@@ -17,7 +17,7 @@ use Symfony\Component\Intl\Exception\InvalidArgumentException;
 /**
  * Provides access to currency-related data.
  *
- * @since  2.4
+ * @since  2.5
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @api

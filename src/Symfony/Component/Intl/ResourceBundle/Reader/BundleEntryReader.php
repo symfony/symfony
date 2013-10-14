@@ -20,7 +20,7 @@ use Symfony\Component\Intl\ResourceBundle\Util\RecursiveArrayAccess;
 /**
  * A structured reader wrapping an existing resource bundle reader.
  *
- * @since  2.4
+ * @since  2.5
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @see    BundleEntryReaderInterface
  */

@@ -25,7 +25,7 @@ use Symfony\Component\Intl\Exception\InvalidArgumentException;
 class Currency
 {
     /**
-     * @var IcuCurrencyDataProvider
+     * @var CurrencyDataProvider
      */
     private static $dataProvider;
 

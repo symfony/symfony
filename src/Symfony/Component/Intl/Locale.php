@@ -26,7 +26,7 @@ use Symfony\Component\Intl\Exception\NoSuchEntryException;
 class Locale extends \Locale
 {
     /**
-     * @var IcuCurrencyDataProvider
+     * @var LocaleDataProvider
      */
     private static $dataProvider;
 

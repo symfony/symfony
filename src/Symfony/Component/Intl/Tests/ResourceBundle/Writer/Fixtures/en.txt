@@ -19,6 +19,11 @@ en{
             b:int{1}
             c:int{2}
         }
+        TableWithIntKeys{
+            0:int{0}
+            1:int{1}
+            3:int{3}
+        }
         FalseBoolean{"false"}
         TrueBoolean{"true"}
         Null{""}

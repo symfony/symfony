@@ -92,7 +92,7 @@ class Currency
     }
 
     /**
-     * Returns the name for this currency in the given locale.
+     * Returns the name of a currency in the given locale.
      *
      * For example, the name of the Euro ("EUR") in the locale "ru_RU" is
      * "Евро". If the resource data for the given locale contains no entry for

@@ -52,7 +52,7 @@ class Locale extends \Locale
     }
 
     /**
-     * Returns the name of a locale in a specified display locale.
+     * Returns the name of a locale in the given display locale.
      *
      * If there is no suitable name found for a display locale, the ICU locale
      * code is used instead.
@@ -91,7 +91,7 @@ class Locale extends \Locale
     }
 
     /**
-     * Returns the names of all known locales in a specified display locale.
+     * Returns the names of all known locales in the given display locale.
      *
      * If <code>null</code> is passed as display locale, the result of
      * {@link \Locale::getDefault()} is used instead.

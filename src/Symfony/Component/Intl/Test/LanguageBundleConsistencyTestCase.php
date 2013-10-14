@@ -13,6 +13,7 @@ namespace Symfony\Component\Intl\Test;
 
 use Symfony\Component\Intl\Exception\MissingResourceException;
 use Symfony\Component\Intl\Intl;
+use Symfony\Component\Intl\Locale;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -39,7 +40,7 @@ abstract class LanguageBundleConsistencyTestCase extends ConsistencyTestCase
                     return false;
                 }
 
-                $locale = Intl::getFallbackLocale($locale);
+                $locale = Locale::getFallback($locale);
             }
 
             return true;
@@ -62,7 +63,7 @@ abstract class LanguageBundleConsistencyTestCase extends ConsistencyTestCase
                     return false;
                 }
 
-                $targetLocale = Intl::getFallbackLocale($targetLocale);
+                $targetLocale = Locale::getFallback($targetLocale);
             }
 
             return true;

@@ -59,4 +59,19 @@ class LocaleTest extends \PHPUnit_Framework_TestCase
     {
         Locale::getNames('foo');
     }
+
+    public function testGetFallback()
+    {
+        $this->assertSame('fr', Locale::getFallback('fr_FR'));
+    }
+
+    public function testGetFallbackForTopLevelLocale()
+    {
+        $this->assertSame('root', Locale::getFallback('en'));
+    }
+
+    public function testGetFallbackForRoot()
+    {
+        $this->assertNull(Locale::getFallback('root'));
+    }
 }

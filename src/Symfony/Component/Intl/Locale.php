@@ -173,6 +173,29 @@ class Locale extends \Locale
     }
 
     /**
+     * Returns the fallback locale for a given locale, if any
+     *
+     * @param string $locale The ICU locale code to find the fallback for.
+     *
+     * @return string|null The ICU locale code of the fallback locale, or null
+     *                     if no fallback exists
+     *
+     * @api
+     */
+    public static function getFallback($locale)
+    {
+        if (false === $pos = strrpos($locale, '_')) {
+            if ('root' === $locale) {
+                return null;
+            }
+
+            return 'root';
+        }
+
+        return substr($locale, 0, $pos);
+    }
+
+    /**
      * @return LocaleDataProvider
      */
     private static function getDataProvider()

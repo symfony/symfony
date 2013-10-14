@@ -13,7 +13,7 @@ namespace Symfony\Component\Intl\ResourceBundle\Transformer\Rule;
 
 use Symfony\Component\Intl\Exception\MissingResourceException;
 use Symfony\Component\Intl\Exception\ResourceBundleNotFoundException;
-use Symfony\Component\Intl\Intl;
+use Symfony\Component\Intl\Locale;
 use Symfony\Component\Intl\ResourceBundle\LanguageBundleInterface;
 use Symfony\Component\Intl\ResourceBundle\LocaleBundleInterface;
 use Symfony\Component\Intl\ResourceBundle\RegionBundleInterface;
@@ -254,7 +254,7 @@ class LocaleBundleTransformationRule implements TransformationRuleInterface
             $fallback = $displayLocale;
 
             // Recursively search for a fallback locale until one is found
-            while (null !== ($fallback = Intl::getFallbackLocale($fallback))) {
+            while (null !== ($fallback = Locale::getFallback($fallback))) {
                 // Currently, no locale has an alias as fallback locale.
                 // If this starts to be the case, we need to add code here.
                 assert(!isset($aliases[$fallback]));

@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Intl\ResourceBundle\Reader;
 
-use Symfony\Component\Intl\Intl;
 use Symfony\Component\Intl\Exception\MissingResourceException;
 use Symfony\Component\Intl\Exception\ResourceBundleNotFoundException;
 use Symfony\Component\Intl\Exception\OutOfBoundsException;
+use Symfony\Component\Intl\Locale;
 use Symfony\Component\Intl\ResourceBundle\Util\RecursiveArrayAccess;
 
 /**
@@ -144,7 +144,7 @@ class BundleEntryReader implements BundleEntryReaderInterface, StructuredBundleR
             }
 
             // Then determine fallback locale
-            $currentLocale = Intl::getFallbackLocale($currentLocale);
+            $currentLocale = Locale::getFallback($currentLocale);
         }
 
         // Multi-valued entry was merged

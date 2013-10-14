@@ -12,7 +12,7 @@
 namespace Symfony\Component\Intl\ResourceBundle;
 
 use Symfony\Component\Icu\CurrencyDataProvider;
-use Symfony\Component\Locale\Locale;
+use Symfony\Component\Intl\Locale;
 
 /**
  * Default implementation of {@link CurrencyBundleInterface}.

@@ -11,27 +11,46 @@
 
 namespace Symfony\Component\Intl\ResourceBundle;
 
+use Symfony\Component\Icu\LanguageDataProvider;
 use Symfony\Component\Intl\Exception\NoSuchEntryException;
+use Symfony\Component\Intl\Locale;
+use Symfony\Component\Intl\ResourceBundle\Reader\BundleEntryReaderInterface;
 
 /**
  * Default implementation of {@link LanguageBundleInterface}.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+ *             Use {@link LanguageDataProvider} instead.
  */
 class LanguageBundle extends AbstractBundle implements LanguageBundleInterface
 {
+    /**
+     * @var LanguageDataProvider
+     */
+    private $languageDataProvider;
+
+    /**
+     * Creates a bundle at the given path using the given reader for reading
+     * bundle entries.
+     *
+     * @param string                     $path   The path to the resource bundle.
+     * @param BundleEntryReaderInterface $reader The reader for reading the resource bundle.
+     */
+    public function __construct($path, BundleEntryReaderInterface $reader)
+    {
+        $this->languageDataProvider = new LanguageDataProvider($path, $reader);
+
+        parent::__construct($path, $reader);
+    }
+
     /**
      * {@inheritdoc}
      */
     public function getLocales()
     {
-        $locales = $this->readEntry('meta', array('Locales'));
-
-        if ($locales instanceof \Traversable) {
-            $locales = iterator_to_array($locales);
-        }
-
-        return $locales;
+        return Locale::getLocales();
     }
 
     /**
@@ -47,12 +66,12 @@ class LanguageBundle extends AbstractBundle implements LanguageBundleInterface
         // i.e. "en_GB" is translated as "British English"
         if (null !== $region) {
             try {
-                return $this->readEntry($locale, array('Languages', $lang.'_'.$region));
+                return $this->languageDataProvider->getName($lang.'_'.$region, $locale);
             } catch (NoSuchEntryException $e) {
             }
         }
 
-        return $this->readEntry($locale, array('Languages', $lang));
+        return $this->languageDataProvider->getName($lang, $locale);
     }
 
     /**
@@ -64,15 +83,7 @@ class LanguageBundle extends AbstractBundle implements LanguageBundleInterface
             $locale = \Locale::getDefault();
         }
 
-        if (null === ($languages = $this->readEntry($locale, array('Languages')))) {
-            return array();
-        }
-
-        if ($languages instanceof \Traversable) {
-            $languages = iterator_to_array($languages);
-        }
-
-        return $languages;
+        return $this->languageDataProvider->getNames($locale);
     }
 
     /**

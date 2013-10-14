@@ -16,9 +16,6 @@ namespace Symfony\Component\Intl\Tests\DataProvider;
  */
 abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
 {
-    protected static $localesWithoutTranslationForAnyCurrency = array();
-    protected static $localesWithoutTranslationForCurrency = array();
-
     protected static $currencies = array();
 
     protected static $alpha3ToNumeric = array();
@@ -43,7 +40,7 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
         );
     }
 
-    public function testGetAlpha3CurrencyCodes()
+    public function testGetCurrencies()
     {
         $this->assertEquals(static::$currencies, $this->dataProvider->getCurrencies());
     }

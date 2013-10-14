@@ -81,6 +81,9 @@ class Intl
      * Returns the bundle containing currency information.
      *
      * @return ResourceBundle\CurrencyBundleInterface The currency resource bundle.
+     *
+     * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+     *             Use the {@link Currency} class instead.
      */
     public static function getCurrencyBundle()
     {

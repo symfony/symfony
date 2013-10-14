@@ -11,33 +11,25 @@
 
 namespace Symfony\Component\Intl\ResourceBundle;
 
+use Symfony\Component\Icu\CurrencyDataProvider;
+use Symfony\Component\Locale\Locale;
+
 /**
  * Default implementation of {@link CurrencyBundleInterface}.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+ *             Use {@link CurrencyDataProvider} instead.
  */
-class CurrencyBundle extends AbstractBundle implements CurrencyBundleInterface
+class CurrencyBundle extends CurrencyDataProvider implements CurrencyBundleInterface
 {
-    const INDEX_NAME = 0;
-
-    const INDEX_SYMBOL = 1;
-
-    const INDEX_FRACTION_DIGITS = 2;
-
-    const INDEX_ROUNDING_INCREMENT = 3;
-
     /**
      * {@inheritdoc}
      */
     public function getLocales()
     {
-        $locales = $this->readEntry('meta', array('Locales'));
-
-        if ($locales instanceof \Traversable) {
-            $locales = iterator_to_array($locales);
-        }
-
-        return $locales;
+        return Locale::getLocales();
     }
 
     /**
@@ -49,7 +41,7 @@ class CurrencyBundle extends AbstractBundle implements CurrencyBundleInterface
             $locale = \Locale::getDefault();
         }
 
-        return $this->readEntry($locale, array('Currencies', $currency, static::INDEX_SYMBOL));
+        return $this->getSymbol($currency, $locale);
     }
 
     /**
@@ -61,7 +53,7 @@ class CurrencyBundle extends AbstractBundle implements CurrencyBundleInterface
             $locale = \Locale::getDefault();
         }
 
-        return $this->readEntry($locale, array('Currencies', $currency, static::INDEX_NAME));
+        return $this->getDisplayName($currency, $locale);
     }
 
     /**
@@ -73,36 +65,6 @@ class CurrencyBundle extends AbstractBundle implements CurrencyBundleInterface
             $locale = \Locale::getDefault();
         }
 
-        if (null === ($currencies = $this->readEntry($locale, array('Currencies')))) {
-            return array();
-        }
-
-        if ($currencies instanceof \Traversable) {
-            $currencies = iterator_to_array($currencies);
-        }
-
-        $index = static::INDEX_NAME;
-
-        array_walk($currencies, function (&$value) use ($index) {
-            $value = $value[$index];
-        });
-
-        return $currencies;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getFractionDigits($currency)
-    {
-        return $this->readEntry('en', array('Currencies', $currency, static::INDEX_FRACTION_DIGITS));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getRoundingIncrement($currency)
-    {
-        return $this->readEntry('en', array('Currencies', $currency, static::INDEX_ROUNDING_INCREMENT));
+        return $this->getDisplayNames($locale);
     }
 }

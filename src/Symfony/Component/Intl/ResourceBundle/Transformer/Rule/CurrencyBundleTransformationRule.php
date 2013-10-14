@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Intl\ResourceBundle\Transformer\Rule;
 
-use Symfony\Component\Intl\Exception\RuntimeException;
-use Symfony\Component\Intl\Intl;
 use Symfony\Component\Intl\ResourceBundle\CurrencyBundle;
 use Symfony\Component\Intl\ResourceBundle\CurrencyBundleInterface;
 use Symfony\Component\Intl\ResourceBundle\Reader\BinaryBundleReader;
@@ -60,53 +58,87 @@ class CurrencyBundleTransformationRule implements TransformationRuleInterface
         // in ICU <= 4.2
         if (IcuVersion::compare($context->getIcuVersion(), '4.2', '<=', 1)) {
             $context->getFilesystem()->mirror($context->getSourceDir().'/locales', $tempDir.'/txt');
-            $context->getFilesystem()->copy($context->getSourceDir().'/misc/supplementalData.txt', $tempDir.'/txt/meta.txt');
+            $context->getFilesystem()->copy($context->getSourceDir().'/misc/supplementalData.txt', $tempDir.'/txt/supplementalData.txt');
         } else {
             $context->getFilesystem()->mirror($context->getSourceDir().'/curr', $tempDir.'/txt');
-            $context->getFilesystem()->rename($tempDir.'/txt/supplementalData.txt', $tempDir.'/txt/meta.txt');
         }
-
-        // Replace "supplementalData" in the file by "meta" before compilation
-        file_put_contents($tempDir.'/txt/meta.txt', str_replace('supplementalData', 'meta', file_get_contents($tempDir.'/txt/meta.txt')));
 
         $context->getCompiler()->compile($tempDir.'/txt', $tempDir.'/res');
+        $context->getCompiler()->compile($context->getSourceDir().'/misc/currencyNumericCodes.txt', $tempDir.'/res');
 
-        // Read file, add locales and currencies and write again
         $reader = new BinaryBundleReader();
-        $meta = iterator_to_array($reader->read($tempDir.'/res', 'meta'));
-
-        // Key must not exist
-        if (isset($meta['AvailableLocales'])) {
-            throw new RuntimeException('The key "AvailableLocales" should not exist.');
-        }
-
-        if (isset($meta['Currencies'])) {
-            throw new RuntimeException('The key "Currencies" should not exist.');
-        }
+        $writer = new TextBundleWriter();
 
         // Collect supported locales of the bundle
-        $meta['AvailableLocales'] = $context->getLocaleScanner()->scanLocales($tempDir.'/txt');
+        $availableLocales = $context->getLocaleScanner()->scanLocales($tempDir.'/txt');
 
-        // Collect complete list of currencies in all locales
-        $meta['Currencies'] = array();
+        // Drop and regenerate txt files
+        $context->getFilesystem()->remove($tempDir.'/txt');
+        $context->getFilesystem()->mkdir($tempDir.'/txt');
 
-        foreach ($meta['AvailableLocales'] as $locale) {
+        $currencies = array();
+
+        // Generate a text file for each locale
+        foreach ($availableLocales as $locale) {
             $bundle = $reader->read($tempDir.'/res', $locale);
 
-            // isset() on \ResourceBundle returns true even if the value is null
             if (isset($bundle['Currencies']) && null !== $bundle['Currencies']) {
-                $meta['Currencies'] = array_merge(
-                    $meta['Currencies'],
-                    array_keys(iterator_to_array($bundle['Currencies']))
-                );
+                $symbolNamePairs = iterator_to_array($bundle['Currencies']);
+
+                // Remove the unknown currency
+                unset($symbolNamePairs['XXX']);
+
+                // No other keys but "Currencies" are needed for now
+                $writer->write($tempDir.'/txt', $locale, array(
+                    'Version' => $bundle['Version'],
+                    'Currencies' => $symbolNamePairs,
+                ));
+
+                // Add currencies to the list of known currencies
+                $currencies = array_merge($currencies, array_keys($symbolNamePairs));
             }
         }
 
-        $meta['Currencies'] = array_unique($meta['Currencies']);
-        sort($meta['Currencies']);
+        // Remove duplicate currencies and sort
+        $currencies = array_unique($currencies);
+        sort($currencies);
 
-        $writer = new TextBundleWriter();
-        $writer->write($tempDir.'/txt', 'meta', $meta, false);
+        // Open resource bundles that contain currency metadata
+        $root = $reader->read($tempDir.'/res', 'root');
+        $supplementalData = $reader->read($tempDir.'/res', 'supplementalData');
+        $numericCodes = $reader->read($tempDir.'/res', 'currencyNumericCodes');
+
+        // Generate default currency names and symbols
+        $defaultSymbolNamePairs = array_map(
+            function ($currency) use ($root) {
+                if (isset($root['Currencies'][$currency]) && null !== $root['Currencies'][$currency]) {
+                    return $root['Currencies'][$currency];
+                }
+
+                // by default both the symbol and the name equal the ISO code
+                return array($currency, $currency);
+            },
+            $currencies
+        );
+
+        // Replace keys by currencies
+        $defaultSymbolNamePairs = array_combine($currencies, $defaultSymbolNamePairs);
+
+        // Generate and sort the mapping from 3-letter codes to numeric codes
+        $alpha3ToNumericMapping = iterator_to_array($numericCodes['codeMap']);
+
+        asort($alpha3ToNumericMapping);
+
+        // Filter unknown currencies (e.g. "AYM")
+        $alpha3ToNumericMapping = array_intersect_key($alpha3ToNumericMapping, $defaultSymbolNamePairs);
+
+        // Write the root resource bundle
+        $writer->write($tempDir.'/txt', 'root', array(
+            'Version' => $root['Version'],
+            'Currencies' => $defaultSymbolNamePairs,
+            'CurrencyMeta' => $supplementalData['CurrencyMeta'],
+            'Alpha3ToNumeric' => $alpha3ToNumericMapping,
+        ));
 
         // The temporary directory now contains all sources to be compiled
         return $tempDir.'/txt';
@@ -118,7 +150,7 @@ class CurrencyBundleTransformationRule implements TransformationRuleInterface
     public function afterCompile(CompilationContext $context)
     {
         // Remove the temporary directory
-        $context->getFilesystem()->remove(sys_get_temp_dir().'/icu-data-currencies-source');
+        //$context->getFilesystem()->remove(sys_get_temp_dir().'/icu-data-currencies-source');
     }
 
     /**

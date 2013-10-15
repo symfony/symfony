@@ -54,7 +54,7 @@ class Language
      * A full table of ISO 639 language codes can be found here:
      * http://www-01.sil.org/iso639-3/codes.asp
      *
-     * @return string[] An array of canonicalized ISO 639 language codes
+     * @return string[] An array of canonical ISO 639 language codes
      *
      * @api
      */
@@ -82,7 +82,7 @@ class Language
      * If you want to support the above cases, you should manually canonicalize
      * the language code prior to calling this method.
      *
-     * @param string $language A canonicalized ISO 639 language code (e.g. "en")
+     * @param string $language A canonical ISO 639 language code (e.g. "en")
      *
      * @return Boolean Whether the language code exists
      *
@@ -117,9 +117,9 @@ class Language
      * actually exists. In case of doubt, you should pass the canonicalized
      * language to {@link exists()}.
      *
-     * @param string $language A canonicalized ISO 639 language code (e.g. "en")
+     * @param string $language A language code (e.g. "en")
      *
-     * @return string The canonicalized language name
+     * @return string The canonicalized ISO 639 language codde
      *
      * @see exists
      *
@@ -168,7 +168,7 @@ class Language
      * If <code>null</code> is passed as locale, the result of
      * {@link \Locale::getDefault()} is used instead.
      *
-     * @param string $language      A canonicalized ISO 639 language code
+     * @param string $language      A canonical ISO 639 language code
      *                              (e.g. "en")
      * @param string $displayLocale The ICU locale code to return the name in
      *
@@ -199,7 +199,7 @@ class Language
      * Returns the names of all known languages in the specified locale.
      *
      * If the resource data for the given locale contains no entry for a
-     * language, then the canonicalized ISO 639 language code is used instead.
+     * language, then the canonical ISO 639 language code is used instead.
      *
      * If <code>null</code> is passed as locale, the result of
      * {@link \Locale::getDefault()} is used instead.
@@ -207,7 +207,7 @@ class Language
      * @param string $displayLocale The ICU locale code to return the names in
      *
      * @return string[] An array of language names indexed by their
-     *                  canonicalized ISO 639 language codes
+     *                  canonical ISO 639 language codes
      *
      * @throws InvalidArgumentException If the locale is invalid
      *
@@ -229,7 +229,7 @@ class Language
     /**
      * Returns the ISO 639-2 three-letter code of a language.
      *
-     * @param string $language A canonicalized ISO 639 language code (e.g. "en")
+     * @param string $language A canonical ISO 639 language code (e.g. "en")
      *
      * @return string The ISO 639-2 three-letter code of the language
      *

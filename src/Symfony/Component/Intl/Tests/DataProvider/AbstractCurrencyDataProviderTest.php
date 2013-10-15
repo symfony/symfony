@@ -144,9 +144,70 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
 
     /**
      * @dataProvider provideCurrenciesWithoutNumericEquivalent
+     * @expectedException \Symfony\Component\Intl\Exception\MissingResourceException
      */
-    public function testGetNumericCodeReturnsZeroIfNoNumericEquivalent($currency)
+    public function testGetNumericCodeFailsIfNoNumericEquivalent($currency)
     {
-        $this->assertSame(0, $this->dataProvider->getNumericCode($currency));
+        $this->dataProvider->getNumericCode($currency);
+    }
+
+    public function provideValidNumericCodes()
+    {
+        $numericToAlpha3 = $this->getNumericToAlpha3Mapping();
+
+        return array_map(
+            function ($numeric, $alpha3) { return array($numeric, $alpha3); },
+            array_keys($numericToAlpha3),
+            $numericToAlpha3
+        );
+    }
+
+    /**
+     * @dataProvider provideValidNumericCodes
+     */
+    public function testForNumericCode($numeric, $expected)
+    {
+        $actual = $this->dataProvider->forNumericCode($numeric);
+
+        // Make sure that a different array order doesn't break the test
+        sort($actual);
+        sort($expected);
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function provideInvalidNumericCodes()
+    {
+        $validNumericCodes = array_keys($this->getNumericToAlpha3Mapping());
+        $invalidNumericCodes = array_diff(range(0, 1000), $validNumericCodes);
+
+        return array_map(
+            function ($value) { return array($value); },
+            $invalidNumericCodes
+        );
+    }
+
+    /**
+     * @dataProvider provideInvalidNumericCodes
+     * @expectedException \Symfony\Component\Intl\Exception\MissingResourceException
+     */
+    public function testForNumericCodeFailsIfInvalidNumericCode($currency)
+    {
+        $this->dataProvider->forNumericCode($currency);
+    }
+
+    private function getNumericToAlpha3Mapping()
+    {
+        $numericToAlpha3 = array();
+
+        foreach (static::$alpha3ToNumeric as $alpha3 => $numeric) {
+            if (!isset($numericToAlpha3[$numeric])) {
+                $numericToAlpha3[$numeric] = array();
+            }
+
+            $numericToAlpha3[$numeric][] = $alpha3;
+        }
+
+        return $numericToAlpha3;
     }
 }

@@ -114,4 +114,17 @@ class CurrencyTest extends \PHPUnit_Framework_TestCase
     {
         Currency::getNumericCode('FOO');
     }
+
+    public function testForNumericCode()
+    {
+        $this->assertSame(array('EUR'), Currency::forNumericCode(978));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Intl\Exception\InvalidArgumentException
+     */
+    public function testForNumericCodeFailsOnInvalidNumber()
+    {
+        Currency::forNumericCode(12345);
+    }
 }

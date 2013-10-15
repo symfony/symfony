@@ -132,12 +132,27 @@ class CurrencyBundleTransformationRule implements TransformationRuleInterface
         // Filter unknown currencies (e.g. "AYM")
         $alpha3ToNumericMapping = array_intersect_key($alpha3ToNumericMapping, $defaultSymbolNamePairs);
 
+        // Generate numeric code to 3-letter code mapping
+        $numericToAlpha3Mapping = array();
+
+        foreach ($alpha3ToNumericMapping as $alpha3 => $numeric) {
+            // Make sure that the mapping is stored as table and not as array
+            $numeric = (string) $numeric;
+
+            if (!isset($numericToAlpha3Mapping[$numeric])) {
+                $numericToAlpha3Mapping[$numeric] = array();
+            }
+
+            $numericToAlpha3Mapping[$numeric][] = $alpha3;
+        }
+
         // Write the root resource bundle
         $writer->write($tempDir.'/txt', 'root', array(
             'Version' => $root['Version'],
             'Currencies' => $defaultSymbolNamePairs,
             'CurrencyMeta' => $supplementalData['CurrencyMeta'],
             'Alpha3ToNumeric' => $alpha3ToNumericMapping,
+            'NumericToAlpha3' => $numericToAlpha3Mapping,
         ));
 
         // The temporary directory now contains all sources to be compiled

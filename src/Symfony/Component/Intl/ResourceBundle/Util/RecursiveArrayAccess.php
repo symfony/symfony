@@ -26,7 +26,11 @@ class RecursiveArrayAccess
                 throw new OutOfBoundsException('The index '.$index.' does not exist.');
             }
 
-            $array = $array[$index];
+            if ($array instanceof \ArrayAccess) {
+                $array = $array->offsetGet($index);
+            } else {
+                $array = $array[$index];
+            }
         }
 
         return $array;

@@ -733,40 +733,43 @@ class Request
      * Returns the client IP addresses.
      *
      * The least trusted IP address is first, and the most trusted one last.
-     * The "real" client IP address is the first one, but this is also the
-     * least trusted one.
+     * The "real" client IP address is the first one. The addresses of trusted
+     * proxies are not included.
      *
-     * Use this method carefully; you should use getClientIp() instead.
+     * Use this method carefully; you should probably use getClientIp() instead.
      *
-     * @return array The client IP addresses
+     * @return array A list of untrusted addresses, ordered from least to most trusted
      *
      * @see getClientIp()
      */
     public function getClientIps()
     {
-        $ip = $this->server->get('REMOTE_ADDR');
+        $mostTrusted = $this->server->get('REMOTE_ADDR');
 
-        if (!self::$trustedProxies) {
-            return array($ip);
+        // do not bother checking if...
+        //  * there are no trusted proxies configured
+        //  * there is no header configured
+        //  * there is no header present
+        if (!self::$trustedProxies || !self::$trustedHeaders[self::HEADER_CLIENT_IP] || !$this->headers->has(self::$trustedHeaders[self::HEADER_CLIENT_IP])) {
+            return array($mostTrusted);
         }
 
-        if (!self::$trustedHeaders[self::HEADER_CLIENT_IP] || !$this->headers->has(self::$trustedHeaders[self::HEADER_CLIENT_IP])) {
-            return array($ip);
-        }
-
+        // a list of addresses from least to most trusted
         $clientIps = array_map('trim', explode(',', $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_IP])));
-        $clientIps[] = $ip;
+        $clientIps[] = $mostTrusted;
 
-        $trustedProxies = !self::$trustedProxies ? array($ip) : self::$trustedProxies;
-        $ip = $clientIps[0];
+        // remember the least trusted
+        $leastTrusted = $clientIps[0];
 
+        // remove the addresses of any trusted proxies from the list
         foreach ($clientIps as $key => $clientIp) {
-            if (IpUtils::checkIp($clientIp, $trustedProxies)) {
+            if (IpUtils::checkIp($clientIp, self::$trustedProxies)) {
                 unset($clientIps[$key]);
             }
         }
 
-        return $clientIps ? array_reverse($clientIps) : array($ip);
+        // return a list of untrusted addresses, from least to most trusted
+        return array_values($clientIps) ?: array($leastTrusted);
     }
 
     /**

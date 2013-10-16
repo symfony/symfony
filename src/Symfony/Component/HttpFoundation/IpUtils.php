@@ -24,10 +24,10 @@ class IpUtils
     private function __construct() {}
 
     /**
-     * Validates an IPv4 or IPv6 address.
+     * Checks if an IPv4 or IPv6 address is contained in the list of given IPs or subnets
      *
-     * @param string       $requestIp
-     * @param string|array $ips
+     * @param string       $requestIp   IP to check
+     * @param string|array $ips         List of IPs or subnets (can be a string if only a single one)
      *
      * @return boolean Whether the IP is valid
      */
@@ -49,10 +49,11 @@ class IpUtils
     }
 
     /**
-     * Validates an IPv4 address.
+     * Compares two IPv4 addresses.
+     * In case a subnet is given, it checks if it contains the request IP.
      *
-     * @param string $requestIp
-     * @param string $ip
+     * @param string $requestIp IPv4 address to check
+     * @param string $ip        IPv4 address or subnet in CIDR notation
      *
      * @return boolean Whether the IP is valid
      */
@@ -73,13 +74,14 @@ class IpUtils
     }
 
     /**
-     * Validates an IPv6 address.
+     * Compares two IPv6 addresses.
+     * In case a subnet is given, it checks if it contains the request IP.
      *
      * @author David Soria Parra <dsp at php dot net>
      * @see https://github.com/dsp/v6tools
      *
-     * @param string $requestIp
-     * @param string $ip
+     * @param string $requestIp IPv6 address to check
+     * @param string $ip        IPv6 address or subnet in CIDR notation
      *
      * @return boolean Whether the IP is valid
      *

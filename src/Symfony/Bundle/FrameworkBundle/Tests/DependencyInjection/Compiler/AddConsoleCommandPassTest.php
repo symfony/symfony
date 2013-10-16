@@ -15,7 +15,6 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddConsoleComman
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Reference;
 
 class AddConsoleCommandPassTest extends \PHPUnit_Framework_TestCase
 {

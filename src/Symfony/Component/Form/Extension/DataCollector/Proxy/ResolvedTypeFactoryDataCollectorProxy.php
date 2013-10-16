@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Form\Extension\DataCollector\Proxy;
 
-use Symfony\Component\Form\Exception;
 use Symfony\Component\Form\Extension\DataCollector\FormDataCollectorInterface;
 use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\Form\ResolvedFormTypeFactoryInterface;

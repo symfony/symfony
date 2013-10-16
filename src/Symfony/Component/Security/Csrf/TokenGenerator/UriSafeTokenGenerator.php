@@ -13,9 +13,6 @@ namespace Symfony\Component\Security\Csrf\TokenGenerator;
 
 use Symfony\Component\Security\Core\Util\SecureRandomInterface;
 use Symfony\Component\Security\Core\Util\SecureRandom;
-use Symfony\Component\Security\Core\Util\StringUtils;
-use Symfony\Component\Security\Csrf\TokenStorage\NativeSessionTokenStorage;
-use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
 
 /**
  * Generates CSRF tokens.

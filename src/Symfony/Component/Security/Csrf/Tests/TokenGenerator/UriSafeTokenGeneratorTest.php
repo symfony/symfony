@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\Tests\Extension\Csrf\CsrfProvider\TokenGenerator;
+namespace Symfony\Component\Security\Csrf\Tests\TokenGenerator;
 
 use Symfony\Component\Security\Csrf\TokenGenerator\UriSafeTokenGenerator;
 

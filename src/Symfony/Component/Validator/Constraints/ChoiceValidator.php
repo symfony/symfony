@@ -77,7 +77,7 @@ class ChoiceValidator extends ConstraintValidator
                 return;
             }
         } elseif (!in_array($value, $choices, $constraint->strict)) {
-            $this->context->addViolation($constraint->message, array('{{ value }}' => $value));
+            $this->context->addViolation($constraint->message, array('{{ value }}' => $value, '{{ choices }}' => implode( ',', $choices) )));
         }
     }
 }

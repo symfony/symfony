@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpKernel\DataCollector;
 
 use Symfony\Component\HttpKernel\DataCollector\Util\ValueExporter;
-use Symfony\Component\HttpKernel\DataCollector\Util\ValueExporterInterface;
 
 /**
  * DataCollector.

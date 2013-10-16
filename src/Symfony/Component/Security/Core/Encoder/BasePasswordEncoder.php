@@ -12,7 +12,6 @@
 namespace Symfony\Component\Security\Core\Encoder;
 
 use Symfony\Component\Security\Core\Util\StringUtils;
-use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 
 /**
  * BasePasswordEncoder is the base class for all password encoders.

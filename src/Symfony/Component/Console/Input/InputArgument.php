@@ -108,6 +108,7 @@ class InputArgument
         }
 
         $this->default = $default;
+
         return $this;
     }
 

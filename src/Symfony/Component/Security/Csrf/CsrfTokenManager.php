@@ -92,6 +92,6 @@ class CsrfTokenManager implements CsrfTokenManagerInterface
             return false;
         }
 
-        return StringUtils::equals((string) $this->storage->getToken($token->getId()), $token->getValue());
+        return StringUtils::equals($this->storage->getToken($token->getId()), $token->getValue());
     }
 }

@@ -52,8 +52,8 @@ interface CsrfTokenManagerInterface
      *
      * @param string $tokenId The token ID
      *
-     * @return Boolean Returns true if a token existed for this ID, false
-     *                 otherwise
+     * @return string|null Returns the removed token value if one existed, NULL
+     *                     otherwise
      */
     public function removeToken($tokenId);
 

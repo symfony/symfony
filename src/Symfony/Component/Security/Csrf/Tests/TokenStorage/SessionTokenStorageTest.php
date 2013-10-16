@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\Tests\Extension\Csrf\CsrfProvider;
+namespace Symfony\Component\Security\Csrf\Tests\TokenStorage;
 
 use Symfony\Component\Security\Csrf\TokenStorage\SessionTokenStorage;
 

@@ -39,24 +39,19 @@ class UriSafeTokenGenerator implements TokenGeneratorInterface
     /**
      * Generates URI-safe CSRF tokens.
      *
-     * @param SecureRandomInterface $random  The random value generator used for
-     *                                       generating entropy
-     * @param integer               $entropy The amount of entropy collected for
-     *                                       each token (in bits)
-     *
+     * @param SecureRandomInterface|null $random  The random value generator used for
+     *                                            generating entropy
+     * @param integer                    $entropy The amount of entropy collected for
+     *                                            each token (in bits)
      */
     public function __construct(SecureRandomInterface $random = null, $entropy = 256)
     {
-        if (null === $random) {
-            $random = new SecureRandom();
-        }
-
-        $this->random = $random;
+        $this->random = $random ?: new SecureRandom();
         $this->entropy = $entropy;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function generateToken()
     {

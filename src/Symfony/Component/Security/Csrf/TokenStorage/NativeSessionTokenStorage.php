@@ -98,7 +98,7 @@ class NativeSessionTokenStorage implements TokenStorageInterface
         }
 
         $token = isset($_SESSION[$this->namespace][$tokenId])
-            ? $_SESSION[$this->namespace][$tokenId]
+            ? (string) $_SESSION[$this->namespace][$tokenId]
             : null;
 
         unset($_SESSION[$this->namespace][$tokenId]);

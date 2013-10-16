@@ -12,7 +12,6 @@
 namespace Symfony\Bridge\Doctrine\Tests\Form\ChoiceList;
 
 use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
-use Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeIntIdEntity;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityChoiceList;
 use Doctrine\ORM\Tools\SchemaTool;
 use Symfony\Component\Form\Tests\Extension\Core\ChoiceList\AbstractChoiceListTest;

@@ -732,9 +732,9 @@ class Request
     /**
      * Returns the client IP addresses.
      *
-     * The least trusted IP address is first, and the most trusted one last.
-     * The "real" client IP address is the first one, but this is also the
-     * least trusted one.
+     * In the returned array the most trusted IP address is first, and the
+     * least trusted one last. The "real" client IP address is the last one,
+     * but this is also the least trusted one. Trusted proxies are stripped.
      *
      * Use this method carefully; you should use getClientIp() instead.
      *
@@ -755,17 +755,19 @@ class Request
         }
 
         $clientIps = array_map('trim', explode(',', $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_IP])));
-        $clientIps[] = $ip;
+        $clientIps[] = $ip; // Complete the IP chain with the IP the request actually came from
 
         $trustedProxies = !self::$trustedProxies ? array($ip) : self::$trustedProxies;
-        $ip = $clientIps[0];
+        $ip = $clientIps[0]; // Fallback to this when the client IP falls into the range of trusted proxies
 
+        // Eliminate all IPs from the forwarded IP chain which are trusted proxies
         foreach ($clientIps as $key => $clientIp) {
             if (IpUtils::checkIp($clientIp, $trustedProxies)) {
                 unset($clientIps[$key]);
             }
         }
 
+        // Now the IP chain contains only untrusted proxies and the client IP
         return $clientIps ? array_reverse($clientIps) : array($ip);
     }
 

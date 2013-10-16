@@ -23,7 +23,8 @@ interface CsrfTokenManagerInterface
      * Returns a CSRF token for the given ID.
      *
      * If previously no token existed for the given ID, a new token is
-     * generated. Otherwise the existing token is returned.
+     * generated. Otherwise the existing token is returned (with the same value,
+     * not the same instance).
      *
      * @param string $tokenId The token ID. You may choose an arbitrary value
      *                        for the ID

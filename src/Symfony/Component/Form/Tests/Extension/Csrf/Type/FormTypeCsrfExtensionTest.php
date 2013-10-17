@@ -141,6 +141,24 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
         $this->assertEquals('token', $view['csrf']->vars['value']);
     }
 
+    public function testGenerateCsrfTokenUsesFormNameAsIntentionByDefault()
+    {
+        $this->tokenManager->expects($this->once())
+            ->method('getToken')
+            ->with('FORM_NAME')
+            ->will($this->returnValue('token'));
+
+        $view = $this->factory
+            ->createNamed('FORM_NAME', 'form', null, array(
+                'csrf_field_name' => 'csrf',
+                'csrf_token_manager' => $this->tokenManager,
+                'compound' => true,
+            ))
+            ->createView();
+
+        $this->assertEquals('token', $view['csrf']->vars['value']);
+    }
+
     public function provideBoolean()
     {
         return array(
@@ -164,6 +182,37 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
                 'csrf_field_name' => 'csrf',
                 'csrf_token_manager' => $this->tokenManager,
                 'csrf_token_id' => 'TOKEN_ID',
+                'compound' => true,
+            ))
+            ->add('child', 'text')
+            ->getForm();
+
+        $form->submit(array(
+            'child' => 'foobar',
+            'csrf' => 'token',
+        ));
+
+        // Remove token from data
+        $this->assertSame(array('child' => 'foobar'), $form->getData());
+
+        // Validate accordingly
+        $this->assertSame($valid, $form->isValid());
+    }
+
+    /**
+     * @dataProvider provideBoolean
+     */
+    public function testValidateTokenOnBindIfRootAndCompoundUsesFormNameAsIntentionByDefault($valid)
+    {
+        $this->tokenManager->expects($this->once())
+            ->method('isTokenValid')
+            ->with(new CsrfToken('FORM_NAME', 'token'))
+            ->will($this->returnValue($valid));
+
+        $form = $this->factory
+            ->createNamedBuilder('FORM_NAME', 'form', null, array(
+                'csrf_field_name' => 'csrf',
+                'csrf_token_manager' => $this->tokenManager,
                 'compound' => true,
             ))
             ->add('child', 'text')

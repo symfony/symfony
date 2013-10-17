@@ -148,15 +148,15 @@ class Crawler extends \SplObjectStorage
         $dom->validateOnParse = true;
 
         if (function_exists('mb_convert_encoding')) {
-            $has_error = false;
-            $previous = set_error_handler(function()use(&$has_error){
-                $has_error = true;
+            $hasError = false;
+            set_error_handler(function()use(&$hasError){
+                $hasError = true;
             });
             $tmpContent = @mb_convert_encoding($content, 'HTML-ENTITIES', $charset);
 
-            set_error_handler($previous);
+            restore_error_handler();
 
-            if (!$has_error) {
+            if (!$hasError) {
                 $content = $tmpContent;
             }
         }

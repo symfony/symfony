@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Yaml\Tests;
 
-use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Yaml\Inline;
 
 class InlineTest extends \PHPUnit_Framework_TestCase
@@ -31,11 +30,11 @@ class InlineTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals($yaml, Inline::dump($value), sprintf('::dump() converts a PHP structure to an inline YAML (%s)', $yaml));
         }
 
-        foreach ($this->getTestsForParse() as $yaml => $value) {
+        foreach ($this->getTestsForParse() as $value) {
             $this->assertEquals($value, Inline::parse(Inline::dump($value)), 'check consistency');
         }
 
-        foreach ($testsForDump as $yaml => $value) {
+        foreach ($testsForDump as $value) {
             $this->assertEquals($value, Inline::parse(Inline::dump($value)), 'check consistency');
         }
     }
@@ -204,6 +203,9 @@ class InlineTest extends \PHPUnit_Framework_TestCase
             "'#cfcfcf'" => '#cfcfcf',
 
             "'a \"string\" with ''quoted strings inside'''" => 'a "string" with \'quoted strings inside\'',
+
+            "'-dash'" => '-dash',
+            "'-'" => '-',
 
             // sequences
             '[foo, bar, false, null, 12]' => array('foo', 'bar', false, null, 12),

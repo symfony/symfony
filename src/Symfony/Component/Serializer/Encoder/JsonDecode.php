@@ -70,7 +70,7 @@ class JsonDecode implements DecoderInterface
      *
      * json_decode_associative: boolean
      *      If true, returns the object as associative array.
-     *      If false, returns the object as nested StdClass
+     *      If false, returns the object as nested stdClass
      *      If not specified, this method will use the default set in JsonDecode::__construct
      *
      * json_decode_recursion_depth: integer

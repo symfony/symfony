@@ -75,7 +75,7 @@ class ChainLoader extends Loader
     public function isFresh(TemplateReferenceInterface $template, $time)
     {
         foreach ($this->loaders as $loader) {
-            return $loader->isFresh($template);
+            return $loader->isFresh($template, $time);
         }
 
         return false;

@@ -300,7 +300,9 @@ class DateType extends AbstractType
         $result = array();
 
         foreach ($years as $year) {
-            $result[$year] = gmmktime(0, 0, 0, 6, 15, $year);
+            if(($y = gmmktime(0, 0, 0, 6, 15, $year)) !== false) {
+                $result[$year] = $y;
+            }
         }
 
         return $result;

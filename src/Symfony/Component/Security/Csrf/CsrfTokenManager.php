@@ -37,23 +37,14 @@ class CsrfTokenManager implements CsrfTokenManagerInterface
     /**
      * Creates a new CSRF provider using PHP's native session storage.
      *
-     * @param TokenGeneratorInterface $generator The token generator
-     * @param TokenStorageInterface   $storage   The storage for storing
-     *                                           generated CSRF tokens
-     *
+     * @param TokenGeneratorInterface|null $generator The token generator
+     * @param TokenStorageInterface|null   $storage   The storage for storing
+     *                                                generated CSRF tokens
      */
     public function __construct(TokenGeneratorInterface $generator = null, TokenStorageInterface $storage = null)
     {
-        if (null === $generator) {
-            $generator = new UriSafeTokenGenerator();
-        }
-
-        if (null === $storage) {
-            $storage = new NativeSessionTokenStorage();
-        }
-
-        $this->generator = $generator;
-        $this->storage = $storage;
+        $this->generator = $generator ?: new UriSafeTokenGenerator();
+        $this->storage = $storage ?: new NativeSessionTokenStorage();
     }
 
     /**
@@ -101,6 +92,6 @@ class CsrfTokenManager implements CsrfTokenManagerInterface
             return false;
         }
 
-        return StringUtils::equals((string) $this->storage->getToken($token->getId()), $token->getValue());
+        return StringUtils::equals($this->storage->getToken($token->getId()), $token->getValue());
     }
 }

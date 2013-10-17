@@ -175,7 +175,7 @@
     <li>
         <a href="#details_{{ data.view_vars.id|default("") }}">{{ name }}</a>
 
-        {% if data.children|length > 1 %}
+        {% if data.children is not empty %}
             <ul>
                 {% for childName, childData in data.children %}
                     {{ _self.form_tree_entry(childName, childData) }}

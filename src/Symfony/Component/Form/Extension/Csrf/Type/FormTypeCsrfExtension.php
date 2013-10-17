@@ -76,7 +76,7 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
             ->addEventSubscriber(new CsrfValidationListener(
                 $options['csrf_field_name'],
                 $options['csrf_provider'],
-                $options['intention'],
+                $options['intention'] ?: $builder->getName(),
                 $options['csrf_message'],
                 $this->translator,
                 $this->translationDomain
@@ -95,7 +95,7 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
     {
         if ($options['csrf_protection'] && !$view->parent && $options['compound']) {
             $factory = $form->getConfig()->getAttribute('csrf_factory');
-            $data = $options['csrf_provider']->generateCsrfToken($options['intention']);
+            $data = $options['csrf_provider']->generateCsrfToken($options['intention'] ?: $form->getName());
 
             $csrfForm = $factory->createNamed($options['csrf_field_name'], 'hidden', $data, array(
                 'mapped' => false,
@@ -115,7 +115,7 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
             'csrf_field_name'   => $this->defaultFieldName,
             'csrf_provider'     => $this->defaultCsrfProvider,
             'csrf_message'      => 'The CSRF token is invalid. Please try to resubmit the form.',
-            'intention'         => 'unknown',
+            'intention'         => null,
         ));
     }
 

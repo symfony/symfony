@@ -291,7 +291,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
     }
 
     /**
-     * Checks whether remember-me capabilities where requested
+     * Checks whether remember-me capabilities were requested
      *
      * @param Request $request
      *

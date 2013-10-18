@@ -50,7 +50,7 @@ class RouterMatchCommand extends ContainerAwareCommand
             ->setName('router:match')
             ->setDefinition(array(
                 new InputArgument('path_info', InputArgument::REQUIRED, 'A path info'),
-                new InputArgument('_method', InputArgument::OPTIONAL, 'Forces to match against the specified method (optional)')
+                new InputArgument('method', InputArgument::OPTIONAL, 'Forces to match against the specified method (optional)')
             ))
             ->setDescription('Helps debug routes by simulating a path info match')
             ->setHelp(<<<EOF
@@ -69,9 +69,10 @@ EOF
     {
         $router = $this->getContainer()->get('router');
         $context = $router->getContext();
-        $method = $input->getArgument('_method');
-        if( $method )
+        $method = $input->getArgument('method');
+        if ( $method ) {
             $context->setMethod($method);
+        }
 
         $matcher = new TraceableUrlMatcher($router->getRouteCollection(), $context);
 

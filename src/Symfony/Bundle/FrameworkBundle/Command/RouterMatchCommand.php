@@ -68,7 +68,7 @@ class RouterMatchCommand extends ContainerAwareCommand
             ->setHelp(<<<EOF
 The <info>%command.name%</info> simulates a path info match:
 
-  <info>php %command.full_name% /foo -m METHOD -h HOST</info>
+  <info>php %command.full_name% /foo -m METHOD --host HOST</info>
 EOF
             )
         ;

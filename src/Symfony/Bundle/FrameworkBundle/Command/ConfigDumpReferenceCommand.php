@@ -137,6 +137,6 @@ EOF
                 throw new \InvalidArgumentException('Only the yaml and xml formats are supported.');
         }
 
-        $output->writeln($dumper->dump($configuration), $extension->getNamespace());
+        $output->writeln($dumper->dump($configuration, $extension->getNamespace()));
     }
 }

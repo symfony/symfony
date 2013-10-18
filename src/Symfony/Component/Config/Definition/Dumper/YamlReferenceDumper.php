@@ -17,6 +17,7 @@ use Symfony\Component\Config\Definition\ArrayNode;
 use Symfony\Component\Config\Definition\ScalarNode;
 use Symfony\Component\Config\Definition\EnumNode;
 use Symfony\Component\Config\Definition\PrototypedArrayNode;
+use Symfony\Component\Yaml\Inline;
 
 /**
  * Dumps a Yaml reference configuration for the given configuration/node instance.
@@ -95,18 +96,14 @@ class YamlReferenceDumper
             if ($node->hasDefaultValue()) {
                 $default = $node->getDefaultValue();
 
-                if (true === $default) {
-                    $default = 'true';
-                } elseif (false === $default) {
-                    $default = 'false';
-                } elseif (null === $default) {
-                    $default = '~';
-                } elseif (is_array($default)) {
+                if (is_array($default)) {
                     if ($node->hasDefaultValue() && count($defaultArray = $node->getDefaultValue())) {
                         $default = '';
                     } elseif (!is_array($example)) {
                         $default = '[]';
                     }
+                } else {
+                    $default = Inline::dump($default);
                 }
             }
         }

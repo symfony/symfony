@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2013-10-18T11:20:06Z
+
+I don't think you need this PR. The merge of 2.3 into master after merging the other PR will be enough (and should not even conflict)
+
+---------------------------------------------------------------------------
+
+by stof at 2013-10-18T11:20:49Z
+
+ah no, actually, it will conflict

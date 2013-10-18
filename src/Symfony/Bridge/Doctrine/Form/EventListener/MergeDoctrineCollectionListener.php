@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Doctrine\Form\EventListener;
 
+use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -40,7 +41,7 @@ class MergeDoctrineCollectionListener implements EventSubscriberInterface
 
         // If all items were removed, call clear which has a higher
         // performance on persistent collections
-        if ($collection && count($data) === 0) {
+        if ($collection instanceof Collection && count($data) === 0) {
             $collection->clear();
         }
     }

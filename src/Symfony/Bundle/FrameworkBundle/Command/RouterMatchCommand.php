@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Routing\RouterInterface;
@@ -49,14 +50,25 @@ class RouterMatchCommand extends ContainerAwareCommand
         $this
             ->setName('router:match')
             ->setDefinition(array(
-                new InputArgument('path_info', InputArgument::REQUIRED, 'A path info'),
-                new InputArgument('method', InputArgument::OPTIONAL, 'Forces to match against the specified method (optional)')
+                new InputArgument('path_info', InputArgument::REQUIRED, 'A path info')
             ))
+            ->addOption(
+                'method',
+                'm',
+                InputOption::VALUE_OPTIONAL,
+                'Forces to match against the specified method'
+            )
+            ->addOption(
+                'host',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Forces the host to be the one specified by this parameter'
+            )
             ->setDescription('Helps debug routes by simulating a path info match')
             ->setHelp(<<<EOF
 The <info>%command.name%</info> simulates a path info match:
 
-  <info>php %command.full_name% /foo POST</info>
+  <info>php %command.full_name% /foo -m METHOD -h HOST</info>
 EOF
             )
         ;
@@ -69,9 +81,13 @@ EOF
     {
         $router = $this->getContainer()->get('router');
         $context = $router->getContext();
-        $method = $input->getArgument('method');
-        if ( $method ) {
+        $method = $input->getOption('method');
+        $host = $input->getOption('host');
+        if ($method) {
             $context->setMethod($method);
+        }
+        if ($host) {
+            $context->setHost($host);
         }
 
         $matcher = new TraceableUrlMatcher($router->getRouteCollection(), $context);

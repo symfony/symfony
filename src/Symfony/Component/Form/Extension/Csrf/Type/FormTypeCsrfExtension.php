@@ -86,7 +86,7 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
             ->addEventSubscriber(new CsrfValidationListener(
                 $options['csrf_field_name'],
                 $options['csrf_token_manager'],
-                $options['csrf_token_id'] ?: $builder->getName(),
+                $options['csrf_token_id'] ?: ($builder->getName() ?: get_class($builder->getType()->getInnerType())),
                 $options['csrf_message'],
                 $this->translator,
                 $this->translationDomain
@@ -105,7 +105,8 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
     {
         if ($options['csrf_protection'] && !$view->parent && $options['compound']) {
             $factory = $form->getConfig()->getFormFactory();
-            $data = (string) $options['csrf_token_manager']->getToken($options['csrf_token_id'] ?: $form->getName());
+            $tokenId = $options['csrf_token_id'] ?: ($form->getName() ?: get_class($form->getConfig()->getType()->getInnerType()));
+            $data = (string) $options['csrf_token_manager']->getToken($tokenId);
 
             $csrfForm = $factory->createNamed($options['csrf_field_name'], 'hidden', $data, array(
                 'mapped' => false,

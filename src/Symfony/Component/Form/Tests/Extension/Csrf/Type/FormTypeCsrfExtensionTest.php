@@ -159,6 +159,24 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
         $this->assertEquals('token', $view['csrf']->vars['value']);
     }
 
+    public function testGenerateCsrfTokenUsesTypeClassAsIntentionIfEmptyFormName()
+    {
+        $this->tokenManager->expects($this->once())
+            ->method('getToken')
+            ->with('Symfony\Component\Form\Extension\Core\Type\FormType')
+            ->will($this->returnValue('token'));
+
+        $view = $this->factory
+            ->createNamed('', 'form', null, array(
+                'csrf_field_name' => 'csrf',
+                'csrf_token_manager' => $this->tokenManager,
+                'compound' => true,
+            ))
+            ->createView();
+
+        $this->assertEquals('token', $view['csrf']->vars['value']);
+    }
+
     public function provideBoolean()
     {
         return array(
@@ -202,7 +220,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
     /**
      * @dataProvider provideBoolean
      */
-    public function testValidateTokenOnBindIfRootAndCompoundUsesFormNameAsIntentionByDefault($valid)
+    public function testValidateTokenOnSubmitIfRootAndCompoundUsesFormNameAsIntentionByDefault($valid)
     {
         $this->tokenManager->expects($this->once())
             ->method('isTokenValid')
@@ -211,6 +229,37 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
 
         $form = $this->factory
             ->createNamedBuilder('FORM_NAME', 'form', null, array(
+                'csrf_field_name' => 'csrf',
+                'csrf_token_manager' => $this->tokenManager,
+                'compound' => true,
+            ))
+            ->add('child', 'text')
+            ->getForm();
+
+        $form->submit(array(
+            'child' => 'foobar',
+            'csrf' => 'token',
+        ));
+
+        // Remove token from data
+        $this->assertSame(array('child' => 'foobar'), $form->getData());
+
+        // Validate accordingly
+        $this->assertSame($valid, $form->isValid());
+    }
+
+    /**
+     * @dataProvider provideBoolean
+     */
+    public function testValidateTokenOnSubmitIfRootAndCompoundUsesTypeClassAsIntentionIfEmptyFormName($valid)
+    {
+        $this->tokenManager->expects($this->once())
+            ->method('isTokenValid')
+            ->with(new CsrfToken('Symfony\Component\Form\Extension\Core\Type\FormType', 'token'))
+            ->will($this->returnValue($valid));
+
+        $form = $this->factory
+            ->createNamedBuilder('', 'form', null, array(
                 'csrf_field_name' => 'csrf',
                 'csrf_token_manager' => $this->tokenManager,
                 'compound' => true,

@@ -432,4 +432,16 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
             $this->assertSame('Document types are not allowed.', $e->getMessage(), '->load() throws an InvalidArgumentException if the configuration contains a document type');
         }
     }
+
+    public function testXmlNamespaces()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('namespaces.xml');
+        $services = $container->getDefinitions();
+
+        $this->assertTrue(isset($services['foo']), '->load() parses <srv:service> elements');
+        $this->assertEquals(1, count($services['foo']->getTag('foo.tag')), '->load parses <srv:tag> elements');
+        $this->assertEquals(array(array('setBar', array('foo'))), $services['foo']->getMethodCalls(), '->load() parses the <srv:call> tag');
+    }
 }

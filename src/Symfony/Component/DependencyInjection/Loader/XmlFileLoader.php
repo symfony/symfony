@@ -189,10 +189,6 @@ class XmlFileLoader extends FileLoader
         foreach ($this->getChildren($service, 'tag') as $tag) {
             $parameters = array();
             foreach ($tag->attributes as $name => $node) {
-                if ($node->namespaceURI !== self::NS) {
-                    continue;
-                }
-
                 if ('name' === $name) {
                     continue;
                 }

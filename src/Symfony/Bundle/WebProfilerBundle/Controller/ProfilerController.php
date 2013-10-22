@@ -56,6 +56,8 @@ class ProfilerController
      * Redirects to the last profiles.
      *
      * @return RedirectResponse A RedirectResponse instance
+     *
+     * @throws NotFoundHttpException
      */
     public function homeAction()
     {
@@ -140,6 +142,8 @@ class ProfilerController
      * Purges all tokens.
      *
      * @return Response A Response instance
+     *
+     * @throws NotFoundHttpException
      */
     public function purgeAction()
     {
@@ -159,6 +163,8 @@ class ProfilerController
      * @param Request $request The current HTTP Request
      *
      * @return Response A Response instance
+     *
+     * @throws NotFoundHttpException
      */
     public function importAction(Request $request)
     {
@@ -187,6 +193,8 @@ class ProfilerController
      * @param string $about The about message
      *
      * @return Response A Response instance
+     *
+     * @throws NotFoundHttpException
      */
     public function infoAction($about)
     {
@@ -208,6 +216,8 @@ class ProfilerController
      * @param string  $token    The profiler token
      *
      * @return Response A Response instance
+     *
+     * @throws NotFoundHttpException
      */
     public function toolbarAction(Request $request, $token)
     {
@@ -259,6 +269,8 @@ class ProfilerController
      * @param Request $request The current HTTP Request
      *
      * @return Response A Response instance
+     *
+     * @throws NotFoundHttpException
      */
     public function searchBarAction(Request $request)
     {
@@ -304,6 +316,8 @@ class ProfilerController
      * @param string  $token   The token
      *
      * @return Response A Response instance
+     *
+     * @throws NotFoundHttpException
      */
     public function searchResultsAction(Request $request, $token)
     {
@@ -342,6 +356,8 @@ class ProfilerController
      * @param Request $request The current HTTP Request
      *
      * @return Response A Response instance
+     *
+     * @throws NotFoundHttpException
      */
     public function searchAction(Request $request)
     {
@@ -390,6 +406,8 @@ class ProfilerController
      * Displays the PHP info.
      *
      * @return Response A Response instance
+     *
+     * @throws NotFoundHttpException
      */
     public function phpinfoAction()
     {

@@ -130,7 +130,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
      * @expectedException LogicException
      * @expectedExceptionMessage You must call the parent constructor in "Foo5Command::__construct()"
      */
-    public function testAddCommandWithEmptyContructor()
+    public function testAddCommandWithEmptyConstructor()
     {
         $application = new Application();
         $application->add($foo = new \Foo5Command());

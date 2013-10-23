@@ -21,6 +21,7 @@ class GroupSequenceProviderEntity implements GroupSequenceProviderInterface
 {
     public $firstName;
     public $lastName;
+    public $street;
 
     protected $groups = array();
 

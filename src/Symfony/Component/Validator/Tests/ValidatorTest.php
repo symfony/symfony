@@ -187,7 +187,7 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
         $metadata->addPropertyConstraint('lastName', new FailingConstraint(array(
                 'groups' => array('Second'),
             )));
-        $metadata->addPropertyConstraint('street', new FailingConstraint(array(
+        $metadata->addPropertyConstraint('address', new FailingConstraint(array(
                 'groups' => array('Third'),
             )));
         $metadata->setGroupSequenceProvider(true);
@@ -215,11 +215,67 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
                 'Failed',
                 array(),
                 $entity,
-                'street',
+                'address',
                 ''
             ));
 
         $entity->setGroups(array('First', 'Second', 'Third'));
+        $result = $this->validator->validate($entity);
+        $this->assertEquals($violations, $result);
+    }
+
+    public function testValidateGroupSequenceProviderWithMultipleGroupsAndDefault()
+    {
+        $entity = new GroupSequenceProviderEntity();
+        $metadata = new ClassMetadata(get_class($entity));
+        $metadata->addPropertyConstraint('firstName', new FailingConstraint(array(
+                'groups' => array('First'),
+            )));
+        $metadata->addPropertyConstraint('lastName', new FailingConstraint(array(
+                'groups' => array('Second'),
+            )));
+        $metadata->addPropertyConstraint('address', new FailingConstraint(array(
+                'groups' => array('Third'),
+            )));
+        $metadata->addPropertyConstraint('author', new FailingConstraint(array()));
+        $metadata->setGroupSequenceProvider(true);
+        $this->metadataFactory->addMetadata($metadata);
+
+        $violations = new ConstraintViolationList();
+        $violations->add(new ConstraintViolation(
+                'Failed',
+                'Failed',
+                array(),
+                $entity,
+                'firstName',
+                ''
+            ));
+        $violations->add(new ConstraintViolation(
+                'Failed',
+                'Failed',
+                array(),
+                $entity,
+                'lastName',
+                ''
+            ));
+        $violations->add(new ConstraintViolation(
+                'Failed',
+                'Failed',
+                array(),
+                $entity,
+                'address',
+                ''
+            ));
+        $violations->add(new ConstraintViolation(
+                'Failed',
+                'Failed',
+                array(),
+                $entity,
+                'author',
+                ''
+            ));
+
+        $entity->setGroups(array('GroupSequenceProviderEntity', 'First', 'Second', 'Third'));
         $result = $this->validator->validate($entity);
         $this->assertEquals($violations, $result);
     }

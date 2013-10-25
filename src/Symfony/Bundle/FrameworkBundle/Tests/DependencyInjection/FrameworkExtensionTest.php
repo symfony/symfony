@@ -34,7 +34,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
     /**
      * @expectedException \LogicException
-     * @expectedExceptionMessage CSRF protection needs that sessions are enabled.
+     * @expectedExceptionMessage CSRF protection needs sessions to be enabled.
      */
     public function testCsrfProtectionNeedsSessionToBeEnabled()
     {

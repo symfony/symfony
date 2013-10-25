@@ -95,9 +95,7 @@ class FrameworkExtension extends Extension
 
         $loader->load('security.xml');
 
-        if (isset($config['csrf_protection'])) {
-            $this->registerSecurityCsrfConfiguration($config['csrf_protection'], $container, $loader);
-        }
+        $this->registerSecurityCsrfConfiguration($config['csrf_protection'], $container, $loader);
 
         if ($this->isConfigEnabled($container, $config['form'])) {
             $this->formConfigEnabled = true;
@@ -156,6 +154,8 @@ class FrameworkExtension extends Extension
      * @param array            $config    A configuration array
      * @param ContainerBuilder $container A ContainerBuilder instance
      * @param XmlFileLoader    $loader    An XmlFileLoader instance
+     *
+     * @throws \LogicException
      */
     private function registerFormConfiguration($config, ContainerBuilder $container, XmlFileLoader $loader)
     {
@@ -732,7 +732,7 @@ class FrameworkExtension extends Extension
     /**
      * Loads the security configuration.
      *
-     * @param array            $config    A csrf configuration array
+     * @param array            $config    A CSRF configuration array
      * @param ContainerBuilder $container A ContainerBuilder instance
      * @param XmlFileLoader    $loader    An XmlFileLoader instance
      *
@@ -740,14 +740,16 @@ class FrameworkExtension extends Extension
      */
     private function registerSecurityCsrfConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
-        if ($this->isConfigEnabled($container, $config)) {
-            if (!$this->sessionConfigEnabled) {
-                throw new \LogicException('CSRF protection needs that sessions are enabled.');
-            }
-
-            // Enable services for CSRF protection (even without forms)
-            $loader->load('security_csrf.xml');
+        if (!$this->isConfigEnabled($container, $config)) {
+            return;
         }
+
+        if (!$this->sessionConfigEnabled) {
+            throw new \LogicException('CSRF protection needs sessions to be enabled.');
+        }
+
+        // Enable services for CSRF protection (even without forms)
+        $loader->load('security_csrf.xml');
     }
 
     /**

@@ -42,17 +42,12 @@ class ProcessPipes
         if ($this->useFiles) {
             $this->fileHandles = array(
                 Process::STDOUT => tmpfile(),
-                Process::STDERR => tmpfile(),
             );
             if (false === $this->fileHandles[Process::STDOUT]) {
                 throw new RuntimeException('A temporary file could not be opened to write the process output to, verify that your TEMP environment variable is writable');
             }
-            if (false === $this->fileHandles[Process::STDERR]) {
-                throw new RuntimeException('A temporary file could not be opened to write the process output to, verify that your TEMP environment variable is writable');
-            }
             $this->readBytes = array(
                 Process::STDOUT => 0,
-                Process::STDERR => 0,
             );
         }
     }
@@ -108,7 +103,8 @@ class ProcessPipes
             return array(
                 array('pipe', 'r'),
                 $this->fileHandles[Process::STDOUT],
-                $this->fileHandles[Process::STDERR],
+                // Use a file handle only for STDOUT. Using for both STDOUT and STDERR would trigger https://bugs.php.net/bug.php?id=65650
+                array('pipe', 'w'),
             );
         }
 
@@ -150,11 +146,11 @@ class ProcessPipes
      */
     public function hasOpenHandles()
     {
-        if ($this->useFiles) {
-            return (Boolean) $this->fileHandles;
+        if (!$this->useFiles) {
+            return (Boolean) $this->pipes;
         }
 
-        return (Boolean) $this->pipes;
+        return (Boolean) $this->pipes && (Boolean) $this->fileHandles;
     }
 
     /**

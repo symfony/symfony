@@ -82,7 +82,7 @@ class Controller extends ContainerAware
     /**
      * @param string         $route         The name of the route to generate redirect
      * @param mixed          $parameters    An array of parameters for URL generate
-     * @param int            $status        The status code to use for the Response
+     * @param integer        $status        The status code to use for the Response
      * @param Boolean|string $referenceType The type of reference (one of the constants in UrlGeneratorInterface)
      * @return RedirectResponse
      */

@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-09-29T19:34:54Z
+
+#9169 must be merged first to fix the tests.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-09-30T06:05:55Z
+
+#9169 has been merged now.
+
+---------------------------------------------------------------------------
+
+by drak at 2013-09-30T07:10:49Z
+
+This causes everything to blow up for me and I get a weird error like before
+
+```
+LogicException: Event "__section__" is not started.
+in C:\xampp\htdocs\core13\src\vendor\symfony\symfony\src\Symfony\Component\Stopwatch\Stopwatch.php line 276
+at Section->stopEvent('__section__') in C:\xampp\htdocs\core13\src\vendor\symfony\symfony\src\Symfony\Component\Stopwatch\Stopwatch.php line 113
+at Stopwatch->stop('__section__') in C:\xampp\htdocs\core13\src\vendor\symfony\symfony\src\Symfony\Component\Stopwatch\Stopwatch.php line 69
+at Stopwatch->stopSection('29c39c') in C:\xampp\htdocs\core13\src\vendor\symfony\symfony\src\Symfony\Component\HttpKernel\Debug\TraceableEventDispatcher.php line 366
+at TraceableEventDispatcher->postDispatch('kernel.response', object(FilterResponseEvent)) in C:\xampp\htdocs\core13\src\vendor\symfony\symfony\src\Symfony\Component\HttpKernel\Debug\TraceableEventDispatcher.php line 151
+at TraceableEventDispatcher->dispatch('kernel.response', object(FilterResponseEvent)) in C:\xampp\htdocs\core13\src\index.php line 188
+```
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-09-30T07:25:17Z
+
+@drak What you mean by "like before"?
+
+"TraceableEventDispatcher.php line 366" -> is it the `stopSection()` from `RESPONSE` or `TERMINATE`?
+
+---------------------------------------------------------------------------
+
+by stof at 2013-09-30T08:14:26Z
+
+@fabpot the logger, database (this one is extended in DoctrineBundle so we need to check how it would work) and swiftmailer (in the bundle) collectors should also implement this interface IMO, otherwise they are missing the data for logic happening in the terminate event
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-09-30T08:37:03Z
+
+As the replacement of the default event dispatcher by the traceable one still causes problems on some apps (like Zikula), I've opened a new PR with just the refactoring part as it brings value by itself and is totally independent (see #9170).

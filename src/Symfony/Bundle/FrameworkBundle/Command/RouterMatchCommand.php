@@ -50,10 +50,10 @@ class RouterMatchCommand extends ContainerAwareCommand
         $this
             ->setName('router:match')
             ->setDefinition(array(
-                new InputArgument('path_info', InputArgument::REQUIRED, 'A path info')
+                new InputArgument('path_info', InputArgument::REQUIRED, 'A path info'),
+                new InputOption('method', 'm', InputOption::VALUE_OPTIONAL, 'Forces to match against the specified method'),
+                new InputOption('host', null, InputOption::VALUE_OPTIONAL, 'Forces the host to be the one specified by this parameter')
             ))
-            ->addOption('method', 'm', InputOption::VALUE_OPTIONAL, 'Forces to match against the specified method')
-            ->addOption('host', null, InputOption::VALUE_OPTIONAL, 'Forces the host to be the one specified by this parameter')
             ->setDescription('Helps debug routes by simulating a path info match')
             ->setHelp(<<<EOF
 The <info>%command.name%</info> simulates a path info match:

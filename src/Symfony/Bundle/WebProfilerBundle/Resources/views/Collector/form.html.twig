@@ -173,7 +173,7 @@
 
 {% macro form_tree_entry(name, data) %}
     <li>
-        <a href="#details_{{ data.view_vars.id|default("") }}">{{ name }}</a>
+        <a href="#details_{{ data.id }}">{{ name }}</a>
 
         {% if data.children is not empty %}
             <ul>
@@ -186,7 +186,7 @@
 {% endmacro %}
 
 {% macro form_tree_details(name, data) %}
-    <div class="tree-details" id="details_{{ data.view_vars.id|default("") }}">
+    <div class="tree-details" id="details_{{ data.id }}">
         <h2>
             {{ name }}
             {% if data.type_class is defined %}
@@ -323,6 +323,7 @@
         </table>
         {% endif %}
 
+        {% if data.view_vars is defined %}
         <h3>View Variables</h3>
 
         <table>
@@ -337,6 +338,7 @@
             </tr>
             {% endfor %}
         </table>
+        {% endif %}
     </div>
 
     {% for childName, childData in data.children %}

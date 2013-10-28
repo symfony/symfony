@@ -76,6 +76,10 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
         libxml_use_internal_errors($internalErrors);
         libxml_disable_entity_loader($disableEntities);
 
+        if ($error = libxml_get_last_error()) {
+            throw new UnexpectedValueException($error->message);
+        }
+
         foreach ($dom->childNodes as $child) {
             if ($child->nodeType === XML_DOCUMENT_TYPE_NODE) {
                 throw new UnexpectedValueException('Document types are not allowed.');

@@ -52,7 +52,7 @@ class RouterMatchCommand extends ContainerAwareCommand
             ->setDefinition(array(
                 new InputArgument('path_info', InputArgument::REQUIRED, 'A path info'),
                 new InputOption('method', 'm', InputOption::VALUE_OPTIONAL, 'Forces to match against the specified method'),
-                new InputOption('host', null, InputOption::VALUE_OPTIONAL, 'Forces the host to be the one specified by this parameter')
+                new InputOption('host', null, InputOption::VALUE_OPTIONAL, 'Forces the host to be the one specified by this parameter'),
             ))
             ->setDescription('Helps debug routes by simulating a path info match')
             ->setHelp(<<<EOF

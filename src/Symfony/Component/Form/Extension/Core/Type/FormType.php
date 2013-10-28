@@ -40,6 +40,8 @@ class FormType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $isDataOptionSet = array_key_exists('data', $options);
+
         $builder
             ->setRequired($options['required'])
             ->setDisabled($options['disabled'])
@@ -51,8 +53,8 @@ class FormType extends AbstractType
             ->setByReference($options['by_reference'])
             ->setVirtual($options['virtual'])
             ->setCompound($options['compound'])
-            ->setData(isset($options['data']) ? $options['data'] : null)
-            ->setDataLocked(isset($options['data']))
+            ->setData($isDataOptionSet ? $options['data'] : null)
+            ->setDataLocked($isDataOptionSet)
             ->setDataMapper($options['compound'] ? new PropertyPathMapper($this->propertyAccessor) : null)
         ;
 

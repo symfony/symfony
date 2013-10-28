@@ -20,6 +20,8 @@ use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
 
 class XmlEncoderTest extends \PHPUnit_Framework_TestCase
 {
+    private $encoder;
+
     protected function setUp()
     {
         $this->encoder = new XmlEncoder;
@@ -299,6 +301,14 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
         );
         $xml = $this->encoder->encode($obj, 'xml');
         $this->assertEquals($expected, $this->encoder->decode($xml, 'xml'));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Serializer\Exception\UnexpectedValueException
+     */
+    public function testDecodeInvalidXml()
+    {
+        $this->encoder->decode('<?xml version="1.0"?><invalid><xml>', 'xml');
     }
 
     public function testPreventsComplexExternalEntities()

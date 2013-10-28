@@ -79,6 +79,7 @@ class FormDataExtractorTest extends \PHPUnit_Framework_TestCase
             ->getForm();
 
         $this->assertSame(array(
+            'id' => 'name',
             'type' => 'type_name',
             'type_class' => 'stdClass',
             'synchronized' => 'true',
@@ -111,6 +112,7 @@ class FormDataExtractorTest extends \PHPUnit_Framework_TestCase
             ->getForm();
 
         $this->assertSame(array(
+            'id' => 'name',
             'type' => 'type_name',
             'type_class' => 'stdClass',
             'synchronized' => 'true',
@@ -144,6 +146,7 @@ class FormDataExtractorTest extends \PHPUnit_Framework_TestCase
             ->getForm();
 
         $this->assertSame(array(
+            'id' => 'name',
             'type' => 'type_name',
             'type_class' => 'stdClass',
             'synchronized' => 'true',
@@ -153,6 +156,41 @@ class FormDataExtractorTest extends \PHPUnit_Framework_TestCase
                 'b' => "'foo'",
                 'c' => "'baz'",
             ),
+        ), $this->dataExtractor->extractConfiguration($form));
+    }
+
+    public function testExtractConfigurationBuildsIdRecursively()
+    {
+        $type = $this->getMock('Symfony\Component\Form\ResolvedFormTypeInterface');
+        $type->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue('type_name'));
+        $type->expects($this->any())
+            ->method('getInnerType')
+            ->will($this->returnValue(new \stdClass()));
+
+        $grandParent = $this->createBuilder('grandParent')
+            ->setCompound(true)
+            ->setDataMapper($this->getMock('Symfony\Component\Form\DataMapperInterface'))
+            ->getForm();
+        $parent = $this->createBuilder('parent')
+            ->setCompound(true)
+            ->setDataMapper($this->getMock('Symfony\Component\Form\DataMapperInterface'))
+            ->getForm();
+        $form = $this->createBuilder('name')
+            ->setType($type)
+            ->getForm();
+
+        $grandParent->add($parent);
+        $parent->add($form);
+
+        $this->assertSame(array(
+            'id' => 'grandParent_parent_name',
+            'type' => 'type_name',
+            'type_class' => 'stdClass',
+            'synchronized' => 'true',
+            'passed_options' => array(),
+            'resolved_options' => array(),
         ), $this->dataExtractor->extractConfiguration($form));
     }
 

@@ -42,6 +42,7 @@ class FormDataExtractor implements FormDataExtractorInterface
     public function extractConfiguration(FormInterface $form)
     {
         $data = array(
+            'id' => $this->buildId($form),
             'type' => $form->getConfig()->getType()->getName(),
             'type_class' => get_class($form->getConfig()->getType()->getInnerType()),
             'synchronized' => $this->valueExporter->exportValue($form->isSynchronized()),
@@ -131,5 +132,23 @@ class FormDataExtractor implements FormDataExtractorInterface
         ksort($data['view_vars']);
 
         return $data;
+    }
+
+    /**
+     * Recursively builds an HTML ID for a form.
+     *
+     * @param FormInterface $form The form
+     *
+     * @return string The HTML ID
+     */
+    private function buildId(FormInterface $form)
+    {
+        $id = $form->getName();
+
+        if (null !== $form->getParent()) {
+            $id = $this->buildId($form->getParent()).'_'.$id;
+        }
+
+        return $id;
     }
 }

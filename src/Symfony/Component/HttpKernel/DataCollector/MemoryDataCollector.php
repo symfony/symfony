@@ -79,6 +79,7 @@ class MemoryDataCollector extends DataCollector
             return -1;
         }
 
+        $memoryLimit = strtolower($memoryLimit);
         $max = strtolower(ltrim($memoryLimit, '+'));
         if (0 === strpos($max, '0x')) {
             $max = intval($max, 16);

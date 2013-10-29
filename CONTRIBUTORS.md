@@ -780,7 +780,7 @@ Symfony2 is the result of the work of many people who made the code better
  - wesleyh
  - patrick-mcdougle
  - Daniel Basten
- - Giacomo Gallico
+ - cocporn
  - Steve Müller
  - andreabreu98
  - Thomas Schulz

@@ -123,7 +123,9 @@ class FormDataExtractor implements FormDataExtractorInterface
      */
     public function extractViewVariables(FormView $view)
     {
-        $data = array();
+        $data = array(
+            'id' => $view->vars['id']
+        );
 
         foreach ($view->vars as $varName => $value) {
             $data['view_vars'][$varName] = $this->valueExporter->exportValue($value);

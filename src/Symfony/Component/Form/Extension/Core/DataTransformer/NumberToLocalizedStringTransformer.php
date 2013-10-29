@@ -183,6 +183,9 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
         if (',' !== $decSep && (!$this->grouping || ',' !== $groupSep)) {
             $value = str_replace(',', $decSep, $value);
         }
+        
+        // Convert normal spaces to fixed ones
+        $value = str_replace(' ', "\xc2\xa0", $value);
 
         $result = $formatter->parse($value, \NumberFormatter::TYPE_DOUBLE, $position);
 

@@ -251,6 +251,10 @@ class ProcessPipes
      */
     private function readStreams($blocking, $close = false)
     {
+        if(empty($this->pipes)){
+            return [];
+        }
+
         $read = array();
 
         $r = $this->pipes;
@@ -258,7 +262,7 @@ class ProcessPipes
         $e = null;
 
         // let's have a look if something changed in streams
-        if (empty($r) || (false === $n = @stream_select($r, $w, $e, 0, $blocking ? ceil(Process::TIMEOUT_PRECISION * 1E6) : 0))) {
+        if (false === $n = @stream_select($r, $w, $e, 0, $blocking ? ceil(Process::TIMEOUT_PRECISION * 1E6) : 0)) {
             // if a system call has been interrupted, forget about it, let's try again
             // otherwise, an error occured, let's reset pipes
             if (!$this->hasSystemCallBeenInterrupted()) {

@@ -352,13 +352,16 @@ class FormDataExtractorTest extends \PHPUnit_Framework_TestCase
             'b' => 'foo',
             'a' => 'bar',
             'c' => 'baz',
+            'id' => 'foo_bar',
         );
 
         $this->assertSame(array(
+            'id' => 'foo_bar',
             'view_vars' => array(
                 'a' => "'bar'",
                 'b' => "'foo'",
                 'c' => "'baz'",
+                'id' => "'foo_bar'",
             ),
         ), $this->dataExtractor->extractViewVariables($view));
     }

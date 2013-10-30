@@ -235,8 +235,12 @@ class ProgressHelper extends Helper
             $redraw = true;
         }
 
+        $prevSlot = intval($this->current / $this->redrawFreq);
+
         $this->current += $step;
-        if ($redraw || 0 === $this->current % $this->redrawFreq) {
+
+        $currSlot = intval($this->current / $this->redrawFreq);
+        if ($redraw || $prevSlot != $currSlot) {
             $this->display();
         }
     }
@@ -265,8 +269,12 @@ class ProgressHelper extends Helper
             $redraw = true;
         }
 
+        $prevSlot = intval($this->current / $this->redrawFreq);
+
         $this->current = $current;
-        if ($redraw || 0 === $this->current % $this->redrawFreq) {
+        
+        $currSlot = intval($this->current / $this->redrawFreq);
+        if ($redraw || $prevSlot != $currSlot) {
             $this->display();
         }
     }

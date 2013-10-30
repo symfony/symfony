@@ -579,7 +579,7 @@ class Command
         $descriptor = new TextDescriptor();
         $output = new BufferedOutput(BufferedOutput::VERBOSITY_NORMAL, true);
         $descriptor->describe($output, $this, array('raw_output' => true));
-        
+
         return $output->fetch();
     }
 
@@ -595,14 +595,14 @@ class Command
     public function asXml($asDom = false)
     {
         $descriptor = new XmlDescriptor();
-        
+
         if ($asDom) {
             return $descriptor->getCommandDocument($this);
         }
-        
+
         $output = new BufferedOutput();
         $descriptor->describe($output, $this);
-        
+
         return $output->fetch();
     }
 

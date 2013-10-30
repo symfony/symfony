@@ -62,7 +62,6 @@ class FormDataCollectorTest extends \PHPUnit_Framework_TestCase
      */
     private $childView;
 
-
     protected function setUp()
     {
         $this->dataExtractor = $this->getMock('Symfony\Component\Form\Extension\DataCollector\FormDataExtractorInterface');

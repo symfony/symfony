@@ -173,7 +173,7 @@ class MongoDbSessionHandlerTest extends \PHPUnit_Framework_TestCase
     {
         $method = new \ReflectionMethod($this->storage, 'getMongo');
         $method->setAccessible(true);
- 
+
         $this->assertInstanceOf('\Mongo', $method->invoke($this->storage));
     }
 }

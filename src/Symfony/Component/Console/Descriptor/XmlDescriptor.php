@@ -46,7 +46,7 @@ class XmlDescriptor extends Descriptor
 
         return $dom;
     }
-    
+
     /**
      * @param Command $command
      *
@@ -83,11 +83,11 @@ class XmlDescriptor extends Descriptor
 
         return $dom;
     }
-    
+
     /**
      * @param Application $application
      * @param string|null $namespace
-     * 
+     *
      * @return \DOMDocument
      */
     public function getApplicationDocument(Application $application, $namespace = null)
@@ -127,10 +127,10 @@ class XmlDescriptor extends Descriptor
                 }
             }
         }
-        
+
         return $dom;
     }
-    
+
     /**
      * {@inheritdoc}
      */

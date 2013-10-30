@@ -59,7 +59,7 @@ class EntityTypeTest extends TypeTestCase
         if (!class_exists('Doctrine\ORM\EntityManager')) {
             $this->markTestSkipped('Doctrine ORM is not available.');
         }
-        
+
         $this->em = DoctrineTestHelper::createTestEntityManager();
         $this->emRegistry = $this->createRegistryMock('default', $this->em);
 

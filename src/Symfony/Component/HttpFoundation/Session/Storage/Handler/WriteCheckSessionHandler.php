@@ -13,7 +13,7 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
 
 /**
  * Wraps another SessionHandlerInterface to only write the session when it has been modified.
- * 
+ *
  * @author Adrien Brault <adrien.brault@gmail.com>
  */
 class WriteCheckSessionHandler implements \SessionHandlerInterface

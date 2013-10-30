@@ -200,6 +200,7 @@ class Parser
             case Token::NUMBER_TYPE:
             case Token::STRING_TYPE:
                 $this->stream->next();
+
                 return new Node\ConstantNode($token->value);
 
             default:

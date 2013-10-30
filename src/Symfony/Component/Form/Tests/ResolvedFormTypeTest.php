@@ -167,7 +167,6 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('\stdClass', $builder->getDataClass());
     }
 
-
     public function testBuildForm()
     {
         if (version_compare(\PHPUnit_Runner_Version::id(), '3.7', '<')) {

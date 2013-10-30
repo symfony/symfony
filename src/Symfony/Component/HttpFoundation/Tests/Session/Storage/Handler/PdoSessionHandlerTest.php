@@ -105,7 +105,7 @@ class PdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
 
         $method = new \ReflectionMethod($storage, 'getConnection');
         $method->setAccessible(true);
- 
+
         $this->assertInstanceOf('\PDO', $method->invoke($storage));
     }
 }

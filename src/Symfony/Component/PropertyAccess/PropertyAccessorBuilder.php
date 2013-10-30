@@ -92,7 +92,6 @@ class PropertyAccessorBuilder
         return $this->throwExceptionOnInvalidIndex;
     }
 
-
     /**
      * Builds and returns a new propertyAccessor object.
      *

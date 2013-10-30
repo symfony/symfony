@@ -137,6 +137,7 @@ class ContainerAwareHttpKernelTest extends \PHPUnit_Framework_TestCase
             ->method('set')
             ->with($this->equalTo('request'), $this->equalTo($with), $this->equalTo('request'))
         ;
+
         return $this;
     }
 

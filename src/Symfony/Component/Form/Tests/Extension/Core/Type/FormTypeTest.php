@@ -546,6 +546,18 @@ class FormTypeTest extends BaseTypeTest
         $this->assertSame('default', $form->getData());
     }
 
+    public function testDataOptionSupersedesSetDataCallsIfNull()
+    {
+        $form = $this->factory->create('form', null, array(
+            'data' => null,
+            'compound' => false,
+        ));
+
+        $form->setData('foobar');
+
+        $this->assertNull($form->getData());
+    }
+
     public function testNormDataIsPassedToView()
     {
         $view = $this->factory->createBuilder('form')

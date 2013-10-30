@@ -101,7 +101,7 @@ class Crawler extends \SplObjectStorage
         }
 
         $charset = null;
-        if (false !== $pos = strpos($type, 'charset=')) {
+        if (false !== $pos = stripos($type, 'charset=')) {
             $charset = substr($type, $pos + 8);
             if (false !== $pos = strpos($charset, ';')) {
                 $charset = substr($charset, 0, $pos);

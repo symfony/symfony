@@ -1135,7 +1135,6 @@ class Process
         }
     }
 
-
     /**
      * Closes process resource, closes file handles, sets the exitcode.
      *

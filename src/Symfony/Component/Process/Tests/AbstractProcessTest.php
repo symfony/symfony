@@ -537,7 +537,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testStartAfterATimeout()
     {
-        $process = $this->getProcess('php -r "while(true) {echo \'\'; usleep(1000); }"');
+        $process = $this->getProcess('php -r "while (true) {echo \'\'; usleep(1000); }"');
         $process->setTimeout(0.1);
         try {
             $process->run();

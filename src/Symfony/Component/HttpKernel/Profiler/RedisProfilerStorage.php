@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\HttpKernel\Profiler;
 
-
 /**
  * RedisProfilerStorage stores profiling information in Redis.
  *

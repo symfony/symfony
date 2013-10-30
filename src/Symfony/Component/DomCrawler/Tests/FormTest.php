@@ -770,7 +770,8 @@ class FormTest extends \PHPUnit_Framework_TestCase
         return new Form($nodes->item($nodes->length - 1), $currentUri, $method);
     }
 
-    protected function createTestHtml5Form() {
+    protected function createTestHtml5Form()
+    {
         $dom = new \DOMDocument();
         $dom->loadHTML('
         <html>

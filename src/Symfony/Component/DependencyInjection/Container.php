@@ -346,6 +346,7 @@ class Container implements IntrospectableContainerInterface
     public function initialized($id)
     {
         $id = strtolower($id);
+
         return isset($this->services[$id]) || array_key_exists($id, $this->services);
     }
 

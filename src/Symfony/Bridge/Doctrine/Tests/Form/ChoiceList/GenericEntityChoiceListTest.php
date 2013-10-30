@@ -51,7 +51,7 @@ class GenericEntityChoiceListTest extends \PHPUnit_Framework_TestCase
         if (!class_exists('Doctrine\ORM\EntityManager')) {
             $this->markTestSkipped('Doctrine ORM is not available.');
         }
-        
+
         $this->em = DoctrineTestHelper::createTestEntityManager();
 
         $schemaTool = new SchemaTool($this->em);

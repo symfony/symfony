@@ -83,7 +83,7 @@ class InlineFragmentRendererTest extends \PHPUnit_Framework_TestCase
         $strategy = new InlineFragmentRenderer($kernel);
 
         $strategy->render('/', Request::create('/'));
-        
+
         Request::setTrustedHeaderName(Request::HEADER_CLIENT_IP, $trustedHeaderName);
     }
 

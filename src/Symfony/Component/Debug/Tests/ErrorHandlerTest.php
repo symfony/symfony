@@ -26,7 +26,7 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
         if (class_exists('Symfony\Component\Debug\Exception\ContextErrorException', false)) {
             $this->markTestSkipped('The ContextErrorException class is already loaded.');
         }
-    
+
         $handler = ErrorHandler::register(E_ALL | E_STRICT);
         $displayErrors = ini_get('display_errors');
         ini_set('display_errors', '1');
@@ -38,7 +38,7 @@ class _BaseCompileTimeError { function foo() {} }
 class _CompileTimeError extends _BaseCompileTimeError { function foo($invalid) {} }
 PHP
             );
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             // if an exception is thrown, the test passed
         }
 

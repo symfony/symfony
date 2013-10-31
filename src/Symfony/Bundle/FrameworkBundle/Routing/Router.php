@@ -104,7 +104,7 @@ class Router extends BaseRouter implements WarmableInterface
      * @param mixed $value The source which might contain "%placeholders%"
      *
      * @return mixed The source with the placeholders replaced by the container
-     *               parameters. Array are resolved recursively.
+     *               parameters. Arrays are resolved recursively.
      *
      * @throws ParameterNotFoundException When a placeholder does not exist as a container parameter
      * @throws RuntimeException           When a container value is not a string or a numeric value
@@ -125,30 +125,25 @@ class Router extends BaseRouter implements WarmableInterface
 
         $container = $this->container;
 
-        $escapedValue = preg_replace_callback('/%%|%([^%\s]+)%/', function ($match) use ($container, $value) {
+        $escapedValue = preg_replace_callback('/%%|%([^%\s]++)%/', function ($match) use ($container, $value) {
             // skip %%
             if (!isset($match[1])) {
                 return '%%';
             }
 
-            $key = strtolower($match[1]);
-
-            if (!$container->hasParameter($key)) {
-                throw new ParameterNotFoundException($key);
-            }
-
-            $resolved = $container->getParameter($key);
+            $resolved = $container->getParameter($match[1]);
 
             if (is_string($resolved) || is_numeric($resolved)) {
                 return (string) $resolved;
             }
 
             throw new RuntimeException(sprintf(
-                'A string value must be composed of strings and/or numbers,' .
-                'but found parameter "%s" of type %s inside string value "%s".',
-                $key,
-                gettype($resolved),
-                $value)
+                'The container parameter "%s", used in the route configuration value "%s", ' .
+                'must be a string or numeric, but it is of type %s.',
+                $match[1],
+                $value,
+                gettype($resolved)
+                )
             );
 
         }, $value);

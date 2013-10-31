@@ -59,14 +59,14 @@ abstract class Guess
     private $confidence;
 
     /**
-     * Returns the guess most likely to be correct from a list of guesses
+     * Returns the guess most likely to be correct from a list of guesses.
      *
      * If there are multiple guesses with the same, highest confidence, the
      * returned guess is any of them.
      *
-     * @param array $guesses A list of guesses
+     * @param Guess[] $guesses An array of guesses
      *
-     * @return Guess The guess with the highest confidence
+     * @return Guess|null The guess with the highest confidence
      */
     public static function getBestGuess(array $guesses)
     {
@@ -84,7 +84,7 @@ abstract class Guess
     }
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param integer $confidence The confidence
      *
@@ -101,7 +101,7 @@ abstract class Guess
     }
 
     /**
-     * Returns the confidence that the guessed value is correct
+     * Returns the confidence that the guessed value is correct.
      *
      * @return integer One of the constants VERY_HIGH_CONFIDENCE,
      *                 HIGH_CONFIDENCE, MEDIUM_CONFIDENCE and LOW_CONFIDENCE

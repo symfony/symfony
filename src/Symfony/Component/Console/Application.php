@@ -56,13 +56,13 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class Application
 {
-    private $commands;
+    private $commands = array();
     private $wantHelps = false;
     private $runningCommand;
     private $name;
     private $version;
-    private $catchExceptions;
-    private $autoExit;
+    private $catchExceptions = true;
+    private $autoExit = true;
     private $definition;
     private $helperSet;
     private $dispatcher;
@@ -80,9 +80,6 @@ class Application
     {
         $this->name = $name;
         $this->version = $version;
-        $this->catchExceptions = true;
-        $this->autoExit = true;
-        $this->commands = array();
         $this->helperSet = $this->getDefaultHelperSet();
         $this->definition = $this->getDefaultInputDefinition();
 
@@ -407,8 +404,8 @@ class Application
             return;
         }
 
-        if (null === $command->getAliases()) {
-            throw new \LogicException(sprintf('You must call the parent constructor in "%s::__construct()"', get_class($command)));
+        if (null === $command->getDefinition()) {
+            throw new \LogicException(sprintf('Command class "%s" is not correctly initialized. You probably forgot to call the parent constructor.', get_class($command)));
         }
 
         $this->commands[$command->getName()] = $command;

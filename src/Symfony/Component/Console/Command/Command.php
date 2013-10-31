@@ -33,13 +33,13 @@ class Command
 {
     private $application;
     private $name;
-    private $aliases;
+    private $aliases = array();
     private $definition;
     private $help;
     private $description;
-    private $ignoreValidationErrors;
-    private $applicationDefinitionMerged;
-    private $applicationDefinitionMergedWithArgs;
+    private $ignoreValidationErrors = false;
+    private $applicationDefinitionMerged = false;
+    private $applicationDefinitionMergedWithArgs = false;
     private $code;
     private $synopsis;
     private $helperSet;
@@ -47,7 +47,7 @@ class Command
     /**
      * Constructor.
      *
-     * @param string $name The name of the command
+     * @param string|null $name The name of the command; passing null means it must be set in configure()
      *
      * @throws \LogicException When the command name is empty
      *
@@ -56,10 +56,6 @@ class Command
     public function __construct($name = null)
     {
         $this->definition = new InputDefinition();
-        $this->ignoreValidationErrors = false;
-        $this->applicationDefinitionMerged = false;
-        $this->applicationDefinitionMergedWithArgs = false;
-        $this->aliases = array();
 
         if (null !== $name) {
             $this->setName($name);
@@ -402,7 +398,7 @@ class Command
      *
      * @return Command The current instance
      *
-     * @throws \InvalidArgumentException When command name given is empty
+     * @throws \InvalidArgumentException When the name is invalid
      *
      * @api
      */
@@ -512,6 +508,8 @@ class Command
      *
      * @return Command The current instance
      *
+     * @throws \InvalidArgumentException When an alias is invalid
+     *
      * @api
      */
     public function setAliases($aliases)
@@ -606,9 +604,18 @@ class Command
         return $output->fetch();
     }
 
+    /**
+     * Validates a command name.
+     *
+     * It must be non-empty and parts can optionally be separated by ":".
+     *
+     * @param string $name
+     *
+     * @throws \InvalidArgumentException When the name is invalid
+     */
     private function validateName($name)
     {
-        if (!preg_match('/^[^\:]+(\:[^\:]+)*$/', $name)) {
+        if (!preg_match('/^[^\:]++(\:[^\:]++)*$/', $name)) {
             throw new \InvalidArgumentException(sprintf('Command name "%s" is invalid.', $name));
         }
     }

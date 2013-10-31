@@ -52,12 +52,20 @@ class FormRenderer implements FormRendererInterface
      */
     private $variableStack = array();
 
+    /**
+     * Constructor.
+     *
+     * @param FormRendererEngineInterface    $engine
+     * @param CsrfTokenManagerInterface|null $csrfTokenManager
+     *
+     * @throws UnexpectedTypeException
+     */
     public function __construct(FormRendererEngineInterface $engine, $csrfTokenManager = null)
     {
         if ($csrfTokenManager instanceof CsrfProviderInterface) {
             $csrfTokenManager = new CsrfProviderAdapter($csrfTokenManager);
         } elseif (null !== $csrfTokenManager && !$csrfTokenManager instanceof CsrfTokenManagerInterface) {
-            throw new UnexpectedTypeException($csrfTokenManager, 'CsrfProviderInterface or CsrfTokenManagerInterface');
+            throw new UnexpectedTypeException($csrfTokenManager, 'CsrfProviderInterface or CsrfTokenManagerInterface or null');
         }
 
         $this->engine = $engine;

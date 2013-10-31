@@ -46,7 +46,7 @@ class CsrfProviderAdapter implements CsrfTokenManagerInterface
      */
     public function getToken($tokenId)
     {
-        return $this->csrfProvider->generateCsrfToken($tokenId);
+        return new CsrfToken($tokenId, $this->csrfProvider->generateCsrfToken($tokenId));
     }
 
     /**

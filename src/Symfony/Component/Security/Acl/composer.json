@@ -25,9 +25,9 @@
         "psr/log": "~1.0"
     },
     "suggest": {
-        "symfony/class-loader": "",
-        "symfony/finder": "",
-        "doctrine/dbal": "to use the built-in ACL implementation"
+        "symfony/class-loader": "For using the ACL generateSql script",
+        "symfony/finder": "For using the ACL generateSql script",
+        "doctrine/dbal": "For using the built-in ACL implementation"
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\Security\\Acl\\": "" }

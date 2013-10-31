@@ -28,7 +28,7 @@
         "symfony/stopwatch": "~2.3",
         "symfony/templating": "~2.1",
         "symfony/translation": "~2.3",
-        "doctrine/common": "~2.2"
+        "doctrine/annotations": "~1.0"
     },
     "require-dev": {
         "symfony/finder": "~2.0",
@@ -38,10 +38,11 @@
         "symfony/validator": "~2.1"
     },
     "suggest": {
-        "symfony/console": "",
-        "symfony/finder": "",
-        "symfony/form": "",
-        "symfony/validator": ""
+        "symfony/console": "For using the console commands",
+        "symfony/finder": "For using the translation loader and cache warmer",
+        "symfony/form": "For using forms",
+        "symfony/validator": "For using validation",
+        "doctrine/cache": "For using alternative cache drivers"
     },
     "autoload": {
         "psr-0": { "Symfony\\Bundle\\FrameworkBundle\\": "" }

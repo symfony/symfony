@@ -28,8 +28,9 @@
     "suggest": {
         "symfony/event-dispatcher": "",
         "symfony/http-foundation": "",
-        "symfony/validator": "",
-        "ircmaxell/password-compat": ""
+        "symfony/validator": "For using the user password constraint",
+        "symfony/expression-language": "For using the expression voter",
+        "ircmaxell/password-compat": "For using the BCrypt password encoder in PHP <5.5"
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\Security\\Core\\": "" }

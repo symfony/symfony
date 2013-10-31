@@ -205,8 +205,8 @@ class ValidatorBuilder implements ValidatorBuilderInterface
         }
 
         if (null === $annotationReader) {
-            if (!class_exists('Doctrine\Common\Annotations\AnnotationReader')) {
-                throw new \RuntimeException('Requested a ValidatorFactory with an AnnotationLoader, but the AnnotationReader was not found. You should add Doctrine Common to your project.');
+            if (!class_exists('Doctrine\Common\Annotations\AnnotationReader') || !class_exists('Doctrine\Common\Cache\ArrayCache')) {
+                throw new \RuntimeException('Enabling annotation based constraint mapping requires the packages doctrine/annotations and doctrine/cache to be installed.');
             }
 
             $annotationReader = new CachedReader(new AnnotationReader(), new ArrayCache());

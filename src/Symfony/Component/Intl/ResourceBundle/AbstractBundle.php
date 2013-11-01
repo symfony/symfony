@@ -46,15 +46,7 @@ abstract class AbstractBundle implements ResourceBundleInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getLocales()
-    {
-        return $this->reader->getLocales($this->path);
-    }
-
-    /**
-     * Proxy method for {@link StructuredBundleReaderInterface#read}.
+     * Proxy method for {@link BundleEntryReaderInterface#read}.
      */
     protected function read($locale)
     {
@@ -62,10 +54,10 @@ abstract class AbstractBundle implements ResourceBundleInterface
     }
 
     /**
-     * Proxy method for {@link StructuredBundleReaderInterface#readEntry}.
+     * Proxy method for {@link BundleEntryReaderInterface#readEntry}.
      */
-    protected function readEntry($locale, array $indices, $mergeFallback = false)
+    protected function readEntry($locale, array $indices, $fallback = true)
     {
-        return $this->reader->readEntry($this->path, $locale, $indices, $mergeFallback);
+        return $this->reader->readEntry($this->path, $locale, $indices, $fallback);
     }
 }

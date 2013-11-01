@@ -15,6 +15,9 @@ namespace Symfony\Component\Intl\ResourceBundle;
  * Gives access to currency-related ICU data.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+ *             Use {@link \Symfony\Component\Icu\CurrencyDataProvider} instead.
  */
 interface CurrencyBundleInterface extends ResourceBundleInterface
 {

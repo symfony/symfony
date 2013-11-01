@@ -17,7 +17,7 @@ use Symfony\Component\Icu\IcuLanguageBundle;
 use Symfony\Component\Icu\IcuLocaleBundle;
 use Symfony\Component\Icu\IcuRegionBundle;
 use Symfony\Component\Intl\ResourceBundle\Reader\BufferedBundleReader;
-use Symfony\Component\Intl\ResourceBundle\Reader\StructuredBundleReader;
+use Symfony\Component\Intl\ResourceBundle\Reader\BundleEntryReader;
 
 /**
  * Gives access to internationalization data.
@@ -63,9 +63,9 @@ class Intl
     private static $icuDataVersion = false;
 
     /**
-     * @var ResourceBundle\Reader\StructuredBundleReaderInterface
+     * @var BundleEntryReader
      */
-    private static $bundleReader;
+    private static $entryReader;
 
     /**
      * Returns whether the intl extension is installed.
@@ -81,11 +81,14 @@ class Intl
      * Returns the bundle containing currency information.
      *
      * @return ResourceBundle\CurrencyBundleInterface The currency resource bundle.
+     *
+     * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+     *             Use the {@link Currency} class instead.
      */
     public static function getCurrencyBundle()
     {
         if (null === self::$currencyBundle) {
-            self::$currencyBundle = new IcuCurrencyBundle(self::getBundleReader());
+            self::$currencyBundle = new IcuCurrencyBundle(self::getEntryReader());
         }
 
         return self::$currencyBundle;
@@ -99,7 +102,7 @@ class Intl
     public static function getLanguageBundle()
     {
         if (null === self::$languageBundle) {
-            self::$languageBundle = new IcuLanguageBundle(self::getBundleReader());
+            self::$languageBundle = new IcuLanguageBundle(self::getEntryReader());
         }
 
         return self::$languageBundle;
@@ -109,11 +112,14 @@ class Intl
      * Returns the bundle containing locale information.
      *
      * @return ResourceBundle\LocaleBundleInterface The locale resource bundle.
+     *
+     * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+     *             Use the {@link Locale} class instead.
      */
     public static function getLocaleBundle()
     {
         if (null === self::$localeBundle) {
-            self::$localeBundle = new IcuLocaleBundle(self::getBundleReader());
+            self::$localeBundle = new IcuLocaleBundle(self::getEntryReader());
         }
 
         return self::$localeBundle;
@@ -127,7 +133,7 @@ class Intl
     public static function getRegionBundle()
     {
         if (null === self::$regionBundle) {
-            self::$regionBundle = new IcuRegionBundle(self::getBundleReader());
+            self::$regionBundle = new IcuRegionBundle(self::getEntryReader());
         }
 
         return self::$regionBundle;
@@ -190,18 +196,22 @@ class Intl
     /**
      * Returns a resource bundle reader for .php resource bundle files.
      *
-     * @return ResourceBundle\Reader\StructuredBundleReaderInterface The resource reader.
+     * @return ResourceBundle\Reader\BundleEntryReaderInterface The resource reader.
      */
-    private static function getBundleReader()
+    public static function getEntryReader()
     {
-        if (null === self::$bundleReader) {
-            self::$bundleReader = new StructuredBundleReader(new BufferedBundleReader(
+        if (null === self::$entryReader) {
+            self::$entryReader = new BundleEntryReader(new BufferedBundleReader(
                 IcuData::getBundleReader(),
                 self::BUFFER_SIZE
             ));
+
+            // Make sure that self::$bundleReader is already set to prevent
+            // a cycle
+            self::$entryReader->setLocaleAliases(Locale::getAliases());
         }
 
-        return self::$bundleReader;
+        return self::$entryReader;
     }
 
     /**

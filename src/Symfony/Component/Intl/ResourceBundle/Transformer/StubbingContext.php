@@ -14,9 +14,11 @@ namespace Symfony\Component\Intl\ResourceBundle\Transformer;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
+ * Stores contextual information for resource bundle stub creation.
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class StubbingContext implements StubbingContextInterface
+class StubbingContext
 {
     /**
      * @var string
@@ -47,7 +49,9 @@ class StubbingContext implements StubbingContextInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Returns the directory where the binary resource bundles are stored.
+     *
+     * @return string An absolute path to a directory.
      */
     public function getBinaryDir()
     {
@@ -55,7 +59,9 @@ class StubbingContext implements StubbingContextInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Returns the directory where the stub resource bundles are stored.
+     *
+     * @return string An absolute path to a directory.
      */
     public function getStubDir()
     {
@@ -63,7 +69,9 @@ class StubbingContext implements StubbingContextInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Returns a tool for manipulating the filesystem.
+     *
+     * @return \Symfony\Component\Filesystem\Filesystem The filesystem manipulator.
      */
     public function getFilesystem()
     {
@@ -71,7 +79,9 @@ class StubbingContext implements StubbingContextInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Returns the ICU version of the bundles being converted.
+     *
+     * @return string The ICU version string.
      */
     public function getIcuVersion()
     {

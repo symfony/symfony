@@ -11,42 +11,39 @@
 
 namespace Symfony\Component\Intl\ResourceBundle;
 
+use Symfony\Component\Icu\LocaleDataProvider;
+
 /**
  * Default implementation of {@link LocaleBundleInterface}.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+ *             Use {@link LocaleDataProvider} instead.
  */
-class LocaleBundle extends AbstractBundle implements LocaleBundleInterface
+class LocaleBundle extends LocaleDataProvider implements LocaleBundleInterface
 {
     /**
-     * {@inheritdoc}
-     */
-    public function getLocaleName($ofLocale, $locale = null)
-    {
-        if (null === $locale) {
-            $locale = \Locale::getDefault();
-        }
-
-        return $this->readEntry($locale, array('Locales', $ofLocale));
-    }
-
-    /**
-     * {@inheritdoc}
+     * Alias of {@link getNames()}.
      */
     public function getLocaleNames($locale = null)
     {
-        if (null === $locale) {
-            $locale = \Locale::getDefault();
-        }
+        return $this->getNames($locale);
+    }
 
-        if (null === ($locales = $this->readEntry($locale, array('Locales')))) {
-            return array();
-        }
+    /**
+     * Alias of {@link getName()}.
+     */
+    public function getLocaleName($ofLocale, $locale = null)
+    {
+        return $this->getName($ofLocale, $locale);
+    }
 
-        if ($locales instanceof \Traversable) {
-            $locales = iterator_to_array($locales);
-        }
-
-        return $locales;
+    /**
+     * Alias of {@link getAliases()}.
+     */
+    public function getLocaleAliases()
+    {
+        return $this->getAliases();
     }
 }

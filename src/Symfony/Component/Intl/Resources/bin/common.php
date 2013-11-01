@@ -67,3 +67,27 @@ function get_icu_version_from_genrb($genrb)
 
     return $matches[1];
 }
+
+set_exception_handler(function (\Exception $exception) {
+    echo "\n";
+
+    $cause = $exception;
+    $root = true;
+
+    while (null !== $cause) {
+        if (!$root) {
+            echo "Caused by\n";
+        }
+
+        echo get_class($cause).": ".$cause->getMessage()."\n";
+        echo "\n";
+        echo $cause->getFile().":".$cause->getLine()."\n";
+        foreach ($cause->getTrace() as $trace) {
+            echo $trace['file'].":".$trace['line']."\n";
+        }
+        echo "\n";
+
+        $cause = $cause->getPrevious();
+        $root = false;
+    }
+});

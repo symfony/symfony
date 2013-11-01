@@ -40,13 +40,13 @@ class BundleTransformer
     /**
      * Runs the compilation with the given compilation context.
      *
-     * @param CompilationContextInterface $context The context storing information
-     *                                             needed to run the compilation.
+     * @param CompilationContext $context The context storing information
+     *                                    needed to run the compilation.
      *
      * @throws RuntimeException If any of the files to be compiled by the loaded
      *                          compilation rules does not exist.
      */
-    public function compileBundles(CompilationContextInterface $context)
+    public function compileBundles(CompilationContext $context)
     {
         $filesystem = $context->getFilesystem();
         $compiler = $context->getCompiler();
@@ -75,7 +75,7 @@ class BundleTransformer
         }
     }
 
-    public function createStubs(StubbingContextInterface $context)
+    public function createStubs(StubbingContext $context)
     {
         $filesystem = $context->getFilesystem();
         $phpWriter = new PhpBundleWriter();

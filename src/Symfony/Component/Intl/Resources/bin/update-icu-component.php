@@ -9,9 +9,16 @@
  * file that was distributed with this source code.
  */
 
+use Symfony\Component\Icu\IcuCurrencyBundle;
 use Symfony\Component\Icu\IcuData;
+use Symfony\Component\Icu\IcuLanguageBundle;
+use Symfony\Component\Icu\IcuLocaleBundle;
+use Symfony\Component\Icu\IcuRegionBundle;
 use Symfony\Component\Intl\Intl;
-use Symfony\Component\Intl\ResourceBundle\Compiler\BundleCompiler;
+use Symfony\Component\Intl\ResourceBundle\Compiler\GenrbBundleCompiler;
+use Symfony\Component\Intl\ResourceBundle\Reader\BinaryBundleReader;
+use Symfony\Component\Intl\ResourceBundle\Reader\BundleEntryReader;
+use Symfony\Component\Intl\ResourceBundle\Scanner\LocaleScanner;
 use Symfony\Component\Intl\ResourceBundle\Transformer\BundleTransformer;
 use Symfony\Component\Intl\ResourceBundle\Transformer\CompilationContext;
 use Symfony\Component\Intl\ResourceBundle\Transformer\Rule\CurrencyBundleTransformationRule;
@@ -42,7 +49,7 @@ the subdirectories bin/ and lib/.
 For running this script, the intl extension must be loaded and all vendors
 must have been installed through composer:
 
-    composer install --dev
+composer install --dev
 
 MESSAGE
     );
@@ -170,15 +177,23 @@ $context = new CompilationContext(
     $sourceDir . '/data',
     IcuData::getResourceDirectory(),
     $filesystem,
-    new BundleCompiler($genrb, $genrbEnv),
-    $icuVersionInDownload
+    new GenrbBundleCompiler($genrb, $genrbEnv),
+    $icuVersionInDownload,
+    new LocaleScanner()
 );
 
+$reader = new BundleEntryReader(new BinaryBundleReader());
+
+$localeBundle = new IcuLocaleBundle($reader);
+$languageBundle = new IcuLanguageBundle($reader);
+$regionBundle = new IcuRegionBundle($reader);
+$currencyBundle = new IcuCurrencyBundle($reader);
+
 $transformer = new BundleTransformer();
-$transformer->addRule(new LanguageBundleTransformationRule());
-$transformer->addRule(new RegionBundleTransformationRule());
-$transformer->addRule(new CurrencyBundleTransformationRule());
-$transformer->addRule(new LocaleBundleTransformationRule());
+$transformer->addRule(new LanguageBundleTransformationRule($languageBundle));
+$transformer->addRule(new RegionBundleTransformationRule($regionBundle));
+$transformer->addRule(new CurrencyBundleTransformationRule($currencyBundle));
+$transformer->addRule(new LocaleBundleTransformationRule($localeBundle, $languageBundle, $regionBundle));
 
 echo "Starting resource bundle compilation. This may take a while...\n";
 

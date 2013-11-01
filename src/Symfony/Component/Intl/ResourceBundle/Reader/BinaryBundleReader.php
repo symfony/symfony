@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Intl\ResourceBundle\Reader;
 
-use Symfony\Component\Intl\Exception\RuntimeException;
+use Symfony\Component\Intl\Exception\ResourceBundleNotFoundException;
 use Symfony\Component\Intl\ResourceBundle\Util\ArrayAccessibleResourceBundle;
 
 /**
@@ -19,7 +19,7 @@ use Symfony\Component\Intl\ResourceBundle\Util\ArrayAccessibleResourceBundle;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class BinaryBundleReader extends AbstractBundleReader implements BundleReaderInterface
+class BinaryBundleReader implements BundleReaderInterface
 {
     /**
      * {@inheritdoc}
@@ -28,24 +28,23 @@ class BinaryBundleReader extends AbstractBundleReader implements BundleReaderInt
     {
         // Point for future extension: Modify this class so that it works also
         // if the \ResourceBundle class is not available.
-        $bundle = new \ResourceBundle($locale, $path);
 
+        // Never enable fallback. We want to know if a bundle cannot be found
+        $bundle = new \ResourceBundle($locale, $path, false);
+
+        // The bundle is NULL if the path does not look like a resource bundle
+        // (i.e. contain a bunch of *.res files)
         if (null === $bundle) {
-            throw new RuntimeException(sprintf(
-                'Could not load the resource bundle "%s/%s.res".',
+            throw new ResourceBundleNotFoundException(sprintf(
+                'The resource bundle "%s/%s.res" could not be found.',
                 $path,
                 $locale
             ));
         }
 
-        return new ArrayAccessibleResourceBundle($bundle);
-    }
+        // Other possible errors are U_USING_FALLBACK_WARNING and U_ZERO_ERROR,
+        // which are OK for us.
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getFileExtension()
-    {
-        return 'res';
+        return new ArrayAccessibleResourceBundle($bundle);
     }
 }

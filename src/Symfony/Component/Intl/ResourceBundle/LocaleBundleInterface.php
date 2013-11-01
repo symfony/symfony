@@ -15,6 +15,9 @@ namespace Symfony\Component\Intl\ResourceBundle;
  * Gives access to locale-related ICU data.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+ *             Use {@link \Symfony\Component\Icu\LocaleDataProvider} instead.
  */
 interface LocaleBundleInterface extends ResourceBundleInterface
 {
@@ -38,4 +41,12 @@ interface LocaleBundleInterface extends ResourceBundleInterface
      * @return string[] A list of locale names indexed by locale codes.
      */
     public function getLocaleNames($locale = null);
+
+    /**
+     * Returns a list of locale aliases.
+     *
+     * @return array An array with aliases as keys and aliased locales as
+     *               values.
+     */
+    public function getLocaleAliases();
 }

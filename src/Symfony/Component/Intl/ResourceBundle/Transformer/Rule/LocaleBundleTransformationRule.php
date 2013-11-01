@@ -11,10 +11,14 @@
 
 namespace Symfony\Component\Intl\ResourceBundle\Transformer\Rule;
 
-use Symfony\Component\Intl\Exception\RuntimeException;
-use Symfony\Component\Intl\Intl;
-use Symfony\Component\Intl\ResourceBundle\Transformer\CompilationContextInterface;
-use Symfony\Component\Intl\ResourceBundle\Transformer\StubbingContextInterface;
+use Symfony\Component\Intl\Exception\MissingResourceException;
+use Symfony\Component\Intl\Exception\ResourceBundleNotFoundException;
+use Symfony\Component\Intl\Locale;
+use Symfony\Component\Intl\ResourceBundle\LanguageBundleInterface;
+use Symfony\Component\Intl\ResourceBundle\LocaleBundleInterface;
+use Symfony\Component\Intl\ResourceBundle\RegionBundleInterface;
+use Symfony\Component\Intl\ResourceBundle\Transformer\CompilationContext;
+use Symfony\Component\Intl\ResourceBundle\Transformer\StubbingContext;
 use Symfony\Component\Intl\ResourceBundle\Writer\TextBundleWriter;
 
 /**
@@ -25,19 +29,25 @@ use Symfony\Component\Intl\ResourceBundle\Writer\TextBundleWriter;
 class LocaleBundleTransformationRule implements TransformationRuleInterface
 {
     /**
-     * @var \Symfony\Component\Intl\ResourceBundle\LanguageBundleInterface
+     * @var LocaleBundleInterface
+     */
+    private $localeBundle;
+
+    /**
+     * @var LanguageBundleInterface
      */
     private $languageBundle;
 
     /**
-     * @var \Symfony\Component\Intl\ResourceBundle\RegionBundleInterface
+     * @var RegionBundleInterface
      */
     private $regionBundle;
 
-    public function __construct()
+    public function __construct(LocaleBundleInterface $localeBundle, LanguageBundleInterface $languageBundle, RegionBundleInterface $regionBundle)
     {
-        $this->languageBundle = Intl::getLanguageBundle();
-        $this->regionBundle = Intl::getRegionBundle();
+        $this->localeBundle = $localeBundle;
+        $this->languageBundle = $languageBundle;
+        $this->regionBundle = $regionBundle;
     }
 
     /**
@@ -51,14 +61,31 @@ class LocaleBundleTransformationRule implements TransformationRuleInterface
     /**
      * {@inheritdoc}
      */
-    public function beforeCompile(CompilationContextInterface $context)
+    public function beforeCompile(CompilationContext $context)
     {
-        $tempDir = sys_get_temp_dir() . '/icu-data-locales';
+        $tempDir = sys_get_temp_dir().'/icu-data-locales';
 
         $context->getFilesystem()->remove($tempDir);
         $context->getFilesystem()->mkdir($tempDir);
 
-        $this->generateTextFiles($tempDir, $this->scanLocales($context));
+        $locales = $context->getLocaleScanner()->scanLocales($context->getSourceDir().'/locales');
+        $aliases = $context->getLocaleScanner()->scanAliases($context->getSourceDir().'/locales');
+
+        $writer = new TextBundleWriter();
+
+        $this->generateTextFiles($writer, $tempDir, $locales, $aliases);
+
+        // Generate aliases, needed to enable proper fallback from alias to its
+        // target
+        foreach ($aliases as $alias => $aliasOf) {
+            $writer->write($tempDir, $alias, array('%%ALIAS' => $aliasOf));
+        }
+
+        // Create root file which maps locale codes to locale codes, for fallback
+        $writer->write($tempDir, 'root', array(
+            'Locales' => array_combine($locales, $locales),
+            'Aliases' => $aliases,
+        ));
 
         return $tempDir;
     }
@@ -66,115 +93,84 @@ class LocaleBundleTransformationRule implements TransformationRuleInterface
     /**
      * {@inheritdoc}
      */
-    public function afterCompile(CompilationContextInterface $context)
+    public function afterCompile(CompilationContext $context)
     {
-        $context->getFilesystem()->remove(sys_get_temp_dir() . '/icu-data-locales');
+        $context->getFilesystem()->remove(sys_get_temp_dir().'/icu-data-locales');
     }
 
     /**
      * {@inheritdoc}
      */
-    public function beforeCreateStub(StubbingContextInterface $context)
+    public function beforeCreateStub(StubbingContext $context)
     {
         return array(
-            'Locales' => Intl::getLocaleBundle()->getLocaleNames('en'),
+            'Locales' => $this->localeBundle->getLocaleNames('en'),
         );
     }
 
     /**
      * {@inheritdoc}
      */
-    public function afterCreateStub(StubbingContextInterface $context)
+    public function afterCreateStub(StubbingContext $context)
     {
     }
 
-    private function scanLocales(CompilationContextInterface $context)
+    private function generateTextFiles(TextBundleWriter $writer, $targetDirectory, array $locales, array $aliases)
     {
-        $tempDir = sys_get_temp_dir() . '/icu-data-locales-source';
+        // Flip to facilitate lookup
+        $locales = array_flip($locales);
 
-        $context->getFilesystem()->remove($tempDir);
-        $context->getFilesystem()->mkdir($tempDir);
+        // Don't generate names for aliases (names will be generated for the
+        // locale they are duplicating)
+        $displayLocales = array_diff_key($locales, $aliases);
 
-        // Temporarily generate the resource bundles
-        $context->getCompiler()->compile($context->getSourceDir() . '/locales', $tempDir);
+        // Since fallbacks are always shorter than their source, we can sort
+        // the display locales so that fallbacks are always processed before
+        // their variants
+        ksort($displayLocales);
 
-        // Discover the list of supported locales, which are the names of the resource
-        // bundles in the "locales" directory
-        $locales = glob($tempDir . '/*.res');
+        // Generate a list of (existing) locale fallbacks
+        $fallbackMapping = $this->generateFallbackMapping($displayLocales, $aliases);
 
-        // Remove file extension and sort
-        array_walk($locales, function (&$locale) { $locale = basename($locale, '.res'); });
-        sort($locales);
+        $localeNames = array();
 
-        // Delete unneeded locales
-        foreach ($locales as $key => $locale) {
-            // Delete all aliases from the list
-            // i.e., "az_AZ" is an alias for "az_Latn_AZ"
-            $content = file_get_contents($context->getSourceDir() . '/locales/' . $locale . '.txt');
+        // Generate locale names for all locales that have translations in
+        // at least the language or the region bundle
+        foreach ($displayLocales as $displayLocale => $_) {
+            $localeNames[$displayLocale] = array();
 
-            // The key "%%ALIAS" is not accessible through the \ResourceBundle class,
-            // so look in the original .txt file instead
-            if (strpos($content, '%%ALIAS') !== false) {
-                unset($locales[$key]);
-            }
-
-            // Delete locales that have no content (i.e. only "Version" key)
-            $bundle = new \ResourceBundle($locale, $tempDir);
-
-            if (null === $bundle) {
-                throw new RuntimeException('The resource bundle for locale ' . $locale . ' could not be loaded from directory ' . $tempDir);
-            }
-
-            // There seems to be no other way for identifying all keys in this specific
-            // resource bundle
-            if (array_keys(iterator_to_array($bundle)) === array('Version')) {
-                unset($locales[$key]);
-            }
-        }
-
-        $context->getFilesystem()->remove($tempDir);
-
-        return $locales;
-    }
-
-    private function generateTextFiles($targetDirectory, array $locales)
-    {
-        $displayLocales = array_unique(array_merge(
-            $this->languageBundle->getLocales(),
-            $this->regionBundle->getLocales()
-        ));
-
-        $txtWriter = new TextBundleWriter();
-
-        // Generate a list of locale names in the language of each display locale
-        // Each locale name has the form: "Language (Script, Region, Variant1, ...)
-        // Script, Region and Variants are optional. If none of them is available,
-        // the braces are not printed.
-        foreach ($displayLocales as $displayLocale) {
-            // Don't include ICU's root resource bundle
-            if ('root' === $displayLocale) {
-                continue;
-            }
-
-            $names = array();
-
-            foreach ($locales as $locale) {
-                // Don't include ICU's root resource bundle
-                if ($locale === 'root') {
-                    continue;
-                }
-
-                if (null !== ($name = $this->generateLocaleName($locale, $displayLocale))) {
-                    $names[$locale] = $name;
+            foreach ($locales as $locale => $__) {
+                try {
+                    // Generate a locale name in the language of each display locale
+                    // Each locale name has the form: "Language (Script, Region, Variant1, ...)
+                    // Script, Region and Variants are optional. If none of them is
+                    // available, the braces are not printed.
+                    if (null !== ($name = $this->generateLocaleName($locale, $displayLocale))) {
+                        $localeNames[$displayLocale][$locale] = $name;
+                    }
+                } catch (MissingResourceException $e) {
+                } catch (ResourceBundleNotFoundException $e) {
                 }
             }
 
-            // If no names could be generated for the current locale, skip it
-            if (0 === count($names)) {
+            // Compare names with the names of the fallback locales and only
+            // keep the differences
+            $fallback = $displayLocale;
+
+            while (isset($fallbackMapping[$fallback])) {
+                $fallback = $fallbackMapping[$fallback];
+                $localeNames[$displayLocale] = array_diff(
+                    $localeNames[$displayLocale],
+                    $localeNames[$fallback]
+                );
+            }
+
+            // If no names remain to be saved for the current locale, skip it
+            if (0 === count($localeNames[$displayLocale])) {
                 continue;
             }
 
-            $txtWriter->write($targetDirectory, $displayLocale, array('Locales' => $names));
+            $writer->write($targetDirectory, $displayLocale, array('Locales' => $localeNames[$displayLocale]));
         }
     }
 
@@ -247,5 +243,30 @@ class LocaleBundleTransformationRule implements TransformationRuleInterface
         }
 
         return $name;
+    }
+
+    private function generateFallbackMapping(array $displayLocales, array $aliases)
+    {
+        $mapping = array();
+
+        foreach ($displayLocales as $displayLocale => $_) {
+            $mapping[$displayLocale] = null;
+            $fallback = $displayLocale;
+
+            // Recursively search for a fallback locale until one is found
+            while (null !== ($fallback = Locale::getFallback($fallback))) {
+                // Currently, no locale has an alias as fallback locale.
+                // If this starts to be the case, we need to add code here.
+                assert(!isset($aliases[$fallback]));
+
+                // Check whether the fallback exists
+                if (isset($displayLocales[$fallback])) {
+                    $mapping[$displayLocale] = $fallback;
+                    break;
+                }
+            }
+        }
+
+        return $mapping;
     }
 }

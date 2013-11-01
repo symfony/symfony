@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Intl\ResourceBundle\Reader;
 
-use Symfony\Component\Intl\Exception\InvalidArgumentException;
+use Symfony\Component\Intl\Exception\ResourceBundleNotFoundException;
 use Symfony\Component\Intl\Exception\RuntimeException;
 
 /**
@@ -19,21 +19,17 @@ use Symfony\Component\Intl\Exception\RuntimeException;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class PhpBundleReader extends AbstractBundleReader implements BundleReaderInterface
+class PhpBundleReader implements BundleReaderInterface
 {
     /**
      * {@inheritdoc}
      */
     public function read($path, $locale)
     {
-        if ('en' !== $locale) {
-            throw new InvalidArgumentException('Only the locale "en" is supported.');
-        }
-
         $fileName = $path . '/' . $locale . '.php';
 
         if (!file_exists($fileName)) {
-            throw new RuntimeException(sprintf(
+            throw new ResourceBundleNotFoundException(sprintf(
                 'The resource bundle "%s/%s.php" does not exist.',
                 $path,
                 $locale
@@ -49,13 +45,5 @@ class PhpBundleReader extends AbstractBundleReader implements BundleReaderInterf
         }
 
         return include $fileName;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getFileExtension()
-    {
-        return 'php';
     }
 }

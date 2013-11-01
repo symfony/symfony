@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by stof at 2013-10-18T10:57:54Z
+
+This is not enough. you are missing strings matching teh Yaml timestamp regex (which need to be rendered quoted as the unquoted version would be parsed as a timestamp) and strings requiring to be double quoted in YAML.
+And on the other hand, you are sometimes quoting when unnecessary.
+
+You should use the Yaml component to do the Yaml quoting instead of reimplementing it differently
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2013-10-18T11:55:01Z
+
+@stof thanks for the suggestion, I've updated the patch
+
+---------------------------------------------------------------------------
+
+by stof at 2013-10-18T12:54:56Z
+
+This will still not handle the timestamps, which are handled by the ``Inline`` dumper (which would also take care of many other cases which have been reimplemented in the reference dumper)
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2013-10-18T13:09:26Z
+
+I've refactored the section to use the Inline class from the Yaml component.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2013-10-31T19:31:06Z
+
+should be ready to merge now.

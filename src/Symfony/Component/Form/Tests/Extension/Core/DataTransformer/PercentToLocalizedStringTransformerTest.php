@@ -12,12 +12,16 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
 use Symfony\Component\Form\Extension\Core\DataTransformer\PercentToLocalizedStringTransformer;
+use Symfony\Component\Intl\Util\IntlTestHelper;
 
-class PercentToLocalizedStringTransformerTest extends LocalizedTestCase
+class PercentToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()
     {
         parent::setUp();
+
+        // Since we test against "de_AT", we need the full implementation
+        IntlTestHelper::requireFullIntl($this);
 
         \Locale::setDefault('de_AT');
     }
@@ -94,7 +98,7 @@ class PercentToLocalizedStringTransformerTest extends LocalizedTestCase
     {
         $transformer = new PercentToLocalizedStringTransformer();
 
-        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
+        $this->setExpectedException('Symfony\Component\Form\Exception\TransformationFailedException');
 
         $transformer->transform('foo');
     }
@@ -103,7 +107,7 @@ class PercentToLocalizedStringTransformerTest extends LocalizedTestCase
     {
         $transformer = new PercentToLocalizedStringTransformer();
 
-        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
+        $this->setExpectedException('Symfony\Component\Form\Exception\TransformationFailedException');
 
         $transformer->reverseTransform(1);
     }

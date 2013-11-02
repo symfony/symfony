@@ -23,10 +23,6 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        if (!class_exists('Symfony\Component\EventDispatcher\EventDispatcher')) {
-            $this->markTestSkipped('The "EventDispatcher" component is not available');
-        }
-
         $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $this->factory = $this->getMock('Symfony\Component\Form\FormFactoryInterface');
         $this->form = $this->getBuilder()
@@ -72,11 +68,11 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->factory->expects($this->at(0))
             ->method('createNamed')
-            ->with(1, 'text', null, array('property_path' => '[1]', 'max_length' => 10))
+            ->with(1, 'text', null, array('property_path' => '[1]', 'max_length' => 10, 'auto_initialize' => false))
             ->will($this->returnValue($this->getForm('1')));
         $this->factory->expects($this->at(1))
             ->method('createNamed')
-            ->with(2, 'text', null, array('property_path' => '[2]', 'max_length' => 10))
+            ->with(2, 'text', null, array('property_path' => '[2]', 'max_length' => 10, 'auto_initialize' => false))
             ->will($this->returnValue($this->getForm('2')));
 
         $data = array(1 => 'string', 2 => 'string');
@@ -110,25 +106,25 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
         $listener->preSetData($event);
     }
 
-    public function testPreBindResizesUpIfAllowAdd()
+    public function testPreSubmitResizesUpIfAllowAdd()
     {
         $this->form->add($this->getForm('0'));
 
         $this->factory->expects($this->once())
             ->method('createNamed')
-            ->with(1, 'text', null, array('property_path' => '[1]', 'max_length' => 10))
+            ->with(1, 'text', null, array('property_path' => '[1]', 'max_length' => 10, 'auto_initialize' => false))
             ->will($this->returnValue($this->getForm('1')));
 
         $data = array(0 => 'string', 1 => 'string');
         $event = new FormEvent($this->form, $data);
         $listener = new ResizeFormListener('text', array('max_length' => 10), true, false);
-        $listener->preBind($event);
+        $listener->preSubmit($event);
 
         $this->assertTrue($this->form->has('0'));
         $this->assertTrue($this->form->has('1'));
     }
 
-    public function testPreBindResizesDownIfAllowDelete()
+    public function testPreSubmitResizesDownIfAllowDelete()
     {
         $this->form->add($this->getForm('0'));
         $this->form->add($this->getForm('1'));
@@ -136,26 +132,26 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
         $data = array(0 => 'string');
         $event = new FormEvent($this->form, $data);
         $listener = new ResizeFormListener('text', array(), false, true);
-        $listener->preBind($event);
+        $listener->preSubmit($event);
 
         $this->assertTrue($this->form->has('0'));
         $this->assertFalse($this->form->has('1'));
     }
 
     // fix for https://github.com/symfony/symfony/pull/493
-    public function testPreBindRemovesZeroKeys()
+    public function testPreSubmitRemovesZeroKeys()
     {
         $this->form->add($this->getForm('0'));
 
         $data = array();
         $event = new FormEvent($this->form, $data);
         $listener = new ResizeFormListener('text', array(), false, true);
-        $listener->preBind($event);
+        $listener->preSubmit($event);
 
         $this->assertFalse($this->form->has('0'));
     }
 
-    public function testPreBindDoesNothingIfNotAllowAddNorAllowDelete()
+    public function testPreSubmitDoesNothingIfNotAllowAddNorAllowDelete()
     {
         $this->form->add($this->getForm('0'));
         $this->form->add($this->getForm('1'));
@@ -163,7 +159,7 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
         $data = array(0 => 'string', 2 => 'string');
         $event = new FormEvent($this->form, $data);
         $listener = new ResizeFormListener('text', array(), false, false);
-        $listener->preBind($event);
+        $listener->preSubmit($event);
 
         $this->assertTrue($this->form->has('0'));
         $this->assertTrue($this->form->has('1'));
@@ -173,59 +169,59 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
      */
-    public function testPreBindRequiresArrayOrTraversable()
+    public function testPreSubmitRequiresArrayOrTraversable()
     {
         $data = 'no array or traversable';
         $event = new FormEvent($this->form, $data);
         $listener = new ResizeFormListener('text', array(), false, false);
-        $listener->preBind($event);
+        $listener->preSubmit($event);
     }
 
-    public function testPreBindDealsWithNullData()
+    public function testPreSubmitDealsWithNullData()
     {
         $this->form->add($this->getForm('1'));
 
         $data = null;
         $event = new FormEvent($this->form, $data);
         $listener = new ResizeFormListener('text', array(), false, true);
-        $listener->preBind($event);
+        $listener->preSubmit($event);
 
         $this->assertFalse($this->form->has('1'));
     }
 
     // fixes https://github.com/symfony/symfony/pull/40
-    public function testPreBindDealsWithEmptyData()
+    public function testPreSubmitDealsWithEmptyData()
     {
         $this->form->add($this->getForm('1'));
 
         $data = '';
         $event = new FormEvent($this->form, $data);
         $listener = new ResizeFormListener('text', array(), false, true);
-        $listener->preBind($event);
+        $listener->preSubmit($event);
 
         $this->assertFalse($this->form->has('1'));
     }
 
-    public function testOnBindNormDataRemovesEntriesMissingInTheFormIfAllowDelete()
+    public function testOnSubmitNormDataRemovesEntriesMissingInTheFormIfAllowDelete()
     {
         $this->form->add($this->getForm('1'));
 
         $data = array(0 => 'first', 1 => 'second', 2 => 'third');
         $event = new FormEvent($this->form, $data);
         $listener = new ResizeFormListener('text', array(), false, true);
-        $listener->onBind($event);
+        $listener->onSubmit($event);
 
         $this->assertEquals(array(1 => 'second'), $event->getData());
     }
 
-    public function testOnBindNormDataDoesNothingIfNotAllowDelete()
+    public function testOnSubmitNormDataDoesNothingIfNotAllowDelete()
     {
         $this->form->add($this->getForm('1'));
 
         $data = array(0 => 'first', 1 => 'second', 2 => 'third');
         $event = new FormEvent($this->form, $data);
         $listener = new ResizeFormListener('text', array(), false, false);
-        $listener->onBind($event);
+        $listener->onSubmit($event);
 
         $this->assertEquals($data, $event->getData());
     }
@@ -233,22 +229,22 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
      */
-    public function testOnBindNormDataRequiresArrayOrTraversable()
+    public function testOnSubmitNormDataRequiresArrayOrTraversable()
     {
         $data = 'no array or traversable';
         $event = new FormEvent($this->form, $data);
         $listener = new ResizeFormListener('text', array(), false, false);
-        $listener->onBind($event);
+        $listener->onSubmit($event);
     }
 
-    public function testOnBindNormDataDealsWithNullData()
+    public function testOnSubmitNormDataDealsWithNullData()
     {
         $this->form->add($this->getForm('1'));
 
         $data = null;
         $event = new FormEvent($this->form, $data);
         $listener = new ResizeFormListener('text', array(), false, true);
-        $listener->onBind($event);
+        $listener->onSubmit($event);
 
         $this->assertEquals(array(), $event->getData());
     }

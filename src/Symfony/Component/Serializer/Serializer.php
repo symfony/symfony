@@ -75,7 +75,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     final public function serialize($data, $format, array $context = array())
     {
         if (!$this->supportsEncoding($format)) {
-            throw new UnexpectedValueException('Serialization for the format '.$format.' is not supported');
+            throw new UnexpectedValueException(sprintf('Serialization for the format %s is not supported', $format));
         }
 
         if ($this->encoder->needsNormalization($format)) {
@@ -91,7 +91,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     final public function deserialize($data, $type, $format, array $context = array())
     {
         if (!$this->supportsDecoding($format)) {
-            throw new UnexpectedValueException('Deserialization for the format '.$format.' is not supported');
+            throw new UnexpectedValueException(sprintf('Deserialization for the format %s is not supported', $format));
         }
 
         $data = $this->decode($data, $format, $context);
@@ -128,7 +128,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
 
             return $data;
         }
-        throw new UnexpectedValueException('An unexpected value could not be normalized: '.var_export($data, true));
+        throw new UnexpectedValueException(sprintf('An unexpected value could not be normalized: %s', var_export($data, true)));
     }
 
     /**
@@ -173,9 +173,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     private function getNormalizer($data, $format = null)
     {
         foreach ($this->normalizers as $normalizer) {
-            if ($normalizer instanceof NormalizerInterface
-                && $normalizer->supportsNormalization($data, $format)
-            ) {
+            if ($normalizer instanceof NormalizerInterface && $normalizer->supportsNormalization($data, $format)) {
                 return $normalizer;
             }
         }
@@ -189,9 +187,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     private function getDenormalizer($data, $type, $format = null)
     {
         foreach ($this->normalizers as $normalizer) {
-            if ($normalizer instanceof DenormalizerInterface
-                && $normalizer->supportsDenormalization($data, $type, $format)
-            ) {
+            if ($normalizer instanceof DenormalizerInterface && $normalizer->supportsDenormalization($data, $type, $format)) {
                 return $normalizer;
             }
         }
@@ -239,14 +235,15 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
         }
 
         foreach ($this->normalizers as $normalizer) {
-            if ($normalizer->supportsNormalization($object, $format)) {
+            if ($normalizer instanceof NormalizerInterface
+                && $normalizer->supportsNormalization($object, $format)) {
                 $this->normalizerCache[$class][$format] = $normalizer;
 
                 return $normalizer->normalize($object, $format, $context);
             }
         }
 
-        throw new UnexpectedValueException('Could not normalize object of type '.$class.', no supporting normalizer found.');
+        throw new UnexpectedValueException(sprintf('Could not normalize object of type %s, no supporting normalizer found.', $class));
     }
 
     /**
@@ -273,14 +270,15 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
         }
 
         foreach ($this->normalizers as $normalizer) {
-            if ($normalizer->supportsDenormalization($data, $class, $format)) {
+            if ($normalizer instanceof DenormalizerInterface
+                && $normalizer->supportsDenormalization($data, $class, $format)) {
                 $this->denormalizerCache[$class][$format] = $normalizer;
 
                 return $normalizer->denormalize($data, $class, $format, $context);
             }
         }
 
-        throw new UnexpectedValueException('Could not denormalize object of type '.$class.', no supporting normalizer found.');
+        throw new UnexpectedValueException(sprintf('Could not denormalize object of type %s, no supporting normalizer found.', $class));
     }
 
     /**

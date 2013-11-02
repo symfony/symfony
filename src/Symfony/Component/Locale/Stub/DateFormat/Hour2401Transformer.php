@@ -11,54 +11,17 @@
 
 namespace Symfony\Component\Locale\Stub\DateFormat;
 
+use Symfony\Component\Intl\DateFormatter\DateFormat\Hour2401Transformer as BaseHour2401Transformer;
+
 /**
- * Parser and formatter for 24 hour format (1-24)
+ * Alias of {@link \Symfony\Component\Intl\DateFormatter\DateFormat\Hour2401Transformer}.
  *
- * @author Igor Wiedler <igor@wiedler.ch>
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
+ *             {@link \Symfony\Component\Intl\DateFormatter\DateFormat\Hour2401Transformer}
+ *             instead.
  */
-class Hour2401Transformer extends HourTransformer
+class Hour2401Transformer extends BaseHour2401Transformer
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function format(\DateTime $dateTime, $length)
-    {
-        $hourOfDay = $dateTime->format('G');
-        $hourOfDay = ('0' == $hourOfDay) ? '24' : $hourOfDay;
-
-        return $this->padLeft($hourOfDay, $length);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function normalizeHour($hour, $marker = null)
-    {
-        if ((null === $marker && 24 === $hour) || 'AM' == $marker) {
-            $hour = 0;
-        } elseif ('PM' == $marker) {
-            $hour = 12;
-        }
-
-        return $hour;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getReverseMatchingRegExp($length)
-    {
-        return '\d{1,2}';
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function extractDateOptions($matched, $length)
-    {
-        return array(
-            'hour' => (int) $matched,
-            'hourInstance' => $this
-        );
-    }
 }

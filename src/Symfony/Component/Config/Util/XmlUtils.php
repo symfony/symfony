@@ -187,14 +187,21 @@ class XmlUtils
                 $cast = intval($value);
 
                 return '0' == $value[0] ? octdec($value) : (((string) $raw == (string) $cast) ? $cast : $raw);
+            case isset($value[1]) && '-' === $value[0] && ctype_digit(substr($value, 1)):
+                $raw = $value;
+                $cast = intval($value);
+
+                return '0' == $value[1] ? octdec($value) : (((string) $raw == (string) $cast) ? $cast : $raw);
             case 'true' === $lowercaseValue:
                 return true;
             case 'false' === $lowercaseValue:
                 return false;
+            case isset($value[1]) && '0b' == $value[0].$value[1]:
+                return bindec($value);
             case is_numeric($value):
                 return '0x' == $value[0].$value[1] ? hexdec($value) : floatval($value);
-            case preg_match('/^(-|\+)?[0-9,]+(\.[0-9]+)?$/', $value):
-                return floatval(str_replace(',', '', $value));
+            case preg_match('/^(-|\+)?[0-9]+(\.[0-9]+)?$/', $value):
+                return floatval($value);
             default:
                 return $value;
         }

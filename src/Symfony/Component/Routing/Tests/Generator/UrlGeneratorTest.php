@@ -207,10 +207,6 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
 
     public function testGenerateForRouteWithInvalidOptionalParameterNonStrictWithLogger()
     {
-        if (!interface_exists('Psr\Log\LoggerInterface')) {
-            $this->markTestSkipped('The "psr/log" package is not available');
-        }
-
         $routes = $this->getRoutes('test', new Route('/testing/{foo}', array('foo' => '1'), array('foo' => 'd+')));
         $logger = $this->getMock('Psr\Log\LoggerInterface');
         $logger->expects($this->once())
@@ -286,12 +282,19 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('/app.php/foo', $this->getGenerator($routes)->generate('test', array('default' => 'foo')));
     }
 
+    public function testNullForOptionalParameterIsIgnored()
+    {
+        $routes = $this->getRoutes('test', new Route('/test/{default}', array('default' => 0)));
+
+        $this->assertEquals('/app.php/test', $this->getGenerator($routes)->generate('test', array('default' => null)));
+    }
+
     public function testQueryParamSameAsDefault()
     {
         $routes = $this->getRoutes('test', new Route('/test', array('default' => 'value')));
 
-        $this->assertSame('/app.php/test?default=foo', $this->getGenerator($routes)->generate('test', array('default' => 'foo')));
-        $this->assertSame('/app.php/test?default=value', $this->getGenerator($routes)->generate('test', array('default' => 'value')));
+        $this->assertSame('/app.php/test', $this->getGenerator($routes)->generate('test', array('default' => 'foo')));
+        $this->assertSame('/app.php/test', $this->getGenerator($routes)->generate('test', array('default' => 'value')));
         $this->assertSame('/app.php/test', $this->getGenerator($routes)->generate('test'));
     }
 
@@ -309,8 +312,8 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
         $chars = '@:[]/()*\'" +,;-._~&$<>|{}%\\^`!?foo=bar#id';
         $routes = $this->getRoutes('test', new Route("/$chars/{varpath}", array(), array('varpath' => '.+')));
         $this->assertSame('/app.php/@:%5B%5D/%28%29*%27%22%20+,;-._~%26%24%3C%3E|%7B%7D%25%5C%5E%60!%3Ffoo=bar%23id'
-            . '/@:%5B%5D/%28%29*%27%22%20+,;-._~%26%24%3C%3E|%7B%7D%25%5C%5E%60!%3Ffoo=bar%23id'
-            . '?query=%40%3A%5B%5D%2F%28%29%2A%27%22+%2B%2C%3B-._%7E%26%24%3C%3E%7C%7B%7D%25%5C%5E%60%21%3Ffoo%3Dbar%23id',
+           .'/@:%5B%5D/%28%29*%27%22%20+,;-._~%26%24%3C%3E|%7B%7D%25%5C%5E%60!%3Ffoo=bar%23id'
+           .'?query=%40%3A%5B%5D%2F%28%29%2A%27%22+%2B%2C%3B-._%7E%26%24%3C%3E%7C%7B%7D%25%5C%5E%60%21%3Ffoo%3Dbar%23id',
             $this->getGenerator($routes)->generate('test', array(
                 'varpath' => $chars,
                 'query' => $chars

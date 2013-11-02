@@ -38,53 +38,92 @@ class ArrayInputTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($input->hasParameterOption('--foo'), '->hasParameterOption() returns true if an option is present in the passed parameters');
     }
 
-    public function testParse()
+    public function testParseArguments()
     {
         $input = new ArrayInput(array('name' => 'foo'), new InputDefinition(array(new InputArgument('name'))));
+
         $this->assertEquals(array('name' => 'foo'), $input->getArguments(), '->parse() parses required arguments');
+    }
 
-        try {
-            $input = new ArrayInput(array('foo' => 'foo'), new InputDefinition(array(new InputArgument('name'))));
-            $this->fail('->parse() throws an \InvalidArgumentException exception if an invalid argument is passed');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->parse() throws an \InvalidArgumentException exception if an invalid argument is passed');
-            $this->assertEquals('The "foo" argument does not exist.', $e->getMessage(), '->parse() throws an \InvalidArgumentException exception if an invalid argument is passed');
-        }
+    /**
+     * @dataProvider provideOptions
+     */
+    public function testParseOptions($input, $options, $expectedOptions, $message)
+    {
+        $input = new ArrayInput($input, new InputDefinition($options));
 
-        $input = new ArrayInput(array('--foo' => 'bar'), new InputDefinition(array(new InputOption('foo'))));
-        $this->assertEquals(array('foo' => 'bar'), $input->getOptions(), '->parse() parses long options');
+        $this->assertEquals($expectedOptions, $input->getOptions(), $message);
+    }
 
-        $input = new ArrayInput(array('--foo' => 'bar'), new InputDefinition(array(new InputOption('foo', 'f', InputOption::VALUE_OPTIONAL, '', 'default'))));
-        $this->assertEquals(array('foo' => 'bar'), $input->getOptions(), '->parse() parses long options with a default value');
+    public function provideOptions()
+    {
+        return array(
+            array(
+                array('--foo' => 'bar'),
+                array(new InputOption('foo')),
+                array('foo' => 'bar'),
+                '->parse() parses long options'
+            ),
+            array(
+                array('--foo' => 'bar'),
+                array(new InputOption('foo', 'f', InputOption::VALUE_OPTIONAL, '', 'default')),
+                array('foo' => 'bar'),
+                '->parse() parses long options with a default value'
+            ),
+            array(
+                array('--foo' => null),
+                array(new InputOption('foo', 'f', InputOption::VALUE_OPTIONAL, '', 'default')),
+                array('foo' => 'default'),
+                '->parse() parses long options with a default value'
+            ),
+            array(
+                array('-f' => 'bar'),
+                array(new InputOption('foo', 'f')),
+                array('foo' => 'bar'),
+                '->parse() parses short options'
+            )
+        );
+    }
 
-        $input = new ArrayInput(array('--foo' => null), new InputDefinition(array(new InputOption('foo', 'f', InputOption::VALUE_OPTIONAL, '', 'default'))));
-        $this->assertEquals(array('foo' => 'default'), $input->getOptions(), '->parse() parses long options with a default value');
+    /**
+     * @dataProvider provideInvalidInput
+     */
+    public function testParseInvalidInput($parameters, $definition, $expectedExceptionMessage)
+    {
+        $this->setExpectedException('InvalidArgumentException', $expectedExceptionMessage);
 
-        try {
-            $input = new ArrayInput(array('--foo' => null), new InputDefinition(array(new InputOption('foo', 'f', InputOption::VALUE_REQUIRED))));
-            $this->fail('->parse() throws an \InvalidArgumentException exception if a required option is passed without a value');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->parse() throws an \InvalidArgumentException exception if a required option is passed without a value');
-            $this->assertEquals('The "--foo" option requires a value.', $e->getMessage(), '->parse() throws an \InvalidArgumentException exception if a required option is passed without a value');
-        }
+        new ArrayInput($parameters, $definition);
+    }
 
-        try {
-            $input = new ArrayInput(array('--foo' => 'foo'), new InputDefinition());
-            $this->fail('->parse() throws an \InvalidArgumentException exception if an invalid option is passed');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->parse() throws an \InvalidArgumentException exception if an invalid option is passed');
-            $this->assertEquals('The "--foo" option does not exist.', $e->getMessage(), '->parse() throws an \InvalidArgumentException exception if an invalid option is passed');
-        }
+    public function provideInvalidInput()
+    {
+        return array(
+            array(
+                array('foo' => 'foo'),
+                new InputDefinition(array(new InputArgument('name'))),
+                'The "foo" argument does not exist.'
+            ),
+            array(
+                array('--foo' => null),
+                new InputDefinition(array(new InputOption('foo', 'f', InputOption::VALUE_REQUIRED))),
+                'The "--foo" option requires a value.'
+            ),
+            array(
+                array('--foo' => 'foo'),
+                new InputDefinition(),
+                'The "--foo" option does not exist.'
+            ),
+            array(
+                array('-o' => 'foo'),
+                new InputDefinition(),
+                'The "-o" option does not exist.'
+            )
+        );
+    }
 
-        $input = new ArrayInput(array('-f' => 'bar'), new InputDefinition(array(new InputOption('foo', 'f'))));
-        $this->assertEquals(array('foo' => 'bar'), $input->getOptions(), '->parse() parses short options');
-
-        try {
-            $input = new ArrayInput(array('-o' => 'foo'), new InputDefinition());
-            $this->fail('->parse() throws an \InvalidArgumentException exception if an invalid option is passed');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->parse() throws an \InvalidArgumentException exception if an invalid option is passed');
-            $this->assertEquals('The "-o" option does not exist.', $e->getMessage(), '->parse() throws an \InvalidArgumentException exception if an invalid option is passed');
-        }
+    public function testToString()
+    {
+        $input = new ArrayInput(array('-f' => null, '-b' => 'bar', '--foo' => 'b a z', '--lala' => null, 'test' => 'Foo', 'test2' => "A\nB'C"));
+        $this->assertEquals('-f -b=bar --foo='.escapeshellarg('b a z').' --lala Foo '.escapeshellarg("A\nB'C"), (string) $input);
     }
 }

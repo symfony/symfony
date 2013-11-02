@@ -32,7 +32,7 @@ class ValidationListener implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(FormEvents::POST_BIND => 'validateForm');
+        return array(FormEvents::POST_SUBMIT => 'validateForm');
     }
 
     public function __construct(ValidatorInterface $validator, ViolationMapperInterface $violationMapper)
@@ -54,14 +54,12 @@ class ValidationListener implements EventSubscriberInterface
             // Validate the form in group "Default"
             $violations = $this->validator->validate($form);
 
-            if (count($violations) > 0) {
-                foreach ($violations as $violation) {
-                    // Allow the "invalid" constraint to be put onto
-                    // non-synchronized forms
-                    $allowNonSynchronized = Form::ERR_INVALID === $violation->getCode();
+            foreach ($violations as $violation) {
+                // Allow the "invalid" constraint to be put onto
+                // non-synchronized forms
+                $allowNonSynchronized = Form::ERR_INVALID === $violation->getCode();
 
-                    $this->violationMapper->mapViolation($violation, $form, $allowNonSynchronized);
-                }
+                $this->violationMapper->mapViolation($violation, $form, $allowNonSynchronized);
             }
         }
     }

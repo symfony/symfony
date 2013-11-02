@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Extension\Core\ChoiceList;
 
 use Symfony\Component\Form\Exception\StringCastException;
+use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -103,7 +104,7 @@ class ObjectChoiceList extends ChoiceList
      * @param array              $labels           Ignored.
      * @param array              $preferredChoices The choices to display with priority.
      *
-     * @throws \InvalidArgumentException When passing a hierarchy of choices and using
+     * @throws InvalidArgumentException When passing a hierarchy of choices and using
      *                                   the "groupPath" option at the same time.
      */
     protected function initialize($choices, array $labels, array $preferredChoices)
@@ -113,7 +114,7 @@ class ObjectChoiceList extends ChoiceList
 
             foreach ($choices as $i => $choice) {
                 if (is_array($choice)) {
-                    throw new \InvalidArgumentException('You should pass a plain object array (without groups) when using the "groupPath" option.');
+                    throw new InvalidArgumentException('You should pass a plain object array (without groups) when using the "groupPath" option.');
                 }
 
                 try {
@@ -176,7 +177,7 @@ class ObjectChoiceList extends ChoiceList
             } elseif (method_exists($choice, '__toString')) {
                 $labels[$i] = (string) $choice;
             } else {
-                throw new StringCastException('A "__toString()" method was not found on the objects of type "' . get_class($choice) . '" passed to the choice field. To read a custom getter instead, set the argument $labelPath to the desired property path.');
+                throw new StringCastException(sprintf('A "__toString()" method was not found on the objects of type "%s" passed to the choice field. To read a custom getter instead, set the argument $labelPath to the desired property path.', get_class($choice)));
             }
         }
     }

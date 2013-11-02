@@ -222,6 +222,26 @@
                 <source>Unsupported card type or invalid card number.</source>
                 <target>Tipus de targeta no suportada o número de targeta invàlid.</target>
             </trans-unit>
+            <trans-unit id="59">
+                <source>This is not a valid International Bank Account Number (IBAN).</source>
+                <target>Això no és un nombre de compte bancari internacional (IBAN) vàlid.</target>
+            </trans-unit>
+            <trans-unit id="60">
+                <source>This value is not a valid ISBN-10.</source>
+                <target>Aquest valor no és un ISBN-10 vàlid.</target>
+            </trans-unit>
+            <trans-unit id="61">
+                <source>This value is not a valid ISBN-13.</source>
+                <target>Aquest valor no és un ISBN-13 vàlid.</target>
+            </trans-unit>
+            <trans-unit id="62">
+                <source>This value is neither a valid ISBN-10 nor a valid ISBN-13.</source>
+                <target>Aquest valor no és ni un ISBN-10 vàlid ni un ISBN-13 vàlid.</target>
+            </trans-unit>
+            <trans-unit id="63">
+                <source>This value is not a valid ISSN.</source>
+                <target>Aquest valor no és un ISSN vàlid.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

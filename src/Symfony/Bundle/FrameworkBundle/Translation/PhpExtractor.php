@@ -111,7 +111,7 @@ class PhpExtractor implements ExtractorInterface
                     }
                 }
 
-                $message = trim($message, '\'');
+                $message = trim($message, '\'"');
 
                 if ($message) {
                     $catalog->set($message, $this->prefix.$message);

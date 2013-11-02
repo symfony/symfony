@@ -17,21 +17,42 @@ use Symfony\Component\HttpFoundation\Response;
 
 class MemoryDataCollectorTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-    }
-
     public function testCollect()
     {
-        $c = new MemoryDataCollector();
+        $collector = new MemoryDataCollector();
+        $collector->collect(new Request(), new Response());
 
-        $c->collect(new Request(), new Response());
-
-        $this->assertInternalType('integer',$c->getMemory());
-        $this->assertSame('memory',$c->getName());
+        $this->assertInternalType('integer', $collector->getMemory());
+        $this->assertInternalType('integer', $collector->getMemoryLimit());
+        $this->assertSame('memory', $collector->getName());
     }
 
+    /** @dataProvider getBytesConversionTestData */
+    public function testBytesConversion($limit, $bytes)
+    {
+        $collector = new MemoryDataCollector();
+        $method = new \ReflectionMethod($collector, 'convertToBytes');
+        $method->setAccessible(true);
+        $this->assertEquals($bytes, $method->invoke($collector, $limit));
+    }
+
+    public function getBytesConversionTestData()
+    {
+        return array(
+            array('2k', 2048),
+            array('2 k', 2048),
+            array('8m', 8 * 1024 * 1024),
+            array('+2 k', 2048),
+            array('+2???k', 2048),
+            array('0x10', 16),
+            array('0xf', 15),
+            array('010', 8),
+            array('+0x10 k', 16 * 1024),
+            array('1g', 1024 * 1024 * 1024),
+            array('1G', 1024 * 1024 * 1024),
+            array('-1', -1),
+            array('0', 0),
+            array('2mk', 2048), // the unit must be the last char, so in this case 'k', not 'm'
+        );
+    }
 }

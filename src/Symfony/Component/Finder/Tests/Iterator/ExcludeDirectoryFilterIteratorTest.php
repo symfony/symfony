@@ -21,7 +21,7 @@ class ExcludeDirectoryFilterIteratorTest extends RealIteratorTestCase
      */
     public function testAccept($directories, $expected)
     {
-        $inner = new \RecursiveIteratorIterator(new RecursiveDirectoryIterator(sys_get_temp_dir().'/symfony2_finder', \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::SELF_FIRST);
+        $inner = new \RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->toAbsolute(), \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::SELF_FIRST);
 
         $iterator = new ExcludeDirectoryFilterIterator($inner, $directories);
 
@@ -30,33 +30,36 @@ class ExcludeDirectoryFilterIteratorTest extends RealIteratorTestCase
 
     public function getAcceptData()
     {
-        $tmpDir = sys_get_temp_dir().'/symfony2_finder';
+        $foo = array(
+            '.bar',
+            '.foo',
+            '.foo/.bar',
+            '.foo/bar',
+            '.git',
+            'test.py',
+            'test.php',
+            'toto',
+            'foo bar'
+        );
+
+        $fo = array(
+            '.bar',
+            '.foo',
+            '.foo/.bar',
+            '.foo/bar',
+            '.git',
+            'test.py',
+            'foo',
+            'foo/bar.tmp',
+            'test.php',
+            'toto',
+            'foo bar'
+        );
 
         return array(
-            array(array('foo'), array(
-                $tmpDir.DIRECTORY_SEPARATOR.'.bar',
-                $tmpDir.DIRECTORY_SEPARATOR.'.foo',
-                $tmpDir.DIRECTORY_SEPARATOR.'.foo'.DIRECTORY_SEPARATOR.'.bar',
-                $tmpDir.DIRECTORY_SEPARATOR.'.foo'.DIRECTORY_SEPARATOR.'bar',
-                $tmpDir.DIRECTORY_SEPARATOR.'.git',
-                $tmpDir.DIRECTORY_SEPARATOR.'test.py',
-                $tmpDir.DIRECTORY_SEPARATOR.'test.php',
-                $tmpDir.DIRECTORY_SEPARATOR.'toto',
-                $tmpDir.DIRECTORY_SEPARATOR.'foo bar',
-            )),
-            array(array('fo'), array(
-                $tmpDir.DIRECTORY_SEPARATOR.'.bar',
-                $tmpDir.DIRECTORY_SEPARATOR.'.foo',
-                $tmpDir.DIRECTORY_SEPARATOR.'.foo'.DIRECTORY_SEPARATOR.'.bar',
-                $tmpDir.DIRECTORY_SEPARATOR.'.foo'.DIRECTORY_SEPARATOR.'bar',
-                $tmpDir.DIRECTORY_SEPARATOR.'.git',
-                $tmpDir.DIRECTORY_SEPARATOR.'test.py',
-                $tmpDir.DIRECTORY_SEPARATOR.'foo',
-                $tmpDir.DIRECTORY_SEPARATOR.'foo'.DIRECTORY_SEPARATOR.'bar.tmp',
-                $tmpDir.DIRECTORY_SEPARATOR.'test.php',
-                $tmpDir.DIRECTORY_SEPARATOR.'toto',
-                $tmpDir.DIRECTORY_SEPARATOR.'foo bar',
-            )),
+            array(array('foo'), $this->toAbsolute($foo)),
+            array(array('fo'), $this->toAbsolute($fo)),
         );
     }
+
 }

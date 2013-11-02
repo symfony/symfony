@@ -21,6 +21,29 @@
 
    Note: The function is the preferred way.
 
+#### Deprecations
+
+ * The `standalone` option is deprecated and will be replaced with the `strategy` option in 2.3.
+ * The values `true`, `false`, `js` for the `standalone` option were deprecated and replaced respectively with the `esi`, `inline`, `hinclude` in 2.3.
+
+
+   Before:
+
+   ```
+   {% render 'BlogBundle:Post:list' with { 'limit': 2 }, {'standalone': true} %}
+   {% render 'BlogBundle:Post:list' with { 'limit': 2 }, {'standalone': false} %}
+   {% render 'BlogBundle:Post:list' with { 'limit': 2 }, {'standalone': 'js'} %}
+   ```
+
+   After:
+
+   ```
+   {{ render(controller('BlogBundle:Post:list', { 'limit': 2 }), { 'strategy': 'esi'}) }}
+   {{ render(controller('BlogBundle:Post:list', { 'limit': 2 }), { 'strategy': 'inline'}) }}
+   {{ render(controller('BlogBundle:Post:list', { 'limit': 2 }), { 'strategy': 'hinclude'}) }}
+   ```
+
+
 ### HttpFoundation
 
  * The MongoDbSessionHandler default field names and timestamp type have changed.
@@ -202,10 +225,10 @@
    ```
    use Symfony\Component\PropertyAccess\PropertyAccess;
 
-   $accessor = PropertyAccess::getPropertyAccessor();
+   $propertyAccessor = PropertyAccess::getPropertyAccessor();
 
    $value = $propertyAccessor->getValue($object, 'some.path');
-   $accessor->setValue($object, 'some.path', 'new value');
+   $propertyAccessor->setValue($object, 'some.path', 'new value');
    ```
 
    After (alternative 2):
@@ -214,11 +237,11 @@
    use Symfony\Component\PropertyAccess\PropertyAccess;
    use Symfony\Component\PropertyAccess\PropertyPath;
 
-   $accessor = PropertyAccess::getPropertyAccessor();
+   $propertyAccessor = PropertyAccess::getPropertyAccessor();
    $propertyPath = new PropertyPath('some.path');
 
    $value = $propertyAccessor->getValue($object, $propertyPath);
-   $accessor->setValue($object, $propertyPath, 'new value');
+   $propertyAccessor->setValue($object, $propertyPath, 'new value');
    ```
 
 ### Routing
@@ -441,7 +464,7 @@
                $path .= '.';
            }
 
-           $context->getGraphWalker()->walkReference($someObject, $group, $path . 'myProperty', false);
+           $context->getGraphWalker()->walkReference($someObject, $group, $path.'myProperty', false);
        }
    }
    ```
@@ -459,8 +482,9 @@
    }
    ```
 
- * The method `ExecutionContext::addViolationAtSubPath()` was deprecated and
-   will be removed in Symfony 2.3. You should use `addViolationAt()` instead.
+ * The methods `ExecutionContext::addViolationAtSubPath()` and
+   `ExecutionContext::addViolationAtPath()` were deprecated and will be
+   removed in Symfony 2.3. You should use `addViolationAt()` instead.
 
    Before:
 

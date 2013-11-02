@@ -130,14 +130,10 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
 
     public function testMatchWithPrefixes()
     {
-        $collection1 = new RouteCollection();
-        $collection1->add('foo', new Route('/{foo}'));
-
-        $collection2 = new RouteCollection();
-        $collection2->addCollection($collection1, '/b');
-
         $collection = new RouteCollection();
-        $collection->addCollection($collection2, '/a');
+        $collection->add('foo', new Route('/{foo}'));
+        $collection->addPrefix('/b');
+        $collection->addPrefix('/a');
 
         $matcher = new UrlMatcher($collection, new RequestContext());
         $this->assertEquals(array('_route' => 'foo', 'foo' => 'foo'), $matcher->match('/a/b/foo'));
@@ -145,14 +141,10 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
 
     public function testMatchWithDynamicPrefix()
     {
-        $collection1 = new RouteCollection();
-        $collection1->add('foo', new Route('/{foo}'));
-
-        $collection2 = new RouteCollection();
-        $collection2->addCollection($collection1, '/b');
-
         $collection = new RouteCollection();
-        $collection->addCollection($collection2, '/{_locale}');
+        $collection->add('foo', new Route('/{foo}'));
+        $collection->addPrefix('/b');
+        $collection->addPrefix('/{_locale}');
 
         $matcher = new UrlMatcher($collection, new RequestContext());
         $this->assertEquals(array('_locale' => 'fr', '_route' => 'foo', 'foo' => 'foo'), $matcher->match('/fr/b/foo'));
@@ -325,6 +317,19 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo', array(), array('_scheme' => 'https')));
+        $matcher = new UrlMatcher($coll, new RequestContext());
+        $matcher->match('/foo');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Routing\Exception\ResourceNotFoundException
+     */
+    public function testCondition()
+    {
+        $coll = new RouteCollection();
+        $route = new Route('/foo');
+        $route->setCondition('context.getMethod() == "POST"');
+        $coll->add('foo', $route);
         $matcher = new UrlMatcher($coll, new RequestContext());
         $matcher->match('/foo');
     }

@@ -45,11 +45,6 @@
                  class="%security.authentication.rememberme.services.persistent.class%"
                  parent="security.authentication.rememberme.services.abstract"
                  abstract="true">
-            <argument type="collection" /> <!--  User Providers -->
-            <argument /> <!-- Shared Token Key -->
-            <argument /> <!-- Shared Provider Key -->
-            <argument type="collection" /> <!-- Options -->
-            <argument type="service" id="logger" on-invalid="null" />
             <argument type="service" id="security.secure_random" />
         </service>
 

@@ -12,7 +12,7 @@
 namespace Symfony\Component\PropertyAccess;
 
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
-use Symfony\Component\PropertyAccess\Exception\PropertyAccessDeniedException;
+use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
 use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
 
 /**
@@ -26,11 +26,23 @@ class PropertyAccessor implements PropertyAccessorInterface
     const IS_REF = 1;
 
     /**
-     * Should not be used by application code. Use
-     * {@link PropertyAccess::getPropertyAccessor()} instead.
+     * @var Boolean
      */
-    public function __construct()
+    private $magicCall;
+
+    /**
+     * @var Boolean
+     */
+    private $throwExceptionOnInvalidIndex;
+
+    /**
+     * Should not be used by application code. Use
+     * {@link PropertyAccess::createPropertyAccessor()} instead.
+     */
+    public function __construct($magicCall = false, $throwExceptionOnInvalidIndex = false)
     {
+        $this->magicCall = $magicCall;
+        $this->throwExceptionOnInvalidIndex = $throwExceptionOnInvalidIndex;
     }
 
     /**
@@ -44,7 +56,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             throw new UnexpectedTypeException($propertyPath, 'string or Symfony\Component\PropertyAccess\PropertyPathInterface');
         }
 
-        $propertyValues =& $this->readPropertiesUntil($objectOrArray, $propertyPath, $propertyPath->getLength());
+        $propertyValues =& $this->readPropertiesUntil($objectOrArray, $propertyPath, $propertyPath->getLength(), $this->throwExceptionOnInvalidIndex);
 
         return $propertyValues[count($propertyValues) - 1][self::VALUE];
     }
@@ -96,15 +108,15 @@ class PropertyAccessor implements PropertyAccessorInterface
     /**
      * Reads the path from an object up to a given path index.
      *
-     * @param object|array          $objectOrArray The object or array to read from.
-     * @param PropertyPathInterface $propertyPath  The property path to read.
-     * @param integer               $lastIndex     The integer up to which should be read.
+     * @param object|array          $objectOrArray The object or array to read from
+     * @param PropertyPathInterface $propertyPath  The property path to read
+     * @param integer               $lastIndex     The index up to which should be read
      *
      * @return array The values read in the path.
      *
      * @throws UnexpectedTypeException If a value within the path is neither object nor array.
      */
-    private function &readPropertiesUntil(&$objectOrArray, PropertyPathInterface $propertyPath, $lastIndex)
+    private function &readPropertiesUntil(&$objectOrArray, PropertyPathInterface $propertyPath, $lastIndex, $throwExceptionOnNonexistantIndex = false)
     {
         $propertyValues = array();
 
@@ -119,6 +131,9 @@ class PropertyAccessor implements PropertyAccessorInterface
 
             // Create missing nested arrays on demand
             if ($isIndex && $isArrayAccess && !isset($objectOrArray[$property])) {
+                if ($throwExceptionOnNonexistantIndex) {
+                    throw new NoSuchIndexException(sprintf('Cannot read property "%s". Available properties are "%s"', $property, print_r(array_keys($objectOrArray), true)));
+                }
                 $objectOrArray[$property] = $i + 1 < $propertyPath->getLength() ? array() : null;
             }
 
@@ -139,12 +154,12 @@ class PropertyAccessor implements PropertyAccessorInterface
     /**
      * Reads a key from an array-like structure.
      *
-     * @param \ArrayAccess|array $array The array or \ArrayAccess object to read from.
-     * @param string|integer     $index The key to read.
+     * @param \ArrayAccess|array $array The array or \ArrayAccess object to read from
+     * @param string|integer     $index The key to read
      *
      * @return mixed The value of the key
      *
-     * @throws NoSuchPropertyException If the array does not implement \ArrayAccess or it is not an array.
+     * @throws NoSuchPropertyException If the array does not implement \ArrayAccess or it is not an array
      */
     private function &readIndex(&$array, $index)
     {
@@ -180,9 +195,8 @@ class PropertyAccessor implements PropertyAccessorInterface
      *
      * @return mixed The value of the read property
      *
-     * @throws NoSuchPropertyException       If the property does not exist.
-     * @throws PropertyAccessDeniedException If the property cannot be accessed due to
-     *                                       access restrictions (private or protected).
+     * @throws NoSuchPropertyException If the property does not exist or is not
+     *                                 public.
      */
     private function &readProperty(&$object, $property)
     {
@@ -202,41 +216,41 @@ class PropertyAccessor implements PropertyAccessorInterface
         $getter = 'get'.$camelProp;
         $isser = 'is'.$camelProp;
         $hasser = 'has'.$camelProp;
+        $classHasProperty = $reflClass->hasProperty($property);
 
-        if ($reflClass->hasMethod($getter)) {
-            if (!$reflClass->getMethod($getter)->isPublic()) {
-                throw new PropertyAccessDeniedException(sprintf('Method "%s()" is not public in class "%s"', $getter, $reflClass->name));
-            }
-
+        if ($reflClass->hasMethod($getter) && $reflClass->getMethod($getter)->isPublic()) {
             $result[self::VALUE] = $object->$getter();
-        } elseif ($reflClass->hasMethod($isser)) {
-            if (!$reflClass->getMethod($isser)->isPublic()) {
-                throw new PropertyAccessDeniedException(sprintf('Method "%s()" is not public in class "%s"', $isser, $reflClass->name));
-            }
-
+        } elseif ($reflClass->hasMethod($isser) && $reflClass->getMethod($isser)->isPublic()) {
             $result[self::VALUE] = $object->$isser();
-        } elseif ($reflClass->hasMethod($hasser)) {
-            if (!$reflClass->getMethod($hasser)->isPublic()) {
-                throw new PropertyAccessDeniedException(sprintf('Method "%s()" is not public in class "%s"', $hasser, $reflClass->name));
-            }
-
+        } elseif ($reflClass->hasMethod($hasser) && $reflClass->getMethod($hasser)->isPublic()) {
             $result[self::VALUE] = $object->$hasser();
-        } elseif ($reflClass->hasMethod('__get')) {
-            // needed to support magic method __get
+        } elseif ($reflClass->hasMethod('__get') && $reflClass->getMethod('__get')->isPublic()) {
             $result[self::VALUE] = $object->$property;
-        } elseif ($reflClass->hasProperty($property)) {
-            if (!$reflClass->getProperty($property)->isPublic()) {
-                throw new PropertyAccessDeniedException(sprintf('Property "%s" is not public in class "%s". Maybe you should create the method "%s()" or "%s()" or "%s()"?', $property, $reflClass->name, $getter, $isser, $hasser));
-            }
-
+        } elseif ($classHasProperty && $reflClass->getProperty($property)->isPublic()) {
             $result[self::VALUE] =& $object->$property;
             $result[self::IS_REF] = true;
-        } elseif (property_exists($object, $property)) {
-            // needed to support \stdClass instances
+        } elseif (!$classHasProperty && property_exists($object, $property)) {
+            // Needed to support \stdClass instances. We need to explicitly
+            // exclude $classHasProperty, otherwise if in the previous clause
+            // a *protected* property was found on the class, property_exists()
+            // returns true, consequently the following line will result in a
+            // fatal error.
             $result[self::VALUE] =& $object->$property;
             $result[self::IS_REF] = true;
+        } elseif ($this->magicCall && $reflClass->hasMethod('__call') && $reflClass->getMethod('__call')->isPublic()) {
+            // we call the getter and hope the __call do the job
+            $result[self::VALUE] = $object->$getter();
         } else {
-            throw new NoSuchPropertyException(sprintf('Neither property "%s" nor method "%s()" nor method "%s()" exists in class "%s"', $property, $getter, $isser, $reflClass->name));
+            throw new NoSuchPropertyException(sprintf(
+                'Neither the property "%s" nor one of the methods "%s()", '.
+                '"%s()", "%s()", "__get()" or "__call()" exist and have public access in '.
+                'class "%s".',
+                $property,
+                $getter,
+                $isser,
+                $hasser,
+                $reflClass->name
+            ));
         }
 
         // Objects are always passed around by reference
@@ -250,11 +264,11 @@ class PropertyAccessor implements PropertyAccessorInterface
     /**
      * Sets the value of the property at the given index in the path
      *
-     * @param \ArrayAccess|array $array An array or \ArrayAccess object to write to.
-     * @param string|integer     $index The index to write at.
-     * @param mixed              $value The value to write.
+     * @param \ArrayAccess|array $array An array or \ArrayAccess object to write to
+     * @param string|integer     $index The index to write at
+     * @param mixed              $value The value to write
      *
-     * @throws NoSuchPropertyException If the array does not implement \ArrayAccess or it is not an array.
+     * @throws NoSuchPropertyException If the array does not implement \ArrayAccess or it is not an array
      */
     private function writeIndex(&$array, $index, $value)
     {
@@ -268,18 +282,17 @@ class PropertyAccessor implements PropertyAccessorInterface
     /**
      * Sets the value of the property at the given index in the path
      *
-     * @param object|array          $object   The object or array to write to.
-     * @param string                $property The property to write.
-     * @param string|null           $singular The singular form of the property name or null.
-     * @param mixed                 $value    The value to write.
+     * @param object|array $object   The object or array to write to
+     * @param string       $property The property to write
+     * @param string|null  $singular The singular form of the property name or null
+     * @param mixed        $value    The value to write
      *
-     * @throws NoSuchPropertyException       If the property does not exist.
-     * @throws PropertyAccessDeniedException If the property cannot be accessed due to
-     *                                       access restrictions (private or protected).
+     * @throws NoSuchPropertyException If the property does not exist or is not
+     *                                 public.
      */
     private function writeProperty(&$object, $property, $singular, $value)
     {
-        $adderRemoverError = null;
+        $guessedAdders = '';
 
         if (!is_object($object)) {
             throw new NoSuchPropertyException(sprintf('Cannot write property "%s" to an array. Maybe you should write the property path as "[%s]" instead?', $property, $property));
@@ -330,47 +343,51 @@ class PropertyAccessor implements PropertyAccessorInterface
 
                 return;
             } else {
-                $adderRemoverError = ', nor could adders and removers be found based on the ';
-                if (null === $singular) {
-                    // $adderRemoverError .= 'guessed singulars: '.implode(', ', $singulars).' (provide a singular by suffixing the property path with "|{singular}" to override the guesser)';
-                    $adderRemoverError .= 'guessed singulars: '.implode(', ', $singulars);
-                } else {
-                    $adderRemoverError .= 'passed singular: '.$singular;
-                }
+                // It is sufficient to include only the adders in the error
+                // message. If the user implements the adder but not the remover,
+                // an exception will be thrown in findAdderAndRemover() that
+                // the remover has to be implemented as well.
+                $guessedAdders = '"add'.implode('()", "add', $singulars).'()", ';
             }
         }
 
         $setter = 'set'.$this->camelize($property);
+        $classHasProperty = $reflClass->hasProperty($property);
 
-        if ($reflClass->hasMethod($setter)) {
-            if (!$reflClass->getMethod($setter)->isPublic()) {
-                throw new PropertyAccessDeniedException(sprintf('Method "%s()" is not public in class "%s"', $setter, $reflClass->name));
-            }
-
+        if ($reflClass->hasMethod($setter) && $reflClass->getMethod($setter)->isPublic()) {
             $object->$setter($value);
-        } elseif ($reflClass->hasMethod('__set')) {
-            // needed to support magic method __set
+        } elseif ($reflClass->hasMethod('__set') && $reflClass->getMethod('__set')->isPublic()) {
             $object->$property = $value;
-        } elseif ($reflClass->hasProperty($property)) {
-            if (!$reflClass->getProperty($property)->isPublic()) {
-                throw new PropertyAccessDeniedException(sprintf('Property "%s" is not public in class "%s"%s. Maybe you should create the method "%s()"?', $property, $reflClass->name, $adderRemoverError, $setter));
-            }
-
+        } elseif ($classHasProperty && $reflClass->getProperty($property)->isPublic()) {
             $object->$property = $value;
-        } elseif (property_exists($object, $property)) {
-            // needed to support \stdClass instances
+        } elseif (!$classHasProperty && property_exists($object, $property)) {
+            // Needed to support \stdClass instances. We need to explicitly
+            // exclude $classHasProperty, otherwise if in the previous clause
+            // a *protected* property was found on the class, property_exists()
+            // returns true, consequently the following line will result in a
+            // fatal error.
             $object->$property = $value;
+        } elseif ($this->magicCall && $reflClass->hasMethod('__call') && $reflClass->getMethod('__call')->isPublic()) {
+            // we call the getter and hope the __call do the job
+            $object->$setter($value);
         } else {
-            throw new NoSuchPropertyException(sprintf('Neither element "%s" nor method "%s()" exists in class "%s"%s', $property, $setter, $reflClass->name, $adderRemoverError));
+            throw new NoSuchPropertyException(sprintf(
+                'Neither the property "%s" nor one of the methods %s"%s()", '.
+                '"__set()" or "__call()" exist and have public access in class "%s".',
+                $property,
+                $guessedAdders,
+                $setter,
+                $reflClass->name
+            ));
         }
     }
 
     /**
      * Camelizes a given string.
      *
-     * @param  string $string Some string.
+     * @param  string $string Some string
      *
-     * @return string The camelized version of the string.
+     * @return string The camelized version of the string
      */
     private function camelize($string)
     {
@@ -381,17 +398,17 @@ class PropertyAccessor implements PropertyAccessorInterface
      * Searches for add and remove methods.
      *
      * @param \ReflectionClass $reflClass The reflection class for the given object
-     * @param array            $singulars The singular form of the property name or null.
+     * @param array            $singulars The singular form of the property name or null
      *
-     * @return array|null An array containing the adder and remover when found, null otherwise.
+     * @return array|null An array containing the adder and remover when found, null otherwise
      *
-     * @throws NoSuchPropertyException If the property does not exist.
+     * @throws NoSuchPropertyException If the property does not exist
      */
     private function findAdderAndRemover(\ReflectionClass $reflClass, array $singulars)
     {
         foreach ($singulars as $singular) {
-            $addMethod = 'add' . $singular;
-            $removeMethod = 'remove' . $singular;
+            $addMethod = 'add'.$singular;
+            $removeMethod = 'remove'.$singular;
 
             $addMethodFound = $this->isAccessible($reflClass, $addMethod, 1);
             $removeMethodFound = $this->isAccessible($reflClass, $removeMethod, 1);
@@ -402,7 +419,7 @@ class PropertyAccessor implements PropertyAccessorInterface
 
             if ($addMethodFound xor $removeMethodFound) {
                 throw new NoSuchPropertyException(sprintf(
-                    'Found the public method "%s", but did not find a public "%s" on class %s',
+                    'Found the public method "%s()", but did not find a public "%s()" on class %s',
                     $addMethodFound ? $addMethod : $removeMethod,
                     $addMethodFound ? $removeMethod : $addMethod,
                     $reflClass->name
@@ -416,12 +433,12 @@ class PropertyAccessor implements PropertyAccessorInterface
     /**
      * Returns whether a method is public and has a specific number of required parameters.
      *
-     * @param  \ReflectionClass $class      The class of the method.
-     * @param  string           $methodName The method name.
-     * @param  integer          $parameters The number of parameters.
+     * @param  \ReflectionClass $class      The class of the method
+     * @param  string           $methodName The method name
+     * @param  integer          $parameters The number of parameters
      *
      * @return Boolean Whether the method is public and has $parameters
-     *                                      required parameters.
+     *                                      required parameters
      */
     private function isAccessible(\ReflectionClass $class, $methodName, $parameters)
     {

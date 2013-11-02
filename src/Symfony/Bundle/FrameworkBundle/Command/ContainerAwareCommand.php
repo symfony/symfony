@@ -23,7 +23,7 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 abstract class ContainerAwareCommand extends Command implements ContainerAwareInterface
 {
     /**
-     * @var ContainerInterface
+     * @var ContainerInterface|null
      */
     private $container;
 
@@ -40,7 +40,7 @@ abstract class ContainerAwareCommand extends Command implements ContainerAwareIn
     }
 
     /**
-     * @see ContainerAwareInterface::setContainer()
+     * {@inheritdoc}
      */
     public function setContainer(ContainerInterface $container = null)
     {

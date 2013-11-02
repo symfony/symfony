@@ -12,7 +12,6 @@
 namespace Symfony\Component\Form\Extension\Core\DataTransformer;
 
 use Symfony\Component\Form\DataTransformerInterface;
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface;
 
@@ -41,7 +40,7 @@ class ChoiceToValueTransformer implements DataTransformerInterface
     public function reverseTransform($value)
     {
         if (null !== $value && !is_scalar($value)) {
-            throw new UnexpectedTypeException($value, 'scalar');
+            throw new TransformationFailedException('Expected a scalar.');
         }
 
         // These are now valid ChoiceList values, so we can return null
@@ -53,7 +52,7 @@ class ChoiceToValueTransformer implements DataTransformerInterface
         $choices = $this->choiceList->getChoicesForValues(array($value));
 
         if (1 !== count($choices)) {
-            throw new TransformationFailedException('The choice "' . $value . '" does not exist or is not unique');
+            throw new TransformationFailedException(sprintf('The choice "%s" does not exist or is not unique', $value));
         }
 
         $choice = current($choices);

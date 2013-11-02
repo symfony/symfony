@@ -23,7 +23,7 @@ class SwitchUserTest extends WebTestCase
     {
         $client = $this->createAuthenticatedClient($originalUser);
 
-        $client->request('GET', '/profile?_switch_user=' . $targetUser);
+        $client->request('GET', '/profile?_switch_user='.$targetUser);
 
         $this->assertEquals($expectedStatus, $client->getResponse()->getStatusCode());
         $this->assertEquals($expectedUser, $client->getProfile()->getCollector('security')->getUser());

@@ -54,7 +54,7 @@ class GnuFindAdapter extends AbstractFindAdapter
                 $format = '%T@';
                 break;
             default:
-                throw new \InvalidArgumentException('Unknown sort options: '.$sort.'.');
+                throw new \InvalidArgumentException(sprintf('Unknown sort options: %s.', $sort));
         }
 
         $command
@@ -93,10 +93,12 @@ class GnuFindAdapter extends AbstractFindAdapter
 
             // todo: avoid forking process for each $pattern by using multiple -e options
             $command
-                ->add('| xargs -r grep -I')
+                ->add('| xargs -I{} -r grep -I')
                 ->add($expr->isCaseSensitive() ? null : '-i')
                 ->add($not ? '-L' : '-l')
-                ->add('-Ee')->arg($expr->renderPattern());
+                ->add('-Ee')->arg($expr->renderPattern())
+                ->add('{}')
+            ;
         }
     }
 }

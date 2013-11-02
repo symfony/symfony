@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\Exception\Exception;
+use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
@@ -53,7 +53,7 @@ abstract class AbstractExtension implements FormExtensionInterface
         }
 
         if (!isset($this->types[$name])) {
-            throw new Exception(sprintf('The type "%s" can not be loaded by this extension', $name));
+            throw new InvalidArgumentException(sprintf('The type "%s" can not be loaded by this extension', $name));
         }
 
         return $this->types[$name];

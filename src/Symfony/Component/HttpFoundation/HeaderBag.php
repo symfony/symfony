@@ -149,7 +149,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      *
      * @param string       $key     The key
      * @param string|array $values  The value or an array of values
-     * @param Boolean      $replace Whether to replace the actual value of not (true by default)
+     * @param Boolean      $replace Whether to replace the actual value or not (true by default)
      *
      * @api
      */

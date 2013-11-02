@@ -15,6 +15,7 @@ services:
         calls:
             - [ setBar, [] ]
             - [ setBar ]
+            - [ setBar, ['@=service("foo").foo() ~ parameter("foo")'] ]
     method_call2:
         class: FooClass
         calls:
@@ -24,3 +25,8 @@ services:
         alias: foo
         public: false
     factory_service: { class: BazClass, factory_method: getInstance, factory_service: baz_factory }
+    request:
+        class: Request
+        synthetic: true
+        synchronized: true
+        lazy: true

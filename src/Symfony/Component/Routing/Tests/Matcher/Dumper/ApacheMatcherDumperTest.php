@@ -150,7 +150,8 @@ class ApacheMatcherDumperTest extends \PHPUnit_Framework_TestCase
         $route3 = new Route('/route3', array(), array(), array(), 'b.example.com');
         $collection2->add('route3', $route3);
 
-        $collection1->addCollection($collection2, '/c2');
+        $collection2->addPrefix('/c2');
+        $collection1->addCollection($collection2);
 
         $route4 = new Route('/route4', array(), array(), array(), 'a.example.com');
         $collection1->add('route4', $route4);

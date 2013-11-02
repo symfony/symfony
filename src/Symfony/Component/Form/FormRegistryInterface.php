@@ -19,17 +19,6 @@ namespace Symfony\Component\Form;
 interface FormRegistryInterface
 {
     /**
-     * Adds a form type.
-     *
-     * @param ResolvedFormTypeInterface $type The type
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
-     *             form extensions or type registration in the Dependency
-     *             Injection Container instead.
-     */
-    public function addType(ResolvedFormTypeInterface $type);
-
-    /**
      * Returns a form type by name.
      *
      * This methods registers the type extensions from the form extensions.
@@ -38,8 +27,8 @@ interface FormRegistryInterface
      *
      * @return ResolvedFormTypeInterface The type
      *
-     * @throws Exception\UnexpectedTypeException if the passed name is not a string
-     * @throws Exception\FormException           if the type can not be retrieved from any extension
+     * @throws Exception\UnexpectedTypeException  if the passed name is not a string
+     * @throws Exception\InvalidArgumentException if the type can not be retrieved from any extension
      */
     public function getType($name);
 

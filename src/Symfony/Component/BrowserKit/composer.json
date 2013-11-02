@@ -24,7 +24,7 @@
         "symfony/css-selector": "~2.0"
     },
     "suggest": {
-        "symfony/process": "2.2.*"
+        "symfony/process": ""
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\BrowserKit\\": "" }
@@ -33,7 +33,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.3-dev"
+            "dev-master": "2.4-dev"
         }
     }
 }

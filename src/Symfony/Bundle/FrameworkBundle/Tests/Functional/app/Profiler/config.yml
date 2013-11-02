@@ -3,4 +3,5 @@ imports:
 
 framework:
     profiler:
-        enabled: false
+        enabled: true
+        collect: false

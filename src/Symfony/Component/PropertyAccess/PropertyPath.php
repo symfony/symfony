@@ -62,10 +62,10 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
     /**
      * Constructs a property path from a string.
      *
-     * @param PropertyPath|string $propertyPath The property path as string or instance.
+     * @param PropertyPath|string $propertyPath The property path as string or instance
      *
-     * @throws UnexpectedTypeException      If the given path is not a string.
-     * @throws InvalidPropertyPathException If the syntax of the property path is not valid.
+     * @throws UnexpectedTypeException      If the given path is not a string
+     * @throws InvalidPropertyPathException If the syntax of the property path is not valid
      */
     public function __construct($propertyPath)
     {
@@ -193,7 +193,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
     public function getElement($index)
     {
         if (!isset($this->elements[$index])) {
-            throw new OutOfBoundsException('The index ' . $index . ' is not within the property path');
+            throw new OutOfBoundsException(sprintf('The index %s is not within the property path', $index));
         }
 
         return $this->elements[$index];
@@ -205,7 +205,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
     public function isProperty($index)
     {
         if (!isset($this->isIndex[$index])) {
-            throw new OutOfBoundsException('The index ' . $index . ' is not within the property path');
+            throw new OutOfBoundsException(sprintf('The index %s is not within the property path', $index));
         }
 
         return !$this->isIndex[$index];
@@ -217,7 +217,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
     public function isIndex($index)
     {
         if (!isset($this->isIndex[$index])) {
-            throw new OutOfBoundsException('The index ' . $index . ' is not within the property path');
+            throw new OutOfBoundsException(sprintf('The index %s is not within the property path', $index));
         }
 
         return $this->isIndex[$index];

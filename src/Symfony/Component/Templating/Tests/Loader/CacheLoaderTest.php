@@ -31,13 +31,19 @@ class CacheLoaderTest extends \PHPUnit_Framework_TestCase
     {
         $dir = sys_get_temp_dir().DIRECTORY_SEPARATOR.rand(111111, 999999);
         mkdir($dir, 0777, true);
+
         $loader = new ProjectTemplateLoader($varLoader = new ProjectTemplateLoaderVar(new TemplateNameParser()), $dir);
-        $loader->setDebugger($debugger = new \Symfony\Component\Templating\Tests\Fixtures\ProjectTemplateDebugger());
         $this->assertFalse($loader->load(new TemplateReference('foo', 'php')), '->load() returns false if the embed loader is not able to load the template');
+
+        $logger = $this->getMock('Psr\Log\LoggerInterface');
+        $logger->expects($this->once())->method('debug')->with('Storing template "index" in cache');
+        $loader->setLogger($logger);
         $loader->load(new TemplateReference('index'));
-        $this->assertTrue($debugger->hasMessage('Storing template'), '->load() logs a "Storing template" message if the template is found');
+
+        $logger = $this->getMock('Psr\Log\LoggerInterface');
+        $logger->expects($this->once())->method('debug')->with('Fetching template "index" from cache');
+        $loader->setLogger($logger);
         $loader->load(new TemplateReference('index'));
-        $this->assertTrue($debugger->hasMessage('Fetching template'), '->load() logs a "Storing template" message if the template is fetched from cache');
     }
 }
 

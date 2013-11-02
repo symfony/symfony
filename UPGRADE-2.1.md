@@ -901,7 +901,7 @@
     public function guessPattern($class, $property)
     {
         if (/* condition */) {
-            return new ValueGuess('.{' . $minLength . ',}', Guess::LOW_CONFIDENCE);
+            return new ValueGuess('.{'.$minLength.',}', Guess::LOW_CONFIDENCE);
         }
     }
     ```
@@ -1189,7 +1189,7 @@
     public function isPropertyValid(ExecutionContext $context)
     {
         // ...
-        $propertyPath = $context->getPropertyPath() . '.property';
+        $propertyPath = $context->getPropertyPath().'.property';
         $context->setPropertyPath($propertyPath);
         $context->addViolation('Error Message', array(), null);
     }

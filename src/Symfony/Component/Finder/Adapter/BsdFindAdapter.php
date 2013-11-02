@@ -62,7 +62,7 @@ class BsdFindAdapter extends AbstractFindAdapter
                 $format = '%m';
                 break;
             default:
-                throw new \InvalidArgumentException('Unknown sort options: '.$sort.'.');
+                throw new \InvalidArgumentException(sprintf('Unknown sort options: %s.', $sort));
         }
 
         $command
@@ -92,10 +92,12 @@ class BsdFindAdapter extends AbstractFindAdapter
             // todo: avoid forking process for each $pattern by using multiple -e options
             $command
                 ->add('| grep -v \'^$\'')
-                ->add('| xargs grep -I')
+                ->add('| xargs -I{} grep -I')
                 ->add($expr->isCaseSensitive() ? null : '-i')
                 ->add($not ? '-L' : '-l')
-                ->add('-Ee')->arg($expr->renderPattern());
+                ->add('-Ee')->arg($expr->renderPattern())
+                ->add('{}')
+            ;
         }
     }
 }

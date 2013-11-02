@@ -13,7 +13,7 @@ namespace Symfony\Bridge\Propel1\Form\DataTransformer;
 
 use \PropelObjectCollection;
 use Symfony\Component\Form\DataTransformerInterface;
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\Exception\TransformationFailedException;
 
 /**
  * CollectionToArrayTransformer class.
@@ -30,7 +30,7 @@ class CollectionToArrayTransformer implements DataTransformerInterface
         }
 
         if (!$collection instanceof PropelObjectCollection) {
-            throw new UnexpectedTypeException($collection, '\PropelObjectCollection');
+            throw new TransformationFailedException('Expected a \PropelObjectCollection.');
         }
 
         return $collection->getData();
@@ -45,7 +45,7 @@ class CollectionToArrayTransformer implements DataTransformerInterface
         }
 
         if (!is_array($array)) {
-            throw new UnexpectedTypeException($array, 'array');
+            throw new TransformationFailedException('Expected an array.');
         }
 
         $collection->setData($array);

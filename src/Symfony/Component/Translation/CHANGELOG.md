@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+2.3.0
+-----
+
+ * added classes to make operations on catalogues (like making a diff or a merge on 2 catalogues)
+ * added Translator::getFallbackLocales()
+ * deprecated Translator::setFallbackLocale() in favor of the new Translator::setFallbackLocales() method
+
 2.2.0
 -----
 

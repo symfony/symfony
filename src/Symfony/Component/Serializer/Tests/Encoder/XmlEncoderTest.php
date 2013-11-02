@@ -20,6 +20,8 @@ use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
 
 class XmlEncoderTest extends \PHPUnit_Framework_TestCase
 {
+    private $encoder;
+
     protected function setUp()
     {
         $this->encoder = new XmlEncoder;
@@ -116,6 +118,23 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
             '<response><person><firstname>Peter</firstname></person></response>'."\n";
 
         $this->assertEquals($expected, $this->encoder->encode($array, 'xml'));
+    }
+
+    public function testEncodeXmlAttributes()
+    {
+        $xml = simplexml_load_string('<firstname>Peter</firstname>');
+        $array = array('person' => $xml);
+
+        $expected = '<?xml version="1.1" encoding="utf-8" standalone="yes"?>'."\n".
+            '<response><person><firstname>Peter</firstname></person></response>'."\n";
+
+        $context = array(
+            'xml_version' => '1.1',
+            'xml_encoding' => 'utf-8',
+            'xml_standalone' => true,
+        );
+
+        $this->assertSame($expected, $this->encoder->encode($array, 'xml', $context));
     }
 
     public function testEncodeScalarRootAttributes()
@@ -299,6 +318,14 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
         );
         $xml = $this->encoder->encode($obj, 'xml');
         $this->assertEquals($expected, $this->encoder->decode($xml, 'xml'));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Serializer\Exception\UnexpectedValueException
+     */
+    public function testDecodeInvalidXml()
+    {
+        $this->encoder->decode('<?xml version="1.0"?><invalid><xml>', 'xml');
     }
 
     public function testPreventsComplexExternalEntities()

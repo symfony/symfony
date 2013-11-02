@@ -25,9 +25,23 @@ use Symfony\Component\HttpFoundation\Response;
 class ConfigDataCollector extends DataCollector
 {
     private $kernel;
+    private $name;
+    private $version;
 
     /**
      * Constructor.
+     *
+     * @param string $name    The name of the application using the web profiler
+     * @param string $version The version of the application using the web profiler
+     */
+    public function __construct($name = null, $version = null)
+    {
+        $this->name = $name;
+        $this->version = $version;
+    }
+
+    /**
+     * Sets the Kernel associated with this Request.
      *
      * @param KernelInterface $kernel A KernelInterface instance
      */
@@ -42,19 +56,22 @@ class ConfigDataCollector extends DataCollector
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
         $this->data = array(
-            'token'            => $response->headers->get('X-Debug-Token'),
-            'symfony_version'  => Kernel::VERSION,
-            'name'             => isset($this->kernel) ? $this->kernel->getName() : 'n/a',
-            'env'              => isset($this->kernel) ? $this->kernel->getEnvironment() : 'n/a',
-            'debug'            => isset($this->kernel) ? $this->kernel->isDebug() : 'n/a',
-            'php_version'      => PHP_VERSION,
-            'xdebug_enabled'   => extension_loaded('xdebug'),
-            'eaccel_enabled'   => extension_loaded('eaccelerator') && ini_get('eaccelerator.enable'),
-            'apc_enabled'      => extension_loaded('apc') && ini_get('apc.enabled'),
-            'xcache_enabled'   => extension_loaded('xcache') && ini_get('xcache.cacher'),
-            'wincache_enabled' => extension_loaded('wincache') && ini_get('wincache.ocenabled'),
-            'bundles'          => array(),
-            'sapi_name'        => php_sapi_name()
+            'app_name'             => $this->name,
+            'app_version'          => $this->version,
+            'token'                => $response->headers->get('X-Debug-Token'),
+            'symfony_version'      => Kernel::VERSION,
+            'name'                 => isset($this->kernel) ? $this->kernel->getName() : 'n/a',
+            'env'                  => isset($this->kernel) ? $this->kernel->getEnvironment() : 'n/a',
+            'debug'                => isset($this->kernel) ? $this->kernel->isDebug() : 'n/a',
+            'php_version'          => PHP_VERSION,
+            'xdebug_enabled'       => extension_loaded('xdebug'),
+            'eaccel_enabled'       => extension_loaded('eaccelerator') && ini_get('eaccelerator.enable'),
+            'apc_enabled'          => extension_loaded('apc') && ini_get('apc.enabled'),
+            'xcache_enabled'       => extension_loaded('xcache') && ini_get('xcache.cacher'),
+            'wincache_enabled'     => extension_loaded('wincache') && ini_get('wincache.ocenabled'),
+            'zend_opcache_enabled' => extension_loaded('Zend OPcache') && ini_get('opcache.enable'),
+            'bundles'              => array(),
+            'sapi_name'            => php_sapi_name()
         );
 
         if (isset($this->kernel)) {
@@ -62,6 +79,16 @@ class ConfigDataCollector extends DataCollector
                 $this->data['bundles'][$name] = $bundle->getPath();
             }
         }
+    }
+
+    public function getApplicationName()
+    {
+        return $this->data['app_name'];
+    }
+
+    public function getApplicationVersion()
+    {
+        return $this->data['app_version'];
     }
 
     /**
@@ -155,6 +182,16 @@ class ConfigDataCollector extends DataCollector
     }
 
     /**
+     * Returns true if Zend OPcache is enabled
+     *
+     * @return Boolean true if Zend OPcache is enabled, false otherwise
+     */
+    public function hasZendOpcache()
+    {
+        return $this->data['zend_opcache_enabled'];
+    }
+
+    /**
      * Returns true if XCache is enabled.
      *
      * @return Boolean true if XCache is enabled, false otherwise
@@ -181,7 +218,7 @@ class ConfigDataCollector extends DataCollector
      */
     public function hasAccelerator()
     {
-        return $this->hasApc() || $this->hasEAccelerator() || $this->hasXCache() || $this->hasWinCache();
+        return $this->hasApc() || $this->hasZendOpcache() || $this->hasEAccelerator() || $this->hasXCache() || $this->hasWinCache();
     }
 
     public function getBundles()

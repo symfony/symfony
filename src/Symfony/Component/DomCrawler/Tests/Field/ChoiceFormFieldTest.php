@@ -284,6 +284,21 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         $this->assertEquals('foo', $field->getValue(), '->select() changes the selected option');
     }
 
+    public function testDisableValidation()
+    {
+        $node = $this->createSelectNode(array('foo' => false, 'bar' => false));
+        $field = new ChoiceFormField($node);
+        $field->disableValidation();
+        $field->setValue('foobar');
+        $this->assertEquals('foobar', $field->getValue(), '->disableValidation() allows to set a value which is not in the selected options.');
+
+        $node = $this->createSelectNode(array('foo' => false, 'bar' => false), array('multiple' => 'multiple'));
+        $field = new ChoiceFormField($node);
+        $field->disableValidation();
+        $field->setValue(array('foobar'));
+        $this->assertEquals(array('foobar'), $field->getValue(), '->disableValidation() allows to set a value which is not in the selected options.');
+    }
+
     protected function createSelectNode($options, $attributes = array())
     {
         $document = new \DOMDocument();

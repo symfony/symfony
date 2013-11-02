@@ -263,7 +263,11 @@ SELECTCLAUSE;
         for ($i = 0; $i < $count; $i++) {
             if (!isset($types[$batch[$i]->getType()])) {
                 $types[$batch[$i]->getType()] = true;
-                if ($count > 1) {
+
+                // if there is more than one type we can safely break out of the
+                // loop, because it is the differentiator factor on whether to
+                // query for only one or more class types
+                if (count($types) > 1) {
                     break;
                 }
             }

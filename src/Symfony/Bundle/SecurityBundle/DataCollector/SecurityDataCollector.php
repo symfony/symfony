@@ -105,7 +105,7 @@ class SecurityDataCollector extends DataCollector
     /**
      * Get the class name of the security token.
      *
-     * @return String The token
+     * @return string The token
      */
     public function getTokenClass()
     {

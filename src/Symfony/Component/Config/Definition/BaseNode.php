@@ -281,6 +281,16 @@ abstract class BaseNode implements NodeInterface
     }
 
     /**
+     * Returns parent node for this node.
+     *
+     * @return NodeInterface|null
+     */
+    public function getParent()
+    {
+        return $this->parent;
+    }
+
+    /**
      * Finalizes a value, applying all finalization closures.
      *
      * @param mixed $value The value to finalize

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Yaml\Tests;
 
-use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Yaml\Inline;
 
 class InlineTest extends \PHPUnit_Framework_TestCase
@@ -31,11 +30,11 @@ class InlineTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals($yaml, Inline::dump($value), sprintf('::dump() converts a PHP structure to an inline YAML (%s)', $yaml));
         }
 
-        foreach ($this->getTestsForParse() as $yaml => $value) {
+        foreach ($this->getTestsForParse() as $value) {
             $this->assertEquals($value, Inline::parse(Inline::dump($value)), 'check consistency');
         }
 
-        foreach ($testsForDump as $yaml => $value) {
+        foreach ($testsForDump as $value) {
             $this->assertEquals($value, Inline::parse(Inline::dump($value)), 'check consistency');
         }
     }
@@ -49,7 +48,7 @@ class InlineTest extends \PHPUnit_Framework_TestCase
 
         $required_locales = array('fr_FR.UTF-8', 'fr_FR.UTF8', 'fr_FR.utf-8', 'fr_FR.utf8', 'French_France.1252');
         if (false === setlocale(LC_ALL, $required_locales)) {
-            $this->markTestSkipped('Could not set any of required locales: ' . implode(", ", $required_locales));
+            $this->markTestSkipped('Could not set any of required locales: '.implode(", ", $required_locales));
         }
 
         $this->assertEquals('1.2', Inline::dump(1.2));
@@ -197,13 +196,15 @@ class InlineTest extends \PHPUnit_Framework_TestCase
             '.Inf' => -log(0),
             '-.Inf' => log(0),
             "'686e444'" => '686e444',
-            '.Inf' => 646e444,
             '"foo\r\nbar"' => "foo\r\nbar",
             "'foo#bar'" => 'foo#bar',
             "'foo # bar'" => 'foo # bar',
             "'#cfcfcf'" => '#cfcfcf',
 
             "'a \"string\" with ''quoted strings inside'''" => 'a "string" with \'quoted strings inside\'',
+
+            "'-dash'" => '-dash',
+            "'-'" => '-',
 
             // sequences
             '[foo, bar, false, null, 12]' => array('foo', 'bar', false, null, 12),

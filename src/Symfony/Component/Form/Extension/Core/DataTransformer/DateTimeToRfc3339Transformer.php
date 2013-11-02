@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Form\Extension\Core\DataTransformer;
 
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
 /**
@@ -29,7 +28,7 @@ class DateTimeToRfc3339Transformer extends BaseDateTimeTransformer
         }
 
         if (!$dateTime instanceof \DateTime) {
-            throw new UnexpectedTypeException($dateTime, '\DateTime');
+            throw new TransformationFailedException('Expected a \DateTime.');
         }
 
         if ($this->inputTimezone !== $this->outputTimezone) {
@@ -46,16 +45,20 @@ class DateTimeToRfc3339Transformer extends BaseDateTimeTransformer
     public function reverseTransform($rfc3339)
     {
         if (!is_string($rfc3339)) {
-            throw new UnexpectedTypeException($rfc3339, 'string');
+            throw new TransformationFailedException('Expected a string.');
         }
 
         if ('' === $rfc3339) {
             return null;
         }
 
-        $dateTime = new \DateTime($rfc3339);
+        try {
+            $dateTime = new \DateTime($rfc3339);
+        } catch (\Exception $e) {
+            throw new TransformationFailedException($e->getMessage(), $e->getCode(), $e);
+        }
 
-        if ($this->outputTimezone !== $this->inputTimezone) {
+        if ($this->outputTimezone !== $dateTime->getTimezone()->getName()) {
             try {
                 $dateTime->setTimezone(new \DateTimeZone($this->inputTimezone));
             } catch (\Exception $e) {

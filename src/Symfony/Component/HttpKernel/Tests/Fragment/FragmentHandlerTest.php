@@ -17,11 +17,19 @@ use Symfony\Component\HttpFoundation\Response;
 
 class FragmentHandlerTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
+    private $requestStack;
+
+    public function setUp()
     {
-        if (!class_exists('Symfony\Component\EventDispatcher\EventDispatcher')) {
-            $this->markTestSkipped('The "EventDispatcher" component is not available');
-        }
+        $this->requestStack = $this->getMockBuilder('Symfony\\Component\\HttpFoundation\\RequestStack')
+            ->disableOriginalConstructor()
+            ->getMock()
+        ;
+        $this->requestStack
+            ->expects($this->any())
+            ->method('getCurrentRequest')
+            ->will($this->returnValue(Request::create('/')))
+        ;
     }
 
     /**
@@ -29,7 +37,7 @@ class FragmentHandlerTest extends \PHPUnit_Framework_TestCase
      */
     public function testRenderWhenRendererDoesNotExist()
     {
-        $handler = new FragmentHandler();
+        $handler = new FragmentHandler(array(), null, $this->requestStack);
         $handler->render('/', 'foo');
     }
 
@@ -61,27 +69,6 @@ class FragmentHandlerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $handler->render('/', 'foo', array('foo' => 'foo')));
     }
 
-    /**
-     * @dataProvider getFixOptionsData
-     */
-    public function testFixOptions($expected, $options)
-    {
-        $handler = new FragmentHandler();
-
-        set_error_handler(function ($errorNumber, $message, $file, $line, $context) { return $errorNumber & E_USER_DEPRECATED; });
-        $this->assertEquals($expected, $handler->fixOptions($options));
-        restore_error_handler();
-    }
-
-    public function getFixOptionsData()
-    {
-        return array(
-            array(array('renderer' => 'esi'), array('standalone' => true)),
-            array(array('renderer' => 'esi'), array('standalone' => 'esi')),
-            array(array('renderer' => 'hinclude'), array('standalone' => 'js')),
-        );
-    }
-
     protected function getHandler($returnValue, $arguments = array())
     {
         $renderer = $this->getMock('Symfony\Component\HttpKernel\Fragment\FragmentRendererInterface');
@@ -100,16 +87,8 @@ class FragmentHandlerTest extends \PHPUnit_Framework_TestCase
             call_user_func_array(array($e, 'with'), $arguments);
         }
 
-        $handler = new FragmentHandler();
+        $handler = new FragmentHandler(array(), null, $this->requestStack);
         $handler->addRenderer($renderer);
-
-        $event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')->disableOriginalConstructor()->getMock();
-        $event
-            ->expects($this->once())
-            ->method('getRequest')
-            ->will($this->returnValue(Request::create('/')))
-        ;
-        $handler->onKernelRequest($event);
 
         return $handler;
     }

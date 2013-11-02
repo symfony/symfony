@@ -39,15 +39,13 @@ interface PropertyAccessorInterface
      *
      * If neither is found, an exception is thrown.
      *
-     * @param object|array                 $objectOrArray The object or array to modify.
-     * @param string|PropertyPathInterface $propertyPath  The property path to modify.
-     * @param mixed                        $value         The value to set at the end of the property path.
+     * @param object|array                 $objectOrArray The object or array to modify
+     * @param string|PropertyPathInterface $propertyPath  The property path to modify
+     * @param mixed                        $value         The value to set at the end of the property path
      *
-     * @throws Exception\NoSuchPropertyException       If a property does not exist.
-     * @throws Exception\PropertyAccessDeniedException If a property cannot be accessed due to
-     *                                                 access restrictions (private or protected).
-     * @throws Exception\UnexpectedTypeException       If a value within the path is neither object
-     *                                                 nor array.
+     * @throws Exception\NoSuchPropertyException If a property does not exist or is not public.
+     * @throws Exception\UnexpectedTypeException If a value within the path is neither object
+     *                                           nor array
      */
     public function setValue(&$objectOrArray, $propertyPath, $value);
 
@@ -73,12 +71,11 @@ interface PropertyAccessorInterface
      * If none of them are found, an exception is thrown.
      *
      * @param object|array                 $objectOrArray The object or array to traverse
-     * @param string|PropertyPathInterface $propertyPath  The property path to modify.
+     * @param string|PropertyPathInterface $propertyPath  The property path to read
      *
      * @return mixed The value at the end of the property path
      *
-     * @throws Exception\NoSuchPropertyException       If the property/getter does not exist
-     * @throws Exception\PropertyAccessDeniedException If the property/getter exists but is not public
+     * @throws Exception\NoSuchPropertyException If a property does not exist or is not public.
      */
     public function getValue($objectOrArray, $propertyPath);
 }

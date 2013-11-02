@@ -253,7 +253,7 @@ class OptionsResolver implements OptionsResolverInterface
             ksort($diff);
 
             throw new InvalidOptionsException(sprintf(
-                (count($diff) > 1 ? 'The options "%s" do not exist.' : 'The option "%s" does not exist.') . ' Known options are: "%s"',
+                (count($diff) > 1 ? 'The options "%s" do not exist.' : 'The option "%s" does not exist.').' Known options are: "%s"',
                 implode('", "', array_keys($diff)),
                 implode('", "', array_keys($this->knownOptions))
             ));
@@ -320,7 +320,7 @@ class OptionsResolver implements OptionsResolverInterface
             $allowedTypes = (array) $allowedTypes;
 
             foreach ($allowedTypes as $type) {
-                $isFunction = 'is_' . $type;
+                $isFunction = 'is_'.$type;
 
                 if (function_exists($isFunction) && $isFunction($value)) {
                     continue 2;

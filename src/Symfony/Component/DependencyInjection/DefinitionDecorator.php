@@ -150,6 +150,18 @@ class DefinitionDecorator extends Definition
     }
 
     /**
+     * {@inheritDoc}
+     *
+     * @api
+     */
+    public function setLazy($boolean)
+    {
+        $this->changes['lazy'] = true;
+
+        return parent::setLazy($boolean);
+    }
+
+    /**
      * Gets an argument to pass to the service constructor/factory method.
      *
      * If replaceArgument() has been used to replace an argument, this method

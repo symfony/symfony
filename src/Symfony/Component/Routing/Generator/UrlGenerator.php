@@ -141,7 +141,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
     }
 
     /**
-     * @throws MissingMandatoryParametersException When some parameters are missing that mandatory for the route
+     * @throws MissingMandatoryParametersException When some parameters are missing that are mandatory for the route
      * @throws InvalidParameterException           When a parameter value for a placeholder is not correct because
      *                                             it does not match the requirement
      */
@@ -159,7 +159,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         $optional = true;
         foreach ($tokens as $token) {
             if ('variable' === $token[0]) {
-                if (!$optional || !array_key_exists($token[3], $defaults) || (string) $mergedParams[$token[3]] !== (string) $defaults[$token[3]]) {
+                if (!$optional || !array_key_exists($token[3], $defaults) || null !== $mergedParams[$token[3]] && (string) $mergedParams[$token[3]] !== (string) $defaults[$token[3]]) {
                     // check requirement
                     if (null !== $this->strictRequirements && !preg_match('#^'.$token[2].'$#', $mergedParams[$token[3]])) {
                         $message = sprintf('Parameter "%s" for route "%s" must match "%s" ("%s" given) to generate a corresponding URL.', $token[3], $name, $token[2], $mergedParams[$token[3]]);
@@ -196,9 +196,9 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         // otherwise we would generate a URI that, when followed by a user agent (e.g. browser), does not match this route
         $url = strtr($url, array('/../' => '/%2E%2E/', '/./' => '/%2E/'));
         if ('/..' === substr($url, -3)) {
-            $url = substr($url, 0, -2) . '%2E%2E';
+            $url = substr($url, 0, -2).'%2E%2E';
         } elseif ('/.' === substr($url, -2)) {
-            $url = substr($url, 0, -1) . '%2E';
+            $url = substr($url, 0, -1).'%2E';
         }
 
         $schemeAuthority = '';
@@ -261,7 +261,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         }
 
         // add a query string if needed
-        $extra = array_diff_key($parameters, $variables);
+        $extra = array_diff_key($parameters, $variables, $defaults);
         if ($extra && $query = http_build_query($extra, '', '&')) {
             $url .= '?'.$query;
         }
@@ -309,7 +309,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         }
 
         $targetDirs[] = $targetFile;
-        $path = str_repeat('../', count($sourceDirs)) . implode('/', $targetDirs);
+        $path = str_repeat('../', count($sourceDirs)).implode('/', $targetDirs);
 
         // A reference to the same base directory or an empty subdirectory must be prefixed with "./".
         // This also applies to a segment with a colon character (e.g., "file:colon") that cannot be used

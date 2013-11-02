@@ -11,36 +11,17 @@
 
 namespace Symfony\Component\Locale\Stub\DateFormat;
 
+use Symfony\Component\Intl\DateFormatter\DateFormat\AmPmTransformer as BaseAmPmTransformer;
+
 /**
- * Parser and formatter for AM/PM markers format
+ * Alias of {@link \Symfony\Component\Intl\DateFormatter\DateFormat\AmPmTransformer}.
  *
- * @author Igor Wiedler <igor@wiedler.ch>
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
+ *             {@link \Symfony\Component\Intl\DateFormatter\DateFormat\AmPmTransformer}
+ *             instead.
  */
-class AmPmTransformer extends Transformer
+class AmPmTransformer extends BaseAmPmTransformer
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function format(\DateTime $dateTime, $length)
-    {
-        return $dateTime->format('A');
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getReverseMatchingRegExp($length)
-    {
-        return 'AM|PM';
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function extractDateOptions($matched, $length)
-    {
-        return array(
-            'marker' => $matched
-        );
-    }
 }

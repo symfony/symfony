@@ -29,19 +29,43 @@ class IdentityTranslatorTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getTransChoiceTests
      */
-    public function testTransChoice($expected, $id, $number, $parameters)
+    public function testTransChoiceWithExplicitLocale($expected, $id, $number, $parameters)
     {
+        $translator = new IdentityTranslator(new MessageSelector());
+        $translator->setLocale('en');
+
+        $this->assertEquals($expected, $translator->transChoice($id, $number, $parameters));
+    }
+
+    /**
+     * @dataProvider getTransChoiceTests
+     */
+    public function testTransChoiceWithDefaultLocale($expected, $id, $number, $parameters)
+    {
+        \Locale::setDefault('en');
+
         $translator = new IdentityTranslator(new MessageSelector());
 
         $this->assertEquals($expected, $translator->transChoice($id, $number, $parameters));
     }
 
-    // noop
     public function testGetSetLocale()
     {
         $translator = new IdentityTranslator(new MessageSelector());
         $translator->setLocale('en');
-        $translator->getLocale();
+
+        $this->assertEquals('en', $translator->getLocale());
+    }
+
+    public function testGetLocaleReturnsDefaultLocaleIfNotSet()
+    {
+        $translator = new IdentityTranslator(new MessageSelector());
+
+        \Locale::setDefault('en');
+        $this->assertEquals('en', $translator->getLocale());
+
+        \Locale::setDefault('pt_BR');
+        $this->assertEquals('pt_BR', $translator->getLocale());
     }
 
     public function getTransTests()
@@ -55,7 +79,14 @@ class IdentityTranslatorTest extends \PHPUnit_Framework_TestCase
     public function getTransChoiceTests()
     {
         return array(
-            array('There is 10 apples', '{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples', 10, array('%count%' => 10)),
+            array('There are no apples', '{0} There are no apples|{1} There is one apple|]1,Inf] There are %count% apples', 0, array('%count%' => 0)),
+            array('There is one apple', '{0} There are no apples|{1} There is one apple|]1,Inf] There are %count% apples', 1, array('%count%' => 1)),
+            array('There are 10 apples', '{0} There are no apples|{1} There is one apple|]1,Inf] There are %count% apples', 10, array('%count%' => 10)),
+            array('There are 0 apples', 'There is 1 apple|There are %count% apples', 0, array('%count%' => 0)),
+            array('There is 1 apple', 'There is 1 apple|There are %count% apples', 1, array('%count%' => 1)),
+            array('There are 10 apples', 'There is 1 apple|There are %count% apples', 10, array('%count%' => 10)),
+            // custom validation messages may be coded with a fixed value
+            array('There are 2 apples', 'There are 2 apples', 2, array('%count%' => 2)),
         );
     }
 }

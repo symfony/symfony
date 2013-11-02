@@ -15,7 +15,6 @@ use \ModelCriteria;
 use \BaseObject;
 use \Persistent;
 
-use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\StringCastException;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ObjectChoiceList;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -84,7 +83,7 @@ class ModelChoiceList extends ObjectChoiceList
     {
         $this->class        = $class;
 
-        $queryClass         = $this->class . 'Query';
+        $queryClass         = $this->class.'Query';
         $query              = new $queryClass();
 
         $this->identifier   = $query->getTableMap()->getPrimaryKeys();
@@ -198,7 +197,7 @@ class ModelChoiceList extends ObjectChoiceList
     {
         if (!$this->loaded) {
             if (1 === count($this->identifier)) {
-                $filterBy = 'filterBy' . current($this->identifier)->getPhpName();
+                $filterBy = 'filterBy'.current($this->identifier)->getPhpName();
 
                 return (array) $this->query->create()
                     ->$filterBy($values)
@@ -253,17 +252,19 @@ class ModelChoiceList extends ObjectChoiceList
      * @return array
      *
      * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     *
+     * @deprecated Deprecated since version 2.4, to be removed in 3.0.
      */
     public function getIndicesForChoices(array $models)
     {
+        $indices = array();
+
         if (!$this->loaded) {
             // Optimize performance for single-field identifiers. We already
             // know that the IDs are used as indices
 
             // Attention: This optimization does not check choices for existence
             if ($this->identifierAsIndex) {
-                $indices = array();
-
                 foreach ($models as $model) {
                     if ($model instanceof $this->class) {
                         // Make sure to convert to the right format
@@ -277,7 +278,30 @@ class ModelChoiceList extends ObjectChoiceList
             $this->load();
         }
 
-        return parent::getIndicesForChoices($models);
+        /*
+         * Overwriting default implementation.
+         *
+         * The two objects may represent the same entry in the database,
+         * but if they originated from different queries, there are not the same object within the code.
+         *
+         * This happens when using m:n relations with either sides model as data_class of the form.
+         * The choicelist will retrieve the list of available related models with a different query, resulting in different objects.
+         */
+        $choices = $this->fixChoices($models);
+        foreach ($this->getChoices() as $i => $choice) {
+            foreach ($choices as $j => $givenChoice) {
+                if (null !== $givenChoice && $this->getIdentifierValues($choice) === $this->getIdentifierValues($givenChoice)) {
+                    $indices[] = $i;
+                    unset($choices[$j]);
+
+                    if (0 === count($choices)) {
+                        break 2;
+                    }
+                }
+            }
+        }
+
+        return $indices;
     }
 
     /**
@@ -288,6 +312,8 @@ class ModelChoiceList extends ObjectChoiceList
      * @return array
      *
      * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     *
+     * @deprecated Deprecated since version 2.4, to be removed in 3.0.
      */
     public function getIndicesForValues(array $values)
     {
@@ -379,8 +405,6 @@ class ModelChoiceList extends ObjectChoiceList
      * @param object $model The model for which to get the identifier
      *
      * @return array
-     *
-     * @throws FormException If the model does not exist
      */
     private function getIdentifierValues($model)
     {
@@ -391,6 +415,10 @@ class ModelChoiceList extends ObjectChoiceList
         // readonly="true" models do not implement Persistent.
         if ($model instanceof BaseObject && method_exists($model, 'getPrimaryKey')) {
             return array($model->getPrimaryKey());
+        }
+
+        if (null === $model) {
+            return array();
         }
 
         return $model->getPrimaryKeys();

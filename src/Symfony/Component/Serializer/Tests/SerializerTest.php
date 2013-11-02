@@ -17,6 +17,8 @@ use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
 use Symfony\Component\Serializer\Tests\Fixtures\TraversableDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\NormalizableTraversableDummy;
+use Symfony\Component\Serializer\Tests\Normalizer\TestNormalizer;
+use Symfony\Component\Serializer\Tests\Normalizer\TestDenormalizer;
 
 class SerializerTest extends \PHPUnit_Framework_TestCase
 {
@@ -46,10 +48,29 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \Symfony\Component\Serializer\Exception\UnexpectedValueException
      */
+    public function testNormalizeOnDenormalizer()
+    {
+        $this->serializer = new Serializer(array(new TestDenormalizer()), array());
+        $this->assertTrue($this->serializer->normalize(new \stdClass, 'json'));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Serializer\Exception\UnexpectedValueException
+     */
     public function testDenormalizeNoMatch()
     {
         $this->serializer = new Serializer(array($this->getMock('Symfony\Component\Serializer\Normalizer\CustomNormalizer')));
         $this->serializer->denormalize('foo', 'stdClass');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Serializer\Exception\UnexpectedValueException
+     */
+    public function testDenormalizeOnNormalizer()
+    {
+        $this->serializer = new Serializer(array(new TestNormalizer()), array());
+        $data = array('title' => 'foo', 'numbers' => array(5, 3));
+        $this->assertTrue($this->serializer->denormalize(json_encode($data), 'stdClass', 'json'));
     }
 
     public function testSerialize()
@@ -223,5 +244,4 @@ class Model
     {
         return array('title' => $this->title, 'numbers' => $this->numbers);
     }
-
 }

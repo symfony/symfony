@@ -17,13 +17,6 @@ use Symfony\Component\Routing\Tests\Fixtures\CustomXmlFileLoader;
 
 class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\Config\FileLocator')) {
-            $this->markTestSkipped('The "Config" component is not available');
-        }
-    }
-
     public function testSupports()
     {
         $loader = new XmlFileLoader($this->getMock('Symfony\Component\Config\FileLocator'));
@@ -43,14 +36,17 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertCount(2, $routes, 'Two routes are loaded');
         $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
-        $route = $routes['blog_show'];
-        $this->assertEquals('/blog/{slug}', $route->getPath());
-        $this->assertEquals('MyBundle:Blog:show', $route->getDefault('_controller'));
-        $this->assertEquals('GET', $route->getRequirement('_method'));
-        $this->assertEquals('https', $route->getRequirement('_scheme'));
-        $this->assertEquals('\w+', $route->getRequirement('locale'));
-        $this->assertEquals('{locale}.example.com', $route->getHost());
-        $this->assertEquals('RouteCompiler', $route->getOption('compiler_class'));
+
+        foreach ($routes as $route) {
+            $this->assertSame('/blog/{slug}', $route->getPath());
+            $this->assertSame('{locale}.example.com', $route->getHost());
+            $this->assertSame('MyBundle:Blog:show', $route->getDefault('_controller'));
+            $this->assertSame('\w+', $route->getRequirement('locale'));
+            $this->assertSame('RouteCompiler', $route->getOption('compiler_class'));
+            $this->assertEquals(array('GET', 'POST', 'PUT', 'OPTIONS'), $route->getMethods());
+            $this->assertEquals(array('https'), $route->getSchemes());
+            $this->assertEquals('context.getMethod() == "GET"', $route->getCondition());
+        }
     }
 
     public function testLoadWithNamespacePrefix()
@@ -61,12 +57,13 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(1, $routeCollection->all(), 'One route is loaded');
 
         $route = $routeCollection->get('blog_show');
-        $this->assertEquals('/blog/{slug}', $route->getPath());
-        $this->assertEquals('MyBundle:Blog:show', $route->getDefault('_controller'));
-        $this->assertEquals('\w+', $route->getRequirement('slug'));
-        $this->assertEquals('en|fr|de', $route->getRequirement('_locale'));
-        $this->assertEquals('{_locale}.example.com', $route->getHost());
-        $this->assertEquals('RouteCompiler', $route->getOption('compiler_class'));
+        $this->assertSame('/blog/{slug}', $route->getPath());
+        $this->assertSame('{_locale}.example.com', $route->getHost());
+        $this->assertSame('MyBundle:Blog:show', $route->getDefault('_controller'));
+        $this->assertSame('\w+', $route->getRequirement('slug'));
+        $this->assertSame('en|fr|de', $route->getRequirement('_locale'));
+        $this->assertSame(null, $route->getDefault('slug'));
+        $this->assertSame('RouteCompiler', $route->getOption('compiler_class'));
     }
 
     public function testLoadWithImport()
@@ -79,12 +76,11 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
 
         foreach ($routes as $route) {
-            $this->assertEquals('/{foo}/blog/{slug}', $routes['blog_show']->getPath());
-            $this->assertEquals('MyBundle:Blog:show', $routes['blog_show']->getDefault('_controller'));
-            $this->assertEquals('123', $routes['blog_show']->getDefault('foo'));
-            $this->assertEquals('\d+', $routes['blog_show']->getRequirement('foo'));
-            $this->assertEquals('bar', $routes['blog_show']->getOption('foo'));
-            $this->assertEquals('{locale}.example.com', $routes['blog_show']->getHost());
+            $this->assertSame('/{foo}/blog/{slug}', $route->getPath());
+            $this->assertSame('123', $route->getDefault('foo'));
+            $this->assertSame('\d+', $route->getRequirement('foo'));
+            $this->assertSame('bar', $route->getOption('foo'));
+            $this->assertSame('', $route->getHost());
         }
     }
 

@@ -107,6 +107,16 @@ class StopwatchEvent
     }
 
     /**
+     * Checks if the event was started
+     *
+     * @return bool
+     */
+    public function isStarted()
+    {
+        return !empty($this->started);
+    }
+
+    /**
      * Stops the current period and then starts a new one.
      *
      * @return StopwatchEvent The event

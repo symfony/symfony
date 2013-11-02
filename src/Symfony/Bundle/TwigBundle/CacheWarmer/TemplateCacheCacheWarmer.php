@@ -26,7 +26,7 @@ use Symfony\Bundle\FrameworkBundle\CacheWarmer\TemplateFinderInterface;
 class TemplateCacheCacheWarmer implements CacheWarmerInterface
 {
     protected $container;
-    protected $warmer;
+    protected $finder;
 
     /**
      * Constructor.

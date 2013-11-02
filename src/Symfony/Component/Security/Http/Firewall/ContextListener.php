@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Security\Http\Firewall;
 
-use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
@@ -38,6 +37,7 @@ class ContextListener implements ListenerInterface
     private $logger;
     private $userProviders;
     private $dispatcher;
+    private $registered;
 
     public function __construct(SecurityContextInterface $context, array $userProviders, $contextKey, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
     {
@@ -65,8 +65,9 @@ class ContextListener implements ListenerInterface
      */
     public function handle(GetResponseEvent $event)
     {
-        if (null !== $this->dispatcher && HttpKernelInterface::MASTER_REQUEST === $event->getRequestType()) {
+        if (!$this->registered && null !== $this->dispatcher && $event->isMasterRequest()) {
             $this->dispatcher->addListener(KernelEvents::RESPONSE, array($this, 'onKernelResponse'));
+            $this->registered = true;
         }
 
         $request = $event->getRequest();
@@ -104,7 +105,7 @@ class ContextListener implements ListenerInterface
      */
     public function onKernelResponse(FilterResponseEvent $event)
     {
-        if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
+        if (!$event->isMasterRequest()) {
             return;
         }
 

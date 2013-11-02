@@ -52,7 +52,7 @@ abstract class Loader implements LoaderInterface
      */
     public function import($resource, $type = null)
     {
-        return $this->resolve($resource)->load($resource, $type);
+        return $this->resolve($resource, $type)->load($resource, $type);
     }
 
     /**

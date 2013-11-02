@@ -60,14 +60,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
         fseek($file, 0, SEEK_END);
 
         $result = array();
-
-        for (;$limit > 0; $limit--) {
-            $line = $this->readLineFromFile($file);
-
-            if (null === $line) {
-                break;
-            }
-
+        while (count($result) < $limit && $line = $this->readLineFromFile($file)) {
             list($csvToken, $csvIp, $csvMethod, $csvUrl, $csvTime, $csvParent) = str_getcsv($line);
 
             $csvTime = (int) $csvTime;
@@ -77,7 +70,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
             }
 
             if (!empty($start) && $csvTime < $start) {
-               continue;
+                continue;
             }
 
             if (!empty($end) && $csvTime > $end) {
@@ -238,12 +231,12 @@ class FileProfilerStorage implements ProfilerStorageInterface
             $buffer = fread($file, $chunkSize);
 
             if (false === ($upTo = strrpos($buffer, "\n"))) {
-                $line = $buffer . $line;
+                $line = $buffer.$line;
                 continue;
             }
 
             $position += $upTo;
-            $line = substr($buffer, $upTo + 1) . $line;
+            $line = substr($buffer, $upTo + 1).$line;
             fseek($file, max(0, $position), SEEK_SET);
 
             if ('' !== $line) {

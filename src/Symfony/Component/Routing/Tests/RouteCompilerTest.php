@@ -167,7 +167,7 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
      */
     public function testRouteWithNumericVariableName($name)
     {
-        $route = new Route('/{'. $name . '}');
+        $route = new Route('/{'. $name.'}');
         $route->compile();
     }
 

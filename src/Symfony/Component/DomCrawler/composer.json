@@ -22,7 +22,7 @@
         "symfony/css-selector": "~2.0"
     },
     "suggest": {
-        "symfony/css-selector": "2.2.*"
+        "symfony/css-selector": ""
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\DomCrawler\\": "" }
@@ -31,7 +31,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.3-dev"
+            "dev-master": "2.4-dev"
         }
     }
 }

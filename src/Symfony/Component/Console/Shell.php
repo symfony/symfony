@@ -32,7 +32,6 @@ class Shell
     private $history;
     private $output;
     private $hasReadline;
-    private $prompt;
     private $processIsolation;
 
     /**
@@ -49,7 +48,6 @@ class Shell
         $this->application = $application;
         $this->history = getenv('HOME').'/.history_'.$application->getName();
         $this->output = new ConsoleOutput();
-        $this->prompt = $application->getName().' > ';
         $this->processIsolation = false;
     }
 
@@ -142,6 +140,27 @@ EOF;
     }
 
     /**
+     * Renders a prompt.
+     *
+     * @return string The prompt
+     */
+    protected function getPrompt()
+    {
+        // using the formatter here is required when using readline
+        return $this->output->getFormatter()->format($this->application->getName().' > ');
+    }
+
+    protected function getOutput()
+    {
+        return $this->output;
+    }
+
+    protected function getApplication()
+    {
+        return $this->application;
+    }
+
+    /**
      * Tries to return autocompletion for the current entered text.
      *
      * @param string $text The last segment of the entered text
@@ -185,9 +204,9 @@ EOF;
     private function readline()
     {
         if ($this->hasReadline) {
-            $line = readline($this->prompt);
+            $line = readline($this->getPrompt());
         } else {
-            $this->output->write($this->prompt);
+            $this->output->write($this->getPrompt());
             $line = fgets(STDIN, 1024);
             $line = (!$line && strlen($line) == 0) ? false : rtrim($line);
         }

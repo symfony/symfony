@@ -193,8 +193,6 @@ class PluralizationRules
      * @param string $rule   A PHP callable
      * @param string $locale The locale
      *
-     * @return null
-     *
      * @throws \LogicException
      */
     public static function set($rule, $locale)

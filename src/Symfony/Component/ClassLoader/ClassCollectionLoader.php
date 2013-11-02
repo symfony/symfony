@@ -53,7 +53,7 @@ class ClassCollectionLoader
             $classes = array_diff($classes, $declared);
 
             // the cache is different depending on which classes are already declared
-            $name = $name.'-'.substr(md5(implode('|', $classes)), 0, 5);
+            $name = $name.'-'.substr(hash('sha256', implode('|', $classes)), 0, 5);
         }
 
         $classes = array_unique($classes);
@@ -63,7 +63,7 @@ class ClassCollectionLoader
         // auto-reload
         $reload = false;
         if ($autoReload) {
-            $metadata = $cacheDir.'/'.$name.$extension.'.meta';
+            $metadata = $cache.'.meta';
             if (!is_file($metadata) || !is_file($cache)) {
                 $reload = true;
             } else {
@@ -169,18 +169,19 @@ class ClassCollectionLoader
                     $inNamespace = false;
                     prev($tokens);
                 } else {
-                    $rawChunk = rtrim($rawChunk) . "\n{";
+                    $rawChunk = rtrim($rawChunk)."\n{";
                     $inNamespace = true;
                 }
             } elseif (T_START_HEREDOC === $token[0]) {
-                $output .= self::compressCode($rawChunk) . $token[1];
+                $output .= self::compressCode($rawChunk).$token[1];
                 do {
                     $token = next($tokens);
-                    $output .= $token[1];
+                    $output .= is_string($token) ? $token : $token[1];
                 } while ($token[0] !== T_END_HEREDOC);
+                $output .= "\n";
                 $rawChunk = '';
             } elseif (T_CONSTANT_ENCAPSED_STRING === $token[0]) {
-                $output .= self::compressCode($rawChunk) . $token[1];
+                $output .= self::compressCode($rawChunk).$token[1];
                 $rawChunk = '';
             } else {
                 $rawChunk .= $token[1];
@@ -191,7 +192,7 @@ class ClassCollectionLoader
             $rawChunk .= "}\n";
         }
 
-        return $output . self::compressCode($rawChunk);
+        return $output.self::compressCode($rawChunk);
     }
 
     /**

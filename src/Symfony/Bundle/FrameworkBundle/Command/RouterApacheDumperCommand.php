@@ -26,7 +26,7 @@ use Symfony\Component\Routing\RouterInterface;
 class RouterApacheDumperCommand extends ContainerAwareCommand
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function isEnabled()
     {
@@ -42,7 +42,7 @@ class RouterApacheDumperCommand extends ContainerAwareCommand
     }
 
     /**
-     * @see Command
+     * {@inheritdoc}
      */
     protected function configure()
     {
@@ -65,7 +65,7 @@ EOF
     }
 
     /**
-     * @see Command
+     * {@inheritdoc}
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {

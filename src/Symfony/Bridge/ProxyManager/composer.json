@@ -1,0 +1,35 @@
+{
+    "name": "symfony/proxy-manager-bridge",
+    "type": "symfony-bridge",
+    "description": "Symfony ProxyManager Bridge",
+    "keywords": [],
+    "homepage": "http://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "http://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3",
+        "symfony/dependency-injection": "~2.3",
+        "ocramius/proxy-manager": ">=0.3.1,<0.5-dev"
+    },
+    "autoload": {
+        "psr-0": {
+            "Symfony\\Bridge\\ProxyManager\\": ""
+        }
+    },
+    "target-dir": "Symfony/Bridge/ProxyManager",
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.4-dev"
+        }
+    }
+}

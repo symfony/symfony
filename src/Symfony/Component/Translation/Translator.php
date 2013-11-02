@@ -56,15 +56,15 @@ class Translator implements TranslatorInterface
     /**
      * Constructor.
      *
-     * @param string          $locale   The locale
-     * @param MessageSelector $selector The message selector for pluralization
+     * @param string               $locale   The locale
+     * @param MessageSelector|null $selector The message selector for pluralization
      *
      * @api
      */
     public function __construct($locale, MessageSelector $selector = null)
     {
         $this->locale = $locale;
-        $this->selector = null === $selector ? new MessageSelector() : $selector;
+        $this->selector = $selector ?: new MessageSelector();
     }
 
     /**
@@ -90,11 +90,19 @@ class Translator implements TranslatorInterface
      *
      * @api
      */
-    public function addResource($format, $resource, $locale, $domain = 'messages')
+    public function addResource($format, $resource, $locale, $domain = null)
     {
+        if (null === $domain) {
+            $domain = 'messages';
+        }
+
         $this->resources[$locale][] = array($format, $resource, $domain);
 
-        unset($this->catalogues[$locale]);
+        if (in_array($locale, $this->fallbackLocales)) {
+            $this->catalogues = array();
+        } else {
+            unset($this->catalogues[$locale]);
+        }
     }
 
     /**
@@ -122,14 +130,40 @@ class Translator implements TranslatorInterface
      *
      * @param string|array $locales The fallback locale(s)
      *
+     * @deprecated since 2.3, to be removed in 3.0. Use setFallbackLocales() instead.
+     *
      * @api
      */
     public function setFallbackLocale($locales)
     {
+        $this->setFallbackLocales(is_array($locales) ? $locales : array($locales));
+    }
+
+    /**
+     * Sets the fallback locales.
+     *
+     * @param array $locales The fallback locales
+     *
+     * @api
+     */
+    public function setFallbackLocales(array $locales)
+    {
         // needed as the fallback locales are linked to the already loaded catalogues
         $this->catalogues = array();
 
-        $this->fallbackLocales = is_array($locales) ? $locales : array($locales);
+        $this->fallbackLocales = $locales;
+    }
+
+    /**
+     * Gets the fallback locales.
+     *
+     * @return array $locales The fallback locales
+     *
+     * @api
+     */
+    public function getFallbackLocales()
+    {
+        return $this->fallbackLocales;
     }
 
     /**
@@ -137,10 +171,14 @@ class Translator implements TranslatorInterface
      *
      * @api
      */
-    public function trans($id, array $parameters = array(), $domain = 'messages', $locale = null)
+    public function trans($id, array $parameters = array(), $domain = null, $locale = null)
     {
-        if (!isset($locale)) {
+        if (null === $locale) {
             $locale = $this->getLocale();
+        }
+
+        if (null === $domain) {
+            $domain = 'messages';
         }
 
         if (!isset($this->catalogues[$locale])) {
@@ -155,10 +193,14 @@ class Translator implements TranslatorInterface
      *
      * @api
      */
-    public function transChoice($id, $number, array $parameters = array(), $domain = 'messages', $locale = null)
+    public function transChoice($id, $number, array $parameters = array(), $domain = null, $locale = null)
     {
-        if (!isset($locale)) {
+        if (null === $locale) {
             $locale = $this->getLocale();
+        }
+
+        if (null === $domain) {
+            $domain = 'messages';
         }
 
         if (!isset($this->catalogues[$locale])) {
@@ -177,7 +219,17 @@ class Translator implements TranslatorInterface
             }
         }
 
-        return strtr($this->selector->choose($catalogue->get($id, $domain), (float) $number, $locale), $parameters);
+        return strtr($this->selector->choose($catalogue->get($id, $domain), (int) $number, $locale), $parameters);
+    }
+
+    /**
+     * Gets the loaders.
+     *
+     * @return array LoaderInterface[]
+     */
+    protected function getLoaders()
+    {
+        return $this->loaders;
     }
 
     protected function loadCatalogue($locale)

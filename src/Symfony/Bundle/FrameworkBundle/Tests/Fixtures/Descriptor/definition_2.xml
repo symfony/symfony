@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definition class="Full\Qualified\Class2" scope="container" public="false" synthetic="true" file="/path/to/file">
+  <tags>
+    <tag name="tag1">
+      <parameter name="attr1"/>
+      <parameter name="attr2"/>
+    </tag>
+    <tag name="tag1">
+      <parameter name="attr3"/>
+    </tag>
+    <tag name="tag2"/>
+  </tags>
+</definition>

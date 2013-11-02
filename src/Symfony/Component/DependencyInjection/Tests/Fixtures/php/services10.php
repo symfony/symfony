@@ -33,6 +33,11 @@ class ProjectServiceContainer extends Container
 
         $this->scopes = array();
         $this->scopeChildren = array();
+        $this->methodMap = array(
+            'test' => 'getTestService',
+        );
+
+        $this->aliases = array();
     }
 
     /**

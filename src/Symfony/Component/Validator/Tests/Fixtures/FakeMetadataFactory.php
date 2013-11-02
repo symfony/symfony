@@ -26,11 +26,11 @@ class FakeMetadataFactory implements MetadataFactoryInterface
         }
 
         if (!is_string($class)) {
-            throw new NoSuchMetadataException('No metadata for type ' . gettype($class));
+            throw new NoSuchMetadataException(sprintf('No metadata for type %s', gettype($class)));
         }
 
         if (!isset($this->metadatas[$class])) {
-            throw new NoSuchMetadataException('No metadata for "' . $class . '"');
+            throw new NoSuchMetadataException(sprintf('No metadata for "%s"', $class));
         }
 
         return $this->metadatas[$class];

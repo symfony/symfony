@@ -1,6 +1,6 @@
 <?php
 
-$file = __DIR__ . '/ProjectWithXsdExtensionInPhar.phar';
+$file = __DIR__.'/ProjectWithXsdExtensionInPhar.phar';
 if (is_file($file)) {
     @unlink($file);
 }

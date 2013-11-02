@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Doctrine\Form\ChoiceList;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\DBAL\Connection;
+use Doctrine\ORM\EntityManager;
 
 /**
  * Getting Entities through the ORM QueryBuilder

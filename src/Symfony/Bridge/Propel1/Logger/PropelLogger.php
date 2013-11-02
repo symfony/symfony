@@ -20,7 +20,7 @@ use Psr\Log\LoggerInterface;
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  * @author William Durand <william.durand1@gmail.com>
  */
-class PropelLogger
+class PropelLogger implements \BasicLogger
 {
     /**
      * @var LoggerInterface
@@ -30,14 +30,17 @@ class PropelLogger
     /**
      * @var array
      */
-    protected $queries;
+    protected $queries = array();
 
     /**
      * @var Stopwatch
      */
     protected $stopwatch;
 
-    private $isPrepared;
+    /**
+     * @var Boolean
+     */
+    private $isPrepared = false;
 
     /**
      * Constructor.
@@ -48,87 +51,59 @@ class PropelLogger
     public function __construct(LoggerInterface $logger = null, Stopwatch $stopwatch = null)
     {
         $this->logger    = $logger;
-        $this->queries   = array();
         $this->stopwatch = $stopwatch;
-        $this->isPrepared = false;
     }
 
     /**
-     * A convenience function for logging an alert event.
-     *
-     * @param mixed $message the message to log.
+     * {@inheritDoc}
      */
     public function alert($message)
     {
-        if (null !== $this->logger) {
-            $this->logger->alert($message);
-        }
+        $this->log($message, 'alert');
     }
 
     /**
-     * A convenience function for logging a critical event.
-     *
-     * @param mixed $message the message to log.
+     * {@inheritDoc}
      */
     public function crit($message)
     {
-        if (null !== $this->logger) {
-            $this->logger->critical($message);
-        }
+        $this->log($message, 'crit');
     }
 
     /**
-     * A convenience function for logging an error event.
-     *
-     * @param mixed $message the message to log.
+     * {@inheritDoc}
      */
     public function err($message)
     {
-        if (null !== $this->logger) {
-            $this->logger->error($message);
-        }
+        $this->log($message, 'err');
     }
 
     /**
-     * A convenience function for logging a warning event.
-     *
-     * @param mixed $message the message to log.
+     * {@inheritDoc}
      */
     public function warning($message)
     {
-        if (null !== $this->logger) {
-            $this->logger->warning($message);
-        }
+        $this->log($message, 'warning');
     }
 
     /**
-     * A convenience function for logging an critical event.
-     *
-     * @param mixed $message the message to log.
+     * {@inheritDoc}
      */
     public function notice($message)
     {
-        if (null !== $this->logger) {
-            $this->logger->notice($message);
-        }
+        $this->log($message, 'notice');
     }
 
     /**
-     * A convenience function for logging an critical event.
-     *
-     * @param mixed $message the message to log.
+     * {@inheritDoc}
      */
     public function info($message)
     {
-        if (null !== $this->logger) {
-            $this->logger->info($message);
-        }
+        $this->log($message, 'info');
     }
 
     /**
-     * A convenience function for logging a debug event.
-     *
-     * @param mixed $message the message to log.
+     * {@inheritDoc}
      */
     public function debug($message)
     {
@@ -152,8 +127,40 @@ class PropelLogger
 
         if ($add) {
             $this->queries[] = $message;
-            if (null !== $this->logger) {
-                $this->logger->debug($message);
+            $this->log($message, 'debug');
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function log($message, $severity = null)
+    {
+        if (null !== $this->logger) {
+            $message = is_string($message) ? $message : var_export($message, true);
+
+            switch ($severity) {
+                case 'alert':
+                    $this->logger->alert($message);
+                    break;
+                case 'crit':
+                    $this->logger->critical($message);
+                    break;
+                case 'err':
+                    $this->logger->error($message);
+                    break;
+                case 'warning':
+                    $this->logger->warning($message);
+                    break;
+                case 'notice':
+                    $this->logger->notice($message);
+                    break;
+                case 'info':
+                    $this->logger->info($message);
+                    break;
+                case 'debug':
+                default:
+                    $this->logger->debug($message);
             }
         }
     }

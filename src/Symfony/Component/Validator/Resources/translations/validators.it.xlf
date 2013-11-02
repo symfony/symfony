@@ -222,17 +222,30 @@
                 <source>Unsupported card type or invalid card number.</source>
                 <target>Tipo di carta non supportato o numero non valido.</target>
             </trans-unit>
-            <!--
-            Old messages: differents ?!
-            <trans-unit id="57">
-                <source>Invalid card number.</source>
-                <target>Il numero della carta non è valido.</target>
+            <trans-unit id="59">
+                <source>This is not a valid International Bank Account Number (IBAN).</source>
+                <target>Questo valore non è un IBAN (International Bank Account Number) valido.</target>
             </trans-unit>
-            <trans-unit id="58">
-                <source>Unsupported card type or invalid card number.</source>
-                <target>Il tipo di carta non è supportato o il numero non è valido.</target>
+            <trans-unit id="60">
+                <source>This value is not a valid ISBN-10.</source>
+                <target>Questo valore non è un codice ISBN-10 valido.</target>
             </trans-unit>
-            -->
+            <trans-unit id="61">
+                <source>This value is not a valid ISBN-13.</source>
+                <target>Questo valore non è un codice ISBN-13 valido.</target>
+            </trans-unit>
+            <trans-unit id="62">
+                <source>This value is neither a valid ISBN-10 nor a valid ISBN-13.</source>
+                <target>Questo valore non è un codice ISBN-10 o ISBN-13 valido.</target>
+            </trans-unit>
+            <trans-unit id="63">
+                <source>This value is not a valid ISSN.</source>
+                <target>Questo valore non è un codice ISSN valido.</target>
+            </trans-unit>
+            <trans-unit id="64">
+                <source>This value is not a valid currency.</source>
+                <target>Questo valore non è una valuta valida.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

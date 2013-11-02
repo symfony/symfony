@@ -12,15 +12,16 @@
 namespace Symfony\Component\HttpKernel\DependencyInjection;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Scope;
 
 /**
- * This HttpKernel is used to manage scope changes of the DI container.
+ * Adds a managed request scope.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
@@ -35,12 +36,18 @@ class ContainerAwareHttpKernel extends HttpKernel
      * @param EventDispatcherInterface    $dispatcher         An EventDispatcherInterface instance
      * @param ContainerInterface          $container          A ContainerInterface instance
      * @param ControllerResolverInterface $controllerResolver A ControllerResolverInterface instance
+     * @param RequestStack                $requestStack       A stack for master/sub requests
      */
-    public function __construct(EventDispatcherInterface $dispatcher, ContainerInterface $container, ControllerResolverInterface $controllerResolver)
+    public function __construct(EventDispatcherInterface $dispatcher, ContainerInterface $container, ControllerResolverInterface $controllerResolver, RequestStack $requestStack = null)
     {
-        parent::__construct($dispatcher, $controllerResolver);
+        parent::__construct($dispatcher, $controllerResolver, $requestStack);
 
         $this->container = $container;
+
+        // the request scope might have been created before (see FrameworkBundle)
+        if (!$container->hasScope('request')) {
+            $container->addScope(new Scope('request'));
+        }
     }
 
     /**
@@ -56,11 +63,13 @@ class ContainerAwareHttpKernel extends HttpKernel
         try {
             $response = parent::handle($request, $type, $catch);
         } catch (\Exception $e) {
+            $this->container->set('request', null, 'request');
             $this->container->leaveScope('request');
 
             throw $e;
         }
 
+        $this->container->set('request', null, 'request');
         $this->container->leaveScope('request');
 
         return $response;

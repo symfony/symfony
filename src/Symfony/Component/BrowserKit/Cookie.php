@@ -95,7 +95,7 @@ class Cookie
             $cookie .= '; domain='.$this->domain;
         }
 
-        if ('/' !== $this->path) {
+        if ($this->path) {
             $cookie .= '; path='.$this->path;
         }
 
@@ -127,7 +127,7 @@ class Cookie
         $parts = explode(';', $cookie);
 
         if (false === strpos($parts[0], '=')) {
-            throw new \InvalidArgumentException('The cookie string "%s" is not valid.');
+            throw new \InvalidArgumentException(sprintf('The cookie string "%s" is not valid.', $cookie));
         }
 
         list($name, $value) = explode('=', array_shift($parts), 2);
@@ -147,10 +147,9 @@ class Cookie
             if ((false === $urlParts = parse_url($url)) || !isset($urlParts['host']) || !isset($urlParts['path'])) {
                 throw new \InvalidArgumentException(sprintf('The URL "%s" is not valid.', $url));
             }
-            $parts = array_merge($urlParts, $parts);
 
-            $values['domain'] = $parts['host'];
-            $values['path'] = substr($parts['path'], 0, strrpos($parts['path'], '/'));
+            $values['domain'] = $urlParts['host'];
+            $values['path'] = substr($urlParts['path'], 0, strrpos($urlParts['path'], '/'));
         }
 
         foreach ($parts as $part) {

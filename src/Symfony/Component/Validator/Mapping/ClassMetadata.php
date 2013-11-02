@@ -252,7 +252,7 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
 
                 $this->addMemberMetadata($member);
 
-                if (!$member->isPrivate()) {
+                if (!$member->isPrivate($this->name)) {
                     $property = $member->getPropertyName();
 
                     if ($member instanceof PropertyMetadata && !isset($this->properties[$property])) {

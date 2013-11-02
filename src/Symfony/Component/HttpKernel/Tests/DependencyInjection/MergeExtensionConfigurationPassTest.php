@@ -15,17 +15,6 @@ use Symfony\Component\HttpKernel\DependencyInjection\MergeExtensionConfiguration
 
 class MergeExtensionConfigurationPassTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\DependencyInjection\Container')) {
-            $this->markTestSkipped('The "DependencyInjection" component is not available');
-        }
-
-        if (!class_exists('Symfony\Component\Config\FileLocator')) {
-            $this->markTestSkipped('The "Config" component is not available');
-        }
-    }
-
     public function testAutoloadMainExtension()
     {
         $container = $this->getMock('Symfony\\Component\\DependencyInjection\\ContainerBuilder');

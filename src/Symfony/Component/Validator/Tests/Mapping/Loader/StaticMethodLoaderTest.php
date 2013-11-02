@@ -48,12 +48,12 @@ class StaticMethodLoaderTest extends \PHPUnit_Framework_TestCase
         $loader = new StaticMethodLoader('loadMetadata');
         $metadata = new ClassMetadata(__NAMESPACE__.'\StaticLoaderDocument');
         $loader->loadClassMetadata($metadata);
-        $this->assertSame(0, count($metadata->getConstraints()));
+        $this->assertCount(0, $metadata->getConstraints());
 
         $loader = new StaticMethodLoader('loadMetadata');
         $metadata = new ClassMetadata(__NAMESPACE__.'\BaseStaticLoaderDocument');
         $loader->loadClassMetadata($metadata);
-        $this->assertSame(1, count($metadata->getConstraints()));
+        $this->assertCount(1, $metadata->getConstraints());
     }
 
     public function testLoadClassMetadataIgnoresInterfaces()
@@ -63,13 +63,46 @@ class StaticMethodLoaderTest extends \PHPUnit_Framework_TestCase
 
         $loader->loadClassMetadata($metadata);
 
-        $this->assertSame(0, count($metadata->getConstraints()));
+        $this->assertCount(0, $metadata->getConstraints());
+    }
+
+    public function testLoadClassMetadataInAbstractClasses()
+    {
+        $loader = new StaticMethodLoader('loadMetadata');
+        $metadata = new ClassMetadata(__NAMESPACE__.'\AbstractStaticLoader');
+
+        $loader->loadClassMetadata($metadata);
+
+        $this->assertCount(1, $metadata->getConstraints());
+    }
+
+    public function testLoadClassMetadataIgnoresAbstractMethods()
+    {
+        $loader = new StaticMethodLoader('loadMetadata');
+        try {
+            include __DIR__ . '/AbstractMethodStaticLoader.php';
+            $this->fail('AbstractMethodStaticLoader should produce a strict standard error.');
+        } catch (\Exception $e) {
+        }
+
+        $metadata = new ClassMetadata(__NAMESPACE__.'\AbstractMethodStaticLoader');
+        $loader->loadClassMetadata($metadata);
+
+        $this->assertCount(0, $metadata->getConstraints());
     }
 }
 
 interface StaticLoaderInterface
 {
     public static function loadMetadata(ClassMetadata $metadata);
+}
+
+abstract class AbstractStaticLoader
+{
+    public static function loadMetadata(ClassMetadata $metadata)
+    {
+        $metadata->addConstraint(new ConstraintA());
+    }
 }
 
 class StaticLoaderEntity

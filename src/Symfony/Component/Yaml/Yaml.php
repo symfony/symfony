@@ -23,53 +23,6 @@ use Symfony\Component\Yaml\Exception\ParseException;
 class Yaml
 {
     /**
-     * Be warned that PHP support will be removed in Symfony 2.3.
-     *
-     * @deprecated Deprecated since version 2.0, to be removed in 2.3.
-     */
-    public static $enablePhpParsing = false;
-
-    /**
-     * Enables PHP support when parsing YAML files.
-     *
-     * Be warned that PHP support will be removed in Symfony 2.3.
-     *
-     * @deprecated Deprecated since version 2.0, to be removed in 2.3.
-     */
-    public static function enablePhpParsing()
-    {
-        self::$enablePhpParsing = true;
-    }
-
-    /**
-     * Sets the PHP support flag when parsing YAML files.
-     *
-     * Be warned that PHP support will be removed in Symfony 2.3.
-     *
-     * @param Boolean $boolean true if PHP parsing support is enabled, false otherwise
-     *
-     * @deprecated Deprecated since version 2.0, to be removed in 2.3.
-     */
-    public static function setPhpParsing($boolean)
-    {
-        self::$enablePhpParsing = (Boolean) $boolean;
-    }
-
-    /**
-     * Checks if PHP support is enabled when parsing YAML files.
-     *
-     * Be warned that PHP support will be removed in Symfony 2.3.
-     *
-     * @return Boolean true if PHP parsing support is enabled, false otherwise
-     *
-     * @deprecated Deprecated since version 2.0, to be removed in 2.3.
-     */
-    public static function supportsPhpParsing()
-    {
-        return self::$enablePhpParsing;
-    }
-
-    /**
      * Parses YAML into a PHP array.
      *
      * The parse method, when supplied with a YAML stream (string or file),
@@ -85,7 +38,9 @@ class Yaml
      * you must validate the input before calling this method. Passing a file
      * as an input is a deprecated feature and will be removed in 3.0.
      *
-     * @param string $input Path to a YAML file or a string containing YAML
+     * @param string  $input                  Path to a YAML file or a string containing YAML
+     * @param Boolean $exceptionOnInvalidType True if an exception must be thrown on invalid types false otherwise
+     * @param Boolean $objectSupport          True if object support is enabled, false otherwise
      *
      * @return array The YAML converted to a PHP array
      *
@@ -103,21 +58,7 @@ class Yaml
             }
 
             $file = $input;
-            if (self::$enablePhpParsing) {
-                ob_start();
-                $retval = include($file);
-                $content = ob_get_clean();
-
-                // if an array is returned by the config file assume it's in plain php form else in YAML
-                $input = is_array($retval) ? $retval : $content;
-
-                // if an array is returned by the config file assume it's in plain php form else in YAML
-                if (is_array($input)) {
-                    return $input;
-                }
-            } else {
-                $input = file_get_contents($file);
-            }
+            $input = file_get_contents($file);
         }
 
         $yaml = new Parser();

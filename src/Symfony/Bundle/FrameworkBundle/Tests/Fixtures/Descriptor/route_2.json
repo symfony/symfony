@@ -1,0 +1,17 @@
+{
+    "path": "\/name\/add",
+    "host": "localhost",
+    "scheme": "http|https",
+    "method": "PUT|POST",
+    "class": "Symfony\\Component\\Routing\\Route",
+    "defaults": [
+
+    ],
+    "requirements": "NO CUSTOM",
+    "options": {
+        "compiler_class": "Symfony\\Component\\Routing\\RouteCompiler",
+        "opt1": "val1",
+        "opt2": "val2"
+    },
+    "pathRegex": "#^\/name\/add$#s"
+}

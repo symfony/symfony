@@ -13,10 +13,8 @@ namespace Symfony\Component\HttpKernel\Debug;
 
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpKernel\Profiler\Profile;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -34,7 +32,6 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
     private $logger;
     private $called;
     private $stopwatch;
-    private $profiler;
     private $dispatcher;
     private $wrappedListeners;
     private $firstCalledEvent;
@@ -60,11 +57,16 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
     /**
      * Sets the profiler.
      *
+     * The traceable event dispatcher does not use the profiler anymore.
+     * The job is now done directly by the Profiler listener and the
+     * data collectors themselves.
+     *
      * @param Profiler|null $profiler A Profiler instance
+     *
+     * @deprecated Deprecated since version 2.4, to be removed in 3.0.
      */
     public function setProfiler(Profiler $profiler = null)
     {
-        $this->profiler = $profiler;
     }
 
     /**
@@ -132,6 +134,10 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
 
         $this->firstCalledEvent[$eventName] = $this->stopwatch->start($eventName.'.loading', 'event_listener_loading');
 
+        if (!$this->dispatcher->hasListeners($eventName)) {
+            $this->firstCalledEvent[$eventName]->stop();
+        }
+
         $this->dispatcher->dispatch($eventName, $event);
 
         // reset the id as another event might have been dispatched during the dispatching of this event
@@ -139,7 +145,9 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
 
         unset($this->firstCalledEvent[$eventName]);
 
-        $e->stop();
+        if ($e->isStarted()) {
+            $e->stop();
+        }
 
         $this->postDispatch($eventName, $event);
 
@@ -309,57 +317,6 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
         return $info;
     }
 
-    /**
-     * Updates the stopwatch data in the profile hierarchy.
-     *
-     * @param string  $token          Profile token
-     * @param Boolean $updateChildren Whether to update the children altogether
-     */
-    private function updateProfiles($token, $updateChildren)
-    {
-        if (!$this->profiler || !$profile = $this->profiler->loadProfile($token)) {
-            return;
-        }
-
-        $this->saveInfoInProfile($profile, $updateChildren);
-    }
-
-    /**
-     * Update the profiles with the timing and events information and saves them.
-     *
-     * @param Profile $profile        The root profile
-     * @param Boolean $updateChildren Whether to update the children altogether
-     */
-    private function saveInfoInProfile(Profile $profile, $updateChildren)
-    {
-        try {
-            $collector = $profile->getCollector('memory');
-            $collector->updateMemoryUsage();
-        } catch (\InvalidArgumentException $e) {
-        }
-
-        try {
-            $collector = $profile->getCollector('time');
-            $collector->setEvents($this->stopwatch->getSectionEvents($profile->getToken()));
-        } catch (\InvalidArgumentException $e) {
-        }
-
-        try {
-            $collector = $profile->getCollector('events');
-            $collector->setCalledListeners($this->getCalledListeners());
-            $collector->setNotCalledListeners($this->getNotCalledListeners());
-        } catch (\InvalidArgumentException $e) {
-        }
-
-        $this->profiler->saveProfile($profile);
-
-        if ($updateChildren) {
-            foreach ($profile->getChildren() as $child) {
-                $this->saveInfoInProfile($child, true);
-            }
-        }
-    }
-
     private function preDispatch($eventName, Event $event)
     {
         // wrap all listeners before they are called
@@ -381,9 +338,8 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
             case KernelEvents::VIEW:
             case KernelEvents::RESPONSE:
                 // stop only if a controller has been executed
-                try {
+                if ($this->stopwatch->isStarted('controller')) {
                     $this->stopwatch->stop('controller');
-                } catch (\LogicException $e) {
                 }
                 break;
             case KernelEvents::TERMINATE:
@@ -409,23 +365,14 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
             case KernelEvents::RESPONSE:
                 $token = $event->getResponse()->headers->get('X-Debug-Token');
                 $this->stopwatch->stopSection($token);
-                if (HttpKernelInterface::MASTER_REQUEST === $event->getRequestType()) {
-                    // The profiles can only be updated once they have been created
-                    // that is after the 'kernel.response' event of the main request
-                    $this->updateProfiles($token, true);
-                }
                 break;
             case KernelEvents::TERMINATE:
-                $token = $event->getResponse()->headers->get('X-Debug-Token');
                 // In the special case described in the `preDispatch` method above, the `$token` section
                 // does not exist, then closing it throws an exception which must be caught.
+                $token = $event->getResponse()->headers->get('X-Debug-Token');
                 try {
                     $this->stopwatch->stopSection($token);
                 } catch (\LogicException $e) {}
-                // The children profiles have been updated by the previous 'kernel.response'
-                // event. Only the root profile need to be updated with the 'kernel.terminate'
-                // timing informations.
-                $this->updateProfiles($token, false);
                 break;
         }
 
@@ -444,9 +391,11 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
         return function (Event $event) use ($self, $eventName, $listener) {
             $e = $self->preListenerCall($eventName, $listener);
 
-            call_user_func($listener, $event);
+            call_user_func($listener, $event, $eventName, $self);
 
-            $e->stop();
+            if ($e->isStarted()) {
+                $e->stop();
+            }
 
             if ($event->isPropagationStopped()) {
                 $self->logSkippedListeners($eventName, $event, $listener);

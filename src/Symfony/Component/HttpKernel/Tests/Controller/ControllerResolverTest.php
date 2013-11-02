@@ -16,13 +16,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 class ControllerResolverTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-    }
-
     public function testGetController()
     {
         $logger = new Logger();
@@ -148,6 +141,16 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
         $request = Request::create('/');
         $controller = array(new self(), 'controllerMethod5');
         $this->assertEquals(array($request), $resolver->getArguments($request, $controller), '->getArguments() injects the request');
+    }
+
+    public function testCreateControllerCanReturnAnyCallable()
+    {
+        $mock = $this->getMock('Symfony\Component\HttpKernel\Controller\ControllerResolver', array('createController'));
+        $mock->expects($this->once())->method('createController')->will($this->returnValue('Symfony\Component\HttpKernel\Tests\some_controller_function'));
+
+        $request = Request::create('/');
+        $request->attributes->set('_controller', 'foobar');
+        $mock->getController($request);
     }
 
     public function __invoke($foo, $bar = null)

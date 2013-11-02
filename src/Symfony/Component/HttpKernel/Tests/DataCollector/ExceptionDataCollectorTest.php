@@ -18,13 +18,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ExceptionDataCollectorTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-    }
-
     public function testCollect()
     {
         $e = new \Exception('foo',500);

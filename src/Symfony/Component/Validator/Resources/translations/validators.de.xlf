@@ -222,6 +222,30 @@
                 <source>Unsupported card type or invalid card number.</source>
                 <target>Nicht unterstützer Kartentyp oder ungültige Kartennummer.</target>
             </trans-unit>
+            <trans-unit id="59">
+                <source>This is not a valid International Bank Account Number (IBAN).</source>
+                <target>Dieser Wert ist keine gültige IBAN-Kontonummer.</target>
+            </trans-unit>
+            <trans-unit id="60">
+                <source>This value is not a valid ISBN-10.</source>
+                <target>Dieser Wert entspricht keiner gültigen ISBN-10.</target>
+            </trans-unit>
+            <trans-unit id="61">
+                <source>This value is not a valid ISBN-13.</source>
+                <target>Dieser Wert entspricht keiner gültigen ISBN-13.</target>
+            </trans-unit>
+            <trans-unit id="62">
+                <source>This value is neither a valid ISBN-10 nor a valid ISBN-13.</source>
+                <target>Dieser Wert ist weder eine gültige ISBN-10 noch eine gültige ISBN-13.</target>
+            </trans-unit>
+            <trans-unit id="63">
+                <source>This value is not a valid ISSN.</source>
+                <target>Dieser Wert ist keine gültige ISSN.</target>
+            </trans-unit>
+             <trans-unit id="64">
+                <source>This value is not a valid currency.</source>
+                <target>Dieser Wert ist keine gültige Währung.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

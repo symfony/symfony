@@ -19,12 +19,12 @@
         "php": ">=5.3.3"
     },
     "require-dev": {
-        "symfony/config": ">=2.0,<2.4-dev",
+        "symfony/config": "~2.0",
         "symfony/yaml": "~2.2"
     },
     "suggest": {
-        "symfony/config": "2.2.*",
-        "symfony/yaml": "2.2.*"
+        "symfony/config": "",
+        "symfony/yaml": ""
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\Translation\\": "" }
@@ -33,7 +33,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.3-dev"
+            "dev-master": "2.4-dev"
         }
     }
 }

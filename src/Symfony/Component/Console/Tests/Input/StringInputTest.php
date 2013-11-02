@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Console\Tests\Input;
 
-use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Input\StringInput;
 
 class StringInputTest extends \PHPUnit_Framework_TestCase
 {
@@ -35,10 +35,14 @@ class StringInputTest extends \PHPUnit_Framework_TestCase
             array(new InputOption('foo', null, InputOption::VALUE_REQUIRED))
         );
 
-        $input = new StringInput('--foo=bar', $definition);
-        $actual = $input->getOption('foo');
+        // call to bind
+        $input = new StringInput('--foo=bar');
+        $input->bind($definition);
+        $this->assertEquals('bar', $input->getOption('foo'));
 
-        $this->assertEquals('bar', $actual);
+        // definition in constructor
+        $input = new StringInput('--foo=bar', $definition);
+        $this->assertEquals('bar', $input->getOption('foo'));
     }
 
     public function getTokenizeData()
@@ -49,6 +53,8 @@ class StringInputTest extends \PHPUnit_Framework_TestCase
             array('  foo  bar  ', array('foo', 'bar'), '->tokenize() ignores whitespaces between arguments'),
             array('"quoted"', array('quoted'), '->tokenize() parses quoted arguments'),
             array("'quoted'", array('quoted'), '->tokenize() parses quoted arguments'),
+            array("'a\rb\nc\td'", array("a\rb\nc\td"), '->tokenize() parses whitespace chars in strings'),
+            array("'a'\r'b'\n'c'\t'd'", array('a','b','c','d'), '->tokenize() parses whitespace chars between args as spaces'),
             array('\"quoted\"', array('"quoted"'), '->tokenize() parses escaped-quoted arguments'),
             array("\'quoted\'", array('\'quoted\''), '->tokenize() parses escaped-quoted arguments'),
             array('-a', array('-a'), '->tokenize() parses short options'),
@@ -68,5 +74,17 @@ class StringInputTest extends \PHPUnit_Framework_TestCase
             array("--long-option='foo bar'\"another\"", array("--long-option=foo baranother"), '->tokenize() parses long options with a value'),
             array('foo -a -ffoo --long bar', array('foo', '-a', '-ffoo', '--long', 'bar'), '->tokenize() parses when several arguments and options'),
         );
+    }
+
+    public function testToString()
+    {
+        $input = new StringInput('-f foo');
+        $this->assertEquals('-f foo', (string) $input);
+
+        $input = new StringInput('-f --bar=foo "a b c d"');
+        $this->assertEquals('-f --bar=foo '.escapeshellarg('a b c d'), (string) $input);
+
+        $input = new StringInput('-f --bar=foo \'a b c d\' '."'A\nB\\'C'");
+        $this->assertEquals('-f --bar=foo '.escapeshellarg('a b c d').' '.escapeshellarg("A\nB'C"), (string) $input);
     }
 }

@@ -11,32 +11,11 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-use Symfony\Component\Form\FormBuilder;
-use Symfony\Component\Form\Tests\FormIntegrationTestCase;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Form\Test\TypeTestCase as BaseTypeTestCase;
 
-abstract class TypeTestCase extends FormIntegrationTestCase
+/**
+ * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use Symfony\Component\Form\Test\TypeTestCase instead.
+ */
+abstract class TypeTestCase extends BaseTypeTestCase
 {
-    /**
-     * @var FormBuilder
-     */
-    protected $builder;
-
-    /**
-     * @var EventDispatcher
-     */
-    protected $dispatcher;
-
-    protected function setUp()
-    {
-        parent::setUp();
-
-        $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $this->builder = new FormBuilder(null, null, $this->dispatcher, $this->factory);
-    }
-
-    public static function assertDateTimeEquals(\DateTime $expected, \DateTime $actual)
-    {
-        self::assertEquals($expected->format('c'), $actual->format('c'));
-    }
 }

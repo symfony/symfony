@@ -50,11 +50,15 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
 
         $attributes = array();
         foreach ($request->attributes->all() as $key => $value) {
-            if ('_route' == $key && is_object($value)) {
-                $value = $value->getPath();
+            if ('_route' === $key && is_object($value)) {
+                $attributes['_route'] = $this->varToString($value->getPath());
+            } elseif ('_route_params' === $key) {
+                foreach ($value as $key => $v) {
+                    $attributes['_route_params'][$key] = $this->varToString($v);
+                }
+            } else {
+                $attributes[$key] = $this->varToString($value);
             }
-
-            $attributes[$key] = $this->varToString($value);
         }
 
         $content = null;
@@ -79,11 +83,14 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
             }
         }
 
+        $statusCode = $response->getStatusCode();
+
         $this->data = array(
             'format'             => $request->getRequestFormat(),
             'content'            => $content,
             'content_type'       => $response->headers->get('Content-Type') ? $response->headers->get('Content-Type') : 'text/html',
-            'status_code'        => $response->getStatusCode(),
+            'status_text'        => isset(Response::$statusTexts[$statusCode]) ? Response::$statusTexts[$statusCode] : '',
+            'status_code'        => $statusCode,
             'request_query'      => $request->query->all(),
             'request_request'    => $request->request->all(),
             'request_headers'    => $request->headers->all(),
@@ -130,7 +137,13 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
                     }
                 }
             } elseif ($controller instanceof \Closure) {
-                $this->data['controller'] = 'Closure';
+                $r = new \ReflectionFunction($controller);
+                $this->data['controller'] = array(
+                    'class'  => $r->getName(),
+                    'method' => null,
+                    'file'   => $r->getFilename(),
+                    'line'   => $r->getStartLine(),
+                );
             } else {
                 $this->data['controller'] = (string) $controller ?: 'n/a';
             }
@@ -201,6 +214,11 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
     public function getContentType()
     {
         return $this->data['content_type'];
+    }
+
+    public function getStatusText()
+    {
+        return $this->data['status_text'];
     }
 
     public function getStatusCode()

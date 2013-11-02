@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Extension\Validator\Constraints;
 
+use Symfony\Component\Form\ClickableInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Extension\Validator\Util\ServerParams;
 use Symfony\Component\Validator\Constraint;
@@ -21,6 +22,11 @@ use Symfony\Component\Validator\ConstraintValidator;
  */
 class FormValidator extends ConstraintValidator
 {
+    /**
+     * @var \SplObjectStorage
+     */
+    private static $clickedButtons;
+
     /**
      * @var ServerParams
      */
@@ -44,6 +50,16 @@ class FormValidator extends ConstraintValidator
     {
         if (!$form instanceof FormInterface) {
             return;
+        }
+
+        if (null === static::$clickedButtons) {
+            static::$clickedButtons = new \SplObjectStorage();
+        }
+
+        // If the form was previously validated, remove it from the cache in
+        // case the clicked button has changed
+        if (static::$clickedButtons->contains($form)) {
+            static::$clickedButtons->detach($form);
         }
 
         /* @var FormInterface $form */
@@ -120,7 +136,7 @@ class FormValidator extends ConstraintValidator
         if ($form->isRoot() && null !== $length) {
             $max = $this->serverParams->getPostMaxSize();
 
-            if (null !== $max && $length > $max) {
+            if (!empty($max) && $length > $max) {
                 $this->context->addViolation(
                     $config->getOption('post_max_size_message'),
                     array('{{ max }}' => $this->serverParams->getNormalizedIniPostMaxSize()),
@@ -171,20 +187,75 @@ class FormValidator extends ConstraintValidator
      */
     private static function getValidationGroups(FormInterface $form)
     {
+        $root = $form->getRoot();
+
+        // Determine the clicked button of the complete form tree
+        if (!static::$clickedButtons->contains($root)) {
+            // Only call findClickedButton() once to prevent an exponential
+            // runtime
+            // https://github.com/symfony/symfony/issues/8317
+            static::$clickedButtons->attach($root, self::findClickedButton($root));
+        }
+
+        $button = static::$clickedButtons->offsetGet($root);
+
+        if (null !== $button) {
+            $groups = $button->getConfig()->getOption('validation_groups');
+
+            if (null !== $groups) {
+                return self::resolveValidationGroups($groups, $form);
+            }
+        }
+
         do {
             $groups = $form->getConfig()->getOption('validation_groups');
 
             if (null !== $groups) {
-                if (is_callable($groups)) {
-                    $groups = call_user_func($groups, $form);
-                }
-
-                return (array) $groups;
+                return self::resolveValidationGroups($groups, $form);
             }
 
             $form = $form->getParent();
         } while (null !== $form);
 
         return array(Constraint::DEFAULT_GROUP);
+    }
+
+    /**
+     * Extracts a clicked button from a form tree, if one exists.
+     *
+     * @param FormInterface $form The root form.
+     *
+     * @return ClickableInterface|null The clicked button or null.
+     */
+    private static function findClickedButton(FormInterface $form)
+    {
+        if ($form instanceof ClickableInterface && $form->isClicked()) {
+            return $form;
+        }
+
+        foreach ($form as $child) {
+            if (null !== ($button = self::findClickedButton($child))) {
+                return $button;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Post-processes the validation groups option for a given form.
+     *
+     * @param array|callable $groups The validation groups.
+     * @param FormInterface  $form   The validated form.
+     *
+     * @return array The validation groups.
+     */
+    private static function resolveValidationGroups($groups, FormInterface $form)
+    {
+        if (!is_string($groups) && is_callable($groups)) {
+            $groups = call_user_func($groups, $form);
+        }
+
+        return (array) $groups;
     }
 }

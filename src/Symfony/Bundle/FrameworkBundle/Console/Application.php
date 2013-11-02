@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Console;
 
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -27,6 +28,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 class Application extends BaseApplication
 {
     private $kernel;
+    private $commandsRegistered = false;
 
     /**
      * Constructor.
@@ -65,7 +67,23 @@ class Application extends BaseApplication
      */
     public function doRun(InputInterface $input, OutputInterface $output)
     {
-        $this->registerCommands();
+        $this->kernel->boot();
+
+        if (!$this->commandsRegistered) {
+            $this->registerCommands();
+
+            $this->commandsRegistered = true;
+        }
+
+        $container = $this->kernel->getContainer();
+
+        foreach ($this->all() as $command) {
+            if ($command instanceof ContainerAwareInterface) {
+                $command->setContainer($container);
+            }
+        }
+
+        $this->setDispatcher($container->get('event_dispatcher'));
 
         if (true === $input->hasParameterOption(array('--shell', '-s'))) {
             $shell = new Shell($this);
@@ -80,7 +98,13 @@ class Application extends BaseApplication
 
     protected function registerCommands()
     {
-        $this->kernel->boot();
+        $container = $this->kernel->getContainer();
+
+        if ($container->hasParameter('console.command.ids')) {
+            foreach ($container->getParameter('console.command.ids') as $id) {
+                $this->add($container->get($id));
+            }
+        }
 
         foreach ($this->kernel->getBundles() as $bundle) {
             if ($bundle instanceof Bundle) {

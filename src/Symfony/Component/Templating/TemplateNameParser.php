@@ -27,11 +27,7 @@ use Symfony\Component\Templating\TemplateReference;
 class TemplateNameParser implements TemplateNameParserInterface
 {
     /**
-     * Parses a template to an array of parameters.
-     *
-     * @param string $name A template name
-     *
-     * @return TemplateReferenceInterface A template
+     * {@inheritdoc}
      *
      * @api
      */

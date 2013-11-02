@@ -25,6 +25,8 @@ class ProjectServiceContainer extends Container
         $this->methodMap = array(
             'bar' => 'getBarService',
             'baz' => 'getBazService',
+            'configurator_service' => 'getConfiguratorServiceService',
+            'configured_service' => 'getConfiguredServiceService',
             'depends_on_request' => 'getDependsOnRequestService',
             'factory_service' => 'getFactoryServiceService',
             'foo' => 'getFooService',
@@ -51,9 +53,11 @@ class ProjectServiceContainer extends Container
      */
     protected function getBarService()
     {
-        $this->services['bar'] = $instance = new \FooClass('foo', $this->get('foo.baz'), $this->getParameter('foo_bar'));
+        $a = $this->get('foo.baz');
 
-        $this->get('foo.baz')->configure($instance);
+        $this->services['bar'] = $instance = new \FooClass('foo', $a, $this->getParameter('foo_bar'));
+
+        $a->configure($instance);
 
         return $instance;
     }
@@ -71,6 +75,23 @@ class ProjectServiceContainer extends Container
         $this->services['baz'] = $instance = new \Baz();
 
         $instance->setFoo($this->get('foo_with_inline'));
+
+        return $instance;
+    }
+
+    /**
+     * Gets the 'configured_service' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return stdClass A stdClass instance.
+     */
+    protected function getConfiguredServiceService()
+    {
+        $this->services['configured_service'] = $instance = new \stdClass();
+
+        $this->get('configurator_service')->configureStdClass($instance);
 
         return $instance;
     }
@@ -222,6 +243,27 @@ class ProjectServiceContainer extends Container
         if ($this->initialized('depends_on_request')) {
             $this->get('depends_on_request')->setRequest($this->get('request', ContainerInterface::NULL_ON_INVALID_REFERENCE));
         }
+    }
+
+    /**
+     * Gets the 'configurator_service' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * This service is private.
+     * If you want to be able to request this service from the container directly,
+     * make it public, otherwise you might end up with broken code.
+     *
+     * @return ConfClass A ConfClass instance.
+     */
+    protected function getConfiguratorServiceService()
+    {
+        $this->services['configurator_service'] = $instance = new \ConfClass();
+
+        $instance->setFoo($this->get('baz'));
+
+        return $instance;
     }
 
     /**

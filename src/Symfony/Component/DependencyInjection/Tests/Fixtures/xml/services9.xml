@@ -76,6 +76,14 @@
         <argument type="service" id="request" on-invalid="null" strict="false"/>
       </call>
     </service>
+    <service id="configurator_service" class="ConfClass" public="false">
+      <call method="setFoo">
+        <argument type="service" id="baz"/>
+      </call>
+    </service>
+    <service id="configured_service" class="stdClass">
+      <configurator service="configurator_service" method="configureStdClass"/>
+    </service>
     <service id="alias_for_foo" alias="foo"/>
     <service id="alias_for_alias" alias="foo"/>
   </services>

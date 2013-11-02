@@ -83,5 +83,14 @@ $container
     ->register('depends_on_request', 'stdClass')
     ->addMethodCall('setRequest', array(new Reference('request', ContainerInterface::NULL_ON_INVALID_REFERENCE, false)))
 ;
+$container
+    ->register('configurator_service', 'ConfClass')
+    ->setPublic(false)
+    ->addMethodCall('setFoo', array(new Reference('baz')))
+;
+$container
+    ->register('configured_service', 'stdClass')
+    ->setConfigurator(array(new Reference('configurator_service'), 'configureStdClass'))
+;
 
 return $container;

@@ -23,6 +23,10 @@ use Symfony\Component\Validator\Exception\MissingOptionsException;
  */
 class Range extends Constraint
 {
+    const ERROR = 'bc619de0-7f99-4d29-b5cb-f93bce9f6274';
+    const ERROR_MIN = '0be45eb8-3d65-452b-9cbe-3b398c5c08c7';
+    const ERROR_MAX = 'ac98b917-6b0a-4bea-8bac-e937064d3b42';
+
     public $minMessage = 'This value should be {{ limit }} or more.';
     public $maxMessage = 'This value should be {{ limit }} or less.';
     public $invalidMessage = 'This value should be a valid number.';

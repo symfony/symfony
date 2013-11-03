@@ -62,7 +62,7 @@ class NotBlankValidatorTest extends \PHPUnit_Framework_TestCase
 
         $this->context->expects($this->once())
             ->method('addViolation')
-            ->with('myMessage');
+            ->with('myMessage', array(), null, null, NotBlank::ERROR);
 
         $this->validator->validate(null, $constraint);
     }
@@ -75,7 +75,7 @@ class NotBlankValidatorTest extends \PHPUnit_Framework_TestCase
 
         $this->context->expects($this->once())
             ->method('addViolation')
-            ->with('myMessage');
+            ->with('myMessage', array(), '', null, NotBlank::ERROR);
 
         $this->validator->validate('', $constraint);
     }
@@ -88,7 +88,7 @@ class NotBlankValidatorTest extends \PHPUnit_Framework_TestCase
 
         $this->context->expects($this->once())
             ->method('addViolation')
-            ->with('myMessage');
+            ->with('myMessage', array(), false, null, NotBlank::ERROR);
 
         $this->validator->validate(false, $constraint);
     }
@@ -101,7 +101,7 @@ class NotBlankValidatorTest extends \PHPUnit_Framework_TestCase
 
         $this->context->expects($this->once())
             ->method('addViolation')
-            ->with('myMessage');
+            ->with('myMessage', array(), array(), null, NotBlank::ERROR);
 
         $this->validator->validate(array(), $constraint);
     }

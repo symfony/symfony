@@ -50,7 +50,7 @@ class CollectionValidator extends ConstraintValidator
             } elseif (!$fieldConstraint instanceof Optional && !$constraint->allowMissingFields) {
                 $this->context->addViolationAt('['.$field.']', $constraint->missingFieldsMessage, array(
                     '{{ field }}' => $field
-                ), $field, $constraint->code);
+                ), $field, $constraint::ERROR_MISSING_FIELD);
             }
         }
 
@@ -59,7 +59,7 @@ class CollectionValidator extends ConstraintValidator
                 if (!isset($constraint->fields[$field])) {
                     $this->context->addViolationAt('['.$field.']', $constraint->extraFieldsMessage, array(
                         '{{ field }}' => $field
-                    ), $field, null, $constraint->code);
+                    ), $field, null, $constraint::ERROR_EXTRA_FIELD);
                 }
             }
         }

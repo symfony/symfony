@@ -22,5 +22,7 @@ use Symfony\Component\Validator\Constraint;
  */
 class Currency extends Constraint
 {
+    const ERROR = 'f68a8d40-4231-4afd-83ac-0bcd818dc818';
+
     public $message = 'This value is not a valid currency.';
 }

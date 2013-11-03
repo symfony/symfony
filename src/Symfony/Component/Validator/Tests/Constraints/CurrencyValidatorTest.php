@@ -94,7 +94,7 @@ class CurrencyValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolation')
             ->with('myMessage', array(
                 '{{ value }}' => $currency,
-            ));
+            ), $currency, null, Currency::ERROR);
 
         $this->validator->validate($currency, $constraint);
     }

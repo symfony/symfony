@@ -22,5 +22,7 @@ use Symfony\Component\Validator\Constraint;
  */
 class DateTime extends Constraint
 {
+    const ERROR = '383654a2-f53e-4529-ace3-176742663f3a';
+
     public $message = 'This value is not a valid datetime.';
 }

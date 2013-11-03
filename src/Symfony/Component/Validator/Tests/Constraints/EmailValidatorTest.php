@@ -89,56 +89,7 @@ class EmailValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolation')
             ->with('myMessage', array(
                 '{{ value }}' => $email,
-            ));
-
-        $this->validator->validate($email, $constraint);
-    }
-
-    /**
-     * @dataProvider getInvalidEmails
-     */
-    public function testCodePopulation($email)
-    {
-        $constraint = new Email(array(
-            'message' => 'foo',
-            'code' => 666
-        ));
-
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('foo', array('{{ value }}' => $email), $email, null, 666);
-
-        $this->validator->validate($email, $constraint);
-    }
-
-    /**
-     * @dataProvider getInvalidEmails
-     */
-    public function testCodeNotPopulated($email)
-    {
-        $constraint = new Email(array(
-            'message' => 'foo',
-        ));
-
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('foo', array('{{ value }}' => $email), $email, null, null);
-
-        $this->validator->validate($email, $constraint);
-    }
-
-    /**
-     * @dataProvider getInvalidEmails
-     */
-    public function testInvalidValuePopulated($email)
-    {
-        $constraint = new Email(array(
-            'message' => 'foo',
-        ));
-
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('foo', array('{{ value }}' => $email), $email);
+            ), $email, null, Email::ERROR);
 
         $this->validator->validate($email, $constraint);
     }

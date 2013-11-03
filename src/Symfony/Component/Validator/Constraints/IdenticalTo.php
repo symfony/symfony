@@ -18,5 +18,7 @@ namespace Symfony\Component\Validator\Constraints;
  */
 class IdenticalTo extends AbstractComparison
 {
+    const ERROR = '5368c23a-37c0-4148-83bc-7ee8ac34a1af';
+
     public $message = 'This value should be identical to {{ compared_value_type }} {{ compared_value }}.';
 }

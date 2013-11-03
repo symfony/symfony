@@ -30,7 +30,7 @@ class FileValidatorPathTest extends FileValidatorTest
             ->method('addViolation')
             ->with('myMessage', array(
                 '{{ file }}' => 'foobar',
-            ));
+            ), 'foobar', null, File::ERROR_NOT_FOUND);
 
         $this->validator->validate('foobar', $constraint);
     }

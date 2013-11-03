@@ -105,7 +105,7 @@ abstract class AbstractComparisonValidatorTestCase extends \PHPUnit_Framework_Te
                 '{{ value }}' => $comparedValueString,
                 '{{ compared_value }}' => $comparedValueString,
                 '{{ compared_value_type }}' => $comparedValueType
-            ));
+            ), $comparedValue, null, $constraint::ERROR);
 
         $this->validator->validate($dirtyValue, $constraint);
     }

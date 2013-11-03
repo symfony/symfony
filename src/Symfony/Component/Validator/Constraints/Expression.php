@@ -21,6 +21,8 @@ use Symfony\Component\Validator\Constraint;
  */
 class Expression extends Constraint
 {
+    const ERROR = '2fe78c81-b47e-4d20-952b-f571a301a8df';
+
     public $message = 'This value is not valid.';
     public $expression;
 

@@ -18,5 +18,7 @@ namespace Symfony\Component\Validator\Constraints;
  */
 class NotIdenticalTo extends AbstractComparison
 {
+    const ERROR = '2c96e376-8e6f-488c-9936-840a73fd3163';
+
     public $message = 'This value should not be identical to {{ compared_value_type }} {{ compared_value }}.';
 }

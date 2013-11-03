@@ -22,5 +22,7 @@ use Symfony\Component\Validator\Constraint;
  */
 class Language extends Constraint
 {
+    const ERROR = 'eb2120ee-6f0d-4fa8-9e63-79af6289bda6';
+
     public $message = 'This value is not a valid language.';
 }

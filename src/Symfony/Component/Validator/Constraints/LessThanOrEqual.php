@@ -18,5 +18,7 @@ namespace Symfony\Component\Validator\Constraints;
  */
 class LessThanOrEqual extends AbstractComparison
 {
+    const ERROR = '8bb5f334-d139-4821-ad09-00c63d55b5a8';
+
     public $message = 'This value should be less than or equal to {{ compared_value }}.';
 }

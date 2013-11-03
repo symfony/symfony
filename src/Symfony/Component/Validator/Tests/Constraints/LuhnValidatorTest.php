@@ -92,7 +92,9 @@ class LuhnValidatorTest extends \PHPUnit_Framework_TestCase
 
         $this->context->expects($this->once())
             ->method('addViolation')
-            ->with($constraint->message);
+            ->with($constraint->message, array(
+                '{{ value }}' => $number,
+            ), $number, null, Luhn::ERROR);
 
         $this->validator->validate($number, $constraint);
     }

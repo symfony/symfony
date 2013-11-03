@@ -22,6 +22,8 @@ use Symfony\Component\Validator\Constraint;
  */
 class Type extends Constraint
 {
+    const ERROR = 'f42711f9-d10d-4272-9b1c-76de264f642c';
+
     public $message = 'This value should be of type {{ type }}.';
     public $type;
 

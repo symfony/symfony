@@ -20,6 +20,8 @@ use Symfony\Component\Validator\Constraint;
  */
 class Issn extends Constraint
 {
+    const ERROR = '3e3590ed-7890-4ccf-8d62-12b4966d0a39';
+
     public $message = 'This value is not a valid ISSN.';
     public $caseSensitive = false;
     public $requireHyphen = false;

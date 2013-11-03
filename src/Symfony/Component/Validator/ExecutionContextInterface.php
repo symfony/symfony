@@ -92,7 +92,7 @@ interface ExecutionContextInterface
      * @param array        $params        The parameters substituted in the error message.
      * @param mixed        $invalidValue  The invalid, validated value.
      * @param integer|null $pluralization The number to use to pluralize of the message.
-     * @param integer|null $code          The violation code.
+     * @param mixed        $code          The violation code.
      *
      * @api
      */
@@ -107,7 +107,7 @@ interface ExecutionContextInterface
      * @param array        $params        The parameters substituted in the error message.
      * @param mixed        $invalidValue  The invalid, validated value.
      * @param integer|null $pluralization The number to use to pluralize of the message.
-     * @param integer|null $code          The violation code.
+     * @param mixed        $code          The violation code.
      *
      * @api
      */

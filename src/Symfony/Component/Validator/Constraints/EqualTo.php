@@ -18,5 +18,7 @@ namespace Symfony\Component\Validator\Constraints;
  */
 class EqualTo extends AbstractComparison
 {
+    const ERROR = 'f92206ec-df92-406d-931b-833343889cd7';
+
     public $message = 'This value should be equal to {{ compared_value }}.';
 }

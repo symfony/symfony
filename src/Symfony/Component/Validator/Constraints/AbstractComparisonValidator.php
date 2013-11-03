@@ -35,7 +35,7 @@ abstract class AbstractComparisonValidator extends ConstraintValidator
                 '{{ value }}' => $this->valueToString($constraint->value),
                 '{{ compared_value }}' => $this->valueToString($constraint->value),
                 '{{ compared_value_type }}' => $this->valueToType($constraint->value)
-            ));
+            ), $constraint->value, null, $constraint::ERROR);
         }
     }
 

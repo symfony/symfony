@@ -64,10 +64,16 @@ class CardSchemeValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidNumbers($scheme, $number)
     {
-        $this->context->expects($this->once())
-            ->method('addViolation');
+        $constraint = new CardScheme(array(
+            'schemes' => $scheme,
+            'message' => 'myMessage'
+        ));
 
-        $this->validator->validate($number, new CardScheme(array('schemes' => $scheme)));
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('myMessage', array(), $this->identicalTo($number), null, CardScheme::ERROR);
+
+        $this->validator->validate($number, $constraint);
     }
 
     public function getValidNumbers()

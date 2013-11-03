@@ -18,5 +18,7 @@ namespace Symfony\Component\Validator\Constraints;
  */
 class GreaterThan extends AbstractComparison
 {
+    const ERROR = '48f4b8a5-832c-4ffc-92b5-64dcd6312c32';
+
     public $message = 'This value should be greater than {{ compared_value }}.';
 }

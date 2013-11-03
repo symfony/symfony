@@ -22,5 +22,7 @@ use Symfony\Component\Validator\Constraint;
  */
 class False extends Constraint
 {
+    const ERROR = '890770b4-e5c4-49e5-a285-b480ab42b43a';
+
     public $message = 'This value should be false.';
 }

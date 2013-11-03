@@ -23,6 +23,10 @@ use Symfony\Component\Validator\Exception\MissingOptionsException;
  */
 class Count extends Constraint
 {
+    const ERROR_MIN = '4b57ee81-3a6b-4b43-93ae-69441571d39e';
+    const ERROR_MAX = '9537c665-37eb-4515-a1fd-7beff83e6c1f';
+    const ERROR_EXACT = 'd3625fef-ce0a-4332-a89e-408078ed6e58';
+
     public $minMessage = 'This collection should contain {{ limit }} element or more.|This collection should contain {{ limit }} elements or more.';
     public $maxMessage = 'This collection should contain {{ limit }} element or less.|This collection should contain {{ limit }} elements or less.';
     public $exactMessage = 'This collection should contain exactly {{ limit }} element.|This collection should contain exactly {{ limit }} elements.';

@@ -22,6 +22,8 @@ use Symfony\Component\Validator\Constraint;
  */
 class Email extends Constraint
 {
+    const ERROR = '38b1dcdc-501a-43c1-98e1-4ab0971ca1b2';
+
     public $message = 'This value is not a valid email address.';
     public $checkMX = false;
     public $checkHost = false;

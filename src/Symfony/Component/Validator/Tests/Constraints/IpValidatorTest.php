@@ -163,7 +163,7 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolation')
             ->with('myMessage', array(
                 '{{ value }}' => $ip,
-            ));
+            ), $ip, null, Ip::ERROR);
 
         $this->validator->validate($ip, $constraint);
     }
@@ -197,7 +197,7 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolation')
             ->with('myMessage', array(
                 '{{ value }}' => $ip,
-            ));
+            ), $ip, null, Ip::ERROR);
 
         $this->validator->validate($ip, $constraint);
     }
@@ -225,7 +225,7 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolation')
             ->with('myMessage', array(
                 '{{ value }}' => $ip,
-            ));
+            ), $ip, null, Ip::ERROR);
 
         $this->validator->validate($ip, $constraint);
     }
@@ -253,7 +253,7 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolation')
             ->with('myMessage', array(
                 '{{ value }}' => $ip,
-            ));
+            ), $ip, null, Ip::ERROR);
 
         $this->validator->validate($ip, $constraint);
     }
@@ -277,7 +277,7 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolation')
             ->with('myMessage', array(
                 '{{ value }}' => $ip,
-            ));
+            ), $ip, null, Ip::ERROR);
 
         $this->validator->validate($ip, $constraint);
     }
@@ -315,7 +315,7 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolation')
             ->with('myMessage', array(
                 '{{ value }}' => $ip,
-            ));
+            ), $ip, null, Ip::ERROR);
 
         $this->validator->validate($ip, $constraint);
     }
@@ -343,7 +343,7 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolation')
             ->with('myMessage', array(
                 '{{ value }}' => $ip,
-            ));
+            ), $ip, null, Ip::ERROR);
 
         $this->validator->validate($ip, $constraint);
     }
@@ -370,7 +370,7 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolation')
             ->with('myMessage', array(
                 '{{ value }}' => $ip,
-            ));
+            ), $ip, null, Ip::ERROR);
 
         $this->validator->validate($ip, $constraint);
     }
@@ -394,7 +394,7 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolation')
             ->with('myMessage', array(
                 '{{ value }}' => $ip,
-            ));
+            ), $ip, null, Ip::ERROR);
 
         $this->validator->validate($ip, $constraint);
     }
@@ -418,7 +418,7 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolation')
             ->with('myMessage', array(
                 '{{ value }}' => $ip,
-            ));
+            ), $ip, null, Ip::ERROR);
 
         $this->validator->validate($ip, $constraint);
     }
@@ -442,7 +442,7 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolation')
             ->with('myMessage', array(
                 '{{ value }}' => $ip,
-            ));
+            ), $ip, null, Ip::ERROR);
 
         $this->validator->validate($ip, $constraint);
     }
@@ -466,7 +466,7 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolation')
             ->with('myMessage', array(
                 '{{ value }}' => $ip,
-            ));
+            ), $ip, null, Ip::ERROR);
 
         $this->validator->validate($ip, $constraint);
     }

@@ -159,7 +159,7 @@ class ChoiceValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolation')
             ->with('myMessage', array(
                 '{{ value }}' => 'baz',
-            ), 'baz', null);
+            ), $this->identicalTo('baz'), null, Choice::ERROR);
 
         $this->validator->validate('baz', $constraint);
     }
@@ -176,7 +176,7 @@ class ChoiceValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolation')
             ->with('myMessage', array(
                 '{{ value }}' => 'baz',
-            ));
+            ), $this->identicalTo('baz'), null, Choice::ERROR_MULTIPLE);
 
         $this->validator->validate(array('foo', 'baz'), $constraint);
     }
@@ -194,7 +194,7 @@ class ChoiceValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolation')
             ->with('myMessage', array(
                 '{{ limit }}' => 2,
-            ), null, 2);
+            ), null, 2, Choice::ERROR_MIN);
 
         $this->validator->validate(array('foo'), $constraint);
     }
@@ -212,7 +212,7 @@ class ChoiceValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolation')
             ->with('myMessage', array(
                 '{{ limit }}' => 2,
-            ), null, 2);
+            ), null, 2, Choice::ERROR_MAX);
 
         $this->validator->validate(array('foo', 'bar', 'moo'), $constraint);
     }
@@ -256,7 +256,7 @@ class ChoiceValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolation')
             ->with('myMessage', array(
                 '{{ value }}' => '2',
-            ));
+            ), $this->identicalTo('2'), null, Choice::ERROR);
 
         $this->validator->validate('2', $constraint);
     }
@@ -288,7 +288,7 @@ class ChoiceValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolation')
             ->with('myMessage', array(
                 '{{ value }}' => '3',
-            ));
+            ), $this->identicalTo('3'), null, Choice::ERROR_MULTIPLE);
 
         $this->validator->validate(array(2, '3'), $constraint);
     }

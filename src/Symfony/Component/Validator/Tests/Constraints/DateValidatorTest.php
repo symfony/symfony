@@ -97,7 +97,7 @@ class DateValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolation')
             ->with('myMessage', array(
                 '{{ value }}' => $date,
-            ));
+            ), $date, null, Date::ERROR);
 
         $this->validator->validate($date, $constraint);
     }

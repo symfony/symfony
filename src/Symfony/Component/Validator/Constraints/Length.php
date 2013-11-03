@@ -23,6 +23,10 @@ use Symfony\Component\Validator\Exception\MissingOptionsException;
  */
 class Length extends Constraint
 {
+    const ERROR = 'cca1a7c3-beed-44c8-a12c-dd94e6208631';
+    const ERROR_MAX = '2127fa68-8220-4d66-bdbd-6c9e12c4e529';
+    const ERROR_MIN = '7ec9200c-b68d-4aff-b29f-d546912ed243';
+
     public $maxMessage = 'This value is too long. It should have {{ limit }} character or less.|This value is too long. It should have {{ limit }} characters or less.';
     public $minMessage = 'This value is too short. It should have {{ limit }} character or more.|This value is too short. It should have {{ limit }} characters or more.';
     public $exactMessage = 'This value should have exactly {{ limit }} character.|This value should have exactly {{ limit }} characters.';

@@ -119,7 +119,7 @@ class RangeValidatorTest extends \PHPUnit_Framework_TestCase
             ->with('myMessage', $this->identicalTo(array(
                 '{{ value }}' => $value,
                 '{{ limit }}' => 10,
-        )));
+        )), $value, null, Range::ERROR_MIN);
 
         $this->validator->validate($value, $constraint);
     }
@@ -139,7 +139,7 @@ class RangeValidatorTest extends \PHPUnit_Framework_TestCase
             ->with('myMessage', $this->identicalTo(array(
                 '{{ value }}' => $value,
                 '{{ limit }}' => 20,
-            )));
+            )), $value, null, Range::ERROR_MAX);
 
         $this->validator->validate($value, $constraint);
     }
@@ -161,7 +161,7 @@ class RangeValidatorTest extends \PHPUnit_Framework_TestCase
             ->with('myMaxMessage', $this->identicalTo(array(
                 '{{ value }}' => $value,
                 '{{ limit }}' => 20,
-            )));
+            )), $value, null, Range::ERROR_MAX);
 
         $this->validator->validate($value, $constraint);
     }
@@ -183,7 +183,7 @@ class RangeValidatorTest extends \PHPUnit_Framework_TestCase
             ->with('myMinMessage', $this->identicalTo(array(
             '{{ value }}' => $value,
             '{{ limit }}' => 10,
-        )));
+        )), $value, null, Range::ERROR_MIN);
 
         $this->validator->validate($value, $constraint);
     }
@@ -212,7 +212,7 @@ class RangeValidatorTest extends \PHPUnit_Framework_TestCase
             ->with('myMessage', array(
                 '{{ value }}' => 9,
                 '{{ limit }}' => 10,
-            ));
+            ), 9, null, Range::ERROR_MIN);
 
         $this->validator->validate(9, $constraint);
     }
@@ -230,7 +230,7 @@ class RangeValidatorTest extends \PHPUnit_Framework_TestCase
             ->with('myMessage', array(
                 '{{ value }}' => 21,
                 '{{ limit }}' => 20,
-            ));
+            ), 21, null, Range::ERROR_MAX);
 
         $this->validator->validate(21, $constraint);
     }

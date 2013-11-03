@@ -22,5 +22,7 @@ use Symfony\Component\Validator\Constraint;
  */
 class Locale extends Constraint
 {
+    const ERROR = 'ccf90455-5e51-47d9-a927-61a31dc4338c';
+
     public $message = 'This value is not a valid locale.';
 }

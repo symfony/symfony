@@ -54,7 +54,7 @@ abstract class Constraint
     public $groups = array(self::DEFAULT_GROUP);
 
     /**
-     * @var int
+     * @var mixed
      */
     public $code;
 

@@ -9,9 +9,8 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\EventListener;
+namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
-use Symfony\Bundle\FrameworkBundle\EventListener\TestSessionListener;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -39,14 +38,8 @@ class TestSessionListenerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->listener = new TestSessionListener($this->getMock('Symfony\Component\DependencyInjection\ContainerInterface'));
+        $this->listener = $this->getMockForAbstractClass('Symfony\Component\HttpKernel\EventListener\TestSessionListener');
         $this->session  = $this->getSession();
-    }
-
-    protected function tearDown()
-    {
-        $this->listener = null;
-        $this->session = null;
     }
 
     public function testShouldSaveMasterRequestSession()

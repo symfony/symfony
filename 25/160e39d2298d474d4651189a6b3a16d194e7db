@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2013-11-03T22:20:59Z
+
+You only need to do it for one branch. It is later merged to the other ones.
+
+---------------------------------------------------------------------------
+
+by peterkokot at 2013-11-03T22:40:24Z
+
+Hi, I see. The case is that Validator translation files are different for 2.2 and 2.3 versions.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2013-11-03T22:41:17Z
+
+Ah, in that case you probably did the right thing ;)

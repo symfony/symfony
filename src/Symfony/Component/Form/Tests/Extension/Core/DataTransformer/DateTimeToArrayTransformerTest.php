@@ -509,4 +509,52 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
             'second' => '6',
         ));
     }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
+     */
+    public function testReverseTransformWithEmptyStringHour()
+    {
+        $transformer = new DateTimeToArrayTransformer();
+        $transformer->reverseTransform(array(
+            'year' => '2010',
+            'month' => '2',
+            'day' => '31',
+            'hour' => '',
+            'minute' => '5',
+            'second' => '6',
+        ));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
+     */
+    public function testReverseTransformWithEmptyStringMinute()
+    {
+        $transformer = new DateTimeToArrayTransformer();
+        $transformer->reverseTransform(array(
+            'year' => '2010',
+            'month' => '2',
+            'day' => '31',
+            'hour' => '4',
+            'minute' => '',
+            'second' => '6',
+        ));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
+     */
+    public function testReverseTransformWithEmptyStringSecond()
+    {
+        $transformer = new DateTimeToArrayTransformer();
+        $transformer->reverseTransform(array(
+            'year' => '2010',
+            'month' => '2',
+            'day' => '31',
+            'hour' => '4',
+            'minute' => '5',
+            'second' => '',
+        ));
+    }
 }

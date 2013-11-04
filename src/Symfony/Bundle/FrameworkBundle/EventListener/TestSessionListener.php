@@ -28,7 +28,7 @@ class TestSessionListener extends BaseTestSessionListener
         $this->container = $container;
     }
 
-    public function getSession()
+    protected function getSession()
     {
         if (!$this->container->has('session')) {
             return null;

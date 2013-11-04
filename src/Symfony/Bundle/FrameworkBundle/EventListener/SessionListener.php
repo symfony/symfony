@@ -31,7 +31,7 @@ class SessionListener extends BaseSessionListener
         $this->container = $container;
     }
 
-    public function getSession()
+    protected function getSession()
     {
         if (!$this->container->has('session')) {
             return null;

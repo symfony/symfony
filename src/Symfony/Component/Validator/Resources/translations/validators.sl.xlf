@@ -224,7 +224,7 @@
             </trans-unit>
             <trans-unit id="59">
                 <source>This is not a valid International Bank Account Number (IBAN).</source>
-                <target>Neveljavna mednarodna številka bančnega računa (IBAN).</target>
+                <target>To ni veljavna mednarodna številka bančnega računa (IBAN).</target>
             </trans-unit>
             <trans-unit id="60">
                 <source>This value is not a valid ISBN-10.</source>
@@ -244,39 +244,39 @@
             </trans-unit>
             <trans-unit id="64">
                 <source>This value is not a valid currency.</source>
-                <target>Vrednost ni veljavna valuta.</target>
+                <target>Ta vrednost ni veljavna valuta.</target>
             </trans-unit>
             <trans-unit id="65">
                 <source>This value should be equal to {{ compared_value }}.</source>
-                <target>Vrednost mora biti enaka {{ compared_value }}.</target>
+                <target>Ta vrednost bi morala biti enaka {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="66">
                 <source>This value should be greater than {{ compared_value }}.</source>
-                <target>Vrednost mora biti večja od {{ compared_value }}.</target>
+                <target>Ta vrednost bi morala biti večja od {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="67">
                 <source>This value should be greater than or equal to {{ compared_value }}.</source>
-                <target>Vrednost mora biti večja ali enaka {{ compared_value }}.</target>
+                <target>Ta vrednost bi morala biti večja ali enaka {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="68">
                 <source>This value should be identical to {{ compared_value_type }} {{ compared_value }}.</source>
-                <target>Vrednost mora biti identična {{ compared_value_type }} {{ compared_value }}.</target>
+                <target>Ta vrednost bi morala biti identična {{ compared_value_type }} {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="69">
                 <source>This value should be less than {{ compared_value }}.</source>
-                <target>Vrednost mora biti manjša {{ compared_value }}.</target>
+                <target>Ta vrednost bi morala biti manjša od {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="70">
                 <source>This value should be less than or equal to {{ compared_value }}.</source>
-                <target>Vrednost mora biti manjša ali enaka {{ compared_value }}.</target>
+                <target>Ta vrednost bi morala biti manjša ali enaka {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="71">
                 <source>This value should not be equal to {{ compared_value }}.</source>
-                <target>Vrednost ne sme biti enaka {{ compared_value }}.</target>
+                <target>Ta vrednost ne bi smela biti enaka {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="72">
                 <source>This value should not be identical to {{ compared_value_type }} {{ compared_value }}.</source>
-                <target>Vrednost ne sme biti identična {{ compared_value_type }} {{ compared_value }}.</target>
+                <target>Ta vrednost ne bi smela biti identična {{ compared_value_type }} {{ compared_value }}.</target>
             </trans-unit>
         </body>
     </file>

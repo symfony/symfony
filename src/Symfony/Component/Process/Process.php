@@ -296,9 +296,14 @@ class Process
      *
      * @throws RuntimeException When process timed out
      * @throws RuntimeException When process stopped after receiving signal
+     * @throws LogicException When process is not started
      */
     public function wait($callback = null)
     {
+        if (!$this->isStarted()) {
+            throw new LogicException(sprintf('Process must be started before calling %s', __FUNCTION__));
+        }
+
         $this->updateStatus(false);
         if (null !== $callback) {
             $this->callback = $this->buildCallback($callback);
@@ -366,10 +371,16 @@ class Process
      *
      * @return string The process output
      *
+     * @throws LogicException In case the process is not started
+     *
      * @api
      */
     public function getOutput()
     {
+        if (!$this->isStarted()) {
+            throw new LogicException(sprintf('Process must be started before calling %s', __FUNCTION__));
+        }
+
         $this->readPipes(false, defined('PHP_WINDOWS_VERSION_BUILD') ? !$this->processInformation['running'] : true);
 
         return $this->stdout;
@@ -398,10 +409,16 @@ class Process
      *
      * @return string The process error output
      *
+     * @throws LogicException In case the process is not started
+     *
      * @api
      */
     public function getErrorOutput()
     {
+        if (!$this->isStarted()) {
+            throw new LogicException(sprintf('Process must be started before calling %s', __FUNCTION__));
+        }
+
         $this->readPipes(false, defined('PHP_WINDOWS_VERSION_BUILD') ? !$this->processInformation['running'] : true);
 
         return $this->stderr;

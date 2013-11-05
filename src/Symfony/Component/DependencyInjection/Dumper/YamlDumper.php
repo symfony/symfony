@@ -75,6 +75,10 @@ class YamlDumper extends Dumper
             $code .= sprintf("        class: %s\n", $definition->getClass());
         }
 
+        if (!$definition->isPublic()) {
+            $code .= "        public: false\n";
+        }
+
         $tagsCode = '';
         foreach ($definition->getTags() as $name => $tags) {
             foreach ($tags as $attributes) {

@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "symfony/filesystem": "~2.3"
+        "symfony/filesystem": "~2.4"
     },
     "require-dev": {
         "symfony/yaml": "~2.0",

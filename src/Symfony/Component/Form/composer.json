@@ -26,7 +26,8 @@
         "symfony/filesystem": "~2.3",
         "symfony/validator": "~2.2",
         "symfony/http-foundation": "~2.2",
-        "symfony/security-csrf": "~2.4"
+        "symfony/security-csrf": "~2.4",
+        "symfony/filesystem": "~2.4"
     },
     "suggest": {
         "symfony/validator": "For form validation.",

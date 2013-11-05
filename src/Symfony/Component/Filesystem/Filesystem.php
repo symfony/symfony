@@ -475,7 +475,6 @@ class Filesystem
     /** source: http://www.deltascripts.com/board/viewtopic.php?id=7843 */
     public static function tempnam2($dir, $prefix, $postfix='')
     {
-        if (function_exists(tempnam()))
         if ($dir[strlen($dir) - 1] == '/') {
             $trailing_slash = "";
         } else {

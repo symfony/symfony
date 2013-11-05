@@ -378,10 +378,16 @@ class Process
      *
      * @return string The process output
      *
+     * @throws LogicException In case the process is not started
+     *
      * @api
      */
     public function getOutput()
     {
+        if (!$this->isStarted()) {
+            throw new LogicException(sprintf('Process must be started before calling %s', __FUNCTION__));
+        }
+
         $this->readPipes(false, defined('PHP_WINDOWS_VERSION_BUILD') ? !$this->processInformation['running'] : true);
 
         return $this->stdout;
@@ -410,10 +416,16 @@ class Process
      *
      * @return string The process error output
      *
+     * @throws LogicException In case the process is not started
+     *
      * @api
      */
     public function getErrorOutput()
     {
+        if (!$this->isStarted()) {
+            throw new LogicException(sprintf('Process must be started before calling %s', __FUNCTION__));
+        }
+
         $this->readPipes(false, defined('PHP_WINDOWS_VERSION_BUILD') ? !$this->processInformation['running'] : true);
 
         return $this->stderr;

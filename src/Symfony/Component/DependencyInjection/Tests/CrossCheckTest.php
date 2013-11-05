@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Tests;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Filesystem\Filesystem;
 
 class CrossCheckTest extends \PHPUnit_Framework_TestCase
 {
@@ -34,7 +35,7 @@ class CrossCheckTest extends \PHPUnit_Framework_TestCase
         $loaderClass = 'Symfony\\Component\\DependencyInjection\\Loader\\'.ucfirst($type).'FileLoader';
         $dumperClass = 'Symfony\\Component\\DependencyInjection\\Dumper\\'.ucfirst($type).'Dumper';
 
-        $tmp = tempnam('sf_service_container', 'sf');
+        $tmp = Filesystem::tempnam2('sf_service_container', 'sf');
 
         file_put_contents($tmp, file_get_contents(self::$fixturesPath.'/'.$type.'/'.$fixture));
 

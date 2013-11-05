@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Translation\Loader;
 
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Exception\InvalidResourceException;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
@@ -111,7 +112,7 @@ class XliffFileLoader implements LoaderInterface
         $location = str_replace('\\', '/', __DIR__).'/schema/dic/xliff-core/xml.xsd';
         $parts = explode('/', $location);
         if (0 === stripos($location, 'phar://')) {
-            $tmpfile = tempnam(sys_get_temp_dir(), 'sf2');
+            $tmpfile = Filesystem::tempnam2(sys_get_temp_dir(), 'sf2');
             if ($tmpfile) {
                 copy($location, $tmpfile);
                 $parts = explode('/', str_replace('\\', '/', $tmpfile));

@@ -20,7 +20,8 @@
     },
     "require-dev": {
         "symfony/config": "~2.0",
-        "symfony/yaml": "~2.2"
+        "symfony/yaml": "~2.2",
+        "symfony/filesystem": "~2.3"
     },
     "suggest": {
         "symfony/config": "",

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests;
 
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Client;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpFoundation\Request;
@@ -94,7 +95,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
     public function testUploadedFile()
     {
-        $source = tempnam(sys_get_temp_dir(), 'source');
+        $source = Filesystem::tempnam2(sys_get_temp_dir(), 'source');
         $target = sys_get_temp_dir().'/sf.moved.file';
         @unlink($target);
 
@@ -129,7 +130,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
     public function testUploadedFileWhenSizeExceedsUploadMaxFileSize()
     {
-        $source = tempnam(sys_get_temp_dir(), 'source');
+        $source = Filesystem::tempnam2(sys_get_temp_dir(), 'source');
 
         $kernel = new TestHttpKernel();
         $client = new Client($kernel);

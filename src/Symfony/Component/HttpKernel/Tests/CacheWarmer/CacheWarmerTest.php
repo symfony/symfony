@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\CacheWarmer;
 
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmer;
 
 class CacheWarmerTest extends \PHPUnit_Framework_TestCase
@@ -19,7 +20,7 @@ class CacheWarmerTest extends \PHPUnit_Framework_TestCase
 
     public static function setUpBeforeClass()
     {
-        self::$cacheFile = tempnam(sys_get_temp_dir(), 'sf2_cache_warmer_dir');
+        self::$cacheFile = Filesystem::tempnam2(sys_get_temp_dir(), 'sf2_cache_warmer_dir');
     }
 
     public static function tearDownAfterClass()

@@ -30,7 +30,7 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
         $response = new Response();
         $collector = new RequestDataCollector();
 
-        $tmp = tempnam(sys_get_temp_dir(), 'sf2_profiler');
+        $tmp = Filesystem::tempnam2(sys_get_temp_dir(), 'sf2_profiler');
         if (file_exists($tmp)) {
             @unlink($tmp);
         }

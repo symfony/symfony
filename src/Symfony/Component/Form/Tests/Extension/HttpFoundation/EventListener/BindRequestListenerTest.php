@@ -37,7 +37,7 @@ class BindRequestListenerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $path = tempnam(sys_get_temp_dir(), 'sf2');
+        $path = Filesystem::tempnam2(sys_get_temp_dir(), 'sf2');
         touch($path);
 
         $this->values = array(

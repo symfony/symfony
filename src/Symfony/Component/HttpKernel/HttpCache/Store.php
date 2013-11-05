@@ -14,6 +14,7 @@
 
 namespace Symfony\Component\HttpKernel\HttpCache;
 
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -343,7 +344,7 @@ class Store implements StoreInterface
             return false;
         }
 
-        $tmpFile = tempnam(dirname($path), basename($path));
+        $tmpFile = Filesystem::tempnam2(dirname($path), basename($path));
         if (false === $fp = @fopen($tmpFile, 'wb')) {
             return false;
         }

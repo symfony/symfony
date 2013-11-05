@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\HttpFoundation\EventListener;
 
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\Extension\HttpFoundation\EventListener\BindRequestListener;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormConfigBuilder;

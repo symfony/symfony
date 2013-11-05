@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\Profiler;
 
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\DataCollector\RequestDataCollector;
 use Symfony\Component\HttpKernel\Profiler\SqliteProfilerStorage;
 use Symfony\Component\HttpKernel\Profiler\Profiler;

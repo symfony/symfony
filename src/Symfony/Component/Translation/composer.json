@@ -21,7 +21,7 @@
     "require-dev": {
         "symfony/config": "~2.0",
         "symfony/yaml": "~2.2",
-        "symfony/filesystem": "~2.3"
+        "symfony/filesystem": "~2.4"
     },
     "suggest": {
         "symfony/config": "",

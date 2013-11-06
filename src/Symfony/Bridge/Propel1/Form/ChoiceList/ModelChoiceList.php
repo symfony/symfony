@@ -20,7 +20,7 @@ use Symfony\Component\Form\Extension\Core\ChoiceList\ObjectChoiceList;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
- * Widely inspired by the EntityChoiceList.
+ * A choice list for object choices based on Propel model.
  *
  * @author William Durand <william.durand1@gmail.com>
  * @author Toni Uebernickel <tuebernickel@gmail.com>
@@ -58,7 +58,7 @@ class ModelChoiceList extends ObjectChoiceList
     protected $loaded = false;
 
     /**
-     * Whether to use the identifier for index generation
+     * Whether to use the identifier for index generation.
      *
      * @var Boolean
      */
@@ -67,7 +67,7 @@ class ModelChoiceList extends ObjectChoiceList
     /**
      * Constructor.
      *
-     * @see Symfony\Bridge\Propel1\Form\Type\ModelType How to use the preferred choices.
+     * @see \Symfony\Bridge\Propel1\Form\Type\ModelType How to use the preferred choices.
      *
      * @param string                   $class             The FQCN of the model class to be loaded.
      * @param string                   $labelPath         A property path pointing to the property used for the choice labels.
@@ -86,8 +86,8 @@ class ModelChoiceList extends ObjectChoiceList
         $queryClass         = $this->class.'Query';
         $query              = new $queryClass();
 
-        $this->identifier   = $query->getTableMap()->getPrimaryKeys();
         $this->query        = $queryObject ?: $query;
+        $this->identifier   = $this->query->getTableMap()->getPrimaryKeys();
         $this->loaded       = is_array($choices) || $choices instanceof \Traversable;
 
         if ($preferred instanceof ModelCriteria) {
@@ -101,7 +101,7 @@ class ModelChoiceList extends ObjectChoiceList
             $preferred = array();
         }
 
-        if (1 === count($this->identifier) && $this->isInteger(current($this->identifier))) {
+        if (1 === count($this->identifier) && $this->isScalar(current($this->identifier))) {
             $this->identifierAsIndex = true;
         }
 
@@ -109,7 +109,7 @@ class ModelChoiceList extends ObjectChoiceList
     }
 
     /**
-     * Returns the class name
+     * Returns the class name of the model.
      *
      * @return string
      */
@@ -119,162 +119,135 @@ class ModelChoiceList extends ObjectChoiceList
     }
 
     /**
-     * Returns the list of model objects
-     *
-     * @return array
-     *
-     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     * {@inheritdoc}
      */
     public function getChoices()
     {
-        if (!$this->loaded) {
-            $this->load();
-        }
+        $this->load();
 
         return parent::getChoices();
     }
 
     /**
-     * Returns the values for the model objects
-     *
-     * @return array
-     *
-     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     * {@inheritdoc}
      */
     public function getValues()
     {
-        if (!$this->loaded) {
-            $this->load();
-        }
+        $this->load();
 
         return parent::getValues();
     }
 
     /**
-     * Returns the choice views of the preferred choices as nested array with
-     * the choice groups as top-level keys.
-     *
-     * @return array
-     *
-     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     * {@inheritdoc}
      */
     public function getPreferredViews()
     {
-        if (!$this->loaded) {
-            $this->load();
-        }
+        $this->load();
 
         return parent::getPreferredViews();
     }
 
     /**
-     * Returns the choice views of the choices that are not preferred as nested
-     * array with the choice groups as top-level keys.
-     *
-     * @return array
-     *
-     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     * {@inheritdoc}
      */
     public function getRemainingViews()
     {
-        if (!$this->loaded) {
-            $this->load();
-        }
+        $this->load();
 
         return parent::getRemainingViews();
     }
 
     /**
-     * Returns the model objects corresponding to the given values.
-     *
-     * @param array $values
-     *
-     * @return array
-     *
-     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     * {@inheritdoc}
      */
     public function getChoicesForValues(array $values)
     {
+        if (empty($values)) {
+            return array();
+        }
+
+        /**
+         * This performance optimization reflects a common scenario:
+         * * A simple select of a model entry.
+         * * The choice option "expanded" is set to false.
+         * * The current request is the submission of the selected value.
+         *
+         * @see \Symfony\Component\Form\Extension\Core\DataTransformer\ChoicesToValuesTransformer::reverseTransform
+         * @see \Symfony\Component\Form\Extension\Core\DataTransformer\ChoiceToValueTransformer::reverseTransform
+         */
         if (!$this->loaded) {
             if (1 === count($this->identifier)) {
                 $filterBy = 'filterBy'.current($this->identifier)->getPhpName();
 
-                return (array) $this->query->create()
+                // The initial query is cloned, so all additional filters are applied correctly.
+                $query = clone $this->query;
+                $result = (array) $query
                     ->$filterBy($values)
                     ->find();
-            }
 
-            $this->load();
+                // Preserve the keys as provided by the values.
+                $models = array();
+                foreach ($values as $index => $value) {
+                    foreach ($result as $eachModel) {
+                        if ($value === $this->createValue($eachModel)) {
+                            // Make sure to convert to the right format
+                            $models[$index] = $this->fixChoice($eachModel);
+
+                            // If all values have been assigned, skip further loops.
+                            unset($values[$index]);
+                            if (0 === count($values)) {
+                                break 2;
+                            }
+                        }
+                    }
+                }
+
+                return $models;
+            }
         }
+
+        $this->load();
 
         return parent::getChoicesForValues($values);
     }
 
     /**
-     * Returns the values corresponding to the given model objects.
-     *
-     * @param array $models
-     *
-     * @return array
-     *
-     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     * {@inheritdoc}
      */
     public function getValuesForChoices(array $models)
     {
-        if (!$this->loaded) {
-            // Optimize performance for single-field identifiers. We already
-            // know that the IDs are used as values
+        if (empty($models)) {
+            return array();
+        }
 
-            // Attention: This optimization does not check choices for existence
+        if (!$this->loaded) {
+            /**
+             * This performance optimization assumes the validation of the respective values will be done by other means.
+             *
+             * It correlates with the performance optimization in {@link ModelChoiceList::getChoicesForValues()}
+             * as it won't load the actual entries from the database.
+             *
+             * @see \Symfony\Component\Form\Extension\Core\DataTransformer\ChoicesToValuesTransformer::transform
+             * @see \Symfony\Component\Form\Extension\Core\DataTransformer\ChoiceToValueTransformer::transform
+             */
             if (1 === count($this->identifier)) {
                 $values = array();
-                foreach ($models as $model) {
+                foreach ($models as $index => $model) {
                     if ($model instanceof $this->class) {
                         // Make sure to convert to the right format
-                        $values[] = $this->fixValue(current($this->getIdentifierValues($model)));
+                        $values[$index] = $this->fixValue(current($this->getIdentifierValues($model)));
                     }
                 }
 
                 return $values;
             }
-
-            $this->load();
         }
 
-        return parent::getValuesForChoices($models);
-    }
+        $this->load();
 
-    /**
-     * Returns the indices corresponding to the given models.
-     *
-     * @param array $models
-     *
-     * @return array
-     *
-     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
-     */
-    public function getIndicesForChoices(array $models)
-    {
-        $indices = array();
-
-        if (!$this->loaded) {
-            // Optimize performance for single-field identifiers. We already
-            // know that the IDs are used as indices
-
-            // Attention: This optimization does not check choices for existence
-            if ($this->identifierAsIndex) {
-                foreach ($models as $model) {
-                    if ($model instanceof $this->class) {
-                        // Make sure to convert to the right format
-                        $indices[] = $this->fixIndex(current($this->getIdentifierValues($model)));
-                    }
-                }
-
-                return $indices;
-            }
-
-            $this->load();
-        }
+        $values = array();
+        $availableValues = $this->getValues();
 
         /*
          * Overwriting default implementation.
@@ -286,12 +259,61 @@ class ModelChoiceList extends ObjectChoiceList
          * The choicelist will retrieve the list of available related models with a different query, resulting in different objects.
          */
         $choices = $this->fixChoices($models);
-        foreach ($this->getChoices() as $i => $choice) {
-            foreach ($choices as $j => $givenChoice) {
-                if (null !== $givenChoice && $this->getIdentifierValues($choice) === $this->getIdentifierValues($givenChoice)) {
-                    $indices[] = $i;
-                    unset($choices[$j]);
+        foreach ($choices as $i => $givenChoice) {
+            if (null === $givenChoice) {
+                continue;
+            }
 
+            foreach ($this->getChoices() as $j => $choice) {
+                if ($this->isEqual($choice, $givenChoice)) {
+                    $values[$i] = $availableValues[$j];
+
+                    // If all choices have been assigned, skip further loops.
+                    unset($choices[$i]);
+                    if (0 === count($choices)) {
+                        break 2;
+                    }
+                }
+            }
+        }
+
+        return $values;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getIndicesForChoices(array $models)
+    {
+        if (empty($models)) {
+            return array();
+        }
+
+        $this->load();
+
+        $indices = array();
+
+        /*
+         * Overwriting default implementation.
+         *
+         * The two objects may represent the same entry in the database,
+         * but if they originated from different queries, there are not the same object within the code.
+         *
+         * This happens when using m:n relations with either sides model as data_class of the form.
+         * The choicelist will retrieve the list of available related models with a different query, resulting in different objects.
+         */
+        $choices = $this->fixChoices($models);
+        foreach ($choices as $i => $givenChoice) {
+            if (null === $givenChoice) {
+                continue;
+            }
+
+            foreach ($this->getChoices() as $j => $choice) {
+                if ($this->isEqual($choice, $givenChoice)) {
+                    $indices[$i] = $j;
+
+                    // If all choices have been assigned, skip further loops.
+                    unset($choices[$i]);
                     if (0 === count($choices)) {
                         break 2;
                     }
@@ -303,27 +325,15 @@ class ModelChoiceList extends ObjectChoiceList
     }
 
     /**
-     * Returns the models corresponding to the given values.
-     *
-     * @param array $values
-     *
-     * @return array
-     *
-     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     * {@inheritdoc}
      */
     public function getIndicesForValues(array $values)
     {
-        if (!$this->loaded) {
-            // Optimize performance for single-field identifiers. We already
-            // know that the IDs are used as indices and values
-
-            // Attention: This optimization does not check values for existence
-            if ($this->identifierAsIndex) {
-                return $this->fixIndices($values);
-            }
-
-            $this->load();
+        if (empty($values)) {
+            return array();
         }
+
+        $this->load();
 
         return parent::getIndicesForValues($values);
     }
@@ -362,7 +372,7 @@ class ModelChoiceList extends ObjectChoiceList
      */
     protected function createValue($model)
     {
-        if (1 === count($this->identifier)) {
+        if ($this->identifierAsIndex) {
             return (string) current($this->getIdentifierValues($model));
         }
 
@@ -370,10 +380,16 @@ class ModelChoiceList extends ObjectChoiceList
     }
 
     /**
-     * Loads the list with model objects.
+     * Loads the complete choice list entries, once.
+     *
+     * If data has been loaded the choice list is initialized with the retrieved data.
      */
     private function load()
     {
+        if ($this->loaded) {
+            return;
+        }
+
         $models = (array) $this->query->find();
 
         $preferred = array();
@@ -384,15 +400,15 @@ class ModelChoiceList extends ObjectChoiceList
         try {
             // The second parameter $labels is ignored by ObjectChoiceList
             parent::initialize($models, array(), $preferred);
+
+            $this->loaded = true;
         } catch (StringCastException $e) {
             throw new StringCastException(str_replace('argument $labelPath', 'option "property"', $e->getMessage()), null, $e);
         }
-
-        $this->loaded = true;
     }
 
     /**
-     * Returns the values of the identifier fields of an model
+     * Returns the values of the identifier fields of a model.
      *
      * Propel must know about this model, that is, the model must already
      * be persisted or added to the idmodel map before. Otherwise an
@@ -404,6 +420,10 @@ class ModelChoiceList extends ObjectChoiceList
      */
     private function getIdentifierValues($model)
     {
+        if (!$model instanceof $this->class) {
+            return array();
+        }
+
         if ($model instanceof Persistent) {
             return array($model->getPrimaryKey());
         }
@@ -413,7 +433,7 @@ class ModelChoiceList extends ObjectChoiceList
             return array($model->getPrimaryKey());
         }
 
-        if (null === $model) {
+        if (!method_exists($model, 'getPrimaryKeys')) {
             return array();
         }
 
@@ -421,14 +441,39 @@ class ModelChoiceList extends ObjectChoiceList
     }
 
     /**
-     * Whether this column in an integer
+     * Whether this column contains scalar values (to be used as indices).
      *
      * @param \ColumnMap $column
      *
      * @return Boolean
      */
-    private function isInteger(\ColumnMap $column)
+    private function isScalar(\ColumnMap $column)
     {
-        return $column->getPdoType() === \PDO::PARAM_INT;
+        return in_array($column->getPdoType(), array(
+            \PDO::PARAM_BOOL,
+            \PDO::PARAM_INT,
+            \PDO::PARAM_STR,
+        ));
+    }
+
+    /**
+     * Check the given choices for equality.
+     *
+     * @param mixed $choice
+     * @param mixed $givenChoice
+     *
+     * @return Boolean
+     */
+    private function isEqual($choice, $givenChoice)
+    {
+        if ($choice === $givenChoice) {
+            return true;
+        }
+
+        if ($this->getIdentifierValues($choice) === $this->getIdentifierValues($givenChoice)) {
+            return true;
+        }
+
+        return false;
     }
 }

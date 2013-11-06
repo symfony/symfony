@@ -234,9 +234,10 @@ class PropertyAccessor implements PropertyAccessorInterface
             }
 
             throw new NoSuchPropertyException(sprintf(
-                'Neither the property "%s" nor one of the methods "'. implode('()", "', $methods).'() '.
+                'Neither the property "%s" nor one of the methods "%s()" '.
                 'exist and have public access in class "%s".',
                 $property,
+                implode('()", "', $methods),
                 $reflClass->name
             ));
         }

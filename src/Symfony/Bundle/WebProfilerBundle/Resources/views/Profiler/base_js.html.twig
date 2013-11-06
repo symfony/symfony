@@ -97,10 +97,10 @@
                                 li.appendChild(durationSpan);
                             }
 
-                            if (request.token) {
+                            if (request.profilerUrl) {
                                 li.appendChild(document.createTextNode(' '));
                                 var profilerA = document.createElement('a');
-                                profilerA.setAttribute('href', '{{ path('_profiler_home') }}' + request.token);
+                                profilerA.setAttribute('href', request.profilerUrl);
                                 profilerA.innerText = 'profiler';
                                 li.appendChild(profilerA);
                             }
@@ -151,7 +151,7 @@
                         stackElement.duration = new Date() - stackElement.start;
                         stackElement.loading = false;
                         stackElement.error = self.status < 200 || self.status >= 400;
-                        stackElement.token = self.getResponseHeader("X-Debug-Token");
+                        stackElement.profilerUrl = self.getResponseHeader("X-Debug-Token-Link");
 
                         Sfjs.renderAjaxRequests();
                     }

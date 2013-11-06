@@ -71,12 +71,10 @@ EOF
     {
         $router = $this->getContainer()->get('router');
         $context = $router->getContext();
-        $method = $input->getOption('method');
-        $host = $input->getOption('host');
-        if ($method) {
+        if ($method = $input->getOption('method')) {
             $context->setMethod($method);
         }
-        if ($host) {
+        if ($host = $input->getOption('host')) {
             $context->setHost($host);
         }
 

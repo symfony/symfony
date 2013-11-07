@@ -23,7 +23,6 @@
         "symfony/property-access": "~2.2"
     },
     "require-dev": {
-        "symfony/filesystem": "~2.3",
         "symfony/validator": "~2.2",
         "symfony/http-foundation": "~2.2",
         "symfony/security-csrf": "~2.4"

@@ -20,7 +20,8 @@
         "php": ">=5.3.3"
     },
     "require-dev": {
-        "symfony/finder": "~2.0"
+        "symfony/finder": "~2.0",
+        "symfony/filesystem": "~2.4"
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\ClassLoader\\": "" }

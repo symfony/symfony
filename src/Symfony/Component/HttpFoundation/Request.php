@@ -647,6 +647,8 @@ class Request
     public static function enableHttpMethodParameterOverride()
     {
         self::$httpMethodParameterOverride = true;
+        
+        $this->method = null;
     }
 
     /**

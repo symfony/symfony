@@ -94,7 +94,7 @@ EOF
 
         $output->writeln('Removing old cache directory...');
         $filesystem->remove($oldCacheDir);
-        $output->writeln('Completed clearing cache' . ($input->getOption('no-warmup') ? " ." : " and warmup."));
+        $output->writeln('Completed clearing cache' . ($input->getOption('no-warmup') ? "!" : " and warmup!"));
     }
 
     /**

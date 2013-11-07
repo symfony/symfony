@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Form\Tests\Extension\HttpFoundation\EventListener;
 
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\Extension\HttpFoundation\EventListener\BindRequestListener;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormConfigBuilder;
@@ -38,7 +37,7 @@ class BindRequestListenerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $path = Filesystem::tempnam2(sys_get_temp_dir(), 'sf2');
+        $path = tempnam(sys_get_temp_dir(), 'sf2');
         touch($path);
 
         $this->values = array(

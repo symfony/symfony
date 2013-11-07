@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\HttpKernel\Tests\Profiler;
 
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\DataCollector\RequestDataCollector;
 use Symfony\Component\HttpKernel\Profiler\SqliteProfilerStorage;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
@@ -31,7 +30,7 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
         $response = new Response();
         $collector = new RequestDataCollector();
 
-        $tmp = Filesystem::tempnam2(sys_get_temp_dir(), 'sf2_profiler');
+        $tmp = tempnam(sys_get_temp_dir(), 'sf2_profiler');
         if (file_exists($tmp)) {
             @unlink($tmp);
         }

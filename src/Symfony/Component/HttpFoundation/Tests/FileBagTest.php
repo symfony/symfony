@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\HttpFoundation\Tests;
 
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\FileBag;
 
@@ -130,7 +129,7 @@ class FileBagTest extends \PHPUnit_Framework_TestCase
 
     protected function createTempFile()
     {
-        return Filesystem::tempnam2(sys_get_temp_dir().'/form_test', 'FormTest');
+        return tempnam(sys_get_temp_dir().'/form_test', 'FormTest');
     }
 
     protected function setUp()

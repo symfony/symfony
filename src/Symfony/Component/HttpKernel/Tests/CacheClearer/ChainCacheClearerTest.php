@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\HttpKernel\Tests\CacheClearer;
 
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
 use Symfony\Component\HttpKernel\CacheClearer\ChainCacheClearer;
 
@@ -21,7 +20,7 @@ class ChainCacheClearerTest extends \PHPUnit_Framework_TestCase
 
     public static function setUpBeforeClass()
     {
-        self::$cacheDir = Filesystem::tempnam2(sys_get_temp_dir(), 'sf2_cache_clearer_dir');
+        self::$cacheDir = tempnam(sys_get_temp_dir(), 'sf2_cache_clearer_dir');
     }
 
     public static function tearDownAfterClass()

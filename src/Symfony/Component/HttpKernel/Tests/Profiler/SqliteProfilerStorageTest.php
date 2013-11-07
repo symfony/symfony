@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\HttpKernel\Tests\Profiler;
 
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Profiler\SqliteProfilerStorage;
 
 class SqliteProfilerStorageTest extends AbstractProfilerStorageTest
@@ -21,7 +20,7 @@ class SqliteProfilerStorageTest extends AbstractProfilerStorageTest
 
     public static function setUpBeforeClass()
     {
-        self::$dbFile = Filesystem::tempnam2(sys_get_temp_dir(), 'sf2_sqlite_storage');
+        self::$dbFile = tempnam(sys_get_temp_dir(), 'sf2_sqlite_storage');
         if (file_exists(self::$dbFile)) {
             @unlink(self::$dbFile);
         }

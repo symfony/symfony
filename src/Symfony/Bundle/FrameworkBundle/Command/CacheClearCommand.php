@@ -66,7 +66,7 @@ EOF
         }
 
         $kernel = $this->getContainer()->get('kernel');
-        $output->writeln(sprintf('Clearing the cache for the <info>%s</info> environment with debug <info>%s</info>', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
+        $output->writeln(sprintf('Clearing the cache for the <info>%s</info> environment with debug <info>%s</info>:', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
         $this->getContainer()->get('cache_clearer')->clear($realCacheDir);
 
         if ($input->getOption('no-warmup')) {
@@ -77,9 +77,11 @@ EOF
             $warmupDir = substr($realCacheDir, 0, -1).'_';
 
             if ($filesystem->exists($warmupDir)) {
+                $output->writeln('Clearing outdated warmup directory...');
                 $filesystem->remove($warmupDir);
             }
 
+            $output->writeln('Warming up cache...');
             $this->warmup($warmupDir, $realCacheDir, !$input->getOption('no-optional-warmers'));
 
             $filesystem->rename($realCacheDir, $oldCacheDir);
@@ -87,9 +89,12 @@ EOF
                 sleep(1);  // workaround for windows php rename bug
             }
             $filesystem->rename($warmupDir, $realCacheDir);
+            $output->writeln('Warm up completed...');
         }
 
+        $output->writeln('Removing old cache directory...');
         $filesystem->remove($oldCacheDir);
+        $output->writeln('Completed clearing cache' . ($input->getOption('no-warmup') ? " ." : " and warmup."));
     }
 
     /**

@@ -35,7 +35,7 @@ class CrossCheckTest extends \PHPUnit_Framework_TestCase
         $loaderClass = 'Symfony\\Component\\DependencyInjection\\Loader\\'.ucfirst($type).'FileLoader';
         $dumperClass = 'Symfony\\Component\\DependencyInjection\\Dumper\\'.ucfirst($type).'Dumper';
 
-        $tmp = Filesystem::tempnam2('sf_service_container', 'sf');
+        $tmp = tempnam('sf_service_container', 'sf');
 
         file_put_contents($tmp, file_get_contents(self::$fixturesPath.'/'.$type.'/'.$fixture));
 

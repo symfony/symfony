@@ -472,9 +472,13 @@ class Filesystem
         return $files;
     }
 
-    /** source: http://www.deltascripts.com/board/viewtopic.php?id=7843 */
+    /** adapted from: http://www.deltascripts.com/board/viewtopic.php?id=7843 */
     public static function tempnam2($dir, $prefix, $postfix='')
     {
+        if (!getenv('DISABLE_FUNCTIONS')) {
+            return tempnam($dir, $prefix);
+        }
+
         if ($dir[strlen($dir) - 1] == '/') {
             $trailing_slash = "";
         } else {
@@ -496,8 +500,7 @@ class Filesystem
             $seed = substr(md5(microtime().posix_getpid()), 0, 8);
             $filename = $dir . $trailing_slash . $prefix . $seed . $postfix;
         } while (file_exists($filename));
-        $fp = fopen($filename, "w");
-        fclose($fp);
+        touch($filename);
 
         return $filename;
     }

@@ -13,7 +13,6 @@ namespace Symfony\Component\Config\Tests;
 
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\Resource\FileResource;
-use Symfony\Component\Filesystem\Filesystem;
 
 class ConfigTest extends \PHPUnit_Framework_TestCase
 {
@@ -25,8 +24,8 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->resourceFile = Filesystem::tempnam2(sys_get_temp_dir(), '_resource');
-        $this->cacheFile = Filesystem::tempnam2(sys_get_temp_dir(), 'config_');
+        $this->resourceFile = tempnam(sys_get_temp_dir(), '_resource');
+        $this->cacheFile = tempnam(sys_get_temp_dir(), 'config_');
         $this->metaFile = $this->cacheFile.'.meta';
 
         $this->makeCacheFresh();

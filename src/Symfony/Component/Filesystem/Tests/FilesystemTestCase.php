@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Filesystem\Tests;
 
-use Symfony\Component\Filesystem\Filesystem;
-
 class FilesystemTestCase extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -26,8 +24,8 @@ class FilesystemTestCase extends \PHPUnit_Framework_TestCase
     {
         if (defined('PHP_WINDOWS_VERSION_MAJOR')) {
             static::$symlinkOnWindows = true;
-            $originDir = Filesystem::tempnam2(sys_get_temp_dir(), 'sl');
-            $targetDir = Filesystem::tempnam2(sys_get_temp_dir(), 'sl');
+            $originDir = tempnam(sys_get_temp_dir(), 'sl');
+            $targetDir = tempnam(sys_get_temp_dir(), 'sl');
             if (true !== @symlink($originDir, $targetDir)) {
                 $report = error_get_last();
                 if (is_array($report) && false !== strpos($report['message'], 'error code(1314)')) {

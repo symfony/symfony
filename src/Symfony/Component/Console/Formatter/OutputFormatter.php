@@ -49,7 +49,7 @@ class OutputFormatter implements OutputFormatterInterface
      *
      * @api
      */
-    public function __construct($decorated = null, array $styles = array())
+    public function __construct($decorated = false, array $styles = array())
     {
         $this->decorated = (Boolean) $decorated;
 

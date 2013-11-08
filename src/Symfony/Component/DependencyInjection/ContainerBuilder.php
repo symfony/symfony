@@ -220,7 +220,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                 $this->addResource(new FileResource($parent->getFileName()));
             } while ($parent = $parent->getParentClass());
         }
-        
+
         return $this;
     }
 
@@ -230,7 +230,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @param string $extension The extension alias or namespace
      * @param array  $values    An array of values that customizes the extension
      *
-     * @return ContainerBuilder The current instance
+     * @return ContainerBuilder       The current instance
      * @throws BadMethodCallException When this ContainerBuilder is frozen
      *
      * @throws \LogicException if the container is frozen
@@ -393,7 +393,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @return object The associated service
      *
      * @throws InvalidArgumentException if the service is not defined
-     * @throws LogicException if the service has a circular reference to itself
+     * @throws LogicException           if the service has a circular reference to itself
      *
      * @see Reference
      *
@@ -510,8 +510,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Prepends a config array to the configs of the given extension.
      *
-     * @param string $name    The name of the extension
-     * @param array  $config  The config to set
+     * @param string $name   The name of the extension
+     * @param array  $config The config to set
      */
     public function prependExtensionConfig($name, array $config)
     {
@@ -597,8 +597,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Sets an alias for an existing service.
      *
-     * @param string        $alias The alias to create
-     * @param string|Alias  $id    The service to alias
+     * @param string       $alias The alias to create
+     * @param string|Alias $id    The service to alias
      *
      * @throws InvalidArgumentException if the id is not a string or an Alias
      * @throws InvalidArgumentException if the alias is for itself
@@ -832,9 +832,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @return object The service described by the service definition
      *
-     * @throws RuntimeException When the scope is inactive
-     * @throws RuntimeException When the factory definition is incomplete
-     * @throws RuntimeException When the service is a synthetic service
+     * @throws RuntimeException         When the scope is inactive
+     * @throws RuntimeException         When the factory definition is incomplete
+     * @throws RuntimeException         When the service is a synthetic service
      * @throws InvalidArgumentException When configure callable is not callable
      */
     private function createService(Definition $definition, $id)

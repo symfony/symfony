@@ -11,7 +11,7 @@ evaluate expressions:
     echo $language->evaluate('1 + foo', array('foo' => 2));
     // would output 3
 
-    echo $language->compile('1 + foo');
+    echo $language->compile('1 + foo', array('foo'));
     // would output (1 + $foo)
 
 By default, the engine implements simple math and logic functions, method

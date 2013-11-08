@@ -22,5 +22,7 @@ use Symfony\Component\Validator\Constraint;
  */
 class Time extends Constraint
 {
+    const ERROR = 'a487eb1b-b785-49e0-97d8-b3eb6a165185';
+
     public $message = 'This value is not a valid time.';
 }

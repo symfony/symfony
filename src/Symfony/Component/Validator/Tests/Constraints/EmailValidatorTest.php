@@ -89,7 +89,7 @@ class EmailValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolation')
             ->with('myMessage', array(
                 '{{ value }}' => $email,
-            ));
+            ), $email, null, Email::ERROR);
 
         $this->validator->validate($email, $constraint);
     }

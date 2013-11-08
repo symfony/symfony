@@ -22,5 +22,7 @@ use Symfony\Component\Validator\Constraint;
  */
 class Date extends Constraint
 {
+    const ERROR = 'f360bec2-4636-46ad-8ef6-aecc65e08a00';
+
     public $message = 'This value is not a valid date.';
 }

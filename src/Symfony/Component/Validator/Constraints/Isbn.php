@@ -21,6 +21,10 @@ use Symfony\Component\Validator\Exception\MissingOptionsException;
  */
 class Isbn extends Constraint
 {
+    const ERROR = 'af6f41b0-3626-4b78-96a3-a6027832d1cb';
+    const ERROR_ISBN10 = '7665fcb0-e6bf-4d31-8159-f9cf713bae5f';
+    const ERROR_ISBN13 = '6aa1c63f-c281-4741-bb12-d8505011414f';
+
     public $isbn10Message = 'This value is not a valid ISBN-10.';
     public $isbn13Message = 'This value is not a valid ISBN-13.';
     public $bothIsbnMessage = 'This value is neither a valid ISBN-10 nor a valid ISBN-13.';

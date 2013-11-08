@@ -20,6 +20,8 @@ use Symfony\Component\Validator\Constraint;
  */
 class CardScheme extends Constraint
 {
+    const ERROR = '300f90d4-23d9-4bfe-a922-ebecff115e9d';
+
     public $message = 'Unsupported card type or invalid card number.';
     public $schemes;
 

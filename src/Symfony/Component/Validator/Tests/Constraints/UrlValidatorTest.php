@@ -117,7 +117,7 @@ class UrlValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolation')
             ->with('myMessage', array(
                 '{{ value }}' => $url,
-            ));
+            ), $url, null, Url::ERROR);
 
         $this->validator->validate($url, $constraint);
     }

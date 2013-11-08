@@ -22,5 +22,7 @@ use Symfony\Component\Validator\Constraint;
  */
 class Country extends Constraint
 {
+    const ERROR = '326b7f14-6fde-4489-8e9b-8458ecc2e559';
+
     public $message = 'This value is not a valid country.';
 }

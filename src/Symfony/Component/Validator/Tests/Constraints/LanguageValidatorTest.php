@@ -92,7 +92,7 @@ class LanguageValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolation')
             ->with('myMessage', array(
                 '{{ value }}' => $language,
-            ));
+            ), $language, null, Language::ERROR);
 
         $this->validator->validate($language, $constraint);
     }

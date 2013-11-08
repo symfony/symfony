@@ -145,7 +145,9 @@ class IssnValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context
             ->expects($this->once())
             ->method('addViolation')
-            ->with($constraint->message);
+            ->with($constraint->message, array(
+                '{{ value }}' => $issn,
+            ), $issn, null, Issn::ERROR);
 
         $this->validator->validate($issn, $constraint);
     }
@@ -159,7 +161,9 @@ class IssnValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context
             ->expects($this->once())
             ->method('addViolation')
-            ->with($constraint->message);
+            ->with($constraint->message, array(
+                '{{ value }}' => $issn,
+            ), $issn, null, Issn::ERROR);
 
         $this->validator->validate($issn, $constraint);
     }
@@ -186,7 +190,9 @@ class IssnValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context
             ->expects($this->once())
             ->method('addViolation')
-            ->with($constraint->message);
+            ->with($constraint->message, array(
+                '{{ value }}' => $issn,
+            ), $issn, null, Issn::ERROR);
 
         $this->validator->validate($issn, $constraint);
     }
@@ -200,7 +206,9 @@ class IssnValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context
             ->expects($this->once())
             ->method('addViolation')
-            ->with($constraint->message);
+            ->with($constraint->message, array(
+                '{{ value }}' => $issn,
+            ), $issn, null, Issn::ERROR);
 
         $this->validator->validate($issn, $constraint);
     }
@@ -213,7 +221,9 @@ class IssnValidatorTest extends \PHPUnit_Framework_TestCase
         $constraint = new Issn();
         $this->context
             ->expects($this->once())
-            ->method('addViolation');
+            ->method('addViolation', array(
+                '{{ value }}' => $issn,
+            ), $issn, null, Issn::ERROR);
 
         $this->validator->validate($issn, $constraint);
     }

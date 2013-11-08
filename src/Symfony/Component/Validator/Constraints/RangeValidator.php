@@ -31,7 +31,7 @@ class RangeValidator extends ConstraintValidator
         if (!is_numeric($value)) {
             $this->context->addViolation($constraint->invalidMessage, array(
                 '{{ value }}' => $value,
-            ));
+            ), $value, null, $constraint::ERROR);
 
             return;
         }
@@ -40,7 +40,7 @@ class RangeValidator extends ConstraintValidator
             $this->context->addViolation($constraint->maxMessage, array(
                 '{{ value }}' => $value,
                 '{{ limit }}' => $constraint->max,
-            ));
+            ), $value, null, $constraint::ERROR_MAX);
 
             return;
         }
@@ -49,7 +49,7 @@ class RangeValidator extends ConstraintValidator
             $this->context->addViolation($constraint->minMessage, array(
                 '{{ value }}' => $value,
                 '{{ limit }}' => $constraint->min,
-            ));
+            ), $value, null, $constraint::ERROR_MIN);
         }
     }
 }

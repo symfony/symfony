@@ -22,5 +22,7 @@ use Symfony\Component\Validator\Constraint;
  */
 class NotBlank extends Constraint
 {
+    const ERROR = 'ca626403-7b11-487f-9dfb-c177a9040ce7';
+
     public $message = 'This value should not be blank.';
 }

@@ -92,7 +92,7 @@ class CountryValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolation')
             ->with('myMessage', array(
                 '{{ value }}' => $country,
-            ));
+            ), $country, Country::ERROR);
 
         $this->validator->validate($country, $constraint);
     }

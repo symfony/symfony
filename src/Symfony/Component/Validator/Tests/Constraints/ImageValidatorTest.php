@@ -84,7 +84,7 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
             ->with('myMessage', array(
                 '{{ width }}' => '2',
                 '{{ min_width }}' => '3',
-            ));
+            ), $this->image, null, Image::ERROR_MIN_WIDTH);
 
         $this->validator->validate($this->image, $constraint);
     }
@@ -101,7 +101,7 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
             ->with('myMessage', array(
                 '{{ width }}' => '2',
                 '{{ max_width }}' => '1',
-            ));
+            ), $this->image, null, Image::ERROR_MAX_WIDTH);
 
         $this->validator->validate($this->image, $constraint);
     }
@@ -118,7 +118,7 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
             ->with('myMessage', array(
                 '{{ height }}' => '2',
                 '{{ min_height }}' => '3',
-            ));
+            ), $this->image, null, Image::ERROR_MIN_HEIGHT);
 
         $this->validator->validate($this->image, $constraint);
     }
@@ -135,7 +135,7 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
             ->with('myMessage', array(
                 '{{ height }}' => '2',
                 '{{ max_height }}' => '1',
-            ));
+            ), $this->image, null, Image::ERROR_MAX_HEIGHT);
 
         $this->validator->validate($this->image, $constraint);
     }
@@ -200,7 +200,7 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
             ->with('myMessage', array(
                 '{{ ratio }}' => 1,
                 '{{ min_ratio }}' => 2,
-            ));
+            ), $this->image, null, Image::ERROR_MIN_RATIO);
 
         $this->validator->validate($this->image, $constraint);
     }
@@ -217,7 +217,7 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
             ->with('myMessage', array(
                 '{{ ratio }}' => 1,
                 '{{ max_ratio }}' => 0.5,
-            ));
+            ), $this->image, null, Image::ERROR_MAX_RATIO);
 
         $this->validator->validate($this->image, $constraint);
     }
@@ -258,7 +258,7 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
             ->with('myMessage', array(
                 '{{ width }}' => 2,
                 '{{ height }}' => 2,
-            ));
+            ), $this->image, null, Image::ERROR_DONT_ALLOW_SQUARE);
 
         $this->validator->validate($this->image, $constraint);
     }
@@ -275,7 +275,7 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
             ->with('myMessage', array(
                 '{{ width }}' => 2,
                 '{{ height }}' => 1,
-            ));
+            ), $this->imageLandscape, null, Image::ERROR_DONT_ALLOW_LANDSCAPE);
 
         $this->validator->validate($this->imageLandscape, $constraint);
     }
@@ -292,7 +292,7 @@ class ImageValidatorTest extends \PHPUnit_Framework_TestCase
             ->with('myMessage', array(
                 '{{ width }}' => 1,
                 '{{ height }}' => 2,
-            ));
+            ), $this->imagePortrait, null, Image::ERROR_DONT_ALLOW_PORTRAIT);
 
         $this->validator->validate($this->imagePortrait, $constraint);
     }

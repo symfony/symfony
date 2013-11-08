@@ -25,6 +25,9 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
  */
 class Collection extends Constraint
 {
+    const ERROR_EXTRA_FIELD = 'd3a68ca4-4836-42d9-a2c8-c21103a18b3f';
+    const ERROR_MISSING_FIELD = 'fb668c0b-5d90-4bda-8a3e-1fe4f1d5335b';
+
     public $fields;
     public $allowExtraFields = false;
     public $allowMissingFields = false;

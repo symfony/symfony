@@ -54,6 +54,11 @@ abstract class Constraint
     public $groups = array(self::DEFAULT_GROUP);
 
     /**
+     * @var mixed
+     */
+    public $code;
+
+    /**
      * Initializes the constraint with options.
      *
      * You should pass an associative array. The keys should be the names of

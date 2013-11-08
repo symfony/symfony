@@ -22,6 +22,11 @@ use Symfony\Component\Validator\Constraint;
  */
 class Choice extends Constraint
 {
+    const ERROR = '75d601e8-d9da-49a6-bf32-6df461244744';
+    const ERROR_MULTIPLE = '695ad03b-1cdc-4b97-81d2-60c7de8424b5';
+    const ERROR_MIN = '34f58897-1e70-4353-97d7-27ebd472406e';
+    const ERROR_MAX = '73311798-3160-48b9-b71a-1502ba9e45d6';
+
     public $choices;
     public $callback;
     public $multiple = false;

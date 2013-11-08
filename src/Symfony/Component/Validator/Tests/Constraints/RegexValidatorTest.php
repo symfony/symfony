@@ -92,7 +92,7 @@ class RegexValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolation')
             ->with('myMessage', array(
                 '{{ value }}' => $value,
-            ));
+            ), $value, null, Regex::ERROR);
 
         $this->validator->validate($value, $constraint);
     }

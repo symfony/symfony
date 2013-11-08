@@ -22,6 +22,8 @@ use Symfony\Component\Validator\Constraint;
  */
 class Url extends Constraint
 {
+    const ERROR = '23af3103-a5ca-4459-b0ae-3a2043479a98';
+
     public $message = 'This value is not a valid URL.';
     public $protocols = array('http', 'https');
 }

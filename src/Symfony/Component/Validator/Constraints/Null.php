@@ -22,5 +22,7 @@ use Symfony\Component\Validator\Constraint;
  */
 class Null extends Constraint
 {
+    const ERROR = '05b25fe2-0bfa-4ba3-b0aa-2491f80840a9';
+
     public $message = 'This value should be null.';
 }

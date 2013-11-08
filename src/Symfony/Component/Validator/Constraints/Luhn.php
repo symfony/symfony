@@ -20,5 +20,7 @@ use Symfony\Component\Validator\Constraint;
  */
 class Luhn extends Constraint
 {
+    const ERROR = 'e146c87e-3063-47ad-bde0-37cd2f5f117b';
+
     public $message = 'Invalid card number.';
 }

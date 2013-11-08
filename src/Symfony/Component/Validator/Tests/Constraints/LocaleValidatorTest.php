@@ -94,7 +94,7 @@ class LocaleValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolation')
             ->with('myMessage', array(
                 '{{ value }}' => $locale,
-            ));
+            ), $locale, null, Locale::ERROR);
 
         $this->validator->validate($locale, $constraint);
     }

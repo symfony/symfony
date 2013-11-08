@@ -98,7 +98,7 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
                 '{{ size }}'    => '11',
                 '{{ suffix }}'  => 'bytes',
                 '{{ file }}'    => $this->path,
-            ));
+            ), $this->path, null, File::ERROR_MAX_SIZE);
 
         $this->validator->validate($this->getFile($this->path), $constraint);
     }
@@ -119,7 +119,7 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
                 '{{ size }}'    => '1.4',
                 '{{ suffix }}'  => 'kB',
                 '{{ file }}'    => $this->path,
-            ));
+            ), $this->path, null, File::ERROR_MAX_SIZE);
 
         $this->validator->validate($this->getFile($this->path), $constraint);
     }
@@ -140,7 +140,7 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
                 '{{ size }}'    => '1.4',
                 '{{ suffix }}'  => 'MB',
                 '{{ file }}'    => $this->path,
-            ));
+            ), $this->path, null, File::ERROR_MAX_SIZE);
 
         $this->validator->validate($this->getFile($this->path), $constraint);
     }
@@ -242,7 +242,7 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
                 '{{ type }}'    => '"application/pdf"',
                 '{{ types }}'   => '"image/png", "image/jpg"',
                 '{{ file }}'    => $this->path,
-            ));
+            ), $file, null, File::ERROR_MIME_TYPE);
 
         $this->validator->validate($file, $constraint);
     }
@@ -276,7 +276,7 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
                 '{{ type }}'    => '"application/pdf"',
                 '{{ types }}'   => '"image/*", "image/jpg"',
                 '{{ file }}'    => $this->path,
-            ));
+            ), $file, null, File::ERROR_MIME_TYPE);
 
         $this->validator->validate($file, $constraint);
     }
@@ -284,7 +284,7 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider uploadedFileErrorProvider
      */
-    public function testUploadedFileError($error, $message, array $params = array(), $maxSize = null)
+    public function testUploadedFileError($error, $message, $constraintErrorCode, array $params = array(), $maxSize = null)
     {
         $file = new UploadedFile('/path/to/file', 'originalName', 'mime', 0, $error);
 
@@ -295,7 +295,7 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
 
         $this->context->expects($this->once())
             ->method('addViolation')
-            ->with('myMessage', $params);
+            ->with('myMessage', $params, $file, null, $constraintErrorCode);
 
         $this->validator->validate($file, $constraint);
 
@@ -304,30 +304,30 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
     public function uploadedFileErrorProvider()
     {
         $tests = array(
-            array(UPLOAD_ERR_FORM_SIZE, 'uploadFormSizeErrorMessage'),
-            array(UPLOAD_ERR_PARTIAL, 'uploadPartialErrorMessage'),
-            array(UPLOAD_ERR_NO_FILE, 'uploadNoFileErrorMessage'),
-            array(UPLOAD_ERR_NO_TMP_DIR, 'uploadNoTmpDirErrorMessage'),
-            array(UPLOAD_ERR_CANT_WRITE, 'uploadCantWriteErrorMessage'),
-            array(UPLOAD_ERR_EXTENSION, 'uploadExtensionErrorMessage'),
+            array(UPLOAD_ERR_FORM_SIZE, 'uploadFormSizeErrorMessage', File::ERROR_UPLOAD_FORM_SIZE),
+            array(UPLOAD_ERR_PARTIAL, 'uploadPartialErrorMessage', File::ERROR_UPLOAD_PARTIAL),
+            array(UPLOAD_ERR_NO_FILE, 'uploadNoFileErrorMessage', File::ERROR_UPLOAD_NO_FILE),
+            array(UPLOAD_ERR_NO_TMP_DIR, 'uploadNoTmpDirErrorMessage', File::ERROR_UPLOAD_NO_TMP_DIR),
+            array(UPLOAD_ERR_CANT_WRITE, 'uploadCantWriteErrorMessage', File::ERROR_UPLOAD_CANT_WRITE),
+            array(UPLOAD_ERR_EXTENSION, 'uploadExtensionErrorMessage', File::ERROR_UPLOAD_EXTENSION),
         );
 
         if (class_exists('Symfony\Component\HttpFoundation\File\UploadedFile')) {
             // when no maxSize is specified on constraint, it should use the ini value
-            $tests[] = array(UPLOAD_ERR_INI_SIZE, 'uploadIniSizeErrorMessage', array(
+            $tests[] = array(UPLOAD_ERR_INI_SIZE, 'uploadIniSizeErrorMessage', File::ERROR_UPLOAD_INI_SIZE, array(
                 '{{ limit }}' => UploadedFile::getMaxFilesize(),
                 '{{ suffix }}' => 'bytes',
             ));
 
             // it should use the smaller limitation (maxSize option in this case)
-            $tests[] = array(UPLOAD_ERR_INI_SIZE, 'uploadIniSizeErrorMessage', array(
+            $tests[] = array(UPLOAD_ERR_INI_SIZE, 'uploadIniSizeErrorMessage', File::ERROR_UPLOAD_INI_SIZE, array(
                 '{{ limit }}' => 1,
                 '{{ suffix }}' => 'bytes',
             ), '1');
 
             // it correctly parses the maxSize option and not only uses simple string comparison
             // 1000M should be bigger than the ini value
-            $tests[] = array(UPLOAD_ERR_INI_SIZE, 'uploadIniSizeErrorMessage', array(
+            $tests[] = array(UPLOAD_ERR_INI_SIZE, 'uploadIniSizeErrorMessage', File::ERROR_UPLOAD_INI_SIZE, array(
                 '{{ limit }}' => UploadedFile::getMaxFilesize(),
                 '{{ suffix }}' => 'bytes',
             ), '1000M');

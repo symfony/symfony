@@ -52,10 +52,19 @@ class TypeValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testEmptyIsInvalidIfNoString()
     {
-        $this->context->expects($this->once())
-            ->method('addViolation');
+        $constraint = new Type(array(
+            'type' => 'integer',
+            'message' => 'myMessage'
+        ));
 
-        $this->validator->validate('', new Type(array('type' => 'integer')));
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('myMessage', array(
+                '{{ value }}' => '',
+                '{{ type }}' => 'integer'
+            ), '', null, Type::ERROR);
+
+        $this->validator->validate('', $constraint);
     }
 
     /**
@@ -123,7 +132,7 @@ class TypeValidatorTest extends \PHPUnit_Framework_TestCase
             ->with('myMessage', array(
                 '{{ value }}' => $valueAsString,
                 '{{ type }}' => $type,
-            ));
+            ), $this->identicalTo($value), null, Type::ERROR);
 
         $this->validator->validate($value, $constraint);
     }

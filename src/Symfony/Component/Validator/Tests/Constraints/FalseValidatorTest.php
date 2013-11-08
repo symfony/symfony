@@ -60,4 +60,17 @@ class FalseValidatorTest extends \PHPUnit_Framework_TestCase
 
         $this->validator->validate(true, $constraint);
     }
+
+    public function testReturnedCode()
+    {
+        $constraint = new False(array(
+            'message' => 'myMessage',
+        ));
+
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('myMessage', array(), true, null, False::ERROR);
+
+        $this->validator->validate(true, $constraint);
+    }
 }

@@ -26,6 +26,8 @@ use Symfony\Component\Validator\Constraint;
  */
 class Ip extends Constraint
 {
+    const ERROR = '77436b41-d7f5-4793-8e67-cd5e5d3722a1';
+
     const V4 = '4';
     const V6 = '6';
     const ALL = 'all';

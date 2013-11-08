@@ -33,7 +33,7 @@ class IbanValidator extends ConstraintValidator
         $teststring = preg_replace('/\s+/', '', $value);
 
         if (strlen($teststring) < 4) {
-            $this->context->addViolation($constraint->message, array('{{ value }}' => $value));
+            $this->context->addViolation($constraint->message, array('{{ value }}' => $value), $value, null, $constraint::ERROR);
 
             return;
         }
@@ -55,7 +55,7 @@ class IbanValidator extends ConstraintValidator
         }
 
         if ($rest != 1) {
-            $this->context->addViolation($constraint->message, array('{{ value }}' => $value));
+            $this->context->addViolation($constraint->message, array('{{ value }}' => $value), $value, null, $constraint::ERROR);
 
             return;
         }

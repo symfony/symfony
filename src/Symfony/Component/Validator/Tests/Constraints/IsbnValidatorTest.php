@@ -162,7 +162,9 @@ class IsbnValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context
             ->expects($this->once())
             ->method('addViolation')
-            ->with($constraint->isbn10Message);
+            ->with($constraint->isbn10Message, array(
+                '{{ value }}' => $isbn,
+            ), $isbn, null, Isbn::ERROR_ISBN10);
 
         $this->validator->validate($isbn, $constraint);
     }
@@ -189,7 +191,9 @@ class IsbnValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context
             ->expects($this->once())
             ->method('addViolation')
-            ->with($constraint->isbn13Message);
+            ->with($constraint->isbn13Message, array(
+                '{{ value }}' => $isbn,
+            ), $isbn, null, Isbn::ERROR_ISBN13);
 
         $this->validator->validate($isbn, $constraint);
     }
@@ -216,7 +220,9 @@ class IsbnValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context
             ->expects($this->once())
             ->method('addViolation')
-            ->with($constraint->bothIsbnMessage);
+            ->with($constraint->bothIsbnMessage, array(
+                '{{ value }}' => $isbn,
+            ), $isbn, null, Isbn::ERROR);
 
         $this->validator->validate($isbn, $constraint);
     }

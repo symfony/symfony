@@ -169,7 +169,7 @@ class LengthValidatorTest extends \PHPUnit_Framework_TestCase
             ->with('myMessage', $this->identicalTo(array(
                 '{{ value }}' => (string) $value,
                 '{{ limit }}' => 4,
-            )), $this->identicalTo($value), 4);
+            )), $this->identicalTo($value), 4, Length::ERROR_MIN);
 
         $this->validator->validate($value, $constraint);
     }
@@ -193,7 +193,7 @@ class LengthValidatorTest extends \PHPUnit_Framework_TestCase
             ->with('myMessage', $this->identicalTo(array(
                 '{{ value }}' => (string) $value,
                 '{{ limit }}' => 4,
-            )), $this->identicalTo($value), 4);
+            )), $this->identicalTo($value), 4, Length::ERROR_MAX);
 
         $this->validator->validate($value, $constraint);
     }
@@ -218,7 +218,7 @@ class LengthValidatorTest extends \PHPUnit_Framework_TestCase
             ->with('myMessage', $this->identicalTo(array(
                 '{{ value }}' => (string) $value,
                 '{{ limit }}' => 4,
-            )), $this->identicalTo($value), 4);
+            )), $this->identicalTo($value), 4, Length::ERROR);
 
         $this->validator->validate($value, $constraint);
     }

@@ -22,6 +22,8 @@ use Symfony\Component\Validator\Constraint;
  */
 class Regex extends Constraint
 {
+    const ERROR = '3feb30b5-8882-4179-bf27-81155fcc71fc';
+
     public $message = 'This value is not valid.';
     public $pattern;
     public $htmlPattern = null;

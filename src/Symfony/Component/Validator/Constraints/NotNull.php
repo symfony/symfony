@@ -22,5 +22,7 @@ use Symfony\Component\Validator\Constraint;
  */
 class NotNull extends Constraint
 {
+    const ERROR = '80ab39d6-9e19-4191-afd9-03aab806e7b8';
+
     public $message = 'This value should not be null.';
 }

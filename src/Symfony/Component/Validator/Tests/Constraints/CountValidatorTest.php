@@ -139,7 +139,7 @@ abstract class CountValidatorTest extends \PHPUnit_Framework_TestCase
             ->with('myMessage', $this->identicalTo(array(
                 '{{ count }}' => count($value),
                 '{{ limit }}' => 4,
-            )), $value, 4);
+            )), $value, 4, Count::ERROR_MAX);
 
         $this->validator->validate($value, $constraint);
     }
@@ -159,7 +159,7 @@ abstract class CountValidatorTest extends \PHPUnit_Framework_TestCase
             ->with('myMessage', $this->identicalTo(array(
                 '{{ count }}' => count($value),
                 '{{ limit }}' => 4,
-            )), $value, 4);
+            )), $value, 4, Count::ERROR_MIN);
 
         $this->validator->validate($value, $constraint);
     }
@@ -180,7 +180,7 @@ abstract class CountValidatorTest extends \PHPUnit_Framework_TestCase
             ->with('myMessage', $this->identicalTo(array(
             '{{ count }}' => count($value),
             '{{ limit }}' => 4,
-        )), $value, 4);
+        )), $value, 4, Count::ERROR_EXACT);
 
         $this->validator->validate($value, $constraint);
     }

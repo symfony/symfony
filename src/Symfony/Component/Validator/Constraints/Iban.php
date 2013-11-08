@@ -18,5 +18,7 @@ use Symfony\Component\Validator\Constraint;
  */
 class Iban extends Constraint
 {
+    const ERROR = '403389e4-59d7-4942-ad9c-b5ba5a0a6a92';
+
     public $message = 'This is not a valid International Bank Account Number (IBAN).';
 }

@@ -55,35 +55,35 @@ class FileValidator extends ConstraintValidator
                     $this->context->addViolation($constraint->uploadIniSizeErrorMessage, array(
                         '{{ limit }}' => $maxSize,
                         '{{ suffix }}' => 'bytes',
-                    ));
+                    ), $value, null, $constraint::ERROR_UPLOAD_INI_SIZE);
 
                     return;
                 case UPLOAD_ERR_FORM_SIZE:
-                    $this->context->addViolation($constraint->uploadFormSizeErrorMessage);
+                    $this->context->addViolation($constraint->uploadFormSizeErrorMessage, array(), $value, null, $constraint::ERROR_UPLOAD_FORM_SIZE);
 
                     return;
                 case UPLOAD_ERR_PARTIAL:
-                    $this->context->addViolation($constraint->uploadPartialErrorMessage);
+                    $this->context->addViolation($constraint->uploadPartialErrorMessage, array(), $value, null, $constraint::ERROR_UPLOAD_PARTIAL);
 
                     return;
                 case UPLOAD_ERR_NO_FILE:
-                    $this->context->addViolation($constraint->uploadNoFileErrorMessage);
+                    $this->context->addViolation($constraint->uploadNoFileErrorMessage, array(), $value, null, $constraint::ERROR_UPLOAD_NO_FILE);
 
                     return;
                 case UPLOAD_ERR_NO_TMP_DIR:
-                    $this->context->addViolation($constraint->uploadNoTmpDirErrorMessage);
+                    $this->context->addViolation($constraint->uploadNoTmpDirErrorMessage, array(), $value, null, $constraint::ERROR_UPLOAD_NO_TMP_DIR);
 
                     return;
                 case UPLOAD_ERR_CANT_WRITE:
-                    $this->context->addViolation($constraint->uploadCantWriteErrorMessage);
+                    $this->context->addViolation($constraint->uploadCantWriteErrorMessage, array(), $value, null, $constraint::ERROR_UPLOAD_CANT_WRITE);
 
                     return;
                 case UPLOAD_ERR_EXTENSION:
-                    $this->context->addViolation($constraint->uploadExtensionErrorMessage);
+                    $this->context->addViolation($constraint->uploadExtensionErrorMessage, array(), $value, null, $constraint::ERROR_UPLOAD_EXTENSION);
 
                     return;
                 default:
-                    $this->context->addViolation($constraint->uploadErrorMessage);
+                    $this->context->addViolation($constraint->uploadErrorMessage, array(), $value, null, $constraint::ERROR_UPLOAD);
 
                     return;
             }
@@ -96,13 +96,13 @@ class FileValidator extends ConstraintValidator
         $path = $value instanceof FileObject ? $value->getPathname() : (string) $value;
 
         if (!is_file($path)) {
-            $this->context->addViolation($constraint->notFoundMessage, array('{{ file }}' => $path));
+            $this->context->addViolation($constraint->notFoundMessage, array('{{ file }}' => $path), $value, null, $constraint::ERROR_NOT_FOUND);
 
             return;
         }
 
         if (!is_readable($path)) {
-            $this->context->addViolation($constraint->notReadableMessage, array('{{ file }}' => $path));
+            $this->context->addViolation($constraint->notReadableMessage, array('{{ file }}' => $path), $value, null, $constraint::ERROR_NOT_READABLE);
 
             return;
         }
@@ -130,7 +130,7 @@ class FileValidator extends ConstraintValidator
                     '{{ limit }}'   => $limit,
                     '{{ suffix }}'  => $suffix,
                     '{{ file }}'    => $path,
-                ));
+                ), $value, null, $constraint::ERROR_MAX_SIZE);
 
                 return;
             }
@@ -164,7 +164,7 @@ class FileValidator extends ConstraintValidator
                     '{{ type }}'    => '"'.$mime.'"',
                     '{{ types }}'   => '"'.implode('", "', $mimeTypes) .'"',
                     '{{ file }}'    => $path,
-                ));
+                ), $value, null, $constraint::ERROR_MIME_TYPE);
             }
         }
     }

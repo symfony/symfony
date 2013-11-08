@@ -178,11 +178,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function addResource(ResourceInterface $resource)
     {
-        if (!$this->trackResources) {
-            return $this;
+        if ($this->trackResources) {
+            $this->resources[] = $resource;
         }
-
-        $this->resources[] = $resource;
 
         return $this;
     }
@@ -198,11 +196,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function setResources(array $resources)
     {
-        if (!$this->trackResources) {
-            return $this;
+        if ($this->trackResources) {
+            $this->resources = $resources;
         }
-
-        $this->resources = $resources;
 
         return $this;
     }
@@ -218,15 +214,13 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function addObjectResource($object)
     {
-        if (!$this->trackResources) {
-            return $this;
+        if ($this->trackResources) {
+            $parent = new \ReflectionObject($object);
+            do {
+                $this->addResource(new FileResource($parent->getFileName()));
+            } while ($parent = $parent->getParentClass());
         }
-
-        $parent = new \ReflectionObject($object);
-        do {
-            $this->addResource(new FileResource($parent->getFileName()));
-        } while ($parent = $parent->getParentClass());
-
+        
         return $this;
     }
 

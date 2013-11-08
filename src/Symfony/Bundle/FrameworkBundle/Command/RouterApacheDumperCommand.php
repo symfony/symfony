@@ -50,6 +50,8 @@ class RouterApacheDumperCommand extends ContainerAwareCommand
             ->setName('router:dump-apache')
             ->setDefinition(array(
                 new InputArgument('script_name', InputArgument::OPTIONAL, 'The script name of the application\'s front controller.'),
+                new InputOption('http-port', null, InputOption::VALUE_REQUIRED, 'The http-port.'),
+                new InputOption('https-port', null, InputOption::VALUE_REQUIRED, 'The https-port.'),
                 new InputOption('base-uri', null, InputOption::VALUE_REQUIRED, 'The base URI'),
             ))
             ->setDescription('Dumps all routes as Apache rewrite rules')
@@ -77,6 +79,12 @@ EOF
         }
         if ($input->getOption('base-uri')) {
             $dumpOptions['base_uri'] = $input->getOption('base-uri');
+        }
+        if ($input->getOption('http-port')) {
+            $dumpOptions['http_port'] = $input->getOption('http-port');
+        }
+        if ($input->getOption('https-port')) {
+            $dumpOptions['https_port'] = $input->getOption('https-port');
         }
 
         $dumper = new ApacheMatcherDumper($router->getRouteCollection());

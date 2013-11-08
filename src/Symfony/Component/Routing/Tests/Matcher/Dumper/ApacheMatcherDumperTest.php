@@ -87,6 +87,24 @@ class ApacheMatcherDumperTest extends \PHPUnit_Framework_TestCase
             array(),
             array('_method' => 'get|post')
         ));
+        // scheme requirement (http)
+        $collection->add('barhttp', new Route(
+            '/barhttp/{foo}',
+            array(),
+            array('_scheme' => 'http')
+        ));
+        // method requirement (https)
+        $collection->add('barhttps', new Route(
+            '/barhttps/{foo}',
+            array(),
+            array('_scheme' => 'https')
+        ));
+        // method requirement (http + https)
+        $collection->add('barhttphttps', new Route(
+            '/barhttphttps/{foo}',
+            array(),
+            array('_scheme' => 'http|https')
+        ));
         // simple
         $collection->add('baz', new Route(
             '/test/baz'

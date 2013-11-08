@@ -24,6 +24,26 @@ RewriteRule .* - [S=1,E=_ROUTING_allow_GET:1,E=_ROUTING_allow_POST:1,E=_ROUTING_
 RewriteCond %{REQUEST_URI} ^/baragain/([^/]++)$
 RewriteRule .* app.php [QSA,L,E=_ROUTING_route:baragain,E=_ROUTING_param_foo:%1]
 
+# barhttp
+RewriteCond %{HTTPS} on
+RewriteCond %{REQUEST_URI} ^/barhttp/([^/]++)$
+RewriteRule ^(.*)$ http://%{SERVER_NAME}%{REQUEST_URI} [L,R=301]
+RewriteCond %{HTTPS} off
+RewriteCond %{REQUEST_URI} ^/barhttp/([^/]++)$
+RewriteRule .* app.php [QSA,L,E=_ROUTING_route:barhttp,E=_ROUTING_param_foo:%1]
+
+# barhttps
+RewriteCond %{HTTPS} off
+RewriteCond %{REQUEST_URI} ^/barhttps/([^/]++)$
+RewriteRule ^(.*)$ https://%{SERVER_NAME}%{REQUEST_URI} [L,R=301]
+RewriteCond %{HTTPS} on
+RewriteCond %{REQUEST_URI} ^/barhttps/([^/]++)$
+RewriteRule .* app.php [QSA,L,E=_ROUTING_route:barhttps,E=_ROUTING_param_foo:%1]
+
+# barhttphttps
+RewriteCond %{REQUEST_URI} ^/barhttphttps/([^/]++)$
+RewriteRule .* app.php [QSA,L,E=_ROUTING_route:barhttphttps,E=_ROUTING_param_foo:%1]
+
 # baz
 RewriteCond %{REQUEST_URI} ^/test/baz$
 RewriteRule .* app.php [QSA,L,E=_ROUTING_route:baz]

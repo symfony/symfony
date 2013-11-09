@@ -408,7 +408,7 @@ class Process
      *
      * @return Process
      */
-    public function flushOutput()
+    public function clearOutput()
     {
         $this->stdout = '';
         $this->incrementalOutputOffset = 0;
@@ -454,7 +454,7 @@ class Process
      *
      * @return Process
      */
-    public function flushErrorOutput()
+    public function clearErrorOutput()
     {
         $this->stderr = '';
         $this->incrementalErrorOutputOffset = 0;

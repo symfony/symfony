@@ -359,6 +359,27 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($newParentParentAcl->getId(), $reloadedAcl->getParentAcl()->getParentAcl()->getId());
     }
 
+    public function testUpdateAclInsertingMultipleObjectFieldAcesThrowsDBConstraintViolations()
+    {
+        $provider = $this->getProvider();
+        $oid = new ObjectIdentity(1, 'Foo');
+        $sid1 = new UserSecurityIdentity('johannes', 'FooClass');
+        $sid2 = new UserSecurityIdentity('guilro', 'FooClass');
+        $sid3 = new UserSecurityIdentity('bmaz', 'FooClass');
+        $fieldName = 'fieldName';
+
+        $acl = $provider->createAcl($oid);
+        $acl->insertobjectFieldAce($fieldName, $sid1, 4);
+        $provider->updateAcl($acl);
+
+        $acl = $provider->findAcl($oid);
+        $acl->insertobjectFieldAce($fieldName, $sid2, 4);
+        $provider->updateAcl($acl);
+
+        $acl = $provider->findAcl($oid);
+        $acl->insertobjectFieldAce($fieldName, $sid3, 4);
+        $provider->updateAcl($acl);
+    }
     /**
      * Data must have the following format:
      * array(

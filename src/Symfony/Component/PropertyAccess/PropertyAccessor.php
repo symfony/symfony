@@ -228,14 +228,16 @@ class PropertyAccessor implements PropertyAccessorInterface
             // we call the getter and hope the __call do the job
             $result[self::VALUE] = $object->$getter();
         } else {
+            $methods = array($getter, $isser, $hasser, '__get');
+            if ($this->magicCall) {
+                $methods[] = '__call';
+            }
+
             throw new NoSuchPropertyException(sprintf(
-                'Neither the property "%s" nor one of the methods "%s()", '.
-                '"%s()", "%s()", "__get()" or "__call()" exist and have public access in '.
-                'class "%s".',
+                'Neither the property "%s" nor one of the methods "%s()" '.
+                'exist and have public access in class "%s".',
                 $property,
-                $getter,
-                $isser,
-                $hasser,
+                implode('()", "', $methods),
                 $reflClass->name
             ));
         }

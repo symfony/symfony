@@ -856,7 +856,9 @@ QUERY;
      */
     private function updateAces(\SplObjectStorage $aces)
     {
-        foreach ($aces as $ace) {
+        $aces_array = iterator_to_array($aces);
+        for ($i = count($aces_array)-1; $i>=0; $i--) {
+            $ace = $aces_array[$i];
             $propertyChanges = $aces->offsetGet($ace);
             $sets = array();
 

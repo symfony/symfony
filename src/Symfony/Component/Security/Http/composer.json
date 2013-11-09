@@ -23,14 +23,13 @@
         "symfony/http-kernel": "~2.4"
     },
     "require-dev": {
-        "symfony/form": "~2.0",
         "symfony/routing": "~2.2",
         "symfony/security-csrf": "~2.4",
         "psr/log": "~1.0"
     },
     "suggest": {
-        "symfony/security-csrf": "",
-        "symfony/routing": ""
+        "symfony/security-csrf": "For using tokens to protect authentication/logout attempts",
+        "symfony/routing": "For using the HttpUtils class to create sub-requests, redirect the user, and match URLs"
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\Security\\Http\\": "" }

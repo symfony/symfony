@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-10-04T08:29:01Z
+
+Couldn't we cast numbers to strings instead?
+
+---------------------------------------------------------------------------
+
+by Richtermeister at 2013-10-04T09:12:25Z
+
+I agree that would be more elegant but I'm not sure how.
+
+In case of float to string casting you end up with something like `"3.7828224631000E+14"` for original input `378282246310005`, which passes the is_numeric test, but fails the Luhn validation.
+
+From what I gather numbers of more than 14 digits are likely to loose precision in float conversion, depending on php settings. So it seems credit card numbers should always be treated as strings from the start.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-10-04T09:13:31Z
+
+Yes, but this is a BC break then. Why not comparing the casted number to the original one and only throw an exception if the two are different?
+
+---------------------------------------------------------------------------
+
+by Richtermeister at 2013-10-04T09:42:31Z
+
+Interesting idea. Functionally that would work, but I think there are two issues:
+ * it only avoids the exception for shorter floats which are unlikely to be credit card numbers (for me 11 digits was the cutoff)
+ * whether the exception is thrown or not would depend on the php precision settings
+
+I completely share your concern for BC, and maybe this should be more of a documentation issue. Potentially we could also add a new form type "CreditCardNumber", which produces a string (and can optionally strip spaces and dashes).
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-11-09T12:52:49Z
+
+:+1:
+
+I agree that the constraint should be restricted to strings. Judging from the test cases and the documentation, this constraint was never supposed to work with numbers, so I don't think our BC promise applies here.

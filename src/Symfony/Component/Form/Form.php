@@ -91,6 +91,12 @@ class Form implements \IteratorAggregate, FormInterface
     private $submitted = false;
 
     /**
+     * The button that was used to submit the form
+     * @var Button
+     */
+    private $clickedButton;
+
+    /**
      * The form data in model format
      * @var mixed
      */
@@ -551,6 +557,20 @@ class Form implements \IteratorAggregate, FormInterface
                     if (isset($submittedData[$name]) || $clearMissing) {
                         $child->submit(isset($submittedData[$name]) ? $submittedData[$name] : null, $clearMissing);
                         unset($submittedData[$name]);
+
+                        if (null !== $this->clickedButton) {
+                            continue;
+                        }
+
+                        if ($child instanceof ClickableInterface && $child->isClicked()) {
+                            $this->clickedButton = $child;
+
+                            continue;
+                        }
+
+                        if (method_exists($child, 'getClickedButton') && null !== $child->getClickedButton()) {
+                            $this->clickedButton = $child->getClickedButton();
+                        }
                     }
                 }
 
@@ -728,6 +748,25 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         return true;
+    }
+
+    /**
+     * Returns the button that was used to submit the form.
+     *
+     * @return Button|null The clicked button or NULL if the form was not
+     *                     submitted
+     */
+    public function getClickedButton()
+    {
+        if ($this->clickedButton) {
+            return $this->clickedButton;
+        }
+
+        if ($this->parent && method_exists($this->parent, 'getClickedButton')) {
+            return $this->parent->getClickedButton();
+        }
+
+        return null;
     }
 
     /**

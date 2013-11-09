@@ -23,11 +23,6 @@ use Symfony\Component\Validator\ConstraintValidator;
 class FormValidator extends ConstraintValidator
 {
     /**
-     * @var array
-     */
-    private static $clickedButtons = array();
-
-    /**
      * @var ServerParams
      */
     private $serverParams;
@@ -51,10 +46,6 @@ class FormValidator extends ConstraintValidator
         if (!$form instanceof FormInterface) {
             return;
         }
-
-        // If the form was previously validated, remove it from the cache in
-        // case the clicked button has changed
-        unset(self::$clickedButtons[spl_object_hash($form)]);
 
         /* @var FormInterface $form */
         $config = $form->getConfig();
@@ -181,21 +172,15 @@ class FormValidator extends ConstraintValidator
      */
     private static function getValidationGroups(FormInterface $form)
     {
-        $root = $form->getRoot();
-        $rootHash = spl_object_hash($root);
-
         // Determine the clicked button of the complete form tree
-        if (!array_key_exists($rootHash, self::$clickedButtons)) {
-            // Only call findClickedButton() once to prevent an exponential
-            // runtime
-            // https://github.com/symfony/symfony/issues/8317
-            self::$clickedButtons[$rootHash] = self::findClickedButton($root);
+        $clickedButton = null;
+
+        if (method_exists($form, 'getClickedButton')) {
+            $clickedButton = $form->getClickedButton();
         }
 
-        $button = self::$clickedButtons[$rootHash];
-
-        if (null !== $button) {
-            $groups = $button->getConfig()->getOption('validation_groups');
+        if (null !== $clickedButton) {
+            $groups = $clickedButton->getConfig()->getOption('validation_groups');
 
             if (null !== $groups) {
                 return self::resolveValidationGroups($groups, $form);
@@ -213,28 +198,6 @@ class FormValidator extends ConstraintValidator
         } while (null !== $form);
 
         return array(Constraint::DEFAULT_GROUP);
-    }
-
-    /**
-     * Extracts a clicked button from a form tree, if one exists.
-     *
-     * @param FormInterface $form The root form.
-     *
-     * @return ClickableInterface|null The clicked button or null.
-     */
-    private static function findClickedButton(FormInterface $form)
-    {
-        if ($form instanceof ClickableInterface && $form->isClicked()) {
-            return $form;
-        }
-
-        foreach ($form as $child) {
-            if (null !== ($button = self::findClickedButton($child))) {
-                return $button;
-            }
-        }
-
-        return null;
     }
 
     /**

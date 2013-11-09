@@ -13,8 +13,10 @@ namespace Symfony\Component\Form\Tests;
 
 use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
 use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationRequestHandler;
+use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\Forms;
+use Symfony\Component\Form\SubmitButtonBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Form\Tests\Fixtures\FixedDataTransformer;
@@ -828,6 +830,88 @@ class CompoundFormTest extends AbstractFormTest
         $parent->add($this->getBuilder('foo')->getForm());
 
         $this->assertEquals("name:\n    ERROR: Error!\nfoo:\n    No errors\n", $parent->getErrorsAsString());
+    }
+
+    public function testNoClickedButtonBeforeSubmission()
+    {
+        $this->assertNull($this->form->getClickedButton());
+    }
+
+    public function testNoClickedButton()
+    {
+        $button = $this->getMockBuilder('Symfony\Component\Form\SubmitButton')
+            ->setConstructorArgs(array(new SubmitButtonBuilder('submit')))
+            ->setMethods(array('isClicked'))
+            ->getMock();
+
+        $button->expects($this->any())
+            ->method('isClicked')
+            ->will($this->returnValue(false));
+
+        $parentForm = $this->getBuilder('parent')->getForm();
+        $nestedForm = $this->getBuilder('nested')->getForm();
+
+        $this->form->setParent($parentForm);
+        $this->form->add($button);
+        $this->form->add($nestedForm);
+        $this->form->submit(array());
+
+        $this->assertNull($this->form->getClickedButton());
+    }
+
+    public function testClickedButton()
+    {
+        $button = $this->getMockBuilder('Symfony\Component\Form\SubmitButton')
+            ->setConstructorArgs(array(new SubmitButtonBuilder('submit')))
+            ->setMethods(array('isClicked'))
+            ->getMock();
+
+        $button->expects($this->any())
+            ->method('isClicked')
+            ->will($this->returnValue(true));
+
+        $this->form->add($button);
+        $this->form->submit(array());
+
+        $this->assertSame($button, $this->form->getClickedButton());
+    }
+
+    public function testClickedButtonFromNestedForm()
+    {
+        $button = $this->getBuilder('submit')->getForm();
+
+        $nestedForm = $this->getMockBuilder('Symfony\Component\Form\Form')
+            ->setConstructorArgs(array($this->getBuilder('nested')))
+            ->setMethods(array('getClickedButton'))
+            ->getMock();
+
+        $nestedForm->expects($this->any())
+            ->method('getClickedButton')
+            ->will($this->returnValue($button));
+
+        $this->form->add($nestedForm);
+        $this->form->submit(array());
+
+        $this->assertSame($button, $this->form->getClickedButton());
+    }
+
+    public function testClickedButtonFromParentForm()
+    {
+        $button = $this->getBuilder('submit')->getForm();
+
+        $parentForm = $this->getMockBuilder('Symfony\Component\Form\Form')
+            ->setConstructorArgs(array($this->getBuilder('parent')))
+            ->setMethods(array('getClickedButton'))
+            ->getMock();
+
+        $parentForm->expects($this->any())
+            ->method('getClickedButton')
+            ->will($this->returnValue($button));
+
+        $this->form->setParent($parentForm);
+        $this->form->submit(array());
+
+        $this->assertSame($button, $this->form->getClickedButton());
     }
 
     protected function createForm()

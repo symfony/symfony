@@ -21,8 +21,8 @@ interface ParserCacheInterface
     /**
      * Saves an expression in the cache.
      *
-     * @param string           $key  The cache key
-     * @param ParsedExpression $data A ParsedExpression instance to store in the cache
+     * @param string           $key        The cache key
+     * @param ParsedExpression $expression A ParsedExpression instance to store in the cache
      */
     public function save($key, ParsedExpression $expression);
 

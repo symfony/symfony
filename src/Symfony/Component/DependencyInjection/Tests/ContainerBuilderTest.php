@@ -21,6 +21,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Scope;
@@ -757,6 +758,39 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $container->prependExtensionConfig('foo', $second);
         $configs = $container->getExtensionConfig('foo');
         $this->assertEquals(array($second, $first), $configs);
+    }
+
+    public function testLazyLoadedService()
+    {
+        $loader = new ClosureLoader($container = new ContainerBuilder());
+        $loader->load(function (ContainerBuilder $container) {
+                $container->set('a', new \BazClass());
+                $definition = new Definition('BazClass');
+                $definition->setLazy(true);
+                $container->setDefinition('a', $definition);
+            }
+        );
+
+        $container->setResourceTracking(true);
+
+        $container->compile();
+
+        $class = new \BazClass();
+        $reflectionClass = new \ReflectionClass($class);
+
+        $r = new \ReflectionProperty($container, 'resources');
+        $r->setAccessible(true);
+        $resources = $r->getValue($container);
+
+        $classInList = false;
+        foreach ($resources as $resource) {
+            if ($resource->getResource() === $reflectionClass->getFileName()) {
+                $classInList = true;
+                break;
+            }
+        }
+
+        $this->assertEquals(true, $classInList);
     }
 }
 

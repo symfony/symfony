@@ -227,18 +227,7 @@ class ProgressHelper extends Helper
      */
     public function advance($step = 1, $redraw = false)
     {
-        if (null === $this->startTime) {
-            throw new \LogicException('You must start the progress bar before calling advance().');
-        }
-
-        if (0 === $this->current) {
-            $redraw = true;
-        }
-
-        $this->current += $step;
-        if ($redraw || 0 === $this->current % $this->redrawFreq) {
-            $this->display();
-        }
+        $this->setCurrent($this->current + $step, $redraw);
     }
 
     /**

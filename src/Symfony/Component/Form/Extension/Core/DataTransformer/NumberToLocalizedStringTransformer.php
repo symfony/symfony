@@ -99,14 +99,14 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
 
     protected $roundingMode;
 
-    public function __construct($precision = null, $grouping = null, $roundingMode = null)
+    public function __construct($precision = null, $grouping = false, $roundingMode = self::ROUND_HALF_UP)
     {
         if (null === $grouping) {
             $grouping = false;
         }
 
         if (null === $roundingMode) {
-            $roundingMode = self::ROUND_HALFUP;
+            $roundingMode = self::ROUND_HALF_UP;
         }
 
         $this->precision = $precision;

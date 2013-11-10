@@ -18,7 +18,7 @@ namespace Symfony\Component\Finder\Iterator;
  */
 class ExcludeDirectoryFilterIterator extends FilterIterator
 {
-    private $patterns;
+    private $patterns = array();
 
     /**
      * Constructor.
@@ -28,7 +28,6 @@ class ExcludeDirectoryFilterIterator extends FilterIterator
      */
     public function __construct(\Iterator $iterator, array $directories)
     {
-        $this->patterns = array();
         foreach ($directories as $directory) {
             $this->patterns[] = '#(^|/)'.preg_quote($directory, '#').'(/|$)#';
         }

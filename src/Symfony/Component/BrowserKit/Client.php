@@ -32,19 +32,19 @@ abstract class Client
 {
     protected $history;
     protected $cookieJar;
-    protected $server;
+    protected $server = array();
     protected $internalRequest;
     protected $request;
     protected $internalResponse;
     protected $response;
     protected $crawler;
-    protected $insulated;
+    protected $insulated = false;
     protected $redirect;
-    protected $followRedirects;
+    protected $followRedirects = true;
 
-    private $maxRedirects;
-    private $redirectCount;
-    private $isMainRequest;
+    private $maxRedirects = -1;
+    private $redirectCount = 0;
+    private $isMainRequest = true;
 
     /**
      * Constructor.
@@ -58,13 +58,8 @@ abstract class Client
     public function __construct(array $server = array(), History $history = null, CookieJar $cookieJar = null)
     {
         $this->setServerParameters($server);
-        $this->history = null === $history ? new History() : $history;
-        $this->cookieJar = null === $cookieJar ? new CookieJar() : $cookieJar;
-        $this->insulated = false;
-        $this->followRedirects = true;
-        $this->maxRedirects = -1;
-        $this->redirectCount = 0;
-        $this->isMainRequest = true;
+        $this->history = $history ?: new History();
+        $this->cookieJar = $cookieJar ?: new CookieJar();
     }
 
     /**

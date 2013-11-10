@@ -35,7 +35,7 @@ use Symfony\Component\HttpKernel\Controller\ControllerReference;
 class FragmentHandler
 {
     private $debug;
-    private $renderers;
+    private $renderers = array();
     private $request;
     private $requestStack;
 
@@ -51,7 +51,6 @@ class FragmentHandler
     public function __construct(array $renderers = array(), $debug = false, RequestStack $requestStack = null)
     {
         $this->requestStack = $requestStack;
-        $this->renderers = array();
         foreach ($renderers as $renderer) {
             $this->addRenderer($renderer);
         }

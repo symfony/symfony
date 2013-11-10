@@ -24,12 +24,12 @@ class Command
     /**
      * @var array
      */
-    private $bits;
+    private $bits = array();
 
     /**
      * @var array
      */
-    private $labels;
+    private $labels = array();
 
     /**
      * @var \Closure|null
@@ -44,8 +44,6 @@ class Command
     public function __construct(Command $parent = null)
     {
         $this->parent = $parent;
-        $this->bits   = array();
-        $this->labels = array();
     }
 
     /**

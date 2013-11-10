@@ -33,7 +33,7 @@ class ProfilerListener implements EventSubscriberInterface
     protected $onlyException;
     protected $onlyMasterRequests;
     protected $exception;
-    protected $requests;
+    protected $requests = array();
     protected $profiles;
     protected $requestStack;
     protected $parents;
@@ -54,7 +54,6 @@ class ProfilerListener implements EventSubscriberInterface
         $this->onlyMasterRequests = (Boolean) $onlyMasterRequests;
         $this->profiles = new \SplObjectStorage();
         $this->parents = new \SplObjectStorage();
-        $this->requests = array();
         $this->requestStack = $requestStack;
     }
 

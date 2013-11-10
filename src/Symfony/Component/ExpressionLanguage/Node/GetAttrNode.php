@@ -21,8 +21,10 @@ class GetAttrNode extends Node
 
     public function __construct(Node $node, Node $attribute, ArrayNode $arguments, $type)
     {
-        $this->nodes = array('node' => $node, 'attribute' => $attribute, 'arguments' => $arguments);
-        $this->attributes = array('type' => $type);
+        parent::__construct(
+            array('node' => $node, 'attribute' => $attribute, 'arguments' => $arguments),
+            array('type' => $type)
+        );
     }
 
     public function compile(Compiler $compiler)

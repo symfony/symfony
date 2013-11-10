@@ -48,14 +48,14 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     /**
      * @var BundleInterface[]
      */
-    protected $bundles;
+    protected $bundles = array();
 
     protected $bundleMap;
     protected $container;
     protected $rootDir;
     protected $environment;
     protected $debug;
-    protected $booted;
+    protected $booted = false;
     protected $name;
     protected $startTime;
     protected $loadClassCache;
@@ -79,10 +79,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     {
         $this->environment = $environment;
         $this->debug = (Boolean) $debug;
-        $this->booted = false;
         $this->rootDir = $this->getRootDir();
         $this->name = $this->getName();
-        $this->bundles = array();
 
         if ($this->debug) {
             $this->startTime = microtime(true);

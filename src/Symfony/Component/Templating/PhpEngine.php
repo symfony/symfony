@@ -32,14 +32,14 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 {
     protected $loader;
     protected $current;
-    protected $helpers;
-    protected $parents;
-    protected $stack;
-    protected $charset;
-    protected $cache;
-    protected $escapers;
-    protected static $escaperCache;
-    protected $globals;
+    protected $helpers = array();
+    protected $parents = array();
+    protected $stack = array();
+    protected $charset = 'UTF-8';
+    protected $cache = array();
+    protected $escapers = array();
+    protected static $escaperCache = array();
+    protected $globals = array();
     protected $parser;
 
     private $evalTemplate;
@@ -56,13 +56,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     {
         $this->parser  = $parser;
         $this->loader  = $loader;
-        $this->parents = array();
-        $this->stack   = array();
-        $this->charset = 'UTF-8';
-        $this->cache   = array();
-        $this->globals = array();
 
-        $this->setHelpers($helpers);
+        $this->addHelpers($helpers);
 
         $this->initializeEscapers();
         foreach ($this->escapers as $context => $escaper) {

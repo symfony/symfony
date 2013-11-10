@@ -187,6 +187,10 @@ class XmlFileLoader extends FileLoader
                     continue;
                 }
 
+                if (false !== strpos($name, '-') && false === strpos($name, '_') && !array_key_exists($normalizedName = str_replace('-', '_', $name), $parameters)) {
+                    $parameters[$normalizedName] = SimpleXMLElement::phpize($value);
+                }
+                // keep not normalized key for BC too
                 $parameters[$name] = SimpleXMLElement::phpize($value);
             }
 

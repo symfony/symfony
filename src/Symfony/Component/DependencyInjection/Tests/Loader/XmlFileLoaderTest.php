@@ -198,6 +198,29 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($aliases['another_alias_for_foo']->isPublic());
     }
 
+    public function testParsesTags()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('services10.xml');
+
+        $services = $container->findTaggedServiceIds('foo_tag');
+        $this->assertCount(1, $services);
+
+        foreach ($services as $id => $tagAttributes) {
+            foreach ($tagAttributes as $attributes) {
+                $this->assertArrayHasKey('other_option', $attributes);
+                $this->assertEquals('lorem', $attributes['other_option']);
+                $this->assertArrayHasKey('other-option', $attributes, 'unnormalized tag attributes should not be removed');
+
+                $this->assertEquals('ciz', $attributes['some_option'], 'no overriding should be done when normalizing');
+                $this->assertEquals('cat', $attributes['some-option']);
+
+                $this->assertArrayNotHasKey('an_other_option', $attributes, 'normalization should not be done when an underscore is already found');
+            }
+        }
+    }
+
     public function testConvertDomElementToArray()
     {
         $doc = new \DOMDocument("1.0");

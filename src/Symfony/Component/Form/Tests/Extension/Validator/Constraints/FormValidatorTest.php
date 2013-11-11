@@ -615,7 +615,7 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->validate($form, new Form());
     }
 
-    public function testViolationIfExtraDataAllowed()
+    public function testNoViolationIfExtraDataAllowed()
     {
         $context = $this->getMockExecutionContext();
 

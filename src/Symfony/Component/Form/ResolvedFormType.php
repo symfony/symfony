@@ -29,12 +29,12 @@ class ResolvedFormType implements ResolvedFormTypeInterface
     private $innerType;
 
     /**
-     * @var array
+     * @var FormTypeExtensionInterface[]
      */
     private $typeExtensions;
 
     /**
-     * @var ResolvedFormTypeInterface
+     * @var ResolvedFormTypeInterface|null
      */
     private $parent;
 

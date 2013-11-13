@@ -615,15 +615,17 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             foreach ($compiler->getPassConfig()->getPasses() as $pass) {
                 $this->addObjectResource($pass);
             }
+        }
 
+        $compiler->compile($this);
+
+        if ($this->trackResources) {
             foreach ($this->definitions as $definition) {
                 if ($definition->isLazy() && ($class = $definition->getClass()) && class_exists($class)) {
                     $this->addClassResource(new \ReflectionClass($class));
                 }
             }
         }
-
-        $compiler->compile($this);
 
         $this->extensionConfigs = array();
 

@@ -181,6 +181,7 @@
 .sf-toolbar-block .sf-toolbar-icon > a,
 .sf-toolbar-block .sf-toolbar-icon > span {
     display: block;
+    font-weight: normal;
     text-decoration: none;
     margin: 0;
     padding: 5px 8px;
@@ -193,6 +194,10 @@
 .sf-toolbar-block .sf-toolbar-icon > a:link
 .sf-toolbar-block .sf-toolbar-icon > a:hover {
     color: black !important;
+}
+
+.sf-toolbar-block .sf-toolbar-icon > a[href]:after {
+    content: "";
 }
 
 .sf-toolbar-block .sf-toolbar-icon img {
@@ -359,5 +364,13 @@
 @media screen and (max-width: 1439px) {
     .sf-toolbar-block .sf-toolbar-icon > * > .sf-toolbar-info-piece-additional-detail {
         display: none;
+    }
+}
+
+/***** Media query print: Do not print the Toolbar. *****/
+@media print {
+    .sf-toolbar {
+        display: none;
+        visibility: hidden;
     }
 }

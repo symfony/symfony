@@ -29,7 +29,7 @@ class OutputFormatterStyleStack
     /**
      * Constructor.
      *
-     * @param OutputFormatterStyleInterface $emptyStyle
+     * @param OutputFormatterStyleInterface|null $emptyStyle
      */
     public function __construct(OutputFormatterStyleInterface $emptyStyle = null)
     {
@@ -58,7 +58,7 @@ class OutputFormatterStyleStack
     /**
      * Pops a style from the stack.
      *
-     * @param OutputFormatterStyleInterface $style
+     * @param OutputFormatterStyleInterface|null $style
      *
      * @return OutputFormatterStyleInterface
      *

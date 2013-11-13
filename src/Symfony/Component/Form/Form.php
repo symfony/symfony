@@ -170,6 +170,8 @@ class Form implements \IteratorAggregate, FormInterface
 
     public function __clone()
     {
+        $this->children = clone $this->children;
+        
         foreach ($this->children as $key => $child) {
             $this->children[$key] = clone $child;
         }

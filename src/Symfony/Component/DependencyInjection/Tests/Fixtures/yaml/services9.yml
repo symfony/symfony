@@ -51,6 +51,7 @@ services:
 
     inlined:
         class: Bar
+        public: false
         properties: { pub: pub }
         calls:
             - [setBaz, ['@baz']]

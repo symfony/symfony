@@ -155,6 +155,7 @@ class CompoundFormTest extends AbstractFormTest
 
         $this->assertNotSame($this->form, $clone);
         $this->assertNotSame($child, $clone['child']);
+        $this->assertNotSame($this->form['child'], $clone['child']);
     }
 
     public function testNotEmptyIfChildNotEmpty()

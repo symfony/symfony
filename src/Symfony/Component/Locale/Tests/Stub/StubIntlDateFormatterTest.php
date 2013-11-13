@@ -503,18 +503,18 @@ class StubIntlDateFormatterTest extends LocaleTestCase
         $this->assertEquals('GMT+03:00', $formatter->format(0));
     }
 
-    public function testFormatWithDefaultTimezoneStub()
+    public function testFormatWithConstructorTimezoneStub()
     {
-        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT);
+        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT, 'UTC');
         $formatter->setPattern('yyyy-MM-dd HH:mm:ss');
 
         $this->assertEquals(
-            $this->createDateTime(0)->format('Y-m-d H:i:s'),
+            $this->createDateTime(0, 'UTC')->format('Y-m-d H:i:s'),
             $formatter->format(0)
         );
     }
 
-    public function testFormatWithDefaultTimezoneIntl()
+    public function testFormatWithConstructorTimezoneIntl()
     {
         $this->skipIfIntlExtensionIsNotLoaded();
         $this->skipIfICUVersionIsTooOld();
@@ -523,7 +523,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
         $formatter->setPattern('yyyy-MM-dd HH:mm:ss');
 
         $this->assertEquals(
-            $this->createDateTime(0)->format('Y-m-d H:i:s'),
+            $this->createDateTime(0, 'UTC')->format('Y-m-d H:i:s'),
             $formatter->format(0)
         );
     }
@@ -541,7 +541,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
         $formatter->setPattern('yyyy-MM-dd HH:mm:ss');
 
         $this->assertEquals(
-            $this->createDateTime(0)->format('Y-m-d H:i:s'),
+            $this->createDateTime(0, 'Europe/London')->format('Y-m-d H:i:s'),
             $formatter->format(0)
         );
 
@@ -564,7 +564,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
         $formatter->setPattern('yyyy-MM-dd HH:mm:ss');
 
         $this->assertEquals(
-            $this->createDateTime(0)->format('Y-m-d H:i:s'),
+            $this->createDateTime(0, 'Europe/London')->format('Y-m-d H:i:s'),
             $formatter->format(0)
         );
 
@@ -599,7 +599,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
         $this->assertEquals('Europe/Paris', getenv('TZ'));
 
         $this->assertEquals(
-            $this->createDateTime(0)->format('Y-m-d H:i:s'),
+            $this->createDateTime(0, 'Europe/Paris')->format('Y-m-d H:i:s'),
             $formatter->format(0)
         );
 
@@ -628,7 +628,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
         $this->assertEquals('Europe/Paris', date_default_timezone_get());
 
         $this->assertEquals(
-            $this->createDateTime(0)->format('Y-m-d H:i:s'),
+            $this->createDateTime(0, 'Europe/Paris')->format('Y-m-d H:i:s'),
             $formatter->format(0)
         );
 
@@ -1223,13 +1223,8 @@ class StubIntlDateFormatterTest extends LocaleTestCase
         return new \IntlDateFormatter('en', \IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, 'UTC', \IntlDateFormatter::GREGORIAN, $pattern);
     }
 
-    protected function createDateTime($timestamp = null)
+    protected function createDateTime($timestamp, $timeZone)
     {
-        if ($this->isGreaterOrEqualThanPhpVersion('5.5.0-dev')) {
-            $timeZone = date_default_timezone_get();
-        } else {
-            $timeZone = getenv('TZ') ?: 'UTC';
-        }
 
         $dateTime = new \DateTime();
         $dateTime->setTimestamp(null === $timestamp ? time() : $timestamp);

@@ -71,12 +71,12 @@ Symfony2 is the result of the work of many people who made the code better
  - Fabien Pennequin (fabienpennequin)
  - Jacob Dreesen (jdreesen)
  - Kevin Bond (kbond)
+ - Wouter De Jong (wouterj)
+ - Adrien Brault (adrienbrault)
  - Michal Piotrowski (eventhorizon)
  - Robert Schönthal (digitalkaoz)
- - Wouter De Jong (wouterj)
  - Juti Noppornpitak (shiroyuki)
  - Sebastian Hörl (blogsh)
- - Adrien Brault (adrienbrault)
  - Hidenori Goto (hidenorigoto)
  - Gábor Egyed (1ed)
  - David Buchmann (dbu)
@@ -205,6 +205,7 @@ Symfony2 is the result of the work of many people who made the code better
  - Kai
  - Xavier HAUSHERR
  - Albert Jessurum (ajessu)
+ - Luis Cordova (cordoval)
  - Laszlo Korte
  - Tiago Ribeiro (fixe)
  - Alessandro Desantis
@@ -267,7 +268,6 @@ Symfony2 is the result of the work of many people who made the code better
  - Nils Adermann (naderman)
  - Gábor Fási
  - Benjamin Leveque (benji07)
- - Luis Cordova (cordoval)
  - sasezaki
  - Denis Gorbachev (starfall)
  - Steven Surowiec
@@ -349,6 +349,7 @@ Symfony2 is the result of the work of many people who made the code better
  - Casper Valdemar Poulsen
  - Eduardo Gulias (egulias)
  - Josiah (josiah)
+ - Peter Rehm
  - John Bohn (jbohn)
  - Andrew Hilobok (hilobok)
  - Christian Soronellas (theunic)
@@ -523,7 +524,6 @@ Symfony2 is the result of the work of many people who made the code better
  - Sebastian Göttschkes (sgoettschkes)
  - Kévin Gomez (kevin)
  - Pierre Tachoire
- - Peter Rehm
  - marcj
  - Ludek Stepan
  - Balázs Benyó (duplabe)
@@ -696,6 +696,7 @@ Symfony2 is the result of the work of many people who made the code better
  - timaschew
  - Ian Phillips
  - Haritz
+ - Matthieu Prat
  - Grummfy
  - Filipe Guerra
  - Rowan Manning
@@ -729,6 +730,7 @@ Symfony2 is the result of the work of many people who made the code better
  - Jimmy Leger (redpanda)
  - Baptiste Clavié (talus)
  - Cyrille Jouineau (tuxosaurus)
+ - Yorkie Chadwick (yorkie76)
  - Yanick Witschi
  - srsbiz
  - Nicolas A. Bérard-Nault
@@ -778,6 +780,7 @@ Symfony2 is the result of the work of many people who made the code better
  - vlechemin
  - Brian Corrigan
  - Skorney
+ - mieszko4
  - datibbaw
  - Norbert Orzechowicz
  - Pierre-Louis LAUNAY

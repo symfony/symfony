@@ -480,7 +480,7 @@ class Request
 
         $request = array('g' => $_GET, 'p' => $_POST, 'c' => $_COOKIE);
 
-        $requestOrder = ini_get('request_order') ?: ini_get('variable_order');
+        $requestOrder = ini_get('request_order') ?: ini_get('variables_order');
         $requestOrder = preg_replace('#[^cgp]#', '', strtolower($requestOrder)) ?: 'gp';
 
         $_REQUEST = array();

@@ -7,6 +7,24 @@ in 2.2 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.2.0...v2.2.1
 
+* 2.2.10 (2013-11-13)
+
+ * bug #9499 Request::overrideGlobals() may call invalid ini value (denkiryokuhatsuden)
+ * bug #9212 [Validator] Force Luhn Validator to only work with strings (Richtermeister)
+ * bug #9431 [DependencyInjection] fixed YamlDumper did not make services private. (realityking)
+ * bug #9412 [HttpFoundation] added content length header to BinaryFileResponse (kbond)
+ * bug #9388 [Form] Fixed: The "data" option is taken into account even if it is NULL (bschussek)
+ * bug #9391 [Serializer] Fixed the error handling when decoding invalid XML to avoid a Warning (stof)
+ * bug #9378 [DomCrawler] [HttpFoundation] Make `Content-Type` attributes identification case-insensitive (matthieuprat)
+ * bug #9354 [Process] Fix #9343 : revert file handle usage on Windows platform (romainneutron)
+ * bug #9333 [Form] Improved FormTypeCsrfExtension to use the type class as default intention if the form name is empty (bschussek)
+ * bug #9338 [DoctrineBridge] Added type check to prevent calling clear() on arrays (bschussek)
+ * bug #9327 [Form] Changed FormTypeCsrfExtension to use the form's name as default intention (bschussek)
+ * bug #9308 [DoctrineBridge] Loosened CollectionToArrayTransformer::transform() to accept arrays (bschussek)
+ * bug #9274 [Yaml] Fixed the escaping of strings starting with a dash when dumping (stof)
+ * bug #9270 [Templating] Fix in ChainLoader.php (janschoenherr)
+ * bug #9246 [Session] fixed wrong started state (tecbot)
+
 * 2.2.9 (2013-10-10)
 
  * [Security] limited the password length passed to encoders

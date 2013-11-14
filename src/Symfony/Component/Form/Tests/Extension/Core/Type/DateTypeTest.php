@@ -778,7 +778,7 @@ class DateTypeTest extends LocalizedTestCase
     public function testYearsFor32BitsMachines()
     {
         if (4 !== PHP_INT_SIZE) {
-            $testCase->markTestSkipped(
+            $this->markTestSkipped(
                 'PHP must be compiled in 32 bit mode to run this test');
         }
         

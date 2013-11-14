@@ -430,11 +430,11 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
         ));
 
         $parent->add($form);
-        $parent->add($this->getClickedSubmitButton('submit', array(
+        $parent->add($this->getSubmitButton('submit', array(
             'validation_groups' => 'button_group',
         )));
 
-        $form->setData($object);
+        $parent->submit(array('name' => $object, 'submit' => ''));
 
         $context->expects($this->once())
             ->method('validate')
@@ -731,11 +731,6 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
         $builder = new SubmitButtonBuilder($name, $options);
 
         return $builder->getForm();
-    }
-
-    private function getClickedSubmitButton($name = 'name', array $options = array())
-    {
-        return $this->getSubmitButton($name, $options)->submit('');
     }
 
     /**

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2013-11-13T22:45:00Z
+
+:+1:
+
+Without this change some tests are failing if environment timezone is set to something else than UTC.
+
+Before, `createDateTime()` was always using environment timezone to create a `\DateTime` which is later compared to dates created with explicitly given timezone (testFormatWithConstructorTimezone).
+
+I like this PR since it makes that timezone is set explicitly in each test which better reflects the intent of each case.

@@ -758,7 +758,7 @@ class ResponseTest extends ResponseTestCase
     public function validContentProvider()
     {
         return array(
-            'obj'    => array(new StringableObject),
+            'obj'    => array(new StringableObject()),
             'string' => array('Foo'),
             'int'    => array(2),
         );

@@ -82,7 +82,7 @@ class Router implements RouterInterface
         $this->loader = $loader;
         $this->resource = $resource;
         $this->logger = $logger;
-        $this->context = null === $context ? new RequestContext() : $context;
+        $this->context = $context ?: new RequestContext();
         $this->setOptions($options);
     }
 

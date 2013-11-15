@@ -21,19 +21,22 @@ use Symfony\Component\ExpressionLanguage\ParserCache\ParserCacheInterface;
  */
 class ExpressionLanguage
 {
+
     /**
      * @var ParserCacheInterface
      */
     private $cache;
     private $lexer;
     private $parser;
+    private $parserClass;
     private $compiler;
 
     protected $functions;
 
-    public function __construct(ParserCacheInterface $cache = null)
+    public function __construct(ParserCacheInterface $cache = null, $parserClass = null)
     {
         $this->cache = $cache ?: new ArrayParserCache();
+        $this->parserClass = $parserClass ?: "Symfony\\Component\\ExpressionLanguage\\Parser";
         $this->functions = array();
         $this->registerFunctions();
     }
@@ -122,7 +125,7 @@ class ExpressionLanguage
     private function getParser()
     {
         if (null === $this->parser) {
-            $this->parser = new Parser($this->functions);
+            $this->parser = new $this->parserClass($this->functions);
         }
 
         return $this->parser;

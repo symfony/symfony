@@ -25,18 +25,16 @@ class ExpressionLanguage
     /**
      * @var ParserCacheInterface
      */
-    private $cache;
-    private $lexer;
-    private $parser;
-    private $parserClass;
-    private $compiler;
+    protected $cache;
+    protected $lexer;
+    protected $parser;
+    protected $compiler;
 
     protected $functions;
 
-    public function __construct(ParserCacheInterface $cache = null, $parserClass = null)
+    public function __construct(ParserCacheInterface $cache = null)
     {
         $this->cache = $cache ?: new ArrayParserCache();
-        $this->parserClass = $parserClass ?: "Symfony\\Component\\ExpressionLanguage\\Parser";
         $this->functions = array();
         $this->registerFunctions();
     }
@@ -113,7 +111,7 @@ class ExpressionLanguage
         });
     }
 
-    private function getLexer()
+    protected function getLexer()
     {
         if (null === $this->lexer) {
             $this->lexer = new Lexer();
@@ -122,7 +120,7 @@ class ExpressionLanguage
         return $this->lexer;
     }
 
-    private function getParser()
+    protected function getParser()
     {
         if (null === $this->parser) {
             $this->parser = new $this->parserClass($this->functions);

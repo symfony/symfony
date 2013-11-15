@@ -123,7 +123,7 @@ class ExpressionLanguage
     protected function getParser()
     {
         if (null === $this->parser) {
-            $this->parser = new $this->parserClass($this->functions);
+            $this->parser = new Parser($this->functions);
         }
 
         return $this->parser;

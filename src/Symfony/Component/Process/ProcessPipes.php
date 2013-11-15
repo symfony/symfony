@@ -247,6 +247,10 @@ class ProcessPipes
      */
     private function readStreams($blocking, $close = false)
     {
+        if (empty($this->pipes)) {
+            return array();
+        }
+
         $read = array();
 
         $r = $this->pipes;

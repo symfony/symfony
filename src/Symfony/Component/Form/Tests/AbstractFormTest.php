@@ -57,6 +57,7 @@ abstract class AbstractFormTest extends \PHPUnit_Framework_TestCase
      * @param string                   $name
      * @param EventDispatcherInterface $dispatcher
      * @param string                   $dataClass
+     * @param array                    $options
      *
      * @return FormBuilder
      */

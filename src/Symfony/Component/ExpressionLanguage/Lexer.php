@@ -24,6 +24,8 @@ class Lexer
      * @param string $expression The expression to tokenize
      *
      * @return TokenStream A token stream instance
+     *
+     * @throws SyntaxError
      */
     public function tokenize($expression)
     {

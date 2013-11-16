@@ -34,7 +34,7 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
     /**
      * Stores the collected data per {@link FormInterface} instance.
      *
-     * Uses the hashes of the forms as keys. This is preferrable over using
+     * Uses the hashes of the forms as keys. This is preferable over using
      * {@link \SplObjectStorage}, because in this way no references are kept
      * to the {@link FormInterface} instances.
      *
@@ -45,7 +45,7 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
     /**
      * Stores the collected data per {@link FormView} instance.
      *
-     * Uses the hashes of the views as keys. This is preferrable over using
+     * Uses the hashes of the views as keys. This is preferable over using
      * {@link \SplObjectStorage}, because in this way no references are kept
      * to the {@link FormView} instances.
      *
@@ -57,7 +57,7 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
      * Connects {@link FormView} with {@link FormInterface} instances.
      *
      * Uses the hashes of the views as keys and the hashes of the forms as
-     * values. This is preferrable over storing the objects directly, because
+     * values. This is preferable over storing the objects directly, because
      * this way they can safely be discarded by the GC.
      *
      * @var array

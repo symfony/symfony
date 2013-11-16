@@ -32,7 +32,7 @@ class Filesystem
      * @param string  $targetFile The target filename
      * @param boolean $override   Whether to override an existing file or not
      *
-     * @throws FileNotFoundException    When orginFile doesn't exist
+     * @throws FileNotFoundException    When originFile doesn't exist
      * @throws IOException              When copy fails
      */
     public function copy($originFile, $targetFile, $override = false)

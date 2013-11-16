@@ -61,6 +61,13 @@ class CompatModelChoiceListTest extends AbstractChoiceListTest
             'filterById',
         ), array(), '', true, true, true, false, true);
 
+        $this->query
+            ->expects($this->any())
+            ->method('filterById')
+            ->with($this->anything())
+            ->will($this->returnSelf())
+        ;
+
         $this->createItems();
 
         ItemQuery::$result = array(

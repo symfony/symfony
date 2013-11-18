@@ -65,10 +65,6 @@ class Lexer
 
                 $tokens[] = new Token(Token::PUNCTUATION_TYPE, $expression[$cursor], $cursor + 1);
                 ++$cursor;
-            } elseif (false !== strpos('.,?:', $expression[$cursor])) {
-                // punctuation
-                $tokens[] = new Token(Token::PUNCTUATION_TYPE, $expression[$cursor], $cursor + 1);
-                ++$cursor;
             } elseif (preg_match('/"([^#"\\\\]*(?:\\\\.[^#"\\\\]*)*)"|\'([^\'\\\\]*(?:\\\\.[^\'\\\\]*)*)\'/As', $expression, $match, null, $cursor)) {
                 // strings
                 $tokens[] = new Token(Token::STRING_TYPE, stripcslashes(substr($match[0], 1, -1)), $cursor + 1);
@@ -77,6 +73,10 @@ class Lexer
                 // operators
                 $tokens[] = new Token(Token::OPERATOR_TYPE, $match[0], $cursor + 1);
                 $cursor += strlen($match[0]);
+            } elseif (false !== strpos('.,?:', $expression[$cursor])) {
+                // punctuation
+                $tokens[] = new Token(Token::PUNCTUATION_TYPE, $expression[$cursor], $cursor + 1);
+                ++$cursor;
             } elseif (preg_match('/[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/A', $expression, $match, null, $cursor)) {
                 // names
                 $tokens[] = new Token(Token::NAME_TYPE, $match[0], $cursor + 1);

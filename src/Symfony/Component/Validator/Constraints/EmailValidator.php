@@ -27,7 +27,7 @@ class EmailValidator extends ConstraintValidator
     /**
      * isStrict
      *
-     * @var boolean
+     * @var Boolean
      */
     protected $isStrict;
 

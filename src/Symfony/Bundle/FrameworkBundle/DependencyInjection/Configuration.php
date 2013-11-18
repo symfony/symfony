@@ -415,7 +415,7 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('cache')->end()
                         ->booleanNode('enable_annotations')->defaultFalse()->end()
                         ->scalarNode('translation_domain')->defaultValue('validators')->end()
-                        ->booleanNode('strict_email')->defaultTrue()->end()
+                        ->booleanNode('strict_email')->defaultFalse()->end()
                     ->end()
                 ->end()
             ->end()

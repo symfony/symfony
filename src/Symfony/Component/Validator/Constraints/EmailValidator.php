@@ -63,15 +63,32 @@ class EmailValidator extends ConstraintValidator
             $valid = preg_match('/.+\@.+\..+/', $value);
         }
 
-        if ($valid && $constraint->checkHost) {
+        if ($valid) {
             $host = substr($value, strpos($value, '@') + 1);
             // Check for host DNS resource records
-            $valid = $this->checkHost($host);
+
+            if ($valid && $constraint->checkMX) {
+                $valid = $this->checkMX($host);
+            } elseif ($valid && $constraint->checkHost) {
+                $valid = $this->checkHost($host);
+            }
         }
 
         if (!$valid) {
             $this->context->addViolation($constraint->message, array('{{ value }}' => $value));
         }
+    }
+
+    /**
+     * Check DNS Records for MX type.
+     *
+     * @param string $host Host
+     *
+     * @return Boolean
+     */
+    private function checkMX($host)
+    {
+        return checkdnsrr($host, 'MX');
     }
 
     /**

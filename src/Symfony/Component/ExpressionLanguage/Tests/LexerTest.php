@@ -70,6 +70,10 @@ class LexerTest extends \PHPUnit_Framework_TestCase
                 ),
                 '(3 + 5) ~ foo("bar").baz[4]',
             ),
+            array(
+                array(new Token('operator', '..', 1)),
+                '..',
+            ),
         );
     }
 }

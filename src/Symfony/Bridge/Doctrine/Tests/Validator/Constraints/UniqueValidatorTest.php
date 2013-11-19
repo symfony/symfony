@@ -355,9 +355,6 @@ class UniqueValidatorTest extends \PHPUnit_Framework_TestCase
         $violationsList = $validator->validate($associated);
     }
 
-    /**
-     * @group EM
-     */
     public function testDedicatedEntityManagerNullObject()
     {
         $uniqueFields = array('name');
@@ -382,9 +379,6 @@ class UniqueValidatorTest extends \PHPUnit_Framework_TestCase
         $uniqueValidator->validate($entity, $constraint);
     }
 
-    /**
-     * @group EM
-     */
     public function testEntityManagerNullObject()
     {
         $uniqueFields = array('name');

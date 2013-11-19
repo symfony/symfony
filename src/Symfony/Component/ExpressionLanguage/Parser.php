@@ -79,6 +79,8 @@ class Parser
      * @param array       $names  An array of valid names
      *
      * @return Node A node tree
+     *
+     * @throws SyntaxError
      */
     public function parse(TokenStream $stream, $names = array())
     {

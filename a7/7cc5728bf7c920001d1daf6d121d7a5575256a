@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by pborreli at 2013-11-17T14:11:27Z
+
+imo, if there is any doubt of BC, PR should be done against master only
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-11-19T18:31:01Z
+
+Next time, can you bundle everything is a single PR? That's much easier for me to handle.

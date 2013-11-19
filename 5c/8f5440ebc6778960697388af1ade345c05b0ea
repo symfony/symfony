@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by stof at 2013-11-19T13:24:49Z
+
+for which test is it using the expression language ?
+
+---------------------------------------------------------------------------
+
+by armetiz at 2013-11-19T14:40:35Z
+
+The Symfony\Bridge\Doctrine\ExpressionLanguage\DoctrineParserCache have a dependency to :
+* Symfony\Component\ExpressionLanguage\ParsedExpression
+* Symfony\Component\ExpressionLanguage\ParserCache\ParserCacheInterface
+
+---------------------------------------------------------------------------
+
+by stof at 2013-11-19T15:29:33Z
+
+oh, I forgot there was a parser cache implementation in the bridge, right

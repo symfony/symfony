@@ -164,7 +164,6 @@ class MockArraySessionStorage implements SessionStorageInterface
         }
         // nothing to do since we don't persist the session data
         $this->closed = false;
-        $this->started = false;
     }
 
     /**
@@ -213,7 +212,7 @@ class MockArraySessionStorage implements SessionStorageInterface
      */
     public function isStarted()
     {
-        return $this->started;
+        return $this->started && !$this->closed;
     }
 
     /**

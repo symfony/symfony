@@ -375,8 +375,8 @@ class UniqueValidatorTest extends \PHPUnit_Framework_TestCase
         $entity = new SingleIntIdEntity(1, null);
 
         $this->setExpectedException(
-            'Symfony\Component\Validator\Exception\RuntimeException',
-            'There is not entity manager \'foo\''
+            'Symfony\Component\Validator\Exception\ConstraintDefinitionException',
+            'There is not object manager \'foo\''
         );
 
         $uniqueValidator->validate($entity, $constraint);
@@ -400,8 +400,8 @@ class UniqueValidatorTest extends \PHPUnit_Framework_TestCase
         $entity = new SingleIntIdEntity(1, null);
 
         $this->setExpectedException(
-            'Symfony\Component\Validator\Exception\RuntimeException',
-            'There is not entity manager associated with this entity \'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity\''
+            'Symfony\Component\Validator\Exception\ConstraintDefinitionException',
+            'There is not object manager associated with this entity \'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity\''
         );
 
         $uniqueValidator->validate($entity, $constraint);

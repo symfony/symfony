@@ -15,7 +15,6 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
-use Symfony\Component\Validator\Exception\RuntimeException;
 use Symfony\Component\Validator\ConstraintValidator;
 
 /**
@@ -65,13 +64,13 @@ class UniqueEntityValidator extends ConstraintValidator
             $em = $this->registry->getManager($constraint->em);
 
             if(!$em) {
-               throw new RuntimeException(sprintf("There is not entity manager '%s'", $constraint->em));
+               throw new ConstraintDefinitionException(sprintf("There is not object manager '%s'", $constraint->em));
             }
         } else {
             $em = $this->registry->getManagerForClass(get_class($entity));
 
             if(!$em) {
-                throw new RuntimeException(sprintf("There is not entity manager associated with this entity '%s'", get_class($entity)));
+                throw new ConstraintDefinitionException(sprintf("There is not object manager associated with this entity '%s'", get_class($entity)));
             }
         }
 

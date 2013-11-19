@@ -354,4 +354,56 @@ class UniqueValidatorTest extends \PHPUnit_Framework_TestCase
         );
         $violationsList = $validator->validate($associated);
     }
+
+    /**
+     * @group EM
+     */
+    public function testDedicatedEntityManagerNullObject()
+    {
+        $uniqueFields = array('name');
+        $entityManagerName = 'foo'; 
+
+        $registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+
+        $constraint = new UniqueEntity(array(
+            'fields' => $uniqueFields,
+            'em' => $entityManagerName,
+        ));
+
+        $uniqueValidator = new UniqueEntityValidator($registry);
+
+        $entity = new SingleIntIdEntity(1, null);
+
+        $this->setExpectedException(
+            'Symfony\Component\Validator\Exception\RuntimeException',
+            'There is not entity manager \'foo\''
+        );
+
+        $uniqueValidator->validate($entity, $constraint);
+    }
+
+    /**
+     * @group EM
+     */
+    public function testEntityManagerNullObject()
+    {
+        $uniqueFields = array('name');
+
+        $registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+
+        $constraint = new UniqueEntity(array(
+            'fields' => $uniqueFields,
+        ));
+
+        $uniqueValidator = new UniqueEntityValidator($registry);
+
+        $entity = new SingleIntIdEntity(1, null);
+
+        $this->setExpectedException(
+            'Symfony\Component\Validator\Exception\RuntimeException',
+            'There is not entity manager associated with this entity \'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity\''
+        );
+
+        $uniqueValidator->validate($entity, $constraint);
+    }
 }

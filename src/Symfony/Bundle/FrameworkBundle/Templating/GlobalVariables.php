@@ -78,8 +78,8 @@ class GlobalVariables
      */
     public function getRequest()
     {
-        if ($this->container->has('request') && $request = $this->container->get('request')) {
-            return $request;
+        if ($this->container->has('request_stack')) {
+            return $this->container->get('request_stack')->getCurrentRequest();
         }
     }
 

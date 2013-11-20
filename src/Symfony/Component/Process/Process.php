@@ -184,7 +184,7 @@ class Process
      * The STDOUT and STDERR are also available after the process is finished
      * via the getOutput() and getErrorOutput() methods.
      *
-     * @param callback|null $callback A PHP callback to run whenever there is some
+     * @param callable|null $callback A PHP callback to run whenever there is some
      *                                output available on STDOUT or STDERR
      *
      * @return integer The exit status code
@@ -215,7 +215,7 @@ class Process
      * with true as a second parameter then the callback will get all data occurred
      * in (and since) the start call.
      *
-     * @param callback|null $callback A PHP callback to run whenever there is some
+     * @param callable|null $callback A PHP callback to run whenever there is some
      *                                output available on STDOUT or STDERR
      *
      * @return Process The process itself
@@ -261,8 +261,8 @@ class Process
      *
      * Be warned that the process is cloned before being started.
      *
-     * @param callable $callback A PHP callback to run whenever there is some
-     *                           output available on STDOUT or STDERR
+     * @param callable|null $callback A PHP callback to run whenever there is some
+     *                                output available on STDOUT or STDERR
      *
      * @return Process The new process
      *
@@ -290,7 +290,7 @@ class Process
      * from the output in real-time while writing the standard input to the process.
      * It allows to have feedback from the independent process during execution.
      *
-     * @param callback|null $callback A valid PHP callback
+     * @param callable|null $callback A valid PHP callback
      *
      * @return integer The exitcode of the process
      *
@@ -1018,9 +1018,9 @@ class Process
      * The callbacks adds all occurred output to the specific buffer and calls
      * the user callback (if present) with the received output.
      *
-     * @param callback|null $callback The user defined PHP callback
+     * @param callable|null $callback The user defined PHP callback
      *
-     * @return callback A PHP callable
+     * @return callable A PHP callable
      */
     protected function buildCallback($callback)
     {

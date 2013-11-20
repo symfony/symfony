@@ -188,7 +188,7 @@ class Response
     /**
      * Constructor.
      *
-     * @param string  $content The response content
+     * @param mixed   $content The response content, see setContent()
      * @param integer $status  The response status code
      * @param array   $headers An array of response headers
      *
@@ -215,7 +215,7 @@ class Response
      *     return Response::create($body, 200)
      *         ->setSharedMaxAge(300);
      *
-     * @param string  $content The response content
+     * @param mixed   $content The response content, see setContent()
      * @param integer $status  The response status code
      * @param array   $headers An array of response headers
      *
@@ -403,9 +403,9 @@ class Response
     /**
      * Sets the response content.
      *
-     * Valid types are strings, numbers, and objects that implement a __toString() method.
+     * Valid types are strings, numbers, null, and objects that implement a __toString() method.
      *
-     * @param mixed $content
+     * @param mixed $content Content that can be cast to string
      *
      * @return Response
      *

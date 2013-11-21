@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by stloyd at 2013-11-20T19:12:20Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-11-21T06:15:48Z
+
+Can you mark this method as deprecated in 2.4 (with a removal in 3.0?) And update the UPGRADE-3.0 file accordingly. I don't even know why we added this in the first place as you can easily get the request by type hinting it in any action method. Thanks.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2013-11-21T08:09:04Z
+
+@fabpot done!
+
+---------------------------------------------------------------------------
+
+by hhamon at 2013-11-21T08:12:20Z
+
+Forgot to add a note in Ugrade file... I'm on it.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2013-11-21T08:19:12Z
+
+Should I squash the three commits?
+
+---------------------------------------------------------------------------
+
+by hhamon at 2013-11-21T11:00:12Z
+
+Thanks! I have fixed the UPGRADE file and the PHPDoc. Commits have been squashed together.

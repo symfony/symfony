@@ -14,6 +14,7 @@ namespace Symfony\Component\Console\Tests;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\FormatterHelper;
+use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputArgument;
@@ -22,6 +23,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Tester\ApplicationTester;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleExceptionEvent;
@@ -564,9 +566,6 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $tester->run(array('command' => 'list', '--verbose' => true));
         $this->assertSame(Output::VERBOSITY_VERBOSE, $tester->getOutput()->getVerbosity(), '->run() sets the output to verbose if --verbose is passed');
 
-        $tester->run(array('command' => 'list', '--verbose' => 0));
-        $this->assertSame(Output::VERBOSITY_VERBOSE, $tester->getOutput()->getVerbosity(), '->run() sets the output to verbose if smaller --verbose level is passed');
-
         $tester->run(array('command' => 'list', '--verbose' => 1));
         $this->assertSame(Output::VERBOSITY_VERBOSE, $tester->getOutput()->getVerbosity(), '->run() sets the output to verbose if --verbose=1 is passed');
 
@@ -577,7 +576,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(Output::VERBOSITY_DEBUG, $tester->getOutput()->getVerbosity(), '->run() sets the output to debug if --verbose=3 is passed');
 
         $tester->run(array('command' => 'list', '--verbose' => 4));
-        $this->assertSame(Output::VERBOSITY_DEBUG, $tester->getOutput()->getVerbosity(), '->run() sets the output to debug if greater --verbose level is passed');
+        $this->assertSame(Output::VERBOSITY_VERBOSE, $tester->getOutput()->getVerbosity(), '->run() sets the output to verbose if unknown --verbose level is passed');
 
         $tester->run(array('command' => 'list', '-v' => true));
         $this->assertSame(Output::VERBOSITY_VERBOSE, $tester->getOutput()->getVerbosity(), '->run() sets the output to verbose if -v is passed');
@@ -599,6 +598,29 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
         $tester->run(array('command' => 'foo:bar', '-n' => true), array('decorated' => false));
         $this->assertSame('called'.PHP_EOL, $tester->getDisplay(), '->run() does not call interact() if -n is passed');
+    }
+
+    /**
+     * Issue #9285
+     *
+     * If the "verbose" option is just before an argument in ArgvInput,
+     * an argument value should not be treated as verbosity value.
+     * This test will fail with "Not enough arguments." if broken
+     */
+    public function testVerboseValueNotBreakArguments()
+    {
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->setCatchExceptions(false);
+        $application->add(new \FooCommand());
+
+        $output = new StreamOutput(fopen('php://memory', 'w', false));
+
+        $input = new ArgvInput(array('cli.php', '-v', 'foo:bar'));
+        $application->run($input, $output);
+
+        $input = new ArgvInput(array('cli.php', '--verbose', 'foo:bar'));
+        $application->run($input, $output);
     }
 
     public function testRunReturnsIntegerExitCode()

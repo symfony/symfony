@@ -409,11 +409,16 @@ class ProgressHelper extends Helper
     private function humaneMemory()
     {
         $memory = memory_get_usage(true);
-        if ($memory>1024*1024*1024*10) {
+
+        if ($memory > 1024*1024*1024*10) {
             return sprintf('%.2fGB', $memory/1024/1024/1024);
-        } elseif ($memory>1024*1024*10) {
+        }
+
+        if ($memory > 1024*1024*10) {
             return sprintf('%.2fMB', $memory/1024/1024);
-        } elseif ($memory>1024*10) {
+        }
+
+        if ($memory > 1024*10) {
             return sprintf('%.2fkB', $memory/1024);
         }
 

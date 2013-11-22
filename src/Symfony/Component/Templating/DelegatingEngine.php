@@ -23,7 +23,7 @@ class DelegatingEngine implements EngineInterface, StreamingEngineInterface
     /**
      * @var EngineInterface[]
      */
-    protected $engines;
+    protected $engines = array();
 
     /**
      * Constructor.
@@ -34,7 +34,6 @@ class DelegatingEngine implements EngineInterface, StreamingEngineInterface
      */
     public function __construct(array $engines = array())
     {
-        $this->engines = array();
         foreach ($engines as $engine) {
             $this->addEngine($engine);
         }

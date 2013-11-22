@@ -40,8 +40,8 @@ class AclProvider implements AclProviderInterface
 
     protected $cache;
     protected $connection;
-    protected $loadedAces;
-    protected $loadedAcls;
+    protected $loadedAces = array();
+    protected $loadedAcls = array();
     protected $options;
     private $permissionGrantingStrategy;
 
@@ -57,8 +57,6 @@ class AclProvider implements AclProviderInterface
     {
         $this->cache = $cache;
         $this->connection = $connection;
-        $this->loadedAces = array();
-        $this->loadedAcls = array();
         $this->options = $options;
         $this->permissionGrantingStrategy = $permissionGrantingStrategy;
     }

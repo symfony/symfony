@@ -30,11 +30,11 @@ use Symfony\Component\EventDispatcher\Debug\TraceableEventDispatcherInterface;
 class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEventDispatcherInterface
 {
     private $logger;
-    private $called;
+    private $called = array();
     private $stopwatch;
     private $dispatcher;
-    private $wrappedListeners;
-    private $firstCalledEvent;
+    private $wrappedListeners = array();
+    private $firstCalledEvent = array();
     private $id;
 
     /**
@@ -49,9 +49,6 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
         $this->dispatcher = $dispatcher;
         $this->stopwatch = $stopwatch;
         $this->logger = $logger;
-        $this->called = array();
-        $this->wrappedListeners = array();
-        $this->firstCalledEvent = array();
     }
 
     /**

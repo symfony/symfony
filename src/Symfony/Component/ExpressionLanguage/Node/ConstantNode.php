@@ -17,7 +17,10 @@ class ConstantNode extends Node
 {
     public function __construct($value)
     {
-        $this->attributes = array('value' => $value);
+        parent::__construct(
+            array(),
+            array('value' => $value)
+        );
     }
 
     public function compile(Compiler $compiler)

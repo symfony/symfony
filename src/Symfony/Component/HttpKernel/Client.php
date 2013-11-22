@@ -43,10 +43,9 @@ class Client extends BaseClient
      */
     public function __construct(HttpKernelInterface $kernel, array $server = array(), History $history = null, CookieJar $cookieJar = null)
     {
-        $this->kernel = $kernel;
-
         parent::__construct($server, $history, $cookieJar);
 
+        $this->kernel = $kernel;
         $this->followRedirects = false;
     }
 

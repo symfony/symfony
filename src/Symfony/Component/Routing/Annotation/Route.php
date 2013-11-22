@@ -22,12 +22,12 @@ class Route
 {
     private $path;
     private $name;
-    private $requirements;
-    private $options;
-    private $defaults;
+    private $requirements = array();
+    private $options = array();
+    private $defaults = array();
     private $host;
-    private $methods;
-    private $schemes;
+    private $methods = array();
+    private $schemes = array();
     private $condition;
 
     /**
@@ -39,12 +39,6 @@ class Route
      */
     public function __construct(array $data)
     {
-        $this->requirements = array();
-        $this->options = array();
-        $this->defaults = array();
-        $this->methods = array();
-        $this->schemes = array();
-
         if (isset($data['value'])) {
             $data['path'] = $data['value'];
             unset($data['value']);

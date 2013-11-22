@@ -20,7 +20,7 @@ class DumperPrefixCollectionTest extends \PHPUnit_Framework_TestCase
 {
     public function testAddPrefixRoute()
     {
-        $coll = new DumperPrefixCollection;
+        $coll = new DumperPrefixCollection();
         $coll->setPrefix('');
 
         $route = new DumperRoute('bar', new Route('/foo/bar'));
@@ -66,7 +66,7 @@ EOF;
 
     public function testMergeSlashNodes()
     {
-        $coll = new DumperPrefixCollection;
+        $coll = new DumperPrefixCollection();
         $coll->setPrefix('');
 
         $route = new DumperRoute('bar', new Route('/foo/bar'));

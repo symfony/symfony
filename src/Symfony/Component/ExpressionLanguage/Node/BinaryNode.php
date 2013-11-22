@@ -16,9 +16,9 @@ use Symfony\Component\ExpressionLanguage\Compiler;
 class BinaryNode extends Node
 {
     private static $operators = array(
-        '~'     => '.',
-        'and'   => '&&',
-        'or'    => '||',
+        '~'   => '.',
+        'and' => '&&',
+        'or'  => '||',
     );
 
     private static $functions = array(
@@ -30,8 +30,10 @@ class BinaryNode extends Node
 
     public function __construct($operator, Node $left, Node $right)
     {
-        $this->nodes = array('left' => $left, 'right' => $right);
-        $this->attributes = array('operator' => $operator);
+        parent::__construct(
+            array('left' => $left, 'right' => $right),
+            array('operator' => $operator)
+        );
     }
 
     public function compile(Compiler $compiler)

@@ -29,12 +29,11 @@ class ExpressionLanguage
     private $parser;
     private $compiler;
 
-    protected $functions;
+    protected $functions = array();
 
     public function __construct(ParserCacheInterface $cache = null)
     {
         $this->cache = $cache ?: new ArrayParserCache();
-        $this->functions = array();
         $this->registerFunctions();
     }
 

@@ -42,6 +42,11 @@ class FormError
     protected $messagePluralization;
 
     /**
+     * The error field name 
+     * @var string
+     */
+    protected $errorPath;
+    /**
      * Constructor
      *
      * Any array key in $messageParameters will be used as a placeholder in
@@ -52,15 +57,17 @@ class FormError
      * @param array        $messageParameters    The parameters that should be
      *                                           substituted in the message template.
      * @param integer|null $messagePluralization The value for error message pluralization
+     * @param string       $errorPath           The error field name 
      *
      * @see \Symfony\Component\Translation\Translator
      */
-    public function __construct($message, $messageTemplate = null, array $messageParameters = array(), $messagePluralization = null)
+    public function __construct($message, $messageTemplate = null, array $messageParameters = array(), $messagePluralization = null, $errorPath = null)
     {
         $this->message = $message;
         $this->messageTemplate = $messageTemplate ?: $message;
         $this->messageParameters = $messageParameters;
         $this->messagePluralization = $messagePluralization;
+        $this->errorPath = $errorPath;
     }
 
     /**
@@ -101,5 +108,15 @@ class FormError
     public function getMessagePluralization()
     {
         return $this->messagePluralization;
+    }
+    
+    /**
+     * Returns the error field name 
+     *
+     * @return string
+     */
+    public function getErrorPath()
+    {
+    	return $this->errorPath;
     }
 }

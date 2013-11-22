@@ -67,4 +67,29 @@ class MainConfigurationTest extends \PHPUnit_Framework_TestCase
         $configuration = new MainConfiguration(array(), array());
         $config = $processor->processConfiguration($configuration, array($config));
     }
+
+    public function testCsrfTokenGeneratorSet()
+    {
+        $config = array(
+            'providers' => array(
+                'stub' => array(
+                    'id' => 'foo',
+                ),
+            ),
+            'firewalls' => array(
+                'stub' => array(
+                    'logout' => array(
+                        'csrf_token_generator' => 'bar'
+                    )
+                )
+            )
+        );
+
+        $processor = new Processor();
+        $configuration = new MainConfiguration(array(), array());
+        $config = $processor->processConfiguration($configuration, array($config));
+
+        $this->assertTrue(isset($config['firewalls']['stub']['logout']['csrf_provider']));
+        $this->assertEquals($config['firewalls']['stub']['logout']['csrf_provider'], 'bar');
+    }
 }

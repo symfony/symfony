@@ -156,8 +156,8 @@ class ProcessPipes
     /**
      * Writes stdin data.
      *
-     * @param Boolean $blocking Whether to use blocking calls or not.
-     * @param string  $stdin    The data to write.
+     * @param Boolean     $blocking Whether to use blocking calls or not.
+     * @param string|null $stdin    The data to write.
      */
     public function write($blocking, $stdin)
     {

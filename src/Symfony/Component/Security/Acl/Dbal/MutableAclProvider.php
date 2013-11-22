@@ -810,17 +810,17 @@ QUERY;
     {
         $currentIds = array();
         foreach ($changes[1] as $field => $new) {
-            for ($i=0,$c=count($new); $i<$c; $i++) {
+            for ($i = 0, $c = count($new); $i < $c; $i++) {
                 $ace = $new[$i];
 
-                if (null != $ace->getId()) {
+                if (null !== $ace->getId()) {
                     $currentIds[$ace->getId()] = true;
                 }
             }
         }
 
         foreach ($changes[0] as $old) {
-            for ($i=0,$c=count($old); $i<$c; $i++) {
+            for ($i = 0, $c = count($old); $i < $c; $i++) {
                 $ace = $old[$i];
 
                 if (!isset($currentIds[$ace->getId()])) {
@@ -890,12 +890,12 @@ QUERY;
         for ($i=0,$c=count($new); $i<$c; $i++) {
             $ace = $new[$i];
 
-            if (null != $ace->getId()) {
+            if (null !== $ace->getId()) {
                 $currentIds[$ace->getId()] = true;
             }
         }
 
-        for ($i=0,$c=count($old); $i<$c; $i++) {
+        for ($i = 0, $c = count($old); $i < $c; $i++) {
             $ace = $old[$i];
 
             if (!isset($currentIds[$ace->getId()])) {

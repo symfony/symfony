@@ -23,7 +23,7 @@ class ProgressHelper extends Helper
 {
     const FORMAT_QUIET         = ' %percent%%';
     const FORMAT_NORMAL        = ' %current%/%max% [%bar%] %percent%%';
-    const FORMAT_VERBOSE       = ' %current%/%max% [%bar%] %percent%% Elapsed: %elapsed%';
+    const FORMAT_VERBOSE       = ' %current%/%max% [%bar%] %percent%% Elapsed: %elapsed% - Estimated: %estimated%';
     const FORMAT_QUIET_NOMAX   = ' %current%';
     const FORMAT_NORMAL_NOMAX  = ' %current% [%bar%]';
     const FORMAT_VERBOSE_NOMAX = ' %current% [%bar%] Elapsed: %elapsed%';
@@ -76,6 +76,7 @@ class ProgressHelper extends Helper
         'bar',
         'percent',
         'elapsed',
+        'estimated',
     );
 
     /**
@@ -91,10 +92,11 @@ class ProgressHelper extends Helper
      * @var array
      */
     private $widths = array(
-        'current' => 4,
-        'max'     => 4,
-        'percent' => 3,
-        'elapsed' => 6,
+        'current'   => 4,
+        'max'       => 4,
+        'percent'   => 3,
+        'elapsed'   => 6,
+        'estimated' => 6,
     );
 
     /**
@@ -390,6 +392,11 @@ class ProgressHelper extends Helper
 
         if (isset($this->formatVars['percent'])) {
             $vars['percent'] = str_pad(floor($percent * 100), $this->widths['percent'], ' ', STR_PAD_LEFT);
+        }
+
+        if (isset($this->formatVars['estimated'])) {
+            $eta = round((time() - $this->startTime) * ($this->max - $this->current)) / $this->current;
+            $vars['estimated'] = str_pad($this->humaneTime($eta), $this->widths['estimated'], ' ', STR_PAD_LEFT);
         }
 
         return $vars;

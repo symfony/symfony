@@ -16,6 +16,7 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AbstractF
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 /**
  * This class contains the configuration information for the following tags:
@@ -213,12 +214,12 @@ class MainConfiguration implements ConfigurationInterface
                 ->treatTrueLike(array())
                 ->canBeUnset()
                 ->beforeNormalization()
-                    ->ifTrue(function($v) { return isset($v['csrf_token_generator']) && !isset($v['csrf_provider']); })
-                    ->then(function($v) { $v['csrf_provider'] = $v['csrf_token_generator']; unset($v['csrf_token_generator']); return $v; })
+                    ->ifTrue(function($v) { return isset($v['csrf_token_generator']); })
+                    ->then(function($v) { if (isset($v['csrf_provider']) ){ throw new InvalidConfigurationException('Both csrf_token_generator and csrf_provider keys cannot be specified at the same time'); } $v['csrf_provider'] = $v['csrf_token_generator']; unset($v['csrf_token_generator']); return $v; })
                 ->end()
                 ->beforeNormalization()
-                    ->ifTrue(function($v) { return isset($v['csrf_token_id']) && !isset($v['intention']); })
-                    ->then(function($v) { $v['intention'] = $v['csrf_token_id']; unset($v['csrf_token_id']); return $v; })
+                    ->ifTrue(function($v) { return isset($v['csrf_token_id']); })
+                    ->then(function($v) { if (isset($v['intention']) ){ throw new InvalidConfigurationException('Both csrf_token_id and intention keys cannot be specified at the same time'); } $v['intention'] = $v['csrf_token_id']; unset($v['csrf_token_id']); return $v; })
                 ->end()
                 ->children()
                     ->scalarNode('csrf_parameter')->defaultValue('_csrf_token')->end()

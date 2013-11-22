@@ -23,7 +23,7 @@ class ProgressHelper extends Helper
 {
     const FORMAT_QUIET         = ' %percent%%';
     const FORMAT_NORMAL        = ' %current%/%max% [%bar%] %percent%%';
-    const FORMAT_VERBOSE       = ' %current%/%max% [%bar%] %percent%% Elapsed: %elapsed%';
+    const FORMAT_VERBOSE       = ' %current%/%max% [%bar%] %percent%% Elapsed: %elapsed% (%memory%)';
     const FORMAT_QUIET_NOMAX   = ' %current%';
     const FORMAT_NORMAL_NOMAX  = ' %current% [%bar%]';
     const FORMAT_VERBOSE_NOMAX = ' %current% [%bar%] Elapsed: %elapsed%';
@@ -76,6 +76,7 @@ class ProgressHelper extends Helper
         'bar',
         'percent',
         'elapsed',
+        'memory'
     );
 
     /**
@@ -95,6 +96,7 @@ class ProgressHelper extends Helper
         'max'     => 4,
         'percent' => 3,
         'elapsed' => 6,
+        'memory'  => 6
     );
 
     /**
@@ -392,7 +394,31 @@ class ProgressHelper extends Helper
             $vars['percent'] = str_pad(floor($percent * 100), $this->widths['percent'], ' ', STR_PAD_LEFT);
         }
 
+        if (isset($this->formatVars['memory'])) {
+            $vars['memory'] = str_pad($this->humaneMemory(), $this->widths['memory'], ' ', STR_PAD_LEFT);
+        }
+
         return $vars;
+    }
+
+    /**
+     * Converts memory usage to human-readable format.
+     *
+     * @return string
+     */
+    private function humaneMemory()
+    {
+        $memory = memory_get_usage(true);
+        if ($memory>1024*1024*1024*10) {
+            return sprintf('%.2fGB', $memory/1024/1024/1024);
+        } elseif ($memory>1024*1024*10) {
+            return sprintf('%.2fMB', $memory/1024/1024);
+        } elseif ($memory>1024*10) {
+            return sprintf('%.2fkB', $memory/1024);
+        }
+
+        return sprintf('%.2fB', $memory);
+
     }
 
     /**

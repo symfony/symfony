@@ -31,8 +31,8 @@ class XmlUtils
     /**
      * Loads an XML file.
      *
-     * @param string $file                      An XML file path
-     * @param string|callable $schemaOrCallable An XSD schema file path or callable
+     * @param string               $file             An XML file path
+     * @param string|callable|null $schemaOrCallable An XSD schema file path, a callable, or null to disable validation
      *
      * @return \DOMDocument
      *

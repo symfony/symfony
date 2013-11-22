@@ -23,7 +23,7 @@ class ProgressHelper extends Helper
 {
     const FORMAT_QUIET         = ' %percent%%';
     const FORMAT_NORMAL        = ' %current%/%max% [%bar%] %percent%%';
-    const FORMAT_VERBOSE       = ' %current%/%max% [%bar%] %percent%% Elapsed: %elapsed%';
+    const FORMAT_VERBOSE       = ' %current%/%max% [%bar%] %percent%% Elapsed: %elapsed% (%memory%)';
     const FORMAT_QUIET_NOMAX   = ' %current%';
     const FORMAT_NORMAL_NOMAX  = ' %current% [%bar%]';
     const FORMAT_VERBOSE_NOMAX = ' %current% [%bar%] Elapsed: %elapsed% Estimated: %estimated% (%memory%)';

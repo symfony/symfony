@@ -22,7 +22,7 @@ class EmailValidatorTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
-        $this->validator = new EmailValidator();
+        $this->validator = new EmailValidator(false);
         $this->validator->initialize($this->context);
     }
 

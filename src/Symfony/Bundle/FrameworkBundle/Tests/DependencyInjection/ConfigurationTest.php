@@ -127,6 +127,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'enabled'            => false,
                 'enable_annotations' => false,
                 'translation_domain' => 'validators',
+                'strict_email'       => false,
             ),
             'annotations'         => array(
                 'cache'          => 'file',

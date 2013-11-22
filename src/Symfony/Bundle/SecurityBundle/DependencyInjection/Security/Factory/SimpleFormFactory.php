@@ -65,7 +65,7 @@ class SimpleFormFactory extends FormLoginFactory
         $listenerId = parent::createListener($container, $id, $config, $userProvider);
         $listener = $container->getDefinition($listenerId);
 
-        if (!isset($config['csrf_provider'])) {
+        if (!isset($config['csrf_token_generator'])) {
             $listener->addArgument(null);
         }
 

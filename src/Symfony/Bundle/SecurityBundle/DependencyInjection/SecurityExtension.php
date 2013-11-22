@@ -291,7 +291,7 @@ class SecurityExtension extends Extension
             $listener = $container->setDefinition($listenerId, new DefinitionDecorator('security.logout_listener'));
             $listener->replaceArgument(3, array(
                 'csrf_parameter' => $firewall['logout']['csrf_parameter'],
-                'intention'      => $firewall['logout']['intention'],
+                'intention'      => $firewall['logout']['csrf_token_id'],
                 'logout_path'    => $firewall['logout']['path'],
             ));
             $listeners[] = new Reference($listenerId);
@@ -307,8 +307,8 @@ class SecurityExtension extends Extension
             $listener->replaceArgument(2, new Reference($logoutSuccessHandlerId));
 
             // add CSRF provider
-            if (isset($firewall['logout']['csrf_provider'])) {
-                $listener->addArgument(new Reference($firewall['logout']['csrf_provider']));
+            if (isset($firewall['logout']['csrf_token_generator'])) {
+                $listener->addArgument(new Reference($firewall['logout']['csrf_token_generator']));
             }
 
             // add session logout handler
@@ -336,9 +336,9 @@ class SecurityExtension extends Extension
                 ->addMethodCall('registerListener', array(
                     $id,
                     $firewall['logout']['path'],
-                    $firewall['logout']['intention'],
+                    $firewall['logout']['csrf_token_id'],
                     $firewall['logout']['csrf_parameter'],
-                    isset($firewall['logout']['csrf_provider']) ? new Reference($firewall['logout']['csrf_provider']) : null,
+                    isset($firewall['logout']['csrf_token_generator']) ? new Reference($firewall['logout']['csrf_token_generator']) : null,
                 ))
             ;
         }

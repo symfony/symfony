@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by hhamon at 2013-11-20T12:48:29Z
+
+I think we should also use the `request_stack` service in the base `Controller` class to get the request object in the `getRequest()` method.
+
+---------------------------------------------------------------------------
+
+by stof at 2013-11-20T13:32:25Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by sstok at 2013-11-20T14:35:46Z
+
+:+1:

@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by armetiz at 2013-11-19T16:00:03Z
+
+@stof, you right.
+
+Also, the class UniqueEntityValidator take a Symfony\Component\Validator\Constraint on construct. But, two lines later, this class is trying to access to "fields" property which is not defined in the Constraint abstract class but inside the UniqueEntity.. Don't you think that an parameter check can be useful ?
+
+https://github.com/symfony/symfony/blob/master/src/Symfony/Bridge/Doctrine/Validator/Constraints/UniqueEntityValidator.php#L47
+
+---------------------------------------------------------------------------
+
+by stof at 2013-11-19T16:02:49Z
+
+the typehint is required by the interface. You will see the same in all validators
+
+---------------------------------------------------------------------------
+
+by armetiz at 2013-11-19T19:09:33Z
+
+@stof thanks for the explanation.
+
+With the latest two commits, this PR seems to be ok to be merged.

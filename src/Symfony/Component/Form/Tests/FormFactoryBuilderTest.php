@@ -27,12 +27,12 @@ class FormFactoryBuilderTest extends \PHPUnit_Framework_TestCase
         $this->registry->setAccessible(true);
 
         $this->guesser = $this->getMock('Symfony\Component\Form\FormTypeGuesserInterface');
-        $this->type = new FooType;
+        $this->type = new FooType();
     }
 
     public function testAddType()
     {
-        $factoryBuilder = new FormFactoryBuilder;
+        $factoryBuilder = new FormFactoryBuilder();
         $factoryBuilder->addType($this->type);
 
         $factory = $factoryBuilder->getFormFactory();
@@ -46,7 +46,7 @@ class FormFactoryBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testAddTypeGuesser()
     {
-        $factoryBuilder = new FormFactoryBuilder;
+        $factoryBuilder = new FormFactoryBuilder();
         $factoryBuilder->addTypeGuesser($this->guesser);
 
         $factory = $factoryBuilder->getFormFactory();

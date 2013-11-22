@@ -862,7 +862,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
     protected function getDispatcher()
     {
-        $dispatcher = new EventDispatcher;
+        $dispatcher = new EventDispatcher();
         $dispatcher->addListener('console.command', function (ConsoleCommandEvent $event) {
             $event->getOutput()->write('before.');
         });

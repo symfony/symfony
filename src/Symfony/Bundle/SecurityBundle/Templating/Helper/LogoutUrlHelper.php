@@ -26,7 +26,7 @@ use Symfony\Component\Templating\Helper\Helper;
 class LogoutUrlHelper extends Helper
 {
     private $container;
-    private $listeners;
+    private $listeners = array();
     private $router;
 
     /**
@@ -39,7 +39,6 @@ class LogoutUrlHelper extends Helper
     {
         $this->container = $container;
         $this->router = $router;
-        $this->listeners = array();
     }
 
     /**

@@ -43,7 +43,7 @@ class AbstractRememberMeServicesTest extends \PHPUnit_Framework_TestCase
     public function testAutoLoginThrowsExceptionWhenImplementationDoesNotReturnUserInterface()
     {
         $service = $this->getService(null, array('name' => 'foo', 'path' => null, 'domain' => null));
-        $request = new Request;
+        $request = new Request();
         $request->cookies->set('foo', 'foo');
 
         $service
@@ -106,8 +106,8 @@ class AbstractRememberMeServicesTest extends \PHPUnit_Framework_TestCase
     public function testLoginSuccessIsNotProcessedWhenTokenDoesNotContainUserInterfaceImplementation()
     {
         $service = $this->getService(null, array('name' => 'foo', 'always_remember_me' => true, 'path' => null, 'domain' => null));
-        $request = new Request;
-        $response = new Response;
+        $request = new Request();
+        $response = new Response();
         $account = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
         $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
         $token
@@ -129,8 +129,8 @@ class AbstractRememberMeServicesTest extends \PHPUnit_Framework_TestCase
     public function testLoginSuccessIsNotProcessedWhenRememberMeIsNotRequested()
     {
         $service = $this->getService(null, array('name' => 'foo', 'always_remember_me' => false, 'remember_me_parameter' => 'foo', 'path' => null, 'domain' => null));
-        $request = new Request;
-        $response = new Response;
+        $request = new Request();
+        $response = new Response();
         $account = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
         $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
         $token
@@ -153,8 +153,8 @@ class AbstractRememberMeServicesTest extends \PHPUnit_Framework_TestCase
     public function testLoginSuccessWhenRememberMeAlwaysIsTrue()
     {
         $service = $this->getService(null, array('name' => 'foo', 'always_remember_me' => true, 'path' => null, 'domain' => null));
-        $request = new Request;
-        $response = new Response;
+        $request = new Request();
+        $response = new Response();
         $account = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
         $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
         $token
@@ -179,9 +179,9 @@ class AbstractRememberMeServicesTest extends \PHPUnit_Framework_TestCase
     {
         $service = $this->getService(null, array('name' => 'foo', 'always_remember_me' => false, 'remember_me_parameter' => 'foo[bar]', 'path' => null, 'domain' => null));
 
-        $request = new Request;
+        $request = new Request();
         $request->request->set('foo', array('bar' => $value));
-        $response = new Response;
+        $response = new Response();
         $account = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
         $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
         $token
@@ -206,9 +206,9 @@ class AbstractRememberMeServicesTest extends \PHPUnit_Framework_TestCase
     {
         $service = $this->getService(null, array('name' => 'foo', 'always_remember_me' => false, 'remember_me_parameter' => 'foo', 'path' => null, 'domain' => null));
 
-        $request = new Request;
+        $request = new Request();
         $request->request->set('foo', $value);
-        $response = new Response;
+        $response = new Response();
         $account = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
         $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
         $token

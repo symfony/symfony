@@ -17,13 +17,13 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()
     {
-        $this->normalizer = new GetSetMethodNormalizer;
+        $this->normalizer = new GetSetMethodNormalizer();
         $this->normalizer->setSerializer($this->getMock('Symfony\Component\Serializer\Serializer'));
     }
 
     public function testNormalize()
     {
-        $obj = new GetSetDummy;
+        $obj = new GetSetDummy();
         $obj->setFoo('foo');
         $obj->setBar('bar');
         $obj->setCamelCase('camelcase');
@@ -118,7 +118,7 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
     {
         $this->normalizer->setIgnoredAttributes(array('foo', 'bar', 'camelCase'));
 
-        $obj = new GetSetDummy;
+        $obj = new GetSetDummy();
         $obj->setFoo('foo');
         $obj->setBar('bar');
 

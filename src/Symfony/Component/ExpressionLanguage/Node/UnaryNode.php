@@ -24,8 +24,10 @@ class UnaryNode extends Node
 
     public function __construct($operator, Node $node)
     {
-        $this->nodes = array('node' => $node);
-        $this->attributes = array('operator' => $operator);
+        parent::__construct(
+            array('node' => $node),
+            array('operator' => $operator)
+        );
     }
 
     public function compile(Compiler $compiler)

@@ -1,0 +1,48 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-11-22T08:48:39Z
+
+Thanks you very much for your work on this one. Do you have any ETA for it to be mergeable (as this is a blocker for 2.4RC1)?
+
+---------------------------------------------------------------------------
+
+by chEbba at 2013-11-22T09:38:31Z
+
+@fabpot The only one thing which stops the merge, is that there is a failing test for `--verbose=X`. And i dont see a good way how to fix it.
+So there is few options:
+- Merge now and think what to do with this problem later.
+- Decide here how to resolve a problem, fix and then merge.
+
+As for me the most acceptable decision is to remove this feature, but it should be done in 2.3, and 2.4 and low chance of user problems still exists if they rely to this option in `ArrayInput` (long verbose option value works for `ArrayInput` because it does not check that value is acceptable, and does not work for `String` or `Argv` because of this check).
+
+So what can be done:
+- Remove all hacks like `hasParameterOption('--verbose=3')`
+- Remove tests for long option value
+- Add checks in ArrayInput for options without value
+
+The another way is to add some more hacks to fix this support. But any change in this way have to be a hack, because option should stay to be `VALUE_NONE`
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-11-22T13:53:37Z
+
+For 2.4, we just need to revert what was done to get the behavior of 2.3 (even if it was not perfect.) We will then have plenty of time to think about how to fix that in 2.5 (can you create a ticket about this?)
+
+---------------------------------------------------------------------------
+
+by chEbba at 2013-11-22T15:14:59Z
+
+I removed test for long verbose option (to have passed tests in the current version). So now it can be merged, i will create a separate PR with this test and issue description.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-11-22T16:07:08Z
+
+@chEbba Looks like you forgot to push your code, no?
+
+---------------------------------------------------------------------------
+
+by chEbba at 2013-11-22T16:17:01Z
+
+@fabpot Hm, I guess no. 2 commits one with BC test and the second one with changes revert. I removed the third one with test for long option value.
+Tests are still failed, but as i see only on 5.3 in Stopwatch component.

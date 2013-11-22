@@ -95,7 +95,7 @@ class MainConfigurationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedException InvalidArgumentException
      */
     public function testBothConfigForCsrfTokenGeneratorAndCsrfProvider()
     {
@@ -147,7 +147,7 @@ class MainConfigurationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedException InvalidArgumentException
      */
     public function testBothConfigForCsrfTokenIdAndIntention()
     {

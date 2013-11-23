@@ -16,6 +16,7 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AbstractF
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 /**
  * This class contains the configuration information for the following tags:
@@ -212,6 +213,26 @@ class MainConfiguration implements ConfigurationInterface
             ->arrayNode('logout')
                 ->treatTrueLike(array())
                 ->canBeUnset()
+                ->beforeNormalization()
+                    ->ifTrue(function($v) { return isset($v['csrf_provider']) && isset($v['csrf_token_generator']); })
+                    ->thenInvalid("You should define a value for only one of 'csrf_provider' and 'csrf_token_generator' on a security firewall. Use 'csrf_token_generator' as this replaces 'csrf_provider'.")
+                ->end()
+                ->beforeNormalization()
+                    ->ifTrue(function($v) { return isset($v['intention']) && isset($v['csrf_token_id']); })
+                    ->thenInvalid("You should define a value for only one of 'intention' and 'csrf_token_id' on a security firewall. Use 'csrf_token_id' as this replaces 'intention'.")
+                ->end()
+                ->beforeNormalization()
+                    ->ifTrue(function($v) { return isset($v['csrf_token_generator']); })
+                    ->then(function($v) { $v['csrf_provider'] = $v['csrf_token_generator']; return $v; })
+                ->end()
+                ->beforeNormalization()
+                    ->ifTrue(function($v) { return isset($v['csrf_token_id']); })
+                    ->then(function($v) { $v['intention'] = $v['csrf_token_id']; return $v; })
+                ->end()
+                ->beforeNormalization()
+                    ->always()
+                    ->then(function($v) { unset($v['csrf_token_generator']); unset($v['csrf_token_id']); return $v; })
+                ->end()
                 ->children()
                     ->scalarNode('csrf_parameter')->defaultValue('_csrf_token')->end()
                     ->scalarNode('csrf_provider')->cannotBeEmpty()->end()

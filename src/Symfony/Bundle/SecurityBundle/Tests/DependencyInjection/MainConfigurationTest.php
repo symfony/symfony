@@ -67,4 +67,108 @@ class MainConfigurationTest extends \PHPUnit_Framework_TestCase
         $configuration = new MainConfiguration(array(), array());
         $config = $processor->processConfiguration($configuration, array($config));
     }
+
+    public function testConfigForCsrfTokenGenerator()
+    {
+        $config = array(
+            'providers' => array(
+                'stub' => array(
+                    'id' => 'foo',
+                ),
+            ),
+            'firewalls' => array(
+                'stub' => array(
+                    'logout' => array(
+                        'csrf_token_generator' => 'bar'
+                    )
+                )
+            )
+        );
+
+        $processor = new Processor();
+        $configuration = new MainConfiguration(array(), array());
+        $config = $processor->processConfiguration($configuration, array($config));
+
+        $this->assertTrue(isset($config['firewalls']['stub']['logout']['csrf_provider']));
+        $this->assertEquals($config['firewalls']['stub']['logout']['csrf_provider'], 'bar');
+        $this->assertFalse(isset($config['firewalls']['stub']['logout']['csrf_token_generator']));
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testBothConfigForCsrfTokenGeneratorAndCsrfProvider()
+    {
+        $config = array(
+            'providers' => array(
+                'stub' => array(
+                    'id' => 'foo',
+                ),
+            ),
+            'firewalls' => array(
+                'stub' => array(
+                    'logout' => array(
+                        'csrf_token_generator' => 'bar',
+                        'csrf_provider' => 'baz'
+                    )
+                )
+            )
+        );
+
+        $processor = new Processor();
+        $configuration = new MainConfiguration(array(), array());
+        $config = $processor->processConfiguration($configuration, array($config));
+    }
+
+    public function testConfigForCsrfTokenId()
+    {
+        $config = array(
+            'providers' => array(
+                'stub' => array(
+                    'id' => 'foo',
+                ),
+            ),
+            'firewalls' => array(
+                'stub' => array(
+                    'logout' => array(
+                        'csrf_token_id' => 'bar'
+                    )
+                )
+            )
+        );
+
+        $processor = new Processor();
+        $configuration = new MainConfiguration(array(), array());
+        $config = $processor->processConfiguration($configuration, array($config));
+
+        $this->assertTrue(isset($config['firewalls']['stub']['logout']['intention']));
+        $this->assertEquals($config['firewalls']['stub']['logout']['intention'], 'bar');
+        $this->assertFalse(isset($config['firewalls']['stub']['logout']['csrf_token_id']));
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testBothConfigForCsrfTokenIdAndIntention()
+    {
+        $config = array(
+            'providers' => array(
+                'stub' => array(
+                    'id' => 'foo',
+                ),
+            ),
+            'firewalls' => array(
+                'stub' => array(
+                    'logout' => array(
+                        'csrf_token_id' => 'bar',
+                        'intention' => 'baz'
+                    )
+                )
+            )
+        );
+
+        $processor = new Processor();
+        $configuration = new MainConfiguration(array(), array());
+        $config = $processor->processConfiguration($configuration, array($config));
+    }
 }

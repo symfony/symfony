@@ -81,4 +81,25 @@ class ClassNotFoundFatalErrorHandlerTest extends \PHPUnit_Framework_TestCase
             ),
         );
     }
+
+    public function testCannotRedeclareClass()
+    {
+        if (!file_exists(__DIR__.'/../FIXTURES/REQUIREDTWICE.PHP')) {
+            $this->markTestSkipped('Can only be run on case insensitive filesystems');
+        }
+
+        require_once __DIR__.'/../FIXTURES/REQUIREDTWICE.PHP';
+
+        $error = array(
+            'type' => 1,
+            'line' => 12,
+            'file' => 'foo.php',
+            'message' => 'Class \'Foo\\Bar\\RequiredTwice\' not found',
+        );
+
+        $handler = new ClassNotFoundFatalErrorHandler();
+        $exception = $handler->handleError($error, new FatalErrorException('', 0, $error['type'], $error['file'], $error['line']));
+
+        $this->assertInstanceof('Symfony\Component\Debug\Exception\ClassNotFoundException', $exception);
+    }
 }

@@ -34,7 +34,6 @@ class JsonDecode implements DecoderInterface
      */
     private $recursionDepth;
 
-    private $lastError = JSON_ERROR_NONE;
     protected $serializer;
 
     /**

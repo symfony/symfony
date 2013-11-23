@@ -29,12 +29,11 @@ class JsonEncode implements EncoderInterface
     }
 
     /**
-     * @deprecated Encoder throws exception if an error is found
-     *
      * Returns the last encoding error (if any).
      *
      * @return integer
      *
+     * @deprecated encode() throws an exception if error found
      * @see http://php.net/manual/en/function.json-last-error.php json_last_error
      */
     public function getLastError()

@@ -51,14 +51,13 @@ class JsonDecode implements DecoderInterface
     }
 
     /**
-      * @deprecated Decoder throws exception if an error is found
-      *
-      * Returns the last decoding error (if any).
-      *
-      * @return integer
-      *
-      * @see http://php.net/manual/en/function.json-last-error.php json_last_error
-      */
+     * Returns the last decoding error (if any).
+     *
+     * @return integer
+     *
+     * @deprecated decode() throws an exception if error found
+     * @see http://php.net/manual/en/function.json-last-error.php json_last_error
+     */
     public function getLastError()
     {
         return $this->lastError;

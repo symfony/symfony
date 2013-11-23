@@ -37,11 +37,12 @@ class JsonEncoder implements EncoderInterface, DecoderInterface
     }
 
     /**
-     * @deprecated Encoder throws exception if an error is found
      *
      * Returns the last encoding error (if any)
      *
      * @return integer
+     *
+     * @deprecated JsonEncode throws exception if an error is found
      */
     public function getLastEncodingError()
     {
@@ -49,11 +50,12 @@ class JsonEncoder implements EncoderInterface, DecoderInterface
     }
 
     /**
-     * @deprecated Decoder throws exception if an error is found
      *
      * Returns the last decoding error (if any)
      *
      * @return integer
+     *
+     * @deprecated JsonDecode throws exception if an error is found
      */
     public function getLastDecodingError()
     {

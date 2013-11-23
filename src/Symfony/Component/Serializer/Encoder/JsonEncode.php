@@ -39,7 +39,7 @@ class JsonEncode implements EncoderInterface
         $encodedJson = json_encode($data, $context['json_encode_options']);
 
         if (JSON_ERROR_NONE !== $error = json_last_error()) {
-            $message = JsonEncoder::getErrorMessage($error);
+            $message = JsonEncoder::getLastErrorMessage();
             throw new UnexpectedValueException($message);
         }
 

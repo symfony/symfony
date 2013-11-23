@@ -71,11 +71,9 @@ class JsonEncoder implements EncoderInterface, DecoderInterface
     /**
      * Resolves json_last_error message
      *
-     * @param $error
-     *
      * @return string
      */
-    public static function getErrorMessage($error)
+    public static function getLastErrorMessage()
     {
         // PHP 5 < 5.5.0
         if (!function_exists('json_last_error_msg')) {

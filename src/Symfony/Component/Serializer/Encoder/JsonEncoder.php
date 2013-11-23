@@ -95,13 +95,15 @@ class JsonEncoder implements EncoderInterface, DecoderInterface
     /**
      * Resolves json_last_error message
      *
-     * @param $error
-     *
      * @return string
      */
-    public static function getErrorMessage($error)
+    public static function getLastErrorMessage()
     {
-        switch ($error) {
+        if (function_exists('json_last_error_msg')) {
+            return json_last_error_msg();
+        }
+
+        switch (json_last_error()) {
             case JSON_ERROR_DEPTH:
                 return 'Maximum stack depth exceeded';
                 break;

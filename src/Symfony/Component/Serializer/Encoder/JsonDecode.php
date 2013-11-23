@@ -106,7 +106,7 @@ class JsonDecode implements DecoderInterface
         }
 
         if (JSON_ERROR_NONE !== $this->lastError = json_last_error()) {
-            $message = JsonEncoder::getErrorMessage($this->lastError);
+            $message = JsonEncoder::getLastErrorMessage();
             throw new UnexpectedValueException($message);
         }
 

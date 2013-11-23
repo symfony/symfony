@@ -51,6 +51,8 @@ class JsonDecode implements DecoderInterface
     }
 
     /**
+      * @deprecated Decoder throws exception if an error is found
+      *
       * Returns the last decoding error (if any).
       *
       * @return integer

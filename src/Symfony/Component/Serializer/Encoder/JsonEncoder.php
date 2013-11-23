@@ -37,6 +37,8 @@ class JsonEncoder implements EncoderInterface, DecoderInterface
     }
 
     /**
+     * @deprecated Encoder throws exception if an error is found
+     *
      * Returns the last encoding error (if any)
      *
      * @return integer
@@ -47,6 +49,8 @@ class JsonEncoder implements EncoderInterface, DecoderInterface
     }
 
     /**
+     * @deprecated Decoder throws exception if an error is found
+     *
      * Returns the last decoding error (if any)
      *
      * @return integer

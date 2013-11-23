@@ -61,4 +61,16 @@ class TrueValidatorTest extends \PHPUnit_Framework_TestCase
 
         $this->validator->validate(false, $constraint);
     }
+
+    public function testTrueIsValidIfNotInValidatedGroups()
+    {
+        $constraint = new True(array(
+            'groups' => array('neverCalled')
+        ));
+
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
+        $this->context->validateValue(false, $constraint);
+    }
 }

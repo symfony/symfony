@@ -20,16 +20,24 @@ class ItemQuery
         'is_active'     => \PropelColumnTypes::BOOLEAN,
         'enabled'       => \PropelColumnTypes::BOOLEAN_EMU,
         'updated_at'    => \PropelColumnTypes::TIMESTAMP,
-
-        'updated_at'    => \PropelColumnTypes::TIMESTAMP,
-        'updated_at'    => \PropelColumnTypes::TIMESTAMP,
-        'updated_at'    => \PropelColumnTypes::TIMESTAMP,
     );
 
     private $caseInsensitiveMap = array(
         'isactive'      => 'is_active',
         'updatedat'     => 'updated_at',
     );
+
+    public static $result = array();
+
+    public function find()
+    {
+        return self::$result;
+    }
+
+    public function filterById($id)
+    {
+        return $this;
+    }
 
     public function getTableMap()
     {
@@ -42,6 +50,7 @@ class ItemQuery
     {
         $cm = new \ColumnMap('id', new \TableMap());
         $cm->setType('INTEGER');
+        $cm->setPhpName('Id');
 
         return array('id' => $cm);
     }

@@ -19,7 +19,7 @@ use Symfony\Component\Validator\Constraints\ExpressionValidator;
  * Default implementation of the ConstraintValidatorFactoryInterface.
  *
  * This enforces the convention that the validatedBy() method on any
- * Constrain will return the class name of the ConstraintValidator that
+ * Constraint will return the class name of the ConstraintValidator that
  * should validate the Constraint.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>

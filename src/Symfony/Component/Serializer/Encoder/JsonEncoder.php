@@ -103,6 +103,6 @@ class JsonEncoder implements EncoderInterface, DecoderInterface
             $message = json_last_error_msg();
         }
 
-        return $error;
+        return $message;
     }
 }

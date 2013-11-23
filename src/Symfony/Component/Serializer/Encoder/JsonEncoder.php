@@ -79,28 +79,26 @@ class JsonEncoder implements EncoderInterface, DecoderInterface
         if (!function_exists('json_last_error_msg')) {
             switch (json_last_error()) {
                 default:
-                    $message = 'Unknown error';
+                    return 'Unknown error';
                     break;
                 case JSON_ERROR_DEPTH:
-                    $message = 'Maximum stack depth exceeded';
+                    return 'Maximum stack depth exceeded';
                     break;
                 case JSON_ERROR_STATE_MISMATCH:
-                    $message = 'Underflow or the modes mismatch';
+                    return 'Underflow or the modes mismatch';
                     break;
                 case JSON_ERROR_CTRL_CHAR:
-                    $message = 'Unexpected control character found';
+                    return 'Unexpected control character found';
                     break;
                 case JSON_ERROR_SYNTAX:
-                    $message = 'Syntax error, malformed JSON';
+                    return 'Syntax error, malformed JSON';
                     break;
                 case JSON_ERROR_UTF8:
-                    $message = 'Malformed UTF-8 characters, possibly incorrectly encoded';
+                    return 'Malformed UTF-8 characters, possibly incorrectly encoded';
                     break;
             }
-        } else {
-            $message = json_last_error_msg();
         }
-
-        return $message;
+        
+        return json_last_error_msg();
     }
 }

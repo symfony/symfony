@@ -119,12 +119,12 @@ class Process
     /**
      * Constructor.
      *
-     * @param string  $commandline The command line to run
-     * @param string  $cwd         The working directory
-     * @param array   $env         The environment variables or null to inherit
-     * @param string  $stdin       The STDIN content
-     * @param integer $timeout     The timeout in seconds
-     * @param array   $options     An array of options for proc_open
+     * @param string             $commandline The command line to run
+     * @param string|null        $cwd         The working directory or null to use the working dir of the current PHP process
+     * @param array|null         $env         The environment variables or null to inherit
+     * @param string|null        $stdin       The STDIN content
+     * @param integer|float|null $timeout     The timeout in seconds or null to disable
+     * @param array              $options     An array of options for proc_open
      *
      * @throws RuntimeException When proc_open is not installed
      *
@@ -692,7 +692,7 @@ class Process
     /**
      * Gets the process timeout.
      *
-     * @return integer|null The timeout in seconds or null if it's disabled
+     * @return float|null The timeout in seconds or null if it's disabled
      */
     public function getTimeout()
     {
@@ -704,7 +704,7 @@ class Process
      *
      * To disable the timeout, set this value to null.
      *
-     * @param float|null $timeout The timeout in seconds
+     * @param integer|float|null $timeout The timeout in seconds
      *
      * @return self The current Process instance
      *
@@ -712,15 +712,11 @@ class Process
      */
     public function setTimeout($timeout)
     {
-        if (null === $timeout) {
-            $this->timeout = null;
-
-            return $this;
-        }
-
         $timeout = (float) $timeout;
 
-        if ($timeout < 0) {
+        if (0.0 === $timeout) {
+            $timeout = null;
+        } elseif ($timeout < 0) {
             throw new InvalidArgumentException('The timeout value must be a valid positive integer or float number.');
         }
 
@@ -756,11 +752,10 @@ class Process
     /**
      * Gets the working directory.
      *
-     * @return string The current working directory
+     * @return string|null The current working directory or null on failure
      */
     public function getWorkingDirectory()
     {
-        // This is for BC only
         if (null === $this->cwd) {
             // getcwd() will return false if any one of the parent directories does not have
             // the readable or search mode set, even if the current directory does
@@ -823,7 +818,7 @@ class Process
     /**
      * Gets the contents of STDIN.
      *
-     * @return string The current contents
+     * @return string|null The current contents
      */
     public function getStdin()
     {
@@ -833,7 +828,7 @@ class Process
     /**
      * Sets the contents of STDIN.
      *
-     * @param string $stdin The new contents
+     * @param string|null $stdin The new contents
      *
      * @return self The current Process instance
      */
@@ -932,7 +927,7 @@ class Process
      */
     public function checkTimeout()
     {
-        if (0 < $this->timeout && $this->timeout < microtime(true) - $this->starttime) {
+        if (null !== $this->timeout && $this->timeout < microtime(true) - $this->starttime) {
             $this->stop(0);
 
             throw new RuntimeException('The process timed-out.');

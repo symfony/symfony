@@ -559,6 +559,11 @@ abstract class Client
             );
         }
 
+        // protocol relative URL
+        if (0 === strpos($uri, '//')) {
+            return parse_url($currentUri, PHP_URL_SCHEME).':'.$uri;
+        }
+
         // anchor?
         if (!$uri || '#' == $uri[0]) {
             return preg_replace('/#.*?$/', '', $currentUri).$uri;

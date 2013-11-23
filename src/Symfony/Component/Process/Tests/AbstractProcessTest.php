@@ -19,6 +19,16 @@ use Symfony\Component\Process\Exception\RuntimeException;
  */
 abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 {
+    public function testThatProcessDoesNotThrowWarningDuringRun()
+    {
+        @trigger_error('Test Error', E_USER_NOTICE);
+        $process = $this->getProcess("php -r 'sleep(3)'");
+        $process->run();
+        $actualError = error_get_last();
+        $this->assertEquals('Test Error', $actualError['message']);
+        $this->assertEquals(E_USER_NOTICE, $actualError['type']);
+    }
+
     /**
      * @expectedException \Symfony\Component\Process\Exception\InvalidArgumentException
      */
@@ -36,12 +46,17 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $p->setTimeout(-1);
     }
 
-    public function testNullTimeout()
+    public function testFloatAndNullTimeout()
     {
         $p = $this->getProcess('');
-        $p->setTimeout(10);
-        $p->setTimeout(null);
 
+        $p->setTimeout(10);
+        $this->assertSame(10.0, $p->getTimeout());
+
+        $p->setTimeout(null);
+        $this->assertNull($p->getTimeout());
+
+        $p->setTimeout(0.0);
         $this->assertNull($p->getTimeout());
     }
 

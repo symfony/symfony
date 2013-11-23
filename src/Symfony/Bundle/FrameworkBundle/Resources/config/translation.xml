@@ -82,7 +82,7 @@
             <tag name="translation.loader" alias="res" />
         </service>
 
-        <service id="translation.loader.dat" class="%translation.loader.res.class%">
+        <service id="translation.loader.dat" class="%translation.loader.dat.class%">
             <tag name="translation.loader" alias="dat" />
         </service>
 

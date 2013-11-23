@@ -21,10 +21,23 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 class JsonEncode implements EncoderInterface
 {
     private $options ;
+    private $lastError = JSON_ERROR_NONE;
 
     public function __construct($bitmask = 0)
     {
         $this->options = $bitmask;
+    }
+
+    /**
+     * Returns the last encoding error (if any).
+     *
+     * @return integer
+     *
+     * @see http://php.net/manual/en/function.json-last-error.php json_last_error
+     */
+    public function getLastError()
+    {
+        return $this->lastError;
     }
 
     /**
@@ -38,7 +51,7 @@ class JsonEncode implements EncoderInterface
 
         $encodedJson = json_encode($data, $context['json_encode_options']);
 
-        if (JSON_ERROR_NONE !== $error = json_last_error()) {
+        if (JSON_ERROR_NONE !== $this->lastError = json_last_error()) {
             $message = JsonEncoder::getLastErrorMessage();
             throw new UnexpectedValueException($message);
         }

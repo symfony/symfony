@@ -31,6 +31,8 @@ interface DecoderInterface
      * phpdoc comment.
      *
      * @return mixed
+     *
+     * @throws UnexpectedValueException
      */
     public function decode($data, $format, array $context = array());
 

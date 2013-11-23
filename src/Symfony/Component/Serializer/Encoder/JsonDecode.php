@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Serializer\Encoder;
 
+use Symfony\Component\Serializer\Exception\UnexpectedValueException;
+
 /**
  * Decodes JSON data
  *
@@ -48,18 +50,6 @@ class JsonDecode implements DecoderInterface
     }
 
     /**
-     * Returns the last decoding error (if any).
-     *
-     * @return integer
-     *
-     * @see http://php.net/manual/en/function.json-last-error.php json_last_error
-     */
-    public function getLastError()
-    {
-        return $this->lastError;
-    }
-
-    /**
      * Decodes data.
      *
      * @param string $data    The encoded JSON string to decode
@@ -82,6 +72,8 @@ class JsonDecode implements DecoderInterface
      *
      * @return mixed
      *
+     * @throws UnexpectedValueException
+     *
      * @see http://php.net/json_decode json_decode
      */
     public function decode($data, $format, array $context = array())
@@ -98,7 +90,10 @@ class JsonDecode implements DecoderInterface
             $decodedData = json_decode($data, $associative, $recursionDepth);
         }
 
-        $this->lastError = json_last_error();
+        if (JSON_ERROR_NONE !== $error = json_last_error()) {
+            $message = JsonEncoder::getErrorMessage($error);
+            throw new UnexpectedValueException($message);
+        }
 
         return $decodedData;
     }

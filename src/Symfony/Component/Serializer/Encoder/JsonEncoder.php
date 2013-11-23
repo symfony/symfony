@@ -98,9 +98,6 @@ class JsonEncoder implements EncoderInterface, DecoderInterface
     public static function getErrorMessage($error)
     {
         switch ($error) {
-            default:
-                return 'Unknown error';
-                break;
             case JSON_ERROR_DEPTH:
                 return 'Maximum stack depth exceeded';
                 break;
@@ -115,6 +112,9 @@ class JsonEncoder implements EncoderInterface, DecoderInterface
                 break;
             case JSON_ERROR_UTF8:
                 return 'Malformed UTF-8 characters, possibly incorrectly encoded';
+                break;
+            default:
+                return 'Unknown error';
                 break;
         }
     }

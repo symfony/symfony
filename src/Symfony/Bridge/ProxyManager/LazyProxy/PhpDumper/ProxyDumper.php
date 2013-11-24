@@ -76,6 +76,7 @@ class ProxyDumper implements DumperInterface
             $instantiation new $proxyClass(
                 function (&\$wrappedInstance, \ProxyManager\Proxy\LazyLoadingInterface \$proxy) use (\$container) {
                     \$wrappedInstance = \$container->$methodName(false);
+                    \$container->set('$id', \$wrappedInstance);
 
                     \$proxy->setProxyInitializer(null);
 

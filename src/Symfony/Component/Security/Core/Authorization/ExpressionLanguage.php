@@ -31,21 +31,21 @@ class ExpressionLanguage extends BaseExpressionLanguage
         });
 
         $this->register('is_authenticated', function () {
-            return '!$trust_resolver->isAnonymous($token)';
+            return '$token && !$trust_resolver->isAnonymous($token)';
         }, function (array $variables) {
-            return !$variables['trust_resolver']->isAnonymous($variables['token']);
+            return $variables['token'] && !$variables['trust_resolver']->isAnonymous($variables['token']);
         });
 
         $this->register('is_fully_authenticated', function () {
-            return '!$trust_resolver->isFullFledge($token)';
+            return '$trust_resolver->isFullFledged($token)';
         }, function (array $variables) {
-            return !$variables['trust_resolver']->isFullFledge($variables['token']);
+            return $variables['trust_resolver']->isFullFledged($variables['token']);
         });
 
         $this->register('is_remember_me', function () {
-            return '!$trust_resolver->isRememberMe($token)';
+            return '$trust_resolver->isRememberMe($token)';
         }, function (array $variables) {
-            return !$variables['trust_resolver']->isRememberMe($variables['token']);
+            return $variables['trust_resolver']->isRememberMe($variables['token']);
         });
 
         $this->register('has_role', function ($role) {

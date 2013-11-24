@@ -224,6 +224,7 @@ class MainConfiguration implements ConfigurationInterface
                     ->ifTrue(function($v) { return isset($v['csrf_provider']); })
                     ->then(function($v) {
                         $v['csrf_token_generator'] = $v['csrf_provider'];
+                        unset($v['csrf_provider']);
 
                         return $v;
                     })
@@ -232,14 +233,6 @@ class MainConfiguration implements ConfigurationInterface
                     ->ifTrue(function($v) { return isset($v['intention']); })
                     ->then(function($v) {
                         $v['csrf_token_id'] = $v['intention'];
-
-                        return $v;
-                    })
-                ->end()
-                ->beforeNormalization()
-                    ->always()
-                    ->then(function ($v) {
-                        unset($v['csrf_provider']);
                         unset($v['intention']);
 
                         return $v;

@@ -124,7 +124,15 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
      */
     protected static function getKernelClass()
     {
-        $dir = isset($_SERVER['KERNEL_DIR']) ? $_SERVER['KERNEL_DIR'] : static::getPhpUnitXmlDir();
+        $dir = $phpUnitDir = static::getPhpUnitXmlDir();
+
+        if (isset($_SERVER['KERNEL_DIR'])) {
+            $dir = $_SERVER['KERNEL_DIR'];
+
+            if (!is_dir($dir) && is_dir("$phpUnitDir/$dir")) {
+                $dir = "$phpUnitDir/$dir";
+            }
+        }
 
         $finder = new Finder();
         $finder->name('*Kernel.php')->depth(0)->in($dir);

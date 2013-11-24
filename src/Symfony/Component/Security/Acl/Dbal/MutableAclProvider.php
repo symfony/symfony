@@ -253,7 +253,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
             }
 
             // check properties for deleted, and created ACEs, and perform deletions
-            // we need to perfom deletions before updating existing ACEs, in order to
+            // we need to perform deletions before updating existing ACEs, in order to
             // preserve uniqueness of the order field
             if (isset($propertyChanges['classAces'])) {
                 $this->updateOldAceProperty('classAces', $propertyChanges['classAces']);
@@ -360,7 +360,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
     protected function getDeleteAccessControlEntriesSql($oidPK)
     {
         return sprintf(
-              'DELETE FROM %s WHERE object_identity_id = %d',
+            'DELETE FROM %s WHERE object_identity_id = %d',
             $this->options['entry_table_name'],
             $oidPK
         );
@@ -806,7 +806,7 @@ QUERY;
      * @param string $name
      * @param array $changes
      */
-    private function updateOldFieldAceProperty($ane, array $changes)
+    private function updateOldFieldAceProperty($name, array $changes)
     {
         $currentIds = array();
         foreach ($changes[1] as $field => $new) {
@@ -925,11 +925,12 @@ QUERY;
         if (isset($propertyChanges['aceOrder'])
             && $propertyChanges['aceOrder'][1] > $propertyChanges['aceOrder'][0]
             && $propertyChanges == $aces->offsetGet($ace)) {
-                $aces->next();
-                if ($aces->valid()) {
+
+            $aces->next();
+            if ($aces->valid()) {
                     $this->updateAce($aces, $aces->current());
-                }
             }
+        }
 
         if (isset($propertyChanges['mask'])) {
             $sets[] = sprintf('mask = %d', $propertyChanges['mask'][1]);
@@ -949,5 +950,4 @@ QUERY;
 
         $this->connection->executeQuery($this->getUpdateAccessControlEntrySql($ace->getId(), $sets));
     }
-
 }

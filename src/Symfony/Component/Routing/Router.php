@@ -265,16 +265,16 @@ class Router implements RouterInterface, RequestMatcherInterface
         }
 
         $class = $this->options['matcher_cache_class'];
-        $routerOptions = $this->options;
+        $baseClass = $this->options['matcher_base_class'];
         $self = $this;
 
         $cache = $this->getConfigCacheFactory()->cache($this->options['cache_dir'].'/'.$class.'.php',
-            function($cache) use ($routerOptions, $self, $class) {
-                $dumper = $this->getMatcherDumperInstance();
+            function($cache) use ($self, $class, $baseClass) {
+                $dumper = $self->getMatcherDumperInstance();
 
                 $options = array(
                     'class'      => $class,
-                    'base_class' => $routerOptions['matcher_base_class'],
+                    'base_class' => $baseClass,
                 );
 
                 $cache->write($dumper->dump($options), $self->getRouteCollection()->getResources());

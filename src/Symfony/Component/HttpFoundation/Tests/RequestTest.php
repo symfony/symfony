@@ -749,7 +749,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException RuntimeException
+     * @expectedException \RuntimeException
      */
     public function testGetHostWithFakeHttpHostValue()
     {
@@ -879,7 +879,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException LogicException
+     * @expectedException \LogicException
      * @dataProvider getContentCantBeCalledTwiceWithResourcesProvider
      */
     public function testGetContentCantBeCalledTwiceWithResources($first, $second)

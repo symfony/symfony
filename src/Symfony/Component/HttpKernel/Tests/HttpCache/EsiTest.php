@@ -133,7 +133,7 @@ class EsiTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException RuntimeException
+     * @expectedException \RuntimeException
      */
     public function testProcessWhenNoSrcInAnEsi()
     {
@@ -173,7 +173,7 @@ class EsiTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException RuntimeException
+     * @expectedException \RuntimeException
      */
     public function testHandleWhenResponseIsNot200()
     {

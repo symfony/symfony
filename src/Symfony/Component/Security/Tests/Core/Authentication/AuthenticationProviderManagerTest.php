@@ -20,7 +20,7 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 class AuthenticationProviderManagerTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      */
     public function testAuthenticateWithoutProviders()
     {

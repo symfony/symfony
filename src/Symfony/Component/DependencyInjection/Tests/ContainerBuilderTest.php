@@ -410,7 +410,7 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Symfony\Component\DependencyInjection\ContainerBuilder::merge
-     * @expectedException LogicException
+     * @expectedException \LogicException
      */
     public function testMergeLogicException()
     {
@@ -537,7 +537,7 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException BadMethodCallException
+     * @expectedException \BadMethodCallException
      */
     public function testThrowsExceptionWhenSetServiceOnAFrozenContainer()
     {
@@ -549,7 +549,7 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException BadMethodCallException
+     * @expectedException \BadMethodCallException
      */
     public function testThrowsExceptionWhenAddServiceOnAFrozenContainer()
     {
@@ -578,7 +578,7 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException BadMethodCallException
+     * @expectedException \BadMethodCallException
      */
     public function testThrowsExceptionWhenSetDefinitionOnAFrozenContainer()
     {

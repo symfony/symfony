@@ -669,18 +669,18 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $request->initialize(array('foo' => 'bar'));
         $this->assertEquals('', $request->getHost(), '->getHost() return empty string if not initialized');
 
-        $request->initialize(array(), array(), array(), array(), array(), array('HTTP_HOST' => 'www.exemple.com'));
-        $this->assertEquals('www.exemple.com', $request->getHost(), '->getHost() from Host Header');
+        $request->initialize(array(), array(), array(), array(), array(), array('HTTP_HOST' => 'www.example.com'));
+        $this->assertEquals('www.example.com', $request->getHost(), '->getHost() from Host Header');
 
         // Host header with port number
-        $request->initialize(array(), array(), array(), array(), array(), array('HTTP_HOST' => 'www.exemple.com:8080'));
-        $this->assertEquals('www.exemple.com', $request->getHost(), '->getHost() from Host Header with port number');
+        $request->initialize(array(), array(), array(), array(), array(), array('HTTP_HOST' => 'www.example.com:8080'));
+        $this->assertEquals('www.example.com', $request->getHost(), '->getHost() from Host Header with port number');
 
         // Server values
-        $request->initialize(array(), array(), array(), array(), array(), array('SERVER_NAME' => 'www.exemple.com'));
-        $this->assertEquals('www.exemple.com', $request->getHost(), '->getHost() from server name');
+        $request->initialize(array(), array(), array(), array(), array(), array('SERVER_NAME' => 'www.example.com'));
+        $this->assertEquals('www.example.com', $request->getHost(), '->getHost() from server name');
 
-        $request->initialize(array(), array(), array(), array(), array(), array('SERVER_NAME' => 'www.exemple.com', 'HTTP_HOST' => 'www.host.com'));
+        $request->initialize(array(), array(), array(), array(), array(), array('SERVER_NAME' => 'www.example.com', 'HTTP_HOST' => 'www.host.com'));
         $this->assertEquals('www.host.com', $request->getHost(), '->getHost() value from Host header has priority over SERVER_NAME ');
     }
 
@@ -739,7 +739,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException RuntimeException
+     * @expectedException \RuntimeException
      */
     public function testGetHostWithFakeHttpHostValue()
     {
@@ -896,7 +896,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException LogicException
+     * @expectedException \LogicException
      * @dataProvider getContentCantBeCalledTwiceWithResourcesProvider
      */
     public function testGetContentCantBeCalledTwiceWithResources($first, $second)

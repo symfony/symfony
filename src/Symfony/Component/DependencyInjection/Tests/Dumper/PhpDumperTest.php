@@ -81,7 +81,7 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      */
     public function testExportParameters()
     {
@@ -121,7 +121,7 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Service id "bar$" cannot be converted to a valid PHP method name.
      */
     public function testAddServiceInvalidServiceId()

@@ -260,7 +260,7 @@ class ProcessPipes
         // let's have a look if something changed in streams
         if (false === $n = @stream_select($r, $w, $e, 0, $blocking ? ceil(Process::TIMEOUT_PRECISION * 1E6) : 0)) {
             // if a system call has been interrupted, forget about it, let's try again
-            // otherwise, an error occured, let's reset pipes
+            // otherwise, an error occurred, let's reset pipes
             if (!$this->hasSystemCallBeenInterrupted()) {
                 $this->pipes = array();
             }

@@ -288,7 +288,7 @@ class CommandTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Invalid callable provided to Command::setCode.
      */
     public function testSetCodeWithNonCallable()

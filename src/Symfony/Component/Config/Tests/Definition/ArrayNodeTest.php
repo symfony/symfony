@@ -25,7 +25,7 @@ class ArrayNodeTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
      * @expectedExceptionMessage Unrecognized options "foo" under "root"
      */
     public function testExceptionThrownOnUnrecognizedChild()

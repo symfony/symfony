@@ -34,7 +34,7 @@ class FragmentHandlerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      */
     public function testRenderWithUnknownRenderer()
     {
@@ -44,7 +44,7 @@ class FragmentHandlerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException RuntimeException
+     * @expectedException \RuntimeException
      * @expectedExceptionMessage Error when rendering "http://localhost/" (Status code is 404).
      */
     public function testDeliverWithUnsuccessfulResponse()

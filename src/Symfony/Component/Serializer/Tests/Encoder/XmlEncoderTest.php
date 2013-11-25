@@ -53,7 +53,7 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException        UnexpectedValueException
+     * @expectedException        \Symfony\Component\Serializer\Exception\UnexpectedValueException
      * @expectedExceptionMessage Document types are not allowed.
      */
     public function testDocTypeIsNotAllowed()

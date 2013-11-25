@@ -71,7 +71,7 @@ class DefinitionDecoratorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      */
     public function testReplaceArgumentShouldRequireIntegerIndex()
     {
@@ -96,7 +96,7 @@ class DefinitionDecoratorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException OutOfBoundsException
+     * @expectedException \OutOfBoundsException
      */
     public function testGetArgumentShouldCheckBounds()
     {

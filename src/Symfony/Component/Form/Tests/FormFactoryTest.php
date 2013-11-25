@@ -278,7 +278,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException        Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @expectedException        \Symfony\Component\Form\Exception\UnexpectedTypeException
      * @expectedExceptionMessage Expected argument of type "string, Symfony\Component\Form\ResolvedFormTypeInterface or Symfony\Component\Form\FormTypeInterface", "stdClass" given
      */
     public function testCreateNamedBuilderThrowsUnderstandableException()

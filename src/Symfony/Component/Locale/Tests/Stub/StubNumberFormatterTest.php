@@ -312,7 +312,7 @@ class StubNumberFormatterTest extends LocaleTestCase
     }
 
     /**
-     * @expectedException RuntimeException
+     * @expectedException \RuntimeException
      */
     public function testFormatWithCurrencyStyleStub()
     {
@@ -436,7 +436,7 @@ class StubNumberFormatterTest extends LocaleTestCase
     }
 
     /**
-     * @expectedException PHPUnit_Framework_Error_Warning
+     * @expectedException \PHPUnit_Framework_Error_Warning
      */
     public function testFormatTypeCurrencyStub()
     {
@@ -452,7 +452,7 @@ class StubNumberFormatterTest extends LocaleTestCase
 
     /**
      * @dataProvider formatTypeCurrencyProvider
-     * @expectedException PHPUnit_Framework_Error_Warning
+     * @expectedException \PHPUnit_Framework_Error_Warning
      */
     public function testFormatTypeCurrencyIntl($formatter, $value)
     {
@@ -814,7 +814,7 @@ class StubNumberFormatterTest extends LocaleTestCase
     }
 
     /**
-     * @expectedException PHPUnit_Framework_Error_Warning
+     * @expectedException \PHPUnit_Framework_Error_Warning
      */
     public function testParseTypeDefaultStub()
     {
@@ -823,7 +823,7 @@ class StubNumberFormatterTest extends LocaleTestCase
     }
 
     /**
-     * @expectedException PHPUnit_Framework_Error_Warning
+     * @expectedException \PHPUnit_Framework_Error_Warning
      */
     public function testParseTypeDefaultIntl()
     {
@@ -1103,7 +1103,7 @@ class StubNumberFormatterTest extends LocaleTestCase
     }
 
     /**
-     * @expectedException PHPUnit_Framework_Error_Warning
+     * @expectedException \PHPUnit_Framework_Error_Warning
      */
     public function testParseTypeCurrencyStub()
     {
@@ -1112,7 +1112,7 @@ class StubNumberFormatterTest extends LocaleTestCase
     }
 
     /**
-     * @expectedException PHPUnit_Framework_Error_Warning
+     * @expectedException \PHPUnit_Framework_Error_Warning
      */
     public function testParseTypeCurrencyIntl()
     {

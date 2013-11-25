@@ -17,7 +17,7 @@ use Symfony\Component\Locale\Tests\TestCase as LocaleTestCase;
 class StubLocaleTest extends LocaleTestCase
 {
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      */
     public function testGetDisplayCountriesWithUnsupportedLocale()
     {
@@ -37,7 +37,7 @@ class StubLocaleTest extends LocaleTestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      */
     public function testGetDisplayLanguagesWithUnsupportedLocale()
     {
@@ -57,7 +57,7 @@ class StubLocaleTest extends LocaleTestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      */
     public function testGetCurrenciesDataWithUnsupportedLocale()
     {
@@ -92,7 +92,7 @@ class StubLocaleTest extends LocaleTestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      */
     public function testGetDisplayLocalesWithUnsupportedLocale()
     {

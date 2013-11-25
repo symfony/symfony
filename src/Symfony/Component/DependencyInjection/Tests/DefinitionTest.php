@@ -251,7 +251,7 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException OutOfBoundsException
+     * @expectedException \OutOfBoundsException
      */
     public function testGetArgumentShouldCheckBounds()
     {
@@ -262,7 +262,7 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException OutOfBoundsException
+     * @expectedException \OutOfBoundsException
      */
     public function testReplaceArgumentShouldCheckBounds()
     {

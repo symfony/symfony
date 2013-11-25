@@ -563,7 +563,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Process\Exception\LogicException
+     * @expectedException \Symfony\Component\Process\Exception\LogicException
      */
     public function testSignalProcessNotRunning()
     {
@@ -583,7 +583,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Process\Exception\RuntimeException
+     * @expectedException \Symfony\Component\Process\Exception\RuntimeException
      */
     public function testSignalWithWrongIntSignal()
     {
@@ -597,7 +597,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Process\Exception\RuntimeException
+     * @expectedException \Symfony\Component\Process\Exception\RuntimeException
      */
     public function testSignalWithWrongNonIntSignal()
     {

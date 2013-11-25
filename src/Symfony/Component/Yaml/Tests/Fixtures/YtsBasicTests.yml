@@ -56,7 +56,7 @@ test: Simple Mapping
 brief: |
     You can add a keyed list (also known as a dictionary or
     hash) to your document by placing each member of the
-    list on a new line, with a colon seperating the key
+    list on a new line, with a colon separating the key
     from its value.  In YAML, this type of list is called
     a mapping.
 yaml: |

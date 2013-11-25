@@ -51,6 +51,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
             array('.foo', '_Foo'),
             array('foo_', 'Foo'),
             array('foo.', 'Foo_'),
+            array('foo\bar', 'Foo_Bar'),
         );
     }
 

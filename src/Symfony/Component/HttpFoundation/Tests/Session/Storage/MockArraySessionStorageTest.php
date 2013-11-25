@@ -103,4 +103,21 @@ class MockArraySessionStorageTest extends \PHPUnit_Framework_TestCase
     {
         $this->storage->save();
     }
+
+    public function testClosedIsStarted()
+    {
+        $this->storage->start();
+
+        $refl = new \ReflectionProperty($this->storage, 'started');
+        $refl->setAccessible(true);
+
+        $this->assertTrue($this->storage->isStarted());
+        $this->assertTrue($refl->getValue($this->storage));
+
+        $this->storage->save();
+
+        // isStarted should return false once the storage saves the session
+        $this->assertFalse($this->storage->isStarted());
+        $this->assertFalse($refl->getValue($this->storage));
+    }
 }

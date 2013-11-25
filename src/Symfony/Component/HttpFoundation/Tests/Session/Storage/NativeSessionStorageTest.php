@@ -249,6 +249,24 @@ class NativeSessionStorageTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse(isset($_SESSION[$key]));
         $storage->start();
     }
+
+    public function testClosedIsStarted()
+    {
+        $storage = $this->getStorage();
+        $storage->start();
+
+        $refl = new \ReflectionProperty($storage, 'started');
+        $refl->setAccessible(true);
+
+        $this->assertTrue($storage->isStarted());
+        $this->assertTrue($refl->getValue($storage));
+
+        $storage->save();
+
+        // isStarted should return false once the storage saves the session
+        $this->assertFalse($storage->isStarted());
+        $this->assertTrue($refl->getValue($storage));
+    }
 }
 
 class SessionHandler implements \SessionHandlerInterface

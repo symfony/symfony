@@ -239,7 +239,6 @@ class NativeSessionStorage implements SessionStorageInterface
         }
 
         $this->closed = true;
-        $this->started = false;
     }
 
     /**
@@ -314,7 +313,7 @@ class NativeSessionStorage implements SessionStorageInterface
      */
     public function isStarted()
     {
-        return $this->started;
+        return $this->started && !$this->closed;
     }
 
     /**

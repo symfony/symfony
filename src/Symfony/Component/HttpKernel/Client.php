@@ -43,10 +43,11 @@ class Client extends BaseClient
      */
     public function __construct(HttpKernelInterface $kernel, array $server = array(), History $history = null, CookieJar $cookieJar = null)
     {
-        parent::__construct($server, $history, $cookieJar);
-
+        // These class properties must be set before calling the parent constructor, as it may depend on it.
         $this->kernel = $kernel;
         $this->followRedirects = false;
+
+        parent::__construct($server, $history, $cookieJar);
     }
 
     /**

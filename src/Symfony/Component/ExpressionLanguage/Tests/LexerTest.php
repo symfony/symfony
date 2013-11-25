@@ -22,7 +22,7 @@ class LexerTest extends \PHPUnit_Framework_TestCase
      */
     public function testTokenize($tokens, $expression)
     {
-        $tokens[] = new Token('end of expression', null, strlen($expression) + 1);
+        $tokens[] = new Token('end of expression', null, strlen(rtrim($expression)) + 1);
         $lexer = new Lexer();
         $this->assertEquals(new TokenStream($tokens), $lexer->tokenize($expression));
     }
@@ -30,6 +30,10 @@ class LexerTest extends \PHPUnit_Framework_TestCase
     public function getTokenizeData()
     {
         return array(
+            array(
+                array(),
+                ' ',
+            ),
             array(
                 array(new Token('name', 'a', 1)),
                 'a',

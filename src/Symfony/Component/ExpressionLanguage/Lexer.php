@@ -29,7 +29,7 @@ class Lexer
      */
     public function tokenize($expression)
     {
-        $expression = str_replace(array("\r", "\n", "\t", "\v", "\f"), ' ', $expression);
+        $expression = rtrim(str_replace(array("\r", "\n", "\t", "\v", "\f"), ' ', $expression));
         $cursor = 0;
         $tokens = array();
         $brackets = array();

@@ -46,7 +46,7 @@ class SigchildEnabledProcessTest extends AbstractProcessTest
     }
 
     /**
-     * @expectedException Symfony\Component\Process\Exception\RuntimeException
+     * @expectedException \Symfony\Component\Process\Exception\RuntimeException
      */
     public function testGetPid()
     {
@@ -54,7 +54,7 @@ class SigchildEnabledProcessTest extends AbstractProcessTest
     }
 
     /**
-     * @expectedException Symfony\Component\Process\Exception\RuntimeException
+     * @expectedException \Symfony\Component\Process\Exception\RuntimeException
      */
     public function testGetPidIsNullBeforeStart()
     {
@@ -62,7 +62,7 @@ class SigchildEnabledProcessTest extends AbstractProcessTest
     }
 
     /**
-     * @expectedException Symfony\Component\Process\Exception\RuntimeException
+     * @expectedException \Symfony\Component\Process\Exception\RuntimeException
      */
     public function testGetPidIsNullAfterRun()
     {
@@ -78,7 +78,7 @@ class SigchildEnabledProcessTest extends AbstractProcessTest
     }
 
     /**
-     * @expectedException Symfony\Component\Process\Exception\RuntimeException
+     * @expectedException \Symfony\Component\Process\Exception\RuntimeException
      */
     public function testSignal()
     {
@@ -86,7 +86,7 @@ class SigchildEnabledProcessTest extends AbstractProcessTest
     }
 
     /**
-     * @expectedException Symfony\Component\Process\Exception\RuntimeException
+     * @expectedException \Symfony\Component\Process\Exception\RuntimeException
      */
     public function testProcessWithoutTermSignalIsNotSignaled()
     {

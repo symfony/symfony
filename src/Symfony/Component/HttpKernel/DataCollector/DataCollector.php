@@ -53,6 +53,6 @@ abstract class DataCollector implements DataCollectorInterface, \Serializable
             $this->valueExporter = new ValueExporter();
         }
 
-        $this->valueExporter->exportValue($var);
+        return $this->valueExporter->exportValue($var);
     }
 }

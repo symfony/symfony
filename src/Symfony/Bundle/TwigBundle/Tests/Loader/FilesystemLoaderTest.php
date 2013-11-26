@@ -52,7 +52,7 @@ class FilesystemLoaderTest extends TestCase
     }
 
     /**
-     * @expectedException Twig_Error_Loader
+     * @expectedException \Twig_Error_Loader
      */
     public function testTwigErrorIfLocatorThrowsInvalid()
     {
@@ -76,7 +76,7 @@ class FilesystemLoaderTest extends TestCase
     }
 
     /**
-     * @expectedException Twig_Error_Loader
+     * @expectedException \Twig_Error_Loader
      */
     public function testTwigErrorIfLocatorReturnsFalse()
     {

@@ -358,7 +358,7 @@ class UniqueValidatorTest extends \PHPUnit_Framework_TestCase
     public function testDedicatedEntityManagerNullObject()
     {
         $uniqueFields = array('name');
-        $entityManagerName = 'foo'; 
+        $entityManagerName = 'foo';
 
         $registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
 

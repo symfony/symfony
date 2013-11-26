@@ -38,6 +38,11 @@ class Crawler extends \SplObjectStorage
     private $namespaces = array();
 
     /**
+     * @var bool Indicates if XML was added as content
+     */
+    private $xmlAddedAsContent = false;
+
+    /**
      * Constructor.
      *
      * @param mixed  $node A Node to use as the base for the crawling
@@ -211,6 +216,8 @@ class Crawler extends \SplObjectStorage
         libxml_disable_entity_loader($disableEntities);
 
         $this->addDocument($dom);
+
+        $this->xmlAddedAsContent = true;
     }
 
     /**
@@ -616,7 +623,17 @@ class Crawler extends \SplObjectStorage
             // @codeCoverageIgnoreEnd
         }
 
-        return $this->filterXPath(CssSelector::toXPath($selector));
+        if (true === $this->xmlAddedAsContent) {
+            CssSelector::disableHtmlExtension();
+        }
+
+        $crawler = $this->filterXPath(CssSelector::toXPath($selector));
+
+        if (true === $this->xmlAddedAsContent) {
+            CssSelector::enableHtmlExtension();
+        }
+
+        return $crawler;
     }
 
     /**

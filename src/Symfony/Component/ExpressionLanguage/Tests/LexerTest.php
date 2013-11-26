@@ -31,6 +31,10 @@ class LexerTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array(
+                array(new Token('name', 'a', 3)),
+                '  a  ',
+            ),
+            array(
                 array(new Token('name', 'a', 1)),
                 'a',
             ),

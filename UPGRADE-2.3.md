@@ -137,7 +137,7 @@ Form
 
    ```
    $form = $factory->create('form');
-   $form->add($factory->createNamed('field', 'text', array(
+   $form->add($factory->createNamed('field', 'text', array(), array(
        'auto_initialize' => false,
    )));
    ```

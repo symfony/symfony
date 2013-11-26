@@ -44,6 +44,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         require_once self::$fixturesPath.'/Foo4Command.php';
         require_once self::$fixturesPath.'/Foo5Command.php';
         require_once self::$fixturesPath.'/FoobarCommand.php';
+        require_once self::$fixturesPath.'/BarBucCommand.php';
     }
 
     protected function normalizeLineBreaks($text)
@@ -207,6 +208,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     public function testFindAmbiguousNamespace()
     {
         $application = new Application();
+        $application->add(new \BarBucCommand());
         $application->add(new \FooCommand());
         $application->add(new \Foo2Command());
         $application->findNamespace('f');

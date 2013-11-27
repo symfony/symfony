@@ -11,15 +11,28 @@
 
 namespace Symfony\Component\Validator\Mapping;
 
+use Symfony\Component\Validator\MetadataFactoryInterface;
+
 /**
- * Simple implementation of ClassMetadataFactoryInterface that can be used when using ValidatorInterface::validateValue().
+ * Simple implementation of MetadataFactoryInterface that can be used when using ValidatorInterface::validateValue().
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class BlackholeMetadataFactory implements ClassMetadataFactoryInterface
+class BlackholeMetadataFactory implements MetadataFactoryInterface
 {
-    public function getClassMetadata($class)
+    /**
+     * @inheritdoc
+     */
+    public function getMetadataFor($value)
     {
         throw new \LogicException('BlackholeClassMetadataFactory only works with ValidatorInterface::validateValue().');
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function hasMetadataFor($value)
+    {
+        return false;
     }
 }

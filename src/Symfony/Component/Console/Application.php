@@ -515,8 +515,8 @@ class Application
         }
 
         $exact = in_array($namespace, $namespaces, true);
-        if (1 < count($namespaces) && !$exact) {
-            throw new \InvalidArgumentException(sprintf('The namespace "%s" is ambiguous (%s).', $namespace, $this->getAbbreviationSuggestions($namespaces)));
+        if (count($namespaces) > 1 && !$exact) {
+            throw new \InvalidArgumentException(sprintf('The namespace "%s" is ambiguous (%s).', $namespace, $this->getAbbreviationSuggestions(array_values($namespaces))));
         }
 
         return $exact ? $namespace : reset($namespaces);

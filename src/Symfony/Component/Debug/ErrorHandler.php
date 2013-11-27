@@ -161,7 +161,7 @@ class ErrorHandler
         $exceptionHandler = set_exception_handler(function() {});
         restore_exception_handler();
 
-        if (is_array($exceptionHandler) && $exceptionHandler[0] instanceof ExceptionHandler) {
+        if (is_array($exceptionHandler) && $exceptionHandler[0] instanceof ExceptionHandlerInterface) {
             $level = isset($this->levels[$type]) ? $this->levels[$type] : $type;
             $message = sprintf('%s: %s in %s line %d', $level, $error['message'], $error['file'], $error['line']);
             $exception = new FatalErrorException($message, 0, $type, $error['file'], $error['line']);

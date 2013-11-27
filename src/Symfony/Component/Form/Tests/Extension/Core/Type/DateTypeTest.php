@@ -162,7 +162,7 @@ class DateTypeTest extends TypeTestCase
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
             'widget' => 'text',
-            'pad'    => true
+            'pad'    => true,
         ));
 
         $text = array(

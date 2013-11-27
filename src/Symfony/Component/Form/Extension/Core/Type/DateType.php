@@ -209,7 +209,7 @@ class DateType extends AbstractType
             // this option.
             'data_class'     => null,
             'compound'       => $compound,
-            'pad'            => false
+            'pad'            => false,
         ));
 
         $resolver->setNormalizers(array(

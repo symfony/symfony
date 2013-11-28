@@ -125,7 +125,17 @@ class ErrorHandler
                 require __DIR__.'/Exception/ContextErrorException.php';
             }
 
-            throw new ContextErrorException(sprintf('%s: %s in %s line %d', isset($this->levels[$level]) ? $this->levels[$level] : $level, $message, $file, $line), 0, $level, $file, $line, $context);
+            $exception = new ContextErrorException(sprintf('%s: %s in %s line %d', isset($this->levels[$level]) ? $this->levels[$level] : $level, $message, $file, $line), 0, $level, $file, $line, $context);
+
+            // Exceptions thrown from error handlers are sometimes not caught by the exception
+            // handler, so we invoke it directly (https://bugs.php.net/bug.php?id=54275)
+            $exceptionHandler = set_exception_handler(function() {});
+            restore_exception_handler();
+
+            if (is_array($exceptionHandler) && $exceptionHandler[0] instanceof ExceptionHandler) {
+                $exceptionHandler[0]->handle($exception);
+                return true;
+            }
         }
 
         return false;

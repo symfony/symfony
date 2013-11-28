@@ -12,7 +12,6 @@
 namespace Symfony\Component\Debug\Tests;
 
 use Symfony\Component\Debug\ErrorHandler;
-use Symfony\Component\Debug\ExceptionHandler;
 
 /**
  * ErrorHandlerTest
@@ -44,28 +43,39 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testCompileTimeError()
     {
-        $exceptionHandler = $this->getMock('Symfony\Component\Debug\ExceptionHandler', array('handle'));
-        set_exception_handler(array($exceptionHandler, 'handle'));
-
         // the ContextErrorException must not be loaded to test the workaround
         // for https://bugs.php.net/bug.php?id=65322.
         if (class_exists('Symfony\Component\Debug\Exception\ContextErrorException', false)) {
             $this->markTestSkipped('The ContextErrorException class is already loaded.');
         }
 
+        $exceptionHandler = $this->getMock('Symfony\Component\Debug\ExceptionHandler', array('handle'));
+
+        // the following code forces some PHPUnit classes to be loaded
+        // so that they will be available in the exception handler
+        // as they won't be autoloaded by PHP
+        class_exists('PHPUnit_Framework_MockObject_Invocation_Object');
+        $this->assertInstanceOf('stdClass', new \stdClass());
+        $this->assertEquals(1, 1);
+        $this->assertStringStartsWith('foo', 'foobar');
+        $this->assertArrayHasKey('bar', array('bar' => 'foo'));
+
         $that = $this;
-        $exceptionCheck = function($exception) use ($that) {
+        $exceptionCheck = function ($exception) use ($that) {
             $that->assertInstanceOf('Symfony\Component\Debug\Exception\ContextErrorException', $exception);
             $that->assertEquals(E_STRICT, $exception->getSeverity());
             $that->assertEquals(2, $exception->getLine());
-            $that->assertStringStartsWith('Runtime Notice: Declaration of _CompileTimeError::foo() should be compatible with that of _BaseCompileTimeError::foo()', $exception->getMessage());
+            $that->assertStringStartsWith('Runtime Notice: Declaration of _CompileTimeError::foo() should be compatible with', $exception->getMessage());
             $that->assertArrayHasKey('bar', $exception->getContext());
         };
 
         $exceptionHandler->expects($this->once())
             ->method('handle')
-            ->will($this->returnCallback($exceptionCheck));
+            ->will($this->returnCallback($exceptionCheck))
+        ;
+
         ErrorHandler::register();
+        set_exception_handler(array($exceptionHandler, 'handle'));
 
         // dummy variable to check for in error handler.
         $bar = 123;
@@ -76,7 +86,9 @@ class _BaseCompileTimeError { function foo() {} }
 class _CompileTimeError extends _BaseCompileTimeError { function foo($invalid) {} }
 PHP
         );
+
         restore_error_handler();
+        restore_exception_handler();
     }
 
     public function testNotice()
@@ -88,7 +100,7 @@ PHP
         $exceptionCheck = function($exception) use ($that) {
             $that->assertInstanceOf('Symfony\Component\Debug\Exception\ContextErrorException', $exception);
             $that->assertEquals(E_NOTICE, $exception->getSeverity());
-            $that->assertEquals(__LINE__ + 35, $exception->getLine());
+            $that->assertEquals(__LINE__ + 36, $exception->getLine());
             $that->assertEquals(__FILE__, $exception->getFile());
             $that->assertRegexp('/^Notice: Undefined variable: (foo|bar)/', $exception->getMessage());
             $that->assertArrayHasKey('foobar', $exception->getContext());
@@ -120,10 +132,11 @@ PHP
     }
 
     // dummy function to test trace in error handler.
-    private static function triggerNotice($that) {
+    private static function triggerNotice($that)
+    {
         // dummy variable to check for in error handler.
         $foobar = 123;
-        $that->assertSame('', $foo . $foo . $bar);
+        $that->assertSame('', $foo.$foo.$bar);
     }
 
     public function testConstruct()
@@ -172,7 +185,7 @@ PHP
 
         restore_error_handler();
 
-        $logger = $this->getMock('Psr\Log\LoggerInterface', array('warning'));
+        $logger = $this->getMock('Psr\Log\LoggerInterface');
 
         $that = $this;
         $warnArgCheck = function($message, $context) use ($that) {

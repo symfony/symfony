@@ -134,6 +134,7 @@ class ErrorHandler
 
             if (is_array($exceptionHandler) && $exceptionHandler[0] instanceof ExceptionHandler) {
                 $exceptionHandler[0]->handle($exception);
+
                 return true;
             }
         }

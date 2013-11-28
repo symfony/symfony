@@ -91,7 +91,7 @@
         {% endfor %}
     {% endif %}
 
-    <script type="text/javascript">//<![CDATA[
+    <script type="text/javascript">{% autoescape 'js' %}//<![CDATA[
         /**
          * In-memory key-value cache manager
          */
@@ -428,10 +428,11 @@
             canvasAutoUpdateOnThresholdChange(null);
         }, 50);
 
-    //]]></script>
+    //]]>{% endautoescape %}</script>
 {% endblock %}
 
 {% macro dump_request_data(token, profile, events, origin) %}
+{% autoescape 'js' %}
 {% from _self import dump_events %}
                 {
                     "id": "{{ token }}",
@@ -440,13 +441,15 @@
 {{ dump_events(events) }}
                     ]
                 }
+{% endautoescape %}
 {% endmacro %}
 
 {% macro dump_events(events) %}
+{% autoescape 'js' %}
 {% for name, event in events %}
 {% if '__section__' != name %}
                         {
-                            "name": "{{ name|replace({"\\": "\\\\"}) }}",
+                            "name": "{{ name }}",
                             "category": "{{ event.category }}",
                             "origin": {{ "%F"|format(event.origin) }},
                             "starttime": {{ "%F"|format(event.starttime) }},
@@ -461,6 +464,7 @@
                         }{{ loop.last ? '' : ',' }}
 {% endif %}
 {% endfor %}
+{% endautoescape %}
 {% endmacro %}
 
 {% macro display_timeline(id, events, colors) %}

@@ -20,30 +20,123 @@ use Symfony\Component\Debug\ErrorHandler;
  */
 class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var int Error reporting level before running tests.
+     */
+    protected $errorReporting;
+
+    /**
+     * @var string Display errors setting before running tests.
+     */
+    protected $displayErrors;
+
+    public function setUp() {
+        $this->errorReporting = error_reporting(E_ALL | E_STRICT);
+        $this->displayErrors = ini_get('display_errors');
+        ini_set('display_errors', '1');
+    }
+
+    public function tearDown() {
+        ini_set('display_errors', $this->displayErrors);
+        error_reporting($this->errorReporting);
+    }
+
     public function testCompileTimeError()
     {
-        // the ContextErrorException must not be loaded for this test to work
+        // the ContextErrorException must not be loaded to test the workaround
+        // for https://bugs.php.net/bug.php?id=65322.
         if (class_exists('Symfony\Component\Debug\Exception\ContextErrorException', false)) {
             $this->markTestSkipped('The ContextErrorException class is already loaded.');
         }
 
-        $handler = ErrorHandler::register(E_ALL | E_STRICT);
-        $displayErrors = ini_get('display_errors');
-        ini_set('display_errors', '1');
+        $exceptionHandler = $this->getMock('Symfony\Component\Debug\ExceptionHandler', array('handle'));
 
-        try {
-            // trigger compile time error
-            eval(<<<'PHP'
+        // the following code forces some PHPUnit classes to be loaded
+        // so that they will be available in the exception handler
+        // as they won't be autoloaded by PHP
+        class_exists('PHPUnit_Framework_MockObject_Invocation_Object');
+        $this->assertInstanceOf('stdClass', new \stdClass());
+        $this->assertEquals(1, 1);
+        $this->assertStringStartsWith('foo', 'foobar');
+        $this->assertArrayHasKey('bar', array('bar' => 'foo'));
+
+        $that = $this;
+        $exceptionCheck = function ($exception) use ($that) {
+            $that->assertInstanceOf('Symfony\Component\Debug\Exception\ContextErrorException', $exception);
+            $that->assertEquals(E_STRICT, $exception->getSeverity());
+            $that->assertEquals(2, $exception->getLine());
+            $that->assertStringStartsWith('Runtime Notice: Declaration of _CompileTimeError::foo() should be compatible with', $exception->getMessage());
+            $that->assertArrayHasKey('bar', $exception->getContext());
+        };
+
+        $exceptionHandler->expects($this->once())
+            ->method('handle')
+            ->will($this->returnCallback($exceptionCheck))
+        ;
+
+        ErrorHandler::register();
+        set_exception_handler(array($exceptionHandler, 'handle'));
+
+        // dummy variable to check for in error handler.
+        $bar = 123;
+
+        // trigger compile time error
+        eval(<<<'PHP'
 class _BaseCompileTimeError { function foo() {} }
 class _CompileTimeError extends _BaseCompileTimeError { function foo($invalid) {} }
 PHP
-            );
-        } catch (\Exception $e) {
-            // if an exception is thrown, the test passed
-        }
+        );
 
-        ini_set('display_errors', $displayErrors);
         restore_error_handler();
+        restore_exception_handler();
+    }
+
+    public function testNotice()
+    {
+        $exceptionHandler = $this->getMock('Symfony\Component\Debug\ExceptionHandler', array('handle'));
+        set_exception_handler(array($exceptionHandler, 'handle'));
+
+        $that = $this;
+        $exceptionCheck = function($exception) use ($that) {
+            $that->assertInstanceOf('Symfony\Component\Debug\Exception\ContextErrorException', $exception);
+            $that->assertEquals(E_NOTICE, $exception->getSeverity());
+            $that->assertEquals(__LINE__ + 36, $exception->getLine());
+            $that->assertEquals(__FILE__, $exception->getFile());
+            $that->assertRegexp('/^Notice: Undefined variable: (foo|bar)/', $exception->getMessage());
+            $that->assertArrayHasKey('foobar', $exception->getContext());
+
+            $trace = $exception->getTrace();
+            $that->assertEquals(__FILE__, $trace[0]['file']);
+            $that->assertEquals('Symfony\Component\Debug\ErrorHandler', $trace[0]['class']);
+            $that->assertEquals('handle', $trace[0]['function']);
+            $that->assertEquals('->', $trace[0]['type']);
+
+            $that->assertEquals(__FILE__, $trace[1]['file']);
+            $that->assertEquals(__CLASS__, $trace[1]['class']);
+            $that->assertEquals('triggerNotice', $trace[1]['function']);
+            $that->assertEquals('::', $trace[1]['type']);
+
+            $that->assertEquals(__CLASS__, $trace[2]['class']);
+            $that->assertEquals('testNotice', $trace[2]['function']);
+            $that->assertEquals('->', $trace[2]['type']);
+        };
+
+        $exceptionHandler->expects($this->exactly(3))
+            ->method('handle')
+            ->will($this->returnCallback($exceptionCheck));
+        ErrorHandler::register();
+
+        self::triggerNotice($this);
+
+        restore_error_handler();
+    }
+
+    // dummy function to test trace in error handler.
+    private static function triggerNotice($that)
+    {
+        // dummy variable to check for in error handler.
+        $foobar = 123;
+        $that->assertSame('', $foo.$foo.$bar);
     }
 
     public function testConstruct()

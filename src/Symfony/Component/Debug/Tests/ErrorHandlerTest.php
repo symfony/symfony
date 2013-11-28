@@ -12,6 +12,7 @@
 namespace Symfony\Component\Debug\Tests;
 
 use Symfony\Component\Debug\ErrorHandler;
+use Symfony\Component\Debug\Exception\DummyException;
 
 /**
  * ErrorHandlerTest
@@ -81,11 +82,15 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
         $bar = 123;
 
         // trigger compile time error
-        eval(<<<'PHP'
+        try {
+            eval(<<<'PHP'
 class _BaseCompileTimeError { function foo() {} }
 class _CompileTimeError extends _BaseCompileTimeError { function foo($invalid) {} }
 PHP
-        );
+            );
+        } catch (DummyException $e) {
+            // if an exception is thrown, the test passed
+        }
 
         restore_error_handler();
         restore_exception_handler();
@@ -100,7 +105,7 @@ PHP
         $exceptionCheck = function($exception) use ($that) {
             $that->assertInstanceOf('Symfony\Component\Debug\Exception\ContextErrorException', $exception);
             $that->assertEquals(E_NOTICE, $exception->getSeverity());
-            $that->assertEquals(__LINE__ + 36, $exception->getLine());
+            $that->assertEquals(__LINE__ + 40, $exception->getLine());
             $that->assertEquals(__FILE__, $exception->getFile());
             $that->assertRegexp('/^Notice: Undefined variable: (foo|bar)/', $exception->getMessage());
             $that->assertArrayHasKey('foobar', $exception->getContext());
@@ -121,12 +126,16 @@ PHP
             $that->assertEquals('->', $trace[2]['type']);
         };
 
-        $exceptionHandler->expects($this->exactly(3))
+        $exceptionHandler->expects($this->once())
             ->method('handle')
             ->will($this->returnCallback($exceptionCheck));
         ErrorHandler::register();
 
-        self::triggerNotice($this);
+        try {
+            self::triggerNotice($this);
+        } catch (DummyException $e) {
+            // if an exception is thrown, the test passed
+        }
 
         restore_error_handler();
     }

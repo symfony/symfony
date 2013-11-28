@@ -774,4 +774,25 @@ class DateTypeTest extends LocalizedTestCase
         $this->assertSame(array(), $form['day']->getErrors());
         $this->assertSame(array($error), $form->getErrors());
     }
+    
+    public function testYearsFor32BitsMachines()
+    {
+        if (4 !== PHP_INT_SIZE) {
+            $this->markTestSkipped(
+                'PHP must be compiled in 32 bit mode to run this test');
+        }
+        
+        $form = $this->factory->create('date', null, array(
+            'years' => range(1900, 2040),
+        ));
+
+        $view = $form->createView();
+
+        $listChoices = array();
+        foreach(range(1902, 2037) as $y) {
+            $listChoices[] = new ChoiceView($y, $y, $y);
+        }
+        
+        $this->assertEquals($listChoices, $view['year']->vars['choices']);
+    }
 }

@@ -36,8 +36,10 @@ class Lexer
         $end = strlen($expression);
 
         while ($cursor < $end) {
-            while (' ' == $expression[$cursor]) {
+            if (' ' == $expression[$cursor]) {
                 ++$cursor;
+
+                continue;
             }
 
             if (preg_match('/[0-9]+(?:\.[0-9]+)?/A', $expression, $match, null, $cursor)) {

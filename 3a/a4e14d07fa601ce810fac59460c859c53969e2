@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-11-05T10:30:29Z
+
+What do you mean by "when form is disabled"?
+
+---------------------------------------------------------------------------
+
+by stof at 2013-11-05T10:35:56Z
+
+@fabpot in case you don't use forms in your project and are using the subtree splits (thus being able to drop the Form component entirely). FrameworkBundle does not require enabling forms
+
+---------------------------------------------------------------------------
+
+by hason at 2013-11-05T10:36:11Z
+
+```
+framework:
+  form:
+    enabled: false
+  validation:
+    enabled: true
+```
+
+---------------------------------------------------------------------------
+
+by hason at 2013-11-07T06:24:17Z
+
+The use case of this problem:
+
+*composer.json*:
+```json
+{
+    "require": {
+        "symfony/framework-bundle": "2.*",
+        "symfony/validator": "2.*",
+        "symfony/yml": "2.*"
+    }
+}
+```
+
+*config.yml*:
+```yaml
+framework:
+  validator:
+    enabled: true
+```
+
+> PHP Fatal error:  Uncaught exception 'ReflectionException' with message 'Class Symfony\Component\Form\FormInterface does not exist' in /vendor/symfony/framework-bundle/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php:630

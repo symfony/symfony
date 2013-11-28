@@ -46,6 +46,7 @@ class FormError
      * @var string
      */
     protected $errorPath;
+    
     /**
      * Constructor
      *
@@ -57,7 +58,7 @@ class FormError
      * @param array        $messageParameters    The parameters that should be
      *                                           substituted in the message template.
      * @param integer|null $messagePluralization The value for error message pluralization
-     * @param string       $errorPath           The error field name 
+     * @param string       $errorPath            The error field name 
      *
      * @see \Symfony\Component\Translation\Translator
      */

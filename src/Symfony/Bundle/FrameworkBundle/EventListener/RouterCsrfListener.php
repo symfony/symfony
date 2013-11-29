@@ -16,7 +16,6 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Security\Csrf\CsrfToken;
-use Symfony\Component\Routing\Router;
 use Symfony\Component\Routing\Generator\UrlOptionsInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
@@ -37,7 +36,7 @@ class RouterCsrfListener implements EventSubscriberInterface
      * @param Router The router
      * @param CsrfProviderInterface The CSRF provider service
      */
-    public function __construct(Router $router, CsrfTokenManagerInterface $csrfManager)
+    public function __construct($router, CsrfTokenManagerInterface $csrfManager)
     {
         $this->router = $router;
         $this->csrfManager = $csrfManager;

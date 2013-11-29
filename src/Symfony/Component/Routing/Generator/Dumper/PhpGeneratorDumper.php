@@ -119,7 +119,7 @@ EOF;
 
         list(\$variables, \$defaults, \$requirements, \$tokens, \$hostTokens, \$options) = self::\$declaredRoutes[\$name];
 
-        return \$this->doGenerate(\$variables, \$defaults, \$requirements, \$tokens, \$parameters, \$name, \$referenceType, \$hostTokens, \$options);
+        return \$this->doGenerate(\$variables, \$defaults, \$requirements, \$tokens, \$parameters, \$name, \$referenceType, \$hostTokens);
     }
 EOF;
     }

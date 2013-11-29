@@ -101,7 +101,7 @@
         <service id="router_csrf_listener" class="%router_csrf_listener.class%">
             <tag name="kernel.event_subscriber" />
             <argument type="service" id="router" />
-            <argument type="service" id="form.csrf_provider" />
+            <argument type="service" id="security.csrf.token_manager" />
         </service>
     </services>
 </container>

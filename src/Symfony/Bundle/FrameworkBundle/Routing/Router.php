@@ -174,6 +174,7 @@ class Router extends BaseRouter implements WarmableInterface
      */
     protected function getCsrfToken($intention)
     {
-        return $this->container->get('form.csrf_provider')->generateCsrfToken($intention);
+        return $this->container->get('security.csrf.token_manager')
+            ->getToken($intention)->getValue();
     }
 }

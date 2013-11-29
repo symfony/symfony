@@ -55,7 +55,6 @@ class RouterCsrfListener implements EventSubscriberInterface
                 $options = $generator->getOptions($route);
 
                 if (isset($options['csrf_protect']) && $options['csrf_protect']) {
-                    $exceptedToken = $this->csrfProvider->generateCsrfToken($route);
                     $query = $request->query;
 
                     if (!$query->has('_csrf_token') ||

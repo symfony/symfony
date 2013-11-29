@@ -16,7 +16,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Security\Csrf\CsrfToken;
-use Symfony\Component\Routing\Generator\UrlOptionsInterface;
+use Symfony\Component\Routing\Generator\RouteResolverInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
@@ -48,17 +48,18 @@ class RouterCsrfListener implements EventSubscriberInterface
         $attributes = $request->attributes;
 
         if ($attributes->has('_route')) {
-            $route = $attributes->get('_route');
+            $name = $attributes->get('_route');
             $generator = $this->router->getGenerator();
 
-            if ($generator instanceof UrlOptionsInterface) {
-                $options = $generator->getOptions($route);
+            if ($generator instanceof RouteResolverInterface) {
+                $route = $generator->getRoute($name);
+                $defaults = $route->getDefaults();
 
-                if (isset($options['csrf_protect']) && $options['csrf_protect']) {
+                if (isset($defaults['_csrf_protect']) && $defaults['_csrf_protect']) {
                     $query = $request->query;
 
                     if (!$query->has('_csrf_token') ||
-                        !$this->csrfManager->isTokenValid(new CsrfToken($route, $query->get('_csrf_token')))) {
+                        !$this->csrfManager->isTokenValid(new CsrfToken($name, $query->get('_csrf_token')))) {
                             throw new BadRequestHttpException('Invalid CSRF token passed');
                     }
                 }

@@ -15,7 +15,7 @@ use Symfony\Component\Routing\Router as BaseRouter;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Routing\Generator\UrlOptionsInterface;
+use Symfony\Component\Routing\Generator\RouteResolverInterface;
 use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -159,9 +159,11 @@ class Router extends BaseRouter implements WarmableInterface
     {  
         $generator = $this->getGenerator();
 
-        if ($generator instanceof UrlOptionsInterface) {
-            $options = $generator->getOptions($name);
-            if (isset($options['csrf_protect']) && $options['csrf_protect']) {
+        if ($generator instanceof RouteResolverInterface) {
+            $route = $generator->getRoute($name);
+            $defaults = $route->getDefaults();
+            
+            if (isset($defaults['_csrf_protect']) && $defaults['_csrf_protect']) {
                 $parameters['_csrf_token'] = $this->getCsrfToken($name);
             }
         }

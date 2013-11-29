@@ -26,7 +26,6 @@ class CompiledRoute
     private $hostVariables;
     private $hostRegex;
     private $hostTokens;
-    private $options;
 
     /**
      * Constructor.
@@ -40,7 +39,7 @@ class CompiledRoute
      * @param array       $hostVariables      An array of host variables
      * @param array       $variables          An array of variables (variables defined in the path and in the host patterns)
      */
-    public function __construct($staticPrefix, $regex, array $tokens, array $pathVariables, $hostRegex = null, array $hostTokens = array(), array $hostVariables = array(), array $variables = array(), array $options = array())
+    public function __construct($staticPrefix, $regex, array $tokens, array $pathVariables, $hostRegex = null, array $hostTokens = array(), array $hostVariables = array(), array $variables = array())
     {
         $this->staticPrefix = (string) $staticPrefix;
         $this->regex = $regex;
@@ -50,7 +49,6 @@ class CompiledRoute
         $this->hostTokens = $hostTokens;
         $this->hostVariables = $hostVariables;
         $this->variables = $variables;
-        $this->options = $options;
     }
 
     /**
@@ -131,15 +129,5 @@ class CompiledRoute
     public function getHostVariables()
     {
         return $this->hostVariables;
-    }
-
-    /**
-     * Returns the route options.
-     *
-     * @return array The options
-     */
-    public function getOptions()
-    {
-        return $this->options;
     }
 }

@@ -12,18 +12,18 @@
 namespace Symfony\Component\Routing\Generator;
 
 /**
- * UrlOptionsInterface is the interface that add support for getting options of a route.
+ * An object that is able to find the route from its name
  *
  * @author Grégoire Passault <g.passault@gmail.com>
  */
-interface UrlOptionsInterface
+interface RouteResolverInterface
 {
     /**
-     * Getting options of the given route.
+     * Getting a route.
      *
      * @param $name The route name
      *
-     * @return array The route options
+     * @return UrlGeneratorRoute A route usable by the url generator
      */
-    public function getOptions($name);
+    public function getRoute($name);
 }

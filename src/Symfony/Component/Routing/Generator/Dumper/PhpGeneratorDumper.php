@@ -69,6 +69,8 @@ class {$options['class']} extends {$options['base_class']}
     }
 
 {$this->generateGenerateMethod()}
+
+{$this->generateGetOptionsMethod()}
 }
 
 EOF;
@@ -92,6 +94,7 @@ EOF;
             $properties[] = $route->getRequirements();
             $properties[] = $compiledRoute->getTokens();
             $properties[] = $compiledRoute->getHostTokens();
+            $properties[] = $compiledRoute->getOptions();
 
             $routes .= sprintf("        '%s' => %s,\n", $name, str_replace("\n", '', var_export($properties, true)));
         }
@@ -114,9 +117,28 @@ EOF;
             throw new RouteNotFoundException(sprintf('Unable to generate a URL for the named route "%s" as such route does not exist.', \$name));
         }
 
-        list(\$variables, \$defaults, \$requirements, \$tokens, \$hostTokens) = self::\$declaredRoutes[\$name];
+        list(\$variables, \$defaults, \$requirements, \$tokens, \$hostTokens, \$options) = self::\$declaredRoutes[\$name];
 
-        return \$this->doGenerate(\$variables, \$defaults, \$requirements, \$tokens, \$parameters, \$name, \$referenceType, \$hostTokens);
+        return \$this->doGenerate(\$variables, \$defaults, \$requirements, \$tokens, \$parameters, \$name, \$referenceType, \$hostTokens, \$options);
+    }
+EOF;
+    }
+
+    /**
+     * Generates PHP code representing the `getOptions` method that implements the UrlOptionsInterface.
+     *
+     * @return string PHP code
+     */
+    private function generateGetOptionsMethod()
+    {
+        return <<<EOF
+    public function getOptions(\$name)
+    {
+        if (!isset(self::\$declaredRoutes[\$name])) {
+            throw new RouteNotFoundException(sprintf('Unable to generate a URL for the named route "%s" as such route does not exist.', \$name));
+        }
+
+        return self::\$declaredRoutes[\$name][5];
     }
 EOF;
     }

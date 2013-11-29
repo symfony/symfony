@@ -27,7 +27,7 @@ use Psr\Log\LoggerInterface;
  *
  * @api
  */
-class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInterface
+class UrlGenerator implements UrlGeneratorInterface, UrlOptionsInterface, ConfigurableRequirementsInterface
 {
     /**
      * @var RouteCollection
@@ -126,13 +126,33 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
     }
 
     /**
-     * {@inheritDoc}
+     * Helper to get a route
      */
-    public function generate($name, $parameters = array(), $referenceType = self::ABSOLUTE_PATH)
+    protected function getRoute($name)
     {
         if (null === $route = $this->routes->get($name)) {
             throw new RouteNotFoundException(sprintf('Unable to generate a URL for the named route "%s" as such route does not exist.', $name));
         }
+
+        return $route;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getOptions($name)
+    {
+        $route = $this->getRoute($name);
+
+        return $route->getOptions();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function generate($name, $parameters = array(), $referenceType = self::ABSOLUTE_PATH)
+    {
+        $route = $this->getRoute($name);
 
         // the Route has a cache of its own and is not recompiled as long as it does not get modified
         $compiledRoute = $route->compile();

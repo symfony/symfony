@@ -22,6 +22,7 @@
         <parameter key="router.options.matcher.cache_class">%router.cache_class_prefix%UrlMatcher</parameter>
         <parameter key="router.options.generator.cache_class">%router.cache_class_prefix%UrlGenerator</parameter>
         <parameter key="router_listener.class">Symfony\Component\HttpKernel\EventListener\RouterListener</parameter>
+        <parameter key="router_csrf_listener.class">Symfony\Bundle\FrameworkBundle\EventListener\RouterCsrfListener</parameter>
         <parameter key="router.request_context.host">localhost</parameter>
         <parameter key="router.request_context.scheme">http</parameter>
         <parameter key="router.request_context.base_url"></parameter>
@@ -95,6 +96,12 @@
             <argument type="service" id="router.request_context" on-invalid="ignore" />
             <argument type="service" id="logger" on-invalid="ignore" />
             <argument type="service" id="request_stack" />
+        </service>
+        
+        <service id="router_csrf_listener" class="%router_csrf_listener.class%">
+            <tag name="kernel.event_subscriber" />
+            <argument type="service" id="router" />
+            <argument type="service" id="form.csrf_provider" />
         </service>
     </services>
 </container>

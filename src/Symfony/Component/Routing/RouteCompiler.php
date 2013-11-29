@@ -45,6 +45,7 @@ class RouteCompiler implements RouteCompilerInterface
         $regex = null;
         $hostRegex = null;
         $hostTokens = array();
+        $options = $route->getOptions();
 
         if ('' !== $host = $route->getHost()) {
             $result = self::compilePattern($route, $host, true);
@@ -68,6 +69,8 @@ class RouteCompiler implements RouteCompilerInterface
         $tokens = $result['tokens'];
         $regex = $result['regex'];
 
+        unset($options['compiler_class']);
+
         return new CompiledRoute(
             $staticPrefix,
             $regex,
@@ -76,7 +79,8 @@ class RouteCompiler implements RouteCompilerInterface
             $hostRegex,
             $hostTokens,
             $hostVariables,
-            array_unique($variables)
+            array_unique($variables),
+            $options
         );
     }
 

@@ -41,13 +41,11 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->createContainerFromFile('csrf_needs_session');
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage CSRF protection needs to be enabled in order to use CSRF protection for forms.
-     */
-    public function testCsrfProtectionForFormsNeedCsrfProtectionToBeEnabled()
+    public function testCsrfProtectionForFormsEnablesCsrfProtectionAutomatically()
     {
-        $this->createContainerFromFile('csrf');
+        $container = $this->createContainerFromFile('csrf');
+
+        $this->assertTrue($container->hasDefinition('security.csrf.token_manager'));
     }
 
     public function testSecureRandomIsAvailableIfCsrfIsDisabled()

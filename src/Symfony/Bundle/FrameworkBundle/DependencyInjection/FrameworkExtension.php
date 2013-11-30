@@ -93,13 +93,17 @@ class FrameworkExtension extends Extension
 
         $loader->load('security.xml');
 
-        $this->registerSecurityCsrfConfiguration($config['csrf_protection'], $container, $loader);
-
         if ($this->isConfigEnabled($container, $config['form'])) {
             $this->formConfigEnabled = true;
             $this->registerFormConfiguration($config, $container, $loader);
             $config['validation']['enabled'] = true;
+
+            if ($this->isConfigEnabled($container, $config['form']['csrf_protection'])) {
+                $config['csrf_protection']['enabled'] = true;
+            }
         }
+
+        $this->registerSecurityCsrfConfiguration($config['csrf_protection'], $container, $loader);
 
         if (isset($config['templating'])) {
             $this->registerTemplatingConfiguration($config['templating'], $config['ide'], $container, $loader);
@@ -159,10 +163,6 @@ class FrameworkExtension extends Extension
     {
         $loader->load('form.xml');
         if ($this->isConfigEnabled($container, $config['form']['csrf_protection'])) {
-            if (!$this->isConfigEnabled($container, $config['csrf_protection'])) {
-                throw new \LogicException('CSRF protection needs to be enabled in order to use CSRF protection for forms.');
-            }
-
             $loader->load('form_csrf.xml');
 
             $container->setParameter('form.type_extension.csrf.enabled', true);

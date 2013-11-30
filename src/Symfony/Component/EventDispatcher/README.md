@@ -1,9 +1,8 @@
 EventDispatcher Component
 =========================
 
-The Symfony2 Event Dispatcher component implements the Mediator pattern
-in a simple and effective way to make all these things possible and
-to make your projects truly extensible.
+The Symfony2 EventDispatcher component implements the Mediator pattern in a
+simple and effective way to make your projects truly extensible.
 
     use Symfony\Component\EventDispatcher\EventDispatcher;
     use Symfony\Component\EventDispatcher\Event;

@@ -96,7 +96,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             'form'                => array(
                 'enabled' => false,
                 'csrf_protection' => array(
-                    'enabled' => true,
+                    'enabled' => null, // defaults to csrf_protection.enabled
                     'field_name' => null,
                 ),
             ),

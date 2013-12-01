@@ -16,6 +16,8 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
  */
 class ProjectServiceContainer extends Container
 {
+    protected $parameters;
+
     /**
      * Constructor.
      */

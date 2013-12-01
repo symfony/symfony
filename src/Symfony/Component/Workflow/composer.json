@@ -1,0 +1,36 @@
+{
+    "name": "symfony/workflow",
+    "type": "library",
+    "description": "Symfony Workflow Component",
+    "keywords": [],
+    "homepage": "http://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "http://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3",
+        "symfony/event-dispatcher": "~2.1",
+        "symfony/property-access": "~2.3"
+    },
+    "require-dev": {
+        "twig/twig": "~1.14"
+    },
+    "autoload": {
+        "psr-0": { "Symfony\\Component\\Workflow\\": "" }
+    },
+    "target-dir": "Symfony/Component/Workflow",
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.5-dev"
+        }
+    }
+}

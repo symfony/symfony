@@ -120,8 +120,12 @@ class Configuration implements ConfigurationInterface
                     ->canBeEnabled()
                     ->children()
                         ->arrayNode('csrf_protection')
-                            ->canBeDisabled()
+                            ->treatFalseLike(array('enabled' => false))
+                            ->treatTrueLike(array('enabled' => true))
+                            ->treatNullLike(array('enabled' => true))
+                            ->addDefaultsIfNotSet()
                             ->children()
+                                ->booleanNode('enabled')->defaultNull()->end() // defaults to framework.csrf_protection.enabled
                                 ->scalarNode('field_name')->defaultNull()->end()
                             ->end()
                         ->end()

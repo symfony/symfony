@@ -193,7 +193,7 @@ class PhpDumper extends Dumper
      */
     private function addProxyClasses()
     {
-        /* @var $proxyDefinitions Definition[] */
+        /* @var $definitions Definition[] */
         $definitions = array_filter(
             $this->container->getDefinitions(),
             array($this->getProxyDumper(), 'isProxyCandidate')

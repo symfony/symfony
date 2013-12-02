@@ -67,17 +67,16 @@ class YamlReferenceDumper
                 }
 
                 // check for attribute as key
-                if ($key = $node->getKeyAttribute()) {
-                    $keyNodeClass = 'Symfony\Component\Config\Definition\\'.($prototype instanceof ArrayNode ? 'ArrayNode' : 'ScalarNode');
-                    $keyNode = new $keyNodeClass($key, $node);
-                    $keyNode->setInfo('Prototype');
+                $key = $node->getKeyAttribute() ?: '-';
+                $keyNodeClass = 'Symfony\Component\Config\Definition\\'.($prototype instanceof ArrayNode ? 'ArrayNode' : 'ScalarNode');
+                $keyNode = new $keyNodeClass($key, $node);
+                $keyNode->setInfo('Prototype');
 
-                    // add children
-                    foreach ($children as $childNode) {
-                        $keyNode->addChild($childNode);
-                    }
-                    $children = array($key => $keyNode);
+                // add children
+                foreach ($children as $childNode) {
+                    $keyNode->addChild($childNode);
                 }
+                $children = array($key => $keyNode);
             }
 
             if (!$children) {
@@ -118,10 +117,15 @@ class YamlReferenceDumper
             $comments[] = 'Example: '.$example;
         }
 
-        $default = (string) $default != '' ? ' '.$default : '';
+        // inliner dump does not handle when null needs to be displayed as ~
+        if ($default === 'null') {
+            $default = '~';
+        }
+
         $comments = count($comments) ? '# '.implode(', ', $comments) : '';
 
-        $text = rtrim(sprintf('%-20s %s %s', $node->getName().':', $default, $comments), ' ');
+        $keyOrDash = $node->getName() == '-' ? $node->getName() : $node->getName().':';
+        $text = rtrim(sprintf('%-20s %s %s', $keyOrDash, $default, $comments), ' ');
 
         if ($info = $node->getInfo()) {
             $this->writeLine('');

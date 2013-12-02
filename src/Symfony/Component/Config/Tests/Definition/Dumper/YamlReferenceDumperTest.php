@@ -22,7 +22,6 @@ class YamlReferenceDumperTest extends \PHPUnit_Framework_TestCase
 
         $dumper = new YamlReferenceDumper();
 
-        $this->markTestIncomplete('The Yaml Dumper currently does not support prototyped arrays');
         $this->assertEquals($this->getConfigurationAsString(), $dumper->dump($configuration));
     }
 
@@ -30,37 +29,40 @@ class YamlReferenceDumperTest extends \PHPUnit_Framework_TestCase
     {
       return <<<EOL
 acme_root:
-    boolean:              true
-    scalar_empty:         ~
-    scalar_null:          ~
-    scalar_true:          true
-    scalar_false:         false
-    scalar_default:       default
-    scalar_array_empty:   []
+    boolean:             true
+    scalar_empty:        ~
+    scalar_null:         ~
+    scalar_true:         true
+    scalar_false:        false
+    scalar_default:      default
+    scalar_array_empty:  []
     scalar_array_defaults:
 
         # Defaults:
         - elem1
         - elem2
-    scalar_required:      ~ # Required
-    enum:                 ~ # One of "this"; "that"
+    scalar_required:     ~ # Required
+    enum:                ~ # One of "this"; "that"
 
     # some info
     array:
-        child1:               ~
-        child2:               ~
+        child1:              ~
+        child2:              ~
 
         # this is a long
         # multi-line info text
         # which should be indented
-        child3:               ~ # Example: example setting
+        child3:              ~ # Example: example setting
     parameters:
 
         # Prototype
-        name:                 ~
+        name:                ~
     connections:
+
         # Prototype
-        - { user: ~, pass: ~ }
+        -
+            user:                ~
+            pass:                ~
 
 EOL;
     }

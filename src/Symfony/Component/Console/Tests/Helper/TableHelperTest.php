@@ -32,13 +32,14 @@ class TableHelperTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider testRenderProvider
      */
-    public function testRender($headers, $rows, $layout, $expected)
+    public function testRender($headers, $rows, $layout, $dividersAt, $expected)
     {
         $table = new TableHelper();
         $table
             ->setHeaders($headers)
             ->setRows($rows)
             ->setLayout($layout)
+            ->setDividersAt($dividersAt)
         ;
         $table->render($output = $this->getOutputStream());
 
@@ -48,13 +49,14 @@ class TableHelperTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider testRenderProvider
      */
-    public function testRenderAddRows($headers, $rows, $layout, $expected)
+    public function testRenderAddRows($headers, $rows, $layout, $dividersAt, $expected)
     {
         $table = new TableHelper();
         $table
             ->setHeaders($headers)
             ->addRows($rows)
             ->setLayout($layout)
+            ->setDividersAt($dividersAt)
         ;
         $table->render($output = $this->getOutputStream());
 
@@ -64,12 +66,13 @@ class TableHelperTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider testRenderProvider
      */
-    public function testRenderAddRowsOneByOne($headers, $rows, $layout, $expected)
+    public function testRenderAddRowsOneByOne($headers, $rows, $layout, $dividersAt, $expected)
     {
         $table = new TableHelper();
         $table
             ->setHeaders($headers)
             ->setLayout($layout)
+            ->setDividersAt($dividersAt)
         ;
         foreach ($rows as $row) {
             $table->addRow($row);
@@ -93,6 +96,7 @@ class TableHelperTest extends \PHPUnit_Framework_TestCase
                 array('ISBN', 'Title', 'Author'),
                 $books,
                 TableHelper::LAYOUT_DEFAULT,
+                array(),
 <<<TABLE
 +---------------+--------------------------+------------------+
 | ISBN          | Title                    | Author           |
@@ -109,6 +113,7 @@ TABLE
                 array('ISBN', 'Title', 'Author'),
                 $books,
                 TableHelper::LAYOUT_COMPACT,
+                array(),
 <<<TABLE
  ISBN          Title                    Author           
  99921-58-10-7 Divine Comedy            Dante Alighieri  
@@ -122,6 +127,7 @@ TABLE
                 array('ISBN', 'Title', 'Author'),
                 $books,
                 TableHelper::LAYOUT_BORDERLESS,
+                array(),
 <<<TABLE
  =============== ========================== ================== 
   ISBN            Title                      Author            
@@ -143,6 +149,7 @@ TABLE
                     array('80-902734-1-6', 'And Then There Were None', 'Agatha Christie'),
                 ),
                 TableHelper::LAYOUT_DEFAULT,
+                array(),
 <<<TABLE
 +---------------+--------------------------+------------------+
 | ISBN          | Title                    |                  |
@@ -164,6 +171,7 @@ TABLE
                     array('80-902734-1-6', 'And Then There Were None', 'Agatha Christie'),
                 ),
                 TableHelper::LAYOUT_DEFAULT,
+                array(),
 <<<TABLE
 +---------------+--------------------------+------------------+
 | 99921-58-10-7 | Divine Comedy            | Dante Alighieri  |
@@ -183,6 +191,7 @@ TABLE
                     array("960-425-059-0", "The Lord of the Rings", "J. R. R.\nTolkien"),
                 ),
                 TableHelper::LAYOUT_DEFAULT,
+                array(),
 <<<TABLE
 +---------------+----------------------------+-----------------+
 | ISBN          | Title                      | Author          |
@@ -200,9 +209,33 @@ TABLE
 TABLE
             ),
             array(
+                array('ISBN', 'Title', 'Author'),
+                array(
+                    array('99921-58-10-7', 'Divine Comedy', 'Dante Alighieri'),
+                    array('9971-5-0210-0'),
+                    array('960-425-059-0', 'The Lord of the Rings', 'J. R. R. Tolkien'),
+                    array('80-902734-1-6', 'And Then There Were None', 'Agatha Christie'),
+                ),
+                TableHelper::LAYOUT_DEFAULT,
+                array(2),
+                <<<TABLE
++---------------+--------------------------+------------------+
+| ISBN          | Title                    | Author           |
++---------------+--------------------------+------------------+
+| 99921-58-10-7 | Divine Comedy            | Dante Alighieri  |
+| 9971-5-0210-0 |                          |                  |
+| 960-425-059-0 | The Lord of the Rings    | J. R. R. Tolkien |
+*               *                          *                  *
+| 80-902734-1-6 | And Then There Were None | Agatha Christie  |
++---------------+--------------------------+------------------+
+
+TABLE
+            ),
+            array(
                 array('ISBN', 'Title'),
                 array(),
                 TableHelper::LAYOUT_DEFAULT,
+                array(),
 <<<TABLE
 +------+-------+
 | ISBN | Title |
@@ -214,6 +247,7 @@ TABLE
                 array(),
                 array(),
                 TableHelper::LAYOUT_DEFAULT,
+                array(),
                 '',
             ),
             'Cell text with tags used for Output styling' => array(
@@ -223,6 +257,7 @@ TABLE
                     array('9971-5-0210-0', 'A Tale of Two Cities', '<info>Charles Dickens</>'),
                 ),
                 TableHelper::LAYOUT_DEFAULT,
+                array(),
 <<<TABLE
 +---------------+----------------------+-----------------+
 | ISBN          | Title                | Author          |
@@ -240,6 +275,7 @@ TABLE
                     array('9971-5-0210-0', 'A Tale of Two Cities', 'Charles Dickens'),
                 ),
                 TableHelper::LAYOUT_DEFAULT,
+                array(),
 <<<TABLE
 +----------------------------------+----------------------+-----------------+
 | ISBN                             | Title                | Author          |

@@ -39,11 +39,20 @@ class TableHelper extends Helper
      */
     private $rows = array();
 
+    /**
+     * Dividers at row positions.
+     *
+     * @var array
+     */
+    private $dividersAt = array();
+
     // Rendering options
     private $paddingChar;
     private $horizontalBorderChar;
+    private $horizontalDividerChar;
     private $verticalBorderChar;
     private $crossingChar;
+    private $crossingDividerChar;
     private $cellHeaderFormat;
     private $cellRowFormat;
     private $cellRowContentFormat;
@@ -88,8 +97,10 @@ class TableHelper extends Helper
                 $this
                     ->setPaddingChar(' ')
                     ->setHorizontalBorderChar('=')
+                    ->setHorizontalDividerChar(' ')
                     ->setVerticalBorderChar(' ')
                     ->setCrossingChar(' ')
+                    ->setCrossingDividerChar(' ')
                     ->setCellHeaderFormat('<info>%s</info>')
                     ->setCellRowFormat('%s')
                     ->setCellRowContentFormat(' %s ')
@@ -102,8 +113,10 @@ class TableHelper extends Helper
                 $this
                     ->setPaddingChar(' ')
                     ->setHorizontalBorderChar('')
+                    ->setHorizontalDividerChar('-')
                     ->setVerticalBorderChar(' ')
                     ->setCrossingChar('')
+                    ->setCrossingDividerChar('-')
                     ->setCellHeaderFormat('<info>%s</info>')
                     ->setCellRowFormat('%s')
                     ->setCellRowContentFormat('%s')
@@ -116,8 +129,10 @@ class TableHelper extends Helper
                 $this
                     ->setPaddingChar(' ')
                     ->setHorizontalBorderChar('-')
+                    ->setHorizontalDividerChar(' ')
                     ->setVerticalBorderChar('|')
                     ->setCrossingChar('+')
+                    ->setCrossingDividerChar('*')
                     ->setCellHeaderFormat('<info>%s</info>')
                     ->setCellRowFormat('%s')
                     ->setCellRowContentFormat(' %s ')
@@ -187,11 +202,16 @@ class TableHelper extends Helper
         return $this;
     }
 
-    public function setRow($column, array $row)
+    public function setRow($position, array $row)
     {
-        $this->rows[$column] = $row;
+        $this->rows[$position] = $row;
 
         return $this;
+    }
+
+    public function setDividersAt(array $positions)
+    {
+        $this->dividersAt = $positions;
     }
 
     /**
@@ -227,6 +247,20 @@ class TableHelper extends Helper
     }
 
     /**
+     * Sets horizontal divider character.
+     *
+     * @param string $horizontalDividerChar
+     *
+     * @return TableHelper
+     */
+    public function setHorizontalDividerChar($horizontalDividerChar)
+    {
+        $this->horizontalDividerChar = $horizontalDividerChar;
+
+        return $this;
+    }
+
+    /**
      * Sets vertical border character.
      *
      * @param string $verticalBorderChar
@@ -250,6 +284,20 @@ class TableHelper extends Helper
     public function setCrossingChar($crossingChar)
     {
         $this->crossingChar = $crossingChar;
+
+        return $this;
+    }
+
+    /**
+     * Sets crossing divider character.
+     *
+     * @param string $crossingDividerChar
+     *
+     * @return TableHelper
+     */
+    public function setCrossingDividerChar($crossingDividerChar)
+    {
+        $this->crossingDividerChar = $crossingDividerChar;
 
         return $this;
     }
@@ -347,8 +395,11 @@ class TableHelper extends Helper
         if (!empty($this->headers)) {
             $this->renderRowSeparator();
         }
-        foreach ($this->rows as $row) {
+        foreach ($this->rows as $key => $row) {
             $this->renderRow($row, $this->cellRowFormat);
+            if (in_array($key, $this->dividersAt)) {
+                $this->renderDivider();
+            }
         }
         if (!empty($this->rows)) {
             $this->renderRowSeparator();
@@ -375,6 +426,29 @@ class TableHelper extends Helper
         $markup = $this->crossingChar;
         for ($column = 0; $column < $count; $column++) {
             $markup .= str_repeat($this->horizontalBorderChar, $this->getColumnWidth($column)).$this->crossingChar;
+        }
+
+        $this->output->writeln(sprintf($this->borderFormat, $markup));
+    }
+
+    /**
+     * Renders horizontal row divider.
+     *
+     * Example: |     |           |       |
+     */
+    private function renderDivider()
+    {
+        if (0 === $count = $this->getNumberOfColumns()) {
+            return;
+        }
+
+        if (!$this->horizontalDividerChar && !$this->crossingDividerChar) {
+            return;
+        }
+
+        $markup = $this->crossingDividerChar;
+        for ($column = 0; $column < $count; $column++) {
+            $markup .= str_repeat($this->horizontalDividerChar, $this->getColumnWidth($column)).$this->crossingDividerChar;
         }
 
         $this->output->writeln(sprintf($this->borderFormat, $markup));

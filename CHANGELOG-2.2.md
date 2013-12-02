@@ -7,6 +7,23 @@ in 2.2 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.2.0...v2.2.1
 
+* 2.2.11 (2013-12-02)
+
+ * bug #9656 [DoctrineBridge] normalized class names in the ORM type guesser (fabpot)
+ * bug #9647 use the correct class name to retrieve mapped class' metadata and reposi... (xabbuh)
+ * bug #9643 [WebProfilerBundle] Fixed js escaping in time.html.twig (hason)
+ * bug #9639 Modified guessDefaultEscapingStrategy to not escape txt templates (fabpot)
+ * bug #9314 [Form] Fix DateType for 32bits computers. (WedgeSama)
+ * bug #9443 [FrameworkBundle] Fixed the registration of validation.xml file when the form is disabled (hason)
+ * bug #9625 [HttpFoundation] Do not return an empty session id if the session was closed (Taluu)
+ * bug #9447 [BrowserKit] fixed protocol-relative url redirection (jong99)
+ * bug #9535 No Entity Manager defined exception (armetiz)
+ * bug #9485 [Acl] Fix for issue #9433 (guilro)
+ * bug #9516 [AclProvider] Fix incorrect behavior when partial results returned from cache (superdav42)
+ * bug #9537 [FrameworkBundle] Fix mistake in translation's service definition. (phpmike)
+ * bug #9367 [Process] Check if the pipe array is empty before calling stream_select() (jfposton)
+ * bug #9469 [Propel1] re-factor Propel1 ModelChoiceList (havvg)
+
 * 2.2.10 (2013-11-13)
 
  * bug #9499 Request::overrideGlobals() may call invalid ini value (denkiryokuhatsuden)

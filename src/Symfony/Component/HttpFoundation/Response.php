@@ -519,8 +519,6 @@ class Response
      * Retrieves the status text for the current web response.
      *
      * @return string Status text
-     *
-     * @api
      */
     public function getStatusText()
     {

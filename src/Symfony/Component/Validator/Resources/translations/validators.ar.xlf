@@ -80,7 +80,7 @@
             </trans-unit>
             <trans-unit id="20">
                 <source>This value should be {{ limit }} or more.</source>
-                <target>هذه القيمة يجب ان تكون {{ limit }} او اكثر</target>
+                <target>هذه القيمة يجب ان تكون {{ limit }} او اكثر.</target>
             </trans-unit>
             <trans-unit id="21">
                 <source>This value is too short. It should have {{ limit }} character or more.|This value is too short. It should have {{ limit }} characters or more.</source>
@@ -104,7 +104,7 @@
             </trans-unit>
             <trans-unit id="26">
                 <source>This value is not a valid time.</source>
-                <target>هذه القيمة ليست وقت صحيح</target>
+                <target>هذه القيمة ليست وقت صحيح.</target>
             </trans-unit>
             <trans-unit id="27">
                 <source>This value is not a valid URL.</source>

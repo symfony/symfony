@@ -14,6 +14,7 @@ namespace Symfony\Component\Debug;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Debug\Exception\ContextErrorException;
 use Symfony\Component\Debug\Exception\FatalErrorException;
+use Symfony\Component\Debug\Exception\DummyException;
 use Symfony\Component\Debug\FatalErrorHandler\UndefinedFunctionFatalErrorHandler;
 use Symfony\Component\Debug\FatalErrorHandler\ClassNotFoundFatalErrorHandler;
 use Symfony\Component\Debug\FatalErrorHandler\FatalErrorHandlerInterface;
@@ -148,13 +149,29 @@ class ErrorHandler
 
             // Exceptions thrown from error handlers are sometimes not caught by the exception
             // handler, so we invoke it directly (https://bugs.php.net/bug.php?id=54275)
-            $exceptionHandler = set_exception_handler(function() {});
+            $exceptionHandler = set_exception_handler(function () {});
             restore_exception_handler();
 
             if (is_array($exceptionHandler) && $exceptionHandler[0] instanceof ExceptionHandler) {
                 $exceptionHandler[0]->handle($exception);
 
-                return true;
+                if (!class_exists('Symfony\Component\Debug\Exception\DummyException')) {
+                    require __DIR__.'/Exception/DummyException.php';
+                }
+
+                // we must stop the PHP script execution, as the exception has
+                // already been dealt with, so, let's throw an exception that
+                // will be catched by a dummy exception handler
+                set_exception_handler(function (\Exception $e) use ($exceptionHandler) {
+                    if (!$e instanceof DummyException) {
+                        // happens if our dummy exception is catched by a
+                        // catch-all from user code, in which case, let's the
+                        // current handler handle this "new" exception
+                        call_user_func($exceptionHandler, $e);
+                    }
+                });
+
+                throw new DummyException();
             }
         }
 

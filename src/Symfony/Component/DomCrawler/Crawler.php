@@ -554,6 +554,7 @@ class Crawler extends \SplObjectStorage
     public function extract($attributes)
     {
         $attributes = (array) $attributes;
+        $count = count($attributes);
 
         $data = array();
         foreach ($this as $node) {
@@ -566,7 +567,7 @@ class Crawler extends \SplObjectStorage
                 }
             }
 
-            $data[] = count($attributes) > 1 ? $elements : $elements[0];
+            $data[] = $count > 1 ? $elements : $elements[0];
         }
 
         return $data;

@@ -194,7 +194,8 @@ class AclProvider implements AclProviderInterface
         foreach ($oids as $oid) {
             if (!$result->contains($oid)) {
                 if (1 === count($oids)) {
-                    throw new AclNotFoundException(sprintf('No ACL found for %s.', $oid));
+                    $objectName = method_exists($oid, '__toString') ? $oid : get_class($oid);
+                    throw new AclNotFoundException(sprintf('No ACL found for %s.', $objectName));
                 }
 
                 $partialResultException = new NotAllAclsFoundException('The provider could not find ACLs for all object identities.');

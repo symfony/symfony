@@ -19,6 +19,20 @@ namespace Symfony\Component\Form\Extension\Core\View;
 class ChoiceView
 {
     /**
+     * Attributes which can be used in view.
+     *
+     * @var array
+     */
+    public $attr = array();
+
+    /**
+     * A prototype who can be used in view.
+     *
+     * @var FormView
+     */
+    public $prototype;
+
+    /**
      * The original choice value.
      *
      * @var mixed

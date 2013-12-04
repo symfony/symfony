@@ -12,21 +12,23 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Exception\LogicException;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\Extension\Core\ChoiceList\SimpleChoiceList;
+use Symfony\Component\Form\Extension\Core\DataTransformer\ChoiceToBooleanArrayTransformer;
+use Symfony\Component\Form\Extension\Core\DataTransformer\ChoiceToValueTransformer;
+use Symfony\Component\Form\Extension\Core\DataTransformer\ChoicesToBooleanArrayTransformer;
+use Symfony\Component\Form\Extension\Core\DataTransformer\ChoicesToValuesTransformer;
+use Symfony\Component\Form\Extension\Core\EventListener\FixCheckboxInputListener;
+use Symfony\Component\Form\Extension\Core\EventListener\FixRadioInputListener;
+use Symfony\Component\Form\Extension\Core\EventListener\MergeCollectionListener;
 use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\Exception\LogicException;
-use Symfony\Component\Form\Extension\Core\ChoiceList\SimpleChoiceList;
-use Symfony\Component\Form\Extension\Core\EventListener\FixRadioInputListener;
-use Symfony\Component\Form\Extension\Core\EventListener\FixCheckboxInputListener;
-use Symfony\Component\Form\Extension\Core\EventListener\MergeCollectionListener;
-use Symfony\Component\Form\Extension\Core\DataTransformer\ChoiceToValueTransformer;
-use Symfony\Component\Form\Extension\Core\DataTransformer\ChoiceToBooleanArrayTransformer;
-use Symfony\Component\Form\Extension\Core\DataTransformer\ChoicesToValuesTransformer;
-use Symfony\Component\Form\Extension\Core\DataTransformer\ChoicesToBooleanArrayTransformer;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ChoiceType extends AbstractType
 {
@@ -35,6 +37,11 @@ class ChoiceType extends AbstractType
      * @var array
      */
     private $choiceListCache = array();
+
+    /**
+     * @var array
+     */
+    private $choicesPrototypeForm = array();
 
     /**
      * {@inheritdoc}
@@ -88,6 +95,23 @@ class ChoiceType extends AbstractType
             // transformation is merged back into the original collection
             $builder->addEventSubscriber(new MergeCollectionListener(true, true));
         }
+
+        if ($options['choices_prototypes']) {
+            foreach ($options['choices_prototypes'] as $prototype) {
+                $resoler = new OptionsResolver();
+                $resoler
+                    ->setDefaults(array('options' => array()))
+                    ->setRequired(array('name', 'type'))
+                    ->setAllowedTypes(array(
+                        'name'      => array('string'),
+                        'type'      => array('string', 'Symfony\Component\Form\FormTypeInterface'),
+                        'options'   => array('array'),
+                    ))
+                ;
+                $prototype = $resoler->resolve($prototype);
+                $this->choicesPrototypeForm[] = $builder->create($prototype['name'], $prototype['type'], $prototype['options'])->getForm();
+            }
+        }
     }
 
     /**
@@ -131,6 +155,20 @@ class ChoiceType extends AbstractType
             // displayed. Otherwise only one of the selected options is sent in the
             // POST request.
             $view->vars['full_name'] = $view->vars['full_name'].'[]';
+        }
+
+        $choicesAttributes = $options['choices_attributes'];
+        $choicesPrototypes = $options['choices_prototypes'];
+        if (count($choicesAttributes) || count($choicesPrototypes)) {
+            foreach ($view->vars['choices'] as $key => $choiceView) {
+                if (array_key_exists($key, $choicesAttributes)) {
+                    $choiceView->attr = $choicesAttributes[$key];
+                }
+
+                if (array_key_exists($key, $this->choicesPrototypeForm) && $this->choicesPrototypeForm[$key] instanceof FormInterface) {
+                    $choiceView->prototype = $this->choicesPrototypeForm[$key]->createView($options['choices_prototypes_view']($view));
+                }
+            }
         }
     }
 
@@ -203,6 +241,14 @@ class ChoiceType extends AbstractType
             return $emptyValue;
         };
 
+        $choicesClosureNormalizer = function (Options $options, $values) {
+            if ($values instanceof \Closure && false === is_array($values = $values($options['choice_list']))) {
+                throw new UnexpectedTypeException($values, 'array');
+            }
+
+            return $values;
+        };
+
         $compound = function (Options $options) {
             return $options['expanded'];
         };
@@ -221,14 +267,25 @@ class ChoiceType extends AbstractType
             // is manually set to an object.
             // See https://github.com/symfony/symfony/pull/5582
             'data_class'        => null,
+            // All options related to choices extra data
+            'choices_attributes'      => array(),
+            'choices_prototypes'      => array(),
+            'choices_prototypes_view' => function ($view) {
+                return $view->parent;
+            }
         ));
 
         $resolver->setNormalizers(array(
             'empty_value' => $emptyValueNormalizer,
+            'choices_attributes' => $choicesClosureNormalizer,
+            'choices_prototypes' => $choicesClosureNormalizer
         ));
 
         $resolver->setAllowedTypes(array(
-            'choice_list' => array('null', 'Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface'),
+            'choice_list'             => array('null', 'Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface'),
+            'choices_attributes'      => array('array', '\Closure'),
+            'choices_prototypes'      => array('array', '\Closure'),
+            'choices_prototypes_view' => array('\Closure'),
         ));
     }
 

@@ -421,7 +421,7 @@ QUERY;
         $ancestorIds = array();
         foreach ($this->connection->executeQuery($sql)->fetchAll() as $data) {
             // FIXME: skip ancestors which are cached
-            // Fix: Oracle returns key's in uppercase
+            // Fix: Oracle returns keys in uppercase
             $ancestorIds[] = reset($data);
         }
 

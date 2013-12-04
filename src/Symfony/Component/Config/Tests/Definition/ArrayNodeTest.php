@@ -83,7 +83,6 @@ class ArrayNodeTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @group cordoval
      * @dataProvider getZeroNamedNodeExamplesData
      */
     public function testNodeNameCanBeZero($denormalized, $normalized)

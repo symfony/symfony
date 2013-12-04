@@ -293,9 +293,9 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
         $value = $this->remapXml($value);
 
         $normalized = array();
-        foreach ($this->children as $name => $child) {
-            if (array_key_exists($name, $value)) {
-                $normalized[$name] = $child->normalize($value[$name]);
+        foreach ($value as $name => $val) {
+            if (array_key_exists($name, $this->children)) {
+                $normalized[$name] = $this->children[$name]->normalize($val);
                 unset($value[$name]);
             }
         }

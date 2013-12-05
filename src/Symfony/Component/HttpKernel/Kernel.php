@@ -714,7 +714,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
 
         $content = $dumper->dump(array('class' => $class, 'base_class' => $baseClass));
         if (!$this->debug) {
-            $content = self::stripComments($content);
+            $content = static::stripComments($content);
         }
 
         $cache->write($content, $container->getResources());

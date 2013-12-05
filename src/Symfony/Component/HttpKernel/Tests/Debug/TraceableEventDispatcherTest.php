@@ -159,6 +159,22 @@ class TraceableEventDispatcherTest extends \PHPUnit_Framework_TestCase
         $dispatcher->dispatch('foo');
     }
 
+    public function testDispatchReusedEventNested()
+    {
+        $nestedCall = false;
+        $dispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
+        $dispatcher->addListener('foo', function (Event $e) use ($dispatcher) {
+            $dispatcher->dispatch('bar', $e);
+        });
+        $dispatcher->addListener('bar', function (Event $e) use (&$nestedCall) {
+            $nestedCall = true;
+        });
+
+        $this->assertFalse($nestedCall);
+        $dispatcher->dispatch('foo');
+        $this->assertTrue($nestedCall);
+    }
+
     public function testStopwatchSections()
     {
         $dispatcher = new TraceableEventDispatcher(new EventDispatcher(), $stopwatch = new Stopwatch());

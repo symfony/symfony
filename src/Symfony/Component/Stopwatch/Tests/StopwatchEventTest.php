@@ -20,7 +20,7 @@ use Symfony\Component\Stopwatch\StopwatchEvent;
  */
 class StopwatchEventTest extends \PHPUnit_Framework_TestCase
 {
-    const DELTA = 20;
+    const DELTA = 37;
 
     public function testGetOrigin()
     {

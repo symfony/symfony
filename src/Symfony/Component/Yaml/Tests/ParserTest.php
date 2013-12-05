@@ -385,6 +385,27 @@ EOF;
         );
         $tests['Folded block chomping keep without trailing newline'] = array($expected, $yaml);
 
+        $yaml = <<<'EOF'
+---
+a:
+-
+  b: c
+EOF;
+        $expected = array(
+            'a' => array(0 => array('b' => 'c')),
+        );
+        $tests['Check for an keyless array with nested items on new line'] = array($expected, $yaml);
+
+        $yaml = <<<'EOF'
+---
+a:
+- b: c
+EOF;
+        $expected = array(
+            'a' => array(0 => array('b' => 'c')),
+        );
+        $tests['Check for an keyless array with nested items inline'] = array($expected, $yaml);
+
         return $tests;
     }
 

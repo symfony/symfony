@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Extension\Core;
 
+use Doctrine\Tests\ORM\Functional\Type;
 use Symfony\Component\Form\AbstractExtension;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
@@ -44,6 +45,7 @@ class CoreExtension extends AbstractExtension
             new Type\RadioType(),
             new Type\RepeatedType(),
             new Type\SearchType(),
+            new Type\TelType(),
             new Type\TextareaType(),
             new Type\TextType(),
             new Type\TimeType(),

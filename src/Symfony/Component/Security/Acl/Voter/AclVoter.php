@@ -36,6 +36,14 @@ class AclVoter implements VoterInterface
     private $allowIfObjectIdentityUnavailable;
     private $logger;
 
+    /**
+     * @param AclProviderInterface                       $aclProvider
+     * @param ObjectIdentityRetrievalStrategyInterface   $oidRetrievalStrategy
+     * @param SecurityIdentityRetrievalStrategyInterface $sidRetrievalStrategy
+     * @param PermissionMapInterface                     $permissionMap
+     * @param LoggerInterface|null                       $logger
+     * @param Boolean                                    $allowIfObjectIdentityUnavailable
+     */
     public function __construct(AclProviderInterface $aclProvider, ObjectIdentityRetrievalStrategyInterface $oidRetrievalStrategy, SecurityIdentityRetrievalStrategyInterface $sidRetrievalStrategy, PermissionMapInterface $permissionMap, LoggerInterface $logger = null, $allowIfObjectIdentityUnavailable = true)
     {
         $this->aclProvider = $aclProvider;

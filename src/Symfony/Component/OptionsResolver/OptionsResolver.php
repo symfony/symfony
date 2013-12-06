@@ -237,6 +237,14 @@ class OptionsResolver implements OptionsResolverInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getOptions()
+    {
+        return $this->knownOptions;
+    }
+
+    /**
      * Validates that the given option names exist and throws an exception
      * otherwise.
      *

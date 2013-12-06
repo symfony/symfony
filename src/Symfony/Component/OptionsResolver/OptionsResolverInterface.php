@@ -207,11 +207,4 @@ interface OptionsResolverInterface
      *                                             between two lazy options.
      */
     public function resolve(array $options = array());
-
-    /**
-     * Returns the known options.
-     *
-     * @return array
-     */
-    public function getOptions();
 }

@@ -237,7 +237,9 @@ class OptionsResolver implements OptionsResolverInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Returns the known options.
+     *
+     * @return array
      */
     public function getOptions()
     {

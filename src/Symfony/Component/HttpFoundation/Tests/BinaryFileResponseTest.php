@@ -82,14 +82,42 @@ class BinaryFileResponseTest extends ResponseTestCase
     public function provideRanges()
     {
         return array(
+            array('bytes=0-', 0, 35, 'bytes 0-34/35'),
             array('bytes=1-4', 1, 4, 'bytes 1-4/35'),
             array('bytes=-5', 30, 5, 'bytes 30-34/35'),
-            array('bytes=-35', 0, 35, 'bytes 0-34/35'),
-            array('bytes=-40', 0, 35, 'bytes 0-34/35'),
             array('bytes=30-', 30, 5, 'bytes 30-34/35'),
             array('bytes=30-30', 30, 1, 'bytes 30-30/35'),
             array('bytes=30-34', 30, 5, 'bytes 30-34/35'),
-            array('bytes=30-40', 30, 5, 'bytes 30-34/35')
+        );
+    }
+
+    /**
+     * @dataProvider provideInvalidRanges
+     */
+    public function testInvalidRequests($requestRange)
+    {
+        $response = BinaryFileResponse::create(__DIR__.'/File/Fixtures/test.gif')->setAutoEtag();
+
+        // prepare a request for a range of the testing file
+        $request = Request::create('/');
+        $request->headers->set('Range', $requestRange);
+
+        $response = clone $response;
+        $response->prepare($request);
+        $response->sendContent();
+
+        $this->assertEquals(416, $response->getStatusCode());
+        $this->assertEquals('binary', $response->headers->get('Content-Transfer-Encoding'));
+        #$this->assertEquals('', $response->headers->get('Content-Range'));
+    }
+
+    public function provideInvalidRanges()
+    {
+        return array(
+            array('bytes=20-10'),
+            array('bytes=-35'),
+            array('bytes=-40'),
+            array('bytes=30-40')
         );
     }
 

@@ -61,13 +61,13 @@ class AclVoter implements VoterInterface
 
     public function vote(TokenInterface $token, $object, array $attributes)
     {
+        if (null === $object) {
+            return $this->voteObjectIdentityUnavailable();
+        }
+
         foreach ($attributes as $attribute) {
             if (null === $masks = $this->permissionMap->getMasks($attribute, $object)) {
                 continue;
-            }
-
-            if (null === $object) {
-                return $this->voteObjectIdentityUnavailable();
             }
 
             if ($object instanceof FieldVote) {

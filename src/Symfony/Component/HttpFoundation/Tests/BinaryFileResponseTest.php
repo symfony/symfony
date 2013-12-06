@@ -121,6 +121,9 @@ class BinaryFileResponseTest extends ResponseTestCase
             array('bytes=0-'),
             array('bytes=0-34'),
             array('bytes=-35'),
+            // Syntactical invalid range-request should also return the full resource
+            array('bytes=20-10'),
+            array('bytes=50-40'),
         );
     }
 
@@ -147,7 +150,6 @@ class BinaryFileResponseTest extends ResponseTestCase
     public function provideInvalidRanges()
     {
         return array(
-            array('bytes=20-10'),
             array('bytes=-40'),
             array('bytes=30-40')
         );

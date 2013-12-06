@@ -70,7 +70,9 @@ class AclVoter implements VoterInterface
                 $this->logDebug(sprintf('Object identity unavailable. Voting to %s', $this->allowIfObjectIdentityUnavailable? 'grant access' : 'abstain'));
 
                 return $this->allowIfObjectIdentityUnavailable ? self::ACCESS_GRANTED : self::ACCESS_ABSTAIN;
-            } elseif ($object instanceof FieldVote) {
+            }
+
+            if ($object instanceof FieldVote) {
                 $field = $object->getField();
                 $object = $object->getDomainObject();
             } else {
@@ -98,7 +100,9 @@ class AclVoter implements VoterInterface
                     $this->logDebug('ACL found, permission granted. Voting to grant access');
 
                     return self::ACCESS_GRANTED;
-                } elseif (null !== $field && $acl->isFieldGranted($field, $masks, $sids, false)) {
+                }
+
+                if (null !== $field && $acl->isFieldGranted($field, $masks, $sids, false)) {
                     $this->logDebug('ACL found, permission granted. Voting to grant access');
 
                     return self::ACCESS_GRANTED;

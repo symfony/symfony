@@ -67,9 +67,7 @@ class AclVoter implements VoterInterface
             }
 
             if (null === $object) {
-                $this->logDebug(sprintf('Object identity unavailable. Voting to %s', $this->allowIfObjectIdentityUnavailable? 'grant access' : 'abstain'));
-
-                return $this->allowIfObjectIdentityUnavailable ? self::ACCESS_GRANTED : self::ACCESS_ABSTAIN;
+                return $this->voteObjectIdentityUnavailable();
             }
 
             if ($object instanceof FieldVote) {
@@ -82,9 +80,7 @@ class AclVoter implements VoterInterface
             if ($object instanceof ObjectIdentityInterface) {
                 $oid = $object;
             } elseif (null === $oid = $this->objectIdentityRetrievalStrategy->getObjectIdentity($object)) {
-                $this->logDebug(sprintf('Object identity unavailable. Voting to %s', $this->allowIfObjectIdentityUnavailable? 'grant access' : 'abstain'));
-
-                return $this->allowIfObjectIdentityUnavailable ? self::ACCESS_GRANTED : self::ACCESS_ABSTAIN;
+                return $this->voteObjectIdentityUnavailable();
             }
 
             if (!$this->supportsClass($oid->getType())) {
@@ -150,5 +146,17 @@ class AclVoter implements VoterInterface
         if (null !== $this->logger) {
             $this->logger->debug($message, $context);
         }
+    }
+
+    /**
+     * Get vote for object with no identity
+     *
+     * @return integer
+     */
+    private function voteObjectIdentityUnavailable()
+    {
+        $this->logDebug(sprintf('Object identity unavailable. Voting to %s', $this->allowIfObjectIdentityUnavailable ? 'grant access' : 'abstain'));
+
+        return $this->allowIfObjectIdentityUnavailable ? self::ACCESS_GRANTED : self::ACCESS_ABSTAIN;
     }
 }

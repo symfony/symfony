@@ -198,7 +198,17 @@ abstract class Descriptor implements DescriptorInterface
     protected function formatParameter($value)
     {
         if (is_bool($value) || is_array($value) || (null === $value)) {
-            return json_encode($value);
+            $jsonString = json_encode($value);
+
+            if (!function_exists('mb_strlen')) {
+                return substr($jsonString, 0, 60).(strlen($jsonString) > 60 ? ' ...' : '');
+            }
+
+            if (mb_strlen($jsonString) > 60) {
+                return mb_substr($jsonString, 0, 60).' ...';
+            }
+
+            return $jsonString;
         }
 
         return (string) $value;

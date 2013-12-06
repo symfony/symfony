@@ -218,7 +218,7 @@ class BinaryFileResponse extends Response
 
                 if ($start < 0 || $end > $fileSize - 1 || $start > $end) {
                     $this->setStatusCode(self::HTTP_REQUESTED_RANGE_NOT_SATISFIABLE);
-                } else {
+                } elseif ($start !== 0 || $end !== $fileSize - 1) {
                     $this->maxlen = $end < $fileSize ? $end - $start + 1 : -1;
                     $this->offset = $start;
 

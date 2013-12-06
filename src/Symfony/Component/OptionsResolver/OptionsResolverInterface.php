@@ -209,7 +209,7 @@ interface OptionsResolverInterface
     public function resolve(array $options = array());
 
     /**
-     * Returns the known options
+     * Returns the known options.
      *
      * @return array
      */

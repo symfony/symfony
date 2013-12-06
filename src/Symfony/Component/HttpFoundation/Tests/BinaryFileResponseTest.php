@@ -90,7 +90,6 @@ class BinaryFileResponseTest extends ResponseTestCase
         );
     }
 
-
     /**
      * @dataProvider provideFullFileRanges
      */

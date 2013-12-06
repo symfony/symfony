@@ -65,29 +65,29 @@ class AclVoter implements VoterInterface
             return $this->voteObjectIdentityUnavailable();
         }
 
+        if ($object instanceof FieldVote) {
+            $field = $object->getField();
+            $object = $object->getDomainObject();
+        } else {
+            $field = null;
+        }
+
+        if ($object instanceof ObjectIdentityInterface) {
+            $oid = $object;
+        } elseif (null === $oid = $this->objectIdentityRetrievalStrategy->getObjectIdentity($object)) {
+            return $this->voteObjectIdentityUnavailable();
+        }
+
+        if (!$this->supportsClass($oid->getType())) {
+            return self::ACCESS_ABSTAIN;
+        }
+
+        $sids = $this->securityIdentityRetrievalStrategy->getSecurityIdentities($token);
+
         foreach ($attributes as $attribute) {
             if (null === $masks = $this->permissionMap->getMasks($attribute, $object)) {
                 continue;
             }
-
-            if ($object instanceof FieldVote) {
-                $field = $object->getField();
-                $object = $object->getDomainObject();
-            } else {
-                $field = null;
-            }
-
-            if ($object instanceof ObjectIdentityInterface) {
-                $oid = $object;
-            } elseif (null === $oid = $this->objectIdentityRetrievalStrategy->getObjectIdentity($object)) {
-                return $this->voteObjectIdentityUnavailable();
-            }
-
-            if (!$this->supportsClass($oid->getType())) {
-                return self::ACCESS_ABSTAIN;
-            }
-
-            $sids = $this->securityIdentityRetrievalStrategy->getSecurityIdentities($token);
 
             try {
                 $acl = $this->aclProvider->findAcl($oid, $sids);

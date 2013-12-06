@@ -12,6 +12,7 @@
 namespace Symfony\Component\ExpressionLanguage\Node;
 
 use Symfony\Component\ExpressionLanguage\Compiler;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class GetAttrNode extends Node
 {
@@ -69,8 +70,9 @@ class GetAttrNode extends Node
                 }
 
                 $property = $this->nodes['attribute']->attributes['value'];
+                $accessor = PropertyAccess::createPropertyAccessor();
 
-                return $obj->$property;
+                return $accessor->getValue($obj, $property);
 
             case self::METHOD_CALL:
                 $obj = $this->nodes['node']->evaluate($functions, $values);

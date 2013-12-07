@@ -108,14 +108,14 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
     }
 
     /**
-     * Retrives roles from user and appends SwitchUserRole if original token contained one.
+     * Retrieves roles from user and appends SwitchUserRole if original token contained one.
      *
-     * @param \Symfony\Component\Security\Core\User\UserInterface                  $user
-     * @param \Symfony\Component\Security\Core\Authentication\Token\TokenInterface $token
+     * @param UserInterface  $user  The user
+     * @param TokenInterface $token The token
      *
-     * @return \Symfony\Component\Security\Core\Role\SwitchUserRole
+     * @return Role[] The user roles
      */
-    protected function getRoles(UserInterface $user, TokenInterface $token)
+    private function getRoles(UserInterface $user, TokenInterface $token)
     {
         $roles = $user->getRoles();
 

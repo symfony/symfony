@@ -32,10 +32,15 @@ class GetAttrNode extends Node
     {
         switch ($this->attributes['type']) {
             case self::PROPERTY_CALL:
+
+                $property = $this->nodes['attribute']->attributes['value'];
+                $accessor = PropertyAccess::createPropertyAccessor();
+                $objName = $this->nodes['node']->attributes['name'];
+                $obj = $compiler->getFunction($objName);
+
                 $compiler
                     ->compile($this->nodes['node'])
-                    ->raw('->')
-                    ->raw($this->nodes['attribute']->attributes['value'])
+                    ->raw($accessor->getAccessorPath($obj, $property));
                 ;
                 break;
 

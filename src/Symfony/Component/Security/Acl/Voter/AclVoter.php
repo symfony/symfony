@@ -61,6 +61,10 @@ class AclVoter implements VoterInterface
 
     public function vote(TokenInterface $token, $object, array $attributes)
     {
+        if (null === $attributesMasks = $this->getAttributesMasks($attributes, $object)) {
+            return self::ACCESS_ABSTAIN;
+        }
+
         if (null === $object) {
             return $this->voteObjectIdentityUnavailable();
         }
@@ -84,11 +88,7 @@ class AclVoter implements VoterInterface
 
         $sids = $this->securityIdentityRetrievalStrategy->getSecurityIdentities($token);
 
-        foreach ($attributes as $attribute) {
-            if (null === $masks = $this->permissionMap->getMasks($attribute, $object)) {
-                continue;
-            }
-
+        foreach ($attributesMasks as $masks) {
             try {
                 $acl = $this->aclProvider->findAcl($oid, $sids);
 
@@ -158,5 +158,26 @@ class AclVoter implements VoterInterface
         $this->logDebug(sprintf('Object identity unavailable. Voting to %s', $this->allowIfObjectIdentityUnavailable ? 'grant access' : 'abstain'));
 
         return $this->allowIfObjectIdentityUnavailable ? self::ACCESS_GRANTED : self::ACCESS_ABSTAIN;
+    }
+
+    /**
+     * Retrieve array containing the masks for all attributes
+     *
+     * @param array $attributes
+     * @param       $object
+     *
+     * @return array|null
+     */
+    private function getAttributesMasks(array $attributes, $object)
+    {
+        $attributesMasks = null;
+
+        foreach ($attributes as $attribute) {
+            if (null !== $masks = $this->permissionMap->getMasks($attribute, $object)) {
+                $attributesMasks[] = $masks;
+            }
+        }
+
+        return $attributesMasks;
     }
 }

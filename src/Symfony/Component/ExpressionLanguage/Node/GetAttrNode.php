@@ -39,7 +39,7 @@ class GetAttrNode extends Node
                 $obj = $compiler->getFunction($objName);
 
                 // scope may be injected in compiler
-                if(is_array($obj) && isset($obj['compiler'])) {
+                if(is_array($obj)) {
                     if(isset($obj['compiler']) && $obj['compiler'] instanceof Compiler) {
                         $obj = $obj['compiler']->getFunction($objName);
                     }

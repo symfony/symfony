@@ -38,6 +38,13 @@ class GetAttrNode extends Node
                 $objName = $this->nodes['node']->attributes['name'];
                 $obj = $compiler->getFunction($objName);
 
+                // scope may be injected in compiler
+                if(is_array($obj) && isset($obj['compiler'])) {
+                    if(isset($obj['compiler']) && $obj['compiler'] instanceof Compiler) {
+                        $obj = $obj['compiler']->getFunction($objName);
+                    }
+                }
+
                 $compiler
                     ->compile($this->nodes['node'])
                     ->raw($accessor->getAccessorPath($obj, $property));

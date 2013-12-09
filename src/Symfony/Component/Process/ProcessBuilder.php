@@ -29,6 +29,7 @@ class ProcessBuilder
     private $options = array();
     private $inheritEnv = true;
     private $prefix = array();
+    private $processPipes;
 
     public function __construct(array $arguments = array())
     {
@@ -118,6 +119,20 @@ class ProcessBuilder
     }
 
     /**
+     * Sets the process pipes to use for the new process
+     *
+     * @param ProcessPipes $pipes
+     *
+     * @return ProcessBuilder
+     */
+    public function setProcessPipes(ProcessPipes $pipes)
+    {
+        $this->processPipes = $pipes;
+
+        return $this;
+    }
+
+    /**
      * Sets the process timeout.
      *
      * To disable the timeout, set this value to null.
@@ -172,6 +187,11 @@ class ProcessBuilder
             $env = $this->env;
         }
 
-        return new Process($script, $this->cwd, $env, $this->stdin, $this->timeout, $options);
+        $process = new Process($script, $this->cwd, $env, $this->stdin, $this->timeout, $options);
+        if ($this->processPipes) {
+            $process->setProcessPipes($this->processPipes);
+        }
+
+        return $process;
     }
 }

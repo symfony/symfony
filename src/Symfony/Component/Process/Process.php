@@ -992,13 +992,24 @@ class Process
     }
 
     /**
+     * Sets the process pipes to use.
+     *
+     * @param ProcessPipes $pipes
+     */
+    public function setProcessPipes(ProcessPipes $pipes) {
+        $this->processPipes = $pipes;
+    }
+
+    /**
      * Creates the descriptors needed by the proc_open.
      *
      * @return array
      */
     private function getDescriptors()
     {
-        $this->processPipes = new ProcessPipes($this->useFileHandles);
+        if (!$this->processPipes) {
+            $this->processPipes = new ProcessPipes($this->useFileHandles);
+        }
         $descriptors = $this->processPipes->getDescriptors();
 
         if (!$this->useFileHandles && $this->enhanceSigchildCompatibility && $this->isSigchildEnabled()) {

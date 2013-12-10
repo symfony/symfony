@@ -185,6 +185,58 @@ class ObjectChoiceListTest extends AbstractChoiceListTest
         );
     }
 
+    public function testGetValuesForChoicesWithIdenticalObjects()
+    {
+        $foo = new \stdClass();
+        $foo->id = 11;
+        $foo->name = 'Foo';
+
+        $bar = new \stdClass();
+        $bar->id = 12;
+        $bar->name = 'Bar';
+
+        $baz = new \stdClass();
+        $baz->id = 13;
+        $baz->name = 'Baz';
+
+        $list = new ObjectChoiceList(
+            array($foo, $bar, $baz),
+            'name',
+            array(),
+            null,
+            'id'
+        );
+        $this->assertEquals(array(12), $list->getValuesForChoices(array($bar)));
+    }
+
+    public function testGetValuesForChoicesWithEqualObjects()
+    {
+        $foo = new \stdClass();
+        $foo->id = 11;
+        $foo->name = 'Foo';
+
+        $bar = new \stdClass();
+        $bar->id = 12;
+        $bar->name = 'Bar';
+
+        $baz = new \stdClass();
+        $baz->id = 13;
+        $baz->name = 'Baz';
+
+        $anotherBar = new \stdClass();
+        $anotherBar->id = 12;
+        $anotherBar->name = 'Bar';
+
+        $list = new ObjectChoiceList(
+            array($foo, $bar, $baz),
+            'name',
+            array(),
+            null,
+            'id'
+        );
+        $this->assertEquals(array(12), $list->getValuesForChoices(array($anotherBar)));
+    }
+
     /**
      * @return \Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
      */

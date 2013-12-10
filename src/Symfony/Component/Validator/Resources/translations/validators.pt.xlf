@@ -132,7 +132,7 @@
             </trans-unit>
             <trans-unit id="36">
                 <source>This file is not a valid image.</source>
-                <target>Este ficheito não é uma imagem.</target>
+                <target>Este ficheiro não é uma imagem.</target>
             </trans-unit>
             <trans-unit id="37">
                 <source>This is not a valid IP address.</source>

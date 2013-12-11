@@ -101,10 +101,22 @@ class ProcessPipes
     /**
      * Returns an array of descriptors for the use of proc_open.
      *
+     * @param Boolean $disableOutput Whether to redirect STDOUT and STDERR to /dev/null or not.
+     *
      * @return array
      */
-    public function getDescriptors()
+    public function getDescriptors($disableOutput)
     {
+        if ($disableOutput) {
+            $nullstream = fopen(defined('PHP_WINDOWS_VERSION_BUILD') ? 'NUL' : '/dev/null', 'c');
+
+            return array(
+                array('pipe', 'r'),
+                $nullstream,
+                $nullstream,
+            );
+        }
+
         if ($this->useFiles) {
             return array(
                 array('pipe', 'r'),

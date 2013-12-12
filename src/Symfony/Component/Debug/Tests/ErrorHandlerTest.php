@@ -110,7 +110,7 @@ PHP
         $exceptionCheck = function($exception) use ($that) {
             $that->assertInstanceOf('Symfony\Component\Debug\Exception\ContextErrorException', $exception);
             $that->assertEquals(E_NOTICE, $exception->getSeverity());
-            $that->assertEquals(__LINE__ + 40, $exception->getLine());
+            $that->assertEquals(__LINE__ + 44, $exception->getLine());
             $that->assertEquals(__FILE__, $exception->getFile());
             $that->assertRegexp('/^Notice: Undefined variable: (foo|bar)/', $exception->getMessage());
             $that->assertArrayHasKey('foobar', $exception->getContext());
@@ -267,10 +267,10 @@ PHP
                     'type' => 1,
                     'line' => 12,
                     'file' => 'foo.php',
-                    'message' => 'Call to undefined function test_namespaced_function()',
+                    'message' => 'Call to undefined function test_namespaced_function_again()',
                 ),
                 'Symfony\Component\Debug\Exception\UndefinedFunctionException',
-                'Attempted to call function "test_namespaced_function" from the global namespace in foo.php line 12. Did you mean to call: "\\symfony\\component\\debug\\tests\\fatalerrorhandler\\test_namespaced_function"?',
+                'Attempted to call function "test_namespaced_function_again" from the global namespace in foo.php line 12. Did you mean to call: "\\symfony\\component\\debug\\tests\\test_namespaced_function_again"?',
             ),
             // class not found
             array(
@@ -285,4 +285,9 @@ PHP
             ),
         );
     }
+}
+
+
+function test_namespaced_function_again()
+{
 }

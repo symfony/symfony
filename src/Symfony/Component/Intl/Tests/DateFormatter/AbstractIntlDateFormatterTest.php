@@ -24,7 +24,7 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
 {
 
     protected function setUp()
-    {   
+    {
         \Locale::setDefault('en');
     }
 

@@ -366,15 +366,16 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
 
     private function preDispatch($eventName, Event $event)
     {
+        $id = $this->id; //the value of $this->id can change during execution of this method, so we store it in a local variable
         // wrap all listeners before they are called
-        $this->wrappedListeners[$this->id] = new \SplObjectStorage();
+        $this->wrappedListeners[$id] = new \SplObjectStorage();
 
         $listeners = $this->dispatcher->getListeners($eventName);
 
         foreach ($listeners as $listener) {
             $this->dispatcher->removeListener($eventName, $listener);
             $wrapped = $this->wrapListener($eventName, $listener);
-            $this->wrappedListeners[$this->id][$wrapped] = $listener;
+            $this->wrappedListeners[$id][$wrapped] = $listener;
             $this->dispatcher->addListener($eventName, $wrapped);
         }
 
@@ -431,13 +432,13 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
                 $this->updateProfiles($token, false);
                 break;
         }
-
-        foreach ($this->wrappedListeners[$this->id] as $wrapped) {
+        $id = $this->id;
+        foreach ($this->wrappedListeners[$id] as $wrapped) {
             $this->dispatcher->removeListener($eventName, $wrapped);
-            $this->dispatcher->addListener($eventName, $this->wrappedListeners[$this->id][$wrapped]);
+            $this->dispatcher->addListener($eventName, $this->wrappedListeners[$id][$wrapped]);
         }
 
-        unset($this->wrappedListeners[$this->id]);
+        unset($this->wrappedListeners[$id]);
     }
 
     private function wrapListener($eventName, $listener)

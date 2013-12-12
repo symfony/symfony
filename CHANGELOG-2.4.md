@@ -7,6 +7,28 @@ in 2.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.4.0...v2.4.1
 
+* 2.4.0 (2013-12-03)
+
+ * bug #9673 Fixed BC break in csrf protection (WouterJ)
+ * bug #9665 [Bridge/Doctrine] ORMQueryBuilderLoader - handled the scenario when no entity manager is passed with closure query builder (jakzal)
+ * bug #9662 [FrameworkBundle] Enabled csrf_protection by default if form.csrf_protection is enabled (bschussek)
+ * bug #9656 [DoctrineBridge] normalized class names in the ORM type guesser (fabpot)
+ * bug #9647 use the correct class name to retrieve mapped class' metadata and reposi... (xabbuh)
+ * bug #9648 [Debug] ensured that a fatal PHP error is actually fatal after being handled by our error handler (fabpot)
+ * bug #9643 [WebProfilerBundle] Fixed js escaping in time.html.twig (hason)
+ * bug #9641 [Debug] Avoid notice from being "eaten" by fatal error. (fabpot)
+ * bug #9639 Modified guessDefaultEscapingStrategy to not escape txt templates (fabpot)
+ * bug #9314 [Form] Fix DateType for 32bits computers. (WedgeSama)
+ * bug #9443 [FrameworkBundle] Fixed the registration of validation.xml file when the form is disabled (hason)
+ * bug #9625 [HttpFoundation] Do not return an empty session id if the session was closed (Taluu)
+ * bug #9621 [ExpressionLanguage] fixed lexing expression ending with spaces (fabpot)
+ * bug #9637 [Validator] Replaced inexistent interface (jakzal)
+ * bug #9628 [HttpKernel] Fix profiler event-listener usage outside request stack context (romainneutron)
+ * bug #9624 [Console] Fix undefined offset when formatting namespace suggestions (GromNaN)
+ * bug #9605 Adjusting CacheClear Warmup method to namespaced kernels (rdohms)
+ * bug #9617 [HttpKernel] Http kernel regression fix (hhamon)
+ * bug #9610 Container::camelize also takes backslashes into consideration (ondrejmirtes)
+
 * 2.4.0-RC1 (2013-11-25)
 
  * bug #9607 [HttpKernel] Fix a bug when using the kernel property in overridden method Client::setServerParameters() (gnutix)

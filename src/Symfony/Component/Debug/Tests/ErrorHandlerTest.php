@@ -90,6 +90,11 @@ PHP
             );
         } catch (DummyException $e) {
             // if an exception is thrown, the test passed
+        } catch (\Exception $e) {
+            restore_error_handler();
+            restore_exception_handler();
+
+            throw $e;
         }
 
         restore_error_handler();
@@ -105,7 +110,7 @@ PHP
         $exceptionCheck = function($exception) use ($that) {
             $that->assertInstanceOf('Symfony\Component\Debug\Exception\ContextErrorException', $exception);
             $that->assertEquals(E_NOTICE, $exception->getSeverity());
-            $that->assertEquals(__LINE__ + 40, $exception->getLine());
+            $that->assertEquals(__LINE__ + 44, $exception->getLine());
             $that->assertEquals(__FILE__, $exception->getFile());
             $that->assertRegexp('/^Notice: Undefined variable: (foo|bar)/', $exception->getMessage());
             $that->assertArrayHasKey('foobar', $exception->getContext());
@@ -135,6 +140,10 @@ PHP
             self::triggerNotice($this);
         } catch (DummyException $e) {
             // if an exception is thrown, the test passed
+        } catch (\Exception $e) {
+            restore_error_handler();
+
+            throw $e;
         }
 
         restore_error_handler();
@@ -150,72 +159,84 @@ PHP
 
     public function testConstruct()
     {
-        $handler = ErrorHandler::register(3);
+        try {
+            $handler = ErrorHandler::register(3);
 
-        $level = new \ReflectionProperty($handler, 'level');
-        $level->setAccessible(true);
+            $level = new \ReflectionProperty($handler, 'level');
+            $level->setAccessible(true);
 
-        $this->assertEquals(3, $level->getValue($handler));
+            $this->assertEquals(3, $level->getValue($handler));
 
-        restore_error_handler();
+            restore_error_handler();
+        } catch (\Exception $e) {
+            restore_error_handler();
+
+            throw $e;
+        }
     }
 
     public function testHandle()
     {
-        $handler = ErrorHandler::register(0);
-        $this->assertFalse($handler->handle(0, 'foo', 'foo.php', 12, 'foo'));
-
-        restore_error_handler();
-
-        $handler = ErrorHandler::register(3);
-        $this->assertFalse($handler->handle(4, 'foo', 'foo.php', 12, 'foo'));
-
-        restore_error_handler();
-
-        $handler = ErrorHandler::register(3);
         try {
-            $handler->handle(111, 'foo', 'foo.php', 12, 'foo');
-        } catch (\ErrorException $e) {
-            $this->assertSame('111: foo in foo.php line 12', $e->getMessage());
-            $this->assertSame(111, $e->getSeverity());
-            $this->assertSame('foo.php', $e->getFile());
-            $this->assertSame(12, $e->getLine());
+            $handler = ErrorHandler::register(0);
+            $this->assertFalse($handler->handle(0, 'foo', 'foo.php', 12, 'foo'));
+
+            restore_error_handler();
+
+            $handler = ErrorHandler::register(3);
+            $this->assertFalse($handler->handle(4, 'foo', 'foo.php', 12, 'foo'));
+
+            restore_error_handler();
+
+            $handler = ErrorHandler::register(3);
+            try {
+                $handler->handle(111, 'foo', 'foo.php', 12, 'foo');
+            } catch (\ErrorException $e) {
+                $this->assertSame('111: foo in foo.php line 12', $e->getMessage());
+                $this->assertSame(111, $e->getSeverity());
+                $this->assertSame('foo.php', $e->getFile());
+                $this->assertSame(12, $e->getLine());
+            }
+
+            restore_error_handler();
+
+            $handler = ErrorHandler::register(E_USER_DEPRECATED);
+            $this->assertTrue($handler->handle(E_USER_DEPRECATED, 'foo', 'foo.php', 12, 'foo'));
+
+            restore_error_handler();
+
+            $handler = ErrorHandler::register(E_DEPRECATED);
+            $this->assertTrue($handler->handle(E_DEPRECATED, 'foo', 'foo.php', 12, 'foo'));
+
+            restore_error_handler();
+
+            $logger = $this->getMock('Psr\Log\LoggerInterface');
+
+            $that = $this;
+            $warnArgCheck = function($message, $context) use ($that) {
+                $that->assertEquals('foo', $message);
+                $that->assertArrayHasKey('type', $context);
+                $that->assertEquals($context['type'], ErrorHandler::TYPE_DEPRECATION);
+                $that->assertArrayHasKey('stack', $context);
+                $that->assertInternalType('array', $context['stack']);
+            };
+
+            $logger
+                ->expects($this->once())
+                ->method('warning')
+                ->will($this->returnCallback($warnArgCheck))
+            ;
+
+            $handler = ErrorHandler::register(E_USER_DEPRECATED);
+            $handler->setLogger($logger);
+            $handler->handle(E_USER_DEPRECATED, 'foo', 'foo.php', 12, 'foo');
+
+            restore_error_handler();
+        } catch (\Exception $e) {
+            restore_error_handler();
+
+            throw $e;
         }
-
-        restore_error_handler();
-
-        $handler = ErrorHandler::register(E_USER_DEPRECATED);
-        $this->assertTrue($handler->handle(E_USER_DEPRECATED, 'foo', 'foo.php', 12, 'foo'));
-
-        restore_error_handler();
-
-        $handler = ErrorHandler::register(E_DEPRECATED);
-        $this->assertTrue($handler->handle(E_DEPRECATED, 'foo', 'foo.php', 12, 'foo'));
-
-        restore_error_handler();
-
-        $logger = $this->getMock('Psr\Log\LoggerInterface');
-
-        $that = $this;
-        $warnArgCheck = function($message, $context) use ($that) {
-            $that->assertEquals('foo', $message);
-            $that->assertArrayHasKey('type', $context);
-            $that->assertEquals($context['type'], ErrorHandler::TYPE_DEPRECATION);
-            $that->assertArrayHasKey('stack', $context);
-            $that->assertInternalType('array', $context['stack']);
-        };
-
-        $logger
-            ->expects($this->once())
-            ->method('warning')
-            ->will($this->returnCallback($warnArgCheck))
-        ;
-
-        $handler = ErrorHandler::register(E_USER_DEPRECATED);
-        $handler->setLogger($logger);
-        $handler->handle(E_USER_DEPRECATED, 'foo', 'foo.php', 12, 'foo');
-
-        restore_error_handler();
     }
 
     /**
@@ -246,10 +267,10 @@ PHP
                     'type' => 1,
                     'line' => 12,
                     'file' => 'foo.php',
-                    'message' => 'Call to undefined function test_namespaced_function()',
+                    'message' => 'Call to undefined function test_namespaced_function_again()',
                 ),
                 'Symfony\Component\Debug\Exception\UndefinedFunctionException',
-                'Attempted to call function "test_namespaced_function" from the global namespace in foo.php line 12. Did you mean to call: "\\symfony\\component\\debug\\tests\\fatalerrorhandler\\test_namespaced_function"?',
+                'Attempted to call function "test_namespaced_function_again" from the global namespace in foo.php line 12. Did you mean to call: "\\symfony\\component\\debug\\tests\\test_namespaced_function_again"?',
             ),
             // class not found
             array(
@@ -264,4 +285,9 @@ PHP
             ),
         );
     }
+}
+
+
+function test_namespaced_function_again()
+{
 }

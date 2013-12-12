@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by mvrhov at 2013-12-05T08:37:38Z
+
+I already said that throwing the exception is the easy way, and I don't agree with that as it really doesn't solve the actual problem. If this cannot be solved otherwise I'd rather have getParameter returning null. And documentation explicitly stating that when parameters contain expression the getParameter function returns null for that specific parameter
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2013-12-05T16:01:13Z
+
+@mvrhov why do you want to use expressions in parameters? If you want to do that, you should create the parameter in the Extension of the bundle
+
+---------------------------------------------------------------------------
+
+by mvrhov at 2013-12-06T07:14:56Z
+
+I said that in original ticket in my case that's for multitenat application Where some parameters are dependant on the tenant.
+
+---------------------------------------------------------------------------
+
+by stof at 2013-12-06T08:52:45Z
+
+@mvrhov As parameters are resolved at compilation time and dumped statically, it won't work. You should use the expression in the argument instead of using it in a parameter.
+
+---------------------------------------------------------------------------
+
+by mvrhov at 2013-12-06T09:11:34Z
+
+I can't configure 3rd party bundles like this? Also the services that are configured via parameters.yml seem to work just fine, the only problem ATM is the parameters array. That's why my suggestion is to write null for those keys.
+
+---------------------------------------------------------------------------
+
+by mvrhov at 2013-12-06T11:32:26Z
+
+I've updated the original issue with additional information.

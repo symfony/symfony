@@ -122,7 +122,7 @@ EOF
         // fix references to the Kernel in .meta files
         $safeTempKernel = str_replace('\\', '\\\\', get_class($tempKernel));
         $realKernelFQN = get_class($realKernel);
-        
+
         foreach (Finder::create()->files()->name('*.meta')->in($warmupDir) as $file) {
             file_put_contents($file, preg_replace(
                 '/(C\:\d+\:)"'.$safeTempKernel.'"/',

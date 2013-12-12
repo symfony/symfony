@@ -31,13 +31,15 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
      */
     protected $displayErrors;
 
-    public function setUp() {
+    public function setUp()
+    {
         $this->errorReporting = error_reporting(E_ALL | E_STRICT);
         $this->displayErrors = ini_get('display_errors');
         ini_set('display_errors', '1');
     }
 
-    public function tearDown() {
+    public function tearDown()
+    {
         ini_set('display_errors', $this->displayErrors);
         error_reporting($this->errorReporting);
     }

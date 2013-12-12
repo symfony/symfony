@@ -57,7 +57,7 @@ class TwigEngine extends BaseEngine implements EngineInterface
         if ('js' === $format) {
             return 'js';
         }
-        
+
         if ('txt' === $format) {
             return false;
         }

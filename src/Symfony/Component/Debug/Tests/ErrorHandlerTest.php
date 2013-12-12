@@ -289,7 +289,6 @@ PHP
     }
 }
 
-
 function test_namespaced_function_again()
 {
 }

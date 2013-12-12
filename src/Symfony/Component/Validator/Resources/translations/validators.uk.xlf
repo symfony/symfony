@@ -28,7 +28,7 @@
             </trans-unit>
             <trans-unit id="7">
                 <source>You must select at most {{ limit }} choice.|You must select at most {{ limit }} choices.</source>
-                <target>Ви повинні обрати не більше ніж {{ limit }} варіантів</target>
+                <target>Ви повинні обрати не більше ніж {{ limit }} варіантів.</target>
             </trans-unit>
             <trans-unit id="8">
                 <source>One or more of the given values is invalid.</source>

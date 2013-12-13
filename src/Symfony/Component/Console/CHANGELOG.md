@@ -4,7 +4,9 @@ CHANGELOG
 2.5.0
 -----
 
-* added a way to set the process name of a command
+ * deprecated the dialog helper (use the question helper instead)
+ * added a question helper
+ * added a way to set the process name of a command
 
 2.4.0
 -----

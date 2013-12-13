@@ -18,6 +18,9 @@ use Symfony\Component\Console\Formatter\OutputFormatterStyle;
  * The Dialog class provides helpers to interact with the user.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated Deprecated since version 2.5, to be removed in 3.0.
+ *             Use the question helper instead.
  */
 class DialogHelper extends InputAwareHelper
 {
@@ -337,7 +340,7 @@ class DialogHelper extends InputAwareHelper
     {
         $that = $this;
 
-        $interviewer = function() use ($output, $question, $default, $autocomplete, $that) {
+        $interviewer = function () use ($output, $question, $default, $autocomplete, $that) {
             return $that->ask($output, $question, $default, $autocomplete);
         };
 
@@ -367,7 +370,7 @@ class DialogHelper extends InputAwareHelper
     {
         $that = $this;
 
-        $interviewer = function() use ($output, $question, $fallback, $that) {
+        $interviewer = function () use ($output, $question, $fallback, $that) {
             return $that->askHiddenResponse($output, $question, $fallback);
         };
 

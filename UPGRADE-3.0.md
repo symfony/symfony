@@ -18,6 +18,10 @@ UPGRADE FROM 2.x to 3.0
    `DebugClassLoader`. The difference is that the constructor now takes a
    loader to wrap.
 
+### Console
+
+ * The `dialog` helper has been removed in favor of the `question` helper.
+
 ### Form
 
  * The methods `Form::bind()` and `Form::isBound()` were removed. You should

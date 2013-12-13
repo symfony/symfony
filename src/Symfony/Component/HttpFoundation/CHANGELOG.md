@@ -7,7 +7,7 @@ CHANGELOG
  * added RequestStack
  * added Request::getEncodings()
  * added accessors methods to session handlers
- * added StreamResponse as a kind of wrapper fpr fpassthru (responding contents of stream or file decription handles)
+ * added StreamResponse as a kind of wrapper for fpassthru (responding contents of stream or file decription handles)
 
 2.3.0
 -----

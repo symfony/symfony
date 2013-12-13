@@ -12,9 +12,9 @@
 namespace Symfony\Component\HttpFoundation;
 
 /**
- * SocketResponse represents a HTTP response whose content is read from a socket or file.
+ * SocketResponse represents a HTTP response whose content is read from a file handle.
  *
- * A SocketRepsonse uses a socket handle (or file descriptor) for its content.
+ * A SocketResponse uses a PHP file handle for its content.
  *
  * The socket handle needs to be readable, e.g. $handle = fopen("example.txt", "r");
  *
@@ -29,7 +29,7 @@ class SocketResponse extends Response
     /**
      * Constructor
      *
-     * @param resource $handle  A readable socket handle (or file descriptor)
+     * @param resource $handle  A readable file handle
      * @param int      $status  The response status code
      * @param array    $headers An array of response headers
      * @param bool     $close   Close socket handle after sending content
@@ -50,7 +50,7 @@ class SocketResponse extends Response
     /**
      * Factory method for chainability
      *
-     * @param resource $handle  A readable socket handle (or file descriptor)
+     * @param resource $handle  A readable file handle
      * @param int      $status  The response status code
      * @param array    $headers An array of response headers
      * @param bool     $close   Close socket handle after sending content
@@ -63,23 +63,23 @@ class SocketResponse extends Response
     }
 
     /**
-     * Sets the socket handle associated with this Response.
+     * Sets the file handle associated with this Response.
      *
-     * @param mixed $handle A readable socket handle (or file descriptor)
+     * @param mixed $handle A readable file handle
      *
      * @throws \LogicException
      */
     public function setHandle($handle)
     {
         if (!is_resource($handle)) {
-            throw new \LogicException("The Response stream handle must be a valid PHP resource.");
+            throw new \LogicException("The Response handle must be a valid PHP resource.");
         }
 
         $this->handle = $handle;
     }
 
     /**
-     * Close socket handle after sending content
+     * Close file handle after sending content
      *
      * @param bool $close
      */
@@ -102,7 +102,7 @@ class SocketResponse extends Response
         $this->sent = true;
 
         if (null === $this->handle) {
-            throw new \LogicException("The Response stream handle must not be null.");
+            throw new \LogicException("The Response handle must not be null.");
         }
 
         fpassthru($this->handle);

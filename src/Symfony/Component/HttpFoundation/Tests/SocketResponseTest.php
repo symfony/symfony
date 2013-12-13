@@ -40,7 +40,7 @@ class SocketResponseTest extends \PHPUnit_Framework_TestCase
     {
         $response = new SocketResponse();
 
-        $response->setHandle("non resurce");
+        $response->setHandle("non resource");
     }
 
     public function testSendContent()

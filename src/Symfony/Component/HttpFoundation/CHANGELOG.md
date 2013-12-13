@@ -4,7 +4,7 @@ CHANGELOG
 2.5.0
 -----
 
- * added StreamResponse as a kind of wrapper for fpassthru (responding contents of stream or file decription handles)
+ * added StreamResponse as a kind of wrapper for fpassthru (responding contents of file handles)
 
 2.4.0
 -----

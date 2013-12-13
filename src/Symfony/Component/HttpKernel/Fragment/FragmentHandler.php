@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel\Fragment;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\SocketResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
@@ -134,7 +135,7 @@ class FragmentHandler
             throw new \RuntimeException(sprintf('Error when rendering "%s" (Status code is %s).', $this->getRequest()->getUri(), $response->getStatusCode()));
         }
 
-        if (!$response instanceof StreamedResponse) {
+        if (!$response instanceof StreamedResponse && !$response instanceof SocketResponse) {
             return $response->getContent();
         }
 

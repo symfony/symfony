@@ -118,6 +118,14 @@ class ResponseTest extends ResponseTestCase
         $this->assertEquals(304, $modified->getStatusCode());
     }
 
+    public function testSetPreconditionFailed()
+    {
+        $response = new Response();
+        $preconditionFailed = $response->setPreconditionFailed();
+        $this->assertEquals(412, $response->getStatusCode());
+        $this->assertNull($response->getContent());
+    }
+
     public function testIsSuccessful()
     {
         $response = new Response();
@@ -173,6 +181,55 @@ class ResponseTest extends ResponseTestCase
 
         $response->headers->set('ETag', '');
         $this->assertFalse($response->isNotModified($request));
+    }
+
+    public function testHasPreconditionFailed()
+    {
+        $response = new Response();
+        $reconditionFailed = $response->hasPreconditionFailed(new Request());
+        $this->assertFalse($reconditionFailed);
+    }
+
+    public function testHasPreconditionFailedLastModified()
+    {
+        $modified = 'Tue, 17 Dec 2013 14:00:00 GMT';
+
+        $request = new Request();
+        $request->headers->set('If-Modified-Since', $modified);
+
+        $response = new Response();
+        $response->headers->set('Last-Modified', $modified);
+
+        $this->assertFalse($response->hasPreconditionFailed($request));
+
+        $response->headers->set('Last-Modified', '');
+        $this->assertFalse($response->hasPreconditionFailed($request));
+
+        $response->headers->set('Last-Modified', 'Wed, 1 Jan 2014 00:00:00 GMT');
+        $this->assertTrue($response->hasPreconditionFailed($request));
+    }
+
+    public function testHasPreconditionFailedEtag()
+    {
+        $etagOne = 'randomly_generated_etag';
+        $etagTwo = 'randomly_generated_etag_2';
+
+        $request = new Request();
+        $request->headers->set('if_none_match', sprintf('%s, %s, %s', $etagOne, $etagTwo, 'etagThree'));
+
+        $response = new Response();
+
+        $response->headers->set('ETag', $etagOne);
+        $this->assertFalse($response->hasPreconditionFailed($request));
+
+        $response->headers->set('ETag', $etagTwo);
+        $this->assertFalse($response->hasPreconditionFailed($request));
+
+        $response->headers->set('ETag', '');
+        $this->assertFalse($response->hasPreconditionFailed($request));
+
+        $response->headers->set('ETag', 'etagFour');
+        $this->assertTrue($response->hasPreconditionFailed($request));
     }
 
     public function testIsValidateable()

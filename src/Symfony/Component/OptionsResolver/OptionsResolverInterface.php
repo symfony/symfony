@@ -17,6 +17,18 @@ namespace Symfony\Component\OptionsResolver;
 interface OptionsResolverInterface
 {
     /**
+     * Remove unknown options passed to the resolve() method
+     * Is mutually exclusive with IGNORE_UNKNOWN
+     */
+    const REMOVE_UNKNOWN = 1;
+
+    /**
+     * Ignore unknown options passed to the resolve() method
+     * Is mutually exclusive with REMOVE_UNKNOWN
+     */
+    const IGNORE_UNKNOWN = 2;
+
+    /**
      * Sets default option values.
      *
      * The options can either be values of any types or closures that
@@ -196,6 +208,7 @@ interface OptionsResolverInterface
      * Returns the combination of the default and the passed options.
      *
      * @param array $options The custom option values.
+     * @param int   $flags   Can be REMOVE_UNKNOWN or IGNORE_UNKNOWN
      *
      * @return array A list of options and their values.
      *
@@ -206,5 +219,5 @@ interface OptionsResolverInterface
      * @throws Exception\OptionDefinitionException If a cyclic dependency is detected
      *                                             between two lazy options.
      */
-    public function resolve(array $options = array());
+    public function resolve(array $options = array(), $flags = 0);
 }

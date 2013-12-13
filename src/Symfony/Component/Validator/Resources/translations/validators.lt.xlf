@@ -276,7 +276,7 @@
             </trans-unit>
             <trans-unit id="72">
                 <source>This value should not be identical to {{ compared_value_type }} {{ compared_value }}.</source>
-                <target>Še reikšmė neturi būti identiška {{ compared_value_type }} {{ compared_value }}.</target>
+                <target>Ši reikšmė neturi būti identiška {{ compared_value_type }} {{ compared_value }}.</target>
             </trans-unit>
         </body>
     </file>

@@ -42,7 +42,7 @@ class SocketResponse extends Response
             $this->setHandle($handle);
         }
 
-        $this->close = (bool) $close;
+        $this->setClose($close);
 
         $this->sent = false;
     }
@@ -76,6 +76,16 @@ class SocketResponse extends Response
         }
 
         $this->handle = $handle;
+    }
+
+    /**
+     * Close socket handle after sending content
+     *
+     * @param bool $close
+     */
+    public function setClose($close)
+    {
+        $this->close = (boolean) $close;
     }
 
     /**

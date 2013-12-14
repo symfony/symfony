@@ -18,8 +18,8 @@ use Symfony\Component\Yaml\Exception\DumpException;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Inline {
-
+class Inline
+{
     const REGEX_QUOTED_STRING = '(?:"([^"\\\\]*(?:\\\\.[^"\\\\]*)*)"|\'([^\']*(?:\'\'[^\']*)*)\')';
 
     private static $exceptionOnInvalidType = false;
@@ -36,7 +36,8 @@ class Inline {
      *
      * @throws ParseException
      */
-    public static function parse($value, $exceptionOnInvalidType = false, $objectSupport = false) {
+    public static function parse($value, $exceptionOnInvalidType = false, $objectSupport = false)
+    {
         self::$exceptionOnInvalidType = $exceptionOnInvalidType;
         self::$objectSupport = $objectSupport;
 
@@ -88,7 +89,8 @@ class Inline {
      *
      * @throws DumpException When trying to dump PHP resource
      */
-    public static function dump($value, $exceptionOnInvalidType = false, $objectSupport = false) {
+    public static function dump($value, $exceptionOnInvalidType = false, $objectSupport = false)
+    {
         switch (true) {
             case is_resource($value):
                 if ($exceptionOnInvalidType) {
@@ -151,12 +153,12 @@ class Inline {
      *
      * @return string The YAML string representing the PHP array
      */
-    private static function dumpArray($value, $exceptionOnInvalidType, $objectSupport) {
+    private static function dumpArray($value, $exceptionOnInvalidType, $objectSupport)
+    {
         // array
         $keys = array_keys($value);
-        if ((1 == count($keys) && '0' == $keys[0]) || (count($keys) > 1 && array_reduce($keys, function ($v, $w) {
-                            return (integer) $v + $w;
-                        }, 0) == count($keys) * (count($keys) - 1) / 2)
+        if ((1 == count($keys) && '0' == $keys[0])
+            || (count($keys) > 1 && array_reduce($keys, function ($v, $w) { return (integer) $v + $w; }, 0) == count($keys) * (count($keys) - 1) / 2)
         ) {
             $output = array();
             foreach ($value as $val) {
@@ -239,8 +241,9 @@ class Inline {
      *
      * @throws ParseException When malformed inline YAML string is parsed
      */
-    private static function parseQuotedScalar($scalar, &$i) {
-        if (!preg_match('/' . self::REGEX_QUOTED_STRING . '/Au', substr($scalar, $i), $match)) {
+    private static function parseQuotedScalar($scalar, &$i)
+    {
+        if (!preg_match('/'.self::REGEX_QUOTED_STRING.'/Au', substr($scalar, $i), $match)) {
             throw new ParseException(sprintf('Malformed inline YAML string (%s).', substr($scalar, $i)));
         }
 
@@ -268,7 +271,8 @@ class Inline {
      *
      * @throws ParseException When malformed inline YAML string is parsed
      */
-    private static function parseSequence($sequence, &$i = 0) {
+    private static function parseSequence($sequence, &$i = 0)
+    {
         $output = array();
         $len = strlen($sequence);
         $i += 1;
@@ -322,7 +326,8 @@ class Inline {
      *
      * @throws ParseException When malformed inline YAML string is parsed
      */
-    private static function parseMapping($mapping, &$i = 0) {
+    private static function parseMapping($mapping, &$i = 0)
+    {
         $output = array();
         $len = strlen($mapping);
         $i += 1;
@@ -381,7 +386,8 @@ class Inline {
      *
      * @return string A YAML string
      */
-    private static function evaluateScalar($scalar) {
+    private static function evaluateScalar($scalar)
+    {
         $scalar = trim($scalar);
 
         switch (true) {
@@ -440,7 +446,8 @@ class Inline {
      *
      * @see http://www.yaml.org/spec/1.2/spec.html#id2761573
      */
-    private static function getTimestampRegex() {
+    private static function getTimestampRegex()
+    {
         return <<<EOF
         ~^
         (?P<year>[0-9][0-9][0-9][0-9])
@@ -467,7 +474,8 @@ EOF;
      * @return int Position where php/object ends
      * @throws ParseException
      */
-    public static function findEndOfPhpObject($scalar) {
+    public static function findEndOfPhpObject($scalar) 
+    {
         //Now we have to find where serialized object ends.
         $countOfBrackets = 0;
         for ($pos = 0; $pos < strlen($scalar); $pos++) {

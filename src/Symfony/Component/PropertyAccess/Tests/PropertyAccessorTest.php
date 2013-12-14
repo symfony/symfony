@@ -63,11 +63,10 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
             array('[root][%!@$§.]', 'Bernhard', array('root' => array('%!@$§.' => 'Bernhard'))),
             array('[child][index][firstName]', 'Bernhard', array('child' => array('index' => array('firstName' => 'Bernhard')))),
 
-            // additional tests for #8930
             array('[@name]', 'Thunderer', array('@name' => 'Thunderer')),
             array('@name', 'Thunderer', (object) array('@name' => 'Thunderer')),
             array('_name', 'Thunderer', (object) array('_name' => 'Thunderer')),
-            );
+        );
     }
 
     public function testGetValueReadsArrayWithMissingIndexForCustomPropertyPath()

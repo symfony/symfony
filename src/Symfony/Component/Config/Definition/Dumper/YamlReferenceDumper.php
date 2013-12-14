@@ -97,7 +97,7 @@ class YamlReferenceDumper
                 $default = $node->getDefaultValue();
 
                 if (is_array($default)) {
-                    if ($node->hasDefaultValue() && count($defaultArray = $node->getDefaultValue())) {
+                    if (count($defaultArray = $node->getDefaultValue())) {
                         $default = '';
                     } elseif (!is_array($example)) {
                         $default = '[]';

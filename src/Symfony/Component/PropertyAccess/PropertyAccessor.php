@@ -25,6 +25,12 @@ class PropertyAccessor implements PropertyAccessorInterface
     const VALUE = 0;
     const IS_REF = 1;
 
+    const METHOD_PROPERTY = "@prop";
+    const METHOD_GETTER = "@getter";
+    const METHOD_MAGIC_GETTER = "@magic-getter";
+    const METHOD_HASSER = "@hasser";
+    const METHOD_ISSER = "@isser";
+
     /**
      * @var Boolean
      */
@@ -50,11 +56,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      */
     public function getValue($objectOrArray, $propertyPath)
     {
-        if (is_string($propertyPath)) {
-            $propertyPath = new PropertyPath($propertyPath);
-        } elseif (!$propertyPath instanceof PropertyPathInterface) {
-            throw new UnexpectedTypeException($propertyPath, 'string or Symfony\Component\PropertyAccess\PropertyPathInterface');
-        }
+        $propertyPath = $this->getPropertyPath($propertyPath);
 
         $propertyValues =& $this->readPropertiesUntil($objectOrArray, $propertyPath, $propertyPath->getLength(), $this->throwExceptionOnInvalidIndex);
 
@@ -66,11 +68,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      */
     public function setValue(&$objectOrArray, $propertyPath, $value)
     {
-        if (is_string($propertyPath)) {
-            $propertyPath = new PropertyPath($propertyPath);
-        } elseif (!$propertyPath instanceof PropertyPathInterface) {
-            throw new UnexpectedTypeException($propertyPath, 'string or Symfony\Component\PropertyAccess\PropertyPathInterface');
-        }
+        $propertyPath = $this->getPropertyPath($propertyPath);
 
         $propertyValues =& $this->readPropertiesUntil($objectOrArray, $propertyPath, $propertyPath->getLength() - 1);
         $overwrite = true;
@@ -106,15 +104,37 @@ class PropertyAccessor implements PropertyAccessorInterface
     }
 
     /**
+     * @param object|array $objectOrArray
+     * @param string $propertyName
+     *
+     * @return Boolean
+     */
+    public function isAccessible($objectOrArray, $propertyName)
+    {
+        if ($this->isArrayAccess($objectOrArray)) {
+            return isset($objectOrArray[$propertyName]);
+        }
+        try {
+            $this->getAccessMethod($objectOrArray, $propertyName);
+
+            return true;
+        } catch (NoSuchPropertyException $e) {
+            return false;
+        }
+    }
+
+    /**
      * Reads the path from an object up to a given path index.
      *
      * @param object|array          $objectOrArray The object or array to read from
      * @param PropertyPathInterface $propertyPath  The property path to read
      * @param integer               $lastIndex     The index up to which should be read
+     * @param Boolean               $throwExceptionOnNonexistantIndex if the exception should thrown on invalid index
      *
      * @return array The values read in the path.
      *
      * @throws UnexpectedTypeException If a value within the path is neither object nor array.
+     * @throws NoSuchIndexException if path is not found and $throwExceptionOnNonexistantIndex flag is true
      */
     private function &readPropertiesUntil(&$objectOrArray, PropertyPathInterface $propertyPath, $lastIndex, $throwExceptionOnNonexistantIndex = false)
     {
@@ -127,10 +147,9 @@ class PropertyAccessor implements PropertyAccessorInterface
 
             $property = $propertyPath->getElement($i);
             $isIndex = $propertyPath->isIndex($i);
-            $isArrayAccess = is_array($objectOrArray) || $objectOrArray instanceof \ArrayAccess;
 
             // Create missing nested arrays on demand
-            if ($isIndex && $isArrayAccess && !isset($objectOrArray[$property])) {
+            if ($isIndex && $this->isArrayAccess($objectOrArray) && !isset($objectOrArray[$property])) {
                 if ($throwExceptionOnNonexistantIndex) {
                     throw new NoSuchIndexException(sprintf('Cannot read property "%s". Available properties are "%s"', $property, print_r(array_keys($objectOrArray), true)));
                 }
@@ -197,6 +216,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      *
      * @throws NoSuchPropertyException If the property does not exist or is not
      *                                 public.
+     * @throws \UnexpectedValueException
      */
     private function &readProperty(&$object, $property)
     {
@@ -211,48 +231,33 @@ class PropertyAccessor implements PropertyAccessorInterface
             throw new NoSuchPropertyException(sprintf('Cannot read property "%s" from an array. Maybe you should write the property path as "[%s]" instead?', $property, $property));
         }
 
-        $camelProp = $this->camelize($property);
-        $reflClass = new \ReflectionClass($object);
-        $getter = 'get'.$camelProp;
-        $isser = 'is'.$camelProp;
-        $hasser = 'has'.$camelProp;
-        $classHasProperty = $reflClass->hasProperty($property);
-
-        if ($reflClass->hasMethod($getter) && $reflClass->getMethod($getter)->isPublic()) {
-            $result[self::VALUE] = $object->$getter();
-        } elseif ($reflClass->hasMethod($isser) && $reflClass->getMethod($isser)->isPublic()) {
-            $result[self::VALUE] = $object->$isser();
-        } elseif ($reflClass->hasMethod($hasser) && $reflClass->getMethod($hasser)->isPublic()) {
-            $result[self::VALUE] = $object->$hasser();
-        } elseif ($reflClass->hasMethod('__get') && $reflClass->getMethod('__get')->isPublic()) {
-            $result[self::VALUE] = $object->$property;
-        } elseif ($classHasProperty && $reflClass->getProperty($property)->isPublic()) {
-            $result[self::VALUE] =& $object->$property;
-            $result[self::IS_REF] = true;
-        } elseif (!$classHasProperty && property_exists($object, $property)) {
-            // Needed to support \stdClass instances. We need to explicitly
-            // exclude $classHasProperty, otherwise if in the previous clause
-            // a *protected* property was found on the class, property_exists()
-            // returns true, consequently the following line will result in a
-            // fatal error.
-            $result[self::VALUE] =& $object->$property;
-            $result[self::IS_REF] = true;
-        } elseif ($this->magicCall && $reflClass->hasMethod('__call') && $reflClass->getMethod('__call')->isPublic()) {
-            // we call the getter and hope the __call do the job
-            $result[self::VALUE] = $object->$getter();
-        } else {
-            $methods = array($getter, $isser, $hasser, '__get');
-            if ($this->magicCall) {
-                $methods[] = '__call';
-            }
-
-            throw new NoSuchPropertyException(sprintf(
-                'Neither the property "%s" nor one of the methods "%s()" '.
-                'exist and have public access in class "%s".',
-                $property,
-                implode('()", "', $methods),
-                $reflClass->name
-            ));
+        $accessMethod = $this->getAccessMethod($object, $property);
+        switch ($accessMethod) {
+            case self::METHOD_GETTER:
+                $getter = $this->buildMethod("get", $property);
+                $result[self::VALUE] = $object->$getter();
+                break;
+            case self::METHOD_PROPERTY:
+                $result[self::IS_REF] = true;
+                $result[self::VALUE] = $object->$property;
+                break;
+            case self::METHOD_MAGIC_GETTER:
+                $result[self::VALUE] = $object->$property;
+                break;
+            case self::METHOD_HASSER:
+                $hasser = $this->buildMethod("has", $property);
+                $result[self::VALUE] = $object->$hasser();
+                break;
+            case self::METHOD_ISSER:
+                $isser = $this->buildMethod("is", $property);
+                $result[self::VALUE] = $object->$isser();
+                break;
+            default:
+                throw new \UnexpectedValueException(sprintf(
+                    "Unexpected access method: %s",
+                    $accessMethod
+                ));
+                break;
         }
 
         // Objects are always passed around by reference
@@ -412,8 +417,8 @@ class PropertyAccessor implements PropertyAccessorInterface
             $addMethod = 'add'.$singular;
             $removeMethod = 'remove'.$singular;
 
-            $addMethodFound = $this->isAccessible($reflClass, $addMethod, 1);
-            $removeMethodFound = $this->isAccessible($reflClass, $removeMethod, 1);
+            $addMethodFound = $this->isMethodAccessible($reflClass, $addMethod, 1);
+            $removeMethodFound = $this->isMethodAccessible($reflClass, $removeMethod, 1);
 
             if ($addMethodFound && $removeMethodFound) {
                 return array($addMethod, $removeMethod);
@@ -442,7 +447,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      * @return Boolean Whether the method is public and has $parameters
      *                                      required parameters
      */
-    private function isAccessible(\ReflectionClass $class, $methodName, $parameters)
+    private function isMethodAccessible(\ReflectionClass $class, $methodName, $parameters)
     {
         if ($class->hasMethod($methodName)) {
             $method = $class->getMethod($methodName);
@@ -453,5 +458,106 @@ class PropertyAccessor implements PropertyAccessorInterface
         }
 
         return false;
+    }
+
+    private function getPropertyPath($propertyPath)
+    {
+        if (is_string($propertyPath)) {
+            $propertyPath = new PropertyPath($propertyPath);
+        } elseif (!$propertyPath instanceof PropertyPathInterface) {
+            throw new UnexpectedTypeException($propertyPath, 'string or Symfony\Component\PropertyAccess\PropertyPathInterface');
+        }
+
+        return $propertyPath;
+    }
+
+    private function hasGetter($object, $property)
+    {
+        return $this->hasMethod("get", $object, $property);
+    }
+
+    private function hasMagicGetter($object)
+    {
+        return $this->hasMethod("__get", $object, "");
+    }
+
+    private function hasHasser($object, $property)
+    {
+        return $this->hasMethod("has", $object, $property);
+    }
+
+    private function hasIsser($object, $property)
+    {
+        return $this->hasMethod("is", $object, $property);
+    }
+
+    private function hasMagicMethod($object)
+    {
+        return $this->hasMethod("__call", $object, "");
+    }
+
+    private function hasMethod($methodPrefix, $object, $property)
+    {
+        $method = $methodPrefix.$this->camelize($property);
+        $reflector = new \ReflectionClass($object);
+
+        return $reflector->hasMethod($method) && $reflector->getMethod($method)->isPublic();
+    }
+
+    private function buildMethod($methodPrefix, $property)
+    {
+        return $methodPrefix.$this->camelize($property);
+    }
+
+    private function isArrayAccess($objectOrArray)
+    {
+        return is_array($objectOrArray) || $objectOrArray instanceof \ArrayAccess;
+    }
+
+    /**
+     * Return one of METHOD_* class constants reprsenting suitable access method
+     */
+    private function getAccessMethod($object, $property)
+    {
+        $reflClass = new \ReflectionClass($object);
+        $getter = $this->buildMethod("get", $property);
+        $isser = $this->buildMethod("is", $property);
+        $hasser = $this->buildMethod("has", $property);
+        $classHasProperty = $reflClass->hasProperty($property);
+
+        if ($this->hasGetter($object, $property)) {
+            return self::METHOD_GETTER;
+        } elseif ($this->hasIsser($object, $property)) {
+            return self::METHOD_ISSER;
+        } elseif ($this->hasHasser($object, $property)) {
+            return self::METHOD_HASSER;
+        } elseif ($this->hasMagicGetter($object)) {
+            return self::METHOD_MAGIC_GETTER;
+        } elseif ($classHasProperty && $reflClass->getProperty($property)->isPublic()) {
+            return self::METHOD_PROPERTY;
+        } elseif (!$classHasProperty && property_exists($object, $property)) {
+            // Needed to support \stdClass instances. We need to explicitly
+            // exclude $classHasProperty, otherwise if in the previous clause
+            // a *protected* property was found on the class, property_exists()
+            // returns true, consequently the following line will result in a
+            // fatal error.
+            return self::METHOD_PROPERTY;
+        } elseif ($this->magicCall && $this->hasMagicMethod($object)) {
+            // we call the getter and hope the __call do the job
+            return self::METHOD_GETTER;
+        } else {
+            $methods = array($getter, $isser, $hasser, '__get');
+            if ($this->magicCall) {
+                $methods[] = '__call';
+            }
+
+            throw new NoSuchPropertyException(sprintf(
+                'Neither the property "%s" nor one of the methods "%s()" '.
+                'exist and have public access in class "%s".',
+                $property,
+                implode('()", "', $methods),
+                $reflClass->name
+            ));
+        }
     }
 }

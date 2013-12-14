@@ -413,4 +413,59 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foobar', $object->getMagicProperty());
     }
 
+    public function testShouldIndicateThatPropertyUnaccessibleWhenMissing()
+    {
+        $propertyAccessor = new PropertyAccessor();
+        $object = new Author();
+        $this->assertFalse($propertyAccessor->isAccessible($object, 'mind_state'));
+    }
+
+    public function testShouldIndicateThatPropertyUnaccessibleWhenPrivate()
+    {
+        $propertyAccessor = new PropertyAccessor();
+        $object = new Author();
+        $this->assertFalse($propertyAccessor->isAccessible($object, 'private_property'));
+    }
+
+    public function testShouldIndicateThatPropertyUnaccessibleWhenArray()
+    {
+        $propertyAccessor = new PropertyAccessor();
+        $array = array_flip(array("foo", "baz"));
+        $this->assertFalse($propertyAccessor->isAccessible($array, 'bar'));
+    }
+
+    public function testShouldIndicateThatPropertyUnaccessibleWhenArrayAccess()
+    {
+        $propertyAccessor = new PropertyAccessor();
+        $array = new \ArrayObject(array("bar" => "foo"));
+        $this->assertFalse($propertyAccessor->isAccessible($array, 'foo'));
+    }
+
+    public function testShouldIndicateThatPropertyIsAccessibleWhenPublic()
+    {
+        $propertyAccessor = new PropertyAccessor();
+        $object = new Author();
+        $this->assertTrue($propertyAccessor->isAccessible($object, 'child'));
+    }
+
+    public function testShouldIndicateThatPropertyIsAccessibleWhenHasGetter()
+    {
+        $propertyAccessor = new PropertyAccessor();
+        $object = new Author();
+        $this->assertTrue($propertyAccessor->isAccessible($object, 'lastName'));
+    }
+
+    public function testShouldIndicateThatPropertyIsAccessibleWhenArray()
+    {
+        $propertyAccessor = new PropertyAccessor();
+        $array = array_flip(array("foo", "baz"));
+        $this->assertTrue($propertyAccessor->isAccessible($array, 'foo'));
+    }
+
+    public function testShouldIndicateThatPropertyIsAccessibleWhenArrayAccess()
+    {
+        $propertyAccessor = new PropertyAccessor();
+        $array = new \ArrayObject(array("bar" => "foo"));
+        $this->assertTrue($propertyAccessor->isAccessible($array, 'bar'));
+    }
 }

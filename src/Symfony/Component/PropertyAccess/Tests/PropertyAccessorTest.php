@@ -92,7 +92,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
             array('[@name]', 'Thunderer', array('@name' => 'Thunderer')),
             array('@name', 'Thunderer', (object) array('@name' => 'Thunderer')),
             array('_name', 'Thunderer', (object) array('_name' => 'Thunderer')),
-            );
+        );
     }
 
     public function testGetValueReadsArrayWithMissingIndexForCustomPropertyPath()

@@ -70,32 +70,29 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
         $this->getPropertyAccessor()->getValue($array, 'firstName');
     }
 
-    public function testGetValueReadsZeroIndex()
+    /**
+     * @dataProvider provideValueReads
+     */
+    public function testGetValueReads($propertyPath, $expectedValue, $testedData)
     {
-        $array = array('Bernhard');
-
-        $this->assertEquals('Bernhard', $this->getPropertyAccessor()->getValue($array, '[0]'));
+        $this->assertEquals($expectedValue, $this->getPropertyAccessor()->getValue($testedData, $propertyPath));
     }
 
-    public function testGetValueReadsIndexWithSpecialChars()
+    public function provideValueReads()
     {
-        $array = array('%!@$§.' => 'Bernhard');
+        return array(
+            array('%!@$§', 'Bernhard', (object) array('%!@$§' => 'Bernhard')),
+            array('[0]', 'Bernhard', array('Bernhard')),
+            array('[%!@$§.]', 'Bernhard', array('%!@$§.' => 'Bernhard')),
 
-        $this->assertEquals('Bernhard', $this->getPropertyAccessor()->getValue($array, '[%!@$§.]'));
-    }
+            array('[root][%!@$§.]', 'Bernhard', array('root' => array('%!@$§.' => 'Bernhard'))),
+            array('[child][index][firstName]', 'Bernhard', array('child' => array('index' => array('firstName' => 'Bernhard')))),
 
-    public function testGetValueReadsNestedIndexWithSpecialChars()
-    {
-        $array = array('root' => array('%!@$§.' => 'Bernhard'));
-
-        $this->assertEquals('Bernhard', $this->getPropertyAccessor()->getValue($array, '[root][%!@$§.]'));
-    }
-
-    public function testGetValueReadsArrayWithCustomPropertyPath()
-    {
-        $array = array('child' => array('index' => array('firstName' => 'Bernhard')));
-
-        $this->assertEquals('Bernhard', $this->getPropertyAccessor()->getValue($array, '[child][index][firstName]'));
+            // additional tests for #8930
+            array('[@name]', 'Thunderer', array('@name' => 'Thunderer')),
+            array('@name', 'Thunderer', (object) array('@name' => 'Thunderer')),
+            array('_name', 'Thunderer', (object) array('_name' => 'Thunderer')),
+        );
     }
 
     public function testGetValueReadsArrayWithMissingIndexForCustomPropertyPath()

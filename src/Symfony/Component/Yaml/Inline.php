@@ -18,8 +18,8 @@ use Symfony\Component\Yaml\Exception\DumpException;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Inline
-{
+class Inline {
+
     const REGEX_QUOTED_STRING = '(?:"([^"\\\\]*(?:\\\\.[^"\\\\]*)*)"|\'([^\']*(?:\'\'[^\']*)*)\')';
 
     private static $exceptionOnInvalidType = false;
@@ -36,8 +36,7 @@ class Inline
      *
      * @throws ParseException
      */
-    public static function parse($value, $exceptionOnInvalidType = false, $objectSupport = false)
-    {
+    public static function parse($value, $exceptionOnInvalidType = false, $objectSupport = false) {
         self::$exceptionOnInvalidType = $exceptionOnInvalidType;
         self::$objectSupport = $objectSupport;
 
@@ -89,8 +88,7 @@ class Inline
      *
      * @throws DumpException When trying to dump PHP resource
      */
-    public static function dump($value, $exceptionOnInvalidType = false, $objectSupport = false)
-    {
+    public static function dump($value, $exceptionOnInvalidType = false, $objectSupport = false) {
         switch (true) {
             case is_resource($value):
                 if ($exceptionOnInvalidType) {
@@ -100,7 +98,7 @@ class Inline
                 return 'null';
             case is_object($value):
                 if ($objectSupport) {
-                    return '!!php/object:'.serialize($value);
+                    return '!!php/object:' . serialize($value);
                 }
 
                 if ($exceptionOnInvalidType) {
@@ -153,12 +151,12 @@ class Inline
      *
      * @return string The YAML string representing the PHP array
      */
-    private static function dumpArray($value, $exceptionOnInvalidType, $objectSupport)
-    {
+    private static function dumpArray($value, $exceptionOnInvalidType, $objectSupport) {
         // array
         $keys = array_keys($value);
-        if ((1 == count($keys) && '0' == $keys[0])
-            || (count($keys) > 1 && array_reduce($keys, function ($v, $w) { return (integer) $v + $w; }, 0) == count($keys) * (count($keys) - 1) / 2)
+        if ((1 == count($keys) && '0' == $keys[0]) || (count($keys) > 1 && array_reduce($keys, function ($v, $w) {
+                            return (integer) $v + $w;
+                        }, 0) == count($keys) * (count($keys) - 1) / 2)
         ) {
             $output = array();
             foreach ($value as $val) {
@@ -203,22 +201,28 @@ class Inline
                 }
             }
         } else {
+            $scalarWithoutKey = substr($scalar, $i);
+            $match = array();
             // "normal" string
             if (!$delimiters) {
-                $output = substr($scalar, $i);
+                $output = $scalarWithoutKey;
                 $i += strlen($output);
 
                 // remove comments
                 if (false !== $strpos = strpos($output, ' #')) {
                     $output = rtrim(substr($output, 0, $strpos));
                 }
-            } elseif (preg_match('/^(.+?)('.implode('|', $delimiters).')/', substr($scalar, $i), $match)) {
+            // special treatment of php/object as it contains , and } unescaped
+            } elseif (0 === strpos($scalarWithoutKey, '!!php/object:')) {
+                $endOfObject = self::findEndOfPhpObject($scalarWithoutKey);
+                $output = substr($scalarWithoutKey, 0, $endOfObject+1);
+                $i += strlen($output);
+            } elseif (preg_match('/^(.+?)(' . implode('|', $delimiters) . ')/', $scalarWithoutKey, $match)) {
                 $output = $match[1];
                 $i += strlen($output);
             } else {
                 throw new ParseException(sprintf('Malformed inline YAML string (%s).', $scalar));
             }
-
             $output = $evaluate ? self::evaluateScalar($output) : $output;
         }
 
@@ -235,9 +239,8 @@ class Inline
      *
      * @throws ParseException When malformed inline YAML string is parsed
      */
-    private static function parseQuotedScalar($scalar, &$i)
-    {
-        if (!preg_match('/'.self::REGEX_QUOTED_STRING.'/Au', substr($scalar, $i), $match)) {
+    private static function parseQuotedScalar($scalar, &$i) {
+        if (!preg_match('/' . self::REGEX_QUOTED_STRING . '/Au', substr($scalar, $i), $match)) {
             throw new ParseException(sprintf('Malformed inline YAML string (%s).', substr($scalar, $i)));
         }
 
@@ -265,8 +268,7 @@ class Inline
      *
      * @throws ParseException When malformed inline YAML string is parsed
      */
-    private static function parseSequence($sequence, &$i = 0)
-    {
+    private static function parseSequence($sequence, &$i = 0) {
         $output = array();
         $len = strlen($sequence);
         $i += 1;
@@ -294,7 +296,7 @@ class Inline
                     if (!$isQuoted && false !== strpos($value, ': ')) {
                         // embedded mapping?
                         try {
-                            $value = self::parseMapping('{'.$value.'}');
+                            $value = self::parseMapping('{' . $value . '}');
                         } catch (\InvalidArgumentException $e) {
                             // no, it's not
                         }
@@ -304,7 +306,6 @@ class Inline
 
                     --$i;
             }
-
             ++$i;
         }
 
@@ -321,8 +322,7 @@ class Inline
      *
      * @throws ParseException When malformed inline YAML string is parsed
      */
-    private static function parseMapping($mapping, &$i = 0)
-    {
+    private static function parseMapping($mapping, &$i = 0) {
         $output = array();
         $len = strlen($mapping);
         $i += 1;
@@ -363,7 +363,6 @@ class Inline
                         $done = true;
                         --$i;
                 }
-
                 ++$i;
 
                 if ($done) {
@@ -382,8 +381,7 @@ class Inline
      *
      * @return string A YAML string
      */
-    private static function evaluateScalar($scalar)
-    {
+    private static function evaluateScalar($scalar) {
         $scalar = trim($scalar);
 
         switch (true) {
@@ -420,7 +418,7 @@ class Inline
             case 'false' === strtolower($scalar):
                 return false;
             case is_numeric($scalar):
-                return '0x' == $scalar[0].$scalar[1] ? hexdec($scalar) : floatval($scalar);
+                return '0x' == $scalar[0] . $scalar[1] ? hexdec($scalar) : floatval($scalar);
             case 0 == strcasecmp($scalar, '.inf'):
             case 0 == strcasecmp($scalar, '.NaN'):
                 return -log(0);
@@ -442,8 +440,7 @@ class Inline
      *
      * @see http://www.yaml.org/spec/1.2/spec.html#id2761573
      */
-    private static function getTimestampRegex()
-    {
+    private static function getTimestampRegex() {
         return <<<EOF
         ~^
         (?P<year>[0-9][0-9][0-9][0-9])
@@ -459,4 +456,30 @@ class Inline
         $~x
 EOF;
     }
+
+    /**
+     * When the value in inline notation contains serialized php object it has
+     * not escaped commas and curly brackets. For that reason we need to know
+     * where this serialized object ends. Searching for } and , as delimieters
+     * was corrupting yaml structure.
+     * 
+     * @param String $scalar
+     * @return int Position where php/object ends
+     * @throws ParseException
+     */
+    public static function findEndOfPhpObject($scalar) {
+        //Now we have to find where serialized object ends.
+        $countOfBrackets = 0;
+        for ($pos = 0; $pos < strlen($scalar); $pos++) {
+            if ($scalar[$pos] == '{')
+                $countOfBrackets++;
+            if ($scalar[$pos] == '}') {
+                $countOfBrackets--;
+                if (0 === $countOfBrackets)
+                    return $pos;
+            }
+        }
+        throw new ParseException('php/object value malformed');
+    }
+
 }

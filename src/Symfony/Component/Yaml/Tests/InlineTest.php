@@ -115,6 +115,14 @@ class InlineTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expect, Inline::parseScalar($value));
     }
 
+    public function testCreativestyleObjectParseWithObjectSupportEnabled() {
+        $input = <<<'EOF'
+{ foo: !!php/object:O:30:"Symfony\Component\Yaml\Tests\B":1:{s:1:"b";s:3:"foo";}, bar: 1 }
+EOF;
+        $object = Inline::parse($input, false, true);
+        $this->assertEquals(array('foo' => new B(), 'bar' => 1), $object);
+    }
+    
     protected function getTestsForParse()
     {
         return array(
@@ -230,3 +238,5 @@ class InlineTest extends \PHPUnit_Framework_TestCase
         );
     }
 }
+
+

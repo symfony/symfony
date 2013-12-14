@@ -310,7 +310,7 @@ class XmlDescriptor extends Descriptor
                         foreach ($parameters as $name => $value) {
                             $tagXML->appendChild($parameterXML = $dom->createElement('parameter'));
                             $parameterXML->setAttribute('name', $name);
-                            $parameterXML->textContent = $value;
+                            $parameterXML->appendChild(new \DOMText($this->formatParameter($value)));
                         }
                     }
                 }

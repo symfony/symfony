@@ -504,6 +504,109 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('builderInstance', $this->builder);
     }
 
+    public function testCreateBuilderUsesMinAndMaxValueIfFound()
+    {
+        $this->guesser1->expects($this->once())
+            ->method('guessType')
+            ->will($this->returnValue(new TypeGuess(
+                    'integer',
+                    array(),
+                    Guess::HIGH_CONFIDENCE
+                )));
+
+        $this->guesser1->expects($this->once())
+                ->method('guessMinValue')
+                ->with('Application\Temperature', 'degrees')
+                ->will($this->returnValue(new ValueGuess(
+                    -276,
+                    Guess::HIGH_CONFIDENCE
+                )));
+
+        $this->guesser2->expects($this->once())
+                ->method('guessMaxValue')
+                ->with('Application\Temperature', 'degrees')
+                ->will($this->returnValue(new ValueGuess(
+                    100,
+                    Guess::HIGH_CONFIDENCE
+                )));
+
+        $factory = $this->getMockFactory(array('createNamedBuilder'));
+
+        $factory->expects($this->once())
+            ->method('createNamedBuilder')
+            ->with('degrees', 'integer', null, array('attr' => array('min' => -276, 'max' => 100)))
+            ->will($this->returnValue('builderInstance'));
+
+        $this->builder = $factory->createBuilderForProperty(
+            'Application\Temperature',
+            'degrees'
+        );
+
+        $this->assertEquals('builderInstance', $this->builder);
+    }
+
+    public function testMinAndMaxAttributesCanBeOverridden()
+    {
+        $this->guesser1->expects($this->once())
+            ->method('guessType')
+            ->will($this->returnValue(new TypeGuess(
+                    'integer',
+                    array(),
+                    Guess::HIGH_CONFIDENCE
+                )));
+
+        $this->guesser1->expects($this->once())
+                ->method('guessMinValue')
+                ->with('Application\Temperature', 'degrees')
+                ->will($this->returnValue(new ValueGuess(
+                    -276,
+                    Guess::HIGH_CONFIDENCE
+                )));
+
+        $factory = $this->getMockFactory(array('createNamedBuilder'));
+
+        $factory->expects($this->once())
+            ->method('createNamedBuilder')
+            ->with('degrees', 'integer', null, array('attr' => array('min' => 50)))
+            ->will($this->returnValue('builderInstance'));
+
+        $this->builder = $factory->createBuilderForProperty(
+            'Application\Temperature',
+            'degrees',
+            null,
+            array('attr' => array('min' => 50))
+        );
+
+        $this->assertEquals('builderInstance', $this->builder);
+    }
+
+    public function testMinAndMaxAttributesAreNotAddedToTextType()
+    {
+        $this->guesser1->expects($this->once())
+                ->method('guessMinValue')
+                ->with('Application\Author', 'firstName')
+                ->will($this->returnValue(new ValueGuess(
+                    -276,
+                    Guess::HIGH_CONFIDENCE
+                )));
+
+        $factory = $this->getMockFactory(array('createNamedBuilder'));
+
+        $factory->expects($this->once())
+            ->method('createNamedBuilder')
+            ->with('firstName', 'text', null)
+            ->will($this->returnValue('builderInstance'));
+
+        $this->builder = $factory->createBuilderForProperty(
+            'Application\Author',
+            'firstName',
+            null,
+            array('attr' => array('min' => 50))
+        );
+
+        $this->assertEquals('builderInstance', $this->builder);
+    }
+
     public function testCreateBuilderUsesRequiredSettingWithHighestConfidence()
     {
         $this->guesser1->expects($this->once())

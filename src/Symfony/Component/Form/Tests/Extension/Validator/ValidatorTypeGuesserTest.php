@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Tests\Extension\Validator;
 use Symfony\Component\Form\Extension\Validator\ValidatorTypeGuesser;
 use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Validator\Constraints\Type;
 
 /**
@@ -53,8 +54,8 @@ class ValidatorTypeGuesserTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-* @dataProvider dataProviderTestGuessMaxLengthForConstraintWithType
-*/
+     * @dataProvider dataProviderTestGuessMaxLengthForConstraintWithType
+     */
     public function testGuessMaxLengthForConstraintWithType($type)
     {
         $constraint = new Type($type);
@@ -73,5 +74,41 @@ class ValidatorTypeGuesserTest extends \PHPUnit_Framework_TestCase
             array('numeric'),
             array('real')
         );
+    }
+
+    public function testGuessMinValueForConstraintWithMinValue()
+    {
+        $constraint = new Range(array('min' => '2'));
+
+        $result = $this->typeGuesser->guessMinValueForConstraint($constraint);
+        $this->assertInstanceOf('Symfony\Component\Form\Guess\ValueGuess', $result);
+        $this->assertEquals(2, $result->getValue());
+        $this->assertEquals(Guess::HIGH_CONFIDENCE, $result->getConfidence());
+    }
+
+    public function testGuessMinValueForConstraintWithMaxValue()
+    {
+        $constraint = new Range(array('max' => '2'));
+
+        $result = $this->typeGuesser->guessMinValueForConstraint($constraint);
+        $this->assertNull($result);
+    }
+
+    public function testGuessMaxValueForConstraintWithMaxValue()
+    {
+        $constraint = new Range(array('max' => '2'));
+
+        $result = $this->typeGuesser->guessMaxValueForConstraint($constraint);
+        $this->assertInstanceOf('Symfony\Component\Form\Guess\ValueGuess', $result);
+        $this->assertEquals(2, $result->getValue());
+        $this->assertEquals(Guess::HIGH_CONFIDENCE, $result->getConfidence());
+    }
+
+    public function testGuessMaxValueForConstraintWithMinValue()
+    {
+        $constraint = new Range(array('min' => '2'));
+
+        $result = $this->typeGuesser->guessMaxValueForConstraint($constraint);
+        $this->assertNull($result);
     }
 }

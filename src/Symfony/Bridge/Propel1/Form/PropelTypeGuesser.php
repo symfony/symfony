@@ -139,6 +139,24 @@ class PropelTypeGuesser implements FormTypeGuesserInterface
     /**
      * {@inheritDoc}
      */
+    public function guessMinValue($class, $property)
+    {
+        // Unfortunately we can't guess anything from database
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function guessMaxValue($class, $property)
+    {
+        // Unfortunately we can't guess anything from database
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function guessPattern($class, $property)
     {
         if ($column = $this->getColumn($class, $property)) {

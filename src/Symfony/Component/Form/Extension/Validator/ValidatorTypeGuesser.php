@@ -68,6 +68,30 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
     /**
      * {@inheritDoc}
      */
+    public function guessMaxValue($class, $property)
+    {
+        $guesser = $this;
+
+        return $this->guess($class, $property, function (Constraint $constraint) use ($guesser) {
+            return $guesser->guessMaxValueForConstraint($constraint);
+        });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function guessMinValue($class, $property)
+    {
+        $guesser = $this;
+
+        return $this->guess($class, $property, function (Constraint $constraint) use ($guesser) {
+            return $guesser->guessMinValueForConstraint($constraint);
+        });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function guessPattern($class, $property)
     {
         $guesser = $this;
@@ -207,6 +231,46 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
             case 'Symfony\Component\Validator\Constraints\Range':
                 if (is_numeric($constraint->max)) {
                     return new ValueGuess(strlen((string) $constraint->max), Guess::LOW_CONFIDENCE);
+                }
+                break;
+        }
+
+        return null;
+    }
+
+    /**
+     * Guesses a field's maximum value based on the given constraint
+     *
+     * @param Constraint $constraint The constraint to guess for
+     *
+     * @return ValueGuess|null The guess for the maximum value
+     */
+    public function guessMaxValueForConstraint(Constraint $constraint)
+    {
+        switch (get_class($constraint)) {
+            case 'Symfony\Component\Validator\Constraints\Range':
+                if (is_numeric($constraint->max)) {
+                    return new ValueGuess($constraint->max, Guess::HIGH_CONFIDENCE);
+                }
+                break;
+        }
+
+        return null;
+    }
+
+    /**
+     * Guesses a field's minimum value based on the given constraint
+     *
+     * @param Constraint $constraint The constraint to guess for
+     *
+     * @return ValueGuess|null The guess for the minimum value
+     */
+    public function guessMinValueForConstraint(Constraint $constraint)
+    {
+        switch (get_class($constraint)) {
+            case 'Symfony\Component\Validator\Constraints\Range':
+                if (is_numeric($constraint->min)) {
+                    return new ValueGuess($constraint->min, Guess::HIGH_CONFIDENCE);
                 }
                 break;
         }

@@ -104,12 +104,16 @@ class FormFactory implements FormFactoryInterface
 
         $typeGuess = $guesser->guessType($class, $property);
         $maxLengthGuess = $guesser->guessMaxLength($class, $property);
+        $minValueGuess = $guesser->guessMinValue($class, $property);
+        $maxValueGuess = $guesser->guessMaxValue($class, $property);
         $requiredGuess = $guesser->guessRequired($class, $property);
         $patternGuess = $guesser->guessPattern($class, $property);
 
         $type = $typeGuess ? $typeGuess->getType() : 'text';
 
         $maxLength = $maxLengthGuess ? $maxLengthGuess->getValue() : null;
+        $minValue = $minValueGuess ? $minValueGuess->getValue() : null;
+        $maxValue = $maxValueGuess ? $maxValueGuess->getValue() : null;
         $pattern   = $patternGuess ? $patternGuess->getValue() : null;
 
         if (null !== $pattern) {
@@ -118,6 +122,13 @@ class FormFactory implements FormFactoryInterface
 
         if (null !== $maxLength) {
             $options = array_merge(array('attr' => array('maxlength' => $maxLength)), $options);
+        }
+
+        // Should we add number type?
+        // At the moment number types are rendered as text (@see form_div_layout.html.twig#163)
+        if (in_array($type, array('integer'))) {
+            $options = $this->addAttrValue($options, 'min', $minValue);
+            $options = $this->addAttrValue($options, 'max', $maxValue);
         }
 
         if ($requiredGuess) {
@@ -130,6 +141,30 @@ class FormFactory implements FormFactoryInterface
         }
 
         return $this->createNamedBuilder($property, $type, $data, $options);
+    }
+
+    /**
+     * Add attribute value to attr option
+     *
+     * @param array  $options The options
+     * @param string $key     The key of the array
+     * @param string $value   The value of the attribute
+     *
+     * @return array $options The options
+     */
+    protected function addAttrValue(array $options, $key, $value = null)
+    {
+        if (null === $value) {
+            return $options;
+        }
+
+        if (false === isset($options['attr'])) {
+            $options['attr'] = array();
+        }
+
+        $options['attr'] = array_merge(array($key => $value), $options['attr']);
+
+        return $options;
     }
 
     /**

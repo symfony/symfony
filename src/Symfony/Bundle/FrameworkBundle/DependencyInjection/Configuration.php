@@ -398,6 +398,7 @@ class Configuration implements ConfigurationInterface
                     ->canBeEnabled()
                     ->children()
                         ->scalarNode('fallback')->defaultValue('en')->end()
+                        ->booleanNode('enable_logging')->defaultFalse()->end()
                     ->end()
                 ->end()
             ->end()

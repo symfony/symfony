@@ -482,6 +482,7 @@ class Parser
         if ('>' === $separator) {
             preg_match('/(\n*)$/', $text, $matches);
             $text = preg_replace('/(?<!\n)\n(?!\n)/', ' ', rtrim($text, "\n"));
+            $text = preg_replace('/>\s+</', '><', $text);
             $text .= $matches[1];
         }
 

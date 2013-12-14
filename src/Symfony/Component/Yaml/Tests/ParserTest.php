@@ -611,6 +611,42 @@ EOT
 EOF
         ));
     }
+
+    public function testHtmlStringWithWhiteSpaces()
+    {
+        $this->assertEquals(array('test' => <<<EOT
+<h2>A heading</h2><ul><li>a list</li><li>may be a good example</li></ul>
+EOT
+        ), Yaml::parse(<<<EOF
+test: >
+    <h2>A heading</h2>
+
+    <ul>
+        <li>a list</li>
+        <li>may be a good example</li>
+    </ul>
+EOF
+        ));
+
+        $this->assertEquals(array('test' => <<<EOT
+<h2> 3 < 4 </h2>
+EOT
+        ), Yaml::parse(<<<EOF
+test: >
+    <h2> 3 < 4 </h2>
+EOF
+        ));
+
+        $this->assertEquals(array('test' => <<<EOT
+<h2> 4 > 3 </h2>
+EOT
+        ), Yaml::parse(<<<EOF
+test: >
+    <h2> 4 > 3 </h2>
+EOF
+        ));
+
+    }
 }
 
 class B

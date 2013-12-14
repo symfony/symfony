@@ -295,10 +295,11 @@ abstract class Client
         } else {
             ++$this->redirectCount;
         }
-
+        
+        $this->server = $server = array_merge($this->server, $server);
+        
         $uri = $this->getAbsoluteUri($uri);
 
-        $server = array_merge($this->server, $server);
         if (!$this->history->isEmpty()) {
             $server['HTTP_REFERER'] = $this->history->current()->getUri();
         }

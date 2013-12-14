@@ -193,7 +193,7 @@ class Translator implements TranslatorInterface
 
         $catalogue = $this->filterCatalogueForId($this->catalogues[$locale], $id, $domain);
 
-        return strtr($this->catalogues[$locale]->get((string) $id, $domain), $parameters);
+        return strtr($catalogue->get((string) $id, $domain), $parameters);
     }
 
     /**
@@ -276,7 +276,7 @@ class Translator implements TranslatorInterface
             if ($catalogue->has($id, $domain)) {
                 $this->logger->info('Translator: using fallback catalogue.', array('id' => $id, 'domain' => $domain));
             } else {
-                $this->logger->warn('Translator: translation not found.', array('id' => $id, 'domain' => $domain));
+                $this->logger->warning('Translator: translation not found.', array('id' => $id, 'domain' => $domain));
             }
         }
 

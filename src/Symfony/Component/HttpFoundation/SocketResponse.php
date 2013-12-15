@@ -67,6 +67,7 @@ class SocketResponse extends Response
      *
      * @param mixed $handle A readable file handle
      *
+     * @return SocketResponse
      * @throws \LogicException
      */
     public function setHandle($handle)
@@ -76,16 +77,21 @@ class SocketResponse extends Response
         }
 
         $this->handle = $handle;
+        
+        return $this;
     }
 
     /**
      * Close file handle after sending content
      *
+     * @return SocketResponse
      * @param bool $close
      */
     public function setClose($close)
     {
         $this->close = (boolean) $close;
+        
+        return $this;
     }
 
     /**

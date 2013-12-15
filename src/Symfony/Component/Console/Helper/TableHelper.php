@@ -142,26 +142,26 @@ class TableHelper extends Helper
     public function addRow(array $row)
     {
         $this->rows[] = array_values($row);
-        
+
         $keys = array_keys($this->rows);
         $rowKey = array_pop($keys);
 
         foreach ($row as $key => $cellValue) {
-            if (strstr($cellValue, "\n")) {
+            if (!strstr($cellValue, "\n")) {
+                continue;
+            }
 
-                $lines = explode("\n", $cellValue);
-                $this->rows[$rowKey][$key] = $lines[0];
-                unset($lines[0]);
+            $lines = explode("\n", $cellValue);
+            $this->rows[$rowKey][$key] = $lines[0];
+            unset($lines[0]);
 
-                foreach ($lines as $lineKey => $line) {
+            foreach ($lines as $lineKey => $line) {
+                $nextRowKey = $rowKey + $lineKey + 1;
 
-                    $nextRowKey = $rowKey + $lineKey + 1;
-
-                    if (isset($this->rows[$nextRowKey])) {
-                        $this->rows[$nextRowKey][$key] = $line;
-                    } else {
-                        $this->rows[$nextRowKey] = array($key => $line);
-                    }
+                if (isset($this->rows[$nextRowKey])) {
+                    $this->rows[$nextRowKey][$key] = $line;
+                } else {
+                    $this->rows[$nextRowKey] = array($key => $line);
                 }
             }
         }

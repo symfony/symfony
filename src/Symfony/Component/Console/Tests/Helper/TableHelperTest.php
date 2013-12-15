@@ -159,6 +159,7 @@ TABLE
                 array(
                     array("99921-58-10-7", "Divine\nComedy", "Dante Alighieri"),
                     array("9971-5-0210-2", "Harry Potter\nand the Chamber of Secrets", "Rowling\nJoanne K."),
+                    array("9971-5-0210-2", "Harry Potter\nand the Chamber of Secrets", "Rowling\nJoanne K."),
                     array("960-425-059-0", "The Lord of the Rings", "J. R. R.\nTolkien"),
                 ),
                 TableHelper::LAYOUT_DEFAULT,
@@ -168,6 +169,8 @@ TABLE
 +---------------+----------------------------+-----------------+
 | 99921-58-10-7 | Divine                     | Dante Alighieri |
 |               | Comedy                     |                 |
+| 9971-5-0210-2 | Harry Potter               | Rowling         |
+|               | and the Chamber of Secrets | Joanne K.       |
 | 9971-5-0210-2 | Harry Potter               | Rowling         |
 |               | and the Chamber of Secrets | Joanne K.       |
 | 960-425-059-0 | The Lord of the Rings      | J. R. R.        |

@@ -127,7 +127,7 @@ class Cookie
         $parts = explode(';', $cookie);
 
         if (false === strpos($parts[0], '=')) {
-            throw new \InvalidArgumentException('The cookie string "%s" is not valid.');
+            throw new \InvalidArgumentException(sprintf('The cookie string "%s" is not valid.', $parts[0]));
         }
 
         list($name, $value) = explode('=', array_shift($parts), 2);

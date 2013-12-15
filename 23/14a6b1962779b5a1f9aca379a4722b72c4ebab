@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by stof at 2013-12-14T01:34:26Z
+
+Please add some unit tests covering this bugfix
+
+---------------------------------------------------------------------------
+
+by k-przybyszewski at 2013-12-14T19:24:24Z
+
+here is it ;)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-12-15T16:57:23Z
+
+This PR contains some unrelated commits from me. Can you rebase to remove them?
+
+---------------------------------------------------------------------------
+
+by k-przybyszewski at 2013-12-15T18:10:25Z
+
+@fabpot already :)
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-15T18:42:50Z
+
+please add the PR template available for your convenience here http://symfony.com/doc/current/contributing/code/patches.html#make-a-pull-request

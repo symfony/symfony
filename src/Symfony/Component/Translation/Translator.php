@@ -57,7 +57,7 @@ class Translator implements TranslatorInterface
     /**
      * @var LoggerInterface|null
      */
-    protected $logger;
+    private $logger;
 
     /**
      * Constructor.

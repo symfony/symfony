@@ -90,7 +90,6 @@ class CollectionTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $this->assertEquals(array('foo@foo.com'), $form->getData());
     }
 
-
     public function testResizedDownIfSubmittedWithEmptyDataAndDeleteEmpty()
     {
         $form = $this->factory->create('collection', null, array(

@@ -77,7 +77,7 @@ class SocketResponse extends Response
         }
 
         $this->handle = $handle;
-        
+
         return $this;
     }
 
@@ -90,7 +90,7 @@ class SocketResponse extends Response
     public function setClose($close)
     {
         $this->close = (boolean) $close;
-        
+
         return $this;
     }
 

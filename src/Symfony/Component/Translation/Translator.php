@@ -194,7 +194,7 @@ class Translator implements TranslatorInterface
         $catalogue = $this->catalogues[$locale];
 
         if (null !== $this->logger && !$catalogue->defines($id, $domain)) {
-            $this->filterCatalogueForId($catalogue, $id, $domain);
+            $this->log($catalogue, $id, $domain);
         }
 
         return strtr($catalogue->get((string) $id, $domain), $parameters);
@@ -224,7 +224,7 @@ class Translator implements TranslatorInterface
         $catalogue = $this->catalogues[$locale];
 
         if (null !== $this->logger && !$catalogue->defines($id, $domain)) {
-            $this->filterCatalogueForId($catalogue, $id, $domain);
+            $this->log($catalogue, $id, $domain);
         }
 
         while (!$catalogue->defines($id, $domain)) {
@@ -272,18 +272,18 @@ class Translator implements TranslatorInterface
     }
 
     /**
-     * Extension point for handling catalogue misses or fallbacks.
+     * Log for missing catalogue
      *
      * @param  MessageCatalogueInterface $catalogue
      * @param  string                    $id
      * @param  string                    $domain
      */
-    private function filterCatalogueForId(MessageCatalogueInterface $catalogue, $id, $domain)
+    private function log(MessageCatalogueInterface $catalogue, $id, $domain)
     {
         if ($catalogue->has($id, $domain)) {
-            $this->logger->info('Translator: using fallback catalogue.', array('id' => $id, 'domain' => $domain));
+            $this->logger->info('Translation use fallback catalogue.', array('id' => $id, 'domain' => $domain, 'locale' => $catalogue->getLocale()));
         } else {
-            $this->logger->warning('Translator: translation not found.', array('id' => $id, 'domain' => $domain));
+            $this->logger->warning('Translation not found.', array('id' => $id, 'domain' => $domain, 'locale' => $catalogue->getLocale()));
         }
     }
 

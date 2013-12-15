@@ -54,6 +54,37 @@ class TraceableUrlMatcherTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(0, 1, 2), $this->getLevels($traces));
     }
 
+    public function testMatchRouteOnMultipleHosts()
+    {
+        $routes = new RouteCollection();
+        $routes->add('first', new Route(
+            '/mypath/',
+            array('_controller' => 'MainBundle:Info:first'),
+            array(),
+            array(),
+            'some.example.com'
+        ));
+
+        $routes->add('second', new Route(
+            '/mypath/',
+            array('_controller' => 'MainBundle:Info:second'),
+            array(),
+            array(),
+            'another.example.com'
+        ));
+
+        $context = new RequestContext();
+        $context->setHost('baz');
+
+        $matcher = new TraceableUrlMatcher($routes, $context);
+
+        $traces = $matcher->getTraces('/mypath/');
+        $this->assertEquals(
+            array(TraceableUrlMatcher::ROUTE_ALMOST_MATCHES, TraceableUrlMatcher::ROUTE_ALMOST_MATCHES),
+            $this->getLevels($traces)
+        );
+    }
+
     public function getLevels($traces)
     {
         $levels = array();

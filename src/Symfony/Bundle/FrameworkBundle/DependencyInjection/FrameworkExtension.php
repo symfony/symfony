@@ -437,7 +437,7 @@ class FrameworkExtension extends Extension
         // Apply request scope to assets helper if one or more packages are request-scoped
         $requireRequestScope = array_reduce(
             $namedPackages,
-            function($v, Reference $ref) use ($container) {
+            function ($v, Reference $ref) use ($container) {
                 return $v || 'request' === $container->getDefinition($ref)->getScope();
             },
             'request' === $defaultPackage->getScope()
@@ -448,7 +448,7 @@ class FrameworkExtension extends Extension
         }
 
         if (!empty($config['loaders'])) {
-            $loaders = array_map(function($loader) { return new Reference($loader); }, $config['loaders']);
+            $loaders = array_map(function ($loader) { return new Reference($loader); }, $config['loaders']);
 
             // Use a delegation unless only a single loader was registered
             if (1 === count($loaders)) {
@@ -485,7 +485,7 @@ class FrameworkExtension extends Extension
         }
 
         $container->setParameter('templating.engines', $config['engines']);
-        $engines = array_map(function($engine) { return new Reference('templating.engine.'.$engine); }, $config['engines']);
+        $engines = array_map(function ($engine) { return new Reference('templating.engine.'.$engine); }, $config['engines']);
 
         // Use a delegation unless only a single engine was registered
         if (1 === count($engines)) {
@@ -585,8 +585,8 @@ class FrameworkExtension extends Extension
         }
         $translator->addMethodCall('setFallbackLocales', array($config['fallback']));
 
-        if ($config['enable_logging']) {
-            $logger = new Reference('logger', ContainerInterface::IGNORE_ON_INVALID_REFERENCE);
+        if (null !== $config['logger_id']) {
+            $logger = new Reference($config['logger_id'], ContainerInterface::IGNORE_ON_INVALID_REFERENCE);
             $translator->addMethodCall('setLogger', array($logger));
         }
 

@@ -191,7 +191,11 @@ class Translator implements TranslatorInterface
             $this->loadCatalogue($locale);
         }
 
-        $catalogue = $this->filterCatalogueForId($this->catalogues[$locale], $id, $domain);
+        $catalogue = $this->catalogues[$locale];
+
+        if (null !== $this->logger && !$catalogue->defines($id, $domain)) {
+            $this->filterCatalogueForId($catalogue, $id, $domain);
+        }
 
         return strtr($catalogue->get((string) $id, $domain), $parameters);
     }
@@ -217,7 +221,12 @@ class Translator implements TranslatorInterface
 
         $id = (string) $id;
 
-        $catalogue = $this->filterCatalogueForId($this->catalogues[$locale], $id, $domain);
+        $catalogue = $this->catalogues[$locale];
+
+        if (null !== $this->logger && !$catalogue->defines($id, $domain)) {
+            $this->filterCatalogueForId($catalogue, $id, $domain);
+        }
+
         while (!$catalogue->defines($id, $domain)) {
             if ($cat = $catalogue->getFallbackCatalogue()) {
                 $catalogue = $cat;
@@ -268,19 +277,14 @@ class Translator implements TranslatorInterface
      * @param  MessageCatalogueInterface $catalogue
      * @param  string                    $id
      * @param  string                    $domain
-     * @return MessageCatalogueInterface
      */
-    protected function filterCatalogueForId(MessageCatalogueInterface $catalogue, $id, $domain)
+    private function filterCatalogueForId(MessageCatalogueInterface $catalogue, $id, $domain)
     {
-        if (null !== $this->logger && !$catalogue->defines($id, $domain)) {
-            if ($catalogue->has($id, $domain)) {
-                $this->logger->info('Translator: using fallback catalogue.', array('id' => $id, 'domain' => $domain));
-            } else {
-                $this->logger->warning('Translator: translation not found.', array('id' => $id, 'domain' => $domain));
-            }
+        if ($catalogue->has($id, $domain)) {
+            $this->logger->info('Translator: using fallback catalogue.', array('id' => $id, 'domain' => $domain));
+        } else {
+            $this->logger->warning('Translator: translation not found.', array('id' => $id, 'domain' => $domain));
         }
-
-        return $catalogue;
     }
 
     private function doLoadCatalogue($locale)

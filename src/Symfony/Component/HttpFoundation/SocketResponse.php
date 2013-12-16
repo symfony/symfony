@@ -30,11 +30,11 @@ class SocketResponse extends Response
      * Constructor
      *
      * @param resource $handle  A readable file handle
-     * @param int      $status  The response status code
+     * @param integer  $status  The response status code
      * @param array    $headers An array of response headers
-     * @param bool     $close   Close socket handle after sending content
+     * @param boolean  $close   Close socket handle after sending content
      */
-    public function __construct($handle = null, $status = 200, $headers = array(), $close = true)
+    public function __construct($handle = null, $status = Response::HTTP_OK, $headers = array(), $close = true)
     {
         parent::__construct(null, $status, $headers);
 
@@ -51,13 +51,13 @@ class SocketResponse extends Response
      * Factory method for chainability
      *
      * @param resource $handle  A readable file handle
-     * @param int      $status  The response status code
+     * @param integer  $status  The response status code
      * @param array    $headers An array of response headers
-     * @param bool     $close   Close socket handle after sending content
+     * @param boolean  $close   Close socket handle after sending content
      *
      * @return SocketResponse
      */
-    public static function create($handle = null, $status = 200, $headers = array(), $close = true)
+    public static function create($handle = null, $status = Response::HTTP_OK, $headers = array(), $close = true)
     {
         return new static($handle, $status, $headers, $close);
     }
@@ -85,7 +85,7 @@ class SocketResponse extends Response
      * Close file handle after sending content
      *
      * @return SocketResponse
-     * @param bool $close
+     * @param boolean $close
      */
     public function setClose($close)
     {

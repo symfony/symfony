@@ -12,7 +12,7 @@
 namespace Symfony\Component\HttpFoundation;
 
 /**
- * SocketResponse represents a HTTP response whose content is read from a file handle.
+ * SocketResponse represents an HTTP response whose content is read from a file handle.
  *
  * A SocketResponse uses a PHP file handle for its content.
  *

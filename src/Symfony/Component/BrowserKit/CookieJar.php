@@ -55,16 +55,16 @@ class CookieJar
         $this->flushExpiredCookies();
 
         if (!empty($domain)) {
-            foreach ($this->cookieJar as $_domain => $pathCookies) {
-                if ($_domain) {
-                    $_domain = '.'.ltrim($_domain, '.');
-                    if ($_domain != substr('.'.$domain, -strlen($_domain))) {
+            foreach ($this->cookieJar as $cookieDomain => $pathCookies) {
+                if ($cookieDomain) {
+                    $cookieDomain = '.'.ltrim($cookieDomain, '.');
+                    if ($cookieDomain != substr('.'.$domain, -strlen($cookieDomain))) {
                         continue;
                     }
                 }
 
-                foreach ($pathCookies as $_path => $namedCookies) {
-                    if ($_path != substr($path, 0, strlen($_path))) {
+                foreach ($pathCookies as $cookiePath => $namedCookies) {
+                    if ($cookiePath != substr($path, 0, strlen($cookiePath))) {
                         continue;
                     }
                     if (isset($namedCookies[$name])) {

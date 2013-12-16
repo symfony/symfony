@@ -34,7 +34,7 @@ class GenericEntityChoiceListTest extends \PHPUnit_Framework_TestCase
      * @var \Doctrine\ORM\EntityManager
      */
     private $em;
-    
+
     private $emLifecycle;
 
     protected function setUp()

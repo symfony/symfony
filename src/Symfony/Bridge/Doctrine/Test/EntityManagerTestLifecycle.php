@@ -21,17 +21,19 @@ use Doctrine\ORM\EntityManager;
 class EntityManagerTestLifecycle
 {
     private $em;
-    
+
     public function __construct(EntityManager $em)
     {
         $this->em = $em;
     }
-    
-    public function setUp() {
+
+    public function setUp()
+    {
         $this->em->beginTransaction();
     }
-    
-    public function tearDown() {
+
+    public function tearDown()
+    {
         $this->em->rollback();
     }
 }

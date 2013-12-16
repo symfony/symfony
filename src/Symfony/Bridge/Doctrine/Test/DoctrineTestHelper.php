@@ -23,7 +23,7 @@ use Doctrine\ORM\EntityManager;
 class DoctrineTestHelper
 {
     private static $pdo = array();
-    
+
     /**
      * Returns an entity manager for testing.
      *
@@ -45,8 +45,8 @@ class DoctrineTestHelper
         $config->setMetadataCacheImpl(new \Doctrine\Common\Cache\ArrayCache());
 
         $dsn = defined('SYMFONY_TEST_PDO_DSN') ? SYMFONY_TEST_PDO_DSN : null;
-        
-        if($dsn) {
+
+        if ($dsn) {
             //share single connection through all tests to prevent exceed max connections limit
             $pdo = isset(self::$pdo[$dsn]) ? self::$pdo[$dsn] : (self::$pdo[$dsn] = new \PDO($dsn));
             $params = array(

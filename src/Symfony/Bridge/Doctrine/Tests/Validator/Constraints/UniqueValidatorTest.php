@@ -30,7 +30,7 @@ class UniqueValidatorTest extends \PHPUnit_Framework_TestCase
 {
     private $em;
     private $emLifecycle;
-    
+
     protected function setUp()
     {
         parent::setUp();
@@ -42,17 +42,17 @@ class UniqueValidatorTest extends \PHPUnit_Framework_TestCase
         if (!class_exists('Symfony\Component\Validator\Constraint')) {
             $this->markTestSkipped('The "Validator" component is not available');
         }
-        
+
         $this->em = DoctrineTestHelper::createTestEntityManager();
         $this->emLifecycle = new EntityManagerTestLifecycle($this->em);
         $this->emLifecycle->setUp();
     }
-    
+
     protected function tearDown()
     {
         parent::tearDown();
-        
-        if($this->emLifecycle !== null) {
+
+        if ($this->emLifecycle !== null) {
             $this->emLifecycle->tearDown();
         }
         $this->em = null;
@@ -310,7 +310,7 @@ class UniqueValidatorTest extends \PHPUnit_Framework_TestCase
         $repository->expects($this->once())
             ->method('findByCustom')
             ->will(
-                $this->returnCallback(function() use ($entity) {
+                $this->returnCallback(function () use ($entity) {
                     $returnValue = array(
                         $entity,
                     );

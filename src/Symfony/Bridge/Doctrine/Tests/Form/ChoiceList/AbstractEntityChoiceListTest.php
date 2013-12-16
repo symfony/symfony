@@ -34,7 +34,7 @@ abstract class AbstractEntityChoiceListTest extends AbstractChoiceListTest
     protected $obj3;
 
     protected $obj4;
-    
+
     private $emLifecycle;
 
     protected function setUp()
@@ -55,7 +55,7 @@ abstract class AbstractEntityChoiceListTest extends AbstractChoiceListTest
             $this->markTestSkipped('Doctrine ORM is not available.');
         }
 
-        $this->em = DoctrineTestHelper::createTestEntityManager();        
+        $this->em = DoctrineTestHelper::createTestEntityManager();
         $this->emLifecycle = new EntityManagerTestLifecycle($this->em);
         $this->emLifecycle->setUp();
 
@@ -87,7 +87,7 @@ abstract class AbstractEntityChoiceListTest extends AbstractChoiceListTest
     {
         parent::tearDown();
 
-        if($this->emLifecycle !== null) {
+        if ($this->emLifecycle !== null) {
             $this->emLifecycle->tearDown();
         }
         $this->em = null;

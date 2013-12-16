@@ -42,7 +42,7 @@ class EntityTypeTest extends TypeTestCase
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
     private $emRegistry;
-    
+
     private $emLifecycle;
 
     protected function setUp()
@@ -94,10 +94,10 @@ class EntityTypeTest extends TypeTestCase
     {
         parent::tearDown();
 
-        if($this->emLifecycle !== null) {
+        if ($this->emLifecycle !== null) {
             $this->emLifecycle->tearDown();
         }
-        
+
         $this->em = null;
         $this->emRegistry = null;
         $this->emLifecycle = null;

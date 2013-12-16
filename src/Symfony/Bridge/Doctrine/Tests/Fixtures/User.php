@@ -14,9 +14,9 @@ namespace Symfony\Bridge\Doctrine\Tests\Fixtures;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-/** 
- * @ORM\Entity() 
- * @ORM\Table(name="Users") 
+/**
+ * @ORM\Entity()
+ * @ORM\Table(name="Users")
  */
 class User implements UserInterface
 {

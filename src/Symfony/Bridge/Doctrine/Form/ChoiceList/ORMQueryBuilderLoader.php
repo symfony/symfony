@@ -88,27 +88,27 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
                   ->setParameter($parameter, $values, Connection::PARAM_STR_ARRAY)
                   ->getResult();
     }
-    
+
     private function castValuesToProperType(array $values, $field)
     {
         $em = $this->queryBuilder->getEntityManager();
-        $entities = $this->queryBuilder->getRootEntities();  
+        $entities = $this->queryBuilder->getRootEntities();
 
-        if(!$entities) {
+        if (!$entities) {
             // root entities not found, so $field type can not be determine
             return $values;
         }
-        
+
         $class = $em->getClassMetadata($entities[0]);
 
         $type = $class->getTypeOfField($field);
 
-        if(in_array($type, array('integer', 'smallint', 'bigint'))) {
-            array_walk($values, function(&$value) {
+        if (in_array($type, array('integer', 'smallint', 'bigint'))) {
+            array_walk($values, function (&$value) {
                 $value = (int) $value;
             });
         }
-        
+
         return $values;
     }
 }

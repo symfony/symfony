@@ -30,7 +30,7 @@ class EntityTypePerformanceTest extends FormPerformanceTestCase
      * @var \Doctrine\ORM\EntityManager
      */
     private $em;
-    
+
     private $emLifecycle;
 
     protected function getExtensions()
@@ -99,11 +99,11 @@ class EntityTypePerformanceTest extends FormPerformanceTestCase
 
         $this->em->flush();
     }
-    
+
     protected function tearDown()
     {
         parent::tearDown();
-        
+
         $this->emLifecycle->tearDown();
     }
 

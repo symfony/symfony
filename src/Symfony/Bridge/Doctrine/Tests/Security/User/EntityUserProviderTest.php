@@ -21,7 +21,7 @@ class EntityUserProviderTest extends \PHPUnit_Framework_TestCase
 {
     private $em;
     private $emLifecycle;
-    
+
     protected function setUp()
     {
         if (!class_exists('Symfony\Component\Security\Core\SecurityContext')) {
@@ -29,15 +29,16 @@ class EntityUserProviderTest extends \PHPUnit_Framework_TestCase
         }
 
         parent::setUp();
-        
+
         $this->em = DoctrineTestHelper::createTestEntityManager();
         $this->emLifecycle = new EntityManagerTestLifecycle($this->em);
         $this->emLifecycle->setUp();
     }
-    
-    protected function tearDown() {
+
+    protected function tearDown()
+    {
         parent::tearDown();
-        
+
         $this->emLifecycle->tearDown();
     }
 

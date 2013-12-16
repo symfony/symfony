@@ -201,7 +201,7 @@ class Crawler extends \SplObjectStorage
     public function addXmlContent($content, $charset = 'UTF-8')
     {
         // remove the default namespace if it's the only namespace to make XPath expressions simpler
-        if(!preg_match('/xmlns:/', $content)) {
+        if (!preg_match('/xmlns:/', $content)) {
             $content = str_replace('xmlns', 'ns', $content);
         }
 

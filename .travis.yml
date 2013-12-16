@@ -5,10 +5,15 @@ php:
   - 5.3
   - 5.4
   - 5.5
+  - hhvm
+
+matrix:
+    allow_failures:
+        - php: hhvm
 
 before_script:
     - sudo apt-get install parallel
-    - echo '' > ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini
+    - sh -c 'if [ $(php -r "echo (int) defined("HHVM_VERSION");") -eq 0 ]; then echo "" >> "~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini"; fi;'
     - sh -c 'if [ $(php -r "echo PHP_MINOR_VERSION;") -le 4 ]; then echo "extension = apc.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi;'
     - COMPOSER_ROOT_VERSION=dev-master composer --prefer-source --dev install
 

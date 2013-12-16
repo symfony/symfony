@@ -48,5 +48,12 @@ abstract class BaseDateTimeTransformer implements DataTransformerInterface
 
         $this->inputTimezone = $inputTimezone ?: date_default_timezone_get();
         $this->outputTimezone = $outputTimezone ?: date_default_timezone_get();
+
+        try {
+            new \DateTimeZone($this->inputTimezone);
+            new \DateTimeZone($this->outputTimezone);
+        } catch (\Exception $e) {
+            throw new \InvalidArgumentException();
+        }
     }
 }

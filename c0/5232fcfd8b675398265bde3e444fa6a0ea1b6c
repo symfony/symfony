@@ -1,0 +1,73 @@
+---------------------------------------------------------------------------
+
+by stof at 2013-09-26T13:54:07Z
+
+``guessTypeForConstraint`` and ``guessPatternForConstraint`` suffer from the same issues: they don't handle the new constraints introduced in 2.1 (which should be fixed in 2.2 actually, only the clean of deprecated ones should go in 2.3)
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-10-01T08:12:21Z
+
+As @stof said, could you please rebase this onto 2.2?
+
+```
+git rebase 2134801 --onto 2.2
+```
+
+(2134801 is currently the commit before your first commit)
+
+Then you should revert the removal of the code handling the old constraints.
+
+When this is done, we need a second PR for 2.3 which removes the code handling the old constraints. Do you think you can do that? :)
+
+---------------------------------------------------------------------------
+
+by franek at 2013-10-01T12:13:50Z
+
+I have created a new PR for 2.2 (see https://github.com/symfony/symfony/pull/9188).
+
+I will update this PR for 2.3.
+
+I hope that it will be ok. I am new to symfony contributing.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-10-01T12:47:54Z
+
+@franek #9188 has been merged now and I've also merged 2.2 into the 2.3 branch, so you can rebase this PR. Thanks.
+
+---------------------------------------------------------------------------
+
+by franek at 2013-10-01T13:14:57Z
+
+@fabpot I have modified the PR to remove deprecated constrains calls. Thanks.
+
+---------------------------------------------------------------------------
+
+by stof at 2013-10-01T14:12:42Z
+
+@franek Mincount and MaxCount are also deprecated (replaced by Count that you forgot when doing the PR to 2.2)
+
+---------------------------------------------------------------------------
+
+by franek at 2013-10-01T14:41:30Z
+
+@stof Yes. You are right MinCount and MaxCount are deprecated but they are not related to my bugs (max_length guessing). I think that we should create another bug for that ?
+
+---------------------------------------------------------------------------
+
+by stof at 2013-10-01T14:43:07Z
+
+@franek But your PR does not fix only the guessing of the max length but also of the type
+
+---------------------------------------------------------------------------
+
+by franek at 2013-10-01T14:51:07Z
+
+@stof I have created another PR (see https://github.com/symfony/symfony/pull/9192)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-10-01T17:22:49Z
+
+#9192 has been merged into 2.2 and 2.3.

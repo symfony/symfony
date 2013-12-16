@@ -281,7 +281,7 @@ class Translator implements TranslatorInterface
     private function log(MessageCatalogueInterface $catalogue, $id, $domain)
     {
         if ($catalogue->has($id, $domain)) {
-            $this->logger->info('Translation use fallback catalogue.', array('id' => $id, 'domain' => $domain, 'locale' => $catalogue->getLocale()));
+            $this->logger->debug('Translation use fallback catalogue.', array('id' => $id, 'domain' => $domain, 'locale' => $catalogue->getLocale()));
         } else {
             $this->logger->warning('Translation not found.', array('id' => $id, 'domain' => $domain, 'locale' => $catalogue->getLocale()));
         }

@@ -81,9 +81,34 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
         $parameter = 'ORMQueryBuilderLoader_getEntitiesByIds_'.$identifier;
         $where = $qb->expr()->in($alias.'.'.$identifier, ':'.$parameter);
 
+        $values = $this->castValuesToProperType($values, $identifier);
+
         return $qb->andWhere($where)
                   ->getQuery()
                   ->setParameter($parameter, $values, Connection::PARAM_STR_ARRAY)
                   ->getResult();
+    }
+    
+    private function castValuesToProperType(array $values, $field)
+    {
+        $em = $this->queryBuilder->getEntityManager();
+        $entities = $this->queryBuilder->getRootEntities();  
+
+        if(!$entities) {
+            // root entities not found, so $field type can not be determine
+            return $values;
+        }
+        
+        $class = $em->getClassMetadata($entities[0]);
+
+        $type = $class->getTypeOfField($field);
+
+        if(in_array($type, array('integer', 'smallint', 'bigint'))) {
+            array_walk($values, function(&$value) {
+                $value = (int) $value;
+            });
+        }
+        
+        return $values;
     }
 }

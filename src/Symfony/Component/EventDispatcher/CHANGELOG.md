@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.5.0
+-----
+
+ * added RegisterListenersPass (originally in HttpKernel)
+
 2.1.0
 -----
 

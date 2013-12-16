@@ -292,6 +292,9 @@ UPGRADE FROM 2.x to 3.0
  * The `Symfony\Component\HttpKernel\EventListener\ExceptionListener` now
    passes the Request format as the `_format` argument instead of `format`.
 
+ * The `Symfony\Component\HttpKernel\DependencyInjection\RegisterListenersPass` has been renamed to
+   `Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass` and moved to the EventDispatcher component.
+
 ### Locale
 
  * The Locale component was removed and replaced by the Intl component.

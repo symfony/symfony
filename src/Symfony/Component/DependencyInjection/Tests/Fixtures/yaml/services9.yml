@@ -70,5 +70,13 @@ services:
         calls:
             - [setRequest, ['@?request']]
 
+    configurator_service:
+        class: ConfClass
+        calls:
+            - [setFoo, ['@baz']]
+
+    configured_service:
+        class: stdClass
+        configurator: ['@configurator_service', configureStdClass]
     alias_for_foo: @foo
     alias_for_alias: @foo

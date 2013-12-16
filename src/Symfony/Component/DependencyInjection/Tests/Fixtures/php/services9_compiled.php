@@ -34,6 +34,7 @@ class ProjectServiceContainer extends Container
         $this->methodMap = array(
             'bar' => 'getBarService',
             'baz' => 'getBazService',
+            'configured_service' => 'getConfiguredServiceService',
             'depends_on_request' => 'getDependsOnRequestService',
             'factory_service' => 'getFactoryServiceService',
             'foo' => 'getFooService',
@@ -59,9 +60,11 @@ class ProjectServiceContainer extends Container
      */
     protected function getBarService()
     {
-        $this->services['bar'] = $instance = new \FooClass('foo', $this->get('foo.baz'), $this->getParameter('foo_bar'));
+        $a = $this->get('foo.baz');
 
-        $this->get('foo.baz')->configure($instance);
+        $this->services['bar'] = $instance = new \FooClass('foo', $a, $this->getParameter('foo_bar'));
+
+        $a->configure($instance);
 
         return $instance;
     }
@@ -79,6 +82,26 @@ class ProjectServiceContainer extends Container
         $this->services['baz'] = $instance = new \Baz();
 
         $instance->setFoo($this->get('foo_with_inline'));
+
+        return $instance;
+    }
+
+    /**
+     * Gets the 'configured_service' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return stdClass A stdClass instance.
+     */
+    protected function getConfiguredServiceService()
+    {
+        $a = new \ConfClass();
+        $a->setFoo($this->get('baz'));
+
+        $this->services['configured_service'] = $instance = new \stdClass();
+
+        $a->configureStdClass($instance);
 
         return $instance;
     }

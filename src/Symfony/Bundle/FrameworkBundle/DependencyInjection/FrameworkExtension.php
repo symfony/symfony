@@ -585,10 +585,11 @@ class FrameworkExtension extends Extension
         }
         $translator->addMethodCall('setFallbackLocales', array($config['fallback']));
 
-        if (null !== $config['logger_id']) {
-            $logger = new Reference($config['logger_id'], ContainerInterface::IGNORE_ON_INVALID_REFERENCE);
-            $translator->addMethodCall('setLogger', array($logger));
-        }
+        $logger = new Reference('logger', ContainerInterface::IGNORE_ON_INVALID_REFERENCE);
+
+        $translator
+            ->addTag('monolog.logger', array('channel' => 'translation'))
+            ->addMethodCall('setLogger', array($logger));
 
         // Discover translation directories
         $dirs = array();

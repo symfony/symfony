@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2013-12-16T11:31:32Z
+
+I also fixed the cs problems reported by ubot.io. I'm not sure if I should be doing this in the same PR?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-12-16T11:33:34Z
+
+@jakzal ubot is drunk ;) your code was ok.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2013-12-16T11:38:42Z
+
+I must be still drunk after the conference too, as I thought I'm changing `$OK` into `$ok`...
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-16T11:40:02Z
+
+ubot :baby:
+
+---------------------------------------------------------------------------
+
+by tiger-seo at 2013-12-16T13:23:23Z
+
+@fabpot I like the idea behind `ubot.io`, is it proprietary software or I can use it for our repository too ?
+p.s. sorry for offtop, but i don't know where to ask)
+
+---------------------------------------------------------------------------
+
+by stof at 2013-12-16T14:59:01Z
+
+@tiger-seo I asked on twitter when he announced it, and he said that it will be available for other projects soon.

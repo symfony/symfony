@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\Form\Type;
 
+use Symfony\Bridge\Doctrine\Test\EntityManagerTestLifecycle;
 use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Test\TypeTestCase;
@@ -41,6 +42,8 @@ class EntityTypeTest extends TypeTestCase
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
     private $emRegistry;
+    
+    private $emLifecycle;
 
     protected function setUp()
     {
@@ -61,6 +64,8 @@ class EntityTypeTest extends TypeTestCase
         }
 
         $this->em = DoctrineTestHelper::createTestEntityManager();
+        $this->emLifecycle = new EntityManagerTestLifecycle($this->em);
+        $this->emLifecycle->setUp();
         $this->emRegistry = $this->createRegistryMock('default', $this->em);
 
         parent::setUp();
@@ -89,8 +94,13 @@ class EntityTypeTest extends TypeTestCase
     {
         parent::tearDown();
 
+        if($this->emLifecycle !== null) {
+            $this->emLifecycle->tearDown();
+        }
+        
         $this->em = null;
         $this->emRegistry = null;
+        $this->emLifecycle = null;
     }
 
     protected function getExtensions()

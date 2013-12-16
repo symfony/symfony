@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\Security\User;
 
+use Symfony\Bridge\Doctrine\Test\EntityManagerTestLifecycle;
 use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\User;
 use Symfony\Bridge\Doctrine\Security\User\EntityUserProvider;
@@ -18,6 +19,9 @@ use Doctrine\ORM\Tools\SchemaTool;
 
 class EntityUserProviderTest extends \PHPUnit_Framework_TestCase
 {
+    private $em;
+    private $emLifecycle;
+    
     protected function setUp()
     {
         if (!class_exists('Symfony\Component\Security\Core\SecurityContext')) {
@@ -25,21 +29,30 @@ class EntityUserProviderTest extends \PHPUnit_Framework_TestCase
         }
 
         parent::setUp();
+        
+        $this->em = DoctrineTestHelper::createTestEntityManager();
+        $this->emLifecycle = new EntityManagerTestLifecycle($this->em);
+        $this->emLifecycle->setUp();
+    }
+    
+    protected function tearDown() {
+        parent::tearDown();
+        
+        $this->emLifecycle->tearDown();
     }
 
     public function testRefreshUserGetsUserByPrimaryKey()
     {
-        $em = DoctrineTestHelper::createTestEntityManager();
-        $this->createSchema($em);
+        $this->createSchema($this->em);
 
         $user1 = new User(1, 1, 'user1');
         $user2 = new User(1, 2, 'user2');
 
-        $em->persist($user1);
-        $em->persist($user2);
-        $em->flush();
+        $this->em->persist($user1);
+        $this->em->persist($user2);
+        $this->em->flush();
 
-        $provider = new EntityUserProvider($this->getManager($em), 'Symfony\Bridge\Doctrine\Tests\Fixtures\User', 'name');
+        $provider = new EntityUserProvider($this->getManager($this->em), 'Symfony\Bridge\Doctrine\Tests\Fixtures\User', 'name');
 
         // try to change the user identity
         $user1->name = 'user2';
@@ -49,10 +62,8 @@ class EntityUserProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testRefreshUserRequiresId()
     {
-        $em = DoctrineTestHelper::createTestEntityManager();
-
         $user1 = new User(null, null, 'user1');
-        $provider = new EntityUserProvider($this->getManager($em), 'Symfony\Bridge\Doctrine\Tests\Fixtures\User', 'name');
+        $provider = new EntityUserProvider($this->getManager($this->em), 'Symfony\Bridge\Doctrine\Tests\Fixtures\User', 'name');
 
         $this->setExpectedException(
             'InvalidArgumentException',
@@ -63,15 +74,14 @@ class EntityUserProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testRefreshInvalidUser()
     {
-        $em = DoctrineTestHelper::createTestEntityManager();
-        $this->createSchema($em);
+        $this->createSchema($this->em);
 
         $user1 = new User(1, 1, 'user1');
 
-        $em->persist($user1);
-        $em->flush();
+        $this->em->persist($user1);
+        $this->em->flush();
 
-        $provider = new EntityUserProvider($this->getManager($em), 'Symfony\Bridge\Doctrine\Tests\Fixtures\User', 'name');
+        $provider = new EntityUserProvider($this->getManager($this->em), 'Symfony\Bridge\Doctrine\Tests\Fixtures\User', 'name');
 
         $user2 = new User(1, 2, 'user2');
         $this->setExpectedException(
@@ -83,18 +93,17 @@ class EntityUserProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testSupportProxy()
     {
-        $em = DoctrineTestHelper::createTestEntityManager();
-        $this->createSchema($em);
+        $this->createSchema($this->em);
 
         $user1 = new User(1, 1, 'user1');
 
-        $em->persist($user1);
-        $em->flush();
-        $em->clear();
+        $this->em->persist($user1);
+        $this->em->flush();
+        $this->em->clear();
 
-        $provider = new EntityUserProvider($this->getManager($em), 'Symfony\Bridge\Doctrine\Tests\Fixtures\User', 'name');
+        $provider = new EntityUserProvider($this->getManager($this->em), 'Symfony\Bridge\Doctrine\Tests\Fixtures\User', 'name');
 
-        $user2 = $em->getReference('Symfony\Bridge\Doctrine\Tests\Fixtures\User', array('id1' => 1, 'id2' => 1));
+        $user2 = $this->em->getReference('Symfony\Bridge\Doctrine\Tests\Fixtures\User', array('id1' => 1, 'id2' => 1));
         $this->assertTrue($provider->supportsClass(get_class($user2)));
     }
 

@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\Form\ChoiceList;
 
+use Symfony\Bridge\Doctrine\Test\EntityManagerTestLifecycle;
 use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\GroupableEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity;
@@ -33,6 +34,8 @@ class GenericEntityChoiceListTest extends \PHPUnit_Framework_TestCase
      * @var \Doctrine\ORM\EntityManager
      */
     private $em;
+    
+    private $emLifecycle;
 
     protected function setUp()
     {
@@ -53,6 +56,8 @@ class GenericEntityChoiceListTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->em = DoctrineTestHelper::createTestEntityManager();
+        $this->emLifecycle = new EntityManagerTestLifecycle($this->em);
+        $this->emLifecycle->setUp();
 
         $schemaTool = new SchemaTool($this->em);
         $classes = array(
@@ -79,7 +84,9 @@ class GenericEntityChoiceListTest extends \PHPUnit_Framework_TestCase
     {
         parent::tearDown();
 
+        $this->emLifecycle->tearDown();
         $this->em = null;
+        $this->emLifecycle = null;
     }
 
     /**

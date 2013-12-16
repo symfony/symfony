@@ -11,6 +11,8 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\Validator\Constraints;
 
+use Symfony\Bridge\Doctrine\Test\EntityManagerTestLifecycle;
+
 use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeIntIdEntity;
 use Symfony\Component\Validator\DefaultTranslator;
@@ -26,6 +28,9 @@ use Doctrine\ORM\Tools\SchemaTool;
 
 class UniqueValidatorTest extends \PHPUnit_Framework_TestCase
 {
+    private $em;
+    private $emLifecycle;
+    
     protected function setUp()
     {
         parent::setUp();
@@ -37,6 +42,21 @@ class UniqueValidatorTest extends \PHPUnit_Framework_TestCase
         if (!class_exists('Symfony\Component\Validator\Constraint')) {
             $this->markTestSkipped('The "Validator" component is not available');
         }
+        
+        $this->em = DoctrineTestHelper::createTestEntityManager();
+        $this->emLifecycle = new EntityManagerTestLifecycle($this->em);
+        $this->emLifecycle->setUp();
+    }
+    
+    protected function tearDown()
+    {
+        parent::tearDown();
+        
+        if($this->emLifecycle !== null) {
+            $this->emLifecycle->tearDown();
+        }
+        $this->em = null;
+        $this->emLifecycle = null;
     }
 
     protected function createRegistryMock($entityManagerName, $em)
@@ -153,16 +173,15 @@ class UniqueValidatorTest extends \PHPUnit_Framework_TestCase
     public function testValidateUniqueness()
     {
         $entityManagerName = "foo";
-        $em = DoctrineTestHelper::createTestEntityManager();
-        $this->createSchema($em);
-        $validator = $this->createValidator($entityManagerName, $em);
+        $this->createSchema($this->em);
+        $validator = $this->createValidator($entityManagerName, $this->em);
 
         $entity1 = new SingleIntIdEntity(1, 'Foo');
         $violationsList = $validator->validate($entity1);
         $this->assertEquals(0, $violationsList->count(), "No violations found on entity before it is saved to the database.");
 
-        $em->persist($entity1);
-        $em->flush();
+        $this->em->persist($entity1);
+        $this->em->flush();
 
         $violationsList = $validator->validate($entity1);
         $this->assertEquals(0, $violationsList->count(), "No violations found on entity after it was saved to the database.");
@@ -181,14 +200,13 @@ class UniqueValidatorTest extends \PHPUnit_Framework_TestCase
     public function testValidateCustomErrorPath()
     {
         $entityManagerName = "foo";
-        $em = DoctrineTestHelper::createTestEntityManager();
-        $this->createSchema($em);
-        $validator = $this->createValidator($entityManagerName, $em, null, null, 'bar');
+        $this->createSchema($this->em);
+        $validator = $this->createValidator($entityManagerName, $this->em, null, null, 'bar');
 
         $entity1 = new SingleIntIdEntity(1, 'Foo');
 
-        $em->persist($entity1);
-        $em->flush();
+        $this->em->persist($entity1);
+        $this->em->flush();
 
         $entity2 = new SingleIntIdEntity(2, 'Foo');
 
@@ -204,16 +222,15 @@ class UniqueValidatorTest extends \PHPUnit_Framework_TestCase
     public function testValidateUniquenessWithNull()
     {
         $entityManagerName = "foo";
-        $em = DoctrineTestHelper::createTestEntityManager();
-        $this->createSchema($em);
-        $validator = $this->createValidator($entityManagerName, $em);
+        $this->createSchema($this->em);
+        $validator = $this->createValidator($entityManagerName, $this->em);
 
         $entity1 = new SingleIntIdEntity(1, null);
         $entity2 = new SingleIntIdEntity(2, null);
 
-        $em->persist($entity1);
-        $em->persist($entity2);
-        $em->flush();
+        $this->em->persist($entity1);
+        $this->em->persist($entity2);
+        $this->em->flush();
 
         $violationsList = $validator->validate($entity1);
         $this->assertEquals(0, $violationsList->count(), "No violations found on entity having a null value.");
@@ -223,16 +240,15 @@ class UniqueValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $entityManagerName = "foo";
         $validateClass = 'Symfony\Bridge\Doctrine\Tests\Fixtures\DoubleNameEntity';
-        $em = DoctrineTestHelper::createTestEntityManager();
-        $this->createSchema($em);
-        $validator = $this->createValidator($entityManagerName, $em, $validateClass, array('name', 'name2'), 'bar', 'findby', false);
+        $this->createSchema($this->em);
+        $validator = $this->createValidator($entityManagerName, $this->em, $validateClass, array('name', 'name2'), 'bar', 'findby', false);
 
         $entity1 = new DoubleNameEntity(1, 'Foo', null);
         $violationsList = $validator->validate($entity1);
         $this->assertEquals(0, $violationsList->count(), "No violations found on entity before it is saved to the database.");
 
-        $em->persist($entity1);
-        $em->flush();
+        $this->em->persist($entity1);
+        $this->em->flush();
 
         $violationsList = $validator->validate($entity1);
         $this->assertEquals(0, $violationsList->count(), "No violations found on entity after it was saved to the database.");
@@ -251,16 +267,15 @@ class UniqueValidatorTest extends \PHPUnit_Framework_TestCase
     public function testValidateUniquenessAfterConsideringMultipleQueryResults()
     {
         $entityManagerName = "foo";
-        $em = DoctrineTestHelper::createTestEntityManager();
-        $this->createSchema($em);
-        $validator = $this->createValidator($entityManagerName, $em);
+        $this->createSchema($this->em);
+        $validator = $this->createValidator($entityManagerName, $this->em);
 
         $entity1 = new SingleIntIdEntity(1, 'foo');
         $entity2 = new SingleIntIdEntity(2, 'foo');
 
-        $em->persist($entity1);
-        $em->persist($entity2);
-        $em->flush();
+        $this->em->persist($entity1);
+        $this->em->persist($entity2);
+        $this->em->flush();
 
         $violationsList = $validator->validate($entity1);
         $this->assertEquals(1, $violationsList->count(), 'Violation found on entity with conflicting entity existing in the database.');
@@ -318,17 +333,16 @@ class UniqueValidatorTest extends \PHPUnit_Framework_TestCase
     public function testAssociatedEntity()
     {
         $entityManagerName = "foo";
-        $em = DoctrineTestHelper::createTestEntityManager();
-        $this->createSchema($em);
-        $validator = $this->createValidator($entityManagerName, $em, 'Symfony\Bridge\Doctrine\Tests\Fixtures\AssociationEntity', array('single'));
+        $this->createSchema($this->em);
+        $validator = $this->createValidator($entityManagerName, $this->em, 'Symfony\Bridge\Doctrine\Tests\Fixtures\AssociationEntity', array('single'));
 
         $entity1 = new SingleIntIdEntity(1, 'foo');
         $associated = new AssociationEntity();
         $associated->single = $entity1;
 
-        $em->persist($entity1);
-        $em->persist($associated);
-        $em->flush();
+        $this->em->persist($entity1);
+        $this->em->persist($associated);
+        $this->em->flush();
 
         $violationsList = $validator->validate($associated);
         $this->assertEquals(0, $violationsList->count());
@@ -336,8 +350,8 @@ class UniqueValidatorTest extends \PHPUnit_Framework_TestCase
         $associated2 = new AssociationEntity();
         $associated2->single = $entity1;
 
-        $em->persist($associated2);
-        $em->flush();
+        $this->em->persist($associated2);
+        $this->em->flush();
 
         $violationsList = $validator->validate($associated2);
         $this->assertEquals(1, $violationsList->count());
@@ -349,17 +363,16 @@ class UniqueValidatorTest extends \PHPUnit_Framework_TestCase
     public function testAssociatedCompositeEntity()
     {
         $entityManagerName = "foo";
-        $em = DoctrineTestHelper::createTestEntityManager();
-        $this->createSchema($em);
-        $validator = $this->createValidator($entityManagerName, $em, 'Symfony\Bridge\Doctrine\Tests\Fixtures\AssociationEntity', array('composite'));
+        $this->createSchema($this->em);
+        $validator = $this->createValidator($entityManagerName, $this->em, 'Symfony\Bridge\Doctrine\Tests\Fixtures\AssociationEntity', array('composite'));
 
         $composite = new CompositeIntIdEntity(1, 1, "test");
         $associated = new AssociationEntity();
         $associated->composite = $composite;
 
-        $em->persist($composite);
-        $em->persist($associated);
-        $em->flush();
+        $this->em->persist($composite);
+        $this->em->persist($associated);
+        $this->em->flush();
 
         $this->setExpectedException(
             'Symfony\Component\Validator\Exception\ConstraintDefinitionException',

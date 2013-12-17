@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by WouterJ at 2013-12-04T18:27:32Z
+
+I don't think the docs need to reflect this, it's just something that's expected to work in this way.
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-04T18:28:18Z
+
+@WouterJ in which way? please be specific thanks :baby:
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2013-12-04T18:30:18Z
+
+I think everyone already assumes it's ordered the way it's configured
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-04T18:32:57Z
+
+no i think the guy from the PR has a case. I think it should be better to have it via value as it will make it more powerful
+
+---------------------------------------------------------------------------
+
+by sstok at 2013-12-06T15:29:01Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-07T13:10:33Z
+
+done :baby: :shipit: @stof

@@ -46,6 +46,7 @@ class PhpGeneratorDumper extends GeneratorDumper
 <?php
 
 use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\Routing\Generator\UrlGeneratorRoute;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Psr\Log\LoggerInterface;
 
@@ -68,7 +69,7 @@ class {$options['class']} extends {$options['base_class']}
         \$this->logger = \$logger;
     }
 
-{$this->generateGenerateMethod()}
+{$this->generateGetRouteMethod()}
 }
 
 EOF;
@@ -105,10 +106,10 @@ EOF;
      *
      * @return string PHP code
      */
-    private function generateGenerateMethod()
+    private function generateGetRouteMethod()
     {
         return <<<EOF
-    public function generate(\$name, \$parameters = array(), \$referenceType = self::ABSOLUTE_PATH)
+    public function getRoute(\$name)
     {
         if (!isset(self::\$declaredRoutes[\$name])) {
             throw new RouteNotFoundException(sprintf('Unable to generate a URL for the named route "%s" as such route does not exist.', \$name));
@@ -116,7 +117,7 @@ EOF;
 
         list(\$variables, \$defaults, \$requirements, \$tokens, \$hostTokens) = self::\$declaredRoutes[\$name];
 
-        return \$this->doGenerate(\$variables, \$defaults, \$requirements, \$tokens, \$parameters, \$name, \$referenceType, \$hostTokens);
+        return new UrlGeneratorRoute(\$variables, \$defaults, \$requirements, \$tokens, \$hostTokens); 
     }
 EOF;
     }

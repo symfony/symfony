@@ -173,7 +173,7 @@ Form
  * Even if it wasn't intended, it was possible to set a form type's `data`
    option to `null` if you wanted the form component to set the form's data
    to the data of the object bound to the form (if one was bound).
-   This was used in some projects to preset a form field with optional
+   This was used in some projects to pre-set a form field with optional
    initial data as long as there wasn't already data set through a bound object.
    Altough this feature is intended, setting the `data` option for a form
    by default also locks that form's data so that it can't be overriden by
@@ -198,7 +198,7 @@ Form
    ```
    
    The cleanest solution would be to only set the `data` option if there's
-   actually data so pre-set.
+   actually data to pre-set.
    
    After (Alternative 1):
    
@@ -293,7 +293,7 @@ Console
 
    Before:
 
-   ```a
+   ```
    if (OutputInterface::VERBOSITY_VERBOSE === $output->getVerbosity()) { ... }
    ```
 

@@ -11,10 +11,8 @@
 
 namespace Symfony\Component\HttpKernel\Tests\Bundle;
 
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddConsoleCommandPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\Tests\Fixtures\ExtensionAbsentBundle\ExtensionAbsentBundle;
 use Symfony\Component\HttpKernel\Tests\Fixtures\ExtensionPresentBundle\Command\FooCommand;
 use Symfony\Component\HttpKernel\Tests\Fixtures\ExtensionPresentBundle\ExtensionPresentBundle;
@@ -38,10 +36,11 @@ class BundleTest extends \PHPUnit_Framework_TestCase
     public function testRegisterCommandsIngoreCommandAsAService()
     {
         $container = new ContainerBuilder();
-        $container->addCompilerPass(new AddConsoleCommandPass());
-        $definition = new Definition('Symfony\Component\HttpKernel\Tests\Fixtures\ExtensionPresentBundle\Command\FooCommand');
+        $commandClass = 'Symfony\Component\HttpKernel\Tests\Fixtures\ExtensionPresentBundle\Command\FooCommand';
+        $definition = new Definition($commandClass);
         $definition->addTag('console.command');
         $container->setDefinition('my-command', $definition);
+        $container->setAlias('console.command.'.strtolower(str_replace('\\', '_', $commandClass)), 'my-command');
         $container->compile();
 
         $application = $this->getMock('Symfony\Component\Console\Application');

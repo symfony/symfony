@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.5.0
+------
+
+ * added an option for multiple files upload
+
 2.4.0
 -----
 

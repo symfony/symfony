@@ -1,0 +1,78 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-12-15T17:06:39Z
+
+ping @jakzal
+
+---------------------------------------------------------------------------
+
+by jakzal at 2013-12-16T21:51:10Z
+
+@fabpot I've helped with this PR during the hack day so I'm :+1:
+
+This seems to be the only way to revert the BC break partially. This PR brings back [the hack which we used to have](https://github.com/symfony/symfony/pull/6650/files#diff-b21c94d886a3648c0f8a59ef30df1e8aL199), but only for the scenario when there's a single namespace and it is a default namespace. So it simplifies filtering for single namespace documents and keeps it flexible for multiple namespace ones.
+
+It might be worth documenting. I'll send a PR if we all agree it's good to merge.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-12-16T21:52:37Z
+
+@jakzal You're the boss here, so let's document this properly.
+@crudecki Can you rebase your PR to remove the merge commit and avoid any non-related commits?
+
+---------------------------------------------------------------------------
+
+by jakzal at 2013-12-16T21:54:47Z
+
+@crudecki also, ubot suggest a small CS fix ;)
+
+---------------------------------------------------------------------------
+
+by jakzal at 2013-12-16T22:13:33Z
+
+I think we should also update the [CHANGELOG.md](https://github.com/symfony/symfony/blob/2.4/src/Symfony/Component/DomCrawler/CHANGELOG.md):
+
+    `Crawler::addXmlContent()` removes the default document namespace again if it's an only namespace.
+
+---------------------------------------------------------------------------
+
+by crudecki at 2013-12-17T11:36:54Z
+
+I've removed the unnecessary merge
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-12-17T11:38:57Z
+
+@crudecki Great, can you add the suggested change in the CHANGELOG?
+
+---------------------------------------------------------------------------
+
+by crudecki at 2013-12-17T11:40:31Z
+
+Done it through Github interface, hope this is fine.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2013-12-17T11:41:31Z
+
+Doing so through github interface results in a new PR: #9800
+
+---------------------------------------------------------------------------
+
+by stloyd at 2013-12-17T11:43:19Z
+
+@crudecki Go at this page: https://github.com/crudecki/symfony/blob/crawlerDefaultNamespaceFix/src/Symfony/Component/DomCrawler/CHANGELOG.md and edit file there, after that it will be in this PR so you can close #9800.
+
+---------------------------------------------------------------------------
+
+by crudecki at 2013-12-17T11:47:48Z
+
+Done : ) help in getting started with contributing much appreciated : ) thanks
+
+---------------------------------------------------------------------------
+
+by jakzal at 2013-12-17T11:49:34Z
+
+:beer:

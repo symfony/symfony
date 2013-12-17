@@ -470,12 +470,12 @@ EOF;
      * not escaped commas and curly brackets. For that reason we need to know
      * where this serialized object ends. Searching for } and , as delimieters
      * was corrupting yaml structure.
-     * 
+     *
      * @param String $scalar
      * @return int Position where php/object ends
      * @throws ParseException
      */
-    public static function findEndOfPhpObject($scalar) 
+    public static function findEndOfPhpObject($scalar)
     {
         $countOfBrackets = 0;
         for ($pos = 0; $pos < strlen($scalar); $pos++) {

@@ -278,6 +278,18 @@
                 <source>This value should not be identical to {{ compared_value_type }} {{ compared_value }}.</source>
                 <target>Значение не должно быть идентичным {{ compared_value_type }} {{ compared_value }}.</target>
             </trans-unit>
+            <trans-unit id="63">
+                <source>This value should be a valid date.</source>
+                <target>Значение должно быть датой.</target>
+            </trans-unit>
+            <trans-unit id="64">
+                <source>This date should be {{ limit }} or earlier.</source>
+                <target>Дата должна быть {{ limit }} или ранее.</target>
+            </trans-unit>
+            <trans-unit id="65">
+                <source>This value should be {{ limit }} or later.</source>
+                <target>Дата должна быть {{ limit }} или позднее.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -287,15 +287,28 @@ class XmlDescriptor extends Descriptor
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->appendChild($serviceXML = $dom->createElement('definition'));
-
+        
         if ($id) {
             $serviceXML->setAttribute('id', $id);
         }
-
+        
         $serviceXML->setAttribute('class', $definition->getClass());
+        
+        if ('' != $definition->getFactoryClass()) {
+            $serviceXML->setAttribute('factory-class', $definition->getFactoryClass());
+        }
+        
+        if ('' != $definition->getFactoryService()) {
+            $serviceXML->setAttribute('factory-service', $definition->getFactoryService());
+        }
+        
+        $serviceXML->setAttribute('factory-method', $definition->getFactoryMethod());
         $serviceXML->setAttribute('scope', $definition->getScope());
         $serviceXML->setAttribute('public', $definition->isPublic() ? 'true' : 'false');
         $serviceXML->setAttribute('synthetic', $definition->isSynthetic() ? 'true' : 'false');
+        $serviceXML->setAttribute('lazy', $definition->isLazy() ? 'true' : 'false');
+        $serviceXML->setAttribute('synchronized', $definition->isSynchronized() ? 'true' : 'false');
+        $serviceXML->setAttribute('abstract', $definition->isAbstract() ? 'true' : 'false');
         $serviceXML->setAttribute('file', $definition->getFile());
 
         if (!$omitTags) {
@@ -319,7 +332,7 @@ class XmlDescriptor extends Descriptor
 
         return $dom;
     }
-
+    
     /**
      * @param Alias       $alias
      * @param string|null $id
@@ -330,14 +343,14 @@ class XmlDescriptor extends Descriptor
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->appendChild($aliasXML = $dom->createElement('alias'));
-
+        
         if ($id) {
             $aliasXML->setAttribute('id', $id);
         }
-
+        
         $aliasXML->setAttribute('service', (string) $alias);
         $aliasXML->setAttribute('public', $alias->isPublic() ? 'true' : 'false');
-
+        
         return $dom;
     }
 }

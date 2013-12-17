@@ -46,7 +46,7 @@ class ResizeFormListener implements EventSubscriberInterface
     protected $allowDelete;
 
     /**
-     * @var bool
+     * @var Boolean
      */
     private $deleteEmpty;
 
@@ -132,7 +132,6 @@ class ResizeFormListener implements EventSubscriberInterface
     public function onSubmit(FormEvent $event)
     {
         $form = $event->getForm();
-        $previousData = $event->getForm()->getData();
         $data = $event->getData();
 
         // At this point, $data is an array or an array-like object that already contains the
@@ -148,6 +147,7 @@ class ResizeFormListener implements EventSubscriberInterface
         }
 
         if ($this->deleteEmpty) {
+            $previousData = $event->getForm()->getData();
             foreach ($form as $name => $child) {
                 $isNew = !isset($previousData[$name]);
 

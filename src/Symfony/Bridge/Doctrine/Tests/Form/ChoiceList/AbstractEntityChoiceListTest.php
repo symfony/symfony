@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\Form\ChoiceList;
 
+use Symfony\Bridge\Doctrine\Test\EntityManagerTestLifecycle;
 use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityChoiceList;
 use Doctrine\ORM\Tools\SchemaTool;
@@ -34,6 +35,8 @@ abstract class AbstractEntityChoiceListTest extends AbstractChoiceListTest
 
     protected $obj4;
 
+    private $emLifecycle;
+
     protected function setUp()
     {
         if (!class_exists('Symfony\Component\Form\Form')) {
@@ -53,6 +56,8 @@ abstract class AbstractEntityChoiceListTest extends AbstractChoiceListTest
         }
 
         $this->em = DoctrineTestHelper::createTestEntityManager();
+        $this->emLifecycle = new EntityManagerTestLifecycle($this->em);
+        $this->emLifecycle->setUp();
 
         $schemaTool = new SchemaTool($this->em);
         $classes = array($this->em->getClassMetadata($this->getEntityClass()));
@@ -82,7 +87,11 @@ abstract class AbstractEntityChoiceListTest extends AbstractChoiceListTest
     {
         parent::tearDown();
 
+        if ($this->emLifecycle !== null) {
+            $this->emLifecycle->tearDown();
+        }
         $this->em = null;
+        $this->emLifecycle = null;
     }
 
     abstract protected function getEntityClass();

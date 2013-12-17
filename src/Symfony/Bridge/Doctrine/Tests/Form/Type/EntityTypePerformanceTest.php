@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\Form\Type;
 
+use Symfony\Bridge\Doctrine\Test\EntityManagerTestLifecycle;
 use Symfony\Component\Form\Tests\FormPerformanceTestCase;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity;
 use Doctrine\ORM\Tools\SchemaTool;
@@ -29,6 +30,8 @@ class EntityTypePerformanceTest extends FormPerformanceTestCase
      * @var \Doctrine\ORM\EntityManager
      */
     private $em;
+
+    private $emLifecycle;
 
     protected function getExtensions()
     {
@@ -67,6 +70,8 @@ class EntityTypePerformanceTest extends FormPerformanceTestCase
         }
 
         $this->em = DoctrineOrmTestCase::createTestEntityManager();
+        $this->emLifecycle = new EntityManagerTestLifecycle($this->em);
+        $this->emLifecycle->setUp();
 
         parent::setUp();
 
@@ -93,6 +98,13 @@ class EntityTypePerformanceTest extends FormPerformanceTestCase
         }
 
         $this->em->flush();
+    }
+
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        $this->emLifecycle->tearDown();
     }
 
     /**

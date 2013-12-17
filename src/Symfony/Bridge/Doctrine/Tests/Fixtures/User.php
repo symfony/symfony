@@ -11,21 +11,22 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\Fixtures;
 
-use Doctrine\ORM\Mapping\Id;
-use Doctrine\ORM\Mapping\Column;
-use Doctrine\ORM\Mapping\Entity;
+use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-/** @Entity */
+/**
+ * @ORM\Entity()
+ * @ORM\Table(name="Users")
+ */
 class User implements UserInterface
 {
-    /** @Id @Column(type="integer") */
+    /** @ORM\Id @ORM\Column(type="integer") */
     protected $id1;
 
-    /** @Id @Column(type="integer") */
+    /** @ORM\Id @ORM\Column(type="integer") */
     protected $id2;
 
-    /** @Column(type="string") */
+    /** @ORM\Column(type="string") */
     public $name;
 
     public function __construct($id1, $id2, $name)

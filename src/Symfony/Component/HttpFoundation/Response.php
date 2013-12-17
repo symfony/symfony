@@ -196,7 +196,7 @@ class Response
      *
      * @api
      */
-    public function __construct($content = '', $status = 200, $headers = array())
+    public function __construct($content = '', $status = self::HTTP_OK, $headers = array())
     {
         $this->headers = new ResponseHeaderBag($headers);
         $this->setContent($content);
@@ -221,7 +221,7 @@ class Response
      *
      * @return Response
      */
-    public static function create($content = '', $status = 200, $headers = array())
+    public static function create($content = '', $status = self::HTTP_OK, $headers = array())
     {
         return new static($content, $status, $headers);
     }
@@ -268,7 +268,7 @@ class Response
     {
         $headers = $this->headers;
 
-        if ($this->isInformational() || in_array($this->statusCode, array(204, 304))) {
+        if ($this->isInformational() || in_array($this->statusCode, array(self::HTTP_NO_CONTENT, self::HTTP_NOT_MODIFIED))) {
             $this->setContent(null);
         }
 
@@ -558,7 +558,7 @@ class Response
      */
     public function isCacheable()
     {
-        if (!in_array($this->statusCode, array(200, 203, 300, 301, 302, 404, 410))) {
+        if (!in_array($this->statusCode, array(self::HTTP_OK, self::HTTP_NON_AUTHORITATIVE_INFORMATION, self::HTTP_MULTIPLE_CHOICES, self::HTTP_MOVED_PERMANENTLY, self::HTTP_FOUND, self::HTTP_NOT_FOUND, self::HTTP_GONE))) {
             return false;
         }
 
@@ -1016,7 +1016,7 @@ class Response
      */
     public function setNotModified()
     {
-        $this->setStatusCode(304);
+        $this->setStatusCode(self::HTTP_NOT_MODIFIED);
         $this->setContent(null);
 
         // remove headers that MUST NOT be included with 304 Not Modified responses
@@ -1116,7 +1116,7 @@ class Response
      */
     public function isInvalid()
     {
-        return $this->statusCode < 100 || $this->statusCode >= 600;
+        return $this->statusCode < self::HTTP_CONTINUE || $this->statusCode >= 600;
     }
 
     /**
@@ -1128,7 +1128,7 @@ class Response
      */
     public function isInformational()
     {
-        return $this->statusCode >= 100 && $this->statusCode < 200;
+        return $this->statusCode >= self::HTTP_CONTINUE && $this->statusCode < self::HTTP_OK;
     }
 
     /**
@@ -1140,7 +1140,7 @@ class Response
      */
     public function isSuccessful()
     {
-        return $this->statusCode >= 200 && $this->statusCode < 300;
+        return $this->statusCode >= self::HTTP_OK && $this->statusCode < self::HTTP_MULTIPLE_CHOICES;
     }
 
     /**
@@ -1152,7 +1152,7 @@ class Response
      */
     public function isRedirection()
     {
-        return $this->statusCode >= 300 && $this->statusCode < 400;
+        return $this->statusCode >= self::HTTP_MULTIPLE_CHOICES && $this->statusCode < self::HTTP_BAD_REQUEST;
     }
 
     /**
@@ -1164,7 +1164,7 @@ class Response
      */
     public function isClientError()
     {
-        return $this->statusCode >= 400 && $this->statusCode < 500;
+        return $this->statusCode >= self::HTTP_BAD_REQUEST && $this->statusCode < self::HTTP_INTERNAL_SERVER_ERROR;
     }
 
     /**
@@ -1176,7 +1176,7 @@ class Response
      */
     public function isServerError()
     {
-        return $this->statusCode >= 500 && $this->statusCode < 600;
+        return $this->statusCode >= self::HTTP_INTERNAL_SERVER_ERROR && $this->statusCode < 600;
     }
 
     /**
@@ -1188,7 +1188,7 @@ class Response
      */
     public function isOk()
     {
-        return 200 === $this->statusCode;
+        return self::HTTP_OK === $this->statusCode;
     }
 
     /**
@@ -1200,7 +1200,7 @@ class Response
      */
     public function isForbidden()
     {
-        return 403 === $this->statusCode;
+        return self::HTTP_FORBIDDEN === $this->statusCode;
     }
 
     /**
@@ -1212,7 +1212,7 @@ class Response
      */
     public function isNotFound()
     {
-        return 404 === $this->statusCode;
+        return self::HTTP_NOT_FOUND === $this->statusCode;
     }
 
     /**
@@ -1226,7 +1226,7 @@ class Response
      */
     public function isRedirect($location = null)
     {
-        return in_array($this->statusCode, array(201, 301, 302, 303, 307, 308)) && (null === $location ?: $location == $this->headers->get('Location'));
+        return in_array($this->statusCode, array(self::HTTP_CREATED, self::HTTP_MOVED_PERMANENTLY, self::HTTP_FOUND, self::HTTP_SEE_OTHER, self::HTTP_TEMPORARY_REDIRECT, self::HTTP_PERMANENTLY_REDIRECT)) && (null === $location ?: $location == $this->headers->get('Location'));
     }
 
     /**
@@ -1238,7 +1238,7 @@ class Response
      */
     public function isEmpty()
     {
-        return in_array($this->statusCode, array(201, 204, 304));
+        return in_array($this->statusCode, array(self::HTTP_CREATED, self::HTTP_NO_CONTENT, self::HTTP_NOT_MODIFIED));
     }
 
     /**

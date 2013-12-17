@@ -218,12 +218,12 @@ class BinaryFileResponse extends Response
 
                 if ($start <= $end) {
                     if ($start < 0 || $end > $fileSize - 1) {
-                        $this->setStatusCode(self::HTTP_REQUESTED_RANGE_NOT_SATISFIABLE);
+                        $this->setStatusCode(416);
                     } elseif ($start !== 0 || $end !== $fileSize - 1) {
                         $this->maxlen = $end < $fileSize ? $end - $start + 1 : -1;
                         $this->offset = $start;
 
-                        $this->setStatusCode(self::HTTP_PARTIAL_CONTENT);
+                        $this->setStatusCode(206);
                         $this->headers->set('Content-Range', sprintf('bytes %s-%s/%s', $start, $end, $fileSize));
                         $this->headers->set('Content-Length', $end - $start + 1);
                     }

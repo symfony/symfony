@@ -169,6 +169,45 @@ Form
    $builder->add('field', 'text');
    $form = $builder->getForm();
    ```
+   
+ * Even if it wasn't intended, it was possible to set a form type's `data`
+   option to `null` if you wanted the form component to set the form's data
+   to the data of the object bound to the form (if one was bound).
+   This was used in some projects to preset a form field with optional
+   initial data as long as there wasn't already data set through a bound object.
+   Altough this feature is intended, setting the `data` option for a form
+   by default also locks that form's data so that it can't be overriden by
+   a later bound object. To disable said lock you have to specifically call
+   `FormConfigBuilderInterface:setDataLocked()`:
+
+   Before:
+
+   ```
+   $builder->add('field', 'text', array(
+      'data' => $options['default_data'] ?: null,
+   ));
+   ```
+   
+   After:
+
+   ```
+   $builder->add('field', 'text', array(
+      'data' => $options['default_data'] ?: null,
+   ));
+   $builder->get('field')->setDataLocked(false);
+   ```
+   
+   The cleanest solution would be to only set the `data` option if there's
+   actually data so pre-set.
+   
+   After (Alternative 1):
+   
+   ```
+   $fieldOptions = array();
+   if ($options['default_data']) {
+      $fieldOptions['data'] = $options['default_data'];
+   }
+   $builder->add('field', 'text', $fieldOptions);
 
 PropertyAccess
 --------------
@@ -254,7 +293,7 @@ Console
 
    Before:
 
-   ```
+   ```a
    if (OutputInterface::VERBOSITY_VERBOSE === $output->getVerbosity()) { ... }
    ```
 

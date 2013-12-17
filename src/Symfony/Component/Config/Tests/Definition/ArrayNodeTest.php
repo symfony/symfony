@@ -129,4 +129,33 @@ class ArrayNodeTest extends \PHPUnit_Framework_TestCase
             ),
         );
     }
+
+    /**
+     * @dataProvider getPreNormalizedNormalizedOrderedData
+     */
+    public function testChildrenOrderIsMaintainedOnNormalizeValue($prenormalized, $normalized)
+    {
+        $scalar1 = new ScalarNode('1');
+        $scalar2 = new ScalarNode('2');
+        $scalar3 = new ScalarNode('3');
+        $node = new ArrayNode('foo');
+        $node->addChild($scalar1);
+        $node->addChild($scalar3);
+        $node->addChild($scalar2);
+
+        $r = new \ReflectionMethod($node, 'normalizeValue');
+        $r->setAccessible(true);
+
+        $this->assertSame($normalized, $r->invoke($node, $prenormalized));
+    }
+
+    public function getPreNormalizedNormalizedOrderedData()
+    {
+        return array(
+            array(
+                array('2' => 'two', '1' => 'one', '3' => 'three'),
+                array('2' => 'two', '1' => 'one', '3' => 'three'),
+            ),
+        );
+    }
 }

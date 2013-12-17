@@ -176,6 +176,11 @@ class ArgvInputTest extends \PHPUnit_Framework_TestCase
                 'The "-o" option does not exist.'
             ),
             array(
+                array('cli.php', '--foo=bar'),
+                new InputDefinition(array(new InputOption('foo', 'f', InputOption::VALUE_NONE))),
+                'The "--foo" option does not accept a value.'
+            ),
+            array(
                 array('cli.php', 'foo', 'bar'),
                 new InputDefinition(),
                 'Too many arguments.'
@@ -268,6 +273,9 @@ class ArgvInputTest extends \PHPUnit_Framework_TestCase
 
         $input = new ArgvInput(array('cli.php', 'foo'));
         $this->assertFalse($input->hasParameterOption('--foo'), '->hasParameterOption() returns false if the given short option is not in the raw input');
+
+        $input = new ArgvInput(array('cli.php', '--foo=bar'));
+        $this->assertTrue($input->hasParameterOption('--foo'), '->hasParameterOption() returns true if the given option with provided value is in the raw input');
     }
 
     public function testToString()
@@ -295,6 +303,14 @@ class ArgvInputTest extends \PHPUnit_Framework_TestCase
             array(array('app/console', 'foo:bar', '--env=dev'), '--env', 'dev'),
             array(array('app/console', 'foo:bar', '-e', 'dev'), array('-e', '--env'), 'dev'),
             array(array('app/console', 'foo:bar', '--env=dev'), array('-e', '--env'), 'dev'),
+            array(array('app/console', 'foo:bar', '--env=dev', '--en=1'), array('--en'), '1'),
         );
+    }
+
+    public function testParseSingleDashAsArgument()
+    {
+        $input = new ArgvInput(array('cli.php', '-'));
+        $input->bind(new InputDefinition(array(new InputArgument('file'))));
+        $this->assertEquals(array('file' => '-'), $input->getArguments(), '->parse() parses single dash as an argument');
     }
 }

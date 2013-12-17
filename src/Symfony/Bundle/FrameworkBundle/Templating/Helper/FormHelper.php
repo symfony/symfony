@@ -138,7 +138,6 @@ class FormHelper extends Helper
     {
         // Uncomment this as soon as the deprecation note should be shown
         // trigger_error('The form helper $view[\'form\']->enctype() is deprecated since version 2.3 and will be removed in 3.0. Use $view[\'form\']->start() instead.', E_USER_DEPRECATED);
-
         return $this->renderer->searchAndRenderBlock($view, 'enctype');
     }
 
@@ -147,13 +146,13 @@ class FormHelper extends Helper
      *
      * Example usage:
      *
-     *     <?php echo view['form']->widget($form) ?>
+     *     <?php echo $view['form']->widget($form) ?>
      *
      * You can pass options during the call:
      *
-     *     <?php echo view['form']->widget($form, array('attr' => array('class' => 'foo'))) ?>
+     *     <?php echo $view['form']->widget($form, array('attr' => array('class' => 'foo'))) ?>
      *
-     *     <?php echo view['form']->widget($form, array('separator' => '+++++')) ?>
+     *     <?php echo $view['form']->widget($form, array('separator' => '+++++')) ?>
      *
      * @param FormView $view      The view for which to render the widget
      * @param array    $variables Additional variables passed to the template
@@ -248,7 +247,7 @@ class FormHelper extends Helper
      * Check the token in your action using the same intention.
      *
      * <code>
-     * $csrfProvider = $this->get('form.csrf_provider');
+     * $csrfProvider = $this->get('security.csrf.token_generator');
      * if (!$csrfProvider->isCsrfTokenValid('rm_user_'.$user->getId(), $token)) {
      *     throw new \RuntimeException('CSRF attack detected.');
      * }

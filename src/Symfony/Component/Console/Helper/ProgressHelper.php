@@ -167,7 +167,7 @@ class ProgressHelper extends Helper
     /**
      * Sets the redraw frequency.
      *
-     * @param int $freq The frequency in seconds
+     * @param int $freq The frequency in steps
      */
     public function setRedrawFrequency($freq)
     {
@@ -178,7 +178,7 @@ class ProgressHelper extends Helper
      * Starts the progress output.
      *
      * @param OutputInterface $output An Output instance
-     * @param integer         $max    Maximum steps
+     * @param integer|null    $max    Maximum steps
      */
     public function start(OutputInterface $output, $max = null)
     {
@@ -186,6 +186,8 @@ class ProgressHelper extends Helper
         $this->current   = 0;
         $this->max       = (int) $max;
         $this->output    = $output;
+        $this->lastMessagesLength = 0;
+        $this->barCharOriginal = '';
 
         if (null === $this->format) {
             switch ($output->getVerbosity()) {
@@ -196,6 +198,8 @@ class ProgressHelper extends Helper
                     }
                     break;
                 case OutputInterface::VERBOSITY_VERBOSE:
+                case OutputInterface::VERBOSITY_VERY_VERBOSE:
+                case OutputInterface::VERBOSITY_DEBUG:
                     $this->format = self::FORMAT_VERBOSE_NOMAX;
                     if ($this->max > 0) {
                         $this->format = self::FORMAT_VERBOSE;
@@ -223,18 +227,7 @@ class ProgressHelper extends Helper
      */
     public function advance($step = 1, $redraw = false)
     {
-        if (null === $this->startTime) {
-            throw new \LogicException('You must start the progress bar before calling advance().');
-        }
-
-        if (0 === $this->current) {
-            $redraw = true;
-        }
-
-        $this->current += $step;
-        if ($redraw || 0 === $this->current % $this->redrawFreq) {
-            $this->display();
-        }
+        $this->setCurrent($this->current + $step, $redraw);
     }
 
     /**
@@ -261,8 +254,12 @@ class ProgressHelper extends Helper
             $redraw = true;
         }
 
+        $prevPeriod = intval($this->current / $this->redrawFreq);
+
         $this->current = $current;
-        if ($redraw || 0 === $this->current % $this->redrawFreq) {
+
+        $currPeriod = intval($this->current / $this->redrawFreq);
+        if ($redraw || $prevPeriod !== $currPeriod || $this->max === $this->current) {
             $this->display();
         }
     }
@@ -285,6 +282,18 @@ class ProgressHelper extends Helper
             $message = str_replace("%{$name}%", $value, $message);
         }
         $this->overwrite($this->output, $message);
+    }
+
+    /**
+     * Removes the progress bar from the current line.
+     *
+     * This is useful if you wish to write some output
+     * while a progress bar is running.
+     * Call display() to show the progress bar again.
+     */
+    public function clear()
+    {
+        $this->overwrite($this->output, '');
     }
 
     /**
@@ -340,12 +349,12 @@ class ProgressHelper extends Helper
         $vars    = array();
         $percent = 0;
         if ($this->max > 0) {
-            $percent = (double) round($this->current / $this->max, 2);
+            $percent = (double) $this->current / $this->max;
         }
 
         if (isset($this->formatVars['bar'])) {
             $completeBars = 0;
-            $emptyBars = 0;
+
             if ($this->max > 0) {
                 $completeBars = floor($percent * $this->barWidth);
             } else {
@@ -380,7 +389,7 @@ class ProgressHelper extends Helper
         }
 
         if (isset($this->formatVars['percent'])) {
-            $vars['percent'] = str_pad($percent * 100, $this->widths['percent'], ' ', STR_PAD_LEFT);
+            $vars['percent'] = str_pad(floor($percent * 100), $this->widths['percent'], ' ', STR_PAD_LEFT);
         }
 
         return $vars;

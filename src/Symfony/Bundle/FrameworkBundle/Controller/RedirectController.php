@@ -49,7 +49,7 @@ class RedirectController extends ContainerAware
         $attributes = array();
         if (false === $ignoreAttributes || is_array($ignoreAttributes)) {
             $attributes = $request->attributes->get('_route_params');
-            unset($attributes['route'], $attributes['permanent']);
+            unset($attributes['route'], $attributes['permanent'], $attributes['ignoreAttributes']);
             if ($ignoreAttributes) {
                 $attributes = array_diff_key($attributes, array_flip($ignoreAttributes));
             }

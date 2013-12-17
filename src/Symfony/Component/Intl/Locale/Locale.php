@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Intl\Locale;
 
-use Symfony\Component\Intl\Exception\NotImplementedException;
 use Symfony\Component\Intl\Exception\MethodNotImplementedException;
 
 /**
@@ -313,6 +312,8 @@ class Locale
      */
     public static function setDefault($locale)
     {
-        throw new MethodNotImplementedException(__METHOD__);
+        if ('en' !== $locale) {
+            throw new MethodNotImplementedException(__METHOD__);
+        }
     }
 }

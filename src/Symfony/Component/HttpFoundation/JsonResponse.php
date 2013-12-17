@@ -14,6 +14,12 @@ namespace Symfony\Component\HttpFoundation;
 /**
  * Response represents an HTTP response in JSON format.
  *
+ * Note that this class does not force the returned JSON content to be an
+ * object. It is however recommended that you do return an object as it
+ * protects yourself against XSSI and JSON-JavaScript Hijacking.
+ *
+ * @see https://www.owasp.org/index.php/OWASP_AJAX_Security_Guidelines#Always_return_JSON_with_an_Object_on_the_outside
+ *
  * @author Igor Wiedler <igor@wiedler.ch>
  */
 class JsonResponse extends Response
@@ -49,11 +55,11 @@ class JsonResponse extends Response
     /**
      * Sets the JSONP callback.
      *
-     * @param string $callback
+     * @param string|null $callback The JSONP callback or null to use none
      *
      * @return JsonResponse
      *
-     * @throws \InvalidArgumentException
+     * @throws \InvalidArgumentException When the callback name is not valid
      */
     public function setCallback($callback = null)
     {

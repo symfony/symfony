@@ -1,7 +1,8 @@
 ﻿UPGRADE FROM 2.2 to 2.3
 =======================
 
-### Form
+Form
+----
 
  * Although this was not officially supported nor documented, it was possible to
    set the option "validation_groups" to false, resulting in the group "Default"
@@ -109,7 +110,68 @@
    }
    ```
 
-### PropertyAccess
+ * The *_SET_DATA events are now guaranteed to be fired *after* the children
+   were added by the FormBuilder (unless setData() is called manually). Before,
+   the *_SET_DATA events were sometimes thrown before adding child forms,
+   which made it impossible to remove child forms dynamically.
+
+   A consequence of this change is that you need to set the "auto_initialize"
+   option to `false` for `FormInterface` instances that you pass to
+   `FormInterface::add()`:
+
+   Before:
+
+   ```
+   $form = $factory->create('form');
+   $form->add($factory->createNamed('field', 'text'));
+   ```
+
+   This code will now throw an exception with the following message:
+
+   Automatic initialization is only supported on root forms. You should set the
+   "auto_initialize" option to false on the field "field".
+
+   Consequently, you need to set the "auto_initialize" option:
+
+   After (Alternative 1):
+
+   ```
+   $form = $factory->create('form');
+   $form->add($factory->createNamed('field', 'text', array(), array(
+       'auto_initialize' => false,
+   )));
+   ```
+
+   The problem also disappears if you work with `FormBuilder` instances instead
+   of `Form` instances:
+
+   After (Alternative 2):
+
+   ```
+   $builder = $factory->createBuilder('form');
+   $builder->add($factory->createBuilder('field', 'text'));
+   $form = $builder->getForm();
+   ```
+
+   The best solution is in most cases to let `add()` handle the field creation:
+
+   After (Alternative 3):
+
+   ```
+   $form = $factory->create('form');
+   $form->add('field', 'text');
+   ```
+
+   After (Alternative 4):
+
+   ```
+   $builder = $factory->createBuilder('form');
+   $builder->add('field', 'text');
+   $form = $builder->getForm();
+   ```
+
+PropertyAccess
+--------------
 
  * PropertyAccessor was changed to continue its search for a property or method
    even if a non-public match was found. This means that the property "author"
@@ -160,3 +222,58 @@
        // Method/property was not found or not public
    }
    ```
+
+DomCrawler
+----------
+
+ * `Crawler::each()` and `Crawler::reduce()` now return Crawler instances
+   instead of DomElement instances:
+
+   Before:
+
+   ```
+   $data = $crawler->each(function ($node, $i) {
+       return $node->nodeValue;
+   });
+   ```
+
+   After:
+
+   ```
+   $data = $crawler->each(function ($crawler, $i) {
+       return $crawler->text();
+   });
+   ```
+
+Console
+-------
+
+ * New verbosity levels have been added, therefore if you used to do check
+   the output verbosity level directly for VERBOSITY_VERBOSE you probably
+   want to update it to a greater than comparison:
+
+   Before:
+
+   ```
+   if (OutputInterface::VERBOSITY_VERBOSE === $output->getVerbosity()) { ... }
+   ```
+
+   After:
+
+   ```
+   if (OutputInterface::VERBOSITY_VERBOSE <= $output->getVerbosity()) { ... }
+   ```
+
+BrowserKit
+----------
+
+ * If you are receiving responses with non-3xx Status Code and Location header
+   please be aware that you won't be able to use auto-redirects on these kind
+   of responses.
+
+   If you are correctly passing 3xx Status Code with Location header, you
+   don't have to worry about the change.
+
+   If you were using responses with Location header and non-3xx Status Code,
+   you have to update your code to manually create another request to URL
+   grabbed from the Location header.

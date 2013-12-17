@@ -34,11 +34,11 @@ class InputOption
     /**
      * Constructor.
      *
-     * @param string  $name        The option name
-     * @param string  $shortcut    The shortcut (can be null)
-     * @param integer $mode        The option mode: One of the VALUE_* constants
-     * @param string  $description A description text
-     * @param mixed   $default     The default value (must be null for self::VALUE_REQUIRED or self::VALUE_NONE)
+     * @param string       $name        The option name
+     * @param string|array $shortcut    The shortcuts, can be null, a string of shortcuts delimited by | or an array of shortcuts
+     * @param integer      $mode        The option mode: One of the VALUE_* constants
+     * @param string       $description A description text
+     * @param mixed        $default     The default value (must be null for self::VALUE_REQUIRED or self::VALUE_NONE)
      *
      * @throws \InvalidArgumentException If option mode is invalid or incompatible
      *
@@ -59,9 +59,12 @@ class InputOption
         }
 
         if (null !== $shortcut) {
-            if ('-' === $shortcut[0]) {
-                $shortcut = substr($shortcut, 1);
+            if (is_array($shortcut)) {
+                $shortcut = implode('|', $shortcut);
             }
+            $shortcuts = preg_split('{(\|)-?}', ltrim($shortcut, '-'));
+            $shortcuts = array_filter($shortcuts);
+            $shortcut = implode('|', $shortcuts);
 
             if (empty($shortcut)) {
                 throw new \InvalidArgumentException('An option shortcut cannot be empty.');

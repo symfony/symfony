@@ -1,12 +1,20 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Bridge\Twig\Tests\NodeVisitor;
 
 use Symfony\Bridge\Twig\NodeVisitor\TranslationDefaultDomainNodeVisitor;
 use Symfony\Bridge\Twig\NodeVisitor\TranslationNodeVisitor;
-use Symfony\Bridge\Twig\Tests\TestCase;
 
-class TranslationDefaultDomainNodeVisitorTest extends TestCase
+class TranslationDefaultDomainNodeVisitorTest extends \PHPUnit_Framework_TestCase
 {
     private static $message = 'message';
     private static $domain = 'domain';

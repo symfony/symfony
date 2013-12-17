@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Form\Extension\HttpFoundation;
 
-use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\RequestHandlerInterface;
@@ -45,7 +44,7 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
             if ('' === $name) {
                 $data = $request->query->all();
             } else {
-                // Don't bind GET requests if the form's name does not exist
+                // Don't submit GET requests if the form's name does not exist
                 // in the request
                 if (!$request->query->has($name)) {
                     return;
@@ -57,10 +56,13 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
             if ('' === $name) {
                 $params = $request->request->all();
                 $files = $request->files->all();
-            } else {
+            } elseif ($request->request->has($name) || $request->files->has($name)) {
                 $default = $form->getConfig()->getCompound() ? array() : null;
                 $params = $request->request->get($name, $default);
                 $files = $request->files->get($name, $default);
+            } else {
+                // Don't submit the form if it is not present in the request
+                return;
             }
 
             if (is_array($params) && is_array($files)) {
@@ -70,11 +72,11 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
             }
         }
 
-        // Don't auto-bind the form unless at least one field is submitted.
+        // Don't auto-submit the form unless at least one field is present.
         if ('' === $name && count(array_intersect_key($data, $form->all())) <= 0) {
             return;
         }
 
-        $form->bind($data);
+        $form->submit($data, 'PATCH' !== $method);
     }
 }

@@ -163,7 +163,7 @@ class NativeSessionStorage implements SessionStorageInterface
      */
     public function getId()
     {
-        if (!$this->started) {
+        if (!$this->started && !$this->closed) {
             return ''; // returning empty is consistent with session_id() behaviour
         }
 
@@ -207,7 +207,23 @@ class NativeSessionStorage implements SessionStorageInterface
             $this->metadataBag->stampNew();
         }
 
-        return session_regenerate_id($destroy);
+        $ret = session_regenerate_id($destroy);
+
+        // workaround for https://bugs.php.net/bug.php?id=61470 as suggested by David Grudl
+        if ('files' === $this->getSaveHandler()->getSaveHandlerName()) {
+            session_write_close();
+            if (isset($_SESSION)) {
+                $backup = $_SESSION;
+                session_start();
+                $_SESSION = $backup;
+            } else {
+                session_start();
+            }
+
+            $this->loadSession();
+        }
+
+        return $ret;
     }
 
     /**
@@ -223,6 +239,7 @@ class NativeSessionStorage implements SessionStorageInterface
         }
 
         $this->closed = true;
+        $this->started = false;
     }
 
     /**

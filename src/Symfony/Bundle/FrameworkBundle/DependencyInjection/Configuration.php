@@ -36,7 +36,7 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->scalarNode('secret')->end()
                 ->scalarNode('http_method_override')
-                    ->info("Set true to enable support for the '_method' request parameter to determine the intended HTTP method on POST requests.")
+                    ->info("Set true to enable support for the '_method' request parameter to determine the intended HTTP method on POST requests. Note: When using the HttpCache, you need to call the method in your front controller instead")
                     ->defaultTrue()
                 ->end()
                 ->arrayNode('trusted_proxies')
@@ -68,9 +68,17 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('ide')->defaultNull()->end()
                 ->booleanNode('test')->end()
                 ->scalarNode('default_locale')->defaultValue('en')->end()
+                ->arrayNode('trusted_hosts')
+                    ->beforeNormalization()
+                        ->ifTrue(function($v) { return is_string($v); })
+                        ->then(function($v) { return array($v); })
+                    ->end()
+                    ->prototype('scalar')->end()
+                ->end()
             ->end()
         ;
 
+        $this->addCsrfSection($rootNode);
         $this->addFormSection($rootNode);
         $this->addEsiSection($rootNode);
         $this->addFragmentsSection($rootNode);
@@ -86,6 +94,23 @@ class Configuration implements ConfigurationInterface
         return $treeBuilder;
     }
 
+    private function addCsrfSection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('csrf_protection')
+                    ->canBeEnabled()
+                    ->children()
+                        ->scalarNode('field_name')
+                            ->defaultValue('_token')
+                            ->info('Deprecated since 2.4, to be removed in 3.0. Use form.csrf_protection.field_name instead')
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
     private function addFormSection(ArrayNodeDefinition $rootNode)
     {
         $rootNode
@@ -93,11 +118,17 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('form')
                     ->info('form configuration')
                     ->canBeEnabled()
-                ->end()
-                ->arrayNode('csrf_protection')
-                    ->canBeDisabled()
                     ->children()
-                        ->scalarNode('field_name')->defaultValue('_token')->end()
+                        ->arrayNode('csrf_protection')
+                            ->treatFalseLike(array('enabled' => false))
+                            ->treatTrueLike(array('enabled' => true))
+                            ->treatNullLike(array('enabled' => true))
+                            ->addDefaultsIfNotSet()
+                            ->children()
+                                ->booleanNode('enabled')->defaultNull()->end() // defaults to framework.csrf_protection.enabled
+                                ->scalarNode('field_name')->defaultNull()->end()
+                            ->end()
+                        ->end()
                     ->end()
                 ->end()
             ->end()
@@ -139,6 +170,7 @@ class Configuration implements ConfigurationInterface
                     ->info('profiler configuration')
                     ->canBeEnabled()
                     ->children()
+                        ->booleanNode('collect')->defaultTrue()->end()
                         ->booleanNode('only_exceptions')->defaultFalse()->end()
                         ->booleanNode('only_master_requests')->defaultFalse()->end()
                         ->scalarNode('dsn')->defaultValue('file:%kernel.cache_dir%/profiler')->end()
@@ -148,13 +180,17 @@ class Configuration implements ConfigurationInterface
                         ->arrayNode('matcher')
                             ->canBeUnset()
                             ->performNoDeepMerging()
+                            ->fixXmlConfig('ip')
                             ->children()
-                                ->scalarNode('ip')->end()
                                 ->scalarNode('path')
                                     ->info('use the urldecoded format')
                                     ->example('^/path to resource/')
                                 ->end()
                                 ->scalarNode('service')->end()
+                                ->arrayNode('ips')
+                                    ->beforeNormalization()->ifString()->then(function($v) { return array($v); })->end()
+                                    ->prototype('scalar')->end()
+                                ->end()
                             ->end()
                         ->end()
                     ->end()
@@ -210,6 +246,10 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('gc_probability')->end()
                         ->scalarNode('gc_maxlifetime')->end()
                         ->scalarNode('save_path')->defaultValue('%kernel.cache_dir%/sessions')->end()
+                        ->integerNode('metadata_update_threshold')
+                            ->defaultValue('0')
+                            ->info('seconds to wait between 2 session metadata updates, it will also prevent the session handler to write if the session has not changed')
+                        ->end()
                     ->end()
                 ->end()
             ->end()

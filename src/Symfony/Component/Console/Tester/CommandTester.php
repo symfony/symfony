@@ -14,6 +14,8 @@ namespace Symfony\Component\Console\Tester;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\StreamOutput;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Eases the testing of console commands.
@@ -25,6 +27,7 @@ class CommandTester
     private $command;
     private $input;
     private $output;
+    private $statusCode;
 
     /**
      * Constructor.
@@ -52,6 +55,15 @@ class CommandTester
      */
     public function execute(array $input, array $options = array())
     {
+        // set the command name automatically if the application requires
+        // this argument and no command name was passed
+        if (!isset($input['command'])
+            && (null !== $application = $this->command->getApplication())
+            && $application->getDefinition()->hasArgument('command')
+        ) {
+            $input['command'] = $this->command->getName();
+        }
+
         $this->input = new ArrayInput($input);
         if (isset($options['interactive'])) {
             $this->input->setInteractive($options['interactive']);
@@ -65,7 +77,7 @@ class CommandTester
             $this->output->setVerbosity($options['verbosity']);
         }
 
-        return $this->command->run($this->input, $this->output);
+        return $this->statusCode = $this->command->run($this->input, $this->output);
     }
 
     /**
@@ -106,5 +118,15 @@ class CommandTester
     public function getOutput()
     {
         return $this->output;
+    }
+
+    /**
+     * Gets the status code returned by the last execution of the application.
+     *
+     * @return integer The status code
+     */
+    public function getStatusCode()
+    {
+        return $this->statusCode;
     }
 }

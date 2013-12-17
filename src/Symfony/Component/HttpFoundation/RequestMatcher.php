@@ -96,7 +96,7 @@ class RequestMatcher implements RequestMatcherInterface
     /**
      * Adds a check for the client IP.
      *
-     * @param string|string[] $ip A specific IP address or a range specified using IP/netmask like 192.168.1.0/24
+     * @param string|string[] $ips A specific IP address or a range specified using IP/netmask like 192.168.1.0/24
      */
     public function matchIps($ips)
     {
@@ -136,20 +136,16 @@ class RequestMatcher implements RequestMatcherInterface
         }
 
         foreach ($this->attributes as $key => $pattern) {
-            if (!preg_match('#'.str_replace('#', '\\#', $pattern).'#', $request->attributes->get($key))) {
+            if (!preg_match('{'.$pattern.'}', $request->attributes->get($key))) {
                 return false;
             }
         }
 
-        if (null !== $this->path) {
-            $path = str_replace('#', '\\#', $this->path);
-
-            if (!preg_match('#'.$path.'#', rawurldecode($request->getPathInfo()))) {
-                return false;
-            }
+        if (null !== $this->path && !preg_match('{'.$this->path.'}', rawurldecode($request->getPathInfo()))) {
+            return false;
         }
 
-        if (null !== $this->host && !preg_match('#'.str_replace('#', '\\#', $this->host).'#i', $request->getHost())) {
+        if (null !== $this->host && !preg_match('{'.$this->host.'}i', $request->getHost())) {
             return false;
         }
 
@@ -159,7 +155,6 @@ class RequestMatcher implements RequestMatcherInterface
 
         // Note to future implementors: add additional checks above the
         // foreach above or else your check might not be run!
-
         return count($this->ips) === 0;
     }
 }

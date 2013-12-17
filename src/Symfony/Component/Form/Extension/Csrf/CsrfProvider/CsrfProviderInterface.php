@@ -22,10 +22,14 @@ namespace Symfony\Component\Form\Extension\Csrf\CsrfProvider;
  *
  * If you want to secure a form submission against CSRF attacks, you could
  * supply an "intention" string. This way you make sure that the form can only
- * be bound to pages that are designed to handle the form, that is, that use
+ * be submitted to pages that are designed to handle the form, that is, that use
  * the same intention string to validate the CSRF token with isCsrfTokenValid().
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated Deprecated since version 2.4, to be removed in Symfony 3.0. Use
+ *             {@link \Symfony\Component\Security\Csrf\CsrfTokenManagerInterface}
+ *             instead.
  */
 interface CsrfProviderInterface
 {
@@ -34,6 +38,8 @@ interface CsrfProviderInterface
      *
      * @param string $intention Some value that identifies the action intention
      *                          (i.e. "authenticate"). Doesn't have to be a secret value.
+     *
+     * @return string The generated token
      */
     public function generateCsrfToken($intention);
 

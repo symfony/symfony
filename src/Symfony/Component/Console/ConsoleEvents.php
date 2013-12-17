@@ -46,7 +46,7 @@ final class ConsoleEvents
      *
      * This event allows you to deal with the exception or
      * to modify the thrown exception. The event listener method receives
-     * a Symfony\Component\Console\Event\ConsoleForExceptionEvent
+     * a Symfony\Component\Console\Event\ConsoleExceptionEvent
      * instance.
      *
      * @var string

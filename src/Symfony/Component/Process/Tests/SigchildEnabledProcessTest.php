@@ -46,7 +46,7 @@ class SigchildEnabledProcessTest extends AbstractProcessTest
     }
 
     /**
-     * @expectedException Symfony\Component\Process\Exception\RuntimeException
+     * @expectedException \Symfony\Component\Process\Exception\RuntimeException
      */
     public function testGetPid()
     {
@@ -54,7 +54,7 @@ class SigchildEnabledProcessTest extends AbstractProcessTest
     }
 
     /**
-     * @expectedException Symfony\Component\Process\Exception\RuntimeException
+     * @expectedException \Symfony\Component\Process\Exception\RuntimeException
      */
     public function testGetPidIsNullBeforeStart()
     {
@@ -62,7 +62,7 @@ class SigchildEnabledProcessTest extends AbstractProcessTest
     }
 
     /**
-     * @expectedException Symfony\Component\Process\Exception\RuntimeException
+     * @expectedException \Symfony\Component\Process\Exception\RuntimeException
      */
     public function testGetPidIsNullAfterRun()
     {
@@ -78,19 +78,29 @@ class SigchildEnabledProcessTest extends AbstractProcessTest
     }
 
     /**
-     * @expectedException Symfony\Component\Process\Exception\RuntimeException
+     * @expectedException \Symfony\Component\Process\Exception\RuntimeException
      */
     public function testSignal()
     {
         parent::testSignal();
     }
-    
+
     /**
-     * @expectedException Symfony\Component\Process\Exception\RuntimeException
+     * @expectedException \Symfony\Component\Process\Exception\RuntimeException
      */
     public function testProcessWithoutTermSignalIsNotSignaled()
     {
         parent::testProcessWithoutTermSignalIsNotSignaled();
+    }
+
+    public function testProcessThrowsExceptionWhenExternallySignaled()
+    {
+        $this->markTestSkipped('Retrieving Pid is not supported in sigchild environment');
+    }
+
+    public function testExitCodeIsAvailableAfterSignal()
+    {
+        $this->markTestSkipped('Signal is not supported in sigchild environment');
     }
 
     /**

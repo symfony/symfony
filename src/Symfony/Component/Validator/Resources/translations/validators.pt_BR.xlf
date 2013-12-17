@@ -24,7 +24,7 @@
             </trans-unit>
             <trans-unit id="6">
                 <source>You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.</source>
-                <target>Você deve selecionar, no mínimo, {{ limit }} opção.|Você deve selecionar, no mínimo, {{ limit }} opções</target>
+                <target>Você deve selecionar, no mínimo, {{ limit }} opção.|Você deve selecionar, no mínimo, {{ limit }} opções.</target>
             </trans-unit>
             <trans-unit id="7">
                 <source>You must select at most {{ limit }} choice.|You must select at most {{ limit }} choices.</source>
@@ -221,6 +221,26 @@
             <trans-unit id="58">
                 <source>Unsupported card type or invalid card number.</source>
                 <target>Tipo de cartão não suportado ou número de cartão inválido.</target>
+            </trans-unit>
+            <trans-unit id="59">
+                <source>This is not a valid International Bank Account Number (IBAN).</source>
+                <target>Este não é um Número Internacional de Conta Bancária (IBAN) válido.</target>
+            </trans-unit>
+            <trans-unit id="60">
+                <source>This value is not a valid ISBN-10.</source>
+                <target>Este valor não é um ISBN-10 válido.</target>
+            </trans-unit>
+            <trans-unit id="61">
+                <source>This value is not a valid ISBN-13.</source>
+                <target>Este valor não é um ISBN-13 válido.</target>
+            </trans-unit>
+            <trans-unit id="62">
+                <source>This value is neither a valid ISBN-10 nor a valid ISBN-13.</source>
+                <target>Este valor não é um ISBN-10 e nem um ISBN-13 válido.</target>
+            </trans-unit>
+            <trans-unit id="63">
+                <source>This value is not a valid ISSN.</source>
+                <target>Este valor não é um ISSN válido.</target>
             </trans-unit>
         </body>
     </file>

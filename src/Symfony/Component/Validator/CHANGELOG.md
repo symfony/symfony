@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+2.4.0
+-----
+
+ * added a constraint the uses the expression language
+ * added `minRatio`, `maxRatio`, `allowSquare`, `allowLandscape`, and `allowPortrait` to Image validator
+
 2.3.0
 -----
 
@@ -8,6 +14,7 @@ CHANGELOG
  * copied the constraints `Optional` and `Required` to the
    `Symfony\Component\Validator\Constraints\` namespace and deprecated the original
    classes.
+ * added comparison validators (EqualTo, NotEqualTo, LessThan, LessThanOrEqualTo, GreaterThan, GreaterThanOrEqualTo, IdenticalTo, NotIdenticalTo)
 
 2.2.0
 -----

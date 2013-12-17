@@ -15,6 +15,7 @@ services:
         calls:
             - [ setBar, [] ]
             - [ setBar ]
+            - [ setBar, ['@=service("foo").foo() ~ parameter("foo")'] ]
     method_call2:
         class: FooClass
         calls:
@@ -28,3 +29,4 @@ services:
         class: Request
         synthetic: true
         synchronized: true
+        lazy: true

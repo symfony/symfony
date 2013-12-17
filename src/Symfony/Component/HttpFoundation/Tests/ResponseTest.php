@@ -79,6 +79,19 @@ class ResponseTest extends ResponseTestCase
         $this->assertFalse($response->isCacheable());
     }
 
+    public function testIsCacheableWithErrorCode()
+    {
+        $response = new Response('', 500);
+        $this->assertFalse($response->isCacheable());
+    }
+
+    public function testIsCacheableWithNoStoreDirective()
+    {
+        $response = new Response();
+        $response->headers->set('cache-control', 'private');
+        $this->assertFalse($response->isCacheable());
+    }
+
     public function testIsCacheableWithSetTtl()
     {
         $response = new Response();
@@ -116,6 +129,50 @@ class ResponseTest extends ResponseTestCase
         $response = new Response();
         $modified = $response->isNotModified(new Request());
         $this->assertFalse($modified);
+    }
+
+    public function testIsNotModifiedNotSafe()
+    {
+        $request = Request::create('/homepage', 'POST');
+
+        $response = new Response();
+        $this->assertFalse($response->isNotModified($request));
+    }
+
+    public function testIsNotModifiedLastModified()
+    {
+        $modified = 'Sun, 25 Aug 2013 18:33:31 GMT';
+
+        $request = new Request();
+        $request->headers->set('If-Modified-Since', $modified);
+
+        $response = new Response();
+        $response->headers->set('Last-Modified', $modified);
+
+        $this->assertTrue($response->isNotModified($request));
+
+        $response->headers->set('Last-Modified', '');
+        $this->assertFalse($response->isNotModified($request));
+    }
+
+    public function testIsNotModifiedEtag()
+    {
+        $etagOne = 'randomly_generated_etag';
+        $etagTwo = 'randomly_generated_etag_2';
+
+        $request = new Request();
+        $request->headers->set('if_none_match', sprintf('%s, %s, %s', $etagOne, $etagTwo, 'etagThree'));
+
+        $response = new Response();
+
+        $response->headers->set('ETag', $etagOne);
+        $this->assertTrue($response->isNotModified($request));
+
+        $response->headers->set('ETag', $etagTwo);
+        $this->assertTrue($response->isNotModified($request));
+
+        $response->headers->set('ETag', '');
+        $this->assertFalse($response->isNotModified($request));
     }
 
     public function testIsValidateable()
@@ -361,9 +418,42 @@ class ResponseTest extends ResponseTestCase
         $response = new Response('foo');
         $request = Request::create('/', 'HEAD');
 
+        $length = 12345;
+        $response->headers->set('Content-Length', $length);
         $response->prepare($request);
 
         $this->assertEquals('', $response->getContent());
+        $this->assertEquals($length, $response->headers->get('Content-Length'), 'Content-Length should be as if it was GET; see RFC2616 14.13');
+    }
+
+    public function testPrepareRemovesContentForInformationalResponse()
+    {
+        $response = new Response('foo');
+        $request = Request::create('/');
+
+        $response->setContent('content');
+        $response->setStatusCode(101);
+        $response->prepare($request);
+        $this->assertEquals('', $response->getContent());
+
+        $response->setContent('content');
+        $response->setStatusCode(304);
+        $response->prepare($request);
+        $this->assertEquals('', $response->getContent());
+    }
+
+    public function testPrepareRemovesContentLength()
+    {
+        $response = new Response('foo');
+        $request = Request::create('/');
+
+        $response->headers->set('Content-Length', 12345);
+        $response->prepare($request);
+        $this->assertEquals(12345, $response->headers->get('Content-Length'));
+
+        $response->headers->set('Transfer-Encoding', 'chunked');
+        $response->prepare($request);
+        $this->assertFalse($response->headers->has('Content-Length'));
     }
 
     public function testPrepareSetsPragmaOnHttp10Only()
@@ -634,7 +724,7 @@ class ResponseTest extends ResponseTestCase
     }
 
     /**
-     * @expectedException UnexpectedValueException
+     * @expectedException \UnexpectedValueException
      * @dataProvider invalidContentProvider
      */
     public function testSetContentInvalid($content)
@@ -668,7 +758,7 @@ class ResponseTest extends ResponseTestCase
     public function validContentProvider()
     {
         return array(
-            'obj'    => array(new StringableObject),
+            'obj'    => array(new StringableObject()),
             'string' => array('Foo'),
             'int'    => array(2),
         );

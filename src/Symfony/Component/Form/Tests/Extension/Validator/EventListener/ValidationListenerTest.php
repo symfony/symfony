@@ -17,6 +17,7 @@ use Symfony\Component\Form\Extension\Validator\Constraints\Form;
 use Symfony\Component\Form\Extension\Validator\EventListener\ValidationListener;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\ConstraintViolationList;
 
 class ValidationListenerTest extends \PHPUnit_Framework_TestCase
 {
@@ -53,10 +54,6 @@ class ValidationListenerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        if (!class_exists('Symfony\Component\EventDispatcher\Event')) {
-            $this->markTestSkipped('The "EventDispatcher" component is not available');
-        }
-
         $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $this->factory = $this->getMock('Symfony\Component\Form\FormFactoryInterface');
         $this->validator = $this->getMock('Symfony\Component\Validator\ValidatorInterface');
@@ -138,6 +135,25 @@ class ValidationListenerTest extends \PHPUnit_Framework_TestCase
             ->method('validate');
 
         $this->violationMapper->expects($this->never())
+            ->method('mapViolation');
+
+        $this->listener->validateForm(new FormEvent($form, null));
+    }
+
+    public function testValidateWithEmptyViolationList()
+    {
+        $form = $this->getMockForm();
+        $form->expects($this->once())
+            ->method('isRoot')
+            ->will($this->returnValue(true));
+
+        $this->validator
+            ->expects($this->once())
+            ->method('validate')
+            ->will($this->returnValue(new ConstraintViolationList()));
+
+        $this->violationMapper
+            ->expects($this->never())
             ->method('mapViolation');
 
         $this->listener->validateForm(new FormEvent($form, null));

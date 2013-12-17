@@ -32,17 +32,21 @@
         <parameter key="security.access.simple_role_voter.class">Symfony\Component\Security\Core\Authorization\Voter\RoleVoter</parameter>
         <parameter key="security.access.authenticated_voter.class">Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter</parameter>
         <parameter key="security.access.role_hierarchy_voter.class">Symfony\Component\Security\Core\Authorization\Voter\RoleHierarchyVoter</parameter>
+        <parameter key="security.access.expression_voter.class">Symfony\Component\Security\Core\Authorization\Voter\ExpressionVoter</parameter>
 
         <parameter key="security.firewall.class">Symfony\Component\Security\Http\Firewall</parameter>
         <parameter key="security.firewall.map.class">Symfony\Bundle\SecurityBundle\Security\FirewallMap</parameter>
         <parameter key="security.firewall.context.class">Symfony\Bundle\SecurityBundle\Security\FirewallContext</parameter>
         <parameter key="security.matcher.class">Symfony\Component\HttpFoundation\RequestMatcher</parameter>
+        <parameter key="security.expression_matcher.class">Symfony\Component\HttpFoundation\ExpressionRequestMatcher</parameter>
 
         <parameter key="security.role_hierarchy.class">Symfony\Component\Security\Core\Role\RoleHierarchy</parameter>
 
         <parameter key="security.http_utils.class">Symfony\Component\Security\Http\HttpUtils</parameter>
 
         <parameter key="security.validator.user_password.class">Symfony\Component\Security\Core\Validator\Constraints\UserPasswordValidator</parameter>
+
+        <parameter key="security.expression_language.class">Symfony\Component\Security\Core\Authorization\ExpressionLanguage</parameter>
     </parameters>
 
     <services>
@@ -78,6 +82,7 @@
 
         <service id="security.user_checker" class="%security.user_checker.class%" public="false" />
 
+        <service id="security.expression_language" class="%security.expression_language.class%" public="false" />
 
         <!-- Authorization related services -->
         <service id="security.access.decision_manager" class="%security.access.decision_manager.class%" public="false">
@@ -101,6 +106,13 @@
 
         <service id="security.access.role_hierarchy_voter" class="%security.access.role_hierarchy_voter.class%" public="false">
             <argument type="service" id="security.role_hierarchy" />
+            <tag name="security.voter" priority="245" />
+        </service>
+
+        <service id="security.access.expression_voter" class="%security.access.expression_voter.class%" public="false">
+            <argument type="service" id="security.expression_language" />
+            <argument type="service" id="security.authentication.trust_resolver" />
+            <argument type="service" id="security.role_hierarchy" on-invalid="null" />
             <tag name="security.voter" priority="245" />
         </service>
 
@@ -138,13 +150,6 @@
             <tag name="validator.constraint_validator" alias="security.validator.user_password" />
             <argument type="service" id="security.context" />
             <argument type="service" id="security.encoder_factory" />
-        </service>
-
-        <!-- Pseudorandom Number Generator -->
-        <service id="security.secure_random" class="Symfony\Component\Security\Core\Util\SecureRandom">
-            <tag name="monolog.logger" channel="security" />
-            <argument>%kernel.cache_dir%/secure_random.seed</argument>
-            <argument type="service" id="logger" on-invalid="ignore" />
         </service>
     </services>
 </container>

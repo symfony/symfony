@@ -67,7 +67,7 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTest
         $_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'] = 'PUT';
 
         $form->expects($this->once())
-            ->method('bind')
+            ->method('submit')
             ->with('DATA');
 
         $this->requestHandler->handleRequest($form, $this->request);
@@ -86,7 +86,7 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTest
         )));
 
         $form->expects($this->once())
-            ->method('bind')
+            ->method('submit')
             ->with($this->identicalTo(null));
 
         $this->requestHandler->handleRequest($form, $this->request);
@@ -115,7 +115,7 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTest
         )));
 
         $form->expects($this->once())
-            ->method('bind')
+            ->method('submit')
             ->with(array(
                 'field' => array(
                     'name' => 'upload.txt',
@@ -152,7 +152,7 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTest
         )));
 
         $form->expects($this->once())
-            ->method('bind')
+            ->method('submit')
             ->with(array(
                 'field' => array(
                     'subfield' => array(
@@ -179,7 +179,7 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTest
         $_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'] = 'PUT';
 
         $form->expects($this->never())
-            ->method('bind');
+            ->method('submit');
 
         $this->requestHandler->handleRequest($form, $this->request);
     }

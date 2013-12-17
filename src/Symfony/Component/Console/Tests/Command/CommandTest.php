@@ -260,6 +260,20 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $tester->execute(array('--bar' => true));
     }
 
+    public function testRunReturnsIntegerExitCode()
+    {
+        $command = new \TestCommand();
+        $exitCode = $command->run(new StringInput(''), new NullOutput());
+        $this->assertSame(0, $exitCode, '->run() returns integer exit code (treats null as 0)');
+
+        $command = $this->getMock('TestCommand', array('execute'));
+        $command->expects($this->once())
+             ->method('execute')
+             ->will($this->returnValue('2.3'));
+        $exitCode = $command->run(new StringInput(''), new NullOutput());
+        $this->assertSame(2, $exitCode, '->run() returns integer exit code (casts numeric to int)');
+    }
+
     public function testRunReturnsAlwaysInteger()
     {
         $command = new \TestCommand();

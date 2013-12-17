@@ -1,0 +1,347 @@
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+
+{% from _self import form_tree_entry, form_tree_details %}
+
+{% block toolbar %}
+    {% if collector.data|length %}
+        {% set icon %}
+            <img width="20" height="28" alt="Forms" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAbCAYAAAB836/YAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyRpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoTWFjaW50b3NoKSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDpDNkE1RUQ2RjBFMzcxMUUzOEIyQkVBRkQ5QzNENTIxMyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDpDNkE1RUQ3MDBFMzcxMUUzOEIyQkVBRkQ5QzNENTIxMyI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkM2QTVFRDZEMEUzNzExRTM4QjJCRUFGRDlDM0Q1MjEzIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOkM2QTVFRDZFMEUzNzExRTM4QjJCRUFGRDlDM0Q1MjEzIi8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+fkaAkgAAAQtJREFUeNpi/P//PwM1ARMDlQGLg4MDgsPCAqb//PnDwMzMDGJ+//v3L4oGqDgnSBxZPdwMLJa4ggioQRzoklBxVySh3SguBOICGOffv38TgNQuIny2C6oeRDEim8Fob28PjxVgBIEk/zMyMhIVXqAIZYQo/o81UlhZWcGYWIBNLQta+PACKS1iDYSGJy9OA4Fe+EBKUsKWhlmwpMtZZCS/NHzJ5iFFCRuN7wXEEtQ0sJDirIfGrwBiLiL0HSbWwLPoWQkH2I0tu+KKlOVk+BSngclALEnNMHSldqTMJtOcCFwGNlDbhZ1Y1LwhwpwTuAz0waI4gxIXPqC2lzuoYeAPalajjIO+ogcIMAAaCkonoOPIhQAAAABJRU5ErkJggg=="/>
+            <span class="sf-toolbar-status sf-toolbar-status-{% if collector.data.nb_errors %}red{% else %}green{% endif %}">{% if collector.data.nb_errors %}{{ collector.data.nb_errors }}{% else %}{{ collector.data.forms|length }}{% endif %}</span>
+        {% endset %}
+
+        {% include '@WebProfiler/Profiler/toolbar_item.html.twig' with { 'link': profiler_url } %}
+    {% endif %}
+{% endblock %}
+
+{% block menu %}
+    <span class="label">
+        <span class="icon"><img src="data:image/png;base64,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" alt=""/></span>
+        <strong>Forms</strong>
+        {% if collector.data.forms|length %}
+            <span class="count"><span>{{ collector.data.forms|length }}</span></span>
+        {% endif %}
+    </span>
+{% endblock %}
+
+{% block panel %}
+    <style type="text/css">
+    .window {
+        /*background: #F6F6F6;*/
+        margin: -30px -40px -40px;
+    }
+    .tree {
+        width: 230px;
+        padding: 10px;
+        font-size: 12px;
+        float: left;
+    }
+    #content .tree h2 {
+        font-size: 13px;
+        padding: 5px 7px;
+        margin: 0;
+    }
+    .tree li {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+    }
+    .tree a {
+        text-decoration: none;
+        display: block;
+        padding: 5px 7px;
+        border-radius: 6px;
+        color: #313131;
+    }
+    .tree ul ul a {
+        padding-left: 22px;
+    }
+    .tree ul ul ul a {
+        padding-left: 37px;
+    }
+    .tree ul ul ul ul a {
+        padding-left: 52px;
+    }
+    .tree ul ul ul ul ul a {
+        padding-left: 67px;
+    }
+    .tree a:hover {
+        background: #dfdfdf;
+    }
+    .tree a.active, a.active:hover {
+        background: #dfdfdf;
+        font-weight: bold;
+        color: #313131;
+    }
+    .tree-details {
+        border-left: 1px solid #dfdfdf;
+        background: white;
+        margin-left: 250px;
+        padding: 30px 40px 40px;
+    }
+    .form-type {
+        color: #999999;
+    }
+    .hidden {
+        display: none;
+    }
+    </style>
+
+    {% if collector.data.forms|length %}
+        <div class="window">
+            <div class="tree">
+                <h2>Forms</h2>
+
+                <ul>
+                {% for formName, formData in collector.data.forms %}
+                    {{ form_tree_entry(formName, formData) }}
+                {% endfor %}
+                </ul>
+            </div>
+
+            {% for formName, formData in collector.data.forms %}
+                {{ form_tree_details(formName, formData) }}
+            {% endfor %}
+        </div>
+    {% else %}
+        <p><em>No forms were submitted for this request.</em></p>
+    {% endif %}
+
+    <script>
+    function TabView() {
+        var _activeLink = null,
+            _activeView = null;
+
+        this.init = function () {
+            var links = document.querySelectorAll('.tree a'),
+                views = document.querySelectorAll('.tree-details'),
+                i,
+                l;
+
+            for (i = 0, l = links.length; i < l; ++i) {
+                (function () {
+                    var link = links[i];
+
+                    link.addEventListener('click', function (e) {
+                        var href = link.getAttribute('href'),
+                            targetId = href.substr(href.indexOf('#') + 1),
+                            view = document.getElementById(targetId);
+
+                        if (view) {
+                            if (null !== _activeLink) {
+                                Sfjs.removeClass(_activeLink, 'active');
+                            }
+
+                            if (null !== _activeView) {
+                                Sfjs.addClass(_activeView, 'hidden');
+                            }
+
+                            Sfjs.addClass(link, 'active');
+                            Sfjs.removeClass(view, 'hidden');
+
+                            _activeLink = link;
+                            _activeView = view;
+                        }
+
+                        e.preventDefault();
+
+                        return false;
+                    })
+                }());
+            }
+
+            for (i = 0, l = views.length; i < l; ++i) {
+                Sfjs.addClass(views[i], 'hidden');
+            }
+
+            if (links.length > 0) {
+                Sfjs.addClass(links[0], 'active');
+                _activeLink = links[0];
+
+                if (views.length > 0) {
+                    Sfjs.removeClass(views[0], 'hidden');
+                    _activeView = views[0];
+                }
+            }
+        }
+    }
+
+    var tabView = new TabView();
+
+    tabView.init();
+    </script>
+{% endblock %}
+
+{% macro form_tree_entry(name, data) %}
+    <li>
+        <a href="#details_{{ data.id }}">{{ name }}</a>
+
+        {% if data.children is not empty %}
+            <ul>
+                {% for childName, childData in data.children %}
+                    {{ _self.form_tree_entry(childName, childData) }}
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </li>
+{% endmacro %}
+
+{% macro form_tree_details(name, data) %}
+    <div class="tree-details" id="details_{{ data.id }}">
+        <h2>
+            {{ name }}
+            {% if data.type_class is defined %}
+            <span class="form-type">[<abbr title="{{ data.type_class }}">{{ data.type }}</abbr>]</span>
+            {% endif %}
+        </h2>
+
+        {% if data.errors is defined and data.errors|length > 0 %}
+        <h3>Errors</h3>
+
+        <table>
+            <tr>
+                <th width="50%">Message</th>
+                <th>Cause</th>
+            </tr>
+            {% for error in data.errors %}
+            <tr>
+                <td>{{ error.message }}</td>
+                <td><em>Unknown.</em></td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% endif %}
+
+        {% if data.default_data is defined %}
+        <h3>Default Data</h3>
+
+        <table>
+            <tr>
+                <th width="180">Model Format</th>
+                <td>
+                    {% if data.default_data.model is defined %}
+                        <pre>{{ data.default_data.model }}</pre>
+                    {% else %}
+                        <em>same as normalized format</em>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <th>Normalized Format</th>
+                <td><pre>{{ data.default_data.norm }}</pre></td>
+            </tr>
+            <tr>
+                <th>View Format</th>
+                <td>
+                    {% if data.default_data.view is defined %}
+                        <pre>{{ data.default_data.view }}</pre>
+                    {% else %}
+                        <em>same as normalized format</em>
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+        {% endif %}
+
+        {% if data.submitted_data is defined %}
+        <h3>Submitted Data</h3>
+
+        {% if data.submitted_data.norm is defined %}
+            <table>
+                <tr>
+                    <th width="180">View Format</th>
+                    <td>
+                        {% if data.submitted_data.view is defined %}
+                            <pre>{{ data.submitted_data.view }}</pre>
+                        {% else %}
+                            <em>same as normalized format</em>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Normalized Format</th>
+                    <td><pre>{{ data.submitted_data.norm }}</pre></td>
+                </tr>
+                <tr>
+                    <th>Model Format</th>
+                    <td>
+                        {% if data.submitted_data.model is defined %}
+                            <pre>{{ data.submitted_data.model }}</pre>
+                        {% else %}
+                            <em>same as normalized format</em>
+                        {% endif %}
+                    </td>
+                </tr>
+            </table>
+        {% else %}
+            <p><em>This form was not submitted.</em></p>
+        {% endif %}
+        {% endif %}
+
+        {% if data.passed_options is defined %}
+        <h3>Passed Options</h3>
+
+        {% if data.passed_options|length %}
+        <table>
+            <tr>
+                <th width="180">Option</th>
+                <th>Passed Value</th>
+                <th>Resolved Value</th>
+            </tr>
+            {% for option, value in data.passed_options %}
+            <tr>
+                <th>{{ option }}</th>
+                <td><pre>{{ value }}</pre></td>
+                <td>
+                    {% if data.resolved_options[option] is sameas(value) %}
+                        <em>same as passed value</em>
+                    {% else %}
+                        <pre>{{ data.resolved_options[option] }}</pre>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+        <p><em>No options where passed when constructing this form.</em></p>
+        {% endif %}
+        {% endif %}
+
+        {% if data.resolved_options is defined %}
+        <h3>Resolved Options</h3>
+
+        <table>
+            <tr>
+                <th width="180">Option</th>
+                <th>Value</th>
+            </tr>
+            {% for option, value in data.resolved_options %}
+            <tr>
+                <th>{{ option }}</th>
+                <td><pre>{{ value }}</pre></td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% endif %}
+
+        {% if data.view_vars is defined %}
+        <h3>View Variables</h3>
+
+        <table>
+            <tr>
+                <th width="180">Variable</th>
+                <th>Value</th>
+            </tr>
+            {% for variable, value in data.view_vars %}
+            <tr>
+                <th>{{ variable }}</th>
+                <td><pre>{{ value }}</pre></td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% endif %}
+    </div>
+
+    {% for childName, childData in data.children %}
+        {{ _self.form_tree_details(childName, childData) }}
+    {% endfor %}
+{% endmacro %}

@@ -33,6 +33,7 @@ abstract class AbstractAdapter implements AdapterInterface
     protected $sort        = false;
     protected $paths       = array();
     protected $notPaths    = array();
+    protected $ignoreUnreadableDirs = false;
 
     private static $areSupported = array();
 
@@ -206,6 +207,16 @@ abstract class AbstractAdapter implements AdapterInterface
     public function setNotPath(array $notPaths)
     {
         $this->notPaths = $notPaths;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function ignoreUnreadableDirs($ignore = true)
+    {
+        $this->ignoreUnreadableDirs = (Boolean) $ignore;
 
         return $this;
     }

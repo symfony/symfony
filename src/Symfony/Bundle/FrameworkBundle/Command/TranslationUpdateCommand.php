@@ -19,7 +19,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Translation\MessageCatalogue;
-use Symfony\Component\Yaml\Yaml;
 
 /**
  * A command that parse templates to extract translation messages and add them into the translation files.

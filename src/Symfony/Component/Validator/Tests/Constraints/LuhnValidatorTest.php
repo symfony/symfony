@@ -103,7 +103,28 @@ class LuhnValidatorTest extends \PHPUnit_Framework_TestCase
             array('1234567812345678'),
             array('4222222222222222'),
             array('0000000000000000'),
+        );
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
+     * @dataProvider getInvalidTypes
+     */
+    public function testInvalidTypes($number)
+    {
+        $constraint = new Luhn();
+
+        $this->validator->validate($number, $constraint);
+    }
+
+    public function getInvalidTypes()
+    {
+        return array(
             array(0),
+            array(123),
+            array(42424242424242424242),
+            array(378282246310005),
+            array(371449635398431),
         );
     }
 }

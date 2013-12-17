@@ -156,11 +156,11 @@ class ChoiceList implements ChoiceListInterface
         $values = $this->fixValues($values);
         $choices = array();
 
-        foreach ($values as $j => $givenValue) {
-            foreach ($this->values as $i => $value) {
+        foreach ($values as $i => $givenValue) {
+            foreach ($this->values as $j => $value) {
                 if ($value === $givenValue) {
-                    $choices[] = $this->choices[$i];
-                    unset($values[$j]);
+                    $choices[$i] = $this->choices[$j];
+                    unset($values[$i]);
 
                     if (0 === count($values)) {
                         break 2;
@@ -180,11 +180,11 @@ class ChoiceList implements ChoiceListInterface
         $choices = $this->fixChoices($choices);
         $values = array();
 
-        foreach ($this->choices as $i => $choice) {
-            foreach ($choices as $j => $givenChoice) {
+        foreach ($choices as $i => $givenChoice) {
+            foreach ($this->choices as $j => $choice) {
                 if ($choice === $givenChoice) {
-                    $values[] = $this->values[$i];
-                    unset($choices[$j]);
+                    $values[$i] = $this->values[$j];
+                    unset($choices[$i]);
 
                     if (0 === count($choices)) {
                         break 2;
@@ -198,17 +198,19 @@ class ChoiceList implements ChoiceListInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @deprecated Deprecated since version 2.4, to be removed in 3.0.
      */
     public function getIndicesForChoices(array $choices)
     {
         $choices = $this->fixChoices($choices);
         $indices = array();
 
-        foreach ($this->choices as $i => $choice) {
-            foreach ($choices as $j => $givenChoice) {
+        foreach ($choices as $i => $givenChoice) {
+            foreach ($this->choices as $j => $choice) {
                 if ($choice === $givenChoice) {
-                    $indices[] = $i;
-                    unset($choices[$j]);
+                    $indices[$i] = $j;
+                    unset($choices[$i]);
 
                     if (0 === count($choices)) {
                         break 2;
@@ -222,17 +224,19 @@ class ChoiceList implements ChoiceListInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @deprecated Deprecated since version 2.4, to be removed in 3.0.
      */
     public function getIndicesForValues(array $values)
     {
         $values = $this->fixValues($values);
         $indices = array();
 
-        foreach ($this->values as $i => $value) {
-            foreach ($values as $j => $givenValue) {
+        foreach ($values as $i => $givenValue) {
+            foreach ($this->values as $j => $value) {
                 if ($value === $givenValue) {
-                    $indices[] = $i;
-                    unset($values[$j]);
+                    $indices[$i] = $j;
+                    unset($values[$i]);
 
                     if (0 === count($values)) {
                         break 2;
@@ -485,9 +489,9 @@ class ChoiceList implements ChoiceListInterface
      * Extension point. In this implementation, choices are guaranteed to
      * always maintain their type and thus can be typesafely compared.
      *
-     * @param mixed $choice The choice.
+     * @param mixed $choice The choice
      *
-     * @return mixed The fixed choice.
+     * @return mixed The fixed choice
      */
     protected function fixChoice($choice)
     {
@@ -495,14 +499,14 @@ class ChoiceList implements ChoiceListInterface
     }
 
     /**
-    * Fixes the data type of the given choices to avoid comparison problems.
+     * Fixes the data type of the given choices to avoid comparison problems.
      *
-    * @param array $choices The choices.
-    *
-    * @return array The fixed choices.
-    *
-    * @see fixChoice
-    */
+     * @param array $choices The choices.
+     *
+     * @return array The fixed choices.
+     *
+     * @see fixChoice
+     */
     protected function fixChoices(array $choices)
     {
         return $choices;

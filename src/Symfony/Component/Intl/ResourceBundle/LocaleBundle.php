@@ -27,7 +27,7 @@ class LocaleBundle extends AbstractBundle implements LocaleBundleInterface
             $locale = \Locale::getDefault();
         }
 
-        return $this->readEntry($locale, array('Locales', $ofLocale));
+        return $this->readEntry($locale, array('Locales', $ofLocale), true);
     }
 
     /**
@@ -39,7 +39,7 @@ class LocaleBundle extends AbstractBundle implements LocaleBundleInterface
             $locale = \Locale::getDefault();
         }
 
-        if (null === ($locales = $this->readEntry($locale, array('Locales')))) {
+        if (null === ($locales = $this->readEntry($locale, array('Locales'), true))) {
             return array();
         }
 

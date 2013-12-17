@@ -124,7 +124,10 @@ class DigestAuthenticationListener implements ListenerInterface
 
     private function fail(GetResponseEvent $event, Request $request, AuthenticationException $authException)
     {
-        $this->securityContext->setToken(null);
+        $token = $this->securityContext->getToken();
+        if ($token instanceof UsernamePasswordToken && $this->providerKey === $token->getProviderKey()) {
+            $this->securityContext->setToken(null);
+        }
 
         if (null !== $this->logger) {
             $this->logger->info($authException);
@@ -136,7 +139,7 @@ class DigestAuthenticationListener implements ListenerInterface
 
 class DigestData
 {
-    private $elements;
+    private $elements = array();
     private $header;
     private $nonceExpiryTime;
 
@@ -144,7 +147,6 @@ class DigestData
     {
         $this->header = $header;
         preg_match_all('/(\w+)=("((?:[^"\\\\]|\\\\.)+)"|([^\s,$]+))/', $header, $matches, PREG_SET_ORDER);
-        $this->elements = array();
         foreach ($matches as $match) {
             if (isset($match[1]) && isset($match[3])) {
                 $this->elements[$match[1]] = isset($match[4]) ? $match[4] : $match[3];

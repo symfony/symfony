@@ -211,6 +211,10 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('testnopass', $request->getUser());
         $this->assertNull($request->getPassword());
         $this->assertFalse($request->isSecure());
+
+        $request = Request::create('http://test.com/?foo');
+        $this->assertEquals('/?foo', $request->getRequestUri());
+        $this->assertEquals(array('foo' => ''), $request->query->all());
     }
 
     /**
@@ -250,9 +254,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo=bar', $request->getQueryString());
     }
 
-    /**
-     * @covers Symfony\Component\HttpFoundation\Request::duplicate
-     */
     public function testDuplicate()
     {
         $request = new Request(array('foo' => 'bar'), array('foo' => 'bar'), array('foo' => 'bar'), array(), array(), array('HTTP_FOO' => 'bar'));
@@ -269,6 +270,21 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('foo' => 'foobar'), $dup->request->all(), '->duplicate() overrides the request parameters if provided');
         $this->assertEquals(array('foo' => 'foobar'), $dup->attributes->all(), '->duplicate() overrides the attributes if provided');
         $this->assertEquals(array('foo' => array('foobar')), $dup->headers->all(), '->duplicate() overrides the HTTP header if provided');
+    }
+
+    public function testDuplicateWithFormat()
+    {
+        $request = new Request(array(), array(), array('_format' => 'json'));
+        $dup = $request->duplicate();
+
+        $this->assertEquals('json', $dup->getRequestFormat());
+        $this->assertEquals('json', $dup->attributes->get('_format'));
+
+        $request = new Request();
+        $request->setRequestFormat('xml');
+        $dup = $request->duplicate();
+
+        $this->assertEquals('xml', $dup->getRequestFormat());
     }
 
     /**
@@ -653,23 +669,77 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $request->initialize(array('foo' => 'bar'));
         $this->assertEquals('', $request->getHost(), '->getHost() return empty string if not initialized');
 
-        $request->initialize(array(), array(), array(), array(), array(), array('HTTP_HOST' => 'www.exemple.com'));
-        $this->assertEquals('www.exemple.com', $request->getHost(), '->getHost() from Host Header');
+        $request->initialize(array(), array(), array(), array(), array(), array('HTTP_HOST' => 'www.example.com'));
+        $this->assertEquals('www.example.com', $request->getHost(), '->getHost() from Host Header');
 
         // Host header with port number
-        $request->initialize(array(), array(), array(), array(), array(), array('HTTP_HOST' => 'www.exemple.com:8080'));
-        $this->assertEquals('www.exemple.com', $request->getHost(), '->getHost() from Host Header with port number');
+        $request->initialize(array(), array(), array(), array(), array(), array('HTTP_HOST' => 'www.example.com:8080'));
+        $this->assertEquals('www.example.com', $request->getHost(), '->getHost() from Host Header with port number');
 
         // Server values
-        $request->initialize(array(), array(), array(), array(), array(), array('SERVER_NAME' => 'www.exemple.com'));
-        $this->assertEquals('www.exemple.com', $request->getHost(), '->getHost() from server name');
+        $request->initialize(array(), array(), array(), array(), array(), array('SERVER_NAME' => 'www.example.com'));
+        $this->assertEquals('www.example.com', $request->getHost(), '->getHost() from server name');
 
-        $request->initialize(array(), array(), array(), array(), array(), array('SERVER_NAME' => 'www.exemple.com', 'HTTP_HOST' => 'www.host.com'));
+        $request->initialize(array(), array(), array(), array(), array(), array('SERVER_NAME' => 'www.example.com', 'HTTP_HOST' => 'www.host.com'));
         $this->assertEquals('www.host.com', $request->getHost(), '->getHost() value from Host header has priority over SERVER_NAME ');
     }
 
+    public function testGetPort()
+    {
+        $request = Request::create('http://example.com', 'GET', array(), array(), array(), array(
+            'HTTP_X_FORWARDED_PROTO' => 'https',
+            'HTTP_X_FORWARDED_PORT' => '443'
+        ));
+        $port = $request->getPort();
+
+        $this->assertEquals(80, $port, 'Without trusted proxies FORWARDED_PROTO and FORWARDED_PORT are ignored.');
+
+        Request::setTrustedProxies(array('1.1.1.1'));
+        $request = Request::create('http://example.com', 'GET', array(), array(), array(), array(
+            'HTTP_X_FORWARDED_PROTO' => 'https',
+            'HTTP_X_FORWARDED_PORT'  => '8443'
+        ));
+        $port = $request->getPort();
+
+        $this->assertEquals(8443, $port, 'With PROTO and PORT set PORT takes precedence.');
+
+        $request = Request::create('http://example.com', 'GET', array(), array(), array(), array(
+            'HTTP_X_FORWARDED_PROTO' => 'https'
+        ));
+        $port = $request->getPort();
+
+        $this->assertEquals(443, $port, 'With only PROTO set getPort() defaults to 443.');
+
+        $request = Request::create('http://example.com', 'GET', array(), array(), array(), array(
+            'HTTP_X_FORWARDED_PROTO' => 'http'
+        ));
+        $port = $request->getPort();
+
+        $this->assertEquals(80, $port, 'If X_FORWARDED_PROTO is set to http return 80.');
+
+        $request = Request::create('http://example.com', 'GET', array(), array(), array(), array(
+            'HTTP_X_FORWARDED_PROTO' => 'On'
+        ));
+        $port = $request->getPort();
+        $this->assertEquals(443, $port, 'With only PROTO set and value is On, getPort() defaults to 443.');
+
+        $request = Request::create('http://example.com', 'GET', array(), array(), array(), array(
+            'HTTP_X_FORWARDED_PROTO' => '1'
+        ));
+        $port = $request->getPort();
+        $this->assertEquals(443, $port, 'With only PROTO set and value is 1, getPort() defaults to 443.');
+
+        $request = Request::create('http://example.com', 'GET', array(), array(), array(), array(
+            'HTTP_X_FORWARDED_PROTO' => 'something-else'
+        ));
+        $port = $request->getPort();
+        $this->assertEquals(80, $port, 'With only PROTO set and value is not recognized, getPort() defaults to 80.');
+
+        Request::setTrustedProxies(array());
+    }
+
     /**
-     * @expectedException RuntimeException
+     * @expectedException \RuntimeException
      */
     public function testGetHostWithFakeHttpHostValue()
     {
@@ -811,14 +881,14 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
     public function testGetContentWorksTwiceInDefaultMode()
     {
-        $req = new Request;
+        $req = new Request();
         $this->assertEquals('', $req->getContent());
         $this->assertEquals('', $req->getContent());
     }
 
     public function testGetContentReturnsResource()
     {
-        $req = new Request;
+        $req = new Request();
         $retval = $req->getContent(true);
         $this->assertInternalType('resource', $retval);
         $this->assertEquals("", fread($retval, 1));
@@ -826,12 +896,12 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException LogicException
+     * @expectedException \LogicException
      * @dataProvider getContentCantBeCalledTwiceWithResourcesProvider
      */
     public function testGetContentCantBeCalledTwiceWithResources($first, $second)
     {
-        $req = new Request;
+        $req = new Request();
         $req->getContent($first);
         $req->getContent($second);
     }
@@ -930,6 +1000,12 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $request->overrideGlobals();
 
         $this->assertArrayHasKey('HTTP_X_FORWARDED_PROTO', $_SERVER);
+
+        $request->headers->set('CONTENT_TYPE', 'multipart/form-data');
+        $request->headers->set('CONTENT_LENGTH', 12345);
+        $request->overrideGlobals();
+        $this->assertArrayHasKey('CONTENT_TYPE', $_SERVER);
+        $this->assertArrayHasKey('CONTENT_LENGTH', $_SERVER);
 
         // restore initial $_SERVER array
         $_SERVER = $server;
@@ -1085,6 +1161,22 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $request = new Request();
         $request->headers->set('Accept-Charset', 'ISO-8859-1,utf-8;q=0.7,*;q=0.7');
         $this->assertEquals(array('ISO-8859-1', 'utf-8', '*'), $request->getCharsets());
+    }
+
+    public function testGetEncodings()
+    {
+        $request = new Request();
+        $this->assertEquals(array(), $request->getEncodings());
+        $request->headers->set('Accept-Encoding', 'gzip,deflate,sdch');
+        $this->assertEquals(array(), $request->getEncodings()); // testing caching
+
+        $request = new Request();
+        $request->headers->set('Accept-Encoding', 'gzip,deflate,sdch');
+        $this->assertEquals(array('gzip', 'deflate', 'sdch'), $request->getEncodings());
+
+        $request = new Request();
+        $request->headers->set('Accept-Encoding', 'gzip;q=0.4,deflate;q=0.9,compress;q=0.7');
+        $this->assertEquals(array('deflate', 'compress', 'gzip'), $request->getEncodings());
     }
 
     public function testGetAcceptableContentTypes()
@@ -1269,7 +1361,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
      */
     public function testUrlencodedStringPrefix($string, $prefix, $expect)
     {
-        $request = new Request;
+        $request = new Request();
 
         $me = new \ReflectionMethod($request, 'getUrlencodedPrefix');
         $me->setAccessible(true);
@@ -1350,6 +1442,13 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(443, $request->getPort());
         $this->assertTrue($request->isSecure());
 
+        // check various X_FORWARDED_PROTO header values
+        $request->headers->set('X_FORWARDED_PROTO', 'ssl');
+        $this->assertTrue($request->isSecure());
+
+        $request->headers->set('X_FORWARDED_PROTO', 'https, http');
+        $this->assertTrue($request->isSecure());
+
         // custom header names
         Request::setTrustedHeaderName(Request::HEADER_CLIENT_IP, 'X_MY_FOR');
         Request::setTrustedHeaderName(Request::HEADER_CLIENT_HOST, 'X_MY_HOST');
@@ -1379,6 +1478,24 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testSetTrustedProxiesInvalidHeaderName()
+    {
+        Request::create('http://example.com/');
+        Request::setTrustedHeaderName('bogus name', 'X_MY_FOR');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testGetTrustedProxiesInvalidHeaderName()
+    {
+        Request::create('http://example.com/');
+        Request::getTrustedHeaderName('bogus name');
+    }
+
+    /**
      * @dataProvider iisRequestUriProvider
      */
     public function testIISRequestUri($headers, $server, $expectedRequestUri)
@@ -1390,7 +1507,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedRequestUri, $request->getRequestUri(), '->getRequestUri() is correct');
 
         $subRequestUri = '/bar/foo';
-        $subRequest = $request::create($subRequestUri, 'get', array(), array(), array(), $request->server->all());
+        $subRequest = Request::create($subRequestUri, 'get', array(), array(), array(), $request->server->all());
         $this->assertEquals($subRequestUri, $subRequest->getRequestUri(), '->getRequestUri() is correct in sub request');
     }
 
@@ -1466,6 +1583,60 @@ class RequestTest extends \PHPUnit_Framework_TestCase
             )
         );
     }
+
+    public function testTrustedHosts()
+    {
+        // create a request
+        $request = Request::create('/');
+
+        // no trusted host set -> no host check
+        $request->headers->set('host', 'evil.com');
+        $this->assertEquals('evil.com', $request->getHost());
+
+        // add a trusted domain and all its subdomains
+        Request::setTrustedHosts(array('.*\.?trusted.com$'));
+
+        // untrusted host
+        $request->headers->set('host', 'evil.com');
+        try {
+            $request->getHost();
+            $this->fail('Request::getHost() should throw an exception when host is not trusted.');
+        } catch (\UnexpectedValueException $e) {
+            $this->assertEquals('Untrusted Host "evil.com"', $e->getMessage());
+        }
+
+        // trusted hosts
+        $request->headers->set('host', 'trusted.com');
+        $this->assertEquals('trusted.com', $request->getHost());
+        $this->assertEquals(80, $request->getPort());
+
+        $request->server->set('HTTPS', true);
+        $request->headers->set('host', 'trusted.com');
+        $this->assertEquals('trusted.com', $request->getHost());
+        $this->assertEquals(443, $request->getPort());
+        $request->server->set('HTTPS', false);
+
+        $request->headers->set('host', 'trusted.com:8000');
+        $this->assertEquals('trusted.com', $request->getHost());
+        $this->assertEquals(8000, $request->getPort());
+
+        $request->headers->set('host', 'subdomain.trusted.com');
+        $this->assertEquals('subdomain.trusted.com', $request->getHost());
+
+        // reset request for following tests
+        Request::setTrustedHosts(array());
+    }
+
+    public function testFactory()
+    {
+        Request::setFactory(function (array $query = array(), array $request = array(), array $attributes = array(), array $cookies = array(), array $files = array(), array $server = array(), $content = null) {
+            return new NewRequest();
+        });
+
+        $this->assertEquals('foo', Request::create('/')->getFoo());
+
+        Request::setFactory(null);
+    }
 }
 
 class RequestContentProxy extends Request
@@ -1473,5 +1644,13 @@ class RequestContentProxy extends Request
     public function getContent($asResource = false)
     {
         return http_build_query(array('_method' => 'PUT', 'content' => 'mycontent'));
+    }
+}
+
+class NewRequest extends Request
+{
+    public function getFoo()
+    {
+        return 'foo';
     }
 }

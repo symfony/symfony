@@ -43,8 +43,13 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
             throw new \InvalidArgumentException('You must at least add one voter.');
         }
 
+        $strategyMethod = 'decide'.ucfirst($strategy);
+        if (!is_callable(array($this, $strategyMethod))) {
+            throw new \InvalidArgumentException(sprintf('The strategy "%s" is not supported.', $strategy));
+        }
+
         $this->voters = $voters;
-        $this->strategy = 'decide'.ucfirst($strategy);
+        $this->strategy = $strategyMethod;
         $this->allowIfAllAbstainDecisions = (Boolean) $allowIfAllAbstainDecisions;
         $this->allowIfEqualGrantedDeniedDecisions = (Boolean) $allowIfEqualGrantedDeniedDecisions;
     }

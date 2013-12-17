@@ -117,5 +117,11 @@
         {% endfor %}
     {% else %}
         {{ log.priorityName }} - {{ log.message }}
+        {% if log.context is defined and log.context is not empty %}
+            <br />
+            <small>
+                <strong>Context</strong>: {{ log.context|json_encode(64 b-or 256) }}
+            </small>
+        {% endif %}
     {% endif %}
 {% endmacro %}

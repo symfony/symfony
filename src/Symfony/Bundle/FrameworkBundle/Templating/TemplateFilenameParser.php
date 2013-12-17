@@ -24,9 +24,13 @@ class TemplateFilenameParser implements TemplateNameParserInterface
     /**
      * {@inheritdoc}
      */
-    public function parse($file)
+    public function parse($name)
     {
-        $parts = explode('/', strtr($file, '\\', '/'));
+        if ($name instanceof TemplateReferenceInterface) {
+            return $name;
+        }
+
+        $parts = explode('/', strtr($name, '\\', '/'));
 
         $elements = explode('.', array_pop($parts));
         if (3 > count($elements)) {

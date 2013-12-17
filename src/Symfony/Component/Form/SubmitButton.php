@@ -32,17 +32,18 @@ class SubmitButton extends Button implements ClickableInterface
     }
 
     /**
-     * Binds data to the button.
+     * Submits data to the button.
      *
-     * @param null|string $submittedData The data
+     * @param null|string $submittedData The data.
+     * @param Boolean     $clearMissing  Not used.
      *
      * @return SubmitButton The button instance
      *
-     * @throws Exception\AlreadyBoundException If the form has already been bound.
+     * @throws Exception\AlreadySubmittedException If the form has already been submitted.
      */
-    public function bind($submittedData)
+    public function submit($submittedData, $clearMissing = true)
     {
-        parent::bind($submittedData);
+        parent::submit($submittedData, $clearMissing);
 
         $this->clicked = null !== $submittedData;
 

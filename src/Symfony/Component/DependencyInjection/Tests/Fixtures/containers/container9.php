@@ -6,6 +6,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Parameter;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 $container = new ContainerBuilder();
 $container->
@@ -43,13 +44,15 @@ $container->getParameterBag()->add(array(
     'foo' => 'bar',
 ));
 $container->setAlias('alias_for_foo', 'foo');
+$container->setAlias('alias_for_alias', 'alias_for_foo');
 $container->
     register('method_call1', 'FooClass')->
     setFile(realpath(__DIR__.'/../includes/foo.php'))->
     addMethodCall('setBar', array(new Reference('foo')))->
     addMethodCall('setBar', array(new Reference('foo2', ContainerInterface::NULL_ON_INVALID_REFERENCE)))->
     addMethodCall('setBar', array(new Reference('foo3', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)))->
-    addMethodCall('setBar', array(new Reference('foobaz', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)))
+    addMethodCall('setBar', array(new Reference('foobaz', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)))->
+    addMethodCall('setBar', array(new Expression('service("foo").foo() ~ parameter("foo")')))
 ;
 $container->
     register('factory_service', 'Bar')->
@@ -79,6 +82,15 @@ $container
 $container
     ->register('depends_on_request', 'stdClass')
     ->addMethodCall('setRequest', array(new Reference('request', ContainerInterface::NULL_ON_INVALID_REFERENCE, false)))
+;
+$container
+    ->register('configurator_service', 'ConfClass')
+    ->setPublic(false)
+    ->addMethodCall('setFoo', array(new Reference('baz')))
+;
+$container
+    ->register('configured_service', 'stdClass')
+    ->setConfigurator(array(new Reference('configurator_service'), 'configureStdClass'))
 ;
 
 return $container;

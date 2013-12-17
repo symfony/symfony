@@ -8,6 +8,7 @@ $container->loadFromExtension('twig', array(
      ),
      'globals' => array(
          'foo' => '@bar',
+         'baz' => '@@qux',
          'pi'  => 3.14,
          'bad' => array('key' => 'foo'),
      ),

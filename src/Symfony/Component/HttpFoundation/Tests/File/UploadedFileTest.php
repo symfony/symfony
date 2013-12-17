@@ -63,6 +63,32 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('application/octet-stream', $file->getClientMimeType());
     }
 
+    public function testGuessClientExtension()
+    {
+        $file = new UploadedFile(
+            __DIR__.'/Fixtures/test.gif',
+            'original.gif',
+            'image/gif',
+            filesize(__DIR__.'/Fixtures/test.gif'),
+            null
+        );
+
+        $this->assertEquals('gif', $file->guessClientExtension());
+    }
+
+    public function testGuessClientExtensionWithIncorrectMimeType()
+    {
+        $file = new UploadedFile(
+            __DIR__.'/Fixtures/test.gif',
+            'original.gif',
+            'image/jpeg',
+            filesize(__DIR__.'/Fixtures/test.gif'),
+            null
+        );
+
+        $this->assertEquals('jpeg', $file->guessClientExtension());
+    }
+
     public function testErrorIsOkByDefault()
     {
         $file = new UploadedFile(
@@ -198,7 +224,7 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
             null,
             filesize(__DIR__.'/Fixtures/test.gif'),
             UPLOAD_ERR_OK,
-                true
+            true
         );
 
         $this->assertTrue($file->isValid());

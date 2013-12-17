@@ -13,20 +13,20 @@
     <services>
         <service id="web_profiler.controller.profiler" class="%web_profiler.controller.profiler.class%">
             <argument type="service" id="router" on-invalid="null" />
-            <argument type="service" id="profiler" />
+            <argument type="service" id="profiler" on-invalid="null" />
             <argument type="service" id="twig" />
             <argument>%data_collector.templates%</argument>
             <argument>%web_profiler.debug_toolbar.position%</argument>
         </service>
 
         <service id="web_profiler.controller.router" class="%web_profiler.controller.router.class%">
-            <argument type="service" id="profiler" />
+            <argument type="service" id="profiler" on-invalid="null" />
             <argument type="service" id="twig" />
             <argument type="service" id="router" on-invalid="null" />
         </service>
 
         <service id="web_profiler.controller.exception" class="%web_profiler.controller.exception.class%">
-            <argument type="service" id="profiler" />
+            <argument type="service" id="profiler" on-invalid="null" />
             <argument type="service" id="twig" />
             <argument>%kernel.debug%</argument>
         </service>

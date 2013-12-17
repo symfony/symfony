@@ -222,6 +222,62 @@
                 <source>Unsupported card type or invalid card number.</source>
                 <target>نوع کارت پشتیبانی نمی شود یا شماره کارت نامعتبر است.</target>
             </trans-unit>
+            <trans-unit id="59">
+                <source>This is not a valid International Bank Account Number (IBAN).</source>
+                <target>این یک شماره حساب بین المللی بانک (IBAN) درست نیست.</target>
+            </trans-unit>
+            <trans-unit id="60">
+                <source>This value is not a valid ISBN-10.</source>
+                <target>این مقدار یک ISBN-10 درست نیست.</target>
+            </trans-unit>
+            <trans-unit id="61">
+                <source>This value is not a valid ISBN-13.</source>
+                <target>این مقدار یک ISBN-13 درست نیست.</target>
+            </trans-unit>
+            <trans-unit id="62">
+                <source>This value is neither a valid ISBN-10 nor a valid ISBN-13.</source>
+                <target>این مقدار یک ISBN-10 درست یا ISBN-13 درست نیست.</target>
+            </trans-unit>
+            <trans-unit id="63">
+                <source>This value is not a valid ISSN.</source>
+                <target>این مقدار یک ISSN درست نیست.</target>
+            </trans-unit>
+            <trans-unit id="64">
+                <source>This value is not a valid currency.</source>
+                <target>این مقدار یک یکای پول درست نیست.</target>
+            </trans-unit>
+            <trans-unit id="65">
+                <source>This value should be equal to {{ compared_value }}.</source>
+                <target>این مقدار باید برابر با {{ compared_value }} باشد.</target>
+            </trans-unit>
+            <trans-unit id="66">
+                <source>This value should be greater than {{ compared_value }}.</source>
+                <target>این مقدار باید از {{ compared_value }} بیشتر باشد.</target>
+            </trans-unit>
+            <trans-unit id="67">
+                <source>This value should be greater than or equal to {{ compared_value }}.</source>
+                <target>این مقدار باید بزرگتر یا مساوی با {{ compared_value }} باشد.</target>
+            </trans-unit>
+            <trans-unit id="68">
+                <source>This value should be identical to {{ compared_value_type }} {{ compared_value }}.</source>
+                <target>این مقدار باید با {{ compared_value_type }} {{ compared_value }} یکی باشد.</target>
+            </trans-unit>
+            <trans-unit id="69">
+                <source>This value should be less than {{ compared_value }}.</source>
+                <target>این مقدار باید کمتر از {{ compared_value }} باشد.</target>
+            </trans-unit>
+            <trans-unit id="70">
+                <source>This value should be less than or equal to {{ compared_value }}.</source>
+                <target>این مقدار باید کمتر یا مساوی با {{ compared_value }} باشد.</target>
+            </trans-unit>
+            <trans-unit id="71">
+                <source>This value should not be equal to {{ compared_value }}.</source>
+                <target>این مقدار نباید با {{ compared_value }} برابر باشد.</target>
+            </trans-unit>
+            <trans-unit id="72">
+                <source>This value should not be identical to {{ compared_value_type }} {{ compared_value }}.</source>
+                <target>این مقدار نباید {{ compared_value_type }} {{ compared_value }} یکی باشد.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

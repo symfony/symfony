@@ -41,6 +41,8 @@ class FormType extends BaseType
     {
         parent::buildForm($builder, $options);
 
+        $isDataOptionSet = array_key_exists('data', $options);
+
         $builder
             ->setRequired($options['required'])
             ->setErrorBubbling($options['error_bubbling'])
@@ -50,8 +52,8 @@ class FormType extends BaseType
             ->setByReference($options['by_reference'])
             ->setInheritData($options['inherit_data'])
             ->setCompound($options['compound'])
-            ->setData(isset($options['data']) ? $options['data'] : null)
-            ->setDataLocked(isset($options['data']))
+            ->setData($isDataOptionSet ? $options['data'] : null)
+            ->setDataLocked($isDataOptionSet)
             ->setDataMapper($options['compound'] ? new PropertyPathMapper($this->propertyAccessor) : null)
             ->setMethod($options['method'])
             ->setAction($options['action'])
@@ -86,7 +88,7 @@ class FormType extends BaseType
         $view->vars = array_replace($view->vars, array(
             'read_only'  => $readOnly,
             'errors'     => $form->getErrors(),
-            'valid'      => $form->isBound() ? $form->isValid() : true,
+            'valid'      => $form->isSubmitted() ? $form->isValid() : true,
             'value'      => $form->getViewData(),
             'data'       => $form->getNormData(),
             'required'   => $form->isRequired(),
@@ -97,6 +99,7 @@ class FormType extends BaseType
             'compound'   => $form->getConfig()->getCompound(),
             'method'     => $form->getConfig()->getMethod(),
             'action'     => $form->getConfig()->getAction(),
+            'submitted'  => $form->isSubmitted(),
         ));
     }
 
@@ -155,7 +158,6 @@ class FormType extends BaseType
             if (null !== $options['virtual']) {
                 // Uncomment this as soon as the deprecation note should be shown
                 // trigger_error('The form option "virtual" is deprecated since version 2.3 and will be removed in 3.0. Use "inherit_data" instead.', E_USER_DEPRECATED);
-
                 return $options['virtual'];
             }
 

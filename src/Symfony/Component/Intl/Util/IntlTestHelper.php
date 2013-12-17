@@ -39,11 +39,11 @@ class IntlTestHelper
         //   * the intl extension is loaded with version Intl::getIcuStubVersion()
         //   * the intl extension is not loaded
 
-        if (IcuVersion::compare(Intl::getIcuVersion(), Intl::getIcuStubVersion(), '!=', $precision = 1)) {
+        if (IcuVersion::compare(Intl::getIcuVersion(), Intl::getIcuStubVersion(), '!=', 1)) {
             $testCase->markTestSkipped('Please change ICU version to ' . Intl::getIcuStubVersion());
         }
 
-        if (IcuVersion::compare(Intl::getIcuDataVersion(), Intl::getIcuStubVersion(), '!=', $precision = 1)) {
+        if (IcuVersion::compare(Intl::getIcuDataVersion(), Intl::getIcuStubVersion(), '!=', 1)) {
             $testCase->markTestSkipped('Please change the Icu component to version 1.0.x or 1.' . IcuVersion::normalize(Intl::getIcuStubVersion(), 1) . '.x');
         }
 
@@ -75,12 +75,12 @@ class IntlTestHelper
         }
 
         // ... and only if the version is *one specific version* ...
-        if (IcuVersion::compare(Intl::getIcuVersion(), Intl::getIcuStubVersion(), '!=', $precision = 1)) {
+        if (IcuVersion::compare(Intl::getIcuVersion(), Intl::getIcuStubVersion(), '!=', 1)) {
             $testCase->markTestSkipped('Please change ICU version to ' . Intl::getIcuStubVersion());
         }
 
         // ... and only if the data in the Icu component matches that version.
-        if (IcuVersion::compare(Intl::getIcuDataVersion(), Intl::getIcuStubVersion(), '!=', $precision = 1)) {
+        if (IcuVersion::compare(Intl::getIcuDataVersion(), Intl::getIcuStubVersion(), '!=', 1)) {
             $testCase->markTestSkipped('Please change the Icu component to version 1.0.x or 1.' . IcuVersion::normalize(Intl::getIcuStubVersion(), 1) . '.x');
         }
 

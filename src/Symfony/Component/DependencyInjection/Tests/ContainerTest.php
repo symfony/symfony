@@ -32,6 +32,30 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider dataForTestCamelize
+     */
+    public function testCamelize($id, $expected)
+    {
+        $this->assertEquals($expected, Container::camelize($id), sprintf('Container::camelize("%s")', $id));
+    }
+
+    public function dataForTestCamelize()
+    {
+        return array(
+            array('foo_bar', 'FooBar'),
+            array('foo.bar', 'Foo_Bar'),
+            array('foo.bar_baz', 'Foo_BarBaz'),
+            array('foo._bar', 'Foo_Bar'),
+            array('foo_.bar', 'Foo_Bar'),
+            array('_foo', 'Foo'),
+            array('.foo', '_Foo'),
+            array('foo_', 'Foo'),
+            array('foo.', 'Foo_'),
+            array('foo\bar', 'Foo_Bar'),
+        );
+    }
+
+    /**
      * @covers Symfony\Component\DependencyInjection\Container::compile
      */
     public function testCompile()
@@ -113,6 +137,16 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Symfony\Component\DependencyInjection\Container::set
+     */
+    public function testSetWithNullResetTheService()
+    {
+        $sc = new Container();
+        $sc->set('foo', null);
+        $this->assertFalse($sc->has('foo'));
+    }
+
+    /**
      * @expectedException \InvalidArgumentException
      */
     public function testSetDoesNotAllowPrototypeScope()
@@ -165,6 +199,30 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
             $this->assertInstanceOf('Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException', $e, '->get() throws a ServiceNotFoundException exception if the service is empty');
         }
         $this->assertNull($sc->get('', ContainerInterface::NULL_ON_INVALID_REFERENCE));
+    }
+
+    public function testGetThrowServiceNotFoundException()
+    {
+        $sc = new ProjectServiceContainer();
+        $sc->set('foo', $foo = new \stdClass());
+        $sc->set('bar', $foo = new \stdClass());
+        $sc->set('baz', $foo = new \stdClass());
+
+        try {
+            $sc->get('foo1');
+            $this->fail('->get() throws an Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException if the key does not exist');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException', $e, '->get() throws an Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException if the key does not exist');
+            $this->assertEquals('You have requested a non-existent service "foo1". Did you mean this: "foo"?', $e->getMessage(), '->get() throws an Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException with some advices');
+        }
+
+        try {
+            $sc->get('bag');
+            $this->fail('->get() throws an Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException if the key does not exist');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException', $e, '->get() throws an Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException if the key does not exist');
+            $this->assertEquals('You have requested a non-existent service "bag". Did you mean one of these: "bar", "baz"?', $e->getMessage(), '->get() throws an Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException with some advices');
+        }
     }
 
     public function testGetCircularReference()
@@ -453,6 +511,14 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
         return $reflection->getValue($obj);
     }
+
+    public function testAlias()
+    {
+        $c = new ProjectServiceContainer();
+
+        $this->assertTrue($c->has('alias'));
+        $this->assertSame($c->get('alias'), $c->get('bar'));
+    }
 }
 
 class ProjectServiceContainer extends Container
@@ -466,6 +532,7 @@ class ProjectServiceContainer extends Container
         $this->__bar = new \stdClass();
         $this->__foo_bar = new \stdClass();
         $this->__foo_baz = new \stdClass();
+        $this->aliases = array('alias' => 'bar');
     }
 
     protected function getScopedService()

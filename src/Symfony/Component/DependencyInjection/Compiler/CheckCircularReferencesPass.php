@@ -28,6 +28,7 @@ class CheckCircularReferencesPass implements CompilerPassInterface
 {
     private $currentId;
     private $currentPath;
+    private $checkedNodes;
 
     /**
      * Checks the ContainerBuilder object for circular references.
@@ -38,6 +39,7 @@ class CheckCircularReferencesPass implements CompilerPassInterface
     {
         $graph = $container->getCompiler()->getServiceReferenceGraph();
 
+        $this->checkedNodes = array();
         foreach ($graph->getNodes() as $id => $node) {
             $this->currentId = $id;
             $this->currentPath = array($id);
@@ -58,15 +60,20 @@ class CheckCircularReferencesPass implements CompilerPassInterface
         foreach ($edges as $edge) {
             $node      = $edge->getDestNode();
             $id        = $node->getId();
-            $searchKey = array_search($id, $this->currentPath);
-            $this->currentPath[] = $id;
 
-            if (false !== $searchKey) {
-                throw new ServiceCircularReferenceException($id, array_slice($this->currentPath, $searchKey));
+            if (empty($this->checkedNodes[$id])) {
+                $searchKey = array_search($id, $this->currentPath);
+                $this->currentPath[] = $id;
+
+                if (false !== $searchKey) {
+                    throw new ServiceCircularReferenceException($id, array_slice($this->currentPath, $searchKey));
+                }
+
+                $this->checkOutEdges($node->getOutEdges());
+
+                $this->checkedNodes[$id] = true;
+                array_pop($this->currentPath);
             }
-
-            $this->checkOutEdges($node->getOutEdges());
-            array_pop($this->currentPath);
         }
     }
 }

@@ -30,7 +30,29 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals('%form.type_extension.csrf.enabled%', $def->getArgument(1));
         $this->assertEquals('_csrf', $container->getParameter('form.type_extension.csrf.field_name'));
         $this->assertEquals('%form.type_extension.csrf.field_name%', $def->getArgument(2));
-        $this->assertEquals('s3cr3t', $container->getParameterBag()->resolveValue($container->findDefinition('form.csrf_provider')->getArgument(1)));
+    }
+
+    /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage CSRF protection needs sessions to be enabled.
+     */
+    public function testCsrfProtectionNeedsSessionToBeEnabled()
+    {
+        $this->createContainerFromFile('csrf_needs_session');
+    }
+
+    public function testCsrfProtectionForFormsEnablesCsrfProtectionAutomatically()
+    {
+        $container = $this->createContainerFromFile('csrf');
+
+        $this->assertTrue($container->hasDefinition('security.csrf.token_manager'));
+    }
+
+    public function testSecureRandomIsAvailableIfCsrfIsDisabled()
+    {
+        $container = $this->createContainerFromFile('csrf_disabled');
+
+        $this->assertTrue($container->hasDefinition('security.secure_random'));
     }
 
     public function testProxies()
@@ -54,17 +76,20 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('esi'), '->registerEsiConfiguration() loads esi.xml');
     }
 
-    public function testProfiler()
+    public function testEnabledProfiler()
     {
-        $container = $this->createContainerFromFile('full');
+        $container = $this->createContainerFromFile('profiler');
 
         $this->assertTrue($container->hasDefinition('profiler'), '->registerProfilerConfiguration() loads profiling.xml');
         $this->assertTrue($container->hasDefinition('data_collector.config'), '->registerProfilerConfiguration() loads collectors.xml');
-        $this->assertTrue($container->getParameter('profiler_listener.only_exceptions'));
-        $this->assertEquals('%profiler_listener.only_exceptions%', $container->getDefinition('profiler_listener')->getArgument(2));
+    }
 
-        $calls = $container->getDefinition('profiler')->getMethodCalls();
-        $this->assertEquals('disable', $calls[0][0]);
+    public function testDisabledProfiler()
+    {
+        $container = $this->createContainerFromFile('full');
+
+        $this->assertFalse($container->hasDefinition('profiler'), '->registerProfilerConfiguration() does not load profiling.xml');
+        $this->assertFalse($container->hasDefinition('data_collector.config'), '->registerProfilerConfiguration() does not load collectors.xml');
     }
 
     public function testRouter()
@@ -109,6 +134,15 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals(90000, $options['gc_maxlifetime']);
 
         $this->assertEquals('/path/to/sessions', $container->getParameter('session.save_path'));
+    }
+
+    public function testNullSessionHandler()
+    {
+        $container = $this->createContainerFromFile('session');
+
+        $this->assertTrue($container->hasDefinition('session'), '->registerSessionConfiguration() loads session.xml');
+        $this->assertNull($container->getDefinition('session.storage.native')->getArgument(1));
+        $this->assertNull($container->getDefinition('session.storage.php_bridge')->getArgument(0));
     }
 
     public function testTemplating()
@@ -169,20 +203,22 @@ abstract class FrameworkExtensionTest extends TestCase
             }
         }
 
-        $rootDirectory = str_replace('/', DIRECTORY_SEPARATOR, realpath(__DIR__.'/../../../../..').'/');
-        $files = array_map(function($resource) use ($rootDirectory, $resources) { return str_replace($rootDirectory, '', realpath($resource[1])); }, $resources);
+        $files = array_map(function($resource) { return realpath($resource[1]); }, $resources);
+        $ref = new \ReflectionClass('Symfony\Component\Validator\Validator');
         $this->assertContains(
-            str_replace('/', DIRECTORY_SEPARATOR, 'Symfony/Component/Validator/Resources/translations/validators.en.xlf'),
+            strtr(dirname($ref->getFileName()).'/Resources/translations/validators.en.xlf', '/', DIRECTORY_SEPARATOR),
             $files,
             '->registerTranslatorConfiguration() finds Validator translation resources'
         );
+        $ref = new \ReflectionClass('Symfony\Component\Form\Form');
         $this->assertContains(
-            str_replace('/', DIRECTORY_SEPARATOR, 'Symfony/Component/Form/Resources/translations/validators.en.xlf'),
+            strtr(dirname($ref->getFileName()).'/Resources/translations/validators.en.xlf', '/', DIRECTORY_SEPARATOR),
             $files,
             '->registerTranslatorConfiguration() finds Form translation resources'
         );
+        $ref = new \ReflectionClass('Symfony\Component\Security\Core\SecurityContext');
         $this->assertContains(
-            str_replace('/', DIRECTORY_SEPARATOR, 'Symfony/Component/Security/Resources/translations/security.en.xlf'),
+            strtr(dirname($ref->getFileName()).'/Resources/translations/security.en.xlf', '/', DIRECTORY_SEPARATOR),
             $files,
             '->registerTranslatorConfiguration() finds Security translation resources'
         );
@@ -210,8 +246,9 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('validator.mapping.loader.yaml_files_loader'), '->registerValidationConfiguration() defines the YAML loader');
 
         $xmlFiles = $container->getParameter('validator.mapping.loader.xml_files_loader.mapping_files');
+        $ref = new \ReflectionClass('Symfony\Component\Form\Form');
         $this->assertContains(
-            realpath(__DIR__.'/../../../../Component/Form/Resources/config/validation.xml'),
+            realpath(dirname($ref->getFileName()).'/Resources/config/validation.xml'),
             array_map('realpath', $xmlFiles),
             '->registerValidationConfiguration() adds Form validation.xml to XML loader'
         );
@@ -219,10 +256,6 @@ abstract class FrameworkExtensionTest extends TestCase
 
     public function testAnnotations()
     {
-        if (!class_exists('Doctrine\\Common\\Version')) {
-            $this->markTestSkipped('Doctrine is not available.');
-        }
-
         $container = $this->createContainerFromFile('full');
 
         $this->assertEquals($container->getParameter('kernel.cache_dir').'/annotations', $container->getDefinition('annotations.file_cache_reader')->getArgument(1));
@@ -269,16 +302,38 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertStringEndsWith('TestBundle'.DIRECTORY_SEPARATOR.'Resources'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'validation.xml', $xmlArgs[1]);
     }
 
+    public function testFormsCanBeEnabledWithoutCsrfProtection()
+    {
+        $container = $this->createContainerFromFile('form_no_csrf');
+
+        $this->assertFalse($container->getParameter('form.type_extension.csrf.enabled'));
+    }
+
+    public function testFormCsrfFieldNameCanBeSetUnderCsrfSettings()
+    {
+        $container = $this->createContainerFromFile('form_csrf_sets_field_name');
+
+        $this->assertTrue($container->getParameter('form.type_extension.csrf.enabled'));
+        $this->assertEquals('_custom', $container->getParameter('form.type_extension.csrf.field_name'));
+    }
+
+    public function testFormCsrfFieldNameUnderFormSettingsTakesPrecedence()
+    {
+        $container = $this->createContainerFromFile('form_csrf_under_form_sets_field_name');
+
+        $this->assertTrue($container->getParameter('form.type_extension.csrf.enabled'));
+        $this->assertEquals('_custom_form', $container->getParameter('form.type_extension.csrf.field_name'));
+    }
+
     protected function createContainer(array $data = array())
     {
         return new ContainerBuilder(new ParameterBag(array_merge(array(
-            'kernel.bundles'          => array('FrameworkBundle' => 'Symfony\\Bundle\\FrameworkBundle\\FrameworkBundle'),
-            'kernel.cache_dir'        => __DIR__,
-            'kernel.compiled_classes' => array(),
-            'kernel.debug'            => false,
-            'kernel.environment'      => 'test',
-            'kernel.name'             => 'kernel',
-            'kernel.root_dir'         => __DIR__,
+            'kernel.bundles'     => array('FrameworkBundle' => 'Symfony\\Bundle\\FrameworkBundle\\FrameworkBundle'),
+            'kernel.cache_dir'   => __DIR__,
+            'kernel.debug'       => false,
+            'kernel.environment' => 'test',
+            'kernel.name'        => 'kernel',
+            'kernel.root_dir'    => __DIR__,
         ), $data)));
     }
 

@@ -43,7 +43,6 @@ class LocaleBundleTest extends \PHPUnit_Framework_TestCase
             ->with(self::RES_DIR, 'en', array('Locales', 'de_AT'))
             ->will($this->returnValue('German (Austria)'));
 
-
         $this->assertSame('German (Austria)', $this->bundle->getLocaleName('de_AT', 'en'));
     }
 
@@ -59,7 +58,6 @@ class LocaleBundleTest extends \PHPUnit_Framework_TestCase
             ->method('readEntry')
             ->with(self::RES_DIR, 'en', array('Locales'))
             ->will($this->returnValue($sortedLocales));
-
 
         $this->assertSame($sortedLocales, $this->bundle->getLocaleNames('en'));
     }

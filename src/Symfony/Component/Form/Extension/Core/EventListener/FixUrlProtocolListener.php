@@ -29,7 +29,7 @@ class FixUrlProtocolListener implements EventSubscriberInterface
         $this->defaultProtocol = $defaultProtocol;
     }
 
-    public function onBind(FormEvent $event)
+    public function onSubmit(FormEvent $event)
     {
         $data = $event->getData();
 
@@ -38,8 +38,19 @@ class FixUrlProtocolListener implements EventSubscriberInterface
         }
     }
 
+    /**
+     * Alias of {@link onSubmit()}.
+     *
+     * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
+     *             {@link onSubmit()} instead.
+     */
+    public function onBind(FormEvent $event)
+    {
+        $this->onSubmit($event);
+    }
+
     public static function getSubscribedEvents()
     {
-        return array(FormEvents::BIND => 'onBind');
+        return array(FormEvents::SUBMIT => 'onSubmit');
     }
 }

@@ -163,7 +163,7 @@ class IsbnValidatorTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('addViolation')
             ->with($constraint->isbn10Message);
-        
+
         $this->validator->validate($isbn, $constraint);
     }
 

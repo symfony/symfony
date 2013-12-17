@@ -6,8 +6,6 @@ use Symfony\Component\DependencyInjection\Exception\InactiveScopeException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
-use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 
 /**
@@ -33,6 +31,23 @@ class ProjectServiceContainer extends Container
 
         $this->scopes = array();
         $this->scopeChildren = array();
+        $this->methodMap = array(
+            'bar' => 'getBarService',
+            'baz' => 'getBazService',
+            'configured_service' => 'getConfiguredServiceService',
+            'depends_on_request' => 'getDependsOnRequestService',
+            'factory_service' => 'getFactoryServiceService',
+            'foo' => 'getFooService',
+            'foo.baz' => 'getFoo_BazService',
+            'foo_bar' => 'getFooBarService',
+            'foo_with_inline' => 'getFooWithInlineService',
+            'method_call1' => 'getMethodCall1Service',
+            'request' => 'getRequestService',
+        );
+        $this->aliases = array(
+            'alias_for_alias' => 'foo',
+            'alias_for_foo' => 'foo',
+        );
     }
 
     /**
@@ -45,9 +60,11 @@ class ProjectServiceContainer extends Container
      */
     protected function getBarService()
     {
-        $this->services['bar'] = $instance = new \FooClass('foo', $this->get('foo.baz'), $this->getParameter('foo_bar'));
+        $a = $this->get('foo.baz');
 
-        $this->get('foo.baz')->configure($instance);
+        $this->services['bar'] = $instance = new \FooClass('foo', $a, $this->getParameter('foo_bar'));
+
+        $a->configure($instance);
 
         return $instance;
     }
@@ -65,6 +82,26 @@ class ProjectServiceContainer extends Container
         $this->services['baz'] = $instance = new \Baz();
 
         $instance->setFoo($this->get('foo_with_inline'));
+
+        return $instance;
+    }
+
+    /**
+     * Gets the 'configured_service' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return stdClass A stdClass instance.
+     */
+    protected function getConfiguredServiceService()
+    {
+        $a = new \ConfClass();
+        $a->setFoo($this->get('baz'));
+
+        $this->services['configured_service'] = $instance = new \stdClass();
+
+        $a->configureStdClass($instance);
 
         return $instance;
     }
@@ -187,6 +224,7 @@ class ProjectServiceContainer extends Container
 
         $instance->setBar($this->get('foo'));
         $instance->setBar(NULL);
+        $instance->setBar(($this->get("foo")->foo() . $this->getParameter("foo")));
 
         return $instance;
     }
@@ -202,16 +240,6 @@ class ProjectServiceContainer extends Container
     protected function getRequestService()
     {
         throw new RuntimeException('You have requested a synthetic service ("request"). The DIC does not know how to construct this service.');
-    }
-
-    /**
-     * Gets the alias_for_foo service alias.
-     *
-     * @return FooClass An instance of the foo service
-     */
-    protected function getAliasForFooService()
-    {
-        return $this->get('foo');
     }
 
     /**

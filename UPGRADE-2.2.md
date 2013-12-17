@@ -23,7 +23,7 @@
 
 #### Deprecations
 
- * The `standalone` option is deprecated and will replaced with the `strategy` option in 2.3.
+ * The `standalone` option is deprecated and will be replaced with the `strategy` option in 2.3.
  * The values `true`, `false`, `js` for the `standalone` option were deprecated and replaced respectively with the `esi`, `inline`, `hinclude` in 2.3.
 
 
@@ -482,8 +482,9 @@
    }
    ```
 
- * The method `ExecutionContext::addViolationAtSubPath()` was deprecated and
-   will be removed in Symfony 2.3. You should use `addViolationAt()` instead.
+ * The methods `ExecutionContext::addViolationAtSubPath()` and
+   `ExecutionContext::addViolationAtPath()` were deprecated and will be
+   removed in Symfony 2.3. You should use `addViolationAt()` instead.
 
    Before:
 

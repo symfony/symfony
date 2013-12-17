@@ -84,12 +84,8 @@ class BindRequestListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider requestMethodProvider
      */
-    public function testBindRequest($method)
+    public function testSubmitRequest($method)
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
         $values = array('author' => $this->values);
         $files = array('author' => $this->filesNested);
         $request = new Request(array(), $values, array(), array(), $files, array(
@@ -113,12 +109,8 @@ class BindRequestListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider requestMethodProvider
      */
-    public function testBindRequestWithEmptyName($method)
+    public function testSubmitRequestWithEmptyName($method)
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
         $request = new Request(array(), $this->values, array(), array(), $this->filesPlain, array(
             'REQUEST_METHOD' => $method,
         ));
@@ -140,12 +132,8 @@ class BindRequestListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider requestMethodProvider
      */
-    public function testBindEmptyRequestToCompoundForm($method)
+    public function testSubmitEmptyRequestToCompoundForm($method)
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
         $request = new Request(array(), array(), array(), array(), array(), array(
             'REQUEST_METHOD' => $method,
         ));
@@ -167,12 +155,8 @@ class BindRequestListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider requestMethodProvider
      */
-    public function testBindEmptyRequestToSimpleForm($method)
+    public function testSubmitEmptyRequestToSimpleForm($method)
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
         $request = new Request(array(), array(), array(), array(), array(), array(
             'REQUEST_METHOD' => $method,
         ));
@@ -190,12 +174,8 @@ class BindRequestListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($event->getData());
     }
 
-    public function testBindGetRequest()
+    public function testSubmitGetRequest()
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
         $values = array('author' => $this->values);
         $request = new Request($values, array(), array(), array(), array(), array(
             'REQUEST_METHOD' => 'GET',
@@ -215,12 +195,8 @@ class BindRequestListenerTest extends \PHPUnit_Framework_TestCase
         ), $event->getData());
     }
 
-    public function testBindGetRequestWithEmptyName()
+    public function testSubmitGetRequestWithEmptyName()
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
         $request = new Request($this->values, array(), array(), array(), array(), array(
             'REQUEST_METHOD' => 'GET',
         ));
@@ -239,12 +215,8 @@ class BindRequestListenerTest extends \PHPUnit_Framework_TestCase
         ), $event->getData());
     }
 
-    public function testBindEmptyGetRequestToCompoundForm()
+    public function testSubmitEmptyGetRequestToCompoundForm()
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
         $request = new Request(array(), array(), array(), array(), array(), array(
             'REQUEST_METHOD' => 'GET',
         ));
@@ -262,12 +234,8 @@ class BindRequestListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(), $event->getData());
     }
 
-    public function testBindEmptyGetRequestToSimpleForm()
+    public function testSubmitEmptyGetRequestToSimpleForm()
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
         $request = new Request(array(), array(), array(), array(), array(), array(
             'REQUEST_METHOD' => 'GET',
         ));

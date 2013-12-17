@@ -84,7 +84,13 @@ class FormFactory implements FormFactoryInterface
             throw new UnexpectedTypeException($type, 'string, Symfony\Component\Form\ResolvedFormTypeInterface or Symfony\Component\Form\FormTypeInterface');
         }
 
-        return $type->createBuilder($this, $name, $options);
+        $builder = $type->createBuilder($this, $name, $options);
+
+        // Explicitly call buildForm() in order to be able to override either
+        // createBuilder() or buildForm() in the resolved form type
+        $type->buildForm($builder, $builder->getOptions());
+
+        return $builder;
     }
 
     /**

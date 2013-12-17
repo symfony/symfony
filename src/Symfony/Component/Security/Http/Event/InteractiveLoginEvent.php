@@ -15,10 +15,14 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
+/**
+ * InteractiveLoginEvent
+ *
+ * @author Fabien Potencier <fabien@symfony.com>
+ */
 class InteractiveLoginEvent extends Event
 {
     private $request;
-
     private $authenticationToken;
 
     /**

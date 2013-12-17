@@ -50,7 +50,9 @@ class Store implements StoreInterface
     {
         // unlock everything
         foreach ($this->locks as $lock) {
-            @unlink($lock);
+            if (file_exists($lock)) {
+                @unlink($lock);
+            }
         }
 
         $error = error_get_last();
@@ -214,7 +216,7 @@ class Store implements StoreInterface
      */
     protected function generateContentDigest(Response $response)
     {
-        return 'en'.sha1($response->getContent());
+        return 'en'.hash('sha256', $response->getContent());
     }
 
     /**
@@ -246,15 +248,6 @@ class Store implements StoreInterface
                 throw new \RuntimeException('Unable to store the metadata.');
             }
         }
-
-        // As per the RFC, invalidate Location and Content-Location URLs if present
-        foreach (array('Location', 'Content-Location') as $header) {
-            if ($uri = $request->headers->get($header)) {
-                $subRequest = $request::create($uri, 'get', array(), array(), array(), $request->server->all());
-
-                $this->invalidate($subRequest);
-            }
-        }
     }
 
     /**
@@ -265,7 +258,7 @@ class Store implements StoreInterface
      * @param array  $env1 A Request HTTP header array
      * @param array  $env2 A Request HTTP header array
      *
-     * @return Boolean true if the the two environments match, false otherwise
+     * @return Boolean true if the two environments match, false otherwise
      */
     private function requestsMatch($vary, $env1, $env2)
     {
@@ -374,6 +367,25 @@ class Store implements StoreInterface
     }
 
     /**
+     * Generates a cache key for the given Request.
+     *
+     * This method should return a key that must only depend on a
+     * normalized version of the request URI.
+     *
+     * If the same URI can have more than one representation, based on some
+     * headers, use a Vary header to indicate them, and each representation will
+     * be stored independently under the same cache key.
+     *
+     * @param Request $request A Request instance
+     *
+     * @return string A key for the given Request
+     */
+    protected function generateCacheKey(Request $request)
+    {
+        return 'md'.hash('sha256', $request->getUri());
+    }
+
+    /**
      * Returns a cache key for the given Request.
      *
      * @param Request $request A Request instance
@@ -386,7 +398,7 @@ class Store implements StoreInterface
             return $this->keyCache[$request];
         }
 
-        return $this->keyCache[$request] = 'md'.sha1($request->getUri());
+        return $this->keyCache[$request] = $this->generateCacheKey($request);
     }
 
     /**

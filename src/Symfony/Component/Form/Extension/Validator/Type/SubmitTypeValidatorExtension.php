@@ -11,12 +11,10 @@
 
 namespace Symfony\Component\Form\Extension\Validator\Type;
 
-use Symfony\Component\Form\AbstractTypeExtension;
-
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class SubmitTypeValidatorExtension extends AbstractTypeExtension
+class SubmitTypeValidatorExtension extends BaseValidatorExtension
 {
     /**
      * {@inheritdoc}

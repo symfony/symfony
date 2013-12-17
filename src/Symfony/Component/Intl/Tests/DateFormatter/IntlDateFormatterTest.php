@@ -13,7 +13,6 @@ namespace Symfony\Component\Intl\Tests\DateFormatter;
 
 use Symfony\Component\Intl\DateFormatter\IntlDateFormatter;
 use Symfony\Component\Intl\Globals\IntlGlobals;
-use Symfony\Component\Intl\Util\Version;
 
 class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
 {

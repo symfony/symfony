@@ -49,10 +49,6 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        if (!class_exists('Symfony\Component\EventDispatcher\Event')) {
-            $this->markTestSkipped('The "EventDispatcher" component is not available');
-        }
-
         $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $this->factory = $this->getMock('Symfony\Component\Form\FormFactoryInterface');
         $this->serverParams = $this->getMock(
@@ -206,7 +202,7 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
             ->getForm();
 
         // Launch transformer
-        $form->bind(array());
+        $form->submit(array());
 
         $context->expects($this->never())
             ->method('validate');
@@ -235,7 +231,7 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
             ->getForm();
 
         // Launch transformer
-        $form->bind('foo');
+        $form->submit('foo');
 
         $context->expects($this->never())
             ->method('validate');
@@ -275,7 +271,7 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
             ->getForm();
 
         // Launch transformer
-        $form->bind('foo');
+        $form->submit('foo');
 
         $context->expects($this->never())
             ->method('validate');
@@ -314,7 +310,7 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
             ->getForm();
 
         // Launch transformer
-        $form->bind(array());
+        $form->submit(array());
 
         $context->expects($this->never())
             ->method('validate');
@@ -346,7 +342,7 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
             ->getForm();
 
         // Launch transformer
-        $form->bind(array('child' => 'foo'));
+        $form->submit(array('child' => 'foo'));
 
         $context->expects($this->never())
             ->method('addViolation');
@@ -372,6 +368,23 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
         $context->expects($this->at(1))
             ->method('validate')
             ->with($object, 'data', 'group2', true);
+
+        $this->validator->initialize($context);
+        $this->validator->validate($form, new Form());
+    }
+
+    public function testDontExecuteFunctionNames()
+    {
+        $context = $this->getMockExecutionContext();
+        $object = $this->getMock('\stdClass');
+        $options = array('validation_groups' => 'header');
+        $form = $this->getBuilder('name', '\stdClass', $options)
+            ->setData($object)
+            ->getForm();
+
+        $context->expects($this->once())
+            ->method('validate')
+            ->with($object, 'data', 'header', true);
 
         $this->validator->initialize($context);
         $this->validator->validate($form, new Form());
@@ -413,11 +426,11 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
         ));
 
         $parent->add($form);
-        $parent->add($this->getClickedSubmitButton('submit', array(
+        $parent->add($this->getSubmitButton('submit', array(
             'validation_groups' => 'button_group',
         )));
 
-        $form->setData($object);
+        $parent->submit(array('name' => $object, 'submit' => ''));
 
         $context->expects($this->once())
             ->method('validate')
@@ -582,7 +595,7 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
             ->add($this->getBuilder('child'))
             ->getForm();
 
-        $form->bind(array('foo' => 'bar'));
+        $form->submit(array('foo' => 'bar'));
 
         $context->expects($this->once())
             ->method('addViolation')
@@ -643,6 +656,7 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
             array(1024, '1K', 0),
             array(null, '1K', 0),
             array(1024, '', 0),
+            array(1024, 0, 0),
         );
     }
 
@@ -713,11 +727,6 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
         $builder = new SubmitButtonBuilder($name, $options);
 
         return $builder->getForm();
-    }
-
-    private function getClickedSubmitButton($name = 'name', array $options = array())
-    {
-        return $this->getSubmitButton($name, $options)->bind('');
     }
 
     /**

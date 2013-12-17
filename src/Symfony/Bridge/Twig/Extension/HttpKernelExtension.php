@@ -36,9 +36,9 @@ class HttpKernelExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            'render'     => new \Twig_Function_Method($this, 'renderFragment', array('is_safe' => array('html'))),
-            'render_*'   => new \Twig_Function_Method($this, 'renderFragmentStrategy', array('is_safe' => array('html'))),
-            'controller' => new \Twig_Function_Method($this, 'controller'),
+            new \Twig_SimpleFunction('render',array($this, 'renderFragment'), array('is_safe' => array('html'))),
+            new \Twig_SimpleFunction('render_*', array($this, 'renderFragmentStrategy'), array('is_safe' => array('html'))),
+            new \Twig_SimpleFunction('controller', array($this, 'controller')),
         );
     }
 

@@ -28,27 +28,36 @@ class SubmitTypeTest extends TypeTestCase
         $this->assertFalse($button->isClicked());
     }
 
-    public function testNotClickedIfBoundWithNull()
+    public function testNotClickedIfSubmittedWithNull()
     {
         $button = $this->factory->create('submit');
-        $button->bind(null);
+        $button->submit(null);
 
         $this->assertFalse($button->isClicked());
     }
 
-    public function testClickedIfBoundWithEmptyString()
+    public function testClickedIfSubmittedWithEmptyString()
     {
         $button = $this->factory->create('submit');
-        $button->bind('');
+        $button->submit('');
 
         $this->assertTrue($button->isClicked());
     }
 
-    public function testClickedIfBoundWithUnemptyString()
+    public function testClickedIfSubmittedWithUnemptyString()
     {
         $button = $this->factory->create('submit');
-        $button->bind('foo');
+        $button->submit('foo');
 
         $this->assertTrue($button->isClicked());
+    }
+
+    public function testSubmitCanBeAddedToForm()
+    {
+        $form = $this->factory
+            ->createBuilder('form')
+            ->getForm();
+
+        $this->assertSame($form, $form->add('send', 'submit'));
     }
 }

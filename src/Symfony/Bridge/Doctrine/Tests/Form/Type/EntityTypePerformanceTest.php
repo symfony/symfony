@@ -11,8 +11,8 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\Form\Type;
 
-use Symfony\Component\Form\Test\FormPerformanceTestCase;
-use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIdentEntity;
+use Symfony\Component\Form\Tests\FormPerformanceTestCase;
+use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity;
 use Doctrine\ORM\Tools\SchemaTool;
 use Symfony\Bridge\Doctrine\Tests\DoctrineOrmTestCase;
 use Symfony\Component\Form\Extension\Core\CoreExtension;
@@ -23,7 +23,7 @@ use Symfony\Bridge\Doctrine\Form\DoctrineOrmExtension;
  */
 class EntityTypePerformanceTest extends FormPerformanceTestCase
 {
-    const ENTITY_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIdentEntity';
+    const ENTITY_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity';
 
     /**
      * @var \Doctrine\ORM\EntityManager
@@ -50,22 +50,6 @@ class EntityTypePerformanceTest extends FormPerformanceTestCase
 
     protected function setUp()
     {
-        if (!class_exists('Symfony\Component\Form\Form')) {
-            $this->markTestSkipped('The "Form" component is not available');
-        }
-
-        if (!class_exists('Doctrine\DBAL\Platforms\MySqlPlatform')) {
-            $this->markTestSkipped('Doctrine DBAL is not available.');
-        }
-
-        if (!class_exists('Doctrine\Common\Version')) {
-            $this->markTestSkipped('Doctrine Common is not available.');
-        }
-
-        if (!class_exists('Doctrine\ORM\EntityManager')) {
-            $this->markTestSkipped('Doctrine ORM is not available.');
-        }
-
         $this->em = DoctrineOrmTestCase::createTestEntityManager();
 
         parent::setUp();
@@ -89,7 +73,7 @@ class EntityTypePerformanceTest extends FormPerformanceTestCase
 
         foreach ($ids as $id) {
             $name = 65 + chr($id % 57);
-            $this->em->persist(new SingleIdentEntity($id, $name));
+            $this->em->persist(new SingleIntIdEntity($id, $name));
         }
 
         $this->em->flush();

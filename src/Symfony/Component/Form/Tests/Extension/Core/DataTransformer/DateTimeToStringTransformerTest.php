@@ -101,7 +101,7 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
     {
         $transformer = new DateTimeToStringTransformer();
 
-        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
+        $this->setExpectedException('Symfony\Component\Form\Exception\TransformationFailedException');
 
         $transformer->transform('1234');
     }
@@ -156,7 +156,7 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
     {
         $reverseTransformer = new DateTimeToStringTransformer();
 
-        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
+        $this->setExpectedException('Symfony\Component\Form\Exception\TransformationFailedException');
 
         $reverseTransformer->reverseTransform(1234);
     }

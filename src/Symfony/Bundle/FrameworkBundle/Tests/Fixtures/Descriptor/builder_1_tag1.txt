@@ -1,0 +1,4 @@
+<info>[container]</info> <comment>Public</comment> and <comment>private</comment> services with tag <info>tag1</info>
+ Service ID   attr1 attr2 attr3 Scope     Class name            
+ definition_2 val1  val2        container Full\Qualified\Class2 
+   "                      val3                                  

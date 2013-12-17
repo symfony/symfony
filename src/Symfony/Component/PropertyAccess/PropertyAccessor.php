@@ -12,6 +12,7 @@
 namespace Symfony\Component\PropertyAccess;
 
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
+use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
 use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
 
 /**
@@ -25,11 +26,23 @@ class PropertyAccessor implements PropertyAccessorInterface
     const IS_REF = 1;
 
     /**
-     * Should not be used by application code. Use
-     * {@link PropertyAccess::getPropertyAccessor()} instead.
+     * @var Boolean
      */
-    public function __construct()
+    private $magicCall;
+
+    /**
+     * @var Boolean
+     */
+    private $throwExceptionOnInvalidIndex;
+
+    /**
+     * Should not be used by application code. Use
+     * {@link PropertyAccess::createPropertyAccessor()} instead.
+     */
+    public function __construct($magicCall = false, $throwExceptionOnInvalidIndex = false)
     {
+        $this->magicCall = $magicCall;
+        $this->throwExceptionOnInvalidIndex = $throwExceptionOnInvalidIndex;
     }
 
     /**
@@ -43,7 +56,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             throw new UnexpectedTypeException($propertyPath, 'string or Symfony\Component\PropertyAccess\PropertyPathInterface');
         }
 
-        $propertyValues =& $this->readPropertiesUntil($objectOrArray, $propertyPath, $propertyPath->getLength());
+        $propertyValues =& $this->readPropertiesUntil($objectOrArray, $propertyPath, $propertyPath->getLength(), $this->throwExceptionOnInvalidIndex);
 
         return $propertyValues[count($propertyValues) - 1][self::VALUE];
     }
@@ -103,7 +116,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      *
      * @throws UnexpectedTypeException If a value within the path is neither object nor array.
      */
-    private function &readPropertiesUntil(&$objectOrArray, PropertyPathInterface $propertyPath, $lastIndex)
+    private function &readPropertiesUntil(&$objectOrArray, PropertyPathInterface $propertyPath, $lastIndex, $throwExceptionOnNonexistantIndex = false)
     {
         $propertyValues = array();
 
@@ -118,6 +131,9 @@ class PropertyAccessor implements PropertyAccessorInterface
 
             // Create missing nested arrays on demand
             if ($isIndex && $isArrayAccess && !isset($objectOrArray[$property])) {
+                if ($throwExceptionOnNonexistantIndex) {
+                    throw new NoSuchIndexException(sprintf('Cannot read property "%s". Available properties are "%s"', $property, print_r(array_keys($objectOrArray), true)));
+                }
                 $objectOrArray[$property] = $i + 1 < $propertyPath->getLength() ? array() : null;
             }
 
@@ -221,15 +237,20 @@ class PropertyAccessor implements PropertyAccessorInterface
             // fatal error.
             $result[self::VALUE] =& $object->$property;
             $result[self::IS_REF] = true;
+        } elseif ($this->magicCall && $reflClass->hasMethod('__call') && $reflClass->getMethod('__call')->isPublic()) {
+            // we call the getter and hope the __call do the job
+            $result[self::VALUE] = $object->$getter();
         } else {
+            $methods = array($getter, $isser, $hasser, '__get');
+            if ($this->magicCall) {
+                $methods[] = '__call';
+            }
+
             throw new NoSuchPropertyException(sprintf(
-                'Neither the property "%s" nor one of the methods "%s()", '.
-                '"%s()", "%s()" or "__get()" exist and have public access in '.
-                'class "%s".',
+                'Neither the property "%s" nor one of the methods "%s()" '.
+                'exist and have public access in class "%s".',
                 $property,
-                $getter,
-                $isser,
-                $hasser,
+                implode('()", "', $methods),
                 $reflClass->name
             ));
         }
@@ -348,10 +369,13 @@ class PropertyAccessor implements PropertyAccessorInterface
             // returns true, consequently the following line will result in a
             // fatal error.
             $object->$property = $value;
+        } elseif ($this->magicCall && $reflClass->hasMethod('__call') && $reflClass->getMethod('__call')->isPublic()) {
+            // we call the getter and hope the __call do the job
+            $object->$setter($value);
         } else {
             throw new NoSuchPropertyException(sprintf(
-                'Neither the property "%s" nor one of the methods %s"%s()" or '.
-                '"__set()" exist and have public access in class "%s".',
+                'Neither the property "%s" nor one of the methods %s"%s()", '.
+                '"__set()" or "__call()" exist and have public access in class "%s".',
                 $property,
                 $guessedAdders,
                 $setter,

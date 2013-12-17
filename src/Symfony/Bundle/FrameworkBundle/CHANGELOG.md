@@ -1,18 +1,32 @@
 CHANGELOG
 =========
 
+2.4.0
+-----
+
+ * allowed multiple IP addresses in profiler matcher settings
+ * added stopwatch helper to time templates with the WebProfilerBundle
+ * added service definition for "security.secure_random" service
+ * added service definitions for the new Security CSRF sub-component
+
 2.3.0
 -----
 
+ * [BC BREAK] added a way to disable the profiler (when disabling the profiler, it is now completely removed)
+   To get the same "disabled" behavior as before, set `enabled` to `true` and `collect` to `false`
+ * [BC BREAK] the `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RegisterKernelListenersPass` was moved
+   to `Component\HttpKernel\DependencyInjection\RegisterListenersPass`
+ * added ControllerNameParser::build() which converts a controller short notation (a:b:c) to a class::method notation
  * added possibility to run PHP built-in server in production environment
  * added possibility to load the serializer component in the service container
  * added route debug information when using the `router:match` command
  * added `TimedPhpEngine`
- * added `--clean` option the the `translation:update` command
+ * added `--clean` option to the `translation:update` command
  * added `http_method_override` option
  * added support for default templates per render tag
  * added FormHelper::form(), FormHelper::start() and FormHelper::end()
  * deprecated FormHelper::enctype() in favor of FormHelper::start()
+ * RedirectController actions now receive the Request instance via the method signature.
 
 2.2.0
 -----

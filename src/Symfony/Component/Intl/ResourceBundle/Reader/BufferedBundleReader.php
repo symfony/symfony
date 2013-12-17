@@ -23,7 +23,6 @@ class BufferedBundleReader implements BundleReaderInterface
      */
     private $reader;
 
-
     private $buffer;
 
     /**

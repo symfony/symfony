@@ -36,6 +36,6 @@ Resources
 You can run the unit tests with the following command:
 
     $ cd path/to/Symfony/Component/Finder/
-    $ composer.phar install --dev
+    $ composer.phar install
     $ phpunit
 

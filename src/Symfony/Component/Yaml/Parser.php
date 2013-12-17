@@ -19,6 +19,8 @@ use Symfony\Component\Yaml\Exception\ParseException;
  */
 class Parser
 {
+    const FOLDED_SCALAR_PATTERN = '(?P<separator>\||>)(?P<modifiers>\+|\-|\d+|\+\d+|\-\d+|\d+\+|\d+\-)?(?P<comments> +#.*)?';
+
     private $offset         = 0;
     private $lines          = array();
     private $currentLineNb  = -1;
@@ -111,7 +113,7 @@ class Parser
                         $data[] = $this->parseValue($values['value'], $exceptionOnInvalidType, $objectSupport);
                     }
                 }
-            } elseif (preg_match('#^(?P<key>'.Inline::REGEX_QUOTED_STRING.'|[^ \'"\[\{].*?) *\:(\s+(?P<value>.+?))?\s*$#u', $this->currentLine, $values)) {
+            } elseif (preg_match('#^(?P<key>'.Inline::REGEX_QUOTED_STRING.'|[^ \'"\[\{].*?) *\:(\s+(?P<value>.+?))?\s*$#u', $this->currentLine, $values) && false === strpos($values['key'],' #')) {
                 if ($context && 'sequence' == $context) {
                     throw new ParseException('You cannot define a mapping item when in a sequence');
                 }
@@ -304,14 +306,21 @@ class Parser
 
         $isItUnindentedCollection = $this->isStringUnIndentedCollectionItem($this->currentLine);
 
+        // Comments must not be removed inside a string block (ie. after a line ending with "|")
+        $removeCommentsPattern = '~'.self::FOLDED_SCALAR_PATTERN.'$~';
+        $removeComments = !preg_match($removeCommentsPattern, $this->currentLine);
+
         while ($this->moveToNextLine()) {
+            if ($this->getCurrentLineIndentation() === $newIndent) {
+                $removeComments = !preg_match($removeCommentsPattern, $this->currentLine);
+            }
 
             if ($isItUnindentedCollection && !$this->isStringUnIndentedCollectionItem($this->currentLine)) {
                 $this->moveToPreviousLine();
                 break;
             }
 
-            if ($this->isCurrentLineEmpty()) {
+            if ($removeComments && $this->isCurrentLineEmpty() || $this->isCurrentLineBlank()) {
                 if ($this->isCurrentLineBlank()) {
                     $data[] = substr($this->currentLine, $newIndent);
                 }
@@ -365,7 +374,9 @@ class Parser
     /**
      * Parses a YAML value.
      *
-     * @param string $value A YAML value
+     * @param string  $value                  A YAML value
+     * @param Boolean $exceptionOnInvalidType True if an exception must be thrown on invalid types false otherwise
+     * @param Boolean $objectSupport          True if object support is enabled, false otherwise
      *
      * @return mixed  A PHP value
      *
@@ -387,7 +398,7 @@ class Parser
             return $this->refs[$value];
         }
 
-        if (preg_match('/^(?P<separator>\||>)(?P<modifiers>\+|\-|\d+|\+\d+|\-\d+|\d+\+|\d+\-)?(?P<comments> +#.*)?$/', $value, $matches)) {
+        if (preg_match('/^'.self::FOLDED_SCALAR_PATTERN.'$/', $value, $matches)) {
             $modifiers = isset($matches['modifiers']) ? $matches['modifiers'] : '';
 
             return $this->parseFoldedScalar($matches['separator'], preg_replace('#\d+#', '', $modifiers), intval(abs($modifiers)));
@@ -419,6 +430,18 @@ class Parser
             return '';
         }
 
+        $isCurrentLineBlank = $this->isCurrentLineBlank();
+        $text = '';
+
+        // leading blank lines are consumed before determining indentation
+        while ($notEOF && $isCurrentLineBlank) {
+            // newline only if not EOF
+            if ($notEOF = $this->moveToNextLine()) {
+                $text .= "\n";
+                $isCurrentLineBlank = $this->isCurrentLineBlank();
+            }
+        }
+
         // determine indentation if not specified
         if (0 === $indentation) {
             if (preg_match('/^ +/', $this->currentLine, $matches)) {
@@ -426,11 +449,9 @@ class Parser
             }
         }
 
-        $text = '';
         if ($indentation > 0) {
             $pattern = sprintf('/^ {%d}(.*)$/', $indentation);
 
-            $isCurrentLineBlank = $this->isCurrentLineBlank();
             while (
                 $notEOF && (
                     $isCurrentLineBlank ||

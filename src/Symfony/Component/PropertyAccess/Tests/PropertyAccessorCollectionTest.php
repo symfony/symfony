@@ -289,7 +289,7 @@ abstract class PropertyAccessorCollectionTest extends \PHPUnit_Framework_TestCas
         $propertyPath = 'axes';
         $expectedMessage = sprintf(
             'Neither the property "axes" nor one of the methods "addAx()", '.
-            '"addAxe()", "addAxis()", "setAxes()" or "__set()" exist and have '.
+            '"addAxe()", "addAxis()", "setAxes()", "__set()" or "__call()" exist and have '.
             'public access in class "%s".',
             get_class($car)
         );
@@ -313,7 +313,7 @@ abstract class PropertyAccessorCollectionTest extends \PHPUnit_Framework_TestCas
         $propertyPath = 'axes';
         $expectedMessage = sprintf(
             'Neither the property "axes" nor one of the methods "addAx()", '.
-            '"addAxe()", "addAxis()", "setAxes()" or "__set()" exist and have '.
+            '"addAxe()", "addAxis()", "setAxes()", "__set()" or "__call()" exist and have '.
             'public access in class "%s".',
             get_class($car)
         );

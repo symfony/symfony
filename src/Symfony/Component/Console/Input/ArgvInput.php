@@ -84,7 +84,7 @@ class ArgvInput extends Input
                 $parseOptions = false;
             } elseif ($parseOptions && 0 === strpos($token, '--')) {
                 $this->parseLongOption($token);
-            } elseif ($parseOptions && '-' === $token[0]) {
+            } elseif ($parseOptions && '-' === $token[0] && '-' !== $token) {
                 $this->parseShortOption($token);
             } else {
                 $this->parseArgument($token);
@@ -134,7 +134,7 @@ class ArgvInput extends Input
 
                 break;
             } else {
-                $this->addLongOption($option->getName(), true);
+                $this->addLongOption($option->getName(), null);
             }
         }
     }
@@ -220,6 +220,10 @@ class ArgvInput extends Input
             $value = null;
         }
 
+        if (null !== $value && !$option->acceptValue()) {
+            throw new \RuntimeException(sprintf('The "--%s" option does not accept a value.', $name, $value));
+        }
+
         if (null === $value && $option->acceptValue() && count($this->parsed)) {
             // if option accepts an optional or mandatory argument
             // let's see if there is one provided
@@ -280,9 +284,11 @@ class ArgvInput extends Input
     {
         $values = (array) $values;
 
-        foreach ($this->tokens as $v) {
-            if (in_array($v, $values)) {
-                return true;
+        foreach ($this->tokens as $token) {
+            foreach ($values as $value) {
+                if ($token === $value || 0 === strpos($token, $value.'=')) {
+                    return true;
+                }
             }
         }
 
@@ -307,7 +313,7 @@ class ArgvInput extends Input
         $tokens = $this->tokens;
         while ($token = array_shift($tokens)) {
             foreach ($values as $value) {
-                if (0 === strpos($token, $value)) {
+                if ($token === $value || 0 === strpos($token, $value.'=')) {
                     if (false !== $pos = strpos($token, '=')) {
                         return substr($token, $pos + 1);
                     }

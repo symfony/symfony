@@ -25,7 +25,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @return FormInterface The form instance
      *
-     * @throws Exception\AlreadyBoundException If the form has already been bound.
+     * @throws Exception\AlreadySubmittedException If the form has already been submitted.
      * @throws Exception\LogicException        When trying to set a parent for a form with
      *                                         an empty name.
      */
@@ -47,7 +47,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @return FormInterface The form instance
      *
-     * @throws Exception\AlreadyBoundException   If the form has already been bound.
+     * @throws Exception\AlreadySubmittedException   If the form has already been submitted.
      * @throws Exception\LogicException          When trying to add a child to a non-compound form.
      * @throws Exception\UnexpectedTypeException If $child or $type has an unexpected type.
      */
@@ -80,7 +80,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @return FormInterface The form instance
      *
-     * @throws Exception\AlreadyBoundException If the form has already been bound.
+     * @throws Exception\AlreadySubmittedException If the form has already been submitted.
      */
     public function remove($name);
 
@@ -94,7 +94,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns all errors.
      *
-     * @return FormError[] An array of FormError instances that occurred during binding
+     * @return FormError[] An array of FormError instances that occurred during validation
      */
     public function getErrors();
 
@@ -105,7 +105,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @return FormInterface The form instance
      *
-     * @throws Exception\AlreadyBoundException If the form has already been bound.
+     * @throws Exception\AlreadySubmittedException If the form has already been submitted.
      * @throws Exception\LogicException        If listeners try to call setData in a cycle. Or if
      *                                         the view data does not match the expected type
      *                                         according to {@link FormConfigInterface::getDataClass}.
@@ -122,8 +122,8 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns the normalized data of the field.
      *
-     * @return mixed When the field is not bound, the default data is returned.
-     *               When the field is bound, the normalized bound data is
+     * @return mixed When the field is not submitted, the default data is returned.
+     *               When the field is submitted, the normalized submitted data is
      *               returned if the field is valid, null otherwise.
      */
     public function getNormData();
@@ -138,7 +138,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns the extra data.
      *
-     * @return array The bound data which do not belong to a child
+     * @return array The submitted data which do not belong to a child
      */
     public function getExtraData();
 
@@ -154,7 +154,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @return Boolean true if the form is submitted, false otherwise
      */
-    public function isBound();
+    public function isSubmitted();
 
     /**
      * Returns the name by which the form is identified in forms.
@@ -182,7 +182,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns whether the form and all children are valid.
      *
-     * If the form is not bound, this method always returns false.
+     * If the form is not submitted, this method always returns false.
      *
      * @return Boolean
      */
@@ -227,28 +227,41 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     public function isSynchronized();
 
     /**
-     * Processes the given request and binds the form if it was submitted.
+     * Initializes the form tree.
      *
-     * Internally, the request is forwarded to a {@link RequestHandlerInterface}
-     * instance. This instance determines the allowed value of the
-     * $request parameter.
+     * Should be called on the root form after constructing the tree.
      *
-     * @param mixed $request The request to check.
+     * @return FormInterface The form instance.
+     */
+    public function initialize();
+
+    /**
+     * Inspects the given request and calls {@link submit()} if the form was
+     * submitted.
+     *
+     * Internally, the request is forwarded to the configured
+     * {@link RequestHandlerInterface} instance, which determines whether to
+     * submit the form or not.
+     *
+     * @param mixed $request The request to handle.
      *
      * @return FormInterface The form instance.
      */
     public function handleRequest($request = null);
 
     /**
-     * Binds data to the form, transforms and validates it.
+     * Submits data to the form, transforms and validates it.
      *
-     * @param  null|string|array $submittedData The data
+     * @param null|string|array $submittedData The submitted data.
+     * @param Boolean           $clearMissing  Whether to set fields to NULL
+     *                                         when they are missing in the
+     *                                         submitted data.
      *
      * @return FormInterface The form instance
      *
-     * @throws Exception\AlreadyBoundException If the form has already been bound.
+     * @throws Exception\AlreadySubmittedException If the form has already been submitted.
      */
-    public function bind($submittedData);
+    public function submit($submittedData, $clearMissing = true);
 
     /**
      * Returns the root of the form tree.

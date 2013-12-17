@@ -21,13 +21,33 @@ use Symfony\Component\Finder\SplFileInfo;
  */
 class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
 {
-    public function __construct($path, $flags)
+    /**
+     * @var boolean
+     */
+    private $ignoreUnreadableDirs;
+
+    /**
+     * @var Boolean
+     */
+    private $rewindable;
+
+    /**
+     * Constructor.
+     *
+     * @param string  $path
+     * @param int     $flags
+     * @param boolean $ignoreUnreadableDirs
+     *
+     * @throws \RuntimeException
+     */
+    public function __construct($path, $flags, $ignoreUnreadableDirs = false)
     {
         if ($flags & (self::CURRENT_AS_PATHNAME | self::CURRENT_AS_SELF)) {
             throw new \RuntimeException('This iterator only support returning current as fileinfo.');
         }
 
         parent::__construct($path, $flags);
+        $this->ignoreUnreadableDirs = $ignoreUnreadableDirs;
     }
 
     /**
@@ -41,7 +61,7 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
     }
 
     /**
-     * @return mixed object
+     * @return \RecursiveIterator
      *
      * @throws AccessDeniedException
      */
@@ -50,7 +70,50 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
         try {
             return parent::getChildren();
         } catch (\UnexpectedValueException $e) {
-            throw new AccessDeniedException($e->getMessage(), $e->getCode(), $e);
+            if ($this->ignoreUnreadableDirs) {
+                // If directory is unreadable and finder is set to ignore it, a fake empty content is returned.
+                return new \RecursiveArrayIterator(array());
+            } else {
+                throw new AccessDeniedException($e->getMessage(), $e->getCode(), $e);
+            }
         }
+    }
+
+    /**
+     * Do nothing for non rewindable stream
+     */
+    public function rewind()
+    {
+        if (false === $this->isRewindable()) {
+            return;
+        }
+
+        // @see https://bugs.php.net/bug.php?id=49104
+        parent::next();
+
+        parent::rewind();
+    }
+
+    /**
+     * Checks if the stream is rewindable.
+     *
+     * @return Boolean true when the stream is rewindable, false otherwise
+     */
+    public function isRewindable()
+    {
+        if (null !== $this->rewindable) {
+            return $this->rewindable;
+        }
+
+        if (false !== $stream = @opendir($this->getPath())) {
+            $infos = stream_get_meta_data($stream);
+            closedir($stream);
+
+            if ($infos['seekable']) {
+                return $this->rewindable = true;
+            }
+        }
+
+        return $this->rewindable = false;
     }
 }

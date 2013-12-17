@@ -251,7 +251,7 @@ abstract class AbstractDoctrineExtension extends Extension
         if (!in_array($mappingConfig['type'], array('xml', 'yml', 'annotation', 'php', 'staticphp'))) {
             throw new \InvalidArgumentException(sprintf('Can only configure "xml", "yml", "annotation", "php" or '.
                 '"staticphp" through the DoctrineBundle. Use your own bundle to configure other metadata drivers. '.
-                'You can register them by adding a a new driver to the '.
+                'You can register them by adding a new driver to the '.
                 '"%s" service definition.', $this->getObjectManagerElementName($objectManagerName.'.metadata_driver')
             ));
         }
@@ -365,9 +365,13 @@ abstract class AbstractDoctrineExtension extends Extension
         }
 
         $cacheDef->setPublic(false);
-        // generate a unique namespace for the given application
-        $namespace = 'sf2'.$this->getMappingResourceExtension().'_'.$objectManager['name'].'_'.md5($container->getParameter('kernel.root_dir').$container->getParameter('kernel.environment'));
-        $cacheDef->addMethodCall('setNamespace', array($namespace));
+
+        if (!isset($cacheDriver['namespace'])) {
+            // generate a unique namespace for the given application
+            $cacheDriver['namespace'] = 'sf2'.$this->getMappingResourceExtension().'_'.$objectManager['name'].'_'.hash('sha256',($container->getParameter('kernel.root_dir').$container->getParameter('kernel.environment')));
+        }
+
+        $cacheDef->addMethodCall('setNamespace', array($cacheDriver['namespace']));
 
         $container->setDefinition($cacheDriverService, $cacheDef);
     }

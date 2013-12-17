@@ -122,7 +122,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
     public function setDisabled($disabled);
 
     /**
-     * Sets the data used for the client data when no value is bound.
+     * Sets the data used for the client data when no value is submitted.
      *
      * @param mixed $emptyData The empty data.
      *
@@ -140,7 +140,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
     public function setErrorBubbling($errorBubbling);
 
     /**
-     * Sets whether this field is required to be filled out when bound.
+     * Sets whether this field is required to be filled out when submitted.
      *
      * @param Boolean $required
      *
@@ -222,7 +222,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *
      * A form with locked data is restricted to the data passed in
      * this configuration. The data can only be modified then by
-     * binding the form.
+     * submitting the form.
      *
      * @param Boolean $locked Whether to lock the default data.
      *
@@ -256,11 +256,27 @@ interface FormConfigBuilderInterface extends FormConfigInterface
     public function setMethod($method);
 
     /**
+     * Sets the request handler used by the form.
+     *
      * @param RequestHandlerInterface $requestHandler
      *
      * @return self The configuration object.
      */
     public function setRequestHandler(RequestHandlerInterface $requestHandler);
+
+    /**
+     * Sets whether the form should be initialized automatically.
+     *
+     * Should be set to true only for root forms.
+     *
+     * @param Boolean $initialize True to initialize the form automatically,
+     *                            false to suppress automatic initialization.
+     *                            In the second case, you need to call
+     *                            {@link FormInterface::initialize()} manually.
+     *
+     * @return self The configuration object.
+     */
+    public function setAutoInitialize($initialize);
 
     /**
      * Builds and returns the form configuration.

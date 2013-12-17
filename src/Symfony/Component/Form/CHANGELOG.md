@@ -1,9 +1,20 @@
 CHANGELOG
 =========
 
+2.5.0
+------
+
+ * added an option for multiple files upload
+
+2.4.0
+-----
+
+ * moved CSRF implementation to the new Security CSRF sub-component
+ * deprecated CsrfProviderInterface and its implementations
+ * deprecated options "csrf_provider" and "intention" in favor of the new options "csrf_token_generator" and "csrf_token_id"
 
 2.3.0
-------
+-----
 
  * deprecated FormPerformanceTestCase and FormIntegrationTestCase in the Symfony\Component\Form\Tests namespace and moved them to the Symfony\Component\Form\Test namespace
  * deprecated TypeTestCase in the Symfony\Component\Form\Tests\Extension\Core\Type namespace and moved it to the Symfony\Component\Form\Test namespace
@@ -18,6 +29,22 @@ CHANGELOG
  * added component-level exceptions for various SPL exceptions
    changed all uses of the deprecated Exception class to use more specialized exceptions instead
    removed NotInitializedException, NotValidException, TypeDefinitionException, TypeLoaderException, CreationException
+ * added events PRE_SUBMIT, SUBMIT and POST_SUBMIT
+ * deprecated events PRE_BIND, BIND and POST_BIND
+ * [BC BREAK] renamed bind() and isBound() in FormInterface to submit() and isSubmitted()
+ * added methods submit() and isSubmitted() to Form
+ * deprecated bind() and isBound() in Form
+ * deprecated AlreadyBoundException in favor of AlreadySubmittedException
+ * added support for PATCH requests
+ * [BC BREAK] added initialize() to FormInterface
+ * [BC BREAK] added getAutoInitialize() to FormConfigInterface
+ * [BC BREAK] added setAutoInitialize() to FormConfigBuilderInterface
+ * [BC BREAK] initialization for Form instances added to a form tree must be manually disabled
+ * PRE_SET_DATA is now guaranteed to be called after children were added by the form builder,
+   unless FormInterface::setData() is called manually
+ * fixed CSRF error message to be translated
+ * custom CSRF error messages can now be set through the "csrf_message" option
+ * fixed: expanded single-choice fields now show a radio button for the empty value
 
 2.2.0
 -----

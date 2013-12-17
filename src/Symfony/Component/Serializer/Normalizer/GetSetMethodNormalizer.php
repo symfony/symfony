@@ -41,9 +41,9 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
     protected $camelizedAttributes = array();
 
     /**
-     * Set normalization callbacks
+     * Set normalization callbacks.
      *
-     * @param array $callbacks help normalize the result
+     * @param callable[] $callbacks help normalize the result
      *
      * @throws InvalidArgumentException if a non-callable callback is set
      */
@@ -158,15 +158,15 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
      * As option, if attribute name is found on camelizedAttributes array
      * returns attribute name in camelcase format
      *
-     * @param string $attribute
+     * @param string $attributeName
      * @return string
      */
     protected function formatAttribute($attributeName)
     {
         if (in_array($attributeName, $this->camelizedAttributes)) {
             return preg_replace_callback(
-                '/(^|_|\.)+(.)/', function ($match) { 
-                    return ('.' === $match[1] ? '_' : '').strtoupper($match[2]); 
+                '/(^|_|\.)+(.)/', function ($match) {
+                    return ('.' === $match[1] ? '_' : '').strtoupper($match[2]);
                 }, $attributeName
             );
         }

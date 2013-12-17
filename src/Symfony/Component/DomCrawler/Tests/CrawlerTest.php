@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DomCrawler\Tests;
 
+use Symfony\Component\CssSelector\CssSelector;
 use Symfony\Component\DomCrawler\Crawler;
 
 class CrawlerTest extends \PHPUnit_Framework_TestCase
@@ -51,6 +52,15 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $crawler = new Crawler();
         $crawler->add('<html><body>Foo</body></html>');
         $this->assertEquals('Foo', $crawler->filterXPath('//body')->text(), '->add() adds nodes from a string');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testAddInvalidNode()
+    {
+        $crawler = new Crawler();
+        $crawler->add(1);
     }
 
     /**
@@ -207,6 +217,10 @@ EOF
         $crawler = new Crawler();
         $crawler->addContent('foo bar', 'text/plain');
         $this->assertCount(0, $crawler, '->addContent() does nothing if the type is not (x|ht)ml');
+
+        $crawler = new Crawler();
+        $crawler->addContent('<html><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><span>中文</span></html>');
+        $this->assertEquals('中文', $crawler->filterXPath('//span')->text(), '->addContent() guess wrong charset');
     }
 
     /**
@@ -277,7 +291,7 @@ EOF
     public function testEach()
     {
         $data = $this->createTestCrawler()->filterXPath('//ul[1]/li')->each(function ($node, $i) {
-            return $i.'-'.$node->nodeValue;
+            return $i.'-'.$node->text();
         });
 
         $this->assertEquals(array('0-One', '1-Two', '2-Three'), $data, '->each() executes an anonymous function on each node of the list');
@@ -307,6 +321,17 @@ EOF
         }
     }
 
+    public function testMissingAttrValueIsNull()
+    {
+        $crawler = new Crawler();
+        $crawler->addContent('<html><div non-empty-attr="sample value" empty-attr=""></div></html>', 'text/html; charset=UTF-8');
+        $div = $crawler->filterXPath('//div');
+
+        $this->assertEquals('sample value', $div->attr('non-empty-attr'), '->attr() reads non-empty attributes correctly');
+        $this->assertEquals('', $div->attr('empty-attr'), '->attr() reads empty attributes correctly');
+        $this->assertNull($div->attr('missing-attr'), '->attr() reads missing attributes correctly');
+    }
+
     public function testText()
     {
         $this->assertEquals('One', $this->createTestCrawler()->filterXPath('//li')->text(), '->text() returns the node value of the first element of the node list');
@@ -316,6 +341,20 @@ EOF
             $this->fail('->text() throws an \InvalidArgumentException if the node list is empty');
         } catch (\InvalidArgumentException $e) {
             $this->assertTrue(true, '->text() throws an \InvalidArgumentException if the node list is empty');
+        }
+    }
+
+    public function testHtml()
+    {
+        $this->assertEquals('<img alt="Bar">', $this->createTestCrawler()->filterXPath('//a[5]')->html());
+        $this->assertEquals('<input type="text" value="TextValue" name="TextName"><input type="submit" value="FooValue" name="FooName" id="FooId"><input type="button" value="BarValue" name="BarName" id="BarId"><button value="ButtonValue" name="ButtonName" id="ButtonId"></button>'
+            , trim($this->createTestCrawler()->filterXPath('//form[@id="FooFormId"]')->html()));
+
+        try {
+            $this->createTestCrawler()->filterXPath('//ol')->html();
+            $this->fail('->html() throws an \InvalidArgumentException if the node list is empty');
+        } catch (\InvalidArgumentException $e) {
+            $this->assertTrue(true, '->html() throws an \InvalidArgumentException if the node list is empty');
         }
     }
 
@@ -343,15 +382,60 @@ EOF
         $this->assertCount(6, $crawler->filterXPath('//li'), '->filterXPath() filters the node list with the XPath expression');
     }
 
+    public function testFilterXPathWithDefaultNamespace()
+    {
+        $crawler = $this->createTestXmlCrawler()->filterXPath('//default:entry/default:id');
+        $this->assertCount(1, $crawler, '->filterXPath() automatically registers a namespace');
+        $this->assertSame('tag:youtube.com,2008:video:kgZRZmEc9j4', $crawler->text());
+    }
+
+    public function testFilterXPathWithCustomDefaultNamespace()
+    {
+        $crawler = $this->createTestXmlCrawler();
+        $crawler->setDefaultNamespacePrefix('x');
+        $crawler = $crawler->filterXPath('//x:entry/x:id');
+
+        $this->assertCount(1, $crawler, '->filterXPath() lets to override the default namespace prefix');
+        $this->assertSame('tag:youtube.com,2008:video:kgZRZmEc9j4', $crawler->text());
+    }
+
+    public function testFilterXPathWithNamespace()
+    {
+        $crawler = $this->createTestXmlCrawler()->filterXPath('//yt:accessControl');
+        $this->assertCount(2, $crawler, '->filterXPath() automatically registers a namespace');
+    }
+
+    public function testFilterXPathWithMultipleNamespaces()
+    {
+        $crawler = $this->createTestXmlCrawler()->filterXPath('//media:group/yt:aspectRatio');
+        $this->assertCount(1, $crawler, '->filterXPath() automatically registers multiple namespaces');
+        $this->assertSame('widescreen', $crawler->text());
+    }
+
+    public function testFilterXPathWithManuallyRegisteredNamespace()
+    {
+        $crawler = $this->createTestXmlCrawler();
+        $crawler->registerNamespace('m', 'http://search.yahoo.com/mrss/');
+
+        $crawler = $crawler->filterXPath('//m:group/yt:aspectRatio');
+        $this->assertCount(1, $crawler, '->filterXPath() uses manually registered namespace');
+        $this->assertSame('widescreen', $crawler->text());
+    }
+
+    public function testFilterXPathWithAnUrl()
+    {
+        $crawler = $this->createTestXmlCrawler();
+
+        $crawler = $crawler->filterXPath('//media:category[@scheme="http://gdata.youtube.com/schemas/2007/categories.cat"]');
+        $this->assertCount(1, $crawler);
+        $this->assertSame('Music', $crawler->text());
+    }
+
     /**
      * @covers Symfony\Component\DomCrawler\Crawler::filter
      */
     public function testFilter()
     {
-        if (!class_exists('Symfony\Component\CssSelector\CssSelector')) {
-            $this->markTestSkipped('The "CssSelector" component is not available');
-        }
-
         $crawler = $this->createTestCrawler();
         $this->assertNotSame($crawler, $crawler->filter('li'), '->filter() returns a new instance of a crawler');
         $this->assertInstanceOf('Symfony\\Component\\DomCrawler\\Crawler', $crawler, '->filter() returns a new instance of a crawler');
@@ -359,6 +443,30 @@ EOF
         $crawler = $this->createTestCrawler()->filter('ul');
 
         $this->assertCount(6, $crawler->filter('li'), '->filter() filters the node list with the CSS selector');
+    }
+
+    public function testFilterWithDefaultNamespace()
+    {
+        $crawler = $this->createTestXmlCrawler()->filter('default|entry default|id');
+        $this->assertCount(1, $crawler, '->filter() automatically registers namespaces');
+        $this->assertSame('tag:youtube.com,2008:video:kgZRZmEc9j4', $crawler->text());
+    }
+
+    public function testFilterWithNamespace()
+    {
+        CssSelector::disableHtmlExtension();
+
+        $crawler = $this->createTestXmlCrawler()->filter('yt|accessControl');
+        $this->assertCount(2, $crawler, '->filter() automatically registers namespaces');
+    }
+
+    public function testFilterWithMultipleNamespaces()
+    {
+        CssSelector::disableHtmlExtension();
+
+        $crawler = $this->createTestXmlCrawler()->filter('media|group yt|aspectRatio');
+        $this->assertCount(1, $crawler, '->filter() automatically registers namespaces');
+        $this->assertSame('widescreen', $crawler->text());
     }
 
     public function testSelectLink()
@@ -439,8 +547,8 @@ EOF
         $this->assertEquals($crawler->form()->getFormNode()->getAttribute('id'), $crawler2->form()->getFormNode()->getAttribute('id'), '->form() works on elements with form attribute');
 
         $this->assertEquals(array('FooName' => 'FooBar', 'TextName' => 'TextValue', 'FooTextName' => 'FooTextValue'), $crawler->form(array('FooName' => 'FooBar'))->getValues(), '->form() takes an array of values to submit as its first argument');
-        $this->assertEquals(array('FooName' => 'FooValue', 'TextName' => 'TextValue', 'FooTextName' => 'FooTextValue'), $crawler->form()->getValues(), '->form() takes an array of values to submit as its first argument');
-        $this->assertEquals(array('FooBarName' => 'FooBarValue', 'TextName' => 'TextValue', 'FooTextName' => 'FooTextValue'), $crawler2->form()->getValues(), '->form() takes an array of values to submit as its first argument');
+        $this->assertEquals(array('FooName' => 'FooValue', 'TextName' => 'TextValue', 'FooTextName' => 'FooTextValue'), $crawler->form()->getValues(), '->getValues() returns correct form values');
+        $this->assertEquals(array('FooBarName' => 'FooBarValue', 'TextName' => 'TextValue', 'FooTextName' => 'FooTextValue'), $crawler2->form()->getValues(), '->getValues() returns correct form values');
 
         try {
             $this->createTestCrawler()->filterXPath('//ol')->form();
@@ -546,6 +654,14 @@ EOF
         } catch (\InvalidArgumentException $e) {
             $this->assertTrue(true, '->children() throws an \InvalidArgumentException if the node list is empty');
         }
+
+        try {
+            $crawler = new Crawler('<p></p>');
+            $crawler->filter('p')->children();
+            $this->assertTrue(true, '->children() does not trigger a notice if the node has no children');
+        } catch (\PHPUnit_Framework_Error_Notice $e) {
+            $this->fail('->children() does not trigger a notice if the node has no children');
+        }
     }
 
     public function testParents()
@@ -623,6 +739,23 @@ EOF
         ');
 
         return new Crawler($dom, $uri);
+    }
+
+    protected function createTestXmlCrawler($uri = null)
+    {
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>
+            <entry xmlns="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/" xmlns:yt="http://gdata.youtube.com/schemas/2007">
+                <id>tag:youtube.com,2008:video:kgZRZmEc9j4</id>
+                <yt:accessControl action="comment" permission="allowed"/>
+                <yt:accessControl action="videoRespond" permission="moderated"/>
+                <media:group>
+                    <media:title type="plain">Chordates - CrashCourse Biology #24</media:title>
+                    <yt:aspectRatio>widescreen</yt:aspectRatio>
+                </media:group>
+                <media:category label="Music" scheme="http://gdata.youtube.com/schemas/2007/categories.cat">Music</media:category>
+            </entry>';
+
+        return new Crawler($xml, $uri);
     }
 
     protected function createDomDocument()

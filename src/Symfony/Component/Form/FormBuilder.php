@@ -26,7 +26,7 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
     /**
      * The children of the form builder.
      *
-     * @var array
+     * @var FormBuilderInterface[]
      */
     private $children = array();
 
@@ -220,7 +220,13 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
         $form = new Form($this->getFormConfig());
 
         foreach ($this->children as $child) {
-            $form->add($child->getForm());
+            // Automatic initialization is only supported on root forms
+            $form->add($child->setAutoInitialize(false)->getForm());
+        }
+
+        if ($this->getAutoInitialize()) {
+            // Automatically initialize the form if it is configured so
+            $form->initialize();
         }
 
         return $form;

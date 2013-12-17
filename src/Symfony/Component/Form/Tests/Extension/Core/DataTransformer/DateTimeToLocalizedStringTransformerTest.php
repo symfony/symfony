@@ -142,7 +142,7 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
     public function testTransformRequiresValidDateTime()
     {
@@ -221,7 +221,7 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
     public function testReverseTransformRequiresString()
     {
@@ -262,5 +262,14 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
         $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', \IntlDateFormatter::SHORT);
 
         $this->assertDateTimeEquals($this->dateTimeWithoutSeconds, $transformer->reverseTransform('31.04.10 04:05'));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
+     */
+    public function testReverseTransformOutOfTimestampRange()
+    {
+        $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC');
+        $transformer->reverseTransform('1789-07-14');
     }
 }

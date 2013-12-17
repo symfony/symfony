@@ -144,7 +144,7 @@ class DateType extends AbstractType
 
             // set right order with respect to locale (e.g.: de_DE=dd.MM.yy; en_US=M/d/yy)
             // lookup various formats at http://userguide.icu-project.org/formatparse/datetime
-            if (preg_match('/^([yMd]+).+([yMd]+).+([yMd]+)$/', $pattern)) {
+            if (preg_match('/^([yMd]+)[^yMd]*([yMd]+)[^yMd]*([yMd]+)$/', $pattern)) {
                 $pattern = preg_replace(array('/y+/', '/M+/', '/d+/'), array('{{ year }}', '{{ month }}', '{{ day }}'), $pattern);
             } else {
                 // default fallback
@@ -247,10 +247,10 @@ class DateType extends AbstractType
         $pattern = $formatter->getPattern();
         $timezone = $formatter->getTimezoneId();
 
-        if (version_compare(\PHP_VERSION, '5.5.0-dev', '>=')) {
-            $formatter->setTimeZone(\DateTimeZone::UTC);
+        if ($setTimeZone = method_exists($formatter, 'setTimeZone')) {
+            $formatter->setTimeZone('UTC');
         } else {
-            $formatter->setTimeZoneId(\DateTimeZone::UTC);
+            $formatter->setTimeZoneId('UTC');
         }
 
         if (preg_match($regex, $pattern, $matches)) {
@@ -265,7 +265,7 @@ class DateType extends AbstractType
             $formatter->setPattern($pattern);
         }
 
-        if (version_compare(\PHP_VERSION, '5.5.0-dev', '>=')) {
+        if ($setTimeZone) {
             $formatter->setTimeZone($timezone);
         } else {
             $formatter->setTimeZoneId($timezone);
@@ -279,7 +279,9 @@ class DateType extends AbstractType
         $result = array();
 
         foreach ($years as $year) {
-            $result[$year] = gmmktime(0, 0, 0, 6, 15, $year);
+            if (false !== $y = gmmktime(0, 0, 0, 6, 15, $year)) {
+                $result[$year] = $y;
+            }
         }
 
         return $result;

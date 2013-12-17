@@ -53,6 +53,7 @@ class CoreExtension extends AbstractExtension
             new Type\ButtonType(),
             new Type\SubmitType(),
             new Type\ResetType(),
+            new Type\CurrencyType(),
         );
     }
 }

@@ -4,7 +4,7 @@
         <body>
             <trans-unit id="1">
                 <source>This value should be false.</source>
-                <target>هذه القيمة يجب أن تكون كاذبة.</target>
+                <target>هذه القيمة يجب أن تكون خاطئة.</target>
             </trans-unit>
             <trans-unit id="2">
                 <source>This value should be true.</source>
@@ -80,7 +80,7 @@
             </trans-unit>
             <trans-unit id="20">
                 <source>This value should be {{ limit }} or more.</source>
-                <target>هذه القيمة يجب ان تكون {{ limit }} او اكثر</target>
+                <target>هذه القيمة يجب ان تكون {{ limit }} او اكثر.</target>
             </trans-unit>
             <trans-unit id="21">
                 <source>This value is too short. It should have {{ limit }} character or more.|This value is too short. It should have {{ limit }} characters or more.</source>
@@ -104,7 +104,7 @@
             </trans-unit>
             <trans-unit id="26">
                 <source>This value is not a valid time.</source>
-                <target>هذه القيمة ليست وقت صحيح</target>
+                <target>هذه القيمة ليست وقت صحيح.</target>
             </trans-unit>
             <trans-unit id="27">
                 <source>This value is not a valid URL.</source>
@@ -236,7 +236,11 @@
             </trans-unit>
             <trans-unit id="62">
                 <source>This value is neither a valid ISBN-10 nor a valid ISBN-13.</source>
-                <target>هذه القيمة ليست ISBN-10 صالحة ولا ISBN-13 صالحة</target>
+                <target>هذه القيمة ليست ISBN-10 صالحة ولا ISBN-13 صالحة.</target>
+            </trans-unit>
+            <trans-unit id="63">
+                <source>This value is not a valid ISSN.</source>
+                <target>هذه القيمة ليست ISSN صالحة.</target>
             </trans-unit>
         </body>
     </file>

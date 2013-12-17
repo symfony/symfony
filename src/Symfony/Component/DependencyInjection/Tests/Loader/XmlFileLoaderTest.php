@@ -22,17 +22,11 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\IniFileLoader;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
 {
     protected static $fixturesPath;
-
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\Config\Loader\Loader')) {
-            $this->markTestSkipped('The "Config" component is not available');
-        }
-    }
 
     public static function setUpBeforeClass()
     {
@@ -99,17 +93,33 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader->load('services2.xml');
 
         $actual = $container->getParameterBag()->all();
-        $expected = array('a string', 'foo' => 'bar', 'values' => array(0, 'integer' => 4, 100 => null, 'true', true, false, 'on', 'off', 'float' => 1.3, 1000.3, 'a string', array('foo', 'bar')), 'foo_bar' => new Reference('foo_bar'), 'mixedcase' => array('MixedCaseKey' => 'value'));
+        $expected = array(
+            'a string',
+            'foo' => 'bar',
+            'values' => array(
+                0,
+                'integer' => 4,
+                100 => null,
+                'true',
+                true,
+                false,
+                'on',
+                'off',
+                'float' => 1.3,
+                1000.3,
+                'a string',
+                array('foo', 'bar'),
+            ),
+            'foo_bar' => new Reference('foo_bar'),
+            'mixedcase' => array('MixedCaseKey' => 'value'),
+            'constant' => PHP_EOL,
+        );
 
         $this->assertEquals($expected, $actual, '->load() converts XML values to PHP ones');
     }
 
     public function testLoadImports()
     {
-        if (!class_exists('Symfony\Component\Yaml\Yaml')) {
-            $this->markTestSkipped('The "Yaml" component is not available');
-        }
-
         $container = new ContainerBuilder();
         $resolver = new LoaderResolver(array(
             new IniFileLoader($container, new FileLocator(self::$fixturesPath.'/xml')),
@@ -120,7 +130,30 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader->load('services4.xml');
 
         $actual = $container->getParameterBag()->all();
-        $expected = array('a string', 'foo' => 'bar', 'values' => array(true, false), 'foo_bar' => new Reference('foo_bar'), 'mixedcase' => array('MixedCaseKey' => 'value'), 'bar' => '%foo%', 'imported_from_ini' => true, 'imported_from_yaml' => true);
+        $expected = array(
+            'a string',
+            'foo' => 'bar',
+            'values' => array(
+                0,
+                'integer' => 4,
+                100 => null,
+                'true',
+                true,
+                false,
+                'on',
+                'off',
+                'float' => 1.3,
+                1000.3,
+                'a string',
+                array('foo', 'bar'),
+            ),
+            'foo_bar' => new Reference('foo_bar'),
+            'mixedcase' => array('MixedCaseKey' => 'value'),
+            'constant' => PHP_EOL,
+            'bar' => '%foo%',
+            'imported_from_ini' => true,
+            'imported_from_yaml' => true
+        );
 
         $this->assertEquals(array_keys($expected), array_keys($actual), '->load() imports and merges imported files');
 
@@ -179,7 +212,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('sc_configure', $services['configurator1']->getConfigurator(), '->load() parses the configurator tag');
         $this->assertEquals(array(new Reference('baz', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, false), 'configure'), $services['configurator2']->getConfigurator(), '->load() parses the configurator tag');
         $this->assertEquals(array('BazClass', 'configureStatic'), $services['configurator3']->getConfigurator(), '->load() parses the configurator tag');
-        $this->assertEquals(array(array('setBar', array())), $services['method_call1']->getMethodCalls(), '->load() parses the method_call tag');
+        $this->assertEquals(array(array('setBar', array()), array('setBar', array(new Expression('service("foo").foo() ~ parameter("foo")')))), $services['method_call1']->getMethodCalls(), '->load() parses the method_call tag');
         $this->assertEquals(array(array('setBar', array('foo', new Reference('foo'), array(true, false)))), $services['method_call2']->getMethodCalls(), '->load() parses the method_call tag');
         $this->assertNull($services['factory_service']->getClass());
         $this->assertEquals('getInstance', $services['factory_service']->getFactoryMethod());
@@ -187,6 +220,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($services['request']->isSynthetic(), '->load() parses the synthetic flag');
         $this->assertTrue($services['request']->isSynchronized(), '->load() parses the synchronized flag');
+        $this->assertTrue($services['request']->isLazy(), '->load() parses the lazy flag');
 
         $aliases = $container->getAliases();
         $this->assertTrue(isset($aliases['alias_for_foo']), '->load() parses <service> elements');

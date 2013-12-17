@@ -97,16 +97,12 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
         $collection->addCollection($collection1);
         $collection->add('last', $last = new Route('/last'));
 
-        $this->assertSame(array('bar' => $bar, 'foo' => $foo, 'grandchild' => $grandchild, 'last' => $last), $collection->all(), 
+        $this->assertSame(array('bar' => $bar, 'foo' => $foo, 'grandchild' => $grandchild, 'last' => $last), $collection->all(),
             '->addCollection() imports routes of another collection, overrides if necessary and adds them at the end');
     }
 
     public function testAddCollectionWithResources()
     {
-        if (!class_exists('Symfony\Component\Config\Resource\FileResource')) {
-            $this->markTestSkipped('The "Config" component is not available');
-        }
-
         $collection = new RouteCollection();
         $collection->addResource($foo = new FileResource(__DIR__.'/Fixtures/foo.xml'));
         $collection1 = new RouteCollection();
@@ -178,10 +174,6 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
 
     public function testResource()
     {
-        if (!class_exists('Symfony\Component\Config\Resource\FileResource')) {
-            $this->markTestSkipped('The "Config" component is not available');
-        }
-
         $collection = new RouteCollection();
         $collection->addResource($foo = new FileResource(__DIR__.'/Fixtures/foo.xml'));
         $collection->addResource($bar = new FileResource(__DIR__.'/Fixtures/bar.xml'));
@@ -251,5 +243,19 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('{locale}.example.com', $routea->getHost());
         $this->assertEquals('{locale}.example.com', $routeb->getHost());
+    }
+
+    public function testSetCondition()
+    {
+        $collection = new RouteCollection();
+        $routea = new Route('/a');
+        $routeb = new Route('/b', array(), array(), array(), '{locale}.example.net', array(), array(), 'context.getMethod() == "GET"');
+        $collection->add('a', $routea);
+        $collection->add('b', $routeb);
+
+        $collection->setCondition('context.getMethod() == "POST"');
+
+        $this->assertEquals('context.getMethod() == "POST"', $routea->getCondition());
+        $this->assertEquals('context.getMethod() == "POST"', $routeb->getCondition());
     }
 }

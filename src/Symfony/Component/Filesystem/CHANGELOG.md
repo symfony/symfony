@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.3.0
+-----
+
+ * added the dumpFile() method to atomically write files
+ 
 2.2.0
 -----
 

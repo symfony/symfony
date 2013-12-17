@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\Exception\AlreadyBoundException;
+use Symfony\Component\Form\Exception\AlreadySubmittedException;
 use Symfony\Component\Form\Exception\BadMethodCallException;
 
 /**
@@ -22,7 +22,7 @@ use Symfony\Component\Form\Exception\BadMethodCallException;
 class Button implements \IteratorAggregate, FormInterface
 {
     /**
-     * @var FormInterface
+     * @var FormInterface|null
      */
     private $parent;
 
@@ -34,7 +34,7 @@ class Button implements \IteratorAggregate, FormInterface
     /**
      * @var Boolean
      */
-    private $bound = false;
+    private $submitted = false;
 
     /**
      * Creates a new button from a form configuration.
@@ -200,7 +200,8 @@ class Button implements \IteratorAggregate, FormInterface
      */
     public function setData($modelData)
     {
-        throw new BadMethodCallException('Buttons cannot have data.');
+        // called during initialization of the form tree
+        // noop
     }
 
     /**
@@ -258,9 +259,9 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @return Boolean true if the button was submitted.
      */
-    public function isBound()
+    public function isSubmitted()
     {
-        return $this->bound;
+        return $this->submitted;
     }
 
     /**
@@ -346,31 +347,42 @@ class Button implements \IteratorAggregate, FormInterface
     /**
      * Unsupported method.
      *
+     * @throws BadMethodCallException
+     */
+    public function initialize()
+    {
+        throw new BadMethodCallException('Buttons cannot be initialized. Call initialize() on the root form instead.');
+    }
+
+    /**
+     * Unsupported method.
+     *
      * @param mixed $request
      *
      * @throws BadMethodCallException
      */
     public function handleRequest($request = null)
     {
-        throw new BadMethodCallException('Buttons cannot be processed. Call process() on the root form instead.');
+        throw new BadMethodCallException('Buttons cannot handle requests. Call handleRequest() on the root form instead.');
     }
 
     /**
-     * Binds data to the button.
+     * Submits data to the button.
      *
-     * @param null|string $submittedData The data
+     * @param null|string $submittedData The data.
+     * @param Boolean     $clearMissing  Not used.
      *
      * @return Button The button instance
      *
-     * @throws Exception\AlreadyBoundException If the form has already been bound.
+     * @throws Exception\AlreadySubmittedException If the button has already been submitted.
      */
-    public function bind($submittedData)
+    public function submit($submittedData, $clearMissing = true)
     {
-        if ($this->bound) {
-            throw new AlreadyBoundException('A form can only be bound once');
+        if ($this->submitted) {
+            throw new AlreadySubmittedException('A form can only be submitted once');
         }
 
-        $this->bound = true;
+        $this->submitted = true;
 
         return $this;
     }
@@ -400,7 +412,15 @@ class Button implements \IteratorAggregate, FormInterface
             $parent = $this->parent->createView();
         }
 
-        return $this->config->getType()->createView($this, $parent);
+        $type = $this->config->getType();
+        $options = $this->config->getOptions();
+
+        $view = $type->createView($this, $parent);
+
+        $type->buildView($view, $this, $options);
+        $type->finishView($view, $this, $options);
+
+        return $view;
     }
 
     /**

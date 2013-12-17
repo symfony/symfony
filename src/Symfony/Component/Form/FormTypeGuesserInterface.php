@@ -22,7 +22,7 @@ interface FormTypeGuesserInterface
      * @param string $class    The fully qualified class name
      * @param string $property The name of the property to guess for
      *
-     * @return Guess\TypeGuess A guess for the field's type and options
+     * @return Guess\TypeGuess|null A guess for the field's type and options
      */
     public function guessType($class, $property);
 
@@ -32,7 +32,7 @@ interface FormTypeGuesserInterface
      * @param string $class    The fully qualified class name
      * @param string $property The name of the property to guess for
      *
-     * @return Guess\Guess A guess for the field's required setting
+     * @return Guess\ValueGuess A guess for the field's required setting
      */
     public function guessRequired($class, $property);
 
@@ -42,7 +42,7 @@ interface FormTypeGuesserInterface
      * @param string $class    The fully qualified class name
      * @param string $property The name of the property to guess for
      *
-     * @return Guess\Guess A guess for the field's maximum length
+     * @return Guess\ValueGuess|null A guess for the field's maximum length
      */
     public function guessMaxLength($class, $property);
 
@@ -58,7 +58,7 @@ interface FormTypeGuesserInterface
      * @param string $class    The fully qualified class name
      * @param string $property The name of the property to guess for
      *
-     * @return Guess\Guess A guess for the field's required pattern
+     * @return Guess\ValueGuess|null A guess for the field's required pattern
      */
     public function guessPattern($class, $property);
 }

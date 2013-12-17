@@ -108,11 +108,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     private $dataMapper;
 
     /**
-     * @var array
-     */
-    private $validators = array();
-
-    /**
      * @var Boolean
      */
     private $required = true;
@@ -171,6 +166,11 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      * @var RequestHandlerInterface
      */
     private $requestHandler;
+
+    /**
+     * @var Boolean
+     */
+    private $autoInitialize = false;
 
     /**
      * @var array
@@ -358,7 +358,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     {
         // Uncomment this as soon as the deprecation note should be shown
         // trigger_error('getVirtual() is deprecated since version 2.3 and will be removed in 3.0. Use getInheritData() instead.', E_USER_DEPRECATED);
-
         return $this->getInheritData();
     }
 
@@ -519,6 +518,14 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         }
 
         return $this->requestHandler;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAutoInitialize()
+    {
+        return $this->autoInitialize;
     }
 
     /**
@@ -839,6 +846,16 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         }
 
         $this->requestHandler = $requestHandler;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setAutoInitialize($initialize)
+    {
+        $this->autoInitialize = (Boolean) $initialize;
 
         return $this;
     }

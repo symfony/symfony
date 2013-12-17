@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Form\Extension\Validator\Type;
 
-use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapper;
 use Symfony\Component\Form\Extension\Validator\EventListener\ValidationListener;
@@ -62,7 +61,6 @@ class FormTypeValidatorExtension extends BaseValidatorExtension
 
         $resolver->setDefaults(array(
             'error_mapping'              => array(),
-            'validation_constraint'      => null,
             'constraints'                => array(),
             'cascade_validation'         => false,
             'invalid_message'            => 'This value is not valid.',

@@ -17,6 +17,7 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerI
 use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\SessionUnavailableException;
 use Psr\Log\LoggerInterface;
@@ -164,7 +165,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
     /**
      * Whether this request requires authentication.
      *
-     * The default implementation only processed requests to a specific path,
+     * The default implementation only processes requests to a specific path,
      * but a subclass could change this to only authenticate requests where a
      * certain parameters is present.
      *
@@ -194,7 +195,10 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
             $this->logger->info(sprintf('Authentication request failed: %s', $failed->getMessage()));
         }
 
-        $this->securityContext->setToken(null);
+        $token = $this->securityContext->getToken();
+        if ($token instanceof UsernamePasswordToken && $this->providerKey === $token->getProviderKey()) {
+            $this->securityContext->setToken(null);
+        }
 
         $response = $this->failureHandler->onAuthenticationFailure($request, $failed);
 

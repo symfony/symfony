@@ -89,6 +89,28 @@ class ServerBagTest extends \PHPUnit_Framework_TestCase
         ), $bag->getHeaders());
     }
 
+    public function testHttpDigestAuthWithPhpCgi()
+    {
+        $digest = 'Digest username="foo", realm="acme", nonce="'.md5('secret').'", uri="/protected, qop="auth"';
+        $bag = new ServerBag(array('HTTP_AUTHORIZATION' => $digest));
+
+        $this->assertEquals(array(
+            'AUTHORIZATION' => $digest,
+            'PHP_AUTH_DIGEST' => $digest,
+        ), $bag->getHeaders());
+    }
+
+    public function testHttpDigestAuthWithPhpCgiRedirect()
+    {
+        $digest = 'Digest username="foo", realm="acme", nonce="'.md5('secret').'", uri="/protected, qop="auth"';
+        $bag = new ServerBag(array('REDIRECT_HTTP_AUTHORIZATION' => $digest));
+
+        $this->assertEquals(array(
+            'AUTHORIZATION' => $digest,
+            'PHP_AUTH_DIGEST' => $digest,
+        ), $bag->getHeaders());
+    }
+
     public function testOAuthBearerAuth()
     {
         $headerContent = 'Bearer L-yLEOr9zhmUYRkzN1jwwxwQ-PBNiKDc8dgfB4hTfvo';

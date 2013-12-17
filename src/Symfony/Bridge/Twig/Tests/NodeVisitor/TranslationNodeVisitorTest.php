@@ -1,11 +1,19 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Bridge\Twig\Tests\NodeVisitor;
 
 use Symfony\Bridge\Twig\NodeVisitor\TranslationNodeVisitor;
-use Symfony\Bridge\Twig\Tests\TestCase;
 
-class TranslationNodeVisitorTest extends TestCase
+class TranslationNodeVisitorTest extends \PHPUnit_Framework_TestCase
 {
     /** @dataProvider getMessagesExtractionTestData */
     public function testMessagesExtraction(\Twig_Node $node, array $expectedMessages)

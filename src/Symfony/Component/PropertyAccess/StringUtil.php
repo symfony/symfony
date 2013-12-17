@@ -63,10 +63,13 @@ class StringUtil
         // babies (baby)
         array('sei', 3, false, true, 'y'),
 
+        // accesses (access), addresses (address), kisses (kiss)
+        array('sess', 4, true, false, 'ss'),
+
         // analyses (analysis), ellipses (ellipsis), funguses (fungus),
         // neuroses (neurosis), theses (thesis), emphases (emphasis),
         // oases (oasis), crises (crisis), houses (house), bases (base),
-        // atlases (atlas), kisses (kiss)
+        // atlases (atlas)
         array('ses', 3, true, true, array('s', 'se', 'sis')),
 
         // objectives (objective), alternative (alternatives)
@@ -74,6 +77,9 @@ class StringUtil
 
         // lives (life), wives (wife)
         array('sevi', 4, false, true, 'ife'),
+
+        // moves (move)
+        array('sevom', 5, true, true, 'move'),
 
         // hooves (hoof), dwarves (dwarf), elves (elf), leaves (leaf)
         array('sev', 3, true, true, 'f'),
@@ -185,7 +191,7 @@ class StringUtil
         }
 
         // Convert teeth to tooth, feet to foot
-        if (false !== ($pos = strpos($plural, 'ee'))) {
+        if (false !== ($pos = strpos($plural, 'ee')) && strlen($plural) > 3) {
             return substr_replace($plural, 'oo', $pos, 2);
         }
 

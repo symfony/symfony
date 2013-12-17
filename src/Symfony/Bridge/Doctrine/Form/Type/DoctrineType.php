@@ -12,7 +12,7 @@
 namespace Symfony\Bridge\Doctrine\Form\Type;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Symfony\Component\Form\Exception\Exception;
+use Symfony\Component\Form\Exception\RuntimeException;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityChoiceList;
@@ -109,7 +109,7 @@ abstract class DoctrineType extends AbstractType
                 ? spl_object_hash($options['group_by'])
                 : $options['group_by'];
 
-            $hash = md5(json_encode(array(
+            $hash = hash('sha256', json_encode(array(
                 spl_object_hash($options['em']),
                 $options['class'],
                 $propertyHash,
@@ -144,7 +144,7 @@ abstract class DoctrineType extends AbstractType
             $em = $registry->getManagerForClass($options['class']);
 
             if (null === $em) {
-                throw new Exception(sprintf(
+                throw new RuntimeException(sprintf(
                     'Class "%s" seems not to be a managed Doctrine entity. ' .
                     'Did you forget to map it?',
                     $options['class']

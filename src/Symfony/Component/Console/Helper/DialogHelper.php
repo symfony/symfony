@@ -19,7 +19,7 @@ use Symfony\Component\Console\Formatter\OutputFormatterStyle;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class DialogHelper extends Helper
+class DialogHelper extends InputAwareHelper
 {
     private $inputStream;
     private static $shell;
@@ -57,7 +57,7 @@ class DialogHelper extends Helper
 
             if ($multiselect) {
                 // Check for a separated comma values
-                if(!preg_match('/^[a-zA-Z0-9_-]+(?:,[a-zA-Z0-9_-]+)*$/', $selectedChoices, $matches)) {
+                if (!preg_match('/^[a-zA-Z0-9_-]+(?:,[a-zA-Z0-9_-]+)*$/', $selectedChoices, $matches)) {
                     throw new \InvalidArgumentException(sprintf($errorMessage, $picked));
                 }
                 $selectedChoices = explode(",", $selectedChoices);
@@ -74,10 +74,10 @@ class DialogHelper extends Helper
                 array_push($multiselectChoices, $value);
             }
 
-            if ($multiselect){
+            if ($multiselect) {
                 return $multiselectChoices;
-            } 
-            
+            }
+
             return $picked;
         }, $attempts, $default);
 
@@ -98,6 +98,10 @@ class DialogHelper extends Helper
      */
     public function ask(OutputInterface $output, $question, $default = null, array $autocomplete = null)
     {
+        if ($this->input && !$this->input->isInteractive()) {
+            return $default;
+        }
+
         $output->write($question);
 
         $inputStream = $this->inputStream ?: STDIN;

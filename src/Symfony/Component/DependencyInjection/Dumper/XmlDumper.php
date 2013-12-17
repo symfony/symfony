@@ -15,7 +15,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 /**
  * XmlDumper dumps a service container as an XML string.
@@ -133,6 +135,9 @@ class XmlDumper extends Dumper
         if ($definition->isSynchronized()) {
             $service->setAttribute('synchronized', 'true');
         }
+        if ($definition->isLazy()) {
+            $service->setAttribute('lazy', 'true');
+        }
 
         foreach ($definition->getTags() as $name => $tags) {
             foreach ($tags as $attributes) {
@@ -179,10 +184,10 @@ class XmlDumper extends Dumper
      * Adds a service alias.
      *
      * @param string      $alias
-     * @param string      $id
+     * @param Alias       $id
      * @param \DOMElement $parent
      */
-    private function addServiceAlias($alias, $id, \DOMElement $parent)
+    private function addServiceAlias($alias, Alias $id, \DOMElement $parent)
     {
         $service = $this->document->createElement('service');
         $service->setAttribute('id', $alias);
@@ -210,7 +215,11 @@ class XmlDumper extends Dumper
             $this->addService($definition, $id, $services);
         }
 
-        foreach ($this->container->getAliases() as $alias => $id) {
+        $aliases = $this->container->getAliases();
+        foreach ($aliases as $alias => $id) {
+            while (isset($aliases[(string) $id])) {
+                $id = $aliases[(string) $id];
+            }
             $this->addServiceAlias($alias, $id, $services);
         }
         $parent->appendChild($services);
@@ -251,6 +260,10 @@ class XmlDumper extends Dumper
             } elseif ($value instanceof Definition) {
                 $element->setAttribute('type', 'service');
                 $this->addService($value, null, $element);
+            } elseif ($value instanceof Expression) {
+                $element->setAttribute('type', 'expression');
+                $text = $this->document->createTextNode(self::phpToXml((string) $value));
+                $element->appendChild($text);
             } else {
                 if (in_array($value, array('null', 'true', 'false'), true)) {
                     $element->setAttribute('type', 'string');

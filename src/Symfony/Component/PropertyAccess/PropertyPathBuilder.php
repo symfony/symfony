@@ -31,10 +31,10 @@ class PropertyPathBuilder
     /**
      * Creates a new property path builder.
      *
-     * @param null|PropertyPathInterface $path The path to initially store
-     *                                         in the builder. Optional.
+     * @param null|PropertyPathInterface|string $path The path to initially store
+     *                                                in the builder. Optional.
      */
-    public function __construct(PropertyPathInterface $path = null)
+    public function __construct($path = null)
     {
         if (null !== $path) {
             $this->append($path);
@@ -44,14 +44,18 @@ class PropertyPathBuilder
     /**
      * Appends a (sub-) path to the current path.
      *
-     * @param PropertyPathInterface $path   The path to append
-     * @param integer               $offset The offset where the appended piece
-     *                                      starts in $path
-     * @param integer               $length The length of the appended piece.
-     *                                      If 0, the full path is appended.
+     * @param PropertyPathInterface|string $path   The path to append.
+     * @param integer                      $offset The offset where the appended
+     *                                             piece starts in $path.
+     * @param integer                      $length The length of the appended piece.
+     *                                             If 0, the full path is appended.
      */
-    public function append(PropertyPathInterface $path, $offset = 0, $length = 0)
+    public function append($path, $offset = 0, $length = 0)
     {
+        if (is_string($path)) {
+            $path = new PropertyPath($path);
+        }
+
         if (0 === $length) {
             $end = $path->getLength();
         } else {
@@ -106,20 +110,26 @@ class PropertyPathBuilder
     /**
      * Replaces a sub-path by a different (sub-) path.
      *
-     * @param integer               $offset     The offset at which to replace
-     * @param integer               $length     The length of the piece to replace
-     * @param PropertyPathInterface $path       The path to insert
-     * @param integer               $pathOffset The offset where the inserted piece
-     *                                          starts in $path
-     * @param integer               $pathLength The length of the inserted piece.
-     *                                          If 0, the full path is inserted.
+     * @param integer                      $offset     The offset at which to replace.
+     * @param integer                      $length     The length of the piece to replace.
+     * @param PropertyPathInterface|string $path       The path to insert.
+     * @param integer                      $pathOffset The offset where the inserted piece
+     *                                                 starts in $path.
+     * @param integer                      $pathLength The length of the inserted piece.
+     *                                                 If 0, the full path is inserted.
      *
      * @throws OutOfBoundsException If the offset is invalid
      */
-    public function replace($offset, $length, PropertyPathInterface $path, $pathOffset = 0, $pathLength = 0)
+    public function replace($offset, $length, $path, $pathOffset = 0, $pathLength = 0)
     {
-        if (!isset($this->elements[$offset])) {
-            throw new OutOfBoundsException(sprintf('The offset %s is not within the property path', $offset));
+        if (is_string($path)) {
+            $path = new PropertyPath($path);
+        }
+
+        if ($offset < 0 && abs($offset) <= $this->getLength()) {
+            $offset = $this->getLength() + $offset;
+        } elseif (!isset($this->elements[$offset])) {
+            throw new OutOfBoundsException('The offset ' . $offset . ' is not within the property path');
         }
 
         if (0 === $pathLength) {

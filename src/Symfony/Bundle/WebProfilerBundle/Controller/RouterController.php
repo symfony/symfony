@@ -16,6 +16,7 @@ use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
 use Symfony\Component\Routing\Matcher\TraceableUrlMatcher;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
 
 /**
@@ -30,7 +31,7 @@ class RouterController
     private $matcher;
     private $routes;
 
-    public function __construct(Profiler $profiler, \Twig_Environment $twig, UrlMatcherInterface $matcher = null, RouteCollection $routes = null)
+    public function __construct(Profiler $profiler = null, \Twig_Environment $twig, UrlMatcherInterface $matcher = null, RouteCollection $routes = null)
     {
         $this->profiler = $profiler;
         $this->twig = $twig;
@@ -48,13 +49,19 @@ class RouterController
      * @param string $token The profiler token
      *
      * @return Response A Response instance
+     *
+     * @throws NotFoundHttpException
      */
     public function panelAction($token)
     {
+        if (null === $this->profiler) {
+            throw new NotFoundHttpException('The profiler must be enabled.');
+        }
+
         $this->profiler->disable();
 
         if (null === $this->matcher || null === $this->routes) {
-            return new Response('The Router is not enabled.');
+            return new Response('The Router is not enabled.', 200, array('Content-Type' => 'text/html'));
         }
 
         $profile = $this->profiler->loadProfile($token);
@@ -69,6 +76,6 @@ class RouterController
             'request' => $request,
             'router'  => $profile->getCollector('router'),
             'traces'  => $matcher->getTraces($request->getPathInfo()),
-        )));
+        )), 200, array('Content-Type' => 'text/html'));
     }
 }

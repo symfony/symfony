@@ -22,7 +22,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         $config = $processor->processConfiguration(new Configuration(), array(array('secret' => 's3cr3t')));
 
         $this->assertEquals(
-            array_merge(array('secret' => 's3cr3t'), self::getBundleDefaultConfig()),
+            array_merge(array('secret' => 's3cr3t', 'trusted_hosts' => array()), self::getBundleDefaultConfig()),
             $config
         );
     }
@@ -93,9 +93,15 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             'trusted_proxies'     => array(),
             'ide'                 => null,
             'default_locale'      => 'en',
-            'form'                => array('enabled' => false),
+            'form'                => array(
+                'enabled' => false,
+                'csrf_protection' => array(
+                    'enabled' => null, // defaults to csrf_protection.enabled
+                    'field_name' => null,
+                ),
+            ),
             'csrf_protection'     => array(
-                'enabled'    => true,
+                'enabled'    => false,
                 'field_name' => '_token',
             ),
             'esi'                 => array('enabled' => false),
@@ -111,6 +117,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'username'             => '',
                 'password'             => '',
                 'lifetime'             => 86400,
+                'collect'              => true,
             ),
             'translator'          => array(
                 'enabled'  => false,
@@ -127,7 +134,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'debug'          => '%kernel.debug%',
             ),
             'serializer'          => array(
-                'enabled' => false           
+                'enabled' => false
             )
         );
     }

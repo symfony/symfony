@@ -60,7 +60,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * @throws InvalidArgumentException If the name is empty.
      */
-    public function __construct($name, array $options)
+    public function __construct($name, array $options = array())
     {
         if (empty($name) && 0 != $name) {
             throw new InvalidArgumentException('Buttons cannot have empty names.');
@@ -446,7 +446,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      * This method should not be invoked.
      *
      * @param FormFactoryInterface $formFactory
-     * 
+     *
      * @return void
      *
      * @throws BadMethodCallException
@@ -490,6 +490,22 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     public function setRequestHandler(RequestHandlerInterface $requestHandler)
     {
         throw new BadMethodCallException('Buttons do not support form processors.');
+    }
+
+    /**
+     * Unsupported method.
+     *
+     * @param Boolean $initialize
+     *
+     * @throws BadMethodCallException
+     */
+    public function setAutoInitialize($initialize)
+    {
+        if (true === $initialize) {
+            throw new BadMethodCallException('Buttons do not support automatic initialization.');
+        }
+
+        return $this;
     }
 
     /**
@@ -774,11 +790,21 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     /**
      * Unsupported method.
      *
-     * @return null Always returns null.
+     * @return Boolean Always returns false.
+     */
+    public function getAutoInitialize()
+    {
+        return false;
+    }
+
+    /**
+     * Unsupported method.
+     *
+     * @return Boolean Always returns false.
      */
     public function getInheritData()
     {
-        return null;
+        return false;
     }
 
     /**

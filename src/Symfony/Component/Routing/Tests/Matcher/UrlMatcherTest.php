@@ -321,6 +321,19 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $matcher->match('/foo');
     }
 
+    /**
+     * @expectedException \Symfony\Component\Routing\Exception\ResourceNotFoundException
+     */
+    public function testCondition()
+    {
+        $coll = new RouteCollection();
+        $route = new Route('/foo');
+        $route->setCondition('context.getMethod() == "POST"');
+        $coll->add('foo', $route);
+        $matcher = new UrlMatcher($coll, new RequestContext());
+        $matcher->match('/foo');
+    }
+
     public function testDecodeOnce()
     {
         $coll = new RouteCollection();

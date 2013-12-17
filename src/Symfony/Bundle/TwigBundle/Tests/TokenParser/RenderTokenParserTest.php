@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bridge\Twig\Tests\Node;
+namespace Symfony\Bundle\TwigBundle\Tests\TokenParser;
 
 use Symfony\Bundle\TwigBundle\Tests\TestCase;
 use Symfony\Bundle\TwigBundle\TokenParser\RenderTokenParser;

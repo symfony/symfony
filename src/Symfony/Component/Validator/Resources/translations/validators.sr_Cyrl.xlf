@@ -222,6 +222,26 @@
                 <source>Unsupported card type or invalid card number.</source>
                 <target>Невалидан број картице или тип картице није подржан.</target>
             </trans-unit>
+            <trans-unit id="59">
+                <source>This is not a valid International Bank Account Number (IBAN).</source>
+                <target>Ово није валидан међународни број банковног рачуна (IBAN).</target>
+            </trans-unit>
+            <trans-unit id="60">
+                <source>This value is not a valid ISBN-10.</source>
+                <target>Ово није валидан ISBN-10.</target>
+            </trans-unit>
+            <trans-unit id="61">
+                <source>This value is not a valid ISBN-13.</source>
+                <target>Ово није валидан ISBN-13.</target>
+            </trans-unit>
+            <trans-unit id="62">
+                <source>This value is neither a valid ISBN-10 nor a valid ISBN-13.</source>
+                <target>Ово није валидан ISBN-10 или ISBN-13.</target>
+            </trans-unit>
+            <trans-unit id="63">
+                <source>This value is not a valid ISSN.</source>
+                <target>Ово није валидан ISSN.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

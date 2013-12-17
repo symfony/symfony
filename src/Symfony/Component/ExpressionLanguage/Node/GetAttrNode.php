@@ -12,6 +12,7 @@
 namespace Symfony\Component\ExpressionLanguage\Node;
 
 use Symfony\Component\ExpressionLanguage\Compiler;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class GetAttrNode extends Node
 {
@@ -31,10 +32,22 @@ class GetAttrNode extends Node
     {
         switch ($this->attributes['type']) {
             case self::PROPERTY_CALL:
+
+                $property = $this->nodes['attribute']->attributes['value'];
+                $accessor = PropertyAccess::createPropertyAccessor();
+                $objName = $this->nodes['node']->attributes['name'];
+                $obj = $compiler->getFunction($objName);
+
+                // scope may be injected in compiler
+                if(is_array($obj)) {
+                    if(isset($obj['compiler']) && $obj['compiler'] instanceof Compiler) {
+                        $obj = $obj['compiler']->getFunction($objName);
+                    }
+                }
+
                 $compiler
                     ->compile($this->nodes['node'])
-                    ->raw('->')
-                    ->raw($this->nodes['attribute']->attributes['value'])
+                    ->raw($accessor->getAccessorPath($obj, $property));
                 ;
                 break;
 
@@ -69,8 +82,9 @@ class GetAttrNode extends Node
                 }
 
                 $property = $this->nodes['attribute']->attributes['value'];
+                $accessor = PropertyAccess::createPropertyAccessor();
 
-                return $obj->$property;
+                return $accessor->getValue($obj, $property);
 
             case self::METHOD_CALL:
                 $obj = $this->nodes['node']->evaluate($functions, $values);

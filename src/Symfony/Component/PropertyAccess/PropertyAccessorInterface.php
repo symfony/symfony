@@ -78,4 +78,24 @@ interface PropertyAccessorInterface
      * @throws Exception\NoSuchPropertyException If a property does not exist or is not public.
      */
     public function getValue($objectOrArray, $propertyPath);
+
+    /**
+     * Returns the accessor to use to access to property
+     *
+     * Example:
+     *
+     *     use Symfony\Component\PropertyAccess\PropertyAccess;
+     *
+     *     $propertyAccessor = PropertyAccess::getPropertyAccessor();
+     *
+     *     return $propertyAccessor->getRepresentation($object, 'child.name);
+     *     // returns '->getChild()->getName()'
+     *
+     * @param object|array                 $objectOrArray The object or array to traverse
+     * @param string|PropertyPathInterface $propertyPath  The property path to read
+     *
+     * @return string accessor of the attributes
+     *
+     */
+    public function getAccessorPath($objectOrArray, $propertyPath);
 }

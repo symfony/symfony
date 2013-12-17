@@ -24,6 +24,7 @@ class PropertyAccessor implements PropertyAccessorInterface
 {
     const VALUE = 0;
     const IS_REF = 1;
+    const ACCESSOR_PATH = 2;
 
     /**
      * @var Boolean
@@ -50,6 +51,36 @@ class PropertyAccessor implements PropertyAccessorInterface
      */
     public function getValue($objectOrArray, $propertyPath)
     {
+        $propertyValues = $this->getPropertyValues($objectOrArray, $propertyPath);
+        $attributes = $propertyValues[count($propertyValues) - 1];
+
+        return $attributes[self::VALUE];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAccessorPath($objectOrArray, $propertyPath)
+    {
+        $propertyValues = $this->getPropertyValues($objectOrArray, $propertyPath);
+
+        $accessor = '';
+        foreach($propertyValues as $property) {
+            $accessor .= $property[self::ACCESSOR_PATH];
+        }
+
+        return $accessor;
+    }
+
+    /**
+     * Get values of property
+     * 
+     * @param $objectOrArray
+     * @param $propertyPath
+     * @return mixed
+     * @throws Exception\UnexpectedTypeException
+     */
+    private function getPropertyValues($objectOrArray, $propertyPath) {
         if (is_string($propertyPath)) {
             $propertyPath = new PropertyPath($propertyPath);
         } elseif (!$propertyPath instanceof PropertyPathInterface) {
@@ -58,7 +89,7 @@ class PropertyAccessor implements PropertyAccessorInterface
 
         $propertyValues =& $this->readPropertiesUntil($objectOrArray, $propertyPath, $propertyPath->getLength(), $this->throwExceptionOnInvalidIndex);
 
-        return $propertyValues[count($propertyValues) - 1][self::VALUE];
+        return $propertyValues;
     }
 
     /**
@@ -170,7 +201,8 @@ class PropertyAccessor implements PropertyAccessorInterface
         // Use an array instead of an object since performance is very crucial here
         $result = array(
             self::VALUE => null,
-            self::IS_REF => false
+            self::IS_REF => false,
+            self::ACCESSOR_PATH => '->'.$index,
         );
 
         if (isset($array[$index])) {
@@ -216,18 +248,24 @@ class PropertyAccessor implements PropertyAccessorInterface
         $getter = 'get'.$camelProp;
         $isser = 'is'.$camelProp;
         $hasser = 'has'.$camelProp;
+        $operator = '->';
         $classHasProperty = $reflClass->hasProperty($property);
 
         if ($reflClass->hasMethod($getter) && $reflClass->getMethod($getter)->isPublic()) {
             $result[self::VALUE] = $object->$getter();
+            $result[self::ACCESSOR_PATH] = $operator.$getter.'()';
         } elseif ($reflClass->hasMethod($isser) && $reflClass->getMethod($isser)->isPublic()) {
             $result[self::VALUE] = $object->$isser();
+            $result[self::ACCESSOR_PATH] = $operator.$isser.'()';
         } elseif ($reflClass->hasMethod($hasser) && $reflClass->getMethod($hasser)->isPublic()) {
             $result[self::VALUE] = $object->$hasser();
+            $result[self::ACCESSOR_PATH] = $operator.$hasser.'()';
         } elseif ($reflClass->hasMethod('__get') && $reflClass->getMethod('__get')->isPublic()) {
             $result[self::VALUE] = $object->$property;
+            $result[self::ACCESSOR_PATH] = $operator.$property;
         } elseif ($classHasProperty && $reflClass->getProperty($property)->isPublic()) {
             $result[self::VALUE] =& $object->$property;
+            $result[self::ACCESSOR_PATH] = $operator.$property;
             $result[self::IS_REF] = true;
         } elseif (!$classHasProperty && property_exists($object, $property)) {
             // Needed to support \stdClass instances. We need to explicitly
@@ -236,10 +274,12 @@ class PropertyAccessor implements PropertyAccessorInterface
             // returns true, consequently the following line will result in a
             // fatal error.
             $result[self::VALUE] =& $object->$property;
+            $result[self::ACCESSOR_PATH] = $operator.$property;
             $result[self::IS_REF] = true;
         } elseif ($this->magicCall && $reflClass->hasMethod('__call') && $reflClass->getMethod('__call')->isPublic()) {
             // we call the getter and hope the __call do the job
             $result[self::VALUE] = $object->$getter();
+            $result[self::ACCESSOR_PATH] = $operator.$getter.'()';
         } else {
             $methods = array($getter, $isser, $hasser, '__get');
             if ($this->magicCall) {

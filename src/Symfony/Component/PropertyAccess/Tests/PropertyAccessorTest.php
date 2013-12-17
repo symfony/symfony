@@ -413,4 +413,28 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foobar', $object->getMagicProperty());
     }
 
+    public function testGetAccessorPathGivesUsablePathForPublicAttributes()
+    {
+        $object = new Author();
+        $object->firstName = 'Jean-François';
+        $this->assertEquals('->firstName', $this->getPropertyAccessor()->getAccessorPath($object, 'firstName'));
+    }
+
+    public function testGetAccessorPathGivesUsablePathForPrivateAttributes()
+    {
+        $object = new Author();
+        $object->setLastName('Lépine');
+        $this->assertEquals('->getLastName()', $this->getPropertyAccessor()->getAccessorPath($object, 'lastName'));
+    }
+
+    public function testGetAccessorPathGivesUsablePatRecursively()
+    {
+        $object = new Author();
+        $object->child = array();
+        $object->child['index'] = new Author();
+        $object->child['index']->setLastName('Lépine');
+        $this->assertEquals('->child->index->getLastName()', $this->getPropertyAccessor()->getAccessorPath($object, 'child[index].lastName'));
+    }
+
+
 }

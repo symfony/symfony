@@ -25,6 +25,7 @@ class GetAttrNodeTest extends AbstractNodeTest
             array('a', new GetAttrNode(new NameNode('foo'), new ConstantNode('b'), $this->getArrayNode(), GetAttrNode::ARRAY_CALL), array('foo' => array('b' => 'a', 'b'))),
 
             array('bar', new GetAttrNode(new NameNode('foo'), new ConstantNode('foo'), $this->getArrayNode(), GetAttrNode::PROPERTY_CALL), array('foo' => new Obj())),
+            array('foo', new GetAttrNode(new NameNode('foo'), new ConstantNode('bar'), $this->getArrayNode(), GetAttrNode::PROPERTY_CALL), array('foo' => new Obj())),
 
             array('baz', new GetAttrNode(new NameNode('foo'), new ConstantNode('foo'), $this->getArrayNode(), GetAttrNode::METHOD_CALL), array('foo' => new Obj())),
         );
@@ -37,6 +38,8 @@ class GetAttrNodeTest extends AbstractNodeTest
             array('$foo["b"]', new GetAttrNode(new NameNode('foo'), new ConstantNode('b'), $this->getArrayNode(), GetAttrNode::ARRAY_CALL)),
 
             array('$foo->foo', new GetAttrNode(new NameNode('foo'), new ConstantNode('foo'), $this->getArrayNode(), GetAttrNode::PROPERTY_CALL), array('foo' => new Obj())),
+
+            array('$foo->getBar()', new GetAttrNode(new NameNode('foo'), new ConstantNode('bar'), $this->getArrayNode(), GetAttrNode::PROPERTY_CALL), array('foo' => new Obj())),
 
             array('$foo->foo(array("b" => "a", 0 => "b"))', new GetAttrNode(new NameNode('foo'), new ConstantNode('foo'), $this->getArrayNode(), GetAttrNode::METHOD_CALL), array('foo' => new Obj())),
         );
@@ -55,9 +58,15 @@ class GetAttrNodeTest extends AbstractNodeTest
 class Obj
 {
     public $foo = 'bar';
+    private $bar = 'foo';
 
     public function foo()
     {
         return 'baz';
+    }
+
+    public function getBar()
+    {
+        return $this->bar;
     }
 }

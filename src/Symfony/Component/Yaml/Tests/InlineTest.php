@@ -118,7 +118,7 @@ class InlineTest extends \PHPUnit_Framework_TestCase
     public function testObjectParseWithObjectSupportEnabled()
     {
         $input = <<<'EOF'
-{ foo: !!php/object:O:30:"Symfony\Component\Yaml\Tests\B":1:{s:1:"b";s:3:"foo";}, bar: 1 }
+{ foo: !!php/object:O:30:"Symfony\Component\Yaml\Tests\B":1:{s:1:"b";s:7:"foo,bar";}, bar: 1 }
 EOF;
         $object = Inline::parse($input, false, true);
         $this->assertEquals(array('foo' => new B(), 'bar' => 1), $object);
@@ -127,7 +127,7 @@ EOF;
     public function testObjectParseWithObjectSupportDissabled()
     {
         $input = <<<'EOF'
-{ foo: !!php/object:O:30:"Symfony\Component\Yaml\Tests\B":1:{s:1:"b";s:3:"foo";}, bar: 1 }
+{ foo: !!php/object:O:30:"Symfony\Component\Yaml\Tests\B":1:{s:1:"b";s:7:"foo,bar";}, bar: 1 }
 EOF;
         $object = Inline::parse($input);
         $this->assertEquals(array('foo' => null, 'bar' => 1), $object);

@@ -472,20 +472,20 @@ EOF
     public function testFilterWithDefaultNamespaceOnly()
     {
         $crawler = new Crawler('<?xml version="1.0" encoding="UTF-8"?>
-        <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-            <url>
-                <loc>http://localhost/foo</loc>
-                <changefreq>weekly</changefreq>
-                <priority>0.5</priority>
-                <lastmod>2012-11-16</lastmod>
-           </url>
-           <url>
-                <loc>http://localhost/bar</loc>
-                <changefreq>weekly</changefreq>
-                <priority>0.5</priority>
-                <lastmod>2012-11-16</lastmod>
-            </url>
-        </urlset>
+            <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+                <url>
+                    <loc>http://localhost/foo</loc>
+                    <changefreq>weekly</changefreq>
+                    <priority>0.5</priority>
+                    <lastmod>2012-11-16</lastmod>
+               </url>
+               <url>
+                    <loc>http://localhost/bar</loc>
+                    <changefreq>weekly</changefreq>
+                    <priority>0.5</priority>
+                    <lastmod>2012-11-16</lastmod>
+                </url>
+            </urlset>
         ');
 
         $this->assertEquals(2, $crawler->filter('url')->count());

@@ -490,7 +490,7 @@ class PhpDumper extends Dumper
             $class = $this->dumpValue($callable[0]);
             // If the class is a string we can optimize call_user_func away
             if (strpos($class, "'") === 0) {
-                return sprintf("        \%s::%s(\$%s);\n", substr($class, 1, -1), $callable[1], $variableName);
+                return sprintf("        %s::%s(\$%s);\n", $this->dumpLiteralClass($class), $callable[1], $variableName);
             }
 
             return sprintf("        call_user_func(array(%s, '%s'), \$%s);\n", $this->dumpValue($callable[0]), $callable[1], $variableName);
@@ -701,7 +701,7 @@ EOF;
 
                 // If the class is a string we can optimize call_user_func away
                 if (strpos($class, "'") === 0) {
-                    return sprintf("        $return{$instantiation}\%s::%s(%s);\n", substr($class, 1, -1), $definition->getFactoryMethod(), $arguments ? implode(', ', $arguments) : '');
+                    return sprintf("        $return{$instantiation}%s::%s(%s);\n", $this->dumpLiteralClass($class), $definition->getFactoryMethod(), $arguments ? implode(', ', $arguments) : '');
                 }
 
                 return sprintf("        $return{$instantiation}call_user_func(array(%s, '%s')%s);\n", $this->dumpValue($definition->getFactoryClass()), $definition->getFactoryMethod(), $arguments ? ', '.implode(', ', $arguments) : '');
@@ -718,7 +718,7 @@ EOF;
             return sprintf("        \$class = %s;\n\n        $return{$instantiation}new \$class(%s);\n", $class, implode(', ', $arguments));
         }
 
-        return sprintf("        $return{$instantiation}new \\%s(%s);\n", substr(str_replace('\\\\', '\\', $class), 1, -1), implode(', ', $arguments));
+        return sprintf("        $return{$instantiation}new %s(%s);\n", $this->dumpLiteralClass($class), implode(', ', $arguments));
     }
 
     /**
@@ -1246,6 +1246,18 @@ EOF;
         } else {
             return var_export($value, true);
         }
+    }
+
+    /**
+     * Dumps a string to a literal (aka PHP Code) class value.
+     *
+     * @param string $class
+     *
+     * @return string
+     */
+    private function dumpLiteralClass($class)
+    {
+         return '\\'.substr(str_replace('\\\\', '\\', $class), 1, -1);
     }
 
     /**

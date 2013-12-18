@@ -3,11 +3,11 @@ digraph sc {
   node [fontsize="11" fontname="Arial" shape="record"];
   edge [fontsize="9" fontname="Arial" color="grey" arrowhead="open" arrowsize="0.5"];
 
-  node_foo [label="foo (alias_for_foo)\nFooClass\n", shape=record, fillcolor="#eeeeee", style="filled"];
-  node_bar [label="bar\nFooClass\n", shape=record, fillcolor="#eeeeee", style="filled"];
+  node_foo [label="foo (alias_for_foo)\nBar\\FooClass\n", shape=record, fillcolor="#eeeeee", style="filled"];
+  node_bar [label="bar\nBar\\FooClass\n", shape=record, fillcolor="#eeeeee", style="filled"];
   node_foo_baz [label="foo.baz\nBazClass\n", shape=record, fillcolor="#eeeeee", style="filled"];
-  node_foo_bar [label="foo_bar\nFooClass\n", shape=record, fillcolor="#eeeeee", style="dotted"];
-  node_method_call1 [label="method_call1\nFooClass\n", shape=record, fillcolor="#eeeeee", style="filled"];
+  node_foo_bar [label="foo_bar\nBar\\FooClass\n", shape=record, fillcolor="#eeeeee", style="dotted"];
+  node_method_call1 [label="method_call1\nBar\\FooClass\n", shape=record, fillcolor="#eeeeee", style="filled"];
   node_factory_service [label="factory_service\nBar\n", shape=record, fillcolor="#eeeeee", style="filled"];
   node_foo_with_inline [label="foo_with_inline\nFoo\n", shape=record, fillcolor="#eeeeee", style="filled"];
   node_inlined [label="inlined\nBar\n", shape=record, fillcolor="#eeeeee", style="filled"];

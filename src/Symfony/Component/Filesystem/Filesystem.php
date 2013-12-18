@@ -498,7 +498,7 @@ class Filesystem
 
         do {
             $seed = substr(md5(microtime().posix_getpid()), 0, 8);
-            $filename = $dir . $trailing_slash . $prefix . $seed . $postfix;
+            $filename = $dir.$trailing_slash.$prefix.$seed.$postfix;
         } while (file_exists($filename));
         touch($filename);
 

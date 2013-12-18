@@ -170,7 +170,7 @@ Form
    $form = $builder->getForm();
    ```
    
- * Even if it wasn't intended, it was possible to set a form type's `data`
+ * While it wasn't intended, it was possible to set a form type's `data`
    option to `null` if you wanted the form component to set the form's data
    to the data of the object bound to the form (if one was bound).
    This was used in some projects to pre-set a form field with optional
@@ -195,19 +195,6 @@ Form
       'data' => $options['default_data'] ?: null,
    ));
    $builder->get('field')->setDataLocked(false);
-   ```
-   
-   The cleanest solution would be to only set the `data` option if there's
-   actually data to pre-set.
-   
-   After (Alternative 1):
-   
-   ```
-   $fieldOptions = array();
-   if ($options['default_data']) {
-      $fieldOptions['data'] = $options['default_data'];
-   }
-   $builder->add('field', 'text', $fieldOptions);
    ```
 
 PropertyAccess

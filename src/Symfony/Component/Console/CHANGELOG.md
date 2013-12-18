@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.5.0
+-----
+
+* added a way to set the process name of a command
+
 2.4.0
 -----
 

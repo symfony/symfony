@@ -488,10 +488,10 @@ class Filesystem
         /* The PHP function is_dir returns true on files that have no extension.
         The file type function will tell you correctly what the file is */
         if (!is_dir(realpath($dir)) || filetype(realpath($dir)) != "dir") {
-            // The specified dir is not actualy a dir
+            // The specified dir is not actually a dir
             return false;
         }
-        if (!is_writable($dir)){
+        if (!is_writable($dir)) {
             // The directory will not let us create a file there
             return false;
         }

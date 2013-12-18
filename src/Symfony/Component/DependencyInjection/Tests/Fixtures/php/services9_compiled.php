@@ -148,7 +148,7 @@ class ProjectServiceContainer extends Container
     {
         $a = $this->get('foo.baz');
 
-        $this->services['foo'] = $instance = FooClass::getInstance('foo', $a, array('bar' => 'foo is bar', 'foobar' => 'bar'), true, $this);
+        $this->services['foo'] = $instance = \FooClass::getInstance('foo', $a, array('bar' => 'foo is bar', 'foobar' => 'bar'), true, $this);
 
         $instance->setBar($this->get('bar'));
         $instance->initialize();
@@ -169,9 +169,9 @@ class ProjectServiceContainer extends Container
      */
     protected function getFoo_BazService()
     {
-        $this->services['foo.baz'] = $instance = BazClass::getInstance();
+        $this->services['foo.baz'] = $instance = \BazClass::getInstance();
 
-        BazClass::configureStatic1($instance);
+        \BazClass::configureStatic1($instance);
 
         return $instance;
     }

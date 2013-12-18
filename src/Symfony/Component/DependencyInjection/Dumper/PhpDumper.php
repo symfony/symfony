@@ -788,7 +788,7 @@ EOF;
     {
         $code = <<<EOF
 
-    protected \$parameters;
+    private \$parameters;
 
     /**
      * Constructor.

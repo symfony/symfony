@@ -219,7 +219,7 @@ class Inline
                 $endOfObject = self::findEndOfPhpObject($scalarWithoutKey);
                 $output = substr($scalarWithoutKey, 0, $endOfObject+1);
                 $i += strlen($output);
-            } elseif (preg_match('/^(.+?)(' . implode('|', $delimiters) . ')/', $scalarWithoutKey, $match)) {
+            } elseif (preg_match('/^(.+?)('.implode('|', $delimiters).')/', $scalarWithoutKey, $match)) {
                 $output = $match[1];
                 $i += strlen($output);
             } else {
@@ -243,7 +243,7 @@ class Inline
      */
     private static function parseQuotedScalar($scalar, &$i)
     {
-        $match=array();
+        $match = array();
         if (!preg_match('/'.self::REGEX_QUOTED_STRING.'/Au', substr($scalar, $i), $match)) {
             throw new ParseException(sprintf('Malformed inline YAML string (%s).', substr($scalar, $i)));
         }
@@ -468,20 +468,20 @@ EOF;
     /**
      * When the value in inline notation contains serialized php object it has
      * not escaped commas and curly brackets. For that reason we need to know
-     * where this serialized object ends. Searching for } and , as delimieters
+     * where this serialized object ends. Searching for } and , as delimiters
      * was corrupting yaml structure.
      *
      * @param String $scalar
-     * @return int Position where php/object ends
+     * @return integer Position where php/object ends
      * @throws ParseException
      */
     public static function findEndOfPhpObject($scalar)
     {
         $countOfBrackets = 0;
-        for ($pos = 0; $pos < strlen($scalar); $pos++) {
-            if ('{' == $scalar[$pos])
+        for ($pos = 0, $length = strlen($scalar); $pos < $length; $pos++) {
+            if ('{' == $scalar[$pos]) {
                 $countOfBrackets++;
-            if ('}' == $scalar[$pos]) {
+            } elseif ('}' == $scalar[$pos]) {
                 $countOfBrackets--;
                 if (0 === $countOfBrackets)
                     return $pos;

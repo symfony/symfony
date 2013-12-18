@@ -1,0 +1,46 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2013-12-15T08:31:28Z
+
+This would be very useful ; but I'm not convinced that it should be in the `Command` class directly.
+
+I think to 2 options for this feature (not exclusive):
+* Create a __helper__ that we can use in our command code to set a custom process title.
+* Use an __event listener__ on `console.command` to convert the command name to a process title in a generic fashion.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2013-12-15T09:50:12Z
+
+Why are you not convinced ?
+I am not too, because of my 2nd bullet point. The `Application` class could be a better place to put this code.
+
+But I don't see the benefit of an helper here.
+
+About the event listener: I don't want to add magic. I prefer to be explicit. We used this feature for long time, and usally the command name could be different from the process name.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2013-12-15T20:41:19Z
+
+The benefit of using a helper for this purpose is that it can be replaced/extended (to name the transaction in newrelic with `newrelic_name_transaction`).
+
+My concern about having this code in the `Command` class is that it changes the global state of the php process whereas the command can be unit tested.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2013-12-16T11:05:47Z
+
+@fabpot I added a better php doc block.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2013-12-16T18:25:13Z
+
+Travis is broken, not console tests
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2013-12-17T16:58:15Z
+
+@fabpot Fixed.

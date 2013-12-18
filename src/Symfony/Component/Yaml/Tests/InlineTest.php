@@ -123,7 +123,7 @@ EOF;
         $object = Inline::parse($input, false, true);
         $this->assertEquals(array('foo' => new B(), 'bar' => 1), $object);
     }
-    
+
     public function testObjectParseWithObjectSupportDissabled()
     {
         $input = <<<'EOF'

@@ -148,7 +148,7 @@ abstract class AbstractToken implements TokenInterface
     {
         return serialize(
             array(
-                \is_object($this->user) ? clone $this->user : $this->user,
+                is_object($this->user) ? clone $this->user : $this->user,
                 $this->authenticated,
                 $this->roles,
                 $this->attributes

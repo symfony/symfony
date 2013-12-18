@@ -107,8 +107,8 @@ class AbstractTokenTest extends \PHPUnit_Framework_TestCase
         $uToken = unserialize(serialize($parentToken));
 
         $this->assertEquals(
-            \current($parentToken->getRoles())->getSource()->getUser(),
-            \current($uToken->getRoles())->getSource()->getUser()
+            current($parentToken->getRoles())->getSource()->getUser(),
+            current($uToken->getRoles())->getSource()->getUser()
         );
     }
 

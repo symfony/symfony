@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by sstok at 2013-12-01T10:44:56Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-16T18:00:57Z
+
+@fabpot why this PR sucks? :baby: leaving the room for ->parameters['x'] is ok then?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-12-16T18:07:01Z
+
+Sorry, I was too fast. Is it possible to make it private then?
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-18T09:56:57Z
+
+ready to :shipit: after travis finishes @fabpot

@@ -29,7 +29,7 @@ class AnnotationFileLoaderTest extends AbstractAnnotationLoaderTest
 
     public function testLoad()
     {
-        $this->reader->expects($this->once())->method('getClassAnnotation');
+        $this->reader->expects($this->once())->method('getClassAnnotations');
 
         $this->loader->load(__DIR__.'/../Fixtures/AnnotatedClasses/FooClass.php');
     }

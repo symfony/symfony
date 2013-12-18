@@ -302,7 +302,10 @@ class XmlDescriptor extends Descriptor
             $serviceXML->setAttribute('factory-service', $definition->getFactoryService());
         }
 
-        $serviceXML->setAttribute('factory-method', $definition->getFactoryMethod());
+        if ($definition->getFactoryMethod()) {
+            $serviceXML->setAttribute('factory-method', $definition->getFactoryMethod());
+        }
+
         $serviceXML->setAttribute('scope', $definition->getScope());
         $serviceXML->setAttribute('public', $definition->isPublic() ? 'true' : 'false');
         $serviceXML->setAttribute('synthetic', $definition->isSynthetic() ? 'true' : 'false');

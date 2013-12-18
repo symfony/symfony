@@ -12,15 +12,15 @@
 namespace Symfony\Component\HttpFoundation;
 
 /**
- * SocketResponse represents an HTTP response whose content is read from a file handle.
+ * FileStreamResponse represents an HTTP response whose content is read from a file handle.
  *
- * A SocketResponse uses a PHP file handle for its content.
+ * A FileStreamResponse uses a PHP file handle for its content.
  *
- * The socket handle needs to be readable, e.g. $handle = fopen("example.txt", "r");
+ * The socket handle needs to be readable, e.g. $handle = fopen('example.txt', 'r');
  *
  * @author Sascha Schimke <sascha.schimke@postcon.de>
  */
-class SocketResponse extends Response
+class FileStreamResponse extends Response
 {
     private $handle;
     private $close;
@@ -55,7 +55,7 @@ class SocketResponse extends Response
      * @param array    $headers An array of response headers
      * @param boolean  $close   Close socket handle after sending content
      *
-     * @return SocketResponse
+     * @return FileStreamResponse
      */
     public static function create($handle = null, $status = Response::HTTP_OK, $headers = array(), $close = true)
     {
@@ -67,7 +67,7 @@ class SocketResponse extends Response
      *
      * @param mixed $handle A readable file handle
      *
-     * @return SocketResponse
+     * @return FileStreamResponse
      * @throws \LogicException
      */
     public function setHandle($handle)
@@ -84,8 +84,9 @@ class SocketResponse extends Response
     /**
      * Close file handle after sending content
      *
-     * @return SocketResponse
-     * @param boolean $close
+     * @return FileStreamResponse
+     *
+*@param boolean $close
      */
     public function setClose($close)
     {
@@ -126,7 +127,7 @@ class SocketResponse extends Response
     public function setContent($content)
     {
         if (null !== $content) {
-            throw new \LogicException("The content cannot be set on a SocketResponse instance.");
+            throw new \LogicException("The content cannot be set on a FileStreamResponse instance.");
         }
     }
 

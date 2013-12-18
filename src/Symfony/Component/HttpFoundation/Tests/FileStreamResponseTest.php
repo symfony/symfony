@@ -11,14 +11,14 @@
 
 namespace Symfony\Component\HttpFoundation\Tests;
 
-use Symfony\Component\HttpFoundation\SocketResponse;
+use Symfony\Component\HttpFoundation\FileStreamResponse;
 
-class SocketResponseTest extends \PHPUnit_Framework_TestCase
+class FileStreamResponseTest extends \PHPUnit_Framework_TestCase
 {
     public function testConstructor()
     {
         $fd = fopen("php://stdin", "r");
-        $response = new SocketResponse($fd, 404, array("Content-Type" => "text/plain"));
+        $response = new FileStreamResponse($fd, 404, array("Content-Type" => "text/plain"));
 
         $this->assertEquals(404, $response->getStatusCode());
         $this->assertEquals("text/plain", $response->headers->get('Content-Type'));
@@ -27,7 +27,7 @@ class SocketResponseTest extends \PHPUnit_Framework_TestCase
     public function testCreate()
     {
         $fd = fopen("php://stdin", "r");
-        $response = SocketResponse::create($fd, 404, array("Content-Type" => "text/plain"));
+        $response = FileStreamResponse::create($fd, 404, array("Content-Type" => "text/plain"));
 
         $this->assertEquals(404, $response->getStatusCode());
         $this->assertEquals("text/plain", $response->headers->get('Content-Type'));
@@ -38,7 +38,7 @@ class SocketResponseTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetHandleNonResource()
     {
-        $response = new SocketResponse();
+        $response = new FileStreamResponse();
 
         $response->setHandle("non resource");
     }
@@ -46,7 +46,7 @@ class SocketResponseTest extends \PHPUnit_Framework_TestCase
     public function testSendContent()
     {
         $fd = fopen("data:text/plain;base64,U3ltZm9ueTIgaXMgZ3JlYXQ=", "r");
-        $response = new SocketResponse($fd);
+        $response = new FileStreamResponse($fd);
 
         $this->expectOutputString("Symfony2 is great");
 
@@ -59,7 +59,7 @@ class SocketResponseTest extends \PHPUnit_Framework_TestCase
      */
     public function testSendContentNonResource()
     {
-        $response = new SocketResponse();
+        $response = new FileStreamResponse();
         $response->sendContent();
     }
 
@@ -68,13 +68,13 @@ class SocketResponseTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetContent()
     {
-        $response = new SocketResponse();
+        $response = new FileStreamResponse();
         $response->setContent("test");
     }
 
     public function testGetContent()
     {
-        $response = new SocketResponse();
+        $response = new FileStreamResponse();
 
         $this->assertFalse($response->getContent());
     }

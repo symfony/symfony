@@ -302,6 +302,15 @@ abstract class Client
         }
 
         $uri = $this->getAbsoluteUri($uri);
+
+        if (isset($server['HTTP_HOST'])) {
+            $uri = str_replace(parse_url($uri, PHP_URL_HOST), $server['HTTP_HOST'], $uri);
+        }
+
+        if (isset($server['HTTPS'])) {
+            $uri = str_replace(parse_url($uri, PHP_URL_SCHEME), $server['HTTPS'] ? 'https' : 'http', $uri);
+        }
+
         $server = array_merge($this->server, $server);
 
         if (!$this->history->isEmpty()) {
@@ -518,7 +527,7 @@ abstract class Client
         }
 
         $server = $request->getServer();
-        unset($server['HTTP_IF_NONE_MATCH'], $server['HTTP_IF_MODIFIED_SINCE']);
+        $server = $this->updateServerFromUri($server, $this->redirect);
 
         $this->isMainRequest = false;
 
@@ -599,5 +608,14 @@ abstract class Client
     protected function requestFromRequest(Request $request, $changeHistory = true)
     {
         return $this->request($request->getMethod(), $request->getUri(), $request->getParameters(), $request->getFiles(), $request->getServer(), $request->getContent(), $changeHistory);
+    }
+
+    private function updateServerFromUri($server, $uri)
+    {
+        $server['HTTP_HOST'] = parse_url($uri, PHP_URL_HOST);
+        $server['HTTPS'] = 'https' == parse_url($uri, PHP_URL_SCHEME);
+        unset($server['HTTP_IF_NONE_MATCH'], $server['HTTP_IF_MODIFIED_SINCE']);
+
+        return $server;
     }
 }

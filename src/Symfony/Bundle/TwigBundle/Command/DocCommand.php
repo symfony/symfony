@@ -30,7 +30,7 @@ class DocCommand extends ContainerAwareCommand
             ->setName('twig:doc')
             ->setDefinition(array(
                 new InputArgument('filter', InputArgument::OPTIONAL, 'Show details for all entries matching this filter'),
-                new InputOption('json', null, InputOption::VALUE_NONE, 'Show complete json formatted information for machine reading'),
+                new InputOption('format', null, InputOption::VALUE_REQUIRED, 'Output format: text or json', 'text'),
             ))
             ->setDescription('Shows a list of twig functions, filters, globals and tests')
             ->setHelp(<<<EOF
@@ -45,7 +45,7 @@ The command lists all functions, filters, etc.
 
 The command lists everything that contains the word date.
 
-<info>php %command.full_name% --json</info>
+<info>php %command.full_name% --format=json</info>
 
 The command lists everything in a machine readable json format.
 EOF
@@ -58,7 +58,7 @@ EOF
         $twig = $this->getContainer()->get('twig');
         $types = array('functions', 'filters', 'tests', 'globals');
 
-        if ($input->getOption('json')) {
+        if ($input->getOption('format') === 'json') {
             $data = array();
             foreach ($types as $type) {
                 foreach ($twig->{'get'.ucfirst($type)}() as $name => $entity) {

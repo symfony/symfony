@@ -9,20 +9,35 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\TwigBundle\Command;
+namespace Symfony\Bridge\Twig\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
+use Symfony\Bundle\FrameworkBundle\Console\Application as FrameworkBundleApplication;
 
 /**
  * Command that will validate your template syntax and output encountered errors.
  *
  * @author Marc Weistroff <marc.weistroff@sensiolabs.com>
  */
-class LintCommand extends ContainerAwareCommand
+class LintCommand extends Command
 {
+    private $twig;
+
+    /**
+     * Constructor for dependency injection.
+     *
+     * @param \Twig_Environment $twig
+     */
+    public function __construct(\Twig_Environment $twig)
+    {
+        $this->twig = $twig;
+
+        parent::__construct();
+    }
+
     protected function configure()
     {
         $this
@@ -57,7 +72,7 @@ EOF
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $twig = $this->getContainer()->get('twig');
+        $twig = $this->getTwig();
         $template = null;
         $filename = $input->getArgument('filename');
 
@@ -82,7 +97,7 @@ EOF
             $files = array($filename);
         } elseif (is_dir($filename)) {
             $files = Finder::create()->files()->in($filename)->name('*.twig');
-        } else {
+        } elseif ($this->getApplication() instanceof FrameworkBundleApplication) {
             $dir = $this->getApplication()->getKernel()->locateResource($filename);
             $files = Finder::create()->files()->in($dir)->name('*.twig');
         }
@@ -147,5 +162,13 @@ EOF
         }
 
         return $result;
+    }
+
+    /**
+     * @return \Twig_Environment
+     */
+    protected function getTwig()
+    {
+        return $this->twig;
     }
 }

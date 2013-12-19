@@ -88,48 +88,48 @@ class ExceptionListener
                 if (null !== $this->logger) {
                     $this->logger->info(sprintf('Authentication exception occurred; redirecting to authentication entry point (%s)', $exception->getMessage()));
                 }
-    
+
                 try {
                     $response = $this->startAuthentication($request, $exception);
                 } catch (\Exception $e) {
                     $event->setException($e);
-    
+
                     return;
                 }
             } elseif ($exception instanceof AccessDeniedException) {
                 $event->setException(new AccessDeniedHttpException($exception->getMessage(), $exception));
-    
+
                 $token = $this->context->getToken();
                 if (!$this->authenticationTrustResolver->isFullFledged($token)) {
                     if (null !== $this->logger) {
                         $this->logger->debug(sprintf('Access is denied (user is not fully authenticated) by "%s" at line %s; redirecting to authentication entry point', $exception->getFile(), $exception->getLine()));
                     }
-    
+
                     try {
                         $insufficientAuthenticationException = new InsufficientAuthenticationException('Full authentication is required to access this resource.', 0, $exception);
                         $insufficientAuthenticationException->setToken($token);
                         $response = $this->startAuthentication($request, $insufficientAuthenticationException);
                     } catch (\Exception $e) {
                         $event->setException($e);
-    
+
                         return;
                     }
                 } else {
                     if (null !== $this->logger) {
                         $this->logger->debug(sprintf('Access is denied (and user is neither anonymous, nor remember-me) by "%s" at line %s', $exception->getFile(), $exception->getLine()));
                     }
-    
+
                     try {
                         if (null !== $this->accessDeniedHandler) {
                             $response = $this->accessDeniedHandler->handle($request, $exception);
-    
+
                             if (!$response instanceof Response) {
                                 return;
                             }
                         } elseif (null !== $this->errorPage) {
                             $subRequest = $this->httpUtils->createRequest($request, $this->errorPage);
                             $subRequest->attributes->set(SecurityContextInterface::ACCESS_DENIED_ERROR, $exception);
-    
+
                             $response = $event->getKernel()->handle($subRequest, HttpKernelInterface::SUB_REQUEST, true);
                         } else {
                             return;
@@ -138,9 +138,9 @@ class ExceptionListener
                         if (null !== $this->logger) {
                             $this->logger->error(sprintf('Exception thrown when handling an exception (%s: %s)', get_class($e), $e->getMessage()));
                         }
-    
+
                         $event->setException(new \RuntimeException('Exception thrown when handling an exception.', 0, $e));
-    
+
                         return;
                     }
                 }
@@ -148,10 +148,10 @@ class ExceptionListener
                 if (null !== $this->logger) {
                     $this->logger->info(sprintf('Logout exception occurred; wrapping with AccessDeniedHttpException (%s)', $exception->getMessage()));
                 }
-    
+
                 return;
             } else {
-                if (null === $exception->getPrevious()){
+                if (null === $exception->getPrevious()) {
                     return;
                 }
             }

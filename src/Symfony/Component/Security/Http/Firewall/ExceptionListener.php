@@ -96,6 +96,7 @@ class ExceptionListener
 
                     return;
                 }
+                break;
             } elseif ($exception instanceof AccessDeniedException) {
                 $event->setException(new AccessDeniedHttpException($exception->getMessage(), $exception));
 
@@ -144,16 +145,15 @@ class ExceptionListener
                         return;
                     }
                 }
+                break;
             } elseif ($exception instanceof LogoutException) {
                 if (null !== $this->logger) {
                     $this->logger->info(sprintf('Logout exception occurred; wrapping with AccessDeniedHttpException (%s)', $exception->getMessage()));
                 }
 
                 return;
-            } else {
-                if (null === $exception->getPrevious()) {
-                    return;
-                }
+            } elseif (null === $exception->getPrevious()) {
+                return;
             }
             $exception = $exception->getPrevious();
         }

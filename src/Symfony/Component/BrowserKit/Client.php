@@ -303,6 +303,9 @@ abstract class Client
 
         $uri = $this->getAbsoluteUri($uri);
 
+        if (isset($server['HTTP_HOST'])) {
+            $uri = str_replace(parse_url($uri, PHP_URL_HOST), $server['HTTP_HOST'], $uri);
+        }
         $server = array_merge($this->server, $server);
         if (!$this->history->isEmpty()) {
             $server['HTTP_REFERER'] = $this->history->current()->getUri();
@@ -512,6 +515,8 @@ abstract class Client
         }
 
         $server = $request->getServer();
+        $server = $this->updateServerFromUri($server, $this->redirect);
+
         unset($server['HTTP_IF_NONE_MATCH'], $server['HTTP_IF_MODIFIED_SINCE']);
 
         $this->isMainRequest = false;
@@ -593,5 +598,13 @@ abstract class Client
     protected function requestFromRequest(Request $request, $changeHistory = true)
     {
         return $this->request($request->getMethod(), $request->getUri(), $request->getParameters(), $request->getFiles(), $request->getServer(), $request->getContent(), $changeHistory);
+    }
+
+    private function updateServerFromUri($server, $uri)
+    {
+        $server['HTTP_HOST'] = parse_url($uri, PHP_URL_HOST);
+        $server['HTTPS'] = parse_url($uri, PHP_URL_SCHEME);
+
+        return $server;
     }
 }

@@ -38,6 +38,7 @@ abstract class AbstractFactory implements SecurityFactoryInterface
         'login_path'                     => '/login',
         'target_path_parameter'          => '_target_path',
         'use_referer'                    => false,
+        'target_forward'                 => false
     );
 
     protected $defaultFailureHandlerOptions = array(

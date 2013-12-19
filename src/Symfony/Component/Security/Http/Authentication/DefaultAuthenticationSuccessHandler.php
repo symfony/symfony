@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Authentication;
 
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Http\HttpUtils;
@@ -24,6 +25,7 @@ use Symfony\Component\Security\Http\HttpUtils;
  */
 class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandlerInterface
 {
+    protected $httpKernel;
     protected $httpUtils;
     protected $options;
     protected $providerKey;
@@ -34,9 +36,10 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
      * @param HttpUtils $httpUtils
      * @param array     $options   Options for processing a successful authentication attempt.
      */
-    public function __construct(HttpUtils $httpUtils, array $options)
+    public function __construct(HttpUtils $httpUtils, array $options, HttpKernelInterface $httpKernel)
     {
         $this->httpUtils   = $httpUtils;
+        $this->httpKernel  = $httpKernel;
 
         $this->options = array_merge(array(
             'always_use_default_target_path' => false,
@@ -44,6 +47,7 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
             'login_path'                     => '/login',
             'target_path_parameter'          => '_target_path',
             'use_referer'                    => false,
+            'target_forward'                 => false
         ), $options);
     }
 
@@ -52,7 +56,15 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
      */
     public function onAuthenticationSuccess(Request $request, TokenInterface $token)
     {
-        return $this->httpUtils->createRedirectResponse($request, $this->determineTargetUrl($request));
+        $targetUrl = $this->determineTargetUrl($request);
+
+        if ($this->options['target_forward']) {
+            $subRequest = $this->httpUtils->createRequest($request, $targetUrl);
+
+            return $this->httpKernel->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
+        }
+
+        return $this->httpUtils->createRedirectResponse($request, $targetUrl);
     }
 
     /**

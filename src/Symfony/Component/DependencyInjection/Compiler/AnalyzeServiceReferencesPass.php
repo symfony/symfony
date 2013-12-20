@@ -103,7 +103,7 @@ class AnalyzeServiceReferencesPass implements RepeatablePassInterface
                     $this->getDefinition((string) $argument),
                     $argument
                 );
-            } elseif ($argument instanceof Definition) {
+            } elseif ($argument instanceof Definition && $this->currentDefinition !== $argument) {
                 $this->processArguments($argument->getArguments());
                 $this->processArguments($argument->getMethodCalls());
                 $this->processArguments($argument->getProperties());

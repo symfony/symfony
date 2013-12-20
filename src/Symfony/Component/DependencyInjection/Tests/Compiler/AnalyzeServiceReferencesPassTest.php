@@ -97,6 +97,22 @@ class AnalyzeServiceReferencesPassTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(2, $graph->getNode('a')->getInEdges());
     }
 
+    public function testProcessHandlesInlinedDefinitions()
+    {
+        $container = new ContainerBuilder();
+
+        $definitionA = $container->register('a');
+        $definitionA->addArgument(new Reference('b'));
+
+        $definitionB = $container->register('b');
+        // It can happen that a Reference is replaced with a service Definition by another compiler pass
+        $definitionB->addMethodCall('setFoo', array(array($definitionB, 'guessFoo')));
+
+        $graph = $this->process($container);
+
+        $this->assertCount(1, $graph->getNode('b')->getInEdges());
+    }
+
     protected function process(ContainerBuilder $container)
     {
         $pass = new RepeatedPass(array(new AnalyzeServiceReferencesPass()));

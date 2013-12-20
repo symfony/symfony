@@ -1,15 +1,15 @@
 parameters:
     baz_class: BazClass
-    foo_class: FooClass
+    foo_class: Bar\FooClass
     foo: bar
 
 services:
     foo:
-        class: FooClass
+        class: Bar\FooClass
         tags:
             - { name: foo, foo: foo }
             - { name: foo, bar: bar }
-        factory_class: FooClass
+        factory_class: Bar\FooClass
         factory_method: getInstance
         arguments: [foo, '@foo.baz', { '%foo%': 'foo is %foo%', foobar: '%foo%' }, true, '@service_container']
         properties: { foo: bar, moo: '@foo.baz' }
@@ -19,7 +19,7 @@ services:
 
         configurator: sc_configure
     bar:
-        class: FooClass
+        class: Bar\FooClass
         arguments: [foo, '@foo.baz', '%foo_bar%']
         configurator: ['@foo.baz', configure]
     foo.baz:
@@ -31,7 +31,7 @@ services:
         class: %foo_class%
         scope: prototype
     method_call1:
-        class: FooClass
+        class: Bar\FooClass
         file: %path%foo.php
         calls:
             - [setBar, ['@foo']]

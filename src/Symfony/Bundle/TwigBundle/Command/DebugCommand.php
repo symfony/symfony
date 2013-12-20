@@ -22,12 +22,12 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
-class DocCommand extends ContainerAwareCommand
+class DebugCommand extends ContainerAwareCommand
 {
     protected function configure()
     {
         $this
-            ->setName('twig:doc')
+            ->setName('twig:debug')
             ->setDefinition(array(
                 new InputArgument('filter', InputArgument::OPTIONAL, 'Show details for all entries matching this filter'),
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, 'Output format: text or json', 'text'),

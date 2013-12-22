@@ -42,6 +42,24 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
     /**
      * {@inheritDoc}
      */
+    public function guessOptions($class, $property, $type)
+    {
+        $options = array();
+
+        switch ($type) {
+            case 'text':
+                if (($guess = $this->guessMaxLength($class, $property)) && null !== $guess->getValue()) {
+                    $options = array_merge(array('max_length' => $guess->getValue()), $options);
+                }
+            break;
+        }
+
+        return $options;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function guessRequired($class, $property)
     {
         $guesser = $this;
@@ -56,7 +74,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
     /**
      * {@inheritDoc}
      */
-    public function guessMaxLength($class, $property)
+    protected function guessMaxLength($class, $property)
     {
         $guesser = $this;
 
@@ -213,7 +231,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
      *
      * @return ValueGuess|null The guess for the maximum length
      */
-    public function guessMaxLengthForConstraint(Constraint $constraint)
+    protected function guessMaxLengthForConstraint(Constraint $constraint)
     {
         switch (get_class($constraint)) {
             case 'Symfony\Component\Validator\Constraints\Length':

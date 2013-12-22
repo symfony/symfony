@@ -17,7 +17,9 @@ class JsonDescriptorTest extends AbstractDescriptorTest
 {
     protected function setUp()
     {
-        $this->markTestSkipped('Test skipped on PHP 5.3 as JSON_PRETTY_PRINT does not exist.');
+        if (version_compare(phpversion(), '5.4.0', '<')) {
+            $this->markTestSkipped('Test skipped on PHP 5.3 as JSON_PRETTY_PRINT does not exist.');
+        }
     }
 
     protected function getDescriptor()

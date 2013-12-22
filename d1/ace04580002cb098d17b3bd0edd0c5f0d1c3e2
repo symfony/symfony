@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-20T18:15:13Z
+
+beautiful https://travis-ci.org/cordoval/symfony/jobs/15781257 now i will be working on adjusting these
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-21T15:22:34Z
+
+@fabpot squashing now and after travis it should be good.
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-21T15:55:22Z
+
+@fabpot :ship: ready
+
+:baby:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-12-22T13:56:22Z
+
+we should probably do that in 2.3 instead, no?
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-22T14:56:11Z
+
+@fabpot please merge https://github.com/symfony/symfony/pull/9841 so i can rebase https://github.com/symfony/symfony/pull/9830 and send the PR to master in which there is a new class that needs to be affected.
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-22T15:44:45Z
+
+@fabpot thanks, now i will wait for you to upper port the 2.3 changes to master so i can rebase and then this can be submitted
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-22T15:45:16Z
+
+although actually i can just submit it now since they are non conflicting
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-22T15:50:40Z
+
+@fabpot this one is now ready :baby:

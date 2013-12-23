@@ -53,7 +53,6 @@ class IbanValidatorTest extends \PHPUnit_Framework_TestCase
     public function getValidIbans()
     {
         return array(
-            array('CH93 0076 2011 6238 5295 7'), //Switzerland
             array('CH9300762011623852957'), // Switzerland without spaces
 
             //Country list

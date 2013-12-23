@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.5.0
+------
+
+ * allowed non alpha numeric characters in second level and deeper object properties names
+
 2.3.0
 ------
 

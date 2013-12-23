@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\Validator\Constraints;
 
+use Doctrine\DBAL\DBALException;
 use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeIntIdEntity;
 use Symfony\Component\Validator\DefaultTranslator;
@@ -163,6 +164,33 @@ class UniqueValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('This value is already used.', $violation->getMessage());
         $this->assertEquals('name', $violation->getPropertyPath());
         $this->assertEquals('Foo', $violation->getInvalidValue());
+    }
+
+    public function testValidateUniquenessForDuplicatesInCollection()
+    {
+        $entityManagerName = "foo";
+        $em = DoctrineTestHelper::createTestEntityManager();
+        $this->createSchema($em);
+        $validator = $this->createValidator($entityManagerName, $em);
+
+        $entity1 = new UniqueConstraintEntity(1, 'Foo');
+        $violationsList = $validator->validate($entity1);
+        $this->assertEquals(0, $violationsList->count(), "No violations found on entity before it is saved to the database.");
+
+        $entity2 = new UniqueConstraintEntity(2, 'Foo');
+        $violationsList = $validator->validate($entity2);
+        $this->assertEquals(1, $violationsList->count(), "Violation found on entity with conflicting entity existing in collection.");
+
+        // Check if database really fails with error
+        // SQLSTATE[23000]: Integrity constraint violation: 19 column name is not unique
+        $em->persist($entity1);
+        $em->persist($entity2);
+        try {
+            $em->flush();
+            $this->fail("Duplicate entity was successfully saved");
+        } catch (DBALException $e) {
+            return;
+        }
     }
 
     public function testValidateCustomErrorPath()

@@ -243,16 +243,24 @@ class UniqueValidatorTest extends \PHPUnit_Framework_TestCase
         $validator = $this->createValidator($entityManagerName, $em);
 
         $entity1 = new UniqueConstraintEntity(1, 'foo');
-        $entity2 = new UniqueConstraintEntity(2, 'foo');
+        $entity2 = new UniqueConstraintEntity(2, 'bar');
+        $entity3 = new UniqueConstraintEntity(3, 'foo');
+        $entity4 = new UniqueConstraintEntity(4, 'bar');
 
         $em->persist($entity1);
         $em->persist($entity2);
         $em->flush();
 
         $violationsList = $validator->validate($entity1);
-        $this->assertEquals(1, $violationsList->count(), 'Violation found on entity with conflicting entity existing in the database.');
+        $this->assertEquals(0, $violationsList->count(), 'No violations found on entity after it was saved to the database.');
 
         $violationsList = $validator->validate($entity2);
+        $this->assertEquals(0, $violationsList->count(), 'No violations found on entity after it was saved to the database.');
+
+        $violationsList = $validator->validate($entity3);
+        $this->assertEquals(1, $violationsList->count(), 'Violation found on entity with conflicting entity existing in the database.');
+
+        $violationsList = $validator->validate($entity4);
         $this->assertEquals(1, $violationsList->count(), 'Violation found on entity with conflicting entity existing in the database.');
     }
 

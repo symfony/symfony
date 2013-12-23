@@ -30,6 +30,11 @@ class UniqueEntityValidator extends ConstraintValidator
     private $registry;
 
     /**
+     * @var array
+     */
+    protected $collection = array();
+
+    /**
      * @param ManagerRegistry $registry
      */
     public function __construct(ManagerRegistry $registry)
@@ -122,11 +127,17 @@ class UniqueEntityValidator extends ConstraintValidator
             reset($result);
         }
 
+        $class = get_class($entity);
+        $constraintKey = md5(serialize($fields));
+        $valuesKey = md5(serialize($criteria));
         /* If no entity matched the query criteria or a single entity matched,
          * which is the same as the entity being validated, the criteria is
          * unique.
          */
-        if (0 === count($result) || (1 === count($result) && $entity === ($result instanceof \Iterator ? $result->current() : current($result)))) {
+        if (0 === count($result) && !isset($this->collection[$class][$constraintKey][$valuesKey])) {
+            $this->collection[$class][$constraintKey][$valuesKey] = true;
+            return;
+        } elseif (1 === count($result) && $entity === ($result instanceof \Iterator ? $result->current() : current($result))) {
             return;
         }
 

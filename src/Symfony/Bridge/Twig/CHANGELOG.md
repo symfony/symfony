@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.5.0
+-----
+
+ * added command `twig:lint` from `TwigBundle`
+
 2.4.0
 -----
 

@@ -26,7 +26,6 @@ class IcuResFileDumperTest extends \PHPUnit_Framework_TestCase
         $catalogue->add(array('foo' => 'bar'));
 
         $tempDir = sys_get_temp_dir() . '/IcuResFileDumperTest';
-        mkdir($tempDir);
         $dumper = new IcuResFileDumper();
         $dumper->dump($catalogue, array('path' => $tempDir));
 

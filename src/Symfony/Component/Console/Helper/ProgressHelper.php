@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Helper;
 
+use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -185,7 +186,9 @@ class ProgressHelper extends Helper
         $this->startTime = time();
         $this->current   = 0;
         $this->max       = (int) $max;
-        $this->output    = $output;
+
+        // Disabling output when it does not support ANSI codes as it would result in a broken display anyway.
+        $this->output    = $output->isDecorated() ? $output : new NullOutput();
         $this->lastMessagesLength = 0;
         $this->barCharOriginal = '';
 

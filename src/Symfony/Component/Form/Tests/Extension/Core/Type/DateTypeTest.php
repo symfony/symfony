@@ -295,7 +295,7 @@ class DateTypeTest extends TypeTestCase
     }
 
     /**
-     * This test is to check that the strings '0', '1', '2', '3' are no accepted
+     * This test is to check that the strings '0', '1', '2', '3' are not accepted
      * as valid IntlDateFormatter constants for FULL, LONG, MEDIUM or SHORT respectively.
      *
      * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
@@ -777,5 +777,26 @@ class DateTypeTest extends TypeTestCase
 
         $this->assertSame(array(), $form['day']->getErrors());
         $this->assertSame(array($error), $form->getErrors());
+    }
+
+    public function testYearsFor32BitsMachines()
+    {
+        if (4 !== PHP_INT_SIZE) {
+            $this->markTestSkipped(
+                'PHP must be compiled in 32 bit mode to run this test');
+        }
+
+        $form = $this->factory->create('date', null, array(
+            'years' => range(1900, 2040),
+        ));
+
+        $view = $form->createView();
+
+        $listChoices = array();
+        foreach (range(1902, 2037) as $y) {
+            $listChoices[] = new ChoiceView($y, $y, $y);
+        }
+
+        $this->assertEquals($listChoices, $view['year']->vars['choices']);
     }
 }

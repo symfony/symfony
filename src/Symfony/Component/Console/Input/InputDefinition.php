@@ -11,6 +11,11 @@
 
 namespace Symfony\Component\Console\Input;
 
+if (!defined('JSON_UNESCAPED_UNICODE')) {
+    define('JSON_UNESCAPED_SLASHES', 64);
+    define('JSON_UNESCAPED_UNICODE', 256);
+}
+
 use Symfony\Component\Console\Descriptor\TextDescriptor;
 use Symfony\Component\Console\Descriptor\XmlDescriptor;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -424,7 +429,7 @@ class InputDefinition
         $descriptor = new TextDescriptor();
         $output = new BufferedOutput(BufferedOutput::VERBOSITY_NORMAL, true);
         $descriptor->describe($output, $this, array('raw_output' => true));
-        
+
         return $output->fetch();
     }
 
@@ -440,14 +445,14 @@ class InputDefinition
     public function asXml($asDom = false)
     {
         $descriptor = new XmlDescriptor();
-        
+
         if ($asDom) {
             return $descriptor->getInputDefinitionDocument($this);
         }
-        
+
         $output = new BufferedOutput();
         $descriptor->describe($output, $this);
-        
+
         return $output->fetch();
     }
 }

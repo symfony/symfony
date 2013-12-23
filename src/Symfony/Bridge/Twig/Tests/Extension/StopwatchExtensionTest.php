@@ -12,20 +12,9 @@
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
 use Symfony\Bridge\Twig\Extension\StopwatchExtension;
-use Symfony\Component\Stopwatch\Stopwatch;
-use Symfony\Bridge\Twig\Tests\TestCase;
 
-class StopwatchExtensionTest extends TestCase
+class StopwatchExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        parent::setUp();
-
-        if (!class_exists('Symfony\Component\Stopwatch\Stopwatch')) {
-            $this->markTestSkipped('The "Stopwatch" component is not available');
-        }
-    }
-
     /**
      * @expectedException \Twig_Error_Syntax
      */

@@ -16,7 +16,6 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Text descriptor.
@@ -131,7 +130,7 @@ class TextDescriptor extends Descriptor
             $this->writeText("\n");
             $this->describeInputDefinition($definition, $options);
         }
-        
+
         $this->writeText("\n");
 
         if ($help = $command->getProcessedHelp()) {
@@ -181,7 +180,7 @@ class TextDescriptor extends Descriptor
                     $this->writeText(sprintf("  <info>%-${width}s</info> %s", $name, $description->getCommand($name)->getDescription()), $options);
                 }
             }
-            
+
             $this->writeText("\n");
         }
     }

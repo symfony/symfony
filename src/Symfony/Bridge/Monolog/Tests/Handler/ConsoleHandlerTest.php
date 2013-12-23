@@ -22,13 +22,6 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ConsoleHandlerTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Monolog\\Logger')) {
-            $this->markTestSkipped('Monolog is not available.');
-        }
-    }
-
     public function testConstructor()
     {
         $handler = new ConsoleHandler(null, false);

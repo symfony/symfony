@@ -70,6 +70,18 @@ class CurrencyValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->validate($currency, new Currency());
     }
 
+    /**
+     * @dataProvider getValidCurrencies
+     **/
+    public function testValidCurrenciesWithCountrySpecificLocale($currency)
+    {
+        \Locale::setDefault('en_GB');
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
+        $this->validator->validate($currency, new Currency());
+    }
+
     public function getValidCurrencies()
     {
         return array(

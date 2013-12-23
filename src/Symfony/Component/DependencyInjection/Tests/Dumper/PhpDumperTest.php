@@ -81,7 +81,7 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      */
     public function testExportParameters()
     {
@@ -121,7 +121,7 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Service id "bar$" cannot be converted to a valid PHP method name.
      */
     public function testAddServiceInvalidServiceId()
@@ -180,5 +180,20 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         $container->set('bar', $bar = new \stdClass());
 
         $this->assertSame($bar, $container->get('foo')->bar, '->set() overrides an already defined service');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
+     */
+    public function testCircularReference()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', 'stdClass')->addArgument(new Reference('bar'));
+        $container->register('bar', 'stdClass')->setPublic(false)->addMethodCall('setA', array(new Reference('baz')));
+        $container->register('baz', 'stdClass')->addMethodCall('setA', array(new Reference('foo')));
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        $dumper->dump();
     }
 }

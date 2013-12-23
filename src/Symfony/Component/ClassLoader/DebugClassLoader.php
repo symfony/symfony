@@ -22,6 +22,8 @@ namespace Symfony\Component\ClassLoader;
  * @author Christophe Coevoet <stof@notk.org>
  *
  * @api
+ *
+ * @deprecated Deprecated since version 2.4, to be removed in 3.0. Use the DebugClassLoader provided by the Debug component instead.
  */
 class DebugClassLoader
 {

@@ -178,6 +178,20 @@ class RouteCollection implements \IteratorAggregate, \Countable
     }
 
     /**
+     * Sets a condition on all routes.
+     *
+     * Existing conditions will be overridden.
+     *
+     * @param string $condition The condition
+     */
+    public function setCondition($condition)
+    {
+        foreach ($this->routes as $route) {
+            $route->setCondition($condition);
+        }
+    }
+
+    /**
      * Adds defaults to all routes.
      *
      * An existing default value under the same name in a route will be overridden.

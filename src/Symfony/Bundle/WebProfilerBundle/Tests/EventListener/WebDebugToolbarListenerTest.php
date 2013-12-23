@@ -185,6 +185,27 @@ class WebDebugToolbarListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('<html><head></head><body></body></html>', $response->getContent());
     }
 
+    public function testXDebugUrlHeader()
+    {
+        $response = new Response();
+        $response->headers->set('X-Debug-Token', 'xxxxxxxx');
+
+        $urlGenerator = $this->getUrlGeneratorMock();
+        $urlGenerator
+            ->expects($this->once())
+            ->method('generate')
+            ->with('_profiler', array('token' => 'xxxxxxxx'))
+            ->will($this->returnValue('/_profiler/xxxxxxxx'))
+        ;
+
+        $event = new FilterResponseEvent($this->getKernelMock(), $this->getRequestMock(), HttpKernelInterface::MASTER_REQUEST, $response);
+
+        $listener = new WebDebugToolbarListener($this->getTwigMock(), false, WebDebugToolbarListener::ENABLED, 'bottom', $urlGenerator);
+        $listener->onKernelResponse($event);
+
+        $this->assertEquals('/_profiler/xxxxxxxx', $response->headers->get('X-Debug-Token-Link'));
+    }
+
     protected function getRequestMock($isXmlHttpRequest = false, $requestFormat = 'html', $hasSession = true)
     {
         $request = $this->getMock(
@@ -217,6 +238,11 @@ class WebDebugToolbarListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($render));
 
         return $templating;
+    }
+
+    protected function getUrlGeneratorMock()
+    {
+        return $this->getMock('Symfony\Component\Routing\Generator\UrlGeneratorInterface');
     }
 
     protected function getKernelMock()

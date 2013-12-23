@@ -13,12 +13,10 @@ namespace Symfony\Component\Security\Http\Firewall;
 
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
-use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\SimplePreAuthenticatorInterface;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
@@ -72,7 +70,7 @@ class SimplePreAuthenticationListener implements ListenerInterface
             $this->logger->info(sprintf('Attempting simple pre-authorization %s', $this->providerKey));
         }
 
-        if (null !== $this->context->getToken() && !$this->context->getToken() instanceof AnonymousToken) {
+        if (null !== $this->securityContext->getToken() && !$this->securityContext->getToken() instanceof AnonymousToken) {
             return;
         }
 

@@ -63,7 +63,7 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
         try {
             list($user, $credentials) = $this->getPreAuthenticatedData($request);
         } catch (BadCredentialsException $exception) {
-            $this->clearToken();
+            $this->clearToken($exception);
 
             return;
         }
@@ -91,21 +91,23 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
                 $this->dispatcher->dispatch(SecurityEvents::INTERACTIVE_LOGIN, $loginEvent);
             }
         } catch (AuthenticationException $failed) {
-            $this->clearToken();
+            $this->clearToken($failed);
         }
     }
 
     /**
      * Clears a PreAuthenticatedToken for this provider (if present)
+     *
+     * @param AuthenticationException $exception
      */
-    protected function clearToken()
+    private function clearToken(AuthenticationException $exception)
     {
         $token = $this->securityContext->getToken();
         if ($token instanceof PreAuthenticatedToken && $this->providerKey === $token->getProviderKey()) {
             $this->securityContext->setToken(null);
 
             if (null !== $this->logger) {
-                $this->logger->info(sprintf("Cleared security context due to exception: %s", $failed->getMessage()));
+                $this->logger->info(sprintf("Cleared security context due to exception: %s", $exception->getMessage()));
             }
         }
     }

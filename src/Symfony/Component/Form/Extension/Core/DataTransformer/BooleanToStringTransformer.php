@@ -57,7 +57,7 @@ class BooleanToStringTransformer implements DataTransformerInterface
             throw new TransformationFailedException('Expected a Boolean.');
         }
 
-        return true === $value ? $this->trueValue : null;
+        return $value ? $this->trueValue : null;
     }
 
     /**

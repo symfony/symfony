@@ -62,12 +62,19 @@ class UniqueEntityValidator extends ConstraintValidator
 
         if ($constraint->em) {
             $em = $this->registry->getManager($constraint->em);
+
+            if (!$em) {
+               throw new ConstraintDefinitionException(sprintf('Object manager "%s" does not exist.', $constraint->em));
+            }
         } else {
             $em = $this->registry->getManagerForClass(get_class($entity));
+
+            if (!$em) {
+                throw new ConstraintDefinitionException(sprintf('Unable to find the object manager associated with an entity of class "%s".', get_class($entity)));
+            }
         }
 
-        $className = $this->context->getClassName();
-        $class = $em->getClassMetadata($className);
+        $class = $em->getClassMetadata(get_class($entity));
         /* @var $class \Doctrine\Common\Persistence\Mapping\ClassMetadata */
 
         $criteria = array();
@@ -102,7 +109,7 @@ class UniqueEntityValidator extends ConstraintValidator
             }
         }
 
-        $repository = $em->getRepository($className);
+        $repository = $em->getRepository(get_class($entity));
         $result = $repository->{$constraint->repositoryMethod}($criteria);
 
         /* If the result is a MongoCursor, it must be advanced to the first

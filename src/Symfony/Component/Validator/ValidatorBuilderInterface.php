@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator;
 
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Validator\Mapping\Cache\CacheInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use Doctrine\Common\Annotations\Reader;
@@ -158,6 +159,15 @@ interface ValidatorBuilderInterface
      * @return ValidatorBuilderInterface The builder object.
      */
     public function setTranslationDomain($translationDomain);
+
+    /**
+     * Sets the property accessor for resolving property paths.
+     *
+     * @param PropertyAccessorInterface $propertyAccessor The property accessor.
+     *
+     * @return ValidatorBuilderInterface The builder object.
+     */
+    public function setPropertyAccessor(PropertyAccessorInterface $propertyAccessor);
 
     /**
      * Builds and returns a new validator object.

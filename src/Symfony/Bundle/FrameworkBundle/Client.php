@@ -160,7 +160,7 @@ class Client extends BaseClient
             $profilerCode = '$kernel->getContainer()->get(\'profiler\')->enable();';
         }
 
-        return <<<EOF
+        $code = <<<EOF
 <?php
 
 if ('$autoloader') {
@@ -171,7 +171,10 @@ require_once '$path';
 \$kernel = unserialize('$kernel');
 \$kernel->boot();
 $profilerCode
-echo serialize(\$kernel->handle(unserialize('$request')));
+
+\$request = unserialize('$request');
 EOF;
+
+        return $code.$this->getHandleScript();
     }
 }

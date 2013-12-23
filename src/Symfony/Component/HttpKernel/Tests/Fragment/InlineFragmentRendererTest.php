@@ -21,17 +21,6 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class InlineFragmentRendererTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\EventDispatcher\EventDispatcher')) {
-            $this->markTestSkipped('The "EventDispatcher" component is not available');
-        }
-
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-    }
-
     public function testRender()
     {
         $strategy = new InlineFragmentRenderer($this->getKernel($this->returnValue(new Response('foo'))));
@@ -50,8 +39,8 @@ class InlineFragmentRendererTest extends \PHPUnit_Framework_TestCase
     {
         $object = new \stdClass();
 
-        $subRequest = Request::create('/_fragment?_path=_format%3Dhtml%26_controller%3Dmain_controller');
-        $subRequest->attributes->replace(array('object' => $object, '_format' => 'html', '_controller' => 'main_controller'));
+        $subRequest = Request::create('/_fragment?_path=_format%3Dhtml%26_locale%3Den%26_controller%3Dmain_controller');
+        $subRequest->attributes->replace(array('object' => $object, '_format' => 'html', '_controller' => 'main_controller', '_locale' => 'en'));
         $subRequest->headers->set('x-forwarded-for', array('127.0.0.1'));
         $subRequest->server->set('HTTP_X_FORWARDED_FOR', '127.0.0.1');
 
@@ -216,7 +205,8 @@ class InlineFragmentRendererTest extends \PHPUnit_Framework_TestCase
     }
 }
 
-class Bar {
+class Bar
+{
     public $bar = 'bar';
 
     public function getBar()

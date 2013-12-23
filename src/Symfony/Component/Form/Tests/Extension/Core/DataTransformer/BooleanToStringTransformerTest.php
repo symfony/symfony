@@ -17,6 +17,9 @@ class BooleanToStringTransformerTest extends \PHPUnit_Framework_TestCase
 {
     const TRUE_VALUE = '1';
 
+    /**
+     * @var BooleanToStringTransformer
+     */
     protected $transformer;
 
     protected function setUp()
@@ -33,20 +36,27 @@ class BooleanToStringTransformerTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals(self::TRUE_VALUE, $this->transformer->transform(true));
         $this->assertNull($this->transformer->transform(false));
+    }
+
+    // https://github.com/symfony/symfony/issues/8989
+    public function testTransformAcceptsNull()
+    {
         $this->assertNull($this->transformer->transform(null));
     }
 
-    public function testTransformExpectsBoolean()
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
+     */
+    public function testTransformFailsIfString()
     {
-        $this->setExpectedException('Symfony\Component\Form\Exception\TransformationFailedException');
-
         $this->transformer->transform('1');
     }
 
-    public function testReverseTransformExpectsString()
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
+     */
+    public function testReverseTransformFailsIfInteger()
     {
-        $this->setExpectedException('Symfony\Component\Form\Exception\TransformationFailedException');
-
         $this->transformer->reverseTransform(1);
     }
 

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Debug\Tests\FatalErrorHandler;
 
-use Symfony\Component\Debug\ErrorHandler;
 use Symfony\Component\Debug\Exception\FatalErrorException;
 use Symfony\Component\Debug\FatalErrorHandler\UndefinedFunctionFatalErrorHandler;
 

@@ -242,9 +242,41 @@
                 <source>This value is not a valid ISSN.</source>
                 <target>Dieser Wert ist keine gültige ISSN.</target>
             </trans-unit>
-             <trans-unit id="64">
+            <trans-unit id="64">
                 <source>This value is not a valid currency.</source>
                 <target>Dieser Wert ist keine gültige Währung.</target>
+            </trans-unit>
+            <trans-unit id="65">
+                <source>This value should be equal to {{ compared_value }}.</source>
+                <target>Dieser Wert sollte gleich {{ compared_value }} sein.</target>
+            </trans-unit>
+            <trans-unit id="66">
+                <source>This value should be greater than {{ compared_value }}.</source>
+                <target>Dieser Wert sollte größer als {{ compared_value }} sein.</target>
+            </trans-unit>
+            <trans-unit id="67">
+                <source>This value should be greater than or equal to {{ compared_value }}.</source>
+                <target>Dieser Wert sollte größer oder gleich {{ compared_value }} sein.</target>
+            </trans-unit>
+            <trans-unit id="68">
+                <source>This value should be identical to {{ compared_value_type }} {{ compared_value }}.</source>
+                <target>Dieser Wert sollte identisch sein mit {{ compared_value_type }} {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="69">
+                <source>This value should be less than {{ compared_value }}.</source>
+                <target>Dieser Wert sollte kleiner als {{ compared_value }} sein.</target>
+            </trans-unit>
+            <trans-unit id="70">
+                <source>This value should be less than or equal to {{ compared_value }}.</source>
+                <target>Dieser Wert sollte kleiner oder gleich {{ compared_value }} sein.</target>
+            </trans-unit>
+            <trans-unit id="71">
+                <source>This value should not be equal to {{ compared_value }}.</source>
+                <target>Dieser Wert sollte nicht {{ compared_value }} sein.</target>
+            </trans-unit>
+            <trans-unit id="72">
+                <source>This value should not be identical to {{ compared_value_type }} {{ compared_value }}.</source>
+                <target>Dieser Wert sollte nicht identisch sein mit {{ compared_value_type }} {{ compared_value }}.</target>
             </trans-unit>
         </body>
     </file>

@@ -32,19 +32,19 @@ abstract class Client
 {
     protected $history;
     protected $cookieJar;
-    protected $server;
+    protected $server = array();
     protected $internalRequest;
     protected $request;
     protected $internalResponse;
     protected $response;
     protected $crawler;
-    protected $insulated;
+    protected $insulated = false;
     protected $redirect;
-    protected $followRedirects;
+    protected $followRedirects = true;
 
-    private $maxRedirects;
-    private $redirectCount;
-    private $isMainRequest;
+    private $maxRedirects = -1;
+    private $redirectCount = 0;
+    private $isMainRequest = true;
 
     /**
      * Constructor.
@@ -58,13 +58,8 @@ abstract class Client
     public function __construct(array $server = array(), History $history = null, CookieJar $cookieJar = null)
     {
         $this->setServerParameters($server);
-        $this->history = null === $history ? new History() : $history;
-        $this->cookieJar = null === $cookieJar ? new CookieJar() : $cookieJar;
-        $this->insulated = false;
-        $this->followRedirects = true;
-        $this->maxRedirects = -1;
-        $this->redirectCount = 0;
-        $this->isMainRequest = true;
+        $this->history = $history ?: new History();
+        $this->cookieJar = $cookieJar ?: new CookieJar();
     }
 
     /**
@@ -492,9 +487,31 @@ abstract class Client
             }
         }
 
+        $request = $this->internalRequest;
+
+        if (in_array($this->internalResponse->getStatus(), array(302, 303))) {
+            $method = 'get';
+            $files = array();
+            $content = null;
+        } else {
+            $method = $request->getMethod();
+            $files = $request->getFiles();
+            $content = $request->getContent();
+        }
+
+        if ('get' === strtolower($method)) {
+            // Don't forward parameters for GET request as it should reach the redirection URI
+            $parameters = array();
+        } else {
+            $parameters = $request->getParameters();
+        }
+
+        $server = $request->getServer();
+        unset($server['HTTP_IF_NONE_MATCH'], $server['HTTP_IF_MODIFIED_SINCE']);
+
         $this->isMainRequest = false;
 
-        $response = $this->request('get', $this->redirect);
+        $response = $this->request($method, $this->redirect, $parameters, $files, $server, $content);
 
         $this->isMainRequest = true;
 
@@ -535,6 +552,11 @@ abstract class Client
                 isset($this->server['HTTPS']) ? 's' : '',
                 isset($this->server['HTTP_HOST']) ? $this->server['HTTP_HOST'] : 'localhost'
             );
+        }
+
+        // protocol relative URL
+        if (0 === strpos($uri, '//')) {
+            return parse_url($currentUri, PHP_URL_SCHEME).':'.$uri;
         }
 
         // anchor?

@@ -207,10 +207,6 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
 
     public function testGenerateForRouteWithInvalidOptionalParameterNonStrictWithLogger()
     {
-        if (!interface_exists('Psr\Log\LoggerInterface')) {
-            $this->markTestSkipped('The "psr/log" package is not available');
-        }
-
         $routes = $this->getRoutes('test', new Route('/testing/{foo}', array('foo' => '1'), array('foo' => 'd+')));
         $logger = $this->getMock('Psr\Log\LoggerInterface');
         $logger->expects($this->once())

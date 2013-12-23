@@ -32,6 +32,9 @@
     </service>
     <service id="method_call1" class="FooClass">
       <call method="setBar" />
+      <call method="setBar">
+        <argument type="expression">service("foo").foo() ~ parameter("foo")</argument>
+      </call>
     </service>
     <service id="method_call2" class="FooClass">
       <call method="setBar">

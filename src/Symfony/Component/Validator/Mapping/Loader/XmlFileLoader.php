@@ -166,7 +166,10 @@ class XmlFileLoader extends FileLoader
                     $value = array();
                 }
             } else {
-                $value = trim($node);
+                $value = XmlUtils::phpize($node);
+                if (is_string($value)) {
+                    $value = trim($value);
+                }
             }
 
             $options[(string) $node['name']] = $value;

@@ -204,15 +204,40 @@ class EntityChoiceList extends ObjectChoiceList
      */
     public function getChoicesForValues(array $values)
     {
+        // Performance optimization
+        // Also prevents the generation of "WHERE id IN ()" queries through the
+        // entity loader. At least with MySQL and on the development machine
+        // this was tested on, no exception was thrown for such invalid
+        // statements, consequently no test fails when this code is removed.
+        // https://github.com/symfony/symfony/pull/8981#issuecomment-24230557
+        if (empty($values)) {
+            return array();
+        }
+
         if (!$this->loaded) {
             // Optimize performance in case we have an entity loader and
             // a single-field identifier
             if ($this->idAsValue && $this->entityLoader) {
-                if (empty($values)) {
-                    return array();
+                $unorderedEntities = $this->entityLoader->getEntitiesByIds($this->idField, $values);
+                $entitiesByValue = array();
+                $entities = array();
+
+                // Maintain order and indices from the given $values
+                // An alternative approach to the following loop is to add the
+                // "INDEX BY" clause to the Doctrine query in the loader,
+                // but I'm not sure whether that's doable in a generic fashion.
+                foreach ($unorderedEntities as $entity) {
+                    $value = $this->fixValue(current($this->getIdentifierValues($entity)));
+                    $entitiesByValue[$value] = $entity;
                 }
 
-                return $this->entityLoader->getEntitiesByIds($this->idField, $values);
+                foreach ($values as $i => $value) {
+                    if (isset($entitiesByValue[$value])) {
+                        $entities[$i] = $entitiesByValue[$value];
+                    }
+                }
+
+                return $entities;
             }
 
             $this->load();
@@ -232,6 +257,11 @@ class EntityChoiceList extends ObjectChoiceList
      */
     public function getValuesForChoices(array $entities)
     {
+        // Performance optimization
+        if (empty($entities)) {
+            return array();
+        }
+
         if (!$this->loaded) {
             // Optimize performance for single-field identifiers. We already
             // know that the IDs are used as values
@@ -240,10 +270,10 @@ class EntityChoiceList extends ObjectChoiceList
             if ($this->idAsValue) {
                 $values = array();
 
-                foreach ($entities as $entity) {
+                foreach ($entities as $i => $entity) {
                     if ($entity instanceof $this->class) {
                         // Make sure to convert to the right format
-                        $values[] = $this->fixValue(current($this->getIdentifierValues($entity)));
+                        $values[$i] = $this->fixValue(current($this->getIdentifierValues($entity)));
                     }
                 }
 
@@ -264,9 +294,16 @@ class EntityChoiceList extends ObjectChoiceList
      * @return array
      *
      * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     *
+     * @deprecated Deprecated since version 2.4, to be removed in 3.0.
      */
     public function getIndicesForChoices(array $entities)
     {
+        // Performance optimization
+        if (empty($entities)) {
+            return array();
+        }
+
         if (!$this->loaded) {
             // Optimize performance for single-field identifiers. We already
             // know that the IDs are used as indices
@@ -275,10 +312,10 @@ class EntityChoiceList extends ObjectChoiceList
             if ($this->idAsIndex) {
                 $indices = array();
 
-                foreach ($entities as $entity) {
+                foreach ($entities as $i => $entity) {
                     if ($entity instanceof $this->class) {
                         // Make sure to convert to the right format
-                        $indices[] = $this->fixIndex(current($this->getIdentifierValues($entity)));
+                        $indices[$i] = $this->fixIndex(current($this->getIdentifierValues($entity)));
                     }
                 }
 
@@ -299,9 +336,16 @@ class EntityChoiceList extends ObjectChoiceList
      * @return array
      *
      * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     *
+     * @deprecated Deprecated since version 2.4, to be removed in 3.0.
      */
     public function getIndicesForValues(array $values)
     {
+        // Performance optimization
+        if (empty($values)) {
+            return array();
+        }
+
         if (!$this->loaded) {
             // Optimize performance for single-field identifiers.
 

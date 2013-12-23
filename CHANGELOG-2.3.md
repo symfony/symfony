@@ -7,6 +7,152 @@ in 2.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.3.0...v2.3.1
 
+* 2.3.7 (2013-11-14)
+
+ * bug #9499 Request::overrideGlobals() may call invalid ini value (denkiryokuhatsuden)
+ * bug #9420 [Console][ProgressHelper] Fix ProgressHelper redraw when redrawFreq is greater than 1 (giosh94mhz)
+ * bug #9212 [Validator] Force Luhn Validator to only work with strings (Richtermeister)
+ * bug #9476 Fixed bug with lazy services (peterrehm)
+ * bug #9431 [DependencyInjection] fixed YamlDumper did not make services private. (realityking)
+ * bug #9416 fixed issue with clone now the children of the original form are preserved and the clone form is given new children (yjv)
+ * bug #9412 [HttpFoundation] added content length header to BinaryFileResponse (kbond)
+ * bug #9395 [HttpKernel] fixed memory limit display in MemoryDataCollector (hhamon)
+ * bug #9388 [Form] Fixed: The "data" option is taken into account even if it is NULL (bschussek)
+ * bug #9391 [Serializer] Fixed the error handling when decoding invalid XML to avoid a Warning (stof)
+ * bug #9378 [DomCrawler] [HttpFoundation] Make `Content-Type` attributes identification case-insensitive (matthieuprat)
+ * bug #9354 [Process] Fix #9343 : revert file handle usage on Windows platform (romainneutron)
+ * bug #9334 [Form] Improved FormTypeCsrfExtension to use the type class as default intention if the form name is empty (bschussek)
+ * bug #9333 [Form] Improved FormTypeCsrfExtension to use the type class as default intention if the form name is empty (bschussek)
+ * bug #9338 [DoctrineBridge] Added type check to prevent calling clear() on arrays (bschussek)
+ * bug #9328 [Form] Changed FormTypeCsrfExtension to use the form's name as default intention (bschussek)
+ * bug #9327 [Form] Changed FormTypeCsrfExtension to use the form's name as default intention (bschussek)
+ * bug #9308 [DoctrineBridge] Loosened CollectionToArrayTransformer::transform() to accept arrays (bschussek)
+ * bug #9274 [Yaml] Fixed the escaping of strings starting with a dash when dumping (stof)
+ * bug #9270 [Templating] Fix in ChainLoader.php (janschoenherr)
+ * bug #9246 [Session] fixed wrong started state (tecbot)
+
+* 2.3.6 (2013-10-10)
+
+ * [Security] limited the password length passed to encoders
+ * bug #9259 [Process] Fix latest merge from 2.2 in 2.3 (romainneutron)
+ * bug #9237 [FrameworkBundle] assets:install command should mirror .dotfiles (.htaccess) (FineWolf)
+ * bug #9223 [Translator] PoFileDumper - PO headers (Padam87)
+ * bug #9257 [Process] Fix 9182 : random failure on pipes tests (romainneutron)
+ * bug #9222 [Bridge] [Propel1] Fixed guessed relations (ClementGautier)
+ * bug #9214 [FramworkBundle] Check event listener services are not abstract (lyrixx)
+ * bug #9207 [HttpKernel] Check for lock existence before unlinking (ollietb)
+ * bug #9184 Fixed cache warmup of paths which contain back-slashes (fabpot)
+ * bug #9192 [Form] remove MinCount and MaxCount constraints in ValidatorTypeGuesser (franek)
+ * bug #9190 Fix: duplicate usage of Symfony\Component\HttpFoundation\Response (realsim)
+ * bug #9188 [Form] add support for Length and Range constraint in ValidatorTypeGuesser (franek)
+ * bug #8809 [Form] enforce correct timezone (Burgov)
+ * bug #9169 Fixed client insulation when using the terminable event (fabpot)
+ * bug #9154 Fix problem with Windows file links (backslash in JavaScript string) (fabpot)
+ * bug #9153 [DependencyInjection] Prevented inlining of lazy loaded private service definitions (jakzal)
+ * bug #9103 [HttpFoundation] Header `HTTP_X_FORWARDED_PROTO` can contain various values (stloyd)
+
+* 2.3.5 (2013-09-27)
+
+ * 8980954: bugix: CookieJar returns cookies with domain "domain.com" for domain "foodomain.com"
+ * bb59ac2: fixed HTML5 form attribute handling XPath query
+ * 3108c71: [Locale] added support for the position argument to NumberFormatter::parse()
+ * 0774c79: [Locale] added some more stubs for the number formatter
+ * e5282e8: [DomCrawler]Crawler guess charset from html
+ * 0e80d88: fixes RequestDataCollector bug, visible when used on Drupal8
+ * c8d0342: [Console] fixed exception rendering when nested styles
+ * a47d663: [Console] fixed the formatter for single-char tags
+ * c6c35b3: [Console] Escape exception message during the rendering of an exception
+ * 04e730e: [DomCrawler] fixed HTML5 form attribute handling
+ * 0e437c5: [BrowserKit] Fixed the handling of parameters when redirecting
+ * d84df4c: [Process] Properly close pipes after a Process::stop call
+ * b3ae29d: fixed bytes conversion when used on 32-bits systems
+ * a273e79: [Form] Fixed: "required" attribute is not added to <select> tag if no empty value
+ * 958ec09: NativeSessionStorage regenerate
+ * 0d6af5c: Use setTimeZone if this method exists.
+ * 42019f6: [Console] Fixed argument parsing when a single dash is passed.
+ * 097b376: [WebProfilerBundle] fixed toolbar for IE8 (refs #8380)
+ * 4f5b8f0: [HttpFoundation] tried to keep the original Request URI as much as possible to avoid different behavior between ::createFromGlobals() and ::create()
+ * 4c1dbc7: [TwigBridge] fixed form rendering when used in a template with dynamic inheritance
+ * 8444339: [HttpKernel] added a check for private event listeners/subscribers
+ * 427ee19: [FrameworkBundle] fixed registration of the register listener pass
+ * ce7de37: [DependencyInjection] fixed a non-detected circular reference in PhpDumper (closes #8425)
+ * 37102dc: [Process] Close unix pipes before calling `proc_close` to avoid a deadlock
+ * 8c2a733: [HttpFoundation] fixed format duplication in Request
+ * 1e75cf9: [Process] Fix #8970 : read output once the process is finished, enable pipe tests on Windows
+ * 9542d72: [Form] Fixed expanded choice field to be marked invalid when unknown choices are submitted
+ * 72b8807: [Form] Fixed ChoiceList::get*By*() methods to preserve order and array keys
+ * b65a515: [Form] Fixed FormValidator::findClickedButton() not to be called exponentially
+ * 49f5027: [HttpKernel] fixer HInclude src (closes #8951)
+ * c567262: Fixed escaping of service identifiers in configuration
+ * 4a76c76: [Process][2.2] Fix Process component on windows
+ * 65814ba: Request->getPort() should prefer HTTP_HOST over SERVER_PORT
+ * e75d284: Fixing broken http auth digest in some circumstances (php-fpm + apache).
+ * 970405f: fixed some circular references
+ * 899f176: [Security] fixed a leak in ExceptionListener
+ * 2fd8a7a: [Security] fixed a leak in the ContextListener
+ * 6362fa4: Button missing getErrorsAsString() fixes #8084 Debug: Not calling undefined method anymore. If the form contained a submit button the call would fail and the debug of the form wasn't possible. Now it will work in all cases. This fixes #8084
+ * e4b3039: Use isset() instead of array_key_exists() in DIC
+ * 2d34e78: [BrowserKit] fixed method/files/content when redirecting a request
+ * 64e1655: [BrowserKit] removed some headers when redirecting a request
+ * 96a4b00: [BrowserKit] fixed headers when redirecting if history is set to false (refs #8697)
+ * c931eb7: [HttpKernel] fixed route parameters storage in the Request data collector (closes #8867)
+ * 96bb731: optimized circular reference checker
+ * 39b610d: Clear lazy loading initializer after the service is successfully initialized
+ * 91234cd: [HttpKernel] changed fragment URLs to be relative by default (closes #8458)
+ * 4922a80: [FrameworkBundle] added support for double-quoted strings in the extractor (closes #8797)
+ * 52d8676: [Intl] made RegionBundle and LanguageBundle merge fallback data when using a country-specific locale
+ * 0d07af8: [BrowserKit] Pass headers when `followRedirect()` is called
+ * d400b5a: Return BC compatibility for `@Route` parameters and default values
+
+* 2.3.4 (2013-08-27)
+
+ * f936b41: clearToken exception is thrown at wrong place.
+ * ea480bd: [Form] Fixed Form::all() signature for PHP 5.3.3
+ * e1f40f2: [Locale] Fixed: Locale::setDefault() throws no exception when "en" is passed
+ * d0faf55: [Locale] Fixed: StubLocale::setDefault() throws no exception when "en" is passed
+ * 566d79c: [Yaml] fixed embedded folded string parsing
+ * 33b0a17: [Validator] fixed Boolean handling in XML constraint mappings (closes #5603)
+ * 0951b8d: [Translation] Fixed regression: When only one rule is passed to transChoice(), this rule should be used
+ * 4563f1b: [Yaml] Fix comment containing a colon on a scalar line being parsed as a hash.
+ * 7e87eb1: fixed request format when forwarding a request
+ * 07d14e5: [Form] Removed exception in Button::setData(): setData() is now always called for all elements in the form tree during the initialization of the tree
+ * ccaaedf: [Form] PropertyPathMapper::mapDataToForms() *always* calls setData() on every child to ensure that all *_DATA events were fired when the initialization phase is over (except for virtual forms)
+ * 00bc270: [Form] Fixed: submit() reacts to dynamic modifications of the form children
+ * c4636e1: added a functional test for locale handling in sub-requests
+ * 05fdb12: Fixed issue #6932 - Inconsistent locale handling in subrequests
+ * b3c3159: fixed locale of sub-requests when explicitely set by the developer (refs #8821)
+ * 9bb7a3d: fixed request format of sub-requests when explicitely set by the developer (closes #8787)
+ * fa35597: Sets _format attribute only if it wasn't set previously by the user.
+ * f946108: fixed the format of the request used to render an exception
+ * 51022c3: Fix typo in the check_path validator
+ * 5f7219e: added a missing use statement (closes #8808)
+ * 262879d: fix for Process:isSuccessful()
+ * 0723c10: [Process] Use a consistent way to reset data of the process latest run
+ * 85a9c9d: [HttpFoundation] Fixed removing a nonexisting namespaced attribute.
+ * 191d320: [Validation] Fixed IdentityTranslator to pass correct Locale to MessageSelector
+ * c6ecd83: SwiftMailerHandler in Monolog bridge now able to react to kernel.terminate event
+ * 99adcf1: {HttpFoundation] [Session] fixed session compatibility with memcached/redis session storage
+ * ab9a96b: Fixes for hasParameterOption and getParameterOption methods of ArgvInput
+ * dbd0855: Added sleep() workaround for windows php rename bug
+ * c342715: [Form] Fixed: Added "validation_groups" option to submit button
+ * fa01e6b: [Process] Fix for #8754 (Timed-out processes are successful)
+ * 909fab6: [Process] Fix #8742 : Signal-terminated processes are not successful
+ * fa769a2: [Process] Add more precision to Process::stop timeout
+ * 3ef517b: [Process] Fix #8739
+ * 572ba68: [TwigBridge] removed superflous ; when rendering form_enctype() (closes #8660)
+ * 18896d5a: [Validator] fixed the wrong isAbstract() check against the class (fixed #8589)
+ * e8e76ec: [TwigBridge] Prevent code extension to display warning
+ * 96aec0f: Fix internal sub-request creation
+ * 6ed0fdf: [Form] Moved auto_initialize option to the BaseType
+ * e47657d: Make sure ContextErrorException is loaded during compile time errors
+ * 98f6969: Fix empty process argument escaping on Windows
+ * 1a73b44: added missing support for the new output API in PHP 5.4+
+ * e0c7d3d: Fixed bug introduced in #8675
+ * 0b965fb: made the filesystem loader compatible with Twig 2.0
+ * 8fa0453: [Intl] Updated stubs to reflect ICU 51.2
+ * 322f880: replaced deprecated Twig features
+ * 48338fc: Ignore null value in comparison validators
+
 * 2.3.3 (2013-08-07)
 
  * c35cc5b: added trusted hosts check

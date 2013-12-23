@@ -19,6 +19,7 @@
         <parameter key="twig.extension.form.class">Symfony\Bridge\Twig\Extension\FormExtension</parameter>
         <parameter key="twig.extension.httpkernel.class">Symfony\Bridge\Twig\Extension\HttpKernelExtension</parameter>
         <parameter key="twig.extension.debug.stopwatch.class">Symfony\Bridge\Twig\Extension\StopwatchExtension</parameter>
+        <parameter key="twig.extension.expression.class">Symfony\Bridge\Twig\Extension\ExpressionExtension</parameter>
         <parameter key="twig.form.engine.class">Symfony\Bridge\Twig\Form\TwigRendererEngine</parameter>
         <parameter key="twig.form.renderer.class">Symfony\Bridge\Twig\Form\TwigRenderer</parameter>
         <parameter key="twig.translation.extractor.class">Symfony\Bridge\Twig\Translation\TwigExtractor</parameter>
@@ -90,6 +91,10 @@
         <service id="twig.extension.debug.stopwatch" class="%twig.extension.debug.stopwatch.class%" public="false">
             <tag name="twig.extension" />
             <argument type="service" id="debug.stopwatch" on-invalid="ignore" />
+        </service>
+
+        <service id="twig.extension.expression" class="%twig.extension.expression.class%" public="false">
+            <tag name="twig.extension" />
         </service>
 
         <service id="twig.extension.httpkernel" class="%twig.extension.httpkernel.class%" public="false">

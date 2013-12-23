@@ -13,9 +13,9 @@ namespace Symfony\Component\Debug\FatalErrorHandler;
 
 use Symfony\Component\Debug\Exception\ClassNotFoundException;
 use Symfony\Component\Debug\Exception\FatalErrorException;
+use Symfony\Component\Debug\DebugClassLoader;
 use Composer\Autoload\ClassLoader as ComposerClassLoader;
 use Symfony\Component\ClassLoader as SymfonyClassLoader;
-use Symfony\Component\ClassLoader\DebugClassLoader;
 
 /**
  * ErrorHandler for classes that do not exist.
@@ -30,7 +30,7 @@ class ClassNotFoundFatalErrorHandler implements FatalErrorHandlerInterface
     public function handleError(array $error, FatalErrorException $exception)
     {
         $messageLen = strlen($error['message']);
-        $notFoundSuffix = '" not found';
+        $notFoundSuffix = '\' not found';
         $notFoundSuffixLen = strlen($notFoundSuffix);
         if ($notFoundSuffixLen > $messageLen) {
             return;
@@ -41,7 +41,7 @@ class ClassNotFoundFatalErrorHandler implements FatalErrorHandlerInterface
         }
 
         foreach (array('class', 'interface', 'trait') as $typeName) {
-            $prefix = ucfirst($typeName).' "';
+            $prefix = ucfirst($typeName).' \'';
             $prefixLen = strlen($prefix);
             if (0 !== strpos($error['message'], $prefix)) {
                 continue;
@@ -110,7 +110,7 @@ class ClassNotFoundFatalErrorHandler implements FatalErrorHandlerInterface
             if ($function[0] instanceof ComposerClassLoader || $function[0] instanceof SymfonyClassLoader) {
                 foreach ($function[0]->getPrefixes() as $paths) {
                     foreach ($paths as $path) {
-                        $classes = array_merge($classes, $this->findClassInPath($function[0], $path, $class));
+                        $classes = array_merge($classes, $this->findClassInPath($path, $class));
                     }
                 }
             }
@@ -119,16 +119,22 @@ class ClassNotFoundFatalErrorHandler implements FatalErrorHandlerInterface
         return $classes;
     }
 
-    private function findClassInPath($loader, $path, $class)
+    /**
+     * @param string $path
+     * @param string $class
+     *
+     * @return array
+     */
+    private function findClassInPath($path, $class)
     {
         if (!$path = realpath($path)) {
-            continue;
+            return array();
         }
 
         $classes = array();
         $filename = $class.'.php';
         foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path), \RecursiveIteratorIterator::LEAVES_ONLY) as $file) {
-            if ($filename == $file->getFileName() && $class = $this->convertFileToClass($loader, $path, $file->getPathName())) {
+            if ($filename == $file->getFileName() && $class = $this->convertFileToClass($path, $file->getPathName())) {
                 $classes[] = $class;
             }
         }
@@ -136,25 +142,40 @@ class ClassNotFoundFatalErrorHandler implements FatalErrorHandlerInterface
         return $classes;
     }
 
-    private function convertFileToClass($loader, $path, $file)
+    /**
+     * @param string $path
+     * @param string $file
+     *
+     * @return string|null
+     */
+    private function convertFileToClass($path, $file)
     {
+        $namespacedClass = str_replace(array($path.'/', '.php', '/'), array('', '', '\\'), $file);
+        $pearClass = str_replace('\\', '_', $namespacedClass);
+
         // We cannot use the autoloader here as most of them use require; but if the class
         // is not found, the new autoloader call will require the file again leading to a
         // "cannot redeclare class" error.
-        require_once $file;
-
-        $file = str_replace(array($path.'/', '.php'), array('', ''), $file);
-
-        // is it a namespaced class?
-        $class = str_replace('/', '\\', $file);
-        if (class_exists($class, false) || interface_exists($class, false) || (function_exists('trait_exists') && trait_exists($class, false))) {
-            return $class;
+        if (!$this->classExists($namespacedClass) && !$this->classExists($pearClass)) {
+            require_once $file;
         }
 
-        // is it a PEAR-like class name instead?
-        $class = str_replace('/', '_', $file);
-        if (class_exists($class, false) || interface_exists($class, false) || (function_exists('trait_exists') && trait_exists($class, false))) {
-            return $class;
+        if ($this->classExists($namespacedClass)) {
+            return $namespacedClass;
         }
+
+        if ($this->classExists($pearClass)) {
+            return $pearClass;
+        }
+    }
+
+    /**
+     * @param string $class
+     *
+     * @return Boolean
+     */
+    private function classExists($class)
+    {
+        return class_exists($class, false) || interface_exists($class, false) || (function_exists('trait_exists') && trait_exists($class, false));
     }
 }

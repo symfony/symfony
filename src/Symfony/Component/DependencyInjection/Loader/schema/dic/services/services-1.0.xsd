@@ -164,6 +164,7 @@
     <xsd:restriction base="xsd:string">
       <xsd:enumeration value="collection" />
       <xsd:enumeration value="service" />
+      <xsd:enumeration value="expression" />
       <xsd:enumeration value="string" />
       <xsd:enumeration value="constant" />
     </xsd:restriction>

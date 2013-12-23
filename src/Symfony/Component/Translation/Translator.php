@@ -222,6 +222,16 @@ class Translator implements TranslatorInterface
         return strtr($this->selector->choose($catalogue->get($id, $domain), (int) $number, $locale), $parameters);
     }
 
+    /**
+     * Gets the loaders.
+     *
+     * @return array LoaderInterface[]
+     */
+    protected function getLoaders()
+    {
+        return $this->loaders;
+    }
+
     protected function loadCatalogue($locale)
     {
         try {

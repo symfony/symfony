@@ -21,6 +21,16 @@
     <!-- Custom constraint with namespace abbreviation-->
     <constraint name="custom:ConstraintB" />
 
+    <!-- Callbacks -->
+    <constraint name="Callback">validateMe</constraint>
+
+    <constraint name="Callback">validateMeStatic</constraint>
+
+    <constraint name="Callback">
+        <value>Symfony\Component\Validator\Tests\Fixtures\CallbackClass</value>
+        <value>callback</value>
+    </constraint>
+
     <!-- PROPERTY CONSTRAINTS -->
 
     <property name="firstName">
@@ -78,7 +88,7 @@
       <!-- Constraint with options -->
       <constraint name="Choice">
         <!-- Option with single value -->
-        <option name="message">Must be one of %choices%</option>
+        <option name="message"> Must be one of %choices% </option>
         <!-- Option with multiple values -->
         <option name="choices">
           <value>A</value>

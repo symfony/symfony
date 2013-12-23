@@ -4,7 +4,7 @@
         <body>
             <trans-unit id="1">
                 <source>This value should be false.</source>
-                <target>Verdien skulle ha vore tom/nei</target>
+                <target>Verdien skulle ha vore tom/nei.</target>
             </trans-unit>
             <trans-unit id="2">
                 <source>This value should be true.</source>

@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+2.4.0
+-----
+
+ * Added 'host' option to firewall configuration
+ * Added 'csrf_token_generator' and 'csrf_token_id' options to firewall logout
+   listener configuration to supercede/alias 'csrf_provider' and 'intention'
+   respectively
+ * Moved 'security.secure_random' service configuration to FrameworkBundle
+
 2.3.0
 -----
 
@@ -74,9 +83,9 @@ CHANGELOG
                 logout:
                     path: /logout_path
                     target: /
-                    csrf_parameter: _csrf_token        # Optional (defaults to "_csrf_token")
-                    csrf_provider:  form.csrf_provider # Required to enable protection
-                    intention:      logout             # Optional (defaults to "logout")
+                    csrf_parameter: _csrf_token                   # Optional (defaults to "_csrf_token")
+                    csrf_provider:  security.csrf.token_generator # Required to enable protection
+                    intention:      logout                        # Optional (defaults to "logout")
     ```
 
     If the LogoutListener has CSRF protection enabled but cannot validate a token,

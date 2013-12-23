@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\HttpKernel;
 
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\BrowserKit\Client as BaseClient;
 use Symfony\Component\BrowserKit\Request as DomRequest;
 use Symfony\Component\BrowserKit\Response as DomResponse;
@@ -21,6 +18,9 @@ use Symfony\Component\BrowserKit\Cookie as DomCookie;
 use Symfony\Component\BrowserKit\History;
 use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\HttpKernel\TerminableInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Client simulates a browser and makes requests to a Kernel object.
@@ -43,11 +43,11 @@ class Client extends BaseClient
      */
     public function __construct(HttpKernelInterface $kernel, array $server = array(), History $history = null, CookieJar $cookieJar = null)
     {
+        // These class properties must be set before calling the parent constructor, as it may depend on it.
         $this->kernel = $kernel;
+        $this->followRedirects = false;
 
         parent::__construct($server, $history, $cookieJar);
-
-        $this->followRedirects = false;
     }
 
     /**
@@ -104,7 +104,7 @@ class Client extends BaseClient
         $requirePath = str_replace("'", "\\'", $r->getFileName());
         $symfonyPath = str_replace("'", "\\'", realpath(__DIR__.'/../../..'));
 
-        return <<<EOF
+        $code = <<<EOF
 <?php
 
 require_once '$requirePath';
@@ -114,7 +114,22 @@ require_once '$requirePath';
 \$loader->register();
 
 \$kernel = unserialize('$kernel');
-echo serialize(\$kernel->handle(unserialize('$request')));
+\$request = unserialize('$request');
+EOF;
+
+        return $code.$this->getHandleScript();
+    }
+
+    protected function getHandleScript()
+    {
+        return <<<'EOF'
+$response = $kernel->handle($request);
+
+if ($kernel instanceof Symfony\Component\HttpKernel\TerminableInterface) {
+    $kernel->terminate($request, $response);
+}
+
+echo serialize($response);
 EOF;
     }
 

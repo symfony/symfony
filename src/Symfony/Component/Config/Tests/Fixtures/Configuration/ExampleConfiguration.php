@@ -19,9 +19,11 @@ class ExampleConfiguration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('root');
+        $rootNode = $treeBuilder->root('acme_root');
 
         $rootNode
+            ->fixXmlConfig('parameter')
+            ->fixXmlConfig('connection')
             ->children()
                 ->booleanNode('boolean')->defaultTrue()->end()
                 ->scalarNode('scalar_empty')->end()
@@ -31,6 +33,8 @@ class ExampleConfiguration implements ConfigurationInterface
                 ->scalarNode('scalar_default')->defaultValue('default')->end()
                 ->scalarNode('scalar_array_empty')->defaultValue(array())->end()
                 ->scalarNode('scalar_array_defaults')->defaultValue(array('elem1', 'elem2'))->end()
+                ->scalarNode('scalar_required')->isRequired()->end()
+                ->enumNode('enum')->values(array('this', 'that'))->end()
                 ->arrayNode('array')
                     ->info('some info')
                     ->canBeUnset()
@@ -47,15 +51,15 @@ class ExampleConfiguration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
-                ->arrayNode('array_prototype')
-                    ->children()
-                        ->arrayNode('parameters')
-                            ->useAttributeAsKey('name')
-                            ->prototype('array')
-                                ->children()
-                                    ->scalarNode('value')->isRequired()->end()
-                                ->end()
-                            ->end()
+                ->arrayNode('parameters')
+                    ->useAttributeAsKey('name')
+                    ->prototype('scalar')->end()
+                ->end()
+                ->arrayNode('connections')
+                    ->prototype('array')
+                        ->children()
+                            ->scalarNode('user')->end()
+                            ->scalarNode('pass')->end()
                         ->end()
                     ->end()
                 ->end()

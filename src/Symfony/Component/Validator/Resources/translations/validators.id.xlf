@@ -192,7 +192,7 @@
             </trans-unit>
             <trans-unit id="51">
                 <source>No temporary folder was configured in php.ini.</source>
-                <target>Direktori sementara tidak dikonfiguasi pada php.ini</target>
+                <target>Direktori sementara tidak dikonfiguasi pada php.ini.</target>
             </trans-unit>
             <trans-unit id="52">
                 <source>Cannot write temporary file to disk.</source>

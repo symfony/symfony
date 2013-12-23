@@ -20,7 +20,7 @@ class RecursiveDirectoryIteratorTest extends IteratorTestCase
      *
      * @param string  $path
      * @param Boolean $seekable
-     * @param Boolean $supports
+     * @param array   $contains
      * @param string  $message
      */
     public function testRewind($path, $seekable, $contains, $message = null)
@@ -41,7 +41,7 @@ class RecursiveDirectoryIteratorTest extends IteratorTestCase
      *
      * @param string  $path
      * @param Boolean $seekable
-     * @param Boolean $supports
+     * @param array   $contains
      * @param string  $message
      */
     public function testSeek($path, $seekable, $contains, $message = null)

@@ -41,6 +41,11 @@ class RouterApacheDumperCommand extends ContainerAwareCommand
         return parent::isEnabled();
     }
 
+    protected function getRouter(InputInterface $input)
+    {
+        return $this->getContainer()->get('router');
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -69,7 +74,7 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $router = $this->getContainer()->get('router');
+        $router = $this->getRouter($input);
 
         $dumpOptions = array();
         if ($input->getArgument('script_name')) {

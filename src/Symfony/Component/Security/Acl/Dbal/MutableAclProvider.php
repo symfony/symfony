@@ -352,6 +352,17 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
     }
 
     /**
+     * Updates a user security identity when the user's username changes
+     *
+     * @param UserSecurityIdentity $usid
+     * @param string $oldUsername
+     */
+    public function updateUserSecurityIdentity(UserSecurityIdentity $usid, $oldUsername)
+    {
+        $this->connection->executeQuery($this->getUpdateUserSecurityIdentitySql($usid, $oldUsername));
+    }
+
+    /**
      * Constructs the SQL for deleting access control entries.
      *
      * @param integer $oidPK
@@ -630,6 +641,31 @@ QUERY;
             $this->options['oid_table_name'],
             implode(', ', $changes),
             $pk
+        );
+    }
+
+    /**
+     * Constructs the SQL for updating a user security identity.
+     *
+     * @param UserSecurityIdentity $usid
+     * @param string $oldUsername
+     * @return string
+     */
+    protected function getUpdateUserSecurityIdentitySql(UserSecurityIdentity $usid, $oldUsername)
+    {
+        if ($usid->getUsername() == $oldUsername) {
+            throw new \InvalidArgumentException('There are no changes.');
+        }
+
+        $oldIdentifier = $usid->getClass().'-'.$oldUsername;
+        $newIdentifier = $usid->getClass().'-'.$usid->getUsername();
+
+        return sprintf(
+            'UPDATE %s SET identifier = %s WHERE identifier = %s AND username = %s',
+            $this->options['sid_table_name'],
+            $this->connection->quote($newIdentifier),
+            $this->connection->quote($oldIdentifier),
+            $this->connection->getDatabasePlatform()->convertBooleans(true)
         );
     }
 

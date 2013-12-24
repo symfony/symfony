@@ -4,6 +4,7 @@ CHANGELOG
 2.4.0
 -----
 
+ * `Crawler::addXmlContent()` removes the default document namespace again if it's an only namespace.
  * added support for automatic discovery and explicit registration of document
    namespaces for `Crawler::filterXPath()` and `Crawler::filter()`
  * improved content type guessing in `Crawler::addContent()`

@@ -58,13 +58,18 @@ final class SecureRandom implements SecureRandomInterface
     /**
      * {@inheritdoc}
      */
-    public function nextBytes($nbBytes)
+    public function nextBytes($nbBytes, $bin2hex = false)
     {
         // try OpenSSL
         if ($this->useOpenSsl) {
             $bytes = openssl_random_pseudo_bytes($nbBytes, $strong);
 
             if (false !== $bytes && true === $strong) {
+                 //hexadecimal key is requested
+                if($bin2hex)
+                {
+                    return bin2hex($bytes);
+                }
                 return $bytes;
             }
 
@@ -94,7 +99,13 @@ final class SecureRandom implements SecureRandomInterface
             $this->seed = base64_encode(hash('sha512', $this->seed.$bytes.$nbBytes, true));
             $this->updateSeed();
         }
-
+        
+        //hexadecimal key is requested
+        if($bin2hex)
+        {
+            $bytes = bin2hex($bytes);
+        }
+        
         return substr($bytes, 0, $nbBytes);
     }
 

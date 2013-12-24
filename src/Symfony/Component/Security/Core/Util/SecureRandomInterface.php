@@ -22,8 +22,9 @@ interface SecureRandomInterface
      * Generates the specified number of secure random bytes.
      *
      * @param integer $nbBytes
+     * @param boolean $bin2hex
      *
      * @return string
      */
-    public function nextBytes($nbBytes);
+    public function nextBytes($nbBytes, $bin2hex);
 }

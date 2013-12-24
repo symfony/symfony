@@ -65,7 +65,7 @@ final class SecureRandom implements SecureRandomInterface
             $bytes = openssl_random_pseudo_bytes($nbBytes, $strong);
 
             if (false !== $bytes && true === $strong) {
-                 //hexadecimal key is requested
+                 // hexadecimal key is requested
                 if($bin2hex)
                 {
                     return bin2hex($bytes);
@@ -100,7 +100,7 @@ final class SecureRandom implements SecureRandomInterface
             $this->updateSeed();
         }
         
-        //hexadecimal key is requested
+        // hexadecimal key is requested
         if($bin2hex)
         {
             $bytes = bin2hex($bytes);

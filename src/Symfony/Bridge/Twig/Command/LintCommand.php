@@ -72,7 +72,6 @@ EOF
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $twig = $this->getTwig();
         $template = null;
         $filename = $input->getArgument('filename');
 
@@ -85,7 +84,7 @@ EOF
                 $template .= fread(STDIN, 1024);
             }
 
-            return $this->validateTemplate($twig, $output, $template);
+            return $this->validateTemplate($this->twig, $output, $template);
         }
 
         if (0 !== strpos($filename, '@') && !is_readable($filename)) {
@@ -104,7 +103,7 @@ EOF
 
         $errors = 0;
         foreach ($files as $file) {
-            $errors += $this->validateTemplate($twig, $output, file_get_contents($file), $file);
+            $errors += $this->validateTemplate($this->twig, $output, file_get_contents($file), $file);
         }
 
         return $errors > 0 ? 1 : 0;
@@ -162,13 +161,5 @@ EOF
         }
 
         return $result;
-    }
-
-    /**
-     * @return \Twig_Environment
-     */
-    protected function getTwig()
-    {
-        return $this->twig;
     }
 }

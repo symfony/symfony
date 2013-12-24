@@ -4,7 +4,7 @@ CHANGELOG
 2.5.0
 -----
 
- * moved `LintCommand` to the Twig bridge and register it as a service
+ * moved `LintCommand` to the Twig bridge and registered it as a service
 
 2.3.0
 -----

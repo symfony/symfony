@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Bundle\FrameworkBundle\Console\Descriptor;
 
 use Symfony\Component\Console\Helper\TableHelper;
@@ -242,7 +251,7 @@ class TextDescriptor extends Descriptor
             $description[] = '<comment>Tags</comment>';
             foreach ($tags as $tagName => $tagData) {
                 foreach ($tagData as $parameters) {
-                    $description[] = sprintf('    - %-30s (%s)', $tagName, implode(', ', array_map(function($key, $value) {
+                    $description[] = sprintf('    - %-30s (%s)', $tagName, implode(', ', array_map(function ($key, $value) {
                         return sprintf('<info>%s</info>: %s', $key, $value);
                     }, array_keys($parameters), array_values($parameters))));
                 }

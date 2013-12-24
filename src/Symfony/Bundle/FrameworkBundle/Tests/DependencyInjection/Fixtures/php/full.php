@@ -70,5 +70,16 @@ $container->loadFromExtension('framework', array(
         'debug' => true,
         'file_cache_dir' => '%kernel.cache_dir%/annotations',
     ),
-    'ide' => 'file%%link%%format'
+    'ide' => 'file%%link%%format',
+    'request' => array(
+        'additional_formats' => array(
+            'csv' => array(
+                'text/csv',
+                'text/plain',
+            ),
+            'pdf' => array(
+                'application/pdf'
+            )
+        )
+    )
 ));

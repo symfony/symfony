@@ -1,0 +1,20 @@
+{
+    "tag1": [
+        {
+            "class": "Full\\Qualified\\Class2",
+            "scope": "container",
+            "public": false,
+            "synthetic": true,
+            "file": "\/path\/to\/file"
+        }
+    ],
+    "tag2": [
+        {
+            "class": "Full\\Qualified\\Class2",
+            "scope": "container",
+            "public": false,
+            "synthetic": true,
+            "file": "\/path\/to\/file"
+        }
+    ]
+}

@@ -34,14 +34,14 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
     public function testNormalizeTraversable()
     {
         $this->serializer = new Serializer(array(), array('json' => new JsonEncoder()));
-        $result = $this->serializer->serialize(new TraversableDummy, 'json');
+        $result = $this->serializer->serialize(new TraversableDummy(), 'json');
         $this->assertEquals('{"foo":"foo","bar":"bar"}', $result);
     }
 
     public function testNormalizeGivesPriorityToInterfaceOverTraversable()
     {
-        $this->serializer = new Serializer(array(new CustomNormalizer), array('json' => new JsonEncoder()));
-        $result = $this->serializer->serialize(new NormalizableTraversableDummy, 'json');
+        $this->serializer = new Serializer(array(new CustomNormalizer()), array('json' => new JsonEncoder()));
+        $result = $this->serializer->serialize(new NormalizableTraversableDummy(), 'json');
         $this->assertEquals('{"foo":"normalizedFoo","bar":"normalizedBar"}', $result);
     }
 

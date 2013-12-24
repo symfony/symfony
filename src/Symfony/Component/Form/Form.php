@@ -91,6 +91,12 @@ class Form implements \IteratorAggregate, FormInterface
     private $submitted = false;
 
     /**
+     * The button that was used to submit the form
+     * @var Button
+     */
+    private $clickedButton;
+
+    /**
      * The form data in model format
      * @var mixed
      */
@@ -170,6 +176,8 @@ class Form implements \IteratorAggregate, FormInterface
 
     public function __clone()
     {
+        $this->children = clone $this->children;
+
         foreach ($this->children as $key => $child) {
             $this->children[$key] = clone $child;
         }
@@ -522,83 +530,96 @@ class Form implements \IteratorAggregate, FormInterface
 
         $dispatcher = $this->config->getEventDispatcher();
 
-        // Hook to change content of the data submitted by the browser
-        if ($dispatcher->hasListeners(FormEvents::PRE_SUBMIT)) {
-            $event = new FormEvent($this, $submittedData);
-            $dispatcher->dispatch(FormEvents::PRE_SUBMIT, $event);
-            $submittedData = $event->getData();
-        }
+        $modelData = null;
+        $normData = null;
+        $viewData = null;
 
-        // Check whether the form is compound.
-        // This check is preferable over checking the number of children,
-        // since forms without children may also be compound.
-        // (think of empty collection forms)
-        if ($this->config->getCompound()) {
-            if (!is_array($submittedData)) {
-                $submittedData = array();
+        try {
+            // Hook to change content of the data submitted by the browser
+            if ($dispatcher->hasListeners(FormEvents::PRE_SUBMIT)) {
+                $event = new FormEvent($this, $submittedData);
+                $dispatcher->dispatch(FormEvents::PRE_SUBMIT, $event);
+                $submittedData = $event->getData();
             }
 
-            foreach ($this->children as $name => $child) {
-                if (array_key_exists($name, $submittedData) || $clearMissing) {
-                    $child->submit(isset($submittedData[$name]) ? $submittedData[$name] : null, $clearMissing);
-                    unset($submittedData[$name]);
-                }
-            }
-
-            $this->extraData = $submittedData;
-        }
-
-        // Forms that inherit their parents' data also are not processed,
-        // because then it would be too difficult to merge the changes in
-        // the child and the parent form. Instead, the parent form also takes
-        // changes in the grandchildren (i.e. children of the form that inherits
-        // its parent's data) into account.
-        // (see InheritDataAwareIterator below)
-        if ($this->config->getInheritData()) {
-            $this->submitted = true;
-
-            // When POST_SUBMIT is reached, the data is not yet updated, so pass
-            // NULL to prevent hard-to-debug bugs.
-            $dataForPostSubmit = null;
-        } else {
-            // If the form is compound, the default data in view format
-            // is reused. The data of the children is merged into this
-            // default data using the data mapper.
-            // If the form is not compound, the submitted data is also the data in view format.
-            $viewData = $this->config->getCompound() ? $this->viewData : $submittedData;
-
-            if (FormUtil::isEmpty($viewData)) {
-                $emptyData = $this->config->getEmptyData();
-
-                if ($emptyData instanceof \Closure) {
-                    /* @var \Closure $emptyData */
-                    $emptyData = $emptyData($this, $viewData);
+            // Check whether the form is compound.
+            // This check is preferable over checking the number of children,
+            // since forms without children may also be compound.
+            // (think of empty collection forms)
+            if ($this->config->getCompound()) {
+                if (null === $submittedData) {
+                    $submittedData = array();
                 }
 
-                $viewData = $emptyData;
+                if (!is_array($submittedData)) {
+                    throw new TransformationFailedException('Compound forms expect an array or NULL on submission.');
+                }
+
+                foreach ($this->children as $name => $child) {
+                    if (array_key_exists($name, $submittedData) || $clearMissing) {
+                        $child->submit(isset($submittedData[$name]) ? $submittedData[$name] : null, $clearMissing);
+                        unset($submittedData[$name]);
+
+                        if (null !== $this->clickedButton) {
+                            continue;
+                        }
+
+                        if ($child instanceof ClickableInterface && $child->isClicked()) {
+                            $this->clickedButton = $child;
+
+                            continue;
+                        }
+
+                        if (method_exists($child, 'getClickedButton') && null !== $child->getClickedButton()) {
+                            $this->clickedButton = $child->getClickedButton();
+                        }
+                    }
+                }
+
+                $this->extraData = $submittedData;
             }
 
-            // Merge form data from children into existing view data
-            // It is not necessary to invoke this method if the form has no children,
-            // even if it is compound.
-            if (count($this->children) > 0) {
-                // Use InheritDataAwareIterator to process children of
-                // descendants that inherit this form's data.
-                // These descendants will not be submitted normally (see the check
-                // for $this->config->getInheritData() above)
-                $iterator = new InheritDataAwareIterator($this->children);
-                $iterator = new \RecursiveIteratorIterator($iterator);
-                $this->config->getDataMapper()->mapFormsToData($iterator, $viewData);
-            }
+            // Forms that inherit their parents' data also are not processed,
+            // because then it would be too difficult to merge the changes in
+            // the child and the parent form. Instead, the parent form also takes
+            // changes in the grandchildren (i.e. children of the form that inherits
+            // its parent's data) into account.
+            // (see InheritDataAwareIterator below)
+            if (!$this->config->getInheritData()) {
+                // If the form is compound, the default data in view format
+                // is reused. The data of the children is merged into this
+                // default data using the data mapper.
+                // If the form is not compound, the submitted data is also the data in view format.
+                $viewData = $this->config->getCompound() ? $this->viewData : $submittedData;
 
-            $modelData = null;
-            $normData = null;
+                if (FormUtil::isEmpty($viewData)) {
+                    $emptyData = $this->config->getEmptyData();
 
-            try {
+                    if ($emptyData instanceof \Closure) {
+                        /* @var \Closure $emptyData */
+                        $emptyData = $emptyData($this, $viewData);
+                    }
+
+                    $viewData = $emptyData;
+                }
+
+                // Merge form data from children into existing view data
+                // It is not necessary to invoke this method if the form has no children,
+                // even if it is compound.
+                if (count($this->children) > 0) {
+                    // Use InheritDataAwareIterator to process children of
+                    // descendants that inherit this form's data.
+                    // These descendants will not be submitted normally (see the check
+                    // for $this->config->getInheritData() above)
+                    $childrenIterator = new InheritDataAwareIterator($this->children);
+                    $childrenIterator = new \RecursiveIteratorIterator($childrenIterator);
+                    $this->config->getDataMapper()->mapFormsToData($childrenIterator, $viewData);
+                }
+
                 // Normalize data to unified representation
                 $normData = $this->viewToNorm($viewData);
 
-                // Hook to change content of the data into the normalized
+                // Hook to change content of the data in the normalized
                 // representation
                 if ($dispatcher->hasListeners(FormEvents::SUBMIT)) {
                     $event = new FormEvent($this, $normData);
@@ -609,20 +630,26 @@ class Form implements \IteratorAggregate, FormInterface
                 // Synchronize representations - must not change the content!
                 $modelData = $this->normToModel($normData);
                 $viewData = $this->normToView($normData);
-            } catch (TransformationFailedException $e) {
-                $this->synchronized = false;
             }
+        } catch (TransformationFailedException $e) {
+            $this->synchronized = false;
 
-            $this->submitted = true;
-            $this->modelData = $modelData;
-            $this->normData = $normData;
-            $this->viewData = $viewData;
-
-            $dataForPostSubmit = $viewData;
+            // If $viewData was not yet set, set it to $submittedData so that
+            // the erroneous data is accessible on the form.
+            // Forms that inherit data never set any data, because the getters
+            // forward to the parent form's getters anyway.
+            if (null === $viewData && !$this->config->getInheritData()) {
+                $viewData = $submittedData;
+            }
         }
 
+        $this->submitted = true;
+        $this->modelData = $modelData;
+        $this->normData = $normData;
+        $this->viewData = $viewData;
+
         if ($dispatcher->hasListeners(FormEvents::POST_SUBMIT)) {
-            $event = new FormEvent($this, $dataForPostSubmit);
+            $event = new FormEvent($this, $viewData);
             $dispatcher->dispatch(FormEvents::POST_SUBMIT, $event);
         }
 
@@ -726,6 +753,25 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
+     * Returns the button that was used to submit the form.
+     *
+     * @return Button|null The clicked button or NULL if the form was not
+     *                     submitted
+     */
+    public function getClickedButton()
+    {
+        if ($this->clickedButton) {
+            return $this->clickedButton;
+        }
+
+        if ($this->parent && method_exists($this->parent, 'getClickedButton')) {
+            return $this->parent->getClickedButton();
+        }
+
+        return null;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getErrors()
@@ -751,7 +797,7 @@ class Form implements \IteratorAggregate, FormInterface
 
         foreach ($this->children as $key => $child) {
             $errors .= str_repeat(' ', $level).$key.":\n";
-            if ($err = $child->getErrorsAsString($level + 4)) {
+            if ($child instanceof self && $err = $child->getErrorsAsString($level + 4)) {
                 $errors .= $err;
             } else {
                 $errors .= str_repeat(' ', $level + 4)."No errors\n";
@@ -853,7 +899,9 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         if (isset($this->children[$name])) {
-            $this->children[$name]->setParent(null);
+            if (!$this->children[$name]->isSubmitted()) {
+                $this->children[$name]->setParent(null);
+            }
 
             unset($this->children[$name]);
         }
@@ -938,7 +986,7 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Returns the iterator for this group.
      *
-     * @return \Iterator
+     * @return \Traversable
      */
     public function getIterator()
     {
@@ -964,7 +1012,23 @@ class Form implements \IteratorAggregate, FormInterface
             $parent = $this->parent->createView();
         }
 
-        return $this->config->getType()->createView($this, $parent);
+        $type = $this->config->getType();
+        $options = $this->config->getOptions();
+
+        // The methods createView(), buildView() and finishView() are called
+        // explicitly here in order to be able to override either of them
+        // in a custom resolved form type.
+        $view = $type->createView($this, $parent);
+
+        $type->buildView($view, $this, $options);
+
+        foreach ($this->children as $name => $child) {
+            $view->children[$name] = $child->createView($view);
+        }
+
+        $type->finishView($view, $this, $options);
+
+        return $view;
     }
 
     /**

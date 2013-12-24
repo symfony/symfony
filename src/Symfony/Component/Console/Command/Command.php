@@ -33,13 +33,14 @@ class Command
 {
     private $application;
     private $name;
-    private $aliases;
+    private $processName;
+    private $aliases = array();
     private $definition;
     private $help;
     private $description;
-    private $ignoreValidationErrors;
-    private $applicationDefinitionMerged;
-    private $applicationDefinitionMergedWithArgs;
+    private $ignoreValidationErrors = false;
+    private $applicationDefinitionMerged = false;
+    private $applicationDefinitionMergedWithArgs = false;
     private $code;
     private $synopsis;
     private $helperSet;
@@ -47,7 +48,7 @@ class Command
     /**
      * Constructor.
      *
-     * @param string $name The name of the command
+     * @param string|null $name The name of the command; passing null means it must be set in configure()
      *
      * @throws \LogicException When the command name is empty
      *
@@ -56,10 +57,6 @@ class Command
     public function __construct($name = null)
     {
         $this->definition = new InputDefinition();
-        $this->ignoreValidationErrors = false;
-        $this->applicationDefinitionMerged = false;
-        $this->applicationDefinitionMergedWithArgs = false;
-        $this->aliases = array();
 
         if (null !== $name) {
             $this->setName($name);
@@ -216,6 +213,16 @@ class Command
      */
     public function run(InputInterface $input, OutputInterface $output)
     {
+        if (null !== $this->processName) {
+            if (function_exists('cli_set_process_title')) {
+                cli_set_process_title($this->processName);
+            } elseif (function_exists('setproctitle')) {
+                setproctitle($this->processName);
+            } elseif (OutputInterface::VERBOSITY_VERY_VERBOSE === $output->getVerbosity()) {
+                $output->writeln('<comment>Install the proctitle PECL to be able to change the process title.</comment>');
+            }
+        }
+
         // force the creation of the synopsis before the merge with the app definition
         $this->getSynopsis();
 
@@ -402,7 +409,7 @@ class Command
      *
      * @return Command The current instance
      *
-     * @throws \InvalidArgumentException When command name given is empty
+     * @throws \InvalidArgumentException When the name is invalid
      *
      * @api
      */
@@ -411,6 +418,25 @@ class Command
         $this->validateName($name);
 
         $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * Sets the process name of the command.
+     *
+     * This feature should be used only when creating a long process command,
+     * like a daemon.
+     *
+     * PHP 5.5+ or the proctitle PECL library is required
+     *
+     * @param string $name The process name
+     *
+     * @return Command The current instance
+     */
+    public function setProcessName($name)
+    {
+        $this->processName = $name;
 
         return $this;
     }
@@ -512,6 +538,8 @@ class Command
      *
      * @return Command The current instance
      *
+     * @throws \InvalidArgumentException When an alias is invalid
+     *
      * @api
      */
     public function setAliases($aliases)
@@ -579,7 +607,7 @@ class Command
         $descriptor = new TextDescriptor();
         $output = new BufferedOutput(BufferedOutput::VERBOSITY_NORMAL, true);
         $descriptor->describe($output, $this, array('raw_output' => true));
-        
+
         return $output->fetch();
     }
 
@@ -595,20 +623,29 @@ class Command
     public function asXml($asDom = false)
     {
         $descriptor = new XmlDescriptor();
-        
+
         if ($asDom) {
             return $descriptor->getCommandDocument($this);
         }
-        
+
         $output = new BufferedOutput();
         $descriptor->describe($output, $this);
-        
+
         return $output->fetch();
     }
 
+    /**
+     * Validates a command name.
+     *
+     * It must be non-empty and parts can optionally be separated by ":".
+     *
+     * @param string $name
+     *
+     * @throws \InvalidArgumentException When the name is invalid
+     */
     private function validateName($name)
     {
-        if (!preg_match('/^[^\:]+(\:[^\:]+)*$/', $name)) {
+        if (!preg_match('/^[^\:]++(\:[^\:]++)*$/', $name)) {
             throw new \InvalidArgumentException(sprintf('Command name "%s" is invalid.', $name));
         }
     }

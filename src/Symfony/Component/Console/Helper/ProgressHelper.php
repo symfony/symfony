@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Helper;
 
+use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -178,14 +179,16 @@ class ProgressHelper extends Helper
      * Starts the progress output.
      *
      * @param OutputInterface $output An Output instance
-     * @param integer         $max    Maximum steps
+     * @param integer|null    $max    Maximum steps
      */
     public function start(OutputInterface $output, $max = null)
     {
         $this->startTime = time();
         $this->current   = 0;
         $this->max       = (int) $max;
-        $this->output    = $output;
+
+        // Disabling output when it does not support ANSI codes as it would result in a broken display anyway.
+        $this->output    = $output->isDecorated() ? $output : new NullOutput();
         $this->lastMessagesLength = 0;
         $this->barCharOriginal = '';
 
@@ -227,18 +230,7 @@ class ProgressHelper extends Helper
      */
     public function advance($step = 1, $redraw = false)
     {
-        if (null === $this->startTime) {
-            throw new \LogicException('You must start the progress bar before calling advance().');
-        }
-
-        if (0 === $this->current) {
-            $redraw = true;
-        }
-
-        $this->current += $step;
-        if ($redraw || 0 === $this->current % $this->redrawFreq) {
-            $this->display();
-        }
+        $this->setCurrent($this->current + $step, $redraw);
     }
 
     /**
@@ -265,8 +257,12 @@ class ProgressHelper extends Helper
             $redraw = true;
         }
 
+        $prevPeriod = intval($this->current / $this->redrawFreq);
+
         $this->current = $current;
-        if ($redraw || 0 === $this->current % $this->redrawFreq) {
+
+        $currPeriod = intval($this->current / $this->redrawFreq);
+        if ($redraw || $prevPeriod !== $currPeriod || $this->max === $this->current) {
             $this->display();
         }
     }

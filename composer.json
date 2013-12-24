@@ -33,6 +33,7 @@
         "symfony/doctrine-bridge": "self.version",
         "symfony/dom-crawler": "self.version",
         "symfony/event-dispatcher": "self.version",
+        "symfony/expression-language": "self.version",
         "symfony/filesystem": "self.version",
         "symfony/finder": "self.version",
         "symfony/form": "self.version",
@@ -49,6 +50,10 @@
         "symfony/proxy-manager-bridge": "self.version",
         "symfony/routing": "self.version",
         "symfony/security": "self.version",
+        "symfony/security-acl": "self.version",
+        "symfony/security-core": "self.version",
+        "symfony/security-csrf": "self.version",
+        "symfony/security-http": "self.version",
         "symfony/security-bundle": "self.version",
         "symfony/serializer": "self.version",
         "symfony/stopwatch": "self.version",
@@ -81,7 +86,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.4-dev"
+            "dev-master": "2.5-dev"
         }
     }
 }

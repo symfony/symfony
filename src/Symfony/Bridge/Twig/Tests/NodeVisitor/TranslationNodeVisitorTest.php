@@ -12,9 +12,8 @@
 namespace Symfony\Bridge\Twig\Tests\NodeVisitor;
 
 use Symfony\Bridge\Twig\NodeVisitor\TranslationNodeVisitor;
-use Symfony\Bridge\Twig\Tests\TestCase;
 
-class TranslationNodeVisitorTest extends TestCase
+class TranslationNodeVisitorTest extends \PHPUnit_Framework_TestCase
 {
     /** @dataProvider getMessagesExtractionTestData */
     public function testMessagesExtraction(\Twig_Node $node, array $expectedMessages)

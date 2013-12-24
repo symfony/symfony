@@ -226,11 +226,11 @@ brief: >
     time zone.
 yaml: |
     iso8601: 2001-12-14t21:59:43.10-05:00
-    space seperated: 2001-12-14 21:59:43.10 -05:00
+    space separated: 2001-12-14 21:59:43.10 -05:00
 php: |
     array(
       'iso8601' => mktime( 2001, 12, 14, 21, 59, 43, 0.10, "-05:00" ),
-      'space seperated' => mktime( 2001, 12, 14, 21, 59, 43, 0.10, "-05:00" )
+      'space separated' => mktime( 2001, 12, 14, 21, 59, 43, 0.10, "-05:00" )
     )
 ---
 test: Date

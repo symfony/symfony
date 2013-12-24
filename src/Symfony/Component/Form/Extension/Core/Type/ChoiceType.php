@@ -57,7 +57,7 @@ class ChoiceType extends AbstractType
 
             // Check if the choices already contain the empty value
             // Only add the empty value option if this is not the case
-            if (null !== $options['empty_value'] && 0 === count($options['choice_list']->getIndicesForValues(array('')))) {
+            if (null !== $options['empty_value'] && 0 === count($options['choice_list']->getChoicesForValues(array('')))) {
                 $placeholderView = new ChoiceView(null, '', $options['empty_value']);
 
                 // "placeholder" is a reserved index
@@ -119,8 +119,10 @@ class ChoiceType extends AbstractType
         }
 
         // Check if the choices already contain the empty value
+        $view->vars['empty_value_in_choices'] = 0 !== count($options['choice_list']->getChoicesForValues(array('')));
+
         // Only add the empty value option if this is not the case
-        if (null !== $options['empty_value'] && 0 === count($options['choice_list']->getIndicesForValues(array('')))) {
+        if (null !== $options['empty_value'] && !$view->vars['empty_value_in_choices']) {
             $view->vars['empty_value'] = $options['empty_value'];
         }
 

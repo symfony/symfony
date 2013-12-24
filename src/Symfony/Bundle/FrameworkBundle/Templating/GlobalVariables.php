@@ -26,6 +26,9 @@ class GlobalVariables
 {
     protected $container;
 
+    /**
+     * @param ContainerInterface $container The DI container
+     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
@@ -46,7 +49,7 @@ class GlobalVariables
     /**
      * Returns the current user.
      *
-     * @return mixed|void
+     * @return mixed
      *
      * @see TokenInterface::getUser()
      */
@@ -75,8 +78,8 @@ class GlobalVariables
      */
     public function getRequest()
     {
-        if ($this->container->has('request') && $request = $this->container->get('request')) {
-            return $request;
+        if ($this->container->has('request_stack')) {
+            return $this->container->get('request_stack')->getCurrentRequest();
         }
     }
 

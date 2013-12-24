@@ -17,8 +17,6 @@ use Symfony\Component\Validator\ConstraintValidator;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
- *
  * @api
  */
 class NotBlankValidator extends ConstraintValidator

@@ -14,6 +14,7 @@ namespace Symfony\Component\Console\Tests;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\FormatterHelper;
+use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputArgument;
@@ -22,6 +23,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Tester\ApplicationTester;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleExceptionEvent;
@@ -40,7 +42,9 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         require_once self::$fixturesPath.'/Foo2Command.php';
         require_once self::$fixturesPath.'/Foo3Command.php';
         require_once self::$fixturesPath.'/Foo4Command.php';
+        require_once self::$fixturesPath.'/Foo5Command.php';
         require_once self::$fixturesPath.'/FoobarCommand.php';
+        require_once self::$fixturesPath.'/BarBucCommand.php';
     }
 
     protected function normalizeLineBreaks($text)
@@ -125,6 +129,16 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array($foo, $foo1), array($commands['foo:bar'], $commands['foo:bar1']), '->addCommands() registers an array of commands');
     }
 
+    /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage Command class "Foo5Command" is not correctly initialized. You probably forgot to call the parent constructor.
+     */
+    public function testAddCommandWithEmptyConstructor()
+    {
+        $application = new Application();
+        $application->add(new \Foo5Command());
+    }
+
     public function testHasGet()
     {
         $application = new Application();
@@ -194,6 +208,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     public function testFindAmbiguousNamespace()
     {
         $application = new Application();
+        $application->add(new \BarBucCommand());
         $application->add(new \FooCommand());
         $application->add(new \Foo2Command());
         $application->findNamespace('f');
@@ -481,6 +496,9 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $tester->run(array('command' => 'foo3:bar'), array('decorated' => false));
         $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception3.txt', $tester->getDisplay(true), '->renderException() renders a pretty exceptions with previous exceptions');
 
+        $tester->run(array('command' => 'foo3:bar'), array('decorated' => true));
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception3decorated.txt', $tester->getDisplay(true), '->renderException() renders a pretty exceptions with previous exceptions');
+
         $application = $this->getMock('Symfony\Component\Console\Application', array('getTerminalWidth'));
         $application->setAutoExit(false);
         $application->expects($this->any())
@@ -582,6 +600,29 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
         $tester->run(array('command' => 'foo:bar', '-n' => true), array('decorated' => false));
         $this->assertSame('called'.PHP_EOL, $tester->getDisplay(), '->run() does not call interact() if -n is passed');
+    }
+
+    /**
+     * Issue #9285
+     *
+     * If the "verbose" option is just before an argument in ArgvInput,
+     * an argument value should not be treated as verbosity value.
+     * This test will fail with "Not enough arguments." if broken
+     */
+    public function testVerboseValueNotBreakArguments()
+    {
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->setCatchExceptions(false);
+        $application->add(new \FooCommand());
+
+        $output = new StreamOutput(fopen('php://memory', 'w', false));
+
+        $input = new ArgvInput(array('cli.php', '-v', 'foo:bar'));
+        $application->run($input, $output);
+
+        $input = new ArgvInput(array('cli.php', '--verbose', 'foo:bar'));
+        $application->run($input, $output);
     }
 
     public function testRunReturnsIntegerExitCode()
@@ -823,7 +864,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
     protected function getDispatcher()
     {
-        $dispatcher = new EventDispatcher;
+        $dispatcher = new EventDispatcher();
         $dispatcher->addListener('console.command', function (ConsoleCommandEvent $event) {
             $event->getOutput()->write('before.');
         });

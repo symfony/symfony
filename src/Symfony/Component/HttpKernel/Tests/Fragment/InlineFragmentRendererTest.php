@@ -205,7 +205,8 @@ class InlineFragmentRendererTest extends \PHPUnit_Framework_TestCase
     }
 }
 
-class Bar {
+class Bar
+{
     public $bar = 'bar';
 
     public function getBar()

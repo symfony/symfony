@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Form;
 
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\Exception\TransformationFailedException;
+
 class CallbackTransformer implements DataTransformerInterface
 {
     /**

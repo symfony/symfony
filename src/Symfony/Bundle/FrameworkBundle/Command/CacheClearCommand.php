@@ -120,17 +120,22 @@ EOF
         $warmer->warmUp($warmupDir);
 
         // fix references to the Kernel in .meta files
+        $safeTempKernel = str_replace('\\', '\\\\', get_class($tempKernel));
+        $realKernelFQN = get_class($realKernel);
+
         foreach (Finder::create()->files()->name('*.meta')->in($warmupDir) as $file) {
             file_put_contents($file, preg_replace(
-                '/(C\:\d+\:)"'.get_class($tempKernel).'"/',
-                sprintf('$1"%s"', $realKernelClass),
+                '/(C\:\d+\:)"'.$safeTempKernel.'"/',
+                sprintf('$1"%s"', $realKernelFQN),
                 file_get_contents($file)
             ));
         }
 
         // fix references to cached files with the real cache directory name
+        $search  = array($warmupDir, str_replace('\\', '\\\\', $warmupDir));
+        $replace = str_replace('\\', '/', $realCacheDir);
         foreach (Finder::create()->files()->in($warmupDir) as $file) {
-            $content = str_replace($warmupDir, $realCacheDir, file_get_contents($file));
+            $content = str_replace($search, $replace, file_get_contents($file));
             file_put_contents($file, $content);
         }
 

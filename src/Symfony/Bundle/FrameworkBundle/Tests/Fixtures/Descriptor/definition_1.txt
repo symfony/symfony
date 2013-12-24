@@ -1,0 +1,7 @@
+<comment>Service Id</comment>       -
+<comment>Class</comment>            Full\Qualified\Class1
+<comment>Tags</comment>             -
+<comment>Scope</comment>            container
+<comment>Public</comment>           yes
+<comment>Synthetic</comment>        no
+<comment>Required File</comment>    -

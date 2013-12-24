@@ -112,7 +112,7 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
         if (isset($changes['public'])) {
             $def->setPublic($definition->isPublic());
         }
-        if (isset($changes['lazy'])){
+        if (isset($changes['lazy'])) {
             $def->setLazy($definition->isLazy());
         }
 

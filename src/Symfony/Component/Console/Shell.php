@@ -32,7 +32,7 @@ class Shell
     private $history;
     private $output;
     private $hasReadline;
-    private $processIsolation;
+    private $processIsolation = false;
 
     /**
      * Constructor.
@@ -48,7 +48,6 @@ class Shell
         $this->application = $application;
         $this->history = getenv('HOME').'/.history_'.$application->getName();
         $this->output = new ConsoleOutput();
-        $this->processIsolation = false;
     }
 
     /**

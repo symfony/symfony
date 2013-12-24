@@ -33,7 +33,7 @@ interface AttributeBagInterface extends SessionBagInterface
      * Returns an attribute.
      *
      * @param string $name    The attribute name
-     * @param mixed  $default The default value if not found.
+     * @param mixed  $default The default value if not found
      *
      * @return mixed
      */
@@ -66,7 +66,7 @@ interface AttributeBagInterface extends SessionBagInterface
      *
      * @param string $name
      *
-     * @return mixed The removed value
+     * @return mixed The removed value or null when it does not exist
      */
     public function remove($name);
 }

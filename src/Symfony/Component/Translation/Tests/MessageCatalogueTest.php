@@ -125,7 +125,7 @@ class MessageCatalogueTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException LogicException
+     * @expectedException \LogicException
      */
     public function testAddFallbackCatalogueWithCircularReference()
     {
@@ -137,7 +137,7 @@ class MessageCatalogueTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException LogicException
+     * @expectedException \LogicException
      */
     public function testAddCatalogueWhenLocaleIsNotTheSameAsTheCurrentOne()
     {

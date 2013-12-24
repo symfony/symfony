@@ -38,7 +38,7 @@ class CookieTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider invalidNames
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      * @covers Symfony\Component\HttpFoundation\Cookie::__construct
      */
     public function testInstantiationThrowsExceptionIfCookieNameContainsInvalidCharacters($name)
@@ -47,7 +47,7 @@ class CookieTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      */
     public function testInvalidExpiration()
     {

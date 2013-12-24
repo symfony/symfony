@@ -51,7 +51,7 @@ interface FormRegistryInterface
     /**
      * Returns the extensions loaded by the framework.
      *
-     * @return array
+     * @return FormExtensionInterface[]
      */
     public function getExtensions();
 }

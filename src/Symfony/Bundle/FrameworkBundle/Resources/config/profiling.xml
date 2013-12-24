@@ -29,6 +29,7 @@
             <argument type="service" id="profiler.request_matcher" on-invalid="null" />
             <argument>%profiler_listener.only_exceptions%</argument>
             <argument>%profiler_listener.only_master_requests%</argument>
+            <argument type="service" id="request_stack" />
         </service>
     </services>
 </container>

@@ -55,11 +55,11 @@ class JsonResponse extends Response
     /**
      * Sets the JSONP callback.
      *
-     * @param string $callback
+     * @param string|null $callback The JSONP callback or null to use none
      *
      * @return JsonResponse
      *
-     * @throws \InvalidArgumentException
+     * @throws \InvalidArgumentException When the callback name is not valid
      */
     public function setCallback($callback = null)
     {

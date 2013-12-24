@@ -14,7 +14,9 @@ namespace Symfony\Component\Debug;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Debug\Exception\ContextErrorException;
 use Symfony\Component\Debug\Exception\FatalErrorException;
+use Symfony\Component\Debug\Exception\DummyException;
 use Symfony\Component\Debug\FatalErrorHandler\UndefinedFunctionFatalErrorHandler;
+use Symfony\Component\Debug\FatalErrorHandler\UndefinedMethodFatalErrorHandler;
 use Symfony\Component\Debug\FatalErrorHandler\ClassNotFoundFatalErrorHandler;
 use Symfony\Component\Debug\FatalErrorHandler\FatalErrorHandlerInterface;
 
@@ -59,9 +61,9 @@ class ErrorHandler
      * Registers the error handler.
      *
      * @param integer $level         The level at which the conversion to Exception is done (null to use the error_reporting() value and 0 to disable)
-     * @param Boolean $displayErrors Display errors (for dev environment) or just log they (production usage)
+     * @param Boolean $displayErrors Display errors (for dev environment) or just log them (production usage)
      *
-     * @return The registered error handler
+     * @return ErrorHandler The registered error handler
      */
     public static function register($level = null, $displayErrors = true)
     {
@@ -144,7 +146,34 @@ class ErrorHandler
                 require __DIR__.'/Exception/ContextErrorException.php';
             }
 
-            throw new ContextErrorException(sprintf('%s: %s in %s line %d', isset($this->levels[$level]) ? $this->levels[$level] : $level, $message, $file, $line), 0, $level, $file, $line, $context);
+            $exception = new ContextErrorException(sprintf('%s: %s in %s line %d', isset($this->levels[$level]) ? $this->levels[$level] : $level, $message, $file, $line), 0, $level, $file, $line, $context);
+
+            // Exceptions thrown from error handlers are sometimes not caught by the exception
+            // handler, so we invoke it directly (https://bugs.php.net/bug.php?id=54275)
+            $exceptionHandler = set_exception_handler(function () {});
+            restore_exception_handler();
+
+            if (is_array($exceptionHandler) && $exceptionHandler[0] instanceof ExceptionHandler) {
+                $exceptionHandler[0]->handle($exception);
+
+                if (!class_exists('Symfony\Component\Debug\Exception\DummyException')) {
+                    require __DIR__.'/Exception/DummyException.php';
+                }
+
+                // we must stop the PHP script execution, as the exception has
+                // already been dealt with, so, let's throw an exception that
+                // will be catched by a dummy exception handler
+                set_exception_handler(function (\Exception $e) use ($exceptionHandler) {
+                    if (!$e instanceof DummyException) {
+                        // happens if our dummy exception is catched by a
+                        // catch-all from user code, in which case, let's the
+                        // current handler handle this "new" exception
+                        call_user_func($exceptionHandler, $e);
+                    }
+                });
+
+                throw new DummyException();
+            }
         }
 
         return false;
@@ -156,7 +185,7 @@ class ErrorHandler
             return;
         }
 
-        unset($this->reservedMemory);
+        $this->reservedMemory = '';
         $type = $error['type'];
         if (0 === $this->level || !in_array($type, array(E_ERROR, E_CORE_ERROR, E_COMPILE_ERROR, E_PARSE))) {
             return;
@@ -196,6 +225,7 @@ class ErrorHandler
     {
         return array(
             new UndefinedFunctionFatalErrorHandler(),
+            new UndefinedMethodFatalErrorHandler(),
             new ClassNotFoundFatalErrorHandler(),
         );
     }

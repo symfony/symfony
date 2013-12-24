@@ -11,6 +11,7 @@
             <twig:resource>MyBundle::form.html.twig</twig:resource>
         </twig:form>
         <twig:global key="foo" id="bar" type="service" />
+        <twig:global key="baz">@@qux</twig:global>
         <twig:global key="pi">3.14</twig:global>
         <twig:path>path1</twig:path>
         <twig:path>path2</twig:path>

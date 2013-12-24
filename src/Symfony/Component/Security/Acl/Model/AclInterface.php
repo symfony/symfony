@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Security\Acl\Model;
 
+use Symfony\Component\Security\Acl\Exception\NoAceFoundException;
+
 /**
  * This interface represents an access control list (ACL) for a domain object.
  * Each domain object can have exactly one associated ACL.

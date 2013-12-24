@@ -355,6 +355,24 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $client->setNextResponse(new Response('', 302, array('Location' => 'http://www.example.com/redirected')));
         $client->request('GET', 'http://www.example.com/foo/foobar');
         $this->assertEquals('http://www.example.com/redirected', $client->getRequest()->getUri(), '->followRedirect() follows a redirect if any');
+
+        $client->setNextResponse(new Response('', 302, array('Location' => '/redirected')));
+        $client->request('GET', 'http://www.example.com/foo/foobar');
+
+        $this->assertEquals('http://www.example.com/redirected', $client->getRequest()->getUri(), '->followRedirect() follows relative URLs');
+
+        $client = new TestClient();
+        $client->setNextResponse(new Response('', 302, array('Location' => '//www.example.org/')));
+        $client->request('GET', 'https://www.example.com/');
+
+        $this->assertEquals('https://www.example.org/', $client->getRequest()->getUri(), '->followRedirect() follows protocol-relative URLs');
+
+        $client = new TestClient();
+        $client->setNextResponse(new Response('', 302, array('Location' => 'http://www.example.com/redirected')));
+        $client->request('POST', 'http://www.example.com/foo/foobar', array('name' => 'bar'));
+
+        $this->assertEquals('get', $client->getRequest()->getMethod(), '->followRedirect() uses a get for 302');
+        $this->assertEquals(array(), $client->getRequest()->getParameters(), '->followRedirect() does not submit parameters when changing the method');
     }
 
     public function testFollowRedirectWithCookies()
@@ -369,6 +387,33 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(), $client->getRequest()->getCookies());
         $client->followRedirect();
         $this->assertEquals(array('foo' => 'bar'), $client->getRequest()->getCookies());
+    }
+
+    public function testFollowRedirectWithHeaders()
+    {
+        $headers = array(
+            'HTTP_HOST'       => 'www.example.com',
+            'HTTP_USER_AGENT' => 'Symfony2 BrowserKit',
+            'CONTENT_TYPE'    => 'application/vnd.custom+xml',
+            'HTTPS'           => false,
+        );
+
+        $client = new TestClient();
+        $client->followRedirects(false);
+        $client->setNextResponse(new Response('', 302, array(
+            'Location'    => 'http://www.example.com/redirected',
+        )));
+        $client->request('GET', 'http://www.example.com/', array(), array(), array(
+            'CONTENT_TYPE' => 'application/vnd.custom+xml',
+        ));
+
+        $this->assertEquals($headers, $client->getRequest()->getServer());
+
+        $client->followRedirect();
+
+        $headers['HTTP_REFERER'] = 'http://www.example.com/';
+
+        $this->assertEquals($headers, $client->getRequest()->getServer());
     }
 
     public function testBack()

@@ -188,7 +188,7 @@ class Response
     /**
      * Constructor.
      *
-     * @param string  $content The response content
+     * @param mixed   $content The response content, see setContent()
      * @param integer $status  The response status code
      * @param array   $headers An array of response headers
      *
@@ -215,7 +215,7 @@ class Response
      *     return Response::create($body, 200)
      *         ->setSharedMaxAge(300);
      *
-     * @param string  $content The response content
+     * @param mixed   $content The response content, see setContent()
      * @param integer $status  The response status code
      * @param array   $headers An array of response headers
      *
@@ -284,7 +284,7 @@ class Response
         $charset = $this->charset ?: 'UTF-8';
         if (!$headers->has('Content-Type')) {
             $headers->set('Content-Type', 'text/html; charset='.$charset);
-        } elseif (0 === strpos($headers->get('Content-Type'), 'text/') && false === strpos($headers->get('Content-Type'), 'charset')) {
+        } elseif (0 === stripos($headers->get('Content-Type'), 'text/') && false === stripos($headers->get('Content-Type'), 'charset')) {
             // add the charset
             $headers->set('Content-Type', $headers->get('Content-Type').'; charset='.$charset);
         }
@@ -332,12 +332,12 @@ class Response
         }
 
         // status
-        header(sprintf('HTTP/%s %s %s', $this->version, $this->statusCode, $this->statusText));
+        header(sprintf('HTTP/%s %s %s', $this->version, $this->statusCode, $this->statusText), true, $this->statusCode);
 
         // headers
         foreach ($this->headers->allPreserveCase() as $name => $values) {
             foreach ($values as $value) {
-                header($name.': '.$value, false);
+                header($name.': '.$value, false, $this->statusCode);
             }
         }
 
@@ -403,9 +403,9 @@ class Response
     /**
      * Sets the response content.
      *
-     * Valid types are strings, numbers, and objects that implement a __toString() method.
+     * Valid types are strings, numbers, null, and objects that implement a __toString() method.
      *
-     * @param mixed $content
+     * @param mixed $content Content that can be cast to string
      *
      * @return Response
      *

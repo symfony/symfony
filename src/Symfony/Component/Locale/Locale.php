@@ -64,6 +64,7 @@ class Locale extends \Locale
      * Returns all available country codes
      *
      * @return array              The country codes
+     *
      * @throws \RuntimeException  When the resource bundles cannot be loaded
      */
     public static function getCountries()
@@ -93,6 +94,7 @@ class Locale extends \Locale
      * Returns all available language codes
      *
      * @return array              The language codes
+     *
      * @throws \RuntimeException  When the resource bundles cannot be loaded
      */
     public static function getLanguages()
@@ -122,6 +124,7 @@ class Locale extends \Locale
      * Returns all available locale codes
      *
      * @return array              The locale codes
+     *
      * @throws \RuntimeException  When the resource bundles cannot be loaded
      */
     public static function getLocales()

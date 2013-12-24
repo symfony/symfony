@@ -104,7 +104,7 @@ class SimpleProcessTest extends AbstractProcessTest
     }
 
     /**
-     * @expectedException Symfony\Component\Process\Exception\LogicException
+     * @expectedException \Symfony\Component\Process\Exception\LogicException
      */
     public function testSignalProcessNotRunning()
     {
@@ -113,7 +113,7 @@ class SimpleProcessTest extends AbstractProcessTest
     }
 
     /**
-     * @expectedException Symfony\Component\Process\Exception\RuntimeException
+     * @expectedException \Symfony\Component\Process\Exception\RuntimeException
      */
     public function testSignalWithWrongIntSignal()
     {
@@ -122,7 +122,7 @@ class SimpleProcessTest extends AbstractProcessTest
     }
 
     /**
-     * @expectedException Symfony\Component\Process\Exception\RuntimeException
+     * @expectedException \Symfony\Component\Process\Exception\RuntimeException
      */
     public function testSignalWithWrongNonIntSignal()
     {

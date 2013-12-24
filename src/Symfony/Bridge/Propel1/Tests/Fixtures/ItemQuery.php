@@ -22,6 +22,23 @@ class ItemQuery
         'updated_at'    => \PropelColumnTypes::TIMESTAMP,
     );
 
+    private $caseInsensitiveMap = array(
+        'isactive'      => 'is_active',
+        'updatedat'     => 'updated_at',
+    );
+
+    public static $result = array();
+
+    public function find()
+    {
+        return self::$result;
+    }
+
+    public function filterById($id)
+    {
+        return $this;
+    }
+
     public function getTableMap()
     {
         // Allows to define methods in this class
@@ -33,6 +50,7 @@ class ItemQuery
     {
         $cm = new \ColumnMap('id', new \TableMap());
         $cm->setType('INTEGER');
+        $cm->setPhpName('Id');
 
         return array('id' => $cm);
     }
@@ -60,8 +78,56 @@ class ItemQuery
     /**
      * Method from the TableMap API
      */
+    public function hasColumnByInsensitiveCase($column)
+    {
+        $column = strtolower($column);
+
+        return in_array($column, array_keys($this->caseInsensitiveMap));
+    }
+
+    /**
+     * Method from the TableMap API
+     */
+    public function getColumnByInsensitiveCase($column)
+    {
+        $column = strtolower($column);
+
+        if (isset($this->caseInsensitiveMap[$column])) {
+            return $this->getColumn($this->caseInsensitiveMap[$column]);
+        }
+
+        return null;
+    }
+
+    /**
+     * Method from the TableMap API
+     */
     public function getRelations()
     {
-        return array();
+        // table maps
+        $authorTable = new \TableMap();
+        $authorTable->setClassName('\Foo\Author');
+
+        $resellerTable = new \TableMap();
+        $resellerTable->setClassName('\Foo\Reseller');
+
+        // relations
+        $mainAuthorRelation = new \RelationMap('MainAuthor');
+        $mainAuthorRelation->setType(\RelationMap::MANY_TO_ONE);
+        $mainAuthorRelation->setForeignTable($authorTable);
+
+        $authorRelation = new \RelationMap('Author');
+        $authorRelation->setType(\RelationMap::ONE_TO_MANY);
+        $authorRelation->setForeignTable($authorTable);
+
+        $resellerRelation = new \RelationMap('Reseller');
+        $resellerRelation->setType(\RelationMap::MANY_TO_MANY);
+        $resellerRelation->setLocalTable($resellerTable);
+
+        return array(
+            $mainAuthorRelation,
+            $authorRelation,
+            $resellerRelation
+        );
     }
 }

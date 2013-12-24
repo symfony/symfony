@@ -164,6 +164,7 @@ class MockArraySessionStorage implements SessionStorageInterface
         }
         // nothing to do since we don't persist the session data
         $this->closed = false;
+        $this->started = false;
     }
 
     /**

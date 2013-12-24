@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Form\Extension\Validator\Constraints;
 
-use Symfony\Component\Form\ClickableInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Extension\Validator\Util\ServerParams;
 use Symfony\Component\Validator\Constraint;
@@ -172,10 +171,15 @@ class FormValidator extends ConstraintValidator
      */
     private static function getValidationGroups(FormInterface $form)
     {
-        $button = self::findClickedButton($form->getRoot());
+        // Determine the clicked button of the complete form tree
+        $clickedButton = null;
 
-        if (null !== $button) {
-            $groups = $button->getConfig()->getOption('validation_groups');
+        if (method_exists($form, 'getClickedButton')) {
+            $clickedButton = $form->getClickedButton();
+        }
+
+        if (null !== $clickedButton) {
+            $groups = $clickedButton->getConfig()->getOption('validation_groups');
 
             if (null !== $groups) {
                 return self::resolveValidationGroups($groups, $form);
@@ -193,28 +197,6 @@ class FormValidator extends ConstraintValidator
         } while (null !== $form);
 
         return array(Constraint::DEFAULT_GROUP);
-    }
-
-    /**
-     * Extracts a clicked button from a form tree, if one exists.
-     *
-     * @param FormInterface $form The root form.
-     *
-     * @return ClickableInterface|null The clicked button or null.
-     */
-    private static function findClickedButton(FormInterface $form)
-    {
-        if ($form instanceof ClickableInterface && $form->isClicked()) {
-            return $form;
-        }
-
-        foreach ($form as $child) {
-            if (null !== ($button = self::findClickedButton($child))) {
-                return $button;
-            }
-        }
-
-        return null;
     }
 
     /**

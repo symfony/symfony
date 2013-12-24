@@ -39,7 +39,7 @@ interface FormFactoryBuilderInterface
     /**
      * Adds a list of extensions to be loaded by the factory.
      *
-     * @param array $extensions The extensions.
+     * @param FormExtensionInterface[] $extensions The extensions.
      *
      * @return FormFactoryBuilderInterface The builder.
      */
@@ -57,7 +57,7 @@ interface FormFactoryBuilderInterface
     /**
      * Adds a list of form types to the factory.
      *
-     * @param array $types The form types.
+     * @param FormTypeInterface[] $types The form types.
      *
      * @return FormFactoryBuilderInterface The builder.
      */
@@ -75,7 +75,7 @@ interface FormFactoryBuilderInterface
     /**
      * Adds a list of form type extensions to the factory.
      *
-     * @param array $typeExtensions The form type extensions.
+     * @param FormTypeExtensionInterface[] $typeExtensions The form type extensions.
      *
      * @return FormFactoryBuilderInterface The builder.
      */
@@ -93,7 +93,7 @@ interface FormFactoryBuilderInterface
     /**
      * Adds a list of type guessers to the factory.
      *
-     * @param array $typeGuessers The type guessers.
+     * @param FormTypeGuesserInterface[] $typeGuessers The type guessers.
      *
      * @return FormFactoryBuilderInterface The builder.
      */

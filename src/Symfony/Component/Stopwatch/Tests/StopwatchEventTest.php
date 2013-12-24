@@ -20,6 +20,8 @@ use Symfony\Component\Stopwatch\StopwatchEvent;
  */
 class StopwatchEventTest extends \PHPUnit_Framework_TestCase
 {
+    const DELTA = 37;
+
     public function testGetOrigin()
     {
         $event = new StopwatchEvent(12);
@@ -66,20 +68,18 @@ class StopwatchEventTest extends \PHPUnit_Framework_TestCase
     {
         $event = new StopwatchEvent(microtime(true) * 1000);
         $event->start();
-        usleep(20000);
+        usleep(200000);
         $event->stop();
-        $total = $event->getDuration();
-        $this->assertTrue($total >= 11 && $total <= 29, $total.' should be 20 (between 11 and 29)');
+        $this->assertEquals(200, $event->getDuration(), null, self::DELTA);
 
         $event = new StopwatchEvent(microtime(true) * 1000);
         $event->start();
-        usleep(10000);
+        usleep(100000);
         $event->stop();
         $event->start();
-        usleep(10000);
+        usleep(100000);
         $event->stop();
-        $total = $event->getDuration();
-        $this->assertTrue($total >= 11 && $total <= 29, $total.' should be 20 (between 11 and 29)');
+        $this->assertEquals(200, $event->getDuration(), null, self::DELTA);
     }
 
     /**
@@ -109,12 +109,11 @@ class StopwatchEventTest extends \PHPUnit_Framework_TestCase
         // this also test overlap between two periods
         $event = new StopwatchEvent(microtime(true) * 1000);
         $event->start();
-        usleep(10000);
+        usleep(100000);
         $event->start();
-        usleep(10000);
+        usleep(100000);
         $event->ensureStopped();
-        $total = $event->getDuration();
-        $this->assertTrue($total >= 21 && $total <= 39, $total.' should be 30 (between 21 and 39)');
+        $this->assertEquals(300, $event->getDuration(), null, self::DELTA);
     }
 
     public function testStartTime()
@@ -129,10 +128,9 @@ class StopwatchEventTest extends \PHPUnit_Framework_TestCase
 
         $event = new StopwatchEvent(microtime(true) * 1000);
         $event->start();
-        usleep(10000);
+        usleep(100000);
         $event->stop();
-        $start = $event->getStartTime();
-        $this->assertTrue($start >= 0 && $start <= 20);
+        $this->assertEquals(0, $event->getStartTime(), null, self::DELTA);
     }
 
     public function testEndTime()
@@ -146,13 +144,12 @@ class StopwatchEventTest extends \PHPUnit_Framework_TestCase
 
         $event = new StopwatchEvent(microtime(true) * 1000);
         $event->start();
-        usleep(10000);
+        usleep(100000);
         $event->stop();
         $event->start();
-        usleep(10000);
+        usleep(100000);
         $event->stop();
-        $end = $event->getEndTime();
-        $this->assertTrue($end >= 11 && $end <= 29, $end.' should be 20 (between 11 and 29)');
+        $this->assertEquals(200, $event->getEndTime(), null, self::DELTA);
     }
 
     /**

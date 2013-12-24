@@ -56,13 +56,13 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class Application
 {
-    private $commands;
+    private $commands = array();
     private $wantHelps = false;
     private $runningCommand;
     private $name;
     private $version;
-    private $catchExceptions;
-    private $autoExit;
+    private $catchExceptions = true;
+    private $autoExit = true;
     private $definition;
     private $helperSet;
     private $dispatcher;
@@ -80,9 +80,6 @@ class Application
     {
         $this->name = $name;
         $this->version = $version;
-        $this->catchExceptions = true;
-        $this->autoExit = true;
-        $this->commands = array();
         $this->helperSet = $this->getDefaultHelperSet();
         $this->definition = $this->getDefaultInputDefinition();
 
@@ -407,6 +404,10 @@ class Application
             return;
         }
 
+        if (null === $command->getDefinition()) {
+            throw new \LogicException(sprintf('Command class "%s" is not correctly initialized. You probably forgot to call the parent constructor.', get_class($command)));
+        }
+
         $this->commands[$command->getName()] = $command;
 
         foreach ($command->getAliases() as $alias) {
@@ -514,8 +515,8 @@ class Application
         }
 
         $exact = in_array($namespace, $namespaces, true);
-        if (1 < count($namespaces) && !$exact) {
-            throw new \InvalidArgumentException(sprintf('The namespace "%s" is ambiguous (%s).', $namespace, $this->getAbbreviationSuggestions($namespaces)));
+        if (count($namespaces) > 1 && !$exact) {
+            throw new \InvalidArgumentException(sprintf('The namespace "%s" is ambiguous (%s).', $namespace, $this->getAbbreviationSuggestions(array_values($namespaces))));
         }
 
         return $exact ? $namespace : reset($namespaces);
@@ -664,7 +665,7 @@ class Application
     /**
      * Renders a caught exception.
      *
-     * @param Exception       $e      An exception instance
+     * @param \Exception       $e      An exception instance
      * @param OutputInterface $output An OutputInterface instance
      */
     public function renderException($e, $output)
@@ -685,29 +686,29 @@ class Application
             $title = sprintf('  [%s]  ', get_class($e));
             $len = $strlen($title);
             $width = $this->getTerminalWidth() ? $this->getTerminalWidth() - 1 : PHP_INT_MAX;
+            $formatter = $output->getFormatter();
             $lines = array();
             foreach (preg_split('/\r?\n/', $e->getMessage()) as $line) {
                 foreach (str_split($line, $width - 4) as $line) {
-                    $lines[] = sprintf('  %s  ', $line);
-                    $len = max($strlen($line) + 4, $len);
+                    // pre-format lines to get the right string length
+                    $lineLength = $strlen(preg_replace('/\[[^m]*m/', '', $formatter->format($line))) + 4;
+                    $lines[] = array($line, $lineLength);
+
+                    $len = max($lineLength, $len);
                 }
             }
 
-            $messages = array(str_repeat(' ', $len), $title.str_repeat(' ', max(0, $len - $strlen($title))));
-
+            $messages = array('', '');
+            $messages[] = $emptyLine = $formatter->format(sprintf('<error>%s</error>', str_repeat(' ', $len)));
+            $messages[] = $formatter->format(sprintf('<error>%s%s</error>', $title, str_repeat(' ', max(0, $len - $strlen($title)))));
             foreach ($lines as $line) {
-                $messages[] = $line.str_repeat(' ', $len - $strlen($line));
+                $messages[] = $formatter->format(sprintf('<error>  %s  %s</error>', $line[0], str_repeat(' ', $len - $line[1])));
             }
+            $messages[] = $emptyLine;
+            $messages[] = '';
+            $messages[] = '';
 
-            $messages[] = str_repeat(' ', $len);
-
-            $output->writeln("");
-            $output->writeln("");
-            foreach ($messages as $message) {
-                $output->writeln('<error>'.$message.'</error>');
-            }
-            $output->writeln("");
-            $output->writeln("");
+            $output->writeln($messages, OutputInterface::OUTPUT_RAW);
 
             if (OutputInterface::VERBOSITY_VERBOSE <= $output->getVerbosity()) {
                 $output->writeln('<comment>Exception trace:</comment>');
@@ -838,7 +839,7 @@ class Application
             $input->setInteractive(false);
         } elseif (function_exists('posix_isatty') && $this->getHelperSet()->has('dialog')) {
             $inputStream = $this->getHelperSet()->get('dialog')->getInputStream();
-            if (!posix_isatty($inputStream)) {
+            if (!@posix_isatty($inputStream)) {
                 $input->setInteractive(false);
             }
         }

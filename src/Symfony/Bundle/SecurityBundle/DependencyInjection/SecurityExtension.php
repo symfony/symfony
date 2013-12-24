@@ -14,7 +14,6 @@ namespace Symfony\Bundle\SecurityBundle\DependencyInjection;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\UserProviderFactoryInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
@@ -23,6 +22,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Security\Core\Authorization\ExpressionLanguage;
 
 /**
  * SecurityExtension.
@@ -33,10 +33,12 @@ use Symfony\Component\Config\FileLocator;
 class SecurityExtension extends Extension
 {
     private $requestMatchers = array();
+    private $expressions = array();
     private $contextListeners = array();
     private $listenerPositions = array('pre_auth', 'form', 'http', 'remember_me');
     private $factories = array();
     private $userProviderFactories = array();
+    private $expressionLanguage;
 
     public function __construct()
     {
@@ -188,8 +190,13 @@ class SecurityExtension extends Extension
                 $access['ips']
             );
 
+            $attributes = $access['roles'];
+            if ($access['allow_if']) {
+                $attributes[] = $this->createExpression($container, $access['allow_if']);
+            }
+
             $container->getDefinition('security.access_map')
-                      ->addMethodCall('add', array($matcher, $access['roles'], $access['requires_channel']));
+                      ->addMethodCall('add', array($matcher, $attributes, $access['requires_channel']));
         }
     }
 
@@ -284,7 +291,7 @@ class SecurityExtension extends Extension
             $listener = $container->setDefinition($listenerId, new DefinitionDecorator('security.logout_listener'));
             $listener->replaceArgument(3, array(
                 'csrf_parameter' => $firewall['logout']['csrf_parameter'],
-                'intention'      => $firewall['logout']['intention'],
+                'intention'      => $firewall['logout']['csrf_token_id'],
                 'logout_path'    => $firewall['logout']['path'],
             ));
             $listeners[] = new Reference($listenerId);
@@ -300,8 +307,8 @@ class SecurityExtension extends Extension
             $listener->replaceArgument(2, new Reference($logoutSuccessHandlerId));
 
             // add CSRF provider
-            if (isset($firewall['logout']['csrf_provider'])) {
-                $listener->addArgument(new Reference($firewall['logout']['csrf_provider']));
+            if (isset($firewall['logout']['csrf_token_generator'])) {
+                $listener->addArgument(new Reference($firewall['logout']['csrf_token_generator']));
             }
 
             // add session logout handler
@@ -329,9 +336,9 @@ class SecurityExtension extends Extension
                 ->addMethodCall('registerListener', array(
                     $id,
                     $firewall['logout']['path'],
-                    $firewall['logout']['intention'],
+                    $firewall['logout']['csrf_token_id'],
                     $firewall['logout']['csrf_parameter'],
-                    isset($firewall['logout']['csrf_provider']) ? new Reference($firewall['logout']['csrf_provider']) : null,
+                    isset($firewall['logout']['csrf_token_generator']) ? new Reference($firewall['logout']['csrf_token_generator']) : null,
                 ))
             ;
         }
@@ -596,6 +603,22 @@ class SecurityExtension extends Extension
         return $switchUserListenerId;
     }
 
+    private function createExpression($container, $expression)
+    {
+        if (isset($this->expressions[$id = 'security.expression.'.sha1($expression)])) {
+            return $this->expressions[$id];
+        }
+
+        $container
+            ->register($id, 'Symfony\Component\ExpressionLanguage\SerializedParsedExpression')
+            ->setPublic(false)
+            ->addArgument($expression)
+            ->addArgument(serialize($this->getExpressionLanguage()->parse($expression, array('token', 'user', 'object', 'roles', 'request'))->getNodes()))
+        ;
+
+        return $this->expressions[$id] = new Reference($id);
+    }
+
     private function createRequestMatcher($container, $path = null, $host = null, $methods = array(), $ip = null, array $attributes = array())
     {
         $serialized = serialize(array($path, $host, $methods, $ip, $attributes));
@@ -653,5 +676,17 @@ class SecurityExtension extends Extension
     {
         // first assemble the factories
         return new MainConfiguration($this->factories, $this->userProviderFactories);
+    }
+
+    private function getExpressionLanguage()
+    {
+        if (null === $this->expressionLanguage) {
+            if (!class_exists('Symfony\Component\ExpressionLanguage\ExpressionLanguage')) {
+                throw new RuntimeException('Unable to use expressions as the Symfony ExpressionLanguage component is not installed.');
+            }
+            $this->expressionLanguage = new ExpressionLanguage();
+        }
+
+        return $this->expressionLanguage;
     }
 }

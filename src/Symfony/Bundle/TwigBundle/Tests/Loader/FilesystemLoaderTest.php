@@ -11,11 +11,9 @@
 
 namespace Symfony\Bundle\TwigBundle\Tests\Loader;
 
-use Symfony\Bundle\TwigBundle\Tests\TestCase;
-use Symfony\Bundle\TwigBundle\Loader\FilesystemLoader;
-use Symfony\Component\Config\FileLocatorInterface;
 use Symfony\Bundle\FrameworkBundle\Templating\TemplateReference;
-use Symfony\Component\Templating\TemplateNameParserInterface;
+use Symfony\Bundle\TwigBundle\Loader\FilesystemLoader;
+use Symfony\Bundle\TwigBundle\Tests\TestCase;
 
 class FilesystemLoaderTest extends TestCase
 {
@@ -54,7 +52,7 @@ class FilesystemLoaderTest extends TestCase
     }
 
     /**
-     * @expectedException Twig_Error_Loader
+     * @expectedException \Twig_Error_Loader
      */
     public function testTwigErrorIfLocatorThrowsInvalid()
     {
@@ -78,7 +76,7 @@ class FilesystemLoaderTest extends TestCase
     }
 
     /**
-     * @expectedException Twig_Error_Loader
+     * @expectedException \Twig_Error_Loader
      */
     public function testTwigErrorIfLocatorReturnsFalse()
     {

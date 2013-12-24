@@ -12,10 +12,12 @@
 namespace Symfony\Component\Validator\Tests\Fixtures;
 
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\ExecutionContextInterface;
 
 /**
  * @Symfony\Component\Validator\Tests\Fixtures\ConstraintA
  * @Assert\GroupSequence({"Foo", "Entity"})
+ * @Assert\Callback({"Symfony\Component\Validator\Tests\Fixtures\CallbackClass", "callback"})
  */
 class Entity extends EntityParent implements EntityInterface
 {
@@ -57,5 +59,19 @@ class Entity extends EntityParent implements EntityInterface
     public function getData()
     {
         return 'Overridden data';
+    }
+
+    /**
+     * @Assert\Callback
+     */
+    public function validateMe(ExecutionContextInterface $context)
+    {
+    }
+
+    /**
+     * @Assert\Callback
+     */
+    public static function validateMeStatic($object, ExecutionContextInterface $context)
+    {
     }
 }

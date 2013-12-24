@@ -23,21 +23,16 @@ class ProcessBuilder
 {
     private $arguments;
     private $cwd;
-    private $env;
+    private $env = array();
     private $stdin;
-    private $timeout;
-    private $options;
-    private $inheritEnv;
+    private $timeout = 60;
+    private $options = array();
+    private $inheritEnv = true;
     private $prefix = array();
 
     public function __construct(array $arguments = array())
     {
         $this->arguments = $arguments;
-
-        $this->timeout = 60;
-        $this->options = array();
-        $this->env = array();
-        $this->inheritEnv = true;
     }
 
     public static function create(array $arguments = array())
@@ -108,6 +103,13 @@ class ProcessBuilder
         return $this;
     }
 
+    public function addEnvironmentVariables(array $variables)
+    {
+        $this->env = array_replace($this->env, $variables);
+
+        return $this;
+    }
+
     public function setInput($stdin)
     {
         $this->stdin = $stdin;
@@ -164,8 +166,8 @@ class ProcessBuilder
         $script = implode(' ', array_map(array(__NAMESPACE__.'\\ProcessUtils', 'escapeArgument'), $arguments));
 
         if ($this->inheritEnv) {
-            // include $_ENV for BC purposes 
-            $env = array_replace($_ENV, $_SERVER, $this->env); 
+            // include $_ENV for BC purposes
+            $env = array_replace($_ENV, $_SERVER, $this->env);
         } else {
             $env = $this->env;
         }

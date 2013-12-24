@@ -306,4 +306,11 @@ class ArgvInputTest extends \PHPUnit_Framework_TestCase
             array(array('app/console', 'foo:bar', '--env=dev', '--en=1'), array('--en'), '1'),
         );
     }
+
+    public function testParseSingleDashAsArgument()
+    {
+        $input = new ArgvInput(array('cli.php', '-'));
+        $input->bind(new InputDefinition(array(new InputArgument('file'))));
+        $this->assertEquals(array('file' => '-'), $input->getArguments(), '->parse() parses single dash as an argument');
+    }
 }

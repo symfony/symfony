@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Debug\Tests\FatalErrorHandler;
 
-use Symfony\Component\Debug\ErrorHandler;
 use Symfony\Component\Debug\Exception\FatalErrorException;
 use Symfony\Component\Debug\FatalErrorHandler\ClassNotFoundFatalErrorHandler;
 
@@ -81,5 +80,26 @@ class ClassNotFoundFatalErrorHandlerTest extends \PHPUnit_Framework_TestCase
                 'Attempted to load class "UndefinedFunctionException" from namespace "Foo\Bar" in foo.php line 12. Do you need to "use" it from another namespace? Perhaps you need to add a use statement for one of the following: Symfony\Component\Debug\Exception\UndefinedFunctionException.',
             ),
         );
+    }
+
+    public function testCannotRedeclareClass()
+    {
+        if (!file_exists(__DIR__.'/../FIXTURES/REQUIREDTWICE.PHP')) {
+            $this->markTestSkipped('Can only be run on case insensitive filesystems');
+        }
+
+        require_once __DIR__.'/../FIXTURES/REQUIREDTWICE.PHP';
+
+        $error = array(
+            'type' => 1,
+            'line' => 12,
+            'file' => 'foo.php',
+            'message' => 'Class \'Foo\\Bar\\RequiredTwice\' not found',
+        );
+
+        $handler = new ClassNotFoundFatalErrorHandler();
+        $exception = $handler->handleError($error, new FatalErrorException('', 0, $error['type'], $error['file'], $error['line']));
+
+        $this->assertInstanceof('Symfony\Component\Debug\Exception\ClassNotFoundException', $exception);
     }
 }

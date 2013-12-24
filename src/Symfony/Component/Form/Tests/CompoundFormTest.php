@@ -15,6 +15,8 @@ use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
 use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationRequestHandler;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\Forms;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\SubmitButtonBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Form\Tests\Fixtures\FixedDataTransformer;
@@ -81,6 +83,19 @@ class CompoundFormTest extends AbstractFormTest
         $this->assertTrue($form->isValid());
     }
 
+    public function testSubmitForwardsNullIfNotClearMissingButValueIsExplicitlyNull()
+    {
+        $child = $this->getMockForm('firstName');
+
+        $this->form->add($child);
+
+        $child->expects($this->once())
+            ->method('submit')
+            ->with($this->equalTo(null));
+
+        $this->form->submit(array('firstName' => null), false);
+    }
+
     public function testSubmitForwardsNullIfValueIsMissing()
     {
         $child = $this->getMockForm('firstName');
@@ -141,6 +156,7 @@ class CompoundFormTest extends AbstractFormTest
 
         $this->assertNotSame($this->form, $clone);
         $this->assertNotSame($child, $clone['child']);
+        $this->assertNotSame($this->form['child'], $clone['child']);
     }
 
     public function testNotEmptyIfChildNotEmpty()
@@ -804,6 +820,147 @@ class CompoundFormTest extends AbstractFormTest
         $parent->add($this->getBuilder('foo')->getForm());
 
         $this->assertEquals("name:\n    ERROR: Error!\nfoo:\n    No errors\n", $parent->getErrorsAsString());
+    }
+
+    // Basic cases are covered in SimpleFormTest
+    public function testCreateViewWithChildren()
+    {
+        $type = $this->getMock('Symfony\Component\Form\ResolvedFormTypeInterface');
+        $options = array('a' => 'Foo', 'b' => 'Bar');
+        $field1 = $this->getMockForm('foo');
+        $field2 = $this->getMockForm('bar');
+        $view = new FormView();
+        $field1View = new FormView();
+        $field2View = new FormView();
+
+        $this->form = $this->getBuilder('form', null, null, $options)
+            ->setCompound(true)
+            ->setDataMapper($this->getDataMapper())
+            ->setType($type)
+            ->getForm();
+        $this->form->add($field1);
+        $this->form->add($field2);
+
+        $test = $this;
+
+        $assertChildViewsEqual = function (array $childViews) use ($test) {
+            return function (FormView $view) use ($test, $childViews) {
+                /* @var \PHPUnit_Framework_TestCase $test */
+                $test->assertSame($childViews, $view->children);
+            };
+        };
+
+        // First create the view
+        $type->expects($this->once())
+            ->method('createView')
+            ->will($this->returnValue($view));
+
+        // Then build it for the form itself
+        $type->expects($this->once())
+            ->method('buildView')
+            ->with($view, $this->form, $options)
+            ->will($this->returnCallback($assertChildViewsEqual(array())));
+
+        // Then add the first child form
+        $field1->expects($this->once())
+            ->method('createView')
+            ->will($this->returnValue($field1View));
+
+        // Then the second child form
+        $field2->expects($this->once())
+            ->method('createView')
+            ->will($this->returnValue($field2View));
+
+        // Again build the view for the form itself. This time the child views
+        // exist.
+        $type->expects($this->once())
+            ->method('finishView')
+            ->with($view, $this->form, $options)
+            ->will($this->returnCallback($assertChildViewsEqual(array('foo' => $field1View, 'bar' => $field2View))));
+
+        $this->assertSame($view, $this->form->createView());
+    }
+
+    public function testNoClickedButtonBeforeSubmission()
+    {
+        $this->assertNull($this->form->getClickedButton());
+    }
+
+    public function testNoClickedButton()
+    {
+        $button = $this->getMockBuilder('Symfony\Component\Form\SubmitButton')
+            ->setConstructorArgs(array(new SubmitButtonBuilder('submit')))
+            ->setMethods(array('isClicked'))
+            ->getMock();
+
+        $button->expects($this->any())
+            ->method('isClicked')
+            ->will($this->returnValue(false));
+
+        $parentForm = $this->getBuilder('parent')->getForm();
+        $nestedForm = $this->getBuilder('nested')->getForm();
+
+        $this->form->setParent($parentForm);
+        $this->form->add($button);
+        $this->form->add($nestedForm);
+        $this->form->submit(array());
+
+        $this->assertNull($this->form->getClickedButton());
+    }
+
+    public function testClickedButton()
+    {
+        $button = $this->getMockBuilder('Symfony\Component\Form\SubmitButton')
+            ->setConstructorArgs(array(new SubmitButtonBuilder('submit')))
+            ->setMethods(array('isClicked'))
+            ->getMock();
+
+        $button->expects($this->any())
+            ->method('isClicked')
+            ->will($this->returnValue(true));
+
+        $this->form->add($button);
+        $this->form->submit(array());
+
+        $this->assertSame($button, $this->form->getClickedButton());
+    }
+
+    public function testClickedButtonFromNestedForm()
+    {
+        $button = $this->getBuilder('submit')->getForm();
+
+        $nestedForm = $this->getMockBuilder('Symfony\Component\Form\Form')
+            ->setConstructorArgs(array($this->getBuilder('nested')))
+            ->setMethods(array('getClickedButton'))
+            ->getMock();
+
+        $nestedForm->expects($this->any())
+            ->method('getClickedButton')
+            ->will($this->returnValue($button));
+
+        $this->form->add($nestedForm);
+        $this->form->submit(array());
+
+        $this->assertSame($button, $this->form->getClickedButton());
+    }
+
+    public function testClickedButtonFromParentForm()
+    {
+        $button = $this->getBuilder('submit')->getForm();
+
+        $parentForm = $this->getMockBuilder('Symfony\Component\Form\Form')
+            ->setConstructorArgs(array($this->getBuilder('parent')))
+            ->setMethods(array('getClickedButton'))
+            ->getMock();
+
+        $parentForm->expects($this->any())
+            ->method('getClickedButton')
+            ->will($this->returnValue($button));
+
+        $this->form->setParent($parentForm);
+        $this->form->submit(array());
+
+        $this->assertSame($button, $this->form->getClickedButton());
     }
 
     protected function createForm()

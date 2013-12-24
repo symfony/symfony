@@ -133,7 +133,7 @@ UPGRADE FROM 2.x to 3.0
    ```
 
  * The `TypeTestCase` class was moved from the `Symfony\Component\Form\Tests\Extension\Core\Type` namespace to the `Symfony\Component\Form\Test` namespace.
- 
+
    Before:
 
    ```
@@ -162,8 +162,56 @@ UPGRADE FROM 2.x to 3.0
    `NumberToLocalizedStringTransformer` were renamed to `ROUND_HALF_EVEN`,
    `ROUND_HALF_UP` and `ROUND_HALF_DOWN`.
 
+ * The methods `ChoiceListInterface::getIndicesForChoices()` and
+   `ChoiceListInterface::getIndicesForValues()` were removed. No direct
+   replacement exists, although in most cases
+   `ChoiceListInterface::getChoicesForValues()` and
+   `ChoiceListInterface::getValuesForChoices()` should be sufficient.
+
+ * The interface `Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface`
+   and all of its implementations were removed. Use the new interface
+   `Symfony\Component\Security\Csrf\CsrfTokenManagerInterface` instead.
+
+ * The options "csrf_provider" and "intention" were renamed to "csrf_token_generator"
+   and "csrf_token_id".
+
 
 ### FrameworkBundle
+
+ * The `getRequest` method of the base `Controller` class has been deprecated
+   since Symfony 2.4 and must be therefore removed in 3.0. The only reliable
+   way to get the `Request` object is to inject it in the action method.
+
+   Before:
+
+   ```
+   namespace Acme\FooBundle\Controller;
+
+   class DemoController
+   {
+       public function showAction()
+       {
+           $request = $this->getRequest();
+           // ...
+       }
+   }
+   ```
+
+   After:
+
+   ```
+   namespace Acme\FooBundle\Controller;
+
+   use Symfony\Component\HttpFoundation\Request;
+
+   class DemoController
+   {
+       public function showAction(Request $request)
+       {
+           // ...
+       }
+   }
+   ```
 
  * The `enctype` method of the `form` helper was removed. You should use the
    new method `start` instead.
@@ -244,12 +292,15 @@ UPGRADE FROM 2.x to 3.0
  * The `Symfony\Component\HttpKernel\EventListener\ExceptionListener` now
    passes the Request format as the `_format` argument instead of `format`.
 
+ * The `Symfony\Component\HttpKernel\DependencyInjection\RegisterListenersPass` has been renamed to
+   `Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass` and moved to the EventDispatcher component.
+
 ### Locale
 
  * The Locale component was removed and replaced by the Intl component.
    Instead of the methods in `Symfony\Component\Locale\Locale`, you should use
    these equivalent methods in `Symfony\Component\Intl\Intl` now:
-   
+
     * `Locale::getDisplayCountries()` -> `Intl::getRegionBundle()->getCountryNames()`
     * `Locale::getCountries()` -> `array_keys(Intl::getRegionBundle()->getCountryNames())`
     * `Locale::getDisplayLanguages()` -> `Intl::getLanguageBundle()->getLanguageNames()`
@@ -321,6 +372,10 @@ UPGRADE FROM 2.x to 3.0
    $route->setMethods(array('POST', 'PUT'));
    $route->setSchemes('https');
    ```
+
+### Security
+
+ * The `Resources/` directory was moved to `Core/Resources/`
 
 ### Translator
 
@@ -413,6 +468,64 @@ UPGRADE FROM 2.x to 3.0
     * })
     */
    private $property;
+   ```
+
+ * The option "methods" of the `Callback` constraint was removed. You should
+   use the option "callback" instead. If you have multiple callbacks, add
+   multiple callback constraints instead.
+
+   Before (YAML):
+
+   ```
+   constraints:
+     - Callback: [firstCallback, secondCallback]
+   ```
+
+   After (YAML):
+
+   ```
+   constraints:
+     - Callback: firstCallback
+     - Callback: secondCallback
+   ```
+
+   When using annotations, you can now put the Callback constraint directly on
+   the method that should be executed.
+
+   Before (Annotations):
+
+   ```
+   use Symfony\Component\Validator\Constraints as Assert;
+   use Symfony\Component\Validator\ExecutionContextInterface;
+
+   /**
+    * @Assert\Callback({"callback"})
+    */
+   class MyClass
+   {
+       public function callback(ExecutionContextInterface $context)
+       {
+           // ...
+       }
+   }
+   ```
+
+   After (Annotations):
+
+   ```
+   use Symfony\Component\Validator\Constraints as Assert;
+   use Symfony\Component\Validator\ExecutionContextInterface;
+
+   class MyClass
+   {
+       /**
+        * @Assert\Callback
+        */
+       public function callback(ExecutionContextInterface $context)
+       {
+           // ...
+       }
+   }
    ```
 
 ### Yaml

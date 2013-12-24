@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
@@ -29,6 +30,9 @@ use Symfony\Component\Config\FileLocator;
  */
 class FrameworkExtension extends Extension
 {
+    private $formConfigEnabled = false;
+    private $sessionConfigEnabled = false;
+
     /**
      * Responds to the app.config configuration parameter.
      *
@@ -48,17 +52,22 @@ class FrameworkExtension extends Extension
         // will be used and everything will still work as expected.
         $loader->load('translation.xml');
 
+        // Property access is used by both the Form and the Validator component
+        $loader->load('property_access.xml');
+
         $loader->load('debug_prod.xml');
 
         if ($container->getParameter('kernel.debug')) {
             $loader->load('debug.xml');
 
-            // only HttpKernel needs the debug event dispatcher
             $definition = $container->findDefinition('http_kernel');
-            $arguments = $definition->getArguments();
-            $arguments[0] = new Reference('debug.event_dispatcher');
-            $arguments[2] = new Reference('debug.controller_resolver');
-            $definition->setArguments($arguments);
+            $definition->replaceArgument(2, new Reference('debug.controller_resolver'));
+
+            // replace the regular event_dispatcher service with the debug one
+            $definition = $container->findDefinition('event_dispatcher');
+            $definition->setPublic(false);
+            $container->setDefinition('debug.event_dispatcher.parent', $definition);
+            $container->setAlias('event_dispatcher', 'debug.event_dispatcher');
         }
 
         $configuration = $this->getConfiguration($configs, $container);
@@ -78,6 +87,7 @@ class FrameworkExtension extends Extension
         }
 
         if (isset($config['session'])) {
+            $this->sessionConfigEnabled = true;
             $this->registerSessionConfiguration($config['session'], $container, $loader);
         }
 
@@ -85,10 +95,19 @@ class FrameworkExtension extends Extension
             $this->registerRequestConfiguration($config['request'], $container, $loader);
         }
 
+        $loader->load('security.xml');
+
         if ($this->isConfigEnabled($container, $config['form'])) {
+            $this->formConfigEnabled = true;
             $this->registerFormConfiguration($config, $container, $loader);
             $config['validation']['enabled'] = true;
+
+            if ($this->isConfigEnabled($container, $config['form']['csrf_protection'])) {
+                $config['csrf_protection']['enabled'] = true;
+            }
         }
+
+        $this->registerSecurityCsrfConfiguration($config['csrf_protection'], $container, $loader);
 
         if (isset($config['templating'])) {
             $this->registerTemplatingConfiguration($config['templating'], $config['ide'], $container, $loader);
@@ -147,17 +166,20 @@ class FrameworkExtension extends Extension
     private function registerFormConfiguration($config, ContainerBuilder $container, XmlFileLoader $loader)
     {
         $loader->load('form.xml');
-        if ($this->isConfigEnabled($container, $config['csrf_protection'])) {
-            if (!isset($config['session'])) {
-                throw new \LogicException('CSRF protection needs that sessions are enabled.');
-            }
-            if (!isset($config['secret'])) {
-                throw new \LogicException('CSRF protection needs a secret to be set.');
-            }
+        if (null === $config['form']['csrf_protection']['enabled']) {
+            $config['form']['csrf_protection']['enabled'] = $config['csrf_protection']['enabled'];
+        }
+
+        if ($this->isConfigEnabled($container, $config['form']['csrf_protection'])) {
             $loader->load('form_csrf.xml');
 
             $container->setParameter('form.type_extension.csrf.enabled', true);
-            $container->setParameter('form.type_extension.csrf.field_name', $config['csrf_protection']['field_name']);
+
+            if (null !== $config['form']['csrf_protection']['field_name']) {
+                $container->setParameter('form.type_extension.csrf.field_name', $config['form']['csrf_protection']['field_name']);
+            } else {
+                $container->setParameter('form.type_extension.csrf.field_name', $config['csrf_protection']['field_name']);
+            }
         } else {
             $container->setParameter('form.type_extension.csrf.enabled', false);
         }
@@ -212,6 +234,10 @@ class FrameworkExtension extends Extension
             $container->setParameter('data_collector.templates', array());
 
             return;
+        }
+
+        if (true === $this->formConfigEnabled) {
+            $loader->load('form_debug.xml');
         }
 
         $loader->load('profiling.xml');
@@ -324,12 +350,19 @@ class FrameworkExtension extends Extension
         $container->setParameter('session.storage.options', $options);
 
         // session handler (the internal callback registered with PHP session management)
-        if (null == $config['handler_id']) {
+        if (null === $config['handler_id']) {
             // Set the handler class to be null
             $container->getDefinition('session.storage.native')->replaceArgument(1, null);
             $container->getDefinition('session.storage.php_bridge')->replaceArgument(0, null);
         } else {
-            $container->setAlias('session.handler', $config['handler_id']);
+            $handlerId = $config['handler_id'];
+
+            if ($config['metadata_update_threshold'] > 0) {
+                $container->getDefinition('session.handler.write_check')->addArgument(new Reference($handlerId));
+                $handlerId = 'session.handler.write_check';
+            }
+
+            $container->setAlias('session.handler', $handlerId);
         }
 
         $container->setParameter('session.save_path', $config['save_path']);
@@ -349,6 +382,8 @@ class FrameworkExtension extends Extension
                 $container->findDefinition('session.storage')->getClass(),
             ));
         }
+
+        $container->setParameter('session.metadata.update_threshold', $config['metadata_update_threshold']);
     }
 
     /**
@@ -390,6 +425,15 @@ class FrameworkExtension extends Extension
 
         if ($container->getParameter('kernel.debug')) {
             $loader->load('templating_debug.xml');
+
+            $logger = new Reference('logger', ContainerInterface::IGNORE_ON_INVALID_REFERENCE);
+
+            $container->getDefinition('templating.loader.cache')
+                ->addTag('monolog.logger', array('channel' => 'templating'))
+                ->addMethodCall('setLogger', array($logger));
+            $container->getDefinition('templating.loader.chain')
+                ->addTag('monolog.logger', array('channel' => 'templating'))
+                ->addMethodCall('setLogger', array($logger));
 
             $container->setDefinition('templating.engine.php', $container->findDefinition('debug.templating.engine.php'));
             $container->setAlias('debug.templating.engine.php', 'templating.engine.php');
@@ -575,7 +619,7 @@ class FrameworkExtension extends Extension
         if (class_exists('Symfony\Component\Security\Core\Exception\AuthenticationException')) {
             $r = new \ReflectionClass('Symfony\Component\Security\Core\Exception\AuthenticationException');
 
-            $dirs[] = dirname($r->getFilename()).'/../../Resources/translations';
+            $dirs[] = dirname($r->getFilename()).'/../Resources/translations';
         }
         $overridePath = $container->getParameter('kernel.root_dir').'/Resources/%s/translations';
         foreach ($container->getParameter('kernel.bundles') as $bundle => $class) {
@@ -650,9 +694,13 @@ class FrameworkExtension extends Extension
 
     private function getValidatorXmlMappingFiles(ContainerBuilder $container)
     {
-        $reflClass = new \ReflectionClass('Symfony\Component\Form\FormInterface');
-        $files = array(dirname($reflClass->getFileName()).'/Resources/config/validation.xml');
-        $container->addResource(new FileResource($files[0]));
+        $files = array();
+
+        if (interface_exists('Symfony\Component\Form\FormInterface')) {
+            $reflClass = new \ReflectionClass('Symfony\Component\Form\FormInterface');
+            $files[] = dirname($reflClass->getFileName()).'/Resources/config/validation.xml';
+            $container->addResource(new FileResource($files[0]));
+        }
 
         foreach ($container->getParameter('kernel.bundles') as $bundle) {
             $reflection = new \ReflectionClass($bundle);
@@ -680,7 +728,7 @@ class FrameworkExtension extends Extension
         return $files;
     }
 
-    private function registerAnnotationsConfiguration(array $config, ContainerBuilder $container,$loader)
+    private function registerAnnotationsConfiguration(array $config, ContainerBuilder $container, $loader)
     {
         $loader->load('annotations.xml');
 
@@ -704,6 +752,29 @@ class FrameworkExtension extends Extension
             ;
             $container->setAlias('annotation_reader', 'annotations.cached_reader');
         }
+    }
+
+    /**
+     * Loads the security configuration.
+     *
+     * @param array            $config    A CSRF configuration array
+     * @param ContainerBuilder $container A ContainerBuilder instance
+     * @param XmlFileLoader    $loader    An XmlFileLoader instance
+     *
+     * @throws \LogicException
+     */
+    private function registerSecurityCsrfConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    {
+        if (!$this->isConfigEnabled($container, $config)) {
+            return;
+        }
+
+        if (!$this->sessionConfigEnabled) {
+            throw new \LogicException('CSRF protection needs sessions to be enabled.');
+        }
+
+        // Enable services for CSRF protection (even without forms)
+        $loader->load('security_csrf.xml');
     }
 
     /**

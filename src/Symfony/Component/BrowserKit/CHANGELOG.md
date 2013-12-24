@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.5.0
+-----
+
+ * the CookieJar instance is now also cloned when cloning a Client instance
+
 2.3.0
 -----
 

@@ -526,4 +526,11 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $client->setServerParameter('HTTP_USER_AGENT', 'testua');
         $this->assertEquals('testua', $client->getServerParameter('HTTP_USER_AGENT'));
     }
+
+    public function testCloneClientWithCookieJar()
+    {
+        $client1 = new TestClient(array(), null, new CookieJar());
+        $client2 = clone $client1;
+        $this->assertNotSame($client1->getCookieJar(), $client2->getCookieJar(), 'Clone CookieJar too');
+    }
 }

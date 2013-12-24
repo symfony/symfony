@@ -45,29 +45,42 @@
         padding: 0;
         width: 100%;
     }
-    .tree a {
-        text-decoration: none;
-        display: block;
+    .tree .tree-inner {
+        width:100%;
         padding: 5px 7px;
         border-radius: 6px;
         color: #313131;
+        cursor:pointer;
+
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
     }
-    .tree ul ul a {
+    .tree a {
+        text-decoration: none;
+    }
+    .tree button {
+        width:10px;
+        height:10px;
+        background: none;
+        border: none;
+    }
+    .tree ul ul .tree-inner {
         padding-left: 22px;
     }
-    .tree ul ul ul a {
+    .tree ul ul ul .tree-inner {
         padding-left: 37px;
     }
-    .tree ul ul ul ul a {
+    .tree ul ul ul ul .tree-inner {
         padding-left: 52px;
     }
-    .tree ul ul ul ul ul a {
+    .tree ul ul ul ul ul .tree-inner {
         padding-left: 67px;
     }
-    .tree a:hover {
+    .tree .tree-inner:hover {
         background: #dfdfdf;
     }
-    .tree a.active, a.active:hover {
+    .tree .tree-inner.active, .tree .tree-inner.active:hover {
         background: #dfdfdf;
         font-weight: bold;
         color: #313131;
@@ -107,12 +120,63 @@
     {% endif %}
 
     <script>
+    function TreeView(tree) {
+        this.collapseAll = function () {
+            var children = tree.querySelectorAll('ul');
+
+            for (var i = 0, l = children.length; i < l; i++) {
+                if (children[i].style.display != 'none') {
+                    children[i].style.display = 'none';
+                } else {
+                    children[i].style.display = 'block';
+                }
+            }
+        };
+
+        this.expand = function (element) {
+            element.style.display = 'block';
+        };
+
+        this.collapse = function (element) {
+            element.style.display = 'none';
+        };
+
+        this.toggle = function (element) {
+            if (element.style.display !== 'none') {
+                this.collapse(element);
+
+                return 'collapse';
+            }
+
+            this.expand(element);
+
+            return 'expand';
+        }
+    }
+
+    var tree = document.querySelector('.tree ul');
+
+    var treeView = new TreeView(tree);
+    treeView.collapseAll();
+    treeView.expand(document.querySelector('.tree ul ul'));
+
+    var buttons = tree.querySelectorAll('button');
+    for (var j = 0, l = buttons.length; j < l; j++) {
+        buttons[j].addEventListener('click', function (e) {
+            if ('collapse' === treeView.toggle(this.parentElement.parentElement.querySelector('ul'))) {
+                this.textContent = '+';
+            } else {
+                this.textContent = '-';
+            }
+        }, false);
+    }
+
     function TabView() {
         var _activeLink = null,
             _activeView = null;
 
         this.init = function () {
-            var links = document.querySelectorAll('.tree a'),
+            var links = document.querySelectorAll('.tree .tree-inner'),
                 views = document.querySelectorAll('.tree-details'),
                 i,
                 l;
@@ -122,8 +186,7 @@
                     var link = links[i];
 
                     link.addEventListener('click', function (e) {
-                        var href = link.getAttribute('href'),
-                            targetId = href.substr(href.indexOf('#') + 1),
+                        var targetId = 'details_' + link.dataset.targetId,
                             view = document.getElementById(targetId);
 
                         if (view) {
@@ -173,7 +236,12 @@
 
 {% macro form_tree_entry(name, data) %}
     <li>
-        <a href="#details_{{ data.id }}">{{ name }}</a>
+        <div class="tree-inner" data-target-id="{{ data.id }}">
+            {% if data.children is not empty %}
+                <button>+</button>
+            {% endif %}
+            {{ name }}
+        </div>
 
         {% if data.children is not empty %}
             <ul>

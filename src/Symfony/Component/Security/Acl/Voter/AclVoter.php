@@ -59,26 +59,18 @@ class AclVoter implements VoterInterface
             }
 
             if (null === $object) {
-                if (null !== $this->logger) {
-                    $this->logger->debug(sprintf('Object identity unavailable. Voting to %s', $this->allowIfObjectIdentityUnavailable? 'grant access' : 'abstain'));
-                }
+                return $this->voteObjectIdentityUnavailable();
+            }
 
-                return $this->allowIfObjectIdentityUnavailable ? self::ACCESS_GRANTED : self::ACCESS_ABSTAIN;
-            } elseif ($object instanceof FieldVote) {
+            if ($object instanceof FieldVote) {
                 $field = $object->getField();
                 $object = $object->getDomainObject();
             } else {
                 $field = null;
             }
 
-            if ($object instanceof ObjectIdentityInterface) {
-                $oid = $object;
-            } elseif (null === $oid = $this->objectIdentityRetrievalStrategy->getObjectIdentity($object)) {
-                if (null !== $this->logger) {
-                    $this->logger->debug(sprintf('Object identity unavailable. Voting to %s', $this->allowIfObjectIdentityUnavailable? 'grant access' : 'abstain'));
-                }
-
-                return $this->allowIfObjectIdentityUnavailable ? self::ACCESS_GRANTED : self::ACCESS_ABSTAIN;
+            if (null === $oid = $this->getObjectOid($object)) {
+                return $this->voteObjectIdentityUnavailable();
             }
 
             if (!$this->supportsClass($oid->getType())) {
@@ -96,7 +88,9 @@ class AclVoter implements VoterInterface
                     }
 
                     return self::ACCESS_GRANTED;
-                } elseif (null !== $field && $acl->isFieldGranted($field, $masks, $sids, false)) {
+                }
+
+                if (null !== $field && $acl->isFieldGranted($field, $masks, $sids, false)) {
                     if (null !== $this->logger) {
                         $this->logger->debug('ACL found, permission granted. Voting to grant access');
                     }
@@ -139,5 +133,35 @@ class AclVoter implements VoterInterface
     public function supportsClass($class)
     {
         return true;
+    }
+
+    /**
+     * Get vote for object with no identity
+     *
+     * @return integer
+     */
+    private function voteObjectIdentityUnavailable()
+    {
+        if (null !== $this->logger) {
+            $this->logger->debug(sprintf('Object identity unavailable. Voting to %s', $this->allowIfObjectIdentityUnavailable ? 'grant access' : 'abstain'));
+        }
+
+        return $this->allowIfObjectIdentityUnavailable ? self::ACCESS_GRANTED : self::ACCESS_ABSTAIN;
+    }
+
+    /**
+     * Retrieve the oid for an object
+     *
+     * @param mixed $object
+     *
+     * @return ObjectIdentityInterface
+     */
+    private function getObjectOid($object)
+    {
+        if ($object instanceof ObjectIdentityInterface) {
+            return $object;
+        }
+
+        return $this->objectIdentityRetrievalStrategy->getObjectIdentity($object);
     }
 }

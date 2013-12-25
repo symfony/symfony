@@ -126,6 +126,24 @@ class AclVoterTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($vote, $voter->vote($this->getToken(), new \stdClass(), array('VIEW')));
     }
 
+    public function testVoteWhenAttributesIsEmpty()
+    {
+        list($voter,, $permissionMap,,) = $this->getVoter();
+        $permissionMap
+            ->expects($this->any())
+            ->method('getMasks')
+            ->will($this->returnValue(null));
+
+        $object = $this->getMock('Symfony\Component\Security\Acl\Model\ObjectIdentityInterface');
+
+        $object
+            ->expects($this->any())
+            ->method('getType')
+            ->will($this->returnValue(null));
+
+        $this->assertSame(VoterInterface::ACCESS_ABSTAIN, $voter->vote($this->getToken(), $object, array()));
+    }
+
     public function getTrueFalseTests()
     {
         return array(array(true), array(false));

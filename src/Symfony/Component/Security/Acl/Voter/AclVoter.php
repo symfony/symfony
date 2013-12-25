@@ -36,6 +36,14 @@ class AclVoter implements VoterInterface
     private $allowIfObjectIdentityUnavailable;
     private $logger;
 
+    /**
+     * @param AclProviderInterface                       $aclProvider
+     * @param ObjectIdentityRetrievalStrategyInterface   $oidRetrievalStrategy
+     * @param SecurityIdentityRetrievalStrategyInterface $sidRetrievalStrategy
+     * @param PermissionMapInterface                     $permissionMap
+     * @param LoggerInterface|null                       $logger
+     * @param Boolean                                    $allowIfObjectIdentityUnavailable
+     */
     public function __construct(AclProviderInterface $aclProvider, ObjectIdentityRetrievalStrategyInterface $oidRetrievalStrategy, SecurityIdentityRetrievalStrategyInterface $sidRetrievalStrategy, PermissionMapInterface $permissionMap, LoggerInterface $logger = null, $allowIfObjectIdentityUnavailable = true)
     {
         $this->aclProvider = $aclProvider;
@@ -53,72 +61,58 @@ class AclVoter implements VoterInterface
 
     public function vote(TokenInterface $token, $object, array $attributes)
     {
-        foreach ($attributes as $attribute) {
-            if (null === $masks = $this->permissionMap->getMasks($attribute, $object)) {
-                continue;
-            }
+        if (null === $attributesMasks = $this->getAttributesMasks($attributes, $object)) {
+            return self::ACCESS_ABSTAIN;
+        }
 
-            if (null === $object) {
-                if (null !== $this->logger) {
-                    $this->logger->debug(sprintf('Object identity unavailable. Voting to %s', $this->allowIfObjectIdentityUnavailable? 'grant access' : 'abstain'));
-                }
+        if (null === $object) {
+            return $this->voteObjectIdentityUnavailable();
+        }
 
-                return $this->allowIfObjectIdentityUnavailable ? self::ACCESS_GRANTED : self::ACCESS_ABSTAIN;
-            } elseif ($object instanceof FieldVote) {
-                $field = $object->getField();
-                $object = $object->getDomainObject();
-            } else {
-                $field = null;
-            }
+        if ($object instanceof FieldVote) {
+            $field = $object->getField();
+            $object = $object->getDomainObject();
+        } else {
+            $field = null;
+        }
 
-            if ($object instanceof ObjectIdentityInterface) {
-                $oid = $object;
-            } elseif (null === $oid = $this->objectIdentityRetrievalStrategy->getObjectIdentity($object)) {
-                if (null !== $this->logger) {
-                    $this->logger->debug(sprintf('Object identity unavailable. Voting to %s', $this->allowIfObjectIdentityUnavailable? 'grant access' : 'abstain'));
-                }
+        if ($object instanceof ObjectIdentityInterface) {
+            $oid = $object;
+        } elseif (null === $oid = $this->objectIdentityRetrievalStrategy->getObjectIdentity($object)) {
+            return $this->voteObjectIdentityUnavailable();
+        }
 
-                return $this->allowIfObjectIdentityUnavailable ? self::ACCESS_GRANTED : self::ACCESS_ABSTAIN;
-            }
+        if (!$this->supportsClass($oid->getType())) {
+            return self::ACCESS_ABSTAIN;
+        }
 
-            if (!$this->supportsClass($oid->getType())) {
-                return self::ACCESS_ABSTAIN;
-            }
+        $sids = $this->securityIdentityRetrievalStrategy->getSecurityIdentities($token);
 
-            $sids = $this->securityIdentityRetrievalStrategy->getSecurityIdentities($token);
-
+        foreach ($attributesMasks as $masks) {
             try {
                 $acl = $this->aclProvider->findAcl($oid, $sids);
 
                 if (null === $field && $acl->isGranted($masks, $sids, false)) {
-                    if (null !== $this->logger) {
-                        $this->logger->debug('ACL found, permission granted. Voting to grant access');
-                    }
-
-                    return self::ACCESS_GRANTED;
-                } elseif (null !== $field && $acl->isFieldGranted($field, $masks, $sids, false)) {
-                    if (null !== $this->logger) {
-                        $this->logger->debug('ACL found, permission granted. Voting to grant access');
-                    }
+                    $this->logDebug('ACL found, permission granted. Voting to grant access');
 
                     return self::ACCESS_GRANTED;
                 }
 
-                if (null !== $this->logger) {
-                    $this->logger->debug('ACL found, insufficient permissions. Voting to deny access.');
+                if (null !== $field && $acl->isFieldGranted($field, $masks, $sids, false)) {
+                    $this->logDebug('ACL found, permission granted. Voting to grant access');
+
+                    return self::ACCESS_GRANTED;
                 }
+
+                $this->logDebug('ACL found, insufficient permissions. Voting to deny access.');
 
                 return self::ACCESS_DENIED;
             } catch (AclNotFoundException $noAcl) {
-                if (null !== $this->logger) {
-                    $this->logger->debug('No ACL found for the object identity. Voting to deny access.');
-                }
+                $this->logDebug('No ACL found for the object identity. Voting to deny access.');
 
                 return self::ACCESS_DENIED;
             } catch (NoAceFoundException $noAce) {
-                if (null !== $this->logger) {
-                    $this->logger->debug('ACL found, no ACE applicable. Voting to deny access.');
-                }
+                $this->logDebug('ACL found, no ACE applicable. Voting to deny access.');
 
                 return self::ACCESS_DENIED;
             }
@@ -139,5 +133,51 @@ class AclVoter implements VoterInterface
     public function supportsClass($class)
     {
         return true;
+    }
+
+    /**
+     * Log debug message if logger defined
+     *
+     * @param string $message
+     * @param array  $context
+     */
+    private function logDebug($message, array $context = array())
+    {
+        if (null !== $this->logger) {
+            $this->logger->debug($message, $context);
+        }
+    }
+
+    /**
+     * Get vote for object with no identity
+     *
+     * @return integer
+     */
+    private function voteObjectIdentityUnavailable()
+    {
+        $this->logDebug(sprintf('Object identity unavailable. Voting to %s', $this->allowIfObjectIdentityUnavailable ? 'grant access' : 'abstain'));
+
+        return $this->allowIfObjectIdentityUnavailable ? self::ACCESS_GRANTED : self::ACCESS_ABSTAIN;
+    }
+
+    /**
+     * Retrieve array containing the masks for all attributes
+     *
+     * @param array $attributes
+     * @param       $object
+     *
+     * @return array|null
+     */
+    private function getAttributesMasks(array $attributes, $object)
+    {
+        $attributesMasks = null;
+
+        foreach ($attributes as $attribute) {
+            if (null !== $masks = $this->permissionMap->getMasks($attribute, $object)) {
+                $attributesMasks[] = $masks;
+            }
+        }
+
+        return $attributesMasks;
     }
 }

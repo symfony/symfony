@@ -225,7 +225,7 @@ class Inline
             } else {
                 throw new ParseException(sprintf('Malformed inline YAML string (%s).', $scalar));
             }
-            
+
             $output = $evaluate ? self::evaluateScalar($output) : $output;
         }
 
@@ -245,7 +245,7 @@ class Inline
     private static function parseQuotedScalar($scalar, &$i)
     {
         $match = array();
-        
+
         if (!preg_match('/'.self::REGEX_QUOTED_STRING.'/Au', substr($scalar, $i), $match)) {
             throw new ParseException(sprintf('Malformed inline YAML string (%s).', substr($scalar, $i)));
         }
@@ -313,7 +313,7 @@ class Inline
 
                     --$i;
             }
-            
+
             ++$i;
         }
 
@@ -372,7 +372,7 @@ class Inline
                         $done = true;
                         --$i;
                 }
-                
+
                 ++$i;
 
                 if ($done) {

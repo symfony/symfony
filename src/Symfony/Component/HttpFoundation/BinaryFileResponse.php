@@ -216,15 +216,18 @@ class BinaryFileResponse extends Response
                     $start = (int) $start;
                 }
 
-                $start = max($start, 0);
-                $end = min($end, $fileSize - 1);
+                if ($start <= $end) {
+                    if ($start < 0 || $end > $fileSize - 1) {
+                        $this->setStatusCode(416);
+                    } elseif ($start !== 0 || $end !== $fileSize - 1) {
+                        $this->maxlen = $end < $fileSize ? $end - $start + 1 : -1;
+                        $this->offset = $start;
 
-                $this->maxlen = $end < $fileSize ? $end - $start + 1 : -1;
-                $this->offset = $start;
-
-                $this->setStatusCode(206);
-                $this->headers->set('Content-Range', sprintf('bytes %s-%s/%s', $start, $end, $fileSize));
-                $this->headers->set('Content-Length', $end - $start + 1);
+                        $this->setStatusCode(206);
+                        $this->headers->set('Content-Range', sprintf('bytes %s-%s/%s', $start, $end, $fileSize));
+                        $this->headers->set('Content-Length', $end - $start + 1);
+                    }
+                }
             }
         }
 

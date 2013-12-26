@@ -55,7 +55,25 @@ class CookieJar
         $this->flushExpiredCookies();
 
         if (!empty($domain)) {
-            return isset($this->cookieJar[$domain][$path][$name]) ? $this->cookieJar[$domain][$path][$name] : null;
+            foreach ($this->cookieJar as $cookieDomain => $pathCookies) {
+                if ($cookieDomain) {
+                    $cookieDomain = '.'.ltrim($cookieDomain, '.');
+                    if ($cookieDomain != substr('.'.$domain, -strlen($cookieDomain))) {
+                        continue;
+                    }
+                }
+
+                foreach ($pathCookies as $cookiePath => $namedCookies) {
+                    if ($cookiePath != substr($path, 0, strlen($cookiePath))) {
+                        continue;
+                    }
+                    if (isset($namedCookies[$name])) {
+                        return $namedCookies[$name];
+                    }
+                }
+            }
+
+            return null;
         }
 
         // avoid relying on this behavior that is mainly here for BC reasons

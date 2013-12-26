@@ -52,7 +52,7 @@ class Filesystem
         if ($doCopy) {
             // https://bugs.php.net/bug.php?id=64634
             $source = fopen($originFile, 'r');
-            $target = fopen($targetFile, 'w+');
+            $target = fopen($targetFile, 'w');
             stream_copy_to_stream($source, $target);
             fclose($source);
             fclose($target);

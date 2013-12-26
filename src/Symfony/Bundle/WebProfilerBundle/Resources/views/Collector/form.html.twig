@@ -59,7 +59,7 @@
     .tree a {
         text-decoration: none;
     }
-    .tree button {
+    .tree .toggle-button {
         width:10px;
         height:10px;
         background: none;
@@ -142,15 +142,20 @@
         };
 
         this.toggle = function (element) {
-            if (element.style.display !== 'none') {
-                this.collapse(element);
+            var r;
 
-                return 'collapse';
+            if (element.style.display !== 'none') {
+             //   this.collapse(element);
+
+                r = 'collapse';
+            } else {
+            //    this.expand(element);
             }
 
-            this.expand(element);
+            var imgs = element.parentElement.getElementsByTagName('img');
+            Sfjs.toggle(element, imgs[0], imgs[1]);
 
-            return 'expand';
+            return r || 'expand';
         }
     }
 
@@ -160,7 +165,7 @@
     treeView.collapseAll();
     treeView.expand(document.querySelector('.tree ul ul'));
 
-    var buttons = tree.querySelectorAll('button');
+    var buttons = tree.querySelectorAll('.toggle-button');
     for (var j = 0, l = buttons.length; j < l; j++) {
         buttons[j].addEventListener('click', function (e) {
             if ('collapse' === treeView.toggle(this.parentElement.parentElement.querySelector('ul'))) {
@@ -238,7 +243,10 @@
     <li>
         <div class="tree-inner" data-target-id="{{ data.id }}">
             {% if data.children is not empty %}
-                <button>+</button>
+                <img class="toggle-button" style="display:inline;" src="{{ asset('bundles/framework/images/blue_picto_more.gif') }}">
+                <img class="toggle-button" style="display:none;" src="{{ asset('bundles/framework/images/blue_picto_less.gif') }}">
+            {% else %}
+                <img class="toggle-button" src="{{ asset('bundles/framework/images/blue_picto_full.gif') }}">
             {% endif %}
             {{ name }}
         </div>

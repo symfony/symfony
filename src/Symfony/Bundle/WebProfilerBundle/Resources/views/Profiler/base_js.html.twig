@@ -86,7 +86,7 @@
                 var i,
                     style,
                     tmp = elOn.style.display,
-                    el = document.getElementById(selector);
+                    el = selector.nodeName ? selector : document.getElementById(selector);
 
                 elOn.style.display = elOff.style.display;
                 elOff.style.display = tmp;

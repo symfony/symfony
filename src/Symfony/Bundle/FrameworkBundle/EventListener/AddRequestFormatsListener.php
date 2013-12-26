@@ -36,7 +36,7 @@ class AddRequestFormatsListener implements EventSubscriberInterface
     }
 
     /**
-     * Set additionnal request formats
+     * Set additional request formats
      *
      * @param GetResponseEvent $event
      */

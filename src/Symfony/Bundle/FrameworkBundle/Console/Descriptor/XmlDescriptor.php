@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Bundle\FrameworkBundle\Console\Descriptor;
 
 use Symfony\Component\DependencyInjection\Alias;
@@ -293,9 +302,25 @@ class XmlDescriptor extends Descriptor
         }
 
         $serviceXML->setAttribute('class', $definition->getClass());
+
+        if ($definition->getFactoryClass()) {
+            $serviceXML->setAttribute('factory-class', $definition->getFactoryClass());
+        }
+
+        if ($definition->getFactoryService()) {
+            $serviceXML->setAttribute('factory-service', $definition->getFactoryService());
+        }
+
+        if ($definition->getFactoryMethod()) {
+            $serviceXML->setAttribute('factory-method', $definition->getFactoryMethod());
+        }
+
         $serviceXML->setAttribute('scope', $definition->getScope());
         $serviceXML->setAttribute('public', $definition->isPublic() ? 'true' : 'false');
         $serviceXML->setAttribute('synthetic', $definition->isSynthetic() ? 'true' : 'false');
+        $serviceXML->setAttribute('lazy', $definition->isLazy() ? 'true' : 'false');
+        $serviceXML->setAttribute('synchronized', $definition->isSynchronized() ? 'true' : 'false');
+        $serviceXML->setAttribute('abstract', $definition->isAbstract() ? 'true' : 'false');
         $serviceXML->setAttribute('file', $definition->getFile());
 
         if (!$omitTags) {
@@ -310,7 +335,7 @@ class XmlDescriptor extends Descriptor
                         foreach ($parameters as $name => $value) {
                             $tagXML->appendChild($parameterXML = $dom->createElement('parameter'));
                             $parameterXML->setAttribute('name', $name);
-                            $parameterXML->textContent = $value;
+                            $parameterXML->appendChild(new \DOMText($this->formatParameter($value)));
                         }
                     }
                 }

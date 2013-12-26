@@ -205,12 +205,10 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
         }
 
         // check HTTP scheme requirement
-        $scheme = $route->getRequirement('_scheme');
-        if ($scheme && $scheme !== $this->context->getScheme()) {
-            return array(self::REQUIREMENT_MISMATCH, null);
-        }
+        $scheme = $this->context->getScheme();
+        $status = $route->getSchemes() && !$route->hasScheme($scheme) ? self::REQUIREMENT_MISMATCH : self::REQUIREMENT_MATCH;
 
-        return array(self::REQUIREMENT_MATCH, null);
+        return array($status, null);
     }
 
     /**

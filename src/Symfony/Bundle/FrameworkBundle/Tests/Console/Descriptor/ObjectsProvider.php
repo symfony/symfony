@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor;
 
 use Symfony\Component\DependencyInjection\Alias;
@@ -74,14 +83,24 @@ class ObjectsProvider
         return array(
             'definition_1' => $definition1
                 ->setPublic(true)
-                ->setSynthetic(false),
+                ->setSynthetic(false)
+                ->setLazy(true)
+                ->setSynchronized(true)
+                ->setAbstract(true)
+                ->setFactoryClass('Full\\Qualified\\FactoryClass')
+                ->setFactoryMethod('get'),
             'definition_2' => $definition2
                 ->setPublic(false)
                 ->setSynthetic(true)
                 ->setFile('/path/to/file')
+                ->setLazy(false)
+                ->setSynchronized(false)
+                ->setAbstract(false)
                 ->addTag('tag1', array('attr1' => 'val1', 'attr2' => 'val2'))
                 ->addTag('tag1', array('attr3' => 'val3'))
-                ->addTag('tag2'),
+                ->addTag('tag2')
+                ->setFactoryService('factory.service')
+                ->setFactoryMethod('get'),
         );
     }
 

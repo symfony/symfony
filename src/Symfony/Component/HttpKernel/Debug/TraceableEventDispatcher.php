@@ -36,6 +36,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
     private $wrappedListeners = array();
     private $firstCalledEvent = array();
     private $id;
+    private $lastEventId = 0;
 
     /**
      * Constructor.
@@ -123,7 +124,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
             $event = new Event();
         }
 
-        $this->id = spl_object_hash($event);
+        $this->id = $eventId = ++$this->lastEventId;
 
         $this->preDispatch($eventName, $event);
 
@@ -138,7 +139,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
         $this->dispatcher->dispatch($eventName, $event);
 
         // reset the id as another event might have been dispatched during the dispatching of this event
-        $this->id = spl_object_hash($event);
+        $this->id = $eventId;
 
         unset($this->firstCalledEvent[$eventName]);
 

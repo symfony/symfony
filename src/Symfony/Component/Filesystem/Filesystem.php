@@ -42,7 +42,11 @@ class Filesystem
         $this->mkdir(dirname($targetFile));
 
         if (!$override && is_file($targetFile)) {
-            $doCopy = filemtime($originFile) > filemtime($targetFile);
+            if (null !== parse_url($originFile, PHP_URL_HOST)) {
+                $doCopy = false;
+            } else {
+                $doCopy = filemtime($originFile) > filemtime($targetFile);
+            }
         } else {
             $doCopy = true;
         }

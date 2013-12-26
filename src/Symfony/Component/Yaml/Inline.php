@@ -472,8 +472,8 @@ EOF;
 
     /**
      * When the value in inline notation contains serialized php object it has
-     * not escaped commas and curly brackets. For that reason we need to know
-     * where this serialized object ends. Searching for } and , as delimiters
+     * not escaped commas and curly brackets. We need to know
+     * where this serialized object ends. Searching } and , as delimiters
      * was corrupting yaml structure.
      *
      * @param string $scalar

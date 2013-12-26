@@ -225,6 +225,7 @@ class Inline
             } else {
                 throw new ParseException(sprintf('Malformed inline YAML string (%s).', $scalar));
             }
+            
             $output = $evaluate ? self::evaluateScalar($output) : $output;
         }
 
@@ -244,6 +245,7 @@ class Inline
     private static function parseQuotedScalar($scalar, &$i)
     {
         $match = array();
+        
         if (!preg_match('/'.self::REGEX_QUOTED_STRING.'/Au', substr($scalar, $i), $match)) {
             throw new ParseException(sprintf('Malformed inline YAML string (%s).', substr($scalar, $i)));
         }
@@ -311,6 +313,7 @@ class Inline
 
                     --$i;
             }
+            
             ++$i;
         }
 
@@ -369,6 +372,7 @@ class Inline
                         $done = true;
                         --$i;
                 }
+                
                 ++$i;
 
                 if ($done) {
@@ -449,7 +453,7 @@ class Inline
      */
     private static function getTimestampRegex()
     {
-        return <<<EOF
+        return <<<'EOF'
         ~^
         (?P<year>[0-9][0-9][0-9][0-9])
         -(?P<month>[0-9][0-9]?)
@@ -471,11 +475,11 @@ EOF;
      * where this serialized object ends. Searching for } and , as delimiters
      * was corrupting yaml structure.
      *
-     * @param String $scalar
+     * @param string $scalar
      * @return integer Position where php/object ends
      * @throws ParseException
      */
-    public static function findEndOfPhpObject($scalar)
+    private static function findEndOfPhpObject($scalar)
     {
         $countOfBrackets = 0;
         for ($pos = 0, $length = strlen($scalar); $pos < $length; $pos++) {
@@ -483,8 +487,10 @@ EOF;
                 $countOfBrackets++;
             } elseif ('}' == $scalar[$pos]) {
                 $countOfBrackets--;
-                if (0 === $countOfBrackets)
+                
+                if (0 === $countOfBrackets) {
                     return $pos;
+                }
             }
         }
         throw new ParseException('php/object value malformed');

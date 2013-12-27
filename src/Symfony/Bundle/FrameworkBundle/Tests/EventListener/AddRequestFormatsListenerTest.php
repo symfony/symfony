@@ -52,7 +52,7 @@ class AddRequestFormatsListenerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testSetAdditionnalFormats()
+    public function testSetAdditionalFormats()
     {
         $request = $this->getRequestMock();
         $event = $this->getGetResponseEventMock($request);

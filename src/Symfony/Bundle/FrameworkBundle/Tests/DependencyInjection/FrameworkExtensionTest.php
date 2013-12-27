@@ -153,7 +153,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals(array('csv' => array('text/csv', 'text/plain'), 'pdf' => array('application/pdf')), $container->getParameter('request.additional_formats'));
     }
 
-    public function testEmptyAdditionlRequestFormats()
+    public function testEmptyAdditionalRequestFormats()
     {
         $container = $this->createContainerFromFile('request');
 

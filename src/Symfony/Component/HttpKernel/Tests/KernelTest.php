@@ -334,8 +334,8 @@ EOF;
 
         $output = Kernel::stripComments($source);
 
-        // Heredocs are preserved, making the output mixing unix and windows line
-        // endings, switching to "\n" everywhere on windows to avoid failure.
+        // Heredocs are preserved, making the output mixing Unix and Windows line
+        // endings, switching to "\n" everywhere on Windows to avoid failure.
         if (defined('PHP_WINDOWS_VERSION_MAJOR')) {
             $expected = str_replace("\r\n", "\n", $expected);
             $output = str_replace("\r\n", "\n", $output);

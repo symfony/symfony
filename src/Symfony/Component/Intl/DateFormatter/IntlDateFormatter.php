@@ -201,8 +201,8 @@ class IntlDateFormatter
         // intl allows timestamps to be passed as arrays - we don't
         if (is_array($timestamp)) {
             $message = version_compare(PHP_VERSION, '5.3.4', '>=') ?
-                'Only integer unix timestamps and DateTime objects are supported' :
-                'Only integer unix timestamps are supported';
+                'Only integer Unix timestamps and DateTime objects are supported' :
+                'Only integer Unix timestamps are supported';
 
             throw new MethodArgumentValueNotImplementedException(__METHOD__, 'timestamp', $timestamp, $message);
         }

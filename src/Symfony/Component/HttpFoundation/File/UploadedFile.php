@@ -303,7 +303,7 @@ class UploadedFile extends File
             UPLOAD_ERR_NO_FILE    => 'No file was uploaded.',
             UPLOAD_ERR_CANT_WRITE => 'The file "%s" could not be written on disk.',
             UPLOAD_ERR_NO_TMP_DIR => 'File could not be uploaded: missing temporary directory.',
-            UPLOAD_ERR_EXTENSION  => 'File upload was stopped by a php extension.',
+            UPLOAD_ERR_EXTENSION  => 'File upload was stopped by a PHP extension.',
         );
 
         $maxFilesize = $errorCode === UPLOAD_ERR_INI_SIZE ? self::getMaxFilesize() / 1024 : 0;

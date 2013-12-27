@@ -899,13 +899,12 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         );
     }
 
-    public function testDateTimeWithEmptyValueOnTime()
+    public function testDateTimeWithHourAndMinute()
     {
-        $data = array('year' => '2011', 'month' => '2', 'day' => '3', 'hour' => '', 'minute' => '');
+        $data = array('year' => '2011', 'month' => '2', 'day' => '3', 'hour' => '4', 'minute' => '5');
 
         $form = $this->factory->createNamed('name', 'datetime', $data, array(
             'input' => 'array',
-            'empty_value' => array('hour' => 'Change&Me', 'minute' => 'Change&Me'),
             'required' => false,
         ));
 
@@ -930,10 +929,10 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
             [
                 ./select
                     [@id="name_time_hour"]
-                    [./option[@value=""][not(@selected)][not(@disabled)][.="[trans]Change&Me[/trans]"]]
+                    [./option[@value="4"][@selected="selected"]]
                 /following-sibling::select
                     [@id="name_time_minute"]
-                    [./option[@value=""][not(@selected)][not(@disabled)][.="[trans]Change&Me[/trans]"]]
+                    [./option[@value="5"][@selected="selected"]]
             ]
     ]
     [count(.//select)=5]

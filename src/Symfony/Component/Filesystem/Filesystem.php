@@ -107,8 +107,8 @@ class Filesystem
      * Sets access and modification time of file.
      *
      * @param string|array|\Traversable $files A filename, an array of files, or a \Traversable instance to create
-     * @param integer                   $time  The touch time as a unix timestamp
-     * @param integer                   $atime The access time as a unix timestamp
+     * @param integer                   $time  The touch time as a Unix timestamp
+     * @param integer                   $atime The access time as a Unix timestamp
      *
      * @throws IOException When touch fails
      */

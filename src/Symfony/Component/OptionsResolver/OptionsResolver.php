@@ -54,6 +54,12 @@ class OptionsResolver implements OptionsResolverInterface
     private $allowedTypes = array();
 
     /**
+     * Whether to allow extra options.
+     * @var Boolean
+     */
+    private $allowExtraOptions = false;
+
+    /**
      * Creates a new instance.
      */
     public function __construct()
@@ -67,6 +73,16 @@ class OptionsResolver implements OptionsResolverInterface
     public function __clone()
     {
         $this->defaultOptions = clone $this->defaultOptions;
+    }
+
+    /**
+     * Enable/Disable extra options.
+     *
+     * @param Boolean $value
+     */
+    public function setAllowExtraOptions($value = true)
+    {
+        $this->allowExtraOptions = $value;
     }
 
     /**
@@ -216,7 +232,10 @@ class OptionsResolver implements OptionsResolverInterface
      */
     public function resolve(array $options = array())
     {
-        $this->validateOptionsExistence($options);
+        if (!$this->allowExtraOptions) {
+            $this->validateOptionsExistence($options);
+        }
+
         $this->validateOptionsCompleteness($options);
 
         // Make sure this method can be called multiple times

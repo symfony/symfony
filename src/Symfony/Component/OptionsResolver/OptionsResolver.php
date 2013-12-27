@@ -237,6 +237,16 @@ class OptionsResolver implements OptionsResolverInterface
     }
 
     /**
+     * Returns the known options.
+     *
+     * @return array
+     */
+    public function getOptions()
+    {
+        return $this->knownOptions;
+    }
+
+    /**
      * Validates that the given option names exist and throws an exception
      * otherwise.
      *

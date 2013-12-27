@@ -20,6 +20,7 @@ use Symfony\Component\Validator\DefaultTranslator;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\ConstraintValidatorFactory;
+use Symfony\Component\Validator\Constraints\Group;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
@@ -45,6 +46,45 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $this->metadataFactory = null;
         $this->validator = null;
+    }
+
+    /** @dataProvider provideGroups */
+    public function testValidateGroupConstraint(array $groups)
+    {
+        $entity = new Entity();
+        $metadata = new ClassMetadata(get_class($entity));
+        $metadata->addPropertyConstraint('firstName', new Group(array(
+            'groups' => 'GroupA',
+            'constraints' => array(new FailingConstraint(array(
+                'groups' => $groups,
+            ))),
+        )));
+        $metadata->addPropertyConstraint('lastName', new FailingConstraint(array(
+            'groups' => 'GroupB',
+        )));
+        $this->metadataFactory->addMetadata($metadata);
+
+        // Only the constraint of group "GroupA" failed
+        $violations = new ConstraintViolationList();
+        $violations->add(new ConstraintViolation(
+            'Failed',
+            'Failed',
+            array(),
+            $entity,
+            'firstName',
+            ''
+        ));
+
+        $this->assertEquals($violations, $this->validator->validate($entity, 'GroupA'));
+    }
+
+    public function provideGroups()
+    {
+        return array(
+            array(array()),
+            array(array('Default')),
+            array(array('GroupB')),
+        );
     }
 
     public function testValidateDefaultGroup()

@@ -105,8 +105,8 @@ class Filesystem
      * Sets access and modification time of file.
      *
      * @param string|array|\Traversable $files A filename, an array of files, or a \Traversable instance to create
-     * @param integer                   $time  The touch time as a unix timestamp
-     * @param integer                   $atime The access time as a unix timestamp
+     * @param integer                   $time  The touch time as a Unix timestamp
+     * @param integer                   $atime The access time as a Unix timestamp
      *
      * @throws IOException When touch fails
      */
@@ -306,7 +306,7 @@ class Filesystem
      */
     public function makePathRelative($endPath, $startPath)
     {
-        // Normalize separators on windows
+        // Normalize separators on Windows
         if (defined('PHP_WINDOWS_VERSION_MAJOR')) {
             $endPath = strtr($endPath, '\\', '/');
             $startPath = strtr($startPath, '\\', '/');

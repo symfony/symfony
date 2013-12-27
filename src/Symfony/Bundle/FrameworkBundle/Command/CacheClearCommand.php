@@ -84,7 +84,7 @@ EOF
 
             $filesystem->rename($realCacheDir, $oldCacheDir);
             if (defined('PHP_WINDOWS_VERSION_BUILD')) {
-                sleep(1);  // workaround for windows php rename bug
+                sleep(1);  // workaround for Windows PHP rename bug
             }
             $filesystem->rename($warmupDir, $realCacheDir);
         }

@@ -36,9 +36,9 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
             array('z', '33', '1970-02-03 00:00:00 UTC'),
 
             // not bijective
-            // this will not work as php will use actual date to replace missing info
+            // this will not work as PHP will use actual date to replace missing info
             // and after change of date will lookup for closest Wednesday
-            // i.e. value: 2010-02, php value: 2010-02-(today i.e. 20), parsed date: 2010-02-24
+            // i.e. value: 2010-02, PHP value: 2010-02-(today i.e. 20), parsed date: 2010-02-24
             //array('Y-m-D', '2010-02-Wed', '2010-02-03 00:00:00 UTC'),
             //array('Y-m-l', '2010-02-Wednesday', '2010-02-03 00:00:00 UTC'),
 
@@ -55,7 +55,7 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
             array('g:i:s a', '4:05:06 pm', '1970-01-01 16:05:06 UTC'),
             array('h:i:s a', '04:05:06 pm', '1970-01-01 16:05:06 UTC'),
 
-            // seconds since unix
+            // seconds since Unix
             array('U', '1265213106', '2010-02-03 16:05:06 UTC'),
         );
 

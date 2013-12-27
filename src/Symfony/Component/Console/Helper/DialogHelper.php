@@ -401,7 +401,7 @@ class DialogHelper extends Helper
     }
 
     /**
-     * Return a valid unix shell
+     * Return a valid Unix shell
      *
      * @return string|Boolean  The valid shell name, false in case no valid shell is found
      */

@@ -131,4 +131,20 @@ class RouterListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('GET', $context->getMethod());
     }
+
+    public function testContextGetsUpdatedWhenRequestChangesValue()
+    {
+        $request = Request::create('http://localhost/', 'post');
+        $context = new RequestContext();
+
+        $requestMatcher = $this->getMock('Symfony\Component\Routing\Matcher\RequestMatcherInterface');
+
+        $listener = new RouterListener($requestMatcher, $context);
+        $listener->setRequest($request);
+
+        $request->setMethod('GET');
+        $listener->setRequest($request);
+
+        $this->assertEquals('GET', $context->getMethod());
+    }
 }

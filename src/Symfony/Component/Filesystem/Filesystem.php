@@ -393,7 +393,7 @@ class Filesystem
                 }
             } else {
                 if (is_link($file)) {
-                    $this->symlink($file, $target);
+                    $this->symlink($file->getLinkTarget(), $target);
                 } elseif (is_dir($file)) {
                     $this->mkdir($target);
                 } elseif (is_file($file)) {

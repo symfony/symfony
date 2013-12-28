@@ -51,6 +51,8 @@ class FormErrorBagTest extends \Symfony\Component\Form\Tests\FormPerformanceTest
             $this->assertInstanceof('Symfony\Component\Form\FormError', $error);
             $this->assertEquals(next($messages), $error->getMessage());
         }
+
+        $this->assertFalse(next($messages), 'got all errors');
     }
 
     public function testCountingErrors()

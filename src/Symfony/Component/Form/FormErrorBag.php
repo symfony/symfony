@@ -89,6 +89,14 @@ class FormErrorBag implements \RecursiveIterator, \Countable, \ArrayAccess
 
     public function valid()
     {
+        while (current($this->errors) instanceof FormErrorBag) {
+            $this->next();
+
+            if (!$this->valid()) {
+                return false;
+            }
+        }
+
         return null !== key($this->errors);
     }
 

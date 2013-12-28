@@ -1,0 +1,61 @@
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-23T18:11:10Z
+
+:+1: nice and fast, yeah the only fail is because of the country `Burkina Faso` which is a valid name and not a typo
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-23T18:11:28Z
+
+I think the bot should run on the diff rather than on the whole file.
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-23T18:28:54Z
+
+Sorry but this will not cut it unless you implement a registry like this https://code.google.com/p/php-iban/source/browse/trunk/php-iban.php and implement all the edge cases to truly validate an iban number. This is almost on the same lines as the email validator, that it can get out of control pretty easily :baby: ready for the road @stewe ? :baby:
+
+---------------------------------------------------------------------------
+
+by stewe at 2013-12-23T18:34:55Z
+
+Well, that's a bit huge for me at the moment :)
+Maybe we can merge this and open a new issue to work on a registry.
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-23T18:38:30Z
+
+:-1:
+
+---------------------------------------------------------------------------
+
+by stewe at 2013-12-23T18:42:09Z
+
+:) I will try to have a look at the library.
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-23T18:43:14Z
+
+is very well written, almost a port one to one but not sure about if the license is a problem @fabpot ping any thoughts?
+
+---------------------------------------------------------------------------
+
+by sstok at 2013-12-23T18:46:36Z
+
+LGPL can not be sub licensed (unlike MIT) so you must ask permission from the author(s) to change the license.
+
+---------------------------------------------------------------------------
+
+by cleentfaar at 2013-12-24T08:31:09Z
+
+@stewe Thanks for taking up my bug report as a PR, let me know what I can do to help
+*Original post: https://groups.google.com/forum/#!searchin/symfony2/iban/symfony2/L_96CmDaZ-k/AGJAjBbhfpUJ*
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-12-28T13:42:21Z
+
+merging this one as implementing a full IBAN validator is probably out of the scope of this PR anyway.

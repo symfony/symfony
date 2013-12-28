@@ -142,10 +142,10 @@ class ErrorHandler
 
                 // we must stop the PHP script execution, as the exception has
                 // already been dealt with, so, let's throw an exception that
-                // will be catched by a dummy exception handler
+                // will be caught by a dummy exception handler
                 set_exception_handler(function (\Exception $e) use ($exceptionHandler) {
                     if (!$e instanceof DummyException) {
-                        // happens if our dummy exception is catched by a
+                        // happens if our dummy exception is caught by a
                         // catch-all from user code, in which case, let's the
                         // current handler handle this "new" exception
                         call_user_func($exceptionHandler, $e);

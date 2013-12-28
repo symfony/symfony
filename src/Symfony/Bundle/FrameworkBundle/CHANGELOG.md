@@ -37,8 +37,8 @@ CHANGELOG
  * replaced Symfony\Component\HttpKernel\Debug\ContainerAwareTraceableEventDispatcher by Symfony\Component\HttpKernel\Debug\TraceableEventDispatcher
  * added Client::enableProfiler()
  * a new parameter has been added to the DIC: `router.request_context.base_url`
-   You can customize it for your functional tests or for generating urls with
-   the right base url when your are in the cli context.
+   You can customize it for your functional tests or for generating URLs with
+   the right base URL when your are in the CLI context.
  * added support for default templates per render tag
 
 2.1.0

@@ -56,8 +56,8 @@
 
         <service id="templating.asset.request_aware_package" class="Symfony\Component\Templating\Asset\PackageInterface" factory-service="templating.asset.package_factory" factory-method="getPackage" abstract="true">
             <argument type="service" id="request" strict="false" />
-            <argument /> <!-- http id -->
-            <argument /> <!-- ssl id -->
+            <argument /> <!-- HTTP id -->
+            <argument /> <!-- SSL id -->
         </service>
 
         <service id="templating.asset.package_factory" class="%templating.asset.package_factory.class%">

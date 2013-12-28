@@ -229,7 +229,7 @@ class SecurityExtension extends Extension
         $mapDef->replaceArgument(1, $map);
 
         // add authentication providers to authentication manager
-        $authenticationProviders = array_map(function($id) {
+        $authenticationProviders = array_map(function ($id) {
             return new Reference($id);
         }, array_values(array_unique($authenticationProviders)));
         $container

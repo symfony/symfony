@@ -1063,7 +1063,7 @@ class Application
      */
     private function findAlternativeCommands($name, $abbrevs)
     {
-        $callback = function($item) {
+        $callback = function ($item) {
             return $item->getName();
         };
 

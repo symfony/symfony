@@ -90,7 +90,7 @@ class AcceptHeaderItem
     {
         $string = $this->value.($this->quality < 1 ? ';q='.$this->quality : '');
         if (count($this->attributes) > 0) {
-            $string .= ';'.implode(';', array_map(function($name, $value) {
+            $string .= ';'.implode(';', array_map(function ($name, $value) {
                 return sprintf(preg_match('/[,;=]/', $value) ? '%s="%s"' : '%s=%s', $name, $value);
             }, array_keys($this->attributes), $this->attributes));
         }

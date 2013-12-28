@@ -89,7 +89,7 @@ abstract class BaseMemcacheProfilerStorage implements ProfilerStorageInterface
             --$limit;
         }
 
-        usort($result, function($a, $b) {
+        usort($result, function ($a, $b) {
             if ($a['time'] === $b['time']) {
                 return 0;
             }

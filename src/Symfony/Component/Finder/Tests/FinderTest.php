@@ -583,7 +583,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
         $this->assertEquals(
             array('c', 'e', 'a', 'd', 'b'),
-            array_map(function(Adapter\AdapterInterface $adapter) {
+            array_map(function (Adapter\AdapterInterface $adapter) {
                 return $adapter->getName();
             }, $finder->getAdapters())
         );
@@ -609,7 +609,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     public function getAdaptersTestData()
     {
         return array_map(
-            function ($adapter)  { return array($adapter); },
+            function ($adapter) { return array($adapter); },
             $this->getValidAdapters()
         );
     }
@@ -791,7 +791,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
                 new Adapter\GnuFindAdapter(),
                 new Adapter\PhpAdapter()
             ),
-            function (Adapter\AdapterInterface $adapter)  {
+            function (Adapter\AdapterInterface $adapter) {
                 return $adapter->isSupported();
             }
         );

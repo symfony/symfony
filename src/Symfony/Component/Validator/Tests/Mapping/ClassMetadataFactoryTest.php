@@ -77,7 +77,7 @@ class ClassMetadataFactoryTest extends \PHPUnit_Framework_TestCase
               ->will($this->returnValue(false));
         $cache->expects($this->once())
               ->method('write')
-              ->will($this->returnCallback(function($metadata) use ($tester, $constraints) {
+              ->will($this->returnCallback(function ($metadata) use ($tester, $constraints) {
                   $tester->assertEquals($constraints, $metadata->getConstraints());
               }));
 

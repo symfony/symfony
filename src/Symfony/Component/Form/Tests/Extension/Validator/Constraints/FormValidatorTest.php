@@ -398,7 +398,7 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $context = $this->getMockExecutionContext();
         $object = $this->getMock('\stdClass');
-        $options = array('validation_groups' => function(FormInterface $form){
+        $options = array('validation_groups' => function (FormInterface $form) {
             return array('group1', 'group2');
         });
         $form = $this->getBuilder('name', '\stdClass', $options)
@@ -533,7 +533,7 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
         $object = $this->getMock('\stdClass');
 
         $parentOptions = array(
-            'validation_groups' => function(FormInterface $form){
+            'validation_groups' => function (FormInterface $form) {
                 return array('group1', 'group2');
             },
             'cascade_validation' => true,

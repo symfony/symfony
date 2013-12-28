@@ -3,7 +3,7 @@
 // required for signal handling
 declare(ticks = 1);
 
-pcntl_signal(SIGUSR1, function(){echo "Caught SIGUSR1"; exit;});
+pcntl_signal(SIGUSR1, function () {echo "Caught SIGUSR1"; exit;});
 
 $n=0;
 

@@ -1,0 +1,2 @@
+services:
+    factory: { class: FooBarClass, factory: baz:getClass}

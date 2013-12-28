@@ -89,7 +89,7 @@ class FormErrorBag implements \RecursiveIterator, \Countable, \ArrayAccess
 
     public function valid()
     {
-        return false === key($this->errors);
+        return null !== key($this->errors);
     }
 
     /**

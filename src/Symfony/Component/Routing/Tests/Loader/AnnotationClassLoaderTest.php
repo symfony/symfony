@@ -125,6 +125,32 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
         $this->assertEquals($routeDatas['condition'], $route->getCondition(), '->load preserves condition annotation');
     }
 
+    public function testClassRouteLoad()
+    {
+        $classRouteDatas = array('path' => '/classRoutePrefix');
+
+        $routeDatas = array(
+            'name' => 'route1',
+            'path' => '/',
+        );
+
+        $this->reader
+            ->expects($this->once())
+            ->method('getClassAnnotation')
+            ->will($this->returnValue($this->getAnnotatedRoute($classRouteDatas)))
+        ;
+
+        $this->reader
+            ->expects($this->once())
+            ->method('getMethodAnnotations')
+            ->will($this->returnValue(array($this->getAnnotatedRoute($routeDatas))))
+        ;
+        $routeCollection = $this->loader->load('Symfony\Component\Routing\Tests\Fixtures\AnnotatedClasses\BarClass');
+        $route = $routeCollection->get($routeDatas['name']);
+
+        $this->assertSame($classRouteDatas['path'].$routeDatas['path'], $route->getPath(), '->load preserves class route path annotation');
+    }
+
     private function getAnnotatedRoute($datas)
     {
         return new Route($datas);

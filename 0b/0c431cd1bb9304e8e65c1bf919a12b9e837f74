@@ -1,0 +1,59 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-12-21T09:55:02Z
+
+Not sure if riak should be supported here. Is it that widespread?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-12-21T09:55:25Z
+
+@guilhermeblanco @beberlei Can you have a look at this PR?
+
+---------------------------------------------------------------------------
+
+by jakzal at 2013-12-21T10:04:19Z
+
+@FabioBatSilva you're trying to do two things with one PR. I'd send riak integration as a separate PR. However, I'm not sure if it should be in the core.
+
+---------------------------------------------------------------------------
+
+by guilhermeblanco at 2013-12-21T15:32:29Z
+
+@jakzal I can only see 1 intention on this PR (add Riak cache support). Dunno if there's another from what you've said...
+
+---------------------------------------------------------------------------
+
+by guilhermeblanco at 2013-12-21T15:35:14Z
+
+@fabpot I agree with @jakzal that Symfony Bridge shouldn't consider creating services/cache drivers behind the scenes.
+Main point I've considered might be around validation cache, for example, but it does not use Doctrine Bridge (only service ids).
+We could/should rearrange some pieces of this can move to DoctrineBundle.
+
+We also should consider empowering a bit more DoctrineBundle as right now you can't create Doctrine Cache instances directly (really bad IMHO).
+
+---------------------------------------------------------------------------
+
+by jakzal at 2013-12-21T15:43:25Z
+
+@guilhermeblanco next to what's mentioned in the title of this PR, riak integration is introduced
+
+---------------------------------------------------------------------------
+
+by FabioBatSilva at 2013-12-21T16:46:15Z
+
+The RiakCache support has been removed..
+I'm going to open another PR once we finish this one...
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-12-28T15:41:48Z
+
+@guilhermeblanco @beberlei What about this new version without Riak?
+
+---------------------------------------------------------------------------
+
+by guilhermeblanco at 2013-12-28T17:20:51Z
+
+@fabpot good to go IMHO.
+We are currently working on a DoctrineCacheBundle to reduce the need of Symfony Bridge. I dunno how much investment we should put around here in the meantime.

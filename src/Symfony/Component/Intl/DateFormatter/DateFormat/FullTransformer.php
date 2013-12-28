@@ -91,7 +91,7 @@ class FullTransformer
     {
         $that = $this;
 
-        $formatted = preg_replace_callback($this->regExp, function($matches) use ($that, $dateTime) {
+        $formatted = preg_replace_callback($this->regExp, function ($matches) use ($that, $dateTime) {
             return $that->formatReplace($matches[0], $dateTime);
         }, $this->pattern);
 
@@ -185,7 +185,7 @@ class FullTransformer
         // when parsing a date/time value
         $escapedPattern = preg_replace('/\\\[\-|\/]/', '[\/\-]', $escapedPattern);
 
-        $reverseMatchingRegExp = preg_replace_callback($this->regExp, function($matches) use ($that) {
+        $reverseMatchingRegExp = preg_replace_callback($this->regExp, function ($matches) use ($that) {
             $length = strlen($matches[0]);
             $transformerIndex = $matches[0][0];
 
@@ -245,7 +245,7 @@ class FullTransformer
     {
         $specialCharsArray = str_split($specialChars);
 
-        $specialCharsMatch = implode('|', array_map(function($char) {
+        $specialCharsMatch = implode('|', array_map(function ($char) {
             return $char.'+';
         }, $specialCharsArray));
 

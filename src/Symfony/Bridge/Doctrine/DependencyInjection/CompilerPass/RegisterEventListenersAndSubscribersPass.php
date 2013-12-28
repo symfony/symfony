@@ -55,7 +55,7 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
 
         $this->container = $container;
         $this->connections = $container->getParameter($this->connections);
-        $sortFunc = function($a, $b) {
+        $sortFunc = function ($a, $b) {
             $a = isset($a['priority']) ? $a['priority'] : 0;
             $b = isset($b['priority']) ? $b['priority'] : 0;
 

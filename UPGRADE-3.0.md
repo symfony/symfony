@@ -18,6 +18,11 @@ UPGRADE FROM 2.x to 3.0
    `DebugClassLoader`. The difference is that the constructor now takes a
    loader to wrap.
 
+### EventDispatcher
+
+ * The interface `Symfony\Component\EventDispatcher\Debug\TraceableEventDispatcherInterface`
+   extends `Symfony\Component\EventDispatcher\EventDispatcherInterface`.
+
 ### Form
 
  * The methods `Form::bind()` and `Form::isBound()` were removed. You should

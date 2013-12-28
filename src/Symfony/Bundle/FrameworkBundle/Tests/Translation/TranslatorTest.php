@@ -45,7 +45,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     {
         $translator = $this->getTranslator($this->getLoader());
         $translator->setLocale('fr');
-        $translator->setFallbackLocale(array('en', 'es', 'pt-PT', 'pt_BR'));
+        $translator->setFallbackLocales(array('en', 'es', 'pt-PT', 'pt_BR'));
 
         $this->assertEquals('foo (FR)', $translator->trans('foo'));
         $this->assertEquals('bar (EN)', $translator->trans('bar'));
@@ -61,7 +61,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         // prime the cache
         $translator = $this->getTranslator($this->getLoader(), array('cache_dir' => $this->tmpDir));
         $translator->setLocale('fr');
-        $translator->setFallbackLocale(array('en', 'es', 'pt-PT', 'pt_BR'));
+        $translator->setFallbackLocales(array('en', 'es', 'pt-PT', 'pt_BR'));
 
         $this->assertEquals('foo (FR)', $translator->trans('foo'));
         $this->assertEquals('bar (EN)', $translator->trans('bar'));
@@ -75,7 +75,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $loader = $this->getMock('Symfony\Component\Translation\Loader\LoaderInterface');
         $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir));
         $translator->setLocale('fr');
-        $translator->setFallbackLocale(array('en', 'es', 'pt-PT', 'pt_BR'));
+        $translator->setFallbackLocales(array('en', 'es', 'pt-PT', 'pt_BR'));
 
         $this->assertEquals('foo (FR)', $translator->trans('foo'));
         $this->assertEquals('bar (EN)', $translator->trans('bar'));

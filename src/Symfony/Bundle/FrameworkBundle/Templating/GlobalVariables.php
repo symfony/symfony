@@ -74,7 +74,7 @@ class GlobalVariables
     /**
      * Returns the current request.
      *
-     * @return Request|null The http request object
+     * @return Request|null The HTTP request object
      */
     public function getRequest()
     {

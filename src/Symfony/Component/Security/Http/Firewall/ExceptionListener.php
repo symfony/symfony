@@ -199,7 +199,7 @@ class ExceptionListener
      */
     protected function setTargetPath(Request $request)
     {
-        // session isn't required when using http basic authentication mechanism for example
+        // session isn't required when using HTTP basic authentication mechanism for example
         if ($request->hasSession() && $request->isMethodSafe()) {
             $request->getSession()->set('_security.'.$this->providerKey.'.target_path', $request->getUri());
         }

@@ -1,0 +1,34 @@
+---------------------------------------------------------------------------
+
+by arvenil at 2013-12-23T16:34:30Z
+
+```sh
+1) Symfony\Bridge\Doctrine\Tests\Validator\Constraints\UniqueValidatorTest::testValidateUniqueness
+
+Doctrine\Common\Annotations\AnnotationException: [Semantical Error] The class "Table" is not annotated with @Annotation. Are you sure this class can be used as annotation? If so, then you need to add @Annotation to the _class_ doc comment of "Table". If it is indeed no annotation, then you need to add @IgnoreAnnotation("Table") to the _class_ doc comment of class Symfony\Bridge\Doctrine\Tests\Fixtures\UniqueConstraintEntity.
+```
+? I don't get it, tests passes on my dev env.
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-23T16:39:30Z
+
+please add the standard table description for PRs found in the docu
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-12-23T17:04:48Z
+
+@cordoval Missing PR header is now detected by fabbot (see http://hook.fabbot.io/report/symfony/symfony/9848)
+
+---------------------------------------------------------------------------
+
+by arvenil at 2013-12-23T17:47:57Z
+
+@cordoval @fabpot done
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-23T18:34:08Z
+
+@arvenil please address all issues on http://status.fabbot.io/symfony/symfony/9848

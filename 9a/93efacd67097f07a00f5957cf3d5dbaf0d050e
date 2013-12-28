@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-12-16T06:21:57Z
+
+This cannot be merged as is and it does not even run because of some problems with PHPUnit.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-12-27T14:17:15Z
+
+Ok, I miss the `allow_failures` part. @stloyd Can you make the PR on 2.3 instead?

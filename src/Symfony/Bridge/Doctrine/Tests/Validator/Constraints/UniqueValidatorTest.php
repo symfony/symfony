@@ -282,7 +282,7 @@ class UniqueValidatorTest extends \PHPUnit_Framework_TestCase
         $repository->expects($this->once())
             ->method('findByCustom')
             ->will(
-                $this->returnCallback(function() use ($entity) {
+                $this->returnCallback(function () use ($entity) {
                     $returnValue = array(
                         $entity,
                     );

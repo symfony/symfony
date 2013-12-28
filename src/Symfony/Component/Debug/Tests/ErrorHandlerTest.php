@@ -109,7 +109,7 @@ PHP
         set_exception_handler(array($exceptionHandler, 'handle'));
 
         $that = $this;
-        $exceptionCheck = function($exception) use ($that) {
+        $exceptionCheck = function ($exception) use ($that) {
             $that->assertInstanceOf('Symfony\Component\Debug\Exception\ContextErrorException', $exception);
             $that->assertEquals(E_NOTICE, $exception->getSeverity());
             $that->assertEquals(__LINE__ + 44, $exception->getLine());
@@ -215,7 +215,7 @@ PHP
             $logger = $this->getMock('Psr\Log\LoggerInterface');
 
             $that = $this;
-            $warnArgCheck = function($message, $context) use ($that) {
+            $warnArgCheck = function ($message, $context) use ($that) {
                 $that->assertEquals('foo', $message);
                 $that->assertArrayHasKey('type', $context);
                 $that->assertEquals($context['type'], ErrorHandler::TYPE_DEPRECATION);

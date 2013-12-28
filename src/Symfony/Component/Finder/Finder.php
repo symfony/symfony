@@ -157,7 +157,7 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public function getAdapters()
     {
-        return array_values(array_map(function(array $adapter) {
+        return array_values(array_map(function (array $adapter) {
             return $adapter['adapter'];
         }, $this->adapters));
     }

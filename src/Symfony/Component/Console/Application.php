@@ -1038,7 +1038,8 @@ class Application
     }
 
     /**
-     * Finds alternative of $name among $collection
+     * Finds alternative of $name among $collection,
+     * if nothing is found in $collection, try in $abbrevs
      *
      * @param string               $name       The string
      * @param array|Traversable    $collection The collection

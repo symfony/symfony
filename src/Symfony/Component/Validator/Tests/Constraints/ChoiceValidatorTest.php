@@ -105,7 +105,7 @@ class ChoiceValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testValidChoiceCallbackClosure()
     {
-        $constraint = new Choice(array('callback' => function() {
+        $constraint = new Choice(array('callback' => function () {
             return array('foo', 'bar');
         }));
 

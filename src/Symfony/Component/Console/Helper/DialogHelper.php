@@ -337,7 +337,7 @@ class DialogHelper extends InputAwareHelper
     {
         $that = $this;
 
-        $interviewer = function() use ($output, $question, $default, $autocomplete, $that) {
+        $interviewer = function () use ($output, $question, $default, $autocomplete, $that) {
             return $that->ask($output, $question, $default, $autocomplete);
         };
 
@@ -367,7 +367,7 @@ class DialogHelper extends InputAwareHelper
     {
         $that = $this;
 
-        $interviewer = function() use ($output, $question, $fallback, $that) {
+        $interviewer = function () use ($output, $question, $fallback, $that) {
             return $that->askHiddenResponse($output, $question, $fallback);
         };
 
@@ -405,7 +405,7 @@ class DialogHelper extends InputAwareHelper
     }
 
     /**
-     * Return a valid unix shell
+     * Return a valid Unix shell
      *
      * @return string|Boolean  The valid shell name, false in case no valid shell is found
      */

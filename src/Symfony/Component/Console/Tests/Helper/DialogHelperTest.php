@@ -157,7 +157,7 @@ class DialogHelperTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testNoInteration()
+    public function testNoInteraction()
     {
         $dialog = new DialogHelper();
 

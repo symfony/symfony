@@ -609,7 +609,7 @@ EOF
         $this->assertEquals('http://base.com/link', $crawler->filterXPath('//a')->link()->getUri());
 
         $crawler = new Crawler('<html><base href="//base.com"><a href="link"></a></html>', 'https://domain.com');
-        $this->assertEquals('https://base.com/link', $crawler->filterXPath('//a')->link()->getUri(), '<base> tag can use a schema-less url');
+        $this->assertEquals('https://base.com/link', $crawler->filterXPath('//a')->link()->getUri(), '<base> tag can use a schema-less URL');
 
         $crawler = new Crawler('<html><base href="path/"><a href="link"></a></html>', 'https://domain.com');
         $this->assertEquals('https://domain.com/path/link', $crawler->filterXPath('//a')->link()->getUri(), '<base> tag can set a path');

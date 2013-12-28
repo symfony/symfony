@@ -37,7 +37,7 @@ class ProfilerController
     /**
      * Constructor.
      *
-     * @param UrlGeneratorInterface $generator       The Url Generator
+     * @param UrlGeneratorInterface $generator       The URL Generator
      * @param Profiler              $profiler        The profiler
      * @param \Twig_Environment     $twig            The twig environment
      * @param array                 $templates       The templates

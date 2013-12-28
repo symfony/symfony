@@ -73,23 +73,50 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
         return array(
             array(
                 'Symfony\Component\Routing\Tests\Fixtures\AnnotatedClasses\BarClass',
+                array(),
                 array('name' => 'route1'),
                 array('arg2' => 'defaultValue2', 'arg3' => 'defaultValue3')
             ),
             array(
                 'Symfony\Component\Routing\Tests\Fixtures\AnnotatedClasses\BarClass',
+                array(),
                 array('name' => 'route1', 'defaults' => array('arg2' => 'foo')),
                 array('arg2' => 'defaultValue2', 'arg3' => 'defaultValue3')
             ),
             array(
                 'Symfony\Component\Routing\Tests\Fixtures\AnnotatedClasses\BarClass',
+                array(),
                 array('name' => 'route1', 'defaults' => array('arg2' => 'foobar')),
                 array('arg2' => 'defaultValue2', 'arg3' =>'defaultValue3')
             ),
             array(
                 'Symfony\Component\Routing\Tests\Fixtures\AnnotatedClasses\BarClass',
+                array(),
                 array('name' => 'route1', 'defaults' => array('arg2' => 'foo'), 'condition' => 'context.getMethod() == "GET"'),
                 array('arg2' => 'defaultValue2', 'arg3' =>'defaultValue3')
+            ),
+            array(
+                'Symfony\Component\Routing\Tests\Fixtures\AnnotatedClasses\BarClass',
+                array(
+                    'route1' => array('path' => '/routeprefix'),
+                    'secondrouteprefix.route1' => array('path' => '/secondrouteprefix', 'name' => 'secondrouteprefix'),
+                    'symfony_component_routing_tests_fixtures_annotatedclasses_barclass_routeaction' => array('path' => '/thirdrouteprefix'),
+                    'symfony_component_routing_tests_fixtures_annotatedclasses_barclass_routeaction_1' => array('path' => '/anotherrouteprefix')
+                ),
+                array('name' => 'route1'),
+                array('arg2' => 'defaultValue2', 'arg3' => 'defaultValue3')
+            ),
+            array(
+                'Symfony\Component\Routing\Tests\Fixtures\AnnotatedClasses\BarClass',
+                array(
+                    'routeprefix.route1' => array('path' => '/routeprefix', 'name' => 'routeprefix'),
+                    'route1' => array('path' => '/secondrouteprefix'),
+                    'symfony_component_routing_tests_fixtures_annotatedclasses_barclass_routeaction' => array('path' => '/thirdrouteprefix'),
+                    'anotherrouteprefix.route1' => array('path' => '/anotherrouteprefix', 'name' => 'anotherrouteprefix'),
+                    'symfony_component_routing_tests_fixtures_annotatedclasses_barclass_routeaction_1' => array('path' => '/lastrouteprefix'),
+                ),
+                array('name' => 'route1'),
+                array('arg2' => 'defaultValue2', 'arg3' => 'defaultValue3')
             ),
         );
     }
@@ -97,7 +124,7 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
     /**
      * @dataProvider getLoadTests
      */
-    public function testLoad($className, $routeDatas = array(), $methodArgs = array())
+    public function testLoad($className, $classRouteDatas = array(), $routeDatas = array(), $methodArgs = array())
     {
         $routeDatas = array_replace(array(
             'name'         => 'route',
@@ -110,19 +137,40 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
             'condition'    => null,
         ), $routeDatas);
 
+        if ($classRouteDatas) {
+            $classAnnotationsReturnValue = array();
+
+            foreach ($classRouteDatas as $classRouteData) {
+                $classAnnotationsReturnValue[] = $this->getAnnotatedRoute($classRouteData);
+            }
+
+            $this->reader
+                ->expects($this->once())
+                ->method('getClassAnnotations')
+                ->will($this->returnValue($classAnnotationsReturnValue))
+            ;
+        }
         $this->reader
             ->expects($this->once())
             ->method('getMethodAnnotations')
             ->will($this->returnValue(array($this->getAnnotatedRoute($routeDatas))))
         ;
         $routeCollection = $this->loader->load($className);
-        $route = $routeCollection->get($routeDatas['name']);
 
-        $this->assertSame($routeDatas['path'], $route->getPath(), '->load preserves path annotation');
-        $this->assertSame($routeDatas['requirements'],$route->getRequirements(), '->load preserves requirements annotation');
-        $this->assertCount(0, array_intersect($route->getOptions(), $routeDatas['options']), '->load preserves options annotation');
-        $this->assertSame(array_replace($methodArgs, $routeDatas['defaults']), $route->getDefaults(), '->load preserves defaults annotation');
-        $this->assertEquals($routeDatas['condition'], $route->getCondition(), '->load preserves condition annotation');
+        if (!$classRouteDatas) {
+            $classRouteDatas = array($routeDatas['name'] => array('path' => ''));
+        }
+
+        foreach ($classRouteDatas as $routeName => $classRouteData) {
+            $route = $routeCollection->get($routeName);
+            $this->assertNotNull($route);
+
+            $this->assertSame($classRouteData['path'].$routeDatas['path'], $route->getPath(), '->load preserves path annotation');
+            $this->assertSame($routeDatas['requirements'],$route->getRequirements(), '->load preserves requirements annotation');
+            $this->assertCount(0, array_intersect($route->getOptions(), $routeDatas['options']), '->load preserves options annotation');
+            $this->assertSame(array_replace($methodArgs, $routeDatas['defaults']), $route->getDefaults(), '->load preserves defaults annotation');
+            $this->assertEquals($routeDatas['condition'], $route->getCondition(), '->load preserves condition annotation');
+        }
     }
 
     private function getAnnotatedRoute($datas)

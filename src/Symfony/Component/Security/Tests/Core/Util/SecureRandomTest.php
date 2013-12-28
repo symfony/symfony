@@ -68,7 +68,7 @@ class SecureRandomTest extends \PHPUnit_Framework_TestCase
             $runs[$i] = 0;
         }
 
-        $addRun = function($run) use (&$runs) {
+        $addRun = function ($run) use (&$runs) {
             if ($run > 6) {
                 $run = 6;
             }

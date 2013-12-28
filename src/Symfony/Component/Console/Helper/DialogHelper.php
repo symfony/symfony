@@ -333,7 +333,7 @@ class DialogHelper extends Helper
     {
         $that = $this;
 
-        $interviewer = function() use ($output, $question, $default, $autocomplete, $that) {
+        $interviewer = function () use ($output, $question, $default, $autocomplete, $that) {
             return $that->ask($output, $question, $default, $autocomplete);
         };
 
@@ -363,7 +363,7 @@ class DialogHelper extends Helper
     {
         $that = $this;
 
-        $interviewer = function() use ($output, $question, $fallback, $that) {
+        $interviewer = function () use ($output, $question, $fallback, $that) {
             return $that->askHiddenResponse($output, $question, $fallback);
         };
 

@@ -132,10 +132,10 @@ class MainConfiguration implements ConfigurationInterface
                     ->useAttributeAsKey('id')
                     ->prototype('array')
                         ->performNoDeepMerging()
-                        ->beforeNormalization()->ifString()->then(function($v) { return array('value' => $v); })->end()
+                        ->beforeNormalization()->ifString()->then(function ($v) { return array('value' => $v); })->end()
                         ->beforeNormalization()
-                            ->ifTrue(function($v) { return is_array($v) && isset($v['value']); })
-                            ->then(function($v) { return preg_split('/\s*,\s*/', $v['value']); })
+                            ->ifTrue(function ($v) { return is_array($v) && isset($v['value']); })
+                            ->then(function ($v) { return preg_split('/\s*,\s*/', $v['value']); })
                         ->end()
                         ->prototype('scalar')->end()
                     ->end()
@@ -162,18 +162,18 @@ class MainConfiguration implements ConfigurationInterface
                             ->end()
                             ->scalarNode('host')->defaultNull()->end()
                             ->arrayNode('ips')
-                                ->beforeNormalization()->ifString()->then(function($v) { return array($v); })->end()
+                                ->beforeNormalization()->ifString()->then(function ($v) { return array($v); })->end()
                                 ->prototype('scalar')->end()
                             ->end()
                             ->arrayNode('methods')
-                                ->beforeNormalization()->ifString()->then(function($v) { return preg_split('/\s*,\s*/', $v); })->end()
+                                ->beforeNormalization()->ifString()->then(function ($v) { return preg_split('/\s*,\s*/', $v); })->end()
                                 ->prototype('scalar')->end()
                             ->end()
                         ->end()
                         ->fixXmlConfig('role')
                         ->children()
                             ->arrayNode('roles')
-                                ->beforeNormalization()->ifString()->then(function($v) { return preg_split('/\s*,\s*/', $v); })->end()
+                                ->beforeNormalization()->ifString()->then(function ($v) { return preg_split('/\s*,\s*/', $v); })->end()
                                 ->prototype('scalar')->end()
                             ->end()
                         ->end()
@@ -223,8 +223,8 @@ class MainConfiguration implements ConfigurationInterface
                 ->children()
                     ->arrayNode('delete_cookies')
                         ->beforeNormalization()
-                            ->ifTrue(function($v) { return is_array($v) && is_int(key($v)); })
-                            ->then(function($v) { return array_map(function($v) { return array('name' => $v); }, $v); })
+                            ->ifTrue(function ($v) { return is_array($v) && is_int(key($v)); })
+                            ->then(function ($v) { return array_map(function ($v) { return array('name' => $v); }, $v); })
                         ->end()
                         ->useAttributeAsKey('name')
                         ->prototype('array')
@@ -278,10 +278,10 @@ class MainConfiguration implements ConfigurationInterface
         $firewallNodeBuilder
             ->end()
             ->validate()
-                ->ifTrue(function($v) {
+                ->ifTrue(function ($v) {
                     return true === $v['security'] && isset($v['pattern']) && !isset($v['request_matcher']);
                 })
-                ->then(function($firewall) use ($abstractFactoryKeys) {
+                ->then(function ($firewall) use ($abstractFactoryKeys) {
                     foreach ($abstractFactoryKeys as $k) {
                         if (!isset($firewall[$k]['check_path'])) {
                             continue;
@@ -331,7 +331,7 @@ class MainConfiguration implements ConfigurationInterface
                         ->arrayNode('providers')
                             ->beforeNormalization()
                                 ->ifString()
-                                ->then(function($v) { return preg_split('/\s*,\s*/', $v); })
+                                ->then(function ($v) { return preg_split('/\s*,\s*/', $v); })
                             ->end()
                             ->prototype('scalar')->end()
                         ->end()
@@ -349,11 +349,11 @@ class MainConfiguration implements ConfigurationInterface
 
         $providerNodeBuilder
             ->validate()
-                ->ifTrue(function($v){return count($v) > 1;})
+                ->ifTrue(function ($v) {return count($v) > 1;})
                 ->thenInvalid('You cannot set multiple provider types for the same provider')
             ->end()
             ->validate()
-                ->ifTrue(function($v){return count($v) === 0;})
+                ->ifTrue(function ($v) {return count($v) === 0;})
                 ->thenInvalid('You must set a provider definition for the provider.')
             ->end()
         ;
@@ -378,7 +378,7 @@ class MainConfiguration implements ConfigurationInterface
                     ->prototype('array')
                         ->canBeUnset()
                         ->performNoDeepMerging()
-                        ->beforeNormalization()->ifString()->then(function($v) { return array('algorithm' => $v); })->end()
+                        ->beforeNormalization()->ifString()->then(function ($v) { return array('algorithm' => $v); })->end()
                         ->children()
                             ->scalarNode('algorithm')->cannotBeEmpty()->end()
                             ->scalarNode('hash_algorithm')->info('Name of hashing algorithm for PBKDF2 (i.e. sha256, sha512, etc..) See hash_algos() for a list of supported algorithms.')->defaultValue('sha512')->end()

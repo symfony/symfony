@@ -259,7 +259,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
      * @param object $listener  The listener
      * @param string $eventName The event name
      *
-     * @return array Informations about the listener
+     * @return array Information about the listener
      */
     private function getListenerInfo($listener, $eventName)
     {

@@ -87,7 +87,7 @@ class ObjectChoiceList extends ChoiceList
      */
     public function __construct($choices, $labelPath = null, array $preferredChoices = array(), $groupPath = null, $valuePath = null, PropertyAccessorInterface $propertyAccessor = null)
     {
-        $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::getPropertyAccessor();
+        $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
         $this->labelPath = null !== $labelPath ? new PropertyPath($labelPath) : null;
         $this->groupPath = null !== $groupPath ? new PropertyPath($groupPath) : null;
         $this->valuePath = null !== $valuePath ? new PropertyPath($valuePath) : null;

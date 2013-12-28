@@ -35,7 +35,7 @@ class HttpUtils
      * Constructor.
      *
      * @param UrlGeneratorInterface                       $urlGenerator A UrlGeneratorInterface instance
-     * @param UrlMatcherInterface|RequestMatcherInterface $urlMatcher   The Url or Request matcher
+     * @param UrlMatcherInterface|RequestMatcherInterface $urlMatcher   The URL or Request matcher
      *
      * @throws \InvalidArgumentException
      */
@@ -146,7 +146,7 @@ class HttpUtils
 
         $url = $this->urlGenerator->generate($path, $request->attributes->all(), UrlGeneratorInterface::ABSOLUTE_URL);
 
-        // unnecessary query string parameters must be removed from url
+        // unnecessary query string parameters must be removed from URL
         // (ie. query parameters that are presents in $attributes)
         // fortunately, they all are, so we have to remove entire query string
         $position = strpos($url, '?');

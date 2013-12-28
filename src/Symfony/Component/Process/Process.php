@@ -1046,7 +1046,7 @@ class Process
     }
 
     /**
-     * Captures the exitcode if mentioned in the process informations.
+     * Captures the exitcode if mentioned in the process information.
      */
     private function captureExitCode()
     {

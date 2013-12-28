@@ -146,7 +146,7 @@ class PoFileLoader extends ArrayLoader implements LoaderInterface
     }
 
     /**
-     * Save a translation item to the messeages.
+     * Save a translation item to the messages.
      *
      * A .po file could contain by error missing plural indexes. We need to
      * fix these before saving them.

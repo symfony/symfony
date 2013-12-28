@@ -417,7 +417,7 @@ abstract class Client
      *
      * This method returns null if the DomCrawler component is not available.
      *
-     * @param string $uri     A uri
+     * @param string $uri     A URI
      * @param string $content Content for the crawler to use
      * @param string $type    Content type
      *
@@ -539,9 +539,9 @@ abstract class Client
     /**
      * Takes a URI and converts it to absolute if it is not already absolute.
      *
-     * @param string $uri A uri
+     * @param string $uri A URI
      *
-     * @return string An absolute uri
+     * @return string An absolute URI
      */
     protected function getAbsoluteUri($uri)
     {

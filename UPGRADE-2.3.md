@@ -169,32 +169,31 @@ Form
    $builder->add('field', 'text');
    $form = $builder->getForm();
    ```
-   
- * While it wasn't intended, it was possible to set a form type's `data`
-   option to `null` if you wanted the form component to set the form's data
-   to the data of the object bound to the form (if one was bound).
-   This was used in some projects to pre-set a form field with optional
-   initial data as long as there wasn't already data set through a bound object.
-   Altough this feature is intended, setting the `data` option for a form
-   by default also locks that form's data so that it can't be overriden by
-   a later bound object. To disable said lock you have to specifically call
-   `FormConfigBuilderInterface:setDataLocked()`:
+
+ * Previously, when the "data" option of a field was set to `null` and the
+   containing form was mapped to an object, the field would receive the data
+   from the object as default value. This functionality was unintended and fixed
+   to use `null` as default value in Symfony 2.3.
+
+   In cases where you made use of the previous behavior, you should now remove
+   the "data" option altogether.
 
    Before:
 
    ```
    $builder->add('field', 'text', array(
-      'data' => $options['default_data'] ?: null,
+      'data' => $defaultData ?: null,
    ));
    ```
-   
+
    After:
 
    ```
-   $builder->add('field', 'text', array(
-      'data' => $options['default_data'] ?: null,
-   ));
-   $builder->get('field')->setDataLocked(false);
+   $options = array();
+   if ($defaultData) {
+       $options['data'] = $defaultData;
+   }
+   $builder->add('field', 'text', $options);
    ```
 
 PropertyAccess

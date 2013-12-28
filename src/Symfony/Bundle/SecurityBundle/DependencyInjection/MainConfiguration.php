@@ -213,16 +213,16 @@ class MainConfiguration implements ConfigurationInterface
                 ->treatTrueLike(array())
                 ->canBeUnset()
                 ->beforeNormalization()
-                    ->ifTrue(function($v) { return isset($v['csrf_provider']) && isset($v['csrf_token_generator']); })
+                    ->ifTrue(function ($v) { return isset($v['csrf_provider']) && isset($v['csrf_token_generator']); })
                     ->thenInvalid("You should define a value for only one of 'csrf_provider' and 'csrf_token_generator' on a security firewall. Use 'csrf_token_generator' as this replaces 'csrf_provider'.")
                 ->end()
                 ->beforeNormalization()
-                    ->ifTrue(function($v) { return isset($v['intention']) && isset($v['csrf_token_id']); })
+                    ->ifTrue(function ($v) { return isset($v['intention']) && isset($v['csrf_token_id']); })
                     ->thenInvalid("You should define a value for only one of 'intention' and 'csrf_token_id' on a security firewall. Use 'csrf_token_id' as this replaces 'intention'.")
                 ->end()
                 ->beforeNormalization()
-                    ->ifTrue(function($v) { return isset($v['csrf_provider']); })
-                    ->then(function($v) {
+                    ->ifTrue(function ($v) { return isset($v['csrf_provider']); })
+                    ->then(function ($v) {
                         $v['csrf_token_generator'] = $v['csrf_provider'];
                         unset($v['csrf_provider']);
 
@@ -230,8 +230,8 @@ class MainConfiguration implements ConfigurationInterface
                     })
                 ->end()
                 ->beforeNormalization()
-                    ->ifTrue(function($v) { return isset($v['intention']); })
-                    ->then(function($v) {
+                    ->ifTrue(function ($v) { return isset($v['intention']); })
+                    ->then(function ($v) {
                         $v['csrf_token_id'] = $v['intention'];
                         unset($v['intention']);
 

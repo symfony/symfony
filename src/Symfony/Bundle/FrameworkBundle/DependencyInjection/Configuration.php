@@ -188,7 +188,7 @@ class Configuration implements ConfigurationInterface
                                 ->end()
                                 ->scalarNode('service')->end()
                                 ->arrayNode('ips')
-                                    ->beforeNormalization()->ifString()->then(function($v) { return array($v); })->end()
+                                    ->beforeNormalization()->ifString()->then(function ($v) { return array($v); })->end()
                                     ->prototype('scalar')->end()
                                 ->end()
                             ->end()

@@ -206,7 +206,7 @@ class CookieJarTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($cookie1, $cookieJar->get('foo','/','example.com'));
         $this->assertEquals($cookie2, $cookieJar->get('foo1','/','test.example.com'));
     }
-	
+
     public function testCookieGetWithSubdirectory()
     {
         $cookieJar = new CookieJar();

@@ -13,7 +13,6 @@ namespace Symfony\Component\Config\Tests\Definition;
 
 use Symfony\Component\Config\Definition\ArrayNode;
 use Symfony\Component\Config\Definition\ScalarNode;
-use Symfony\Component\Serializer\Tests\Fixtures\ScalarDummy;
 
 class ArrayNodeTest extends \PHPUnit_Framework_TestCase
 {

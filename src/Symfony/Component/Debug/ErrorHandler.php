@@ -205,7 +205,7 @@ class ErrorHandler
         }
 
         // get current exception handler
-        $exceptionHandler = set_exception_handler(function() {});
+        $exceptionHandler = set_exception_handler(function () {});
         restore_exception_handler();
 
         if (is_array($exceptionHandler) && $exceptionHandler[0] instanceof ExceptionHandler) {

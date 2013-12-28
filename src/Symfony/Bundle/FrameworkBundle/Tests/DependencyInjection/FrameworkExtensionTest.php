@@ -203,7 +203,7 @@ abstract class FrameworkExtensionTest extends TestCase
             }
         }
 
-        $files = array_map(function($resource) { return realpath($resource[1]); }, $resources);
+        $files = array_map(function ($resource) { return realpath($resource[1]); }, $resources);
         $ref = new \ReflectionClass('Symfony\Component\Validator\Validator');
         $this->assertContains(
             strtr(dirname($ref->getFileName()).'/Resources/translations/validators.en.xlf', '/', DIRECTORY_SEPARATOR),

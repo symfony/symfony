@@ -459,7 +459,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testPhpDeadlock()
     {
-        $this->markTestSkipped('Can course php to hang');
+        $this->markTestSkipped('Can course PHP to hang');
 
         // Sleep doesn't work as it will allow the process to handle signals and close
         // file handles from the other end.
@@ -633,7 +633,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
     private function verifyPosixIsEnabled()
     {
         if (defined('PHP_WINDOWS_VERSION_BUILD')) {
-            $this->markTestSkipped('POSIX signals do not work on windows');
+            $this->markTestSkipped('POSIX signals do not work on Windows');
         }
         if (!defined('SIGUSR1')) {
             $this->markTestSkipped('The pcntl extension is not enabled');
@@ -646,7 +646,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
     public function testSignalWithWrongIntSignal()
     {
         if (defined('PHP_WINDOWS_VERSION_BUILD')) {
-            $this->markTestSkipped('POSIX signals do not work on windows');
+            $this->markTestSkipped('POSIX signals do not work on Windows');
         }
 
         $process = $this->getProcess('php -r "sleep(3);"');
@@ -660,7 +660,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
     public function testSignalWithWrongNonIntSignal()
     {
         if (defined('PHP_WINDOWS_VERSION_BUILD')) {
-            $this->markTestSkipped('POSIX signals do not work on windows');
+            $this->markTestSkipped('POSIX signals do not work on Windows');
         }
 
         $process = $this->getProcess('php -r "sleep(3);"');

@@ -104,7 +104,7 @@ EOF
                 ;
 
                 $output = $this->output;
-                $process->run(function($type, $data) use ($output) {
+                $process->run(function ($type, $data) use ($output) {
                     $output->writeln($data);
                 });
 

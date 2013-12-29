@@ -33,6 +33,11 @@ class PhpExecutableFinder
      */
     public function find()
     {
+        // HHVM support
+        if (($hhvm = getenv("PHP_BINARY")) !== false) {
+            return $hhvm;
+        }
+        
         // PHP_BINARY return the current sapi executable
         if (defined('PHP_BINARY') && PHP_BINARY && ('cli' === PHP_SAPI) && is_file(PHP_BINARY)) {
             return PHP_BINARY;

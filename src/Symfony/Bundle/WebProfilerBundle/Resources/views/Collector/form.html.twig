@@ -47,10 +47,11 @@
     }
     .tree .tree-inner {
         width: 100%;
-        padding: 5px 7px;
+        padding: 5px 7px 5px 22px;
         border-radius: 6px;
         color: #313131;
         cursor: pointer;
+        position: relative;
 
         -webkit-box-sizing: border-box;
         -moz-box-sizing: border-box;
@@ -62,20 +63,22 @@
     .tree .toggle-button {
         width: 10px;
         height: 10px;
-        background: none;
-        border: none;
+        position: absolute;
+        top: 50%;
+        margin-top: -5px;
+        margin-left: -15px;
     }
     .tree ul ul .tree-inner {
-        padding-left: 22px;
-    }
-    .tree ul ul ul .tree-inner {
         padding-left: 37px;
     }
-    .tree ul ul ul ul .tree-inner {
+    .tree ul ul ul .tree-inner {
         padding-left: 52px;
     }
-    .tree ul ul ul ul ul .tree-inner {
+    .tree ul ul ul ul .tree-inner {
         padding-left: 67px;
+    }
+    .tree ul ul ul ul ul .tree-inner {
+        padding-left: 82px;
     }
     .tree .tree-inner:hover {
         background: #dfdfdf;

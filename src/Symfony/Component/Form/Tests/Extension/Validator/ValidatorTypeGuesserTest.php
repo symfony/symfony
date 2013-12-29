@@ -92,14 +92,6 @@ class ValidatorTypeGuesserTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('attr' => array('min' => 1, 'max' => 2)), $result);
     }
 
-    public function testGuessMaxValueForConstraintWithMinValue()
-    {
-        $constraint = new Range(array('min' => '2'));
-
-        $result = $this->typeGuesser->guessMaxValueForConstraint($constraint);
-        $this->assertNull($result);
-    }
-
     private function setupMetadata($class, $property, array $constraints)
     {
         $this->elementMetadata = $this->getMock('Symfony\Component\Validator\Mapping\ElementMetadata');

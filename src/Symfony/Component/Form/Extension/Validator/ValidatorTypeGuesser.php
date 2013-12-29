@@ -77,7 +77,12 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
     }
 
     /**
-     * {@inheritDoc}
+     * Returns a guess about the field's maximum length
+     *
+     * @param string $class    The fully qualified class name
+     * @param string $property The name of the property to guess for
+     *
+     * @return Guess\ValueGuess|null A guess for the field's maximum length
      */
     protected function guessMaxLength($class, $property)
     {
@@ -89,9 +94,14 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
     }
 
     /**
-     * {@inheritDoc}
+     * Returns a guess about the field's maximum value
+     *
+     * @param string $class    The fully qualified class name
+     * @param string $property The name of the property to guess for
+     *
+     * @return Guess\ValueGuess|null A guess for the field's maximum value
      */
-    public function guessMaxValue($class, $property)
+    protected function guessMaxValue($class, $property)
     {
         $guesser = $this;
 
@@ -101,9 +111,14 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
     }
 
     /**
-     * {@inheritDoc}
+     * Returns a guess about the field's minimum value
+     *
+     * @param string $class    The fully qualified class name
+     * @param string $property The name of the property to guess for
+     *
+     * @return Guess\ValueGuess|null A guess for the field's minimum value
      */
-    public function guessMinValue($class, $property)
+    protected function guessMinValue($class, $property)
     {
         $guesser = $this;
 
@@ -113,9 +128,20 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
     }
 
     /**
-     * {@inheritDoc}
+     * Returns a guess about the field's pattern
+     *
+     * - When you have a min value, you guess a min length of this min (LOW_CONFIDENCE) , lines below
+     * - If this value is a float type, this is wrong so you guess null with MEDIUM_CONFIDENCE to override the previous guess.
+     * Example:
+     *  You want a float greater than 5, 4.512313 is not valid but length(4.512314) > length(5)
+     * @link https://github.com/symfony/symfony/pull/3927
+     *
+     * @param string $class    The fully qualified class name
+     * @param string $property The name of the property to guess for
+     *
+     * @return Guess\ValueGuess|null A guess for the field's required pattern
      */
-    public function guessPattern($class, $property)
+    protected function guessPattern($class, $property)
     {
         $guesser = $this;
 

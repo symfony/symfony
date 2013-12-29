@@ -273,6 +273,16 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($dom->getElementsByTagName('form')->item(0), $form->getFormNode(), '->getFormNode() returns the form node associated with this form');
     }
 
+    public function testGetFormNodeFromNamedForm()
+    {
+        $dom = new \DOMDocument();
+        $dom->loadHTML('<html><form name="my_form"><input type="submit" /></form></html>');
+
+        $form = new Form($dom->getElementsByTagName('form')->item(0), 'http://example.com');
+
+        $this->assertSame($dom->getElementsByTagName('form')->item(0), $form->getFormNode(), '->getFormNode() returns the form node associated with this form');
+    }
+
     public function testGetMethod()
     {
         $form = $this->createForm('<form><input type="submit" /></form>');

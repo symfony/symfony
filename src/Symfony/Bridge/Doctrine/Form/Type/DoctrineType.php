@@ -89,6 +89,13 @@ abstract class DoctrineType extends AbstractType
                 array_walk_recursive($choiceHashes, function (&$value) {
                     $value = spl_object_hash($value);
                 });
+            } elseif ($choiceHashes instanceof \Traversable) {
+                $hashes = array();
+                foreach ($choiceHashes as $value) {
+                    $hashes[] = spl_object_hash($value);
+                }
+                
+                $choiceHashes = $hashes;
             }
 
             $preferredChoiceHashes = $options['preferred_choices'];

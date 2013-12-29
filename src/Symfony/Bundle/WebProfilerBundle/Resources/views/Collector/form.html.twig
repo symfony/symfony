@@ -46,11 +46,11 @@
         width: 100%;
     }
     .tree .tree-inner {
-        width:100%;
+        width: 100%;
         padding: 5px 7px;
         border-radius: 6px;
         color: #313131;
-        cursor:pointer;
+        cursor: pointer;
 
         -webkit-box-sizing: border-box;
         -moz-box-sizing: border-box;
@@ -60,8 +60,8 @@
         text-decoration: none;
     }
     .tree .toggle-button {
-        width:10px;
-        height:10px;
+        width: 10px;
+        height: 10px;
         background: none;
         border: none;
     }
@@ -260,8 +260,8 @@
     <li>
         <div class="tree-inner" data-target-id="{{ data.id }}">
             {% if data.children is not empty %}
-                <img class="toggle-button" style="display:inline;" src="{{ asset('bundles/framework/images/blue_picto_more.gif') }}">
-                <img class="toggle-button" style="display:none;" src="{{ asset('bundles/framework/images/blue_picto_less.gif') }}">
+                <img class="toggle-button" style="display: inline;" src="{{ asset('bundles/framework/images/blue_picto_more.gif') }}">
+                <img class="toggle-button" style="display: none;" src="{{ asset('bundles/framework/images/blue_picto_less.gif') }}">
             {% else %}
                 <img class="toggle-button" src="{{ asset('bundles/framework/images/blue_picto_full.gif') }}">
             {% endif %}
@@ -311,8 +311,8 @@
         <h3>
             Default Data
             <a class="btn-toggle" onclick="toggle('{{ data.id }}', 'default_data')">
-                <img style="display:none" id="{{ data.id }}-default_data-open" src="{{ asset('bundles/framework/images/blue_picto_more.gif') }}">
-                <img style="display:inline" id="{{ data.id }}-default_data-close" src="{{ asset('bundles/framework/images/blue_picto_less.gif') }}">
+                <img style="display: none" id="{{ data.id }}-default_data-open" src="{{ asset('bundles/framework/images/blue_picto_more.gif') }}">
+                <img style="display: inline" id="{{ data.id }}-default_data-close" src="{{ asset('bundles/framework/images/blue_picto_less.gif') }}">
             </a>
         </h3>
 
@@ -350,8 +350,8 @@
         <h3>
             Submitted Data
             <a class="btn-toggle" onclick="toggle('{{ data.id }}', 'submitted_data')">
-                <img style="display:none" id="{{ data.id }}-submitted_data-open" src="{{ asset('bundles/framework/images/blue_picto_more.gif') }}">
-                <img style="display:inline" id="{{ data.id }}-submitted_data-close" src="{{ asset('bundles/framework/images/blue_picto_less.gif') }}">
+                <img style="display: none" id="{{ data.id }}-submitted_data-open" src="{{ asset('bundles/framework/images/blue_picto_more.gif') }}">
+                <img style="display: inline" id="{{ data.id }}-submitted_data-close" src="{{ asset('bundles/framework/images/blue_picto_less.gif') }}">
             </a>
         </h3>
 
@@ -393,8 +393,8 @@
         <h3>
             Passed Options
             <a class="btn-toggle" onclick="toggle('{{ data.id }}', 'passed_options')">
-                <img style="display:none" id="{{ data.id }}-passed_options-open" src="{{ asset('bundles/framework/images/blue_picto_more.gif') }}">
-                <img style="display:inline" id="{{ data.id }}-passed_options-close" src="{{ asset('bundles/framework/images/blue_picto_less.gif') }}">
+                <img style="display: none" id="{{ data.id }}-passed_options-open" src="{{ asset('bundles/framework/images/blue_picto_more.gif') }}">
+                <img style="display: inline" id="{{ data.id }}-passed_options-close" src="{{ asset('bundles/framework/images/blue_picto_less.gif') }}">
             </a>
         </h3>
 
@@ -430,12 +430,12 @@
         <h3>
             Resolved Options
             <a class="btn-toggle" onclick="toggle('{{ data.id }}', 'resolved_options')">
-                <img style="display:inline" id="{{ data.id }}-resolved_options-open" src="{{ asset('bundles/framework/images/blue_picto_more.gif') }}">
-                <img style="display:none" id="{{ data.id }}-resolved_options-close" src="{{ asset('bundles/framework/images/blue_picto_less.gif') }}">
+                <img style="display: inline" id="{{ data.id }}-resolved_options-open" src="{{ asset('bundles/framework/images/blue_picto_more.gif') }}">
+                <img style="display: none" id="{{ data.id }}-resolved_options-close" src="{{ asset('bundles/framework/images/blue_picto_less.gif') }}">
             </a>
         </h3>
 
-        <div id="{{ data.id }}-resolved_options" style="display:none">
+        <div id="{{ data.id }}-resolved_options" style="display: none">
             <table>
                 <tr>
                     <th width="180">Option</th>
@@ -455,12 +455,12 @@
         <h3>
             View Variables
             <a class="btn-toggle" onclick="toggle('{{ data.id }}', 'view_vars')">
-                <img style="display:inline" id="{{ data.id }}-view_vars-open" src="{{ asset('bundles/framework/images/blue_picto_more.gif') }}">
-                <img style="display:none" id="{{ data.id }}-view_vars-close" src="{{ asset('bundles/framework/images/blue_picto_less.gif') }}">
+                <img style="display: inline" id="{{ data.id }}-view_vars-open" src="{{ asset('bundles/framework/images/blue_picto_more.gif') }}">
+                <img style="display: none" id="{{ data.id }}-view_vars-close" src="{{ asset('bundles/framework/images/blue_picto_less.gif') }}">
             </a>
         </h3>
 
-        <div id="{{ data.id }}-view_vars" style="display:none">
+        <div id="{{ data.id }}-view_vars" style="display: none">
             <table>
                 <tr>
                     <th width="180">Variable</th>

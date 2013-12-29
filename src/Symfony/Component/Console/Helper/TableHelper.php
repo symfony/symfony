@@ -457,7 +457,29 @@ class TableHelper extends Helper
         }
 
         if (isset($row[$column])) {
-            return $this->strlen($row[$column]);
+            $value = $row[$column];
+            $defaultLength = $this->strlen($value);
+            $strippedLength = $this->strlen(strip_tags($value));
+
+            if ($strippedLength === $defaultLength) {
+                // No tags in output
+                return $defaultLength;
+            }
+
+            $tags = $this->getTagsIn($value);
+            if (empty($tags)) {
+                // Malformed tags?
+                return $defaultLength;
+            }
+
+            $styleTags = $this->isolateStyleTags($tags);
+            if (empty($styleTags)) {
+                return $defaultLength;
+            }
+
+            $value = $this->removeTags($styleTags, $value);
+
+            return $this->strlen($value);
         }
 
         return $this->getCellWidth($row, $column - 1);
@@ -478,5 +500,51 @@ class TableHelper extends Helper
     public function getName()
     {
         return 'table';
+    }
+
+    /**
+     * Find tags present in a string
+     *
+     * @param string $str
+     * @return array
+     */
+    private function getTagsIn($str)
+    {
+        $pattern = '/<\/?([a-z\-\_\s]+)>/i';
+        preg_match_all($pattern, $str, $matches);
+
+        return array_unique($matches[1]);
+    }
+
+    /**
+     * Given set of tags, find those that are output styles
+     *
+     * @param array $tags
+     * @return array
+     */
+    private function isolateStyleTags($tags)
+    {
+        $style = array();
+        foreach ($tags as $tag) {
+            if ($this->output->getFormatter()->hasStyle($tag)) {
+                $style[$tag] = $tag;
+            }
+        }
+
+        return $style;
+    }
+
+    /**
+     * Remove given opening and closing tags from string
+     *
+     * @param array $tags
+     * @param string $str
+     * @return string
+     */
+    private function removeTags($tags, $str)
+    {
+        $pattern = sprintf('/<\/?(%s)>/i', implode('|', $tags));
+
+        return preg_replace($pattern, '', $str);
     }
 }

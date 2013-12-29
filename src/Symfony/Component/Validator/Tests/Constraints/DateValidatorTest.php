@@ -113,4 +113,33 @@ class DateValidatorTest extends \PHPUnit_Framework_TestCase
             array('2010-02-29'),
         );
     }
+
+    /**
+     * @dataProvider getBeforeAndAfter
+     */
+    public function testBeforeAndAfter($date, $before, $after, $valid)
+    {
+        $this->context->expects($valid ? $this->never() : $this->once())
+            ->method('addViolation');
+
+        $this->validator->validate($date, new Date(array(
+            'before' => $before,
+            'after' => $after,
+        )));
+    }
+
+    public function getBeforeAndAfter()
+    {
+        return array(
+            array('2010-01-02', '2012-02-02', '2010-01-01', true),
+            array('2008-01-02', '2012-02-02', '2010-01-01', false),
+            array('2010-01-02', '2012-02-02', null, true),
+            array('2013-01-02', '2012-02-02', null, false),
+            array('2010-01-02', null, '2012-02-02', false),
+            array('2013-01-02', null, '2012-02-02', true),
+            array(date('Y-m-d', strtotime('+1 day')), null, 'now', true),
+            array(new \DateTime('-1 day'), 'now', null, true),
+            array(new \DateTime('-5 days'), 'now', '-3 days', false),
+        );
+    }
 }

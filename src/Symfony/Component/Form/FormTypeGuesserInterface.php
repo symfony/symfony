@@ -29,11 +29,11 @@ interface FormTypeGuesserInterface
     /**
      * Returns an array of guessed options
      *
-     * @param string $class    The fully qualified class name
-     * @param string $property The name of the property to guess for
-     * @param string $type     Boh.
+     * @param string                    $class    The fully qualified class name
+     * @param string                    $property The name of the property to guess for
+     * @param ResolvedFormTypeInterface $type     Field's type
      *
      * @return array An array of guesses for the field's option
      */
-    public function guessOptions($class, $property, $type);
+    public function guessOptions($class, $property, ResolvedFormTypeInterface $type);
 }

@@ -15,6 +15,7 @@ use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\Form\Guess\ValueGuess;
+use Symfony\Component\Form\ResolvedFormTypeInterface;
 use Symfony\Component\Validator\MetadataFactoryInterface;
 use Symfony\Component\Validator\Constraint;
 
@@ -42,16 +43,20 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
     /**
      * {@inheritDoc}
      */
-    public function guessOptions($class, $property, $type)
+    public function guessOptions($class, $property, ResolvedFormTypeInterface $type)
     {
         $options = array();
 
-        switch ($type) {
-            case 'text':
-                if (($guess = $this->guessMaxLength($class, $property)) && null !== $guess->getValue()) {
-                    $options = array_merge(array('max_length' => $guess->getValue()), $options);
-                }
-            break;
+        if ($type->isKnown('max_length') && ($guess = $this->guessMaxLength($class, $property)) && null !== $guess->getValue()) {
+            $options = array_merge_recursive(array('max_length' => $guess->getValue()), $options);
+        }
+
+        if ($type->isKnown('min') && ($guess = $this->guessMinValue($class, $property)) && null !== $guess->getValue()) {
+            $options = array_merge_recursive(array('attr' => array('min' => $guess->getValue())), $options);
+        }
+
+        if ($type->isKnown('max') && ($guess = $this->guessMaxValue($class, $property)) && null !== $guess->getValue()) {
+            $options = array_merge_recursive(array('attr' => array('max' => $guess->getValue())), $options);
         }
 
         return $options;

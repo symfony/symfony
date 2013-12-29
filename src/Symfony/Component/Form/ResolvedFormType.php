@@ -13,6 +13,7 @@ namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\Extension\Core\Type as FormType;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -123,6 +124,22 @@ class ResolvedFormType implements ResolvedFormTypeInterface
     public function createView(FormInterface $form, FormView $parent = null)
     {
         return $this->newView($parent);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isKnown($property)
+    {
+        switch ($property) {
+            case 'max_length':
+                return $this->innerType instanceof FormType\TextType;
+            case 'min':
+            case 'max':
+                return $this->innerType instanceof FormType\IntegerType;
+        }
+
+        return false;
     }
 
     /**

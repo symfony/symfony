@@ -103,4 +103,12 @@ interface ResolvedFormTypeInterface
      * @return \Symfony\Component\OptionsResolver\OptionsResolverInterface The options resolver.
      */
     public function getOptionsResolver();
+
+    /**
+     * Checks if the form type supports the given property
+     *
+     * @param  string  $property The property to check
+     * @return boolean           True if the form type supports the given property
+     */
+    public function isKnown($property);
 }

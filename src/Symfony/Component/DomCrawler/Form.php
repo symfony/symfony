@@ -383,7 +383,7 @@ class Form extends Link implements \ArrayAccess
         $root = $document->appendChild($document->createElement('_root'));
 
         // add submitted button if it has a valid name
-        if ($this->button->hasAttribute('name') && $this->button->getAttribute('name')) {
+        if ('form' !== $this->button->nodeName && $this->button->hasAttribute('name') && $this->button->getAttribute('name')) {
             $this->set(new Field\InputFormField($document->importNode($this->button, true)));
         }
 

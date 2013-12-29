@@ -15,6 +15,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Constraints\Optional;
+use Symfony\Component\Validator\Mapping\ValueMetadata;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -37,17 +38,20 @@ class CollectionValidator extends ConstraintValidator
         }
 
         $group = $this->context->getGroup();
+        $map = new ValueMetadata();
 
         foreach ($constraint->fields as $field => $fieldConstraint) {
+            $map->setConstraints($fieldConstraint->constraints);
+
             if (
                 // bug fix issue #2779
                 (is_array($value) && array_key_exists($field, $value)) ||
                 ($value instanceof \ArrayAccess && $value->offsetExists($field))
             ) {
-                foreach ($fieldConstraint->constraints as $constr) {
+                foreach ($map->findConstraints($group) as $constr) {
                     $this->context->validateValue($value[$field], $constr, '['.$field.']', $group);
                 }
-            } elseif (!$fieldConstraint instanceof Optional && !$constraint->allowMissingFields) {
+            } elseif ($map->hasConstraints($group) && !$fieldConstraint instanceof Optional && !$constraint->allowMissingFields) {
                 $this->context->addViolationAt('['.$field.']', $constraint->missingFieldsMessage, array(
                     '{{ field }}' => $field
                 ), null);

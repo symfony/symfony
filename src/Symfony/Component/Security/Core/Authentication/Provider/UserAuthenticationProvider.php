@@ -19,6 +19,7 @@ use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\AuthenticationServiceException;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Role\SwitchUserRole;
 
 /**
  * UserProviderInterface retrieves users for UsernamePasswordToken tokens.
@@ -92,7 +93,7 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
             throw $e;
         }
 
-        $authenticatedToken = new UsernamePasswordToken($user, $token->getCredentials(), $this->providerKey, $user->getRoles());
+        $authenticatedToken = new UsernamePasswordToken($user, $token->getCredentials(), $this->providerKey, $this->getRoles($user, $token));
         $authenticatedToken->setAttributes($token->getAttributes());
 
         return $authenticatedToken;
@@ -104,6 +105,29 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
     public function supports(TokenInterface $token)
     {
         return $token instanceof UsernamePasswordToken && $this->providerKey === $token->getProviderKey();
+    }
+
+    /**
+     * Retrieves roles from user and appends SwitchUserRole if original token contained one.
+     *
+     * @param UserInterface  $user  The user
+     * @param TokenInterface $token The token
+     *
+     * @return Role[] The user roles
+     */
+    private function getRoles(UserInterface $user, TokenInterface $token)
+    {
+        $roles = $user->getRoles();
+
+        foreach ($token->getRoles() as $role) {
+            if ($role instanceof SwitchUserRole) {
+                $roles[] = $role;
+
+                break;
+            }
+        }
+
+        return $roles;
     }
 
     /**

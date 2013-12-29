@@ -26,8 +26,8 @@ class AssociationEntity
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="SingleIntIdEntity")
-     * @var \Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity
+     * @ORM\ManyToOne(targetEntity="UniqueConstraintEntity")
+     * @var \Symfony\Bridge\Doctrine\Tests\Fixtures\UniqueConstraintEntity
      */
     public $single;
 

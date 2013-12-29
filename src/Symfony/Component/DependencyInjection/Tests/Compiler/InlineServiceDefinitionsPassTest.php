@@ -144,6 +144,21 @@ class InlineServiceDefinitionsPassTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($ref, $arguments[0]);
     }
 
+    public function testProcessDoesNotInlineWhenServiceReferencesItself()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register('foo')
+            ->setPublic(false)
+            ->addMethodCall('foo', array($ref = new Reference('foo')))
+        ;
+
+        $this->process($container);
+
+        $calls = $container->getDefinition('foo')->getMethodCalls();
+        $this->assertSame($ref, $calls[0][1][0]);
+    }
+
     protected function process(ContainerBuilder $container)
     {
         $repeatedPass = new RepeatedPass(array(new AnalyzeServiceReferencesPass(), new InlineServiceDefinitionsPass()));

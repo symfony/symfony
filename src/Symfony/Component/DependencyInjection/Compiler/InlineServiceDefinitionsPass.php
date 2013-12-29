@@ -125,6 +125,10 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
             return true;
         }
 
+        if ($this->currentId == $id) {
+            return false;
+        }
+
         $ids = array();
         foreach ($this->graph->getNode($id)->getInEdges() as $edge) {
             $ids[] = $edge->getSourceNode()->getId();

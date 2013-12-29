@@ -166,13 +166,7 @@ class ExceptionListenerTest extends \PHPUnit_Framework_TestCase
             $kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
         }
 
-        $event = new GetResponseForExceptionEvent($kernel, Request::create('/'), HttpKernelInterface::MASTER_REQUEST, $exception);
-
-        // FIXME: to be removed in 2.4
-        $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $event->setDispatcher($dispatcher);
-
-        return $event;
+        return new GetResponseForExceptionEvent($kernel, Request::create('/'), HttpKernelInterface::MASTER_REQUEST, $exception);
     }
 
     private function createExceptionListener(SecurityContextInterface $context = null, AuthenticationTrustResolverInterface $trustResolver = null, HttpUtils $httpUtils = null, AuthenticationEntryPointInterface $authenticationEntryPoint = null, $errorPage = null, AccessDeniedHandlerInterface $accessDeniedHandler = null)

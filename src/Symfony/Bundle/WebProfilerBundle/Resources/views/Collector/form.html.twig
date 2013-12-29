@@ -97,6 +97,22 @@
     .hidden {
         display: none;
     }
+    .btn-toggle {
+        cursor: pointer;
+    }
+    .badge-error {
+        float: right;
+        background: #a33;
+        color: #fff;
+        padding: 1px 4px;
+        font-size: 10px;
+        vertical-align: middle;
+        border-radius: 6px;
+    }
+    .table-error th {
+        background: #a33;
+        color: #fff;
+    }
     </style>
 
     {% if collector.data.forms|length %}
@@ -142,20 +158,8 @@
         };
 
         this.toggle = function (element) {
-            var r;
-
-            if (element.style.display !== 'none') {
-             //   this.collapse(element);
-
-                r = 'collapse';
-            } else {
-            //    this.expand(element);
-            }
-
             var imgs = element.parentElement.getElementsByTagName('img');
             Sfjs.toggle(element, imgs[0], imgs[1]);
-
-            return r || 'expand';
         }
     }
 
@@ -168,11 +172,7 @@
     var buttons = tree.querySelectorAll('.toggle-button');
     for (var j = 0, l = buttons.length; j < l; j++) {
         buttons[j].addEventListener('click', function (e) {
-            if ('collapse' === treeView.toggle(this.parentElement.parentElement.querySelector('ul'))) {
-                this.textContent = '+';
-            } else {
-                this.textContent = '-';
-            }
+            treeView.toggle(this.parentElement.parentElement.querySelector('ul'));
         }, false);
     }
 
@@ -266,6 +266,9 @@
                 <img class="toggle-button" src="{{ asset('bundles/framework/images/blue_picto_full.gif') }}">
             {% endif %}
             {{ name }}
+            {% if data.errors is defined and data.errors|length > 0 %}
+            <div class="badge-error">{{ data.errors|length }}</div>
+            {% endif %}
         </div>
 
         {% if data.children is not empty %}
@@ -290,7 +293,7 @@
         {% if data.errors is defined and data.errors|length > 0 %}
         <h3>Errors</h3>
 
-        <table>
+        <table class="table-error">
             <tr>
                 <th width="50%">Message</th>
                 <th>Cause</th>
@@ -306,11 +309,11 @@
 
         {% if data.default_data is defined %}
         <h3>
-            <a onclick="toggle('{{ data.id }}', 'default_data')">
+            Default Data
+            <a class="btn-toggle" onclick="toggle('{{ data.id }}', 'default_data')">
                 <img style="display:none" id="{{ data.id }}-default_data-open" src="{{ asset('bundles/framework/images/blue_picto_more.gif') }}">
                 <img style="display:inline" id="{{ data.id }}-default_data-close" src="{{ asset('bundles/framework/images/blue_picto_less.gif') }}">
             </a>
-            Default Data
         </h3>
 
         <div id="{{ data.id }}-default_data">
@@ -345,11 +348,11 @@
 
         {% if data.submitted_data is defined %}
         <h3>
-            <a onclick="toggle('{{ data.id }}', 'submitted_data')">
+            Submitted Data
+            <a class="btn-toggle" onclick="toggle('{{ data.id }}', 'submitted_data')">
                 <img style="display:none" id="{{ data.id }}-submitted_data-open" src="{{ asset('bundles/framework/images/blue_picto_more.gif') }}">
                 <img style="display:inline" id="{{ data.id }}-submitted_data-close" src="{{ asset('bundles/framework/images/blue_picto_less.gif') }}">
             </a>
-            Submitted Data
         </h3>
 
         <div id="{{ data.id }}-submitted_data">
@@ -388,11 +391,11 @@
 
         {% if data.passed_options is defined %}
         <h3>
-            <a onclick="toggle('{{ data.id }}', 'passed_options')">
+            Passed Options
+            <a class="btn-toggle" onclick="toggle('{{ data.id }}', 'passed_options')">
                 <img style="display:none" id="{{ data.id }}-passed_options-open" src="{{ asset('bundles/framework/images/blue_picto_more.gif') }}">
                 <img style="display:inline" id="{{ data.id }}-passed_options-close" src="{{ asset('bundles/framework/images/blue_picto_less.gif') }}">
             </a>
-            Passed Options
         </h3>
 
         <div id="{{ data.id }}-passed_options">
@@ -425,11 +428,11 @@
 
         {% if data.resolved_options is defined %}
         <h3>
-            <a onclick="toggle('{{ data.id }}', 'resolved_options')">
+            Resolved Options
+            <a class="btn-toggle" onclick="toggle('{{ data.id }}', 'resolved_options')">
                 <img style="display:inline" id="{{ data.id }}-resolved_options-open" src="{{ asset('bundles/framework/images/blue_picto_more.gif') }}">
                 <img style="display:none" id="{{ data.id }}-resolved_options-close" src="{{ asset('bundles/framework/images/blue_picto_less.gif') }}">
             </a>
-            Resolved Options
         </h3>
 
         <div id="{{ data.id }}-resolved_options" style="display:none">
@@ -450,11 +453,11 @@
 
         {% if data.view_vars is defined %}
         <h3>
-            <a onclick="toggle('{{ data.id }}', 'view_vars')">
+            View Variables
+            <a class="btn-toggle" onclick="toggle('{{ data.id }}', 'view_vars')">
                 <img style="display:inline" id="{{ data.id }}-view_vars-open" src="{{ asset('bundles/framework/images/blue_picto_more.gif') }}">
                 <img style="display:none" id="{{ data.id }}-view_vars-close" src="{{ asset('bundles/framework/images/blue_picto_less.gif') }}">
             </a>
-            View Variables
         </h3>
 
         <div id="{{ data.id }}-view_vars" style="display:none">

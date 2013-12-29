@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2013-11-24T00:21:02Z
+
+That would be coherent with "bootstrap" path to have a kernel dir relative to the config file where it is declared.
+
+```php
+    protected static function getKernelClass()
+    {
+        $dir = static::getPhpUnitXmlDir();
+        if (isset($_SERVER['KERNEL_DIR'])) {
+            $dir = realpath($dir . '/' . $_SERVER['KERNEL_DIR']) ?: $_SERVER['KERNEL_DIR'];
+        }
+        ...
+    }
+```
+
+---------------------------------------------------------------------------
+
+by mpdude at 2013-11-24T22:59:44Z
+
+This PR currently reflects the "conservative" variant that should not break BC IMO.

@@ -23,18 +23,6 @@ class LintCommand extends BaseLintCommand implements ContainerAwareInterface
     private $container;
 
     /**
-     * @return ContainerInterface
-     */
-    protected function getContainer()
-    {
-        if (null === $this->container) {
-            $this->container = $this->getApplication()->getKernel()->getContainer();
-        }
-
-        return $this->container;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function setContainer(ContainerInterface $container = null)
@@ -47,6 +35,10 @@ class LintCommand extends BaseLintCommand implements ContainerAwareInterface
      */
     public function getTwigEnvironment()
     {
-        return $this->getContainer()->get('twig');
+        if (null === $this->container) {
+            $this->container = $this->getApplication()->getKernel()->getContainer();
+        }
+
+        return $this->container->get('twig');
     }
 }

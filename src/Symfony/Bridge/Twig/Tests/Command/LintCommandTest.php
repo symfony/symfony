@@ -63,8 +63,11 @@ class LintCommandTest extends \PHPUnit_Framework_TestCase
     {
         $twig = new \Twig_Environment(new \Twig_Loader_Filesystem());
 
+        $command = new LintCommand();
+        $command->setTwigEnvironment($twig);
+
         $application = new Application();
-        $application->add(new LintCommand($twig));
+        $application->add($command);
         $command = $application->find('twig:lint');
 
         return new CommandTester($command);

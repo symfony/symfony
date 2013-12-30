@@ -33,6 +33,7 @@ class Command
 {
     private $application;
     private $name;
+    private $processName;
     private $aliases = array();
     private $definition;
     private $help;
@@ -212,6 +213,16 @@ class Command
      */
     public function run(InputInterface $input, OutputInterface $output)
     {
+        if (null !== $this->processName) {
+            if (function_exists('cli_set_process_title')) {
+                cli_set_process_title($this->processName);
+            } elseif (function_exists('setproctitle')) {
+                setproctitle($this->processName);
+            } elseif (OutputInterface::VERBOSITY_VERY_VERBOSE === $output->getVerbosity()) {
+                $output->writeln('<comment>Install the proctitle PECL to be able to change the process title.</comment>');
+            }
+        }
+
         // force the creation of the synopsis before the merge with the app definition
         $this->getSynopsis();
 
@@ -407,6 +418,25 @@ class Command
         $this->validateName($name);
 
         $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * Sets the process name of the command.
+     *
+     * This feature should be used only when creating a long process command,
+     * like a daemon.
+     *
+     * PHP 5.5+ or the proctitle PECL library is required
+     *
+     * @param string $name The process name
+     *
+     * @return Command The current instance
+     */
+    public function setProcessName($name)
+    {
+        $this->processName = $name;
 
         return $this;
     }

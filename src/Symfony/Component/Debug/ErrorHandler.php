@@ -16,6 +16,7 @@ use Symfony\Component\Debug\Exception\ContextErrorException;
 use Symfony\Component\Debug\Exception\FatalErrorException;
 use Symfony\Component\Debug\Exception\DummyException;
 use Symfony\Component\Debug\FatalErrorHandler\UndefinedFunctionFatalErrorHandler;
+use Symfony\Component\Debug\FatalErrorHandler\UndefinedMethodFatalErrorHandler;
 use Symfony\Component\Debug\FatalErrorHandler\ClassNotFoundFatalErrorHandler;
 use Symfony\Component\Debug\FatalErrorHandler\FatalErrorHandlerInterface;
 
@@ -224,6 +225,7 @@ class ErrorHandler
     {
         return array(
             new UndefinedFunctionFatalErrorHandler(),
+            new UndefinedMethodFatalErrorHandler(),
             new ClassNotFoundFatalErrorHandler(),
         );
     }

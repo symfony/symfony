@@ -18,6 +18,11 @@ UPGRADE FROM 2.x to 3.0
    `DebugClassLoader`. The difference is that the constructor now takes a
    loader to wrap.
 
+### EventDispatcher
+
+ * The interface `Symfony\Component\EventDispatcher\Debug\TraceableEventDispatcherInterface`
+   extends `Symfony\Component\EventDispatcher\EventDispatcherInterface`.
+
 ### Form
 
  * The methods `Form::bind()` and `Form::isBound()` were removed. You should
@@ -291,6 +296,9 @@ UPGRADE FROM 2.x to 3.0
 
  * The `Symfony\Component\HttpKernel\EventListener\ExceptionListener` now
    passes the Request format as the `_format` argument instead of `format`.
+
+ * The `Symfony\Component\HttpKernel\DependencyInjection\RegisterListenersPass` has been renamed to
+   `Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass` and moved to the EventDispatcher component.
 
 ### Locale
 

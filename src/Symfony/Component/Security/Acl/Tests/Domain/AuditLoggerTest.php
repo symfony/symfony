@@ -26,12 +26,12 @@ class AuditLoggerTest extends \PHPUnit_Framework_TestCase
                 ->expects($this->once())
                 ->method('isAuditSuccess')
                 ->will($this->returnValue($audit))
-           ;
+            ;
 
-           $ace
+            $ace
                ->expects($this->never())
                ->method('isAuditFailure')
-           ;
+            ;
         } else {
             $ace
                 ->expects($this->never())

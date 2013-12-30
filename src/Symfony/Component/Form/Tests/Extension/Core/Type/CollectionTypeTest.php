@@ -12,6 +12,8 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\Tests\Fixtures\Author;
+use Symfony\Component\Form\Tests\Fixtures\AuthorType;
 
 class CollectionTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 {
@@ -86,6 +88,78 @@ class CollectionTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $this->assertFalse($form->has('1'));
         $this->assertEquals('foo@foo.com', $form[0]->getData());
         $this->assertEquals(array('foo@foo.com'), $form->getData());
+    }
+
+    public function testResizedDownIfSubmittedWithEmptyDataAndDeleteEmpty()
+    {
+        $form = $this->factory->create('collection', null, array(
+            'type' => 'text',
+            'allow_delete' => true,
+            'delete_empty' => true,
+        ));
+
+        $form->setData(array('foo@foo.com', 'bar@bar.com'));
+        $form->submit(array('foo@foo.com', ''));
+
+        $this->assertTrue($form->has('0'));
+        $this->assertFalse($form->has('1'));
+        $this->assertEquals('foo@foo.com', $form[0]->getData());
+        $this->assertEquals(array('foo@foo.com'), $form->getData());
+    }
+
+    public function testDontAddEmptyDataIfDeleteEmpty()
+    {
+        $form = $this->factory->create('collection', null, array(
+            'type' => 'text',
+            'allow_add' => true,
+            'delete_empty' => true,
+        ));
+
+        $form->setData(array('foo@foo.com'));
+        $form->submit(array('foo@foo.com', ''));
+
+        $this->assertTrue($form->has('0'));
+        $this->assertFalse($form->has('1'));
+        $this->assertEquals('foo@foo.com', $form[0]->getData());
+        $this->assertEquals(array('foo@foo.com'), $form->getData());
+    }
+
+    public function testNoDeleteEmptyIfDeleteNotAllowed()
+    {
+        $form = $this->factory->create('collection', null, array(
+            'type' => 'text',
+            'allow_delete' => false,
+            'delete_empty' => true,
+        ));
+
+        $form->setData(array('foo@foo.com'));
+        $form->submit(array(''));
+
+        $this->assertTrue($form->has('0'));
+        $this->assertEquals('', $form[0]->getData());
+    }
+
+    public function testResizedDownIfSubmittedWithCompoundEmptyDataAndDeleteEmpty()
+    {
+        $form = $this->factory->create('collection', null, array(
+            'type' => new AuthorType(),
+            // If the field is not required, no new Author will be created if the
+            // form is completely empty
+            'options' => array('required' => false),
+            'allow_add' => true,
+            'delete_empty' => true,
+        ));
+
+        $form->setData(array(new Author('first', 'last')));
+        $form->submit(array(
+            array('firstName' => 's_first', 'lastName' => 's_last'),
+            array('firstName' => '', 'lastName' => ''),
+        ));
+
+        $this->assertTrue($form->has('0'));
+        $this->assertFalse($form->has('1'));
+        $this->assertEquals(new Author('s_first', 's_last'), $form[0]->getData());
+        $this->assertEquals(array(new Author('s_first', 's_last')), $form->getData());
     }
 
     public function testNotResizedIfSubmittedWithExtraData()

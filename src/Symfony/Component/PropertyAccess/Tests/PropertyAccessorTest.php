@@ -137,6 +137,13 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Bernhard', $this->getPropertyAccessor()->getValue($array, '%!@$§'));
     }
 
+    public function testGetValueReadsPropertyWithSpecialCharsExceptDotNested()
+    {
+        $object = (object) array('nested' => (object) array('@child' => 'foo'));
+
+        $this->assertEquals('foo', $this->getPropertyAccessor()->getValue($object, 'nested.@child'));
+    }
+
     public function testGetValueReadsPropertyWithCustomPropertyPath()
     {
         $object = new Author();
@@ -326,6 +333,17 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
         $this->getPropertyAccessor()->setValue($object, 'last_name', 'Schussek');
 
         $this->assertEquals('Schussek', $object->getLastName());
+    }
+
+    public function testSetValueWithSpecialCharsNested()
+    {
+        $object = new \stdClass();
+        $person = new \stdClass();
+        $person->{'@email'} = null;
+        $object->person = $person;
+
+        $this->getPropertyAccessor()->setValue($object, 'person.@email', 'bar');
+        $this->assertEquals('bar', $object->person->{'@email'});
     }
 
     /**

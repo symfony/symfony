@@ -14,7 +14,7 @@ namespace Symfony\Component\Config\Tests;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\Resource\FileResource;
 
-class ConfigTest extends \PHPUnit_Framework_TestCase
+class ConfigCacheTest extends \PHPUnit_Framework_TestCase
 {
     private $resourceFile = null;
 

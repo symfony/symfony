@@ -199,7 +199,7 @@
     {% endif %}
 
     <script>
-    function Toggler() {
+    function Toggler(togglerStorage) {
         "use strict";
 
         var expand = function (button) {
@@ -209,6 +209,8 @@
                 if (!target) {
                     throw "Toggle target " + targetId + " does not exist";
                 }
+
+                togglerStorage.store(targetId, 'visible');
 
                 Sfjs.removeClass(button, 'closed');
                 Sfjs.removeClass(target, 'hidden');
@@ -221,6 +223,8 @@
                 if (!target) {
                     throw "Toggle target " + targetId + " does not exist";
                 }
+
+                togglerStorage.store(targetId, 'hidden');
 
                 Sfjs.addClass(button, 'closed');
                 Sfjs.addClass(target, 'hidden');
@@ -268,6 +272,63 @@
             expand: expand,
 
             collapse: collapse
+        };
+    }
+
+    function TogglerStorage(key) {
+        var key = 'sf_' + (key || 'toggle_data'),
+            store = function (id, state) {
+                var toggleData = sessionStorage.getItem(key);
+                if (!toggleData) {
+                    toggleData = [];
+                } else {
+                    toggleData = toggleData.split('|');
+                }
+
+                if ('visible' == state) {
+                    toggleData.push(id);
+                } else {
+                    var index = toggleData.indexOf(id);
+                    if (-1 < index) {
+                        toggleData.splice(index, 1);
+                    }
+                }
+
+                sessionStorage.setItem(key, toggleData.join('|'));
+            },
+
+            initStorage = function (buttonsSelector) {
+                var toggleData = sessionStorage.getItem(key);
+
+                if (!toggleData) {
+                    return;
+                }
+                toggleData = toggleData.split('|');
+
+                var buttons = document.getElementsByClassName(buttonsSelector || 'toggle-button');
+                for (i in toggleData) {
+                    var element = document.getElementById(toggleData[i]);
+                    if (!element) {
+                        continue;
+                    }
+
+                    if (Sfjs.hasClass(element, 'hidden')) {
+                        for (var i = -1; button = buttons[++i]; ) {
+                            if (button.dataset.toggleTargetId && button.dataset.toggleTargetId == element.getAttribute('id')) {
+                                break;
+                            }
+                        }
+
+                        Sfjs.removeClass(element, 'hidden');
+                        Sfjs.removeClass(button, 'closed');
+                    }
+                }
+            };
+
+        return {
+            store: store,
+
+            initStorage: initStorage
         };
     }
 
@@ -335,10 +396,12 @@
     }
 
     var tabTarget = new TabView(),
-        toggler = new Toggler();
+        storage = new TogglerStorage(),
+        toggler = new Toggler(storage);
 
     tabTarget.initTabs(document.querySelectorAll('.tree .tree-inner'));
     toggler.initButtons(document.querySelectorAll('a.toggle-button'));
+    storage.initStorage();
     </script>
 {% endblock %}
 

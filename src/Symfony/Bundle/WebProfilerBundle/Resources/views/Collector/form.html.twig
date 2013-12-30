@@ -70,18 +70,32 @@
     .tree a {
         text-decoration: none;
     }
-    .tree .toggle-icon {
-        width: 10px;
-        height: 10px;
+    .tree .toggle-button {
+        /* provide a bigger clickable area than just 10x10px */
+        width: 16px;
+        height: 16px;
         /* vertically center the button */
         position: absolute;
         top: 50%;
-        margin-top: -5px;
-        margin-left: -15px;
+        margin-top: -8px;
+        margin-left: -18px;
+    }
+    .tree .toggle-icon {
+        width: 10px;
+        height: 10px;
+        /* position the icon in the center of the clickable area */
+        margin-left: 3px;
+        margin-top: 3px;
         background-size: 10px 20px;
         background-color: #ccc;
     }
     .tree .toggle-icon.empty {
+        width: 10px;
+        height: 10px;
+        position: absolute;
+        top: 50%;
+        margin-top: -5px;
+        margin-left: -15px;
         background-size: 10px 10px;
     }
     .tree ul ul .tree-inner {
@@ -332,7 +346,7 @@
     <li>
         <div class="tree-inner" data-tab-target-id="{{ data.id }}-details">
             {% if data.children is not empty %}
-                <a class="toggle-button toggle-icon" data-toggle-target-id="{{ data.id }}-children" href="#"></a>
+                <a class="toggle-button" data-toggle-target-id="{{ data.id }}-children" href="#"><span class="toggle-icon"></span></a>
             {% else %}
                 <div class="toggle-icon empty"></div>
             {% endif %}

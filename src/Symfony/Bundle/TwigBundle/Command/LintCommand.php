@@ -14,6 +14,7 @@ namespace Symfony\Bundle\TwigBundle\Command;
 use Symfony\Bridge\Twig\Command\LintCommand as BaseLintCommand;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\Finder\Finder;
 
 class LintCommand extends BaseLintCommand implements ContainerAwareInterface
 {
@@ -36,5 +37,34 @@ class LintCommand extends BaseLintCommand implements ContainerAwareInterface
     public function getTwigEnvironment()
     {
         return $this->container->get('twig');
+    }
+
+    protected function configure()
+    {
+        parent::configure();
+
+        $this
+            ->setHelp(
+                $this->getHelp().<<<EOF
+
+
+<info>php %command.full_name% @AcmeMyBundle</info>
+
+The command finds all twig templates in the <comment>AcmeMyBundle</comment> bundle and validates
+the syntax of each Twig template.
+EOF
+            )
+        ;
+    }
+
+    protected function findFiles($filename)
+    {
+        if (0 === strpos($filename, '@')) {
+            $dir = $this->getApplication()->getKernel()->locateResource($filename);
+
+            return Finder::create()->files()->in($dir)->name('*.twig');
+        }
+
+        return parent::findFiles($filename);
     }
 }

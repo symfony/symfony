@@ -15,7 +15,6 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
-use Symfony\Bundle\FrameworkBundle\Console\Application as FrameworkBundleApplication;
 
 /**
  * Command that will validate your template syntax and output encountered errors.
@@ -70,11 +69,6 @@ The command gets the contents of <comment>filename</comment> and validates its s
 The command finds all twig templates in <comment>dirname</comment> and validates the syntax
 of each Twig template.
 
-<info>php %command.full_name% @AcmeMyBundle</info>
-
-The command finds all twig templates in the <comment>AcmeMyBundle</comment> bundle and validates
-the syntax of each Twig template.
-
 <info>cat filename | php %command.full_name%</info>
 
 The command gets the template contents from stdin and validates its syntax.
@@ -101,19 +95,7 @@ EOF
             return $this->validateTemplate($twig, $output, $template);
         }
 
-        if (0 !== strpos($filename, '@') && !is_readable($filename)) {
-            throw new \RuntimeException(sprintf('File or directory "%s" is not readable', $filename));
-        }
-
-        $files = array();
-        if (is_file($filename)) {
-            $files = array($filename);
-        } elseif (is_dir($filename)) {
-            $files = Finder::create()->files()->in($filename)->name('*.twig');
-        } elseif ($this->getApplication() instanceof FrameworkBundleApplication) {
-            $dir = $this->getApplication()->getKernel()->locateResource($filename);
-            $files = Finder::create()->files()->in($dir)->name('*.twig');
-        }
+        $files = $this->findFiles($filename);
 
         $errors = 0;
         foreach ($files as $file) {
@@ -121,6 +103,17 @@ EOF
         }
 
         return $errors > 0 ? 1 : 0;
+    }
+
+    protected function findFiles($filename)
+    {
+        if (is_file($filename)) {
+            return array($filename);
+        } elseif (is_dir($filename)) {
+            return Finder::create()->files()->in($filename)->name('*.twig');
+        }
+
+        throw new \RuntimeException(sprintf('File or directory "%s" is not readable', $filename));
     }
 
     protected function validateTemplate(\Twig_Environment $twig, OutputInterface $output, $template, $file = null)

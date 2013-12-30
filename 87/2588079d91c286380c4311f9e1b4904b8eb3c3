@@ -1,0 +1,95 @@
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-24T10:53:34Z
+
+i wonder if @fabbot is good with `js` syntax stuff too
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2013-12-26T09:34:40Z
+
+Fixed some styling (still not 100% sure if it's right) and made the sections collapsable (need styling)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-12-28T12:07:51Z
+
+@WouterJ Do you expect to finish this one soon? Or do you need some help?
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2013-12-28T12:15:38Z
+
+@fabbot I've now done 2 of the 3 points. I can take a look at the third point tomorrow I think. Then the only thing that needs to be done is remember which sections/forms were collapsed and which not. At the moment, I don't have an idea how to do that, but I think we can merge this PR without that feature.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-12-28T19:15:00Z
+
+Thank you for working on this @WouterJ! :) Let us know when you're finished so we can test the PR
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2013-12-29T14:04:08Z
+
+@bschussek @fabbot I've finished this PR now. I did not include the session storage for the expanded elements, I don't know how to implement that in a good way. I'll leave that to another person.
+
+For the reference, a screenshot:
+
+![form-debugger-prtsc](https://f.cloud.github.com/assets/749025/1819433/0c3a1364-7092-11e3-92cd-9297713071c7.png)
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-12-29T15:01:25Z
+
+The screenshot looks awesome! Going to test the implementation now :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-12-29T17:27:41Z
+
+As a side note, this is going to be merged into master, not 2.4
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2013-12-29T18:12:13Z
+
+@fabpot agreed, don't know why I submitted it for 2.4...
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-12-30T14:35:19Z
+
+I really like it! :) I made some small changes in WouterJ/symfony#1. With those changes applied, the PR can be merged. Thanks!
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2013-12-30T17:07:25Z
+
+Merged @bschussek's PR. And with that PR, I now know how to integrate session storage. So I've put it in WIP mode again, will work on that tomorrow.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-12-30T18:20:28Z
+
+@WouterJ I suggest to merge this PR now and add session storage in a separate PR. That will make the review of the session storage changes easier. :)
+
+ping @fabpot
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-12-30T18:21:04Z
+
+Oh, I just realized that blue_picto_full.gif is still in. Could you please remove it from this PR? It's unused by now.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2013-12-30T19:16:01Z
+
+@bschussek ok, I'll do that
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2013-12-30T20:22:56Z
+
+btw, @bschussek when you want to review the storage: WouterJ/symfony@18cf601f20f5e690f9e71ef6d3b6d92069068700 :P

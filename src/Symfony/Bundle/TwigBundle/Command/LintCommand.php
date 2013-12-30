@@ -35,10 +35,6 @@ class LintCommand extends BaseLintCommand implements ContainerAwareInterface
      */
     public function getTwigEnvironment()
     {
-        if (null === $this->container) {
-            $this->container = $this->getApplication()->getKernel()->getContainer();
-        }
-
         return $this->container->get('twig');
     }
 }

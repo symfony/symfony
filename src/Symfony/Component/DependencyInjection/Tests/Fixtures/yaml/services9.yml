@@ -12,7 +12,7 @@ services:
         factory_class: Bar\FooClass
         factory_method: getInstance
         arguments: [foo, '@foo.baz', { '%foo%': 'foo is %foo%', foobar: '%foo%' }, true, '@service_container']
-        properties: { foo: bar, moo: '@foo.baz' }
+        properties: { foo: bar, moo: '@foo.baz', qux: { '%foo%': 'foo is %foo%', foobar: '%foo%' } }
         calls:
             - [setBar, ['@bar']]
             - [initialize, {  }]

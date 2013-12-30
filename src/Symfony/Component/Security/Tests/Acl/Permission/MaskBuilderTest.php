@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Security\Tests\Acl\Util;
+namespace Symfony\Component\Security\Tests\Acl\Permission;
 
 use Symfony\Component\Security\Acl\Permission\MaskBuilder;
 

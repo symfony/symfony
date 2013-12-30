@@ -9,7 +9,7 @@
 * file that was distributed with this source code.
 */
 
-namespace Symfony\Bridge\Doctrine\Tests\DependencyInjection\Compiler;
+namespace Symfony\Bridge\Doctrine\Tests\DependencyInjection\CompilerPass;
 
 use Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass\RegisterEventListenersAndSubscribersPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;

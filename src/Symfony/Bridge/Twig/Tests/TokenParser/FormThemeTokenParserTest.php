@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bridge\Twig\Tests\Node;
+namespace Symfony\Bridge\Twig\Tests\TokenParser;
 
 use Symfony\Bridge\Twig\Tests\TestCase;
 use Symfony\Bridge\Twig\TokenParser\FormThemeTokenParser;

@@ -23,7 +23,7 @@ use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
  *
  * @runTestsInSeparateProcesses
  */
-class PhpSessionStorageTest extends \PHPUnit_Framework_TestCase
+class PhpBridgeSessionStorageTest extends \PHPUnit_Framework_TestCase
 {
     private $savePath;
 

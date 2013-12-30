@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Validator\Tests\Mapping\Cache;
+namespace Symfony\Bridge\Doctrine\Tests\Validator\Mapping;
 
-use Symfony\Component\Validator\Mapping\Cache\DoctrineCache;
+use Symfony\Bridge\Doctrine\Validator\Mapping\DoctrineCache;
 use Doctrine\Common\Cache\ArrayCache;
 
 class DoctrineCacheTest extends \PHPUnit_Framework_TestCase

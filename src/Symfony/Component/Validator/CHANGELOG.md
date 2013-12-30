@@ -4,8 +4,7 @@ CHANGELOG
 2.5.0
 -----
 
- * deprecated `ApcCache` in favor of `DoctrineCache`
- * added `DoctrineCache` to adapt any Doctrine cache
+ * deprecated `ApcCache` in favor of `Symfony\Bridge\Doctrine\Validator\Mapping\DoctrineCache`
 
 2.4.0
 -----

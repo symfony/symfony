@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+2.5.0
+-----
+
+ * deprecated `ApcCache` in favor of `DoctrineCache`
+ * added `DoctrineCache` to adapt any Doctrine cache
+
 2.4.0
 -----
 

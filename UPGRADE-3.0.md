@@ -443,6 +443,29 @@ UPGRADE FROM 2.x to 3.0
 
 ### Validator
 
+ * The class `Symfony\Component\Validator\Mapping\Cache\ApcCache` has been removed in favor
+   of `Symfony\Component\Validator\Mapping\Cache\DoctrineCache`.
+
+   Before:
+
+   ```
+   use Symfony\Component\Validator\Mapping\Cache\ApcCache;
+
+   $cache = new ApcCache('symfony.validator');
+   ```
+
+   After:
+
+   ```
+   use Symfony\Component\Validator\Mapping\Cache\DoctrineCache;
+   use Doctrine\Common\Cache\ApcCache;
+
+   $apcCache = new ApcCache();
+   $apcCache->setNamespace('symfony.validator');
+
+   $cache = new DoctrineCache($apcCache);
+   ```
+
  * The constraints `Optional` and `Required` were moved to the
    `Symfony\Component\Validator\Constraints\` namespace. You should adapt
    the path wherever you used them.

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2013-12-30T04:11:45Z
+
+The idea was also to deprecate the old caches. It's missing. Please add a `@deprecated` phpdoc. See other examples.
+
+---------------------------------------------------------------------------
+
+by florianv at 2013-12-30T05:06:13Z
+
+@Tobion thanks, done. Also updated the PR description.

@@ -36,6 +36,10 @@ class UserChecker implements UserCheckerInterface
             $ex = new CredentialsExpiredException('User credentials have expired.');
             $ex->setUser($user);
             throw $ex;
+        } elseif (!$user->isAccountNonLocked()) {
+            $ex = new LockedException('User account is locked.');
+            $ex->setUser($user);
+            throw $ex;
         }
     }
 
@@ -46,12 +50,6 @@ class UserChecker implements UserCheckerInterface
     {
         if (!$user instanceof AdvancedUserInterface) {
             return;
-        }
-
-        if (!$user->isAccountNonLocked()) {
-            $ex = new LockedException('User account is locked.');
-            $ex->setUser($user);
-            throw $ex;
         }
 
         if (!$user->isEnabled()) {

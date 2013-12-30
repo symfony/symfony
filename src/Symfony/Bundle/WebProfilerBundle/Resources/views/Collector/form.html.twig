@@ -29,15 +29,15 @@
         /*background: #F6F6F6;*/
         margin: -30px -40px -40px;
     }
-    .toggle-button {
+    .toggle-icon {
         display: inline-block;
-        background: url("/bundles/framework/images/toggler.png") no-repeat top left #ccc;
+        background: url("{{ asset('/bundles/framework/images/toggler.png') }}") no-repeat top left #5eb5e0;
     }
-    .toggle-button.closed {
+    .closed .toggle-icon, .closed.toggle-icon {
         background-position: bottom left;
     }
-    .toggle-button.empty {
-        background-image: url("/bundles/framework/images/toggler_empty.png");
+    .toggle-icon.empty {
+        background-image: url("{{ asset('/bundles/framework/images/toggler_empty.png') }}");
     }
     .tree {
         width: 230px;
@@ -70,7 +70,7 @@
     .tree a {
         text-decoration: none;
     }
-    .tree .toggle-button {
+    .tree .toggle-icon {
         width: 10px;
         height: 10px;
         /* vertically center the button */
@@ -79,8 +79,9 @@
         margin-top: -5px;
         margin-left: -15px;
         background-size: 10px 20px;
+        background-color: #ccc;
     }
-    .tree .toggle-button.empty {
+    .tree .toggle-icon.empty {
         background-size: 10px 10px;
     }
     .tree ul ul .tree-inner {
@@ -103,12 +104,12 @@
         font-weight: bold;
         color: #313131;
     }
-    .tree .tree-inner.active .toggle-button, .tree .tree-inner:hover .toggle-button, .tree .tree-inner.active:hover .toggle-button {
-        background-image: url("/bundles/framework/images/toggler_hover.png");
+    .tree .tree-inner.active .toggle-icon, .tree .tree-inner:hover .toggle-icon, .tree .tree-inner.active:hover .toggle-icon {
+        background-image: url("{{ asset('/bundles/framework/images/toggler_hover.png') }}");
         background-color: #aaa;
     }
-    .tree .tree-inner.active .toggle-button.empty, .tree .tree-inner:hover .toggle-button.empty, .tree .tree-inner.active:hover .toggle-button.empty {
-        background-image: url("/bundles/framework/images/toggler_hover_empty.png");
+    .tree .tree-inner.active .toggle-icon.empty, .tree .tree-inner:hover .toggle-icon.empty, .tree .tree-inner.active:hover .toggle-icon.empty {
+        background-image: url("{{ asset('/bundles/framework/images/toggler_hover_empty.png') }}");
     }
     .tree-details {
         border-left: 1px solid #dfdfdf;
@@ -120,7 +121,7 @@
         position: relative;
         padding-left: 22px;
     }
-    .tree-details .toggle-button {
+    .tree-details .toggle-icon {
         width: 16px;
         height: 16px;
         /* vertically center the button */
@@ -149,14 +150,18 @@
         color: #800;
     }
     .errors th, .errors td {
-        border: 1px solid #800;
+        border-color: #800;
     }
     .errors th {
         background: #a33;
         color: #fff;
     }
-    .errors .toggle-button {
+    .errors .toggle-icon {
         background-color: #a33;
+    }
+    h3 a, h3 a:hover, h3 a:focus {
+        color: inherit;
+        text-decoration: inherit;
     }
     </style>
 
@@ -255,7 +260,7 @@
 
     function TabView() {
         "use strict";
-        
+
         var activeTab = null,
 
             activeTarget = null,
@@ -328,9 +333,9 @@
     <li>
         <div class="tree-inner" data-tab-target-id="{{ data.id }}-details">
             {% if data.children is not empty %}
-                <a class="toggle-button" data-toggle-target-id="{{ data.id }}-children" href="#"></a>
+                <a class="toggle-button toggle-icon" data-toggle-target-id="{{ data.id }}-children" href="#"></a>
             {% else %}
-                <div class="toggle-button empty"></div>
+                <div class="toggle-icon empty"></div>
             {% endif %}
             {{ name }}
             {% if data.errors is defined and data.errors|length > 0 %}
@@ -360,8 +365,10 @@
         {% if data.errors is defined and data.errors|length > 0 %}
         <div class="errors">
             <h3>
-                <a class="toggle-button" data-toggle-target-id="{{ data.id }}-errors" href="#"></a>
-                Errors
+                <a class="toggle-button" data-toggle-target-id="{{ data.id }}-errors" href="#">
+                    <span class="toggle-icon"></span>
+                    Errors
+                </a>
             </h3>
 
             <table id="{{ data.id }}-errors">
@@ -381,8 +388,10 @@
 
         {% if data.default_data is defined %}
         <h3>
-            <a class="toggle-button" data-toggle-target-id="{{ data.id }}-default_data" href="#"></a>
-            Default Data
+            <a class="toggle-button" data-toggle-target-id="{{ data.id }}-default_data" href="#">
+                <span class="toggle-icon"></span>
+                Default Data
+            </a>
         </h3>
 
         <div id="{{ data.id }}-default_data">
@@ -417,8 +426,10 @@
 
         {% if data.submitted_data is defined %}
         <h3>
-            <a class="toggle-button" data-toggle-target-id="{{ data.id }}-submitted_data" href="#"></a>
-            Submitted Data
+            <a class="toggle-button" data-toggle-target-id="{{ data.id }}-submitted_data" href="#">
+                <span class="toggle-icon"></span>
+                Submitted Data
+            </a>
         </h3>
 
         <div id="{{ data.id }}-submitted_data">
@@ -457,8 +468,10 @@
 
         {% if data.passed_options is defined %}
         <h3>
-            <a class="toggle-button" data-toggle-target-id="{{ data.id }}-passed_options" href="#"></a>
-            Passed Options
+            <a class="toggle-button" data-toggle-target-id="{{ data.id }}-passed_options" href="#">
+                <span class="toggle-icon"></span>
+                Passed Options
+            </a>
         </h3>
 
         <div id="{{ data.id }}-passed_options">
@@ -491,8 +504,10 @@
 
         {% if data.resolved_options is defined %}
         <h3>
-            <a class="toggle-button" data-toggle-target-id="{{ data.id }}-resolved_options" href="#"></a>
-            Resolved Options
+            <a class="toggle-button" data-toggle-target-id="{{ data.id }}-resolved_options" href="#">
+                <span class="toggle-icon"></span>
+                Resolved Options
+            </a>
         </h3>
 
         <div id="{{ data.id }}-resolved_options" class="hidden">
@@ -513,8 +528,10 @@
 
         {% if data.view_vars is defined %}
         <h3>
-            <a class="toggle-button" data-toggle-target-id="{{ data.id }}-view_vars" href="#"></a>
-            View Variables
+            <a class="toggle-button" data-toggle-target-id="{{ data.id }}-view_vars" href="#">
+                <span class="toggle-icon"></span>
+                View Variables
+            </a>
         </h3>
 
         <div id="{{ data.id }}-view_vars" class="hidden">

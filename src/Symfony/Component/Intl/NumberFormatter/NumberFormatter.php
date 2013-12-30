@@ -154,7 +154,7 @@ class NumberFormatter
     private $attributes = array(
         self::FRACTION_DIGITS => 0,
         self::GROUPING_USED   => 1,
-        self::ROUNDING_MODE   => self::ROUND_HALFEVEN
+        self::ROUNDING_MODE   => self::ROUND_HALFEVEN,
     );
 
     /**
@@ -171,7 +171,7 @@ class NumberFormatter
      */
     private static $supportedStyles = array(
         'CURRENCY' => self::CURRENCY,
-        'DECIMAL'  => self::DECIMAL
+        'DECIMAL'  => self::DECIMAL,
     );
 
     /**
@@ -182,7 +182,7 @@ class NumberFormatter
     private static $supportedAttributes = array(
         'FRACTION_DIGITS' => self::FRACTION_DIGITS,
         'GROUPING_USED'   => self::GROUPING_USED,
-        'ROUNDING_MODE'   => self::ROUNDING_MODE
+        'ROUNDING_MODE'   => self::ROUNDING_MODE,
     );
 
     /**
@@ -199,7 +199,7 @@ class NumberFormatter
         'ROUND_CEILING'  => self::ROUND_CEILING,
         'ROUND_FLOOR'    => self::ROUND_FLOOR,
         'ROUND_DOWN'     => self::ROUND_DOWN,
-        'ROUND_UP'       => self::ROUND_UP
+        'ROUND_UP'       => self::ROUND_UP,
     );
 
     /**
@@ -227,7 +227,7 @@ class NumberFormatter
         self::ROUND_CEILING => true,
         self::ROUND_FLOOR   => true,
         self::ROUND_DOWN    => true,
-        self::ROUND_UP      => true
+        self::ROUND_UP      => true,
     );
 
     /**
@@ -237,7 +237,7 @@ class NumberFormatter
      */
     private static $int32Range = array(
         'positive' => 2147483647,
-        'negative' => -2147483648
+        'negative' => -2147483648,
     );
 
     /**
@@ -247,7 +247,7 @@ class NumberFormatter
      */
     private static $int64Range = array(
         'positive' => 9223372036854775807,
-        'negative' => -9223372036854775808
+        'negative' => -9223372036854775808,
     );
 
     private static $enSymbols = array(

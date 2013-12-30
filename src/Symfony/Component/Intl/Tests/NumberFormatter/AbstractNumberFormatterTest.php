@@ -486,7 +486,7 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
             array(1.127, '1.13'),
             array(-1.123, '-1.12'),
             array(-1.125, '-1.12'),
-            array(-1.127, '-1.12')
+            array(-1.127, '-1.12'),
         );
     }
 
@@ -510,7 +510,7 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
             array(1.127, '1.12'),
             array(-1.123, '-1.13'),
             array(-1.125, '-1.13'),
-            array(-1.127, '-1.13')
+            array(-1.127, '-1.13'),
         );
     }
 
@@ -534,7 +534,7 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
             array(1.127, '1.12'),
             array(-1.123, '-1.12'),
             array(-1.125, '-1.12'),
-            array(-1.127, '-1.12')
+            array(-1.127, '-1.12'),
         );
     }
 
@@ -558,7 +558,7 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
             array(1.127, '1.13'),
             array(-1.123, '-1.13'),
             array(-1.125, '-1.13'),
-            array(-1.127, '-1.13')
+            array(-1.127, '-1.13'),
         );
     }
 

@@ -177,7 +177,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         $this->filesystem->copy($sourceFilePath, $targetFilePath, false);
 
         $this->assertFileExists($targetFilePath);
-        $this->assertEquals('TARGET FILE', file_get_contents($targetFilePath));
+        $this->assertEquals(file_get_contents($sourceFilePath), file_get_contents($targetFilePath));
     }
 
     public function testMkdirCreatesDirectoriesRecursively()

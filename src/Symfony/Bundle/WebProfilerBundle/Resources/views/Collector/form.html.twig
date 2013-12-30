@@ -29,6 +29,13 @@
         /*background: #F6F6F6;*/
         margin: -30px -40px -40px;
     }
+    .toggle-button {
+        display: inline-block;
+        background: url("/bundles/framework/images/toggler.png") no-repeat top left;
+    }
+    .toggle-button.closed {
+        background-position: bottom left;
+    }
     .tree {
         width: 230px;
         padding: 10px;
@@ -63,10 +70,17 @@
     .tree .toggle-button {
         width: 10px;
         height: 10px;
+        /* vertically center the button */
         position: absolute;
         top: 50%;
         margin-top: -5px;
         margin-left: -15px;
+    }
+    .tree a.toggle-button {
+        background-size: 10px 20px;
+    }
+    .tree img.toggle-button {
+        background: none;
     }
     .tree ul ul .tree-inner {
         padding-left: 37px;
@@ -94,14 +108,24 @@
         margin-left: 250px;
         padding: 30px 40px 40px;
     }
+    .tree-details h3 {
+        position: relative;
+        padding-left: 22px;
+    }
+    .tree-details .toggle-button {
+        width: 16px;
+        height: 16px;
+        /* vertically center the button */
+        position: absolute;
+        top: 50%;
+        margin-top: -9px;
+        margin-left: -22px;
+    }
     .form-type {
         color: #999999;
     }
     .hidden {
         display: none;
-    }
-    .btn-toggle {
-        cursor: pointer;
     }
     .badge-error {
         float: right;
@@ -125,7 +149,7 @@
 
                 <ul>
                 {% for formName, formData in collector.data.forms %}
-                    {{ form_tree_entry(formName, formData) }}
+                    {{ form_tree_entry(formName, formData, true) }}
                 {% endfor %}
                 </ul>
             </div>
@@ -139,134 +163,152 @@
     {% endif %}
 
     <script>
-    function TreeView(tree) {
-        this.collapseAll = function () {
-            var children = tree.querySelectorAll('ul');
+    function Toggler() {
+        var expand = function (button) {
+                var targetId = button.dataset.toggleTargetId,
+                    target = document.getElementById(targetId);
 
-            for (var i = 0, l = children.length; i < l; i++) {
-                if (children[i].style.display != 'none') {
-                    children[i].style.display = 'none';
-                } else {
-                    children[i].style.display = 'block';
+                if (!target) {
+                    throw "Toggle target " + targetId + " does not exist";
                 }
-            }
+
+                Sfjs.removeClass(button, 'closed');
+                Sfjs.removeClass(target, 'hidden');
+            },
+
+            collapse = function (button) {
+                var targetId = button.dataset.toggleTargetId,
+                    target = document.getElementById(targetId);
+
+                if (!target) {
+                    throw "Toggle target " + targetId + " does not exist";
+                }
+
+                Sfjs.addClass(button, 'closed');
+                Sfjs.addClass(target, 'hidden');
+            },
+
+            toggle = function (button) {
+                if (Sfjs.hasClass(button, 'closed')) {
+                    expand(button);
+                } else {
+                    collapse(button);
+                }
+            },
+
+            initButtons = function (buttons) {
+                for (var i = 0, l = buttons.length; i < l; ++i) {
+                    var toggleTargetId = buttons[i].dataset.toggleTargetId,
+                        toggleTarget = document.getElementById(toggleTargetId);
+
+                    if (!toggleTarget) {
+                        throw "Toggle target " + toggleTargetId + " does not exist";
+                    }
+
+                    // correct the initial state of the button
+                    if (Sfjs.hasClass(toggleTarget, 'hidden')) {
+                        Sfjs.addClass(buttons[i], 'closed');
+                    }
+
+                    // attach listener for expanding/collapsing the target
+                    buttons[i].addEventListener('click', function (e) {
+                        toggle(this);
+
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        return false;
+                    });
+                }
+            };
+
+        return {
+            initButtons: initButtons,
+
+            toggle: toggle,
+
+            expand: expand,
+
+            collapse: collapse
         };
-
-        this.expand = function (element) {
-            element.style.display = 'block';
-        };
-
-        this.collapse = function (element) {
-            element.style.display = 'none';
-        };
-
-        this.toggle = function (element) {
-            var imgs = element.parentElement.getElementsByTagName('img');
-            Sfjs.toggle(element, imgs[0], imgs[1]);
-        }
-    }
-
-    var tree = document.querySelector('.tree ul');
-
-    var treeView = new TreeView(tree);
-    treeView.collapseAll();
-    treeView.expand(document.querySelector('.tree ul ul'));
-
-    var buttons = tree.querySelectorAll('.toggle-button');
-    for (var j = 0, l = buttons.length; j < l; j++) {
-        buttons[j].addEventListener('click', function (e) {
-            treeView.toggle(this.parentElement.parentElement.querySelector('ul'));
-        }, false);
     }
 
     function TabView() {
-        var _activeLink = null,
-            _activeView = null;
+        var activeTab = null,
 
-        this.init = function () {
-            var links = document.querySelectorAll('.tree .tree-inner'),
-                views = document.querySelectorAll('.tree-details'),
-                i,
-                l;
+            activeTarget = null,
 
-            for (i = 0, l = links.length; i < l; ++i) {
-                (function () {
-                    var link = links[i];
+            select = function (tab) {
+                var targetId = tab.dataset.tabTargetId,
+                    target = document.getElementById(targetId);
 
-                    link.addEventListener('click', function (e) {
-                        var targetId = 'details_' + link.dataset.targetId,
-                            view = document.getElementById(targetId);
+                if (!target) {
+                    throw "Tab target " + targetId + " does not exist";
+                }
 
-                        if (view) {
-                            if (null !== _activeLink) {
-                                Sfjs.removeClass(_activeLink, 'active');
-                            }
+                if (activeTab) {
+                    Sfjs.removeClass(activeTab, 'active');
+                }
 
-                            if (null !== _activeView) {
-                                Sfjs.addClass(_activeView, 'hidden');
-                            }
+                if (activeTarget) {
+                    Sfjs.addClass(activeTarget, 'hidden');
+                }
 
-                            Sfjs.addClass(link, 'active');
-                            Sfjs.removeClass(view, 'hidden');
+                Sfjs.addClass(tab, 'active');
+                Sfjs.removeClass(target, 'hidden');
 
-                            _activeLink = link;
-                            _activeView = view;
-                        }
+                activeTab = tab;
+                activeTarget = target;
+            },
+
+            initTabs = function (tabs) {
+                for (var i = 0, l = tabs.length; i < l; ++i) {
+                    var targetId = tabs[i].dataset.tabTargetId,
+                        target = document.getElementById(targetId);
+
+                    if (!target) {
+                        throw "Tab target " + targetId + " does not exist";
+                    }
+
+                    tabs[i].addEventListener('click', function (e) {
+                        select(this);
 
                         e.preventDefault();
+                        e.stopPropagation();
 
                         return false;
-                    })
-                }());
-            }
+                    });
 
-            for (i = 0, l = views.length; i < l; ++i) {
-                Sfjs.addClass(views[i], 'hidden');
-            }
-
-            if (links.length > 0) {
-                Sfjs.addClass(links[0], 'active');
-                _activeLink = links[0];
-
-                if (views.length > 0) {
-                    Sfjs.removeClass(views[0], 'hidden');
-                    _activeView = views[0];
+                    Sfjs.addClass(target, 'hidden');
                 }
-            }
-        }
-    }
 
-    var tabView = new TabView();
-
-    tabView.init();
-
-    var elements = {};
-    function toggle(data_id, section) {
-        if (!elements[data_id]) {
-            elements[data_id] = {};
-        }
-        if (!elements[data_id][section]) {
-            elements[data_id][section] = {
-                on: document.getElementById(data_id + '-' + section + '-open'),
-                off: document.getElementById(data_id + '-' + section + '-close'),
-                section_id: data_id + '-' + section
+                if (tabs.length > 0) {
+                    select(tabs[0]);
+                }
             };
-        }
 
-        var data = elements[data_id][section];
-        Sfjs.toggle(data.section_id, data.on, data.off);
+        return {
+            initTabs: initTabs,
+
+            select: select
+        };
     }
+
+    var tabTarget = new TabView(),
+        toggler = new Toggler();
+
+    tabTarget.initTabs(document.querySelectorAll('.tree .tree-inner'));
+    toggler.initButtons(document.querySelectorAll('a.toggle-button'));
     </script>
 {% endblock %}
 
-{% macro form_tree_entry(name, data) %}
+{% macro form_tree_entry(name, data, expanded) %}
     <li>
-        <div class="tree-inner" data-target-id="{{ data.id }}">
+        <div class="tree-inner" data-tab-target-id="{{ data.id }}-details">
             {% if data.children is not empty %}
-                <img class="toggle-button" style="display: inline;" src="{{ asset('bundles/framework/images/blue_picto_more.gif') }}">
-                <img class="toggle-button" style="display: none;" src="{{ asset('bundles/framework/images/blue_picto_less.gif') }}">
+                <a class="toggle-button" data-toggle-target-id="{{ data.id }}-children" href="#"></a>
             {% else %}
-                <img class="toggle-button" src="{{ asset('bundles/framework/images/blue_picto_full.gif') }}">
+                <img class="toggle-button" src="{{ asset('bundles/framework/images/toggler_empty.png') }}">
             {% endif %}
             {{ name }}
             {% if data.errors is defined and data.errors|length > 0 %}
@@ -275,9 +317,9 @@
         </div>
 
         {% if data.children is not empty %}
-            <ul>
+            <ul id="{{ data.id }}-children"{% if not expanded %} class="hidden"{% endif %}>
                 {% for childName, childData in data.children %}
-                    {{ _self.form_tree_entry(childName, childData) }}
+                    {{ _self.form_tree_entry(childName, childData, false) }}
                 {% endfor %}
             </ul>
         {% endif %}
@@ -285,7 +327,7 @@
 {% endmacro %}
 
 {% macro form_tree_details(name, data) %}
-    <div class="tree-details" id="details_{{ data.id }}">
+    <div class="tree-details" id="{{ data.id }}-details">
         <h2>
             {{ name }}
             {% if data.type_class is defined %}
@@ -312,11 +354,8 @@
 
         {% if data.default_data is defined %}
         <h3>
+            <a class="toggle-button" data-toggle-target-id="{{ data.id }}-default_data" href="#"></a>
             Default Data
-            <a class="btn-toggle" onclick="toggle('{{ data.id }}', 'default_data')">
-                <img style="display: none" id="{{ data.id }}-default_data-open" src="{{ asset('bundles/framework/images/blue_picto_more.gif') }}">
-                <img style="display: inline" id="{{ data.id }}-default_data-close" src="{{ asset('bundles/framework/images/blue_picto_less.gif') }}">
-            </a>
         </h3>
 
         <div id="{{ data.id }}-default_data">
@@ -351,11 +390,8 @@
 
         {% if data.submitted_data is defined %}
         <h3>
+            <a class="toggle-button" data-toggle-target-id="{{ data.id }}-submitted_data" href="#"></a>
             Submitted Data
-            <a class="btn-toggle" onclick="toggle('{{ data.id }}', 'submitted_data')">
-                <img style="display: none" id="{{ data.id }}-submitted_data-open" src="{{ asset('bundles/framework/images/blue_picto_more.gif') }}">
-                <img style="display: inline" id="{{ data.id }}-submitted_data-close" src="{{ asset('bundles/framework/images/blue_picto_less.gif') }}">
-            </a>
         </h3>
 
         <div id="{{ data.id }}-submitted_data">
@@ -394,11 +430,8 @@
 
         {% if data.passed_options is defined %}
         <h3>
+            <a class="toggle-button" data-toggle-target-id="{{ data.id }}-passed_options" href="#"></a>
             Passed Options
-            <a class="btn-toggle" onclick="toggle('{{ data.id }}', 'passed_options')">
-                <img style="display: none" id="{{ data.id }}-passed_options-open" src="{{ asset('bundles/framework/images/blue_picto_more.gif') }}">
-                <img style="display: inline" id="{{ data.id }}-passed_options-close" src="{{ asset('bundles/framework/images/blue_picto_less.gif') }}">
-            </a>
         </h3>
 
         <div id="{{ data.id }}-passed_options">
@@ -431,14 +464,11 @@
 
         {% if data.resolved_options is defined %}
         <h3>
+            <a class="toggle-button" data-toggle-target-id="{{ data.id }}-resolved_options" href="#"></a>
             Resolved Options
-            <a class="btn-toggle" onclick="toggle('{{ data.id }}', 'resolved_options')">
-                <img style="display: inline" id="{{ data.id }}-resolved_options-open" src="{{ asset('bundles/framework/images/blue_picto_more.gif') }}">
-                <img style="display: none" id="{{ data.id }}-resolved_options-close" src="{{ asset('bundles/framework/images/blue_picto_less.gif') }}">
-            </a>
         </h3>
 
-        <div id="{{ data.id }}-resolved_options" style="display: none">
+        <div id="{{ data.id }}-resolved_options" class="hidden">
             <table>
                 <tr>
                     <th width="180">Option</th>
@@ -456,14 +486,11 @@
 
         {% if data.view_vars is defined %}
         <h3>
+            <a class="toggle-button" data-toggle-target-id="{{ data.id }}-view_vars" href="#"></a>
             View Variables
-            <a class="btn-toggle" onclick="toggle('{{ data.id }}', 'view_vars')">
-                <img style="display: inline" id="{{ data.id }}-view_vars-open" src="{{ asset('bundles/framework/images/blue_picto_more.gif') }}">
-                <img style="display: none" id="{{ data.id }}-view_vars-close" src="{{ asset('bundles/framework/images/blue_picto_less.gif') }}">
-            </a>
         </h3>
 
-        <div id="{{ data.id }}-view_vars" style="display: none">
+        <div id="{{ data.id }}-view_vars" class="hidden">
             <table>
                 <tr>
                     <th width="180">Variable</th>

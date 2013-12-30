@@ -31,10 +31,13 @@
     }
     .toggle-button {
         display: inline-block;
-        background: url("/bundles/framework/images/toggler.png") no-repeat top left;
+        background: url("/bundles/framework/images/toggler.png") no-repeat top left #ccc;
     }
     .toggle-button.closed {
         background-position: bottom left;
+    }
+    .toggle-button.empty {
+        background-image: url("/bundles/framework/images/toggler_empty.png");
     }
     .tree {
         width: 230px;
@@ -75,12 +78,10 @@
         top: 50%;
         margin-top: -5px;
         margin-left: -15px;
-    }
-    .tree a.toggle-button {
         background-size: 10px 20px;
     }
-    .tree img.toggle-button {
-        background: none;
+    .tree .toggle-button.empty {
+        background-size: 10px 10px;
     }
     .tree ul ul .tree-inner {
         padding-left: 37px;
@@ -101,6 +102,13 @@
         background: #dfdfdf;
         font-weight: bold;
         color: #313131;
+    }
+    .tree .tree-inner.active .toggle-button, .tree .tree-inner:hover .toggle-button, .tree .tree-inner.active:hover .toggle-button {
+        background-image: url("/bundles/framework/images/toggler_hover.png");
+        background-color: #aaa;
+    }
+    .tree .tree-inner.active .toggle-button.empty, .tree .tree-inner:hover .toggle-button.empty, .tree .tree-inner.active:hover .toggle-button.empty {
+        background-image: url("/bundles/framework/images/toggler_hover_empty.png");
     }
     .tree-details {
         border-left: 1px solid #dfdfdf;
@@ -133,12 +141,22 @@
         color: #fff;
         padding: 1px 4px;
         font-size: 10px;
+        font-weight: bold;
         vertical-align: middle;
         border-radius: 6px;
     }
-    .table-error th {
+    .errors h3 {
+        color: #800;
+    }
+    .errors th, .errors td {
+        border: 1px solid #800;
+    }
+    .errors th {
         background: #a33;
         color: #fff;
+    }
+    .errors .toggle-button {
+        background-color: #a33;
     }
     </style>
 
@@ -308,7 +326,7 @@
             {% if data.children is not empty %}
                 <a class="toggle-button" data-toggle-target-id="{{ data.id }}-children" href="#"></a>
             {% else %}
-                <img class="toggle-button" src="{{ asset('bundles/framework/images/toggler_empty.png') }}">
+                <div class="toggle-button empty"></div>
             {% endif %}
             {{ name }}
             {% if data.errors is defined and data.errors|length > 0 %}
@@ -336,20 +354,25 @@
         </h2>
 
         {% if data.errors is defined and data.errors|length > 0 %}
-        <h3>Errors</h3>
+        <div class="errors">
+            <h3>
+                <a class="toggle-button" data-toggle-target-id="{{ data.id }}-errors" href="#"></a>
+                Errors
+            </h3>
 
-        <table class="table-error">
-            <tr>
-                <th width="50%">Message</th>
-                <th>Cause</th>
-            </tr>
-            {% for error in data.errors %}
-            <tr>
-                <td>{{ error.message }}</td>
-                <td><em>Unknown.</em></td>
-            </tr>
-            {% endfor %}
-        </table>
+            <table id="{{ data.id }}-errors">
+                <tr>
+                    <th width="50%">Message</th>
+                    <th>Cause</th>
+                </tr>
+                {% for error in data.errors %}
+                <tr>
+                    <td>{{ error.message }}</td>
+                    <td><em>Unknown.</em></td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
         {% endif %}
 
         {% if data.default_data is defined %}

@@ -28,7 +28,8 @@
         "symfony/translation": "~2.2",
         "symfony/yaml": "~2.0",
         "symfony/security": "~2.4",
-        "symfony/stopwatch": "~2.2"
+        "symfony/stopwatch": "~2.2",
+        "symfony/console": "~2.2"
     },
     "suggest": {
         "symfony/form": "For using the FormExtension",

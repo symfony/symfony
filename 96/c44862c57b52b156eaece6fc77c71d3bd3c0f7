@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-10-31T16:01:28Z
+
+Can you explain your use case? Why do you override this class in the first place?
+
+---------------------------------------------------------------------------
+
+by djoos at 2013-10-31T16:24:53Z
+
+Sure! In our particular case our role hierarchy needs to come from the database, so originally we created a custom RoleHierarchy-class which extended Symfony\Component\Security\Core\Role\RoleHierarchy and then passed our (manipulated) hierachy in the constructor... Works fine - no need to override anything from the parent class.
+
+Monitoring brought to light that Symfony\Component\Security\Core\Role\RoleHierarchy's buildRoleMap was struggling to deal timely with our (huge) hierarchy. So, in order to speed things up there we decided to overwrite buildRoleMap (even though prohibited due to the scope of the method) in our RoleHierarchy so that we can speed up the process (caching) there - resulting in a considerable speed improvement for our web application...
+
+Do let me know if you need any additional information, thanks in advance!

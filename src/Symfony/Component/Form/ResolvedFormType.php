@@ -137,6 +137,8 @@ class ResolvedFormType implements ResolvedFormTypeInterface
             case 'min':
             case 'max':
                 return $this->innerType instanceof FormType\IntegerType;
+            case 'pattern':
+                return $this->innerType instanceof FormType\TextType;
         }
 
         return false;

@@ -27,6 +27,14 @@ class LintCommand extends Command
     private $twig;
 
     /**
+     * {@inheritDoc}
+     */
+    public function __construct($name = 'twig:lint')
+    {
+        parent::__construct($name);
+    }
+
+    /**
      * Sets the twig environment
      *
      * @param \Twig_Environment $twig
@@ -47,7 +55,6 @@ class LintCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('twig:lint')
             ->setDescription('Lints a template and outputs encountered errors')
             ->addArgument('filename')
             ->setHelp(<<<EOF

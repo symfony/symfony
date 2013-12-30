@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Routing\Test\Matcher\Dumper;
+namespace Symfony\Component\Routing\Tests\Matcher\Dumper;
 
 use Symfony\Component\Routing\Matcher\Dumper\DumperCollection;
 

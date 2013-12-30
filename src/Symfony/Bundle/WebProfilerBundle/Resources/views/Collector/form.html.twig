@@ -182,6 +182,8 @@
 
     <script>
     function Toggler() {
+        "use strict";
+
         var expand = function (button) {
                 var targetId = button.dataset.toggleTargetId,
                     target = document.getElementById(targetId);
@@ -252,6 +254,8 @@
     }
 
     function TabView() {
+        "use strict";
+        
         var activeTab = null,
 
             activeTarget = null,

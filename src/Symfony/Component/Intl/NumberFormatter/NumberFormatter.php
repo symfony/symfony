@@ -720,8 +720,7 @@ class NumberFormatter
 
         $roundingModeAttribute = $this->getAttribute(self::ROUNDING_MODE);
         if (isset(self::$phpRoundingMap[$roundingModeAttribute])) {
-            $roundingMode = self::$phpRoundingMap[$this->getAttribute(self::ROUNDING_MODE)];
-            $value = round($value, $precision, $roundingMode);
+            $value = round($value, $precision, self::$phpRoundingMap[$roundingModeAttribute]);
         } elseif (isset(self::$customRoundingList[$roundingModeAttribute])) {
             $roundingCoef = pow(10, $precision);
             $value *= $roundingCoef;

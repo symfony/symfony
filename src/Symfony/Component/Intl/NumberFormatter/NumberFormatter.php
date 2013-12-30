@@ -716,7 +716,7 @@ class NumberFormatter
      */
     private function round($value, $precision)
     {
-        $precision = $this->getUnitializedPrecision($value, $precision);
+        $precision = $this->getUninitializedPrecision($value, $precision);
 
         $roundingModeAttribute = $this->getAttribute(self::ROUNDING_MODE);
         if (isset(self::$phpRoundingMap[$roundingModeAttribute])) {
@@ -756,20 +756,20 @@ class NumberFormatter
      */
     private function formatNumber($value, $precision)
     {
-        $precision = $this->getUnitializedPrecision($value, $precision);
+        $precision = $this->getUninitializedPrecision($value, $precision);
 
         return number_format($value, $precision, '.', $this->getAttribute(self::GROUPING_USED) ? ',' : '');
     }
 
     /**
-     * Returns the precision value if the DECIMAL style is being used and the FRACTION_DIGITS attribute is unitialized.
+     * Returns the precision value if the DECIMAL style is being used and the FRACTION_DIGITS attribute is uninitialized.
      *
-     * @param integer|float $value     The value to get the precision from if the FRACTION_DIGITS attribute is unitialized
+     * @param integer|float $value     The value to get the precision from if the FRACTION_DIGITS attribute is uninitialized
      * @param int           $precision The precision value to returns if the FRACTION_DIGITS attribute is initialized
      *
      * @return int The precision value
      */
-    private function getUnitializedPrecision($value, $precision)
+    private function getUninitializedPrecision($value, $precision)
     {
         if ($this->style == self::CURRENCY) {
             return $precision;

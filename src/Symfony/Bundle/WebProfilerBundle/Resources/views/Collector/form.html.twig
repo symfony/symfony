@@ -119,7 +119,6 @@
     }
     .tree-details h3 {
         position: relative;
-        padding-left: 22px;
     }
     .tree-details .toggle-icon {
         width: 16px;
@@ -128,7 +127,7 @@
         position: absolute;
         top: 50%;
         margin-top: -9px;
-        margin-left: -22px;
+        margin-left: 6px;
     }
     .form-type {
         color: #999999;
@@ -366,8 +365,8 @@
         <div class="errors">
             <h3>
                 <a class="toggle-button" data-toggle-target-id="{{ data.id }}-errors" href="#">
-                    <span class="toggle-icon"></span>
                     Errors
+                    <span class="toggle-icon"></span>
                 </a>
             </h3>
 
@@ -389,8 +388,8 @@
         {% if data.default_data is defined %}
         <h3>
             <a class="toggle-button" data-toggle-target-id="{{ data.id }}-default_data" href="#">
-                <span class="toggle-icon"></span>
                 Default Data
+                <span class="toggle-icon"></span>
             </a>
         </h3>
 
@@ -427,8 +426,8 @@
         {% if data.submitted_data is defined %}
         <h3>
             <a class="toggle-button" data-toggle-target-id="{{ data.id }}-submitted_data" href="#">
-                <span class="toggle-icon"></span>
                 Submitted Data
+                <span class="toggle-icon"></span>
             </a>
         </h3>
 
@@ -469,8 +468,8 @@
         {% if data.passed_options is defined %}
         <h3>
             <a class="toggle-button" data-toggle-target-id="{{ data.id }}-passed_options" href="#">
-                <span class="toggle-icon"></span>
                 Passed Options
+                <span class="toggle-icon"></span>
             </a>
         </h3>
 
@@ -505,8 +504,8 @@
         {% if data.resolved_options is defined %}
         <h3>
             <a class="toggle-button" data-toggle-target-id="{{ data.id }}-resolved_options" href="#">
-                <span class="toggle-icon"></span>
                 Resolved Options
+                <span class="toggle-icon"></span>
             </a>
         </h3>
 
@@ -529,8 +528,8 @@
         {% if data.view_vars is defined %}
         <h3>
             <a class="toggle-button" data-toggle-target-id="{{ data.id }}-view_vars" href="#">
-                <span class="toggle-icon"></span>
                 View Variables
+                <span class="toggle-icon"></span>
             </a>
         </h3>
 

@@ -9,7 +9,7 @@
 * file that was distributed with this source code.
 */
 
-namespace Symfony\Bridge\Doctrine\Tests\DependencyInjection\Compiler;
+namespace Symfony\Bridge\Doctrine\Tests\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;

@@ -63,6 +63,14 @@ abstract class Client
     }
 
     /**
+     * Clones the current client instance.
+     */
+    public function __clone()
+    {
+        $this->cookieJar = clone $this->cookieJar;
+    }
+
+    /**
      * Sets whether to automatically follow redirects or not.
      *
      * @param Boolean $followRedirect Whether to follow redirects

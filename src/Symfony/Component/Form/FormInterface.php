@@ -94,7 +94,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns all errors.
      *
-     * @return FormError[] An array of FormError instances that occurred during validation
+     * @return FormErrorBag
      */
     public function getErrors();
 

@@ -176,7 +176,7 @@
             </trans-unit>
             <trans-unit id="47">
                 <source>This value should be the user current password.</source>
-                <target>Ši reikšmė turi sutapti su dabartiniu vartotojo slaptažodžiu.</target>
+                <target>Ši reikšmė turi sutapti su dabartiniu naudotojo slaptažodžiu.</target>
             </trans-unit>
             <trans-unit id="48">
                 <source>This value should have exactly {{ limit }} character.|This value should have exactly {{ limit }} characters.</source>

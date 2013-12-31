@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\EventListener;
+namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
-use Symfony\Bundle\FrameworkBundle\EventListener\AddRequestFormatsListener;
+use Symfony\Component\HttpKernel\EventListener\AddRequestFormatsListener;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\KernelEvents;
 

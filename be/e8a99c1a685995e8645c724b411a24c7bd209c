@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-12-30T06:14:00Z
+
+Looks good to me, can you add some unit tests?
+
+---------------------------------------------------------------------------
+
+by pamil at 2013-12-30T09:55:28Z
+
+I'm wondering if we could extract `NumberFormatter::round()` functionality to public-available method. There's `Symfony\Component\Form\Extension\Core\DataTransformer\NumberToLocalizedStringTransformer::round()` with the same functionality. We could also use this method in `Twig_Extension_Core::twig_round()` to provide more rounding modes. The only downside I see is dependency with library containing this rounding method.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-12-30T10:12:48Z
+
+I prefer duplicate code in this case

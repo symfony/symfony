@@ -58,6 +58,8 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
      */
     public function testFormatCurrencyWithCurrencyStyle($value, $currency, $expected)
     {
+        IntlTestHelper::requireFullIntl($this);
+
         $formatter = $this->getNumberFormatter('en', NumberFormatter::CURRENCY);
         $this->assertEquals($expected, $formatter->formatCurrency($value, $currency));
     }
@@ -84,6 +86,8 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
      */
     public function testFormatCurrencyWithCurrencyStyleCostaRicanColonsRounding($value, $currency, $symbol, $expected)
     {
+        IntlTestHelper::requireFullIntl($this);
+
         $formatter = $this->getNumberFormatter('en', NumberFormatter::CURRENCY);
         $this->assertEquals(sprintf($expected, $symbol), $formatter->formatCurrency($value, $currency));
     }
@@ -102,6 +106,8 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
      */
     public function testFormatCurrencyWithCurrencyStyleBrazilianRealRounding($value, $currency, $symbol, $expected)
     {
+        IntlTestHelper::requireFullIntl($this);
+
         $formatter = $this->getNumberFormatter('en', NumberFormatter::CURRENCY);
         $this->assertEquals(sprintf($expected, $symbol), $formatter->formatCurrency($value, $currency));
     }
@@ -129,6 +135,8 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
      */
     public function testFormatCurrencyWithCurrencyStyleSwissRounding($value, $currency, $symbol, $expected)
     {
+        IntlTestHelper::requireFullIntl($this);
+
         $formatter = $this->getNumberFormatter('en', NumberFormatter::CURRENCY);
         $this->assertEquals(sprintf($expected, $symbol), $formatter->formatCurrency($value, $currency));
     }

@@ -123,6 +123,7 @@ class ProjectServiceContainer extends Container
         $instance->initialize();
         $instance->foo = 'bar';
         $instance->moo = $a;
+        $instance->qux = array($this->getParameter('foo') => 'foo is '.$this->getParameter('foo').'', 'foobar' => $this->getParameter('foo'));
         sc_configure($instance);
 
         return $instance;

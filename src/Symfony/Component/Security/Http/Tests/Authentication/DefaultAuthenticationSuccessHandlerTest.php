@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Security\Http\Tests;
+namespace Symfony\Component\Security\Http\Tests\Authentication;
 
 use Symfony\Component\Security\Http\Authentication\DefaultAuthenticationSuccessHandler;
 

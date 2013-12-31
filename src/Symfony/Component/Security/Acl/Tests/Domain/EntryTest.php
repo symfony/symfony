@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Security\Tests\Domain;
+namespace Symfony\Component\Security\Tests\Acl\Domain;
 
 use Symfony\Component\Security\Acl\Domain\Entry;
 

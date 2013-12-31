@@ -14,7 +14,7 @@ namespace Symfony\Component\Console\Tests\Formatter;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 
-class FormatterStyleTest extends \PHPUnit_Framework_TestCase
+class OutputFormatterTest extends \PHPUnit_Framework_TestCase
 {
     public function testEmptyTag()
     {

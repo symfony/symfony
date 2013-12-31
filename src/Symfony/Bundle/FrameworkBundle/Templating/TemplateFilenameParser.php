@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Templating;
 
 use Symfony\Component\Templating\TemplateNameParserInterface;
+use Symfony\Component\Templating\TemplateReferenceInterface;
 
 /**
  * TemplateFilenameParser converts template filenames to

@@ -287,4 +287,12 @@ class BinaryFileResponse extends Response
     {
         self::$trustXSendfileTypeHeader = true;
     }
+    
+    /**
+     * Enforces download 
+     */
+     public function forceDownload()
+     {
+         $this->headers->set('Content-type', 'application/force-download');
+     }
 }

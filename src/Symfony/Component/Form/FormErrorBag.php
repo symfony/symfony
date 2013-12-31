@@ -20,7 +20,7 @@ use Symfony\Component\Form\Exception\InvalidArgumentException;
  *
  * @since v2.5
  */
-class FormErrorBag implements \RecursiveIterator, \Countable, \ArrayAccess
+class FormErrorBag implements \Countable, \ArrayAccess, \IteratorAggregate
 {
     /**
      * @var array An array of FormError and FormErrorBag instances
@@ -55,57 +55,6 @@ class FormErrorBag implements \RecursiveIterator, \Countable, \ArrayAccess
         $collection->setFormName($formName);
 
         $this->errors[$formName] = $collection;
-    }
-
-    public function current()
-    {
-        $current = current($this->errors);
-
-        if (!$current instanceof FormError) {
-            $this->next();
-
-            if ($this->valid()) {
-                $current = $this->current();
-            }
-        }
-
-        return $current;
-    }
-
-    public function key()
-    {
-        return isset($this->formName) ? $this->formName : key($this->errors);
-    }
-
-    public function next()
-    {
-        return next($this->errors);
-    }
-
-    public function rewind()
-    {
-        reset($this->errors);
-    }
-
-    public function valid()
-    {
-        return null !== key($this->errors);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function hasChildren()
-    {
-        return current($this->errors) instanceof FormErrorBag;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getChildren()
-    {
-        return current($this->errors);
     }
 
     public function count()
@@ -229,5 +178,19 @@ class FormErrorBag implements \RecursiveIterator, \Countable, \ArrayAccess
     public function offsetUnset($offset)
     {
         return $this->remove($offset);
+    }
+
+    public function getIterator()
+    {
+        $errors = array_filter($this->errors, function ($error) {
+            return $error instanceof FormError;
+        });
+
+        return new \ArrayIterator($errors);
+    }
+
+    public function getAllErrors()
+    {
+        return new \RecursiveArrayIterator($this->errors);
     }
 }

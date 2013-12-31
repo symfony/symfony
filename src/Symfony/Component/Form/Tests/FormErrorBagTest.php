@@ -40,7 +40,7 @@ class FormErrorBagTest extends \Symfony\Component\Form\Tests\FormPerformanceTest
         $childrenCollection->addError(new FormError('This value is not a valid date.'));
         $collection->addCollection('user', $childrenCollection);
 
-        $iterator = new \RecursiveIteratorIterator($collection);
+        $iterator = new \RecursiveIteratorIterator($collection->getAllErrors());
         $messages = array(
             '', // because we use next() in the loop
             'This value should not be blank.',
@@ -90,7 +90,7 @@ class FormErrorBagTest extends \Symfony\Component\Form\Tests\FormPerformanceTest
         $childrenCollection->addError(new FormError('This value is not a valid date.'));
         $collection->addCollection('user', $childrenCollection);
 
-        $iterator = new \RecursiveIteratorIterator($collection);
+        $iterator = new \RecursiveIteratorIterator($collection->getAllErrors());
         $keys = array(
             '', // use of next() in loop
             '0',

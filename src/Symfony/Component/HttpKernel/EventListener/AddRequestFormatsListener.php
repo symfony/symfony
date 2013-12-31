@@ -36,7 +36,7 @@ class AddRequestFormatsListener implements EventSubscriberInterface
     }
 
     /**
-     * Set additional request formats
+     * Set additional requests formats
      *
      * @param GetResponseEvent $event
      */
@@ -52,8 +52,6 @@ class AddRequestFormatsListener implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            KernelEvents::REQUEST => 'onKernelRequest',
-        );
+        return array(KernelEvents::REQUEST => 'onKernelRequest');
     }
 }

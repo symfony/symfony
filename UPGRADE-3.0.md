@@ -180,6 +180,22 @@ UPGRADE FROM 2.x to 3.0
  * The options "csrf_provider" and "intention" were renamed to "csrf_token_generator"
    and "csrf_token_id".
 
+ * The method `Form::getErrorsAsString()` was removed. Use `Form::getErrors()`
+   instead with the argument `$deep` set to true and cast the returned iterator
+   to a string (if not done implicitly by PHP).
+
+   Before:
+
+   ```
+   echo $form->getErrorsAsString();
+   ```
+
+   After:
+
+   ```
+   echo $form->getErrors(true);
+   ```
+
 
 ### FrameworkBundle
 

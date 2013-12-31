@@ -7,6 +7,9 @@ CHANGELOG
  * added an option for multiple files upload
  * form errors now reference their cause (constraint violation, exception, ...)
  * form errors now remember which form they were originally added to
+ * [BC BREAK] added two optional parameters to FormInterface::getErrors() and
+   changed the method to return a Symfony\Component\Form\FormErrorIterator
+   instance instead of an array
 
 2.4.0
 -----

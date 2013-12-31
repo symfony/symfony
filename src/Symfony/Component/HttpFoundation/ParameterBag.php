@@ -102,90 +102,79 @@ class ParameterBag implements \IteratorAggregate, \Countable
      */
     public function get($path, $default = null, $deep = false)
     {
-        if (!$deep || false === $pos = strpos($path, '[')) {
+        if (!$deep || false === strpos($path, '[')) {
             return array_key_exists($path, $this->parameters) ? $this->parameters[$path] : $default;
         }
 
-        $root = substr($path, 0, $pos);
-        if (!array_key_exists($root, $this->parameters)) {
+        $result = null;
+        $callback = function($lastParent, $lastKey, $value) use (&$result) {
+            $result = $value;
+        };
+        if (!$this->getParentAndKeyByPath($path, $callback)) {
             return $default;
         }
 
-        $value = $this->parameters[$root];
-        $currentKey = null;
-        for ($i = $pos, $c = strlen($path); $i < $c; $i++) {
-            $char = $path[$i];
-
-            if ('[' === $char) {
-                if (null !== $currentKey) {
-                    throw new \InvalidArgumentException(sprintf('Malformed path. Unexpected "[" at position %d.', $i));
-                }
-
-                $currentKey = '';
-            } elseif (']' === $char) {
-                if (null === $currentKey) {
-                    throw new \InvalidArgumentException(sprintf('Malformed path. Unexpected "]" at position %d.', $i));
-                }
-
-                if (!is_array($value) || !array_key_exists($currentKey, $value)) {
-                    return $default;
-                }
-
-                $value = $value[$currentKey];
-                $currentKey = null;
-            } else {
-                if (null === $currentKey) {
-                    throw new \InvalidArgumentException(sprintf('Malformed path. Unexpected "%s" at position %d.', $char, $i));
-                }
-
-                $currentKey .= $char;
-            }
-        }
-
-        if (null !== $currentKey) {
-            throw new \InvalidArgumentException(sprintf('Malformed path. Path must end with "]".'));
-        }
-
-        return $value;
+        return $result;
     }
 
     /**
      * Sets a parameter by name.
      *
-     * @param string $key   The key
-     * @param mixed  $value The value
+     * @param string  $path  The key
+     * @param mixed   $value The value
+     * @param boolean $deep  If true, a path like foo[bar] will find deeper items
+     *
+     * @throws \RuntimeException
      *
      * @api
      */
-    public function set($key, $value)
+    public function set($path, $value, $deep = false)
     {
-        $this->parameters[$key] = $value;
+        if (!$deep || false === strpos($path, '[')) {
+            $this->parameters[$path] = $value;
+        } else {
+            $this->getParentAndKeyByPath($path, function(&$lastParent, $lastKey, $value) use ($value) {
+                $lastParent[$lastKey] = $value;
+            }, true);
+        }
     }
 
     /**
      * Returns true if the parameter is defined.
      *
-     * @param string $key The key
+     * @param string  $path The key
+     * @param boolean $deep If true, a path like foo[bar] will find deeper items
      *
      * @return Boolean true if the parameter exists, false otherwise
      *
      * @api
      */
-    public function has($key)
+    public function has($path, $deep = false)
     {
-        return array_key_exists($key, $this->parameters);
+        if (!$deep || false === strpos($path, '[')) {
+            return array_key_exists($path, $this->parameters);
+        }
+
+        return $this->getParentAndKeyByPath($path);
     }
 
     /**
      * Removes a parameter.
      *
-     * @param string $key The key
+     * @param string  $path The key
+     * @param boolean $deep If true, a path like foo[bar] will find deeper items
      *
      * @api
      */
-    public function remove($key)
+    public function remove($path, $deep = false)
     {
-        unset($this->parameters[$key]);
+        if (!$deep || false === strpos($path, '[')) {
+            unset($this->parameters[$path]);
+        } else {
+            $this->getParentAndKeyByPath($path, function(&$lastParent, &$lastKey, $value) {
+                unset($lastParent[$lastKey]);
+            });
+        }
     }
 
     /**
@@ -302,4 +291,88 @@ class ParameterBag implements \IteratorAggregate, \Countable
     {
         return count($this->parameters);
     }
+
+    /**
+     * Allows to find the last parent and key for a given path within the parameters.
+     *
+     * @param string      $path           A path like foo[bar]
+     * @param \Closure    $foundCallback  Is called with parent level, key and value, if found 
+     * @param Boolean     $createPath     If true, create missing levels on path
+     *
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     *
+     * @return Boolean True if the path was found, false otherwise
+     */
+    private function getParentAndKeyByPath($path, \Closure $foundCallback = null, $createPath = false)
+    {
+        $parameters = $this->parameters;
+
+        $pos = strpos($path, '[');
+        if ($pos === false) {
+            $pos = strlen($path);
+        }
+        $root = substr($path, 0, $pos);
+        if (!array_key_exists($root, $parameters)) {
+            if ($createPath) {
+                $parameters[$root] = array();
+            } else {
+                return false;
+            }
+        }
+
+        $lastParent = &$parameters;
+        $lastKey = $root;
+        $currentKey = null;
+        for ($i = $pos, $c = strlen($path); $i < $c; $i++) {
+            $char = $path[$i];
+
+            if ('[' === $char) {
+                if (null !== $currentKey) {
+                    throw new \InvalidArgumentException(sprintf('Malformed path. Unexpected "[" at position %d.', $i));
+                }
+
+                $currentKey = '';
+            } elseif (']' === $char) {
+                if (null === $currentKey) {
+                    throw new \InvalidArgumentException(sprintf('Malformed path. Unexpected "]" at position %d.', $i));
+                }
+
+                if (!$createPath && (!is_array($lastParent[$lastKey]) || !array_key_exists($currentKey, $lastParent[$lastKey]))) {
+                    return false;
+                }
+
+                if ($createPath) {
+                    if (!is_array($lastParent[$lastKey])) {
+                        throw new \RuntimeException("Cannot set deep value as $lastKey is not an array");
+                    }
+                    if (!array_key_exists($currentKey, $lastParent[$lastKey])) {
+                        $lastParent[$lastKey][$currentKey] = array();
+                    }
+                }
+
+                $lastParent = &$lastParent[$lastKey];
+                $lastKey = $currentKey;
+                $currentKey = null;
+            } else {
+                if (null === $currentKey) {
+                    throw new \InvalidArgumentException(sprintf('Malformed path. Unexpected "%s" at position %d.', $char, $i));
+                }
+
+                $currentKey .= $char;
+            }
+        }
+
+        if (null !== $currentKey) {
+            throw new \InvalidArgumentException(sprintf('Malformed path. Path must end with "]".'));
+        }
+
+        if ($foundCallback) {
+            $foundCallback($lastParent, $lastKey, $lastParent[$lastKey]);
+        }
+        $this->parameters = $parameters;
+
+        return true;
+    }
+
 }

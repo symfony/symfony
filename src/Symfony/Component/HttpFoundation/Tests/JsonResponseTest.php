@@ -166,6 +166,18 @@ class JsonResponseTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('"\u003C\u003E\u0027\u0026\u0022"', $response->getContent());
     }
 
+    public function testSetEncodingOptions()
+    {
+        $response = new JsonResponse();
+        $response->setData(array(array(1, 2, 3)));
+
+        $this->assertEquals('[[1,2,3]]', $response->getContent());
+
+        $response->setEncodingOptions(array(JSON_FORCE_OBJECT));
+
+        $this->assertEquals('{"0":{"0":1,"1":2,"2":3}}', $response->getContent());
+    }
+
     /**
      * @expectedException \InvalidArgumentException
      */
@@ -181,5 +193,14 @@ class JsonResponseTest extends \PHPUnit_Framework_TestCase
     public function testSetContent()
     {
         JsonResponse::create("\xB1\x31");
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testAddInvalidEncodingOption()
+    {
+        $response = new JsonResponse();
+        $response->addEncodingOption(666);
     }
 }

@@ -4,6 +4,12 @@ CHANGELOG
 2.5.0
 ------
 
+ * [BC BREAK] changed getErrors() to return a FormErrorBag, which is countable,
+   traversable and can be converted to a string. This breaks BC if the return
+   value is used in array function like is_array().
+ * deprecated getErrorsAsString() in favor of converting getErrors() to a
+   string
+
  * added an option for multiple files upload
 
 2.4.0

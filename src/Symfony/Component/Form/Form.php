@@ -79,10 +79,11 @@ class Form implements \IteratorAggregate, FormInterface
     private $children;
 
     /**
-     * The errors of this form
-     * @var FormError[] An array of FormError instances
+     * The errors of this form.
+     *
+     * @var FormErrorBag
      */
-    private $errors = array();
+    private $errors;
 
     /**
      * Whether this form was submitted
@@ -172,6 +173,7 @@ class Form implements \IteratorAggregate, FormInterface
 
         $this->config = $config;
         $this->children = new OrderedHashMap();
+        $this->errors = new FormErrorBag();
     }
 
     public function __clone()
@@ -501,7 +503,7 @@ class Form implements \IteratorAggregate, FormInterface
 
         // Initialize errors in the very beginning so that we don't lose any
         // errors added during listeners
-        $this->errors = array();
+        $this->errors = new FormErrorBag();
 
         // Obviously, a disabled form should not change its data upon submission.
         if ($this->isDisabled()) {
@@ -675,7 +677,7 @@ class Form implements \IteratorAggregate, FormInterface
         if ($this->parent && $this->config->getErrorBubbling()) {
             $this->parent->addError($error);
         } else {
-            $this->errors[] = $error;
+            $this->errors->addError($error);
         }
 
         return $this;
@@ -776,35 +778,32 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function getErrors()
     {
-        return $this->errors;
-    }
-
-    /**
-     * Returns a string representation of all form errors (including children errors).
-     *
-     * This method should only be used to help debug a form.
-     *
-     * @param integer $level The indentation level (used internally)
-     *
-     * @return string A string representation of all errors
-     */
-    public function getErrorsAsString($level = 0)
-    {
-        $errors = '';
-        foreach ($this->errors as $error) {
-            $errors .= str_repeat(' ', $level).'ERROR: '.$error->getMessage()."\n";
-        }
+        $errors = clone $this->errors;
 
         foreach ($this->children as $key => $child) {
-            $errors .= str_repeat(' ', $level).$key.":\n";
-            if ($child instanceof self && $err = $child->getErrorsAsString($level + 4)) {
-                $errors .= $err;
-            } else {
-                $errors .= str_repeat(' ', $level + 4)."No errors\n";
+            $childrenErrors = $child->getErrors();
+
+            // for BC
+            if (is_array($childrenErrors)) {
+                $_collection = new FormErrorBag();
+                foreach ($childrenErrors as $error) {
+                    $_collection->addError($error);
+                }
+                $childrenErrors = $_collection;
             }
+
+            $errors->addCollection($key, $childrenErrors);
         }
 
         return $errors;
+    }
+
+    /**
+     * @deprecated Deprecated since version 2.5, to be removed in 3.0. Convert {@link getErrors()} to a string instead.
+     */
+    public function getErrorsAsString($level = 0)
+    {
+        return $this->getErrors()->__toString($level);
     }
 
     /**

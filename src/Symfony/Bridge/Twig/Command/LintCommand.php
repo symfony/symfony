@@ -20,6 +20,7 @@ use Symfony\Component\Finder\Finder;
  * Command that will validate your template syntax and output encountered errors.
  *
  * @author Marc Weistroff <marc.weistroff@sensiolabs.com>
+ * @author Jérôme Tamarelle <jerome@tamarelle.net>
  */
 class LintCommand extends Command
 {

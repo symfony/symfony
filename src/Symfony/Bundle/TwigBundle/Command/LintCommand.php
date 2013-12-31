@@ -34,11 +34,14 @@ class LintCommand extends BaseLintCommand implements ContainerAwareInterface
     /**
      * {@inheritdoc}
      */
-    public function getTwigEnvironment()
+    protected function getTwigEnvironment()
     {
         return $this->container->get('twig');
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function configure()
     {
         parent::configure();

@@ -94,7 +94,7 @@ abstract class DoctrineType extends AbstractType
                 foreach ($choiceHashes as $value) {
                     $hashes[] = spl_object_hash($value);
                 }
-                
+
                 $choiceHashes = $hashes;
             }
 

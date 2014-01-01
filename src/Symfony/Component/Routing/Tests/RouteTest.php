@@ -65,10 +65,10 @@ class RouteTest extends \PHPUnit_Framework_TestCase
     public function testOption()
     {
         $route = new Route('/{foo}');
-        $this->assertFalse($route->hasOption('foo'), '->hasOption() return false if option is not setted');
+        $this->assertFalse($route->hasOption('foo'), '->hasOption() return false if option is not set');
         $this->assertEquals($route, $route->setOption('foo', 'bar'), '->setOption() implements a fluent interface');
         $this->assertEquals('bar', $route->getOption('foo'), '->setOption() sets the option');
-        $this->assertTrue($route->hasOption('foo'), '->hasOption() return true if option is setted');
+        $this->assertTrue($route->hasOption('foo'), '->hasOption() return true if option is set');
     }
 
     public function testDefaults()
@@ -83,7 +83,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
 
         $route->setDefault('foo2', 'bar2');
         $this->assertEquals('bar2', $route->getDefault('foo2'), '->getDefault() return the default value');
-        $this->assertNull($route->getDefault('not_defined'), '->getDefault() return null if default value is not setted');
+        $this->assertNull($route->getDefault('not_defined'), '->getDefault() return null if default value is not set');
 
         $route->setDefault('_controller', $closure = function () { return 'Hello'; });
         $this->assertEquals($closure, $route->getDefault('_controller'), '->setDefault() sets a default value');
@@ -114,10 +114,10 @@ class RouteTest extends \PHPUnit_Framework_TestCase
     public function testRequirement()
     {
         $route = new Route('/{foo}');
-        $this->assertFalse($route->hasRequirement('foo'), '->hasRequirement() return false if requirement is not setted');
+        $this->assertFalse($route->hasRequirement('foo'), '->hasRequirement() return false if requirement is not set');
         $route->setRequirement('foo', '^\d+$');
         $this->assertEquals('\d+', $route->getRequirement('foo'), '->setRequirement() removes ^ and $ from the path');
-        $this->assertTrue($route->hasRequirement('foo'), '->hasRequirement() return true if requirement is setted');
+        $this->assertTrue($route->hasRequirement('foo'), '->hasRequirement() return true if requirement is set');
     }
 
     /**

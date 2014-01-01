@@ -259,13 +259,13 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
         $collection->add('a', new Route('/a'));
         $collection->add('b', new Route('/b', array('placeholder' => 'default'), array('placeholder' => '.+')));
 
-        $collectionBis = clone $collection;
+        $clonedCollection = clone $collection;
 
-        $this->assertEquals(2, count($collectionBis));
-        $this->assertEquals($collection->get('a'),$collectionBis->get('a'));
-        $this->assertNotSame($collection->get('a'),$collectionBis->get('a'));
-        $this->assertEquals($collection->get('b'),$collectionBis->get('b'));
-        $this->assertNotSame($collection->get('b'),$collectionBis->get('b'));
+        $this->assertCount(2, $clonedCollection);
+        $this->assertEquals($collection->get('a'), $clonedCollection->get('a'));
+        $this->assertNotSame($collection->get('a'), $clonedCollection->get('a'));
+        $this->assertEquals($collection->get('b'), $clonedCollection->get('b'));
+        $this->assertNotSame($collection->get('b'), $clonedCollection->get('b'));
     }
 
     public function testSetSchemes()

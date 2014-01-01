@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Intl\Exception;
 
-use Symfony\Component\Intl\Exception\NotImplementedException;
-
 /**
  * @author Eriksen Costa <eriksen.costa@infranology.com.br>
  */

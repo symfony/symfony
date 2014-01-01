@@ -69,13 +69,26 @@ class TwigExtension extends Extension
         }
 
         // register bundles as Twig namespaces
-        foreach ($container->getParameter('kernel.bundles') as $bundle => $class) {
+        $bundles = $this->getBundlesByChildPriority($container);
+        foreach ($bundles as $bundle => $bundleReflection) {
+            /** @var \Symfony\Component\HttpKernel\Bundle\BundleInterface $bundleInstance */
+            $bundleInstance = $bundleReflection->newInstance();
+
+            if (null !== $parentBundle = $bundleInstance->getParent()) {
+                if (is_dir($dir = $container->getParameter('kernel.root_dir').'/Resources/'.$bundle.'/views')) {
+                    $this->addTwigPath($twigFilesystemLoaderDefinition, $dir, $parentBundle);
+                }
+
+                if (is_dir($dir = $bundleInstance->getPath().'/Resources/views')) {
+                    $this->addTwigPath($twigFilesystemLoaderDefinition, $dir, $parentBundle);
+                }
+            }
+
             if (is_dir($dir = $container->getParameter('kernel.root_dir').'/Resources/'.$bundle.'/views')) {
                 $this->addTwigPath($twigFilesystemLoaderDefinition, $dir, $bundle);
             }
 
-            $reflection = new \ReflectionClass($class);
-            if (is_dir($dir = dirname($reflection->getFilename()).'/Resources/views')) {
+            if (is_dir($dir = $bundleInstance->getPath().'/Resources/views')) {
                 $this->addTwigPath($twigFilesystemLoaderDefinition, $dir, $bundle);
             }
         }
@@ -130,12 +143,36 @@ class TwigExtension extends Extension
         ));
     }
 
+    /**
+     * @param ContainerBuilder $container
+     * @return array | \ReflectionClass[]
+     */
+    private function getBundlesByChildPriority(ContainerBuilder $container)
+    {
+        $childBundles = array();
+        $parentBundles = array();
+
+        foreach ($container->getParameter('kernel.bundles') as $bundle => $class) {
+            $reflection = new \ReflectionClass($class);
+
+            $bundleInstance = $reflection->newInstance();
+            if (null === $bundleInstance->getParent()) {
+                $parentBundles[$bundle] = $reflection;
+            } else {
+                $childBundles[$bundle] = $reflection;
+            }
+        }
+
+        return array_merge($childBundles, $parentBundles);
+    }
+
     private function addTwigPath($twigFilesystemLoaderDefinition, $dir, $bundle)
     {
         $name = $bundle;
         if ('Bundle' === substr($name, -6)) {
             $name = substr($name, 0, -6);
         }
+
         $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($dir, $name));
     }
 

@@ -17,7 +17,6 @@ use Symfony\Component\BrowserKit\Response as DomResponse;
 use Symfony\Component\BrowserKit\Cookie as DomCookie;
 use Symfony\Component\BrowserKit\History;
 use Symfony\Component\BrowserKit\CookieJar;
-use Symfony\Component\HttpKernel\TerminableInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

@@ -12,8 +12,6 @@
 namespace Symfony\Component\Finder\Tests\Iterator;
 
 use Symfony\Component\Finder\Iterator\FilecontentFilterIterator;
-use Symfony\Component\Finder\Tests\Iterator\MockSplFileInfo;
-use Symfony\Component\Finder\Tests\Iterator\MockFileListIterator;
 
 class FilecontentFilterIteratorTest extends IteratorTestCase
 {

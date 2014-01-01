@@ -17,7 +17,6 @@ use Symfony\Component\CssSelector\Node\NodeInterface;
 use Symfony\Component\CssSelector\Node\SelectorNode;
 use Symfony\Component\CssSelector\Parser\Parser;
 use Symfony\Component\CssSelector\Parser\ParserInterface;
-use Symfony\Component\CssSelector\XPath\Extension;
 
 /**
  * XPath expression translator interface.

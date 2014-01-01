@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Security\Core\Exception;
 
-use Symfony\Component\Security\Core\Exception\AuthenticationException;
-
 /**
  * NonceExpiredException is thrown when an authentication is rejected because
  * the digest nonce has expired.

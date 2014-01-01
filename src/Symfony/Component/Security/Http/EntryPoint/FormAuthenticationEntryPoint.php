@@ -13,7 +13,6 @@ namespace Symfony\Component\Security\Http\EntryPoint;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 

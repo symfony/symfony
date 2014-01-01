@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Security\Core\Encoder;
 
-use Symfony\Component\Security\Core\Encoder\BasePasswordEncoder;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 
 /**

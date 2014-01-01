@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Serializer;
 
-use Symfony\Component\Serializer\SerializerInterface;
-
 /**
  * Defines the interface of encoders
  *

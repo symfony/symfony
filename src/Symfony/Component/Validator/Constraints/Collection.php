@@ -12,8 +12,6 @@
 namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Constraints\Required;
-use Symfony\Component\Validator\Constraints\Optional;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 /**

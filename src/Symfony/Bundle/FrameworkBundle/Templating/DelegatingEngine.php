@@ -13,7 +13,6 @@ namespace Symfony\Bundle\FrameworkBundle\Templating;
 
 use Symfony\Component\Templating\DelegatingEngine as BaseDelegatingEngine;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 /**

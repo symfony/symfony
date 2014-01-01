@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Validator;
 
-use Symfony\Component\Validator\Constraint;
-
 /**
  * Specifies an object able to return the correct ConstraintValidatorInterface
  * instance given a Constraint object.

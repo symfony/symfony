@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Templating;
 
-use Symfony\Component\Templating\TemplateReferenceInterface;
-use Symfony\Component\Templating\TemplateReference;
-
 /**
  * TemplateNameParser is the default implementation of TemplateNameParserInterface.
  *

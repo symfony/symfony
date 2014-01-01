@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Translation\Catalogue\DiffOperation;
 use Symfony\Component\Translation\Catalogue\MergeOperation;
 use Symfony\Component\Console\Input\InputInterface;

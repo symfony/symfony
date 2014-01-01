@@ -35,7 +35,11 @@ class DoctrineParserCache implements ParserCacheInterface
      */
     public function fetch($key)
     {
-        return $this->cache->fetch($key);
+        if (false === $value = $this->cache->fetch($key)) {
+            return null;
+        }
+
+        return $value;
     }
 
     /**

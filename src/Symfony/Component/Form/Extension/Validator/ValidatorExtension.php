@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Form\Extension\Validator;
 
-use Symfony\Component\Form\Extension\Validator\Type;
 use Symfony\Component\Form\Extension\Validator\Constraints\Form;
 use Symfony\Component\Form\AbstractExtension;
 use Symfony\Component\Validator\ValidatorInterface;

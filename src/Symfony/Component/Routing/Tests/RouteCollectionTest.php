@@ -252,4 +252,47 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('{locale}.example.com', $routea->getHost());
         $this->assertEquals('{locale}.example.com', $routeb->getHost());
     }
+
+    public function testClone()
+    {
+        $collection = new RouteCollection();
+        $collection->add('a', new Route('/a'));
+        $collection->add('b', new Route('/b', array('placeholder' => 'default'), array('placeholder' => '.+')));
+
+        $clonedCollection = clone $collection;
+
+        $this->assertCount(2, $clonedCollection);
+        $this->assertEquals($collection->get('a'), $clonedCollection->get('a'));
+        $this->assertNotSame($collection->get('a'), $clonedCollection->get('a'));
+        $this->assertEquals($collection->get('b'), $clonedCollection->get('b'));
+        $this->assertNotSame($collection->get('b'), $clonedCollection->get('b'));
+    }
+
+    public function testSetSchemes()
+    {
+        $collection = new RouteCollection();
+        $routea = new Route('/a', array(), array(), array(), '', 'http');
+        $routeb = new Route('/b');
+        $collection->add('a', $routea);
+        $collection->add('b', $routeb);
+
+        $collection->setSchemes(array('http', 'https'));
+
+        $this->assertEquals(array('http', 'https'), $routea->getSchemes());
+        $this->assertEquals(array('http', 'https'), $routeb->getSchemes());
+    }
+
+    public function testSetMethods()
+    {
+        $collection = new RouteCollection();
+        $routea = new Route('/a', array(), array(), array(), '', array(), array('GET', 'POST'));
+        $routeb = new Route('/b');
+        $collection->add('a', $routea);
+        $collection->add('b', $routeb);
+
+        $collection->setMethods('PUT');
+
+        $this->assertEquals(array('PUT'), $routea->getMethods());
+        $this->assertEquals(array('PUT'), $routeb->getMethods());
+    }
 }

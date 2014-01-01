@@ -13,7 +13,6 @@ namespace Symfony\Component\Intl\DateFormatter\DateFormat;
 
 use Symfony\Component\Intl\Exception\NotImplementedException;
 use Symfony\Component\Intl\Globals\IntlGlobals;
-use Symfony\Component\Intl\DateFormatter\DateFormat\MonthTransformer;
 
 /**
  * Parser and formatter for date formats

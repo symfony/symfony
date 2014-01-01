@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Debug;
 
-use Symfony\Component\Debug\DebugClassLoader;
-
 /**
  * Registers all the debug tools.
  *

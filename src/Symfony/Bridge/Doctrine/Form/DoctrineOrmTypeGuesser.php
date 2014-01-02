@@ -82,7 +82,44 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
     /**
      * {@inheritDoc}
      */
-    public function guessRequired($class, $property)
+    public function guessAttributes($class, $property)
+    {
+        $attributes = array();
+
+        if ($guess = $this->guessRequired($class, $property)) {
+            $attributes['required'] = $guess;
+        }
+
+        if ($guess = $this->guessMaxLength($class, $property)) {
+            $attributes['maxlength'] = $guess;
+        }
+
+        if ($guess = $this->guessMinValue($class, $property)) {
+            $attributes['min'] = $guess;
+        }
+
+        if ($guess = $this->guessMaxValue($class, $property)) {
+            $attributes['max'] = $guess;
+        }
+
+        return $attributes;
+    }
+
+    private function addAttribute(array $attributes, $key, Guess $guess = null)
+    {
+        if (null === $guess) {
+            return $attributes;
+        }
+
+        if ($value = $guess->getValue()) {
+            return array_merge($attributes, array($key => $guess->getValue()));
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function guessRequired($class, $property)
     {
         $classMetadatas = $this->getMetadata($class);
 
@@ -122,7 +159,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
     /**
      * {@inheritDoc}
      */
-    public function guessMaxLength($class, $property)
+    protected function guessMaxLength($class, $property)
     {
         $ret = $this->getMetadata($class);
         if ($ret && $ret[0]->hasField($property) && !$ret[0]->hasAssociation($property)) {
@@ -141,7 +178,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
     /**
      * {@inheritDoc}
      */
-    public function guessMinValue($class, $property)
+    protected function guessMinValue($class, $property)
     {
         // Unfortunately we can't guess anything from database
         return null;
@@ -150,7 +187,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
     /**
      * {@inheritDoc}
      */
-    public function guessMaxValue($class, $property)
+    protected function guessMaxValue($class, $property)
     {
         // Unfortunately we can't guess anything from database
         return null;
@@ -159,7 +196,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
     /**
      * {@inheritDoc}
      */
-    public function guessPattern($class, $property)
+    protected function guessPattern($class, $property)
     {
         $ret = $this->getMetadata($class);
         if ($ret && $ret[0]->hasField($property) && !$ret[0]->hasAssociation($property)) {

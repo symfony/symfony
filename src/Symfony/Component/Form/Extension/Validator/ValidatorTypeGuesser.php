@@ -43,29 +43,41 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
     /**
      * {@inheritDoc}
      */
-    public function guessOptions($class, $property, ResolvedFormTypeInterface $type)
+    public function guessAttributes($class, $property)
     {
-        $options = array();
+        $attributes = array();
 
-        if ($type->isKnown('max_length') && ($guess = $this->guessMaxLength($class, $property)) && null !== $guess->getValue()) {
-            $options = array_merge_recursive(array('max_length' => $guess->getValue()), $options);
+        if ($guess = $this->guessRequired($class, $property)) {
+            $attributes['required'] = $guess;
         }
 
-        if ($type->isKnown('min') && ($guess = $this->guessMinValue($class, $property)) && null !== $guess->getValue()) {
-            $options = array_merge_recursive(array('attr' => array('min' => $guess->getValue())), $options);
+        if ($guess = $this->guessMaxLength($class, $property)) {
+            $attributes['maxlength'] = $guess;
         }
 
-        if ($type->isKnown('max') && ($guess = $this->guessMaxValue($class, $property)) && null !== $guess->getValue()) {
-            $options = array_merge_recursive(array('attr' => array('max' => $guess->getValue())), $options);
+        if ($guess = $this->guessMinValue($class, $property)) {
+            $attributes['min'] = $guess;
         }
 
-        return $options;
+        if ($guess = $this->guessMaxValue($class, $property)) {
+            $attributes['max'] = $guess;
+        }
+
+        return $attributes;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function guessRequired($class, $property)
+    private function addAttribute(array $attributes, $key, Guess $guess = null)
+    {
+        if (null === $guess) {
+            return $attributes;
+        }
+
+        if ($value = $guess->getValue()) {
+            return array_merge($attributes, array($key => $guess->getValue()));
+        }
+    }
+
+    protected function guessRequired($class, $property)
     {
         $guesser = $this;
 

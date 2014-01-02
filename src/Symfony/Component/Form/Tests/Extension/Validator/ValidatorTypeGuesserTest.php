@@ -43,9 +43,11 @@ class ValidatorTypeGuesserTest extends \PHPUnit_Framework_TestCase
 
         $this->setupMetadata($class, 'foo', array(new Length(array('max' => '2'))));
 
-        $result = $this->typeGuesser->guessOptions($class, 'foo', new ResolvedFormType(new FormType\TextType()));
+        $result = $this->typeGuesser->guessAttributes($class, 'foo');
 
-        $this->assertEquals(array('max_length' => 2), $result);
+        $this->assertArrayHasKey('maxlength', $result);
+        $this->assertEquals(2, $result['maxlength']->getValue());
+        $this->assertFalse(isset($result['min']));
     }
 
     public function testGuessOptionsForConstraintWithMinLength()
@@ -54,9 +56,10 @@ class ValidatorTypeGuesserTest extends \PHPUnit_Framework_TestCase
 
         $this->setupMetadata($class, 'foo', array(new Length(array('min' => '2'))));
 
-        $result = $this->typeGuesser->guessOptions($class, 'foo', new ResolvedFormType(new FormType\TextType()));
+        $result = $this->typeGuesser->guessAttributes($class, 'foo');
 
-        $this->assertEquals(array(), $result);
+        $this->assertArrayHasKey('required', $result);
+        $this->assertFalse($result['required']->getValue());
     }
 
     public function testGuessOptionsForConstraintWithMinValue()
@@ -65,9 +68,10 @@ class ValidatorTypeGuesserTest extends \PHPUnit_Framework_TestCase
 
         $this->setupMetadata($class, 'foo', array(new Range(array('min' => '2'))));
 
-        $result = $this->typeGuesser->guessOptions($class, 'foo', new ResolvedFormType(new FormType\IntegerType()));
+        $result = $this->typeGuesser->guessAttributes($class, 'foo');
 
-        $this->assertEquals(array('attr' => array('min' => 2)), $result);
+        $this->assertArrayHasKey('min', $result);
+        $this->assertEquals(2, $result['min']->getValue());
     }
 
     public function testGuessOptionsForConstraintWithMaxValue()
@@ -76,9 +80,10 @@ class ValidatorTypeGuesserTest extends \PHPUnit_Framework_TestCase
 
         $this->setupMetadata($class, 'foo', array(new Range(array('max' => '2'))));
 
-        $result = $this->typeGuesser->guessOptions($class, 'foo', new ResolvedFormType(new FormType\IntegerType()));
+        $result = $this->typeGuesser->guessAttributes($class, 'foo');
 
-        $this->assertEquals(array('attr' => array('max' => 2)), $result);
+        $this->assertArrayHasKey('max', $result);
+        $this->assertEquals(2, $result['max']->getValue());
     }
 
     public function testGuessOptionsForConstraintWithMinAndMaxValue()
@@ -87,9 +92,12 @@ class ValidatorTypeGuesserTest extends \PHPUnit_Framework_TestCase
 
         $this->setupMetadata($class, 'foo', array(new Range(array('min' => 1, 'max' => '2'))));
 
-        $result = $this->typeGuesser->guessOptions($class, 'foo', new ResolvedFormType(new FormType\IntegerType()));
+        $result = $this->typeGuesser->guessAttributes($class, 'foo');
 
-        $this->assertEquals(array('attr' => array('min' => 1, 'max' => 2)), $result);
+        $this->assertArrayHasKey('min', $result);
+        $this->assertEquals(1, $result['min']->getValue());
+        $this->assertArrayHasKey('max', $result);
+        $this->assertEquals(2, $result['max']->getValue());
     }
 
     private function setupMetadata($class, $property, array $constraints)

@@ -24,6 +24,22 @@ class FormFactory implements FormFactoryInterface
      * @var ResolvedFormTypeFactoryInterface
      */
     private $resolvedTypeFactory;
+    
+    protected $supportedAttributes = array(
+        'text' => array('autocomplete', 'dirname', 'list', 'maxlength', 'pattern', 'placeholder', 'readonly', 'required', 'size'),
+        'search' => array('autocomplete', 'dirname', 'list', 'maxlength', 'pattern', 'placeholder', 'readonly', 'required', 'size'),
+        'url' => array('autocomplete', 'list', 'maxlength', 'pattern', 'placeholder', 'readonly', 'required', 'size'),
+        'email' => array('autocomplete', 'list', 'maxlength', 'pattern', 'placeholder', 'readonly', 'required', 'size'),
+        'password' => array('autocomplete', 'maxlength', 'pattern', 'placeholder', 'readonly', 'required', 'size'),
+        'date' => array('autocomplete', 'list', 'max', 'min', 'readonly', 'required', 'step'),
+        'datetime' => array('autocomplete', 'list', 'max', 'min', 'readonly', 'required', 'step'),
+        'time' => array('autocomplete', 'list', 'max', 'min', 'readonly', 'required', 'step'),
+        'integer' => array('autocomplete', 'list', 'max', 'min', 'placeholder', 'readonly', 'required', 'step'),
+        'decimal' => array('autocomplete', 'list', 'max', 'min', 'placeholder', 'readonly', 'required', 'step'),
+        'range' => array('autocomplete', 'list', 'max', 'min', 'step'),
+        'checkbox' => array('checked', 'required'),
+        'file' => array('accept', 'multiple', 'required')
+    );
 
     public function __construct(FormRegistryInterface $registry, ResolvedFormTypeFactoryInterface $resolvedTypeFactory)
     {
@@ -103,37 +119,21 @@ class FormFactory implements FormFactoryInterface
         }
 
         $typeGuess = $guesser->guessType($class, $property);
-        $maxLengthGuess = $guesser->guessMaxLength($class, $property);
-        $minValueGuess = $guesser->guessMinValue($class, $property);
-        $maxValueGuess = $guesser->guessMaxValue($class, $property);
-        $requiredGuess = $guesser->guessRequired($class, $property);
-        $patternGuess = $guesser->guessPattern($class, $property);
+        $guessedAttributes = $guesser->guessAttributes($class, $property);
 
         $type = $typeGuess ? $typeGuess->getType() : 'text';
 
-        $maxLength = $maxLengthGuess ? $maxLengthGuess->getValue() : null;
-        $minValue = $minValueGuess ? $minValueGuess->getValue() : null;
-        $maxValue = $maxValueGuess ? $maxValueGuess->getValue() : null;
-        $pattern   = $patternGuess ? $patternGuess->getValue() : null;
+        $filteredAttributes = array();
 
-        if (null !== $pattern) {
-            $options = array_merge(array('attr' => array('pattern' => $pattern)), $options);
+        foreach ($guessedAttributes as $key => $value) {
+            if (isset($this->supportedAttributes[$type]) && in_array($key, $this->supportedAttributes[$type])) {
+                $filteredAttributes[$key] = $value->getValue();
+            }
         }
 
-        if (null !== $maxLength) {
-            $options = array_merge(array('attr' => array('maxlength' => $maxLength)), $options);
-        }
-
-        // Should we add number type?
-        // At the moment number types are rendered as text (@see form_div_layout.html.twig#163)
-        if (in_array($type, array('integer'))) {
-            $options = $this->addAttrValue($options, 'min', $minValue);
-            $options = $this->addAttrValue($options, 'max', $maxValue);
-        }
-
-        if ($requiredGuess) {
-            $options = array_merge(array('required' => $requiredGuess->getValue()), $options);
-        }
+        $options = array_merge(array(
+            'attr' => $filteredAttributes
+        ), $options);
 
         // user options may override guessed options
         if ($typeGuess) {
@@ -141,30 +141,6 @@ class FormFactory implements FormFactoryInterface
         }
 
         return $this->createNamedBuilder($property, $type, $data, $options);
-    }
-
-    /**
-     * Add attribute value to attr option
-     *
-     * @param array  $options The options
-     * @param string $key     The key of the array
-     * @param string $value   The value of the attribute
-     *
-     * @return array $options The options
-     */
-    protected function addAttrValue(array $options, $key, $value = null)
-    {
-        if (null === $value) {
-            return $options;
-        }
-
-        if (false === isset($options['attr'])) {
-            $options['attr'] = array();
-        }
-
-        $options['attr'] = array_merge(array($key => $value), $options['attr']);
-
-        return $options;
     }
 
     /**

@@ -127,24 +127,6 @@ class ResolvedFormType implements ResolvedFormTypeInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function isKnown($property)
-    {
-        switch ($property) {
-            case 'max_length':
-                return $this->innerType instanceof FormType\TextType;
-            case 'min':
-            case 'max':
-                return $this->innerType instanceof FormType\IntegerType;
-            case 'pattern':
-                return $this->innerType instanceof FormType\TextType;
-        }
-
-        return false;
-    }
-
-    /**
      * Configures a form builder for the type hierarchy.
      *
      * @param FormBuilderInterface $builder The builder to configure.

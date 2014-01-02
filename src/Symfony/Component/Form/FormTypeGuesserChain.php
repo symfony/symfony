@@ -53,51 +53,25 @@ class FormTypeGuesserChain implements FormTypeGuesserInterface
     /**
      * {@inheritDoc}
      */
-    public function guessRequired($class, $property)
+    public function guessAttributes($class, $property)
     {
-        return $this->guess(function ($guesser) use ($class, $property) {
-            return $guesser->guessRequired($class, $property);
-        });
-    }
+        $attributes = array();
 
-    /**
-     * {@inheritDoc}
-     */
-    public function guessMaxLength($class, $property)
-    {
-        return $this->guess(function ($guesser) use ($class, $property) {
-            return $guesser->guessMaxLength($class, $property);
-        });
-    }
+        foreach ($this->guessers as $guesser) {
+            $guessedAttributes = $guesser->guessAttributes($class, $property);
 
-    /**
-     * {@inheritDoc}
-     */
-    public function guessMinValue($class, $property)
-    {
-        return $this->guess(function ($guesser) use ($class, $property) {
-            return $guesser->guessMinValue($class, $property);
-        });
-    }
+            if (is_array($guessedAttributes)) {
+                foreach ($guessedAttributes as $key => $value) {
+                    if (isset($attributes[$key])) {
+                        $attributes[$key] = Guess::getBestGuess(array($attributes[$key], $value));
+                    } else {
+                        $attributes[$key] = $value;
+                    }
+                }
+            }
+        }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function guessMaxValue($class, $property)
-    {
-        return $this->guess(function ($guesser) use ($class, $property) {
-            return $guesser->guessMaxValue($class, $property);
-        });
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function guessPattern($class, $property)
-    {
-        return $this->guess(function ($guesser) use ($class, $property) {
-            return $guesser->guessPattern($class, $property);
-        });
+        return $attributes;
     }
 
     /**

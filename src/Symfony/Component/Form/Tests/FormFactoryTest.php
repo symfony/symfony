@@ -474,20 +474,20 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
     public function testCreateBuilderUsesMaxLengthIfFound()
     {
         $this->guesser1->expects($this->once())
-            ->method('guessMaxLength')
+            ->method('guessAttributes')
             ->with('Application\Author', 'firstName')
-            ->will($this->returnValue(new ValueGuess(
+            ->will($this->returnValue(array('maxlength' => new ValueGuess(
                 15,
                 Guess::MEDIUM_CONFIDENCE
-            )));
+            ))));
 
         $this->guesser2->expects($this->once())
-            ->method('guessMaxLength')
+            ->method('guessAttributes')
             ->with('Application\Author', 'firstName')
-            ->will($this->returnValue(new ValueGuess(
+            ->will($this->returnValue(array('maxlength' => new ValueGuess(
                 20,
                 Guess::HIGH_CONFIDENCE
-            )));
+            ))));
 
         $factory = $this->getMockFactory(array('createNamedBuilder'));
 
@@ -515,20 +515,20 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
             )));
 
         $this->guesser1->expects($this->once())
-            ->method('guessMinValue')
+            ->method('guessAttributes')
             ->with('Application\Temperature', 'degrees')
-            ->will($this->returnValue(new ValueGuess(
+            ->will($this->returnValue(array('min' => new ValueGuess(
                 -276,
                 Guess::HIGH_CONFIDENCE
-            )));
+            ))));
 
         $this->guesser2->expects($this->once())
-            ->method('guessMaxValue')
+            ->method('guessAttributes')
             ->with('Application\Temperature', 'degrees')
-            ->will($this->returnValue(new ValueGuess(
+            ->will($this->returnValue(array('max' => new ValueGuess(
                 100,
                 Guess::HIGH_CONFIDENCE
-            )));
+            ))));
 
         $factory = $this->getMockFactory(array('createNamedBuilder'));
 
@@ -556,12 +556,12 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
             )));
 
         $this->guesser1->expects($this->once())
-            ->method('guessMinValue')
+            ->method('guessAttributes')
             ->with('Application\Temperature', 'degrees')
-            ->will($this->returnValue(new ValueGuess(
+            ->will($this->returnValue(array('min' => new ValueGuess(
                 -276,
                 Guess::HIGH_CONFIDENCE
-            )));
+            ))));
 
         $factory = $this->getMockFactory(array('createNamedBuilder'));
 
@@ -583,12 +583,12 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
     public function testMinAndMaxAttributesAreNotAddedToTextType()
     {
         $this->guesser1->expects($this->once())
-            ->method('guessMinValue')
+            ->method('guessAttributes')
             ->with('Application\Author', 'firstName')
-            ->will($this->returnValue(new ValueGuess(
+            ->will($this->returnValue(array('min' => new ValueGuess(
                 -276,
                 Guess::HIGH_CONFIDENCE
-            )));
+            ))));
 
         $factory = $this->getMockFactory(array('createNamedBuilder'));
 
@@ -610,26 +610,26 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
     public function testCreateBuilderUsesRequiredSettingWithHighestConfidence()
     {
         $this->guesser1->expects($this->once())
-            ->method('guessRequired')
+            ->method('guessAttributes')
             ->with('Application\Author', 'firstName')
-            ->will($this->returnValue(new ValueGuess(
+            ->will($this->returnValue(array('required' => new ValueGuess(
                 true,
                 Guess::MEDIUM_CONFIDENCE
-            )));
+            ))));
 
         $this->guesser2->expects($this->once())
-            ->method('guessRequired')
+            ->method('guessAttributes')
             ->with('Application\Author', 'firstName')
-            ->will($this->returnValue(new ValueGuess(
+            ->will($this->returnValue(array('required' => new ValueGuess(
                 false,
                 Guess::HIGH_CONFIDENCE
-            )));
+            ))));
 
         $factory = $this->getMockFactory(array('createNamedBuilder'));
 
         $factory->expects($this->once())
             ->method('createNamedBuilder')
-            ->with('firstName', 'text', null, array('required' => false))
+            ->with('firstName', 'text', null, array('attr' => array('required' => false)))
             ->will($this->returnValue('builderInstance'));
 
         $this->builder = $factory->createBuilderForProperty(
@@ -643,20 +643,20 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
     public function testCreateBuilderUsesPatternIfFound()
     {
         $this->guesser1->expects($this->once())
-            ->method('guessPattern')
+            ->method('guessAttributes')
             ->with('Application\Author', 'firstName')
-            ->will($this->returnValue(new ValueGuess(
+            ->will($this->returnValue(array('pattern' => new ValueGuess(
                 '[a-z]',
                 Guess::MEDIUM_CONFIDENCE
-            )));
+            ))));
 
         $this->guesser2->expects($this->once())
-            ->method('guessPattern')
+            ->method('guessAttributes')
             ->with('Application\Author', 'firstName')
-            ->will($this->returnValue(new ValueGuess(
+            ->will($this->returnValue(array('pattern' => new ValueGuess(
                 '[a-zA-Z]',
                 Guess::HIGH_CONFIDENCE
-            )));
+            ))));
 
         $factory = $this->getMockFactory(array('createNamedBuilder'));
 

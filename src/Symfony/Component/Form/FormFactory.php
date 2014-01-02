@@ -24,7 +24,7 @@ class FormFactory implements FormFactoryInterface
      * @var ResolvedFormTypeFactoryInterface
      */
     private $resolvedTypeFactory;
-    
+
     protected $supportedAttributes = array(
         'text' => array('autocomplete', 'dirname', 'list', 'maxlength', 'pattern', 'placeholder', 'readonly', 'required', 'size'),
         'search' => array('autocomplete', 'dirname', 'list', 'maxlength', 'pattern', 'placeholder', 'readonly', 'required', 'size'),

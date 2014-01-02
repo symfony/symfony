@@ -12,12 +12,8 @@
 namespace Symfony\Component\Form\Tests\Extension\Validator;
 
 use Symfony\Component\Form\Extension\Validator\ValidatorTypeGuesser;
-use Symfony\Component\Form\Guess\Guess;
-use Symfony\Component\Form\ResolvedFormType;
-use Symfony\Component\Form\Extension\Core\Type as FormType;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\Range;
-use Symfony\Component\Validator\Constraints\Type;
 
 /**
 * @author franek <franek@chicour.net>

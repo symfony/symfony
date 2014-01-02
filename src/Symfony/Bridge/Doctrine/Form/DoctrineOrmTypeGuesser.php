@@ -105,17 +105,6 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
         return $attributes;
     }
 
-    private function addAttribute(array $attributes, $key, Guess $guess = null)
-    {
-        if (null === $guess) {
-            return $attributes;
-        }
-
-        if ($value = $guess->getValue()) {
-            return array_merge($attributes, array($key => $guess->getValue()));
-        }
-    }
-
     /**
      * {@inheritDoc}
      */

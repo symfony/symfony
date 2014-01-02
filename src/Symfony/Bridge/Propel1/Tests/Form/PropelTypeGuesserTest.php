@@ -30,49 +30,50 @@ class PropelTypeGuesserTest extends Propel1TestCase
 
     public function testGuessMaxLengthWithText()
     {
-        $value = $this->guesser->guessMaxLength(self::CLASS_NAME, 'value');
+        $attributes = $this->guesser->guessAttributes(self::CLASS_NAME, 'value');
 
-        $this->assertNotNull($value);
-        $this->assertEquals(255, $value->getValue());
+        $this->assertArrayHasKey('maxlength', $attributes);
+        $this->assertEquals(255, $attributes['maxlength']->getValue());
     }
 
     public function testGuessMaxLengthWithFloat()
     {
-        $value = $this->guesser->guessMaxLength(self::CLASS_NAME, 'price');
+        $attributes = $this->guesser->guessAttributes(self::CLASS_NAME, 'price');
 
-        $this->assertNotNull($value);
-        $this->assertNull($value->getValue());
+        $this->assertArrayHasKey('maxlength', $attributes);
+        $this->assertEquals(null, $attributes['maxlength']->getValue());
     }
 
     public function testGuessMinLengthWithText()
     {
-        $value = $this->guesser->guessPattern(self::CLASS_NAME, 'value');
+        $attributes = $this->guesser->guessAttributes(self::CLASS_NAME, 'price');
 
-        $this->assertNull($value);
+        $this->assertArrayHasKey('maxlength', $attributes);
+        $this->assertEquals(null, $attributes['maxlength']->getValue());
     }
 
     public function testGuessMinLengthWithFloat()
     {
-        $value = $this->guesser->guessPattern(self::CLASS_NAME, 'price');
+        $attributes = $this->guesser->guessAttributes(self::CLASS_NAME, 'price');
 
-        $this->assertNotNull($value);
-        $this->assertNull($value->getValue());
+        $this->assertArrayHasKey('maxlength', $attributes);
+        $this->assertEquals(null, $attributes['maxlength']->getValue());
     }
 
     public function testGuessRequired()
     {
-        $value = $this->guesser->guessRequired(self::CLASS_NAME, 'id');
+        $attributes = $this->guesser->guessAttributes(self::CLASS_NAME, 'id');
 
-        $this->assertNotNull($value);
-        $this->assertTrue($value->getValue());
+        $this->assertArrayHasKey('required', $attributes);
+        $this->assertEquals(true, $attributes['required']->getValue());
     }
 
     public function testGuessRequiredWithNullableColumn()
     {
-        $value = $this->guesser->guessRequired(self::CLASS_NAME, 'value');
+        $attributes = $this->guesser->guessAttributes(self::CLASS_NAME, 'value');
 
-        $this->assertNotNull($value);
-        $this->assertFalse($value->getValue());
+        $this->assertArrayHasKey('required', $attributes);
+        $this->assertEquals(false, $attributes['required']->getValue());
     }
 
     public function testGuessTypeWithoutTable()

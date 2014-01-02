@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.5.0
+-----
+
+ * added FileStreamResponse as a kind of wrapper for fpassthru (responding contents of file handles)
+
 2.4.0
 -----
 

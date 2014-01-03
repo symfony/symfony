@@ -39,7 +39,7 @@ class PhpExecutableFinder
         }
 
         // PHP_BINARY return the current sapi executable
-        if (defined('PHP_BINARY') && PHP_BINARY && ('cli' === PHP_SAPI) && is_file(PHP_BINARY)) {
+        if (defined('PHP_BINARY') && PHP_BINARY && in_array(PHP_SAPI, array('cli', 'cli-server')) && is_file(PHP_BINARY)) {
             return PHP_BINARY;
         }
 

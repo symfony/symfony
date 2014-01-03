@@ -992,13 +992,29 @@ class Process
     }
 
     /**
+     * Sets the process pipes to use.
+     *
+     * @param ProcessPipes $pipes
+     * @throws LogicException If called after start()
+     */
+    public function setProcessPipes(ProcessPipes $pipes)
+    {
+        if ($this->status !== self::STATUS_READY) {
+            throw new LogicException('ProcessPipes cannot be changed after the process has started');
+        }
+        $this->processPipes = $pipes;
+    }
+
+    /**
      * Creates the descriptors needed by the proc_open.
      *
      * @return array
      */
     private function getDescriptors()
     {
-        $this->processPipes = new ProcessPipes($this->useFileHandles);
+        if (!$this->processPipes) {
+            $this->processPipes = new ProcessPipes($this->useFileHandles);
+        }
         $descriptors = $this->processPipes->getDescriptors();
 
         if (!$this->useFileHandles && $this->enhanceSigchildCompatibility && $this->isSigchildEnabled()) {

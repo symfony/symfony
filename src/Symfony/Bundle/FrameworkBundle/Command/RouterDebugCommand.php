@@ -43,6 +43,11 @@ class RouterDebugCommand extends ContainerAwareCommand
         return parent::isEnabled();
     }
 
+    protected function getRouter(InputInterface $input)
+    {
+        return $this->getContainer()->get('router');
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -77,7 +82,7 @@ EOF
         $helper = new DescriptorHelper();
 
         if ($name) {
-            $route = $this->getContainer()->get('router')->getRouteCollection()->get($name);
+            $route = $this->getRouter($input)->getRouteCollection()->get($name);
             if (!$route) {
                 throw new \InvalidArgumentException(sprintf('The route "%s" does not exist.', $name));
             }
@@ -88,7 +93,7 @@ EOF
                 'name'     => $name,
             ));
         } else {
-            $routes = $this->getContainer()->get('router')->getRouteCollection();
+            $routes = $this->getRouter($input)->getRouteCollection();
 
             foreach ($routes as $route) {
                 $this->convertController($route);

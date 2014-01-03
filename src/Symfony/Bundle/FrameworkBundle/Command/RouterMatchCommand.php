@@ -41,6 +41,11 @@ class RouterMatchCommand extends ContainerAwareCommand
         return parent::isEnabled();
     }
 
+    protected function getRouter(InputInterface $input)
+    {
+        return $this->getContainer()->get('router');
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -66,7 +71,7 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $router = $this->getContainer()->get('router');
+        $router = $this->getRouter($input);
         $matcher = new TraceableUrlMatcher($router->getRouteCollection(), $router->getContext());
 
         $traces = $matcher->getTraces($input->getArgument('path_info'));

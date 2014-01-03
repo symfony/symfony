@@ -93,7 +93,7 @@ interface FormFactoryInterface
     /**
      * Returns a form builder for a property of a class.
      *
-     * If any of the 'max_length', 'required' and type options can be guessed,
+     * If any of the 'required' and type options can be guessed,
      * and are not provided in the options argument, the guessed value is used.
      *
      * @param string $class    The fully qualified class name

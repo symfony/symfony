@@ -192,8 +192,6 @@ class FormType extends BaseType
             'trim'               => true,
             'required'           => true,
             'read_only'          => false,
-            'max_length'         => null,
-            'pattern'            => null,
             'property_path'      => null,
             'mapped'             => true,
             'by_reference'       => true,

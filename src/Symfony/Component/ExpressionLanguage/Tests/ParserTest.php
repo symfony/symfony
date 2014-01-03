@@ -80,6 +80,10 @@ class ParserTest extends \PHPUnit_Framework_TestCase
                 '3 - 3',
             ),
             array(
+                new Node\BinaryNode('-', new Node\ConstantNode(3), new Node\ConstantNode(300)),
+                '3 - 3e+2',
+            ),
+            array(
                 new Node\BinaryNode('*',
                     new Node\BinaryNode('-', new Node\ConstantNode(3), new Node\ConstantNode(3)),
                     new Node\ConstantNode(2)

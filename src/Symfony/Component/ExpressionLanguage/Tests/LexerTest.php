@@ -47,6 +47,30 @@ class LexerTest extends \PHPUnit_Framework_TestCase
                 '3',
             ),
             array(
+                array(new Token('number', '1000', 1)),
+                '1e3',
+            ),
+            array(
+                array(new Token('number', '1000', 1)),
+                '1e+3',
+            ),
+            array(
+                array(new Token('number', '0.001', 1)),
+                '1e-3',
+            ),
+            array(
+                array(new Token('number', '1000', 1)),
+                '1E3',
+            ),
+            array(
+                array(new Token('number', '1500', 1)),
+                '1.5E+3',
+            ),
+            array(
+                array(new Token('number', '0.001', 1)),
+                '1E-3',
+            ),
+            array(
                 array(new Token('operator', '+', 1)),
                 '+',
             ),

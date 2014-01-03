@@ -395,11 +395,11 @@ class FrameworkExtension extends Extension
      */
     private function registerRequestConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
-        if ($config['additional_formats']) {
+        if ($config['formats']) {
             $loader->load('request.xml');
             $container
                 ->getDefinition('request.add_request_formats_listener')
-                ->replaceArgument(0, $config['additional_formats'])
+                ->replaceArgument(0, $config['formats'])
             ;
         }
     }

@@ -154,11 +154,11 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals(array('csv' => array('text/csv', 'text/plain'), 'pdf' => array('application/pdf')), $listenerDef->getArgument(0));
     }
 
-    public function testEmptyAdditionalRequestFormats()
+    public function testEmptyRequestFormats()
     {
         $container = $this->createContainerFromFile('request');
 
-        $this->assertFalse($container->hasDefinition('request.add_request_formats_listener'), '->registerRequestConfiguration() does not load request.xml when no additional request formats are configured');
+        $this->assertFalse($container->hasDefinition('request.add_request_formats_listener'), '->registerRequestConfiguration() does not load request.xml when no request formats are defined');
     }
 
     public function testTemplating()

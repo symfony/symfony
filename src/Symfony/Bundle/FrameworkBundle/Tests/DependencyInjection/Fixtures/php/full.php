@@ -72,7 +72,7 @@ $container->loadFromExtension('framework', array(
     ),
     'ide' => 'file%%link%%format',
     'request' => array(
-        'additional_formats' => array(
+        'formats' => array(
             'csv' => array(
                 'text/csv',
                 'text/plain',

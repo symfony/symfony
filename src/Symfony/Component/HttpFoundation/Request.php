@@ -64,6 +64,8 @@ class Request
     protected static $httpMethodParameterOverride = false;
 
     /**
+     * Custom parameters
+     *
      * @var \Symfony\Component\HttpFoundation\ParameterBag
      *
      * @api
@@ -71,6 +73,8 @@ class Request
     public $attributes;
 
     /**
+     * Request body parameters ($_POST)
+     *
      * @var \Symfony\Component\HttpFoundation\ParameterBag
      *
      * @api
@@ -78,6 +82,8 @@ class Request
     public $request;
 
     /**
+     * Query string parameters ($_GET)
+     *
      * @var \Symfony\Component\HttpFoundation\ParameterBag
      *
      * @api
@@ -85,6 +91,8 @@ class Request
     public $query;
 
     /**
+     * Server and execution environment parameters ($_SERVER)
+     *
      * @var \Symfony\Component\HttpFoundation\ServerBag
      *
      * @api
@@ -92,6 +100,8 @@ class Request
     public $server;
 
     /**
+     * Uploaded files ($_FILES)
+     *
      * @var \Symfony\Component\HttpFoundation\FileBag
      *
      * @api
@@ -99,6 +109,8 @@ class Request
     public $files;
 
     /**
+     * Cookies ($_COOKIE)
+     *
      * @var \Symfony\Component\HttpFoundation\ParameterBag
      *
      * @api
@@ -106,6 +118,8 @@ class Request
     public $cookies;
 
     /**
+     * Headers (taken from the $_SERVER)
+     *
      * @var \Symfony\Component\HttpFoundation\HeaderBag
      *
      * @api

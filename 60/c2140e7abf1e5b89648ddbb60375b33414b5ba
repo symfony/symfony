@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by pborreli at 2014-01-02T19:55:50Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by piotrpasich at 2014-01-02T20:00:16Z
+
+Good idea, I feel the same with skipping tests.
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by jakzal at 2014-01-02T21:21:54Z
+
+@piotrpasich we skip tests only if they cannot be run on the current environment (like there's a library missing).

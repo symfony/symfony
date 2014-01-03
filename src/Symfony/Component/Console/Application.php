@@ -145,9 +145,8 @@ class Application
             if ($exitCode > 255) {
                 $exitCode = 255;
             }
-            // @codeCoverageIgnoreStart
+
             exit($exitCode);
-            // @codeCoverageIgnoreEnd
         }
 
         return $exitCode;

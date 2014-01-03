@@ -122,12 +122,8 @@ class PropelTypeGuesser implements FormTypeGuesserInterface
             $attributes['maxlength'] = $guess;
         }
 
-        if ($guess = $this->guessMinValue($class, $property)) {
-            $attributes['min'] = $guess;
-        }
-
-        if ($guess = $this->guessMaxValue($class, $property)) {
-            $attributes['max'] = $guess;
+        if ($guess = $this->guessPattern($class, $property)) {
+            $attributes['pattern'] = $guess;
         }
 
         return $attributes;
@@ -160,24 +156,6 @@ class PropelTypeGuesser implements FormTypeGuesserInterface
                     return new ValueGuess(null, Guess::MEDIUM_CONFIDENCE);
             }
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected function guessMinValue($class, $property)
-    {
-        // Unfortunately we can't guess anything from database
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected function guessMaxValue($class, $property)
-    {
-        // Unfortunately we can't guess anything from database
-        return null;
     }
 
     /**

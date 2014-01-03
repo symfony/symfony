@@ -446,13 +446,13 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
     public function testOptionsCanBeOverridden()
     {
         $this->guesser1->expects($this->once())
-                ->method('guessType')
-                ->with('Application\Author', 'firstName')
-                ->will($this->returnValue(new TypeGuess(
-                    'text',
-                    array('attr' => array('maxlength' => 10)),
-                    Guess::MEDIUM_CONFIDENCE
-                )));
+            ->method('guessType')
+            ->with('Application\Author', 'firstName')
+            ->will($this->returnValue(new TypeGuess(
+                'text',
+                array('attr' => array('maxlength' => 10)),
+                Guess::MEDIUM_CONFIDENCE
+            )));
 
         $factory = $this->getMockFactory(array('createNamedBuilder'));
 
@@ -663,6 +663,31 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $factory->expects($this->once())
             ->method('createNamedBuilder')
             ->with('firstName', 'text', null, array('attr' => array('pattern' => '[a-zA-Z]')))
+            ->will($this->returnValue('builderInstance'));
+
+        $this->builder = $factory->createBuilderForProperty(
+            'Application\Author',
+            'firstName'
+        );
+
+        $this->assertEquals('builderInstance', $this->builder);
+    }
+
+    public function testCreateBuilderWithNullAttribute()
+    {
+        $this->guesser1->expects($this->once())
+            ->method('guessAttributes')
+            ->with('Application\Author', 'firstName')
+            ->will($this->returnValue(array('required' => new ValueGuess(
+                null,
+                Guess::MEDIUM_CONFIDENCE
+            ))));
+
+        $factory = $this->getMockFactory(array('createNamedBuilder'));
+
+        $factory->expects($this->once())
+            ->method('createNamedBuilder')
+            ->with('firstName', 'text', null, array())
             ->will($this->returnValue('builderInstance'));
 
         $this->builder = $factory->createBuilderForProperty(

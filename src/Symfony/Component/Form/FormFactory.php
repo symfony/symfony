@@ -123,21 +123,23 @@ class FormFactory implements FormFactoryInterface
 
         $type = $typeGuess ? $typeGuess->getType() : 'text';
 
+        // user options may override guessed options
+        if ($typeGuess) {
+            $options = array_merge($typeGuess->getOptions(), $options);
+        }
+
         $filteredAttributes = array();
 
         foreach ($guessedAttributes as $key => $value) {
-            if (isset($this->supportedAttributes[$type]) && in_array($key, $this->supportedAttributes[$type])) {
+            if (null !== $value->getValue() && isset($this->supportedAttributes[$type]) && in_array($key, $this->supportedAttributes[$type])) {
                 $filteredAttributes[$key] = $value->getValue();
             }
         }
 
-        $options = array_merge(array(
-            'attr' => $filteredAttributes
-        ), $options);
-
-        // user options may override guessed options
-        if ($typeGuess) {
-            $options = array_merge($typeGuess->getOptions(), $options);
+        if (count($filteredAttributes)) {
+            $options = array_merge(array(
+                'attr' => $filteredAttributes
+            ), $options);
         }
 
         return $this->createNamedBuilder($property, $type, $data, $options);

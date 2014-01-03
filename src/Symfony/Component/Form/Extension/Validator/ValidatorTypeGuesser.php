@@ -62,20 +62,21 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
             $attributes['max'] = $guess;
         }
 
+        if ($guess = $this->guessPattern($class, $property)) {
+            $attributes['pattern'] = $guess;
+        }
+
         return $attributes;
     }
 
-    private function addAttribute(array $attributes, $key, Guess $guess = null)
-    {
-        if (null === $guess) {
-            return $attributes;
-        }
-
-        if ($value = $guess->getValue()) {
-            return array_merge($attributes, array($key => $guess->getValue()));
-        }
-    }
-
+    /**
+     * Returns a guess whether a property of a class is required
+     *
+     * @param string $class    The fully qualified class name
+     * @param string $property The name of the property to guess for
+     *
+     * @return Guess\ValueGuess A guess for the field's required setting
+     */
     protected function guessRequired($class, $property)
     {
         $guesser = $this;
@@ -273,7 +274,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
      *
      * @return ValueGuess|null The guess for the maximum length
      */
-    protected function guessMaxLengthForConstraint(Constraint $constraint)
+    public function guessMaxLengthForConstraint(Constraint $constraint)
     {
         switch (get_class($constraint)) {
             case 'Symfony\Component\Validator\Constraints\Length':

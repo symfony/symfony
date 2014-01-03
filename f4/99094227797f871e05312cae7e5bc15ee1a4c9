@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2013-12-28T22:38:18Z
+
+For me, there's too many conditionals in that test case you altered. I'd rather implement the class prefix case as a separate one. Notice that you introduce an additional argument just to use it in one of the cases.
+
+Don't forget to [fix the build](http://hook.fabbot.io/report/symfony/symfony/9880/a1b8d6ea6361b7d9af938d2d6e3ce8fa22939915) (licence header is missing).
+
+---------------------------------------------------------------------------
+
+by ewgRa at 2013-12-30T07:57:24Z
+
+@jakzal
+
+Thanks for your notice. I added header, how I can run rebuild?
+
+>  I'd rather implement the class prefix case as a separate one
+
+if it is common practice in symfony - I can do that. But on my mind there is no advantages. This logic implemented in one method. If I create new one test case - there will be many dupe logic with current one, also as testing same logic twice.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-12-31T07:55:36Z
+
+@ewgRa I agree with @jakzal here. Can you make the needed changes?
+
+---------------------------------------------------------------------------
+
+by ewgRa at 2013-12-31T07:59:56Z
+
+Ok, no problem. Later will extract it to new test case.
+
+---------------------------------------------------------------------------
+
+by ewgRa at 2014-01-02T21:01:04Z
+
+@fabpot Done

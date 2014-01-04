@@ -23,9 +23,7 @@ class DoctrineOrmTypeGuesserTest extends \PHPUnit_Framework_TestCase
      */
     public function testRequiredGuesser($classMetadata, $expected)
     {
-        $attributes = $this->getGuesser($classMetadata)->guessAttributes('TestEntity', 'field');
-
-        $this->assertEquals($expected, isset($attributes['required']) ? $attributes['required'] : null);
+        $this->assertEquals($expected, $this->getGuesser($classMetadata)->guessRequired('TestEntity', 'field'));
     }
 
     public function requiredProvider()

@@ -46,10 +46,6 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
     {
         $attributes = array();
 
-        if ($guess = $this->guessRequired($class, $property)) {
-            $attributes['required'] = $guess;
-        }
-
         if ($guess = $this->guessMaxLength($class, $property)) {
             $attributes['maxlength'] = $guess;
         }
@@ -70,14 +66,9 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
     }
 
     /**
-     * Returns a guess whether a property of a class is required
-     *
-     * @param string $class    The fully qualified class name
-     * @param string $property The name of the property to guess for
-     *
-     * @return Guess\ValueGuess A guess for the field's required setting
+     * {@inheritDoc}
      */
-    protected function guessRequired($class, $property)
+    public function guessRequired($class, $property)
     {
         $guesser = $this;
 

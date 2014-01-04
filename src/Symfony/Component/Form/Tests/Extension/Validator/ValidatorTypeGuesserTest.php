@@ -54,8 +54,7 @@ class ValidatorTypeGuesserTest extends \PHPUnit_Framework_TestCase
 
         $result = $this->typeGuesser->guessAttributes($class, 'foo');
 
-        $this->assertArrayHasKey('required', $result);
-        $this->assertFalse($result['required']->getValue());
+        $this->assertFalse(isset($result['maxlength']));
     }
 
     public function testGuessOptionsForConstraintWithMinValue()

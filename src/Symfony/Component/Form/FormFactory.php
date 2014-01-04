@@ -26,19 +26,22 @@ class FormFactory implements FormFactoryInterface
     private $resolvedTypeFactory;
 
     protected $supportedAttributes = array(
-        'text' => array('autocomplete', 'dirname', 'list', 'maxlength', 'pattern', 'placeholder', 'readonly', 'required', 'size'),
-        'search' => array('autocomplete', 'dirname', 'list', 'maxlength', 'pattern', 'placeholder', 'readonly', 'required', 'size'),
-        'url' => array('autocomplete', 'list', 'maxlength', 'pattern', 'placeholder', 'readonly', 'required', 'size'),
-        'email' => array('autocomplete', 'list', 'maxlength', 'pattern', 'placeholder', 'readonly', 'required', 'size'),
-        'password' => array('autocomplete', 'maxlength', 'pattern', 'placeholder', 'readonly', 'required', 'size'),
-        'date' => array('autocomplete', 'list', 'max', 'min', 'readonly', 'required', 'step'),
-        'datetime' => array('autocomplete', 'list', 'max', 'min', 'readonly', 'required', 'step'),
-        'time' => array('autocomplete', 'list', 'max', 'min', 'readonly', 'required', 'step'),
-        'integer' => array('autocomplete', 'list', 'max', 'min', 'placeholder', 'readonly', 'required', 'step'),
-        'decimal' => array('autocomplete', 'list', 'max', 'min', 'placeholder', 'readonly', 'required', 'step'),
-        'range' => array('autocomplete', 'list', 'max', 'min', 'step'),
-        'checkbox' => array('checked', 'required'),
-        'file' => array('accept', 'multiple', 'required')
+        // rendered as input[type=text]
+        'text' => array('maxlength', 'pattern'),
+        'email' => array('maxlength', 'pattern'),
+        'money' => array('maxlength', 'pattern'),
+        'number' => array('maxlength', 'pattern'),
+        'percent' => array('maxlength', 'pattern'),
+        // rendered as input[type=number]
+        'integer' => array('max', 'min'),
+        // rendered as input[type=password]
+        'password' => array('maxlength', 'pattern'),
+        // rendered as input[type=search]
+        'search' => array('maxlength', 'pattern'),
+        // rendered as input[type=url]
+        'url' => array('maxlength', 'pattern'),
+        // rendered as textarea
+        'textarea' => array('maxlength'),
     );
 
     public function __construct(FormRegistryInterface $registry, ResolvedFormTypeFactoryInterface $resolvedTypeFactory)
@@ -122,6 +125,10 @@ class FormFactory implements FormFactoryInterface
         $guessedAttributes = $guesser->guessAttributes($class, $property);
 
         $type = $typeGuess ? $typeGuess->getType() : 'text';
+
+        if ($requiredGuess = $guesser->guessRequired($class, $property)) {
+            $options = array_merge(array('required' => $requiredGuess->getValue()), $options);
+        }
 
         // user options may override guessed options
         if ($typeGuess) {

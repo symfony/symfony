@@ -610,26 +610,26 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
     public function testCreateBuilderUsesRequiredSettingWithHighestConfidence()
     {
         $this->guesser1->expects($this->once())
-            ->method('guessAttributes')
+            ->method('guessRequired')
             ->with('Application\Author', 'firstName')
-            ->will($this->returnValue(array('required' => new ValueGuess(
+            ->will($this->returnValue(new ValueGuess(
                 true,
                 Guess::MEDIUM_CONFIDENCE
-            ))));
+            )));
 
         $this->guesser2->expects($this->once())
-            ->method('guessAttributes')
+            ->method('guessRequired')
             ->with('Application\Author', 'firstName')
-            ->will($this->returnValue(array('required' => new ValueGuess(
+            ->will($this->returnValue(new ValueGuess(
                 false,
                 Guess::HIGH_CONFIDENCE
-            ))));
+            )));
 
         $factory = $this->getMockFactory(array('createNamedBuilder'));
 
         $factory->expects($this->once())
             ->method('createNamedBuilder')
-            ->with('firstName', 'text', null, array('attr' => array('required' => false)))
+            ->with('firstName', 'text', null, array('required' => false))
             ->will($this->returnValue('builderInstance'));
 
         $this->builder = $factory->createBuilderForProperty(
@@ -678,7 +678,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $this->guesser1->expects($this->once())
             ->method('guessAttributes')
             ->with('Application\Author', 'firstName')
-            ->will($this->returnValue(array('required' => new ValueGuess(
+            ->will($this->returnValue(array('maxlength' => new ValueGuess(
                 null,
                 Guess::MEDIUM_CONFIDENCE
             ))));

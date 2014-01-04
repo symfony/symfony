@@ -114,10 +114,6 @@ class PropelTypeGuesser implements FormTypeGuesserInterface
     {
         $attributes = array();
 
-        if ($guess = $this->guessRequired($class, $property)) {
-            $attributes['required'] = $guess;
-        }
-
         if ($guess = $this->guessMaxLength($class, $property)) {
             $attributes['maxlength'] = $guess;
         }
@@ -132,7 +128,7 @@ class PropelTypeGuesser implements FormTypeGuesserInterface
     /**
      * {@inheritDoc}
      */
-    protected function guessRequired($class, $property)
+    public function guessRequired($class, $property)
     {
         if ($column = $this->getColumn($class, $property)) {
             return new ValueGuess($column->isNotNull(), Guess::HIGH_CONFIDENCE);

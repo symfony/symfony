@@ -36,4 +36,14 @@ interface FormTypeGuesserInterface
      * @return array An array of guesses for the field's attributes
      */
     public function guessAttributes($class, $property);
+
+    /**
+     * Returns a guess whether a property of a class is required
+     *
+     * @param string $class    The fully qualified class name
+     * @param string $property The name of the property to guess for
+     *
+     * @return Guess\ValueGuess A guess for the field's required setting
+     */
+    public function guessRequired($class, $property);
 }

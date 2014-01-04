@@ -86,10 +86,6 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
     {
         $attributes = array();
 
-        if ($guess = $this->guessRequired($class, $property)) {
-            $attributes['required'] = $guess;
-        }
-
         if ($guess = $this->guessMaxLength($class, $property)) {
             $attributes['maxlength'] = $guess;
         }
@@ -104,7 +100,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
     /**
      * {@inheritDoc}
      */
-    protected function guessRequired($class, $property)
+    public function guessRequired($class, $property)
     {
         $classMetadatas = $this->getMetadata($class);
 

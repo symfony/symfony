@@ -62,18 +62,18 @@ class PropelTypeGuesserTest extends Propel1TestCase
 
     public function testGuessRequired()
     {
-        $attributes = $this->guesser->guessAttributes(self::CLASS_NAME, 'id');
+        $value = $this->guesser->guessRequired(self::CLASS_NAME, 'id');
 
-        $this->assertArrayHasKey('required', $attributes);
-        $this->assertEquals(true, $attributes['required']->getValue());
+        $this->assertNotNull($value);
+        $this->assertTrue($value->getValue());
     }
 
     public function testGuessRequiredWithNullableColumn()
     {
-        $attributes = $this->guesser->guessAttributes(self::CLASS_NAME, 'value');
+        $value = $this->guesser->guessRequired(self::CLASS_NAME, 'value');
 
-        $this->assertArrayHasKey('required', $attributes);
-        $this->assertEquals(false, $attributes['required']->getValue());
+        $this->assertNotNull($value);
+        $this->assertFalse($value->getValue());
     }
 
     public function testGuessTypeWithoutTable()

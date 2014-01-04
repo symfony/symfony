@@ -191,6 +191,8 @@ class FormType extends BaseType
             'empty_data'         => $emptyData,
             'trim'               => true,
             'required'           => true,
+            'max_length'         => null,
+            'pattern'            => null,
             'read_only'          => false,
             'property_path'      => null,
             'mapped'             => true,

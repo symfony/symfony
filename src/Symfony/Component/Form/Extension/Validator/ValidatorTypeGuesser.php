@@ -87,7 +87,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
      *
      * @return Guess\ValueGuess|null A guess for the field's maximum length
      */
-    protected function guessMaxLength($class, $property)
+    public function guessMaxLength($class, $property)
     {
         $guesser = $this;
 
@@ -104,7 +104,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
      *
      * @return Guess\ValueGuess|null A guess for the field's maximum value
      */
-    protected function guessMaxValue($class, $property)
+    public function guessMaxValue($class, $property)
     {
         $guesser = $this;
 
@@ -121,7 +121,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
      *
      * @return Guess\ValueGuess|null A guess for the field's minimum value
      */
-    protected function guessMinValue($class, $property)
+    public function guessMinValue($class, $property)
     {
         $guesser = $this;
 
@@ -144,7 +144,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
      *
      * @return Guess\ValueGuess|null A guess for the field's required pattern
      */
-    protected function guessPattern($class, $property)
+    public function guessPattern($class, $property)
     {
         $guesser = $this;
 

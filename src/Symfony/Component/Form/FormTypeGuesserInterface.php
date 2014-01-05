@@ -33,7 +33,7 @@ interface FormTypeGuesserInterface
      * @param string                    $property The name of the property to guess for
      * @param ResolvedFormTypeInterface $type     Field's type
      *
-     * @return array An array of guesses for the field's attributes
+     * @return Guess\ValueGuess[] An array of guesses for the field's attributes
      */
     public function guessAttributes($class, $property);
 

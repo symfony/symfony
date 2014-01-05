@@ -63,6 +63,26 @@ class FormTypeGuesserChain implements FormTypeGuesserInterface
     /**
      * {@inheritDoc}
      */
+    public function guessMaxLength($class, $property)
+    {
+        return $this->guess(function ($guesser) use ($class, $property) {
+            return $guesser->guessMaxLength($class, $property);
+        });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function guessPattern($class, $property)
+    {
+        return $this->guess(function ($guesser) use ($class, $property) {
+            return $guesser->guessPattern($class, $property);
+        });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function guessAttributes($class, $property)
     {
         $attributes = array();

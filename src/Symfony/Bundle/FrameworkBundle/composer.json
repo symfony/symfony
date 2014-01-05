@@ -19,7 +19,7 @@
         "php": ">=5.3.3",
         "symfony/dependency-injection" : "~2.2",
         "symfony/config" : "~2.4",
-        "symfony/event-dispatcher": "~2.1",
+        "symfony/event-dispatcher": "~2.5",
         "symfony/http-foundation": "~2.4",
         "symfony/http-kernel": "~2.4",
         "symfony/filesystem": "~2.3",

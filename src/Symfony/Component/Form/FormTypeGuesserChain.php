@@ -71,7 +71,7 @@ class FormTypeGuesserChain implements FormTypeGuesserInterface
         foreach ($this->guessers as $guesser) {
             $guessedAttributes = $guesser->guessAttributes($class, $property);
 
-            if (false === is_array($guessedAttributes)) {
+            if (!is_array($guessedAttributes)) {
                 continue;
             }
 

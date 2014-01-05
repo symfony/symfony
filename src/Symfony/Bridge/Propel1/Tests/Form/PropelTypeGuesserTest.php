@@ -41,7 +41,7 @@ class PropelTypeGuesserTest extends Propel1TestCase
         $attributes = $this->guesser->guessAttributes(self::CLASS_NAME, 'price');
 
         $this->assertArrayHasKey('maxlength', $attributes);
-        $this->assertEquals(null, $attributes['maxlength']->getValue());
+        $this->assertNull($attributes['maxlength']->getValue());
     }
 
     public function testGuessMinLengthWithText()
@@ -49,7 +49,7 @@ class PropelTypeGuesserTest extends Propel1TestCase
         $attributes = $this->guesser->guessAttributes(self::CLASS_NAME, 'price');
 
         $this->assertArrayHasKey('maxlength', $attributes);
-        $this->assertEquals(null, $attributes['maxlength']->getValue());
+        $this->assertNull($attributes['maxlength']->getValue());
     }
 
     public function testGuessMinLengthWithFloat()
@@ -57,7 +57,7 @@ class PropelTypeGuesserTest extends Propel1TestCase
         $attributes = $this->guesser->guessAttributes(self::CLASS_NAME, 'price');
 
         $this->assertArrayHasKey('maxlength', $attributes);
-        $this->assertEquals(null, $attributes['maxlength']->getValue());
+        $this->assertNull($attributes['maxlength']->getValue());
     }
 
     public function testGuessRequired()

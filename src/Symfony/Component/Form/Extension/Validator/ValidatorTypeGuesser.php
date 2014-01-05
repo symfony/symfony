@@ -17,6 +17,7 @@ use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\Form\Guess\ValueGuess;
 use Symfony\Component\Validator\MetadataFactoryInterface;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Constraints\Range;
 
 class ValidatorTypeGuesser implements FormTypeGuesserInterface
 {
@@ -299,12 +300,8 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
      */
     public function guessMaxValueForConstraint(Constraint $constraint)
     {
-        switch (get_class($constraint)) {
-            case 'Symfony\Component\Validator\Constraints\Range':
-                if (is_numeric($constraint->max)) {
-                    return new ValueGuess($constraint->max, Guess::HIGH_CONFIDENCE);
-                }
-                break;
+        if ($constraint instanceof Range && is_numeric($constraint->max)) {
+            return new ValueGuess($constraint->max, Guess::HIGH_CONFIDENCE);
         }
 
         return null;
@@ -319,12 +316,8 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
      */
     public function guessMinValueForConstraint(Constraint $constraint)
     {
-        switch (get_class($constraint)) {
-            case 'Symfony\Component\Validator\Constraints\Range':
-                if (is_numeric($constraint->min)) {
-                    return new ValueGuess($constraint->min, Guess::HIGH_CONFIDENCE);
-                }
-                break;
+        if ($constraint instanceof Range && is_numeric($constraint->min)) {
+            return new ValueGuess($constraint->min, Guess::HIGH_CONFIDENCE);
         }
 
         return null;

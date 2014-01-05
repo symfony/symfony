@@ -143,7 +143,7 @@ class FormFactory implements FormFactoryInterface
             }
         }
 
-        if (count($filteredAttributes)) {
+        if (!empty($filteredAttributes)) {
             $options = array_merge(array(
                 'attr' => $filteredAttributes
             ), $options);

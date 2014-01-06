@@ -176,5 +176,9 @@ class PropelTypeGuesser implements FormTypeGuesserInterface
         if ($table && $table->hasColumn($property)) {
             return $this->cache[$class.'::'.$property] = $table->getColumn($property);
         }
+
+        if ($table && $table->hasColumnByInsensitiveCase($property)) {
+            return $this->cache[$class.'::'.$property] = $table->getColumnByInsensitiveCase($property);
+        }
     }
 }

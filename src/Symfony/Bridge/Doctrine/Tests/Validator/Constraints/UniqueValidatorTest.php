@@ -26,19 +26,6 @@ use Doctrine\ORM\Tools\SchemaTool;
 
 class UniqueValidatorTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        parent::setUp();
-
-        if (!class_exists('Symfony\Component\Security\Core\SecurityContext')) {
-            $this->markTestSkipped('The "Security" component is not available');
-        }
-
-        if (!class_exists('Symfony\Component\Validator\Constraint')) {
-            $this->markTestSkipped('The "Validator" component is not available');
-        }
-    }
-
     protected function createRegistryMock($entityManagerName, $em)
     {
         $registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');

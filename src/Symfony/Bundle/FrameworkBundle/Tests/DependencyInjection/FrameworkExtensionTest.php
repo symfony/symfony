@@ -30,7 +30,29 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals('%form.type_extension.csrf.enabled%', $def->getArgument(1));
         $this->assertEquals('_csrf', $container->getParameter('form.type_extension.csrf.field_name'));
         $this->assertEquals('%form.type_extension.csrf.field_name%', $def->getArgument(2));
-        $this->assertEquals('s3cr3t', $container->getParameterBag()->resolveValue($container->findDefinition('form.csrf_provider')->getArgument(1)));
+    }
+
+    /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage CSRF protection needs sessions to be enabled.
+     */
+    public function testCsrfProtectionNeedsSessionToBeEnabled()
+    {
+        $this->createContainerFromFile('csrf_needs_session');
+    }
+
+    public function testCsrfProtectionForFormsEnablesCsrfProtectionAutomatically()
+    {
+        $container = $this->createContainerFromFile('csrf');
+
+        $this->assertTrue($container->hasDefinition('security.csrf.token_manager'));
+    }
+
+    public function testSecureRandomIsAvailableIfCsrfIsDisabled()
+    {
+        $container = $this->createContainerFromFile('csrf_disabled');
+
+        $this->assertTrue($container->hasDefinition('security.secure_random'));
     }
 
     public function testProxies()
@@ -184,19 +206,19 @@ abstract class FrameworkExtensionTest extends TestCase
         $files = array_map(function ($resource) { return realpath($resource[1]); }, $resources);
         $ref = new \ReflectionClass('Symfony\Component\Validator\Validator');
         $this->assertContains(
-            strtr(dirname($ref->getFileName()) . '/Resources/translations/validators.en.xlf', '/', DIRECTORY_SEPARATOR),
+            strtr(dirname($ref->getFileName()).'/Resources/translations/validators.en.xlf', '/', DIRECTORY_SEPARATOR),
             $files,
             '->registerTranslatorConfiguration() finds Validator translation resources'
         );
         $ref = new \ReflectionClass('Symfony\Component\Form\Form');
         $this->assertContains(
-            strtr(dirname($ref->getFileName()) . '/Resources/translations/validators.en.xlf', '/', DIRECTORY_SEPARATOR),
+            strtr(dirname($ref->getFileName()).'/Resources/translations/validators.en.xlf', '/', DIRECTORY_SEPARATOR),
             $files,
             '->registerTranslatorConfiguration() finds Form translation resources'
         );
         $ref = new \ReflectionClass('Symfony\Component\Security\Core\SecurityContext');
         $this->assertContains(
-            strtr(dirname(dirname($ref->getFileName())) . '/Resources/translations/security.en.xlf', '/', DIRECTORY_SEPARATOR),
+            strtr(dirname($ref->getFileName()).'/Resources/translations/security.en.xlf', '/', DIRECTORY_SEPARATOR),
             $files,
             '->registerTranslatorConfiguration() finds Security translation resources'
         );
@@ -234,10 +256,6 @@ abstract class FrameworkExtensionTest extends TestCase
 
     public function testAnnotations()
     {
-        if (!class_exists('Doctrine\\Common\\Version')) {
-            $this->markTestSkipped('Doctrine is not available.');
-        }
-
         $container = $this->createContainerFromFile('full');
 
         $this->assertEquals($container->getParameter('kernel.cache_dir').'/annotations', $container->getDefinition('annotations.file_cache_reader')->getArgument(1));
@@ -282,6 +300,29 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertCount(2, $xmlArgs);
         $this->assertStringEndsWith('Component'.DIRECTORY_SEPARATOR.'Form/Resources/config/validation.xml', $xmlArgs[0]);
         $this->assertStringEndsWith('TestBundle'.DIRECTORY_SEPARATOR.'Resources'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'validation.xml', $xmlArgs[1]);
+    }
+
+    public function testFormsCanBeEnabledWithoutCsrfProtection()
+    {
+        $container = $this->createContainerFromFile('form_no_csrf');
+
+        $this->assertFalse($container->getParameter('form.type_extension.csrf.enabled'));
+    }
+
+    public function testFormCsrfFieldNameCanBeSetUnderCsrfSettings()
+    {
+        $container = $this->createContainerFromFile('form_csrf_sets_field_name');
+
+        $this->assertTrue($container->getParameter('form.type_extension.csrf.enabled'));
+        $this->assertEquals('_custom', $container->getParameter('form.type_extension.csrf.field_name'));
+    }
+
+    public function testFormCsrfFieldNameUnderFormSettingsTakesPrecedence()
+    {
+        $container = $this->createContainerFromFile('form_csrf_under_form_sets_field_name');
+
+        $this->assertTrue($container->getParameter('form.type_extension.csrf.enabled'));
+        $this->assertEquals('_custom_form', $container->getParameter('form.type_extension.csrf.field_name'));
     }
 
     protected function createContainer(array $data = array())

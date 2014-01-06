@@ -55,11 +55,11 @@ class JsonResponse extends Response
     /**
      * Sets the JSONP callback.
      *
-     * @param string $callback
+     * @param string|null $callback The JSONP callback or null to use none
      *
      * @return JsonResponse
      *
-     * @throws \InvalidArgumentException
+     * @throws \InvalidArgumentException When the callback name is not valid
      */
     public function setCallback($callback = null)
     {
@@ -91,7 +91,7 @@ class JsonResponse extends Response
     public function setData($data = array())
     {
         // Encode <, >, ', &, and " for RFC4627-compliant JSON, which may also be embedded into HTML.
-        $this->data = json_encode($data, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT);
+        $this->data = @json_encode($data, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT);
 
         if (JSON_ERROR_NONE !== json_last_error()) {
             throw new \InvalidArgumentException($this->transformJsonError());

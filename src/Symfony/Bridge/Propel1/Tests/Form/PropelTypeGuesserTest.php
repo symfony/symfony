@@ -121,6 +121,9 @@ class PropelTypeGuesserTest extends Propel1TestCase
             array('price',      'number',   Guess::MEDIUM_CONFIDENCE),
             array('updated_at', 'datetime', Guess::HIGH_CONFIDENCE),
 
+            array('isActive',   'checkbox', Guess::HIGH_CONFIDENCE),
+            array('updatedAt',  'datetime', Guess::HIGH_CONFIDENCE),
+
             array('Authors',    'model',    Guess::HIGH_CONFIDENCE,     true),
             array('Resellers',  'model',    Guess::HIGH_CONFIDENCE,     true),
             array('MainAuthor', 'model',    Guess::HIGH_CONFIDENCE,     false),

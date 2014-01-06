@@ -18,6 +18,7 @@
         <parameter key="translation.loader.res.class">Symfony\Component\Translation\Loader\IcuResFileLoader</parameter>
         <parameter key="translation.loader.dat.class">Symfony\Component\Translation\Loader\IcuDatFileLoader</parameter>
         <parameter key="translation.loader.ini.class">Symfony\Component\Translation\Loader\IniFileLoader</parameter>
+        <parameter key="translation.loader.json.class">Symfony\Component\Translation\Loader\JsonFileLoader</parameter>
         <parameter key="translation.dumper.php.class">Symfony\Component\Translation\Dumper\PhpFileDumper</parameter>
         <parameter key="translation.dumper.xliff.class">Symfony\Component\Translation\Dumper\XliffFileDumper</parameter>
         <parameter key="translation.dumper.po.class">Symfony\Component\Translation\Dumper\PoFileDumper</parameter>
@@ -26,6 +27,7 @@
         <parameter key="translation.dumper.qt.class">Symfony\Component\Translation\Dumper\QtFileDumper</parameter>
         <parameter key="translation.dumper.csv.class">Symfony\Component\Translation\Dumper\CsvFileDumper</parameter>
         <parameter key="translation.dumper.ini.class">Symfony\Component\Translation\Dumper\IniFileDumper</parameter>
+        <parameter key="translation.dumper.json.class">Symfony\Component\Translation\Dumper\JsonFileDumper</parameter>
         <parameter key="translation.dumper.res.class">Symfony\Component\Translation\Dumper\IcuResFileDumper</parameter>
         <parameter key="translation.extractor.php.class">Symfony\Bundle\FrameworkBundle\Translation\PhpExtractor</parameter>
         <parameter key="translation.loader.class">Symfony\Bundle\FrameworkBundle\Translation\TranslationLoader</parameter>
@@ -90,6 +92,10 @@
             <tag name="translation.loader" alias="ini" />
         </service>
 
+        <service id="translation.loader.json" class="%translation.loader.json.class%">
+            <tag name="translation.loader" alias="json" />
+        </service>
+
         <service id="translation.dumper.php" class="%translation.dumper.php.class%">
             <tag name="translation.dumper" alias="php" />
         </service>
@@ -120,6 +126,10 @@
 
         <service id="translation.dumper.ini" class="%translation.dumper.ini.class%">
             <tag name="translation.dumper" alias="ini" />
+        </service>
+
+        <service id="translation.dumper.json" class="%translation.dumper.json.class%">
+            <tag name="translation.dumper" alias="json" />
         </service>
 
         <service id="translation.dumper.res" class="%translation.dumper.res.class%">

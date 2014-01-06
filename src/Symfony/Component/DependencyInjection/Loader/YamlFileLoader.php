@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Yaml\Parser as YamlParser;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 /**
  * YamlFileLoader loads YAML files service definitions.
@@ -224,8 +225,8 @@ class YamlFileLoader extends FileLoader
                 unset($tag['name']);
 
                 foreach ($tag as $attribute => $value) {
-                    if (!is_scalar($value)) {
-                        throw new InvalidArgumentException(sprintf('A "tags" attribute must be of a scalar-type for service "%s", tag "%s" in %s.', $id, $name, $file));
+                    if (!is_scalar($value) && null !== $value) {
+                        throw new InvalidArgumentException(sprintf('A "tags" attribute must be of a scalar-type for service "%s", tag "%s", attribute "%s" in %s.', $id, $name, $attribute, $file));
                     }
                 }
 
@@ -311,6 +312,8 @@ class YamlFileLoader extends FileLoader
     {
         if (is_array($value)) {
             $value = array_map(array($this, 'resolveServices'), $value);
+        } elseif (is_string($value) &&  0 === strpos($value, '@=')) {
+            return new Expression(substr($value, 2));
         } elseif (is_string($value) &&  0 === strpos($value, '@')) {
             if (0 === strpos($value, '@@')) {
                 $value = substr($value, 1);

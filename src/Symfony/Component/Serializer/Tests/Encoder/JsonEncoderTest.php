@@ -19,7 +19,7 @@ class JsonEncoderTest extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()
     {
-        $this->encoder = new JsonEncoder;
+        $this->encoder = new JsonEncoder();
         $this->serializer = new Serializer(array(new CustomNormalizer()), array('json' => new JsonEncoder()));
     }
 

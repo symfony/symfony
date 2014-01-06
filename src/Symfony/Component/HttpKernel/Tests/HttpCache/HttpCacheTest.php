@@ -19,19 +19,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class HttpCacheTest extends HttpCacheTestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-    }
-
     public function testTerminateDelegatesTerminationOnlyForTerminableInterface()
     {
-        if (!class_exists('Symfony\Component\DependencyInjection\Container')) {
-            $this->markTestSkipped('The "DependencyInjection" component is not available');
-        }
-
         $storeMock = $this->getMockBuilder('Symfony\\Component\\HttpKernel\\HttpCache\\StoreInterface')
             ->disableOriginalConstructor()
             ->getMock();
@@ -634,7 +623,7 @@ class HttpCacheTest extends HttpCacheTestCase
         $r = new \ReflectionObject($this->store);
         $m = $r->getMethod('save');
         $m->setAccessible(true);
-        $m->invoke($this->store, 'md'.sha1('http://localhost/'), serialize($tmp));
+        $m->invoke($this->store, 'md'.hash('sha256', 'http://localhost/'), serialize($tmp));
 
         // build subsequent request; should be found but miss due to freshness
         $this->request('GET', '/');

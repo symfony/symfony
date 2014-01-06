@@ -16,17 +16,6 @@ use Symfony\Component\Config\Resource\FileResource;
 
 class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\Config\Loader\Loader')) {
-            $this->markTestSkipped('The "Config" component is not available');
-        }
-
-        if (!class_exists('Symfony\Component\Yaml\Yaml')) {
-            $this->markTestSkipped('The "Yaml" component is not available');
-        }
-    }
-
     public function testLoad()
     {
         $loader = new YamlFileLoader();

@@ -183,7 +183,7 @@ class BinaryFileResponse extends Response
             $path = $this->file->getRealPath();
             if (strtolower($type) == 'x-accel-redirect') {
                 // Do X-Accel-Mapping substitutions.
-                foreach (explode(',', $request->headers->get('X-Accel-Mapping', ''))  as $mapping) {
+                foreach (explode(',', $request->headers->get('X-Accel-Mapping', '')) as $mapping) {
                     $mapping = explode('=', $mapping, 2);
 
                     if (2 == count($mapping)) {

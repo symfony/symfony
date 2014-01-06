@@ -17,17 +17,6 @@ use Symfony\Component\Config\Resource\FileResource;
 
 class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\Config\FileLocator')) {
-            $this->markTestSkipped('The "Config" component is not available');
-        }
-
-        if (!class_exists('Symfony\Component\Yaml\Yaml')) {
-            $this->markTestSkipped('The "Yaml" component is not available');
-        }
-    }
-
     public function testSupports()
     {
         $loader = new YamlFileLoader($this->getMock('Symfony\Component\Config\FileLocator'));
@@ -90,6 +79,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
             $this->assertSame('RouteCompiler', $route->getOption('compiler_class'));
             $this->assertEquals(array('GET', 'POST', 'PUT', 'OPTIONS'), $route->getMethods());
             $this->assertEquals(array('https'), $route->getSchemes());
+            $this->assertEquals('context.getMethod() == "GET"', $route->getCondition());
         }
     }
 

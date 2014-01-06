@@ -18,7 +18,7 @@
     "require": {
         "php": ">=5.3.3",
         "symfony/event-dispatcher": "~2.1",
-        "symfony/http-foundation": "~2.2",
+        "symfony/http-foundation": "~2.4",
         "symfony/debug": "~2.3",
         "psr/log": "~1.0"
     },
@@ -49,7 +49,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.3-dev"
+            "dev-master": "2.5-dev"
         }
     }
 }

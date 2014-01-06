@@ -86,4 +86,16 @@ class KernelEvent extends Event
     {
         return $this->requestType;
     }
+
+    /**
+     * Checks if this is a master request.
+     *
+     * @return Boolean True if the request is a master request
+     *
+     * @api
+     */
+    public function isMasterRequest()
+    {
+        return HttpKernelInterface::MASTER_REQUEST === $this->requestType;
+    }
 }

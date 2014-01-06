@@ -31,7 +31,7 @@ class MongoDbSessionHandlerTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('MongoDbSessionHandler requires the PHP "mongo" extension.');
         }
 
-        $mongoClass = (version_compare(phpversion('mongo'), '1.3.0', '<')) ? 'Mongo' : 'MongoClient';
+        $mongoClass = version_compare(phpversion('mongo'), '1.3.0', '<') ? 'Mongo' : 'MongoClient';
 
         $this->mongo = $this->getMockBuilder($mongoClass)
             ->disableOriginalConstructor()
@@ -167,5 +167,15 @@ class MongoDbSessionHandlerTest extends \PHPUnit_Framework_TestCase
             }));
 
         $this->assertTrue($this->storage->gc(-1));
+    }
+
+    public function testGetConnection()
+    {
+        $method = new \ReflectionMethod($this->storage, 'getMongo');
+        $method->setAccessible(true);
+
+        $mongoClass = (version_compare(phpversion('mongo'), '1.3.0', '<')) ? '\Mongo' : '\MongoClient';
+
+        $this->assertInstanceOf($mongoClass, $method->invoke($this->storage));
     }
 }

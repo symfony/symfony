@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+2.4.0
+-----
+
+ * added RequestStack
+ * added Request::getEncodings()
+ * added accessors methods to session handlers
+
 2.3.0
 -----
 

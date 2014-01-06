@@ -50,6 +50,9 @@ class ApacheMatcherDumper extends MatcherDumper
         $prevHostRegex = '';
 
         foreach ($this->getRoutes()->all() as $name => $route) {
+            if ($route->getCondition()) {
+                throw new \LogicException(sprintf('Unable to dump the routes for Apache as route "%s" has a condition.', $name));
+            }
 
             $compiledRoute = $route->compile();
             $hostRegex = $compiledRoute->getHostRegex();

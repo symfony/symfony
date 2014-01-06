@@ -242,25 +242,6 @@ class Route implements \Serializable
     }
 
     /**
-     * Checks if a scheme requirement has been set.
-     *
-     * @param string $scheme
-     *
-     * @return Boolean true if the scheme requirement exists, otherwise false
-     */
-    public function hasScheme($scheme)
-    {
-        $scheme = strtolower($scheme);
-        foreach ($this->schemes as $requiredScheme) {
-            if ($scheme === $requiredScheme) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
      * Returns the uppercased HTTP methods this route is restricted to.
      * So an empty array means that any method is allowed.
      *

@@ -50,12 +50,6 @@ class RegisterListenersPass implements CompilerPassInterface
 
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition($this->dispatcherService) && !$container->hasAlias($this->dispatcherService)) {
-            return;
-        }
-
-        $definition = $container->findDefinition($this->dispatcherService);
-
         foreach ($container->findTaggedServiceIds($this->listenerTag) as $id => $events) {
             $def = $container->getDefinition($id);
             if (!$def->isPublic()) {
@@ -67,6 +61,15 @@ class RegisterListenersPass implements CompilerPassInterface
             }
 
             foreach ($events as $event) {
+                $definition = $this->extractDispatcherDef($container, $this->listenerTag, $id, $event);
+
+                /**
+                 * @deprecated Using a dispatcher not available in the container is Deprecated in 2.5. Starting with 3.0, an exception will be thrown in this case.
+                 */
+                if (null === $definition) {
+                    continue;
+                }
+
                 $priority = isset($event['priority']) ? $event['priority'] : 0;
 
                 if (!isset($event['event'])) {
@@ -100,7 +103,34 @@ class RegisterListenersPass implements CompilerPassInterface
                 throw new \InvalidArgumentException(sprintf('Service "%s" must implement interface "%s".', $id, $interface));
             }
 
-            $definition->addMethodCall('addSubscriberService', array($id, $class));
+            foreach ($attributes as $attribute) {
+                $definition = $this->extractDispatcherDef($container, $this->subscriberTag, $id, $attribute);
+
+                /**
+                 * @deprecated Using a dispatcher not available in the container is Deprecated in 2.5. Starting with 3.0, an exception will be thrown in this case.
+                 */
+                if (null === $definition) {
+                    continue;
+                }
+
+                $definition->addMethodCall('addSubscriberService', array($id, $class));
+            }
         }
     }
+
+    protected function extractDispatcherDef(ContainerBuilder $container, $tag, $id, $attributes)
+    {
+        $dispatcher = isset($attributes['dispatcher']) ? $attributes['dispatcher'] : $this->dispatcherService;
+
+        if (!$container->hasDefinition($dispatcher) && !$container->hasAlias($dispatcher)) {
+            /**
+             * @deprecated Using a dispatcher not available in the container is Deprecated in 2.5. Starting with 3.0, an exception will be thrown in this case.
+             */
+            return null;
+            // throw new \InvalidArgumentException(sprintf('The listener "%s" must specify an existing dispatcher service: "%s" not find in the container.', $id, $event['workflow']));
+        }
+
+        return $container->findDefinition($dispatcher);
+    }
+
 }

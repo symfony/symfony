@@ -132,6 +132,40 @@ class RegisterListenersPassTest extends \PHPUnit_Framework_TestCase
         $registerListenersPass = new RegisterListenersPass();
         $registerListenersPass->process($container);
     }
+
+    public function testEventListenerWithCustomDispatcher()
+    {
+        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder', array('findDefinition'));
+
+        $container->register('foo', 'stdClass')->addTag('kernel.event_listener', array('dispatcher' => 'bar', 'event' => 'foo'));
+        $container->setAlias('bar', 'foo');
+
+        $container
+            ->expects($this->once())
+            ->method('findDefinition')
+            ->with('bar')
+            ;
+
+        $registerListenersPass = new RegisterListenersPass();
+        $registerListenersPass->process($container);
+    }
+
+    public function testEventSubscriberWithCustomDispatcher()
+    {
+        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder', array('findDefinition'));
+
+        $container->register('foo', 'Symfony\Component\EventDispatcher\Tests\DependencyInjection\SubscriberService')->addTag('kernel.event_subscriber', array('dispatcher' => 'bar'));
+        $container->setAlias('bar', 'foo');
+
+        $container
+            ->expects($this->once())
+            ->method('findDefinition')
+            ->with('bar')
+            ;
+
+        $registerListenersPass = new RegisterListenersPass();
+        $registerListenersPass->process($container);
+    }
 }
 
 class SubscriberService implements \Symfony\Component\EventDispatcher\EventSubscriberInterface

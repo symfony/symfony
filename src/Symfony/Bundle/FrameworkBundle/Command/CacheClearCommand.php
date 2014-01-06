@@ -76,7 +76,6 @@ EOF
          * to avoid the many problems in serialized resources files
          */
         if (!$noWarmup) {
-
             $warmupDir = substr($realCacheDir, 0, -1) . '_';
 
             if ($filesystem->exists($warmupDir)) {
@@ -101,10 +100,8 @@ EOF
          * Old cache is cleared, so we can just switch if new one is warmed up
          */
         if ($noWarmup) {
-
             $filesystem->rename($realCacheDir, $oldCacheDir);
         } else {
-
             $filesystem->rename($warmupDir, $realCacheDir);
         }
 

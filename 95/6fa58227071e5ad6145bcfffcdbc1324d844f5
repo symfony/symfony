@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2014-01-02T21:56:13Z
+
+@jaugustin wouldn't this be picked up by the error handler form the Debug component?
+
+---------------------------------------------------------------------------
+
+by jaugustin at 2014-01-02T22:33:15Z
+
+@jakzal Yes that was the goal, and I just tested it now ;)
+
+---------------------------------------------------------------------------
+
+by jakzal at 2014-01-02T22:40:50Z
+
+I mean, Debug component should pick up this kind of error even if you don't throw an exception (and it  should propose how to fix the class name).
+
+---------------------------------------------------------------------------
+
+by jaugustin at 2014-01-05T12:04:01Z
+
+@jakzal if you didn't set the `class` parameter the Debug component will tell you about a `Query` class not found but that didn't make much sens

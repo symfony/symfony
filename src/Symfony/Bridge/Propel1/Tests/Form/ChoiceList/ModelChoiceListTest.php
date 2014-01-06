@@ -243,4 +243,20 @@ class ModelChoiceListTest extends Propel1TestCase
         $this->assertEquals(array(), $choiceList->getValuesForChoices(array(new Item(2, 'Bar'))));
         $this->assertEquals(array(), $choiceList->getChoicesForValues(array(2)));
     }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
+     */
+    public function testEmptyClass()
+    {
+        $choiceList = new ModelChoiceList('');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    public function testInvalidClass()
+    {
+        $choiceList = new ModelChoiceList('Foo\Bar\DoesNotExistClass');
+    }
 }

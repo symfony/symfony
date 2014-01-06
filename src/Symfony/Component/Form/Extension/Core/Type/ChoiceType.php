@@ -12,23 +12,23 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Exception\LogicException;
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
-use Symfony\Component\Form\Extension\Core\ChoiceList\SimpleChoiceList;
-use Symfony\Component\Form\Extension\Core\DataTransformer\ChoiceToBooleanArrayTransformer;
-use Symfony\Component\Form\Extension\Core\DataTransformer\ChoiceToValueTransformer;
-use Symfony\Component\Form\Extension\Core\DataTransformer\ChoicesToBooleanArrayTransformer;
-use Symfony\Component\Form\Extension\Core\DataTransformer\ChoicesToValuesTransformer;
-use Symfony\Component\Form\Extension\Core\EventListener\FixCheckboxInputListener;
-use Symfony\Component\Form\Extension\Core\EventListener\FixRadioInputListener;
-use Symfony\Component\Form\Extension\Core\EventListener\MergeCollectionListener;
 use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\Exception\LogicException;
+use Symfony\Component\Form\Extension\Core\ChoiceList\SimpleChoiceList;
+use Symfony\Component\Form\Extension\Core\EventListener\FixRadioInputListener;
+use Symfony\Component\Form\Extension\Core\EventListener\FixCheckboxInputListener;
+use Symfony\Component\Form\Extension\Core\EventListener\MergeCollectionListener;
+use Symfony\Component\Form\Extension\Core\DataTransformer\ChoiceToValueTransformer;
+use Symfony\Component\Form\Extension\Core\DataTransformer\ChoiceToBooleanArrayTransformer;
+use Symfony\Component\Form\Extension\Core\DataTransformer\ChoicesToValuesTransformer;
+use Symfony\Component\Form\Extension\Core\DataTransformer\ChoicesToBooleanArrayTransformer;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 class ChoiceType extends AbstractType
 {

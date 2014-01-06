@@ -17,6 +17,8 @@ use \Persistent;
 
 use Symfony\Component\Form\Exception\StringCastException;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ObjectChoiceList;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
+use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
@@ -84,6 +86,13 @@ class ModelChoiceList extends ObjectChoiceList
         $this->class        = $class;
 
         $queryClass         = $this->class.'Query';
+        if (!class_exists($queryClass)) {
+            if (empty($this->class)) {
+                throw new MissingOptionsException('The "class" parameter is empty, you should provide the model class');
+            }
+            throw new InvalidOptionsException(sprintf('The query class "%s" is not found, you should provide the FQCN of the model class', $queryClass));
+        }
+
         $query              = new $queryClass();
 
         $this->query        = $queryObject ?: $query;

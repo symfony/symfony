@@ -153,15 +153,10 @@ class RouteTest extends \PHPUnit_Framework_TestCase
     {
         $route = new Route('/');
         $this->assertEquals(array(), $route->getSchemes(), 'schemes is initialized with array()');
-        $this->assertFalse($route->hasScheme('http'));
         $route->setSchemes('hTTp');
         $this->assertEquals(array('http'), $route->getSchemes(), '->setSchemes() accepts a single scheme string and lowercases it');
-        $this->assertTrue($route->hasScheme('htTp'));
-        $this->assertFalse($route->hasScheme('httpS'));
         $route->setSchemes(array('HttpS', 'hTTp'));
         $this->assertEquals(array('https', 'http'), $route->getSchemes(), '->setSchemes() accepts an array of schemes and lowercases them');
-        $this->assertTrue($route->hasScheme('htTp'));
-        $this->assertTrue($route->hasScheme('httpS'));
     }
 
     public function testSchemeIsBC()
@@ -170,9 +165,6 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $route->setRequirement('_scheme', 'http|https');
         $this->assertEquals('http|https', $route->getRequirement('_scheme'));
         $this->assertEquals(array('http', 'https'), $route->getSchemes());
-        $this->assertTrue($route->hasScheme('https'));
-        $this->assertTrue($route->hasScheme('http'));
-        $this->assertFalse($route->hasScheme('ftp'));
         $route->setSchemes(array('hTTp'));
         $this->assertEquals('http', $route->getRequirement('_scheme'));
         $route->setSchemes(array());

@@ -26,10 +26,13 @@ class ProcessPipes
     private $readBytes = array();
     /** @var Boolean */
     private $useFiles;
+    /** @var Boolean */
+    private $ttyMode;
 
-    public function __construct($useFiles = false)
+    public function __construct($useFiles, $ttyMode)
     {
         $this->useFiles = (Boolean) $useFiles;
+        $this->ttyMode = (Boolean) $ttyMode;
 
         // Fix for PHP bug #51800: reading from STDOUT pipe hangs forever on Windows if the output is too big.
         // Workaround for this problem is to use temporary files instead of pipes on Windows platform.
@@ -105,6 +108,14 @@ class ProcessPipes
                 $this->fileHandles[Process::STDOUT],
                 // Use a file handle only for STDOUT. Using for both STDOUT and STDERR would trigger https://bugs.php.net/bug.php?id=65650
                 array('pipe', 'w'),
+            );
+        }
+
+        if ($this->ttyMode) {
+            return array(
+                array('file', '/dev/tty', 'r'),
+                array('file', '/dev/tty', 'w'),
+                array('file', '/dev/tty', 'w'),
             );
         }
 

@@ -56,6 +56,7 @@ EOF
         $realCacheDir = $this->getContainer()->getParameter('kernel.cache_dir');
         $oldCacheDir  = $realCacheDir.'_old';
         $filesystem   = $this->getContainer()->get('filesystem');
+        $noWarmup     = $input->getOption('no-warmup');
 
         if (!is_writable($realCacheDir)) {
             throw new \RuntimeException(sprintf('Unable to write in the "%s" directory', $realCacheDir));
@@ -67,14 +68,15 @@ EOF
 
         $kernel = $this->getContainer()->get('kernel');
         $output->writeln(sprintf('Clearing the cache for the <info>%s</info> environment with debug <info>%s</info>', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
-        $this->getContainer()->get('cache_clearer')->clear($realCacheDir);
 
-        if ($input->getOption('no-warmup')) {
-            $filesystem->rename($realCacheDir, $oldCacheDir);
-        } else {
-            // the warmup cache dir name must have the same length than the real one
-            // to avoid the many problems in serialized resources files
-            $warmupDir = substr($realCacheDir, 0, -1).'_';
+        /**
+         * We warmup new cache in a new cache dir.
+         *
+         * The warmup cache dir name must have the same length than the real one
+         * to avoid the many problems in serialized resources files
+         */
+        if (!$noWarmup) {
+            $warmupDir = substr($realCacheDir, 0, -1) . '_';
 
             if ($filesystem->exists($warmupDir)) {
                 $filesystem->remove($warmupDir);
@@ -83,9 +85,23 @@ EOF
             $this->warmup($warmupDir, $realCacheDir, !$input->getOption('no-optional-warmers'));
 
             $filesystem->rename($realCacheDir, $oldCacheDir);
+
             if (defined('PHP_WINDOWS_VERSION_BUILD')) {
                 sleep(1);  // workaround for Windows PHP rename bug
             }
+        }
+
+        /**
+         * Old cache is cleared
+         */
+        $this->getContainer()->get('cache_clearer')->clear($realCacheDir);
+
+        /**
+         * Old cache is cleared, so we can just switch if new one is warmed up
+         */
+        if ($noWarmup) {
+            $filesystem->rename($realCacheDir, $oldCacheDir);
+        } else {
             $filesystem->rename($warmupDir, $realCacheDir);
         }
 

@@ -66,8 +66,7 @@ EOF
         }
 
         $kernel = $this->getContainer()->get('kernel');
-        $output->writeln($this->getClearingCacheMessage($output, $kernel));
-
+        $output->writeln(sprintf('Clearing the cache for the <info>%s</info> environment with debug <info>%s</info>', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
         $this->getContainer()->get('cache_clearer')->clear($realCacheDir);
 
         if ($input->getOption('no-warmup')) {
@@ -78,11 +77,15 @@ EOF
             $warmupDir = substr($realCacheDir, 0, -1).'_';
 
             if ($filesystem->exists($warmupDir)) {
-                $this->writelnIfVerbose($output, 'Clearing outdated warmup directory...');
+                if ($output->isVerbose()) {
+                    $output->writeln('  Clearing outdated warmup directory');
+                }
                 $filesystem->remove($warmupDir);
             }
 
-            $this->writelnIfVerbose($output, 'Warming up cache...');
+            if ($output->isVerbose()) {
+                $output->writeln('  Warming up cache');
+            }
             $this->warmup($warmupDir, $realCacheDir, !$input->getOption('no-optional-warmers'));
 
             $filesystem->rename($realCacheDir, $oldCacheDir);
@@ -90,41 +93,17 @@ EOF
                 sleep(1);  // workaround for Windows PHP rename bug
             }
             $filesystem->rename($warmupDir, $realCacheDir);
-            $this->writelnIfVerbose($output, 'Warm up completed...');
         }
 
-        $this->writelnIfVerbose($output, 'Removing old cache directory...');
+        if ($output->isVerbose()) {
+            $output->writeln('  Removing old cache directory');
+        }
+
         $filesystem->remove($oldCacheDir);
-        $this->writelnIfVerbose($output, 'Completed clearing cache' . ($input->getOption('no-warmup') ? "!" : " and warmup!"));
-    }
 
-    /**
-     * @param OutputInterface $output
-     * @param KernelInterface $kernel
-     * @return string
-     */
-    protected function getClearingCacheMessage(OutputInterface $output, KernelInterface $kernel){
-        $message = 'Clearing the cache for the <info>%s</info> environment with debug <info>%s</info>';
-        $message .= $this->isVerbose($output) ? ":" : "";
-        return sprintf($message, $kernel->getEnvironment(), var_export($kernel->isDebug(), true));
-    }
-
-    /**
-     * @param OutputInterface $output
-     * @param string $message
-     */
-    protected function writelnIfVerbose(OutputInterface $output, $message){
-        if ($this->isVerbose($output)){
-            $output->writeln($message);
+        if ($output->isVerbose()) {
+            $output->writeln('  Done');
         }
-    }
-
-    /**
-     * @param OutputInterface $output
-     * @return bool
-     */
-    protected function isVerbose(OutputInterface $output){
-        return OutputInterface::VERBOSITY_VERBOSE <= $output->getVerbosity();
     }
 
     /**

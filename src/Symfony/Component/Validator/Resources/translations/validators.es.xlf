@@ -92,11 +92,11 @@
             </trans-unit>
             <trans-unit id="23">
                 <source>This value should not be null.</source>
-                <target>Este valor no debería ser null.</target>
+                <target>Este valor no debería ser nulo.</target>
             </trans-unit>
             <trans-unit id="24">
                 <source>This value should be null.</source>
-                <target>Este valor debería ser null.</target>
+                <target>Este valor debería ser nulo.</target>
             </trans-unit>
             <trans-unit id="25">
                 <source>This value is not valid.</source>

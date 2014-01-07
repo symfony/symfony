@@ -276,7 +276,7 @@
     }
 
     function TogglerStorage(key) {
-        var key = key ? key : 'toggle_data',
+        var key = 'sf_' + (key || 'toggle_data'),
             store = function (id, state) {
                 var toggleData = sessionStorage.getItem(key);
                 if (!toggleData) {
@@ -307,12 +307,14 @@
 
                 var buttons = document.getElementsByClassName(buttonsSelector || 'toggle-button');
                 for (i in toggleData) {
-                    var element = document.getElementById(toggleData[i]),
-                        id = element.getAttribute('id');
+                    var element = document.getElementById(toggleData[i]);
+                    if (!element) {
+                        continue;
+                    }
 
                     if (Sfjs.hasClass(element, 'hidden')) {
                         for (var i = -1; button = buttons[++i]; ) {
-                            if (button.dataset.toggleTargetId && button.dataset.toggleTargetId == id) {
+                            if (button.dataset.toggleTargetId && button.dataset.toggleTargetId == element.getAttribute('id')) {
                                 break;
                             }
                         }

@@ -393,6 +393,19 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testFindAlternativeCommandsWithAnAlias()
+    {
+        $fooCommand = new \FooCommand();
+        $fooCommand->setAliases(array('foo2'));
+
+        $application = new Application();
+        $application->add($fooCommand);
+
+        $result = $application->find('foo');
+
+        $this->assertSame($fooCommand, $result);
+    }
+
     public function testFindAlternativeNamespace()
     {
         $application = new Application();

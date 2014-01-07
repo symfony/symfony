@@ -562,6 +562,16 @@ class Application
             throw new \InvalidArgumentException($message);
         }
 
+        // filter out aliases for commands which are already on the list
+        if (count($commands) > 1) {
+            $commandList = $this->commands;
+            $commands = array_filter($commands, function ($nameOrAlias) use ($commandList, $commands) {
+                $commandName = $commandList[$nameOrAlias]->getName();
+
+                return $commandName === $nameOrAlias || !in_array($commandName, $commands);
+            });
+        }
+
         $exact = in_array($name, $commands, true);
         if (count($commands) > 1 && !$exact) {
             $suggestions = $this->getAbbreviationSuggestions(array_values($commands));

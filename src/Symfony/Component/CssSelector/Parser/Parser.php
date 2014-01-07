@@ -378,6 +378,11 @@ class Parser implements ParserInterface
         $stream->skipWhitespace();
         $value = $stream->getNext();
 
+        if ($value->isNumber()) {
+            // if the value is a number, it's casted into a string
+            $value = new Token(Token::TYPE_STRING, (string) $value->getValue(), $value->getPosition());
+        }
+
         if (!($value->isIdentifier() || $value->isString())) {
             throw SyntaxErrorException::unexpectedToken('string or identifier', $value);
         }

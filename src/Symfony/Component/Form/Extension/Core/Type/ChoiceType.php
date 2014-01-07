@@ -17,6 +17,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Exception\LogicException;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Extension\Core\ChoiceList\SimpleChoiceList;
 use Symfony\Component\Form\Extension\Core\EventListener\FixRadioInputListener;
 use Symfony\Component\Form\Extension\Core\EventListener\FixCheckboxInputListener;
@@ -26,9 +27,8 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\ChoiceToBooleanArrayTr
 use Symfony\Component\Form\Extension\Core\DataTransformer\ChoicesToValuesTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\ChoicesToBooleanArrayTransformer;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class ChoiceType extends AbstractType
 {
@@ -157,9 +157,8 @@ class ChoiceType extends AbstractType
             $view->vars['full_name'] = $view->vars['full_name'].'[]';
         }
 
-        $choicesAttributes = $options['choices_attributes'];
-        $choicesPrototypes = $options['choices_prototypes'];
-        if (count($choicesAttributes) || count($choicesPrototypes)) {
+        if (!empty($options['choices_attributes']) || !empty($options['choices_prototypes'])) {
+            $choicesAttributes = $options['choices_attributes'];
             foreach ($view->vars['choices'] as $key => $choiceView) {
                 if (array_key_exists($key, $choicesAttributes)) {
                     $choiceView->attr = $choicesAttributes[$key];
@@ -242,7 +241,7 @@ class ChoiceType extends AbstractType
         };
 
         $choicesClosureNormalizer = function (Options $options, $values) {
-            if ($values instanceof \Closure && false === is_array($values = $values($options['choice_list']))) {
+            if ($values instanceof \Closure && !is_array($values = $values($options['choice_list']))) {
                 throw new UnexpectedTypeException($values, 'array');
             }
 

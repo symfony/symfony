@@ -181,7 +181,7 @@ class IbanValidatorTest extends \PHPUnit_Framework_TestCase
             array('CY170020 128 0000 0012 0052 7600'),
             array('foo'),
             array('123'),
-            array('0750447346')
+            array('0750447346'),
         );
     }
 }

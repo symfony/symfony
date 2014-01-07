@@ -65,7 +65,7 @@ class IssnValidatorTest extends \PHPUnit_Framework_TestCase
             array('1684-5315'),
             array('1996-0786'),
             array('1684-5374'),
-            array('1996-0794')
+            array('1996-0794'),
         );
     }
 
@@ -94,7 +94,7 @@ class IssnValidatorTest extends \PHPUnit_Framework_TestCase
             array('1684-5312'),
             array('1996-0783'),
             array('1684-537X'),
-            array('1996-0795')
+            array('1996-0795'),
         );
 
     }

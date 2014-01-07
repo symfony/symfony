@@ -52,7 +52,7 @@ class LessThanValidatorTest extends AbstractComparisonValidatorTestCase
             array(2, 2, '2', 'integer'),
             array(new \DateTime('2010-01-01'), new \DateTime('2000-01-01'), '2000-01-01 00:00:00', 'DateTime'),
             array(new \DateTime('2000-01-01'), new \DateTime('2000-01-01'), '2000-01-01 00:00:00', 'DateTime'),
-            array('333', '22', "'22'", 'string')
+            array('333', '22', "'22'", 'string'),
         );
     }
 }

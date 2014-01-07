@@ -26,11 +26,11 @@ class Parser
     const OPERATOR_LEFT = 1;
     const OPERATOR_RIGHT = 2;
 
-    private $stream;
-    private $unaryOperators;
-    private $binaryOperators;
-    private $functions;
-    private $names;
+    protected $stream;
+    protected $unaryOperators;
+    protected $binaryOperators;
+    protected $functions;
+    protected $names;
 
     public function __construct(array $functions)
     {

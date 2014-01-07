@@ -117,18 +117,13 @@ class JsonResponse extends Response
     /**
      * Sets options used while encoding data to JSON.
      *
-     * @param array $encodingOptions
+     * @param integer $encodingOptions
      *
      * @return JsonResponse
      */
-    public function setEncodingOptions(array $encodingOptions)
+    public function setEncodingOptions($encodingOptions)
     {
-        $this->encodingOptions = 0;
-        foreach ($encodingOptions as $encodingOption) {
-            if (($this->encodingOptions & $encodingOption) != $encodingOption) {
-                $this->encodingOptions |= $encodingOption;
-            }
-        }
+        $this->encodingOptions = (integer) $encodingOptions;
 
         return $this->setData(json_decode($this->data));
     }

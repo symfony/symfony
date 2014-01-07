@@ -26,7 +26,7 @@ class NotBlankValidator extends ConstraintValidator
      */
     public function validate($value, Constraint $constraint)
     {
-        if (false === $value || (empty($value) && '0' != $value)) {
+        if (false === $value || (empty($value) && '0' !== $value && false !== $value)) {
             $this->context->addViolation($constraint->message);
         }
     }

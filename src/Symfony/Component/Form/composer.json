@@ -20,7 +20,7 @@
         "symfony/event-dispatcher": "~2.1",
         "symfony/intl": "~2.3",
         "symfony/options-resolver": "~2.1",
-        "symfony/property-access": "~2.2"
+        "symfony/property-access": "~2.3"
     },
     "require-dev": {
         "symfony/validator": "~2.2",

@@ -53,11 +53,15 @@ class QtFileLoader implements LoaderInterface
         if ($nodes->length == 1) {
             $translations = $nodes->item(0)->nextSibling->parentNode->parentNode->getElementsByTagName('message');
             foreach ($translations as $translation) {
-                $catalogue->set(
-                    (string) $translation->getElementsByTagName('source')->item(0)->nodeValue,
-                    (string) $translation->getElementsByTagName('translation')->item(0)->nodeValue,
-                    $domain
-                );
+                $translationValue = (string) $translation->getElementsByTagName('translation')->item(0)->nodeValue;
+
+                if (!empty($translationValue)) {
+                    $catalogue->set(
+                        (string) $translation->getElementsByTagName('source')->item(0)->nodeValue,
+                        $translationValue,
+                        $domain
+                    );
+                }
                 $translation = $translation->nextSibling;
             }
             $catalogue->addResource(new FileResource($resource));

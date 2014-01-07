@@ -1090,7 +1090,7 @@ class Application
     }
 
     /**
-     * Sets the default Command instead of using the ListCommand
+     * Sets the default Command name
      *
      * @param string $commandName The Command name
      */

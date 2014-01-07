@@ -180,7 +180,7 @@ class JsonResponseTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('[[1,2,3]]', $response->getContent());
 
-        $response->setEncodingOptions(array(JSON_FORCE_OBJECT));
+        $response->setEncodingOptions(JSON_FORCE_OBJECT);
 
         $this->assertEquals('{"0":{"0":1,"1":2,"2":3}}', $response->getContent());
     }

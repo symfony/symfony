@@ -158,10 +158,9 @@ class ChoiceType extends AbstractType
         }
 
         if (!empty($options['choices_attributes']) || !empty($options['choices_prototypes'])) {
-            $choicesAttributes = $options['choices_attributes'];
             foreach ($view->vars['choices'] as $key => $choiceView) {
-                if (array_key_exists($key, $choicesAttributes)) {
-                    $choiceView->attr = $choicesAttributes[$key];
+                if (array_key_exists($key, $options['choices_attributes'])) {
+                    $choiceView->attr = $options['choices_attributes'][$key];
                 }
 
                 if (array_key_exists($key, $this->choicesPrototypeForm) && $this->choicesPrototypeForm[$key] instanceof FormInterface) {

@@ -330,6 +330,23 @@ class UniqueValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(1, $violationsList->count());
     }
 
+    public function testAssociatedEntityWithNull()
+    {
+        $entityManagerName = "foo";
+        $em = DoctrineTestHelper::createTestEntityManager();
+        $this->createSchema($em);
+        $validator = $this->createValidator($entityManagerName, $em, 'Symfony\Bridge\Doctrine\Tests\Fixtures\AssociationEntity', array('single'), null, 'findBy', false);
+
+        $associated = new AssociationEntity();
+        $associated->single = null;
+
+        $em->persist($associated);
+        $em->flush();
+
+        $violationsList = $validator->validate($associated);
+        $this->assertEquals(0, $violationsList->count());
+    }
+
     /**
      * @group GH-1635
      */

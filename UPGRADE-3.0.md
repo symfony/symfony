@@ -271,6 +271,8 @@ UPGRADE FROM 2.x to 3.0
    <?php echo $view['form']->end($form) ?>
    ```
 
+ * The `RouterApacheDumperCommand` was removed.
+
 ### HttpKernel
 
  * The `Symfony\Component\HttpKernel\Log\LoggerInterface` has been removed in
@@ -380,6 +382,10 @@ UPGRADE FROM 2.x to 3.0
    $route->setMethods(array('POST', 'PUT'));
    $route->setSchemes('https');
    ```
+
+ * The `ApacheMatcherDumper` and `ApacheUrlMatcher` were removed since
+   the performance gains were minimal and it's hard to replicate the behaviour
+   of PHP implementation.
 
 ### Security
 

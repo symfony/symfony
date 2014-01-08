@@ -89,7 +89,7 @@ class UniqueEntityValidator extends ConstraintValidator
                 return;
             }
 
-            if ($class->hasAssociation($fieldName)) {
+            if ($class->hasAssociation($fieldName) && null !== $criteria[$fieldName]) {
                 /* Ensure the Proxy is initialized before using reflection to
                  * read its identifiers. This is necessary because the wrapped
                  * getter methods in the Proxy are being bypassed.

@@ -41,4 +41,31 @@ class ExceptionControllerTest extends TestCase
         $controller = new ExceptionController($twig, false);
         $controller->showAction($request, $flatten);
     }
+
+    public function testFallbackOnRenderException()
+    {
+        $flatten = $this->getMock('Symfony\Component\HttpKernel\Exception\FlattenException');
+        $flatten
+            ->expects($this->once())
+            ->method('getStatusCode')
+            ->will($this->returnValue(404));
+        $twig = $this->getMockBuilder('\Twig_Environment')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $twig
+            ->expects($this->any())
+            ->method('render')
+            ->will($this->throwException(new \Exception()));
+        $twig
+            ->expects($this->any())
+            ->method('getLoader')
+            ->will($this->returnValue($this->getMock('\Twig_LoaderInterface')));
+        $request = Request::create('/');
+        $request->headers->set('X-Php-Ob-Level', 1);
+
+        $controller = new ExceptionController($twig, false);
+        $response = $controller->showAction($request, $flatten);
+
+        $this->assertContains('The server returned a "404', $response->getContent());
+    }
 }

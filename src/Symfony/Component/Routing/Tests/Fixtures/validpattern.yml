@@ -17,3 +17,6 @@ blog_show_legacy:
     condition:    'context.getMethod() == "GET"'
     options:
         compiler_class: RouteCompiler
+
+blog_show_inherited:
+    path:      /blog/{slug}

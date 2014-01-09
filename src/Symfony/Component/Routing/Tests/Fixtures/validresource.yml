@@ -5,3 +5,4 @@ _blog:
     requirements: { 'foo': '\d+' }
     options:      { 'foo': 'bar' }
     host:         ""
+    condition:    'context.getMethod() == "POST"'

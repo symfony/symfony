@@ -11,39 +11,14 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Exception\UnexpectedTypeException;
-use Symfony\Component\Validator\Exception\UnexpectedValueException;
-
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @api
+ *
+ * @deprecated Deprecated in 4.3, to be removed in 5.0. Use
+ *             {@link \Symfony\Component\Validator\Constraints\EachValidator} instead.
  */
-class AllValidator extends ConstraintValidator
+class AllValidator extends EachValidator
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function validate($value, Constraint $constraint)
-    {
-        if (!$constraint instanceof All) {
-            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\All');
-        }
-
-        if (null === $value) {
-            return;
-        }
-
-        if (!\is_array($value) && !$value instanceof \Traversable) {
-            throw new UnexpectedValueException($value, 'iterable');
-        }
-
-        $context = $this->context;
-
-        $validator = $context->getValidator()->inContext($context);
-
-        foreach ($value as $key => $element) {
-            $validator->atPath('['.$key.']')->validate($element, $constraint->constraints);
-        }
-    }
 }

@@ -13,15 +13,16 @@ namespace Symfony\Component\Validator\Constraints;
 
 /**
  * @Annotation
- * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @api
- *
- * @deprecated Deprecated in 4.3, to be removed in 5.0. Use
- *             {@link \Symfony\Component\Validator\Constraints\Each} instead.
+ * @author Marc Morera Merino <yuhu@mmoreram.com>
+ * @author Marc Morales Valldepérez <marcmorales83@gmail.com>
  */
-class All extends Each
+class None extends AbstractComposite
 {
+    /**
+     * @var string
+     *
+     * Message for notice Violation
+     */
+    public $message = 'None of this collection should pass validation.';
 }

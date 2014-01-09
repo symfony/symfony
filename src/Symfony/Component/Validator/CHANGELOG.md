@@ -36,7 +36,17 @@ CHANGELOG
  * added `PositiveOrZero` constraint
  * added `Negative` constraint
  * added `NegativeOrZero` constraint
-
+ * added `AbstractComposite` constraint
+ * deprecate `All` constraint
+ * deprecate `AllValidator` 
+ * added `Each` constraint
+ * added `EachValidator`
+ * added `None` constraint
+ * added `NoneValidator`
+ * added `Some` constraint
+ * added `SomeValidator`
+ * added `Unique` contraint
+ 
 4.2.0
 -----
 

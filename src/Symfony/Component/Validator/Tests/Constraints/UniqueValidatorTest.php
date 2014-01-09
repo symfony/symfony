@@ -12,8 +12,6 @@
 namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\ExecutionContext;
-use Symfony\Component\Validator\Constraints\Range;
-use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Unique;
 use Symfony\Component\Validator\Constraints\UniqueValidator;
 use Symfony\Component\Validator\Tests\Fixtures\FakeMetadataFactory;

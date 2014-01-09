@@ -13,7 +13,6 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\ExecutionContext;
 use Symfony\Component\Validator\Constraints\Range;
-use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Some;
 use Symfony\Component\Validator\Constraints\SomeValidator;
 use Symfony\Component\Validator\Tests\Fixtures\FakeMetadataFactory;
@@ -664,7 +663,6 @@ class SomeValidatorTest extends \PHPUnit_Framework_TestCase
                 ->with($value, $constraint2, '['.$key.']');
         }
     }
-
 
     /**
      * Data provider

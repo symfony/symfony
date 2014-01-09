@@ -12,10 +12,6 @@
 namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Exception\UnexpectedTypeException;
-use Symfony\Component\Validator\Constraints\AbstractCompositeValidator;
-use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
-
 
 /**
  * @author Marc Morera Merino <hyuhu@mmoreram.com>
@@ -48,7 +44,7 @@ class NoneValidator extends AbstractCompositeValidator
          */
         $this->context->clearViolations();
 
-        if ($constraintsSuccess > 0){
+        if ($constraintsSuccess > 0) {
             $this->context->addViolation($constraint->violationMessage);
         }
     }

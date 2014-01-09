@@ -30,7 +30,6 @@ abstract class AbstractComposite extends Constraint
      */
     public $constraints = array();
 
-
     /**
      * {@inheritDoc}
      */
@@ -95,7 +94,6 @@ abstract class AbstractComposite extends Constraint
         }
     }
 
-
     /**
      * Adds the given group if this constraint is in the Default group
      *
@@ -114,7 +112,6 @@ abstract class AbstractComposite extends Constraint
         }
     }
 
-
     /**
      * {@inheritDoc}
      */
@@ -122,7 +119,6 @@ abstract class AbstractComposite extends Constraint
     {
         return 'constraints';
     }
-
 
     /**
      * {@inheritDoc}

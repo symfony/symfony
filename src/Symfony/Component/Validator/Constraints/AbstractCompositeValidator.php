@@ -28,7 +28,6 @@ abstract class AbstractCompositeValidator extends ConstraintValidator
      */
     abstract public function doValidate($value, Constraint $constraint);
 
-
     /**
      * {@inheritDoc}
      */

@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Constraints\EachValidator;
-
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  *

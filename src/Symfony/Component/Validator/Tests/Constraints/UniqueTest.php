@@ -12,7 +12,6 @@
 namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Unique;
-use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author Marc Morera Merino <hyuhu@mmoreram.com>

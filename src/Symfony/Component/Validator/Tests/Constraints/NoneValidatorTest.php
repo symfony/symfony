@@ -13,7 +13,6 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\ExecutionContext;
 use Symfony\Component\Validator\Constraints\Range;
-use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\None;
 use Symfony\Component\Validator\Constraints\NoneValidator;
 use Symfony\Component\Validator\Tests\Fixtures\FakeMetadataFactory;
@@ -190,8 +189,6 @@ class NoneValidatorTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-
-
     /**
      * Adds validateValue assertions
      */
@@ -264,7 +261,6 @@ class NoneValidatorTest extends \PHPUnit_Framework_TestCase
         $visitor->validate(new EntityCollection(), 'Default', '');
         $this->assertCount(1, $visitor->getViolations());
     }
-
 
     /**
      * Data provider

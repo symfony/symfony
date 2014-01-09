@@ -28,7 +28,6 @@ class AbstractCompositeTest extends \PHPUnit_Framework_TestCase
      */
     private $simpleConstraint;
 
-
     /**
      * Setup method
      */
@@ -42,7 +41,6 @@ class AbstractCompositeTest extends \PHPUnit_Framework_TestCase
             ->setMethods(null)
             ->getMock();
     }
-
 
     /**
      * Collection groups: none
@@ -72,7 +70,6 @@ class AbstractCompositeTest extends \PHPUnit_Framework_TestCase
             $constraint::DEFAULT_GROUP,
         ));
     }
-
 
     /**
      * Collection groups: [Default, Group1]
@@ -110,7 +107,6 @@ class AbstractCompositeTest extends \PHPUnit_Framework_TestCase
             'Group1'
         ));
     }
-
 
     /**
      * Collection groups: none
@@ -157,7 +153,6 @@ class AbstractCompositeTest extends \PHPUnit_Framework_TestCase
             'Group1'
         ));
     }
-
 
     /**
      * Collection groups: none

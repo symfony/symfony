@@ -11,9 +11,7 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Validator\Constraints\AbstractComposite;
 use Symfony\Component\Validator\Exception\MissingOptionsException;
-
 
 /**
  * @Annotation
@@ -79,7 +77,7 @@ class Some extends AbstractComposite
             throw new MissingOptionsException(sprintf('"min" or "max" and "exactly" must not be given at the same time: %s', __CLASS__), array('min', 'max', 'exactly'));
         }
 
-        if (!isset($this->min) && !isset($this->exactly)){
+        if (!isset($this->min) && !isset($this->exactly)) {
             $this->min = 1;
         }
 

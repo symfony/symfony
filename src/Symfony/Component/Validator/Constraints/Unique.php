@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-
 use Symfony\Component\Validator\Constraint;
 
 /**

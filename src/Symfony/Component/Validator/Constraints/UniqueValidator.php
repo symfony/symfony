@@ -12,7 +12,6 @@
 namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Constraints\AbstractCompositeValidator;
 
 /**
  * @author Marc Morera Merino <hyuhu@mmoreram.com>
@@ -28,7 +27,7 @@ class UniqueValidator extends AbstractCompositeValidator
      */
     public function doValidate($value, Constraint $constraint)
     {
-        if ($this->findRepeated($value)){
+        if ($this->findRepeated($value)) {
 
             $this->context->addViolation($constraint->uniqueMessage, $params=array());
         }

@@ -11,10 +11,6 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Validator\Constraints\AbstractComposite;
-use Symfony\Component\Validator\Exception\MissingOptionsException;
-
-
 /**
  * @Annotation
  *

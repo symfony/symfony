@@ -12,8 +12,6 @@
 namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Exception\UnexpectedTypeException;
-use Symfony\Component\Validator\Constraints\AbstractCompositeValidator;
 
 /**
  * @author Marc Morera Merino <hyuhu@mmoreram.com>

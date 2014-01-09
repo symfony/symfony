@@ -12,10 +12,6 @@
 namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Exception\UnexpectedTypeException;
-use Symfony\Component\Validator\Constraints\AbstractCompositeValidator;
-use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
-
 
 /**
  * @author Marc Morera Merino <hyuhu@mmoreram.com>
@@ -48,7 +44,7 @@ class SomeValidator extends AbstractCompositeValidator
          */
         $this->context->clearViolations();
 
-        if (isset($constraint->exactly) && $constraintsSuccess != $constraint->exactly){
+        if (isset($constraint->exactly) && $constraintsSuccess != $constraint->exactly) {
 
             $this->context->addViolation($constraint->exactlyMessage, array(
                 '{{ limit }}' => $constraint->exactly,
@@ -57,7 +53,7 @@ class SomeValidator extends AbstractCompositeValidator
             return;
         }
 
-        if (isset($constraint->min) && $constraintsSuccess < $constraint->min){
+        if (isset($constraint->min) && $constraintsSuccess < $constraint->min) {
             $this->context->addViolation($constraint->minMessage, array(
                     '{{ limit }}' => $constraint->min,
             ));
@@ -65,7 +61,7 @@ class SomeValidator extends AbstractCompositeValidator
             return;
         }
 
-        if (isset($constraint->max) && $constraintsSuccess > $constraint->max){
+        if (isset($constraint->max) && $constraintsSuccess > $constraint->max) {
             $this->context->addViolation($constraint->maxMessage, array(
                 '{{ limit }}' => $constraint->max,
             ), null, true);

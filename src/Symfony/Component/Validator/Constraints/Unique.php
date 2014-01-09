@@ -11,18 +11,24 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Constraints\EachValidator;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
+ * @Annotation
+ *
+ * @author Marc Morera Merino <hyuhu@mmoreram.com>
+ * @author Marc Morales Valldepérez <marcmorales83@gmail.com>
  *
  * @api
- *
- * @deprecated Deprecated in 2.5, to be removed in 3.0. Use
- *             {@link \Symfony\Component\Validator\Constraints\EachValidator} instead.
  */
-class AllValidator extends EachValidator
+class Unique extends Constraint
 {
 
+    /**
+     * @var string
+     *
+     * Message for notice Exactly Violation
+     */
+    public $uniqueMessage = 'This collection has repeated elements';
 }

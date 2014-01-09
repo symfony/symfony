@@ -141,6 +141,18 @@ class ExecutionContext implements ExecutionContextInterface
     }
 
     /**
+     * Clears violation stack
+     *
+     * @return ExecutionContext self Object
+     */
+    public function clearViolations()
+    {
+        $this->globalContext->clearViolations();
+
+        return $this;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getRoot()

@@ -164,6 +164,18 @@ class ValidationVisitor implements ValidationVisitorInterface, GlobalExecutionCo
     }
 
     /**
+     * Clears violation stack
+     *
+     * @return ValidationVisitor self Object
+     */
+    public function clearViolations()
+    {
+        $this->violations = new ConstraintViolationList();
+
+        return $this;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getViolations()

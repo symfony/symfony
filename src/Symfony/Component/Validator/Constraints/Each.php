@@ -11,19 +11,17 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Validator\Constraints\Each;
+use Symfony\Component\Validator\Constraints\AbstractComposite;
 
 /**
  * @Annotation
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+ * @author Marc Morera Merino <hyuhu@mmoreram.com>
+ * @author Marc Morales Valldepérez <marcmorales83@gmail.com>
  *
  * @api
  *
- * @deprecated Deprecated in 2.5, to be removed in 3.0. Use
- *             {@link \Symfony\Component\Validator\Constraints\Each} instead.
  */
-class All extends Each
+class Each extends AbstractComposite
 {
-
 }

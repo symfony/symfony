@@ -154,6 +154,7 @@ class XmlFileLoader extends FileLoader
         $type = $node->getAttribute('type');
         $prefix = $node->getAttribute('prefix');
         $host = $node->hasAttribute('host') ? $node->getAttribute('host') : null;
+        $condition = $node->hasAttribute('condition') ? $node->getAttribute('condition') : null;
         $schemes = $node->hasAttribute('schemes') ? preg_split('/[\s,\|]++/', $node->getAttribute('schemes'), -1, PREG_SPLIT_NO_EMPTY) : null;
         $methods = $node->hasAttribute('methods') ? preg_split('/[\s,\|]++/', $node->getAttribute('methods'), -1, PREG_SPLIT_NO_EMPTY) : null;
 
@@ -166,6 +167,9 @@ class XmlFileLoader extends FileLoader
         $subCollection->addPrefix($prefix);
         if (null !== $host) {
             $subCollection->setHost($host);
+        }
+        if(null !== $condition) {
+            $subCollection->setCondition($condition);
         }
         if (null !== $schemes) {
             $subCollection->setSchemes($schemes);

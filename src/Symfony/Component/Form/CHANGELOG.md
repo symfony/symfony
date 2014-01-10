@@ -5,6 +5,8 @@ CHANGELOG
 ------
 
  * added an option for multiple files upload
+ * form errors now reference their cause (constraint violation, exception, ...)
+ * form errors now remember which form they were originally added to
 
 2.4.0
 -----

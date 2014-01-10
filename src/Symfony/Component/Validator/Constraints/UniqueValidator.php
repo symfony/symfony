@@ -12,24 +12,32 @@
 namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
- * @author Marc Morera Merino <hyuhu@mmoreram.com>
+ * @author Marc Morera Merino <yuhu@mmoreram.com>
  * @author Marc Morales Valldepérez <marcmorales83@gmail.com>
- *
- * @api
  */
-class UniqueValidator extends AbstractCompositeValidator
+class UniqueValidator extends ConstraintValidator
 {
 
     /**
      * {@inheritDoc}
      */
-    public function doValidate($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint)
     {
+        if (null === $value) {
+            return;
+        }
+
+        if (!is_array($value) && !$value instanceof \Traversable) {
+            throw new UnexpectedTypeException($value, 'array or Traversable');
+        }
+
         if ($this->findRepeated($value)) {
 
-            $this->context->addViolation($constraint->uniqueMessage, $params=array());
+            $this->context->addViolation($constraint->message, $params=array());
         }
     }
 

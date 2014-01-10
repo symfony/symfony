@@ -16,10 +16,8 @@ use Symfony\Component\Validator\Exception\MissingOptionsException;
 /**
  * @Annotation
  *
- * @author Marc Morera Merino <hyuhu@mmoreram.com>
+ * @author Marc Morera Merino <yuhu@mmoreram.com>
  * @author Marc Morales Valldepérez <marcmorales83@gmail.com>
- *
- * @api
  */
 class Some extends AbstractComposite
 {

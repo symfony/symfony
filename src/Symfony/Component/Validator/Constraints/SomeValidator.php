@@ -12,21 +12,29 @@
 namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
- * @author Marc Morera Merino <hyuhu@mmoreram.com>
+ * @author Marc Morera Merino <yuhu@mmoreram.com>
  * @author Marc Morales Valldepérez <marcmorales83@gmail.com>
- *
- * @api
  */
-class SomeValidator extends AbstractCompositeValidator
+class SomeValidator extends ConstraintValidator
 {
 
     /**
      * {@inheritDoc}
      */
-    public function doValidate($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint)
     {
+        if (null === $value) {
+            return;
+        }
+
+        if (!is_array($value) && !$value instanceof \Traversable) {
+            throw new UnexpectedTypeException($value, 'array or Traversable');
+        }
+
         $group = $this->context->getGroup();
 
         $totalIterations = count($value) * count($constraint->constraints);
@@ -39,9 +47,7 @@ class SomeValidator extends AbstractCompositeValidator
 
         $constraintsSuccess = $totalIterations - (int) $this->context->getViolations()->count();
 
-        /**
-         * We clear all violations as just current Validator should add real Violations
-         */
+        // We clear all violations as just current Validator should add real Violations
         $this->context->clearViolations();
 
         if (isset($constraint->exactly) && $constraintsSuccess != $constraint->exactly) {

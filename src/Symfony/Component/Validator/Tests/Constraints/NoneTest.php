@@ -15,10 +15,8 @@ use Symfony\Component\Validator\Constraints\None;
 use Symfony\Component\Validator\Constraints\Valid;
 
 /**
- * @author Marc Morera Merino <hyuhu@mmoreram.com>
+ * @author Marc Morera Merino <yuhu@mmoreram.com>
  * @author Marc Morales Valldepérez <marcmorales83@gmail.com>
- *
- * @api
  */
 class NoneTest extends \PHPUnit_Framework_TestCase
 {

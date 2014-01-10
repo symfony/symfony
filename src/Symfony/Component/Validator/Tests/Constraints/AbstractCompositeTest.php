@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Constraint;
 
 /**
  * @author Marc Morales Valldepérez <marcmorales83@gmail.com>
- * @author Marc Morera Merino <hyuhu@mmoreram.com>
+ * @author Marc Morera Merino <yuhu@mmoreram.com>
  */
 class AbstractCompositeTest extends \PHPUnit_Framework_TestCase
 {

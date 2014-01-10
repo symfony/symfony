@@ -14,7 +14,7 @@ namespace Symfony\Component\Validator\Tests\Fixtures;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @author Marc Morera Merino <hyuhu@mmoreram.com>
+ * @author Marc Morera Merino <yuhu@mmoreram.com>
  * @author Marc Morales Valldepérez <marcmorales83@gmail.com>
  */
 class EntityCollection

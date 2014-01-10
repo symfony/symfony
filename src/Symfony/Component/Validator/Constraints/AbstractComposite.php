@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
  * @Annotation
  *
  * @author Marc Morales Valldepérez <marcmorales83@gmail.com>
- * @author Marc Morera Merino <hyuhu@mmoreram.com>
+ * @author Marc Morera Merino <yuhu@mmoreram.com>
  */
 abstract class AbstractComposite extends Constraint
 {
@@ -41,14 +41,10 @@ abstract class AbstractComposite extends Constraint
             $this->constraints = array($this->constraints);
         }
 
-        /**
-         * We consider explicid groups are defined if are not default one
-         */
-        $areExplicitGroupsDefined = ( $this->groups != array(self::DEFAULT_GROUP) );
+        // We consider explicid groups are defined if are not default one
+        $areExplicitGroupsDefined = ( $this->groups != array(self::DEFAULT_GROUP));
 
-        /**
-         * Each constraint contained
-         */
+         // Each constraint contained
         foreach ($this->constraints as $constraint) {
             if (!$constraint instanceof Constraint) {
                 throw new ConstraintDefinitionException(sprintf('The value %s is not an instance of Constraint in constraint %s', $constraint, __CLASS__));
@@ -58,9 +54,7 @@ abstract class AbstractComposite extends Constraint
                 throw new ConstraintDefinitionException(sprintf('The constraint Valid cannot be nested inside constraint %s. You can only declare the Valid constraint directly on a field or method.', __CLASS__));
             }
 
-            /**
-             * If explicid groups are defined
-             */
+            // If explicid groups are defined
             if ($areExplicitGroupsDefined) {
                 /**
                  * If constraint has explicid groups defined
@@ -68,17 +62,14 @@ abstract class AbstractComposite extends Constraint
                  * In that case, the groups of the nested constraint need to be
                  * a subset of the groups of the outer constraint.
                  */
-                if ($constraint->groups != array(self::DEFAULT_GROUP)) {
-                    /**
-                     * If are not a subset
-                     */
+                if ($constraint->groups !== array(self::DEFAULT_GROUP)) {
+
+                    // If are not a subset
                     if ($constraint->groups != array_intersect($constraint->groups, $this->groups)) {
                         throw new ConstraintDefinitionException(sprintf('The groups defined in Constraint %s must be a subset of the groups defined in the Constraint %s', $constraint, __CLASS__));
                     }
 
-                /**
-                 * Otherwise, we add all defined groups here
-                 */
+                // Otherwise, we add all defined groups here
                 } else {
                     foreach ($this->groups as $group) {
                         $constraint->addImplicitGroupName($group);
@@ -95,9 +86,9 @@ abstract class AbstractComposite extends Constraint
     }
 
     /**
-     * Adds the given group if this constraint is in the Default group
+     * Adds the given group if this constraint is in the Default group.
      *
-     * Also propagate same method to nested Constraints
+     * Also propagate same method to nested Constraints.
      *
      * @param string $group
      *

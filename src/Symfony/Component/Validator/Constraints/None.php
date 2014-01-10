@@ -14,10 +14,8 @@ namespace Symfony\Component\Validator\Constraints;
 /**
  * @Annotation
  *
- * @author Marc Morera Merino <hyuhu@mmoreram.com>
+ * @author Marc Morera Merino <yuhu@mmoreram.com>
  * @author Marc Morales Valldepérez <marcmorales83@gmail.com>
- *
- * @api
  */
 class None extends AbstractComposite
 {
@@ -27,5 +25,5 @@ class None extends AbstractComposite
      *
      * Message for notice Violation
      */
-    public $violationMessage = 'None of this collection should pass validation.';
+    public $message = 'None of this collection should pass validation.';
 }

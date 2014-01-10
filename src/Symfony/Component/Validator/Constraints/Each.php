@@ -14,11 +14,8 @@ namespace Symfony\Component\Validator\Constraints;
 /**
  * @Annotation
  *
- * @author Marc Morera Merino <hyuhu@mmoreram.com>
- * @author Marc Morales Valldepérez <marcmorales83@gmail.com>
- *
- * @api
- *
+ * @author Marc Morera Merino <yuhu@mmoreram.com>
+ * @author Marc Morales Valldepérez <marcmorales83@gmail.com> *
  */
 class Each extends AbstractComposite
 {

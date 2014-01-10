@@ -23,10 +23,8 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Tests\Fixtures\EntityCollection;
 
 /**
- * @author Marc Morera Merino <hyuhu@mmoreram.com>
+ * @author Marc Morera Merino <yuhu@mmoreram.com>
  * @author Marc Morales Valldepérez <marcmorales83@gmail.com>
- *
- * @api
  */
 class NoneValidatorTest extends \PHPUnit_Framework_TestCase
 {

@@ -16,10 +16,8 @@ use Symfony\Component\Validator\Constraint;
 /**
  * @Annotation
  *
- * @author Marc Morera Merino <hyuhu@mmoreram.com>
+ * @author Marc Morera Merino <yuhu@mmoreram.com>
  * @author Marc Morales Valldepérez <marcmorales83@gmail.com>
- *
- * @api
  */
 class Unique extends Constraint
 {
@@ -29,5 +27,5 @@ class Unique extends Constraint
      *
      * Message for notice Exactly Violation
      */
-    public $uniqueMessage = 'This collection has repeated elements';
+    public $message = 'This collection has repeated elements';
 }

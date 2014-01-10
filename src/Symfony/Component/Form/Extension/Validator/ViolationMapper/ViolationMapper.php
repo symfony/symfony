@@ -128,7 +128,8 @@ class ViolationMapper implements ViolationMapperInterface
                 $violation->getMessage(),
                 $violation->getMessageTemplate(),
                 $violation->getMessageParameters(),
-                $violation->getMessagePluralization()
+                $violation->getMessagePluralization(),
+                $violation
             ));
         }
     }

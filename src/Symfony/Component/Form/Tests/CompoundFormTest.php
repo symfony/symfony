@@ -875,6 +875,30 @@ class CompoundFormTest extends AbstractFormTest
         $this->assertSame(
              "ERROR: Error 1\n".
              "ERROR: Error 2\n".
+             "ERROR: Nested Error\n",
+             (string) $errors
+        );
+
+        $this->assertSame(
+             array($error1, $error2, $nestedError),
+             iterator_to_array($errors)
+        );
+    }
+
+    public function testGetErrorsDeepRecursive()
+    {
+        $this->form->addError($error1 = new FormError('Error 1'));
+        $this->form->addError($error2 = new FormError('Error 2'));
+
+        $childForm = $this->getBuilder('Child')->getForm();
+        $childForm->addError($nestedError = new FormError('Nested Error'));
+        $this->form->add($childForm);
+
+        $errors = $this->form->getErrors(true, false);
+
+        $this->assertSame(
+             "ERROR: Error 1\n".
+             "ERROR: Error 2\n".
              "Child:\n".
              "    ERROR: Nested Error\n",
              (string) $errors
@@ -890,30 +914,6 @@ class CompoundFormTest extends AbstractFormTest
 
         $this->assertCount(1, $nestedErrorsAsArray);
         $this->assertSame($nestedError, $nestedErrorsAsArray[0]);
-    }
-
-    public function testGetErrorsDeepFlat()
-    {
-        $this->form->addError($error1 = new FormError('Error 1'));
-        $this->form->addError($error2 = new FormError('Error 2'));
-
-        $childForm = $this->getBuilder('Child')->getForm();
-        $childForm->addError($nestedError = new FormError('Nested Error'));
-        $this->form->add($childForm);
-
-        $errors = $this->form->getErrors(true, true);
-
-        $this->assertSame(
-             "ERROR: Error 1\n".
-             "ERROR: Error 2\n".
-             "ERROR: Nested Error\n",
-             (string) $errors
-        );
-
-        $this->assertSame(
-             array($error1, $error2, $nestedError),
-             iterator_to_array($errors)
-        );
     }
 
     // Basic cases are covered in SimpleFormTest

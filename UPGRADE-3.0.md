@@ -181,8 +181,8 @@ UPGRADE FROM 2.x to 3.0
    and "csrf_token_id".
 
  * The method `Form::getErrorsAsString()` was removed. Use `Form::getErrors()`
-   instead with the argument `$deep` set to true and cast the returned iterator
-   to a string (if not done implicitly by PHP).
+   instead with the argument `$deep` set to true and `$flatten` set to false
+   and cast the returned iterator to a string (if not done implicitly by PHP).
 
    Before:
 
@@ -193,7 +193,7 @@ UPGRADE FROM 2.x to 3.0
    After:
 
    ```
-   echo $form->getErrors(true);
+   echo $form->getErrors(true, false);
    ```
 
 

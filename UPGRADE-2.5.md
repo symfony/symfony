@@ -41,6 +41,6 @@ Form
    After:
 
    ```
-   public function getErrors($deep = false, $flatten = false)
+   public function getErrors($deep = false, $flatten = true)
    {
    ```

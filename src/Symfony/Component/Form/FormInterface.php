@@ -104,7 +104,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      * @since 2.5 Since version 2.5 this method returns a
      *            {@link FormErrorIterator} instance instead of an array
      */
-    public function getErrors($deep = false, $flatten = false);
+    public function getErrors($deep = false, $flatten = true);
 
     /**
      * Updates the form with default data.

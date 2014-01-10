@@ -778,7 +778,7 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * {@inheritdoc}
      */
-    public function getErrors($deep = false, $flatten = false)
+    public function getErrors($deep = false, $flatten = true)
     {
         return new FormErrorIterator($this->errors, $this, $deep, $flatten);
     }
@@ -797,7 +797,7 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function getErrorsAsString($level = 0)
     {
-        return self::indent((string) $this->getErrors(true), $level);
+        return self::indent((string) $this->getErrors(true, false), $level);
     }
 
     /**

@@ -68,7 +68,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
      * @param Boolean       $flatten Whether to flatten the recursive list of
      *                               errors into a flat list
      */
-    public function __construct(array &$errors, FormInterface $form, $deep = false, $flatten = false)
+    public function __construct(array &$errors, FormInterface $form, $deep = false, $flatten = true)
     {
         $this->errors = &$errors;
         $this->form = $form;

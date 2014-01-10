@@ -15,6 +15,7 @@ services: mongodb
 
 before_script:
     - sudo apt-get install parallel
+    - sh -c 'if [ $(php -r "echo (int) defined('HHVM_VERSION');") -eq 0 ]; then mkdir -p "~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/"; fi;'
     - sh -c 'if [ $(php -r "echo (int) defined('HHVM_VERSION');") -eq 0 ]; then echo "" >> "~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini"; fi;'
     - sh -c 'if [ $(php -r "echo (int) defined('HHVM_VERSION');") -eq 0 ]; then echo "extension = mongo.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi;'
     - sh -c 'if [ $(php -r "echo PHP_MINOR_VERSION;") -le 4 ]; then echo "extension = apc.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi;'

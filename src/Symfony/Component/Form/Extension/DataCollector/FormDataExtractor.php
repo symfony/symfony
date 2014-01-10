@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Extension\DataCollector;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpKernel\DataCollector\Util\ValueExporter;
+use Symfony\Component\Validator\ConstraintViolationInterface;
 
 /**
  * Default implementation of {@link FormDataExtractorInterface}.
@@ -43,6 +44,7 @@ class FormDataExtractor implements FormDataExtractorInterface
     {
         $data = array(
             'id' => $this->buildId($form),
+            'name' => $form->getName(),
             'type' => $form->getConfig()->getType()->getName(),
             'type_class' => get_class($form->getConfig()->getType()->getInnerType()),
             'synchronized' => $this->valueExporter->exportValue($form->isSynchronized()),
@@ -108,9 +110,26 @@ class FormDataExtractor implements FormDataExtractorInterface
         }
 
         foreach ($form->getErrors() as $error) {
-            $data['errors'][] = array(
+            $errorData = array(
                 'message' => $error->getMessage(),
+                'origin' => is_object($error->getOrigin())
+                    ? spl_object_hash($error->getOrigin())
+                    : null,
             );
+
+            $cause = $error->getCause();
+
+            if ($cause instanceof ConstraintViolationInterface) {
+                $errorData['cause'] = array(
+                    'root' => $this->valueExporter->exportValue($cause->getRoot()),
+                    'path' => $this->valueExporter->exportValue($cause->getPropertyPath()),
+                    'value' => $this->valueExporter->exportValue($cause->getInvalidValue()),
+                );
+            } else {
+                $errorData['cause'] = null !== $cause ? $this->valueExporter->exportValue($cause) : null;
+            }
+
+            $data['errors'][] = $errorData;
         }
 
         $data['synchronized'] = $this->valueExporter->exportValue($form->isSynchronized());
@@ -127,8 +146,12 @@ class FormDataExtractor implements FormDataExtractorInterface
 
         // Set the ID in case no FormInterface object was collected for this
         // view
-        if (isset($view->vars['id'])) {
-            $data['id'] = $view->vars['id'];
+        if (!isset($data['id'])) {
+            $data['id'] = isset($view->vars['id']) ? $view->vars['id'] : null;
+        }
+
+        if (!isset($data['name'])) {
+            $data['name'] = isset($view->vars['name']) ? $view->vars['name'] : null;
         }
 
         foreach ($view->vars as $varName => $value) {

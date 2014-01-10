@@ -191,7 +191,7 @@
             </div>
 
             {% for formName, formData in collector.data.forms %}
-                {{ form_tree_details(formName, formData) }}
+                {{ form_tree_details(formName, formData, collector.data.forms_by_hash) }}
             {% endfor %}
         </div>
     {% else %}
@@ -366,7 +366,7 @@
     </li>
 {% endmacro %}
 
-{% macro form_tree_details(name, data) %}
+{% macro form_tree_details(name, data, forms_by_hash) %}
     <div class="tree-details" id="{{ data.id }}-details">
         <h2>
             {{ name }}
@@ -386,13 +386,32 @@
 
             <table id="{{ data.id }}-errors">
                 <tr>
-                    <th width="50%">Message</th>
+                    <th>Message</th>
+                    <th>Origin</th>
                     <th>Cause</th>
                 </tr>
                 {% for error in data.errors %}
                 <tr>
                     <td>{{ error.message }}</td>
-                    <td><em>Unknown.</em></td>
+                    <td>
+                        {% if error.origin is empty %}
+                            <em>This form.</em>
+                        {% elseif forms_by_hash[error.origin] is not defined %}
+                            <em>Unknown.</em>
+                        {% else %}
+                            {{ forms_by_hash[error.origin].name }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if error.cause is empty %}
+                            <em>Unknown.</em>
+                        {% elseif error.cause.root is defined %}
+                            <strong>Constraint Violation</strong><br/>
+                            <pre>{{ error.cause.root }}{% if error.cause.path is not empty %}{% if error.cause.path|first != '[' %}.{% endif %}{{ error.cause.path }}{% endif %} = {{ error.cause.value }}</pre>
+                        {% else %}
+                            <pre>{{ error.cause }}</pre>
+                        {% endif %}
+                    </td>
                 </tr>
                 {% endfor %}
             </table>
@@ -565,6 +584,6 @@
     </div>
 
     {% for childName, childData in data.children %}
-        {{ _self.form_tree_details(childName, childData) }}
+        {{ _self.form_tree_details(childName, childData, forms_by_hash) }}
     {% endfor %}
 {% endmacro %}

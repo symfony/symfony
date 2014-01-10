@@ -100,8 +100,8 @@ class FullTransformer
     /**
      * Return the formatted ICU value for the matched date characters
      *
-     * @param string   $dateChars The date characters to be replaced with a formatted ICU value
-     * @param DateTime $dateTime  A DateTime object to be used to generate the formatted value
+     * @param string    $dateChars The date characters to be replaced with a formatted ICU value
+     * @param \DateTime $dateTime  A DateTime object to be used to generate the formatted value
      *
      * @return string                   The formatted value
      *

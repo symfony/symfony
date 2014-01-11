@@ -377,8 +377,6 @@
     {%- if read_only %} readonly="readonly"{% endif -%}
     {%- if disabled %} disabled="disabled"{% endif -%}
     {%- if required %} required="required"{% endif -%}
-    {%- if max_length %} maxlength="{{ max_length }}"{% endif -%}
-    {%- if pattern %} pattern="{{ pattern }}"{% endif -%}
     {%- for attrname, attrvalue in attr -%}
         {{- " " -}}
         {%- if attrname in ['placeholder', 'title'] -%}

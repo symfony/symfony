@@ -4,6 +4,7 @@ CHANGELOG
 2.5.0
 ------
 
+ * deprecated options "max_length" and "pattern" in favor of putting these values in "attr" option
  * added an option for multiple files upload
  * form errors now reference their cause (constraint violation, exception, ...)
  * form errors now remember which form they were originally added to

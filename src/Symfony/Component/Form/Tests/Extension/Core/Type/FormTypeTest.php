@@ -132,10 +132,18 @@ class FormTypeTest extends BaseTypeTest
 
     public function testPassMaxLengthToView()
     {
+        $form = $this->factory->create('form', null, array('attr' => array('maxlength' => 10)));
+        $view = $form->createView();
+
+        $this->assertSame(10, $view->vars['attr']['maxlength']);
+    }
+
+    public function testPassMaxLengthBCToView()
+    {
         $form = $this->factory->create('form', null, array('max_length' => 10));
         $view = $form->createView();
 
-        $this->assertSame(10, $view->vars['max_length']);
+        $this->assertSame(10, $view->vars['attr']['maxlength']);
     }
 
     public function testSubmitWithEmptyDataCreatesObjectIfClassAvailable()

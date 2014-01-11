@@ -5,6 +5,7 @@ CHANGELOG
 ------
 
  * added an option for multiple files upload
+ * deprecated options "max_length" and "pattern" in favor of putting these values in "attr" option
 
 2.4.0
 -----

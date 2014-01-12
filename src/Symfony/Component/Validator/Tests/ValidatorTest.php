@@ -22,6 +22,7 @@ use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\ConstraintValidatorFactory;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Symfony\Component\Validator\Constraints\Type;
 
 class ValidatorTest extends \PHPUnit_Framework_TestCase
 {
@@ -230,6 +231,16 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
         $this->metadataFactory->addMetadata($metadata);
 
         $this->validator->validateValue($entity, new Valid());
+    }
+
+    public function testValidateValueViolationsToStringHandlesArrays()
+    {
+        $violations = $this->validator->validateValue(
+            array(),
+            array(new Type(array('type' => 'string')))
+        );
+
+        $this->assertInternalType('string', (string) $violations);
     }
 
     /**

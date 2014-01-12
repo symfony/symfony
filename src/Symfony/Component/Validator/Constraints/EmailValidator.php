@@ -29,7 +29,7 @@ class EmailValidator extends ConstraintValidator
      *
      * @var Boolean
      */
-    protected $isStrict;
+    private $isStrict;
 
     public function __construct($strict)
     {
@@ -54,7 +54,7 @@ class EmailValidator extends ConstraintValidator
             $constraint->strict = $this->isStrict;
         }
 
-        if ($constraint->strict === true && class_exists('\Egulias\EmailValidator\EmailValidator')) {
+        if (true === $constraint->strict && class_exists('\Egulias\EmailValidator\EmailValidator')) {
             $strictValidator = new StrictEmailValidator();
             $valid = $strictValidator->isValid($value, $constraint->checkMX);
         } elseif ($constraint->strict === true) {

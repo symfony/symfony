@@ -24,12 +24,13 @@ class EntityType extends DoctrineType
      * @param string        $class
      * @return ORMQueryBuilderLoader
      */
-    public function getLoader(ObjectManager $manager, $queryBuilder, $class)
+    public function getLoader(ObjectManager $manager, $queryBuilder, $class, $hints)
     {
         return new ORMQueryBuilderLoader(
             $queryBuilder,
             $manager,
-            $class
+            $class,
+            $hints
         );
     }
 

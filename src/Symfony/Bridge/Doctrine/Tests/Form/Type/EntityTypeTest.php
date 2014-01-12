@@ -199,6 +199,29 @@ class EntityTypeTest extends TypeTestCase
         $field->submit('2');
     }
 
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
+     */
+    public function testConfigureQueryBuilderWithNonArrayHints()
+    {
+        $entity1 = new SingleIdentEntity(1, 'Foo');
+        $entity2 = new SingleIdentEntity(2, 'Bar');
+
+        $this->persist(array($entity1, $entity2));
+        $qb = $this->em->createQueryBuilder()->select('e')->from(self::SINGLE_IDENT_CLASS, 'e');
+
+        $field = $this->factory->createNamed('name', 'entity', null, array(
+            'em' => 'default',
+            'class' => self::SINGLE_IDENT_CLASS,
+            'required' => false,
+            'property' => 'name',
+            'query_builder' => $qb,
+            'query_hints' => 'foo'
+        ));
+        
+        $field->submit('2');
+    }
+
     public function testSetDataSingleNull()
     {
         $field = $this->factory->createNamed('name', 'entity', null, array(

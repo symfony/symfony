@@ -13,6 +13,7 @@ namespace Symfony\Component\Translation;
 
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
+use Psr\Log\LoggerInterface;
 
 /**
  * Translator.
@@ -52,6 +53,11 @@ class Translator implements TranslatorInterface
      * @var MessageSelector
      */
     private $selector;
+
+    /**
+     * @var LoggerInterface|null
+     */
+    private $logger;
 
     /**
      * Constructor.
@@ -185,7 +191,13 @@ class Translator implements TranslatorInterface
             $this->loadCatalogue($locale);
         }
 
-        return strtr($this->catalogues[$locale]->get((string) $id, $domain), $parameters);
+        $catalogue = $this->catalogues[$locale];
+
+        if (null !== $this->logger && !$catalogue->defines($id, $domain)) {
+            $this->log($catalogue, $id, $domain);
+        }
+
+        return strtr($catalogue->get((string) $id, $domain), $parameters);
     }
 
     /**
@@ -210,6 +222,11 @@ class Translator implements TranslatorInterface
         $id = (string) $id;
 
         $catalogue = $this->catalogues[$locale];
+
+        if (null !== $this->logger && !$catalogue->defines($id, $domain)) {
+            $this->log($catalogue, $id, $domain);
+        }
+
         while (!$catalogue->defines($id, $domain)) {
             if ($cat = $catalogue->getFallbackCatalogue()) {
                 $catalogue = $cat;
@@ -220,6 +237,16 @@ class Translator implements TranslatorInterface
         }
 
         return strtr($this->selector->choose($catalogue->get($id, $domain), (int) $number, $locale), $parameters);
+    }
+
+    /**
+     * Set the logger.
+     *
+     * @param LoggerInterface $logger A logger instance
+     */
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
     }
 
     /**
@@ -242,6 +269,22 @@ class Translator implements TranslatorInterface
             }
         }
         $this->loadFallbackCatalogues($locale);
+    }
+
+    /**
+     * Log for missing catalogue
+     *
+     * @param  MessageCatalogueInterface $catalogue
+     * @param  string                    $id
+     * @param  string                    $domain
+     */
+    private function log(MessageCatalogueInterface $catalogue, $id, $domain)
+    {
+        if ($catalogue->has($id, $domain)) {
+            $this->logger->debug('Translation use fallback catalogue.', array('id' => $id, 'domain' => $domain, 'locale' => $catalogue->getLocale()));
+        } else {
+            $this->logger->warning('Translation not found.', array('id' => $id, 'domain' => $domain, 'locale' => $catalogue->getLocale()));
+        }
     }
 
     private function doLoadCatalogue($locale)

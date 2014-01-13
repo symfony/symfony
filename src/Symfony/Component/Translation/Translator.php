@@ -234,7 +234,7 @@ class Translator implements TranslatorInterface
     }
 
     /**
-     * Set the logger.
+     * Sets the logger.
      *
      * @param LoggerInterface $logger A logger instance
      */
@@ -266,7 +266,7 @@ class Translator implements TranslatorInterface
     }
 
     /**
-     * Log for missing catalogue.
+     * Logs for missing catalogue.
      *
      * @param MessageCatalogueInterface $catalogue
      * @param string                    $id

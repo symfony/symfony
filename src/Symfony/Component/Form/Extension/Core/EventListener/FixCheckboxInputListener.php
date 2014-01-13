@@ -27,14 +27,18 @@ class FixCheckboxInputListener implements EventSubscriberInterface
 {
     private $choiceList;
 
+    private $ignoreInvalidChoices;
+
     /**
      * Constructor.
      *
      * @param ChoiceListInterface $choiceList
+     * @param bool                $ignoreInvalidChoices
      */
-    public function __construct(ChoiceListInterface $choiceList)
+    public function __construct(ChoiceListInterface $choiceList, $ignoreInvalidChoices)
     {
         $this->choiceList = $choiceList;
+        $this->ignoreInvalidChoices = $ignoreInvalidChoices;
     }
 
     public function preSubmit(FormEvent $event)
@@ -62,7 +66,7 @@ class FixCheckboxInputListener implements EventSubscriberInterface
                 }
             }
 
-            if (count($submittedValues) > 0) {
+            if (!$this->ignoreInvalidChoices && count($submittedValues) > 0) {
                 throw new TransformationFailedException(sprintf(
                     'The following choices were not found: "%s"',
                     implode('", "', array_keys($submittedValues))

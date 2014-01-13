@@ -22,6 +22,7 @@ use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 
 /**
@@ -205,7 +206,7 @@ class Controller extends ContainerAware
     /**
      * Get a user from the Security Context
      *
-     * @return mixed
+     * @return null|UserInterface
      *
      * @throws \LogicException If SecurityBundle is not available
      *

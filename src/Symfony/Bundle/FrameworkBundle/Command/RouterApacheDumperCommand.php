@@ -21,6 +21,10 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * RouterApacheDumperCommand.
  *
+ * @deprecated Deprecated since version 2.5, to be removed in 3.0.
+ *             The performance gains are minimal and it's very hard to replicate
+ *             the behavior of PHP implementation.
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class RouterApacheDumperCommand extends ContainerAwareCommand

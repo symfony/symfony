@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+2.5.0
+-----
+ * added logging capabilities to translator.
+
 2.3.0
 -----
 

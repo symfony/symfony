@@ -889,4 +889,68 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertFileExists($filename);
         $this->assertSame('bar', file_get_contents($filename));
     }
+
+    /**
+     * @dataProvider provideResultsForSearch
+     */
+    public function testSearch($pattern, $expectedFiles, $numExpectedResults)
+    {
+        foreach($expectedFiles as $file) {
+            $sourceFilePath = $this->workspace . DIRECTORY_SEPARATOR . $file;
+            touch($sourceFilePath);
+        }
+        $results = $this->filesystem->search($this->workspace, $pattern);
+        $this->assertTrue(is_array($results));
+        $this->assertCount($numExpectedResults, $results);
+    }
+
+    /**
+     * @return array
+     */
+    public function provideResultsForSearch()
+    {
+        return array(
+            array(
+                'search_result',
+                array(
+                    'search_result',
+                    'foo',
+                    'bar',
+                ),
+                1
+            ),
+            array(
+                'search_result*',
+                array(
+                    'search_result',
+                    'search_result_foo',
+                    'bar',
+                ),
+                2
+            ),
+            array(
+                '*',
+                array(
+                    'search_result',
+                    'search_result_foo',
+                    'bar',
+                ),
+                3
+            ),
+        );
+    }
+
+    public function testSearchNoSeparator()
+    {
+        $results = $this->filesystem->search($this->workspace, '*', false);
+        $this->assertTrue(is_array($results));
+        $this->assertCount(1, $results);
+    }
+
+    public function testSearchInvalidPath()
+    {
+        $basePath = $this->workspace.DIRECTORY_SEPARATOR . time();
+        $this->setExpectedException('Symfony\Component\Filesystem\Exception\IOException');
+        $results = $this->filesystem->search($basePath, '*');
+    }
 }

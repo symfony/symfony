@@ -92,6 +92,11 @@ EOF
 
         $output->writeln(sprintf("Server running on <info>%s</info>\n", $input->getArgument('address')));
 
+        if (defined('HHVM_VERSION')) {
+            $this->executeWithHHVM($input, $output, $env);
+            return;
+        }
+
         $builder = new ProcessBuilder(array(PHP_BINARY, '-S', $input->getArgument('address'), $router));
         $builder->setWorkingDirectory($input->getOption('docroot'));
         $builder->setTimeout(null);
@@ -101,4 +106,65 @@ EOF
             }
         });
     }
+
+    protected function executeWithHHVM(InputInterface $input, OutputInterface $output, $env)
+    {
+        list($ip, $port) = explode(':', $input->getArgument('address'));
+        $output->writeln(sprintf("Server(with HHVM) running on <info>$ip:$port</info>\n", $ip, $port));
+        $docroot = realpath($input->getOption('docroot'));
+        $bootstrap = ('prod' === $env ? 'app.php' : 'app_dev.php');
+        $config = <<<EOF
+Server {
+  IP = $ip
+  Port = $port
+  SourceRoot = $docroot
+  RequestTimeoutSeconds = -1
+  RequestMemoryMaxBytes = -1
+}
+
+VirtualHost {
+ * {
+   Pattern = .*
+   RewriteRules {
+      * {
+        pattern = .?
+
+        # app bootstrap
+        to = $bootstrap
+
+        # append the original query string
+        qsa = true
+      }
+   }
+ }
+}
+
+StaticFile {
+  Extensions {
+    css = text/css
+    gif = image/gif
+    html = text/html
+    jpe = image/jpeg
+    jpeg = image/jpeg
+    jpg = image/jpeg
+    png = image/png
+    tif = image/tiff
+    tiff = image/tiff
+    txt = text/plain
+    php = text/plain
+  }
+}
+EOF;
+        $tmpfile = $this->getContainer()->get('kernel')->getCacheDir().DIRECTORY_SEPARATOR.'hhvm-server-'.md5($config).'.hdf';
+        file_put_contents($tmpfile, $config);
+        $builder = new ProcessBuilder(array(PHP_BINARY, '-ms', "-c$tmpfile"));
+        $builder->setWorkingDirectory($docroot);
+        $builder->setTimeout(null);
+        $builder->getProcess()->run(function ($type, $buffer) use ($output) {
+            if (OutputInterface::VERBOSITY_VERBOSE <= $output->getVerbosity()) {
+                $output->write($buffer);
+            }
+        });
+    }
+
 }

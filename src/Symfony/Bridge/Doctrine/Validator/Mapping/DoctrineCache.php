@@ -9,8 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Validator\Mapping\Cache;
+namespace Symfony\Bridge\Doctrine\Validator\Mapping;
 
+use Symfony\Component\Validator\Mapping\Cache\CacheInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Doctrine\Common\Cache\Cache;
 

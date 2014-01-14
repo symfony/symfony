@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.5.0
+-----
+
+ * added Validator\Mapping\DoctrineCache class
+
 2.2.0
 -----
 

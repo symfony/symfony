@@ -453,7 +453,7 @@ UPGRADE FROM 2.x to 3.0
 ### Validator
 
  * The class `Symfony\Component\Validator\Mapping\Cache\ApcCache` has been removed in favor
-   of `Symfony\Component\Validator\Mapping\Cache\DoctrineCache`.
+   of `Symfony\Bridge\Doctrine\Validator\Mapping\DoctrineCache`.
 
    Before:
 
@@ -466,7 +466,7 @@ UPGRADE FROM 2.x to 3.0
    After:
 
    ```
-   use Symfony\Component\Validator\Mapping\Cache\DoctrineCache;
+   use Symfony\Bridge\Doctrine\Validator\Mapping\DoctrineCache;
    use Doctrine\Common\Cache\ApcCache;
 
    $apcCache = new ApcCache();

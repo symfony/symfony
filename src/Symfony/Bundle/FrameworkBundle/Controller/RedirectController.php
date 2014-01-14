@@ -15,6 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
@@ -39,11 +40,13 @@ class RedirectController extends ContainerAware
      * @param Boolean|array $ignoreAttributes Whether to ignore attributes or an array of attributes to ignore
      *
      * @return Response A Response instance
+     *
+     * @throws HttpException In case the route name is empty
      */
     public function redirectAction(Request $request, $route, $permanent = false, $ignoreAttributes = false)
     {
         if ('' == $route) {
-            return new Response(null, $permanent ? 410 : 404);
+            throw new HttpException($permanent ? 410 : 404);
         }
 
         $attributes = array();
@@ -75,11 +78,13 @@ class RedirectController extends ContainerAware
      * @param integer|null $httpsPort The HTTPS port (null to keep the current one for the same scheme or the configured port in the container)
      *
      * @return Response A Response instance
+     *
+     * @throws HttpException In case the path is empty
      */
     public function urlRedirectAction(Request $request, $path, $permanent = false, $scheme = null, $httpPort = null, $httpsPort = null)
     {
         if ('' == $path) {
-            return new Response(null, $permanent ? 410 : 404);
+            throw new HttpException($permanent ? 410 : 404);
         }
 
         $statusCode = $permanent ? 301 : 302;

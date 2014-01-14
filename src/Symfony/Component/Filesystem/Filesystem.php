@@ -459,6 +459,31 @@ class Filesystem
     }
 
     /**
+     * @param  string      $path
+     * @param  string      $pattern
+     * @param  bool        $appendSeparator
+     * @throws IOException
+     * @return array
+     */
+    public function search($path, $pattern, $appendSeparator = true)
+    {
+        if (!$this->exists($path)) {
+            throw new IOException(sprintf('Specified path "%s" does not exist.', $path));
+        }
+        // Append trailing directory separator if it wasn't provided
+        if ($appendSeparator && substr($path, -1) !== DIRECTORY_SEPARATOR) {
+            $path .= DIRECTORY_SEPARATOR;
+        }
+        $searchPattern = $path . $pattern;
+        $results = glob($searchPattern);
+        if (false === $results) {
+            throw new IOException(sprintf('Unknown error occurred while searching "%s".', $searchPattern));
+        }
+
+        return $results;
+    }
+
+    /**
      * @param mixed $files
      *
      * @return \Traversable

@@ -77,7 +77,7 @@ class ChoiceType extends AbstractType
             }
         } else {
             if ($options['multiple']) {
-                $builder->addViewTransformer(new ChoicesToValuesTransformer($options['choice_list']));
+                $builder->addViewTransformer(new ChoicesToValuesTransformer($options['choice_list'], $options['ignore_invalid_choices']));
             } else {
                 $builder->addViewTransformer(new ChoiceToValueTransformer($options['choice_list']));
             }

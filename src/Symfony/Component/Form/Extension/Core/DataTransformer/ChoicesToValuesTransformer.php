@@ -23,14 +23,18 @@ class ChoicesToValuesTransformer implements DataTransformerInterface
 {
     private $choiceList;
 
+    private $ignoreInvalidChoices;
+
     /**
      * Constructor.
      *
      * @param ChoiceListInterface $choiceList
+     * @param bool                $ignoreInvalidChoices
      */
-    public function __construct(ChoiceListInterface $choiceList)
+    public function __construct(ChoiceListInterface $choiceList, $ignoreInvalidChoices)
     {
         $this->choiceList = $choiceList;
+        $this->ignoreInvalidChoices = $ignoreInvalidChoices;
     }
 
     /**
@@ -74,7 +78,7 @@ class ChoicesToValuesTransformer implements DataTransformerInterface
 
         $choices = $this->choiceList->getChoicesForValues($array);
 
-        if (count($choices) !== count($array)) {
+        if (!$this->ignoreInvalidChoices && count($choices) !== count($array)) {
             throw new TransformationFailedException('Could not find all matching choices for the given values');
         }
 

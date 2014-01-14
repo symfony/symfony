@@ -155,16 +155,12 @@ StaticFile {
   }
 }
 EOF;
-        $tmpfile = tempnam(sys_get_temp_dir(), 'symfony_hhvm_config');
+        $tmpfile = $this->getContainer()->get('kernel')->getCacheDir().DIRECTORY_SEPARATOR.'hhvm-server-'.md5($config).'.hdf';
         file_put_contents($tmpfile, $config);
         $builder = new ProcessBuilder(array(PHP_BINARY, '-ms', "-c$tmpfile"));
         $builder->setWorkingDirectory($docroot);
         $builder->setTimeout(null);
-        $builder->getProcess()->run(function ($type, $buffer) use ($output, &$tmpfile) {
-            if (null !== $tmpfile) {
-                unlink($tmpfile);
-                $tmpfile = null;
-            }
+        $builder->getProcess()->run(function ($type, $buffer) use ($output) {
             if (OutputInterface::VERBOSITY_VERBOSE <= $output->getVerbosity()) {
                 $output->write($buffer);
             }

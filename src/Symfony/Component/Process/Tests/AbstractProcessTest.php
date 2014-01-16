@@ -592,6 +592,16 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $process->getErrorOutput();
     }
 
+    /**
+     * @expectedException \Symfony\Component\Process\Exception\LogicException
+     * @expectedExceptionMessage Process must be started before calling wait
+     */
+    public function testWaitProcessWithoutTimeoutNotStarted()
+    {
+        $process = $this->getProcess('php -m')->setTimeout(null);
+        $process->wait();
+    }
+
     private function verifyPosixIsEnabled()
     {
         if (defined('PHP_WINDOWS_VERSION_BUILD')) {

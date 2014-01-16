@@ -298,9 +298,14 @@ class Process
      *
      * @throws RuntimeException When process timed out
      * @throws RuntimeException When process stopped after receiving signal
+     * @throws LogicException When process is not started
      */
     public function wait($callback = null)
     {
+        if (!$this->isStarted()) {
+            throw new LogicException(sprintf('Process must be started before calling %s', __FUNCTION__));
+        }
+
         $this->updateStatus(false);
         if (null !== $callback) {
             $this->callback = $this->buildCallback($callback);

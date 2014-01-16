@@ -35,6 +35,19 @@ class ProcessBuilder
         $this->arguments = $arguments;
     }
 
+    /**
+     * @param array $arguments
+     *
+     * @return ProcessBuilder
+     */
+    public function pipe(array $arguments = array())
+    {
+        $currentProcessBuilder = $this->getProcess();
+        $currentProcessBuilder->run();
+
+        return ProcessBuilder::create($arguments)->setInput($currentProcessBuilder->getOutput());
+    }
+
     public static function create(array $arguments = array())
     {
         return new static($arguments);

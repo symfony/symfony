@@ -46,14 +46,9 @@ class SecurityContext implements SecurityContextInterface
     }
 
     /**
-     * Checks if the attributes are granted against the current token.
+     * {@inheritdoc}
      *
      * @throws AuthenticationCredentialsNotFoundException when the security context has no authentication token.
-     *
-     * @param mixed      $attributes
-     * @param mixed|null $object
-     *
-     * @return Boolean
      */
     final public function isGranted($attributes, $object = null)
     {
@@ -73,9 +68,7 @@ class SecurityContext implements SecurityContextInterface
     }
 
     /**
-     * Gets the currently authenticated token.
-     *
-     * @return TokenInterface|null A TokenInterface instance or null if no authentication information is available
+     * {@inheritdoc}
      */
     public function getToken()
     {
@@ -83,9 +76,7 @@ class SecurityContext implements SecurityContextInterface
     }
 
     /**
-     * Sets the currently authenticated token.
-     *
-     * @param TokenInterface $token A TokenInterface token, or null if no further authentication information should be stored
+     * {@inheritdoc}
      */
     public function setToken(TokenInterface $token = null)
     {

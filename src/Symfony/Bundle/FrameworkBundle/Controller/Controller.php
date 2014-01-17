@@ -140,8 +140,8 @@ class Controller extends ContainerAware
      *
      *     throw $this->createNotFoundException('Page not found!');
      *
-     * @param string     $message  A message
-     * @param \Exception $previous The previous exception
+     * @param string          $message  A message
+     * @param \Exception|null $previous The previous exception
      *
      * @return NotFoundHttpException
      */
@@ -151,14 +151,14 @@ class Controller extends ContainerAware
     }
 
     /**
-     * Returns a AccessDeniedException.
+     * Returns an AccessDeniedException.
      *
      * This will result in a 403 response code. Usage example:
      *
      *     throw $this->createAccessDeniedException('Unable to access this page!');
      *
-     * @param string     $message  A message
-     * @param \Exception $previous The previous exception
+     * @param string          $message  A message
+     * @param \Exception|null $previous The previous exception
      *
      * @return AccessDeniedException
      */

@@ -48,11 +48,6 @@ class WebDebugToolbarListener implements EventSubscriberInterface
         $this->position = $position;
     }
 
-    public function isEnabled()
-    {
-        return self::DISABLED !== $this->mode;
-    }
-
     public function onKernelResponse(FilterResponseEvent $event)
     {
         $response = $event->getResponse();

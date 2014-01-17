@@ -242,6 +242,42 @@
                 <source>This value is not a valid ISSN.</source>
                 <target>Dëse Wäert ass keng gëlteg ISSN.</target>
             </trans-unit>
+            <trans-unit id="64">
+                <source>This value is not a valid currency.</source>
+                <target>Dëse Wäert ass keng gëlteg Währung.</target>
+            </trans-unit>
+            <trans-unit id="65">
+                <source>This value should be equal to {{ compared_value }}.</source>
+                <target>Dëse Wäert sollt {{ compared_value }} sinn.</target>
+            </trans-unit>
+            <trans-unit id="66">
+                <source>This value should be greater than {{ compared_value }}.</source>
+                <target>Dëse Wäert sollt méi grouss wéi {{ compared_value }} sinn.</target>
+            </trans-unit>
+            <trans-unit id="67">
+                <source>This value should be greater than or equal to {{ compared_value }}.</source>
+                <target>Dëse Wäert sollt méi grouss wéi oder gläich {{ compared_value }} sinn.</target>
+            </trans-unit>
+            <trans-unit id="68">
+                <source>This value should be identical to {{ compared_value_type }} {{ compared_value }}.</source>
+                <target>Dëse Wäert sollt identesch si mat {{ compared_value_type }} {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="69">
+                <source>This value should be less than {{ compared_value }}.</source>
+                <target>Dëse Wäert sollt méi kleng wéi {{ compared_value }} sinn.</target>
+            </trans-unit>
+            <trans-unit id="70">
+                <source>This value should be less than or equal to {{ compared_value }}.</source>
+                <target>Dëse Wäert sollt méi kleng wéi oder gläich {{ compared_value }} sinn.</target>
+            </trans-unit>
+            <trans-unit id="71">
+                <source>This value should not be equal to {{ compared_value }}.</source>
+                <target>Dëse Wäert sollt net {{ compared_value }} sinn.</target>
+            </trans-unit>
+            <trans-unit id="72">
+                <source>This value should not be identical to {{ compared_value_type }} {{ compared_value }}.</source>
+                <target>Dëse Wäert sollt net identesch si mat {{ compared_value_type }} {{ compared_value }}.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

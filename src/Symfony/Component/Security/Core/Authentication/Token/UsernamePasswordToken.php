@@ -60,11 +60,19 @@ class UsernamePasswordToken extends AbstractToken
         parent::setAuthenticated(false);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getCredentials()
     {
         return $this->credentials;
     }
 
+    /**
+     * Returns the provider key.
+     *
+     * @return string The provider key
+     */
     public function getProviderKey()
     {
         return $this->providerKey;

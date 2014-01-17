@@ -272,11 +272,11 @@
             </trans-unit>
             <trans-unit id="71">
                 <source>This value should not be equal to {{ compared_value }}.</source>
-                <target>Deze waarde moet niet gelijk zijn aan {{ compared_value }}.</target>
+                <target>Deze waarde mag niet gelijk zijn aan {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="72">
-                <source>This valuemahould not be identical to {{ compared_value }}.</source>
-                <target>Deze waarde moet niet identiek zijn aan {{ compared_value }}.</target>
+                <source>This value should not be identical to {{ compared_value }}.</source>
+                <target>Deze waarde mag niet identiek zijn aan {{ compared_value }}.</target>
             </trans-unit>
         </body>
     </file>

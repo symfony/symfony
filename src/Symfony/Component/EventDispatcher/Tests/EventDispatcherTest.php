@@ -183,6 +183,16 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->dispatcher->hasListeners(self::postFoo));
     }
 
+    /**
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage The EventSubscriber "Symfony\Component\EventDispatcher\Tests\TestEventSubscriberTypo" is mis configured. Did you mean "0 => 'pre.foo'" ?
+     */
+    public function testAddSubscriberThrowExceptionIfSubscriberMisConfigured()
+    {
+        $eventSubscriber = new TestEventSubscriberTypo();
+        $this->dispatcher->addSubscriber($eventSubscriber);
+    }
+
     public function testAddSubscriberWithPriorities()
     {
         $eventSubscriber = new TestEventSubscriber();
@@ -319,6 +329,17 @@ class TestEventSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array('pre.foo' => 'preFoo', 'post.foo' => 'postFoo');
+    }
+}
+
+class TestEventSubscriberTypo implements EventSubscriberInterface
+{
+    public static function getSubscribedEvents()
+    {
+        // User should use:
+        // return array('pre.foo' => 'preFoo');
+        // instead of:
+        return array('pre.foo', 'preFoo');
     }
 }
 

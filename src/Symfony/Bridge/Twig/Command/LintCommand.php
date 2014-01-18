@@ -11,8 +11,13 @@
 
 namespace Symfony\Bridge\Twig\Command;
 
+if (!defined('JSON_PRETTY_PRINT')) {
+    define('JSON_PRETTY_PRINT', 128);
+}
+
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
 
@@ -56,6 +61,7 @@ class LintCommand extends Command
     {
         $this
             ->setDescription('Lints a template and outputs encountered errors')
+            ->addOption('format', null, InputOption::VALUE_REQUIRED, 'The output format', 'txt')
             ->addArgument('filename')
             ->setHelp(<<<EOF
 The <info>%command.name%</info> command lints a template and outputs to STDOUT
@@ -68,6 +74,7 @@ You can validate the syntax of a file:
 Or of a whole directory:
 
 <info>php %command.full_name% dirname</info>
+<info>php %command.full_name% dirname --format=json</info>
 
 You can also pass the template contents from STDIN:
 
@@ -80,7 +87,6 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $twig = $this->getTwigEnvironment();
-        $template = null;
         $filename = $input->getArgument('filename');
 
         if (!$filename) {
@@ -88,21 +94,20 @@ EOF
                 throw new \RuntimeException("Please provide a filename or pipe template content to STDIN.");
             }
 
+            $template = '';
             while (!feof(STDIN)) {
                 $template .= fread(STDIN, 1024);
             }
 
-            return $this->validateTemplate($twig, $output, $template);
+            return $this->display($input, $output, array($this->validate($twig, $template)));
         }
 
-        $files = $this->findFiles($filename);
-
-        $errors = 0;
-        foreach ($files as $file) {
-            $errors += $this->validateTemplate($twig, $output, file_get_contents($file), $file);
+        $filesInfo = array();
+        foreach ($this->findFiles($filename) as $file) {
+            $filesInfo[] = $this->validate($twig, file_get_contents($file), $file);
         }
 
-        return $errors > 0 ? 1 : 0;
+        return $this->display($input, $output, $filesInfo);
     }
 
     protected function findFiles($filename)
@@ -116,24 +121,69 @@ EOF
         throw new \RuntimeException(sprintf('File or directory "%s" is not readable', $filename));
     }
 
-    protected function validateTemplate(\Twig_Environment $twig, OutputInterface $output, $template, $file = null)
+    private function validate(\Twig_Environment $twig, $template, $file = null)
     {
         try {
             $twig->parse($twig->tokenize($template, $file ? (string) $file : null));
-            $output->writeln('<info>OK</info>'.($file ? sprintf(' in %s', $file) : ''));
         } catch (\Twig_Error $e) {
-            $this->renderException($output, $template, $e, $file);
-
-            return 1;
+            return array('template' => $template, 'file' => $file, 'valid' => false, 'exception' => $e);
         }
 
-        return 0;
+        return array('template' => $template, 'file' => $file, 'valid' => true);
     }
 
-    protected function renderException(OutputInterface $output, $template, \Twig_Error $exception, $file = null)
+    private function display(InputInterface $input, OutputInterface $output, $files)
+    {
+        switch ($input->getOption('format')) {
+            case 'txt':
+                return $this->displayTxt($output, $files);
+            case 'json':
+                return $this->displayJson($output, $files);
+            default:
+                throw new \InvalidArgumentException(sprintf('The format "%s" is not supported.', $input->getOption('format')));
+        }
+    }
+
+    private function displayTxt(OutputInterface $output, $filesInfo)
+    {
+        $errors = 0;
+
+        foreach ($filesInfo as $info) {
+            if ($info['valid'] && $output->isVerbose()) {
+                $output->writeln('<info>OK</info>'.($info['file'] ? sprintf(' in %s', $info['file']) : ''));
+            } elseif (!$info['valid']) {
+                $errors++;
+                $this->renderException($output, $info['template'], $info['exception'], $info['file']);
+            }
+        }
+
+        $output->writeln(sprintf('<comment>%d/%d valid files</comment>', count($filesInfo) - $errors, count($filesInfo)));
+
+        return min($errors, 1);
+    }
+
+    private function displayJson(OutputInterface $output, $filesInfo)
+    {
+        $errors = 0;
+
+        array_walk($filesInfo, function (&$v) use (&$errors) {
+            $v['file'] = (string) $v['file'];
+            unset($v['template']);
+            if (!$v['valid']) {
+                $v['message'] = $v['exception']->getMessage();
+                unset($v['exception']);
+                $errors++;
+            }
+        });
+
+        $output->writeln(json_encode($filesInfo, JSON_PRETTY_PRINT));
+
+        return min($errors, 1);
+    }
+
+    private function renderException(OutputInterface $output, $template, \Twig_Error $exception, $file = null)
     {
         $line =  $exception->getTemplateLine();
-        $lines = $this->getContext($template, $line);
 
         if ($file) {
             $output->writeln(sprintf("<error>KO</error> in %s (line %s)", $file, $line));
@@ -141,7 +191,7 @@ EOF
             $output->writeln(sprintf("<error>KO</error> (line %s)", $line));
         }
 
-        foreach ($lines as $no => $code) {
+        foreach ($this->getContext($template, $line) as $no => $code) {
             $output->writeln(sprintf(
                 "%s %-6s %s",
                 $no == $line ? '<error>>></error>' : '  ',
@@ -154,7 +204,7 @@ EOF
         }
     }
 
-    protected function getContext($template, $line, $context = 3)
+    private function getContext($template, $line, $context = 3)
     {
         $lines = explode("\n", $template);
 

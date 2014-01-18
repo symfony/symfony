@@ -11,9 +11,10 @@
 
 namespace Symfony\Bridge\Twig\Tests\Command;
 
-use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Component\Console\Application;
 use Symfony\Bridge\Twig\Command\LintCommand;
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Tester\CommandTester;
 
 /**
  * @covers \Symfony\Bridge\Twig\Command\LintCommand
@@ -27,7 +28,7 @@ class LintCommandTest extends \PHPUnit_Framework_TestCase
         $tester = $this->createCommandTester();
         $filename = $this->createFile('{{ foo }}');
 
-        $ret = $tester->execute(array('filename' => $filename));
+        $ret = $tester->execute(array('filename' => $filename), array('verbosity' => OutputInterface::VERBOSITY_VERBOSE));
 
         $this->assertEquals(0, $ret, 'Returns 0 in case of success');
         $this->assertRegExp('/^OK in /', $tester->getDisplay());

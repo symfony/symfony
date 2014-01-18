@@ -58,21 +58,20 @@ class LintCommand extends Command
             ->setDescription('Lints a template and outputs encountered errors')
             ->addArgument('filename')
             ->setHelp(<<<EOF
-The <info>%command.name%</info> command lints a template and outputs to stdout
+The <info>%command.name%</info> command lints a template and outputs to STDOUT
 the first encountered syntax error.
+
+You can validate the syntax of a file:
 
 <info>php %command.full_name% filename</info>
 
-The command gets the contents of <comment>filename</comment> and validates its syntax.
+Or of a whole directory:
 
 <info>php %command.full_name% dirname</info>
 
-The command finds all twig templates in <comment>dirname</comment> and validates the syntax
-of each Twig template.
+You can also pass the template contents from STDIN:
 
 <info>cat filename | php %command.full_name%</info>
-
-The command gets the template contents from stdin and validates its syntax.
 EOF
             )
         ;
@@ -86,7 +85,7 @@ EOF
 
         if (!$filename) {
             if (0 !== ftell(STDIN)) {
-                throw new \RuntimeException("Please provide a filename or pipe template content to stdin.");
+                throw new \RuntimeException("Please provide a filename or pipe template content to STDIN.");
             }
 
             while (!feof(STDIN)) {

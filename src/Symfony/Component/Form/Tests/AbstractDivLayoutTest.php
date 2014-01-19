@@ -290,6 +290,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/div
+    [@data-form-widget="collection"]
     [
         ./div[./input[@type="text"][@value="a"]]
         /following-sibling::div[./input[@type="text"][@value="b"]]
@@ -312,6 +313,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/div
+    [@data-form-widget="collection"]
     [
         ./div[./div/div/input[@type="text"][@value="a"]]
         /following-sibling::div[./div/div/textarea[.="b"]]
@@ -330,6 +332,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/div
+    [@data-form-widget="collection"]
     [./input[@type="hidden"][@id="name__token"]]
     [count(./div)=0]
 '
@@ -351,6 +354,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/div
+    [@data-form-widget="collection"]
     [
         ./div
             [
@@ -676,6 +680,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/div
+    [@data-form-widget="collection"]
     [
         ./div[./label[.="Custom label: [trans]0[/trans]"]]
         /following-sibling::div[./label[.="Custom label: [trans]1[/trans]"]]

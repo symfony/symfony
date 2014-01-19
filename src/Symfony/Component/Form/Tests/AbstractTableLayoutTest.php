@@ -200,6 +200,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/table
+    [@data-form-widget="collection"]
     [
         ./tr[./td/input[@type="text"][@value="a"]]
         /following-sibling::tr[./td/input[@type="text"][@value="b"]]
@@ -218,6 +219,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/table
+    [@data-form-widget="collection"]
     [./tr[@style="display: none"][./td[@colspan="2"]/input[@type="hidden"][@id="name__token"]]]
     [count(./tr[./td/input])=1]
 '
@@ -445,6 +447,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/table
+    [@data-form-widget="collection"]
     [
         ./tr[./td/label[.="Custom label: [trans]0[/trans]"]]
         /following-sibling::tr[./td/label[.="Custom label: [trans]1[/trans]"]]

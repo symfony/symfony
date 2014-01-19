@@ -72,10 +72,11 @@ class ExecutableFinder
             );
         }
 
-        $suffixes = array('');
+        $suffixes = $this->suffixes;
         if (defined('PHP_WINDOWS_VERSION_BUILD')) {
-            $pathExt = getenv('PATHEXT');
-            $suffixes = $pathExt ? explode(PATH_SEPARATOR, $pathExt) : $this->suffixes;
+            if ($pathExt = getenv('PATHEXT')) {
+                $suffixes = explode(PATH_SEPARATOR, $pathExt);
+            }
         }
         foreach ($suffixes as $suffix) {
             foreach ($dirs as $dir) {

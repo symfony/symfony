@@ -21,6 +21,9 @@ use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Helper\HelperSet;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Console\ConsoleEvents;
+use Symfony\Component\Console\Event\ConsoleCommandInitializeEvent;
 
 /**
  * Base class for all commands.
@@ -44,6 +47,7 @@ class Command
     private $code;
     private $synopsis;
     private $helperSet;
+    private $dispatcher;
 
     /**
      * Constructor.
@@ -67,6 +71,11 @@ class Command
         if (!$this->name) {
             throw new \LogicException('The command name cannot be empty.');
         }
+    }
+
+    public function setDispatcher(EventDispatcher $dispatcher)
+    {
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -236,6 +245,11 @@ class Command
             if (!$this->ignoreValidationErrors) {
                 throw $e;
             }
+        }
+
+        if (null !== $this->dispatcher) {
+            $event = new ConsoleCommandInitializeEvent($this, $input, $output);
+            $this->dispatcher->dispatch(ConsoleEvents::COMMAND_INITIALIZE, $event);
         }
 
         $this->initialize($input, $output);

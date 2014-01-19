@@ -811,9 +811,10 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
     public function testRunWithDispatcher()
     {
+        $dispatcher = $this->getDispatcher();
         $application = new Application();
         $application->setAutoExit(false);
-        $application->setDispatcher($this->getDispatcher());
+        $application->setDispatcher($dispatcher);
 
         $application->register('foo')->setCode(function (InputInterface $input, OutputInterface $output) {
             $output->write('foo.');
@@ -822,6 +823,16 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $tester = new ApplicationTester($application);
         $tester->run(array('command' => 'foo'));
         $this->assertEquals('before.foo.after.', $tester->getDisplay());
+
+        $command = $application->get('foo');
+
+        $refl = new \ReflectionClass(get_class($command));
+        $reflProp = $refl->getProperty('dispatcher');
+        $reflProp->setAccessible(true);
+        $commandDispatcher = $reflProp->getValue($command);
+
+        $this->assertNotNull($commandDispatcher);
+        $this->assertSame($dispatcher, $commandDispatcher);
     }
 
     /**

@@ -22,6 +22,8 @@ use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Console\Event\ConsoleCommandInitializeEvent;
 
 class CommandTest extends \PHPUnit_Framework_TestCase
 {
@@ -279,6 +281,27 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $command = new \TestCommand();
 
         $this->assertSame(0, $command->run(new StringInput(''), new NullOutput()));
+    }
+
+    public function testRunWithDispatcher()
+    {
+        $testCase = $this;
+
+        $command = new \TestCommand();
+        $in = new StringInput('');
+        $out = new NullOutput();
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener('console.command-initialize',
+            function (ConsoleCommandInitializeEvent $event) use ($testCase, $command, $in, $out) {
+                $testCase->assertSame($command, $event->getCommand());
+                $testCase->assertSame($in, $event->getInput());
+                $testCase->assertSame($out, $event->getOutput());
+            }
+        );
+        $command->setDispatcher($dispatcher);
+
+        $command->run($in, $out);
     }
 
     public function testSetCode()

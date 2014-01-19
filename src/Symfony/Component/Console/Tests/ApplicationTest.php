@@ -29,6 +29,7 @@ use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleExceptionEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Console\Event\ConsoleCommandAddEvent;
 
 class ApplicationTest extends \PHPUnit_Framework_TestCase
 {
@@ -127,6 +128,17 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $application->addCommands(array($foo = new \FooCommand(), $foo1 = new \Foo1Command()));
         $commands = $application->all();
         $this->assertEquals(array($foo, $foo1), array($commands['foo:bar'], $commands['foo:bar1']), '->addCommands() registers an array of commands');
+    }
+
+    public function testAddWithDispatcher()
+    {
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->setDispatcher($this->getDispatcher());
+        $application->add(new \FooCommand());
+        $commands = $application->all();
+        $this->assertArrayHasKey('foo:bar', $commands, 'Command has been registered');
+        $this->assertEquals('Description set by command add listener', $commands['foo:bar']->getDescription());
     }
 
     /**
@@ -890,6 +902,10 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
             $event->getOutput()->writeln('caught.');
 
             $event->setException(new \LogicException('caught.', $event->getExitCode(), $event->getException()));
+        });
+        $dispatcher->addListener('console.command-add', function (ConsoleCommandAddEvent $event) {
+            $command = $event->getCommand();
+            $command->setDescription('Description set by command add listener');
         });
 
         return $dispatcher;

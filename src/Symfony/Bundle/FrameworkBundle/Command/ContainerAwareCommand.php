@@ -11,39 +11,24 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\Console\DependencyInjection\ContainerAwareCommand as BaseContainerAwareCommand;
 
 /**
  * Command.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-abstract class ContainerAwareCommand extends Command implements ContainerAwareInterface
+abstract class ContainerAwareCommand extends BaseContainerAwareCommand
 {
-    /**
-     * @var ContainerInterface|null
-     */
-    private $container;
-
     /**
      * @return ContainerInterface
      */
     protected function getContainer()
     {
-        if (null === $this->container) {
+        if (null === parent::getContainer()) {
             $this->container = $this->getApplication()->getKernel()->getContainer();
         }
 
-        return $this->container;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
+        return parent::getContainer();
     }
 }

@@ -244,7 +244,7 @@
             </trans-unit>
             <trans-unit id="64">
                 <source>This value is not a valid currency.</source>
-                <target>العُملة غير صحيحة</target>
+                <target>العُملة غير صحيحة.</target>
             </trans-unit>
             <trans-unit id="65">
                 <source>This value should be equal to {{ compared_value }}.</source>

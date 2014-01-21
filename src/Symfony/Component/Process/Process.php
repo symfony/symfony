@@ -730,7 +730,7 @@ class Process
     }
 
     /**
-     * Gets the process timeout.
+     * Gets the process timeout (max. runtime).
      *
      * @return float|null The timeout in seconds or null if it's disabled
      */
@@ -740,9 +740,9 @@ class Process
     }
 
     /**
-     * Gets the process idle timeout.
+     * Gets the process idle timeout (max. time since last output).
      *
-     * @return float|null
+     * @return float|null The timeout in seconds or null if it's disabled
      */
     public function getIdleTimeout()
     {
@@ -750,7 +750,7 @@ class Process
     }
 
     /**
-     * Sets the process timeout.
+     * Sets the process timeout (max. runtime).
      *
      * To disable the timeout, set this value to null.
      *
@@ -768,9 +768,11 @@ class Process
     }
 
     /**
-     * Sets the process idle timeout.
+     * Sets the process idle timeout (max. time since last output).
      *
-     * @param integer|float|null $timeout
+     * To disable the timeout, set this value to null.
+     *
+     * @param integer|float|null $timeout The timeout in seconds
      *
      * @return self The current Process instance.
      *
@@ -991,7 +993,7 @@ class Process
             throw new ProcessTimedOutException($this, ProcessTimedOutException::TYPE_GENERAL);
         }
 
-        if (0 < $this->idleTimeout && $this->idleTimeout < microtime(true) - $this->lastOutputTime) {
+        if (null !== $this->idleTimeout && $this->idleTimeout < microtime(true) - $this->lastOutputTime) {
             $this->stop(0);
 
             throw new ProcessTimedOutException($this, ProcessTimedOutException::TYPE_IDLE);

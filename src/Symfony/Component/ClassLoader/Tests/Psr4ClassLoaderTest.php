@@ -68,4 +68,4 @@ class Psr4ClassLoaderTest extends \PHPUnit_Framework_TestCase
             array('UnknownVendor\\SomeLib\\I_Do_Not_Exist')
         );
     }
-} 
+}

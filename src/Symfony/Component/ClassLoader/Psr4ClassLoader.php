@@ -12,9 +12,9 @@
 namespace Symfony\Component\ClassLoader;
 
 /**
- * ClassLoader implements an PSR-4 class loader
+ * A PSR-4 compatible class loader.
  *
- * See https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-4-autoloader.md
+ * See http://www.php-fig.org/psr/psr-4/
  *
  * @author Alexander M. Turek <me@derrabus.de>
  */
@@ -31,13 +31,14 @@ class Psr4ClassLoader
      */
     public function addPrefix($prefix, $baseDir)
     {
-        $prefix = trim($prefix, '\\') . '\\';
+        $prefix = trim($prefix, '\\').'\\';
         $baseDir = rtrim($baseDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
         $this->prefixes[] = array($prefix, $baseDir);
     }
 
     /**
      * @param string $class
+     *
      * @return string|null
      */
     public function findFile($class)
@@ -46,7 +47,7 @@ class Psr4ClassLoader
 
         foreach ($this->prefixes as $current) {
             list($currentPrefix, $currentBaseDir) = $current;
-            if (strpos($class, $currentPrefix) === 0) {
+            if (0 === strpos($class, $currentPrefix)) {
                 $classWithoutPrefix = substr($class, strlen($currentPrefix));
                 $file = $currentBaseDir . str_replace('\\', DIRECTORY_SEPARATOR, $classWithoutPrefix) . '.php';
                 if (file_exists($file)) {
@@ -60,12 +61,13 @@ class Psr4ClassLoader
 
     /**
      * @param string $class
+     *
      * @return bool
      */
     public function loadClass($class)
     {
         $file = $this->findFile($class);
-        if ($file !== null) {
+        if (null !== $file) {
             require $file;
 
             return true;

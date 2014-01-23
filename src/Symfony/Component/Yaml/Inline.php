@@ -26,18 +26,20 @@ class Inline
     private static $exceptionOnInvalidType = false;
     private static $objectSupport = false;
 
+
     /**
      * Converts a YAML string to a PHP array.
      *
      * @param string  $value                  A YAML string
      * @param Boolean $exceptionOnInvalidType true if an exception must be thrown on invalid types (a PHP resource or object), false otherwise
      * @param Boolean $objectSupport          true if object support is enabled, false otherwise
+     * @param Boolean $objectForMap           true if maps should return a stdClass instead of array()
      *
+     * @throws Exception\ParseException
      * @return array A PHP array representing the YAML string
      *
-     * @throws ParseException
      */
-    public static function parse($value, $exceptionOnInvalidType = false, $objectSupport = false)
+    public static function parse($value, $exceptionOnInvalidType = false, $objectSupport = false, $objectForMap = false)
     {
         self::$exceptionOnInvalidType = $exceptionOnInvalidType;
         self::$objectSupport = $objectSupport;
@@ -56,11 +58,11 @@ class Inline
         $i = 0;
         switch ($value[0]) {
             case '[':
-                $result = self::parseSequence($value, $i);
+                $result = self::parseSequence($value, $i, $objectForMap);
                 ++$i;
                 break;
             case '{':
-                $result = self::parseMapping($value, $i);
+                $result = self::parseMapping($value, $i, $objectForMap);
                 ++$i;
                 break;
             default:
@@ -256,17 +258,18 @@ class Inline
         return $output;
     }
 
+
     /**
      * Parses a sequence to a YAML string.
      *
-     * @param string $sequence
+     * @param string  $sequence
      * @param integer &$i
+     * @param Boolean $objectForMap true if maps should return a stdClass instead of array()
      *
+     * @throws Exception\ParseException
      * @return string A YAML string
-     *
-     * @throws ParseException When malformed inline YAML string is parsed
      */
-    private static function parseSequence($sequence, &$i = 0)
+    private static function parseSequence($sequence, &$i = 0, $objectForMap = false)
     {
         $output = array();
         $len = strlen($sequence);
@@ -277,11 +280,11 @@ class Inline
             switch ($sequence[$i]) {
                 case '[':
                     // nested sequence
-                    $output[] = self::parseSequence($sequence, $i);
+                    $output[] = self::parseSequence($sequence, $i, $objectForMap);
                     break;
                 case '{':
                     // nested mapping
-                    $output[] = self::parseMapping($sequence, $i);
+                    $output[] = self::parseMapping($sequence, $i, $objectForMap);
                     break;
                 case ']':
                     return $output;
@@ -295,7 +298,8 @@ class Inline
                     if (!$isQuoted && false !== strpos($value, ': ')) {
                         // embedded mapping?
                         try {
-                            $value = self::parseMapping('{'.$value.'}');
+                            $j = 0;
+                            $value = self::parseMapping('{'.$value.'}', $j, $objectForMap);
                         } catch (\InvalidArgumentException $e) {
                             // no, it's not
                         }
@@ -312,19 +316,26 @@ class Inline
         throw new ParseException(sprintf('Malformed inline YAML string %s', $sequence));
     }
 
+
     /**
      * Parses a mapping to a YAML string.
      *
-     * @param string $mapping
+     * @param string  $mapping
      * @param integer &$i
+     * @param Boolean $objectForMap    true if maps should return a stdClass instead of array()
      *
+     * @throws Exception\ParseException
      * @return string A YAML string
      *
-     * @throws ParseException When malformed inline YAML string is parsed
      */
-    private static function parseMapping($mapping, &$i = 0)
+    private static function parseMapping($mapping, &$i = 0, $objectForMap = false)
     {
-        $output = array();
+        if ($objectForMap === true) {
+            $output = new \stdClass();
+        } else {
+            $output = array();
+        }
+
         $len = strlen($mapping);
         $i += 1;
 
@@ -344,23 +355,30 @@ class Inline
 
             // value
             $done = false;
+
+            if ($objectForMap === true) {
+                $editPosition = &$output->$key;
+            } else {
+                $editPosition = &$output[$key];
+            }
+
             while ($i < $len) {
                 switch ($mapping[$i]) {
                     case '[':
                         // nested sequence
-                        $output[$key] = self::parseSequence($mapping, $i);
+                        $editPosition = self::parseSequence($mapping, $i, $objectForMap);
                         $done = true;
                         break;
                     case '{':
                         // nested mapping
-                        $output[$key] = self::parseMapping($mapping, $i);
+                        $editPosition = self::parseMapping($mapping, $i, $objectForMap);
                         $done = true;
                         break;
                     case ':':
                     case ' ':
                         break;
                     default:
-                        $output[$key] = self::parseScalar($mapping, array(',', '}'), array('"', "'"), $i);
+                        $editPosition = self::parseScalar($mapping, array(',', '}'), array('"', "'"), $i);
                         $done = true;
                         --$i;
                 }

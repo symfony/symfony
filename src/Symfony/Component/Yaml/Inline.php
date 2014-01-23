@@ -29,15 +29,16 @@ class Inline
     /**
      * Converts a YAML string to a PHP array.
      *
-     * @param string  $value                  A YAML string
-     * @param bool    $exceptionOnInvalidType true if an exception must be thrown on invalid types (a PHP resource or object), false otherwise
-     * @param bool    $objectSupport          true if object support is enabled, false otherwise
+     * @param string $value                  A YAML string
+     * @param bool   $exceptionOnInvalidType true if an exception must be thrown on invalid types (a PHP resource or object), false otherwise
+     * @param bool   $objectSupport          true if object support is enabled, false otherwise
+     * @param bool   $objectForMap           true if maps should return a stdClass instead of array()
      *
      * @return array A PHP array representing the YAML string
      *
-     * @throws ParseException
+     * @throws Exception\ParseException
      */
-    public static function parse($value, $exceptionOnInvalidType = false, $objectSupport = false)
+    public static function parse($value, $exceptionOnInvalidType = false, $objectSupport = false, $objectForMap = false)
     {
         self::$exceptionOnInvalidType = $exceptionOnInvalidType;
         self::$objectSupport = $objectSupport;
@@ -56,11 +57,11 @@ class Inline
         $i = 0;
         switch ($value[0]) {
             case '[':
-                $result = self::parseSequence($value, $i);
+                $result = self::parseSequence($value, $i, $objectForMap);
                 ++$i;
                 break;
             case '{':
-                $result = self::parseMapping($value, $i);
+                $result = self::parseMapping($value, $i, $objectForMap);
                 ++$i;
                 break;
             default:
@@ -181,9 +182,9 @@ class Inline
     /**
      * Parses a scalar to a YAML string.
      *
-     * @param scalar $scalar
-     * @param string $delimiters
-     * @param array  $stringDelimiters
+     * @param scalar  $scalar
+     * @param string  $delimiters
+     * @param array   $stringDelimiters
      * @param int     &$i
      * @param bool    $evaluate
      *
@@ -232,7 +233,7 @@ class Inline
      * Parses a quoted scalar to YAML.
      *
      * @param string $scalar
-     * @param int     &$i
+     * @param int    &$i
      *
      * @return string A YAML string
      *
@@ -261,14 +262,15 @@ class Inline
     /**
      * Parses a sequence to a YAML string.
      *
-     * @param string $sequence
+     * @param string  $sequence
      * @param int     &$i
+     * @param bool    $objectForMap true if maps should return a stdClass instead of array()
      *
      * @return string A YAML string
      *
-     * @throws ParseException When malformed inline YAML string is parsed
+     * @throws Exception\ParseException
      */
-    private static function parseSequence($sequence, &$i = 0)
+    private static function parseSequence($sequence, &$i = 0, $objectForMap = false)
     {
         $output = array();
         $len = strlen($sequence);
@@ -279,11 +281,11 @@ class Inline
             switch ($sequence[$i]) {
                 case '[':
                     // nested sequence
-                    $output[] = self::parseSequence($sequence, $i);
+                    $output[] = self::parseSequence($sequence, $i, $objectForMap);
                     break;
                 case '{':
                     // nested mapping
-                    $output[] = self::parseMapping($sequence, $i);
+                    $output[] = self::parseMapping($sequence, $i, $objectForMap);
                     break;
                 case ']':
                     return $output;
@@ -297,7 +299,8 @@ class Inline
                     if (!$isQuoted && false !== strpos($value, ': ')) {
                         // embedded mapping?
                         try {
-                            $value = self::parseMapping('{'.$value.'}');
+                            $j = 0;
+                            $value = self::parseMapping('{'.$value.'}', $j, $objectForMap);
                         } catch (\InvalidArgumentException $e) {
                             // no, it's not
                         }
@@ -317,14 +320,15 @@ class Inline
     /**
      * Parses a mapping to a YAML string.
      *
-     * @param string $mapping
+     * @param string  $mapping
      * @param int     &$i
+     * @param bool    $objectForMap true if maps should return a stdClass instead of array()
      *
      * @return string A YAML string
      *
-     * @throws ParseException When malformed inline YAML string is parsed
+     * @throws Exception\ParseException
      */
-    private static function parseMapping($mapping, &$i = 0)
+    private static function parseMapping($mapping, &$i = 0, $objectForMap = false)
     {
         $output = array();
         $len = strlen($mapping);
@@ -338,6 +342,10 @@ class Inline
                     ++$i;
                     continue 2;
                 case '}':
+                    if (true === $objectForMap) {
+                        return (object) $output;
+                    }
+
                     return $output;
             }
 
@@ -346,11 +354,13 @@ class Inline
 
             // value
             $done = false;
+
+
             while ($i < $len) {
                 switch ($mapping[$i]) {
                     case '[':
                         // nested sequence
-                        $value = self::parseSequence($mapping, $i);
+                        $value = self::parseSequence($mapping, $i, $objectForMap);
                         // Spec: Keys MUST be unique; first one wins.
                         // Parser cannot abort this mapping earlier, since lines
                         // are processed sequentially.
@@ -361,7 +371,7 @@ class Inline
                         break;
                     case '{':
                         // nested mapping
-                        $value = self::parseMapping($mapping, $i);
+                        $value = self::parseMapping($mapping, $i, $objectForMap);
                         // Spec: Keys MUST be unique; first one wins.
                         // Parser cannot abort this mapping earlier, since lines
                         // are processed sequentially.
@@ -399,7 +409,7 @@ class Inline
     /**
      * Evaluates scalars and replaces magic values.
      *
-     * @param string $scalar
+     * @param string  $scalar
      *
      * @return string A YAML string
      */

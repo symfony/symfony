@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by cordoval at 2014-01-20T11:24:09Z
+
+does this need also a regression test?
+
+---------------------------------------------------------------------------
+
+by kbond at 2014-01-20T12:11:24Z
+
+I have simplified and added some tests.
+
+---------------------------------------------------------------------------
+
+by kbond at 2014-01-23T12:50:12Z
+
+I suppose this should be merged to the 2.3 branch.

@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2014-01-24T13:28:50Z
+
+:+1:
+https://github.com/florianv/symfony/blob/validator-xml/src/Symfony/Component/Validator/Mapping/Loader/AbstractLoader.php#L42 should also be changed to `mixed`
+
+---------------------------------------------------------------------------
+
+by florianv at 2014-01-24T13:42:54Z
+
+Thanks, yes this is what is expected by https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Validator/Constraint.php#L71

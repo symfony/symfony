@@ -105,7 +105,7 @@ class XmlFileLoader extends FileLoader
                 $options = null;
             }
 
-            $constraints[] = $this->newConstraint($node['name'], $options);
+            $constraints[] = $this->newConstraint((string) $node['name'], $options);
         }
 
         return $constraints;

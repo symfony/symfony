@@ -8,7 +8,7 @@
             </trans-unit>
             <trans-unit id="2">
                 <source>This value should be true.</source>
-                <target>Această valoare ar trebui să fie adevarătă (true).</target>
+                <target>Această valoare ar trebui să fie adevărată (true).</target>
             </trans-unit>
             <trans-unit id="3">
                 <source>This value should be of type {{ type }}.</source>
@@ -48,7 +48,7 @@
             </trans-unit>
             <trans-unit id="12">
                 <source>This value is not a valid datetime.</source>
-                <target>Această valoare nu reprezintă o dată și oră o valide.</target>
+                <target>Această valoare nu reprezintă o dată și oră validă.</target>
             </trans-unit>
             <trans-unit id="13">
                 <source>This value is not a valid email address.</source>
@@ -168,11 +168,11 @@
             </trans-unit>
             <trans-unit id="45">
                 <source>The image height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px.</source>
-                <target>Înlățimea imaginii este prea mare ({{ height }}px). Înălțimea maximă permisă este de {{ max_height }}px.</target>
+                <target>Înălțimea imaginii este prea mare ({{ height }}px). Înălțimea maximă permisă este de {{ max_height }}px.</target>
             </trans-unit>
             <trans-unit id="46">
                 <source>The image height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px.</source>
-                <target>Înlățimea imaginii este prea mică ({{ height }}px). Înălțimea minimă permisă este de {{ min_height }}px.</target>
+                <target>Înălțimea imaginii este prea mică ({{ height }}px). Înălțimea minimă permisă este de {{ min_height }}px.</target>
             </trans-unit>
             <trans-unit id="47">
                 <source>This value should be the user current password.</source>
@@ -276,7 +276,7 @@
             </trans-unit>
             <trans-unit id="72">
                 <source>This value should not be identical to {{ compared_value_type }} {{ compared_value }}.</source>
-                <target>Această valoare nu trebuie identică cu {{ compared_value_type }} {{ compared_value }}.</target>
+                <target>Această valoare nu trebuie să fie identică cu {{ compared_value_type }} {{ compared_value }}.</target>
             </trans-unit>
         </body>
     </file>

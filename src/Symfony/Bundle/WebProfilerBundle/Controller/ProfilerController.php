@@ -227,7 +227,7 @@ class ProfilerController
 
         $session = $request->getSession();
 
-        if (null !== $session && $session->getFlashBag() instanceof AutoExpireFlashBag) {
+        if (null !== $session && $session->isStarted() && $session->getFlashBag() instanceof AutoExpireFlashBag) {
             // keep current flashes for one more request if using AutoExpireFlashBag
             $session->getFlashBag()->setAll($session->getFlashBag()->peekAll());
         }

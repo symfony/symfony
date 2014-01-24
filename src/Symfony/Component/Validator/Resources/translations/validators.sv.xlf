@@ -132,7 +132,7 @@
             </trans-unit>
             <trans-unit id="36">
                 <source>This file is not a valid image.</source>
-                <target>Den är filen är ingen giltig bild.</target>
+                <target>Filen är ingen giltig bild.</target>
             </trans-unit>
             <trans-unit id="37">
                 <source>This is not a valid IP address.</source>
@@ -213,6 +213,70 @@
             <trans-unit id="56">
                 <source>This collection should contain exactly {{ limit }} element.|This collection should contain exactly {{ limit }} elements.</source>
                 <target>Den här samlingen ska innehålla exakt {{ limit }} element.|Den här samlingen ska innehålla exakt {{ limit }} element.</target>
+            </trans-unit>
+            <trans-unit id="57">
+                <source>Invalid card number.</source>
+                <target>Ogiltigt kortnummer.</target>
+            </trans-unit>
+            <trans-unit id="58">
+                <source>Unsupported card type or invalid card number.</source>
+                <target>Okänd korttyp eller ogiltigt kortnummer.</target>
+            </trans-unit>
+            <trans-unit id="59">
+                <source>This is not a valid International Bank Account Number (IBAN).</source>
+                <target>Det här är inte en giltig International Bank Account Number (IBANK).</target>
+            </trans-unit>
+            <trans-unit id="60">
+                <source>This value is not a valid ISBN-10.</source>
+                <target>Värdet är inte en giltig ISBN-10.</target>
+            </trans-unit>
+            <trans-unit id="61">
+                <source>This value is not a valid ISBN-13.</source>
+                <target>Värdet är inte en giltig ISBN-13.</target>
+            </trans-unit>
+            <trans-unit id="62">
+                <source>This value is neither a valid ISBN-10 nor a valid ISBN-13.</source>
+                <target>Värdet är varken en giltig ISBN-10 eller en giltig ISBN-13.</target>
+            </trans-unit>
+            <trans-unit id="63">
+                <source>This value is not a valid ISSN.</source>
+                <target>Värdet är inte en giltig ISSN.</target>
+            </trans-unit>
+            <trans-unit id="64">
+                <source>This value is not a valid currency.</source>
+                <target>Värdet är inte en giltig valuta.</target>
+            </trans-unit>
+            <trans-unit id="65">
+                <source>This value should be equal to {{ compared_value }}.</source>
+                <target>Värdet ska vara detsamma som {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="66">
+                <source>This value should be greater than {{ compared_value }}.</source>
+                <target>Värdet ska vara större än {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="67">
+                <source>This value should be greater than or equal to {{ compared_value }}.</source>
+                <target>Värdet ska bara större än eller detsamma som {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="68">
+                <source>This value should be identical to {{ compared_value_type }} {{ compared_value }}.</source>
+                <target>Värdet ska vara identiskt till {{ compared_value_type }} {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="69">
+                <source>This value should be less than {{ compared_value }}.</source>
+                <target>Värdet ska vara mindre än {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="70">
+                <source>This value should be less than or equal to {{ compared_value }}.</source>
+                <target>Värdet ska vara mindre än eller detsamma som {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="71">
+                <source>This value should not be equal to {{ compared_value }}.</source>
+                <target>Värdet ska inte vara detsamma som {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="72">
+                <source>This value should not be identical to {{ compared_value_type }} {{ compared_value }}.</source>
+                <target>Värdet ska inte vara identiskt med {{ compared_value_type }} {{ compared_value }}.</target>
             </trans-unit>
         </body>
     </file>

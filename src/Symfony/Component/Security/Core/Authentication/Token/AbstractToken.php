@@ -70,6 +70,9 @@ abstract class AbstractToken implements TokenInterface
         return (string) $this->user;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getUser()
     {
         return $this->user;

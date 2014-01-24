@@ -39,7 +39,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     public function getParent();
 
     /**
-     * Adds a child to the form.
+     * Add or replace child to the form.
      *
      * @param FormInterface|string|integer $child   The FormInterface instance or the name of the child.
      * @param string|null                  $type    The child's type, if a name was passed.

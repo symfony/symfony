@@ -57,10 +57,9 @@ class LintCommand extends BaseLintCommand implements ContainerAwareInterface
                 $this->getHelp().<<<EOF
 
 
-<info>php %command.full_name% @AcmeMyBundle</info>
+Or all template files in a bundle:
 
-The command finds all twig templates in the <comment>AcmeMyBundle</comment> bundle and validates
-the syntax of each Twig template.
+<info>php %command.full_name% @AcmeDemoBundle</info>
 EOF
             )
         ;

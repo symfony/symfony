@@ -132,6 +132,7 @@ class Constraints
                     return true;
                 }
             }
+
             return false;
         };
     }
@@ -156,6 +157,7 @@ class Constraints
                         return true;
                     }
                 }
+
                 return false;
             };
         }
@@ -168,6 +170,7 @@ class Constraints
                         return true;
                     }
                 }
+
                 return false;
             };
         }
@@ -187,6 +190,7 @@ class Constraints
                         return true;
                     }
                 }
+
                 return false;
             };
         }
@@ -199,6 +203,7 @@ class Constraints
                         return true;
                     }
                 }
+
                 return false;
             };
         }

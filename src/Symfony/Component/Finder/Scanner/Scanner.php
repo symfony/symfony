@@ -69,7 +69,7 @@ class Scanner implements \IteratorAggregate
                 if (!$this->constraints->isMaxDepthExceeded($relativeDepth)) {
                     $this->scanDirectory($relativePathname, $relativeDepth, $pathnameIncluded);
                 }
-            } elseif($keepFiles && $pathnameIncluded && $this->constraints->isFileKept($relativePathname, $filename)) {
+            } elseif ($keepFiles && $pathnameIncluded && $this->constraints->isFileKept($relativePathname, $filename)) {
                 $this->scannedFiles[$rootPathname] = new SplFileInfo($rootPathname, $relativePath, $relativePathname);
             }
         }

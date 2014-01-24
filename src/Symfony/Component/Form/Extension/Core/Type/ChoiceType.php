@@ -216,6 +216,10 @@ class ChoiceType extends AbstractType
             return $options['expanded'];
         };
 
+        $translationCount = function (Options $options) {
+            return $options['multiple'] ? 2 : 1;
+        };
+
         $resolver->setDefaults(array(
             'multiple'          => false,
             'expanded'          => false,
@@ -227,6 +231,7 @@ class ChoiceType extends AbstractType
             'placeholder'       => $placeholder,
             'error_bubbling'    => false,
             'compound'          => $compound,
+            'translation_count' => $translationCount,
             // The view data is always a string, even if the "data" option
             // is manually set to an object.
             // See https://github.com/symfony/symfony/pull/5582

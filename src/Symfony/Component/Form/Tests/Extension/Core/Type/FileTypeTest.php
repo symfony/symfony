@@ -74,6 +74,24 @@ class FileTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $this->assertEquals('', $view->vars['value']);
     }
 
+    public function testTranslationCountSingle()
+    {
+        $form = $this->factory->createBuilder('file')->getForm();
+        $view = $form->createView();
+
+        $this->assertEquals(1, $view->vars['translation_count']);
+    }
+
+    public function testTranslationCountMultiple()
+    {
+        $form = $this->factory->createBuilder('file', null, array(
+            'multiple' => true,
+        ))->getForm();
+        $view = $form->createView();
+
+        $this->assertEquals(2, $view->vars['translation_count']);
+    }
+
     private function createUploadedFileMock($name, $originalName, $valid)
     {
         $file = $this

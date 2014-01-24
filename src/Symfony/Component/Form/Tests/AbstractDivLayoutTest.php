@@ -49,7 +49,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         $this->assertMatchesXpath($html,
 '/div
     [
-        ./label[@for="name"][@class="my&label&class required"][.="[trans]foo&bar[/trans]"]
+        ./label[@for="name"][@class="my&label&class required"][.="[trans count=1]foo&bar[/trans]"]
         /following-sibling::input[@id="name"][@class="my&class"]
     ]
 '
@@ -534,12 +534,12 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
     [
         ./div
             [
-                ./label[@for="name_first"][.="[trans]Test[/trans]"]
+                ./label[@for="name_first"][.="[trans count=1]Test[/trans]"]
                 /following-sibling::input[@type="text"][@id="name_first"][@required="required"]
             ]
         /following-sibling::div
             [
-                ./label[@for="name_second"][.="[trans]Test2[/trans]"]
+                ./label[@for="name_second"][.="[trans count=1]Test2[/trans]"]
                 /following-sibling::input[@type="text"][@id="name_second"][@required="required"]
             ]
         /following-sibling::input[@type="hidden"][@id="name__token"]
@@ -677,9 +677,9 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/div
     [
-        ./div[./label[.="Custom label: [trans]0[/trans]"]]
-        /following-sibling::div[./label[.="Custom label: [trans]1[/trans]"]]
-        /following-sibling::div[./label[.="Custom label: [trans]2[/trans]"]]
+        ./div[./label[.="Custom label: [trans count=1]0[/trans]"]]
+        /following-sibling::div[./label[.="Custom label: [trans count=1]1[/trans]"]]
+        /following-sibling::div[./label[.="Custom label: [trans count=1]2[/trans]"]]
     ]
 '
         );
@@ -700,8 +700,8 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/div
     [
-        ./label[.="Custom name label: [trans]ChoiceA[/trans]"]
-        /following-sibling::label[.="Custom name label: [trans]ChoiceB[/trans]"]
+        ./label[.="Custom name label: [trans count=1]ChoiceA[/trans]"]
+        /following-sibling::label[.="Custom name label: [trans count=1]ChoiceB[/trans]"]
     ]
 '
         );

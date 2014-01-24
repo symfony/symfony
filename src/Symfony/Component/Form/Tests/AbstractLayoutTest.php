@@ -147,7 +147,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         $this->assertMatchesXpath($html,
 '/label
     [@for="name"]
-    [.="[trans]Name[/trans]"]
+    [.="[trans count=1]Name[/trans]"]
 '
         );
     }
@@ -162,7 +162,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         $this->assertMatchesXpath($html,
 '/label
     [@class="required"]
-    [.="[trans]Name[/trans]"]
+    [.="[trans count=1]Name[/trans]"]
 '
         );
     }
@@ -177,7 +177,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         $this->assertMatchesXpath($html,
 '/label
     [@for="name"]
-    [.="[trans]Custom label[/trans]"]
+    [.="[trans count=1]Custom label[/trans]"]
 '
         );
     }
@@ -190,7 +190,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         $this->assertMatchesXpath($html,
 '/label
     [@for="name"]
-    [.="[trans]Custom label[/trans]"]
+    [.="[trans count=1]Custom label[/trans]"]
 '
         );
     }
@@ -205,7 +205,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         $this->assertMatchesXpath($html,
 '/label
     [@for="name"]
-    [.="[trans]Overridden label[/trans]"]
+    [.="[trans count=1]Overridden label[/trans]"]
 '
         );
     }
@@ -257,7 +257,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 '/label
     [@for="name"]
     [@class="my&class required"]
-    [.="[trans]Custom label[/trans]"]
+    [.="[trans count=1]Custom label[/trans]"]
 '
         );
     }
@@ -278,7 +278,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
             '/label
     [@for="name"]
     [@class="my&class required"]
-    [.="[trans]Custom label[/trans]"]
+    [.="[trans count=1]Custom label[/trans]"]
 '
         );
     }
@@ -294,8 +294,35 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         $this->assertMatchesXpath($html,
 '/label
     [@for="myform_myfield"]
-    [.="[trans]form.myfield[/trans]"]
+    [.="[trans count=1]form.myfield[/trans]"]
 '
+        );
+    }
+
+    /**
+     * @dataProvider translationCountProvider
+     */
+    public function testLabelWithTranslationCount($translationCount)
+    {
+        $form = $this->factory->createNamed('name', 'text');
+        $html = $this->renderLabel($form->createView(), 'Custom label', array(
+            'translation_count' => $translationCount,
+        ));
+
+        $this->assertMatchesXpath($html,
+'/label
+    [@for="name"]
+    [.="[trans count='.$translationCount.']Custom label[/trans]"]
+'
+        );
+    }
+
+    public function translationCountProvider()
+    {
+        return array(
+            array(0),
+            array(1),
+            array(2),
         );
     }
 
@@ -310,7 +337,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         $this->assertMatchesXpath($html,
 '/label
     [@for="myform_myfield"]
-    [.="[trans]form.myform_myfield[/trans]"]
+    [.="[trans count=1]form.myform_myfield[/trans]"]
 '
         );
     }
@@ -328,7 +355,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         $this->assertMatchesXpath($html,
 '/label
     [@for="myform_myfield"]
-    [.="[trans]form.myfield[/trans]"]
+    [.="[trans count=1]form.myfield[/trans]"]
 '
         );
     }
@@ -346,7 +373,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         $this->assertMatchesXpath($html,
 '/label
     [@for="myform_myfield"]
-    [.="[trans]field.myfield[/trans]"]
+    [.="[trans count=1]field.myfield[/trans]"]
 '
         );
     }
@@ -813,9 +840,9 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 '/div
     [
         ./input[@type="radio"][@name="name"][@id="name_0"][@value="&a"][@checked]
-        /following-sibling::label[@for="name_0"][.="[trans]Choice&A[/trans]"]
+        /following-sibling::label[@for="name_0"][.="[trans count=1]Choice&A[/trans]"]
         /following-sibling::input[@type="radio"][@name="name"][@id="name_1"][@value="&b"][not(@checked)]
-        /following-sibling::label[@for="name_1"][.="[trans]Choice&B[/trans]"]
+        /following-sibling::label[@for="name_1"][.="[trans count=1]Choice&B[/trans]"]
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
     [count(./input)=3]
@@ -836,11 +863,11 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 '/div
     [
         ./input[@type="radio"][@name="name"][@id="name_placeholder"][not(@checked)]
-        /following-sibling::label[@for="name_placeholder"][.="[trans]Test&Me[/trans]"]
+        /following-sibling::label[@for="name_placeholder"][.="[trans count=1]Test&Me[/trans]"]
         /following-sibling::input[@type="radio"][@name="name"][@id="name_0"][@checked]
-        /following-sibling::label[@for="name_0"][.="[trans]Choice&A[/trans]"]
+        /following-sibling::label[@for="name_0"][.="[trans count=1]Choice&A[/trans]"]
         /following-sibling::input[@type="radio"][@name="name"][@id="name_1"][not(@checked)]
-        /following-sibling::label[@for="name_1"][.="[trans]Choice&B[/trans]"]
+        /following-sibling::label[@for="name_1"][.="[trans count=1]Choice&B[/trans]"]
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
     [count(./input)=4]
@@ -860,9 +887,9 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 '/div
     [
         ./input[@type="radio"][@name="name"][@id="name_0"][@checked]
-        /following-sibling::label[@for="name_0"][.="[trans]Choice&A[/trans]"]
+        /following-sibling::label[@for="name_0"][.="[trans count=1]Choice&A[/trans]"]
         /following-sibling::input[@type="radio"][@name="name"][@id="name_1"][not(@checked)]
-        /following-sibling::label[@for="name_1"][.="[trans]Choice&B[/trans]"]
+        /following-sibling::label[@for="name_1"][.="[trans count=1]Choice&B[/trans]"]
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
     [count(./input)=3]
@@ -883,11 +910,11 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 '/div
     [
         ./input[@type="checkbox"][@name="name[]"][@id="name_0"][@checked][not(@required)]
-        /following-sibling::label[@for="name_0"][.="[trans]Choice&A[/trans]"]
+        /following-sibling::label[@for="name_0"][.="[trans count=1]Choice&A[/trans]"]
         /following-sibling::input[@type="checkbox"][@name="name[]"][@id="name_1"][not(@checked)][not(@required)]
-        /following-sibling::label[@for="name_1"][.="[trans]Choice&B[/trans]"]
+        /following-sibling::label[@for="name_1"][.="[trans count=1]Choice&B[/trans]"]
         /following-sibling::input[@type="checkbox"][@name="name[]"][@id="name_2"][@checked][not(@required)]
-        /following-sibling::label[@for="name_2"][.="[trans]Choice&C[/trans]"]
+        /following-sibling::label[@for="name_2"][.="[trans count=1]Choice&C[/trans]"]
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
     [count(./input)=4]

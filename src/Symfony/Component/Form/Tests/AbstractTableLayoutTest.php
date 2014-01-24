@@ -411,14 +411,14 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         ./tr
             [
                 ./td
-                    [./label[@for="name_first"][.="[trans]Test[/trans]"]]
+                    [./label[@for="name_first"][.="[trans count=1]Test[/trans]"]]
                 /following-sibling::td
                     [./input[@type="password"][@id="name_first"][@required="required"]]
             ]
         /following-sibling::tr
             [
                 ./td
-                    [./label[@for="name_second"][.="[trans]Test2[/trans]"]]
+                    [./label[@for="name_second"][.="[trans count=1]Test2[/trans]"]]
                 /following-sibling::td
                     [./input[@type="password"][@id="name_second"][@required="required"]]
             ]
@@ -446,9 +446,9 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/table
     [
-        ./tr[./td/label[.="Custom label: [trans]0[/trans]"]]
-        /following-sibling::tr[./td/label[.="Custom label: [trans]1[/trans]"]]
-        /following-sibling::tr[./td/label[.="Custom label: [trans]2[/trans]"]]
+        ./tr[./td/label[.="Custom label: [trans count=1]0[/trans]"]]
+        /following-sibling::tr[./td/label[.="Custom label: [trans count=1]1[/trans]"]]
+        /following-sibling::tr[./td/label[.="Custom label: [trans count=1]2[/trans]"]]
     ]
 '
         );

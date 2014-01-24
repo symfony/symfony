@@ -21,6 +21,9 @@ class UserPassword extends Constraint
     public $message = 'This value should be the user current password.';
     public $service = 'security.validator.user_password';
 
+    /**
+     * {@inheritdoc}
+     */
     public function validatedBy()
     {
         return $this->service;

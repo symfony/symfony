@@ -34,11 +34,7 @@ class RoleHierarchy implements RoleHierarchyInterface
     }
 
     /**
-     * Returns an array of all roles reachable by the given ones.
-     *
-     * @param RoleInterface[] $roles An array of RoleInterface instances
-     *
-     * @return RoleInterface[] An array of RoleInterface instances
+     * {@inheritdoc}
      */
     public function getReachableRoles(array $roles)
     {

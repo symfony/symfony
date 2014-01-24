@@ -18,7 +18,7 @@
     "require": {
         "php": ">=5.3.3",
         "symfony/security-csrf": "~2.4",
-        "twig/twig": "~1.11"
+        "twig/twig": "~1.12"
     },
     "require-dev": {
         "symfony/form": "~2.2",
@@ -29,7 +29,8 @@
         "symfony/yaml": "~2.0",
         "symfony/security": "~2.4",
         "symfony/stopwatch": "~2.2",
-        "symfony/console": "~2.2"
+        "symfony/console": "~2.2",
+        "symfony/expression-language": "~2.4"
     },
     "suggest": {
         "symfony/form": "For using the FormExtension",
@@ -39,7 +40,8 @@
         "symfony/translation": "For using the TranslationExtension",
         "symfony/yaml": "For using the YamlExtension",
         "symfony/security": "For using the SecurityExtension",
-        "symfony/stopwatch": "For using the StopwatchExtension"
+        "symfony/stopwatch": "For using the StopwatchExtension",
+        "symfony/expression": "For using the ExpressionExtension"
     },
     "autoload": {
         "psr-0": { "Symfony\\Bridge\\Twig\\": "" }

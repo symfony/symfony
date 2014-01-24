@@ -20,4 +20,6 @@
         <option key="compiler_class">RouteCompiler</option>
         <condition>context.getMethod() == "GET"</condition>
     </route>
+
+    <route id="blog_show_inherited" path="/blog/{slug}" />
 </routes>

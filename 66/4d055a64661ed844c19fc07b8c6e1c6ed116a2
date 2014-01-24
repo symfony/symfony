@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2014-01-13T20:22:28Z
+
+Can you add some unit tests as well?
+
+---------------------------------------------------------------------------
+
+by marco-jantke at 2014-01-14T07:23:44Z
+
+Yes, I will add some tests and correct the formatting!
+
+---------------------------------------------------------------------------
+
+by marco-jantke at 2014-01-14T07:58:18Z
+
+Done, does the testing setup makes sense? Don't wanted to duplicate everything.
+Is it intented that the configuration paramaters from the "parent" route are overriding those of the imported sub routes?
+
+---------------------------------------------------------------------------
+
+by Koc at 2014-01-24T17:46:24Z
+
+@fabpot can you please merge this PR?

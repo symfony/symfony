@@ -1,0 +1,48 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-01-18T13:27:44Z
+
+```
+>(16)[~/dev/labs/se](master +) app/console twig:lint src --format json
+[{"file":"src\/Acme\/DemoBundle\/Resources\/views\/Secured\/hello.html.twig","valid":true},{"file":"src\/Acme\/DemoBundle\/Resources\/views\/Secured\/
+layout.html.twig","valid":true},{"file":"src\/Acme\/DemoBundle\/Resources\/views\/Secured\/login.html.twig","valid":true},{"file":"src\/Acme\/DemoBundle\/Resources\/views\/Secured\/helloadmin.html.twig","valid":true},{"file":"src\/Acme\/DemoBundle\/Resources\/views\/layout.html.twig","valid":true},$"file":"src\/Acme\/DemoBundle\/Resources\/views\/Welcome\/index.html.twig","valid":true},{"file":"src\/Acme\/DemoBundle\/Resources\/views\/Demo\/hell$.html.twig","valid":true},{"file":"src\/Acme\/DemoBundle\/Resources\/views\/Demo\/contact.html.twig","valid":true},{"file":"src\/Acme\/DemoBundle\/Re$ources\/views\/Demo\/index.html.twig","valid":true}]
+
+>(16)[~/dev/labs/se](master +) app/console twig:lint app --format json
+[{"file":"app\/Resources\/views\/base.html.twig","valid":false,"message":"Unclosed \"variable\" in \"app\/Resources\/views\/base.html.twig\" at line $5"}]
+
+>(16)[~/dev/labs/se](master +) app/console twig:lint app
+KO in app/Resources/views/base.html.twig (line 15)
+   13     </html>
+   14
+>> 15     {{
+>> Unclosed "variable"
+   16
+0/1 valid files
+
+>(16)[~/dev/labs/se](master +) app/console twig:lint src
+9/9 valid files
+
+>(16)[~/dev/labs/se](master +) app/console twig:lint src -v
+OK in src/Acme/DemoBundle/Resources/views/Secured/hello.html.twig
+OK in src/Acme/DemoBundle/Resources/views/Secured/layout.html.twig
+OK in src/Acme/DemoBundle/Resources/views/Secured/login.html.twig
+OK in src/Acme/DemoBundle/Resources/views/Secured/helloadmin.html.twig
+OK in src/Acme/DemoBundle/Resources/views/layout.html.twig
+OK in src/Acme/DemoBundle/Resources/views/Welcome/index.html.twig
+OK in src/Acme/DemoBundle/Resources/views/Demo/hello.html.twig
+OK in src/Acme/DemoBundle/Resources/views/Demo/contact.html.twig
+OK in src/Acme/DemoBundle/Resources/views/Demo/index.html.twig
+9/9 valid files
+```
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-01-20T09:10:40Z
+
+@fabbot BTW, the two commits are atomic
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-01-24T16:53:06Z
+
+I thinks it's ok

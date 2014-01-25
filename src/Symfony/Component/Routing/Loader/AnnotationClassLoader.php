@@ -158,7 +158,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
             $condition = $globals['condition'];
         }
 
-        $route = new Route($globals['path'].$annot->getPath(), $defaults, $requirements, $options, $host, $schemes, $methods, $condition);
+        $route = $this->createRoute($globals['path'].$annot->getPath(), $defaults, $requirements, $options, $host, $schemes, $methods, $condition);
 
         $this->configureRoute($route, $class, $method, $annot);
 
@@ -257,6 +257,11 @@ abstract class AnnotationClassLoader implements LoaderInterface
         }
 
         return $globals;
+    }
+
+    protected function createRoute($path, $defaults, $requirements, $options, $host, $schemes, $methods, $condition)
+    {
+        return new Route($path, $defaults, $requirements, $options, $host, $schemes, $methods, $condition);
     }
 
     abstract protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, $annot);

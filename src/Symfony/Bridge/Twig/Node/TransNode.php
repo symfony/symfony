@@ -95,22 +95,10 @@ class TransNode extends \Twig_Node
 
         preg_match_all('/(?<!%)%([^%]+)%/', $msg, $matches);
 
-        if (version_compare(\Twig_Environment::VERSION, '1.5', '>=')) {
-            foreach ($matches[1] as $var) {
-                $key = new \Twig_Node_Expression_Constant('%'.$var.'%', $body->getLine());
-                if (!$vars->hasElement($key)) {
-                    $vars->addElement(new \Twig_Node_Expression_Name($var, $body->getLine()), $key);
-                }
-            }
-        } else {
-            $current = array();
-            foreach ($vars as $name => $var) {
-                $current[$name] = true;
-            }
-            foreach ($matches[1] as $var) {
-                if (!isset($current['%'.$var.'%'])) {
-                    $vars->setNode('%'.$var.'%', new \Twig_Node_Expression_Name($var, $body->getLine()));
-                }
+        foreach ($matches[1] as $var) {
+            $key = new \Twig_Node_Expression_Constant('%'.$var.'%', $body->getLine());
+            if (!$vars->hasElement($key)) {
+                $vars->addElement(new \Twig_Node_Expression_Name($var, $body->getLine()), $key);
             }
         }
 

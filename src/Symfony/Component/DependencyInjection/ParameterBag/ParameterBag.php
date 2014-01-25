@@ -25,6 +25,7 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 class ParameterBag implements ParameterBagInterface
 {
     protected $parameters = array();
+    protected $environmentMap = array();
     protected $resolved = false;
 
     /**
@@ -157,6 +158,10 @@ class ParameterBag implements ParameterBagInterface
             return;
         }
 
+        if ($this->has('environment_map') && is_array($map = $this->get('environment_map'))) {
+            $this->environmentMap = $map;
+        }
+
         $parameters = array();
         foreach ($this->parameters as $key => $value) {
             try {
@@ -171,6 +176,20 @@ class ParameterBag implements ParameterBagInterface
 
         $this->parameters = $parameters;
         $this->resolved = true;
+    }
+
+    public function resolveEnvironmentMap()
+    {
+        if ($this->has('environment_map') && is_array($map = $this->get('environment_map'))) {
+            $this->environmentMap = $map;
+
+            foreach ($map as $key => $var) {
+                $value = getenv($var);
+                if ($value !== false) {
+                    $this->parameters[strtolower($key)] = $this->resolveValue($value);
+                }
+            }
+        }
     }
 
     /**
@@ -227,14 +246,19 @@ class ParameterBag implements ParameterBagInterface
                 throw new ParameterCircularReferenceException(array_keys($resolving));
             }
 
+            if (isset($this->environmentMap[$key])) {
+                throw new RuntimeException(sprintf('Parameter "%s" is set via the environment map and may not be used in another parameter.', $key));
+            }
+
             $resolving[$key] = true;
 
             return $this->resolved ? $this->get($key) : $this->resolveValue($this->get($key), $resolving);
         }
 
         $self = $this;
+        $environmentMap = $self->environmentMap;
 
-        return preg_replace_callback('/%%|%([^%\s]+)%/', function ($match) use ($self, $resolving, $value) {
+        return preg_replace_callback('/%%|%([^%\s]+)%/', function ($match) use ($self, $resolving, $value, $environmentMap) {
             // skip %%
             if (!isset($match[1])) {
                 return '%%';
@@ -243,6 +267,10 @@ class ParameterBag implements ParameterBagInterface
             $key = strtolower($match[1]);
             if (isset($resolving[$key])) {
                 throw new ParameterCircularReferenceException(array_keys($resolving));
+            }
+
+            if (isset($environmentMap[$key])) {
+                throw new RuntimeException(sprintf('Parameter "%s" is set via the environment map and may not be used in another parameter.', $key));
             }
 
             $resolved = $self->get($key);

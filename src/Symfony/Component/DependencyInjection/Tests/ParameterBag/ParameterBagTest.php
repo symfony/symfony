@@ -267,6 +267,30 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testResolveEnvironmentMaps()
+    {
+        $bag = new ParameterBag(array('foo' => 'bar', 'qux' => 'mu', 'environment_map' => array('foo' => 'SYMFONY_TEST')));
+        $bag->resolve();
+
+        putenv('SYMFONY_TEST=baz_%qux%');
+        $bag->resolveEnvironmentMap();
+        putenv('SYMFONY_TEST');
+
+        $this->assertEquals($bag->get('foo'), 'baz_mu');
+    }
+
+    public function testIllegalResolveEnvironmentMaps()
+    {
+        try {
+            $bag = new ParameterBag(array('foo' => 'bar', 'baz' => '%foo%', 'environment_map' => array('foo' => 'SYMFONY_TEST')));
+            $bag->resolve();
+            $this->fail('->resolve() throws an Symfony\Component\DependencyInjection\Exception\RuntimeException if a parameter uses a parameter part of the environment map.');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('Symfony\Component\DependencyInjection\Exception\RuntimeException', $e, '->resolve() throws an Symfony\Component\DependencyInjection\Exception\RuntimeException if a parameter uses a parameter part of the environment map.');
+            $this->assertEquals('Parameter "foo" is set via the environment map and may not be used in another parameter.', $e->getMessage(), '->resolve() throws an Symfony\Component\DependencyInjection\Exception\RuntimeException with the offending environment variable.');
+        }
+    }
+
     public function stringsWithSpacesProvider()
     {
         return array(

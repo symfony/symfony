@@ -29,6 +29,9 @@ class UserPasswordValidator extends ConstraintValidator
         $this->encoderFactory = $encoderFactory;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function validate($password, Constraint $constraint)
     {
         $user = $this->securityContext->getToken()->getUser();

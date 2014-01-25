@@ -63,11 +63,6 @@ class SimpleFormFactory extends FormLoginFactory
     protected function createListener($container, $id, $config, $userProvider)
     {
         $listenerId = parent::createListener($container, $id, $config, $userProvider);
-        $listener = $container->getDefinition($listenerId);
-
-        if (!isset($config['csrf_token_generator'])) {
-            $listener->addArgument(null);
-        }
 
         $simpleAuthHandlerId = 'security.authentication.simple_success_failure_handler.'.$id;
         $simpleAuthHandler = $container->setDefinition($simpleAuthHandlerId, new DefinitionDecorator('security.authentication.simple_success_failure_handler'));
@@ -75,6 +70,7 @@ class SimpleFormFactory extends FormLoginFactory
         $simpleAuthHandler->replaceArgument(1, new Reference($this->getSuccessHandlerId($id)));
         $simpleAuthHandler->replaceArgument(2, new Reference($this->getFailureHandlerId($id)));
 
+        $listener = $container->getDefinition($listenerId);
         $listener->replaceArgument(5, new Reference($simpleAuthHandlerId));
         $listener->replaceArgument(6, new Reference($simpleAuthHandlerId));
         $listener->addArgument(new Reference($config['authenticator']));

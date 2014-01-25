@@ -167,6 +167,9 @@ class XmlFileLoader extends FileLoader
         if (null !== $host) {
             $subCollection->setHost($host);
         }
+        if (null !== $condition) {
+            $subCollection->setCondition($condition);
+        }
         if (null !== $schemes) {
             $subCollection->setSchemes($schemes);
         }

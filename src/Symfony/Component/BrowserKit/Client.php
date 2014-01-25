@@ -297,12 +297,18 @@ abstract class Client
         }
 
         $uri = $this->getAbsoluteUri($uri);
-
         $server = array_merge($this->server, $server);
+
         if (!$this->history->isEmpty()) {
             $server['HTTP_REFERER'] = $this->history->current()->getUri();
         }
+
         $server['HTTP_HOST'] = parse_url($uri, PHP_URL_HOST);
+
+        if ($port = parse_url($uri, PHP_URL_PORT)) {
+            $server['HTTP_HOST'] .= ':'.$port;
+        }
+
         $server['HTTPS'] = 'https' == parse_url($uri, PHP_URL_SCHEME);
 
         $this->internalRequest = new Request($uri, $method, $parameters, $files, $this->cookieJar->allValues($uri), $server, $content);

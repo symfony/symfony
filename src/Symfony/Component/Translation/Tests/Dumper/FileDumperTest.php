@@ -11,15 +11,15 @@
 
 namespace Symfony\Component\Translation\Tests\Dumper;
 
-use Symfony\Component\Translation\Dumper\NullFileDumper;
 use Symfony\Component\Translation\MessageCatalogue;
+use Symfony\Component\Translation\Dumper\FileDumper;
 
-class NullFileDumperTest extends \PHPUnit_Framework_TestCase
+class FileDumperTest extends \PHPUnit_Framework_TestCase
 {
     public function testDumpBackupsFileIfExisting()
     {
         $tempDir = sys_get_temp_dir();
-        $file = $tempDir.'/messages.en.null';
+        $file = $tempDir.'/messages.en.concrete';
         $backupFile = $file.'~';
 
         @touch($file);
@@ -27,7 +27,7 @@ class NullFileDumperTest extends \PHPUnit_Framework_TestCase
         $catalogue = new MessageCatalogue('en');
         $catalogue->add(array('foo' => 'bar'));
 
-        $dumper = new NullFileDumper();
+        $dumper = new ConcreteFileDumper();
         $dumper->dump($catalogue, array('path' => $tempDir));
 
         $this->assertTrue(file_exists($backupFile));
@@ -40,12 +40,12 @@ class NullFileDumperTest extends \PHPUnit_Framework_TestCase
     {
         $tempDir = sys_get_temp_dir();
         $translationsDir = $tempDir.'/test/translations';
-        $file = $translationsDir.'/messages.en.null';
+        $file = $translationsDir.'/messages.en.concrete';
 
         $catalogue = new MessageCatalogue('en');
         $catalogue->add(array('foo' => 'bar'));
 
-        $dumper = new NullFileDumper();
+        $dumper = new ConcreteFileDumper();
         $dumper->setRelativePathTemplate('test/translations/{domain}.{locale}.{extension}');
         $dumper->dump($catalogue, array('path' => $tempDir));
 
@@ -53,5 +53,18 @@ class NullFileDumperTest extends \PHPUnit_Framework_TestCase
 
         @unlink($file);
         @rmdir($translationsDir);
+    }
+}
+
+class ConcreteFileDumper extends FileDumper
+{
+    protected function format(MessageCatalogue $messages, $domain)
+    {
+        return '';
+    }
+
+    protected function getExtension()
+    {
+        return 'concrete';
     }
 }

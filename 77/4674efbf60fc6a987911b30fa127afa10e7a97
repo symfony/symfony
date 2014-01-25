@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by henrikbjorn at 2014-01-23T10:13:28Z
+
+I am not sure if this needs to be added to 2.4 or earlier versions?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-01-23T11:03:05Z
+
+Master is fine since new features only get into master
+
+---------------------------------------------------------------------------
+
+by henrikbjorn at 2014-01-23T11:09:15Z
+
+@Tobion wouldn't quite say its a new feature. Its just a refactoring to allow extending its functionality. Still works 100% as before.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-01-23T12:54:26Z
+
+See also #9996 which went into master

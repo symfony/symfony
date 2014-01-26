@@ -33,7 +33,7 @@ class TextareaFormField extends FormField
 
         $this->value = null;
         foreach ($this->node->childNodes as $node) {
-            $this->value .= $this->document->saveXML($node);
+            $this->value .= $node->wholeText;
         }
     }
 }

@@ -64,7 +64,7 @@ class TransChoiceTokenParser extends TransTokenParser
         $body = $this->parser->subparse(array($this, 'decideTransChoiceFork'), true);
 
         if (!$body instanceof \Twig_Node_Text && !$body instanceof \Twig_Node_Expression) {
-            throw new \Twig_Error_Syntax('A message must be a simple text.');
+            throw new \Twig_Error_Syntax('A message inside a transchoice tag must be a simple text.', $body->getLine(), $stream->getFilename());
         }
 
         $stream->expect(\Twig_Token::BLOCK_END_TYPE);

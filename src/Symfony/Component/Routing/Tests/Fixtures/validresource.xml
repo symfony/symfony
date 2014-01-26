@@ -8,5 +8,6 @@
         <default key="foo">123</default>
         <requirement key="foo">\d+</requirement>
         <option key="foo">bar</option>
+        <condition>context.getMethod() == "POST"</condition>
     </import>
 </routes>

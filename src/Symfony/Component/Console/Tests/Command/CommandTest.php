@@ -288,20 +288,18 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $testCase = $this;
 
         $command = new \TestCommand();
-        $in = new StringInput('');
-        $out = new NullOutput();
 
         $dispatcher = new EventDispatcher();
         $dispatcher->addListener('console.command-initialize',
-            function (ConsoleCommandInitializeEvent $event) use ($testCase, $command, $in, $out) {
-                $testCase->assertSame($command, $event->getCommand());
-                $testCase->assertSame($in, $event->getInput());
-                $testCase->assertSame($out, $event->getOutput());
+            function (ConsoleCommandInitializeEvent $event) use ($command) {
+                $event->getOutput()->writeln('Listener called');
             }
         );
         $command->setDispatcher($dispatcher);
 
-        $command->run($in, $out);
+        $tester = new CommandTester($command);
+        $tester->execute(array());
+        $this->assertContains('Listener called'.PHP_EOL, $tester->getDisplay());
     }
 
     public function testSetCode()

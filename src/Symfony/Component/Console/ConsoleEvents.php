@@ -65,6 +65,4 @@ final class ConsoleEvents
      * @var string
      */
     const EXCEPTION = 'console.exception';
-
-
 }

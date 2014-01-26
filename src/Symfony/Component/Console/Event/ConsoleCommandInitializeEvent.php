@@ -21,4 +21,3 @@ namespace Symfony\Component\Console\Event;
 class ConsoleCommandInitializeEvent extends ConsoleEvent
 {
 }
-

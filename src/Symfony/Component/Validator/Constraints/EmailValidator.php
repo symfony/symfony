@@ -23,7 +23,6 @@ use Egulias\EmailValidator\EmailValidator as StrictEmailValidator;
  */
 class EmailValidator extends ConstraintValidator
 {
-
     /**
      * isStrict
      *

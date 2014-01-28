@@ -81,6 +81,32 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertLessThan(1.8, $duration);
     }
 
+    public function testAllOutputIsActuallyReadOnTermination()
+    {
+        // this code will result in a maximum of 2 reads of 8192 bytes by calling
+        // start() and isRunning().  by the time getOutput() is called the process
+        // has terminated so the internal pipes array is already empty. normally
+        // the call to start() will not read any data as the process will not have
+        // generated output, but this is non-deterministic so we must count it as
+        // a possibility.  therefore we need 2 * 8192 plus another byte which will
+        // never be read.
+        $expectedOutputSize = 16385;
+
+        $code = sprintf('echo str_repeat(\'*\', %d);', $expectedOutputSize);
+        $p = $this->getProcess(sprintf('php -r %s', escapeshellarg($code)));
+
+        $p->start();
+        usleep(250000);
+
+        if ($p->isRunning()) {
+            $this->fail('Process execution did not complete in the required time frame');
+        }
+
+        $o = $p->getOutput();
+
+        $this->assertEquals($expectedOutputSize, strlen($o));
+    }
+
     public function testCallbacksAreExecutedWithStart()
     {
         $data = '';

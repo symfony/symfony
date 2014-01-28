@@ -286,10 +286,9 @@ class ProcessPipes
 
         foreach ($r as $pipe) {
             $type = array_search($pipe, $this->pipes);
-            $data = fread($pipe, 8192);
 
-            if (strlen($data) > 0) {
-                $read[$type] = $data;
+            while (strlen($data = fread($pipe, 8192)) > 0) {
+                isset($read[$type]) ? $read[$type] .= $data : $read[$type] = $data;
             }
 
             if (false === $data || (true === $close && feof($pipe) && '' === $data)) {

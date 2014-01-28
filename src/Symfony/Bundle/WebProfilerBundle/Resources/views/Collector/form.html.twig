@@ -78,6 +78,12 @@
         margin-left: 250px;
         padding: 30px 40px 40px;
     }
+    .tree .errors {
+        color: #aa3333;
+    }
+    .tree .active.errors {
+        color: #aa3333;
+    }
     .form-type {
         color: #999999;
     }
@@ -173,7 +179,7 @@
 
 {% macro form_tree_entry(name, data) %}
     <li>
-        <a href="#details_{{ data.id }}">{{ name }}</a>
+        <a{% if data.errors is defined and data.errors|length > 0 %} class="errors"{% endif %} href="#details_{{ data.id }}">{{ name }}</a>
 
         {% if data.children is not empty %}
             <ul>

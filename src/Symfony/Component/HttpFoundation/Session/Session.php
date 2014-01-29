@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpFoundation\Session;
 
+use Symfony\Component\HttpFoundation\Session\Storage\LazySessionStorageInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBagInterface;
@@ -78,6 +79,10 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
      */
     public function has($name)
     {
+        if (!$this->isExists()) {
+            return false;
+        }
+
         return $this->storage->getBag($this->attributeName)->has($name);
     }
 
@@ -86,6 +91,10 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
      */
     public function get($name, $default = null)
     {
+        if (!$this->isExists()) {
+            return $default;
+        }
+
         return $this->storage->getBag($this->attributeName)->get($name, $default);
     }
 
@@ -102,6 +111,10 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
      */
     public function all()
     {
+        if (!$this->isExists()) {
+            return array();
+        }
+
         return $this->storage->getBag($this->attributeName)->all();
     }
 
@@ -154,6 +167,10 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
      */
     public function count()
     {
+        if (!$this->isExists()) {
+            return 0;
+        }
+
         return count($this->storage->getBag($this->attributeName)->all());
     }
 
@@ -247,5 +264,18 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     public function getFlashBag()
     {
         return $this->getBag($this->flashName);
+    }
+
+    /**
+     * Is Session exists
+     *
+     * @return boolean
+     */
+    private function isExists()
+    {
+        return
+            $this->isStarted()
+            || !($this->storage instanceof LazySessionStorageInterface)
+            || $this->storage->hasPreviousSession();
     }
 }

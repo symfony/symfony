@@ -78,6 +78,10 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
      */
     public function has($name)
     {
+        if (!$this->isStarted() && !$this->storage->hasPreviousSession()) {
+            return false;
+        }
+
         return $this->storage->getBag($this->attributeName)->has($name);
     }
 
@@ -86,6 +90,10 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
      */
     public function get($name, $default = null)
     {
+        if (!$this->isStarted() && !$this->storage->hasPreviousSession()) {
+            return $default;
+        }
+
         return $this->storage->getBag($this->attributeName)->get($name, $default);
     }
 
@@ -102,6 +110,10 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
      */
     public function all()
     {
+        if (!$this->isStarted() && !$this->storage->hasPreviousSession()) {
+            return array();
+        }
+
         return $this->storage->getBag($this->attributeName)->all();
     }
 
@@ -154,6 +166,10 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
      */
     public function count()
     {
+        if (!$this->isStarted() && !$this->storage->hasPreviousSession()) {
+            return 0;
+        }
+
         return count($this->storage->getBag($this->attributeName)->all());
     }
 

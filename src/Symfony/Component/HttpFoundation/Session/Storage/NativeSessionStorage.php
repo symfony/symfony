@@ -317,6 +317,14 @@ class NativeSessionStorage implements SessionStorageInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function hasPreviousSession()
+    {
+        return isset($_COOKIE[session_name()]);
+    }
+
+    /**
      * Sets session.* ini variables.
      *
      * For convenience we omit 'session.' from the beginning of the keys.

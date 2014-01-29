@@ -20,6 +20,8 @@ class LoginController extends ContainerAware
 {
     public function loginAction()
     {
+        $this->container->get('request')->getSession()->start();
+
         // get the login error if there is one
         if ($this->container->get('request')->attributes->has(SecurityContext::AUTHENTICATION_ERROR)) {
             $error = $this->container->get('request')->attributes->get(SecurityContext::AUTHENTICATION_ERROR);

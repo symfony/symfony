@@ -16,7 +16,7 @@ namespace Symfony\Component\HttpFoundation;
  *
  * @author Benjamin Eberlei <kontakt@beberlei.de>
  */
-class RequestStack
+class RequestStack implements \Countable
 {
     /**
      * @var Request[]
@@ -99,5 +99,15 @@ class RequestStack
         }
 
         return $this->requests[$pos];
+    }
+
+    /**
+     * Implements \Countable.
+     *
+     * @return integer The number of requests in the stack
+     */
+    public function count()
+    {
+        return count($this->requests);
     }
 }

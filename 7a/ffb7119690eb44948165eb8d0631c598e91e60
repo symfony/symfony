@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2014-02-01T16:50:42Z
+
+Can you also remove the image files as they are not needed anymore?
+
+---------------------------------------------------------------------------
+
+by Danez at 2014-02-01T19:25:02Z
+
+Okay, I removed them. Did a grep before to make sure they are not used.

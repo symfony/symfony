@@ -120,8 +120,8 @@ interface InputInterface
     /**
      * Sets an option value by name.
      *
-     * @param string $name  The option name
-     * @param string $value The option value
+     * @param string         $name  The option name
+     * @param string|boolean $value The option value
      *
      * @throws \InvalidArgumentException When option given doesn't exist
      */

@@ -28,7 +28,9 @@
     </option>
     <option name="--format" shortcut="" accept_value="1" is_value_required="1" is_multiple="0">
       <description>To output help in other formats</description>
-      <defaults/>
+      <defaults>
+        <default>txt</default>
+      </defaults>
     </option>
     <option name="--raw" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
       <description>To output raw command help</description>
@@ -90,7 +92,9 @@
     </option>
     <option name="--format" shortcut="" accept_value="1" is_value_required="1" is_multiple="0">
       <description>To output list in other formats</description>
-      <defaults/>
+      <defaults>
+        <default>txt</default>
+      </defaults>
     </option>
   </options>
 </command>

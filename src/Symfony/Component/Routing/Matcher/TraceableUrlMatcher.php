@@ -93,10 +93,21 @@ class TraceableUrlMatcher extends UrlMatcher
                 }
             }
 
+            // check condition
+            if ($condition = $route->getCondition()) {
+                if (!$this->getExpressionLanguage()->evaluate($condition, array('context' => $this->context, 'request' => $this->request))) {
+                    $this->addTrace(sprintf('Condition "%s" does not evaluate to "true"', $condition), self::ROUTE_ALMOST_MATCHES, $name, $route);
+
+                    continue;
+                }
+            }
+
             // check HTTP scheme requirement
-            if ($scheme = $route->getRequirement('_scheme')) {
-                if ($this->context->getScheme() !== $scheme) {
-                    $this->addTrace(sprintf('Scheme "%s" does not match the requirement ("%s"); the user will be redirected', $this->context->getScheme(), $scheme), self::ROUTE_ALMOST_MATCHES, $name, $route);
+            if ($requiredSchemes = $route->getSchemes()) {
+                $scheme = $this->context->getScheme();
+
+                if (!$route->hasScheme($scheme)) {
+                    $this->addTrace(sprintf('Scheme "%s" does not match any of the required schemes ("%s"); the user will be redirected to first required scheme', $scheme, implode(', ', $requiredSchemes)), self::ROUTE_ALMOST_MATCHES, $name, $route);
 
                     return true;
                 }

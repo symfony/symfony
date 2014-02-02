@@ -18,13 +18,6 @@ use Symfony\Bridge\Propel1\Tests\Propel1TestCase;
 
 class PropelDataCollectorTest extends Propel1TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-    }
-
     public function testCollectWithoutData()
     {
         $c = $this->createCollector(array());

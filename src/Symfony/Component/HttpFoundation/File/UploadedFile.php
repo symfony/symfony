@@ -252,7 +252,7 @@ class UploadedFile extends File
             return $target;
         }
 
-        throw new FileException($this->getErrorMessage($this->getError()));
+        throw new FileException($this->getErrorMessage());
     }
 
     /**
@@ -290,11 +290,9 @@ class UploadedFile extends File
     /**
      * Returns an informative upload error message.
      *
-     * @param int $code The error code returned by an upload attempt
-     *
      * @return string The error message regarding the specified error code
      */
-    private function getErrorMessage($errorCode)
+    public function getErrorMessage()
     {
         static $errors = array(
             UPLOAD_ERR_INI_SIZE   => 'The file "%s" exceeds your upload_max_filesize ini directive (limit is %d kb).',
@@ -306,9 +304,10 @@ class UploadedFile extends File
             UPLOAD_ERR_EXTENSION  => 'File upload was stopped by a PHP extension.',
         );
 
+        $errorCode = $this->error;
         $maxFilesize = $errorCode === UPLOAD_ERR_INI_SIZE ? self::getMaxFilesize() / 1024 : 0;
         $message = isset($errors[$errorCode]) ? $errors[$errorCode] : 'The file "%s" was not uploaded due to an unknown error.';
 
-       return sprintf($message, $this->getClientOriginalName(), $maxFilesize);
+        return sprintf($message, $this->getClientOriginalName(), $maxFilesize);
     }
 }

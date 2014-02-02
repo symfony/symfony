@@ -109,6 +109,18 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
     }
 
     /**
+     * Deletes the security identity from the database.
+     * ACL entries have the CASCADE option on their foreign key so they will also get deleted
+     *
+     * @param SecurityIdentityInterface $sid
+     * @throws \InvalidArgumentException
+     */
+    public function deleteSecurityIdentity(SecurityIdentityInterface $sid)
+    {
+        $this->connection->executeQuery($this->getDeleteSecurityIdentityIdSql($sid));
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function findAcls(array $oids, array $sids = array())
@@ -253,7 +265,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
             }
 
             // check properties for deleted, and created ACEs, and perform deletions
-            // we need to perfom deletions before updating existing ACEs, in order to
+            // we need to perform deletions before updating existing ACEs, in order to
             // preserve uniqueness of the order field
             if (isset($propertyChanges['classAces'])) {
                 $this->updateOldAceProperty('classAces', $propertyChanges['classAces']);
@@ -352,6 +364,17 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
     }
 
     /**
+     * Updates a user security identity when the user's username changes
+     *
+     * @param UserSecurityIdentity $usid
+     * @param string $oldUsername
+     */
+    public function updateUserSecurityIdentity(UserSecurityIdentity $usid, $oldUsername)
+    {
+        $this->connection->executeQuery($this->getUpdateUserSecurityIdentitySql($usid, $oldUsername));
+    }
+
+    /**
      * Constructs the SQL for deleting access control entries.
      *
      * @param integer $oidPK
@@ -360,7 +383,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
     protected function getDeleteAccessControlEntriesSql($oidPK)
     {
         return sprintf(
-              'DELETE FROM %s WHERE object_identity_id = %d',
+            'DELETE FROM %s WHERE object_identity_id = %d',
             $this->options['entry_table_name'],
             $oidPK
         );
@@ -612,6 +635,21 @@ QUERY;
     }
 
     /**
+     * Constructs the SQL to delete a security identity.
+     *
+     * @param SecurityIdentityInterface $sid
+     * @throws \InvalidArgumentException
+     * @return string
+     */
+    protected function getDeleteSecurityIdentityIdSql(SecurityIdentityInterface $sid)
+    {
+        $select = $this->getSelectSecurityIdentityIdSql($sid);
+        $delete = preg_replace('/^SELECT id FROM/', 'DELETE FROM', $select);
+
+        return $delete;
+    }
+
+    /**
      * Constructs the SQL for updating an object identity.
      *
      * @param integer $pk
@@ -630,6 +668,31 @@ QUERY;
             $this->options['oid_table_name'],
             implode(', ', $changes),
             $pk
+        );
+    }
+
+    /**
+     * Constructs the SQL for updating a user security identity.
+     *
+     * @param UserSecurityIdentity $usid
+     * @param string $oldUsername
+     * @return string
+     */
+    protected function getUpdateUserSecurityIdentitySql(UserSecurityIdentity $usid, $oldUsername)
+    {
+        if ($usid->getUsername() == $oldUsername) {
+            throw new \InvalidArgumentException('There are no changes.');
+        }
+
+        $oldIdentifier = $usid->getClass().'-'.$oldUsername;
+        $newIdentifier = $usid->getClass().'-'.$usid->getUsername();
+
+        return sprintf(
+            'UPDATE %s SET identifier = %s WHERE identifier = %s AND username = %s',
+            $this->options['sid_table_name'],
+            $this->connection->quote($newIdentifier),
+            $this->connection->quote($oldIdentifier),
+            $this->connection->getDatabasePlatform()->convertBooleans(true)
         );
     }
 
@@ -806,7 +869,7 @@ QUERY;
      * @param string $name
      * @param array $changes
      */
-    private function updateOldFieldAceProperty($ane, array $changes)
+    private function updateOldFieldAceProperty($name, array $changes)
     {
         $currentIds = array();
         foreach ($changes[1] as $field => $new) {
@@ -925,11 +988,12 @@ QUERY;
         if (isset($propertyChanges['aceOrder'])
             && $propertyChanges['aceOrder'][1] > $propertyChanges['aceOrder'][0]
             && $propertyChanges == $aces->offsetGet($ace)) {
-                $aces->next();
-                if ($aces->valid()) {
+
+            $aces->next();
+            if ($aces->valid()) {
                     $this->updateAce($aces, $aces->current());
-                }
             }
+        }
 
         if (isset($propertyChanges['mask'])) {
             $sets[] = sprintf('mask = %d', $propertyChanges['mask'][1]);
@@ -949,5 +1013,4 @@ QUERY;
 
         $this->connection->executeQuery($this->getUpdateAccessControlEntrySql($ace->getId(), $sets));
     }
-
 }

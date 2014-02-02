@@ -198,6 +198,8 @@ class ChoiceList implements ChoiceListInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @deprecated Deprecated since version 2.4, to be removed in 3.0.
      */
     public function getIndicesForChoices(array $choices)
     {
@@ -222,6 +224,8 @@ class ChoiceList implements ChoiceListInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @deprecated Deprecated since version 2.4, to be removed in 3.0.
      */
     public function getIndicesForValues(array $values)
     {
@@ -485,9 +489,9 @@ class ChoiceList implements ChoiceListInterface
      * Extension point. In this implementation, choices are guaranteed to
      * always maintain their type and thus can be typesafely compared.
      *
-     * @param mixed $choice The choice.
+     * @param mixed $choice The choice
      *
-     * @return mixed The fixed choice.
+     * @return mixed The fixed choice
      */
     protected function fixChoice($choice)
     {
@@ -495,14 +499,14 @@ class ChoiceList implements ChoiceListInterface
     }
 
     /**
-    * Fixes the data type of the given choices to avoid comparison problems.
+     * Fixes the data type of the given choices to avoid comparison problems.
      *
-    * @param array $choices The choices.
-    *
-    * @return array The fixed choices.
-    *
-    * @see fixChoice
-    */
+     * @param array $choices The choices.
+     *
+     * @return array The fixed choices.
+     *
+     * @see fixChoice
+     */
     protected function fixChoices(array $choices)
     {
         return $choices;

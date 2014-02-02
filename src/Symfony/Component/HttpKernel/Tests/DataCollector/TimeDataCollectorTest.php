@@ -17,16 +17,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 class TimeDataCollectorTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-    }
-
     public function testCollect()
     {
-        $c = new TimeDataCollector;
+        $c = new TimeDataCollector();
 
         $request = new Request();
         $request->server->set('REQUEST_TIME', 1);
@@ -42,7 +35,7 @@ class TimeDataCollectorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(2000, $c->getStartTime());
 
         $request = new Request();
-        $c->collect($request, new Response);
+        $c->collect($request, new Response());
         $this->assertEquals(0, $c->getStartTime());
 
         $kernel = $this->getMock('Symfony\Component\HttpKernel\KernelInterface');

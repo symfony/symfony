@@ -21,10 +21,9 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  */
 class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransformer
 {
-
     private $divisor;
 
-    public function __construct($precision = null, $grouping = null, $roundingMode = null, $divisor = null)
+    public function __construct($precision = 2, $grouping = true, $roundingMode = self::ROUND_HALF_UP, $divisor = 1)
     {
         if (null === $grouping) {
             $grouping = true;

@@ -35,7 +35,7 @@ class IniFileLoader extends ArrayLoader implements LoaderInterface
             throw new NotFoundResourceException(sprintf('File "%s" not found.', $resource));
         }
 
-        $messages = parse_ini_file($resource, true);
+        $messages = parse_ini_file($resource, true, INI_SCANNER_RAW);
 
         $catalogue = parent::load($messages, $locale, $domain);
         $catalogue->addResource(new FileResource($resource));

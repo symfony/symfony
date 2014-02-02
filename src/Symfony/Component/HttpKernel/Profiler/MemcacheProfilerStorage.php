@@ -42,7 +42,7 @@ class MemcacheProfilerStorage extends BaseMemcacheProfilerStorage
             $host = $matches[1] ?: $matches[2];
             $port = $matches[3];
 
-            $memcache = new Memcache;
+            $memcache = new Memcache();
             $memcache->addServer($host, $port);
 
             $this->memcache = $memcache;

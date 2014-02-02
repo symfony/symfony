@@ -291,6 +291,8 @@ class ModelChoiceList extends ObjectChoiceList
 
     /**
      * {@inheritdoc}
+     *
+     * @deprecated Deprecated since version 2.4, to be removed in 3.0.
      */
     public function getIndicesForChoices(array $models)
     {
@@ -335,6 +337,8 @@ class ModelChoiceList extends ObjectChoiceList
 
     /**
      * {@inheritdoc}
+     *
+     * @deprecated Deprecated since version 2.4, to be removed in 3.0.
      */
     public function getIndicesForValues(array $values)
     {

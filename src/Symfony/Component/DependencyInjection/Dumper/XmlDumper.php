@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 /**
  * XmlDumper dumps a service container as an XML string.
@@ -259,6 +260,10 @@ class XmlDumper extends Dumper
             } elseif ($value instanceof Definition) {
                 $element->setAttribute('type', 'service');
                 $this->addService($value, null, $element);
+            } elseif ($value instanceof Expression) {
+                $element->setAttribute('type', 'expression');
+                $text = $this->document->createTextNode(self::phpToXml((string) $value));
+                $element->appendChild($text);
             } else {
                 if (in_array($value, array('null', 'true', 'false'), true)) {
                     $element->setAttribute('type', 'string');

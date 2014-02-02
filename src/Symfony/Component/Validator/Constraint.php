@@ -87,8 +87,9 @@ abstract class Constraint
         $invalidOptions = array();
         $missingOptions = array_flip((array) $this->getRequiredOptions());
 
-        if (is_array($options) && count($options) == 1 && isset($options['value'])) {
-            $options = $options['value'];
+        if (is_array($options) && count($options) >= 1 && isset($options['value']) && !property_exists($this, 'value')) {
+            $options[$this->getDefaultOption()] = $options['value'];
+            unset($options['value']);
         }
 
         if (is_array($options) && count($options) > 0 && is_string(key($options))) {

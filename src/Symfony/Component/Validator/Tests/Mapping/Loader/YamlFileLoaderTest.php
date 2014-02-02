@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Tests\Mapping\Loader;
 
 use Symfony\Component\Validator\Constraints\All;
+use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Range;
@@ -23,13 +24,6 @@ use Symfony\Component\Validator\Tests\Fixtures\ConstraintB;
 
 class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\Yaml\Yaml')) {
-            $this->markTestSkipped('The "Yaml" component is not available');
-        }
-    }
-
     public function testLoadClassMetadataReturnsFalseIfEmpty()
     {
         $loader = new YamlFileLoader(__DIR__.'/empty-mapping.yml');
@@ -75,6 +69,9 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $expected->setGroupSequence(array('Foo', 'Entity'));
         $expected->addConstraint(new ConstraintA());
         $expected->addConstraint(new ConstraintB());
+        $expected->addConstraint(new Callback('validateMe'));
+        $expected->addConstraint(new Callback('validateMeStatic'));
+        $expected->addConstraint(new Callback(array('Symfony\Component\Validator\Tests\Fixtures\CallbackClass', 'callback')));
         $expected->addPropertyConstraint('firstName', new NotNull());
         $expected->addPropertyConstraint('firstName', new Range(array('min' => 3)));
         $expected->addPropertyConstraint('firstName', new Choice(array('A', 'B')));

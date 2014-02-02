@@ -19,7 +19,7 @@ use Symfony\Component\Console\Formatter\OutputFormatterStyle;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class DialogHelper extends Helper
+class DialogHelper extends InputAwareHelper
 {
     private $inputStream;
     private static $shell;
@@ -98,6 +98,10 @@ class DialogHelper extends Helper
      */
     public function ask(OutputInterface $output, $question, $default = null, array $autocomplete = null)
     {
+        if ($this->input && !$this->input->isInteractive()) {
+            return $default;
+        }
+
         $output->write($question);
 
         $inputStream = $this->inputStream ?: STDIN;
@@ -255,11 +259,12 @@ class DialogHelper extends Helper
     public function askHiddenResponse(OutputInterface $output, $question, $fallback = true)
     {
         if (defined('PHP_WINDOWS_VERSION_BUILD')) {
-            $exe = __DIR__.'/../Resources/bin/hiddeninput.exe';
+            $exe = __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR
+                .'Resources'.DIRECTORY_SEPARATOR.'bin'.DIRECTORY_SEPARATOR.'hiddeninput.exe';
 
             // handle code running from a phar
             if ('phar:' === substr(__FILE__, 0, 5)) {
-                $tmpExe = sys_get_temp_dir().'/hiddeninput.exe';
+                $tmpExe = sys_get_temp_dir().DIRECTORY_SEPARATOR.'hiddeninput.exe';
                 copy($exe, $tmpExe);
                 $exe = $tmpExe;
             }

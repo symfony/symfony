@@ -196,7 +196,6 @@ class InlineTest extends \PHPUnit_Framework_TestCase
             '.Inf' => -log(0),
             '-.Inf' => log(0),
             "'686e444'" => '686e444',
-            '.Inf' => 646e444,
             '"foo\r\nbar"' => "foo\r\nbar",
             "'foo#bar'" => 'foo#bar',
             "'foo # bar'" => 'foo # bar',

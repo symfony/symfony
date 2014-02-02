@@ -1,0 +1,19 @@
+{
+    "path": "\/hello\/{name}",
+    "host": "localhost",
+    "scheme": "http|https",
+    "method": "GET|HEAD",
+    "class": "Symfony\\Component\\Routing\\Route",
+    "defaults": {
+        "name": "Joseph"
+    },
+    "requirements": {
+        "name": "[a-z]+"
+    },
+    "options": {
+        "compiler_class": "Symfony\\Component\\Routing\\RouteCompiler",
+        "opt1": "val1",
+        "opt2": "val2"
+    },
+    "pathRegex": "#^\/hello(?:\/(?P<name>[a-z]+))?$#s"
+}

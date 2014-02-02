@@ -23,5 +23,5 @@ class ProjectServiceContainer extends Container
     }
 }
 
-class stdClass_%s extends \stdClass implements \ProxyManager\Proxy\LazyLoadingInterface, \ProxyManager\Proxy\ValueHolderInterface
+class stdClass_%s extends \stdClass implements \ProxyManager\Proxy\VirtualProxyInterface
 {%a}%A

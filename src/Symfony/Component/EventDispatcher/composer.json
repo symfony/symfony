@@ -19,7 +19,9 @@
         "php": ">=5.3.3"
     },
     "require-dev": {
-        "symfony/dependency-injection": "~2.0"
+        "symfony/dependency-injection": "~2.0",
+        "symfony/stopwatch": "~2.2",
+        "psr/log": "~1.0"
     },
     "suggest": {
         "symfony/dependency-injection": "",
@@ -32,7 +34,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.3-dev"
+            "dev-master": "2.5-dev"
         }
     }
 }

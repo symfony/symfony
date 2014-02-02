@@ -2,6 +2,7 @@
 
 /*
  * This file is part of the Symfony package.
+ *
  * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
@@ -237,11 +238,6 @@ class Inline
      */
     private static function parseQuotedScalar($scalar, &$i)
     {
-        // Only check the current item we're dealing with (for sequences)
-        $subject = substr($scalar, $i);
-        $items = preg_split('/[\'"]\s*(?:[,:]|[}\]]\s*,)/', $subject);
-        $subject = substr($subject, 0, strlen($items[0]) + 1);
-
         if (!preg_match('/'.self::REGEX_QUOTED_STRING.'/Au', substr($scalar, $i), $match)) {
             throw new ParseException(sprintf('Malformed inline YAML string (%s).', substr($scalar, $i)));
         }

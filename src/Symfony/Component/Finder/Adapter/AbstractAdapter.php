@@ -21,7 +21,7 @@ abstract class AbstractAdapter implements AdapterInterface
     protected $followLinks = false;
     protected $mode        = 0;
     protected $minDepth    = 0;
-    protected $maxDepth    = INF;
+    protected $maxDepth    = PHP_INT_MAX;
     protected $exclude     = array();
     protected $names       = array();
     protected $notNames    = array();
@@ -33,6 +33,7 @@ abstract class AbstractAdapter implements AdapterInterface
     protected $sort        = false;
     protected $paths       = array();
     protected $notPaths    = array();
+    protected $ignoreUnreadableDirs = false;
 
     private static $areSupported = array();
 
@@ -76,7 +77,7 @@ abstract class AbstractAdapter implements AdapterInterface
     public function setDepths(array $depths)
     {
         $this->minDepth = 0;
-        $this->maxDepth = INF;
+        $this->maxDepth = PHP_INT_MAX;
 
         foreach ($depths as $comparator) {
             switch ($comparator->getOperator()) {
@@ -206,6 +207,16 @@ abstract class AbstractAdapter implements AdapterInterface
     public function setNotPath(array $notPaths)
     {
         $this->notPaths = $notPaths;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function ignoreUnreadableDirs($ignore = true)
+    {
+        $this->ignoreUnreadableDirs = (Boolean) $ignore;
 
         return $this;
     }

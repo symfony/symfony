@@ -11,36 +11,17 @@
 
 namespace Symfony\Component\Locale\Stub\DateFormat;
 
+use Symfony\Component\Intl\DateFormatter\DateFormat\DayTransformer as BaseDayTransformer;
+
 /**
- * Parser and formatter for day format
+ * Alias of {@link \Symfony\Component\Intl\DateFormatter\DateFormat\DayTransformer}.
  *
- * @author Igor Wiedler <igor@wiedler.ch>
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
+ *             {@link \Symfony\Component\Intl\DateFormatter\DateFormat\DayTransformer}
+ *             instead.
  */
-class DayTransformer extends Transformer
+class DayTransformer extends BaseDayTransformer
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function format(\DateTime $dateTime, $length)
-    {
-        return $this->padLeft($dateTime->format('j'), $length);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getReverseMatchingRegExp($length)
-    {
-        return 1 === $length ? '\d{1,2}' : '\d{'.$length.'}';
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function extractDateOptions($matched, $length)
-    {
-        return array(
-            'day' => (int) $matched,
-        );
-    }
 }

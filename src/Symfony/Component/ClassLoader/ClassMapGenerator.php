@@ -39,7 +39,7 @@ class ClassMapGenerator
     /**
      * Iterate over all files in the given directory searching for classes
      *
-     * @param Iterator|string $dir The directory to search in or an iterator
+     * @param \Iterator|string $dir The directory to search in or an iterator
      *
      * @return array A class map array
      */
@@ -121,7 +121,7 @@ class ClassMapGenerator
                         }
                     }
 
-                    $classes[] = ltrim($namespace . $class, '\\');
+                    $classes[] = ltrim($namespace.$class, '\\');
                     break;
                 default:
                     break;

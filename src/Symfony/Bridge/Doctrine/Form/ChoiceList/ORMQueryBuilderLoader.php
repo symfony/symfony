@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Doctrine\Form\ChoiceList;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\DBAL\Connection;
+use Doctrine\ORM\EntityManager;
 
 /**
  * Getting Entities through the ORM QueryBuilder
@@ -48,6 +49,10 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
         }
 
         if ($queryBuilder instanceof \Closure) {
+            if (!$manager instanceof EntityManager) {
+                throw new UnexpectedTypeException($manager, 'Doctrine\ORM\EntityManager');
+            }
+
             $queryBuilder = $queryBuilder($manager->getRepository($class));
 
             if (!$queryBuilder instanceof QueryBuilder) {
@@ -76,9 +81,18 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
         $parameter = 'ORMQueryBuilderLoader_getEntitiesByIds_'.$identifier;
         $where = $qb->expr()->in($alias.'.'.$identifier, ':'.$parameter);
 
+        // Guess type
+        $entity = current($qb->getRootEntities());
+        $metadata = $qb->getEntityManager()->getClassMetadata($entity);
+        if (in_array($metadata->getTypeOfField($identifier), array('integer', 'bigint', 'smallint'))) {
+            $parameterType = Connection::PARAM_INT_ARRAY;
+        } else {
+            $parameterType = Connection::PARAM_STR_ARRAY;
+        }
+
         return $qb->andWhere($where)
                   ->getQuery()
-                  ->setParameter($parameter, $values, Connection::PARAM_STR_ARRAY)
+                  ->setParameter($parameter, $values, $parameterType)
                   ->getResult();
     }
 }

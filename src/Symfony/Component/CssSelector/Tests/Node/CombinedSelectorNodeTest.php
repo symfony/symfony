@@ -14,23 +14,22 @@ namespace Symfony\Component\CssSelector\Tests\Node;
 use Symfony\Component\CssSelector\Node\CombinedSelectorNode;
 use Symfony\Component\CssSelector\Node\ElementNode;
 
-class CombinedSelectorNodeTest extends \PHPUnit_Framework_TestCase
+class CombinedSelectorNodeTest extends AbstractNodeTest
 {
-    public function testToXpath()
+    public function getToStringConversionTestData()
     {
-        $combinators = array(
-            ' ' => "h1/descendant::p",
-            '>' => "h1/p",
-            '+' => "h1/following-sibling::*[name() = 'p' and (position() = 1)]",
-            '~' => "h1/following-sibling::p",
+        return array(
+            array(new CombinedSelectorNode(new ElementNode(), '>', new ElementNode()), 'CombinedSelector[Element[*] > Element[*]]'),
+            array(new CombinedSelectorNode(new ElementNode(), ' ', new ElementNode()), 'CombinedSelector[Element[*] <followed> Element[*]]'),
         );
+    }
 
-        // h1 ?? p
-        $element1 = new ElementNode('*', 'h1');
-        $element2 = new ElementNode('*', 'p');
-        foreach ($combinators as $combinator => $xpath) {
-            $combinator = new CombinedSelectorNode($element1, $combinator, $element2);
-            $this->assertEquals($xpath, (string) $combinator->toXpath(), '->toXpath() returns the xpath representation of the node');
-        }
+    public function getSpecificityValueTestData()
+    {
+        return array(
+            array(new CombinedSelectorNode(new ElementNode(), '>', new ElementNode()), 0),
+            array(new CombinedSelectorNode(new ElementNode(null, 'element'), '>', new ElementNode()), 1),
+            array(new CombinedSelectorNode(new ElementNode(null, 'element'), '>', new ElementNode(null, 'element')), 2),
+        );
     }
 }

@@ -11,36 +11,17 @@
 
 namespace Symfony\Component\Locale\Stub\DateFormat;
 
+use Symfony\Component\Intl\DateFormatter\DateFormat\DayOfYearTransformer as BaseDayOfYearTransformer;
+
 /**
- * Parser and formatter for day of year format
+ * Alias of {@link \Symfony\Component\Intl\DateFormatter\DateFormat\DayOfYearTransformer}.
  *
- * @author Igor Wiedler <igor@wiedler.ch>
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
+ *             {@link \Symfony\Component\Intl\DateFormatter\DateFormat\DayOfYearTransformer}
+ *             instead.
  */
-class DayOfYearTransformer extends Transformer
+class DayOfYearTransformer extends BaseDayOfYearTransformer
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function format(\DateTime $dateTime, $length)
-    {
-        $dayOfYear = $dateTime->format('z') + 1;
-
-        return $this->padLeft($dayOfYear, $length);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getReverseMatchingRegExp($length)
-    {
-        return '\d{'.$length.'}';
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function extractDateOptions($matched, $length)
-    {
-        return array();
-    }
 }

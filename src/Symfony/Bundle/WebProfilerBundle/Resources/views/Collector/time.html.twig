@@ -18,7 +18,7 @@
 {% block toolbar %}
     {% set duration = collector.events|length ? '%.0f ms'|format(collector.duration) : 'n/a' %}
     {% set icon %}
-        <img width="16" height="28" alt="Time" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAcCAYAAABoMT8aAAABqUlEQVR42t2Vv0sCYRyHX9OmEhsMx/YKGlwLQ69DTEUSBJEQEy5J3FRc/BsuiFqEIIcQIRo6ysUhoaBBWhoaGoJwiMJLglRKrs8bXgienmkQdPDAwX2f57j3fhFJkkbiPwTK5bIiFoul3kmPud8MqKMewDXpwuGww+12n9hsNhFnlijYf/Z4PDmO45Yxo+10ZFGTyWRMEItU6AdCx7lczkgd6n7J2Wx2xm63P6jJMk6n80YQBBN1aUDv9XqvlAbbm2LE7/cLODRB0un0VveAeoDC8/waCQQC18MGQqHQOcEKvw8bcLlcL6TfYnVtCrGRAlartUUYhmn1jKg/E3USjUYfhw3E4/F7ks/nz4YNFIvFQ/ogbUYikdefyqlU6gnuOg2YK5XKvs/n+xhUDgaDTVEUt+HO04ABOBA5isViDTU5kUi81Wq1AzhWMEkDGmAEq2C3UCjcYXGauDvfEsuyUjKZbJRKpVvM8IABU9SVX+cxYABmwIE9cFqtVi9xtgvsC2AHbIAFoKey0gdlHEyDObAEWLACFsEsMALdIJ80+dK0bTS95v7+v/AJnis0eO906QwAAAAASUVORK5CYII=">
+        <img width="16" height="28" alt="Time" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAcCAYAAABoMT8aAAABqUlEQVR42t2Vv0sCYRyHX9OmEhsMx/YKGlwLQ69DTEUSBJEQEy5J3FRc/BsuiFqEIIcQIRo6ysUhoaBBWhoaGoJwiMJLglRKrs8bXgienmkQdPDAwX2f57j3fhFJkkbiPwTK5bIiFoul3kmPud8MqKMewDXpwuGww+12n9hsNhFnlijYf/Z4PDmO45Yxo+10ZFGTyWRMEItU6AdCx7lczkgd6n7J2Wx2xm63P6jJMk6n80YQBBN1aUDv9XqvlAbbm2LE7/cLODRB0un0VveAeoDC8/waCQQC18MGQqHQOcEKvw8bcLlcL6TfYnVtCrGRAlartUUYhmn1jKg/E3USjUYfhw3E4/F7ks/nz4YNFIvFQ/ogbUYikdefyqlU6gnuOg2YK5XKvs/n+xhUDgaDTVEUt+HO04ABOBA5isViDTU5kUi81Wq1AzhWMEkDGmAEq2C3UCjcYXGauDvfEsuyUjKZbJRKpVvM8IABU9SVX+cxYABmwIE9cFqtVi9xtgvsC2AHbIAFoKey0gdlHEyDObAEWLACFsEsMALdIJ80+dK0bTS95v7+v/AJnis0eO906QwAAAAASUVORK5CYII=" />
         <span>{{ duration }}</span>
     {% endset %}
     {% set text %}
@@ -77,8 +77,6 @@
         </small>
     </h3>
 
-    {% set max = collector.events.__section__.endtime %}
-
     {{ display_timeline('timeline_' ~ token, collector.events, colors) }}
 
     {% if profile.children|length %}
@@ -93,7 +91,7 @@
         {% endfor %}
     {% endif %}
 
-    <script>//<![CDATA[
+    <script>{% autoescape 'js' %}//<![CDATA[
         /**
          * In-memory key-value cache manager
          */
@@ -194,7 +192,10 @@
                     h = space,
                     x = request.left * ratio + space, // position
                     canvas = cache.get(elementId) || cache.set(elementId, document.getElementById(elementId)),
-                    ctx    = canvas.getContext("2d");
+                    ctx    = canvas.getContext("2d"),
+                    backingStoreRatio,
+                    scaleRatio,
+                    devicePixelRatio;
 
                 // Filter events whose total time is below the threshold.
                 drawableEvents = request.events.filter(function(event) {
@@ -203,8 +204,20 @@
 
                 canvasHeight += gapPerEvent * drawableEvents.length;
 
-                canvas.width  = width;
-                canvas.height = canvasHeight;
+                // For retina displays so text and boxes will be crisp
+                devicePixelRatio  = window.devicePixelRatio          == "undefined" ? 1 : window.devicePixelRatio;
+                backingStoreRatio = ctx.webkitBackingStorePixelRatio == "undefined" ? 1 : ctx.webkitBackingStorePixelRatio;
+                scaleRatio        = devicePixelRatio / 1;
+
+                canvasHeight += gapPerEvent * drawableEvents.length;
+
+                canvas.width  = width * scaleRatio;
+                canvas.height = canvasHeight * scaleRatio;
+
+                canvas.style.width = width + 'px';
+                canvas.style.height = canvasHeight + 'px';
+
+                ctx.scale(scaleRatio, scaleRatio);
 
                 ctx.textBaseline = "middle";
                 ctx.lineWidth = 0;
@@ -236,7 +249,7 @@
 
                 // Filter for main events.
                 mainEvents = drawableEvents.filter(function(event) {
-                    return ! isChildEvent(event)
+                    return !isChildEvent(event)
                 });
 
                 // For each main event, draw the visual presentation of timelines.
@@ -261,7 +274,7 @@
                         // Draw the timeline
                         var timelineHeadPosition = x + period.start * ratio;
 
-                        if ( ! isSectionEvent(event)) {
+                        if (!isSectionEvent(event)) {
                             ctx.fillRect(timelineHeadPosition, h + 3, 2, 6);
                             ctx.fillRect(timelineHeadPosition, h, (period.end - period.start) * ratio || 2, 6);
                         } else {
@@ -430,10 +443,11 @@
             canvasAutoUpdateOnThresholdChange(null);
         }, 50);
 
-    //]]></script>
+    //]]>{% endautoescape %}</script>
 {% endblock %}
 
 {% macro dump_request_data(token, profile, events, origin) %}
+{% autoescape 'js' %}
 {% from _self import dump_events %}
                 {
                     "id": "{{ token }}",
@@ -442,13 +456,15 @@
 {{ dump_events(events) }}
                     ]
                 }
+{% endautoescape %}
 {% endmacro %}
 
 {% macro dump_events(events) %}
+{% autoescape 'js' %}
 {% for name, event in events %}
 {% if '__section__' != name %}
                         {
-                            "name": "{{ name|replace({"\\": "\\\\"}) }}",
+                            "name": "{{ name }}",
                             "category": "{{ event.category }}",
                             "origin": {{ "%F"|format(event.origin) }},
                             "starttime": {{ "%F"|format(event.starttime) }},
@@ -463,6 +479,7 @@
                         }{{ loop.last ? '' : ',' }}
 {% endif %}
 {% endfor %}
+{% endautoescape %}
 {% endmacro %}
 
 {% macro display_timeline(id, events, colors) %}

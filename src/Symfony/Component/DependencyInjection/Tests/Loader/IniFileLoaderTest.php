@@ -29,10 +29,6 @@ class IniFileLoaderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        if (!class_exists('Symfony\Component\Config\Loader\Loader')) {
-            $this->markTestSkipped('The "Config" component is not available');
-        }
-
         $this->container = new ContainerBuilder();
         $this->loader    = new IniFileLoader($this->container, new FileLocator(self::$fixturesPath.'/ini'));
     }
@@ -50,31 +46,25 @@ class IniFileLoaderTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers Symfony\Component\DependencyInjection\Loader\IniFileLoader::__construct
      * @covers Symfony\Component\DependencyInjection\Loader\IniFileLoader::load
+     *
+     * @expectedException        \InvalidArgumentException
+     * @expectedExceptionMessage The file "foo.ini" does not exist (in:
      */
     public function testExceptionIsRaisedWhenIniFileDoesNotExist()
     {
-        try {
-            $this->loader->load('foo.ini');
-            $this->fail('->load() throws an InvalidArgumentException if the loaded file does not exist');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if the loaded file does not exist');
-            $this->assertStringStartsWith('The file "foo.ini" does not exist (in: ', $e->getMessage(), '->load() throws an InvalidArgumentException if the loaded file does not exist');
-        }
+        $this->loader->load('foo.ini');
     }
 
     /**
      * @covers Symfony\Component\DependencyInjection\Loader\IniFileLoader::__construct
      * @covers Symfony\Component\DependencyInjection\Loader\IniFileLoader::load
+     *
+     * @expectedException        \InvalidArgumentException
+     * @expectedExceptionMessage The "nonvalid.ini" file is not valid.
      */
     public function testExceptionIsRaisedWhenIniFileCannotBeParsed()
     {
-        try {
-            @$this->loader->load('nonvalid.ini');
-            $this->fail('->load() throws an InvalidArgumentException if the loaded file is not parseable');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if the loaded file is not parseable');
-            $this->assertEquals('The "nonvalid.ini" file is not valid.', $e->getMessage(), '->load() throws an InvalidArgumentException if the loaded file is not parseable');
-        }
+        @$this->loader->load('nonvalid.ini');
     }
 
     /**

@@ -24,6 +24,8 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
     {
         $allow = array();
         $pathinfo = rawurldecode($pathinfo);
+        $context = $this->context;
+        $request = $this->request;
 
         if (0 === strpos($pathinfo, '/rootprefix')) {
             // static
@@ -36,6 +38,11 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                 return $this->mergeDefaults(array_replace($matches, array('_route' => 'dynamic')), array ());
             }
 
+        }
+
+        // with-condition
+        if ($pathinfo === '/with-condition' && ($context->getMethod() == "GET")) {
+            return array('_route' => 'with-condition');
         }
 
         throw 0 < count($allow) ? new MethodNotAllowedException(array_unique($allow)) : new ResourceNotFoundException();

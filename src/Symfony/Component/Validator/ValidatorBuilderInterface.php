@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator;
 
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Validator\Mapping\Cache\CacheInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use Doctrine\Common\Annotations\Reader;
@@ -113,14 +114,11 @@ interface ValidatorBuilderInterface
     /**
      * Sets the class metadata factory used by the validator.
      *
-     * As of Symfony 2.3, the first parameter of this method will be typed
-     * against {@link MetadataFactoryInterface}.
-     *
-     * @param MetadataFactoryInterface|Mapping\ClassMetadataFactoryInterface $metadataFactory The metadata factory.
+     * @param MetadataFactoryInterface $metadataFactory The metadata factory.
      *
      * @return ValidatorBuilderInterface The builder object.
      */
-    public function setMetadataFactory($metadataFactory);
+    public function setMetadataFactory(MetadataFactoryInterface $metadataFactory);
 
     /**
      * Sets the cache for caching class metadata.
@@ -161,6 +159,15 @@ interface ValidatorBuilderInterface
      * @return ValidatorBuilderInterface The builder object.
      */
     public function setTranslationDomain($translationDomain);
+
+    /**
+     * Sets the property accessor for resolving property paths.
+     *
+     * @param PropertyAccessorInterface $propertyAccessor The property accessor.
+     *
+     * @return ValidatorBuilderInterface The builder object.
+     */
+    public function setPropertyAccessor(PropertyAccessorInterface $propertyAccessor);
 
     /**
      * Builds and returns a new validator object.

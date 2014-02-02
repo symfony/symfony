@@ -57,11 +57,17 @@
             <logout />
         </firewall>
 
+        <firewall name="host" pattern="/test" host="foo\.example\.org">
+            <anonymous />
+            <http-basic />
+        </firewall>
+
         <role id="ROLE_ADMIN">ROLE_USER</role>
         <role id="ROLE_SUPER_ADMIN">ROLE_USER,ROLE_ADMIN,ROLE_ALLOWED_TO_SWITCH</role>
         <role id="ROLE_REMOTE">ROLE_USER,ROLE_ADMIN</role>
 
         <rule path="/blog/524" role="ROLE_USER" requires-channel="https" methods="get,POST" />
         <rule role='IS_AUTHENTICATED_ANONYMOUSLY' path="/blog/.*" />
+        <rule role='IS_AUTHENTICATED_ANONYMOUSLY' allow-if="token.getUsername() matches '/^admin/'" path="/blog/524" />
     </config>
 </srv:container>

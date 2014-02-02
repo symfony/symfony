@@ -221,8 +221,8 @@
       the XML namespace, e.g. as follows:
      </p>
      <pre>
-          &lt;schema . . .>
-           . . .
+          &lt;schema.. .>
+          .. .
            &lt;import namespace="http://www.w3.org/XML/1998/namespace"
                       schemaLocation="http://www.w3.org/2001/xml.xsd"/>
      </pre>
@@ -239,8 +239,8 @@
       group defined below will have the desired effect, e.g.
      </p>
      <pre>
-          &lt;type . . .>
-           . . .
+          &lt;type.. .>
+          .. .
            &lt;attributeGroup ref="xml:specialAttrs"/>
      </pre>
      <p>

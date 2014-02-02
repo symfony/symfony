@@ -14,14 +14,20 @@ namespace Symfony\Component\CssSelector\Tests\Node;
 use Symfony\Component\CssSelector\Node\HashNode;
 use Symfony\Component\CssSelector\Node\ElementNode;
 
-class HashNodeTest extends \PHPUnit_Framework_TestCase
+class HashNodeTest extends AbstractNodeTest
 {
-    public function testToXpath()
+    public function getToStringConversionTestData()
     {
-        // h1#foo
-        $element = new ElementNode('*', 'h1');
-        $hash = new HashNode($element, 'foo');
+        return array(
+            array(new HashNode(new ElementNode(), 'id'), 'Hash[Element[*]#id]'),
+        );
+    }
 
-        $this->assertEquals("h1[@id = 'foo']", (string) $hash->toXpath(), '->toXpath() returns the xpath representation of the node');
+    public function getSpecificityValueTestData()
+    {
+        return array(
+            array(new HashNode(new ElementNode(), 'id'), 100),
+            array(new HashNode(new ElementNode(null, 'id'), 'class'), 101),
+        );
     }
 }

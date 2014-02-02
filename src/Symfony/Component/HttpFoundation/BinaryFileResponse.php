@@ -34,13 +34,13 @@ class BinaryFileResponse extends Response
     /**
      * Constructor.
      *
-     * @param SplFileInfo|string $file               The file to stream
-     * @param integer            $status             The response status code
-     * @param array              $headers            An array of response headers
-     * @param boolean            $public             Files are public by default
-     * @param null|string        $contentDisposition The type of Content-Disposition to set automatically with the filename
-     * @param boolean            $autoEtag           Whether the ETag header should be automatically set
-     * @param boolean            $autoLastModified   Whether the Last-Modified header should be automatically set
+     * @param \SplFileInfo|string $file               The file to stream
+     * @param integer             $status             The response status code
+     * @param array               $headers            An array of response headers
+     * @param boolean             $public             Files are public by default
+     * @param null|string         $contentDisposition The type of Content-Disposition to set automatically with the filename
+     * @param boolean             $autoEtag           Whether the ETag header should be automatically set
+     * @param boolean             $autoLastModified   Whether the Last-Modified header should be automatically set
      */
     public function __construct($file, $status = 200, $headers = array(), $public = true, $contentDisposition = null, $autoEtag = false, $autoLastModified = true)
     {
@@ -54,7 +54,13 @@ class BinaryFileResponse extends Response
     }
 
     /**
-     * {@inheritdoc}
+     * @param \SplFileInfo|string $file               The file to stream
+     * @param integer             $status             The response status code
+     * @param array               $headers            An array of response headers
+     * @param boolean             $public             Files are public by default
+     * @param null|string         $contentDisposition The type of Content-Disposition to set automatically with the filename
+     * @param boolean             $autoEtag           Whether the ETag header should be automatically set
+     * @param boolean             $autoLastModified   Whether the Last-Modified header should be automatically set
      */
     public static function create($file = null, $status = 200, $headers = array(), $public = true, $contentDisposition = null, $autoEtag = false, $autoLastModified = true)
     {
@@ -64,10 +70,10 @@ class BinaryFileResponse extends Response
     /**
      * Sets the file to stream.
      *
-     * @param SplFileInfo|string $file The file to stream
-     * @param string             $contentDisposition
-     * @param Boolean            $autoEtag
-     * @param Boolean            $autoLastModified
+     * @param \SplFileInfo|string $file The file to stream
+     * @param string              $contentDisposition
+     * @param Boolean             $autoEtag
+     * @param Boolean             $autoLastModified
      *
      * @return BinaryFileResponse
      *
@@ -166,6 +172,8 @@ class BinaryFileResponse extends Response
             $this->setProtocolVersion('1.1');
         }
 
+        $this->ensureIEOverSSLCompatibility($request);
+
         $this->offset = 0;
         $this->maxlen = -1;
 
@@ -175,7 +183,7 @@ class BinaryFileResponse extends Response
             $path = $this->file->getRealPath();
             if (strtolower($type) == 'x-accel-redirect') {
                 // Do X-Accel-Mapping substitutions.
-                foreach (explode(',', $request->headers->get('X-Accel-Mapping', ''))  as $mapping) {
+                foreach (explode(',', $request->headers->get('X-Accel-Mapping', '')) as $mapping) {
                     $mapping = explode('=', $mapping, 2);
 
                     if (2 == count($mapping)) {
@@ -183,7 +191,7 @@ class BinaryFileResponse extends Response
                         $pathPrefix = trim($mapping[1]);
 
                         if (substr($path, 0, strlen($pathPrefix)) == $pathPrefix) {
-                            $path = $location . substr($path, strlen($pathPrefix));
+                            $path = $location.substr($path, strlen($pathPrefix));
                             break;
                         }
                     }
@@ -208,14 +216,18 @@ class BinaryFileResponse extends Response
                     $start = (int) $start;
                 }
 
-                $start = max($start, 0);
-                $end = min($end, $fileSize - 1);
+                if ($start <= $end) {
+                    if ($start < 0 || $end > $fileSize - 1) {
+                        $this->setStatusCode(416);
+                    } elseif ($start !== 0 || $end !== $fileSize - 1) {
+                        $this->maxlen = $end < $fileSize ? $end - $start + 1 : -1;
+                        $this->offset = $start;
 
-                $this->maxlen = $end < $fileSize ? $end - $start + 1 : -1;
-                $this->offset = $start;
-
-                $this->setStatusCode(206);
-                $this->headers->set('Content-Range', sprintf('bytes %s-%s/%s', $start, $end, $fileSize));
+                        $this->setStatusCode(206);
+                        $this->headers->set('Content-Range', sprintf('bytes %s-%s/%s', $start, $end, $fileSize));
+                        $this->headers->set('Content-Length', $end - $start + 1);
+                    }
+                }
             }
         }
 

@@ -11,25 +11,53 @@
 
 namespace Symfony\Component\Form\Extension\Csrf;
 
-use Symfony\Component\Form\Extension\Csrf\Type;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderAdapter;
 use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Form\AbstractExtension;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * This extension protects forms by using a CSRF token.
+ *
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class CsrfExtension extends AbstractExtension
 {
-    private $csrfProvider;
+    /**
+     * @var CsrfTokenManagerInterface
+     */
+    private $tokenManager;
+
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @var null|string
+     */
+    private $translationDomain;
 
     /**
      * Constructor.
      *
-     * @param CsrfProviderInterface $csrfProvider The CSRF provider
+     * @param CsrfTokenManagerInterface $tokenManager      The CSRF token manager
+     * @param TranslatorInterface       $translator        The translator for translating error messages
+     * @param null|string               $translationDomain The translation domain for translating
      */
-    public function __construct(CsrfProviderInterface $csrfProvider)
+    public function __construct($tokenManager, TranslatorInterface $translator = null, $translationDomain = null)
     {
-        $this->csrfProvider = $csrfProvider;
+        if ($tokenManager instanceof CsrfProviderInterface) {
+            $tokenManager = new CsrfProviderAdapter($tokenManager);
+        } elseif (!$tokenManager instanceof CsrfTokenManagerInterface) {
+            throw new UnexpectedTypeException($tokenManager, 'CsrfProviderInterface or CsrfTokenManagerInterface');
+        }
+
+        $this->tokenManager = $tokenManager;
+        $this->translator = $translator;
+        $this->translationDomain = $translationDomain;
     }
 
     /**
@@ -38,7 +66,7 @@ class CsrfExtension extends AbstractExtension
     protected function loadTypeExtensions()
     {
         return array(
-            new Type\FormTypeCsrfExtension($this->csrfProvider),
+            new Type\FormTypeCsrfExtension($this->tokenManager, true, '_token', $this->translator, $this->translationDomain),
         );
     }
 }

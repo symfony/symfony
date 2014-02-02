@@ -1,6 +1,24 @@
 CHANGELOG
 =========
 
+2.4.0
+-----
+
+ * `Crawler::addXmlContent()` removes the default document namespace again if it's an only namespace.
+ * added support for automatic discovery and explicit registration of document
+   namespaces for `Crawler::filterXPath()` and `Crawler::filter()`
+ * improved content type guessing in `Crawler::addContent()`
+ * [BC BREAK] `Crawler::addXmlContent()` no longer removes the default document
+   namespace
+
+2.3.0
+-----
+
+ * added Crawler::html()
+ * [BC BREAK] Crawler::each() and Crawler::reduce() now return Crawler instances instead of DomElement instances
+ * added schema relative URL support to links
+ * added support for HTML5 'form' attribute
+
 2.2.0
 -----
 

@@ -67,6 +67,8 @@ class ResponseHeaderBag extends HeaderBag
             $cookies .= 'Set-Cookie: '.$cookie."\r\n";
         }
 
+        ksort($this->headerNames);
+
         return parent::__toString().$cookies;
     }
 

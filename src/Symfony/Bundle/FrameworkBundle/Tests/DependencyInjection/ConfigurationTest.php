@@ -22,7 +22,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         $config = $processor->processConfiguration(new Configuration(), array(array('secret' => 's3cr3t')));
 
         $this->assertEquals(
-            array_merge(array('secret' => 's3cr3t'), self::getBundleDefaultConfig()),
+            array_merge(array('secret' => 's3cr3t', 'trusted_hosts' => array()), self::getBundleDefaultConfig()),
             $config
         );
     }
@@ -51,6 +51,8 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             array(null, array()),
             array(false, array()),
             array(array(), array()),
+            array(array('10.0.0.0/8'), array('10.0.0.0/8')),
+            array(array('::ffff:0:0/96'), array('::ffff:0:0/96')),
         );
     }
 
@@ -87,14 +89,19 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     protected static function getBundleDefaultConfig()
     {
         return array(
-            'charset'             => null,
-            'trust_proxy_headers' => false,
+            'http_method_override' => true,
             'trusted_proxies'     => array(),
             'ide'                 => null,
             'default_locale'      => 'en',
-            'form'                => array('enabled' => false),
+            'form'                => array(
+                'enabled' => false,
+                'csrf_protection' => array(
+                    'enabled' => null, // defaults to csrf_protection.enabled
+                    'field_name' => null,
+                ),
+            ),
             'csrf_protection'     => array(
-                'enabled'    => true,
+                'enabled'    => false,
                 'field_name' => '_token',
             ),
             'esi'                 => array('enabled' => false),
@@ -110,6 +117,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'username'             => '',
                 'password'             => '',
                 'lifetime'             => 86400,
+                'collect'              => true,
             ),
             'translator'          => array(
                 'enabled'  => false,
@@ -125,6 +133,9 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'file_cache_dir' => '%kernel.cache_dir%/annotations',
                 'debug'          => '%kernel.debug%',
             ),
+            'serializer'          => array(
+                'enabled' => false
+            )
         );
     }
 }

@@ -28,6 +28,8 @@ class FormPass implements CompilerPassInterface
             return;
         }
 
+        $definition = $container->getDefinition('form.extension');
+
         // Builds an array with service IDs as keys and tag aliases as values
         $types = array();
 
@@ -40,7 +42,7 @@ class FormPass implements CompilerPassInterface
             $types[$alias] = $serviceId;
         }
 
-        $container->getDefinition('form.extension')->replaceArgument(1, $types);
+        $definition->replaceArgument(1, $types);
 
         $typeExtensions = array();
 
@@ -52,11 +54,11 @@ class FormPass implements CompilerPassInterface
             $typeExtensions[$alias][] = $serviceId;
         }
 
-        $container->getDefinition('form.extension')->replaceArgument(2, $typeExtensions);
+        $definition->replaceArgument(2, $typeExtensions);
 
         // Find all services annotated with "form.type_guesser"
         $guessers = array_keys($container->findTaggedServiceIds('form.type_guesser'));
 
-        $container->getDefinition('form.extension')->replaceArgument(3, $guessers);
+        $definition->replaceArgument(3, $guessers);
     }
 }

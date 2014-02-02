@@ -45,7 +45,7 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
         $string = '';
 
         foreach ($this->violations as $violation) {
-            $string .= $violation . "\n";
+            $string .= $violation."\n";
         }
 
         return $string;

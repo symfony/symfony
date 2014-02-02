@@ -253,7 +253,7 @@ class OptionsResolver implements OptionsResolverInterface
             ksort($diff);
 
             throw new InvalidOptionsException(sprintf(
-                (count($diff) > 1 ? 'The options "%s" do not exist.' : 'The option "%s" does not exist.') . ' Known options are: "%s"',
+                (count($diff) > 1 ? 'The options "%s" do not exist.' : 'The option "%s" does not exist.').' Known options are: "%s"',
                 implode('", "', array_keys($diff)),
                 implode('", "', array_keys($this->knownOptions))
             ));
@@ -294,8 +294,14 @@ class OptionsResolver implements OptionsResolverInterface
     private function validateOptionValues(array $options)
     {
         foreach ($this->allowedValues as $option => $allowedValues) {
-            if (isset($options[$option]) && !in_array($options[$option], $allowedValues, true)) {
-                throw new InvalidOptionsException(sprintf('The option "%s" has the value "%s", but is expected to be one of "%s"', $option, $options[$option], implode('", "', $allowedValues)));
+            if (isset($options[$option])) {
+                if (is_array($allowedValues) && !in_array($options[$option], $allowedValues, true)) {
+                    throw new InvalidOptionsException(sprintf('The option "%s" has the value "%s", but is expected to be one of "%s"', $option, $options[$option], implode('", "', $allowedValues)));
+                }
+
+                if (is_callable($allowedValues) && !call_user_func($allowedValues, $options[$option])) {
+                    throw new InvalidOptionsException(sprintf('The option "%s" has the value "%s", which it is not valid', $option, $options[$option]));
+                }
             }
         }
     }
@@ -320,7 +326,7 @@ class OptionsResolver implements OptionsResolverInterface
             $allowedTypes = (array) $allowedTypes;
 
             foreach ($allowedTypes as $type) {
-                $isFunction = 'is_' . $type;
+                $isFunction = 'is_'.$type;
 
                 if (function_exists($isFunction) && $isFunction($value)) {
                     continue 2;

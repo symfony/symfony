@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+2.4.0
+-----
+
+ * deprecated the DebugClassLoader as it has been moved to the Debug component instead
+
+2.3.0
+-----
+
+ * added a WinCacheClassLoader for WinCache
+
 2.1.0
 -----
 

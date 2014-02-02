@@ -30,10 +30,41 @@ class DateRangeFilterIteratorTest extends RealIteratorTestCase
 
     public function getAcceptData()
     {
+        $since20YearsAgo = array(
+            '.git',
+            'test.py',
+            'foo',
+            'foo/bar.tmp',
+            'test.php',
+            'toto',
+            '.bar',
+            '.foo',
+            '.foo/.bar',
+            'foo bar',
+            '.foo/bar',
+        );
+
+        $since2MonthsAgo = array(
+            '.git',
+            'test.py',
+            'foo',
+            'toto',
+            '.bar',
+            '.foo',
+            '.foo/.bar',
+            'foo bar',
+            '.foo/bar',
+        );
+
+        $untilLastMonth = array(
+            'foo/bar.tmp',
+            'test.php',
+        );
+
         return array(
-            array(array(new DateComparator('since 20 years ago')), array(sys_get_temp_dir().'/symfony2_finder/.git', sys_get_temp_dir().'/symfony2_finder/test.py', sys_get_temp_dir().'/symfony2_finder/foo', sys_get_temp_dir().'/symfony2_finder/foo/bar.tmp', sys_get_temp_dir().'/symfony2_finder/test.php', sys_get_temp_dir().'/symfony2_finder/toto', sys_get_temp_dir().'/symfony2_finder/.bar', sys_get_temp_dir().'/symfony2_finder/.foo', sys_get_temp_dir().'/symfony2_finder/.foo/.bar', sys_get_temp_dir().'/symfony2_finder/foo bar')),
-            array(array(new DateComparator('since 2 months ago')), array(sys_get_temp_dir().'/symfony2_finder/.git', sys_get_temp_dir().'/symfony2_finder/test.py', sys_get_temp_dir().'/symfony2_finder/foo', sys_get_temp_dir().'/symfony2_finder/toto', sys_get_temp_dir().'/symfony2_finder/.bar', sys_get_temp_dir().'/symfony2_finder/.foo', sys_get_temp_dir().'/symfony2_finder/.foo/.bar', sys_get_temp_dir().'/symfony2_finder/foo bar')),
-            array(array(new DateComparator('until last month')), array(sys_get_temp_dir().'/symfony2_finder/.git', sys_get_temp_dir().'/symfony2_finder/foo', sys_get_temp_dir().'/symfony2_finder/foo/bar.tmp', sys_get_temp_dir().'/symfony2_finder/test.php', sys_get_temp_dir().'/symfony2_finder/toto', sys_get_temp_dir().'/symfony2_finder/.foo')),
+            array(array(new DateComparator('since 20 years ago')), $this->toAbsolute($since20YearsAgo)),
+            array(array(new DateComparator('since 2 months ago')), $this->toAbsolute($since2MonthsAgo)),
+            array(array(new DateComparator('until last month')), $this->toAbsolute($untilLastMonth)),
         );
     }
 }

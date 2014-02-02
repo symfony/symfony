@@ -4,6 +4,7 @@ twig:
             - MyBundle::form.html.twig
     globals:
         foo: "@bar"
+        baz: "@@qux"
         pi:  3.14
         bad: {key: foo}
     auto_reload:         true

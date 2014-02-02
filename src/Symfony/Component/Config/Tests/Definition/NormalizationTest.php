@@ -14,7 +14,7 @@ namespace Symfony\Component\Config\Tests\Definition;
 use Symfony\Component\Config\Definition\NodeInterface;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 
-class NormalizerTest extends \PHPUnit_Framework_TestCase
+class NormalizationTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider getEncoderTests
@@ -29,7 +29,7 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
                     ->node('encoders', 'array')
                         ->useAttributeAsKey('class')
                         ->prototype('array')
-                            ->beforeNormalization()->ifString()->then(function($v) { return array('algorithm' => $v); })->end()
+                            ->beforeNormalization()->ifString()->then(function ($v) { return array('algorithm' => $v); })->end()
                             ->children()
                                 ->node('algorithm', 'scalar')->end()
                             ->end()
@@ -86,7 +86,7 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
             ),
         );
 
-        return array_map(function($v) {
+        return array_map(function ($v) {
             return array($v);
         }, $configs);
     }
@@ -134,7 +134,7 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
             ),
         );
 
-        return array_map(function($v) { return array($v); }, $configs);
+        return array_map(function ($v) { return array($v); }, $configs);
     }
 
     /**
@@ -165,7 +165,7 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
             ),
         );
 
-        return array_map(function($v) { return array($v); }, $configs);
+        return array_map(function ($v) { return array($v); }, $configs);
     }
 
     /**

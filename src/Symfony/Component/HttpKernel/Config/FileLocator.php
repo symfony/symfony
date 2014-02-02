@@ -28,14 +28,16 @@ class FileLocator extends BaseFileLocator
      * Constructor.
      *
      * @param KernelInterface $kernel A KernelInterface instance
-     * @param string          $path   The path the global resource directory
-     * @param string|array    $paths  A path or an array of paths where to look for resources
+     * @param null|string     $path   The path the global resource directory
+     * @param array           $paths  An array of paths where to look for resources
      */
     public function __construct(KernelInterface $kernel, $path = null, array $paths = array())
     {
         $this->kernel = $kernel;
-        $this->path = $path;
-        $paths[] = $path;
+        if (null !== $path) {
+            $this->path = $path;
+            $paths[] = $path;
+        }
 
         parent::__construct($paths);
     }

@@ -148,7 +148,7 @@ class XmlFileLoader extends FileLoader
             $definition = new Definition();
         }
 
-        foreach (array('class', 'scope', 'public', 'factory-class', 'factory-method', 'factory-service', 'synthetic', 'abstract') as $key) {
+        foreach (array('class', 'scope', 'public', 'factory-class', 'factory-method', 'factory-service', 'synthetic', 'synchronized', 'lazy', 'abstract') as $key) {
             if (isset($service[$key])) {
                 $method = 'set'.str_replace('-', '', $key);
                 $definition->$method((string) $service->getAttributeAsPhp($key));
@@ -187,6 +187,10 @@ class XmlFileLoader extends FileLoader
                     continue;
                 }
 
+                if (false !== strpos($name, '-') && false === strpos($name, '_') && !array_key_exists($normalizedName = str_replace('-', '_', $name), $parameters)) {
+                    $parameters[$normalizedName] = SimpleXMLElement::phpize($value);
+                }
+                // keep not normalized key for BC too
                 $parameters[$name] = SimpleXMLElement::phpize($value);
             }
 
@@ -210,7 +214,7 @@ class XmlFileLoader extends FileLoader
         try {
             $dom = XmlUtils::loadFile($file, array($this, 'validateSchema'));
         } catch (\InvalidArgumentException $e) {
-            throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
+            throw new InvalidArgumentException(sprintf('Unable to parse file "%s".', $file), $e->getCode(), $e);
         }
 
         $this->validateExtensions($dom, $file);
@@ -233,10 +237,11 @@ class XmlFileLoader extends FileLoader
         if (false !== $nodes = $xml->xpath('//container:argument[@type="service"][not(@id)]|//container:property[@type="service"][not(@id)]')) {
             foreach ($nodes as $node) {
                 // give it a unique name
-                $node['id'] = sprintf('%s_%d', md5($file), ++$count);
+                $id = sprintf('%s_%d', hash('sha256', $file), ++$count);
+                $node['id'] = $id;
 
-                $definitions[(string) $node['id']] = array($node->service, $file, false);
-                $node->service['id'] = (string) $node['id'];
+                $definitions[$id] = array($node->service, $file, false);
+                $node->service['id'] = $id;
             }
         }
 
@@ -244,10 +249,11 @@ class XmlFileLoader extends FileLoader
         if (false !== $nodes = $xml->xpath('//container:services/container:service[not(@id)]')) {
             foreach ($nodes as $node) {
                 // give it a unique name
-                $node['id'] = sprintf('%s_%d', md5($file), ++$count);
+                $id = sprintf('%s_%d', hash('sha256', $file), ++$count);
+                $node['id'] = $id;
 
-                $definitions[(string) $node['id']] = array($node, $file, true);
-                $node->service['id'] = (string) $node['id'];
+                $definitions[$id] = array($node, $file, true);
+                $node->service['id'] = $id;
             }
         }
 

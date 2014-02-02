@@ -27,7 +27,7 @@ class DoctrineOrmExtension extends AbstractExtension
     protected function loadTypes()
     {
         return array(
-            new Type\EntityType($this->registry, PropertyAccess::getPropertyAccessor()),
+            new Type\EntityType($this->registry, PropertyAccess::createPropertyAccessor()),
         );
     }
 

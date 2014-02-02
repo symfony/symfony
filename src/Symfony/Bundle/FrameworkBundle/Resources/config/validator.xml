@@ -17,13 +17,14 @@
         <parameter key="validator.validator_factory.class">Symfony\Bundle\FrameworkBundle\Validator\ConstraintValidatorFactory</parameter>
         <parameter key="validator.mapping.loader.xml_files_loader.mapping_files" type="collection" />
         <parameter key="validator.mapping.loader.yaml_files_loader.mapping_files" type="collection" />
+        <parameter key="validator.expression.class">Symfony\Component\Validator\Constraints\ExpressionValidator</parameter>
     </parameters>
 
     <services>
         <service id="validator" class="%validator.class%">
             <argument type="service" id="validator.mapping.class_metadata_factory" />
             <argument type="service" id="validator.validator_factory" />
-            <argument type="service" id="translator.default" />
+            <argument type="service" id="translator" />
             <argument>%validator.translation_domain%</argument>
             <argument type="collection" />
         </service>
@@ -62,6 +63,11 @@
 
         <service id="validator.mapping.loader.yaml_files_loader" class="%validator.mapping.loader.yaml_files_loader.class%" public="false">
             <argument>%validator.mapping.loader.yaml_files_loader.mapping_files%</argument>
+        </service>
+
+        <service id="validator.expression" class="%validator.expression.class%">
+            <argument type="service" id="property_accessor" />
+            <tag name="validator.constraint_validator" alias="validator.expression" />
         </service>
     </services>
 </container>

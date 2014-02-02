@@ -19,19 +19,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class HttpCacheTest extends HttpCacheTestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-    }
-
     public function testTerminateDelegatesTerminationOnlyForTerminableInterface()
     {
-        if (!class_exists('Symfony\Component\DependencyInjection\Container')) {
-            $this->markTestSkipped('The "DependencyInjection" component is not available');
-        }
-
         $storeMock = $this->getMockBuilder('Symfony\\Component\\HttpKernel\\HttpCache\\StoreInterface')
             ->disableOriginalConstructor()
             ->getMock();
@@ -145,7 +134,7 @@ class HttpCacheTest extends HttpCacheTestCase
 
         $this->assertHttpKernelIsCalled();
         $this->assertEquals(304, $this->response->getStatusCode());
-        $this->assertEquals('text/html; charset=UTF-8', $this->response->headers->get('Content-Type'));
+        $this->assertEquals('', $this->response->headers->get('Content-Type'));
         $this->assertEmpty($this->response->getContent());
         $this->assertTraceContains('miss');
         $this->assertTraceContains('store');
@@ -158,7 +147,7 @@ class HttpCacheTest extends HttpCacheTestCase
 
         $this->assertHttpKernelIsCalled();
         $this->assertEquals(304, $this->response->getStatusCode());
-        $this->assertEquals('text/html; charset=UTF-8', $this->response->headers->get('Content-Type'));
+        $this->assertEquals('', $this->response->headers->get('Content-Type'));
         $this->assertTrue($this->response->headers->has('ETag'));
         $this->assertEmpty($this->response->getContent());
         $this->assertTraceContains('miss');
@@ -634,7 +623,7 @@ class HttpCacheTest extends HttpCacheTestCase
         $r = new \ReflectionObject($this->store);
         $m = $r->getMethod('save');
         $m->setAccessible(true);
-        $m->invoke($this->store, 'md'.sha1('http://localhost/'), serialize($tmp));
+        $m->invoke($this->store, 'md'.hash('sha256', 'http://localhost/'), serialize($tmp));
 
         // build subsequent request; should be found but miss due to freshness
         $this->request('GET', '/');
@@ -845,7 +834,7 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertTraceContains('fresh');
 
         // now POST to same URL
-        $this->request('POST', '/');
+        $this->request('POST', '/helloworld');
         $this->assertHttpKernelIsCalled();
         $this->assertEquals('/', $this->response->headers->get('Location'));
         $this->assertTraceContains('invalidate');
@@ -1074,5 +1063,33 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->request('POST', '/', $server);
 
         $this->assertEquals('10.0.0.1', $this->kernel->getBackendRequest()->headers->get('X-Forwarded-For'));
+    }
+
+    public function testEsiCacheRemoveValidationHeadersIfEmbeddedResponses()
+    {
+        $time = new \DateTime;
+
+        $responses = array(
+            array(
+                'status'  => 200,
+                'body'    => '<esi:include src="/hey" />',
+                'headers' => array(
+                    'Surrogate-Control' => 'content="ESI/1.0"',
+                    'ETag' => 'hey',
+                    'Last-Modified' => $time->format(DATE_RFC2822),
+                ),
+            ),
+            array(
+                'status'  => 200,
+                'body'    => 'Hey!',
+                'headers' => array(),
+            ),
+        );
+
+        $this->setNextResponses($responses);
+
+        $this->request('GET', '/', array(), array(), true);
+        $this->assertNull($this->response->getETag());
+        $this->assertNull($this->response->getLastModified());
     }
 }

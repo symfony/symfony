@@ -13,10 +13,10 @@ namespace Symfony\Bundle\WebProfilerBundle\EventListener;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * WebDebugToolbarListener injects the Web Debug Toolbar.
@@ -34,13 +34,15 @@ class WebDebugToolbarListener implements EventSubscriberInterface
     const ENABLED  = 2;
 
     protected $twig;
+    protected $urlGenerator;
     protected $interceptRedirects;
     protected $mode;
     protected $position;
 
-    public function __construct(\Twig_Environment $twig, $interceptRedirects = false, $mode = self::ENABLED, $position = 'bottom')
+    public function __construct(\Twig_Environment $twig, $interceptRedirects = false, $mode = self::ENABLED, $position = 'bottom', UrlGeneratorInterface $urlGenerator = null)
     {
         $this->twig = $twig;
+        $this->urlGenerator = $urlGenerator;
         $this->interceptRedirects = (Boolean) $interceptRedirects;
         $this->mode = (integer) $mode;
         $this->position = $position;
@@ -53,12 +55,19 @@ class WebDebugToolbarListener implements EventSubscriberInterface
 
     public function onKernelResponse(FilterResponseEvent $event)
     {
-        if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
-            return;
-        }
-
         $response = $event->getResponse();
         $request = $event->getRequest();
+
+        if ($response->headers->has('X-Debug-Token') && null !== $this->urlGenerator) {
+            $response->headers->set(
+                'X-Debug-Token-Link',
+                $this->urlGenerator->generate('_profiler', array('token' => $response->headers->get('X-Debug-Token')))
+            );
+        }
+
+        if (!$event->isMasterRequest()) {
+            return;
+        }
 
         // do not capture redirects or modify XML HTTP Requests
         if ($request->isXmlHttpRequest()) {
@@ -67,7 +76,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
 
         if ($response->headers->has('X-Debug-Token') && $response->isRedirect() && $this->interceptRedirects) {
             $session = $request->getSession();
-            if ($session && $session->getFlashBag() instanceof AutoExpireFlashBag) {
+            if (null !== $session && $session->isStarted() && $session->getFlashBag() instanceof AutoExpireFlashBag) {
                 // keep current flashes for one more request if using AutoExpireFlashBag
                 $session->getFlashBag()->setAll($session->getFlashBag()->peekAll());
             }

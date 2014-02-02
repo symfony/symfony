@@ -125,13 +125,15 @@ class CodeHelper extends Helper
             if (extension_loaded('fileinfo')) {
                 $finfo = new \Finfo();
 
-                // Check if the file is an application/octet-stream (eg. Phar file) because hightlight_file cannot parse these files
+                // Check if the file is an application/octet-stream (eg. Phar file) because highlight_file cannot parse these files
                 if ('application/octet-stream' === $finfo->file($file, FILEINFO_MIME_TYPE)) {
                     return;
                 }
             }
 
-            $code = highlight_file($file, true);
+            // highlight_file could throw warnings
+            // see https://bugs.php.net/bug.php?id=25725
+            $code = @highlight_file($file, true);
             // remove main code/span tags
             $code = preg_replace('#^<code.*?>\s*<span.*?>(.*)</span>\s*</code>#s', '\\1', $code);
             $content = preg_split('#<br />#', $code);

@@ -32,7 +32,7 @@ class ContainerAwareHIncludeFragmentRenderer extends HIncludeFragmentRenderer
     {
         $this->container = $container;
 
-        parent::__construct(null, $signer, $globalDefaultTemplate);
+        parent::__construct(null, $signer, $globalDefaultTemplate, $container->getParameter('kernel.charset'));
     }
 
     /**

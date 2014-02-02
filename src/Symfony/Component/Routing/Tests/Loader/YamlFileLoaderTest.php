@@ -17,17 +17,6 @@ use Symfony\Component\Config\Resource\FileResource;
 
 class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\Config\FileLocator')) {
-            $this->markTestSkipped('The "Config" component is not available');
-        }
-
-        if (!class_exists('Symfony\Component\Yaml\Yaml')) {
-            $this->markTestSkipped('The "Yaml" component is not available');
-        }
-    }
-
     public function testSupports()
     {
         $loader = new YamlFileLoader($this->getMock('Symfony\Component\Config\FileLocator'));
@@ -73,23 +62,26 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('/true', $route->getPath());
     }
 
-    public function testLoadWithPattern()
+    public function testLoadWithRoute()
     {
         $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
         $routeCollection = $loader->load('validpattern.yml');
         $routes = $routeCollection->all();
 
-        $this->assertCount(2, $routes, 'Two routes are loaded');
+        $this->assertCount(3, $routes, 'Three routes are loaded');
         $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
 
-        foreach ($routes as $route) {
-            $this->assertEquals('/blog/{slug}', $route->getPath());
-            $this->assertEquals('MyBlogBundle:Blog:show', $route->getDefault('_controller'));
-            $this->assertEquals('GET', $route->getRequirement('_method'));
-            $this->assertEquals('https', $route->getRequirement('_scheme'));
-            $this->assertEquals('\w+', $route->getRequirement('locale'));
-            $this->assertEquals('{locale}.example.com', $route->getHost());
-            $this->assertEquals('RouteCompiler', $route->getOption('compiler_class'));
+        $identicalRoutes = array_slice($routes, 0, 2);
+
+        foreach ($identicalRoutes as $route) {
+            $this->assertSame('/blog/{slug}', $route->getPath());
+            $this->assertSame('{locale}.example.com', $route->getHost());
+            $this->assertSame('MyBundle:Blog:show', $route->getDefault('_controller'));
+            $this->assertSame('\w+', $route->getRequirement('locale'));
+            $this->assertSame('RouteCompiler', $route->getOption('compiler_class'));
+            $this->assertEquals(array('GET', 'POST', 'PUT', 'OPTIONS'), $route->getMethods());
+            $this->assertEquals(array('https'), $route->getSchemes());
+            $this->assertEquals('context.getMethod() == "GET"', $route->getCondition());
         }
     }
 
@@ -99,13 +91,17 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $routeCollection = $loader->load('validresource.yml');
         $routes = $routeCollection->all();
 
-        $this->assertCount(2, $routes, 'Two routes are loaded');
+        $this->assertCount(3, $routes, 'Three routes are loaded');
         $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
-        $this->assertEquals('/{foo}/blog/{slug}', $routes['blog_show']->getPath());
-        $this->assertEquals('MyBlogBundle:Blog:show', $routes['blog_show']->getDefault('_controller'));
-        $this->assertEquals('123', $routes['blog_show']->getDefault('foo'));
-        $this->assertEquals('\d+', $routes['blog_show']->getRequirement('foo'));
-        $this->assertEquals('bar', $routes['blog_show']->getOption('foo'));
-        $this->assertEquals('{locale}.example.com', $routes['blog_show']->getHost());
+
+        foreach ($routes as $route) {
+            $this->assertSame('/{foo}/blog/{slug}', $route->getPath());
+            $this->assertSame('123', $route->getDefault('foo'));
+            $this->assertSame('\d+', $route->getRequirement('foo'));
+            $this->assertSame('bar', $route->getOption('foo'));
+            $this->assertSame('', $route->getHost());
+            $this->assertSame('context.getMethod() == "POST"', $route->getCondition());
+        }
     }
+
 }

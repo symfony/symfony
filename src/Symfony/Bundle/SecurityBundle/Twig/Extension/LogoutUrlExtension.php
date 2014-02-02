@@ -38,8 +38,8 @@ class LogoutUrlExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            'logout_url'  => new \Twig_Function_Method($this, 'getLogoutUrl'),
-            'logout_path' => new \Twig_Function_Method($this, 'getLogoutPath'),
+            new \Twig_SimpleFunction('logout_url', array($this, 'getLogoutUrl')),
+            new \Twig_SimpleFunction('logout_path', array($this, 'getLogoutPath')),
         );
     }
 

@@ -167,6 +167,8 @@ class TwigRendererEngine extends AbstractRendererEngine implements TwigRendererE
         // theme is a reference and we don't want to change it.
         $currentTheme = $theme;
 
+        $context = $this->environment->mergeGlobals(array());
+
         // The do loop takes care of template inheritance.
         // Add blocks from all templates in the inheritance tree, but avoid
         // overriding blocks already set.
@@ -178,6 +180,6 @@ class TwigRendererEngine extends AbstractRendererEngine implements TwigRendererE
                     $this->resources[$cacheKey][$block] = $blockData;
                 }
             }
-        } while (false !== $currentTheme = $currentTheme->getParent(array()));
+        } while (false !== $currentTheme = $currentTheme->getParent($context));
     }
 }

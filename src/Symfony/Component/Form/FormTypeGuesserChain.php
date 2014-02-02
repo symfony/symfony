@@ -21,7 +21,7 @@ class FormTypeGuesserChain implements FormTypeGuesserInterface
     /**
      * Constructor.
      *
-     * @param array $guessers Guessers as instances of FormTypeGuesserInterface
+     * @param FormTypeGuesserInterface[] $guessers Guessers as instances of FormTypeGuesserInterface
      *
      * @throws UnexpectedTypeException if any guesser does not implement FormTypeGuesserInterface
      */
@@ -73,18 +73,6 @@ class FormTypeGuesserChain implements FormTypeGuesserInterface
     /**
      * {@inheritDoc}
      */
-    public function guessMinLength($class, $property)
-    {
-        trigger_error('guessMinLength() is deprecated since version 2.1 and will be removed in 2.3.', E_USER_DEPRECATED);
-
-        return $this->guess(function ($guesser) use ($class, $property) {
-            return $guesser->guessMinLength($class, $property);
-        });
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function guessPattern($class, $property)
     {
         return $this->guess(function ($guesser) use ($class, $property) {
@@ -99,7 +87,7 @@ class FormTypeGuesserChain implements FormTypeGuesserInterface
      * @param \Closure $closure The closure to execute. Accepts a guesser
      *                            as argument and should return a Guess instance
      *
-     * @return Guess The guess with the highest confidence
+     * @return Guess|null The guess with the highest confidence
      */
     private function guess(\Closure $closure)
     {

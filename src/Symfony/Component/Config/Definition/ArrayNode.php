@@ -22,34 +22,14 @@ use Symfony\Component\Config\Definition\Exception\UnsetKeyException;
  */
 class ArrayNode extends BaseNode implements PrototypeNodeInterface
 {
-    protected $xmlRemappings;
-    protected $children;
-    protected $allowFalse;
-    protected $allowNewKeys;
-    protected $addIfNotSet;
-    protected $performDeepMerging;
-    protected $ignoreExtraKeys;
-    protected $normalizeKeys;
-
-    /**
-     * Constructor.
-     *
-     * @param string        $name   The Node's name
-     * @param NodeInterface $parent The node parent
-     */
-    public function __construct($name, NodeInterface $parent = null)
-    {
-        parent::__construct($name, $parent);
-
-        $this->children = array();
-        $this->xmlRemappings = array();
-        $this->removeKeyAttribute = true;
-        $this->allowFalse = false;
-        $this->addIfNotSet = false;
-        $this->allowNewKeys = true;
-        $this->performDeepMerging = true;
-        $this->normalizeKeys = true;
-    }
+    protected $xmlRemappings = array();
+    protected $children = array();
+    protected $allowFalse = false;
+    protected $allowNewKeys = true;
+    protected $addIfNotSet = false;
+    protected $performDeepMerging = true;
+    protected $ignoreExtraKeys = false;
+    protected $normalizeKeys = true;
 
     public function setNormalizeKeys($normalizeKeys)
     {
@@ -103,6 +83,16 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     public function setXmlRemappings(array $remappings)
     {
         $this->xmlRemappings = $remappings;
+    }
+
+    /**
+     * Gets the xml remappings that should be performed.
+     *
+     * @return array $remappings an array of the form array(array(string, string))
+     */
+    public function getXmlRemappings()
+    {
+        return $this->xmlRemappings;
     }
 
     /**
@@ -210,7 +200,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     public function addChild(NodeInterface $node)
     {
         $name = $node->getName();
-        if (empty($name)) {
+        if (!strlen($name)) {
             throw new \InvalidArgumentException('Child nodes must be named.');
         }
         if (isset($this->children[$name])) {
@@ -303,9 +293,9 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
         $value = $this->remapXml($value);
 
         $normalized = array();
-        foreach ($this->children as $name => $child) {
-            if (array_key_exists($name, $value)) {
-                $normalized[$name] = $child->normalize($value[$name]);
+        foreach ($value as $name => $val) {
+            if (isset($this->children[$name])) {
+                $normalized[$name] = $this->children[$name]->normalize($val);
                 unset($value[$name]);
             }
         }

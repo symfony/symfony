@@ -58,8 +58,8 @@ class Configuration implements ConfigurationInterface
                             ->prototype('scalar')->defaultValue('form_div_layout.html.twig')->end()
                             ->example(array('MyBundle::form.html.twig'))
                             ->validate()
-                                ->ifTrue(function($v) { return !in_array('form_div_layout.html.twig', $v); })
-                                ->then(function($v){
+                                ->ifTrue(function ($v) { return !in_array('form_div_layout.html.twig', $v); })
+                                ->then(function ($v) {
                                     return array_merge(array('form_div_layout.html.twig'), $v);
                                 })
                             ->end()
@@ -81,11 +81,17 @@ class Configuration implements ConfigurationInterface
                     ->example(array('foo' => '"@bar"', 'pi' => 3.14))
                     ->prototype('array')
                         ->beforeNormalization()
-                            ->ifTrue(function($v){ return is_string($v) && 0 === strpos($v, '@'); })
-                            ->then(function($v){ return array('id' => substr($v, 1), 'type' => 'service'); })
+                            ->ifTrue(function ($v) { return is_string($v) && 0 === strpos($v, '@'); })
+                            ->then(function ($v) {
+                                if (0 === strpos($v, '@@')) {
+                                    return substr($v, 1);
+                                }
+
+                                return array('id' => substr($v, 1), 'type' => 'service');
+                            })
                         ->end()
                         ->beforeNormalization()
-                            ->ifTrue(function($v){
+                            ->ifTrue(function ($v) {
                                 if (is_array($v)) {
                                     $keys = array_keys($v);
                                     sort($keys);
@@ -95,7 +101,7 @@ class Configuration implements ConfigurationInterface
 
                                 return true;
                             })
-                            ->then(function($v){ return array('value' => $v); })
+                            ->then(function ($v) { return array('value' => $v); })
                         ->end()
                         ->children()
                             ->scalarNode('id')->end()
@@ -119,6 +125,8 @@ class Configuration implements ConfigurationInterface
             ->fixXmlConfig('path')
             ->children()
                 ->scalarNode('autoescape')->end()
+                ->scalarNode('autoescape_service')->defaultNull()->end()
+                ->scalarNode('autoescape_service_method')->defaultNull()->end()
                 ->scalarNode('base_template_class')->example('Twig_Template')->end()
                 ->scalarNode('cache')->defaultValue('%kernel.cache_dir%/twig')->end()
                 ->scalarNode('charset')->defaultValue('%kernel.charset%')->end()

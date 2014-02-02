@@ -11,10 +11,13 @@
 
 namespace Symfony\Component\Console\Command;
 
+use Symfony\Component\Console\Descriptor\TextDescriptor;
+use Symfony\Component\Console\Descriptor\XmlDescriptor;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Helper\HelperSet;
@@ -30,12 +33,14 @@ class Command
 {
     private $application;
     private $name;
-    private $aliases;
+    private $processName;
+    private $aliases = array();
     private $definition;
     private $help;
     private $description;
-    private $ignoreValidationErrors;
-    private $applicationDefinitionMerged;
+    private $ignoreValidationErrors = false;
+    private $applicationDefinitionMerged = false;
+    private $applicationDefinitionMergedWithArgs = false;
     private $code;
     private $synopsis;
     private $helperSet;
@@ -43,7 +48,7 @@ class Command
     /**
      * Constructor.
      *
-     * @param string $name The name of the command
+     * @param string|null $name The name of the command; passing null means it must be set in configure()
      *
      * @throws \LogicException When the command name is empty
      *
@@ -52,9 +57,6 @@ class Command
     public function __construct($name = null)
     {
         $this->definition = new InputDefinition();
-        $this->ignoreValidationErrors = false;
-        $this->applicationDefinitionMerged = false;
-        $this->aliases = array();
 
         if (null !== $name) {
             $this->setName($name);
@@ -211,6 +213,16 @@ class Command
      */
     public function run(InputInterface $input, OutputInterface $output)
     {
+        if (null !== $this->processName) {
+            if (function_exists('cli_set_process_title')) {
+                cli_set_process_title($this->processName);
+            } elseif (function_exists('setproctitle')) {
+                setproctitle($this->processName);
+            } elseif (OutputInterface::VERBOSITY_VERY_VERBOSE === $output->getVerbosity()) {
+                $output->writeln('<comment>Install the proctitle PECL to be able to change the process title.</comment>');
+            }
+        }
+
         // force the creation of the synopsis before the merge with the app definition
         $this->getSynopsis();
 
@@ -240,7 +252,7 @@ class Command
             $statusCode = $this->execute($input, $output);
         }
 
-        return is_numeric($statusCode) ? $statusCode : 0;
+        return is_numeric($statusCode) ? (int) $statusCode : 0;
     }
 
     /**
@@ -273,11 +285,13 @@ class Command
     /**
      * Merges the application definition with the command definition.
      *
+     * This method is not part of public API and should not be used directly.
+     *
      * @param Boolean $mergeArgs Whether to merge or not the Application definition arguments to Command definition arguments
      */
-    private function mergeApplicationDefinition($mergeArgs = true)
+    public function mergeApplicationDefinition($mergeArgs = true)
     {
-        if (null === $this->application || true === $this->applicationDefinitionMerged) {
+        if (null === $this->application || (true === $this->applicationDefinitionMerged && ($this->applicationDefinitionMergedWithArgs || !$mergeArgs))) {
             return;
         }
 
@@ -290,6 +304,9 @@ class Command
         $this->definition->addOptions($this->application->getDefinition()->getOptions());
 
         $this->applicationDefinitionMerged = true;
+        if ($mergeArgs) {
+            $this->applicationDefinitionMergedWithArgs = true;
+        }
     }
 
     /**
@@ -332,9 +349,11 @@ class Command
      * Can be overridden to provide the original command representation when it would otherwise
      * be changed by merging with the application InputDefinition.
      *
+     * This method is not part of public API and should not be used directly.
+     *
      * @return InputDefinition An InputDefinition instance
      */
-    protected function getNativeDefinition()
+    public function getNativeDefinition()
     {
         return $this->getDefinition();
     }
@@ -390,7 +409,7 @@ class Command
      *
      * @return Command The current instance
      *
-     * @throws \InvalidArgumentException When command name given is empty
+     * @throws \InvalidArgumentException When the name is invalid
      *
      * @api
      */
@@ -399,6 +418,25 @@ class Command
         $this->validateName($name);
 
         $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * Sets the process name of the command.
+     *
+     * This feature should be used only when creating a long process command,
+     * like a daemon.
+     *
+     * PHP 5.5+ or the proctitle PECL library is required
+     *
+     * @param string $name The process name
+     *
+     * @return Command The current instance
+     */
+    public function setProcessName($name)
+    {
+        $this->processName = $name;
 
         return $this;
     }
@@ -500,6 +538,8 @@ class Command
      *
      * @return Command The current instance
      *
+     * @throws \InvalidArgumentException When an alias is invalid
+     *
      * @api
      */
     public function setAliases($aliases)
@@ -559,32 +599,16 @@ class Command
      * Returns a text representation of the command.
      *
      * @return string A string representing the command
+     *
+     * @deprecated Deprecated since version 2.3, to be removed in 3.0.
      */
     public function asText()
     {
-        if ($this->application && !$this->applicationDefinitionMerged) {
-            $this->getSynopsis();
-            $this->mergeApplicationDefinition(false);
-        }
+        $descriptor = new TextDescriptor();
+        $output = new BufferedOutput(BufferedOutput::VERBOSITY_NORMAL, true);
+        $descriptor->describe($output, $this, array('raw_output' => true));
 
-        $messages = array(
-            '<comment>Usage:</comment>',
-            ' '.$this->getSynopsis(),
-            '',
-        );
-
-        if ($this->getAliases()) {
-            $messages[] = '<comment>Aliases:</comment> <info>'.implode(', ', $this->getAliases()).'</info>';
-        }
-
-        $messages[] = $this->getNativeDefinition()->asText();
-
-        if ($help = $this->getProcessedHelp()) {
-            $messages[] = '<comment>Help:</comment>';
-            $messages[] = ' '.str_replace("\n", "\n ", $help)."\n";
-        }
-
-        return implode("\n", $messages);
+        return $output->fetch();
     }
 
     /**
@@ -592,46 +616,36 @@ class Command
      *
      * @param Boolean $asDom Whether to return a DOM or an XML string
      *
-     * @return string|DOMDocument An XML string representing the command
+     * @return string|\DOMDocument An XML string representing the command
+     *
+     * @deprecated Deprecated since version 2.3, to be removed in 3.0.
      */
     public function asXml($asDom = false)
     {
-        if ($this->application && !$this->applicationDefinitionMerged) {
-            $this->getSynopsis();
-            $this->mergeApplicationDefinition(false);
+        $descriptor = new XmlDescriptor();
+
+        if ($asDom) {
+            return $descriptor->getCommandDocument($this);
         }
 
-        $dom = new \DOMDocument('1.0', 'UTF-8');
-        $dom->formatOutput = true;
-        $dom->appendChild($commandXML = $dom->createElement('command'));
-        $commandXML->setAttribute('id', $this->name);
-        $commandXML->setAttribute('name', $this->name);
+        $output = new BufferedOutput();
+        $descriptor->describe($output, $this);
 
-        $commandXML->appendChild($usageXML = $dom->createElement('usage'));
-        $usageXML->appendChild($dom->createTextNode(sprintf($this->getSynopsis(), '')));
-
-        $commandXML->appendChild($descriptionXML = $dom->createElement('description'));
-        $descriptionXML->appendChild($dom->createTextNode(str_replace("\n", "\n ", $this->getDescription())));
-
-        $commandXML->appendChild($helpXML = $dom->createElement('help'));
-        $helpXML->appendChild($dom->createTextNode(str_replace("\n", "\n ", $this->getProcessedHelp())));
-
-        $commandXML->appendChild($aliasesXML = $dom->createElement('aliases'));
-        foreach ($this->getAliases() as $alias) {
-            $aliasesXML->appendChild($aliasXML = $dom->createElement('alias'));
-            $aliasXML->appendChild($dom->createTextNode($alias));
-        }
-
-        $definition = $this->getNativeDefinition()->asXml(true);
-        $commandXML->appendChild($dom->importNode($definition->getElementsByTagName('arguments')->item(0), true));
-        $commandXML->appendChild($dom->importNode($definition->getElementsByTagName('options')->item(0), true));
-
-        return $asDom ? $dom : $dom->saveXml();
+        return $output->fetch();
     }
 
+    /**
+     * Validates a command name.
+     *
+     * It must be non-empty and parts can optionally be separated by ":".
+     *
+     * @param string $name
+     *
+     * @throws \InvalidArgumentException When the name is invalid
+     */
     private function validateName($name)
     {
-        if (!preg_match('/^[^\:]+(\:[^\:]+)*$/', $name)) {
+        if (!preg_match('/^[^\:]++(\:[^\:]++)*$/', $name)) {
             throw new \InvalidArgumentException(sprintf('Command name "%s" is invalid.', $name));
         }
     }

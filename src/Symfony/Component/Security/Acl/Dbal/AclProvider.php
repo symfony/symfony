@@ -40,8 +40,8 @@ class AclProvider implements AclProviderInterface
 
     protected $cache;
     protected $connection;
-    protected $loadedAces;
-    protected $loadedAcls;
+    protected $loadedAces = array();
+    protected $loadedAcls = array();
     protected $options;
     private $permissionGrantingStrategy;
 
@@ -57,8 +57,6 @@ class AclProvider implements AclProviderInterface
     {
         $this->cache = $cache;
         $this->connection = $connection;
-        $this->loadedAces = array();
-        $this->loadedAcls = array();
         $this->options = $options;
         $this->permissionGrantingStrategy = $permissionGrantingStrategy;
     }
@@ -165,8 +163,17 @@ class AclProvider implements AclProviderInterface
 
             // Is it time to load the current batch?
             if ((self::MAX_BATCH_SIZE === count($currentBatch) || ($i + 1) === $c) && count($currentBatch) > 0) {
-                $loadedBatch = $this->lookupObjectIdentities($currentBatch, $sids, $oidLookup);
-
+                try {
+                    $loadedBatch = $this->lookupObjectIdentities($currentBatch, $sids, $oidLookup);
+                } catch (AclNotFoundException $aclNotFoundException) {
+                    if ($result->count()) {
+                        $partialResultException = new NotAllAclsFoundException('The provider could not find ACLs for all object identities.');
+                        $partialResultException->setPartialResult($result);
+                        throw $partialResultException;
+                    } else {
+                        throw $aclNotFoundException;
+                    }
+                }
                 foreach ($loadedBatch as $loadedOid) {
                     $loadedAcl = $loadedBatch->offsetGet($loadedOid);
 
@@ -263,7 +270,11 @@ SELECTCLAUSE;
         for ($i = 0; $i < $count; $i++) {
             if (!isset($types[$batch[$i]->getType()])) {
                 $types[$batch[$i]->getType()] = true;
-                if ($count > 1) {
+
+                // if there is more than one type we can safely break out of the
+                // loop, because it is the differentiator factor on whether to
+                // query for only one or more class types
+                if (count($types) > 1) {
                     break;
                 }
             }

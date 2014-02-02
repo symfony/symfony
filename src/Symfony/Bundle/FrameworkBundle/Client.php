@@ -85,7 +85,7 @@ class Client extends BaseClient
     }
 
     /**
-     * Makes a request.
+     * {@inheritdoc}
      *
      * @param Request $request A Request instance
      *
@@ -113,6 +113,10 @@ class Client extends BaseClient
 
     /**
      * {@inheritdoc}
+     *
+     * @param Request $request A Request instance
+     *
+     * @return Response A Response instance
      */
     protected function doRequestInProcess($request)
     {
@@ -156,7 +160,7 @@ class Client extends BaseClient
             $profilerCode = '$kernel->getContainer()->get(\'profiler\')->enable();';
         }
 
-        return <<<EOF
+        $code = <<<EOF
 <?php
 
 if ('$autoloader') {
@@ -167,7 +171,10 @@ require_once '$path';
 \$kernel = unserialize('$kernel');
 \$kernel->boot();
 $profilerCode
-echo serialize(\$kernel->handle(unserialize('$request')));
+
+\$request = unserialize('$request');
 EOF;
+
+        return $code.$this->getHandleScript();
     }
 }

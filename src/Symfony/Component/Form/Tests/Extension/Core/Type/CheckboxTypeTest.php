@@ -13,8 +13,17 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\CallbackTransformer;
 
-class CheckboxTypeTest extends TypeTestCase
+class CheckboxTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 {
+    public function testDataIsFalseByDefault()
+    {
+        $form = $this->factory->create('checkbox');
+
+        $this->assertFalse($form->getData());
+        $this->assertFalse($form->getNormData());
+        $this->assertNull($form->getViewData());
+    }
+
     public function testPassValueToView()
     {
         $form = $this->factory->create('checkbox', null, array('value' => 'foobar'));
@@ -50,91 +59,115 @@ class CheckboxTypeTest extends TypeTestCase
         $this->assertFalse($view->vars['checked']);
     }
 
-    public function testBindWithValueChecked()
+    public function testSubmitWithValueChecked()
     {
         $form = $this->factory->create('checkbox', null, array(
             'value' => 'foobar',
         ));
-        $form->bind('foobar');
+        $form->submit('foobar');
 
         $this->assertTrue($form->getData());
         $this->assertEquals('foobar', $form->getViewData());
     }
 
-    public function testBindWithRandomValueChecked()
+    public function testSubmitWithRandomValueChecked()
     {
         $form = $this->factory->create('checkbox', null, array(
             'value' => 'foobar',
         ));
-        $form->bind('krixikraxi');
+        $form->submit('krixikraxi');
 
         $this->assertTrue($form->getData());
         $this->assertEquals('foobar', $form->getViewData());
     }
 
-    public function testBindWithValueUnchecked()
+    public function testSubmitWithValueUnchecked()
     {
         $form = $this->factory->create('checkbox', null, array(
             'value' => 'foobar',
         ));
-        $form->bind(null);
+        $form->submit(null);
 
         $this->assertFalse($form->getData());
         $this->assertNull($form->getViewData());
     }
 
-    public function testBindWithEmptyValueChecked()
+    public function testSubmitWithEmptyValueChecked()
     {
         $form = $this->factory->create('checkbox', null, array(
             'value' => '',
         ));
-        $form->bind('');
+        $form->submit('');
 
         $this->assertTrue($form->getData());
         $this->assertSame('', $form->getViewData());
     }
 
-    public function testBindWithEmptyValueUnchecked()
+    public function testSubmitWithEmptyValueUnchecked()
     {
         $form = $this->factory->create('checkbox', null, array(
             'value' => '',
         ));
-        $form->bind(null);
+        $form->submit(null);
 
         $this->assertFalse($form->getData());
         $this->assertNull($form->getViewData());
     }
 
+    public function testSubmitWithEmptyValueAndFalseUnchecked()
+    {
+        $form = $this->factory->create('checkbox', null, array(
+            'value' => '',
+        ));
+        $form->submit(false);
+
+        $this->assertFalse($form->getData());
+        $this->assertNull($form->getViewData());
+    }
+
+    public function testSubmitWithEmptyValueAndTrueChecked()
+    {
+        $form = $this->factory->create('checkbox', null, array(
+            'value' => '',
+        ));
+        $form->submit(true);
+
+        $this->assertTrue($form->getData());
+        $this->assertSame('', $form->getViewData());
+    }
+
     /**
-     * @dataProvider provideTransformedData
+     * @dataProvider provideCustomModelTransformerData
      */
-    public function testTransformedData($data, $expected)
+    public function testCustomModelTransformer($data, $checked)
     {
         // present a binary status field as a checkbox
         $transformer = new CallbackTransformer(
             function ($value) {
-                return 'expedited' == $value;
+                return 'checked' == $value;
             },
             function ($value) {
-                return $value ? 'expedited' : 'standard';
+                return $value ? 'checked' : 'unchecked';
             }
         );
 
-        $form = $this->builder
-            ->create('expedited_shipping', 'checkbox')
+        $form = $this->factory->createBuilder('checkbox')
             ->addModelTransformer($transformer)
             ->getForm();
+
         $form->setData($data);
         $view = $form->createView();
 
-        $this->assertEquals($expected, $view->vars['checked']);
+        $this->assertSame($data, $form->getData());
+        $this->assertSame($checked, $form->getNormData());
+        $this->assertEquals($checked, $view->vars['checked']);
     }
 
-    public function provideTransformedData()
+    public function provideCustomModelTransformerData()
     {
         return array(
-            array('expedited', true),
-            array('standard', false),
+            array('checked', true),
+            array('unchecked', false),
         );
     }
 }

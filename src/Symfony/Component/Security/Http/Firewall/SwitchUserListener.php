@@ -68,11 +68,11 @@ class SwitchUserListener implements ListenerInterface
     }
 
     /**
-     * Handles digest authentication.
+     * Handles the switch to another user.
      *
      * @param GetResponseEvent $event A GetResponseEvent instance
      *
-     * @throws \LogicException
+     * @throws \LogicException if switching to a user failed
      */
     public function handle(GetResponseEvent $event)
     {
@@ -92,7 +92,9 @@ class SwitchUserListener implements ListenerInterface
             }
         }
 
-        $request->server->set('QUERY_STRING', '');
+        $request->query->remove($this->usernameParameter);
+        $request->server->set('QUERY_STRING', http_build_query($request->query->all()));
+
         $response = new RedirectResponse($request->getUri(), 302);
 
         $event->setResponse($response);

@@ -75,7 +75,9 @@ class StringUtilTest extends \PHPUnit_Framework_TestCase
             array('heroes', array('hero', 'heroe')),
             array('hoaxes', 'hoax'),
             array('irises', array('iris', 'irise', 'irisis')),
-            array('kisses', array('kiss', 'kisse', 'kissis')),
+            array('kisses', 'kiss'),
+            array('addresses', 'address'),
+            array('accesses', 'access'),
             array('knives', 'knife'),
             array('lives', 'life'),
             array('lice', 'louse'),
@@ -117,6 +119,8 @@ class StringUtilTest extends \PHPUnit_Framework_TestCase
             array('bees', array('be', 'bee')),
             array('cheeses', array('chees', 'cheese', 'cheesis')),
             array('radii', 'radius'),
+            array('objectives', 'objective'),
+            array('moves', 'move'),
 
             // test casing: if the first letter was uppercase, it should remain so
             array('Men', 'Man'),

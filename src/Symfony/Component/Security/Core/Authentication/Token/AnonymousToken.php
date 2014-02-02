@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\Security\Core\Authentication\Token;
 
+use Symfony\Component\Security\Core\Role\RoleInterface;
+
 /**
  * AnonymousToken represents an anonymous token.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-
 class AnonymousToken extends AbstractToken
 {
     private $key;

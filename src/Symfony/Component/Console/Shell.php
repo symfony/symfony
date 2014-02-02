@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Console;
 
-use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Process\ProcessBuilder;
@@ -32,8 +31,7 @@ class Shell
     private $history;
     private $output;
     private $hasReadline;
-    private $prompt;
-    private $processIsolation;
+    private $processIsolation = false;
 
     /**
      * Constructor.
@@ -49,8 +47,6 @@ class Shell
         $this->application = $application;
         $this->history = getenv('HOME').'/.history_'.$application->getName();
         $this->output = new ConsoleOutput();
-        $this->prompt = $application->getName().' > ';
-        $this->processIsolation = false;
     }
 
     /**
@@ -107,7 +103,7 @@ EOF
                 ;
 
                 $output = $this->output;
-                $process->run(function($type, $data) use ($output) {
+                $process->run(function ($type, $data) use ($output) {
                     $output->writeln($data);
                 });
 
@@ -139,6 +135,27 @@ or <comment>list</comment> to get a list of available commands.
 To exit the shell, type <comment>^D</comment>.
 
 EOF;
+    }
+
+    /**
+     * Renders a prompt.
+     *
+     * @return string The prompt
+     */
+    protected function getPrompt()
+    {
+        // using the formatter here is required when using readline
+        return $this->output->getFormatter()->format($this->application->getName().' > ');
+    }
+
+    protected function getOutput()
+    {
+        return $this->output;
+    }
+
+    protected function getApplication()
+    {
+        return $this->application;
     }
 
     /**
@@ -185,9 +202,9 @@ EOF;
     private function readline()
     {
         if ($this->hasReadline) {
-            $line = readline($this->prompt);
+            $line = readline($this->getPrompt());
         } else {
-            $this->output->write($this->prompt);
+            $this->output->write($this->getPrompt());
             $line = fgets(STDIN, 1024);
             $line = (!$line && strlen($line) == 0) ? false : rtrim($line);
         }

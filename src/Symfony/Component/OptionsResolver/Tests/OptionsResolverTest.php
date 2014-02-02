@@ -63,7 +63,7 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
         $this->resolver->setDefaults(array(
             'one' => '1',
             'two' => function (Options $options) {
-                return $options['one'] . '2';
+                return $options['one'].'2';
             },
         ));
 
@@ -115,7 +115,7 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
                 /* @var \PHPUnit_Framework_TestCase $test */
                 $test->assertTrue(isset($options['one']));
 
-                return $options['one'] . '2';
+                return $options['one'].'2';
             },
         ));
 
@@ -136,7 +136,7 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
         ));
         $this->resolver->setDefaults(array(
             'two' => function (Options $options) {
-                return $options['one'] . '2';
+                return $options['one'].'2';
             },
         ));
 
@@ -591,7 +591,7 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
         ));
         $this->resolver->setNormalizers(array(
             'foo' => function (Options $options, $value) {
-                return $options['bam'] . '[' . $value . ']';
+                return $options['bam'].'['.$value.']';
             },
         ));
 
@@ -653,6 +653,45 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
         $options = array(
             'one' => '1',
             'two' => '2'
+        );
+
+        $this->assertEquals($options, $this->resolver->resolve($options));
+    }
+
+    public function testResolveSucceedsIfValueAllowedCallbackReturnsTrue()
+    {
+        $this->resolver->setRequired(array(
+            'test',
+        ));
+        $this->resolver->setAllowedValues(array(
+            'test' => function ($value) {
+                return true;
+            },
+        ));
+
+        $options = array(
+            'test' => true,
+        );
+
+        $this->assertEquals($options, $this->resolver->resolve($options));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    public function testResolveFailsIfValueAllowedCallbackReturnsFalse()
+    {
+        $this->resolver->setRequired(array(
+            'test',
+        ));
+        $this->resolver->setAllowedValues(array(
+            'test' => function ($value) {
+                return false;
+            },
+        ));
+
+        $options = array(
+            'test' => true,
         );
 
         $this->assertEquals($options, $this->resolver->resolve($options));

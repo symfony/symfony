@@ -12,6 +12,10 @@
         <parameter key="security.authentication.form_entry_point.class">Symfony\Component\Security\Http\EntryPoint\FormAuthenticationEntryPoint</parameter>
         <parameter key="security.authentication.listener.form.class">Symfony\Component\Security\Http\Firewall\UsernamePasswordFormAuthenticationListener</parameter>
 
+        <parameter key="security.authentication.listener.simple_form.class">Symfony\Component\Security\Http\Firewall\SimpleFormAuthenticationListener</parameter>
+
+        <parameter key="security.authentication.listener.simple_preauth.class">Symfony\Component\Security\Http\Firewall\SimplePreAuthenticationListener</parameter>
+
         <parameter key="security.authentication.listener.basic.class">Symfony\Component\Security\Http\Firewall\BasicAuthenticationListener</parameter>
         <parameter key="security.authentication.basic_entry_point.class">Symfony\Component\Security\Http\EntryPoint\BasicAuthenticationEntryPoint</parameter>
 
@@ -35,12 +39,14 @@
         <parameter key="security.context_listener.class">Symfony\Component\Security\Http\Firewall\ContextListener</parameter>
 
         <parameter key="security.authentication.provider.dao.class">Symfony\Component\Security\Core\Authentication\Provider\DaoAuthenticationProvider</parameter>
+        <parameter key="security.authentication.provider.simple.class">Symfony\Component\Security\Core\Authentication\Provider\SimpleAuthenticationProvider</parameter>
         <parameter key="security.authentication.provider.pre_authenticated.class">Symfony\Component\Security\Core\Authentication\Provider\PreAuthenticatedAuthenticationProvider</parameter>
 
         <parameter key="security.authentication.provider.anonymous.class">Symfony\Component\Security\Core\Authentication\Provider\AnonymousAuthenticationProvider</parameter>
 
         <parameter key="security.authentication.success_handler.class">Symfony\Component\Security\Http\Authentication\DefaultAuthenticationSuccessHandler</parameter>
         <parameter key="security.authentication.failure_handler.class">Symfony\Component\Security\Http\Authentication\DefaultAuthenticationFailureHandler</parameter>
+        <parameter key="security.authentication.simple_success_failure_handler.class">Symfony\Component\Security\Http\Authentication\SimpleAuthenticationHandler</parameter>
     </parameters>
 
     <services>
@@ -133,6 +139,29 @@
                  abstract="true">
         </service>
 
+        <service id="security.authentication.listener.simple_form"
+                 class="%security.authentication.listener.simple_form.class%"
+                 parent="security.authentication.listener.abstract"
+                 abstract="true">
+        </service>
+
+        <service id="security.authentication.simple_success_failure_handler" class="%security.authentication.simple_success_failure_handler.class%" public="false" abstract="true">
+            <tag name="monolog.logger" channel="security" />
+            <argument /> <!-- Authenticator -->
+            <argument type="service" id="security.authentication.success_handler" />
+            <argument type="service" id="security.authentication.failure_handler" />
+            <argument type="service" id="logger" on-invalid="null" />
+        </service>
+
+        <service id="security.authentication.listener.simple_preauth" class="%security.authentication.listener.simple_preauth.class%" public="false" abstract="true">
+            <tag name="monolog.logger" channel="security" />
+            <argument type="service" id="security.context" />
+            <argument type="service" id="security.authentication.manager" />
+            <argument /> <!-- Provider-shared Key -->
+            <argument /> <!-- Authenticator -->
+            <argument type="service" id="logger" on-invalid="null" />
+        </service>
+
         <service id="security.authentication.listener.x509" class="%security.authentication.listener.x509.class%" public="false" abstract="true">
             <tag name="monolog.logger" channel="security" />
             <argument type="service" id="security.context" />
@@ -168,6 +197,12 @@
             <argument /> <!-- Provider-shared Key -->
             <argument type="service" id="security.encoder_factory" />
             <argument>%security.authentication.hide_user_not_found%</argument>
+        </service>
+
+        <service id="security.authentication.provider.simple" class="%security.authentication.provider.simple.class%" abstract="true" public="false">
+            <argument /> <!-- Simple Authenticator -->
+            <argument /> <!-- User Provider -->
+            <argument /> <!-- Provider-shared Key -->
         </service>
 
         <service id="security.authentication.provider.pre_authenticated" class="%security.authentication.provider.pre_authenticated.class%" abstract="true" public="false">
@@ -206,7 +241,6 @@
             <argument type="service" id="security.access.decision_manager" />
             <argument type="service" id="security.access_map" />
             <argument type="service" id="security.authentication.manager" />
-            <argument type="service" id="logger" on-invalid="null" />
         </service>
     </services>
 </container>

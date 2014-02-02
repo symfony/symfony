@@ -59,7 +59,7 @@ EOF
         try {
             $schema->addToSchema($connection->getSchemaManager()->createSchema());
         } catch (SchemaException $e) {
-            $output->writeln("Aborting: " . $e->getMessage());
+            $output->writeln("Aborting: ".$e->getMessage());
 
             return 1;
         }

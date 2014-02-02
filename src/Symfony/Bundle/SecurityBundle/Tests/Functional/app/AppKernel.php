@@ -27,6 +27,11 @@ while ($dir !== $lastDir) {
         break;
     }
 
+    if (file_exists($dir.'/vendor/autoload.php')) {
+        require_once $dir.'/vendor/autoload.php';
+        break;
+    }
+
     $dir = dirname($dir);
 }
 

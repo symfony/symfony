@@ -85,7 +85,7 @@ abstract class Extension implements ExtensionInterface, ConfigurationExtensionIn
         $reflected = new \ReflectionClass($this);
         $namespace = $reflected->getNamespaceName();
 
-        $class = $namespace . '\\Configuration';
+        $class = $namespace.'\\Configuration';
         if (class_exists($class)) {
             $r = new \ReflectionClass($class);
             $container->addResource(new FileResource($r->getFileName()));

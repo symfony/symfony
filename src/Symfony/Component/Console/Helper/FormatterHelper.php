@@ -71,26 +71,6 @@ class FormatterHelper extends Helper
     }
 
     /**
-     * Returns the length of a string, using mb_strlen if it is available.
-     *
-     * @param string $string The string to check its length
-     *
-     * @return integer The length of the string
-     */
-    private function strlen($string)
-    {
-        if (!function_exists('mb_strlen')) {
-            return strlen($string);
-        }
-
-        if (false === $encoding = mb_detect_encoding($string)) {
-            return strlen($string);
-        }
-
-        return mb_strlen($string, $encoding);
-    }
-
-    /**
      * {@inheritDoc}
      */
     public function getName()

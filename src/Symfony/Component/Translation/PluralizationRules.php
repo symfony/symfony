@@ -18,7 +18,6 @@ namespace Symfony\Component\Translation;
  */
 class PluralizationRules
 {
-    // @codeCoverageIgnoreStart
     private static $rules = array();
 
     /**
@@ -31,9 +30,9 @@ class PluralizationRules
      */
     public static function get($number, $locale)
     {
-        if ("pt_BR" == $locale) {
+        if ('pt_BR' === $locale) {
             // temporary set a locale for brazilian
-            $locale = "xbr";
+            $locale = 'xbr';
         }
 
         if (strlen($locale) > 3) {
@@ -115,6 +114,7 @@ class PluralizationRules
             case 'pap':
             case 'ps':
             case 'pt':
+            case 'xbr':
             case 'so':
             case 'sq':
             case 'sv':
@@ -135,7 +135,6 @@ class PluralizationRules
             case 'ln':
             case 'mg':
             case 'nso':
-            case 'xbr':
             case 'ti':
             case 'wa':
                 return (($number == 0) || ($number == 1)) ? 0 : 1;
@@ -193,15 +192,13 @@ class PluralizationRules
      * @param string $rule   A PHP callable
      * @param string $locale The locale
      *
-     * @return null
-     *
      * @throws \LogicException
      */
     public static function set($rule, $locale)
     {
-        if ("pt_BR" == $locale) {
+        if ('pt_BR' === $locale) {
             // temporary set a locale for brazilian
-            $locale = "xbr";
+            $locale = 'xbr';
         }
 
         if (strlen($locale) > 3) {
@@ -214,6 +211,4 @@ class PluralizationRules
 
         self::$rules[$locale] = $rule;
     }
-
-    // @codeCoverageIgnoreEnd
 }

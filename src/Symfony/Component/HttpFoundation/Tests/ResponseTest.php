@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpFoundation\Tests;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class ResponseTest extends \PHPUnit_Framework_TestCase
+class ResponseTest extends ResponseTestCase
 {
     public function testCreate()
     {
@@ -79,6 +79,19 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($response->isCacheable());
     }
 
+    public function testIsCacheableWithErrorCode()
+    {
+        $response = new Response('', 500);
+        $this->assertFalse($response->isCacheable());
+    }
+
+    public function testIsCacheableWithNoStoreDirective()
+    {
+        $response = new Response();
+        $response->headers->set('cache-control', 'private');
+        $this->assertFalse($response->isCacheable());
+    }
+
     public function testIsCacheableWithSetTtl()
     {
         $response = new Response();
@@ -116,6 +129,50 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $response = new Response();
         $modified = $response->isNotModified(new Request());
         $this->assertFalse($modified);
+    }
+
+    public function testIsNotModifiedNotSafe()
+    {
+        $request = Request::create('/homepage', 'POST');
+
+        $response = new Response();
+        $this->assertFalse($response->isNotModified($request));
+    }
+
+    public function testIsNotModifiedLastModified()
+    {
+        $modified = 'Sun, 25 Aug 2013 18:33:31 GMT';
+
+        $request = new Request();
+        $request->headers->set('If-Modified-Since', $modified);
+
+        $response = new Response();
+        $response->headers->set('Last-Modified', $modified);
+
+        $this->assertTrue($response->isNotModified($request));
+
+        $response->headers->set('Last-Modified', '');
+        $this->assertFalse($response->isNotModified($request));
+    }
+
+    public function testIsNotModifiedEtag()
+    {
+        $etagOne = 'randomly_generated_etag';
+        $etagTwo = 'randomly_generated_etag_2';
+
+        $request = new Request();
+        $request->headers->set('if_none_match', sprintf('%s, %s, %s', $etagOne, $etagTwo, 'etagThree'));
+
+        $response = new Response();
+
+        $response->headers->set('ETag', $etagOne);
+        $this->assertTrue($response->isNotModified($request));
+
+        $response->headers->set('ETag', $etagTwo);
+        $this->assertTrue($response->isNotModified($request));
+
+        $response->headers->set('ETag', '');
+        $this->assertFalse($response->isNotModified($request));
     }
 
     public function testIsValidateable()
@@ -326,75 +383,6 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('text/css; charset=UTF-8', $response->headers->get('Content-Type'));
     }
 
-    public function testNoCacheControlHeaderOnAttachmentUsingHTTPSAndMSIE()
-    {
-        // Check for HTTPS and IE 8
-        $request = new Request();
-        $request->server->set('HTTPS', true);
-        $request->server->set('HTTP_USER_AGENT', 'Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0)');
-
-        $response = new Response();
-        $response->headers->set('Content-Disposition', 'attachment; filename="fname.ext"');
-        $response->prepare($request);
-
-        $this->assertFalse($response->headers->has('Cache-Control'));
-
-        // Check for IE 10 and HTTPS
-        $request->server->set('HTTP_USER_AGENT', 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; WOW64; Trident/6.0)');
-
-        $response = new Response();
-        $response->headers->set('Content-Disposition', 'attachment; filename="fname.ext"');
-        $response->prepare($request);
-
-        $this->assertTrue($response->headers->has('Cache-Control'));
-
-        // Check for IE 9 and HTTPS
-        $request->server->set('HTTP_USER_AGENT', 'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 7.1; Trident/5.0)');
-
-        $response = new Response();
-        $response->headers->set('Content-Disposition', 'attachment; filename="fname.ext"');
-        $response->prepare($request);
-
-        $this->assertTrue($response->headers->has('Cache-Control'));
-
-        // Check for IE 9 and HTTP
-        $request->server->set('HTTPS', false);
-
-        $response = new Response();
-        $response->headers->set('Content-Disposition', 'attachment; filename="fname.ext"');
-        $response->prepare($request);
-
-        $this->assertTrue($response->headers->has('Cache-Control'));
-
-        // Check for IE 8 and HTTP
-        $request->server->set('HTTP_USER_AGENT', 'Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0)');
-
-        $response = new Response();
-        $response->headers->set('Content-Disposition', 'attachment; filename="fname.ext"');
-        $response->prepare($request);
-
-        $this->assertTrue($response->headers->has('Cache-Control'));
-
-        // Check for non-IE and HTTPS
-        $request->server->set('HTTPS', true);
-        $request->server->set('HTTP_USER_AGENT', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.60 Safari/537.17');
-
-        $response = new Response();
-        $response->headers->set('Content-Disposition', 'attachment; filename="fname.ext"');
-        $response->prepare($request);
-
-        $this->assertTrue($response->headers->has('Cache-Control'));
-
-        // Check for non-IE and HTTP
-        $request->server->set('HTTPS', false);
-
-        $response = new Response();
-        $response->headers->set('Content-Disposition', 'attachment; filename="fname.ext"');
-        $response->prepare($request);
-
-        $this->assertTrue($response->headers->has('Cache-Control'));
-    }
-
     public function testPrepareDoesNothingIfContentTypeIsSet()
     {
         $response = new Response('foo');
@@ -430,9 +418,42 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $response = new Response('foo');
         $request = Request::create('/', 'HEAD');
 
+        $length = 12345;
+        $response->headers->set('Content-Length', $length);
         $response->prepare($request);
 
         $this->assertEquals('', $response->getContent());
+        $this->assertEquals($length, $response->headers->get('Content-Length'), 'Content-Length should be as if it was GET; see RFC2616 14.13');
+    }
+
+    public function testPrepareRemovesContentForInformationalResponse()
+    {
+        $response = new Response('foo');
+        $request = Request::create('/');
+
+        $response->setContent('content');
+        $response->setStatusCode(101);
+        $response->prepare($request);
+        $this->assertEquals('', $response->getContent());
+
+        $response->setContent('content');
+        $response->setStatusCode(304);
+        $response->prepare($request);
+        $this->assertEquals('', $response->getContent());
+    }
+
+    public function testPrepareRemovesContentLength()
+    {
+        $response = new Response('foo');
+        $request = Request::create('/');
+
+        $response->headers->set('Content-Length', 12345);
+        $response->prepare($request);
+        $this->assertEquals(12345, $response->headers->get('Content-Length'));
+
+        $response->headers->set('Transfer-Encoding', 'chunked');
+        $response->prepare($request);
+        $this->assertFalse($response->headers->has('Content-Length'));
     }
 
     public function testPrepareSetsPragmaOnHttp10Only()
@@ -703,7 +724,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException UnexpectedValueException
+     * @expectedException \UnexpectedValueException
      * @dataProvider invalidContentProvider
      */
     public function testSetContentInvalid($content)
@@ -737,7 +758,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
     public function validContentProvider()
     {
         return array(
-            'obj'    => array(new StringableObject),
+            'obj'    => array(new StringableObject()),
             'string' => array('Foo'),
             'int'    => array(2),
         );
@@ -769,6 +790,11 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
     protected function createDateTimeNow()
     {
         return new \DateTime();
+    }
+
+    protected function provideResponse()
+    {
+        return new Response();
     }
 }
 

@@ -51,12 +51,13 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
     /**
      * Transforms a normalized date into a localized date.
      *
-     * @param DateTime $dateTime Normalized date.
+     * @param \DateTime $dateTime Normalized date.
      *
      * @return array Localized date.
      *
-     * @throws UnexpectedTypeException if the given value is not an instance of \DateTime
-     * @throws TransformationFailedException if the output timezone is not supported
+     * @throws TransformationFailedException If the given value is not an
+     *                                       instance of \DateTime or if the
+     *                                       output timezone is not supported.
      */
     public function transform($dateTime)
     {
@@ -72,7 +73,7 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
         }
 
         if (!$dateTime instanceof \DateTime) {
-            throw new UnexpectedTypeException($dateTime, '\DateTime');
+            throw new TransformationFailedException('Expected a \DateTime.');
         }
 
         $dateTime = clone $dateTime;
@@ -108,11 +109,12 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
      *
      * @param array $value Localized date
      *
-     * @return DateTime Normalized date
+     * @return \DateTime Normalized date
      *
-     * @throws UnexpectedTypeException if the given value is not an array
-     * @throws TransformationFailedException if the value could not be transformed
-     * @throws TransformationFailedException if the input timezone is not supported
+     * @throws TransformationFailedException If the given value is not an array,
+     *                                       if the value could not be transformed
+     *                                       or if the input timezone is not
+     *                                       supported.
      */
     public function reverseTransform($value)
     {
@@ -121,7 +123,7 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
         }
 
         if (!is_array($value)) {
-            throw new UnexpectedTypeException($value, 'array');
+            throw new TransformationFailedException('Expected an array.');
         }
 
         if ('' === implode('', $value)) {
@@ -142,20 +144,32 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
             ));
         }
 
-        if (isset($value['month']) && !ctype_digit($value['month']) && !is_int($value['month'])) {
+        if (isset($value['month']) && !ctype_digit((string) $value['month'])) {
             throw new TransformationFailedException('This month is invalid');
         }
 
-        if (isset($value['day']) && !ctype_digit($value['day']) && !is_int($value['day'])) {
+        if (isset($value['day']) && !ctype_digit((string) $value['day'])) {
             throw new TransformationFailedException('This day is invalid');
         }
 
-        if (isset($value['year']) && !ctype_digit($value['year']) && !is_int($value['year'])) {
+        if (isset($value['year']) && !ctype_digit((string) $value['year'])) {
             throw new TransformationFailedException('This year is invalid');
         }
 
         if (!empty($value['month']) && !empty($value['day']) && !empty($value['year']) && false === checkdate($value['month'], $value['day'], $value['year'])) {
             throw new TransformationFailedException('This is an invalid date');
+        }
+
+        if (isset($value['hour']) && !ctype_digit((string) $value['hour'])) {
+            throw new TransformationFailedException('This hour is invalid');
+        }
+
+        if (isset($value['minute']) && !ctype_digit((string) $value['minute'])) {
+            throw new TransformationFailedException('This minute is invalid');
+        }
+
+        if (isset($value['second']) && !ctype_digit((string) $value['second'])) {
+            throw new TransformationFailedException('This second is invalid');
         }
 
         try {

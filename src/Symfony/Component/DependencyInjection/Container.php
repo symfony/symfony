@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection;
 
+use Symfony\Component\DependencyInjection\Exception\InactiveScopeException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
@@ -66,11 +67,13 @@ class Container implements IntrospectableContainerInterface
      */
     protected $parameterBag;
 
-    protected $services;
-    protected $scopes;
-    protected $scopeChildren;
-    protected $scopedServices;
-    protected $scopeStacks;
+    protected $services = array();
+    protected $methodMap = array();
+    protected $aliases = array();
+    protected $scopes = array();
+    protected $scopeChildren = array();
+    protected $scopedServices = array();
+    protected $scopeStacks = array();
     protected $loading = array();
 
     /**
@@ -82,13 +85,7 @@ class Container implements IntrospectableContainerInterface
      */
     public function __construct(ParameterBagInterface $parameterBag = null)
     {
-        $this->parameterBag = null === $parameterBag ? new ParameterBag() : $parameterBag;
-
-        $this->services       = array();
-        $this->scopes         = array();
-        $this->scopeChildren  = array();
-        $this->scopedServices = array();
-        $this->scopeStacks    = array();
+        $this->parameterBag = $parameterBag ?: new ParameterBag();
 
         $this->set('service_container', $this);
     }
@@ -180,6 +177,9 @@ class Container implements IntrospectableContainerInterface
     /**
      * Sets a service.
      *
+     * Setting a service to null resets the service: has() returns false and get()
+     * behaves in the same way as if the service was never created.
+     *
      * @param string $id      The service identifier
      * @param object $service The service instance
      * @param string $scope   The scope of the service
@@ -206,6 +206,18 @@ class Container implements IntrospectableContainerInterface
         }
 
         $this->services[$id] = $service;
+
+        if (method_exists($this, $method = 'synchronize'.strtr($id, array('_' => '', '.' => '_', '\\' => '_')).'Service')) {
+            $this->$method();
+        }
+
+        if (self::SCOPE_CONTAINER !== $scope && null === $service) {
+            unset($this->scopedServices[$scope][$id]);
+        }
+
+        if (null === $service) {
+            unset($this->services[$id]);
+        }
     }
 
     /**
@@ -221,7 +233,11 @@ class Container implements IntrospectableContainerInterface
     {
         $id = strtolower($id);
 
-        return isset($this->services[$id]) || method_exists($this, 'get'.strtr($id, array('_' => '', '.' => '_')).'Service');
+        return isset($this->services[$id])
+            || array_key_exists($id, $this->services)
+            || isset($this->aliases[$id])
+            || method_exists($this, 'get'.strtr($id, array('_' => '', '.' => '_', '\\' => '_')).'Service')
+        ;
     }
 
     /**
@@ -245,39 +261,72 @@ class Container implements IntrospectableContainerInterface
      */
     public function get($id, $invalidBehavior = self::EXCEPTION_ON_INVALID_REFERENCE)
     {
-        $id = strtolower($id);
-
-        if (isset($this->services[$id])) {
-            return $this->services[$id];
+        // Attempt to retrieve the service by checking first aliases then
+        // available services. Service IDs are case insensitive, however since
+        // this method can be called thousands of times during a request, avoid
+        // calling strtolower() unless necessary.
+        foreach (array(false, true) as $strtolower) {
+            if ($strtolower) {
+                $id = strtolower($id);
+            }
+            if (isset($this->aliases[$id])) {
+                $id = $this->aliases[$id];
+            }
+            // Re-use shared service instance if it exists.
+            if (isset($this->services[$id]) || array_key_exists($id, $this->services)) {
+                return $this->services[$id];
+            }
         }
 
         if (isset($this->loading[$id])) {
             throw new ServiceCircularReferenceException($id, array_keys($this->loading));
         }
 
-        if (method_exists($this, $method = 'get'.strtr($id, array('_' => '', '.' => '_')).'Service')) {
-            $this->loading[$id] = true;
-
-            try {
-                $service = $this->$method();
-            } catch (\Exception $e) {
-                unset($this->loading[$id]);
-
-                if (isset($this->services[$id])) {
-                    unset($this->services[$id]);
+        if (isset($this->methodMap[$id])) {
+            $method = $this->methodMap[$id];
+        } elseif (method_exists($this, $method = 'get'.strtr($id, array('_' => '', '.' => '_', '\\' => '_')).'Service')) {
+            // $method is set to the right value, proceed
+        } else {
+            if (self::EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior) {
+                if (!$id) {
+                    throw new ServiceNotFoundException($id);
                 }
 
-                throw $e;
+                $alternatives = array();
+                foreach (array_keys($this->services) as $key) {
+                    $lev = levenshtein($id, $key);
+                    if ($lev <= strlen($id) / 3 || false !== strpos($key, $id)) {
+                        $alternatives[] = $key;
+                    }
+                }
+
+                throw new ServiceNotFoundException($id, null, null, $alternatives);
             }
 
+            return null;
+        }
+
+        $this->loading[$id] = true;
+
+        try {
+            $service = $this->$method();
+        } catch (\Exception $e) {
             unset($this->loading[$id]);
 
-            return $service;
+            if (array_key_exists($id, $this->services)) {
+                unset($this->services[$id]);
+            }
+
+            if ($e instanceof InactiveScopeException && self::EXCEPTION_ON_INVALID_REFERENCE !== $invalidBehavior) {
+                return null;
+            }
+
+            throw $e;
         }
 
-        if (self::EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior) {
-            throw new ServiceNotFoundException($id);
-        }
+        unset($this->loading[$id]);
+
+        return $service;
     }
 
     /**
@@ -289,7 +338,9 @@ class Container implements IntrospectableContainerInterface
      */
     public function initialized($id)
     {
-        return isset($this->services[strtolower($id)]);
+        $id = strtolower($id);
+
+        return isset($this->services[$id]) || array_key_exists($id, $this->services);
     }
 
     /**
@@ -393,8 +444,11 @@ class Container implements IntrospectableContainerInterface
             $services = $this->scopeStacks[$name]->pop();
             $this->scopedServices += $services;
 
-            array_unshift($services, $this->services);
-            $this->services = call_user_func_array('array_merge', $services);
+            foreach ($services as $array) {
+                foreach ($array as $id => $service) {
+                    $this->set($id, $service, $name);
+                }
+            }
         }
     }
 
@@ -471,7 +525,7 @@ class Container implements IntrospectableContainerInterface
      */
     public static function camelize($id)
     {
-        return preg_replace_callback('/(^|_|\.)+(.)/', function ($match) { return ('.' === $match[1] ? '_' : '').strtoupper($match[2]); }, $id);
+        return strtr(ucwords(strtr($id, array('_' => ' ', '.' => '_ ', '\\' => '_ '))), array(' ' => ''));
     }
 
     /**

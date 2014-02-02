@@ -11,8 +11,19 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-class MoneyTypeTest extends LocalizedTestCase
+use Symfony\Component\Intl\Util\IntlTestHelper;
+
+class MoneyTypeTest extends TypeTestCase
 {
+    protected function setUp()
+    {
+        // we test against different locales, so we need the full
+        // implementation
+        IntlTestHelper::requireFullIntl($this);
+
+        parent::setUp();
+    }
+
     public function testPassMoneyPatternToView()
     {
         \Locale::setDefault('de_DE');

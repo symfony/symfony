@@ -9,23 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bridge\Twig\Tests\Node;
+namespace Symfony\Bridge\Twig\Tests\TokenParser;
 
-use Symfony\Bridge\Twig\Tests\TestCase;
 use Symfony\Bridge\Twig\TokenParser\FormThemeTokenParser;
 use Symfony\Bridge\Twig\Node\FormThemeNode;
 
-class FormThemeTokenParserTest extends TestCase
+class FormThemeTokenParserTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        parent::setUp();
-
-        if (version_compare(\Twig_Environment::VERSION, '1.5.0', '<')) {
-            $this->markTestSkipped('Requires Twig version to be at least 1.5.0.');
-        }
-    }
-
     /**
      * @dataProvider getTestsForFormTheme
      */

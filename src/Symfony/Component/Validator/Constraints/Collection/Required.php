@@ -11,17 +11,16 @@
 
 namespace Symfony\Component\Validator\Constraints\Collection;
 
-use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Constraints\Required as BaseRequired;
 
 /**
  * @Annotation
+ *
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated Deprecated in 2.3, to be removed in 3.0. Use
+ *             {@link \Symfony\Component\Validator\Constraints\Required} instead.
  */
-class Required extends Constraint
+class Required extends BaseRequired
 {
-    public $constraints = array();
-
-    public function getDefaultOption()
-    {
-        return 'constraints';
-    }
 }

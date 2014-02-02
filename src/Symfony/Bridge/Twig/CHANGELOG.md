@@ -1,6 +1,22 @@
 CHANGELOG
 =========
 
+2.5.0
+-----
+
+ * moved command `twig:lint` from `TwigBundle`
+
+2.4.0
+-----
+
+ * added stopwatch tag to time templates with the WebProfilerBundle
+
+2.3.0
+-----
+
+ * added helpers form(), form_start() and form_end()
+ * deprecated form_enctype() in favor of form_start()
+
 2.2.0
 -----
 

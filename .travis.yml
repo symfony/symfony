@@ -5,12 +5,23 @@ php:
   - 5.3
   - 5.4
   - 5.5
+  - hhvm
 
 matrix:
-  allow_failures:
-    - php: 5.5
+    allow_failures:
+        - php: hhvm
+
+services: mongodb
 
 before_script:
+    - sudo apt-get install parallel
+    - sh -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm" ]; then echo "" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini; fi;'
+    - sh -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm" ]; then echo "extension = mongo.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi;'
+    - sh -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm" ] && [ $(php -r "echo PHP_MINOR_VERSION;") -le 4 ]; then echo "extension = apc.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi;'
+    - sh -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm" ]; then echo "extension = memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi;'
+    - sh -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm" ]; then echo "extension = memcache.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi;'
     - COMPOSER_ROOT_VERSION=dev-master composer --prefer-source --dev install
-    - php src/Symfony/Component/Locale/Resources/data/build-data.php
-    - export USE_INTL_ICU_DATA_VERSION=1
+
+script:
+    - ls -d src/Symfony/*/* | parallel --gnu --keep-order 'echo "Running {} tests"; phpunit --exclude-group tty,benchmark {};' || exit 1
+    - echo "Running tests requiring tty"; phpunit --group tty

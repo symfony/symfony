@@ -15,7 +15,6 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Finder\Finder;
 
 /**
@@ -26,7 +25,7 @@ use Symfony\Component\Finder\Finder;
 class AssetsInstallCommand extends ContainerAwareCommand
 {
     /**
-     * @see Command
+     * {@inheritdoc}
      */
     protected function configure()
     {
@@ -62,9 +61,9 @@ EOT
     }
 
     /**
-     * @see Command
+     * {@inheritdoc}
      *
-     * @throws \InvalidArgumentException When the target directory does not exist
+     * @throws \InvalidArgumentException When the target directory does not exist or symlink cannot be used
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -81,13 +80,13 @@ EOT
         $filesystem = $this->getContainer()->get('filesystem');
 
         // Create the bundles directory otherwise symlink will fail.
-        $filesystem->mkdir($targetArg.'/bundles/', 0777);
+        $bundlesDir = $targetArg.'/bundles/';
+        $filesystem->mkdir($bundlesDir, 0777);
 
         $output->writeln(sprintf("Installing assets using the <comment>%s</comment> option", $input->getOption('symlink') ? 'symlink' : 'hard copy'));
 
         foreach ($this->getContainer()->get('kernel')->getBundles() as $bundle) {
             if (is_dir($originDir = $bundle->getPath().'/Resources/public')) {
-                $bundlesDir = $targetArg.'/bundles/';
                 $targetDir  = $bundlesDir.preg_replace('/bundle$/', '', strtolower($bundle->getName()));
 
                 $output->writeln(sprintf('Installing assets for <comment>%s</comment> into <comment>%s</comment>', $bundle->getNamespace(), $targetDir));
@@ -104,7 +103,7 @@ EOT
                 } else {
                     $filesystem->mkdir($targetDir, 0777);
                     // We use a custom iterator to ignore VCS files
-                    $filesystem->mirror($originDir, $targetDir, Finder::create()->in($originDir));
+                    $filesystem->mirror($originDir, $targetDir, Finder::create()->ignoreDotFiles(false)->in($originDir));
                 }
             }
         }

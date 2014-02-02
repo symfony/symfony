@@ -62,6 +62,11 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
             $definition->setProperties(
                 $this->inlineArguments($container, $definition->getProperties())
             );
+
+            $configurator = $this->inlineArguments($container, array($definition->getConfigurator()));
+            $definition->setConfigurator(
+                $configurator[0]
+            );
         }
     }
 
@@ -117,12 +122,16 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
             return true;
         }
 
-        if ($definition->isPublic()) {
+        if ($definition->isPublic() || $definition->isLazy()) {
             return false;
         }
 
         if (!$this->graph->hasNode($id)) {
             return true;
+        }
+
+        if ($this->currentId == $id) {
+            return false;
         }
 
         $ids = array();

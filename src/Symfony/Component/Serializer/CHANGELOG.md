@@ -1,6 +1,19 @@
 CHANGELOG
 =========
 
+2.4.0
+-----
+
+ * added `$context` support for XMLEncoder.
+ * [DEPRECATION] JsonEncode and JsonDecode where modified to throw
+   an exception if error found. No need for get*Error() functions
+
+2.3.0
+-----
+
+ * added `GetSetMethodNormalizer::setCamelizedAttributes` to allow calling
+   camel cased methods for underscored properties
+
 2.2.0
 -----
 

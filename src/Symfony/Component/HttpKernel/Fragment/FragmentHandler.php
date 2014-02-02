@@ -14,11 +14,8 @@ namespace Symfony\Component\HttpKernel\Fragment;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
-use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Renders a URI that represents a resource fragment.
@@ -26,36 +23,44 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * This class handles the rendering of resource fragments that are included into
  * a main resource. The handling of the rendering is managed by specialized renderers.
  *
+ * This listener works in 2 modes:
+ *
+ *  * 2.3 compatibility mode where you must call setRequest whenever the Request changes.
+ *  * 2.4+ mode where you must pass a RequestStack instance in the constructor.
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @see FragmentRendererInterface
  */
-class FragmentHandler implements EventSubscriberInterface
+class FragmentHandler
 {
     private $debug;
-    private $renderers;
-    private $requests;
+    private $renderers = array();
+    private $request;
+    private $requestStack;
 
     /**
      * Constructor.
      *
-     * @param FragmentRendererInterface[] $renderers An array of FragmentRendererInterface instances
-     * @param Boolean                     $debug     Whether the debug mode is enabled or not
+     * RequestStack will become required in 3.0.
+     *
+     * @param FragmentRendererInterface[] $renderers    An array of FragmentRendererInterface instances
+     * @param Boolean                     $debug        Whether the debug mode is enabled or not
+     * @param RequestStack|null           $requestStack The Request stack that controls the lifecycle of requests
      */
-    public function __construct(array $renderers = array(), $debug = false)
+    public function __construct(array $renderers = array(), $debug = false, RequestStack $requestStack = null)
     {
-        $this->renderers = array();
+        $this->requestStack = $requestStack;
         foreach ($renderers as $renderer) {
             $this->addRenderer($renderer);
         }
         $this->debug = $debug;
-        $this->requests = array();
     }
 
     /**
      * Adds a renderer.
      *
-     * @param FragmentRendererInterface $strategy A FragmentRendererInterface instance
+     * @param FragmentRendererInterface $renderer A FragmentRendererInterface instance
      */
     public function addRenderer(FragmentRendererInterface $renderer)
     {
@@ -63,23 +68,19 @@ class FragmentHandler implements EventSubscriberInterface
     }
 
     /**
-     * Stores the Request object.
+     * Sets the current Request.
      *
-     * @param GetResponseEvent $event A GetResponseEvent instance
-     */
-    public function onKernelRequest(GetResponseEvent $event)
-    {
-        array_unshift($this->requests, $event->getRequest());
-    }
-
-    /**
-     * Removes the most recent Request object.
+     * This method was used to synchronize the Request, but as the HttpKernel
+     * is doing that automatically now, you should never call it directly.
+     * It is kept public for BC with the 2.3 version.
      *
-     * @param FilterResponseEvent $event A FilterResponseEvent instance
+     * @param Request|null $request A Request instance
+     *
+     * @deprecated Deprecated since version 2.4, to be removed in 3.0.
      */
-    public function onKernelResponse(FilterResponseEvent $event)
+    public function setRequest(Request $request = null)
     {
-        array_shift($this->requests);
+        $this->request = $request;
     }
 
     /**
@@ -96,7 +97,7 @@ class FragmentHandler implements EventSubscriberInterface
      * @return string|null The Response content or null when the Response is streamed
      *
      * @throws \InvalidArgumentException when the renderer does not exist
-     * @throws \RuntimeException         when the Response is not successful
+     * @throws \LogicException           when the Request is not successful
      */
     public function render($uri, $renderer = 'inline', array $options = array())
     {
@@ -108,7 +109,11 @@ class FragmentHandler implements EventSubscriberInterface
             throw new \InvalidArgumentException(sprintf('The "%s" renderer does not exist.', $renderer));
         }
 
-        return $this->deliver($this->renderers[$renderer]->render($uri, $this->requests[0], $options));
+        if (!$request = $this->getRequest()) {
+            throw new \LogicException('Rendering a fragment can only be done when handling a Request.');
+        }
+
+        return $this->deliver($this->renderers[$renderer]->render($uri, $request, $options));
     }
 
     /**
@@ -126,7 +131,7 @@ class FragmentHandler implements EventSubscriberInterface
     protected function deliver(Response $response)
     {
         if (!$response->isSuccessful()) {
-            throw new \RuntimeException(sprintf('Error when rendering "%s" (Status code is %s).', $this->requests[0]->getUri(), $response->getStatusCode()));
+            throw new \RuntimeException(sprintf('Error when rendering "%s" (Status code is %s).', $this->getRequest()->getUri(), $response->getStatusCode()));
         }
 
         if (!$response instanceof StreamedResponse) {
@@ -136,40 +141,8 @@ class FragmentHandler implements EventSubscriberInterface
         $response->sendContent();
     }
 
-    public static function getSubscribedEvents()
+    private function getRequest()
     {
-        return array(
-            KernelEvents::REQUEST  => 'onKernelRequest',
-            KernelEvents::RESPONSE => 'onKernelResponse',
-        );
-    }
-
-    // to be removed in 2.3
-    public function fixOptions(array $options)
-    {
-        // support for the standalone option is @deprecated in 2.2 and replaced with the renderer option
-        if (isset($options['standalone'])) {
-            trigger_error('The "standalone" option is deprecated in version 2.2 and replaced with the "renderer" option.', E_USER_DEPRECATED);
-
-            // support for the true value is @deprecated in 2.2, will be removed in 2.3
-            if (true === $options['standalone']) {
-                trigger_error('The "true" value for the "standalone" option is deprecated in version 2.2 and replaced with the "esi" value.', E_USER_DEPRECATED);
-
-                $options['standalone'] = 'esi';
-            } elseif (false === $options['standalone']) {
-                trigger_error('The "false" value for the "standalone" option is deprecated in version 2.2 and replaced with the "inline" value.', E_USER_DEPRECATED);
-
-                $options['standalone'] = 'inline';
-            } elseif ('js' === $options['standalone']) {
-                trigger_error('The "js" value for the "standalone" option is deprecated in version 2.2 and replaced with the "hinclude" value.', E_USER_DEPRECATED);
-
-                $options['standalone'] = 'hinclude';
-            }
-
-            $options['renderer'] = $options['standalone'];
-            unset($options['standalone']);
-        }
-
-        return $options;
+        return $this->requestStack ? $this->requestStack->getCurrentRequest() : $this->request;
     }
 }

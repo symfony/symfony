@@ -1,0 +1,7 @@
+<info>[container]</info> List of parameters
+ Parameter Value                    
+ array     [12,"Hello world!",true] 
+ boolean   true                     
+ integer   12                       
+ string    Hello world!             
+                                    

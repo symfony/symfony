@@ -21,24 +21,31 @@ class InputOptionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $option->getName(), '__construct() takes a name as its first argument');
         $option = new InputOption('--foo');
         $this->assertEquals('foo', $option->getName(), '__construct() removes the leading -- of the option name');
+    }
 
-        try {
-            $option = new InputOption('foo', 'f', InputOption::VALUE_IS_ARRAY);
-            $this->fail('__construct() throws an \InvalidArgumentException if VALUE_IS_ARRAY option is used when an option does not accept a value');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '__construct() throws an \InvalidArgumentException if VALUE_IS_ARRAY option is used when an option does not accept a value');
-            $this->assertEquals('Impossible to have an option mode VALUE_IS_ARRAY if the option does not accept a value.', $e->getMessage());
-        }
+    /**
+     * @expectedException        \InvalidArgumentException
+     * @expectedExceptionMessage Impossible to have an option mode VALUE_IS_ARRAY if the option does not accept a value.
+     */
+    public function testArrayModeWithoutValue()
+    {
+        new InputOption('foo', 'f', InputOption::VALUE_IS_ARRAY);
+    }
 
-        // shortcut argument
+    public function testShortcut()
+    {
         $option = new InputOption('foo', 'f');
         $this->assertEquals('f', $option->getShortcut(), '__construct() can take a shortcut as its second argument');
-        $option = new InputOption('foo', '-f');
-        $this->assertEquals('f', $option->getShortcut(), '__construct() removes the leading - of the shortcut');
+        $option = new InputOption('foo', '-f|-ff|fff');
+        $this->assertEquals('f|ff|fff', $option->getShortcut(), '__construct() removes the leading - of the shortcuts');
+        $option = new InputOption('foo', array('f', 'ff', '-fff'));
+        $this->assertEquals('f|ff|fff', $option->getShortcut(), '__construct() removes the leading - of the shortcuts');
         $option = new InputOption('foo');
         $this->assertNull($option->getShortcut(), '__construct() makes the shortcut null by default');
+    }
 
-        // mode argument
+    public function testModes()
+    {
         $option = new InputOption('foo', 'f');
         $this->assertFalse($option->acceptValue(), '__construct() gives a "InputOption::VALUE_NONE" mode by default');
         $this->assertFalse($option->isValueRequired(), '__construct() gives a "InputOption::VALUE_NONE" mode by default');
@@ -63,21 +70,24 @@ class InputOptionTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($option->acceptValue(), '__construct() can take "InputOption::VALUE_OPTIONAL" as its mode');
         $this->assertFalse($option->isValueRequired(), '__construct() can take "InputOption::VALUE_OPTIONAL" as its mode');
         $this->assertTrue($option->isValueOptional(), '__construct() can take "InputOption::VALUE_OPTIONAL" as its mode');
+    }
 
-        try {
-            $option = new InputOption('foo', 'f', 'ANOTHER_ONE');
-            $this->fail('__construct() throws an \InvalidArgumentException if the mode is not valid');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '__construct() throws an \InvalidArgumentException if the mode is not valid');
-            $this->assertEquals('Option mode "ANOTHER_ONE" is not valid.', $e->getMessage());
-        }
-        try {
-            $option = new InputOption('foo', 'f', -1);
-            $this->fail('__construct() throws an \InvalidArgumentException if the mode is not valid');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '__construct() throws an \InvalidArgumentException if the mode is not valid');
-            $this->assertEquals('Option mode "-1" is not valid.', $e->getMessage());
-        }
+    /**
+     * @dataProvider provideInvalidModes
+     */
+    public function testInvalidModes($mode)
+    {
+        $this->setExpectedException('InvalidArgumentException', sprintf('Option mode "%s" is not valid.', $mode));
+
+        new InputOption('foo', 'f', $mode);
+    }
+
+    public function provideInvalidModes()
+    {
+        return array(
+            array('ANOTHER_ONE'),
+            array(-1)
+        );
     }
 
     /**
@@ -147,24 +157,26 @@ class InputOptionTest extends \PHPUnit_Framework_TestCase
         $option = new InputOption('foo', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY);
         $option->setDefault(array(1, 2));
         $this->assertEquals(array(1, 2), $option->getDefault(), '->setDefault() changes the default value');
+    }
 
+    /**
+     * @expectedException        \LogicException
+     * @expectedExceptionMessage Cannot set a default value when using InputOption::VALUE_NONE mode.
+     */
+    public function testDefaultValueWithValueNoneMode()
+    {
         $option = new InputOption('foo', 'f', InputOption::VALUE_NONE);
-        try {
-            $option->setDefault('default');
-            $this->fail('->setDefault() throws a \LogicException if you give a default value for a VALUE_NONE option');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\LogicException', $e, '->setDefault() throws a \LogicException if you give a default value for a VALUE_NONE option');
-            $this->assertEquals('Cannot set a default value when using InputOption::VALUE_NONE mode.', $e->getMessage());
-        }
+        $option->setDefault('default');
+    }
 
+    /**
+     * @expectedException        \LogicException
+     * @expectedExceptionMessage A default value for an array option must be an array.
+     */
+    public function testDefaultValueWithIsArrayMode()
+    {
         $option = new InputOption('foo', 'f', InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY);
-        try {
-            $option->setDefault('default');
-            $this->fail('->setDefault() throws a \LogicException if you give a default value which is not an array for a VALUE_IS_ARRAY option');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\LogicException', $e, '->setDefault() throws a \LogicException if you give a default value which is not an array for a VALUE_IS_ARRAY option');
-            $this->assertEquals('A default value for an array option must be an array.', $e->getMessage());
-        }
+        $option->setDefault('default');
     }
 
     public function testEquals()

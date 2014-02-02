@@ -40,15 +40,33 @@ class XliffFileLoader implements LoaderInterface
             throw new NotFoundResourceException(sprintf('File "%s" not found.', $resource));
         }
 
-        $xml = $this->parseFile($resource);
+        list($xml, $encoding) = $this->parseFile($resource);
         $xml->registerXPathNamespace('xliff', 'urn:oasis:names:tc:xliff:document:1.2');
 
         $catalogue = new MessageCatalogue($locale);
         foreach ($xml->xpath('//xliff:trans-unit') as $translation) {
-            if (!isset($translation->source) || !isset($translation->target)) {
+            $attributes = $translation->attributes();
+
+            if (!(isset($attributes['resname']) || isset($translation->source)) || !isset($translation->target)) {
                 continue;
             }
-            $catalogue->set((string) $translation->source, (string) $translation->target, $domain);
+
+            $source = isset($attributes['resname']) && $attributes['resname'] ? $attributes['resname'] : $translation->source;
+            $target = (string) $translation->target;
+
+            // If the xlf file has another encoding specified, try to convert it because
+            // simple_xml will always return utf-8 encoded values
+            if ('UTF-8' !== $encoding && !empty($encoding)) {
+                if (function_exists('mb_convert_encoding')) {
+                    $target = mb_convert_encoding($target, $encoding, 'UTF-8');
+                } elseif (function_exists('iconv')) {
+                    $target = iconv('UTF-8', $encoding, $target);
+                } else {
+                    throw new \RuntimeException('No suitable convert encoding function (use UTF-8 as your encoding or install the iconv or mbstring extension).');
+                }
+            }
+
+            $catalogue->set((string) $source, $target, $domain);
         }
         $catalogue->addResource(new FileResource($resource));
 
@@ -59,6 +77,8 @@ class XliffFileLoader implements LoaderInterface
      * Validates and parses the given file into a SimpleXMLElement
      *
      * @param string $file
+     *
+     * @throws \RuntimeException
      *
      * @return \SimpleXMLElement
      *
@@ -111,7 +131,7 @@ class XliffFileLoader implements LoaderInterface
 
         libxml_use_internal_errors($internalErrors);
 
-        return simplexml_import_dom($dom);
+        return array(simplexml_import_dom($dom), strtoupper($dom->encoding));
     }
 
     /**

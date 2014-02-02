@@ -22,20 +22,20 @@ use Symfony\Component\Translation\TranslatorInterface;
  * Example usage:
  *
  *     $translator = new DefaultTranslator();
- *    
+ *
  *     echo $translator->trans(
  *         'This is a {{ var }}.',
  *         array('{{ var }}' => 'donkey')
  *     );
- *    
+ *
  *     // -> This is a donkey.
- *    
+ *
  *     echo $translator->transChoice(
  *         'This is {{ count }} donkey.|These are {{ count }} donkeys.',
  *         3,
  *         array('{{ count }}' => 'three')
  *     );
- *    
+ *
  *     // -> These are three donkeys.
  *
  * This translator does not support message catalogs, translation domains or
@@ -56,12 +56,12 @@ class DefaultTranslator implements TranslatorInterface
      * Example usage:
      *
      *     $translator = new DefaultTranslator();
-     *    
+     *
      *     echo $translator->trans(
      *         'This is a {{ var }}.',
      *         array('{{ var }}' => 'donkey')
      *     );
-     *    
+     *
      *     // -> This is a donkey.
      *
      * @param string $id         The message id

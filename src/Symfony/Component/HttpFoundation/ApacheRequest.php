@@ -40,12 +40,4 @@ class ApacheRequest extends Request
 
         return $baseUrl;
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function preparePathInfo()
-    {
-        return $this->server->get('PATH_INFO') ?: substr($this->prepareRequestUri(), strlen($this->prepareBaseUrl())) ?: '/';
-    }
 }

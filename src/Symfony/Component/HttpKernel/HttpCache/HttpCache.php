@@ -19,7 +19,6 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\TerminableInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\HttpCache\Esi;
 
 /**
  * Cache provides HTTP caching.
@@ -35,7 +34,8 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     private $request;
     private $esi;
     private $esiCacheStrategy;
-    private $traces;
+    private $options = array();
+    private $traces = array();
 
     /**
      * Constructor.
@@ -81,6 +81,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     {
         $this->store = $store;
         $this->kernel = $kernel;
+        $this->esi = $esi;
 
         // needed in case there is a fatal error because the backend is too slow to respond
         register_shutdown_function(array($this->store, 'cleanup'));
@@ -94,8 +95,6 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
             'stale_while_revalidate' => 2,
             'stale_if_error'         => 60,
         ), $options);
-        $this->esi = $esi;
-        $this->traces = array();
     }
 
     /**
@@ -194,8 +193,6 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
             $response = $this->lookup($request, $catch);
         }
 
-        $response->isNotModified($request);
-
         $this->restoreResponseBody($request, $response);
 
         $response->setDate(new \DateTime(null, new \DateTimeZone('UTC')));
@@ -205,14 +202,16 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         }
 
         if (null !== $this->esi) {
-            $this->esiCacheStrategy->add($response);
-
             if (HttpKernelInterface::MASTER_REQUEST === $type) {
                 $this->esiCacheStrategy->update($response);
+            } else {
+                $this->esiCacheStrategy->add($response);
             }
         }
 
         $response->prepare($request);
+
+        $response->isNotModified($request);
 
         return $response;
     }
@@ -264,6 +263,15 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         if ($response->isSuccessful() || $response->isRedirect()) {
             try {
                 $this->store->invalidate($request, $catch);
+
+                // As per the RFC, invalidate Location and Content-Location URLs if present
+                foreach (array('Location', 'Content-Location') as $header) {
+                    if ($uri = $response->headers->get($header)) {
+                        $subRequest = Request::create($uri, 'get', array(), array(), array(), $request->server->all());
+
+                        $this->store->invalidate($subRequest);
+                    }
+                }
 
                 $this->record($request, 'invalidate');
             } catch (\Exception $e) {

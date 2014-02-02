@@ -28,7 +28,7 @@ class CollectionType extends AbstractType
     {
         if ($options['allow_add'] && $options['prototype']) {
             $prototype = $builder->create($options['prototype_name'], $options['type'], array_replace(array(
-                'label' => $options['prototype_name'] . 'label__',
+                'label' => $options['prototype_name'].'label__',
             ), $options['options']));
             $builder->setAttribute('prototype', $prototype->getForm());
         }
@@ -37,7 +37,8 @@ class CollectionType extends AbstractType
             $options['type'],
             $options['options'],
             $options['allow_add'],
-            $options['allow_delete']
+            $options['allow_delete'],
+            $options['delete_empty']
         );
 
         $builder->addEventSubscriber($resizeListener);
@@ -86,6 +87,7 @@ class CollectionType extends AbstractType
             'prototype_name' => '__name__',
             'type'           => 'text',
             'options'        => array(),
+            'delete_empty'   => false,
         ));
 
         $resolver->setNormalizers(array(

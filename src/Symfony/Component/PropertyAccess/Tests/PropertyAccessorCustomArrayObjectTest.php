@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\PropertyAccess\Tests;
 
-use Symfony\Component\Form\Tests\Fixtures\CustomArrayObject;
+use Symfony\Component\PropertyAccess\Tests\Fixtures\CustomArrayObject;
 
 class PropertyAccessorCustomArrayObjectTest extends PropertyAccessorCollectionTest
 {

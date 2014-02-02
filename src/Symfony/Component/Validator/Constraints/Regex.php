@@ -16,6 +16,8 @@ use Symfony\Component\Validator\Constraint;
 /**
  * @Annotation
  *
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ *
  * @api
  */
 class Regex extends Constraint
@@ -59,7 +61,7 @@ class Regex extends Constraint
     }
 
     /**
-     * Convert the htmlPattern to a suitable format for HTML5 pattern.
+     * Converts the htmlPattern to a suitable format for HTML5 pattern.
      * Example: /^[a-z]+$/ would be converted to [a-z]+
      * However, if options are specified, it cannot be converted
      *
@@ -86,9 +88,9 @@ class Regex extends Constraint
             $end       = empty($matches[4]) ? '.*' : '';
 
             // Unescape the delimiter in pattern
-            $pattern = str_replace('\\' . $delimiter, $delimiter, $pattern);
+            $pattern = str_replace('\\'.$delimiter, $delimiter, $pattern);
 
-            return $start . $pattern . $end;
+            return $start.$pattern.$end;
         }
 
         return null;

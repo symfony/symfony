@@ -16,6 +16,6 @@ namespace Symfony\Component\PropertyAccess\Exception;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class NoSuchPropertyException extends RuntimeException
+class NoSuchPropertyException extends AccessException
 {
 }

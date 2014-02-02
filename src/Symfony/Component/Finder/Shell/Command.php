@@ -24,23 +24,26 @@ class Command
     /**
      * @var array
      */
-    private $bits;
+    private $bits = array();
 
     /**
      * @var array
      */
-    private $labels;
+    private $labels = array();
+
+    /**
+     * @var \Closure|null
+     */
+    private $errorHandler;
 
     /**
      * Constructor.
      *
-     * @param Command $parent Parent command
+     * @param Command|null $parent Parent command
      */
     public function __construct(Command $parent = null)
     {
         $this->parent = $parent;
-        $this->bits   = array();
-        $this->labels = array();
     }
 
     /**
@@ -56,7 +59,7 @@ class Command
     /**
      * Creates a new Command instance.
      *
-     * @param Command $parent Parent command
+     * @param Command|null $parent Parent command
      *
      * @return Command New Command instance
      */
@@ -161,7 +164,7 @@ class Command
     public function ins($label)
     {
         if (isset($this->labels[$label])) {
-            throw new \RuntimeException('Label "'.$label.'" already exists.');
+            throw new \RuntimeException(sprintf('Label "%s" already exists.', $label));
         }
 
         $this->bits[] = self::create($this);
@@ -182,7 +185,7 @@ class Command
     public function get($label)
     {
         if (!isset($this->labels[$label])) {
-            throw new \RuntimeException('Label "'.$label.'" does not exists.');
+            throw new \RuntimeException(sprintf('Label "%s" does not exist.', $label));
         }
 
         return $this->bits[$this->labels[$label]];
@@ -215,6 +218,26 @@ class Command
     }
 
     /**
+     * @param \Closure $errorHandler
+     *
+     * @return Command
+     */
+    public function setErrorHandler(\Closure $errorHandler)
+    {
+        $this->errorHandler = $errorHandler;
+
+        return $this;
+    }
+
+    /**
+     * @return \Closure|null
+     */
+    public function getErrorHandler()
+    {
+        return $this->errorHandler;
+    }
+
+    /**
      * Executes current command.
      *
      * @return array The command result
@@ -223,10 +246,17 @@ class Command
      */
     public function execute()
     {
-        exec($this->join(), $output, $code);
+        if (null === $this->errorHandler) {
+            exec($this->join(), $output);
+        } else {
+            $process = proc_open($this->join(), array(0 => array('pipe', 'r'), 1 => array('pipe', 'w'), 2 => array('pipe', 'w')), $pipes);
+            $output = preg_split('~(\r\n|\r|\n)~', stream_get_contents($pipes[1]), -1, PREG_SPLIT_NO_EMPTY);
 
-        if (0 !== $code) {
-            throw new \RuntimeException('Execution failed with return code: '.$code.'.');
+            if ($error = stream_get_contents($pipes[2])) {
+                call_user_func($this->errorHandler, $error);
+            }
+
+            proc_close($process);
         }
 
         return $output ?: array();
@@ -240,10 +270,10 @@ class Command
     public function join()
     {
         return implode(' ', array_filter(
-            array_map(function($bit) {
+            array_map(function ($bit) {
                 return $bit instanceof Command ? $bit->join() : ($bit ?: null);
             }, $this->bits),
-            function($bit) { return null !== $bit; }
+            function ($bit) { return null !== $bit; }
         ));
     }
 

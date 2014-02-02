@@ -20,6 +20,8 @@ use Symfony\Component\Stopwatch\Stopwatch;
  */
 class StopwatchTest extends \PHPUnit_Framework_TestCase
 {
+    const DELTA = 20;
+
     public function testStart()
     {
         $stopwatch = new Stopwatch();
@@ -29,30 +31,65 @@ class StopwatchTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('cat', $event->getCategory());
     }
 
+    public function testIsStarted()
+    {
+        $stopwatch = new Stopwatch();
+        $stopwatch->start('foo', 'cat');
+
+        $this->assertTrue($stopwatch->isStarted('foo'));
+    }
+
+    public function testIsNotStarted()
+    {
+        $stopwatch = new Stopwatch();
+
+        $this->assertFalse($stopwatch->isStarted('foo'));
+    }
+
+    public function testIsNotStartedEvent()
+    {
+        $stopwatch = new Stopwatch();
+
+        $sections = new \ReflectionProperty('Symfony\Component\Stopwatch\Stopwatch', 'sections');
+        $sections->setAccessible(true);
+        $section = $sections->getValue($stopwatch);
+
+        $events = new \ReflectionProperty('Symfony\Component\Stopwatch\Section', 'events');
+        $events->setAccessible(true);
+        $events->setValue(
+            end($section),
+            array(
+                'foo' =>
+                $this->getMockBuilder('Symfony\Component\Stopwatch\StopwatchEvent')
+                    ->setConstructorArgs(array(microtime(true) * 1000))
+                    ->getMock())
+        );
+
+        $this->assertFalse($stopwatch->isStarted('foo'));
+    }
+
     public function testStop()
     {
         $stopwatch = new Stopwatch();
         $stopwatch->start('foo', 'cat');
-        usleep(20000);
+        usleep(200000);
         $event = $stopwatch->stop('foo');
 
         $this->assertInstanceof('Symfony\Component\Stopwatch\StopwatchEvent', $event);
-        $total = $event->getDuration();
-        $this->assertTrue($total > 10 && $total <= 29, $total.' should be 20 (between 10 and 29)');
+        $this->assertEquals(200, $event->getDuration(), null, self::DELTA);
     }
 
     public function testLap()
     {
         $stopwatch = new Stopwatch();
         $stopwatch->start('foo', 'cat');
-        usleep(10000);
+        usleep(100000);
         $event = $stopwatch->lap('foo');
-        usleep(10000);
+        usleep(100000);
         $stopwatch->stop('foo');
 
         $this->assertInstanceof('Symfony\Component\Stopwatch\StopwatchEvent', $event);
-        $total = $event->getDuration();
-        $this->assertTrue($total > 10 && $total <= 29, $total.' should be 20 (between 10 and 29)');
+        $this->assertEquals(200, $event->getDuration(), null, self::DELTA);
     }
 
     /**

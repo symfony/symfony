@@ -16,6 +16,10 @@ use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 /**
  * ApacheUrlMatcher matches URL based on Apache mod_rewrite matching (see ApacheMatcherDumper).
  *
+ * @deprecated Deprecated since version 2.5, to be removed in 3.0.
+ *             The performance gains are minimal and it's very hard to replicate
+ *             the behavior of PHP implementation.
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Arnaud Le Blanc <arnaud.lb@gmail.com>
  */
@@ -39,7 +43,7 @@ class ApacheUrlMatcher extends UrlMatcher
         $allow = array();
         $route = null;
 
-        foreach ($_SERVER as $key => $value) {
+        foreach ($this->denormalizeValues($_SERVER) as $key => $value) {
             $name = $key;
 
             // skip non-routing variables
@@ -90,5 +94,29 @@ class ApacheUrlMatcher extends UrlMatcher
         } else {
             return parent::match($pathinfo);
         }
+    }
+
+    /**
+     * Denormalizes an array of values.
+     *
+     * @param string[] $values
+     *
+     * @return array
+     */
+    private function denormalizeValues(array $values)
+    {
+        $normalizedValues = array();
+        foreach ($values as $key => $value) {
+            if (preg_match('~^(.*)\[(\d+)\]$~', $key, $matches)) {
+                if (!isset($normalizedValues[$matches[1]])) {
+                    $normalizedValues[$matches[1]] = array();
+                }
+                $normalizedValues[$matches[1]][(int) $matches[2]] = $value;
+            } else {
+                $normalizedValues[$key] = $value;
+            }
+        }
+
+        return $normalizedValues;
     }
 }

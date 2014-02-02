@@ -16,6 +16,10 @@ use Symfony\Component\Routing\Route;
 /**
  * Dumps a set of Apache mod_rewrite rules.
  *
+ * @deprecated Deprecated since version 2.5, to be removed in 3.0.
+ *             The performance gains are minimal and it's very hard to replicate
+ *             the behavior of PHP implementation.
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Kris Wallsmith <kris@symfony.com>
  */
@@ -50,6 +54,9 @@ class ApacheMatcherDumper extends MatcherDumper
         $prevHostRegex = '';
 
         foreach ($this->getRoutes()->all() as $name => $route) {
+            if ($route->getCondition()) {
+                throw new \LogicException(sprintf('Unable to dump the routes for Apache as route "%s" has a condition.', $name));
+            }
 
             $compiledRoute = $route->compile();
             $hostRegex = $compiledRoute->getHostRegex();
@@ -132,7 +139,7 @@ class ApacheMatcherDumper extends MatcherDumper
         foreach ($compiledRoute->getPathVariables() as $i => $variable) {
             $variables[] = 'E=_ROUTING_param_'.$variable.':%'.($i + 1);
         }
-        foreach ($route->getDefaults() as $key => $value) {
+        foreach ($this->normalizeValues($route->getDefaults()) as $key => $value) {
             $variables[] = 'E=_ROUTING_default_'.$key.':'.strtr($value, array(
                 ':'  => '\\:',
                 '='  => '\\=',
@@ -151,7 +158,7 @@ class ApacheMatcherDumper extends MatcherDumper
                 $allow[] = 'E=_ROUTING_allow_'.$method.':1';
             }
 
-            if ($hostRegex = $compiledRoute->getHostRegex()) {
+            if ($compiledRoute->getHostRegex()) {
                 $rule[] = sprintf("RewriteCond %%{ENV:__ROUTING_host_%s} =1", $hostRegexUnique);
             }
 
@@ -162,8 +169,7 @@ class ApacheMatcherDumper extends MatcherDumper
 
         // redirect with trailing slash appended
         if ($hasTrailingSlash) {
-
-            if ($hostRegex = $compiledRoute->getHostRegex()) {
+            if ($compiledRoute->getHostRegex()) {
                 $rule[] = sprintf("RewriteCond %%{ENV:__ROUTING_host_%s} =1", $hostRegexUnique);
             }
 
@@ -173,7 +179,7 @@ class ApacheMatcherDumper extends MatcherDumper
 
         // the main rule
 
-        if ($hostRegex = $compiledRoute->getHostRegex()) {
+        if ($compiledRoute->getHostRegex()) {
             $rule[] = sprintf("RewriteCond %%{ENV:__ROUTING_host_%s} =1", $hostRegexUnique);
         }
 
@@ -248,5 +254,28 @@ class ApacheMatcherDumper extends MatcherDumper
         }
 
         return $output;
+    }
+
+    /**
+     * Normalizes an array of values.
+     *
+     * @param array $values
+     *
+     * @return string[]
+     */
+    private function normalizeValues(array $values)
+    {
+        $normalizedValues = array();
+        foreach ($values as $key => $value) {
+            if (is_array($value)) {
+                foreach ($value as $index => $bit) {
+                    $normalizedValues[sprintf('%s[%s]', $key, $index)] = $bit;
+                }
+            } else {
+                $normalizedValues[$key] = (string) $value;
+            }
+        }
+
+        return $normalizedValues;
     }
 }

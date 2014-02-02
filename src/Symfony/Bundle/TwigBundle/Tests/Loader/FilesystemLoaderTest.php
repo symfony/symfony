@@ -11,11 +11,9 @@
 
 namespace Symfony\Bundle\TwigBundle\Tests\Loader;
 
-use Symfony\Bundle\TwigBundle\Tests\TestCase;
-use Symfony\Bundle\TwigBundle\Loader\FilesystemLoader;
-use Symfony\Component\Config\FileLocatorInterface;
 use Symfony\Bundle\FrameworkBundle\Templating\TemplateReference;
-use Symfony\Component\Templating\TemplateNameParserInterface;
+use Symfony\Bundle\TwigBundle\Loader\FilesystemLoader;
+use Symfony\Bundle\TwigBundle\Tests\TestCase;
 
 class FilesystemLoaderTest extends TestCase
 {
@@ -38,8 +36,23 @@ class FilesystemLoaderTest extends TestCase
         $this->assertEquals("This is a layout\n", $loader->getSource('TwigBundle::layout.html.twig'));
     }
 
+    public function testExists()
+    {
+        // should return true for templates that Twig does not find, but Symfony does
+        $parser = $this->getMock('Symfony\Component\Templating\TemplateNameParserInterface');
+        $locator = $this->getMock('Symfony\Component\Config\FileLocatorInterface');
+        $locator
+            ->expects($this->once())
+            ->method('locate')
+            ->will($this->returnValue($template = __DIR__.'/../DependencyInjection/Fixtures/Resources/views/layout.html.twig'))
+        ;
+        $loader = new FilesystemLoader($locator, $parser);
+
+        return $this->assertTrue($loader->exists($template));
+    }
+
     /**
-     * @expectedException Twig_Error_Loader
+     * @expectedException \Twig_Error_Loader
      */
     public function testTwigErrorIfLocatorThrowsInvalid()
     {
@@ -63,7 +76,7 @@ class FilesystemLoaderTest extends TestCase
     }
 
     /**
-     * @expectedException Twig_Error_Loader
+     * @expectedException \Twig_Error_Loader
      */
     public function testTwigErrorIfLocatorReturnsFalse()
     {

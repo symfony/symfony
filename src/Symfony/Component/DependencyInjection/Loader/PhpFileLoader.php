@@ -17,7 +17,7 @@ use Symfony\Component\Config\Resource\FileResource;
  * PhpFileLoader loads service definitions from a PHP file.
  *
  * The PHP file is required and the $container variable can be
- * used form the file to change the container.
+ * used within the file to change the container.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

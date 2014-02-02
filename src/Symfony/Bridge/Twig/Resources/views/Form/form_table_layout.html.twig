@@ -14,6 +14,17 @@
 {% endspaceless %}
 {% endblock form_row %}
 
+{% block button_row %}
+{% spaceless %}
+    <tr>
+        <td></td>
+        <td>
+            {{ form_widget(form) }}
+        </td>
+    </tr>
+{% endspaceless %}
+{% endblock button_row %}
+
 {% block hidden_row %}
 {% spaceless %}
     <tr style="display: none">

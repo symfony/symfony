@@ -12,7 +12,7 @@
 namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\BadMethodCallException;
-use Symfony\Component\Form\Exception\Exception;
+use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
@@ -27,6 +27,26 @@ use Symfony\Component\EventDispatcher\ImmutableEventDispatcher;
  */
 class FormConfigBuilder implements FormConfigBuilderInterface
 {
+    /**
+     * Caches a globally unique {@link NativeRequestHandler} instance.
+     *
+     * @var NativeRequestHandler
+     */
+    private static $nativeRequestProcessor;
+
+    /**
+     * The accepted request methods.
+     *
+     * @var array
+     */
+    private static $allowedMethods = array(
+        'GET',
+        'PUT',
+        'POST',
+        'DELETE',
+        'PATCH'
+    );
+
     /**
      * @var Boolean
      */
@@ -60,7 +80,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * @var Boolean
      */
-    private $virtual = false;
+    private $inheritData = false;
 
     /**
      * @var Boolean
@@ -86,11 +106,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      * @var DataMapperInterface
      */
     private $dataMapper;
-
-    /**
-     * @var array
-     */
-    private $validators = array();
 
     /**
      * @var Boolean
@@ -138,6 +153,26 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     private $formFactory;
 
     /**
+     * @var string
+     */
+    private $action;
+
+    /**
+     * @var string
+     */
+    private $method = 'POST';
+
+    /**
+     * @var RequestHandlerInterface
+     */
+    private $requestHandler;
+
+    /**
+     * @var Boolean
+     */
+    private $autoInitialize = false;
+
+    /**
      * @var array
      */
     private $options;
@@ -150,7 +185,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      * @param EventDispatcherInterface $dispatcher The event dispatcher
      * @param array                    $options    The form options
      *
-     * @throws \InvalidArgumentException If the data class is not a valid class or if
+     * @throws InvalidArgumentException If the data class is not a valid class or if
      *                                   the name contains invalid characters.
      */
     public function __construct($name, $dataClass, EventDispatcherInterface $dispatcher, array $options = array())
@@ -158,7 +193,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         self::validateName($name);
 
         if (null !== $dataClass && !class_exists($dataClass)) {
-            throw new \InvalidArgumentException(sprintf('The data class "%s" is not a valid class.', $dataClass));
+            throw new InvalidArgumentException(sprintf('The data class "%s" is not a valid class.', $dataClass));
         }
 
         $this->name = (string) $name;
@@ -198,22 +233,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function addValidator(FormValidatorInterface $validator)
-    {
-        trigger_error('addValidator() is deprecated since version 2.1 and will be removed in 2.3.', E_USER_DEPRECATED);
-
-        if ($this->locked) {
-            throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
-        }
-
-        $this->validators[] = $validator;
-
-        return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function addViewTransformer(DataTransformerInterface $viewTransformer, $forcePrepend = false)
     {
         if ($this->locked) {
@@ -241,72 +260,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         $this->viewTransformers = array();
 
         return $this;
-    }
-
-    /**
-     * Alias of {@link addViewTransformer()}.
-     *
-     * @param DataTransformerInterface $viewTransformer
-     *
-     * @return FormConfigBuilder The configuration object.
-     *
-     * @throws BadMethodCallException if the form configuration is locked
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
-     *             {@link addViewTransformer()} instead.
-     */
-    public function appendClientTransformer(DataTransformerInterface $viewTransformer)
-    {
-        trigger_error('appendClientTransformer() is deprecated since version 2.1 and will be removed in 2.3. Use addViewTransformer() instead.', E_USER_DEPRECATED);
-
-        if ($this->locked) {
-            throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
-        }
-
-        return $this->addViewTransformer($viewTransformer);
-    }
-
-    /**
-     * Prepends a transformer to the client transformer chain.
-     *
-     * @param DataTransformerInterface $viewTransformer
-     *
-     * @return FormConfigBuilder The configuration object.
-     *
-     * @throws BadMethodCallException if the form configuration is locked
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3.
-     */
-    public function prependClientTransformer(DataTransformerInterface $viewTransformer)
-    {
-        trigger_error('prependClientTransformer() is deprecated since version 2.1 and will be removed in 2.3.', E_USER_DEPRECATED);
-
-        if ($this->locked) {
-            throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
-        }
-
-        return $this->addViewTransformer($viewTransformer, true);
-    }
-
-    /**
-     * Alias of {@link resetViewTransformers()}.
-     *
-     * @return FormConfigBuilder The configuration object.
-     *
-     * @throws BadMethodCallException if the form configuration is locked
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
-     *             {@link resetViewTransformers()} instead.
-     */
-    public function resetClientTransformers()
-    {
-        trigger_error('resetClientTransformers() is deprecated since version 2.1 and will be removed in 2.3. Use resetViewTransformers() instead.', E_USER_DEPRECATED);
-
-        if ($this->locked) {
-            throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
-        }
-
-        return $this->resetViewTransformers();
     }
 
     /**
@@ -342,76 +295,14 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     }
 
     /**
-     * Appends a transformer to the normalization transformer chain
-     *
-     * @param DataTransformerInterface $modelTransformer
-     *
-     * @return FormConfigBuilder The configuration object.
-     *
-     * @throws BadMethodCallException if the form configuration is locked
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3.
-     */
-    public function appendNormTransformer(DataTransformerInterface $modelTransformer)
-    {
-        trigger_error('appendNormTransformer() is deprecated since version 2.1 and will be removed in 2.3.', E_USER_DEPRECATED);
-
-        if ($this->locked) {
-            throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
-        }
-
-        return $this->addModelTransformer($modelTransformer, true);
-    }
-
-    /**
-     * Alias of {@link addModelTransformer()}.
-     *
-     * @param DataTransformerInterface $modelTransformer
-     *
-     * @return FormConfigBuilder The configuration object.
-     *
-     * @throws BadMethodCallException if the form configuration is locked
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
-     *             {@link addModelTransformer()} instead.
-     */
-    public function prependNormTransformer(DataTransformerInterface $modelTransformer)
-    {
-        trigger_error('prependNormTransformer() is deprecated since version 2.1 and will be removed in 2.3. Use addModelTransformer() instead.', E_USER_DEPRECATED);
-
-        if ($this->locked) {
-            throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
-        }
-
-        return $this->addModelTransformer($modelTransformer);
-    }
-
-    /**
-     * Alias of {@link resetModelTransformers()}.
-     *
-     * @return FormConfigBuilder The configuration object.
-     *
-     * @throws BadMethodCallException if the form configuration is locked
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
-     *             {@link resetModelTransformers()} instead.
-     */
-    public function resetNormTransformers()
-    {
-        trigger_error('resetNormTransformers() is deprecated since version 2.1 and will be removed in 2.3. Use resetModelTransformers() instead.', E_USER_DEPRECATED);
-
-        if ($this->locked) {
-            throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
-        }
-
-        return $this->resetModelTransformers();
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getEventDispatcher()
     {
+        if ($this->locked && !$this->dispatcher instanceof ImmutableEventDispatcher) {
+            $this->dispatcher = new ImmutableEventDispatcher($this->dispatcher);
+        }
+
         return $this->dispatcher;
     }
 
@@ -450,9 +341,24 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
+    public function getInheritData()
+    {
+        return $this->inheritData;
+    }
+
+    /**
+     * Alias of {@link getInheritData()}.
+     *
+     * @return FormConfigBuilder The configuration object.
+     *
+     * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
+     *             {@link getInheritData()} instead.
+     */
     public function getVirtual()
     {
-        return $this->virtual;
+        // Uncomment this as soon as the deprecation note should be shown
+        // trigger_error('getVirtual() is deprecated since version 2.3 and will be removed in 3.0. Use getInheritData() instead.', E_USER_DEPRECATED);
+        return $this->getInheritData();
     }
 
     /**
@@ -480,21 +386,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     }
 
     /**
-     * Alias of {@link getViewTransformers()}.
-     *
-     * @return array The view transformers.
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
-     *             {@link getViewTransformers()} instead.
-     */
-    public function getClientTransformers()
-    {
-        trigger_error('getClientTransformers() is deprecated since version 2.1 and will be removed in 2.3. Use getViewTransformers() instead.', E_USER_DEPRECATED);
-
-        return $this->getViewTransformers();
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getModelTransformers()
@@ -503,36 +394,11 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     }
 
     /**
-     * Alias of {@link getModelTransformers()}.
-     *
-     * @return array The model transformers.
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
-     *             {@link getModelTransformers()} instead.
-     */
-    public function getNormTransformers()
-    {
-        trigger_error('getNormTransformers() is deprecated since version 2.1 and will be removed in 2.3. Use getModelTransformers() instead.', E_USER_DEPRECATED);
-
-        return $this->getModelTransformers();
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getDataMapper()
     {
         return $this->dataMapper;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getValidators()
-    {
-        trigger_error('getValidators() is deprecated since version 2.1 and will be removed in 2.3.', E_USER_DEPRECATED);
-
-        return $this->validators;
     }
 
     /**
@@ -580,7 +446,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     public function hasAttribute($name)
     {
-        return isset($this->attributes[$name]);
+        return array_key_exists($name, $this->attributes);
     }
 
     /**
@@ -588,7 +454,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     public function getAttribute($name, $default = null)
     {
-        return isset($this->attributes[$name]) ? $this->attributes[$name] : $default;
+        return array_key_exists($name, $this->attributes) ? $this->attributes[$name] : $default;
     }
 
     /**
@@ -626,6 +492,45 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
+    public function getAction()
+    {
+        return $this->action;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMethod()
+    {
+        return $this->method;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRequestHandler()
+    {
+        if (null === $this->requestHandler) {
+            if (null === self::$nativeRequestProcessor) {
+                self::$nativeRequestProcessor = new NativeRequestHandler();
+            }
+            $this->requestHandler = self::$nativeRequestProcessor;
+        }
+
+        return $this->requestHandler;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAutoInitialize()
+    {
+        return $this->autoInitialize;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getOptions()
     {
         return $this->options;
@@ -636,7 +541,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     public function hasOption($name)
     {
-        return isset($this->options[$name]);
+        return array_key_exists($name, $this->options);
     }
 
     /**
@@ -644,7 +549,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     public function getOption($name, $default = null)
     {
-        return isset($this->options[$name]) ? $this->options[$name] : $default;
+        return array_key_exists($name, $this->options) ? $this->options[$name] : $default;
     }
 
     /**
@@ -794,15 +699,33 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setVirtual($virtual)
+    public function setInheritData($inheritData)
     {
         if ($this->locked) {
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
         }
 
-        $this->virtual = $virtual;
+        $this->inheritData = $inheritData;
 
         return $this;
+    }
+
+    /**
+     * Alias of {@link setInheritData()}.
+     *
+     * @param Boolean $inheritData Whether the form should inherit its parent's data.
+     *
+     * @return FormConfigBuilder The configuration object.
+     *
+     * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
+     *             {@link setInheritData()} instead.
+     */
+    public function setVirtual($inheritData)
+    {
+        // Uncomment this as soon as the deprecation note should be shown
+        // trigger_error('setVirtual() is deprecated since version 2.3 and will be removed in 3.0. Use setInheritData() instead.', E_USER_DEPRECATED);
+
+        $this->setInheritData($inheritData);
     }
 
     /**
@@ -878,6 +801,68 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
+    public function setAction($action)
+    {
+        if ($this->locked) {
+            throw new BadMethodCallException('The config builder cannot be modified anymore.');
+        }
+
+        $this->action = $action;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setMethod($method)
+    {
+        if ($this->locked) {
+            throw new BadMethodCallException('The config builder cannot be modified anymore.');
+        }
+
+        $upperCaseMethod = strtoupper($method);
+
+        if (!in_array($upperCaseMethod, self::$allowedMethods)) {
+            throw new InvalidArgumentException(sprintf(
+                'The form method is "%s", but should be one of "%s".',
+                $method,
+                implode('", "', self::$allowedMethods)
+            ));
+        }
+
+        $this->method = $upperCaseMethod;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setRequestHandler(RequestHandlerInterface $requestHandler)
+    {
+        if ($this->locked) {
+            throw new BadMethodCallException('The config builder cannot be modified anymore.');
+        }
+
+        $this->requestHandler = $requestHandler;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setAutoInitialize($initialize)
+    {
+        $this->autoInitialize = (Boolean) $initialize;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getFormConfig()
     {
         if ($this->locked) {
@@ -888,10 +873,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         $config = clone $this;
         $config->locked = true;
 
-        if (!$config->dispatcher instanceof ImmutableEventDispatcher) {
-            $config->dispatcher = new ImmutableEventDispatcher($config->dispatcher);
-        }
-
         return $config;
     }
 
@@ -901,7 +882,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      * @param string|integer $name The tested form name.
      *
      * @throws UnexpectedTypeException   If the name is not a string or an integer.
-     * @throws \InvalidArgumentException If the name contains invalid characters.
+     * @throws InvalidArgumentException If the name contains invalid characters.
      */
     public static function validateName($name)
     {
@@ -910,7 +891,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         }
 
         if (!self::isValidName($name)) {
-            throw new \InvalidArgumentException(sprintf(
+            throw new InvalidArgumentException(sprintf(
                 'The name "%s" contains illegal characters. Names should start with a letter, digit or underscore and only contain letters, digits, numbers, underscores ("_"), hyphens ("-") and colons (":").',
                 $name
             ));

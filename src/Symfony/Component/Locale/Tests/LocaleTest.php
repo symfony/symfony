@@ -11,50 +11,68 @@
 
 namespace Symfony\Component\Locale\Tests;
 
+use Symfony\Component\Intl\Intl;
+use Symfony\Component\Intl\Util\IntlTestHelper;
 use Symfony\Component\Locale\Locale;
-use Symfony\Component\Locale\Tests\TestCase as LocaleTestCase;
 
-class LocaleTest extends LocaleTestCase
+/**
+ * Test case for the {@link Locale} class.
+ *
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ */
+class LocaleTest extends \PHPUnit_Framework_TestCase
 {
-    public function testGetDisplayCountriesReturnsFullListForSubLocale()
+    protected function setUp()
     {
-        $this->skipIfIntlExtensionIsNotLoaded();
-
-        Locale::setDefault('de_CH');
-
-        $countriesDe = Locale::getDisplayCountries('de');
-        $countriesDeCh = Locale::getDisplayCountries('de_CH');
-
-        $this->assertEquals(count($countriesDe), count($countriesDeCh));
-        $this->assertEquals($countriesDe['BD'], 'Bangladesch');
-        $this->assertEquals($countriesDeCh['BD'], 'Bangladesh');
+        // Locale extends \Locale, so intl must be present
+        IntlTestHelper::requireIntl($this);
     }
 
-    public function testGetDisplayLanguagesReturnsFullListForSubLocale()
+    public function testGetDisplayCountries()
     {
-        $this->skipIfIntlExtensionIsNotLoaded();
-
-        Locale::setDefault('de_CH');
-
-        $languagesDe = Locale::getDisplayLanguages('de');
-        $languagesDeCh = Locale::getDisplayLanguages('de_CH');
-
-        $this->assertEquals(count($languagesDe), count($languagesDeCh));
-        $this->assertEquals($languagesDe['be'], 'Weißrussisch');
-        $this->assertEquals($languagesDeCh['be'], 'Weissrussisch');
+        $countries = Locale::getDisplayCountries('en');
+        $this->assertEquals('Brazil', $countries['BR']);
     }
 
-    public function testGetDisplayLocalesReturnsFullListForSubLocale()
+    public function testGetDisplayCountriesForSwitzerland()
     {
-        $this->skipIfIntlExtensionIsNotLoaded();
+        $countries = Locale::getDisplayCountries('de_CH');
+        $this->assertEquals('Schweiz', $countries['CH']);
+    }
 
-        Locale::setDefault('de_CH');
+    public function testGetCountries()
+    {
+        $countries = Locale::getCountries();
+        $this->assertContains('BR', $countries);
+    }
 
-        $localesDe = Locale::getDisplayLocales('de');
-        $localesDeCh = Locale::getDisplayLocales('de_CH');
+    public function testGetCountriesForSwitzerland()
+    {
+        $countries = Locale::getCountries();
+        $this->assertContains('CH', $countries);
+    }
 
-        $this->assertEquals(count($localesDe), count($localesDeCh));
-        $this->assertEquals($localesDe['be'], 'Weißrussisch');
-        $this->assertEquals($localesDeCh['be'], 'Weissrussisch');
+    public function testGetDisplayLanguages()
+    {
+        $languages = Locale::getDisplayLanguages('en');
+        $this->assertEquals('Brazilian Portuguese', $languages['pt_BR']);
+    }
+
+    public function testGetLanguages()
+    {
+        $languages = Locale::getLanguages();
+        $this->assertContains('pt_BR', $languages);
+    }
+
+    public function testGetDisplayLocales()
+    {
+        $locales = Locale::getDisplayLocales('en');
+        $this->assertEquals('Portuguese', $locales['pt']);
+    }
+
+    public function testGetLocales()
+    {
+        $locales = Locale::getLocales();
+        $this->assertContains('pt', $locales);
     }
 }

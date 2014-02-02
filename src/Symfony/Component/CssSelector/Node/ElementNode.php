@@ -11,67 +11,67 @@
 
 namespace Symfony\Component\CssSelector\Node;
 
-use Symfony\Component\CssSelector\XPathExpr;
-
 /**
- * ElementNode represents a "namespace|element" node.
+ * Represents a "<namespace>|<element>" node.
  *
- * This component is a port of the Python lxml library,
- * which is copyright Infrae and distributed under the BSD license.
+ * This component is a port of the Python cssselector library,
+ * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+ * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
  */
-class ElementNode implements NodeInterface
+class ElementNode extends AbstractNode
 {
-    protected $namespace;
-    protected $element;
+    /**
+     * @var string|null
+     */
+    private $namespace;
 
     /**
-     * Constructor.
-     *
-     * @param string $namespace Namespace
-     * @param string $element   Element
+     * @var string|null
      */
-    public function __construct($namespace, $element)
+    private $element;
+
+    /**
+     * @param string|null $namespace
+     * @param string|null $element
+     */
+    public function __construct($namespace = null, $element = null)
     {
         $this->namespace = $namespace;
         $this->element = $element;
     }
 
     /**
-     * {@inheritDoc}
+     * @return null|string
+     */
+    public function getNamespace()
+    {
+        return $this->namespace;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getElement()
+    {
+        return $this->element;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSpecificity()
+    {
+        return new Specificity(0, 0, $this->element ? 1 : 0);
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function __toString()
     {
-        return sprintf('%s[%s]', __CLASS__, $this->formatElement());
-    }
+        $element = $this->element ?: '*';
 
-    /**
-     * Formats the element into a string.
-     *
-     * @return string Element as an XPath string
-     */
-    public function formatElement()
-    {
-        if ($this->namespace == '*') {
-            return $this->element;
-        }
-
-        return sprintf('%s|%s', $this->namespace, $this->element);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function toXpath()
-    {
-        if ($this->namespace == '*') {
-            $el = strtolower($this->element);
-        } else {
-            // FIXME: Should we lowercase here?
-            $el = sprintf('%s:%s', $this->namespace, $this->element);
-        }
-
-        return new XPathExpr(null, null, $el);
+        return sprintf('%s[%s]', $this->getNodeName(), $this->namespace ? $this->namespace.'|'.$element : $element);
     }
 }

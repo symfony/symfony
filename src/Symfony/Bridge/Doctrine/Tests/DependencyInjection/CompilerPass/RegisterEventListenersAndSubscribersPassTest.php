@@ -9,20 +9,13 @@
 * file that was distributed with this source code.
 */
 
-namespace Symfony\Bridge\Doctrine\Tests\DependencyInjection\Compiler;
+namespace Symfony\Bridge\Doctrine\Tests\DependencyInjection\CompilerPass;
 
 use Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass\RegisterEventListenersAndSubscribersPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class RegisterEventListenersAndSubscribersPassTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\DependencyInjection\Container')) {
-            $this->markTestSkipped('The "DependencyInjection" component is not available');
-        }
-    }
-
     public function testProcessEventListenersWithPriorities()
     {
         $container = $this->createBuilder();
@@ -107,6 +100,17 @@ class RegisterEventListenersAndSubscribersPassTest extends \PHPUnit_Framework_Te
 
         $this->process($container);
         $this->assertEquals(array('c', 'd', 'e', 'b', 'a'), $this->getServiceOrder($container, 'addEventSubscriber'));
+    }
+
+    public function testProcessNoTaggedServices()
+    {
+        $container = $this->createBuilder(true);
+
+        $this->process($container);
+
+        $this->assertEquals(array(), $container->getDefinition('doctrine.dbal.default_connection.event_manager')->getMethodCalls());
+
+        $this->assertEquals(array(), $container->getDefinition('doctrine.dbal.second_connection.event_manager')->getMethodCalls());
     }
 
     private function process(ContainerBuilder $container)

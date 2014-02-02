@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-use Symfony\Component\Form\Tests\FormPerformanceTestCase;
+use Symfony\Component\Form\Test\FormPerformanceTestCase;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Form\Guess;
 
+use Symfony\Component\Form\Exception\InvalidArgumentException;
+
 /**
  * Base class for guesses made by TypeGuesserInterface implementation
  *
@@ -57,14 +59,14 @@ abstract class Guess
     private $confidence;
 
     /**
-     * Returns the guess most likely to be correct from a list of guesses
+     * Returns the guess most likely to be correct from a list of guesses.
      *
      * If there are multiple guesses with the same, highest confidence, the
      * returned guess is any of them.
      *
-     * @param array $guesses A list of guesses
+     * @param Guess[] $guesses An array of guesses
      *
-     * @return Guess The guess with the highest confidence
+     * @return Guess|null The guess with the highest confidence
      */
     public static function getBestGuess(array $guesses)
     {
@@ -82,24 +84,24 @@ abstract class Guess
     }
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param integer $confidence The confidence
      *
-     * @throws \InvalidArgumentException if the given value of confidence is unknown
+     * @throws InvalidArgumentException if the given value of confidence is unknown
      */
     public function __construct($confidence)
     {
         if (self::VERY_HIGH_CONFIDENCE !== $confidence && self::HIGH_CONFIDENCE !== $confidence &&
             self::MEDIUM_CONFIDENCE !== $confidence && self::LOW_CONFIDENCE !== $confidence) {
-            throw new \InvalidArgumentException('The confidence should be one of the constants defined in Guess.');
+            throw new InvalidArgumentException('The confidence should be one of the constants defined in Guess.');
         }
 
         $this->confidence = $confidence;
     }
 
     /**
-     * Returns the confidence that the guessed value is correct
+     * Returns the confidence that the guessed value is correct.
      *
      * @return integer One of the constants VERY_HIGH_CONFIDENCE,
      *                 HIGH_CONFIDENCE, MEDIUM_CONFIDENCE and LOW_CONFIDENCE

@@ -159,18 +159,46 @@ class JsonResponseTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('text/javascript', $response->headers->get('Content-Type'));
     }
 
-    public function testSetCallbackInvalidIdentifier()
-    {
-        $response = new JsonResponse('foo');
-
-        $this->setExpectedException('InvalidArgumentException');
-        $response->setCallback('+invalid');
-    }
-
     public function testJsonEncodeFlags()
     {
         $response = new JsonResponse('<>\'&"');
 
         $this->assertEquals('"\u003C\u003E\u0027\u0026\u0022"', $response->getContent());
+    }
+
+    public function testGetEncodingOptions()
+    {
+        $response = new JsonResponse();
+
+        $this->assertEquals(JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT, $response->getEncodingOptions());
+    }
+
+    public function testSetEncodingOptions()
+    {
+        $response = new JsonResponse();
+        $response->setData(array(array(1, 2, 3)));
+
+        $this->assertEquals('[[1,2,3]]', $response->getContent());
+
+        $response->setEncodingOptions(JSON_FORCE_OBJECT);
+
+        $this->assertEquals('{"0":{"0":1,"1":2,"2":3}}', $response->getContent());
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testSetCallbackInvalidIdentifier()
+    {
+        $response = new JsonResponse('foo');
+        $response->setCallback('+invalid');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testSetContent()
+    {
+        JsonResponse::create("\xB1\x31");
     }
 }

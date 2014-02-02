@@ -29,25 +29,12 @@ class FormHelperTableLayoutTest extends AbstractTableLayoutTest
      */
     protected $engine;
 
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Bundle\FrameworkBundle\Templating\Helper\TranslatorHelper')) {
-            $this->markTestSkipped('The "FrameworkBundle" is not available');
-        }
-
-        if (!class_exists('Symfony\Component\Templating\PhpEngine')) {
-            $this->markTestSkipped('The "Templating" component is not available');
-        }
-
-        parent::setUp();
-    }
-
     protected function getExtensions()
     {
         // should be moved to the Form component once absolute file paths are supported
         // by the default name parser in the Templating component
         $reflClass = new \ReflectionClass('Symfony\Bundle\FrameworkBundle\FrameworkBundle');
-        $root = realpath(dirname($reflClass->getFileName()) . '/Resources/views');
+        $root = realpath(dirname($reflClass->getFileName()).'/Resources/views');
         $rootTheme = realpath(__DIR__.'/Resources');
         $templateNameParser = new StubTemplateNameParser($root, $rootTheme);
         $loader = new FilesystemLoader(array());
@@ -59,7 +46,7 @@ class FormHelperTableLayoutTest extends AbstractTableLayoutTest
         ));
 
         return array_merge(parent::getExtensions(), array(
-            new TemplatingExtension($this->engine, $this->csrfProvider, array(
+            new TemplatingExtension($this->engine, $this->csrfTokenManager, array(
                 'FrameworkBundle:Form',
                 'FrameworkBundle:FormTable',
             )),
@@ -71,6 +58,11 @@ class FormHelperTableLayoutTest extends AbstractTableLayoutTest
         $this->engine = null;
 
         parent::tearDown();
+    }
+
+    protected function renderForm(FormView $view, array $vars = array())
+    {
+        return (string) $this->engine->get('form')->form($view, $vars);
     }
 
     protected function renderEnctype(FormView $view)
@@ -101,6 +93,16 @@ class FormHelperTableLayoutTest extends AbstractTableLayoutTest
     protected function renderRest(FormView $view, array $vars = array())
     {
         return (string) $this->engine->get('form')->rest($view, $vars);
+    }
+
+    protected function renderStart(FormView $view, array $vars = array())
+    {
+        return (string) $this->engine->get('form')->start($view, $vars);
+    }
+
+    protected function renderEnd(FormView $view, array $vars = array())
+    {
+        return (string) $this->engine->get('form')->end($view, $vars);
     }
 
     protected function setTheme(FormView $view, array $themes)

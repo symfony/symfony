@@ -66,7 +66,3 @@ pre {
     white-space: normal;
     font-family: Arial, Helvetica, sans-serif;
 }
-pre.xdebug-var-dump{
-    white-space: pre;
-    font-family: monospace;
-}

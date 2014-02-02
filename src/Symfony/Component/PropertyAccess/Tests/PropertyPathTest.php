@@ -12,8 +12,6 @@
 namespace Symfony\Component\PropertyAccess\Tests;
 
 use Symfony\Component\PropertyAccess\PropertyPath;
-use Symfony\Component\PropertyAccess\Tests\Fixtures\Author;
-use Symfony\Component\PropertyAccess\Tests\Fixtures\Magician;
 
 class PropertyPathTest extends \PHPUnit_Framework_TestCase
 {
@@ -40,12 +38,26 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
         new PropertyPath('.property');
     }
 
+    public function providePathsContainingUnexpectedCharacters()
+    {
+        return array(
+            array('property.'),
+            array('property.['),
+            array('property..'),
+            array('property['),
+            array('property[['),
+            array('property[.'),
+            array('property[]'),
+        );
+    }
+
     /**
+     * @dataProvider providePathsContainingUnexpectedCharacters
      * @expectedException \Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException
      */
-    public function testUnexpectedCharacters()
+    public function testUnexpectedCharacters($path)
     {
-        new PropertyPath('property.$foo');
+        new PropertyPath($path);
     }
 
     /**

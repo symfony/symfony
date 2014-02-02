@@ -143,6 +143,16 @@ class NamespacedAttributeBagTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($this->bag->get('user.login'));
     }
 
+    public function testRemoveExistingNamespacedAttribute()
+    {
+        $this->assertSame('cod', $this->bag->remove('category/fishing/first'));
+    }
+
+    public function testRemoveNonexistingNamespacedAttribute()
+    {
+        $this->assertNull($this->bag->remove('foo/bar/baz'));
+    }
+
     public function testClear()
     {
         $this->bag->clear();
@@ -160,8 +170,10 @@ class NamespacedAttributeBagTest extends \PHPUnit_Framework_TestCase
             array('csrf.token/b', '4321', true),
             array('category', array('fishing' => array('first' => 'cod', 'second' => 'sole')), true),
             array('category/fishing', array('first' => 'cod', 'second' => 'sole'), true),
+            array('category/fishing/missing/first', null, false),
             array('category/fishing/first', 'cod', true),
             array('category/fishing/second', 'sole', true),
+            array('category/fishing/missing/second', null, false),
             array('user2.login', null, false),
             array('never', null, false),
             array('bye', null, false),

@@ -57,7 +57,7 @@ class SecurityDataCollector extends DataCollector
                 'authenticated' => $token->isAuthenticated(),
                 'token_class'   => get_class($token),
                 'user'          => $token->getUsername(),
-                'roles'         => array_map(function ($role){ return $role->getRole();}, $token->getRoles()),
+                'roles'         => array_map(function ($role) { return $role->getRole();}, $token->getRoles()),
             );
         }
     }
@@ -105,7 +105,7 @@ class SecurityDataCollector extends DataCollector
     /**
      * Get the class name of the security token.
      *
-     * @return String The token
+     * @return string The token
      */
     public function getTokenClass()
     {

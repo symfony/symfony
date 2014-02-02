@@ -24,8 +24,8 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
 {
     private $messages = array();
     private $metadata = array();
+    private $resources = array();
     private $locale;
-    private $resources;
     private $fallbackCatalogue;
     private $parent;
 
@@ -41,7 +41,6 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
     {
         $this->locale = $locale;
         $this->messages = $messages;
-        $this->resources = array();
     }
 
     /**
@@ -177,8 +176,10 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
             $this->addResource($resource);
         }
 
-        $metadata = $catalogue->getMetadata('', '');
-        $this->addMetadata($metadata);
+        if ($catalogue instanceof MetadataAwareInterface) {
+            $metadata = $catalogue->getMetadata('', '');
+            $this->addMetadata($metadata);
+        }
     }
 
     /**
@@ -205,9 +206,7 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
     }
 
     /**
-     * Gets the fallback catalogue.
-     *
-     * @return MessageCatalogueInterface A MessageCatalogueInterface instance
+     * {@inheritdoc}
      *
      * @api
      */
@@ -223,7 +222,7 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
      */
     public function getResources()
     {
-        return array_values(array_unique($this->resources));
+        return array_values($this->resources);
     }
 
     /**
@@ -233,7 +232,7 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
      */
     public function addResource(ResourceInterface $resource)
     {
-        $this->resources[] = $resource;
+        $this->resources[$resource->__toString()] = $resource;
     }
 
     /**
@@ -241,19 +240,21 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
      */
     public function getMetadata($key = '', $domain = 'messages')
     {
-        if (empty($domain)) {
+        if ('' == $domain) {
             return $this->metadata;
         }
 
         if (isset($this->metadata[$domain])) {
-            if (!empty($key)) {
-                if (isset($this->metadata[$domain][$key])) {
-                    return $this->metadata[$domain][$key];
-                }
-            } else {
+            if ('' == $key) {
                 return $this->metadata[$domain];
             }
+
+            if (isset($this->metadata[$domain][$key])) {
+                return $this->metadata[$domain][$key];
+            }
         }
+
+        return null;
     }
 
     /**
@@ -269,15 +270,13 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
      */
     public function deleteMetadata($key = '', $domain = 'messages')
     {
-        if (empty($domain)) {
+        if ('' == $domain) {
             $this->metadata = array();
-        }
-
-        if (empty($key)) {
+        } elseif ('' == $key) {
             unset($this->metadata[$domain]);
+        } else {
+            unset($this->metadata[$domain][$key]);
         }
-
-        unset($this->metadata[$domain][$key]);
     }
 
     /**

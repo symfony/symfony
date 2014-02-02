@@ -38,4 +38,14 @@ class Role implements RoleInterface
     {
         return $this->role;
     }
+
+    /**
+     * Casts the role to string
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->role;
+    }
 }

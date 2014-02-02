@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="form.resolved_type_factory.data_collector_proxy.class">Symfony\Component\Form\Extension\DataCollector\Proxy\ResolvedTypeFactoryDataCollectorProxy</parameter>
+        <parameter key="form.type_extension.form.data_collector.class">Symfony\Component\Form\Extension\DataCollector\Type\DataCollectorTypeExtension</parameter>
+    </parameters>
+
+    <services>
+        <service id="form.resolved_type_factory" class="%form.resolved_type_factory.data_collector_proxy.class%">
+            <argument type="service">
+                <service class="%form.resolved_type_factory.class%" />
+            </argument>
+            <argument type="service" id="data_collector.form" />
+        </service>
+
+        <!-- DataCollectorTypeExtension -->
+        <service id="form.type_extension.form.data_collector" class="%form.type_extension.form.data_collector.class%">
+            <tag name="form.type_extension" alias="form" />
+            <argument type="service" id="data_collector.form" />
+        </service>
+    </services>
+</container>

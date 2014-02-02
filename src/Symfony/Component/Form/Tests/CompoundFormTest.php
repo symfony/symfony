@@ -15,6 +15,7 @@ use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
 use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationRequestHandler;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\Forms;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\SubmitButtonBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -80,6 +81,19 @@ class CompoundFormTest extends AbstractFormTest
         $form->get('name')->addError(new FormError('Invalid'));
 
         $this->assertTrue($form->isValid());
+    }
+
+    public function testSubmitForwardsNullIfNotClearMissingButValueIsExplicitlyNull()
+    {
+        $child = $this->getMockForm('firstName');
+
+        $this->form->add($child);
+
+        $child->expects($this->once())
+            ->method('submit')
+            ->with($this->equalTo(null));
+
+        $this->form->submit(array('firstName' => null), false);
     }
 
     public function testSubmitForwardsNullIfValueIsMissing()
@@ -583,10 +597,6 @@ class CompoundFormTest extends AbstractFormTest
      */
     public function testSubmitPostOrPutRequest($method)
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
         $path = tempnam(sys_get_temp_dir(), 'sf2');
         touch($path);
 
@@ -635,10 +645,6 @@ class CompoundFormTest extends AbstractFormTest
      */
     public function testSubmitPostOrPutRequestWithEmptyRootFormName($method)
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
         $path = tempnam(sys_get_temp_dir(), 'sf2');
         touch($path);
 
@@ -686,10 +692,6 @@ class CompoundFormTest extends AbstractFormTest
      */
     public function testSubmitPostOrPutRequestWithSingleChildForm($method)
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
         $path = tempnam(sys_get_temp_dir(), 'sf2');
         touch($path);
 
@@ -726,10 +728,6 @@ class CompoundFormTest extends AbstractFormTest
      */
     public function testSubmitPostOrPutRequestWithSingleChildFormUploadedFile($method)
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
         $path = tempnam(sys_get_temp_dir(), 'sf2');
         touch($path);
 
@@ -755,10 +753,6 @@ class CompoundFormTest extends AbstractFormTest
 
     public function testSubmitGetRequest()
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
         $values = array(
             'author' => array(
                 'firstName' => 'Bernhard',
@@ -787,10 +781,6 @@ class CompoundFormTest extends AbstractFormTest
 
     public function testSubmitGetRequestWithEmptyRootFormName()
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
         $values = array(
             'firstName' => 'Bernhard',
             'lastName' => 'Schussek',
@@ -830,6 +820,65 @@ class CompoundFormTest extends AbstractFormTest
         $parent->add($this->getBuilder('foo')->getForm());
 
         $this->assertEquals("name:\n    ERROR: Error!\nfoo:\n    No errors\n", $parent->getErrorsAsString());
+    }
+
+    // Basic cases are covered in SimpleFormTest
+    public function testCreateViewWithChildren()
+    {
+        $type = $this->getMock('Symfony\Component\Form\ResolvedFormTypeInterface');
+        $options = array('a' => 'Foo', 'b' => 'Bar');
+        $field1 = $this->getMockForm('foo');
+        $field2 = $this->getMockForm('bar');
+        $view = new FormView();
+        $field1View = new FormView();
+        $field2View = new FormView();
+
+        $this->form = $this->getBuilder('form', null, null, $options)
+            ->setCompound(true)
+            ->setDataMapper($this->getDataMapper())
+            ->setType($type)
+            ->getForm();
+        $this->form->add($field1);
+        $this->form->add($field2);
+
+        $test = $this;
+
+        $assertChildViewsEqual = function (array $childViews) use ($test) {
+            return function (FormView $view) use ($test, $childViews) {
+                /* @var \PHPUnit_Framework_TestCase $test */
+                $test->assertSame($childViews, $view->children);
+            };
+        };
+
+        // First create the view
+        $type->expects($this->once())
+            ->method('createView')
+            ->will($this->returnValue($view));
+
+        // Then build it for the form itself
+        $type->expects($this->once())
+            ->method('buildView')
+            ->with($view, $this->form, $options)
+            ->will($this->returnCallback($assertChildViewsEqual(array())));
+
+        // Then add the first child form
+        $field1->expects($this->once())
+            ->method('createView')
+            ->will($this->returnValue($field1View));
+
+        // Then the second child form
+        $field2->expects($this->once())
+            ->method('createView')
+            ->will($this->returnValue($field2View));
+
+        // Again build the view for the form itself. This time the child views
+        // exist.
+        $type->expects($this->once())
+            ->method('finishView')
+            ->with($view, $this->form, $options)
+            ->will($this->returnCallback($assertChildViewsEqual(array('foo' => $field1View, 'bar' => $field2View))));
+
+        $this->assertSame($view, $this->form->createView());
     }
 
     public function testNoClickedButtonBeforeSubmission()

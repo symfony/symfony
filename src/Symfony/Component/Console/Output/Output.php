@@ -46,7 +46,7 @@ abstract class Output implements OutputInterface
     public function __construct($verbosity = self::VERBOSITY_NORMAL, $decorated = false, OutputFormatterInterface $formatter = null)
     {
         $this->verbosity = null === $verbosity ? self::VERBOSITY_NORMAL : $verbosity;
-        $this->formatter = null === $formatter ? new OutputFormatter() : $formatter;
+        $this->formatter = $formatter ?: new OutputFormatter();
         $this->formatter->setDecorated($decorated);
     }
 
@@ -96,6 +96,26 @@ abstract class Output implements OutputInterface
     public function getVerbosity()
     {
         return $this->verbosity;
+    }
+
+    public function isQuiet()
+    {
+        return self::VERBOSITY_QUIET === $this->verbosity;
+    }
+
+    public function isVerbose()
+    {
+        return self::VERBOSITY_VERBOSE <= $this->verbosity;
+    }
+
+    public function isVeryVerbose()
+    {
+        return self::VERBOSITY_VERY_VERBOSE <= $this->verbosity;
+    }
+
+    public function isDebug()
+    {
+        return self::VERBOSITY_DEBUG <= $this->verbosity;
     }
 
     /**

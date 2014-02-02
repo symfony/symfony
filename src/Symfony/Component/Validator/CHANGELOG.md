@@ -1,6 +1,18 @@
 CHANGELOG
 =========
 
+2.5.0
+-----
+
+ * deprecated `ApcCache` in favor of `DoctrineCache`
+ * added `DoctrineCache` to adapt any Doctrine cache
+
+2.4.0
+-----
+
+ * added a constraint the uses the expression language
+ * added `minRatio`, `maxRatio`, `allowSquare`, `allowLandscape`, and `allowPortrait` to Image validator
+
 2.3.0
 -----
 

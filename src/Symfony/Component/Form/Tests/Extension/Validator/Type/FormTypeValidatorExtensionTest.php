@@ -11,19 +11,26 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Validator\Type;
 
+use Symfony\Component\Validator\ConstraintViolationList;
+
 class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
 {
     public function testSubmitValidatesData()
     {
-        $builder = $this->factory->createBuilder('form', null, array(
-            'validation_groups' => 'group',
-        ));
+        $builder = $this->factory->createBuilder(
+            'form',
+            null,
+            array(
+                'validation_groups' => 'group',
+            )
+        );
         $builder->add('firstName', 'form');
         $form = $builder->getForm();
 
         $this->validator->expects($this->once())
             ->method('validate')
-            ->with($this->equalTo($form));
+            ->with($this->equalTo($form))
+            ->will($this->returnValue(new ConstraintViolationList()));
 
         // specific data is irrelevant
         $form->submit(array());

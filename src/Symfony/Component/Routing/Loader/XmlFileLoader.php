@@ -129,9 +129,9 @@ class XmlFileLoader extends FileLoader
         $schemes = preg_split('/[\s,\|]++/', $node->getAttribute('schemes'), -1, PREG_SPLIT_NO_EMPTY);
         $methods = preg_split('/[\s,\|]++/', $node->getAttribute('methods'), -1, PREG_SPLIT_NO_EMPTY);
 
-        list($defaults, $requirements, $options) = $this->parseConfigs($node, $path);
+        list($defaults, $requirements, $options, $condition) = $this->parseConfigs($node, $path);
 
-        $route = new Route($node->getAttribute('path'), $defaults, $requirements, $options, $node->getAttribute('host'), $schemes, $methods);
+        $route = new Route($node->getAttribute('path'), $defaults, $requirements, $options, $node->getAttribute('host'), $schemes, $methods, $condition);
         $collection->add($id, $route);
     }
 
@@ -157,7 +157,7 @@ class XmlFileLoader extends FileLoader
         $schemes = $node->hasAttribute('schemes') ? preg_split('/[\s,\|]++/', $node->getAttribute('schemes'), -1, PREG_SPLIT_NO_EMPTY) : null;
         $methods = $node->hasAttribute('methods') ? preg_split('/[\s,\|]++/', $node->getAttribute('methods'), -1, PREG_SPLIT_NO_EMPTY) : null;
 
-        list($defaults, $requirements, $options) = $this->parseConfigs($node, $path);
+        list($defaults, $requirements, $options, $condition) = $this->parseConfigs($node, $path);
 
         $this->setCurrentDir(dirname($path));
 
@@ -166,6 +166,9 @@ class XmlFileLoader extends FileLoader
         $subCollection->addPrefix($prefix);
         if (null !== $host) {
             $subCollection->setHost($host);
+        }
+        if (null !== $condition) {
+            $subCollection->setCondition($condition);
         }
         if (null !== $schemes) {
             $subCollection->setSchemes($schemes);
@@ -211,6 +214,7 @@ class XmlFileLoader extends FileLoader
         $defaults = array();
         $requirements = array();
         $options = array();
+        $condition = null;
 
         foreach ($node->getElementsByTagNameNS(self::NAMESPACE_URI, '*') as $n) {
             switch ($n->localName) {
@@ -228,11 +232,14 @@ class XmlFileLoader extends FileLoader
                 case 'option':
                     $options[$n->getAttribute('key')] = trim($n->textContent);
                     break;
+                case 'condition':
+                    $condition = trim($n->textContent);
+                    break;
                 default:
                     throw new \InvalidArgumentException(sprintf('Unknown tag "%s" used in file "%s". Expected "default", "requirement" or "option".', $n->localName, $path));
             }
         }
 
-        return array($defaults, $requirements, $options);
+        return array($defaults, $requirements, $options, $condition);
     }
 }

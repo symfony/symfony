@@ -23,17 +23,6 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class HttpKernelTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\EventDispatcher\EventDispatcher')) {
-            $this->markTestSkipped('The "EventDispatcher" component is not available');
-        }
-
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-    }
-
     /**
      * @expectedException \RuntimeException
      */
@@ -247,6 +236,20 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($kernel, $capturedKernel);
         $this->assertEquals($request, $capturedRequest);
         $this->assertEquals($response, $capturedResponse);
+    }
+
+    public function testVerifyRequestStackPushPopDuringHandle()
+    {
+        $request = new Request();
+
+        $stack = $this->getMock('Symfony\Component\HttpFoundation\RequestStack', array('push', 'pop'));
+        $stack->expects($this->at(0))->method('push')->with($this->equalTo($request));
+        $stack->expects($this->at(1))->method('pop');
+
+        $dispatcher = new EventDispatcher();
+        $kernel = new HttpKernel($dispatcher, $this->getResolver(), $stack);
+
+        $kernel->handle($request, HttpKernelInterface::MASTER_REQUEST);
     }
 
     protected function getResolver($controller = null)

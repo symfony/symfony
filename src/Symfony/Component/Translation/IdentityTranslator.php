@@ -26,13 +26,13 @@ class IdentityTranslator implements TranslatorInterface
     /**
      * Constructor.
      *
-     * @param MessageSelector $selector The message selector for pluralization
+     * @param MessageSelector|null $selector The message selector for pluralization
      *
      * @api
      */
-    public function __construct(MessageSelector $selector)
+    public function __construct(MessageSelector $selector = null)
     {
-        $this->selector = $selector;
+        $this->selector = $selector ?: new MessageSelector();
     }
 
     /**
@@ -60,7 +60,7 @@ class IdentityTranslator implements TranslatorInterface
      *
      * @api
      */
-    public function trans($id, array $parameters = array(), $domain = 'messages', $locale = null)
+    public function trans($id, array $parameters = array(), $domain = null, $locale = null)
     {
         return strtr((string) $id, $parameters);
     }
@@ -70,7 +70,7 @@ class IdentityTranslator implements TranslatorInterface
      *
      * @api
      */
-    public function transChoice($id, $number, array $parameters = array(), $domain = 'messages', $locale = null)
+    public function transChoice($id, $number, array $parameters = array(), $domain = null, $locale = null)
     {
         return strtr($this->selector->choose((string) $id, (int) $number, $locale ?: $this->getLocale()), $parameters);
     }

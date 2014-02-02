@@ -166,6 +166,20 @@ class ProgressHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->generateOutput('    3 [■■■>------------------------]'), stream_get_contents($output->getStream()));
     }
 
+    public function testClear()
+    {
+        $progress = new ProgressHelper();
+        $progress->start($output = $this->getOutputStream(), 50);
+        $progress->setCurrent(25);
+        $progress->clear();
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            $this->generateOutput(' 25/50 [==============>-------------]  50%') . $this->generateOutput(''),
+            stream_get_contents($output->getStream())
+        );
+    }
+
     public function testPercentNotHundredBeforeComplete()
     {
         $progress = new ProgressHelper();
@@ -178,9 +192,19 @@ class ProgressHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->generateOutput('   0/200 [>---------------------------]   0%').$this->generateOutput(' 199/200 [===========================>]  99%').$this->generateOutput(' 200/200 [============================] 100%'), stream_get_contents($output->getStream()));
     }
 
-    protected function getOutputStream()
+    public function testNonDecoratedOutput()
     {
-        return new StreamOutput(fopen('php://memory', 'r+', false));
+        $progress = new ProgressHelper();
+        $progress->start($output = $this->getOutputStream(false));
+        $progress->advance();
+
+        rewind($output->getStream());
+        $this->assertEquals('', stream_get_contents($output->getStream()));
+    }
+
+    protected function getOutputStream($decorated = true)
+    {
+        return new StreamOutput(fopen('php://memory', 'r+', false), StreamOutput::VERBOSITY_NORMAL, $decorated);
     }
 
     protected $lastMessagesLength;

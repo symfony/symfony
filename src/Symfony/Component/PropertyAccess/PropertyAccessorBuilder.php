@@ -24,7 +24,12 @@ class PropertyAccessorBuilder
     private $magicCall = false;
 
     /**
-     * Enables the use of "__call" by the ProperyAccessor.
+     * @var Boolean
+     */
+    private $throwExceptionOnInvalidIndex = false;
+
+    /**
+     * Enables the use of "__call" by the PropertyAccessor.
      *
      * @return PropertyAccessorBuilder The builder object
      */
@@ -36,7 +41,7 @@ class PropertyAccessorBuilder
     }
 
     /**
-     * Disables the use of "__call" by the ProperyAccessor.
+     * Disables the use of "__call" by the PropertyAccessor.
      *
      * @return PropertyAccessorBuilder The builder object
      */
@@ -48,11 +53,43 @@ class PropertyAccessorBuilder
     }
 
     /**
-     * @return Boolean true if the use of "__call" by the ProperyAccessor is enabled
+     * @return Boolean true if the use of "__call" by the PropertyAccessor is enabled
      */
     public function isMagicCallEnabled()
     {
         return $this->magicCall;
+    }
+
+    /**
+     * Enables exceptions in read context for array by PropertyAccessor
+     *
+     * @return PropertyAccessorBuilder The builder object
+     */
+    public function enableExceptionOnInvalidIndex()
+    {
+        $this->throwExceptionOnInvalidIndex = true;
+
+        return $this;
+    }
+
+    /**
+     * Disables exceptions in read context for array by PropertyAccessor
+     *
+     * @return PropertyAccessorBuilder The builder object
+     */
+    public function disableExceptionOnInvalidIndex()
+    {
+        $this->throwExceptionOnInvalidIndex = false;
+
+        return $this;
+    }
+
+    /**
+     * @return Boolean true is exceptions in read context for array is enabled
+     */
+    public function isExceptionOnInvalidIndexEnabled()
+    {
+        return $this->throwExceptionOnInvalidIndex;
     }
 
     /**
@@ -62,6 +99,6 @@ class PropertyAccessorBuilder
      */
     public function getPropertyAccessor()
     {
-        return new PropertyAccessor($this->magicCall);
+        return new PropertyAccessor($this->magicCall, $this->throwExceptionOnInvalidIndex);
     }
 }

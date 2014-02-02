@@ -154,7 +154,7 @@ class NumberFormatter
     private $attributes = array(
         self::FRACTION_DIGITS => 0,
         self::GROUPING_USED   => 1,
-        self::ROUNDING_MODE   => self::ROUND_HALFEVEN
+        self::ROUNDING_MODE   => self::ROUND_HALFEVEN,
     );
 
     /**
@@ -171,7 +171,7 @@ class NumberFormatter
      */
     private static $supportedStyles = array(
         'CURRENCY' => self::CURRENCY,
-        'DECIMAL'  => self::DECIMAL
+        'DECIMAL'  => self::DECIMAL,
     );
 
     /**
@@ -182,7 +182,7 @@ class NumberFormatter
     private static $supportedAttributes = array(
         'FRACTION_DIGITS' => self::FRACTION_DIGITS,
         'GROUPING_USED'   => self::GROUPING_USED,
-        'ROUNDING_MODE'   => self::ROUNDING_MODE
+        'ROUNDING_MODE'   => self::ROUNDING_MODE,
     );
 
     /**
@@ -195,7 +195,11 @@ class NumberFormatter
     private static $roundingModes = array(
         'ROUND_HALFEVEN' => self::ROUND_HALFEVEN,
         'ROUND_HALFDOWN' => self::ROUND_HALFDOWN,
-        'ROUND_HALFUP'   => self::ROUND_HALFUP
+        'ROUND_HALFUP'   => self::ROUND_HALFUP,
+        'ROUND_CEILING'  => self::ROUND_CEILING,
+        'ROUND_FLOOR'    => self::ROUND_FLOOR,
+        'ROUND_DOWN'     => self::ROUND_DOWN,
+        'ROUND_UP'       => self::ROUND_UP,
     );
 
     /**
@@ -209,7 +213,21 @@ class NumberFormatter
     private static $phpRoundingMap = array(
         self::ROUND_HALFDOWN => \PHP_ROUND_HALF_DOWN,
         self::ROUND_HALFEVEN => \PHP_ROUND_HALF_EVEN,
-        self::ROUND_HALFUP   => \PHP_ROUND_HALF_UP
+        self::ROUND_HALFUP   => \PHP_ROUND_HALF_UP,
+    );
+
+    /**
+     * The list of supported rounding modes which aren't available modes in
+     * PHP's round() function, but there's an equivalent. Keys are rounding
+     * modes, values does not matter.
+     *
+     * @var array
+     */
+    private static $customRoundingList = array(
+        self::ROUND_CEILING => true,
+        self::ROUND_FLOOR   => true,
+        self::ROUND_DOWN    => true,
+        self::ROUND_UP      => true,
     );
 
     /**
@@ -219,7 +237,7 @@ class NumberFormatter
      */
     private static $int32Range = array(
         'positive' => 2147483647,
-        'negative' => -2147483648
+        'negative' => -2147483648,
     );
 
     /**
@@ -229,7 +247,7 @@ class NumberFormatter
      */
     private static $int64Range = array(
         'positive' => 9223372036854775807,
-        'negative' => -9223372036854775808
+        'negative' => -9223372036854775808,
     );
 
     private static $enSymbols = array(
@@ -505,7 +523,7 @@ class NumberFormatter
      * Parse a number
      *
      * @param string $value    The value to parse
-     * @param string $type     Type of the formatting, one of the format type constants. NumberFormatter::TYPE_DOUBLE by default
+     * @param int    $type     Type of the formatting, one of the format type constants. NumberFormatter::TYPE_DOUBLE by default
      * @param int    $position Offset to begin the parsing on return this value will hold the offset at which the parsing ended
      *
      * @return Boolean|string                               The parsed value of false on error
@@ -549,9 +567,7 @@ class NumberFormatter
      * @param int $attr  An attribute specifier, one of the numeric attribute constants.
      *                   The only currently supported attributes are NumberFormatter::FRACTION_DIGITS,
      *                   NumberFormatter::GROUPING_USED and NumberFormatter::ROUNDING_MODE.
-     * @param int $value The attribute value. The only currently supported rounding modes are
-     *                   NumberFormatter::ROUND_HALFEVEN, NumberFormatter::ROUND_HALFDOWN and
-     *                   NumberFormatter::ROUND_HALFUP.
+     * @param int $value The attribute value.
      *
      * @return Boolean true on success or false on failure
      *
@@ -700,10 +716,32 @@ class NumberFormatter
      */
     private function round($value, $precision)
     {
-        $precision = $this->getUnitializedPrecision($value, $precision);
+        $precision = $this->getUninitializedPrecision($value, $precision);
 
-        $roundingMode = self::$phpRoundingMap[$this->getAttribute(self::ROUNDING_MODE)];
-        $value = round($value, $precision, $roundingMode);
+        $roundingModeAttribute = $this->getAttribute(self::ROUNDING_MODE);
+        if (isset(self::$phpRoundingMap[$roundingModeAttribute])) {
+            $value = round($value, $precision, self::$phpRoundingMap[$roundingModeAttribute]);
+        } elseif (isset(self::$customRoundingList[$roundingModeAttribute])) {
+            $roundingCoef = pow(10, $precision);
+            $value *= $roundingCoef;
+
+            switch ($roundingModeAttribute) {
+                case self::ROUND_CEILING:
+                    $value = ceil($value);
+                    break;
+                case self::ROUND_FLOOR:
+                    $value = floor($value);
+                    break;
+                case self::ROUND_UP:
+                    $value = $value > 0 ? ceil($value) : floor($value);
+                    break;
+                case self::ROUND_DOWN:
+                    $value = $value > 0 ? floor($value) : ceil($value);
+                    break;
+            }
+
+            $value /= $roundingCoef;
+        }
 
         return $value;
     }
@@ -718,20 +756,20 @@ class NumberFormatter
      */
     private function formatNumber($value, $precision)
     {
-        $precision = $this->getUnitializedPrecision($value, $precision);
+        $precision = $this->getUninitializedPrecision($value, $precision);
 
         return number_format($value, $precision, '.', $this->getAttribute(self::GROUPING_USED) ? ',' : '');
     }
 
     /**
-     * Returns the precision value if the DECIMAL style is being used and the FRACTION_DIGITS attribute is unitialized.
+     * Returns the precision value if the DECIMAL style is being used and the FRACTION_DIGITS attribute is uninitialized.
      *
-     * @param integer|float $value     The value to get the precision from if the FRACTION_DIGITS attribute is unitialized
+     * @param integer|float $value     The value to get the precision from if the FRACTION_DIGITS attribute is uninitialized
      * @param int           $precision The precision value to returns if the FRACTION_DIGITS attribute is initialized
      *
      * @return int The precision value
      */
-    private function getUnitializedPrecision($value, $precision)
+    private function getUninitializedPrecision($value, $precision)
     {
         if ($this->style == self::CURRENCY) {
             return $precision;

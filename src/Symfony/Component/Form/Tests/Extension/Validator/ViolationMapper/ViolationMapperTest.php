@@ -19,6 +19,7 @@ use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\ConstraintViolationInterface;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -60,10 +61,6 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        if (!class_exists('Symfony\Component\EventDispatcher\Event')) {
-            $this->markTestSkipped('The "EventDispatcher" component is not available');
-        }
-
         $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $this->mapper = new ViolationMapper();
         $this->message = 'Message';
@@ -113,9 +110,9 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
     /**
      * @return FormError
      */
-    protected function getFormError()
+    protected function getFormError(ConstraintViolationInterface $violation)
     {
-        return new FormError($this->message, $this->messageTemplate, $this->params);
+        return new FormError($this->message, $this->messageTemplate, $this->params, null, $violation);
     }
 
     public function testMapToFormInheritingParentDataIfDataDoesNotMatch()
@@ -131,7 +128,7 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
         $this->mapper->mapViolation($violation, $parent);
 
         $this->assertCount(0, $parent->getErrors(), $parent->getName().' should not have an error, but has one');
-        $this->assertEquals(array($this->getFormError()), $child->getErrors(), $child->getName().' should have an error, but has none');
+        $this->assertEquals(array($this->getFormError($violation)), $child->getErrors(), $child->getName().' should have an error, but has none');
         $this->assertCount(0, $grandChild->getErrors(), $grandChild->getName().' should not have an error, but has one');
     }
 
@@ -158,7 +155,7 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(0, $parent->getErrors(), $parent->getName().' should not have an error, but has one');
         $this->assertCount(0, $child->getErrors(), $child->getName().' should not have an error, but has one');
         $this->assertCount(0, $grandChild->getErrors(), $grandChild->getName().' should not have an error, but has one');
-        $this->assertEquals(array($this->getFormError()), $grandGrandChild->getErrors(), $grandGrandChild->getName().' should have an error, but has none');
+        $this->assertEquals(array($this->getFormError($violation)), $grandGrandChild->getErrors(), $grandGrandChild->getName().' should have an error, but has none');
     }
 
     public function testAbortMappingIfNotSynchronized()
@@ -749,17 +746,17 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
         $this->mapper->mapViolation($violation, $parent);
 
         if (self::LEVEL_0 === $target) {
-            $this->assertEquals(array($this->getFormError()), $parent->getErrors(), $parent->getName().' should have an error, but has none');
+            $this->assertEquals(array($this->getFormError($violation)), $parent->getErrors(), $parent->getName().' should have an error, but has none');
             $this->assertCount(0, $child->getErrors(), $childName.' should not have an error, but has one');
             $this->assertCount(0, $grandChild->getErrors(), $grandChildName.' should not have an error, but has one');
         } elseif (self::LEVEL_1 === $target) {
             $this->assertCount(0, $parent->getErrors(), $parent->getName().' should not have an error, but has one');
-            $this->assertEquals(array($this->getFormError()), $child->getErrors(), $childName.' should have an error, but has none');
+            $this->assertEquals(array($this->getFormError($violation)), $child->getErrors(), $childName.' should have an error, but has none');
             $this->assertCount(0, $grandChild->getErrors(), $grandChildName.' should not have an error, but has one');
         } else {
             $this->assertCount(0, $parent->getErrors(), $parent->getName().' should not have an error, but has one');
             $this->assertCount(0, $child->getErrors(), $childName.' should not have an error, but has one');
-            $this->assertEquals(array($this->getFormError()), $grandChild->getErrors(), $grandChildName.' should have an error, but has none');
+            $this->assertEquals(array($this->getFormError($violation)), $grandChild->getErrors(), $grandChildName.' should have an error, but has none');
         }
     }
 
@@ -1221,17 +1218,17 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
         }
 
         if (self::LEVEL_0 === $target) {
-            $this->assertEquals(array($this->getFormError()), $parent->getErrors(), $parent->getName().' should have an error, but has none');
+            $this->assertEquals(array($this->getFormError($violation)), $parent->getErrors(), $parent->getName().' should have an error, but has none');
             $this->assertCount(0, $child->getErrors(), $childName.' should not have an error, but has one');
             $this->assertCount(0, $grandChild->getErrors(), $grandChildName.' should not have an error, but has one');
         } elseif (self::LEVEL_1 === $target) {
             $this->assertCount(0, $parent->getErrors(), $parent->getName().' should not have an error, but has one');
-            $this->assertEquals(array($this->getFormError()), $child->getErrors(), $childName.' should have an error, but has none');
+            $this->assertEquals(array($this->getFormError($violation)), $child->getErrors(), $childName.' should have an error, but has none');
             $this->assertCount(0, $grandChild->getErrors(), $grandChildName.' should not have an error, but has one');
         } else {
             $this->assertCount(0, $parent->getErrors(), $parent->getName().' should not have an error, but has one');
             $this->assertCount(0, $child->getErrors(), $childName.' should not have an error, but has one');
-            $this->assertEquals(array($this->getFormError()), $grandChild->getErrors(), $grandChildName.' should have an error, but has none');
+            $this->assertEquals(array($this->getFormError($violation)), $grandChild->getErrors(), $grandChildName.' should have an error, but has none');
         }
     }
 
@@ -1403,16 +1400,16 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
 
         if (self::LEVEL_0 === $target) {
             $this->assertCount(0, $errorChild->getErrors(), $errorName.' should not have an error, but has one');
-            $this->assertEquals(array($this->getFormError()), $parent->getErrors(), $parent->getName().' should have an error, but has none');
+            $this->assertEquals(array($this->getFormError($violation)), $parent->getErrors(), $parent->getName().' should have an error, but has none');
             $this->assertCount(0, $child->getErrors(), $childName.' should not have an error, but has one');
             $this->assertCount(0, $grandChild->getErrors(), $grandChildName.' should not have an error, but has one');
         } elseif (self::LEVEL_1 === $target) {
             $this->assertCount(0, $errorChild->getErrors(), $errorName.' should not have an error, but has one');
             $this->assertCount(0, $parent->getErrors(), $parent->getName().' should not have an error, but has one');
-            $this->assertEquals(array($this->getFormError()), $child->getErrors(), $childName.' should have an error, but has none');
+            $this->assertEquals(array($this->getFormError($violation)), $child->getErrors(), $childName.' should have an error, but has none');
             $this->assertCount(0, $grandChild->getErrors(), $grandChildName.' should not have an error, but has one');
         } elseif (self::LEVEL_1B === $target) {
-            $this->assertEquals(array($this->getFormError()), $errorChild->getErrors(), $errorName.' should have an error, but has none');
+            $this->assertEquals(array($this->getFormError($violation)), $errorChild->getErrors(), $errorName.' should have an error, but has none');
             $this->assertCount(0, $parent->getErrors(), $parent->getName().' should not have an error, but has one');
             $this->assertCount(0, $child->getErrors(), $childName.' should not have an error, but has one');
             $this->assertCount(0, $grandChild->getErrors(), $grandChildName.' should not have an error, but has one');
@@ -1420,7 +1417,7 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
             $this->assertCount(0, $errorChild->getErrors(), $errorName.' should not have an error, but has one');
             $this->assertCount(0, $parent->getErrors(), $parent->getName().' should not have an error, but has one');
             $this->assertCount(0, $child->getErrors(), $childName.' should not have an error, but has one');
-            $this->assertEquals(array($this->getFormError()), $grandChild->getErrors(), $grandChildName.' should have an error, but has none');
+            $this->assertEquals(array($this->getFormError($violation)), $grandChild->getErrors(), $grandChildName.' should have an error, but has none');
         }
     }
 
@@ -1465,17 +1462,17 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
         $this->mapper->mapViolation($violation, $parent);
 
         if (self::LEVEL_0 === $target) {
-            $this->assertEquals(array($this->getFormError()), $parent->getErrors(), $parent->getName().' should have an error, but has none');
+            $this->assertEquals(array($this->getFormError($violation)), $parent->getErrors(), $parent->getName().' should have an error, but has none');
             $this->assertCount(0, $child->getErrors(), $childName.' should not have an error, but has one');
             $this->assertCount(0, $grandChild->getErrors(), $grandChildName.' should not have an error, but has one');
         } elseif (self::LEVEL_1 === $target) {
             $this->assertCount(0, $parent->getErrors(), $parent->getName().' should not have an error, but has one');
-            $this->assertEquals(array($this->getFormError()), $child->getErrors(), $childName.' should have an error, but has none');
+            $this->assertEquals(array($this->getFormError($violation)), $child->getErrors(), $childName.' should have an error, but has none');
             $this->assertCount(0, $grandChild->getErrors(), $grandChildName.' should not have an error, but has one');
         } else {
             $this->assertCount(0, $parent->getErrors(), $parent->getName().' should not have an error, but has one');
             $this->assertCount(0, $child->getErrors(), $childName.' should not have an error, but has one');
-            $this->assertEquals(array($this->getFormError()), $grandChild->getErrors(), $grandChildName.' should have an error, but has none');
+            $this->assertEquals(array($this->getFormError($violation)), $grandChild->getErrors(), $grandChildName.' should have an error, but has none');
         }
     }
 }

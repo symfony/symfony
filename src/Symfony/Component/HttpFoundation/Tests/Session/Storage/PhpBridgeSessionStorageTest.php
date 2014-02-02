@@ -53,7 +53,7 @@ class PhpBridgeSessionStorageTest extends \PHPUnit_Framework_TestCase
     protected function getStorage()
     {
         $storage = new PhpBridgeSessionStorage();
-        $storage->registerBag(new AttributeBag);
+        $storage->registerBag(new AttributeBag());
 
         return $storage;
     }

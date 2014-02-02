@@ -169,6 +169,7 @@ class MainConfiguration implements ConfigurationInterface
                                 ->beforeNormalization()->ifString()->then(function ($v) { return preg_split('/\s*,\s*/', $v); })->end()
                                 ->prototype('scalar')->end()
                             ->end()
+                            ->scalarNode('allow_if')->defaultNull()->end()
                         ->end()
                         ->fixXmlConfig('role')
                         ->children()
@@ -199,6 +200,7 @@ class MainConfiguration implements ConfigurationInterface
 
         $firewallNodeBuilder
             ->scalarNode('pattern')->end()
+            ->scalarNode('host')->end()
             ->booleanNode('security')->defaultTrue()->end()
             ->scalarNode('request_matcher')->end()
             ->scalarNode('access_denied_url')->end()
@@ -210,10 +212,36 @@ class MainConfiguration implements ConfigurationInterface
             ->arrayNode('logout')
                 ->treatTrueLike(array())
                 ->canBeUnset()
+                ->beforeNormalization()
+                    ->ifTrue(function ($v) { return isset($v['csrf_provider']) && isset($v['csrf_token_generator']); })
+                    ->thenInvalid("You should define a value for only one of 'csrf_provider' and 'csrf_token_generator' on a security firewall. Use 'csrf_token_generator' as this replaces 'csrf_provider'.")
+                ->end()
+                ->beforeNormalization()
+                    ->ifTrue(function ($v) { return isset($v['intention']) && isset($v['csrf_token_id']); })
+                    ->thenInvalid("You should define a value for only one of 'intention' and 'csrf_token_id' on a security firewall. Use 'csrf_token_id' as this replaces 'intention'.")
+                ->end()
+                ->beforeNormalization()
+                    ->ifTrue(function ($v) { return isset($v['csrf_provider']); })
+                    ->then(function ($v) {
+                        $v['csrf_token_generator'] = $v['csrf_provider'];
+                        unset($v['csrf_provider']);
+
+                        return $v;
+                    })
+                ->end()
+                ->beforeNormalization()
+                    ->ifTrue(function ($v) { return isset($v['intention']); })
+                    ->then(function ($v) {
+                        $v['csrf_token_id'] = $v['intention'];
+                        unset($v['intention']);
+
+                        return $v;
+                    })
+                ->end()
                 ->children()
                     ->scalarNode('csrf_parameter')->defaultValue('_csrf_token')->end()
-                    ->scalarNode('csrf_provider')->cannotBeEmpty()->end()
-                    ->scalarNode('intention')->defaultValue('logout')->end()
+                    ->scalarNode('csrf_token_generator')->cannotBeEmpty()->end()
+                    ->scalarNode('csrf_token_id')->defaultValue('logout')->end()
                     ->scalarNode('path')->defaultValue('/logout')->end()
                     ->scalarNode('target')->defaultValue('/')->end()
                     ->scalarNode('success_handler')->end()

@@ -34,7 +34,8 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     private $request;
     private $esi;
     private $esiCacheStrategy;
-    private $traces;
+    private $options = array();
+    private $traces = array();
 
     /**
      * Constructor.
@@ -80,6 +81,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     {
         $this->store = $store;
         $this->kernel = $kernel;
+        $this->esi = $esi;
 
         // needed in case there is a fatal error because the backend is too slow to respond
         register_shutdown_function(array($this->store, 'cleanup'));
@@ -93,8 +95,6 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
             'stale_while_revalidate' => 2,
             'stale_if_error'         => 60,
         ), $options);
-        $this->esi = $esi;
-        $this->traces = array();
     }
 
     /**
@@ -267,7 +267,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
                 // As per the RFC, invalidate Location and Content-Location URLs if present
                 foreach (array('Location', 'Content-Location') as $header) {
                     if ($uri = $response->headers->get($header)) {
-                        $subRequest = $request::create($uri, 'get', array(), array(), array(), $request->server->all());
+                        $subRequest = Request::create($uri, 'get', array(), array(), array(), $request->server->all());
 
                         $this->store->invalidate($subRequest);
                     }

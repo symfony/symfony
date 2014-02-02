@@ -41,19 +41,19 @@ class IntegerType extends AbstractType
             'precision'     => null,
             'grouping'      => false,
             // Integer cast rounds towards 0, so do the same when displaying fractions
-            'rounding_mode' => \NumberFormatter::ROUND_DOWN,
+            'rounding_mode' => IntegerToLocalizedStringTransformer::ROUND_DOWN,
             'compound'      => false,
         ));
 
         $resolver->setAllowedValues(array(
             'rounding_mode' => array(
-                \NumberFormatter::ROUND_FLOOR,
-                \NumberFormatter::ROUND_DOWN,
-                \NumberFormatter::ROUND_HALFDOWN,
-                \NumberFormatter::ROUND_HALFEVEN,
-                \NumberFormatter::ROUND_HALFUP,
-                \NumberFormatter::ROUND_UP,
-                \NumberFormatter::ROUND_CEILING,
+                IntegerToLocalizedStringTransformer::ROUND_FLOOR,
+                IntegerToLocalizedStringTransformer::ROUND_DOWN,
+                IntegerToLocalizedStringTransformer::ROUND_HALF_DOWN,
+                IntegerToLocalizedStringTransformer::ROUND_HALF_EVEN,
+                IntegerToLocalizedStringTransformer::ROUND_HALF_UP,
+                IntegerToLocalizedStringTransformer::ROUND_UP,
+                IntegerToLocalizedStringTransformer::ROUND_CEILING,
             ),
         ));
     }

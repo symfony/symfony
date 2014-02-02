@@ -42,7 +42,7 @@ class MemcachedProfilerStorage extends BaseMemcacheProfilerStorage
             $host = $matches[1] ?: $matches[2];
             $port = $matches[3];
 
-            $memcached = new Memcached;
+            $memcached = new Memcached();
 
             //disable compression to allow appending
             $memcached->setOption(Memcached::OPT_COMPRESSION, false);

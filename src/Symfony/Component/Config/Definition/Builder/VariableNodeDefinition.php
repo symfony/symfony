@@ -49,10 +49,7 @@ class VariableNodeDefinition extends NodeDefinition
             $node->setDefaultValue($this->defaultValue);
         }
 
-        if (false === $this->allowEmptyValue) {
-            $node->setAllowEmptyValue($this->allowEmptyValue);
-        }
-
+        $node->setAllowEmptyValue($this->allowEmptyValue);
         $node->addEquivalentValue(null, $this->nullEquivalent);
         $node->addEquivalentValue(true, $this->trueEquivalent);
         $node->addEquivalentValue(false, $this->falseEquivalent);

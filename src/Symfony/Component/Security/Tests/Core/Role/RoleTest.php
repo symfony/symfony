@@ -21,4 +21,20 @@ class RoleTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('FOO', $role->getRole());
     }
+
+    /**
+     * @dataProvider getToStringFixtures
+     */
+    public function testToString($role, $expected)
+    {
+        $this->assertEquals($role, $expected);
+    }
+
+    public function getToStringFixtures()
+    {
+        return array(
+            array(new Role(null), ''),
+            array(new Role('FOO'), 'FOO')
+        );
+    }
 }

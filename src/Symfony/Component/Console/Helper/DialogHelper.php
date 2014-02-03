@@ -31,7 +31,7 @@ class DialogHelper extends InputAwareHelper
      * @param OutputInterface $output       An Output instance
      * @param string|array    $question     The question to ask
      * @param array           $choices      List of choices to pick from
-     * @param Boolean         $default      The default answer if the user enters nothing
+     * @param Boolean|string  $default      The default answer if the user enters nothing
      * @param Boolean|integer $attempts Max number of times to ask before giving up (false by default, which means infinite)
      * @param string          $errorMessage Message which will be shown if invalid value from choice list would be picked
      * @param Boolean         $multiselect  Select more than one value separated by comma

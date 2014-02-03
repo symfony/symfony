@@ -28,11 +28,14 @@ class ProcessPipes
     private $useFiles;
     /** @var Boolean */
     private $ttyMode;
+    /** @var Boolean */
+    private $ptyMode;
 
-    public function __construct($useFiles, $ttyMode)
+    public function __construct($useFiles, $ttyMode, $ptyMode = false)
     {
         $this->useFiles = (Boolean) $useFiles;
         $this->ttyMode = (Boolean) $ttyMode;
+        $this->ptyMode = (Boolean) $ptyMode;
 
         // Fix for PHP bug #51800: reading from STDOUT pipe hangs forever on Windows if the output is too big.
         // Workaround for this problem is to use temporary files instead of pipes on Windows platform.
@@ -116,6 +119,12 @@ class ProcessPipes
                 array('file', '/dev/tty', 'r'),
                 array('file', '/dev/tty', 'w'),
                 array('file', '/dev/tty', 'w'),
+            );
+        } elseif ($this->ptyMode && Porcess::isPtySupported()) {
+            $descriptors = array(
+                array('pty'),
+                array('pty'),
+                array('pty'),
             );
         }
 

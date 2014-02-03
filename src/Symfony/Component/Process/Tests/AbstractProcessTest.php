@@ -247,6 +247,45 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(Process::STATUS_TERMINATED, $process->getStatus());
     }
 
+    /**
+     * @group pty
+     */
+    public function testPTYCommand()
+    {
+        if (!Process::isPtySupported()) {
+            $this->markTestSkipped('PTY is not supported on this operating system.');
+        }
+
+        $process = $this->getProcess('echo "foo"');
+        $process->setPty(true);
+        $process->run();
+
+        $this->assertSame(Process::STATUS_TERMINATED, $process->getStatus());
+        $this->assertEquals("foo\r\n", $process->getOutput());
+    }
+
+    /**
+     * @group mustRun
+     */
+    public function testMustRun()
+    {
+        $process = $this->getProcess('echo "foo"');
+
+        $this->assertSame($process, $process->mustRun());
+        $this->assertEquals("foo\n", $process->getOutput());
+        $this->assertEquals(0, $process->getExitCode());
+    }
+
+    /**
+     * @expectedException Symfony\Component\Process\Exception\ProcessFailedException
+     * @group mustRun
+     */
+    public function testMustRunThrowsException()
+    {
+        $process = $this->getProcess('exit 1');
+        $process->mustRun();
+    }
+
     public function testExitCodeText()
     {
         $process = $this->getProcess('');

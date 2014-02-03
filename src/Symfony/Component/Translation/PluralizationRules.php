@@ -114,7 +114,6 @@ class PluralizationRules
             case 'pap':
             case 'ps':
             case 'pt':
-            case 'xbr':
             case 'so':
             case 'sq':
             case 'sv':
@@ -135,6 +134,7 @@ class PluralizationRules
             case 'ln':
             case 'mg':
             case 'nso':
+            case 'xbr':
             case 'ti':
             case 'wa':
                 return (($number == 0) || ($number == 1)) ? 0 : 1;

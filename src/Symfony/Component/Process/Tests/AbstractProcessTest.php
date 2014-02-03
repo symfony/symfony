@@ -247,9 +247,6 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(Process::STATUS_TERMINATED, $process->getStatus());
     }
 
-    /**
-     * @group pty
-     */
     public function testPTYCommand()
     {
         if (!Process::isPtySupported()) {
@@ -264,9 +261,6 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("foo\r\n", $process->getOutput());
     }
 
-    /**
-     * @group mustRun
-     */
     public function testMustRun()
     {
         $process = $this->getProcess('echo "foo"');
@@ -278,7 +272,6 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException Symfony\Component\Process\Exception\ProcessFailedException
-     * @group mustRun
      */
     public function testMustRunThrowsException()
     {

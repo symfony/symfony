@@ -47,7 +47,6 @@ class SigchildDisabledProcessTest extends AbstractProcessTest
 
     /**
      * @expectedException \Symfony\Component\Process\Exception\RuntimeException
-     * @group mustRun
      */
     public function testMustRun()
     {
@@ -56,7 +55,6 @@ class SigchildDisabledProcessTest extends AbstractProcessTest
 
     /**
      * @expectedException \Symfony\Component\Process\Exception\RuntimeException
-     * @group mustRun
      */
     public function testMustRunThrowsException()
     {

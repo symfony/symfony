@@ -254,7 +254,8 @@ PHP
         $m->invoke($handler, $exceptionHandler, $error);
 
         $this->assertInstanceof($class, $exceptionHandler->e);
-        $this->assertSame($translatedMessage, $exceptionHandler->e->getMessage());
+        // class names are case insensitive and PHP/HHVM do not return the same
+        $this->assertSame(strtolower($translatedMessage), strtolower($exceptionHandler->e->getMessage()));
         $this->assertSame($error['type'], $exceptionHandler->e->getSeverity());
         $this->assertSame($error['file'], $exceptionHandler->e->getFile());
         $this->assertSame($error['line'], $exceptionHandler->e->getLine());

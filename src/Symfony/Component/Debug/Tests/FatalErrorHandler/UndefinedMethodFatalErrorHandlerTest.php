@@ -59,7 +59,7 @@ class UndefinedMethodFatalErrorHandlerTest extends \PHPUnit_Framework_TestCase
                     'file' => 'foo.php',
                     'message' => 'Call to undefined method SplObjectStorage::offsetFet()',
                 ),
-                'Attempted to call method "offsetFet" on class "SplObjectStorage" in foo.php line 12. Did you mean to call: "offsetSet", "offsetUnset", "offsetGet"?',
+                'Attempted to call method "offsetFet" on class "SplObjectStorage" in foo.php line 12. Did you mean to call: "offsetGet", "offsetSet", "offsetUnset"?',
             ),
         );
     }

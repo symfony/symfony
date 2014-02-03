@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by pscheit at 2013-10-26T09:07:18Z
+
+I would love to have this in. But it would be nice if the expected return code would not be hardcoded to 0. Because sometimes you want to check for other exit codes.
+
+I thought about an ProcessRunExpectator which would allow to execute and then expect/assert the output with more flexibility.
+
+running and checking processes is too much to write, right now
+
+---------------------------------------------------------------------------
+
+by jakzal at 2013-10-26T09:13:35Z
+
+@pscheit any non zero exit code means an error. Are you saying you need to expect an error? Seems wrong.
+
+---------------------------------------------------------------------------
+
+by pscheit at 2013-10-26T09:19:52Z
+
+I have an programm which returns 0 if okay. But its okay when it returns 1, too because it returns 1 when "everything okay but things skipped". I investigate the output then.
+It sounds like an edge case, but is there no scenario where I want to run a process that I expect to be fail? For example in tests? When testing that erroneous calls return the right exit code?
+
+The processExpector would also allow easier to debug output from processes, or maybe expect specific output
+
+---------------------------------------------------------------------------
+
+by schmittjoh at 2013-10-26T10:02:03Z
+
+Usually, if you expect multiple exit codes, you would use the run method and then a switch statement on the exit code.

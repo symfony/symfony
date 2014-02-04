@@ -32,14 +32,10 @@ class TraceableEventDispatcherTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(
             '__section__',
             'kernel.request',
-            'kernel.request.loading',
             'kernel.controller',
-            'kernel.controller.loading',
             'controller',
             'kernel.response',
-            'kernel.response.loading',
             'kernel.terminate',
-            'kernel.terminate.loading',
         ), array_keys($events));
     }
 

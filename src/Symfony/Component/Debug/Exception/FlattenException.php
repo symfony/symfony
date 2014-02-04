@@ -249,7 +249,7 @@ class FlattenException
                 if ($level > 10) {
                     $result[$key] = array('array', '*DEEP NESTED ARRAY*');
                 } else {
-                    $result[$key] = array('array', $this->flattenArgs($value, ++$level));
+                    $result[$key] = array('array', $this->flattenArgs($value, $level + 1));
                 }
             } elseif (null === $value) {
                 $result[$key] = array('null', null);

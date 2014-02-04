@@ -46,11 +46,8 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
     public function lateCollect()
     {
         if (null !== $this->logger) {
-            $this->data = array(
-                'error_count'       => $this->logger->countErrors(),
-                'logs'              => $this->sanitizeLogs($this->logger->getLogs()),
-                'deprecation_count' => $this->computeDeprecationCount()
-            );
+            $this->data = $this->computeErrorsCount();
+            $this->data['logs'] = $this->sanitizeLogs($this->logger->getLogs());
         }
     }
 
@@ -79,6 +76,11 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
     public function countDeprecations()
     {
         return isset($this->data['deprecation_count']) ? $this->data['deprecation_count'] : 0;
+    }
+
+    public function countScreams()
+    {
+        return isset($this->data['scream_count']) ? $this->data['scream_count'] : 0;
     }
 
     /**
@@ -119,12 +121,21 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
         return $context;
     }
 
-    private function computeDeprecationCount()
+    private function computeErrorsCount()
     {
-        $count = 0;
+        $count = array(
+            'error_count' => $this->logger->countErrors(),
+            'deprecation_count' => 0,
+            'scream_count' => 0,
+        );
+
         foreach ($this->logger->getLogs() as $log) {
-            if (isset($log['context']['type']) && ErrorHandler::TYPE_DEPRECATION === $log['context']['type']) {
-                $count++;
+            if (isset($log['context']['type'])) {
+                if (ErrorHandler::TYPE_DEPRECATION === $log['context']['type']) {
+                    ++$count['deprecation_count'];
+                } elseif (isset($log['context']['scream'])) {
+                    ++$count['scream_count'];
+                }
             }
         }
 

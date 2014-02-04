@@ -19,7 +19,7 @@ class LoggerDataCollectorTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getCollectTestData
      */
-    public function testCollect($nb, $logs, $expectedLogs, $expectedDeprecationCount)
+    public function testCollect($nb, $logs, $expectedLogs, $expectedDeprecationCount, $expectedScreamCount)
     {
         $logger = $this->getMock('Symfony\Component\HttpKernel\Log\DebugLoggerInterface');
         $logger->expects($this->once())->method('countErrors')->will($this->returnValue($nb));
@@ -32,6 +32,7 @@ class LoggerDataCollectorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($nb, $c->countErrors());
         $this->assertSame($expectedLogs ? $expectedLogs : $logs, $c->getLogs());
         $this->assertSame($expectedDeprecationCount, $c->countDeprecations());
+        $this->assertSame($expectedScreamCount, $c->countScreams());
     }
 
     public function getCollectTestData()
@@ -41,28 +42,33 @@ class LoggerDataCollectorTest extends \PHPUnit_Framework_TestCase
                 1,
                 array(array('message' => 'foo', 'context' => array())),
                 null,
-                0
+                0,
+                0,
             ),
             array(
                 1,
                 array(array('message' => 'foo', 'context' => array('foo' => fopen(__FILE__, 'r')))),
                 array(array('message' => 'foo', 'context' => array('foo' => 'Resource(stream)'))),
-                0
+                0,
+                0,
             ),
             array(
                 1,
                 array(array('message' => 'foo', 'context' => array('foo' => new \stdClass()))),
                 array(array('message' => 'foo', 'context' => array('foo' => 'Object(stdClass)'))),
-                0
+                0,
+                0,
             ),
             array(
                 1,
                 array(
                     array('message' => 'foo', 'context' => array('type' => ErrorHandler::TYPE_DEPRECATION)),
-                    array('message' => 'foo2', 'context' => array('type' => ErrorHandler::TYPE_DEPRECATION))
+                    array('message' => 'foo2', 'context' => array('type' => ErrorHandler::TYPE_DEPRECATION)),
+                    array('message' => 'foo3', 'context' => array('type' => E_USER_WARNING, 'scream' => 0)),
                 ),
                 null,
-                2
+                2,
+                1,
             ),
         );
     }

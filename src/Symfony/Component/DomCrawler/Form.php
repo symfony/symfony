@@ -384,7 +384,24 @@ class Form extends Link implements \ArrayAccess
 
         // add submitted button if it has a valid name
         if ('form' !== $this->button->nodeName && $this->button->hasAttribute('name') && $this->button->getAttribute('name')) {
-            $this->set(new Field\InputFormField($document->importNode($this->button, true)));
+            if ('input' == $this->button->nodeName && 'image' == $this->button->getAttribute('type')) {
+                $name = $this->button->getAttribute('name');
+                $this->button->setAttribute('value', '0');
+
+                // temporarily change the name of the input node for the x coordinate
+                $this->button->setAttribute('name', $name.'.x');
+                $this->set(new Field\InputFormField($document->importNode($this->button, true)));
+
+                // temporarily change the name of the input node for the y coordinate
+                $this->button->setAttribute('name', $name.'.y');
+                $this->set(new Field\InputFormField($document->importNode($this->button, true)));
+
+                // restore the original name of the input node
+                $this->button->setAttribute('name', $name);
+            }
+            else {
+                $this->set(new Field\InputFormField($document->importNode($this->button, true)));
+            }
         }
 
         // find form elements corresponding to the current form

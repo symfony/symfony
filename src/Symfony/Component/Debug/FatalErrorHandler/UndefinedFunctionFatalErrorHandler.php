@@ -80,6 +80,7 @@ class UndefinedFunctionFatalErrorHandler implements FatalErrorHandlerInterface
         }
 
         if ($candidates) {
+            sort($candidates);
             $message .= ' Did you mean to call: '.implode(', ', array_map(function ($val) {
                 return '"'.$val.'"';
             }, $candidates)).'?';

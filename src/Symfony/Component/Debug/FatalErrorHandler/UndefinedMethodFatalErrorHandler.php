@@ -45,6 +45,7 @@ class UndefinedMethodFatalErrorHandler implements FatalErrorHandlerInterface
         }
 
         if ($candidates) {
+            sort($candidates);
             $message .= sprintf(' Did you mean to call: "%s"?', implode('", "', $candidates));
         }
 

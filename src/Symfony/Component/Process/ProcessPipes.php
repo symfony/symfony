@@ -120,8 +120,8 @@ class ProcessPipes
                 array('file', '/dev/tty', 'w'),
                 array('file', '/dev/tty', 'w'),
             );
-        } elseif ($this->ptyMode && Porcess::isPtySupported()) {
-            $descriptors = array(
+        } elseif ($this->ptyMode && Process::isPtySupported()) {
+            return array(
                 array('pty'),
                 array('pty'),
                 array('pty'),

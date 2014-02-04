@@ -28,9 +28,15 @@ class PhpExtractorTest extends TestCase
         $extractor->extract(__DIR__.'/../Fixtures/Resources/views/', $catalogue);
 
         // Assert
-        $this->assertCount(2, $catalogue->all('messages'), '->extract() should find 1 translation');
+        $this->assertCount(8, $catalogue->all('messages'), '->extract() should find 1 translation');
         $this->assertTrue($catalogue->has('single-quoted key'), '->extract() should find the "single-quoted key" message');
         $this->assertTrue($catalogue->has('double-quoted key'), '->extract() should find the "double-quoted key" message');
+        $this->assertTrue($catalogue->has('single-quoted key with whitespace'), '->extract() should find the "single-quoted key with whitespace" message');
+        $this->assertTrue($catalogue->has('single-quoted key with "quote"'), '->extract() should find the "single-quoted key with "quote"" message');
+        $this->assertTrue($catalogue->has('double-quoted key with whitespace'), '->extract() should find the "double-quoted key with whitespace" message');
+        $this->assertTrue($catalogue->has('heredoc key'), '->extract() should find the "heredoc key" message');
+        $this->assertTrue($catalogue->has('heredoc key with whitespace'), '->extract() should find the "heredoc key with whitespace" message');
+        $this->assertTrue($catalogue->has("double-quoted key with \"escaped\" quotes"), '->extract() should find the "double-quoted key with "escaped" quotes" message');
         $this->assertEquals('prefixsingle-quoted key', $catalogue->get('single-quoted key'), '->extract() should apply "prefix" as prefix');
     }
 }

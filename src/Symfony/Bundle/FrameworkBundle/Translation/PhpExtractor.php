@@ -51,6 +51,9 @@ class PhpExtractor implements ExtractorInterface
         ),
     );
 
+    protected $whitespaceTokens = array(T_WHITESPACE);
+    protected $messageTokens = array(T_START_HEREDOC, T_WHITESPACE, T_STRING, T_END_HEREDOC, T_ENCAPSED_AND_WHITESPACE, T_CONSTANT_ENCAPSED_STRING);
+
     /**
      * {@inheritdoc}
      */
@@ -75,7 +78,7 @@ class PhpExtractor implements ExtractorInterface
     /**
      * Normalizes a token.
      *
-     * @param mixed $token
+     * @param  mixed  $token
      * @return string
      */
     protected function normalizeToken($token)
@@ -88,6 +91,39 @@ class PhpExtractor implements ExtractorInterface
     }
 
     /**
+     * Seeks to a non-whitespace token
+     *
+     * @param \ArrayIterator $tokenIterator
+     */
+    protected function seekToNextRelaventToken($tokenIterator)
+    {
+        $t = $tokenIterator->current();
+        while (is_array($t) && in_array($t[0], $this->whitespaceTokens)) {
+            $tokenIterator->next();
+            $t = $tokenIterator->current();
+        }
+    }
+
+    /**
+     * Extracts the message from the iterator while the tokens
+     * match allowed message tokens
+     *
+     * @param \ArrayIterator $tokenIterator
+     */
+    protected function getMessage($tokenIterator)
+    {
+        $message = '';
+        $t = $tokenIterator->current();
+        while (is_array($t) && in_array($t[0], $this->messageTokens)) {
+            $message .= $this->normalizeToken($t);
+            $tokenIterator->next();
+            $t = $tokenIterator->current();
+        }
+
+        return $message;
+    }
+
+    /**
      * Extracts trans message from PHP tokens.
      *
      * @param array            $tokens
@@ -95,26 +131,32 @@ class PhpExtractor implements ExtractorInterface
      */
     protected function parseTokens($tokens, MessageCatalogue $catalog)
     {
-        foreach ($tokens as $key => $token) {
+        $tokenIterator = new \ArrayIterator($tokens);
+
+        for ($key = 0; $key < $tokenIterator->count(); $key++) {
             foreach ($this->sequences as $sequence) {
                 $message = '';
-
+                $tokenIterator->seek($key);
                 foreach ($sequence as $id => $item) {
-                    if ($this->normalizeToken($tokens[$key + $id]) == $item) {
+
+                    $this->seekToNextRelaventToken($tokenIterator);
+
+                    if ($this->normalizeToken($tokenIterator->current()) == $item) {
+                        $tokenIterator->next();
                         continue;
                     } elseif (self::MESSAGE_TOKEN == $item) {
-                        $message = $this->normalizeToken($tokens[$key + $id]);
-                    } elseif (self::IGNORE_TOKEN == $item) {
-                        continue;
+                        $message = $this->getMessage($tokenIterator);
                     } else {
                         break;
                     }
                 }
 
-                $message = trim($message, '\'"');
-
                 if ($message) {
-                    $catalog->set($message, $this->prefix.$message);
+                    // need to eval here because
+                    // the $message we have here is a PHP string, complete with quotes
+                    // escaped characters, etc
+                    $msg = eval("return $message;");
+                    $catalog->set($msg, $this->prefix.$msg);
                     break;
                 }
             }

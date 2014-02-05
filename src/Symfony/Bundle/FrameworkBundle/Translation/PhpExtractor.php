@@ -23,7 +23,6 @@ use Symfony\Component\Translation\Extractor\ExtractorInterface;
 class PhpExtractor implements ExtractorInterface
 {
     const MESSAGE_TOKEN = 300;
-    const IGNORE_TOKEN = 400;
 
     /**
      * Prefix for new found message.
@@ -39,20 +38,12 @@ class PhpExtractor implements ExtractorInterface
      */
     protected $sequences = array(
         array(
-            '$view',
-            '[',
-            '\'translator\'',
-            ']',
             '->',
             'trans',
             '(',
             self::MESSAGE_TOKEN,
-            ')',
         ),
     );
-
-    protected $whitespaceTokens = array(T_WHITESPACE);
-    protected $messageTokens = array(T_START_HEREDOC, T_WHITESPACE, T_STRING, T_END_HEREDOC, T_ENCAPSED_AND_WHITESPACE, T_CONSTANT_ENCAPSED_STRING);
 
     /**
      * {@inheritdoc}
@@ -97,10 +88,11 @@ class PhpExtractor implements ExtractorInterface
      */
     protected function seekToNextRelaventToken($tokenIterator)
     {
-        $t = $tokenIterator->current();
-        while (is_array($t) && in_array($t[0], $this->whitespaceTokens)) {
-            $tokenIterator->next();
+        for ( ; $tokenIterator->valid(); $tokenIterator->next()) {
             $t = $tokenIterator->current();
+            if (!is_array($t) || ($t[0] !== T_WHITESPACE)) {
+                break;
+            }
         }
     }
 
@@ -113,11 +105,31 @@ class PhpExtractor implements ExtractorInterface
     protected function getMessage($tokenIterator)
     {
         $message = '';
-        $t = $tokenIterator->current();
-        while (is_array($t) && in_array($t[0], $this->messageTokens)) {
-            $message .= $this->normalizeToken($t);
-            $tokenIterator->next();
+        $docToken = '';
+
+        for ( ; $tokenIterator->valid(); $tokenIterator->next()) {
             $t = $tokenIterator->current();
+            if (!is_array($t)) {
+                break;
+            }
+
+            switch ($t[0]) {
+                case T_START_HEREDOC:
+                    $docToken = $t[1];
+                    break;
+                case T_ENCAPSED_AND_WHITESPACE:
+                case T_CONSTANT_ENCAPSED_STRING:
+                    $message .= $t[1];
+                    break;
+                case T_END_HEREDOC:
+                    return PhpStringTokenParser::parseDocString($docToken, $message);
+                default:
+                    break 2;
+            }
+        }
+
+        if ($message) {
+            $message = PhpStringTokenParser::parse($message);
         }
 
         return $message;
@@ -137,8 +149,8 @@ class PhpExtractor implements ExtractorInterface
             foreach ($this->sequences as $sequence) {
                 $message = '';
                 $tokenIterator->seek($key);
-                foreach ($sequence as $id => $item) {
 
+                foreach ($sequence as $item) {
                     $this->seekToNextRelaventToken($tokenIterator);
 
                     if ($this->normalizeToken($tokenIterator->current()) == $item) {
@@ -146,17 +158,14 @@ class PhpExtractor implements ExtractorInterface
                         continue;
                     } elseif (self::MESSAGE_TOKEN == $item) {
                         $message = $this->getMessage($tokenIterator);
+                        break;
                     } else {
                         break;
                     }
                 }
 
                 if ($message) {
-                    // need to eval here because
-                    // the $message we have here is a PHP string, complete with quotes
-                    // escaped characters, etc
-                    $msg = eval("return $message;");
-                    $catalog->set($msg, $this->prefix.$msg);
+                    $catalog->set($message, $this->prefix.$message);
                     break;
                 }
             }

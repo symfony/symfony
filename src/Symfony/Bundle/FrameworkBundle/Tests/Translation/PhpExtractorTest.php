@@ -27,16 +27,26 @@ class PhpExtractorTest extends TestCase
         // Act
         $extractor->extract(__DIR__.'/../Fixtures/Resources/views/', $catalogue);
 
+        $expectedHeredoc = <<<EOF
+heredoc key with whitespace and escaped \$\n sequences
+EOF;
+        $expectedNowdoc = <<<'EOF'
+nowdoc key with whitespace and nonescaped \$\n sequences
+EOF;
         // Assert
-        $this->assertCount(8, $catalogue->all('messages'), '->extract() should find 1 translation');
-        $this->assertTrue($catalogue->has('single-quoted key'), '->extract() should find the "single-quoted key" message');
-        $this->assertTrue($catalogue->has('double-quoted key'), '->extract() should find the "double-quoted key" message');
-        $this->assertTrue($catalogue->has('single-quoted key with whitespace'), '->extract() should find the "single-quoted key with whitespace" message');
-        $this->assertTrue($catalogue->has('single-quoted key with "quote"'), '->extract() should find the "single-quoted key with "quote"" message');
-        $this->assertTrue($catalogue->has('double-quoted key with whitespace'), '->extract() should find the "double-quoted key with whitespace" message');
-        $this->assertTrue($catalogue->has('heredoc key'), '->extract() should find the "heredoc key" message');
-        $this->assertTrue($catalogue->has('heredoc key with whitespace'), '->extract() should find the "heredoc key with whitespace" message');
-        $this->assertTrue($catalogue->has("double-quoted key with \"escaped\" quotes"), '->extract() should find the "double-quoted key with "escaped" quotes" message');
-        $this->assertEquals('prefixsingle-quoted key', $catalogue->get('single-quoted key'), '->extract() should apply "prefix" as prefix');
+        $expectedCatalogue = array('messages' => array(
+            'single-quoted key' => 'prefixsingle-quoted key',
+            'double-quoted key' => 'prefixdouble-quoted key',
+            'heredoc key' => 'prefixheredoc key',
+            'nowdoc key' => 'prefixnowdoc key',
+            "double-quoted key with whitespace and escaped \$\n\" sequences" => "prefixdouble-quoted key with whitespace and escaped \$\n\" sequences",
+            'single-quoted key with whitespace and nonescaped \$\n\' sequences' => 'prefixsingle-quoted key with whitespace and nonescaped \$\n\' sequences',
+            'single-quoted key with "quote mark at the end"' => 'prefixsingle-quoted key with "quote mark at the end"',
+            $expectedHeredoc => "prefix".$expectedHeredoc,
+            $expectedNowdoc => "prefix".$expectedNowdoc,
+        ));
+        $actualCatalogue = $catalogue->all();
+
+        $this->assertEquals($expectedCatalogue, $actualCatalogue);
     }
 }

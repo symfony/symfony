@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-02-05T01:35:14Z
+
+Well, to fix the issue fully, it is not the only place which should be changed
+
+---------------------------------------------------------------------------
+
+by robbertkl at 2014-02-05T10:52:25Z
+
+I've found another reference to the magic "_root" node (in parents()), which I've removed.
+
+@stof Is that what you mean? If not, could you please give me a hint of the other place(s) you're referring to? Thanks!
+
+---------------------------------------------------------------------------
+
+by stof at 2014-02-05T11:19:44Z
+
+@robbertkl there are also such cases in the handling of forms in ``Form::initialize``
+
+---------------------------------------------------------------------------
+
+by robbertkl at 2014-02-05T11:53:27Z
+
+@stof Thanks, I see what you mean now.
+
+I've added changes in `Form::initialize()` and in `Field\FormField::__construct()` as well. Tests still pass.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-02-05T13:18:12Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2014-02-05T13:34:22Z
+
+@robbertkl could you rebase your work ? It conflicts with the merge of #10205
+
+---------------------------------------------------------------------------
+
+by robbertkl at 2014-02-05T16:31:54Z
+
+Done!

@@ -43,6 +43,12 @@ class PhpExtractor implements ExtractorInterface
             '(',
             self::MESSAGE_TOKEN,
         ),
+        array(
+            '->',
+            'transChoice',
+            '(',
+            self::MESSAGE_TOKEN,
+        ),
     );
 
     /**

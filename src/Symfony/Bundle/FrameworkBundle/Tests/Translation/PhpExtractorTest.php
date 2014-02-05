@@ -44,6 +44,7 @@ EOF;
             'single-quoted key with "quote mark at the end"' => 'prefixsingle-quoted key with "quote mark at the end"',
             $expectedHeredoc => "prefix".$expectedHeredoc,
             $expectedNowdoc => "prefix".$expectedNowdoc,
+            '{0} There is no apples|{1} There is one apple|]1,Inf[ There are %count% apples' => 'prefix{0} There is no apples|{1} There is one apple|]1,Inf[ There are %count% apples',
         ));
         $actualCatalogue = $catalogue->all();
 

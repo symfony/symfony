@@ -1,0 +1,16 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2014-02-04T17:35:31Z
+
+Why did you also add the `Stopwatch::getEvent()`? Doesn't seem to be needed for getting the duration.
+
+---------------------------------------------------------------------------
+
+by jochenvdv at 2014-02-04T18:01:55Z
+
+Because there's no other way to get a `StopwatchEvent` from Stopwatch other than start(),
+stop() or lap(). This way you can retrieve one and call its method getDuration() on it,
+as well as all of the other ones.
+
+I think this is more flexible than just a `Stopwatch::getDuration()`
+But let me know if I should change anything.

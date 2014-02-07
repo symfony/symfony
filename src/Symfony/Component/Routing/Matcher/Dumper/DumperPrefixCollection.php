@@ -55,31 +55,28 @@ class DumperPrefixCollection extends DumperCollection
     public function addPrefixRoute(DumperRoute $route)
     {
         $prefix = $route->getRoute()->compile()->getStaticPrefix();
-        $collection = $this;
 
-        // Same prefix, add to current leave
-        if ($collection->prefix === $prefix) {
-            $collection->add($route);
+        for ($collection = $this; null !== $collection; $collection = $collection->getParent()) {
 
-            return $collection;
+            // Same prefix, add to current leave
+            if ($collection->prefix === $prefix) {
+                $collection->add($route);
+
+                return $collection;
+            }
+
+            // Prefix starts with route's prefix
+            if ('' === $collection->prefix || 0 === strpos($prefix, $collection->prefix)) {
+                $child = new DumperPrefixCollection();
+                $child->setPrefix(substr($prefix, 0, strlen($collection->prefix)+1));
+                $collection->add($child);
+
+                return $child->addPrefixRoute($route);
+            }
         }
 
-        // Prefix starts with route's prefix
-        if ('' === $collection->prefix || 0 === strpos($prefix, $collection->prefix)) {
-            $child = new DumperPrefixCollection();
-            $child->setPrefix(substr($prefix, 0, strlen($collection->prefix)+1));
-            $collection->add($child);
-
-            return $child->addPrefixRoute($route);
-        }
-
-        // No match, fallback to parent (recursively)
-
-        if (null === $parent = $collection->getParent()) {
-            throw new \LogicException("The collection root must not have a prefix");
-        }
-
-        return $parent->addPrefixRoute($route);
+        // Reached only if the root has a non empty prefix
+        throw new \LogicException("The collection root must not have a prefix");
     }
 
     /**

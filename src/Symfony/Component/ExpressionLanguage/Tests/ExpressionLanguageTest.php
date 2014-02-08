@@ -12,7 +12,6 @@
 namespace Symfony\Component\ExpressionLanguage\Tests;
 
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
-use Symfony\Component\ExpressionLanguage\ParsedExpression;
 
 class ExpressionLanguageTest extends \PHPUnit_Framework_TestCase
 {

@@ -105,7 +105,7 @@ class ExpressionLanguage
     {
         $this->register('constant', function ($constant) {
             return sprintf('constant(%s)', $constant);
-        }, function (array $values, $constant) {
+        }, function ($constant) {
             return constant($constant);
         });
     }

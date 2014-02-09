@@ -79,7 +79,7 @@ class ProcessPipes
     public function close()
     {
         $this->closeUnixPipes();
-        foreach ($this->fileHandles as $offset => $handle) {
+        foreach ($this->fileHandles as $handle) {
             fclose($handle);
         }
         $this->fileHandles = array();

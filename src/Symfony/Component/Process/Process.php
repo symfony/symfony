@@ -212,6 +212,8 @@ class Process
      * @param callable|null $callback
      *
      * @return self
+     *
+     * @throws ProcessFailedException when process exits with a non-zero code
      */
     public function mustRun($callback = null)
     {
@@ -1168,6 +1170,8 @@ class Process
      * @param integer|float|null $timeout
      *
      * @return float|null
+     *
+     * @throws InvalidArgumentException
      */
     private function validateTimeout($timeout)
     {
@@ -1186,6 +1190,7 @@ class Process
      * Reads pipes, executes callback.
      *
      * @param Boolean $blocking Whether to use blocking calls or not.
+     * @param Boolean $close Whether to close file handles or not
      */
     private function readPipes($blocking, $close)
     {

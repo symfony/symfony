@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\EventListener;
 
-use ArrayObject;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Form\Extension\Core\EventListener\ResizeFormListener;
 use Symfony\Component\Form\FormBuilder;
@@ -259,7 +258,7 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
     {
         $this->form->add($this->getForm('1'));
 
-        $data = new ArrayObject(array(0 => 'first', 1 => 'second', 2 => 'third'));
+        $data = new \ArrayObject(array(0 => 'first', 1 => 'second', 2 => 'third'));
         $event = new FormEvent($this->form, $data);
         $listener = new ResizeFormListener('text', array(), false, true);
         $listener->onSubmit($event);

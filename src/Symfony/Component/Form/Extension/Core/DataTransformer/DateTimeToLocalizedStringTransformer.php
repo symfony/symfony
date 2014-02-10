@@ -26,7 +26,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
     private $timeFormat;
     private $pattern;
     private $calendar;
-    private $lenientDateHandling;
+    private $lenientDateParsing;
 
     /**
      * Constructor.
@@ -39,11 +39,11 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
      * @param integer $timeFormat          The time format
      * @param integer $calendar            One of the \IntlDateFormatter calendar constants
      * @param string  $pattern             A pattern to pass to \IntlDateFormatter
-     * @param bool    $lenientDateHandling Flag, whether the date parser should use lenient parsing
+     * @param bool    $lenientDateParsing  Flag, whether the date parser should use lenient parsing
      *
      * @throws UnexpectedTypeException If a format is not supported or if a timezone is not a string
      */
-    public function __construct($inputTimezone = null, $outputTimezone = null, $dateFormat = null, $timeFormat = null, $calendar = \IntlDateFormatter::GREGORIAN, $pattern = null, $lenientDateHandling = false)
+    public function __construct($inputTimezone = null, $outputTimezone = null, $dateFormat = null, $timeFormat = null, $calendar = \IntlDateFormatter::GREGORIAN, $pattern = null, $lenientDateParsing = false)
     {
         parent::__construct($inputTimezone, $outputTimezone);
 
@@ -67,7 +67,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
         $this->timeFormat = $timeFormat;
         $this->calendar = $calendar;
         $this->pattern = $pattern;
-        $this->lenientDateHandling = $lenientDateHandling;
+        $this->lenientDateParsing = $lenientDateParsing;
     }
 
     /**
@@ -165,7 +165,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
         $pattern = $this->pattern;
 
         $intlDateFormatter = new \IntlDateFormatter(\Locale::getDefault(), $dateFormat, $timeFormat, $timezone, $calendar, $pattern);
-        $intlDateFormatter->setLenient($this->lenientDateHandling);
+        $intlDateFormatter->setLenient($this->lenientDateParsing);
 
         return $intlDateFormatter;
     }

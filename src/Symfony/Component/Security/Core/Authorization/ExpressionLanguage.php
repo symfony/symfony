@@ -53,5 +53,11 @@ class ExpressionLanguage extends BaseExpressionLanguage
         }, function (array $variables, $role) {
             return in_array($role, $variables['roles']);
         });
+
+        $this->register('has_any_roles', function ($roles) {
+            return sprintf('!empty(array_intersect(%s, $roles))', $roles);
+        }, function (array $variables, $roles) {
+            return !empty(array_intersect($roles, $variables['roles']));
+        });
     }
 }

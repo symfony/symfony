@@ -18,6 +18,11 @@ UPGRADE FROM 2.x to 3.0
    `DebugClassLoader`. The difference is that the constructor now takes a
    loader to wrap.
 
+### Console
+
+ * The methods `isQuiet`, `isVerbose`, `isVeryVerbose` and `isDebug` were added
+   to `Symfony\Component\Console\Output\OutputInteface`.
+
 ### EventDispatcher
 
  * The interface `Symfony\Component\EventDispatcher\Debug\TraceableEventDispatcherInterface`

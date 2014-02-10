@@ -45,4 +45,13 @@ class ExpressionLanguageTest extends \PHPUnit_Framework_TestCase
         $parsedExpression = $expressionLanguage->parse('1 + 1', array());
         $this->assertSame($savedParsedExpression, $parsedExpression);
     }
+
+    public function testConstantFunction()
+    {
+        $expressionLanguage = new ExpressionLanguage();
+        $this->assertEquals(PHP_VERSION, $expressionLanguage->evaluate('constant("PHP_VERSION")'));
+
+        $expressionLanguage = new ExpressionLanguage();
+        $this->assertEquals('constant("PHP_VERSION")', $expressionLanguage->compile('constant("PHP_VERSION")'));
+    }
 }

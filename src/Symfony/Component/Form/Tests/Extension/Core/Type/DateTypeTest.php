@@ -799,4 +799,36 @@ class DateTypeTest extends TypeTestCase
 
         $this->assertEquals($listChoices, $view['year']->vars['choices']);
     }
+
+
+    public function testLenientDateParsing ()
+    {
+        $form = $this->factory->create('date', null, array(
+            'format' => 'dd.MM.yyyy',
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
+            'widget' => 'single_text',
+            'input' => 'string',
+            'lenient_date_parsing' => true
+        ));
+
+        $form->submit('35.12.2013');
+
+        $this->assertEquals('2014-01-04', $form->getData());
+    }
+
+
+    public function testWithoutLenientDateParsing ()
+    {
+        $form = $this->factory->create('date', null, array(
+            'format' => 'dd.MM.yyyy',
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
+            'widget' => 'single_text',
+            'input' => 'string',
+        ));
+
+        $form->submit('35.12.2013');
+        $this->assertNull($form->getData());
+    }
 }

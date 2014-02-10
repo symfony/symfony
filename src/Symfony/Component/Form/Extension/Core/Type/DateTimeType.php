@@ -93,7 +93,7 @@ class DateTimeType extends AbstractType
         }
 
         if ('single_text' === $options['widget']) {
-            if (self::HTML5_FORMAT === $pattern) {
+            if ((self::HTML5_FORMAT === $pattern) && !$options['lenient_date_parsing']) {
                 $builder->addViewTransformer(new DateTimeToRfc3339Transformer(
                     $options['model_timezone'],
                     $options['view_timezone']
@@ -105,7 +105,8 @@ class DateTimeType extends AbstractType
                     $dateFormat,
                     $timeFormat,
                     $calendar,
-                    $pattern
+                    $pattern,
+                    $options['lenient_date_parsing']
                 ));
             }
         } else {
@@ -117,6 +118,7 @@ class DateTimeType extends AbstractType
                 'empty_value',
                 'required',
                 'translation_domain',
+                'lenient_date_parsing',
             )));
 
             $timeOptions = array_intersect_key($options, array_flip(array(
@@ -208,26 +210,29 @@ class DateTimeType extends AbstractType
         };
 
         $resolver->setDefaults(array(
-            'input'          => 'datetime',
-            'model_timezone' => null,
-            'view_timezone'  => null,
-            'format'         => self::HTML5_FORMAT,
-            'date_format'    => null,
-            'widget'         => null,
-            'date_widget'    => $dateWidget,
-            'time_widget'    => $timeWidget,
-            'with_minutes'   => true,
-            'with_seconds'   => false,
+            'input'                => 'datetime',
+            'model_timezone'       => null,
+            'view_timezone'        => null,
+            'format'               => self::HTML5_FORMAT,
+            'date_format'          => null,
+            'widget'               => null,
+            'date_widget'          => $dateWidget,
+            'time_widget'          => $timeWidget,
+            'with_minutes'         => true,
+            'with_seconds'         => false,
             // Don't modify \DateTime classes by reference, we treat
             // them like immutable value objects
-            'by_reference'   => false,
-            'error_bubbling' => false,
+            'by_reference'         => false,
+            'error_bubbling'       => false,
             // If initialized with a \DateTime object, FormType initializes
             // this option to "\DateTime". Since the internal, normalized
             // representation is not \DateTime, but an array, we need to unset
             // this option.
-            'data_class'     => null,
-            'compound'       => $compound,
+            'data_class'           => null,
+            'compound'             => $compound,
+            // Enables lenient parsing of dates. If set to true, some invalid date formats
+            // will be automatically adjusted (for example 35.12.2013 -> 04.01.2013)
+            'lenient_date_parsing' => false,
         ));
 
         // Don't add some defaults in order to preserve the defaults

@@ -26,22 +26,24 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
     private $timeFormat;
     private $pattern;
     private $calendar;
+    private $lenientDateHandling;
 
     /**
      * Constructor.
      *
      * @see BaseDateTimeTransformer::formats for available format options
      *
-     * @param string  $inputTimezone  The name of the input timezone
-     * @param string  $outputTimezone The name of the output timezone
-     * @param integer $dateFormat     The date format
-     * @param integer $timeFormat     The time format
-     * @param integer $calendar       One of the \IntlDateFormatter calendar constants
-     * @param string  $pattern        A pattern to pass to \IntlDateFormatter
+     * @param string  $inputTimezone       The name of the input timezone
+     * @param string  $outputTimezone      The name of the output timezone
+     * @param integer $dateFormat          The date format
+     * @param integer $timeFormat          The time format
+     * @param integer $calendar            One of the \IntlDateFormatter calendar constants
+     * @param string  $pattern             A pattern to pass to \IntlDateFormatter
+     * @param bool    $lenientDateHandling Flag, whether the date parser should use lenient parsing
      *
      * @throws UnexpectedTypeException If a format is not supported or if a timezone is not a string
      */
-    public function __construct($inputTimezone = null, $outputTimezone = null, $dateFormat = null, $timeFormat = null, $calendar = \IntlDateFormatter::GREGORIAN, $pattern = null)
+    public function __construct($inputTimezone = null, $outputTimezone = null, $dateFormat = null, $timeFormat = null, $calendar = \IntlDateFormatter::GREGORIAN, $pattern = null, $lenientDateHandling = false)
     {
         parent::__construct($inputTimezone, $outputTimezone);
 
@@ -65,6 +67,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
         $this->timeFormat = $timeFormat;
         $this->calendar = $calendar;
         $this->pattern = $pattern;
+        $this->lenientDateHandling = $lenientDateHandling;
     }
 
     /**
@@ -162,7 +165,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
         $pattern = $this->pattern;
 
         $intlDateFormatter = new \IntlDateFormatter(\Locale::getDefault(), $dateFormat, $timeFormat, $timezone, $calendar, $pattern);
-        $intlDateFormatter->setLenient(false);
+        $intlDateFormatter->setLenient($this->lenientDateHandling);
 
         return $intlDateFormatter;
     }

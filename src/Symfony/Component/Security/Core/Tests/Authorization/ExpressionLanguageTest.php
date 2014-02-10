@@ -54,12 +54,14 @@ class ExpressionLanguageTest extends \PHPUnit_Framework_TestCase
             array($noToken, 'is_fully_authenticated()', false),
             array($noToken, 'is_remember_me()', false),
             array($noToken, "has_role('ROLE_USER')", false),
+            array($noToken, "has_any_roles(['ROLE_USER', 'ROLE_ADMIN'])", false),
 
             array($anonymousToken, 'is_anonymous()', true),
             array($anonymousToken, 'is_authenticated()', false),
             array($anonymousToken, 'is_fully_authenticated()', false),
             array($anonymousToken, 'is_remember_me()', false),
             array($anonymousToken, "has_role('ROLE_USER')", false),
+            array($anonymousToken, "has_any_roles(['ROLE_USER', 'ROLE_ADMIN'])", false),
 
             array($rememberMeToken, 'is_anonymous()', false),
             array($rememberMeToken, 'is_authenticated()', true),
@@ -67,6 +69,8 @@ class ExpressionLanguageTest extends \PHPUnit_Framework_TestCase
             array($rememberMeToken, 'is_remember_me()', true),
             array($rememberMeToken, "has_role('ROLE_FOO')", false, $roles),
             array($rememberMeToken, "has_role('ROLE_USER')", true, $roles),
+            array($rememberMeToken, "has_any_roles(['ROLE_FOO', 'ROLE_BAR'])", false, $roles),
+            array($rememberMeToken, "has_any_roles(['ROLE_USER', 'ROLE_FOO', 'ROLE_ADMIN'])", true, $roles),
 
             array($usernamePasswordToken, 'is_anonymous()', false),
             array($usernamePasswordToken, 'is_authenticated()', true),
@@ -74,6 +78,8 @@ class ExpressionLanguageTest extends \PHPUnit_Framework_TestCase
             array($usernamePasswordToken, 'is_remember_me()', false),
             array($usernamePasswordToken, "has_role('ROLE_FOO')", false, $roles),
             array($usernamePasswordToken, "has_role('ROLE_USER')", true, $roles),
+            array($usernamePasswordToken, "has_any_roles(['ROLE_FOO', 'ROLE_BAR'])", false, $roles),
+            array($usernamePasswordToken, "has_any_roles(['ROLE_USER', 'ROLE_FOO', 'ROLE_ADMIN'])", true, $roles),
         );
     }
 }

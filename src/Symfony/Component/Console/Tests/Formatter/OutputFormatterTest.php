@@ -73,6 +73,16 @@ class OutputFormatterTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testAdjacentStyles()
+    {
+        $formatter = new OutputFormatter(true);
+
+        $this->assertEquals(
+            "\033[37;41msome error\033[0m\033[32msome info\033[0m",
+            $formatter->format('<error>some error</error><info>some info</info>')
+        );
+    }
+
     public function testStyleMatchingNotGreedy()
     {
         $formatter = new OutputFormatter(true);
@@ -140,7 +150,15 @@ class OutputFormatterTest extends \PHPUnit_Framework_TestCase
     public function testNonStyleTag()
     {
         $formatter = new OutputFormatter(true);
-        $this->assertEquals("\033[32msome \033[0m\033[32m<tag> styled \033[0m\033[32m<p>single-char tag\033[0m\033[32m</p>\033[0m", $formatter->format('<info>some <tag> styled <p>single-char tag</p></info>'));
+
+        $this->assertEquals("\033[32msome \033[0m\033[32m<tag>\033[0m\033[32m styled \033[0m\033[32m<p>\033[0m\033[32msingle-char tag\033[0m\033[32m</p>\033[0m", $formatter->format('<info>some <tag> styled <p>single-char tag</p></info>'));
+    }
+
+    public function testFormatLongString()
+    {
+        $formatter = new OutputFormatter(true);
+        $long = str_repeat("\\", 14000);
+        $this->assertEquals("\033[37;41msome error\033[0m".$long, $formatter->format('<error>some error</error>'.$long));
     }
 
     public function testNotDecoratedFormatter()

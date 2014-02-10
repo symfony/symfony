@@ -56,29 +56,27 @@ class DumperPrefixCollection extends DumperCollection
     {
         $prefix = $route->getRoute()->compile()->getStaticPrefix();
 
-        // Same prefix, add to current leave
-        if ($this->prefix === $prefix) {
-            $this->add($route);
+        for ($collection = $this; null !== $collection; $collection = $collection->getParent()) {
 
-            return $this;
+            // Same prefix, add to current leave
+            if ($collection->prefix === $prefix) {
+                $collection->add($route);
+
+                return $collection;
+            }
+
+            // Prefix starts with route's prefix
+            if ('' === $collection->prefix || 0 === strpos($prefix, $collection->prefix)) {
+                $child = new DumperPrefixCollection();
+                $child->setPrefix(substr($prefix, 0, strlen($collection->prefix)+1));
+                $collection->add($child);
+
+                return $child->addPrefixRoute($route);
+            }
         }
 
-        // Prefix starts with route's prefix
-        if ('' === $this->prefix || 0 === strpos($prefix, $this->prefix)) {
-            $collection = new DumperPrefixCollection();
-            $collection->setPrefix(substr($prefix, 0, strlen($this->prefix)+1));
-            $this->add($collection);
-
-            return $collection->addPrefixRoute($route);
-        }
-
-        // No match, fallback to parent (recursively)
-
-        if (null === $parent = $this->getParent()) {
-            throw new \LogicException("The collection root must not have a prefix");
-        }
-
-        return $parent->addPrefixRoute($route);
+        // Reached only if the root has a non empty prefix
+        throw new \LogicException("The collection root must not have a prefix");
     }
 
     /**

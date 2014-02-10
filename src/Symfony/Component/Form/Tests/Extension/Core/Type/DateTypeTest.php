@@ -800,8 +800,7 @@ class DateTypeTest extends TypeTestCase
         $this->assertEquals($listChoices, $view['year']->vars['choices']);
     }
 
-
-    public function testLenientDateParsing ()
+    public function testLenientDateParsing()
     {
         $form = $this->factory->create('date', null, array(
             'format' => 'dd.MM.yyyy',
@@ -817,8 +816,7 @@ class DateTypeTest extends TypeTestCase
         $this->assertEquals('2014-01-04', $form->getData());
     }
 
-
-    public function testWithoutLenientDateParsing ()
+    public function testWithoutLenientDateParsing()
     {
         $form = $this->factory->create('date', null, array(
             'format' => 'dd.MM.yyyy',

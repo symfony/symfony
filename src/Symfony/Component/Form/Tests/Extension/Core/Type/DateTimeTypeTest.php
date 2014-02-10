@@ -474,8 +474,7 @@ class DateTimeTypeTest extends TypeTestCase
         $this->assertSame(array($error), $form->getErrors());
     }
 
-
-    public function testLenientDateParsing ()
+    public function testLenientDateParsing()
     {
         $form = $this->factory->create('datetime', null, array(
             'format' => 'yyyy-MM-dd',
@@ -491,8 +490,7 @@ class DateTimeTypeTest extends TypeTestCase
         $this->assertEquals('2014-01-04 00:00:00', $form->getData());
     }
 
-
-    public function testWithoutLenientDateParsing ()
+    public function testWithoutLenientDateParsing()
     {
         $form = $this->factory->create('datetime', null, array(
             'format' => 'yyyy-MM-dd',
@@ -505,5 +503,4 @@ class DateTimeTypeTest extends TypeTestCase
         $form->submit('2013-12-35');
         $this->assertNull($form->getData());
     }
-
 }

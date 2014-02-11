@@ -22,7 +22,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     public function testConfigTree($options, $results)
     {
         $processor = new Processor();
-        $configuration = new Configuration(array());
+        $configuration = new Configuration();
         $config = $processor->processConfiguration($configuration, array($options));
 
         $this->assertEquals($results, $config);

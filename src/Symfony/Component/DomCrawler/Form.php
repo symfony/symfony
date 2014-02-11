@@ -394,34 +394,43 @@ class Form extends Link implements \ArrayAccess
     {
         $this->fields = new FormFieldRegistry();
 
-        $document = new \DOMDocument('1.0', 'UTF-8');
-        $xpath = new \DOMXPath($document);
-        $root = $document->appendChild($document->createElement('_root'));
+        $xpath = new \DOMXPath($this->node->ownerDocument);
 
         // add submitted button if it has a valid name
         if ('form' !== $this->button->nodeName && $this->button->hasAttribute('name') && $this->button->getAttribute('name')) {
-            $this->set(new Field\InputFormField($document->importNode($this->button, true)));
+            if ('input' == $this->button->nodeName && 'image' == $this->button->getAttribute('type')) {
+                $name = $this->button->getAttribute('name');
+                $this->button->setAttribute('value', '0');
+
+                // temporarily change the name of the input node for the x coordinate
+                $this->button->setAttribute('name', $name.'.x');
+                $this->set(new Field\InputFormField($this->button));
+
+                // temporarily change the name of the input node for the y coordinate
+                $this->button->setAttribute('name', $name.'.y');
+                $this->set(new Field\InputFormField($this->button));
+
+                // restore the original name of the input node
+                $this->button->setAttribute('name', $name);
+            } else {
+                $this->set(new Field\InputFormField($this->button));
+            }
         }
 
         // find form elements corresponding to the current form
         if ($this->node->hasAttribute('id')) {
-            // traverse through the whole document
-            $node = $document->importNode($this->node->ownerDocument->documentElement, true);
-            $root->appendChild($node);
-
             // corresponding elements are either descendants or have a matching HTML5 form attribute
             $formId = Crawler::xpathLiteral($this->node->getAttribute('id'));
-            $fieldNodes = $xpath->query(sprintf('descendant::input[@form=%s] | descendant::button[@form=%s] | descendant::textarea[@form=%s] | descendant::select[@form=%s] | //form[@id=%s]//input[not(@form)] | //form[@id=%s]//button[not(@form)] | //form[@id=%s]//textarea[not(@form)] | //form[@id=%s]//select[not(@form)]', $formId, $formId, $formId, $formId, $formId, $formId, $formId, $formId), $root);
+
+            // do the xpath query without $this->node as the context node (i.e. traverse through the whole document)
+            $fieldNodes = $xpath->query(sprintf('descendant::input[@form=%s] | descendant::button[@form=%s] | descendant::textarea[@form=%s] | descendant::select[@form=%s] | //form[@id=%s]//input[not(@form)] | //form[@id=%s]//button[not(@form)] | //form[@id=%s]//textarea[not(@form)] | //form[@id=%s]//select[not(@form)]', $formId, $formId, $formId, $formId, $formId, $formId, $formId, $formId));
             foreach ($fieldNodes as $node) {
                 $this->addField($node);
             }
         } else {
-            // parent form has no id, add descendant elements only
-            $node = $document->importNode($this->node, true);
-            $root->appendChild($node);
-
-            // descendant elements with form attribute are not part of this form
-            $fieldNodes = $xpath->query('descendant::input[not(@form)] | descendant::button[not(@form)] | descendant::textarea[not(@form)] | descendant::select[not(@form)]', $root);
+            // do the xpath query with $this->node as the context node, to only find descendant elements
+            // however, descendant elements with form attribute are not part of this form
+            $fieldNodes = $xpath->query('descendant::input[not(@form)] | descendant::button[not(@form)] | descendant::textarea[not(@form)] | descendant::select[not(@form)]', $this->node);
             foreach ($fieldNodes as $node) {
                 $this->addField($node);
             }

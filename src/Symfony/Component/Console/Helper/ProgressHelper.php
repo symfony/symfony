@@ -349,7 +349,7 @@ class ProgressHelper extends Helper
         $vars    = array();
         $percent = 0;
         if ($this->max > 0) {
-            $percent = (double) $this->current / $this->max;
+            $percent = (float) $this->current / $this->max;
         }
 
         if (isset($this->formatVars['bar'])) {

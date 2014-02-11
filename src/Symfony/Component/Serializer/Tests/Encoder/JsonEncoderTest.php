@@ -25,7 +25,7 @@ class JsonEncoderTest extends \PHPUnit_Framework_TestCase
 
     public function testEncodeScalar()
     {
-        $obj = new \stdClass;
+        $obj = new \stdClass();
         $obj->foo = "foo";
 
         $expected = '{"foo":"foo"}';
@@ -68,7 +68,7 @@ class JsonEncoderTest extends \PHPUnit_Framework_TestCase
 
     protected function getObject()
     {
-        $obj = new \stdClass;
+        $obj = new \stdClass();
         $obj->foo = 'foo';
         $obj->bar = array('a', 'b');
         $obj->baz = array('key' => 'val', 'key2' => 'val', 'A B' => 'bar', 'item' => array(array('title' => 'title1'), array('title' => 'title2')), 'Barry' => array('FooBar' => array('Baz' => 'Ed', '@id' => 1)));

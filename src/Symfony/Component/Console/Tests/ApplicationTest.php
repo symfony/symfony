@@ -471,7 +471,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     public function testAsText()
     {
         $application = new Application();
-        $application->add(new \FooCommand);
+        $application->add(new \FooCommand());
         $this->ensureStaticCommandHelp($application);
         $this->assertStringEqualsFile(self::$fixturesPath.'/application_astext1.txt', $this->normalizeLineBreaks($application->asText()), '->asText() returns a text representation of the application');
         $this->assertStringEqualsFile(self::$fixturesPath.'/application_astext2.txt', $this->normalizeLineBreaks($application->asText('foo')), '->asText() returns a text representation of the application');
@@ -480,7 +480,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     public function testAsXml()
     {
         $application = new Application();
-        $application->add(new \FooCommand);
+        $application->add(new \FooCommand());
         $this->ensureStaticCommandHelp($application);
         $this->assertXmlStringEqualsXmlFile(self::$fixturesPath.'/application_asxml1.txt', $application->asXml(), '->asXml() returns an XML representation of the application');
         $this->assertXmlStringEqualsXmlFile(self::$fixturesPath.'/application_asxml2.txt', $application->asXml('foo'), '->asXml() returns an XML representation of the application');
@@ -504,7 +504,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $tester->run(array('command' => 'list', '--foo' => true), array('decorated' => false));
         $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception2.txt', $tester->getDisplay(true), '->renderException() renders the command synopsis when an exception occurs in the context of a command');
 
-        $application->add(new \Foo3Command);
+        $application->add(new \Foo3Command());
         $tester = new ApplicationTester($application);
         $tester->run(array('command' => 'foo3:bar'), array('decorated' => false));
         $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception3.txt', $tester->getDisplay(true), '->renderException() renders a pretty exceptions with previous exceptions');

@@ -115,7 +115,7 @@ class DaoAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
             ->method('isPasswordValid')
         ;
 
-        $provider = $this->getProvider(false, false, $encoder);
+        $provider = $this->getProvider(null, null, $encoder);
         $method = new \ReflectionMethod($provider, 'checkAuthentication');
         $method->setAccessible(true);
 
@@ -142,7 +142,7 @@ class DaoAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(true))
         ;
 
-        $provider = $this->getProvider(false, false, $encoder);
+        $provider = $this->getProvider(null, null, $encoder);
         $method = new \ReflectionMethod($provider, 'checkAuthentication');
         $method->setAccessible(true);
 
@@ -171,7 +171,7 @@ class DaoAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
                 ->will($this->returnValue(false))
         ;
 
-        $provider = $this->getProvider(false, false, $encoder);
+        $provider = $this->getProvider(null, null, $encoder);
         $method = new \ReflectionMethod($provider, 'checkAuthentication');
         $method->setAccessible(true);
 
@@ -206,7 +206,7 @@ class DaoAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
                ->will($this->returnValue('newFoo'))
         ;
 
-        $provider = $this->getProvider(false, false, null);
+        $provider = $this->getProvider();
         $reflection = new \ReflectionMethod($provider, 'checkAuthentication');
         $reflection->setAccessible(true);
         $reflection->invoke($provider, $dbUser, $token);
@@ -231,7 +231,7 @@ class DaoAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
                ->will($this->returnValue('foo'))
         ;
 
-        $provider = $this->getProvider(false, false, null);
+        $provider = $this->getProvider();
         $reflection = new \ReflectionMethod($provider, 'checkAuthentication');
         $reflection->setAccessible(true);
         $reflection->invoke($provider, $dbUser, $token);
@@ -245,7 +245,7 @@ class DaoAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
                 ->will($this->returnValue(true))
         ;
 
-        $provider = $this->getProvider(false, false, $encoder);
+        $provider = $this->getProvider(null, null, $encoder);
         $method = new \ReflectionMethod($provider, 'checkAuthentication');
         $method->setAccessible(true);
 
@@ -270,17 +270,17 @@ class DaoAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
         return $mock;
     }
 
-    protected function getProvider($user = false, $userChecker = false, $passwordEncoder = null)
+    protected function getProvider($user = null, $userChecker = null, $passwordEncoder = null)
     {
         $userProvider = $this->getMock('Symfony\\Component\\Security\\Core\\User\\UserProviderInterface');
-        if (false !== $user) {
+        if (null !== $user) {
             $userProvider->expects($this->once())
                          ->method('loadUserByUsername')
                          ->will($this->returnValue($user))
             ;
         }
 
-        if (false === $userChecker) {
+        if (null === $userChecker) {
             $userChecker = $this->getMock('Symfony\\Component\\Security\\Core\\User\\UserCheckerInterface');
         }
 

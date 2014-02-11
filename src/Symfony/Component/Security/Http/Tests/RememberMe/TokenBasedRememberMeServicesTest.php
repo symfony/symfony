@@ -32,7 +32,7 @@ class TokenBasedRememberMeServicesTest extends \PHPUnit_Framework_TestCase
     public function testAutoLoginThrowsExceptionOnInvalidCookie()
     {
         $service = $this->getService(null, array('name' => 'foo', 'path' => null, 'domain' => null, 'always_remember_me' => false, 'remember_me_parameter' => 'foo'));
-        $request = new Request;
+        $request = new Request();
         $request->request->set('foo', 'true');
         $request->cookies->set('foo', 'foo');
 

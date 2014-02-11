@@ -19,15 +19,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class DependencyInjectionExtension implements FormExtensionInterface
 {
     private $container;
-
     private $typeServiceIds;
-
     private $typeExtensionServiceIds;
-
     private $guesserServiceIds;
-
     private $guesser;
-
     private $guesserLoaded = false;
 
     public function __construct(ContainerInterface $container,

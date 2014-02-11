@@ -106,6 +106,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             new UploadedFile($source, 'original', 'mime/original', 123, UPLOAD_ERR_OK, true),
         );
 
+        $file = null;
         foreach ($files as $file) {
             $client->request('POST', '/', array(), array('foo' => $file));
 

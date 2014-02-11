@@ -46,7 +46,7 @@ class CustomNormalizerTest extends \PHPUnit_Framework_TestCase
     public function testSupportsNormalization()
     {
         $this->assertTrue($this->normalizer->supportsNormalization(new ScalarDummy()));
-        $this->assertFalse($this->normalizer->supportsNormalization(new \stdClass));
+        $this->assertFalse($this->normalizer->supportsNormalization(new \stdClass()));
     }
 
     public function testSupportsDenormalization()

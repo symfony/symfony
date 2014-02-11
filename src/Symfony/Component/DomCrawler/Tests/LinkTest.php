@@ -74,6 +74,18 @@ class LinkTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $link->getUri());
     }
 
+    /**
+     * @dataProvider getGetUriTests
+     */
+    public function testGetUriOnArea($url, $currentUri, $expected)
+    {
+        $dom = new \DOMDocument();
+        $dom->loadHTML(sprintf('<html><map><area href="%s" /></map></html>', $url));
+        $link = new Link($dom->getElementsByTagName('area')->item(0), $currentUri);
+
+        $this->assertEquals($expected, $link->getUri());
+    }
+
     public function getGetUriTests()
     {
         return array(

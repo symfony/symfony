@@ -652,7 +652,7 @@ class ResponseTest extends ResponseTestCase
             'setCharset' => 'UTF-8',
             'setPublic' => null,
             'setPrivate' => null,
-            'setDate' => new \DateTime,
+            'setDate' => new \DateTime(),
             'expire' => null,
             'setMaxAge' => 1,
             'setSharedMaxAge' => 1,

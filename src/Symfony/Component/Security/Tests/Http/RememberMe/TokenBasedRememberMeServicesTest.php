@@ -39,7 +39,7 @@ class TokenBasedRememberMeServicesTest extends \PHPUnit_Framework_TestCase
     public function testAutoLoginThrowsExceptionOnInvalidCookie()
     {
         $service = $this->getService(null, array('name' => 'foo', 'path' => null, 'domain' => null, 'always_remember_me' => false, 'remember_me_parameter' => 'foo'));
-        $request = new Request;
+        $request = new Request();
         $request->request->set('foo', 'true');
         $request->cookies->set('foo', 'foo');
 
@@ -51,7 +51,7 @@ class TokenBasedRememberMeServicesTest extends \PHPUnit_Framework_TestCase
     {
         $userProvider = $this->getProvider();
         $service = $this->getService($userProvider, array('name' => 'foo', 'path' => null, 'domain' => null, 'always_remember_me' => true, 'lifetime' => 3600));
-        $request = new Request;
+        $request = new Request();
         $request->cookies->set('foo', $this->getCookie('fooclass', 'foouser', time()+3600, 'foopass'));
 
         $userProvider
@@ -68,7 +68,7 @@ class TokenBasedRememberMeServicesTest extends \PHPUnit_Framework_TestCase
     {
         $userProvider = $this->getProvider();
         $service = $this->getService($userProvider, array('name' => 'foo', 'path' => null, 'domain' => null, 'always_remember_me' => true, 'lifetime' => 3600));
-        $request = new Request;
+        $request = new Request();
         $request->cookies->set('foo', base64_encode('class:'.base64_encode('foouser').':123456789:fooHash'));
 
         $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
@@ -93,7 +93,7 @@ class TokenBasedRememberMeServicesTest extends \PHPUnit_Framework_TestCase
     {
         $userProvider = $this->getProvider();
         $service = $this->getService($userProvider, array('name' => 'foo', 'path' => null, 'domain' => null, 'always_remember_me' => true, 'lifetime' => 3600));
-        $request = new Request;
+        $request = new Request();
         $request->cookies->set('foo', $this->getCookie('fooclass', 'foouser', time() - 1, 'foopass'));
 
         $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
@@ -137,7 +137,7 @@ class TokenBasedRememberMeServicesTest extends \PHPUnit_Framework_TestCase
         ;
 
         $service = $this->getService($userProvider, array('name' => 'foo', 'always_remember_me' => true, 'lifetime' => 3600));
-        $request = new Request;
+        $request = new Request();
         $request->cookies->set('foo', $this->getCookie('fooclass', 'foouser', time()+3600, 'foopass'));
 
         $returnedToken = $service->autoLogin($request);
@@ -179,8 +179,8 @@ class TokenBasedRememberMeServicesTest extends \PHPUnit_Framework_TestCase
     public function testLoginSuccessIgnoresTokensWhichDoNotContainAnUserInterfaceImplementation()
     {
         $service = $this->getService(null, array('name' => 'foo', 'always_remember_me' => true, 'path' => null, 'domain' => null));
-        $request = new Request;
-        $response = new Response;
+        $request = new Request();
+        $response = new Response();
         $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
         $token
             ->expects($this->once())
@@ -200,8 +200,8 @@ class TokenBasedRememberMeServicesTest extends \PHPUnit_Framework_TestCase
     public function testLoginSuccess()
     {
         $service = $this->getService(null, array('name' => 'foo', 'domain' => 'myfoodomain.foo', 'path' => '/foo/path', 'secure' => true, 'httponly' => true, 'lifetime' => 3600, 'always_remember_me' => true));
-        $request = new Request;
-        $response = new Response;
+        $request = new Request();
+        $response = new Response();
 
         $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
         $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');

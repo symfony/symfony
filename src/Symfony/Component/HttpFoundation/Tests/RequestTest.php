@@ -881,14 +881,14 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
     public function testGetContentWorksTwiceInDefaultMode()
     {
-        $req = new Request;
+        $req = new Request();
         $this->assertEquals('', $req->getContent());
         $this->assertEquals('', $req->getContent());
     }
 
     public function testGetContentReturnsResource()
     {
-        $req = new Request;
+        $req = new Request();
         $retval = $req->getContent(true);
         $this->assertInternalType('resource', $retval);
         $this->assertEquals("", fread($retval, 1));
@@ -901,7 +901,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetContentCantBeCalledTwiceWithResources($first, $second)
     {
-        $req = new Request;
+        $req = new Request();
         $req->getContent($first);
         $req->getContent($second);
     }
@@ -1339,7 +1339,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
      */
     public function testUrlencodedStringPrefix($string, $prefix, $expect)
     {
-        $request = new Request;
+        $request = new Request();
 
         $me = new \ReflectionMethod($request, 'getUrlencodedPrefix');
         $me->setAccessible(true);

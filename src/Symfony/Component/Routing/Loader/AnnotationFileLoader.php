@@ -31,17 +31,16 @@ class AnnotationFileLoader extends FileLoader
      *
      * @param FileLocatorInterface  $locator A FileLocator instance
      * @param AnnotationClassLoader $loader  An AnnotationClassLoader instance
-     * @param string|array          $paths   A path or an array of paths where to look for resources
      *
      * @throws \RuntimeException
      */
-    public function __construct(FileLocatorInterface $locator, AnnotationClassLoader $loader, $paths = array())
+    public function __construct(FileLocatorInterface $locator, AnnotationClassLoader $loader)
     {
         if (!function_exists('token_get_all')) {
             throw new \RuntimeException('The Tokenizer extension is required for the routing annotation loaders.');
         }
 
-        parent::__construct($locator, $paths);
+        parent::__construct($locator);
 
         $this->loader = $loader;
     }

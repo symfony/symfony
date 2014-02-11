@@ -25,7 +25,7 @@ function handleSignal($signal)
     echo "received signal $name\n";
 }
 
-declare(ticks=1);
+declare(ticks = 1);
 pcntl_signal(SIGTERM, 'handleSignal');
 pcntl_signal(SIGINT, 'handleSignal');
 

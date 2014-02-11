@@ -70,7 +70,7 @@ class ControllerResolver implements ControllerResolverInterface
 
         if (false === strpos($controller, ':')) {
             if (method_exists($controller, '__invoke')) {
-                return new $controller;
+                return new $controller();
             } elseif (function_exists($controller)) {
                 return $controller;
             }

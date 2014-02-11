@@ -594,6 +594,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     {
         $request = new Request();
 
+        $server = array();
         $server['SERVER_NAME'] = 'servername';
         $server['SERVER_PORT'] = '90';
         $request->initialize(array(), array(), array(), array(), array(), $server);

@@ -125,7 +125,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
             throw new InvalidPropertyPathException(sprintf(
                 'Could not parse property path "%s". Unexpected token "%s" at position %d',
                 $propertyPath,
-                $remaining{0},
+                $remaining[0],
                 $position
             ));
         }

@@ -56,7 +56,7 @@ class ResponseListenerTest extends \PHPUnit_Framework_TestCase
     {
         $listener = new ResponseListener();
 
-        $this->assertSame(array(KernelEvents::RESPONSE => 'onKernelResponse'), $listener->getSubscribedEvents());
+        $this->assertSame(array(KernelEvents::RESPONSE => 'onKernelResponse'), ResponseListener::getSubscribedEvents());
     }
 
     private function getRequest(array $attributes = array())

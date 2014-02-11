@@ -66,7 +66,7 @@ class PhpDumper extends Dumper
     {
         parent::__construct($container);
 
-        $this->inlinedDefinitions = new \SplObjectStorage;
+        $this->inlinedDefinitions = new \SplObjectStorage();
     }
 
     /**

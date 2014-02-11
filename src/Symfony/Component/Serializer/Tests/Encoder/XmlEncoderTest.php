@@ -24,14 +24,14 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->encoder = new XmlEncoder;
+        $this->encoder = new XmlEncoder();
         $serializer = new Serializer(array(new CustomNormalizer()), array('xml' => new XmlEncoder()));
         $this->encoder->setSerializer($serializer);
     }
 
     public function testEncodeScalar()
     {
-        $obj = new ScalarDummy;
+        $obj = new ScalarDummy();
         $obj->xmlFoo = "foo";
 
         $expected = '<?xml version="1.0"?>'."\n".
@@ -42,7 +42,7 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
 
     public function testSetRootNodeName()
     {
-        $obj = new ScalarDummy;
+        $obj = new ScalarDummy();
         $obj->xmlFoo = "foo";
 
         $this->encoder->setRootNodeName('test');
@@ -63,7 +63,7 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
 
     public function testAttributes()
     {
-        $obj = new ScalarDummy;
+        $obj = new ScalarDummy();
         $obj->xmlFoo = array(
             'foo-bar' => array(
                 '@id' => 1,
@@ -92,7 +92,7 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
 
     public function testElementNameValid()
     {
-        $obj = new ScalarDummy;
+        $obj = new ScalarDummy();
         $obj->xmlFoo = array(
             'foo-bar' => 'a',
             'foo_bar' => 'a',
@@ -345,7 +345,7 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
 
     protected function getObject()
     {
-        $obj = new Dummy;
+        $obj = new Dummy();
         $obj->foo = 'foo';
         $obj->bar = array('a', 'b');
         $obj->baz = array('key' => 'val', 'key2' => 'val', 'A B' => 'bar', 'item' => array(array('title' => 'title1'), array('title' => 'title2')), 'Barry' => array('FooBar' => array('Baz' => 'Ed', '@id' => 1)));

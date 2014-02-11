@@ -76,7 +76,7 @@ class MaskBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetPattern()
     {
-        $builder = new MaskBuilder;
+        $builder = new MaskBuilder();
         $this->assertEquals(MaskBuilder::ALL_OFF, $builder->getPattern());
 
         $builder->add('view');

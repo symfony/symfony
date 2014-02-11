@@ -114,17 +114,17 @@ class PreAuthenticatedAuthenticationProviderTest extends \PHPUnit_Framework_Test
         return $token;
     }
 
-    protected function getProvider($user = false, $userChecker = false)
+    protected function getProvider($user = null, $userChecker = null)
     {
         $userProvider = $this->getMock('Symfony\Component\Security\Core\User\UserProviderInterface');
-        if (false !== $user) {
+        if (null !== $user) {
             $userProvider->expects($this->once())
                          ->method('loadUserByUsername')
                          ->will($this->returnValue($user))
             ;
         }
 
-        if (false === $userChecker) {
+        if (null === $userChecker) {
             $userChecker = $this->getMock('Symfony\Component\Security\Core\User\UserCheckerInterface');
         }
 

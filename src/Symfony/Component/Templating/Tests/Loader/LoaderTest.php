@@ -12,14 +12,13 @@
 namespace Symfony\Component\Templating\Tests\Loader;
 
 use Symfony\Component\Templating\Loader\Loader;
-use Symfony\Component\Templating\TemplateNameParser;
 use Symfony\Component\Templating\TemplateReferenceInterface;
 
 class LoaderTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetSetDebugger()
     {
-        $loader = new ProjectTemplateLoader4(new TemplateNameParser());
+        $loader = new ProjectTemplateLoader4();
         $loader->setDebugger($debugger = new \Symfony\Component\Templating\Tests\Fixtures\ProjectTemplateDebugger());
         $this->assertTrue($loader->getDebugger() === $debugger, '->setDebugger() sets the debugger instance');
     }

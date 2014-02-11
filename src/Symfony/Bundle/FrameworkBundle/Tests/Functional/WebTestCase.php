@@ -46,7 +46,7 @@ class WebTestCase extends BaseWebTestCase
     {
         require_once __DIR__.'/app/AppKernel.php';
 
-        return 'Symfony\Bundle\FrameworkBundle\Tests\Functional\AppKernel';
+        return 'Symfony\Bundle\FrameworkBundle\Tests\Functional\app\AppKernel';
     }
 
     protected static function createKernel(array $options = array())

@@ -14,7 +14,6 @@ namespace Symfony\Component\CssSelector\Tests\Parser\Handler;
 use Symfony\Component\CssSelector\Parser\Handler\NumberHandler;
 use Symfony\Component\CssSelector\Parser\Token;
 use Symfony\Component\CssSelector\Parser\Tokenizer\TokenizerPatterns;
-use Symfony\Component\CssSelector\Parser\Tokenizer\TokenizerEscaping;
 
 class NumberHandlerTest extends AbstractHandlerTest
 {
@@ -46,6 +45,6 @@ class NumberHandlerTest extends AbstractHandlerTest
     {
         $patterns = new TokenizerPatterns();
 
-        return new NumberHandler($patterns, new TokenizerEscaping($patterns));
+        return new NumberHandler($patterns);
     }
 }

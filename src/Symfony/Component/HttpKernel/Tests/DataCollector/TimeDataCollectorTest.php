@@ -26,7 +26,7 @@ class TimeDataCollectorTest extends \PHPUnit_Framework_TestCase
 
     public function testCollect()
     {
-        $c = new TimeDataCollector;
+        $c = new TimeDataCollector();
 
         $request = new Request();
         $request->server->set('REQUEST_TIME', 1);
@@ -42,7 +42,7 @@ class TimeDataCollectorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(2000, $c->getStartTime());
 
         $request = new Request();
-        $c->collect($request, new Response);
+        $c->collect($request, new Response());
         $this->assertEquals(0, $c->getStartTime());
 
         $kernel = $this->getMock('Symfony\Component\HttpKernel\KernelInterface');

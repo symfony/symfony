@@ -264,7 +264,7 @@ class ProcessPipes
      * Reads data in file pipes streams.
      *
      * @param Boolean $blocking Whether to use blocking calls or not.
-     * @param Boolean $close Whether to close file handles or not
+     * @param Boolean $close    Whether to close file handles or not.
      *
      * @return array An array of read data indexed by their fd.
      */

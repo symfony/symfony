@@ -1192,7 +1192,7 @@ class Process
      * Reads pipes, executes callback.
      *
      * @param Boolean $blocking Whether to use blocking calls or not.
-     * @param Boolean $close Whether to close file handles or not
+     * @param Boolean $close    Whether to close file handles or not.
      */
     private function readPipes($blocking, $close)
     {

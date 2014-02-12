@@ -30,11 +30,11 @@ class ValueExporter
             return sprintf('Object(%s)', get_class($value));
         }
 
-        if (is_array($value) && empty($value)) {
-            return '[]';
-        }
-
         if (is_array($value)) {
+            if (empty($value)) {
+                return '[]';
+            }
+
             $indent = str_repeat('  ', $depth);
 
             $a = array();

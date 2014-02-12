@@ -11,9 +11,9 @@
 
 namespace Symfony\Bundle\SecurityBundle\Templating\Helper;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderAdapter;
 use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Templating\Helper\Helper;
@@ -25,19 +25,19 @@ use Symfony\Component\Templating\Helper\Helper;
  */
 class LogoutUrlHelper extends Helper
 {
-    private $container;
+    private $requestStack;
     private $listeners = array();
     private $router;
 
     /**
      * Constructor.
      *
-     * @param ContainerInterface    $container A ContainerInterface instance
-     * @param UrlGeneratorInterface $router    A Router instance
+     * @param RequestStack          $requestStack A RequestStack instance
+     * @param UrlGeneratorInterface $router       A Router instance
      */
-    public function __construct(ContainerInterface $container, UrlGeneratorInterface $router)
+    public function __construct(RequestStack $requestStack, UrlGeneratorInterface $router)
     {
-        $this->container = $container;
+        $this->requestStack = $requestStack;
         $this->router = $router;
     }
 
@@ -49,6 +49,8 @@ class LogoutUrlHelper extends Helper
      * @param string                    $csrfTokenId      The ID of the CSRF token
      * @param string                    $csrfParameter    The CSRF token parameter name
      * @param CsrfTokenManagerInterface $csrfTokenManager A CsrfTokenManagerInterface instance
+     *
+     * @throws \InvalidArgumentException
      */
     public function registerListener($key, $logoutPath, $csrfTokenId, $csrfParameter, $csrfTokenManager = null)
     {
@@ -106,7 +108,7 @@ class LogoutUrlHelper extends Helper
         $parameters = null !== $csrfTokenManager ? array($csrfParameter => (string) $csrfTokenManager->getToken($csrfTokenId)) : array();
 
         if ('/' === $logoutPath[0]) {
-            $request = $this->container->get('request');
+            $request = $this->requestStack->getCurrentRequest();
 
             $url = UrlGeneratorInterface::ABSOLUTE_URL === $referenceType ? $request->getUriForPath($logoutPath) : $request->getBasePath().$logoutPath;
 

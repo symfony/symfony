@@ -20,7 +20,7 @@ namespace Symfony\Component\Validator\Constraints;
  *
  * @api
  */
-class GroupSequence
+class GroupSequence implements \ArrayAccess, \IteratorAggregate, \Countable
 {
     /**
      * The members of the sequence
@@ -30,6 +30,43 @@ class GroupSequence
 
     public function __construct(array $groups)
     {
-        $this->groups = $groups['value'];
+        // Support for Doctrine annotations
+        $this->groups = isset($groups['value']) ? $groups['value'] : $groups;
+    }
+
+    public function getIterator()
+    {
+        return new \ArrayIterator($this->groups);
+    }
+
+    public function offsetExists($offset)
+    {
+        return isset($this->groups[$offset]);
+    }
+
+    public function offsetGet($offset)
+    {
+        return $this->groups[$offset];
+    }
+
+    public function offsetSet($offset, $value)
+    {
+        if (null !== $offset) {
+            $this->groups[$offset] = $value;
+
+            return;
+        }
+
+        $this->groups[] = $value;
+    }
+
+    public function offsetUnset($offset)
+    {
+        unset($this->groups[$offset]);
+    }
+
+    public function count()
+    {
+        return count($this->groups);
     }
 }

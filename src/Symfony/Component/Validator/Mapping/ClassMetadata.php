@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Mapping;
 
+use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\ValidationVisitorInterface;
 use Symfony\Component\Validator\PropertyMetadataContainerInterface;
 use Symfony\Component\Validator\ClassBasedInterface;
@@ -330,27 +331,31 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
     /**
      * Sets the default group sequence for this class.
      *
-     * @param array $groups An array of group names
+     * @param array $groupSequence An array of group names
      *
      * @return ClassMetadata
      *
      * @throws GroupDefinitionException
      */
-    public function setGroupSequence(array $groups)
+    public function setGroupSequence($groupSequence)
     {
         if ($this->isGroupSequenceProvider()) {
             throw new GroupDefinitionException('Defining a static group sequence is not allowed with a group sequence provider');
         }
 
-        if (in_array(Constraint::DEFAULT_GROUP, $groups, true)) {
+        if (is_array($groupSequence)) {
+            $groupSequence = new GroupSequence($groupSequence);
+        }
+
+        if (in_array(Constraint::DEFAULT_GROUP, $groupSequence->groups, true)) {
             throw new GroupDefinitionException(sprintf('The group "%s" is not allowed in group sequences', Constraint::DEFAULT_GROUP));
         }
 
-        if (!in_array($this->getDefaultGroup(), $groups, true)) {
+        if (!in_array($this->getDefaultGroup(), $groupSequence->groups, true)) {
             throw new GroupDefinitionException(sprintf('The group "%s" is missing in the group sequence', $this->getDefaultGroup()));
         }
 
-        $this->groupSequence = $groups;
+        $this->groupSequence = $groupSequence;
 
         return $this;
     }
@@ -368,7 +373,7 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
     /**
      * Returns the default group sequence for this class.
      *
-     * @return array An array of group names
+     * @return GroupSequence The group sequence or null
      */
     public function getGroupSequence()
     {

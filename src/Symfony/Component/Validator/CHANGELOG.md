@@ -6,6 +6,8 @@ CHANGELOG
 
  * deprecated `ApcCache` in favor of `DoctrineCache`
  * added `DoctrineCache` to adapt any Doctrine cache
+ * `GroupSequence` now implements `ArrayAccess`, `Countable` and `Traversable`
+ * changed `ClassMetadata::getGroupSequence()` to return a `GroupSequence` instance instead of an array
 
 2.4.0
 -----

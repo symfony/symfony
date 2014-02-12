@@ -32,9 +32,10 @@ class Entity extends EntityParent implements EntityInterface
      * })
      * @Assert\Choice(choices={"A", "B"}, message="Must be one of %choices%")
      */
-    protected $firstName;
+    public $firstName;
     protected $lastName;
     public $reference;
+    public $reference2;
     private $internal;
     public $data = 'Overridden data';
 
@@ -46,6 +47,11 @@ class Entity extends EntityParent implements EntityInterface
     public function getInternal()
     {
         return $this->internal.' from getter';
+    }
+
+    public function setLastName($lastName)
+    {
+        $this->lastName = $lastName;
     }
 
     /**

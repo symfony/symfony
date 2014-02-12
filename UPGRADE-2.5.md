@@ -56,10 +56,11 @@ Validator
 
    After:
 
-   Default email validation is now done via a simple regex which may cause invalid emails (not RFC compilant) to be 
+   Default email validation is now done via a simple regex which may cause invalid emails (not RFC compilant) to be
    valid. This is the default behaviour.
 
    Strict email validation has to be explicitly activated in the configuration file by adding
+
    ```
    framework:
       //...
@@ -68,7 +69,29 @@ Validator
       //...
 
    ```
+
    Also you have to add to your composer.json:
+
    ```
    "egulias/email-validator": "1.1.*"
+   ```
+
+ * `ClassMetadata::getGroupSequence()` now returns `GroupSequence` instances
+   instead of an array. The sequence implements `\Traversable`, `\ArrayAccess`
+   and `\Countable`, so in most cases you should be fine. If you however use the
+   sequence with PHP's `array_*()` functions, you should cast it to an array
+   first using `iterator_to_array()`:
+
+   Before:
+
+   ```
+   $sequence = $metadata->getGroupSequence();
+   $result = array_map($callback, $sequence);
+   ```
+
+   After:
+
+   ```
+   $sequence = iterator_to_array($metadata->getGroupSequence());
+   $result = array_map($callback, $sequence);
    ```

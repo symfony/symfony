@@ -166,7 +166,12 @@ class ChoiceType extends AbstractType
             $choices = null !== $options['choices'] ? $options['choices'] : array();
 
             // Reuse existing choice lists in order to increase performance
-            $hash = hash('sha256', json_encode(array($choices, $options['preferred_choices'])));
+            $hashBase = json_encode(array($choices, $options['preferred_choices']));
+            if (isset($choices[0]) && is_object($choices[0])) {
+                $hashBase .= get_class($choices[0]);
+            }
+
+            $hash = hash('sha256', $hashBase);
 
             if (!isset($choiceListCache[$hash])) {
                 $choiceListCache[$hash] = new SimpleChoiceList($choices, $options['preferred_choices']);

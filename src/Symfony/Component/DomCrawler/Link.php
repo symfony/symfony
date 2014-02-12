@@ -12,7 +12,7 @@
 namespace Symfony\Component\DomCrawler;
 
 /**
- * Link represents an HTML link (an HTML a tag).
+ * Link represents an HTML link (an HTML a or area tag).
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
@@ -188,7 +188,7 @@ class Link
      */
     protected function setNode(\DOMNode $node)
     {
-        if ('a' != $node->nodeName) {
+        if ('a' != $node->nodeName && 'area' != $node->nodeName) {
             throw new \LogicException(sprintf('Unable to click on a "%s" tag.', $node->nodeName));
         }
 

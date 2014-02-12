@@ -228,25 +228,30 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
 
             if ($hostTokens) {
                 $routeHost = '';
+                $optional = true;
                 foreach ($hostTokens as $token) {
                     if ('variable' === $token[0]) {
-                        if (null !== $this->strictRequirements && !preg_match('#^'.$token[2].'$#', $mergedParams[$token[3]])) {
-                            $message = sprintf('Parameter "%s" for route "%s" must match "%s" ("%s" given) to generate a corresponding URL.', $token[3], $name, $token[2], $mergedParams[$token[3]]);
+                        if (!$optional || !array_key_exists($token[3], $defaults) || '' !== $mergedParams[$token[3]]) {
+                            if (null !== $this->strictRequirements && !preg_match('#^'.$token[2].'$#', $mergedParams[$token[3]])) {
+                                $message = sprintf('Parameter "%s" for route "%s" must match "%s" ("%s" given) to generate a corresponding URL.', $token[3], $name, $token[2], $mergedParams[$token[3]]);
 
-                            if ($this->strictRequirements) {
-                                throw new InvalidParameterException($message);
+                                if ($this->strictRequirements) {
+                                    throw new InvalidParameterException($message);
+                                }
+
+                                if ($this->logger) {
+                                    $this->logger->error($message);
+                                }
+
+                                return null;
                             }
 
-                            if ($this->logger) {
-                                $this->logger->error($message);
-                            }
-
-                            return null;
+                            $routeHost .= $mergedParams[$token[3]].$token[1];
+                            $optional = false;
                         }
-
-                        $routeHost = $token[1].$mergedParams[$token[3]].$routeHost;
                     } else {
-                        $routeHost = $token[1].$routeHost;
+                        $routeHost .= $token[1];
+                        $optional = false;
                     }
                 }
 

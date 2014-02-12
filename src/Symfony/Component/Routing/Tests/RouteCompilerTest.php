@@ -220,8 +220,8 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
                     array('text', '/hello'),
                 ),
                 '#^www\.example\.(?P<tld>[^\.]++)$#s', array('tld'), array(
-                    array('variable', '.', '[^\.]++', 'tld'),
-                    array('text', 'www.example'),
+                    array('text', 'www.example.'),
+                    array('variable', '', '[^\.]++', 'tld'),
                 ),
             ),
             array(
@@ -231,9 +231,9 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
                     array('text', '/hello'),
                 ),
                 '#^(?P<locale>[^\.]++)\.example\.(?P<tld>[^\.]++)$#s', array('locale', 'tld'), array(
-                    array('variable', '.', '[^\.]++', 'tld'),
-                    array('text', '.example'),
-                    array('variable', '', '[^\.]++', 'locale'),
+                    array('variable', '.', '[^\.]++', 'locale'),
+                    array('text', 'example.'),
+                    array('variable', '', '[^\.]++', 'tld'),
                 ),
             ),
             array(
@@ -242,10 +242,44 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
                 '/hello', '#^/hello$#s', array('locale', 'tld'), array(), array(
                     array('text', '/hello'),
                 ),
-                '#^(?P<locale>[^\.]++)\.example\.(?P<tld>[^\.]++)$#s', array('locale', 'tld'), array(
-                    array('variable', '.', '[^\.]++', 'tld'),
-                    array('text', '.example'),
-                    array('variable', '', '[^\.]++', 'locale'),
+                '#^(?:(?P<locale>[^\.]++)\.)?example\.(?P<tld>[^\.]++)$#s', array('locale', 'tld'), array(
+                    array('variable', '.', '[^\.]++', 'locale'),
+                    array('text', 'example.'),
+                    array('variable', '', '[^\.]++', 'tld'),
+                ),
+            ),
+            array(
+                'Route with host variables that has a optional and mandatory sub-domains',
+                array('/hello', array('opt1' => 'o1', 'opt2' => 'o2'), array(), array(), '{opt1}.{opt2}.{mand}.example.com'),
+                '/hello', '#^/hello$#s', array('opt1', 'opt2', 'mand'), array(), array(
+                    array('text', '/hello'),
+                ),
+                '#^(?:(?:(?P<opt1>[^\.]++)\.)?(?P<opt2>[^\.]++)\.)?(?P<mand>[^\.]++)\.example\.com$#s', array('opt1', 'opt2', 'mand'), array(
+                    array('variable', '.', '[^\.]++', 'opt1'),
+                    array('variable', '.', '[^\.]++', 'opt2'),
+                    array('variable', '.', '[^\.]++', 'mand'),
+                    array('text', 'example.com'),
+                ),
+            ),
+            array(
+                'Route with host that is optional variable',
+                array('/hello', array('host' => 'example.com'), array('host' => '.+'), array(), '{host}'),
+                '/hello', '#^/hello$#s', array('host'), array(), array(
+                    array('text', '/hello'),
+                ),
+                '#^(?P<host>.+)?$#s', array('host'), array(
+                    array('variable', '', '.+', 'host'),
+                ),
+            ),
+            array(
+                'Route with host that has partial optional sub-domain variable',
+                array('/', array('sub' => 'test'), array(), array(), '{sub}part.example.com'),
+                '/', '#^/$#s', array('sub'), array(), array(
+                    array('text', '/'),
+                ),
+                '#^(?:(?P<sub>[^\.]++))?part\.example\.com$#s', array('sub'), array(
+                    array('variable', '', '[^\.]++', 'sub'),
+                    array('text', 'part.example.com'),
                 ),
             ),
         );

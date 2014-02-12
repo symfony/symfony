@@ -18,7 +18,7 @@
 
 [37;41m                                       [0m
 [37;41m  [Exception]                          [0m
-[37;41m  First exception [0m[37;41m<p>this is html[0m[37;41m</p>  [0m
+[37;41m  First exception [0m[37;41m<p>[0m[37;41mthis is html[0m[37;41m</p>[0m[37;41m  [0m
 [37;41m                                       [0m
 
 

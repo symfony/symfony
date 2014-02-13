@@ -100,15 +100,15 @@ class Application extends BaseApplication
     {
         $container = $this->kernel->getContainer();
 
-        if ($container->hasParameter('console.command.ids')) {
-            foreach ($container->getParameter('console.command.ids') as $id) {
-                $this->add($container->get($id));
-            }
-        }
-
         foreach ($this->kernel->getBundles() as $bundle) {
             if ($bundle instanceof Bundle) {
                 $bundle->registerCommands($this);
+            }
+        }
+
+        if ($container->hasParameter('console.command.ids')) {
+            foreach ($container->getParameter('console.command.ids') as $id) {
+                $this->add($container->get($id));
             }
         }
     }

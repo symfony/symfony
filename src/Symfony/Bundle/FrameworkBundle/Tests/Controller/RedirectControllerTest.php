@@ -199,7 +199,36 @@ class RedirectControllerTest extends TestCase
         $this->assertRedirectUrl($returnValue, $expectedUrl);
     }
 
-    private function createRequestObject($scheme, $host, $port, $baseUrl)
+    public function pathQueryParamsProvider()
+    {
+        return array(
+            array('http://www.example.com/base/redirect-path', '/redirect-path',  ''),
+            array('http://www.example.com/base/redirect-path?foo=bar', '/redirect-path?foo=bar',  ''),
+            array('http://www.example.com/base/redirect-path?foo=bar', '/redirect-path', 'foo=bar'),
+            array('http://www.example.com/base/redirect-path?foo=bar&abc=example', '/redirect-path?foo=bar', 'abc=example'),
+            array('http://www.example.com/base/redirect-path?foo=bar&abc=example&baz=def', '/redirect-path?foo=bar', 'abc=example&baz=def'),
+        );
+    }
+
+    /**
+     * @dataProvider pathQueryParamsProvider
+     */
+    public function testPathQueryParams($expectedUrl, $path, $queryString)
+    {
+        $scheme = 'http';
+        $host = 'www.example.com';
+        $baseUrl = '/base';
+        $port = 80;
+
+        $request = $this->createRequestObject($scheme, $host, $port, $baseUrl, $queryString);
+
+        $controller = $this->createRedirectController();
+
+        $returnValue = $controller->urlRedirectAction($request, $path, false, $scheme, $port, null);
+        $this->assertRedirectUrl($returnValue, $expectedUrl);
+    }
+
+    private function createRequestObject($scheme, $host, $port, $baseUrl, $queryString = '')
     {
         $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
         $request
@@ -218,6 +247,10 @@ class RedirectControllerTest extends TestCase
             ->expects($this->any())
             ->method('getBaseUrl')
             ->will($this->returnValue($baseUrl));
+        $request
+            ->expects($this->any())
+            ->method('getQueryString')
+            ->will($this->returnValue($queryString));
 
         return $request;
     }

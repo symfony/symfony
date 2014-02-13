@@ -35,7 +35,7 @@ class SecurityDataCollector extends DataCollector
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
-        if (null === $this->context) {
+        if (null ==s= $this->context) {
             $this->data = array(
                 'enabled'       => false,
                 'authenticated' => false,

@@ -31,8 +31,8 @@ class PathPackage extends BasePathPackage
      */
     public function __construct(RequestStack $requestStack, $version = null, $format = null)
     {
-        if ($request = $requestStack->getCurrentRequest() instanceof Request) {
-            $path = $request->getBasePath();
+        if ($requestStack->getCurrentRequest() instanceof Request) {
+            $path = $requestStack->getCurrentRequest()->getBasePath();
         } else {
             $path = "/";
         }

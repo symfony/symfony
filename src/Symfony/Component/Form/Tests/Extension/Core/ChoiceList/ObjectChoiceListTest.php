@@ -154,6 +154,32 @@ class ObjectChoiceListTest extends AbstractChoiceListTest
         $this->assertEquals(array(0 => new ChoiceView($this->obj1, '10', 'A'), 3 => new ChoiceView($this->obj4, '40', 'D')), $this->list->getRemainingViews());
     }
 
+    public function testInitArrayWithClosure()
+    {
+        $this->obj1 = (object) array('name' => 'A', 'id' => 10);
+        $this->obj2 = (object) array('name' => 'B', 'id' => 20);
+        $this->obj3 = (object) array('name' => 'C', 'id' => 30);
+        $this->obj4 = (object) array('name' => 'D', 'id' => 40);
+
+        $prefix = '--> ';
+        $closure = function ($choice) use ($prefix) {
+            return $prefix.$choice->name.' ('.$choice->id.')';
+        };
+
+        $this->list = new ObjectChoiceList(
+            array($this->obj1, $this->obj2, $this->obj3, $this->obj4),
+            $closure,
+            array($this->obj2, $this->obj3),
+            null,
+            'id'
+        );
+
+        $this->assertSame(array($this->obj1, $this->obj2, $this->obj3, $this->obj4), $this->list->getChoices());
+        $this->assertSame(array('10', '20', '30', '40'), $this->list->getValues());
+        $this->assertEquals(array(1 => new ChoiceView($this->obj2, '20', '--> B (20)'), 2 => new ChoiceView($this->obj3, '30', '--> C (30)')), $this->list->getPreferredViews());
+        $this->assertEquals(array(0 => new ChoiceView($this->obj1, '10', '--> A (10)'), 3 => new ChoiceView($this->obj4, '40', '--> D (40)')), $this->list->getRemainingViews());
+    }
+
     public function testInitArrayUsesToString()
     {
         $this->obj1 = new ObjectChoiceListTest_EntityWithToString('A');

@@ -11,8 +11,9 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Templating\Asset;
 
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Templating\Asset\PathPackage as BasePathPackage;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * The path packages adds a version and a base path to asset URLs.
@@ -24,12 +25,18 @@ class PathPackage extends BasePathPackage
     /**
      * Constructor.
      *
-     * @param Request $request The current request
-     * @param string  $version The version
-     * @param string  $format  The version format
+     * @param Request $requestStack The current request
+     * @param string  $version      The version
+     * @param string  $format       The version format
      */
-    public function __construct(Request $request, $version = null, $format = null)
+    public function __construct(RequestStack $requestStack, $version = null, $format = null)
     {
-        parent::__construct($request->getBasePath(), $version, $format);
+        if ($request = $requestStack->getCurrentRequest() instanceof Request) {
+            $path = $request->getBasePath();
+        } else {
+            $path = "/";
+        }
+
+        parent::__construct($path, $version, $format);
     }
 }

@@ -44,7 +44,7 @@
         </service>
 
         <service id="templating.asset.path_package" class="%templating.asset.path_package.class%" abstract="true">
-            <argument type="service" id="request" />
+            <argument type="service" id="request_stack" />
             <argument /> <!-- version -->
             <argument /> <!-- version format -->
         </service>

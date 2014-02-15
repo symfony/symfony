@@ -75,6 +75,13 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('baz1', $bag->get('foo'), '->set() converts the key to lowercase');
         $this->assertEquals('baz1', $bag->get('FOO'), '->get() converts the key to lowercase');
 
+        $bag->set('array', array('foo' => array('bar' => 'yada')));
+        $this->assertEquals(array('foo' => array('bar' => 'yada')), $bag->get('array'), '->get() returns array');
+        $this->assertEquals('yada', $bag->get('array.foo.bar'), '->get() returns element requested by dot notation');
+
+        $bag->set('array', array('foo.bar' => 'yada'));
+        $this->assertEquals('yada', $bag->get('array.foo.bar'), '->get() returns element requested by dot notation');
+
         try {
             $bag->get('baba');
             $this->fail('->get() throws an Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException if the key does not exist');

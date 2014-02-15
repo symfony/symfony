@@ -88,25 +88,48 @@ class ParameterBag implements ParameterBagInterface
      */
     public function get($name)
     {
-        $name = strtolower($name);
+        $key = strtolower($name);
+        $arr = &$this->parameters;
 
-        if (!array_key_exists($name, $this->parameters)) {
-            if (!$name) {
+        if($key == '') {
+            if(!array_key_exists($key, $arr)) {
                 throw new ParameterNotFoundException($name);
             }
 
-            $alternatives = array();
-            foreach (array_keys($this->parameters) as $key) {
-                $lev = levenshtein($name, $key);
-                if ($lev <= strlen($name) / 3 || false !== strpos($key, $name)) {
-                    $alternatives[] = $key;
-                }
-            }
-
-            throw new ParameterNotFoundException($name, null, null, null, $alternatives);
+            return $arr[$key];
         }
 
-        return $this->parameters[$name];
+        while($key !== '') {
+            if(array_key_exists($key, $arr)) {
+                return $arr[$key];
+            }
+
+            if(strpos($key, '.') === false) {
+                break;
+            }
+
+            list($sub, $key) = explode('.', $key, 2);
+            if($key === null) {
+                return $arr;
+            }
+
+            if(!array_key_exists($sub, $arr)) {
+                break;
+            }
+
+            $arr = &$arr[$sub];
+        }
+
+        $alternatives = array();
+
+        foreach (array_keys($this->parameters) as $key) {
+            $lev = levenshtein($name, $key);
+            if ($lev <= strlen($name) / 3 || false !== strpos($key, $name)) {
+                $alternatives[] = $key;
+            }
+        }
+
+        throw new ParameterNotFoundException($name, null, null, null, $alternatives);
     }
 
     /**

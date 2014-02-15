@@ -100,20 +100,20 @@ class ParameterBag implements ParameterBagInterface
         }
 
         while($key !== '') {
-            if(array_key_exists($key, $arr)) {
+            if (array_key_exists($key, $arr)) {
                 return $arr[$key];
             }
 
-            if(strpos($key, '.') === false) {
+            if (strpos($key, '.') === false) {
                 break;
             }
 
             list($sub, $key) = explode('.', $key, 2);
-            if($key === null) {
+            if ($key === null) {
                 return $arr;
             }
 
-            if(!array_key_exists($sub, $arr)) {
+            if (!array_key_exists($sub, $arr)) {
                 break;
             }
 

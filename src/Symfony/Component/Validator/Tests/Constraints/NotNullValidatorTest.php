@@ -62,7 +62,7 @@ class NotNullValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->once())
             ->method('addViolation')
             ->with('myMessage', array(
-            ));
+            ), null, null, NotNull::ERROR);
 
         $this->validator->validate(null, $constraint);
     }

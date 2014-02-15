@@ -53,7 +53,7 @@ class NullValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolation')
             ->with('myMessage', array(
                 '{{ value }}' => $value,
-            ));
+            ), $value, null, Null::ERROR);
 
         $this->validator->validate($value, $constraint);
     }

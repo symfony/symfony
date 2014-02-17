@@ -22,6 +22,7 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
  */
 class FlattenException
 {
+    private $original;
     private $message;
     private $code;
     private $previous;
@@ -35,6 +36,7 @@ class FlattenException
     public static function create(\Exception $exception, $statusCode = null, array $headers = array())
     {
         $e = new static();
+        $e->setOriginal($exception);
         $e->setMessage($exception->getMessage());
         $e->setCode($exception->getCode());
 
@@ -237,6 +239,16 @@ class FlattenException
                 'args'        => isset($entry['args']) ? $this->flattenArgs($entry['args']) : array(),
             );
         }
+    }
+
+    public function getOriginal()
+    {
+      return $this->original;
+    }
+
+    protected function setOriginal(\Exception $exception)
+    {
+      $this->original = $exception;
     }
 
     private function flattenArgs($args, $level = 0)

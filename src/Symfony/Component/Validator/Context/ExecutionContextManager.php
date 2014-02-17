@@ -45,8 +45,7 @@ class ExecutionContextManager extends AbstractVisitor implements ExecutionContex
     public function __construct(GroupManagerInterface $groupManager)
     {
         $this->groupManager = $groupManager;
-
-        $this->reset();
+        $this->contextStack = new \SplStack();
     }
 
     public function initialize(ValidatorInterface $validator)
@@ -95,7 +94,7 @@ class ExecutionContextManager extends AbstractVisitor implements ExecutionContex
 
     public function afterTraversal(array $nodes)
     {
-        $this->reset();
+        $this->contextStack = new \SplStack();
     }
 
     public function enterNode(Node $node)
@@ -114,10 +113,5 @@ class ExecutionContextManager extends AbstractVisitor implements ExecutionContex
         }
 
         $this->currentContext->popNode();
-    }
-
-    private function reset()
-    {
-        $this->contextStack = new \SplStack();
     }
 }

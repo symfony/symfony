@@ -15,7 +15,6 @@ use Symfony\Component\Validator\ClassBasedInterface;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Group\GroupManagerInterface;
 use Symfony\Component\Validator\Mapping\PropertyMetadataInterface;
-use Symfony\Component\Validator\MetadataFactoryInterface;
 use Symfony\Component\Validator\Node\Node;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -40,11 +39,6 @@ class ExecutionContext implements ExecutionContextInterface
     private $nodeStack;
 
     /**
-     * @var MetadataFactoryInterface
-     */
-    private $metadataFactory;
-
-    /**
      * @var ValidatorInterface
      */
     private $validator;
@@ -54,9 +48,8 @@ class ExecutionContext implements ExecutionContextInterface
      */
     private $groupManager;
 
-    public function __construct(MetadataFactoryInterface $metadataFactory, ValidatorInterface $validator, GroupManagerInterface $groupManager)
+    public function __construct(ValidatorInterface $validator, GroupManagerInterface $groupManager)
     {
-        $this->metadataFactory = $metadataFactory;
         $this->validator = $validator;
         $this->groupManager = $groupManager;
         $this->violations = new ConstraintViolationList();
@@ -101,11 +94,6 @@ class ExecutionContext implements ExecutionContextInterface
     }
 
     public function buildViolation($message)
-    {
-
-    }
-
-    public function getMetadataFor($object)
     {
 
     }

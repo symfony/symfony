@@ -25,8 +25,6 @@ interface NodeTraverserInterface
 
     /**
      * @param Node[] $nodes
-     *
-     * @return mixed
      */
     public function traverse(array $nodes);
 }

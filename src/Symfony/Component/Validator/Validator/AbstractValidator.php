@@ -16,10 +16,10 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadataInterface;
 use Symfony\Component\Validator\Mapping\ValueMetadata;
 use Symfony\Component\Validator\MetadataFactoryInterface;
-use Symfony\Component\Validator\NodeTraverser\ClassNode;
+use Symfony\Component\Validator\Node\ClassNode;
+use Symfony\Component\Validator\Node\PropertyNode;
+use Symfony\Component\Validator\Node\ValueNode;
 use Symfony\Component\Validator\NodeTraverser\NodeTraverserInterface;
-use Symfony\Component\Validator\NodeTraverser\PropertyNode;
-use Symfony\Component\Validator\NodeTraverser\ValueNode;
 
 /**
  * @since  %%NextVersion%%
@@ -60,9 +60,14 @@ abstract class AbstractValidator implements ValidatorInterface
         return new ContextualValidator($this->nodeTraverser, $this->metadataFactory, $context);
     }
 
-    public function getMetadataFactory()
+    public function getMetadataFor($object)
     {
-        return $this->metadataFactory;
+        return $this->metadataFactory->getMetadataFor($object);
+    }
+
+    public function hasMetadataFor($object)
+    {
+        return $this->metadataFactory->hasMetadataFor($object);
     }
 
     protected function traverseObject($object, $groups = null)

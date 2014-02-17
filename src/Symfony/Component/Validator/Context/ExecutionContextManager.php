@@ -12,7 +12,6 @@
 namespace Symfony\Component\Validator\Context;
 
 use Symfony\Component\Validator\Group\GroupManagerInterface;
-use Symfony\Component\Validator\MetadataFactoryInterface;
 use Symfony\Component\Validator\Node\Node;
 use Symfony\Component\Validator\NodeTraverser\AbstractVisitor;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -23,11 +22,6 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 class ExecutionContextManager extends AbstractVisitor implements ExecutionContextManagerInterface
 {
-    /**
-     * @var MetadataFactoryInterface
-     */
-    private $metadataFactory;
-
     /**
      * @var GroupManagerInterface
      */
@@ -48,9 +42,8 @@ class ExecutionContextManager extends AbstractVisitor implements ExecutionContex
      */
     private $contextStack;
 
-    public function __construct(MetadataFactoryInterface $metadataFactory, GroupManagerInterface $groupManager)
+    public function __construct(GroupManagerInterface $groupManager)
     {
-        $this->metadataFactory = $metadataFactory;
         $this->groupManager = $groupManager;
 
         $this->reset();
@@ -67,7 +60,7 @@ class ExecutionContextManager extends AbstractVisitor implements ExecutionContex
             $this->contextStack->push($this->currentContext);
         }
 
-        $this->currentContext = new ExecutionContext($this->metadataFactory, $this->validator, $this->groupManager);
+        $this->currentContext = new ExecutionContext($this->validator, $this->groupManager);
 
         return $this->currentContext;
     }

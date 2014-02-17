@@ -85,4 +85,8 @@ interface ValidatorInterface
      * @return ContextualValidatorInterface
      */
     public function inContext(ExecutionContextInterface $context);
+
+    public function getMetadataFor($object);
+
+    public function hasMetadataFor($object);
 }

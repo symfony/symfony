@@ -88,8 +88,6 @@ interface ExecutionContextInterface
      */
     public function getMetadata();
 
-    public function getMetadataFor($object);
-
     /**
      * Returns the validation group that is currently being validated.
      *

@@ -26,7 +26,7 @@ use Symfony\Component\Validator\NodeTraverser\NodeTraverserInterface;
  */
 class NodeValidator extends AbstractVisitor implements GroupManagerInterface
 {
-    private $validatedNodes = array();
+    private $validatedObjects = array();
 
     /**
      * @var ConstraintValidatorFactoryInterface
@@ -45,25 +45,25 @@ class NodeValidator extends AbstractVisitor implements GroupManagerInterface
 
     private $currentGroup;
 
-    public function __construct(ConstraintValidatorFactoryInterface $validatorFactory, NodeTraverserInterface $nodeTraverser)
+    public function __construct(NodeTraverserInterface $nodeTraverser, ConstraintValidatorFactoryInterface $validatorFactory)
     {
         $this->validatorFactory = $validatorFactory;
         $this->nodeTraverser = $nodeTraverser;
     }
 
-    public function setContextManager(ExecutionContextManagerInterface $contextManager)
+    public function initialize(ExecutionContextManagerInterface $contextManager)
     {
         $this->contextManager = $contextManager;
     }
 
     public function afterTraversal(array $nodes)
     {
-        $this->validatedNodes = array();
+        $this->validatedObjects = array();
     }
 
     public function enterNode(Node $node)
     {
-        $cacheKey = $node instanceof ClassNode
+        $objectHash = $node instanceof ClassNode
             ? spl_object_hash($node->value)
             : null;
 
@@ -75,73 +75,38 @@ class NodeValidator extends AbstractVisitor implements GroupManagerInterface
 
         foreach ($node->groups as $group) {
             // Validate object nodes only once per group
-            if (null !== $cacheKey) {
+            if (null !== $objectHash) {
                 // Use the object hash for group sequences
-                $groupKey = is_object($group) ? spl_object_hash($group) : $group;
+                $groupHash = is_object($group) ? spl_object_hash($group) : $group;
 
                 // Exit, if the object is already validated for the current group
-                if (isset($this->validatedNodes[$cacheKey][$groupKey])) {
+                if (isset($this->validatedObjects[$objectHash][$groupHash])) {
                     return false;
                 }
 
                 // Remember validating this object before starting and possibly
                 // traversing the object graph
-                $this->validatedNodes[$cacheKey][$groupKey] = true;
+                $this->validatedObjects[$objectHash][$groupHash] = true;
             }
 
             // Validate group sequence until a violation is generated
-            if ($group instanceof GroupSequence) {
-                // Rename for clarity
-                $groupSequence = $group;
+            if (!$group instanceof GroupSequence) {
+                $this->validateNodeForGroup($node, $group);
 
-                // Only evaluate group sequences at class, not at property level
-                if (!$node instanceof ClassNode) {
-                    continue;
-                }
-
-                $context = $this->contextManager->getCurrentContext();
-                $violationCount = count($context->getViolations());
-
-                foreach ($groupSequence->groups as $groupInSequence) {
-                    $this->nodeTraverser->traverse(array(new ClassNode(
-                        $node->value,
-                        $node->metadata,
-                        $node->propertyPath,
-                        array($groupInSequence),
-                        array($groupSequence->cascadedGroup ?: $groupInSequence)
-                    )));
-
-                    // Abort sequence validation if a violation was generated
-                    if (count($context->getViolations()) > $violationCount) {
-                        break;
-                    }
-                }
-
-                // Optimization: If the groups only contain the group sequence,
-                // we can skip the traversal for the properties of the object
-                if (1 === count($node->groups)) {
-                    return false;
-                }
-
-                // We're done for the current loop execution.
                 continue;
             }
 
-            // Validate normal group (non group sequences)
-            try {
-                $this->currentGroup = $group;
+            // Only traverse group sequences at class, not at property level
+            if (!$node instanceof ClassNode) {
+                continue;
+            }
 
-                foreach ($node->metadata->findConstraints($group) as $constraint) {
-                    $validator = $this->validatorFactory->getInstance($constraint);
-                    $validator->initialize($this->contextManager->getCurrentContext());
-                    $validator->validate($node->value, $constraint);
-                }
+            $this->traverseGroupSequence($node, $group);
 
-                $this->currentGroup = null;
-            } catch (\Exception $e) {
-                $this->currentGroup = null;
-
-                throw $e;
+            // Optimization: If the groups only contain the group sequence,
+            // we can skip the traversal for the properties of the object
+            if (1 === count($node->groups)) {
+                return false;
             }
         }
 
@@ -151,5 +116,51 @@ class NodeValidator extends AbstractVisitor implements GroupManagerInterface
     public function getCurrentGroup()
     {
         return $this->currentGroup;
+    }
+
+    private function traverseGroupSequence(ClassNode $node, GroupSequence $groupSequence)
+    {
+        $context = $this->contextManager->getCurrentContext();
+        $violationCount = count($context->getViolations());
+
+        foreach ($groupSequence->groups as $groupInSequence) {
+            $this->nodeTraverser->traverse(array(new ClassNode(
+                $node->value,
+                $node->metadata,
+                $node->propertyPath,
+                array($groupInSequence),
+                array($groupSequence->cascadedGroup ?: $groupInSequence)
+            )));
+
+            // Abort sequence validation if a violation was generated
+            if (count($context->getViolations()) > $violationCount) {
+                break;
+            }
+        }
+    }
+
+    /**
+     * @param Node $node
+     * @param      $group
+     *
+     * @throws \Exception
+     */
+    private function validateNodeForGroup(Node $node, $group)
+    {
+        try {
+            $this->currentGroup = $group;
+
+            foreach ($node->metadata->findConstraints($group) as $constraint) {
+                $validator = $this->validatorFactory->getInstance($constraint);
+                $validator->initialize($this->contextManager->getCurrentContext());
+                $validator->validate($node->value, $constraint);
+            }
+
+            $this->currentGroup = null;
+        } catch (\Exception $e) {
+            $this->currentGroup = null;
+
+            throw $e;
+        }
     }
 }

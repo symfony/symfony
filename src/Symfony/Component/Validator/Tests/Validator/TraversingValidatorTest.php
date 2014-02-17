@@ -15,23 +15,27 @@ use Symfony\Component\Validator\Context\ExecutionContextManager;
 use Symfony\Component\Validator\MetadataFactoryInterface;
 use Symfony\Component\Validator\Tests\AbstractValidatorTest;
 use Symfony\Component\Validator\NodeTraverser\NodeTraverser;
-use Symfony\Component\Validator\NodeTraverser\NodeVisitor\NodeValidator;
 use Symfony\Component\Validator\DefaultTranslator;
 use Symfony\Component\Validator\ConstraintValidatorFactory;
+use Symfony\Component\Validator\Validator\NodeValidator;
 use Symfony\Component\Validator\Validator\Validator;
 
 class TraversingValidatorTest extends AbstractValidatorTest
 {
     protected function createValidator(MetadataFactoryInterface $metadataFactory)
     {
-        $validatorFactory = new ConstraintValidatorFactory();
         $nodeTraverser = new NodeTraverser($metadataFactory);
-        $nodeValidator = new NodeValidator($validatorFactory, $nodeTraverser);
-        $contextManager = new ExecutionContextManager($metadataFactory, $nodeValidator, new DefaultTranslator());
+        $nodeValidator = new NodeValidator($nodeTraverser, new ConstraintValidatorFactory());
+        $contextManager = new ExecutionContextManager($nodeValidator, new DefaultTranslator());
         $validator = new Validator($nodeTraverser, $metadataFactory, $contextManager);
 
+        // The context manager needs the validator for passing it to created
+        // contexts
         $contextManager->initialize($validator);
-        $nodeValidator->setContextManager($contextManager);
+
+        // The node validator needs the context manager for passing the current
+        // context to the constraint validators
+        $nodeValidator->initialize($contextManager);
 
         $nodeTraverser->addVisitor($contextManager);
         $nodeTraverser->addVisitor($nodeValidator);

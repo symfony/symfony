@@ -12,8 +12,10 @@
 namespace Symfony\Component\Validator\NodeTraverser;
 
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Context\ExecutionContextManagerInterface;
 use Symfony\Component\Validator\MetadataFactoryInterface;
+use Symfony\Component\Validator\Node\ClassNode;
+use Symfony\Component\Validator\Node\Node;
+use Symfony\Component\Validator\Node\PropertyNode;
 
 /**
  * @since  %%NextVersion%%

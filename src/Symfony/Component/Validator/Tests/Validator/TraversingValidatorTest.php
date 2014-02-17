@@ -11,13 +11,13 @@
 
 namespace Symfony\Component\Validator\Tests\Validator;
 
-use Symfony\Component\Validator\Context\ExecutionContextManager;
-use Symfony\Component\Validator\MetadataFactoryInterface;
-use Symfony\Component\Validator\Tests\AbstractValidatorTest;
-use Symfony\Component\Validator\NodeTraverser\NodeTraverser;
 use Symfony\Component\Validator\DefaultTranslator;
 use Symfony\Component\Validator\ConstraintValidatorFactory;
-use Symfony\Component\Validator\Validator\NodeValidator;
+use Symfony\Component\Validator\Context\ExecutionContextManager;
+use Symfony\Component\Validator\MetadataFactoryInterface;
+use Symfony\Component\Validator\NodeVisitor\NodeValidator;
+use Symfony\Component\Validator\NodeTraverser\NodeTraverser;
+use Symfony\Component\Validator\Tests\AbstractValidatorTest;
 use Symfony\Component\Validator\Validator\Validator;
 
 class TraversingValidatorTest extends AbstractValidatorTest

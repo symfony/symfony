@@ -13,7 +13,7 @@ namespace Symfony\Component\Validator\Context;
 
 use Symfony\Component\Validator\Group\GroupManagerInterface;
 use Symfony\Component\Validator\Node\Node;
-use Symfony\Component\Validator\NodeTraverser\AbstractVisitor;
+use Symfony\Component\Validator\NodeVisitor\AbstractVisitor;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**

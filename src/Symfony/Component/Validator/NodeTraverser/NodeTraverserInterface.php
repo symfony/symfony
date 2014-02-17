@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\NodeTraverser;
 
 use Symfony\Component\Validator\Node\Node;
+use Symfony\Component\Validator\NodeVisitor\NodeVisitorInterface;
 
 /**
  * @since  %%NextVersion%%

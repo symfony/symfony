@@ -16,6 +16,7 @@ use Symfony\Component\Validator\MetadataFactoryInterface;
 use Symfony\Component\Validator\Node\ClassNode;
 use Symfony\Component\Validator\Node\Node;
 use Symfony\Component\Validator\Node\PropertyNode;
+use Symfony\Component\Validator\NodeVisitor\NodeVisitorInterface;
 
 /**
  * @since  %%NextVersion%%

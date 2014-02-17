@@ -24,4 +24,9 @@ class LegacyValidator extends Validator implements LegacyValidatorInterface
         // TODO what about $traverse and $deep?
         return $this->validateObject($value, $groups);
     }
+
+    public function getMetadataFactory()
+    {
+        return $this->metadataFactory;
+    }
 }

@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Validator\Validator;
+namespace Symfony\Component\Validator\NodeVisitor;
 
 use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
@@ -17,7 +17,6 @@ use Symfony\Component\Validator\Context\ExecutionContextManagerInterface;
 use Symfony\Component\Validator\Group\GroupManagerInterface;
 use Symfony\Component\Validator\Node\ClassNode;
 use Symfony\Component\Validator\Node\Node;
-use Symfony\Component\Validator\NodeTraverser\AbstractVisitor;
 use Symfony\Component\Validator\NodeTraverser\NodeTraverserInterface;
 
 /**

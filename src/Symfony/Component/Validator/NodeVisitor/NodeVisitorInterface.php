@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Validator\NodeTraverser;
+namespace Symfony\Component\Validator\NodeVisitor;
 
 use Symfony\Component\Validator\Node\Node;
 
@@ -17,21 +17,13 @@ use Symfony\Component\Validator\Node\Node;
  * @since  %%NextVersion%%
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-abstract class AbstractVisitor implements NodeVisitorInterface
+interface NodeVisitorInterface
 {
-    public function beforeTraversal(array $nodes)
-    {
-    }
+    public function beforeTraversal(array $nodes);
 
-    public function afterTraversal(array $nodes)
-    {
-    }
+    public function afterTraversal(array $nodes);
 
-    public function enterNode(Node $node)
-    {
-    }
+    public function enterNode(Node $node);
 
-    public function leaveNode(Node $node)
-    {
-    }
+    public function leaveNode(Node $node);
 }

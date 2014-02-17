@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Traversable;
+
 /**
  * Annotation for group sequences
  *
@@ -27,6 +29,22 @@ class GroupSequence implements \ArrayAccess, \IteratorAggregate, \Countable
      * @var array
      */
     public $groups;
+
+    /**
+     * The group under which cascaded objects are validated when validating
+     * this sequence.
+     *
+     * By default, cascaded objects are validated in each of the groups of
+     * the sequence.
+     *
+     * If a class has a group sequence attached, that sequence replaces the
+     * "Default" group. When validating that class in the "Default" group, the
+     * group sequence is used instead, but still the "Default" group should be
+     * cascaded to other objects.
+     *
+     * @var string|GroupSequence
+     */
+    public $cascadedGroup;
 
     public function __construct(array $groups)
     {

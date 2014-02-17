@@ -17,6 +17,7 @@ use Symfony\Component\Validator\Context\ExecutionContextManagerInterface;
 use Symfony\Component\Validator\Group\GroupManagerInterface;
 use Symfony\Component\Validator\Node\ClassNode;
 use Symfony\Component\Validator\Node\Node;
+use Symfony\Component\Validator\Node\PropertyNode;
 use Symfony\Component\Validator\NodeTraverser\NodeTraverserInterface;
 
 /**
@@ -26,6 +27,8 @@ use Symfony\Component\Validator\NodeTraverser\NodeTraverserInterface;
 class NodeValidator extends AbstractVisitor implements GroupManagerInterface
 {
     private $validatedObjects = array();
+
+    private $validatedConstraints = array();
 
     /**
      * @var ConstraintValidatorFactoryInterface
@@ -44,10 +47,15 @@ class NodeValidator extends AbstractVisitor implements GroupManagerInterface
 
     private $currentGroup;
 
+    private $currentObjectHash;
+
+    private $objectHashStack;
+
     public function __construct(NodeTraverserInterface $nodeTraverser, ConstraintValidatorFactoryInterface $validatorFactory)
     {
         $this->validatorFactory = $validatorFactory;
         $this->nodeTraverser = $nodeTraverser;
+        $this->objectHashStack = new \SplStack();
     }
 
     public function initialize(ExecutionContextManagerInterface $contextManager)
@@ -58,13 +66,20 @@ class NodeValidator extends AbstractVisitor implements GroupManagerInterface
     public function afterTraversal(array $nodes)
     {
         $this->validatedObjects = array();
+        $this->validatedConstraints = array();
+        $this->objectHashStack = new \SplStack();
     }
 
     public function enterNode(Node $node)
     {
-        $objectHash = $node instanceof ClassNode
-            ? spl_object_hash($node->value)
-            : null;
+        if ($node instanceof ClassNode) {
+            $objectHash = spl_object_hash($node->value);
+            $this->objectHashStack->push($objectHash);
+        } elseif ($node instanceof PropertyNode) {
+            $objectHash = $this->objectHashStack->top();
+        } else {
+            $objectHash = null;
+        }
 
         // if group (=[<G1,G2>,G3,G4]) contains group sequence (=<G1,G2>)
         // then call traverse() with each entry of the group sequence and abort
@@ -72,25 +87,27 @@ class NodeValidator extends AbstractVisitor implements GroupManagerInterface
         // finally call traverse() with remaining entries ([G3,G4]) or
         // simply continue traversal (if possible)
 
-        foreach ($node->groups as $group) {
-            // Validate object nodes only once per group
-            if (null !== $objectHash) {
+        foreach ($node->groups as $key => $group) {
+            // Remember which object was validated for which group
+            // Skip validation if the object was already validated for this
+            // group
+            if ($node instanceof ClassNode) {
                 // Use the object hash for group sequences
                 $groupHash = is_object($group) ? spl_object_hash($group) : $group;
 
-                // Exit, if the object is already validated for the current group
                 if (isset($this->validatedObjects[$objectHash][$groupHash])) {
-                    return false;
+                    // Skip this group when validating properties
+                    unset($node->groups[$key]);
+
+                    continue;
                 }
 
-                // Remember validating this object before starting and possibly
-                // traversing the object graph
                 $this->validatedObjects[$objectHash][$groupHash] = true;
             }
 
-            // Validate group sequence until a violation is generated
+            // Validate normal group
             if (!$group instanceof GroupSequence) {
-                $this->validateNodeForGroup($node, $group);
+                $this->validateNodeForGroup($objectHash, $node, $group);
 
                 continue;
             }
@@ -100,6 +117,7 @@ class NodeValidator extends AbstractVisitor implements GroupManagerInterface
                 continue;
             }
 
+            // Traverse group sequence until a violation is generated
             $this->traverseGroupSequence($node, $group);
 
             // Optimization: If the groups only contain the group sequence,
@@ -139,17 +157,31 @@ class NodeValidator extends AbstractVisitor implements GroupManagerInterface
     }
 
     /**
+     * @param      $objectHash
      * @param Node $node
      * @param      $group
      *
      * @throws \Exception
      */
-    private function validateNodeForGroup(Node $node, $group)
+    private function validateNodeForGroup($objectHash, Node $node, $group)
     {
         try {
             $this->currentGroup = $group;
 
             foreach ($node->metadata->findConstraints($group) as $constraint) {
+                // Remember the validated constraints of each object to prevent
+                // duplicate validation of constraints that belong to multiple
+                // validated groups
+                if (null !== $objectHash) {
+                    $constraintHash = spl_object_hash($constraint);
+
+                    if (isset($this->validatedConstraints[$objectHash][$constraintHash])) {
+                        continue;
+                    }
+
+                    $this->validatedConstraints[$objectHash][$constraintHash] = true;
+                }
+
                 $validator = $this->validatorFactory->getInstance($constraint);
                 $validator->initialize($this->contextManager->getCurrentContext());
                 $validator->validate($node->value, $constraint);

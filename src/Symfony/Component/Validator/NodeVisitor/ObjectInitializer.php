@@ -39,10 +39,12 @@ class ObjectInitializer extends AbstractVisitor
 
     public function enterNode(Node $node)
     {
-        if ($node instanceof ClassNode) {
-            foreach ($this->initializers as $initializer) {
-                $initializer->initialize($node->value);
-            }
+        if (!$node instanceof ClassNode) {
+            return;
+        }
+
+        foreach ($this->initializers as $initializer) {
+            $initializer->initialize($node->value);
         }
     }
 }

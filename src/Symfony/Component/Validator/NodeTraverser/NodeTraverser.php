@@ -116,27 +116,6 @@ class NodeTraverser implements NodeTraverserInterface
 
     private function traverseClassNode(ClassNode $node)
     {
-        // Replace "Default" group by the group sequence attached to the class
-        // (if any)
-        foreach ($node->groups as $key => $group) {
-            if (Constraint::DEFAULT_GROUP !== $group) {
-                continue;
-            }
-
-            if ($node->metadata->hasGroupSequence()) {
-                $node->groups[$key] = $node->metadata->getGroupSequence();
-            } elseif ($node->metadata->isGroupSequenceProvider()) {
-                /** @var \Symfony\Component\Validator\GroupSequenceProviderInterface $value */
-                $node->groups[$key] = $value->getGroupSequence();
-            }
-
-            // Cascade the "Default" group when validating the sequence
-            $node->groups[$key]->cascadedGroup = Constraint::DEFAULT_GROUP;
-
-            // "Default" group found, abort
-            break;
-        }
-
         $stopTraversal = false;
 
         foreach ($this->visitors as $visitor) {
@@ -147,7 +126,7 @@ class NodeTraverser implements NodeTraverserInterface
 
         // Stop the traversal, but execute the leaveNode() methods anyway to
         // perform possible cleanups
-        if (!$stopTraversal) {
+        if (!$stopTraversal && count($node->groups) > 0) {
             foreach ($node->metadata->getConstrainedProperties() as $propertyName) {
                 foreach ($node->metadata->getPropertyMetadata($propertyName) as $propertyMetadata) {
                     $this->traverseNode(new PropertyNode(

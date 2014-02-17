@@ -115,14 +115,14 @@ class ExecutionContext implements ExecutionContextInterface
     /**
      * {@inheritdoc}
      */
-    public function addViolationAt($subPath, $message, array $params = array(), $invalidValue = null, $pluralization = null, $code = null)
+    public function addViolationAt($subPath, $message, array $parameters = array(), $invalidValue = null, $pluralization = null, $code = null)
     {
         $this->globalContext->getViolations()->add(new ConstraintViolation(
             null === $pluralization
-                ? $this->translator->trans($message, $params, $this->translationDomain)
-                : $this->translator->transChoice($message, $pluralization, $params, $this->translationDomain),
+                ? $this->translator->trans($message, $parameters, $this->translationDomain)
+                : $this->translator->transChoice($message, $pluralization, $parameters, $this->translationDomain),
             $message,
-            $params,
+            $parameters,
             $this->globalContext->getRoot(),
             $this->getPropertyPath($subPath),
             // check using func_num_args() to allow passing null values

@@ -104,14 +104,14 @@ interface ExecutionContextInterface
      *
      * @param string       $subPath       The relative property path for the violation.
      * @param string       $message       The error message.
-     * @param array        $params        The parameters substituted in the error message.
+     * @param array        $parameters    The parameters substituted in the error message.
      * @param mixed        $invalidValue  The invalid, validated value.
      * @param integer|null $pluralization The number to use to pluralize of the message.
      * @param integer|null $code          The violation code.
      *
      * @api
      */
-    public function addViolationAt($subPath, $message, array $params = array(), $invalidValue = null, $pluralization = null, $code = null);
+    public function addViolationAt($subPath, $message, array $parameters = array(), $invalidValue = null, $pluralization = null, $code = null);
 
     /**
      * Validates the given value within the scope of the current validation.

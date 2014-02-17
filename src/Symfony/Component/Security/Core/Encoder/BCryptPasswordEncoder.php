@@ -29,6 +29,7 @@ class BCryptPasswordEncoder extends BasePasswordEncoder
      *
      * @param integer $cost The algorithmic cost that should be used
      *
+     * @throws \RuntimeException If function does not exist
      * @throws \InvalidArgumentException if cost is out of range
      */
     public function __construct($cost)

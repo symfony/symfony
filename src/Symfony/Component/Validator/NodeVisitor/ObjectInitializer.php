@@ -30,8 +30,13 @@ class ObjectInitializer extends AbstractVisitor
     {
         foreach ($initializers as $initializer) {
             if (!$initializer instanceof ObjectInitializerInterface) {
-                throw new \LogicException('Validator initializers must implement ObjectInitializerInterface.');
+                throw new \InvalidArgumentException('Validator initializers must implement ObjectInitializerInterface.');
             }
+        }
+
+        // If no initializer is present, this visitor should not even be created
+        if (0 === count($initializers)) {
+            throw new \InvalidArgumentException('Please pass at least one initializer.');
         }
 
         $this->initializers = $initializers;

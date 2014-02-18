@@ -1156,6 +1156,10 @@ class Process
             return self::$sigchild;
         }
 
+        if (!function_exists('phpinfo')) {
+            return self::$sigchild = false;
+        }
+
         ob_start();
         phpinfo(INFO_GENERAL);
 

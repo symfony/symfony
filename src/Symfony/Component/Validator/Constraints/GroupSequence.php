@@ -94,12 +94,12 @@ class GroupSequence implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * Returns an iterator for this group.
      *
-     * @return Traversable The iterator
+     * @return \Traversable The iterator
      *
      * @see \IteratorAggregate::getIterator()
      *
-     * @deprecated Implemented for backwards compatibility. To be removed in
-     *             Symfony 3.0.
+     * @deprecated Implemented for backwards compatibility with Symfony < 2.5.
+     *             To be removed in 3.0.
      */
     public function getIterator()
     {
@@ -113,8 +113,8 @@ class GroupSequence implements \ArrayAccess, \IteratorAggregate, \Countable
      *
      * @return Boolean Whether the offset exists
      *
-     * @deprecated Implemented for backwards compatibility. To be removed in
-     *             Symfony 3.0.
+     * @deprecated Implemented for backwards compatibility with Symfony < 2.5.
+     *             To be removed in 3.0.
      */
     public function offsetExists($offset)
     {
@@ -130,8 +130,8 @@ class GroupSequence implements \ArrayAccess, \IteratorAggregate, \Countable
      *
      * @throws OutOfBoundsException If the object does not exist
      *
-     * @deprecated Implemented for backwards compatibility. To be removed in
-     *             Symfony 3.0.
+     * @deprecated Implemented for backwards compatibility with Symfony < 2.5.
+     *             To be removed in 3.0.
      */
     public function offsetGet($offset)
     {
@@ -151,8 +151,8 @@ class GroupSequence implements \ArrayAccess, \IteratorAggregate, \Countable
      * @param integer $offset The offset
      * @param string  $value  The group name
      *
-     * @deprecated Implemented for backwards compatibility. To be removed in
-     *             Symfony 3.0.
+     * @deprecated Implemented for backwards compatibility with Symfony < 2.5.
+     *             To be removed in 3.0.
      */
     public function offsetSet($offset, $value)
     {
@@ -170,8 +170,8 @@ class GroupSequence implements \ArrayAccess, \IteratorAggregate, \Countable
      *
      * @param integer $offset The offset
      *
-     * @deprecated Implemented for backwards compatibility. To be removed in
-     *             Symfony 3.0.
+     * @deprecated Implemented for backwards compatibility with Symfony < 2.5.
+     *             To be removed in 3.0.
      */
     public function offsetUnset($offset)
     {
@@ -183,8 +183,8 @@ class GroupSequence implements \ArrayAccess, \IteratorAggregate, \Countable
      *
      * @return integer The number of groups
      *
-     * @deprecated Implemented for backwards compatibility. To be removed in
-     *             Symfony 3.0.
+     * @deprecated Implemented for backwards compatibility with Symfony < 2.5.
+     *             To be removed in 3.0.
      */
     public function count()
     {

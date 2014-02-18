@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\NodeVisitor;
 
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\Node\ClassNode;
 use Symfony\Component\Validator\Node\Node;
 
@@ -31,7 +32,11 @@ class GroupSequenceResolver extends AbstractVisitor
             $groupSequence = $node->metadata->getGroupSequence();
         } elseif ($node->metadata->isGroupSequenceProvider()) {
             /** @var \Symfony\Component\Validator\GroupSequenceProviderInterface $value */
-            $groupSequence = $value->getGroupSequence();
+            $groupSequence = $node->value->getGroupSequence();
+
+            if (!$groupSequence instanceof GroupSequence) {
+                $groupSequence = new GroupSequence($groupSequence);
+            }
         } else {
             return;
         }
@@ -43,7 +48,7 @@ class GroupSequenceResolver extends AbstractVisitor
             $node->groups[$key] = $groupSequence;
 
             // Cascade the "Default" group when validating the sequence
-            $node->groups[$key]->cascadedGroup = Constraint::DEFAULT_GROUP;
+            $groupSequence->cascadedGroup = Constraint::DEFAULT_GROUP;
         }
     }
 }

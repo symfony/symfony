@@ -15,19 +15,20 @@ use Symfony\Component\Validator\DefaultTranslator;
 use Symfony\Component\Validator\ConstraintValidatorFactory;
 use Symfony\Component\Validator\Context\ExecutionContextManager;
 use Symfony\Component\Validator\MetadataFactoryInterface;
+use Symfony\Component\Validator\NodeVisitor\GroupSequenceResolver;
 use Symfony\Component\Validator\NodeVisitor\NodeValidator;
 use Symfony\Component\Validator\NodeTraverser\NodeTraverser;
-use Symfony\Component\Validator\Tests\AbstractValidatorTest;
-use Symfony\Component\Validator\Validator\Validator;
+use Symfony\Component\Validator\Validator\LegacyValidator;
 
-class TraversingValidatorTest extends AbstractValidatorTest
+class ValidatorTest extends AbstractValidatorTest
 {
     protected function createValidator(MetadataFactoryInterface $metadataFactory)
     {
         $nodeTraverser = new NodeTraverser($metadataFactory);
         $nodeValidator = new NodeValidator($nodeTraverser, new ConstraintValidatorFactory());
         $contextManager = new ExecutionContextManager($nodeValidator, new DefaultTranslator());
-        $validator = new Validator($nodeTraverser, $metadataFactory, $contextManager);
+        $validator = new LegacyValidator($nodeTraverser, $metadataFactory, $contextManager);
+        $groupSequenceResolver = new GroupSequenceResolver();
 
         // The context manager needs the validator for passing it to created
         // contexts
@@ -37,6 +38,7 @@ class TraversingValidatorTest extends AbstractValidatorTest
         // context to the constraint validators
         $nodeValidator->initialize($contextManager);
 
+        $nodeTraverser->addVisitor($groupSequenceResolver);
         $nodeTraverser->addVisitor($contextManager);
         $nodeTraverser->addVisitor($nodeValidator);
 

@@ -35,7 +35,7 @@ class Validator extends AbstractValidator
 
     public function validateObject($object, $groups = null)
     {
-        $this->contextManager->startContext();
+        $this->contextManager->startContext($object);
 
         $this->traverseObject($object, $groups);
 
@@ -44,7 +44,7 @@ class Validator extends AbstractValidator
 
     public function validateProperty($object, $propertyName, $groups = null)
     {
-        $this->contextManager->startContext();
+        $this->contextManager->startContext($object);
 
         $this->traverseProperty($object, $propertyName, $groups);
 
@@ -53,7 +53,7 @@ class Validator extends AbstractValidator
 
     public function validatePropertyValue($object, $propertyName, $value, $groups = null)
     {
-        $this->contextManager->startContext();
+        $this->contextManager->startContext($object);
 
         $this->traversePropertyValue($object, $propertyName, $value, $groups);
 
@@ -62,7 +62,7 @@ class Validator extends AbstractValidator
 
     public function validateValue($value, $constraints, $groups = null)
     {
-        $this->contextManager->startContext();
+        $this->contextManager->startContext($value);
 
         $this->traverseValue($value, $constraints, $groups);
 

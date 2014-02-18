@@ -13,7 +13,7 @@ namespace Symfony\Component\Validator\Mapping;
 
 use Symfony\Component\Validator\Constraint;
 
-abstract class ElementMetadata
+abstract class ElementMetadata implements MetadataInterface
 {
     /**
      * @var Constraint[]

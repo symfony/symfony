@@ -24,13 +24,14 @@ class PropertyNode extends Node
      */
     public $metadata;
 
-    public function __construct($value, PropertyMetadataInterface $metadata, $propertyPath, array $groups)
+    public function __construct($value, PropertyMetadataInterface $metadata, $propertyPath, array $groups, array $cascadedGroups)
     {
         parent::__construct(
             $value,
             $metadata,
             $propertyPath,
-            $groups
+            $groups,
+            $cascadedGroups
         );
     }
 

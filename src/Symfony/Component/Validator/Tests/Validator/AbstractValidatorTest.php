@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Validator\Tests;
+namespace Symfony\Component\Validator\Tests\Validator;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Callback;
@@ -788,7 +788,6 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
             $test->assertNull($context->getPropertyName());
             $test->assertSame('', $context->getPropertyPath());
             $test->assertSame('Group', $context->getGroup());
-            $test->assertNull($context->getMetadata());
             $test->assertSame($test->metadataFactory, $context->getMetadataFactory());
             $test->assertSame('Bernhard', $context->getRoot());
             $test->assertSame('Bernhard', $context->getValue());
@@ -942,8 +941,6 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testNoDuplicateValidationIfConstraintInMultipleGroups()
     {
-        $this->markTestSkipped('Currently not supported');
-
         $entity = new Entity();
 
         $callback = function ($value, ExecutionContextInterface $context) {
@@ -963,8 +960,6 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testGroupSequenceAbortsAfterFailedGroup()
     {
-        $this->markTestSkipped('Currently not supported');
-
         $entity = new Entity();
 
         $callback1 = function ($value, ExecutionContextInterface $context) {
@@ -997,8 +992,6 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testGroupSequenceIncludesReferences()
     {
-        $this->markTestSkipped('Currently not supported');
-
         $entity = new Entity();
         $entity->reference = new Reference();
 

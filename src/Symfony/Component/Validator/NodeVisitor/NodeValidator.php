@@ -75,7 +75,7 @@ class NodeValidator extends AbstractVisitor implements GroupManagerInterface
         if ($node instanceof ClassNode) {
             $objectHash = spl_object_hash($node->value);
             $this->objectHashStack->push($objectHash);
-        } elseif ($node instanceof PropertyNode) {
+        } elseif ($node instanceof PropertyNode && count($this->objectHashStack) > 0) {
             $objectHash = $this->objectHashStack->top();
         } else {
             $objectHash = null;
@@ -112,10 +112,8 @@ class NodeValidator extends AbstractVisitor implements GroupManagerInterface
                 continue;
             }
 
-            // Only traverse group sequences at class, not at property level
-            if (!$node instanceof ClassNode) {
-                continue;
-            }
+            // Skip the group sequence when validating properties
+            unset($node->groups[$key]);
 
             // Traverse group sequence until a violation is generated
             $this->traverseGroupSequence($node, $group);
@@ -130,24 +128,29 @@ class NodeValidator extends AbstractVisitor implements GroupManagerInterface
         return true;
     }
 
+    public function leaveNode(Node $node)
+    {
+        if ($node instanceof ClassNode) {
+            $this->objectHashStack->pop();
+        }
+    }
+
     public function getCurrentGroup()
     {
         return $this->currentGroup;
     }
 
-    private function traverseGroupSequence(ClassNode $node, GroupSequence $groupSequence)
+    private function traverseGroupSequence(Node $node, GroupSequence $groupSequence)
     {
         $context = $this->contextManager->getCurrentContext();
         $violationCount = count($context->getViolations());
 
         foreach ($groupSequence->groups as $groupInSequence) {
-            $this->nodeTraverser->traverse(array(new ClassNode(
-                $node->value,
-                $node->metadata,
-                $node->propertyPath,
-                array($groupInSequence),
-                array($groupSequence->cascadedGroup ?: $groupInSequence)
-            )));
+            $node = clone $node;
+            $node->groups = array($groupInSequence);
+            $node->cascadedGroups = array($groupSequence->cascadedGroup ?: $groupInSequence);
+
+            $this->nodeTraverser->traverse(array($node));
 
             // Abort sequence validation if a violation was generated
             if (count($context->getViolations()) > $violationCount) {

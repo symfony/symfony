@@ -11,12 +11,16 @@
 
 namespace Symfony\Component\Validator\Context;
 
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\ClassBasedInterface;
+use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Group\GroupManagerInterface;
 use Symfony\Component\Validator\Mapping\PropertyMetadataInterface;
 use Symfony\Component\Validator\Node\Node;
+use Symfony\Component\Validator\Util\PropertyPath;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Validator\Violation\ConstraintViolationBuilder;
 
 /**
  * @since  %%NextVersion%%
@@ -48,18 +52,30 @@ class ExecutionContext implements ExecutionContextInterface
      */
     private $groupManager;
 
-    public function __construct(ValidatorInterface $validator, GroupManagerInterface $groupManager)
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @var string
+     */
+    private $translationDomain;
+
+    public function __construct($root, ValidatorInterface $validator, GroupManagerInterface $groupManager, TranslatorInterface $translator, $translationDomain = null)
     {
+        $this->root = $root;
         $this->validator = $validator;
         $this->groupManager = $groupManager;
+        $this->translator = $translator;
+        $this->translationDomain = $translationDomain;
         $this->violations = new ConstraintViolationList();
+        $this->nodeStack = new \SplStack();
     }
 
     public function pushNode(Node $node)
     {
-        if (null === $this->node) {
-            $this->root = $node->value;
-        } else {
+        if (null !== $this->node) {
             $this->nodeStack->push($this->node);
         }
 
@@ -89,13 +105,32 @@ class ExecutionContext implements ExecutionContextInterface
         return $poppedNode;
     }
 
-    public function addViolation($message, array $params = array(), $invalidValue = null, $pluralization = null, $code = null)
+    public function addViolation($message, array $parameters = array())
     {
+        $this->violations->add(new ConstraintViolation(
+            $this->translator->trans($message, $parameters, $this->translationDomain),
+            $message,
+            $parameters,
+            $this->root,
+            $this->getPropertyPath(),
+            $this->getValue(),
+            null,
+            null
+        ));
     }
 
-    public function buildViolation($message)
+    public function buildViolation($message, array $parameters = array())
     {
-
+        return new ConstraintViolationBuilder(
+            $this->violations,
+            $message,
+            $parameters,
+            $this->root,
+            $this->getPropertyPath(),
+            $this->getValue(),
+            $this->translator,
+            $this->translationDomain
+        );
     }
 
     public function getViolations()
@@ -141,15 +176,7 @@ class ExecutionContext implements ExecutionContextInterface
     {
         $propertyPath = $this->node ? $this->node->propertyPath : '';
 
-        if (strlen($subPath) > 0) {
-            if ('[' === $subPath{1}) {
-                return $propertyPath.$subPath;
-            }
-
-            return $propertyPath ? $propertyPath.'.'.$subPath : $subPath;
-        }
-
-        return $propertyPath;
+        return PropertyPath::append($propertyPath, $subPath);
     }
 
     /**

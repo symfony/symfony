@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Context;
 
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Group\GroupManagerInterface;
 use Symfony\Component\Validator\Node\Node;
 use Symfony\Component\Validator\NodeVisitor\AbstractVisitor;
@@ -42,9 +43,21 @@ class ExecutionContextManager extends AbstractVisitor implements ExecutionContex
      */
     private $contextStack;
 
-    public function __construct(GroupManagerInterface $groupManager)
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @var string|null
+     */
+    private $translationDomain;
+
+    public function __construct(GroupManagerInterface $groupManager, TranslatorInterface $translator, $translationDomain = null)
     {
         $this->groupManager = $groupManager;
+        $this->translator = $translator;
+        $this->translationDomain = $translationDomain;
         $this->contextStack = new \SplStack();
     }
 
@@ -53,13 +66,23 @@ class ExecutionContextManager extends AbstractVisitor implements ExecutionContex
         $this->validator = $validator;
     }
 
-    public function startContext()
+    public function startContext($root)
     {
+        if (null === $this->validator) {
+            // TODO error, call initialize() first
+        }
+
         if (null !== $this->currentContext) {
             $this->contextStack->push($this->currentContext);
         }
 
-        $this->currentContext = new ExecutionContext($this->validator, $this->groupManager);
+        $this->currentContext = new LegacyExecutionContext(
+            $root,
+            $this->validator,
+            $this->groupManager,
+            $this->translator,
+            $this->translationDomain
+        );
 
         return $this->currentContext;
     }
@@ -100,7 +123,7 @@ class ExecutionContextManager extends AbstractVisitor implements ExecutionContex
     public function enterNode(Node $node)
     {
         if (null === $this->currentContext) {
-            // error no context started
+            // TODO error call startContext() first
         }
 
         $this->currentContext->pushNode($node);

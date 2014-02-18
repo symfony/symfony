@@ -27,11 +27,14 @@ abstract class Node
 
     public $groups;
 
-    public function __construct($value, MetadataInterface $metadata, $propertyPath, array $groups)
+    public $cascadedGroups;
+
+    public function __construct($value, MetadataInterface $metadata, $propertyPath, array $groups, array $cascadedGroups)
     {
         $this->value = $value;
         $this->metadata = $metadata;
         $this->propertyPath = $propertyPath;
         $this->groups = $groups;
+        $this->cascadedGroups = $cascadedGroups;
     }
 }

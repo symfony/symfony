@@ -26,7 +26,7 @@ use Symfony\Component\Validator\Exception\GroupDefinitionException;
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassBasedInterface, PropertyMetadataContainerInterface
+class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassBasedInterface, PropertyMetadataContainerInterface, ClassMetadataInterface
 {
     /**
      * @var string
@@ -62,6 +62,8 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
      * @var Boolean
      */
     public $groupSequenceProvider = false;
+
+    public $traversalStrategy = TraversalStrategy::IMPLICIT;
 
     /**
      * @var \ReflectionClass
@@ -422,5 +424,20 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
     public function isGroupSequenceProvider()
     {
         return $this->groupSequenceProvider;
+    }
+
+    /**
+     * Class nodes are never cascaded.
+     *
+     * @return Boolean Always returns false.
+     */
+    public function getCascadingStrategy()
+    {
+        return CascadingStrategy::NONE;
+    }
+
+    public function getTraversalStrategy()
+    {
+        return $this->traversalStrategy;
     }
 }

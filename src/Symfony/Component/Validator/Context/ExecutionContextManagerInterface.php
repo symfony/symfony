@@ -18,9 +18,11 @@ namespace Symfony\Component\Validator\Context;
 interface ExecutionContextManagerInterface
 {
     /**
+     * @param mixed $root
+     *
      * @return ExecutionContextInterface The started context
      */
-    public function startContext();
+    public function startContext($root);
 
     /**
      * @return ExecutionContextInterface The stopped context

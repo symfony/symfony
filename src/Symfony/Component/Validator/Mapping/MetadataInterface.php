@@ -53,5 +53,7 @@ interface MetadataInterface
      */
     public function findConstraints($group);
 
-    public function supportsCascading();
+    public function getCascadingStrategy();
+
+    public function getTraversalStrategy();
 }

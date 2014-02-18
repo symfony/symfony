@@ -12,20 +12,18 @@
 namespace Symfony\Component\Validator\Mapping;
 
 use Symfony\Component\Validator\ValidationVisitorInterface;
-use Symfony\Component\Validator\ClassBasedInterface;
-use Symfony\Component\Validator\PropertyMetadataInterface;
+use Symfony\Component\Validator\PropertyMetadataInterface as LegacyPropertyMetadataInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
-abstract class MemberMetadata extends ElementMetadata implements PropertyMetadataInterface, ClassBasedInterface
+abstract class MemberMetadata extends ElementMetadata implements PropertyMetadataInterface, LegacyPropertyMetadataInterface
 {
     public $class;
     public $name;
     public $property;
-    public $cascaded = false;
-    public $collectionCascaded = false;
-    public $collectionCascadedDeeply = false;
+    public $cascadingStrategy = CascadingStrategy::NONE;
+    public $traversalStrategy = TraversalStrategy::IMPLICIT;
     private $reflMember = array();
 
     /**
@@ -64,10 +62,15 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
         }
 
         if ($constraint instanceof Valid) {
-            $this->cascaded = true;
-            /* @var Valid $constraint */
-            $this->collectionCascaded = $constraint->traverse;
-            $this->collectionCascadedDeeply = $constraint->deep;
+            $this->cascadingStrategy = CascadingStrategy::CASCADE;
+
+            if ($constraint->traverse) {
+                $this->traversalStrategy = TraversalStrategy::TRAVERSE;
+            }
+
+            if ($constraint->deep) {
+                $this->traversalStrategy |= TraversalStrategy::RECURSIVE;
+            }
         } else {
             parent::addConstraint($constraint);
         }
@@ -86,9 +89,8 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
             'class',
             'name',
             'property',
-            'cascaded',
-            'collectionCascaded',
-            'collectionCascadedDeeply',
+            'cascadingStrategy',
+            'traversalStrategy',
         ));
     }
 
@@ -158,6 +160,16 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
         return $this->getReflectionMember($objectOrClassName)->isPrivate();
     }
 
+    public function getCascadingStrategy()
+    {
+        return $this->cascadingStrategy;
+    }
+
+    public function getTraversalStrategy()
+    {
+        return $this->traversalStrategy;
+    }
+
     /**
      * Returns whether objects stored in this member should be validated
      *
@@ -165,7 +177,7 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
      */
     public function isCascaded()
     {
-        return $this->cascaded;
+        return $this->cascadingStrategy & CascadingStrategy::CASCADE;
     }
 
     /**
@@ -176,7 +188,7 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
      */
     public function isCollectionCascaded()
     {
-        return $this->collectionCascaded;
+        return $this->traversalStrategy & TraversalStrategy::TRAVERSE;
     }
 
     /**
@@ -187,7 +199,7 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
      */
     public function isCollectionCascadedDeeply()
     {
-        return $this->collectionCascadedDeeply;
+        return $this->traversalStrategy & TraversalStrategy::RECURSIVE;
     }
 
     /**

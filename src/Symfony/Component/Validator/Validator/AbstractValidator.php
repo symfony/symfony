@@ -13,6 +13,8 @@ namespace Symfony\Component\Validator\Validator;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
+use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Mapping\ClassMetadataInterface;
 use Symfony\Component\Validator\Mapping\ValueMetadata;
 use Symfony\Component\Validator\MetadataFactoryInterface;
@@ -20,6 +22,7 @@ use Symfony\Component\Validator\Node\ClassNode;
 use Symfony\Component\Validator\Node\PropertyNode;
 use Symfony\Component\Validator\Node\ValueNode;
 use Symfony\Component\Validator\NodeTraverser\NodeTraverserInterface;
+use Symfony\Component\Validator\Util\PropertyPath;
 
 /**
  * @since  %%NextVersion%%
@@ -75,15 +78,22 @@ abstract class AbstractValidator implements ValidatorInterface
         $classMetadata = $this->metadataFactory->getMetadataFor($object);
 
         if (!$classMetadata instanceof ClassMetadataInterface) {
-            // error
+            throw new ValidatorException(sprintf(
+                'The metadata factory should return instances of '.
+                '"\Symfony\Component\Validator\Mapping\ClassMetadataInterface", '.
+                'got: "%s".',
+                is_object($classMetadata) ? get_class($classMetadata) : gettype($classMetadata)
+            ));
         }
+
+        $groups = $groups ? $this->normalizeGroups($groups) : $this->defaultGroups;
 
         $this->nodeTraverser->traverse(array(new ClassNode(
             $object,
             $classMetadata,
             $this->defaultPropertyPath,
-            // TODO use cascade group here
-            $groups ? $this->normalizeGroups($groups) : $this->defaultGroups
+            $groups,
+            $groups
         )));
     }
 
@@ -92,7 +102,12 @@ abstract class AbstractValidator implements ValidatorInterface
         $classMetadata = $this->metadataFactory->getMetadataFor($object);
 
         if (!$classMetadata instanceof ClassMetadataInterface) {
-            // error
+            throw new ValidatorException(sprintf(
+                'The metadata factory should return instances of '.
+                '"\Symfony\Component\Validator\Mapping\ClassMetadataInterface", '.
+                'got: "%s".',
+                is_object($classMetadata) ? get_class($classMetadata) : gettype($classMetadata)
+            ));
         }
 
         $propertyMetadatas = $classMetadata->getPropertyMetadata($propertyName);
@@ -105,7 +120,8 @@ abstract class AbstractValidator implements ValidatorInterface
             $nodes[] = new PropertyNode(
                 $propertyValue,
                 $propertyMetadata,
-                $this->defaultPropertyPath,
+                PropertyPath::append($this->defaultPropertyPath, $propertyName),
+                $groups,
                 $groups
             );
         }
@@ -118,7 +134,12 @@ abstract class AbstractValidator implements ValidatorInterface
         $classMetadata = $this->metadataFactory->getMetadataFor($object);
 
         if (!$classMetadata instanceof ClassMetadataInterface) {
-            // error
+            throw new ValidatorException(sprintf(
+                'The metadata factory should return instances of '.
+                '"\Symfony\Component\Validator\Mapping\ClassMetadataInterface", '.
+                'got: "%s".',
+                is_object($classMetadata) ? get_class($classMetadata) : gettype($classMetadata)
+            ));
         }
 
         $propertyMetadatas = $classMetadata->getPropertyMetadata($propertyName);
@@ -129,7 +150,8 @@ abstract class AbstractValidator implements ValidatorInterface
             $nodes[] = new PropertyNode(
                 $value,
                 $propertyMetadata,
-                $this->defaultPropertyPath,
+                PropertyPath::append($this->defaultPropertyPath, $propertyName),
+                $groups,
                 $groups
             );
         }
@@ -139,13 +161,19 @@ abstract class AbstractValidator implements ValidatorInterface
 
     protected function traverseValue($value, $constraints, $groups = null)
     {
+        if (!is_array($constraints)) {
+            $constraints = array($constraints);
+        }
+
         $metadata = new ValueMetadata($constraints);
+        $groups = $groups ? $this->normalizeGroups($groups) : $this->defaultGroups;
 
         $this->nodeTraverser->traverse(array(new ValueNode(
             $value,
             $metadata,
             $this->defaultPropertyPath,
-            $groups ? $this->normalizeGroups($groups) : $this->defaultGroups
+            $groups,
+            $groups
         )));
     }
 

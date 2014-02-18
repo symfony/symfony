@@ -24,7 +24,7 @@ class ClassNode extends Node
      */
     public $metadata;
 
-    public function __construct($value, ClassMetadataInterface $metadata, $propertyPath, array $groups)
+    public function __construct($value, ClassMetadataInterface $metadata, $propertyPath, array $groups, array $cascadedGroups)
     {
         if (!is_object($value)) {
             // error
@@ -34,7 +34,8 @@ class ClassNode extends Node
             $value,
             $metadata,
             $propertyPath,
-            $groups
+            $groups,
+            $cascadedGroups
         );
     }
 

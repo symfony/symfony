@@ -30,11 +30,11 @@ interface ExecutionContextInterface
      * Adds a violation at the current node of the validation graph.
      *
      * @param string $message       The error message.
-     * @param array  $params        The parameters substituted in the error message.
+     * @param array  $parameters        The parameters substituted in the error message.
      *
      * @api
      */
-    public function addViolation($message, array $params = array());
+    public function addViolation($message, array $parameters = array());
 
     public function buildViolation($message);
 

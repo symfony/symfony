@@ -14,8 +14,7 @@ namespace Symfony\Component\Validator\Mapping;
 use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\ValidationVisitorInterface;
 use Symfony\Component\Validator\PropertyMetadataContainerInterface;
-use Symfony\Component\Validator\ClassBasedInterface;
-use Symfony\Component\Validator\MetadataInterface;
+use Symfony\Component\Validator\MetadataInterface as LegacyMetadataInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\GroupDefinitionException;
@@ -26,7 +25,7 @@ use Symfony\Component\Validator\Exception\GroupDefinitionException;
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassBasedInterface, PropertyMetadataContainerInterface, ClassMetadataInterface
+class ClassMetadata extends ElementMetadata implements LegacyMetadataInterface, PropertyMetadataContainerInterface, ClassMetadataInterface
 {
     /**
      * @var string

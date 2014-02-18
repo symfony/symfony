@@ -15,6 +15,6 @@ namespace Symfony\Component\Validator\Node;
  * @since  %%NextVersion%%
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class ValueNode extends Node
+class GenericNode extends Node
 {
 }

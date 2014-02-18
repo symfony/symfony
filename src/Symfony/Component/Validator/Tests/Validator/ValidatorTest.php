@@ -11,6 +11,10 @@
 
 namespace Symfony\Component\Validator\Tests\Validator;
 
+use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Constraints\Valid;
+use Symfony\Component\Validator\ConstraintViolationInterface;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\DefaultTranslator;
 use Symfony\Component\Validator\ConstraintValidatorFactory;
 use Symfony\Component\Validator\Context\ExecutionContextManager;
@@ -18,6 +22,7 @@ use Symfony\Component\Validator\MetadataFactoryInterface;
 use Symfony\Component\Validator\NodeVisitor\GroupSequenceResolver;
 use Symfony\Component\Validator\NodeVisitor\NodeValidator;
 use Symfony\Component\Validator\NodeTraverser\NodeTraverser;
+use Symfony\Component\Validator\Tests\Fixtures\Entity;
 use Symfony\Component\Validator\Validator\LegacyValidator;
 
 class ValidatorTest extends AbstractValidatorTest
@@ -43,5 +48,44 @@ class ValidatorTest extends AbstractValidatorTest
         $nodeTraverser->addVisitor($nodeValidator);
 
         return $validator;
+    }
+
+    public function testValidateValueAcceptsValid()
+    {
+        $test = $this;
+        $entity = new Entity();
+
+        $callback = function ($value, ExecutionContextInterface $context) use ($test, $entity) {
+            $test->assertSame($test::ENTITY_CLASS, $context->getClassName());
+            $test->assertNull($context->getPropertyName());
+            $test->assertSame('', $context->getPropertyPath());
+            $test->assertSame('Group', $context->getGroup());
+            $test->assertSame($test->metadata, $context->getMetadata());
+            $test->assertSame($test->metadataFactory, $context->getMetadataFactory());
+            $test->assertSame($entity, $context->getRoot());
+            $test->assertSame($entity, $context->getValue());
+            $test->assertSame($entity, $value);
+
+            $context->addViolation('Message %param%', array('%param%' => 'value'));
+        };
+
+        $this->metadata->addConstraint(new Callback(array(
+            'callback' => $callback,
+            'groups' => 'Group',
+        )));
+
+        // This is the same as when calling validateObject()
+        $violations = $this->validator->validateValue($entity, new Valid(), 'Group');
+
+        /** @var ConstraintViolationInterface[] $violations */
+        $this->assertCount(1, $violations);
+        $this->assertSame('Message value', $violations[0]->getMessage());
+        $this->assertSame('Message %param%', $violations[0]->getMessageTemplate());
+        $this->assertSame(array('%param%' => 'value'), $violations[0]->getMessageParameters());
+        $this->assertSame('', $violations[0]->getPropertyPath());
+        $this->assertSame($entity, $violations[0]->getRoot());
+        $this->assertSame($entity, $violations[0]->getInvalidValue());
+        $this->assertNull($violations[0]->getMessagePluralization());
+        $this->assertNull($violations[0]->getCode());
     }
 }

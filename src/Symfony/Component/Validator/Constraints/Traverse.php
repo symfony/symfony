@@ -17,25 +17,40 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 /**
  * @Annotation
  *
+ * @since  2.5
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @api
  */
-class Valid extends Traverse
+class Traverse extends Constraint
 {
+    public $traverse = true;
+
+    public $deep = false;
+
     public function __construct($options = null)
     {
         if (is_array($options) && array_key_exists('groups', $options)) {
-            throw new ConstraintDefinitionException(sprintf('The option "groups" is not supported by the constraint %s', __CLASS__));
+            throw new ConstraintDefinitionException(sprintf(
+                'The option "groups" is not supported by the constraint %s',
+                __CLASS__
+            ));
         }
 
         parent::__construct($options);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getDefaultOption()
     {
-        // Traverse is extended for backwards compatibility reasons
-        // The parent class should be removed in 3.0
-        return null;
+        return 'traverse';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTargets()
+    {
+        return array(self::CLASS_CONSTRAINT, self::PROPERTY_CONSTRAINT);
     }
 }

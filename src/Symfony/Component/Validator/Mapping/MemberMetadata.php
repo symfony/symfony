@@ -14,7 +14,6 @@ namespace Symfony\Component\Validator\Mapping;
 use Symfony\Component\Validator\ValidationVisitorInterface;
 use Symfony\Component\Validator\PropertyMetadataInterface as LegacyPropertyMetadataInterface;
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 abstract class MemberMetadata extends ElementMetadata implements PropertyMetadataInterface, LegacyPropertyMetadataInterface
@@ -22,8 +21,6 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
     public $class;
     public $name;
     public $property;
-    public $cascadingStrategy = CascadingStrategy::NONE;
-    public $traversalStrategy = TraversalStrategy::IMPLICIT;
     private $reflMember = array();
 
     /**
@@ -61,19 +58,7 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
             ));
         }
 
-        if ($constraint instanceof Valid) {
-            $this->cascadingStrategy = CascadingStrategy::CASCADE;
-
-            if ($constraint->traverse) {
-                $this->traversalStrategy = TraversalStrategy::TRAVERSE;
-            }
-
-            if ($constraint->deep) {
-                $this->traversalStrategy |= TraversalStrategy::RECURSIVE;
-            }
-        } else {
-            parent::addConstraint($constraint);
-        }
+        parent::addConstraint($constraint);
 
         return $this;
     }
@@ -89,8 +74,6 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
             'class',
             'name',
             'property',
-            'cascadingStrategy',
-            'traversalStrategy',
         ));
     }
 
@@ -158,16 +141,6 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
     public function isPrivate($objectOrClassName)
     {
         return $this->getReflectionMember($objectOrClassName)->isPrivate();
-    }
-
-    public function getCascadingStrategy()
-    {
-        return $this->cascadingStrategy;
-    }
-
-    public function getTraversalStrategy()
-    {
-        return $this->traversalStrategy;
     }
 
     /**

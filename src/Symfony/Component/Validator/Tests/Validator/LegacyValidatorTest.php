@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Validator\Tests\Validator;
 
+use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\MetadataFactoryInterface;
+use Symfony\Component\Validator\Tests\Fixtures\Entity;
 use Symfony\Component\Validator\Validator;
 use Symfony\Component\Validator\DefaultTranslator;
 use Symfony\Component\Validator\ConstraintValidatorFactory;
@@ -36,5 +38,13 @@ class LegacyValidatorTest extends AbstractValidatorTest
     public function testGroupSequenceIncludesReferences()
     {
         $this->markTestSkipped('Currently not supported');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Validator\Exception\ValidatorException
+     */
+    public function testValidateValueRejectsValid()
+    {
+        $this->validator->validateValue(new Entity(), new Valid());
     }
 }

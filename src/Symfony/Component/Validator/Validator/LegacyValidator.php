@@ -21,7 +21,14 @@ class LegacyValidator extends Validator implements LegacyValidatorInterface
 {
     public function validate($value, $groups = null, $traverse = false, $deep = false)
     {
-        // TODO what about $traverse and $deep?
+        if (is_array($value)) {
+            $this->contextManager->startContext($value);
+
+            $this->traverseCollection($value, $groups, $deep);
+
+            return $this->contextManager->stopContext()->getViolations();
+        }
+
         return $this->validateObject($value, $groups);
     }
 

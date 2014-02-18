@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Mapping;
 
 use Symfony\Component\Validator\Constraints\GroupSequence;
+use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\ValidationVisitorInterface;
 use Symfony\Component\Validator\PropertyMetadataContainerInterface;
 use Symfony\Component\Validator\MetadataInterface as LegacyMetadataInterface;
@@ -61,8 +62,6 @@ class ClassMetadata extends ElementMetadata implements LegacyMetadataInterface, 
      * @var Boolean
      */
     public $groupSequenceProvider = false;
-
-    public $traversalStrategy = TraversalStrategy::IMPLICIT;
 
     /**
      * @var \ReflectionClass
@@ -126,7 +125,12 @@ class ClassMetadata extends ElementMetadata implements LegacyMetadataInterface, 
      */
     public function __sleep()
     {
-        return array_merge(parent::__sleep(), array(
+        $parentProperties = parent::__sleep();
+
+        // Don't store the cascading strategy. Classes never cascade.
+        unset($parentProperties[array_search('cascadingStrategy', $parentProperties)]);
+
+        return array_merge($parentProperties, array(
             'getters',
             'groupSequence',
             'groupSequenceProvider',
@@ -174,7 +178,14 @@ class ClassMetadata extends ElementMetadata implements LegacyMetadataInterface, 
     {
         if (!in_array(Constraint::CLASS_CONSTRAINT, (array) $constraint->getTargets())) {
             throw new ConstraintDefinitionException(sprintf(
-                'The constraint %s cannot be put on classes',
+                'The constraint "%s" cannot be put on classes.',
+                get_class($constraint)
+            ));
+        }
+
+        if ($constraint instanceof Valid) {
+            throw new ConstraintDefinitionException(sprintf(
+                'The constraint "%s" cannot be put on classes.',
                 get_class($constraint)
             ));
         }
@@ -433,10 +444,5 @@ class ClassMetadata extends ElementMetadata implements LegacyMetadataInterface, 
     public function getCascadingStrategy()
     {
         return CascadingStrategy::NONE;
-    }
-
-    public function getTraversalStrategy()
-    {
-        return $this->traversalStrategy;
     }
 }

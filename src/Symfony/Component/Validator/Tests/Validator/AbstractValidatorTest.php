@@ -42,22 +42,22 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
     /**
      * @var ValidatorInterface
      */
-    private $validator;
+    protected $validator;
 
     /**
      * @var FakeMetadataFactory
      */
-    public $metadataFactory;
+    protected $metadataFactory;
 
     /**
      * @var ClassMetadata
      */
-    public $metadata;
+    protected $metadata;
 
     /**
      * @var ClassMetadata
      */
-    public $referenceMetadata;
+    protected $referenceMetadata;
 
     protected function setUp()
     {
@@ -195,6 +195,45 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('lastName', $violations[0]->getPropertyPath());
         $this->assertSame($entity, $violations[0]->getRoot());
         $this->assertSame('Schussek', $violations[0]->getInvalidValue());
+        $this->assertNull($violations[0]->getMessagePluralization());
+        $this->assertNull($violations[0]->getCode());
+    }
+
+    public function testArray()
+    {
+        $test = $this;
+        $entity = new Entity();
+        $array = array('key' => $entity);
+
+        $callback = function ($value, ExecutionContextInterface $context) use ($test, $entity, $array) {
+            $test->assertSame($test::ENTITY_CLASS, $context->getClassName());
+            $test->assertNull($context->getPropertyName());
+            $test->assertSame('[key]', $context->getPropertyPath());
+            $test->assertSame('Group', $context->getGroup());
+            $test->assertSame($test->metadata, $context->getMetadata());
+            $test->assertSame($test->metadataFactory, $context->getMetadataFactory());
+            $test->assertSame($array, $context->getRoot());
+            $test->assertSame($entity, $context->getValue());
+            $test->assertSame($entity, $value);
+
+            $context->addViolation('Message %param%', array('%param%' => 'value'));
+        };
+
+        $this->metadata->addConstraint(new Callback(array(
+            'callback' => $callback,
+            'groups' => 'Group',
+        )));
+
+        $violations = $this->validator->validate($array, 'Group');
+
+        /** @var ConstraintViolationInterface[] $violations */
+        $this->assertCount(1, $violations);
+        $this->assertSame('Message value', $violations[0]->getMessage());
+        $this->assertSame('Message %param%', $violations[0]->getMessageTemplate());
+        $this->assertSame(array('%param%' => 'value'), $violations[0]->getMessageParameters());
+        $this->assertSame('[key]', $violations[0]->getPropertyPath());
+        $this->assertSame($array, $violations[0]->getRoot());
+        $this->assertSame($entity, $violations[0]->getInvalidValue());
         $this->assertNull($violations[0]->getMessagePluralization());
         $this->assertNull($violations[0]->getCode());
     }
@@ -813,14 +852,6 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('Bernhard', $violations[0]->getInvalidValue());
         $this->assertNull($violations[0]->getMessagePluralization());
         $this->assertNull($violations[0]->getCode());
-    }
-
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\ValidatorException
-     */
-    public function testValidateValueRejectsValid()
-    {
-        $this->validator->validateValue(new Entity(), new Valid());
     }
 
     public function testAddCustomizedViolation()

@@ -19,11 +19,25 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\ValidatorInterface as LegacyValidatorInterface;
 
 /**
- * @since  %%NextVersion%%
+ * A backwards compatible execution context.
+ *
+ * @since  2.5
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated Implemented for backwards compatibility with Symfony < 2.5. To be
+ *             removed in 3.0.
  */
 class LegacyExecutionContext extends ExecutionContext implements LegacyExecutionContextInterface
 {
+    /**
+     * Creates a new context.
+     *
+     * This constructor ensures that the given validator implements the
+     * deprecated {@link \Symfony\Component\Validator\ValidatorInterface}. If
+     * it does not, an {@link InvalidArgumentException} is thrown.
+     *
+     * @see ExecutionContext::__construct()
+     */
     public function __construct($root, ValidatorInterface $validator, GroupManagerInterface $groupManager, TranslatorInterface $translator, $translationDomain = null)
     {
         if (!$validator instanceof LegacyValidatorInterface) {
@@ -56,6 +70,9 @@ class LegacyExecutionContext extends ExecutionContext implements LegacyExecution
         parent::addViolation($message, $parameters);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function addViolationAt($subPath, $message, array $parameters = array(), $invalidValue = null, $pluralization = null, $code = null)
     {
         if (func_num_args() >= 3) {
@@ -78,6 +95,9 @@ class LegacyExecutionContext extends ExecutionContext implements LegacyExecution
         ;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function validate($value, $subPath = '', $groups = null, $traverse = false, $deep = false)
     {
         // TODO handle $traverse and $deep
@@ -90,6 +110,9 @@ class LegacyExecutionContext extends ExecutionContext implements LegacyExecution
         ;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function validateValue($value, $constraints, $subPath = '', $groups = null)
     {
         return $this
@@ -100,6 +123,9 @@ class LegacyExecutionContext extends ExecutionContext implements LegacyExecution
         ;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getMetadataFactory()
     {
         return $this->getValidator()->getMetadataFactory();

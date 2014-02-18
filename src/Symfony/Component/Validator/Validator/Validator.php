@@ -24,7 +24,7 @@ class Validator extends AbstractValidator
     /**
      * @var ExecutionContextManagerInterface
      */
-    private $contextManager;
+    protected $contextManager;
 
     public function __construct(NodeTraverserInterface $nodeTraverser, MetadataFactoryInterface $metadataFactory, ExecutionContextManagerInterface $contextManager)
     {

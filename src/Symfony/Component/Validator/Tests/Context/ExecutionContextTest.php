@@ -12,10 +12,10 @@
 namespace Symfony\Component\Validator\Tests\Context;
 
 use Symfony\Component\Validator\Context\ExecutionContext;
-use Symfony\Component\Validator\Mapping\AdHocMetadata;
+use Symfony\Component\Validator\Mapping\GenericMetadata;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Node\ClassNode;
-use Symfony\Component\Validator\Node\ValueNode;
+use Symfony\Component\Validator\Node\GenericNode;
 
 /**
  * @since  2.5
@@ -65,7 +65,7 @@ class ExecutionContextTest extends \PHPUnit_Framework_TestCase
     public function testPushAndPop()
     {
         $metadata = $this->getMock('Symfony\Component\Validator\Mapping\MetadataInterface');
-        $node = new ValueNode('value', $metadata, '', array(), array());
+        $node = new GenericNode('value', $metadata, '', array(), array());
 
         $this->context->pushNode($node);
 
@@ -80,9 +80,9 @@ class ExecutionContextTest extends \PHPUnit_Framework_TestCase
     public function testPushTwiceAndPop()
     {
         $metadata1 = $this->getMock('Symfony\Component\Validator\Mapping\MetadataInterface');
-        $node1 = new ValueNode('value', $metadata1, '', array(), array());
+        $node1 = new GenericNode('value', $metadata1, '', array(), array());
         $metadata2 = $this->getMock('Symfony\Component\Validator\Mapping\MetadataInterface');
-        $node2 = new ValueNode('other value', $metadata2, '', array(), array());
+        $node2 = new GenericNode('other value', $metadata2, '', array(), array());
 
         $this->context->pushNode($node1);
         $this->context->pushNode($node2);

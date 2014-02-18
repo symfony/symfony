@@ -80,6 +80,23 @@ class ExecutionContext implements ExecutionContextInterface
      */
     private $translationDomain;
 
+    /**
+     * Creates a new execution context.
+     *
+     * @param mixed                 $root              The root value of the
+     *                                                 validated object graph
+     * @param ValidatorInterface    $validator         The validator
+     * @param GroupManagerInterface $groupManager      The manager for accessing
+     *                                                 the currently validated
+     *                                                 group
+     * @param TranslatorInterface   $translator        The translator
+     * @param string|null           $translationDomain The translation domain to
+     *                                                 use for translating
+     *                                                 violation messages
+     *
+     * @internal Called by {@link ExecutionContextManager}. Should not be used
+     *           in user code.
+     */
     public function __construct($root, ValidatorInterface $validator, GroupManagerInterface $groupManager, TranslatorInterface $translator, $translationDomain = null)
     {
         $this->root = $root;

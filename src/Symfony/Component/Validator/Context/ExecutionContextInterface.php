@@ -148,7 +148,7 @@ interface ExecutionContextInterface
      * a {@link Mapping\PropertyMetadata} instance if the current value is
      * the value of a property and a {@link Mapping\GetterMetadata} instance if
      * the validated value is the result of a getter method. The metadata can
-     * also be an {@link Mapping\AdHocMetadata} if the current value does not
+     * also be an {@link Mapping\GenericMetadata} if the current value does not
      * belong to any structural element.
      *
      * @return MetadataInterface|null The metadata of the currently validated

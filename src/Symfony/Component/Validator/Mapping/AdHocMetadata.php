@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Exception\ValidatorException;
  * @since  %%NextVersion%%
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class ValueMetadata extends ElementMetadata
+class AdHocMetadata extends ElementMetadata
 {
     public function __construct(array $constraints)
     {

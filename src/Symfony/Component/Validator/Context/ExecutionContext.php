@@ -23,21 +23,39 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilder;
 
 /**
- * @since  %%NextVersion%%
+ * The context used and created by {@link ExecutionContextManager}.
+ *
+ * @since  2.5
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @see ExecutionContextInterface
  */
 class ExecutionContext implements ExecutionContextInterface
 {
+    /**
+     * The root value of the validated object graph.
+     *
+     * @var mixed
+     */
     private $root;
 
+    /**
+     * The violations generated in the current context.
+     *
+     * @var ConstraintViolationList
+     */
     private $violations;
 
     /**
+     * The current node under validation.
+     *
      * @var Node
      */
     private $node;
 
     /**
+     * The trace of nodes from the root node to the current node.
+     *
      * @var \SplStack
      */
     private $nodeStack;
@@ -73,25 +91,39 @@ class ExecutionContext implements ExecutionContextInterface
         $this->nodeStack = new \SplStack();
     }
 
+    /**
+     * Sets the values of the context to match the given node.
+     *
+     * Internally, all nodes are stored on a stack and can be removed from that
+     * stack using {@link popNode()}.
+     *
+     * @param Node $node The currently validated node
+     */
     public function pushNode(Node $node)
     {
-        if (null !== $this->node) {
-            $this->nodeStack->push($this->node);
-        }
-
+        $this->nodeStack->push($node);
         $this->node = $node;
     }
 
+    /**
+     * Sets the values of the context to match the previous node.
+     *
+     * The current node is removed from the internal stack and returned.
+     *
+     * @return Node|null The currently validated node or null, if no node was
+     *                   on the stack
+     */
     public function popNode()
     {
-        $poppedNode = $this->node;
-
+        // Nothing to do if the stack is empty
         if (0 === count($this->nodeStack)) {
-            $this->node = null;
-
-            return $poppedNode;
+            return null;
         }
 
+        $poppedNode = $this->node;
+
+        // After removing the last node, the stack is empty and the node
+        // is null
         if (1 === count($this->nodeStack)) {
             $this->nodeStack->pop();
             $this->node = null;
@@ -105,6 +137,9 @@ class ExecutionContext implements ExecutionContextInterface
         return $poppedNode;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function addViolation($message, array $parameters = array())
     {
         $this->violations->add(new ConstraintViolation(
@@ -119,6 +154,9 @@ class ExecutionContext implements ExecutionContextInterface
         ));
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function buildViolation($message, array $parameters = array())
     {
         return new ConstraintViolationBuilder(
@@ -133,31 +171,57 @@ class ExecutionContext implements ExecutionContextInterface
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getViolations()
     {
         return $this->violations;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getValidator()
+    {
+        return $this->validator;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getRoot()
     {
         return $this->root;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getValue()
     {
         return $this->node ? $this->node->value : null;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getMetadata()
     {
         return $this->node ? $this->node->metadata : null;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getGroup()
     {
         return $this->groupManager->getCurrentGroup();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getClassName()
     {
         $metadata = $this->getMetadata();
@@ -165,6 +229,9 @@ class ExecutionContext implements ExecutionContextInterface
         return $metadata instanceof ClassBasedInterface ? $metadata->getClassName() : null;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getPropertyName()
     {
         $metadata = $this->getMetadata();
@@ -172,18 +239,13 @@ class ExecutionContext implements ExecutionContextInterface
         return $metadata instanceof PropertyMetadataInterface ? $metadata->getPropertyName() : null;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getPropertyPath($subPath = '')
     {
         $propertyPath = $this->node ? $this->node->propertyPath : '';
 
         return PropertyPath::append($propertyPath, $subPath);
-    }
-
-    /**
-     * @return ValidatorInterface
-     */
-    public function getValidator()
-    {
-        return $this->validator;
     }
 }

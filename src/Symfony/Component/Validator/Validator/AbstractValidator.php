@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Mapping\ClassMetadataInterface;
-use Symfony\Component\Validator\Mapping\ValueMetadata;
+use Symfony\Component\Validator\Mapping\AdHocMetadata;
 use Symfony\Component\Validator\MetadataFactoryInterface;
 use Symfony\Component\Validator\Node\ClassNode;
 use Symfony\Component\Validator\Node\PropertyNode;
@@ -165,7 +165,7 @@ abstract class AbstractValidator implements ValidatorInterface
             $constraints = array($constraints);
         }
 
-        $metadata = new ValueMetadata($constraints);
+        $metadata = new AdHocMetadata($constraints);
         $groups = $groups ? $this->normalizeGroups($groups) : $this->defaultGroups;
 
         $this->nodeTraverser->traverse(array(new ValueNode(

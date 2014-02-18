@@ -34,6 +34,7 @@ class GroupSequenceResolver extends AbstractVisitor
             /** @var \Symfony\Component\Validator\GroupSequenceProviderInterface $value */
             $groupSequence = $node->value->getGroupSequence();
 
+            // TODO test
             if (!$groupSequence instanceof GroupSequence) {
                 $groupSequence = new GroupSequence($groupSequence);
             }

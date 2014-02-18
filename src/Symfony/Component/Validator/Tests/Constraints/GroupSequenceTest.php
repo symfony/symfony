@@ -63,4 +63,22 @@ class GroupSequenceTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(isset($sequence[0]));
         $this->assertSame('Group 1', $sequence[0]);
     }
+
+    /**
+     * @expectedException \Symfony\Component\Validator\Exception\OutOfBoundsException
+     */
+    public function testGetExpectsExistingKey()
+    {
+        $sequence = new GroupSequence(array('Group 1', 'Group 2'));
+
+        $sequence[2];
+    }
+
+    public function testUnsetIgnoresNonExistingKeys()
+    {
+        $sequence = new GroupSequence(array('Group 1', 'Group 2'));
+
+        // should not fail
+        unset($sequence[2]);
+    }
 }

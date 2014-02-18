@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator\Validator;
 
+use Symfony\Component\Validator\Constraints\Traverse;
+use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\ValidatorInterface as LegacyValidatorInterface;
 
 /**
@@ -22,11 +24,17 @@ class LegacyValidator extends Validator implements LegacyValidatorInterface
     public function validate($value, $groups = null, $traverse = false, $deep = false)
     {
         if (is_array($value)) {
-            $this->contextManager->startContext($value);
+            return $this->validateValue($value, new Traverse(array(
+                'traverse' => true,
+                'deep' => $deep,
+            )), $groups);
+        }
 
-            $this->traverseCollection($value, $groups, $deep);
-
-            return $this->contextManager->stopContext()->getViolations();
+        if ($traverse && $value instanceof \Traversable) {
+            return $this->validateValue($value, array(
+                new Valid(),
+                new Traverse(array('traverse' => true, 'deep' => $deep)),
+            ), $groups);
         }
 
         return $this->validateObject($value, $groups);

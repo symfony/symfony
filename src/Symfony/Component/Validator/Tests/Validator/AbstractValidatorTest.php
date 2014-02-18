@@ -238,6 +238,169 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($violations[0]->getCode());
     }
 
+    public function testRecursiveArray()
+    {
+        $test = $this;
+        $entity = new Entity();
+        $array = array(2 => array('key' => $entity));
+
+        $callback = function ($value, ExecutionContextInterface $context) use ($test, $entity, $array) {
+            $test->assertSame($test::ENTITY_CLASS, $context->getClassName());
+            $test->assertNull($context->getPropertyName());
+            $test->assertSame('[2][key]', $context->getPropertyPath());
+            $test->assertSame('Group', $context->getGroup());
+            $test->assertSame($test->metadata, $context->getMetadata());
+            $test->assertSame($test->metadataFactory, $context->getMetadataFactory());
+            $test->assertSame($array, $context->getRoot());
+            $test->assertSame($entity, $context->getValue());
+            $test->assertSame($entity, $value);
+
+            $context->addViolation('Message %param%', array('%param%' => 'value'));
+        };
+
+        $this->metadata->addConstraint(new Callback(array(
+            'callback' => $callback,
+            'groups' => 'Group',
+        )));
+
+        $violations = $this->validator->validate($array, 'Group');
+
+        /** @var ConstraintViolationInterface[] $violations */
+        $this->assertCount(1, $violations);
+        $this->assertSame('Message value', $violations[0]->getMessage());
+        $this->assertSame('Message %param%', $violations[0]->getMessageTemplate());
+        $this->assertSame(array('%param%' => 'value'), $violations[0]->getMessageParameters());
+        $this->assertSame('[2][key]', $violations[0]->getPropertyPath());
+        $this->assertSame($array, $violations[0]->getRoot());
+        $this->assertSame($entity, $violations[0]->getInvalidValue());
+        $this->assertNull($violations[0]->getMessagePluralization());
+        $this->assertNull($violations[0]->getCode());
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Validator\Exception\NoSuchMetadataException
+     */
+    public function testTraversableTraverseDisabled()
+    {
+        $test = $this;
+        $entity = new Entity();
+        $traversable = new \ArrayIterator(array('key' => $entity));
+
+        $callback = function () use ($test) {
+            $test->fail('Should not be called');
+        };
+
+        $this->metadata->addConstraint(new Callback(array(
+            'callback' => $callback,
+            'groups' => 'Group',
+        )));
+
+        $this->validator->validate($traversable, 'Group');
+    }
+
+    public function testTraversableTraverseEnabled()
+    {
+        $test = $this;
+        $entity = new Entity();
+        $traversable = new \ArrayIterator(array('key' => $entity));
+
+        $callback = function ($value, ExecutionContextInterface $context) use ($test, $entity, $traversable) {
+            $test->assertSame($test::ENTITY_CLASS, $context->getClassName());
+            $test->assertNull($context->getPropertyName());
+            $test->assertSame('[key]', $context->getPropertyPath());
+            $test->assertSame('Group', $context->getGroup());
+            $test->assertSame($test->metadata, $context->getMetadata());
+            $test->assertSame($test->metadataFactory, $context->getMetadataFactory());
+            $test->assertSame($traversable, $context->getRoot());
+            $test->assertSame($entity, $context->getValue());
+            $test->assertSame($entity, $value);
+
+            $context->addViolation('Message %param%', array('%param%' => 'value'));
+        };
+
+        $this->metadata->addConstraint(new Callback(array(
+            'callback' => $callback,
+            'groups' => 'Group',
+        )));
+
+        $violations = $this->validator->validate($traversable, 'Group', true);
+
+        /** @var ConstraintViolationInterface[] $violations */
+        $this->assertCount(1, $violations);
+        $this->assertSame('Message value', $violations[0]->getMessage());
+        $this->assertSame('Message %param%', $violations[0]->getMessageTemplate());
+        $this->assertSame(array('%param%' => 'value'), $violations[0]->getMessageParameters());
+        $this->assertSame('[key]', $violations[0]->getPropertyPath());
+        $this->assertSame($traversable, $violations[0]->getRoot());
+        $this->assertSame($entity, $violations[0]->getInvalidValue());
+        $this->assertNull($violations[0]->getMessagePluralization());
+        $this->assertNull($violations[0]->getCode());
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Validator\Exception\NoSuchMetadataException
+     */
+    public function testRecursiveTraversableRecursiveTraversalDisabled()
+    {
+        $test = $this;
+        $entity = new Entity();
+        $traversable = new \ArrayIterator(array(
+            2 => new \ArrayIterator(array('key' => $entity)),
+        ));
+
+        $callback = function () use ($test) {
+            $test->fail('Should not be called');
+        };
+
+        $this->metadata->addConstraint(new Callback(array(
+            'callback' => $callback,
+            'groups' => 'Group',
+        )));
+
+        $this->validator->validate($traversable, 'Group', true);
+    }
+
+    public function testRecursiveTraversableRecursiveTraversalEnabled()
+    {
+        $test = $this;
+        $entity = new Entity();
+        $traversable = new \ArrayIterator(array(
+            2 => new \ArrayIterator(array('key' => $entity)),
+        ));
+
+        $callback = function ($value, ExecutionContextInterface $context) use ($test, $entity, $traversable) {
+            $test->assertSame($test::ENTITY_CLASS, $context->getClassName());
+            $test->assertNull($context->getPropertyName());
+            $test->assertSame('[2][key]', $context->getPropertyPath());
+            $test->assertSame('Group', $context->getGroup());
+            $test->assertSame($test->metadata, $context->getMetadata());
+            $test->assertSame($test->metadataFactory, $context->getMetadataFactory());
+            $test->assertSame($traversable, $context->getRoot());
+            $test->assertSame($entity, $context->getValue());
+            $test->assertSame($entity, $value);
+
+            $context->addViolation('Message %param%', array('%param%' => 'value'));
+        };
+
+        $this->metadata->addConstraint(new Callback(array(
+            'callback' => $callback,
+            'groups' => 'Group',
+        )));
+
+        $violations = $this->validator->validate($traversable, 'Group', true, true);
+
+        /** @var ConstraintViolationInterface[] $violations */
+        $this->assertCount(1, $violations);
+        $this->assertSame('Message value', $violations[0]->getMessage());
+        $this->assertSame('Message %param%', $violations[0]->getMessageTemplate());
+        $this->assertSame(array('%param%' => 'value'), $violations[0]->getMessageParameters());
+        $this->assertSame('[2][key]', $violations[0]->getPropertyPath());
+        $this->assertSame($traversable, $violations[0]->getRoot());
+        $this->assertSame($entity, $violations[0]->getInvalidValue());
+        $this->assertNull($violations[0]->getMessagePluralization());
+        $this->assertNull($violations[0]->getCode());
+    }
+
     public function testReferenceClassConstraint()
     {
         $test = $this;

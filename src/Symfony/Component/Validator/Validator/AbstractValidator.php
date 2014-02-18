@@ -98,24 +98,6 @@ abstract class AbstractValidator implements ValidatorInterface
         )));
     }
 
-    protected function traverseCollection($collection, $groups = null, $deep = false)
-    {
-        $metadata = new GenericMetadata();
-        $metadata->addConstraint(new Traverse(array(
-            'traverse' => true,
-            'deep' => $deep,
-        )));
-        $groups = $groups ? $this->normalizeGroups($groups) : $this->defaultGroups;
-
-        $this->nodeTraverser->traverse(array(new GenericNode(
-            $collection,
-            $metadata,
-            $this->defaultPropertyPath,
-            $groups,
-            $groups
-        )));
-    }
-
     protected function traverseProperty($object, $propertyName, $groups = null)
     {
         $classMetadata = $this->metadataFactory->getMetadataFor($object);

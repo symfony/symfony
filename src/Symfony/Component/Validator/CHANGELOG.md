@@ -8,6 +8,7 @@ CHANGELOG
  * added `DoctrineCache` to adapt any Doctrine cache
  * `GroupSequence` now implements `ArrayAccess`, `Countable` and `Traversable`
  * changed `ClassMetadata::getGroupSequence()` to return a `GroupSequence` instance instead of an array
+ * `Callback` can now be put onto properties (useful when you pass a closure to the constraint)
 
 2.4.0
 -----

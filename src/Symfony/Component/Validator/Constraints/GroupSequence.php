@@ -12,7 +12,6 @@
 namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Exception\OutOfBoundsException;
-use Traversable;
 
 /**
  * A sequence of validation groups.

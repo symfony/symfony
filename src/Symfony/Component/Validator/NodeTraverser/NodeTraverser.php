@@ -113,6 +113,9 @@ class NodeTraverser implements NodeTraverserInterface
                     $traversalStrategy
                 );
             } elseif ($cascadingStrategy & CascadingStrategy::CASCADE) {
+                // If the value is a scalar, pass it anyway, because we want
+                // a NoSuchMetadataException to be thrown in that case
+                // (BC with Symfony < 2.5)
                 $this->cascadeObject(
                     $node->value,
                     $node->propertyPath,

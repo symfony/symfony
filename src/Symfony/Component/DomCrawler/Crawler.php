@@ -454,7 +454,7 @@ class Crawler extends \SplObjectStorage
         $nodes = array();
 
         while ($node = $node->parentNode) {
-            if (1 === $node->nodeType) {
+            if (1 === $node->nodeType && '_root' !== $node->nodeName) {
                 $nodes[] = $node;
             }
         }
@@ -599,14 +599,16 @@ class Crawler extends \SplObjectStorage
      */
     public function filterXPath($xpath)
     {
-        $crawler = new static(null, $this->uri);
-        $prefixes = $this->findNamespacePrefixes($xpath);
+        $document = new \DOMDocument('1.0', 'UTF-8');
+        $root = $document->appendChild($document->createElement('_root'));
         foreach ($this as $node) {
-            $domxpath = $this->createDOMXPath($node->ownerDocument, $prefixes);
-            $crawler->add($domxpath->query($xpath, $node));
+            $root->appendChild($document->importNode($node, true));
         }
 
-        return $crawler;
+        $prefixes = $this->findNamespacePrefixes($xpath);
+        $domxpath = $this->createDOMXPath($document, $prefixes);
+
+        return new static($domxpath->query($xpath), $this->uri);
     }
 
     /**

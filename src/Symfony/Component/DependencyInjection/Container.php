@@ -295,19 +295,7 @@ class Container implements IntrospectableContainerInterface
             // $method is set to the right value, proceed
         } else {
             if (self::EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior) {
-                if (!$id) {
-                    throw new ServiceNotFoundException($id);
-                }
-
-                $alternatives = array();
-                foreach (array_keys($this->services) as $key) {
-                    $lev = levenshtein($id, $key);
-                    if ($lev <= strlen($id) / 3 || false !== strpos($key, $id)) {
-                        $alternatives[] = $key;
-                    }
-                }
-
-                throw new ServiceNotFoundException($id, null, null, $alternatives);
+                throw new ServiceNotFoundException($id);
             }
 
             return null;

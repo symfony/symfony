@@ -111,7 +111,7 @@ class DelegatingEngineTest extends \PHPUnit_Framework_TestCase
 
         $delegatingEngine = new DelegatingEngine(array($firstEngine, $secondEngine));
 
-        $this->assertSame($secondEngine, $delegatingEngine->getEngine('template.php', array('foo' => 'bar')));
+        $this->assertSame($secondEngine, $delegatingEngine->getEngine('template.php'));
     }
 
     /**

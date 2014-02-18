@@ -7,6 +7,38 @@ in 2.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.3.0...v2.3.1
 
+* 2.3.10 (2014-02-12)
+
+ * bug #10231 [Console] removed problematic regex (fabpot)
+ * bug #10245 [DomCrawler] Added support for <area> tags to be treated as links (shamess)
+ * bug #10232 [Form] Fix "Array was modified outside object" in ResizeFormListener. (Chekote)
+ * bug #10215 [Routing] reduced recursion in dumper (arnaud-lb)
+ * bug #10207 [DomCrawler] Fixed filterXPath() chaining (robbertkl)
+ * bug #10205 [DomCrawler] Fixed incorrect handling of image inputs (robbertkl)
+ * bug #10191 [HttpKernel] fixed wrong reference in TraceableEventDispatcher (fabpot)
+ * bug #10195 [Debug] Fixed recursion level incrementing in FlattenException::flattenArgs(). (sun)
+ * bug #10151 [Form] Update DateTime objects only if the actual value has changed (peterrehm)
+ * bug #10140 allow the TextAreaFormField to be used with valid/invalid HTML (dawehner)
+ * bug #10131 added lines to exceptions for the trans and transchoice tags (fabpot)
+ * bug #10119 [Validator] Minor fix in XmlFileLoader (florianv)
+ * bug #10078 [BrowserKit] add non-standard port to HTTP_HOST server param (kbond)
+ * bug #10091 [Translation] Update PluralizationRules.php (guilhermeblanco)
+ * bug #10053 [Form] fixed allow render 0 numeric input value (dczech)
+ * bug #10033 [HttpKernel] Bugfix - Logger Deprecation Notice (Rican7)
+ * bug #10023 [FrameworkBundle] Thrown an HttpException instead returning a Response in RedirectController::redirectAction() (jakzal)
+ * bug #9985 Prevent WDT from creating a session (mvrhov)
+ * bug #10000 [Console] Fixed the compatibility with HHVM (stof)
+ * bug #9979 [Doctrine Bridge][Validator] Fix for null values in assosiated properties when using UniqueEntityValidator (vpetrovych)
+ * bug #9983 [TwigBridge] Update min. version of Twig (stloyd)
+ * bug #9970 [CssSelector] fixed numeric attribute issue (jfsimon)
+ * bug #9747 [DoctrineBridge] Fix: Add type detection. Needed by pdo_dblib (iamluc)
+ * bug #9962 [Process] Fix #9861 : Revert TTY mode (romainneutron)
+ * bug #9960 [Form] Update minimal requirement in composer.json (stloyd)
+ * bug #9952 [Translator] Fix Empty translations with Qt files (vlefort)
+ * bug #9948 [WebProfilerBundle] Fixed profiler toolbar icons for XHTML. (rafalwrzeszcz)
+ * bug #9933 Propel1 exception message (jaugustin)
+ * bug #9949 [BrowserKit] Throw exception on invalid cookie expiration timestamp (anlutro)
+
 * 2.3.9 (2014-01-05)
 
  * bug #9938 [Process] Add support SAPI cli-server (peter-gribanov)

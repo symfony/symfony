@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Validator\NodeTraverser;
 
-use Symfony\Component\Validator\Node\Node;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\NodeVisitor\NodeVisitorInterface;
 
 /**
@@ -24,8 +24,5 @@ interface NodeTraverserInterface
 
     public function removeVisitor(NodeVisitorInterface $visitor);
 
-    /**
-     * @param Node[] $nodes
-     */
-    public function traverse(array $nodes);
+    public function traverse(array $nodes, ExecutionContextInterface $context);
 }

@@ -13,30 +13,45 @@ namespace Symfony\Component\Validator\Validator;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Traverse;
-use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Symfony\Component\Validator\Context\ExecutionContextManagerInterface;
+use Symfony\Component\Validator\Exception\ValidatorException;
+use Symfony\Component\Validator\Mapping\ClassMetadataInterface;
+use Symfony\Component\Validator\Mapping\GenericMetadata;
 use Symfony\Component\Validator\MetadataFactoryInterface;
+use Symfony\Component\Validator\Node\ClassNode;
+use Symfony\Component\Validator\Node\GenericNode;
+use Symfony\Component\Validator\Node\PropertyNode;
 use Symfony\Component\Validator\NodeTraverser\NodeTraverserInterface;
+use Symfony\Component\Validator\Util\PropertyPath;
 
 /**
  * @since  %%NextVersion%%
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class ContextualValidator extends AbstractValidator implements ContextualValidatorInterface
+class ContextualValidator implements ContextualValidatorInterface
 {
     /**
-     * @var ExecutionContextManagerInterface
+     * @var ExecutionContextInterface
      */
     private $context;
 
-    public function __construct(NodeTraverserInterface $nodeTraverser, MetadataFactoryInterface $metadataFactory, ExecutionContextInterface $context)
-    {
-        parent::__construct($nodeTraverser, $metadataFactory);
+    /**
+     * @var NodeTraverserInterface
+     */
+    private $nodeTraverser;
 
+    /**
+     * @var MetadataFactoryInterface
+     */
+    private $metadataFactory;
+
+    public function __construct(ExecutionContextInterface $context, NodeTraverserInterface $nodeTraverser, MetadataFactoryInterface $metadataFactory)
+    {
         $this->context = $context;
         $this->defaultPropertyPath = $context->getPropertyPath();
-        $this->defaultGroups = array($context->getGroup());
+        $this->defaultGroups = array($context->getGroup() ?: Constraint::DEFAULT_GROUP);
+        $this->nodeTraverser = $nodeTraverser;
+        $this->metadataFactory = $metadataFactory;
     }
 
     public function atPath($subPath)
@@ -46,40 +61,53 @@ class ContextualValidator extends AbstractValidator implements ContextualValidat
         return $this;
     }
 
-    /**
-     * Validates a value against a constraint or a list of constraints.
-     *
-     * @param mixed                   $value       The value to validate.
-     * @param Constraint|Constraint[] $constraints The constraint(s) to validate against.
-     * @param array|null              $groups      The validation groups to validate.
-     *
-     * @return ConstraintViolationListInterface A list of constraint violations. If the
-     *                                          list is empty, validation succeeded.
-     */
     public function validate($value, $constraints, $groups = null)
     {
-        $this->traverse($value, $constraints, $groups);
+        if (!is_array($constraints)) {
+            $constraints = array($constraints);
+        }
 
-        return $this->context->getViolations();
+        $metadata = new GenericMetadata();
+        $metadata->addConstraints($constraints);
+        $groups = $groups ? $this->normalizeGroups($groups) : $this->defaultGroups;
+
+        $node = new GenericNode(
+            $value,
+            $metadata,
+            $this->defaultPropertyPath,
+            $groups
+        );
+
+        $this->nodeTraverser->traverse(array($node), $this->context);
+
+        return $this;
     }
 
-    /**
-     * Validates a value.
-     *
-     * The accepted values depend on the {@link MetadataFactoryInterface}
-     * implementation.
-     *
-     * @param mixed      $object The value to validate
-     * @param array|null $groups The validation groups to validate.
-     *
-     * @return ConstraintViolationListInterface A list of constraint violations. If the
-     *                                          list is empty, validation succeeded.
-     */
     public function validateObject($object, $groups = null)
     {
-        $this->traverseObject($object, $groups);
+        $classMetadata = $this->metadataFactory->getMetadataFor($object);
 
-        return $this->context->getViolations();
+        if (!$classMetadata instanceof ClassMetadataInterface) {
+            throw new ValidatorException(sprintf(
+                'The metadata factory should return instances of '.
+                '"\Symfony\Component\Validator\Mapping\ClassMetadataInterface", '.
+                'got: "%s".',
+                is_object($classMetadata) ? get_class($classMetadata) : gettype($classMetadata)
+            ));
+        }
+
+        $groups = $groups ? $this->normalizeGroups($groups) : $this->defaultGroups;
+
+        $node = new ClassNode(
+            $object,
+            $classMetadata,
+            $this->defaultPropertyPath,
+            $groups
+        );
+
+        $this->nodeTraverser->traverse(array($node), $this->context);
+
+        return $this;
     }
 
     public function validateCollection($collection, $groups = null, $deep = false)
@@ -89,50 +117,85 @@ class ContextualValidator extends AbstractValidator implements ContextualValidat
             'deep' => $deep,
         ));
 
-        $this->traverse($collection, $constraint, $groups);
-
-        return $this->context->getViolations();
+        return $this->validate($collection, $constraint, $groups);
     }
 
-    /**
-     * Validates a property of a value against its current value.
-     *
-     * The accepted values depend on the {@link MetadataFactoryInterface}
-     * implementation.
-     *
-     * @param mixed      $object       The value containing the property.
-     * @param string     $propertyName The name of the property to validate.
-     * @param array|null $groups       The validation groups to validate.
-     *
-     * @return ConstraintViolationListInterface A list of constraint violations. If the
-     *                                          list is empty, validation succeeded.
-     */
     public function validateProperty($object, $propertyName, $groups = null)
     {
-        $this->traverseProperty($object, $propertyName, $groups);
+        $classMetadata = $this->metadataFactory->getMetadataFor($object);
 
-        return $this->context->getViolations();
+        if (!$classMetadata instanceof ClassMetadataInterface) {
+            throw new ValidatorException(sprintf(
+                'The metadata factory should return instances of '.
+                '"\Symfony\Component\Validator\Mapping\ClassMetadataInterface", '.
+                'got: "%s".',
+                is_object($classMetadata) ? get_class($classMetadata) : gettype($classMetadata)
+            ));
+        }
+
+        $propertyMetadatas = $classMetadata->getPropertyMetadata($propertyName);
+        $groups = $groups ? $this->normalizeGroups($groups) : $this->defaultGroups;
+        $nodes = array();
+
+        foreach ($propertyMetadatas as $propertyMetadata) {
+            $propertyValue = $propertyMetadata->getPropertyValue($object);
+
+            $nodes[] = new PropertyNode(
+                $propertyValue,
+                $propertyMetadata,
+                PropertyPath::append($this->defaultPropertyPath, $propertyName),
+                $groups
+            );
+        }
+
+        $this->nodeTraverser->traverse($nodes, $this->context);
+
+        return $this;
     }
 
-    /**
-     * Validate a property of a value against a potential value.
-     *
-     * The accepted values depend on the {@link MetadataFactoryInterface}
-     * implementation.
-     *
-     * @param string     $object          The value containing the property.
-     * @param string     $propertyName    The name of the property to validate
-     * @param string     $value           The value to validate against the
-     *                                    constraints of the property.
-     * @param array|null $groups          The validation groups to validate.
-     *
-     * @return ConstraintViolationListInterface A list of constraint violations. If the
-     *                                          list is empty, validation succeeded.
-     */
     public function validatePropertyValue($object, $propertyName, $value, $groups = null)
     {
-        $this->traversePropertyValue($object, $propertyName, $value, $groups);
+        $classMetadata = $this->metadataFactory->getMetadataFor($object);
 
+        if (!$classMetadata instanceof ClassMetadataInterface) {
+            throw new ValidatorException(sprintf(
+                'The metadata factory should return instances of '.
+                '"\Symfony\Component\Validator\Mapping\ClassMetadataInterface", '.
+                'got: "%s".',
+                is_object($classMetadata) ? get_class($classMetadata) : gettype($classMetadata)
+            ));
+        }
+
+        $propertyMetadatas = $classMetadata->getPropertyMetadata($propertyName);
+        $groups = $groups ? $this->normalizeGroups($groups) : $this->defaultGroups;
+        $nodes = array();
+
+        foreach ($propertyMetadatas as $propertyMetadata) {
+            $nodes[] = new PropertyNode(
+                $value,
+                $propertyMetadata,
+                PropertyPath::append($this->defaultPropertyPath, $propertyName),
+                $groups,
+                $groups
+            );
+        }
+
+        $this->nodeTraverser->traverse($nodes, $this->context);
+
+        return $this;
+    }
+
+    protected function normalizeGroups($groups)
+    {
+        if (is_array($groups)) {
+            return $groups;
+        }
+
+        return array($groups);
+    }
+
+    public function getViolations()
+    {
         return $this->context->getViolations();
     }
 }

@@ -82,6 +82,11 @@ interface ValidatorInterface
     public function validatePropertyValue($object, $propertyName, $value, $groups = null);
 
     /**
+     * @return ContextualValidatorInterface
+     */
+    public function startContext();
+
+    /**
      * @param ExecutionContextInterface $context
      *
      * @return ContextualValidatorInterface

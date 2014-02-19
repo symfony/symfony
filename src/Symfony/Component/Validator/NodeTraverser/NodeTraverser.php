@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\NodeTraverser;
 
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\NoSuchMetadataException;
 use Symfony\Component\Validator\Mapping\CascadingStrategy;
@@ -59,7 +60,7 @@ class NodeTraverser implements NodeTraverserInterface
     /**
      * {@inheritdoc}
      */
-    public function traverse(array $nodes)
+    public function traverse(array $nodes, ExecutionContextInterface $context)
     {
         $isTopLevelCall = !$this->traversalStarted;
 
@@ -68,39 +69,34 @@ class NodeTraverser implements NodeTraverserInterface
 
             foreach ($this->visitors as $visitor) {
                 /** @var NodeVisitorInterface $visitor */
-                $visitor->beforeTraversal($nodes);
+                $visitor->beforeTraversal($nodes, $context);
             }
         }
 
         foreach ($nodes as $node) {
             if ($node instanceof ClassNode) {
-                $this->traverseClassNode($node);
+                $this->traverseClassNode($node, $context);
             } else {
-                $this->traverseNode($node);
+                $this->traverseNode($node, $context);
             }
         }
 
         if ($isTopLevelCall) {
             foreach ($this->visitors as $visitor) {
                 /** @var NodeVisitorInterface $visitor */
-                $visitor->afterTraversal($nodes);
+                $visitor->afterTraversal($nodes, $context);
             }
 
             $this->traversalStarted = false;
         }
     }
 
-    /**
-     * @param Node $node
-     *
-     * @return Boolean
-     */
-    private function enterNode(Node $node)
+    private function enterNode(Node $node, ExecutionContextInterface $context)
     {
         $continueTraversal = true;
 
         foreach ($this->visitors as $visitor) {
-            if (false === $visitor->enterNode($node)) {
+            if (false === $visitor->enterNode($node, $context)) {
                 $continueTraversal = false;
 
                 // Continue, so that the enterNode() method of all visitors
@@ -111,19 +107,16 @@ class NodeTraverser implements NodeTraverserInterface
         return $continueTraversal;
     }
 
-    /**
-     * @param Node $node
-     */
-    private function leaveNode(Node $node)
+    private function leaveNode(Node $node, ExecutionContextInterface $context)
     {
         foreach ($this->visitors as $visitor) {
-            $visitor->leaveNode($node);
+            $visitor->leaveNode($node, $context);
         }
     }
 
-    private function traverseNode(Node $node)
+    private function traverseNode(Node $node, ExecutionContextInterface $context)
     {
-        $continue = $this->enterNode($node);
+        $continue = $this->enterNode($node, $context);
 
         // Visitors have two possibilities to influence the traversal:
         //
@@ -133,13 +126,13 @@ class NodeTraverser implements NodeTraverserInterface
         //    that group will be skipped in the subtree of that node.
 
         if (false === $continue) {
-            $this->leaveNode($node);
+            $this->leaveNode($node, $context);
 
             return;
         }
 
         if (null === $node->value) {
-            $this->leaveNode($node);
+            $this->leaveNode($node, $context);
 
             return;
         }
@@ -151,7 +144,7 @@ class NodeTraverser implements NodeTraverserInterface
             : $node->groups;
 
         if (0 === count($cascadedGroups)) {
-            $this->leaveNode($node);
+            $this->leaveNode($node, $context);
 
             return;
         }
@@ -166,11 +159,12 @@ class NodeTraverser implements NodeTraverserInterface
             $this->cascadeEachObjectIn(
                 $node->value,
                 $node->propertyPath,
-                $node->cascadedGroups,
-                $traversalStrategy
+                $cascadedGroups,
+                $traversalStrategy,
+                $context
             );
 
-            $this->leaveNode($node);
+            $this->leaveNode($node, $context);
 
             return;
         }
@@ -182,25 +176,26 @@ class NodeTraverser implements NodeTraverserInterface
             $this->cascadeObject(
                 $node->value,
                 $node->propertyPath,
-                $node->cascadedGroups,
-                $traversalStrategy
+                $cascadedGroups,
+                $traversalStrategy,
+                $context
             );
 
-            $this->leaveNode($node);
+            $this->leaveNode($node, $context);
 
             return;
         }
 
         // Traverse only if the TRAVERSE bit is set
         if (!($traversalStrategy & TraversalStrategy::TRAVERSE)) {
-            $this->leaveNode($node);
+            $this->leaveNode($node, $context);
 
             return;
         }
 
         if (!$node->value instanceof \Traversable) {
             if ($traversalStrategy & TraversalStrategy::IGNORE_NON_TRAVERSABLE) {
-                $this->leaveNode($node);
+                $this->leaveNode($node, $context);
 
                 return;
             }
@@ -215,16 +210,17 @@ class NodeTraverser implements NodeTraverserInterface
         $this->cascadeEachObjectIn(
             $node->value,
             $node->propertyPath,
-            $node->groups,
-            $traversalStrategy
+            $cascadedGroups,
+            $traversalStrategy,
+            $context
         );
 
-        $this->leaveNode($node);
+        $this->leaveNode($node, $context);
     }
 
-    private function traverseClassNode(ClassNode $node, $traversalStrategy = TraversalStrategy::IMPLICIT)
+    private function traverseClassNode(ClassNode $node, ExecutionContextInterface $context, $traversalStrategy = TraversalStrategy::IMPLICIT)
     {
-        $continue = $this->enterNode($node);
+        $continue = $this->enterNode($node, $context);
 
         // Visitors have two possibilities to influence the traversal:
         //
@@ -234,28 +230,30 @@ class NodeTraverser implements NodeTraverserInterface
         //    that group will be skipped in the subtree of that node.
 
         if (false === $continue) {
-            $this->leaveNode($node);
+            $this->leaveNode($node, $context);
 
             return;
         }
 
         if (0 === count($node->groups)) {
-            $this->leaveNode($node);
+            $this->leaveNode($node, $context);
 
             return;
         }
 
         foreach ($node->metadata->getConstrainedProperties() as $propertyName) {
             foreach ($node->metadata->getPropertyMetadata($propertyName) as $propertyMetadata) {
-                $this->traverseNode(new PropertyNode(
-                     $propertyMetadata->getPropertyValue($node->value),
-                     $propertyMetadata,
-                     $node->propertyPath
-                         ? $node->propertyPath.'.'.$propertyName
-                         : $propertyName,
-                     $node->groups,
-                     $node->cascadedGroups
-                ));
+                $propertyNode = new PropertyNode(
+                    $propertyMetadata->getPropertyValue($node->value),
+                    $propertyMetadata,
+                    $node->propertyPath
+                        ? $node->propertyPath.'.'.$propertyName
+                        : $propertyName,
+                    $node->groups,
+                    $node->cascadedGroups
+                );
+
+                $this->traverseNode($propertyNode, $context);
             }
         }
 
@@ -267,14 +265,14 @@ class NodeTraverser implements NodeTraverserInterface
 
         // Traverse only if the TRAVERSE bit is set
         if (!($traversalStrategy & TraversalStrategy::TRAVERSE)) {
-            $this->leaveNode($node);
+            $this->leaveNode($node, $context);
 
             return;
         }
 
         if (!$node->value instanceof \Traversable) {
             if ($traversalStrategy & TraversalStrategy::IGNORE_NON_TRAVERSABLE) {
-                $this->leaveNode($node);
+                $this->leaveNode($node, $context);
 
                 return;
             }
@@ -290,13 +288,14 @@ class NodeTraverser implements NodeTraverserInterface
             $node->value,
             $node->propertyPath,
             $node->groups,
-            $traversalStrategy
+            $traversalStrategy,
+            $context
         );
 
-        $this->leaveNode($node);
+        $this->leaveNode($node, $context);
     }
 
-    private function cascadeObject($object, $propertyPath, array $groups, $traversalStrategy)
+    private function cascadeObject($object, $propertyPath, array $groups, $traversalStrategy, ExecutionContextInterface $context)
     {
         try {
             $classMetadata = $this->metadataFactory->getMetadataFor($object);
@@ -312,7 +311,7 @@ class NodeTraverser implements NodeTraverserInterface
                 $groups
             );
 
-            $this->traverseClassNode($classNode, $traversalStrategy);
+            $this->traverseClassNode($classNode, $context, $traversalStrategy);
         } catch (NoSuchMetadataException $e) {
             // Rethrow if the TRAVERSE bit is not set
             if (!($traversalStrategy & TraversalStrategy::TRAVERSE)) {
@@ -329,12 +328,13 @@ class NodeTraverser implements NodeTraverserInterface
                  $object,
                  $propertyPath,
                  $groups,
-                 $traversalStrategy
+                 $traversalStrategy,
+                 $context
             );
         }
     }
 
-    private function cascadeEachObjectIn($collection, $propertyPath, array $groups, $traversalStrategy)
+    private function cascadeEachObjectIn($collection, $propertyPath, array $groups, $traversalStrategy, ExecutionContextInterface $context)
     {
         if ($traversalStrategy & TraversalStrategy::RECURSIVE) {
             // Try to traverse nested objects, but ignore if they do not
@@ -356,7 +356,8 @@ class NodeTraverser implements NodeTraverserInterface
                     $value,
                     $propertyPath.'['.$key.']',
                     $groups,
-                    $traversalStrategy
+                    $traversalStrategy,
+                    $context
                 );
 
                 continue;
@@ -369,7 +370,8 @@ class NodeTraverser implements NodeTraverserInterface
                     $value,
                     $propertyPath.'['.$key.']',
                     $groups,
-                    $traversalStrategy
+                    $traversalStrategy,
+                    $context
                 );
             }
         }

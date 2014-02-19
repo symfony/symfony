@@ -13,8 +13,9 @@ namespace Symfony\Component\Validator\Tests\Validator;
 
 use Symfony\Component\Validator\DefaultTranslator;
 use Symfony\Component\Validator\ConstraintValidatorFactory;
-use Symfony\Component\Validator\Context\ExecutionContextManager;
+use Symfony\Component\Validator\Context\ExecutionContextFactory;
 use Symfony\Component\Validator\MetadataFactoryInterface;
+use Symfony\Component\Validator\NodeVisitor\ContextRefresher;
 use Symfony\Component\Validator\NodeVisitor\GroupSequenceResolver;
 use Symfony\Component\Validator\NodeVisitor\NodeValidator;
 use Symfony\Component\Validator\NodeTraverser\NodeTraverser;
@@ -26,20 +27,13 @@ class Validator2Dot5ApiTest extends Abstract2Dot5ApiTest
     {
         $nodeTraverser = new NodeTraverser($metadataFactory);
         $nodeValidator = new NodeValidator($nodeTraverser, new ConstraintValidatorFactory());
-        $contextManager = new ExecutionContextManager($nodeValidator, new DefaultTranslator());
-        $validator = new Validator($nodeTraverser, $metadataFactory, $contextManager);
+        $contextFactory = new ExecutionContextFactory($nodeValidator, new DefaultTranslator());
+        $validator = new Validator($contextFactory, $nodeTraverser, $metadataFactory);
         $groupSequenceResolver = new GroupSequenceResolver();
-
-        // The context manager needs the validator for passing it to created
-        // contexts
-        $contextManager->initialize($validator);
-
-        // The node validator needs the context manager for passing the current
-        // context to the constraint validators
-        $nodeValidator->initialize($contextManager);
+        $contextRefresher = new ContextRefresher();
 
         $nodeTraverser->addVisitor($groupSequenceResolver);
-        $nodeTraverser->addVisitor($contextManager);
+        $nodeTraverser->addVisitor($contextRefresher);
         $nodeTraverser->addVisitor($nodeValidator);
 
         return $validator;

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\NodeVisitor;
 
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Node\ClassNode;
 use Symfony\Component\Validator\Node\Node;
 use Symfony\Component\Validator\ObjectInitializerInterface;
@@ -42,7 +43,7 @@ class ObjectInitializer extends AbstractVisitor
         $this->initializers = $initializers;
     }
 
-    public function enterNode(Node $node)
+    public function enterNode(Node $node, ExecutionContextInterface $context)
     {
         if (!$node instanceof ClassNode) {
             return;

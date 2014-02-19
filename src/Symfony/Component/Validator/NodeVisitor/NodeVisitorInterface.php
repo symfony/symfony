@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\NodeVisitor;
 
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Node\Node;
 
 /**
@@ -19,11 +20,11 @@ use Symfony\Component\Validator\Node\Node;
  */
 interface NodeVisitorInterface
 {
-    public function beforeTraversal(array $nodes);
+    public function beforeTraversal(array $nodes, ExecutionContextInterface $context);
 
-    public function afterTraversal(array $nodes);
+    public function afterTraversal(array $nodes, ExecutionContextInterface $context);
 
-    public function enterNode(Node $node);
+    public function enterNode(Node $node, ExecutionContextInterface $context);
 
-    public function leaveNode(Node $node);
+    public function leaveNode(Node $node, ExecutionContextInterface $context);
 }

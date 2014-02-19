@@ -25,7 +25,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilder;
 
 /**
- * The context used and created by {@link ExecutionContextManager}.
+ * The context used and created by {@link ExecutionContextFactory}.
  *
  * @since  2.5
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -35,11 +35,31 @@ use Symfony\Component\Validator\Violation\ConstraintViolationBuilder;
 class ExecutionContext implements ExecutionContextInterface, LegacyExecutionContextInterface
 {
     /**
+     * @var ValidatorInterface
+     */
+    private $validator;
+
+    /**
      * The root value of the validated object graph.
      *
      * @var mixed
      */
     private $root;
+
+    /**
+     * @var GroupManagerInterface
+     */
+    private $groupManager;
+
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @var string
+     */
+    private $translationDomain;
 
     /**
      * The violations generated in the current context.
@@ -63,31 +83,11 @@ class ExecutionContext implements ExecutionContextInterface, LegacyExecutionCont
     private $nodeStack;
 
     /**
-     * @var ValidatorInterface
-     */
-    private $validator;
-
-    /**
-     * @var GroupManagerInterface
-     */
-    private $groupManager;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var string
-     */
-    private $translationDomain;
-
-    /**
      * Creates a new execution context.
      *
+     * @param ValidatorInterface    $validator         The validator
      * @param mixed                 $root              The root value of the
      *                                                 validated object graph
-     * @param ValidatorInterface    $validator         The validator
      * @param GroupManagerInterface $groupManager      The manager for accessing
      *                                                 the currently validated
      *                                                 group
@@ -96,13 +96,13 @@ class ExecutionContext implements ExecutionContextInterface, LegacyExecutionCont
      *                                                 use for translating
      *                                                 violation messages
      *
-     * @internal Called by {@link ExecutionContextManager}. Should not be used
+     * @internal Called by {@link ExecutionContextFactory}. Should not be used
      *           in user code.
      */
-    public function __construct($root, ValidatorInterface $validator, GroupManagerInterface $groupManager, TranslatorInterface $translator, $translationDomain = null)
+    public function __construct(ValidatorInterface $validator, $root, GroupManagerInterface $groupManager, TranslatorInterface $translator, $translationDomain = null)
     {
-        $this->root = $root;
         $this->validator = $validator;
+        $this->root = $root;
         $this->groupManager = $groupManager;
         $this->translator = $translator;
         $this->translationDomain = $translationDomain;

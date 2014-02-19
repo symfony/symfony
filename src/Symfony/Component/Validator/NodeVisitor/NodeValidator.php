@@ -13,7 +13,7 @@ namespace Symfony\Component\Validator\NodeVisitor;
 
 use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
-use Symfony\Component\Validator\Context\ExecutionContextManagerInterface;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Group\GroupManagerInterface;
 use Symfony\Component\Validator\Node\ClassNode;
 use Symfony\Component\Validator\Node\Node;
@@ -36,11 +36,6 @@ class NodeValidator extends AbstractVisitor implements GroupManagerInterface
     private $validatorFactory;
 
     /**
-     * @var ExecutionContextManagerInterface
-     */
-    private $contextManager;
-
-    /**
      * @var NodeTraverserInterface
      */
     private $nodeTraverser;
@@ -56,19 +51,14 @@ class NodeValidator extends AbstractVisitor implements GroupManagerInterface
         $this->objectHashStack = new \SplStack();
     }
 
-    public function initialize(ExecutionContextManagerInterface $contextManager)
-    {
-        $this->contextManager = $contextManager;
-    }
-
-    public function afterTraversal(array $nodes)
+    public function afterTraversal(array $nodes, ExecutionContextInterface $context)
     {
         $this->validatedObjects = array();
         $this->validatedConstraints = array();
         $this->objectHashStack = new \SplStack();
     }
 
-    public function enterNode(Node $node)
+    public function enterNode(Node $node, ExecutionContextInterface $context)
     {
         if ($node instanceof ClassNode) {
             $objectHash = spl_object_hash($node->value);
@@ -105,7 +95,7 @@ class NodeValidator extends AbstractVisitor implements GroupManagerInterface
 
             // Validate normal group
             if (!$group instanceof GroupSequence) {
-                $this->validateNodeForGroup($objectHash, $node, $group);
+                $this->validateNodeForGroup($objectHash, $node, $group, $context);
 
                 continue;
             }
@@ -114,7 +104,7 @@ class NodeValidator extends AbstractVisitor implements GroupManagerInterface
             unset($node->groups[$key]);
 
             // Traverse group sequence until a violation is generated
-            $this->traverseGroupSequence($node, $group);
+            $this->traverseGroupSequence($node, $group, $context);
 
             // Optimization: If the groups only contain the group sequence,
             // we can skip the traversal for the properties of the object
@@ -126,7 +116,7 @@ class NodeValidator extends AbstractVisitor implements GroupManagerInterface
         return true;
     }
 
-    public function leaveNode(Node $node)
+    public function leaveNode(Node $node, ExecutionContextInterface $context)
     {
         if ($node instanceof ClassNode) {
             $this->objectHashStack->pop();
@@ -138,9 +128,8 @@ class NodeValidator extends AbstractVisitor implements GroupManagerInterface
         return $this->currentGroup;
     }
 
-    private function traverseGroupSequence(Node $node, GroupSequence $groupSequence)
+    private function traverseGroupSequence(Node $node, GroupSequence $groupSequence, ExecutionContextInterface $context)
     {
-        $context = $this->contextManager->getCurrentContext();
         $violationCount = count($context->getViolations());
 
         foreach ($groupSequence->groups as $groupInSequence) {
@@ -151,7 +140,7 @@ class NodeValidator extends AbstractVisitor implements GroupManagerInterface
                 $node->cascadedGroups = array($groupSequence->cascadedGroup);
             }
 
-            $this->nodeTraverser->traverse(array($node));
+            $this->nodeTraverser->traverse(array($node), $context);
 
             // Abort sequence validation if a violation was generated
             if (count($context->getViolations()) > $violationCount) {
@@ -160,14 +149,7 @@ class NodeValidator extends AbstractVisitor implements GroupManagerInterface
         }
     }
 
-    /**
-     * @param      $objectHash
-     * @param Node $node
-     * @param      $group
-     *
-     * @throws \Exception
-     */
-    private function validateNodeForGroup($objectHash, Node $node, $group)
+    private function validateNodeForGroup($objectHash, Node $node, $group, ExecutionContextInterface $context)
     {
         try {
             $this->currentGroup = $group;
@@ -187,7 +169,7 @@ class NodeValidator extends AbstractVisitor implements GroupManagerInterface
                 }
 
                 $validator = $this->validatorFactory->getInstance($constraint);
-                $validator->initialize($this->contextManager->getCurrentContext());
+                $validator->initialize($context);
                 $validator->validate($node->value, $constraint);
             }
 

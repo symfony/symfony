@@ -87,7 +87,7 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
             'groups' => array('Group 1', 'Group 2'),
         )));
 
-        $violations = $this->validateObject($entity, array('Group 1', 'Group 2'));
+        $violations = $this->validator->validateObject($entity, array('Group 1', 'Group 2'));
 
         /** @var ConstraintViolationInterface[] $violations */
         $this->assertCount(1, $violations);
@@ -118,7 +118,7 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
         )));
 
         $sequence = new GroupSequence(array('Group 1', 'Group 2', 'Group 3'));
-        $violations = $this->validateObject($entity, $sequence);
+        $violations = $this->validator->validateObject($entity, $sequence);
 
         /** @var ConstraintViolationInterface[] $violations */
         $this->assertCount(1, $violations);
@@ -148,7 +148,7 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
         )));
 
         $sequence = new GroupSequence(array('Group 1', 'Entity'));
-        $violations = $this->validateObject($entity, $sequence);
+        $violations = $this->validator->validateObject($entity, $sequence);
 
         /** @var ConstraintViolationInterface[] $violations */
         $this->assertCount(1, $violations);
@@ -207,7 +207,7 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
             'groups' => 'Group',
         )));
 
-        $violations = $this->validateObject($entity, 'Group');
+        $violations = $this->validator->validateObject($entity, 'Group');
 
         /** @var ConstraintViolationInterface[] $violations */
         $this->assertCount(1, $violations);
@@ -251,7 +251,7 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
             'groups' => 'Group',
         )));
 
-        $violations = $this->validateObject($entity, 'Group');
+        $violations = $this->validator->validateObject($entity, 'Group');
 
         /** @var ConstraintViolationInterface[] $violations */
         $this->assertCount(1, $violations);
@@ -302,7 +302,7 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
             'groups' => 'Group',
         )));
 
-        $violations = $this->validateObject($entity, 'Group');
+        $violations = $this->validator->validateObject($entity, 'Group');
 
         /** @var ConstraintViolationInterface[] $violations */
         $this->assertCount(1, $violations);
@@ -361,7 +361,7 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
     {
         $entity = new Entity();
 
-        $this->validate($entity, new Traverse());
+        $this->validator->validate($entity, new Traverse());
     }
 
     /**
@@ -373,7 +373,7 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
 
         $this->metadata->addConstraint(new Traverse());
 
-        $this->validateObject($entity);
+        $this->validator->validateObject($entity);
     }
 
     public function testAddCustomizedViolation()
@@ -391,7 +391,7 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
 
         $this->metadata->addConstraint(new Callback($callback));
 
-        $violations = $this->validateObject($entity);
+        $violations = $this->validator->validateObject($entity);
 
         /** @var ConstraintViolationInterface[] $violations */
         $this->assertCount(1, $violations);

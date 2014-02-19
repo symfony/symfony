@@ -51,11 +51,7 @@ class ExecutionContextTest extends \PHPUnit_Framework_TestCase
         $this->translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
 
         $this->context = new ExecutionContext(
-            self::ROOT,
-            $this->validator,
-            $this->groupManager,
-            $this->translator,
-            self::TRANSLATION_DOMAIN
+            $this->validator, self::ROOT, $this->groupManager, $this->translator, self::TRANSLATION_DOMAIN
         );
     }
 

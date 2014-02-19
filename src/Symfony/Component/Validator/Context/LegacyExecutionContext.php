@@ -39,8 +39,11 @@ class LegacyExecutionContext extends ExecutionContext implements LegacyExecution
      * it does not, an {@link InvalidArgumentException} is thrown.
      *
      * @see ExecutionContext::__construct()
+     *
+     * @internal Called by {@link LegacyExecutionContextFactory}. Should not be used
+     *           in user code.
      */
-    public function __construct($root, ValidatorInterface $validator, GroupManagerInterface $groupManager, TranslatorInterface $translator, $translationDomain = null)
+    public function __construct(ValidatorInterface $validator, $root, GroupManagerInterface $groupManager, TranslatorInterface $translator, $translationDomain = null)
     {
         if (!$validator instanceof LegacyValidatorInterface) {
             throw new InvalidArgumentException(
@@ -49,7 +52,13 @@ class LegacyExecutionContext extends ExecutionContext implements LegacyExecution
             );
         }
 
-        parent::__construct($root, $validator, $groupManager, $translator, $translationDomain);
+        parent::__construct(
+            $validator,
+            $root,
+            $groupManager,
+            $translator,
+            $translationDomain
+        );
     }
 
     /**

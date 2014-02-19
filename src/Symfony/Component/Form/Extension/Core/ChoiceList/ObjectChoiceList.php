@@ -70,11 +70,14 @@ class ObjectChoiceList extends ChoiceList
      *                                                    stored in the array key pointing to the nested
      *                                                    array. The topmost level of the hierarchy may also
      *                                                    be a \Traversable.
-     * @param string                   $labelPath         A property path pointing to the property used
-     *                                                    for the choice labels. The value is obtained
-             *                                            by calling the getter on the object. If the
-     *                                                    path is NULL, the object's __toString() method
+     * @param string|\Closure          $labelPath         A property path pointing to the property used
+     *                                                    for the choice labels.
+     *                                                    If the path is a string, the value is obtained
+     *                                                    by calling the getter on the object.
+     *                                                    If the path is NULL, the object's __toString() method
      *                                                    is used instead.
+     *                                                    If the path is a Closure, the closure is called with
+     *                                                    the choice as first argument.
      * @param array                    $preferredChoices  A flat array of choices that should be
      *                                                    presented to the user with priority.
      * @param string                   $groupPath         A property path pointing to the property used
@@ -88,9 +91,15 @@ class ObjectChoiceList extends ChoiceList
     public function __construct($choices, $labelPath = null, array $preferredChoices = array(), $groupPath = null, $valuePath = null, PropertyAccessorInterface $propertyAccessor = null)
     {
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
-        $this->labelPath = null !== $labelPath ? new PropertyPath($labelPath) : null;
         $this->groupPath = null !== $groupPath ? new PropertyPath($groupPath) : null;
         $this->valuePath = null !== $valuePath ? new PropertyPath($valuePath) : null;
+
+        $this->labelPath = null;
+        if ($labelPath instanceof \Closure) {
+            $this->labelPath = $labelPath;
+        } elseif (is_string($labelPath)) {
+            $this->labelPath = new PropertyPath($labelPath);
+        }
 
         parent::__construct($choices, array(), $preferredChoices);
     }
@@ -173,7 +182,11 @@ class ObjectChoiceList extends ChoiceList
                 $labels[$i] = array();
                 $this->extractLabels($choice, $labels[$i]);
             } elseif ($this->labelPath) {
-                $labels[$i] = $this->propertyAccessor->getValue($choice, $this->labelPath);
+                if ($this->labelPath instanceof \Closure) {
+                    $labels[$i] = call_user_func($this->labelPath, $choice);
+                } else {
+                    $labels[$i] = $this->propertyAccessor->getValue($choice, $this->labelPath);
+                }
             } elseif (method_exists($choice, '__toString')) {
                 $labels[$i] = (string) $choice;
             } else {

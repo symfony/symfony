@@ -14,7 +14,7 @@ namespace Symfony\Component\Validator\Tests\Validator;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\MetadataFactoryInterface;
 use Symfony\Component\Validator\Tests\Fixtures\Entity;
-use Symfony\Component\Validator\Validator;
+use Symfony\Component\Validator\Validator as LegacyValidator;
 use Symfony\Component\Validator\DefaultTranslator;
 use Symfony\Component\Validator\ConstraintValidatorFactory;
 
@@ -22,22 +22,37 @@ class LegacyValidatorTest extends AbstractValidatorTest
 {
     protected function createValidator(MetadataFactoryInterface $metadataFactory)
     {
-        return new Validator($metadataFactory, new ConstraintValidatorFactory(), new DefaultTranslator());
+        return new LegacyValidator($metadataFactory, new ConstraintValidatorFactory(), new DefaultTranslator());
     }
 
     public function testNoDuplicateValidationIfConstraintInMultipleGroups()
     {
-        $this->markTestSkipped('Currently not supported');
+        $this->markTestSkipped('Not supported in the legacy API');
     }
 
     public function testGroupSequenceAbortsAfterFailedGroup()
     {
-        $this->markTestSkipped('Currently not supported');
+        $this->markTestSkipped('Not supported in the legacy API');
     }
 
     public function testGroupSequenceIncludesReferences()
     {
-        $this->markTestSkipped('Currently not supported');
+        $this->markTestSkipped('Not supported in the legacy API');
+    }
+
+    public function testValidateInContext()
+    {
+        $this->markTestSkipped('Not supported in the legacy API');
+    }
+
+    public function testValidateArrayInContext()
+    {
+        $this->markTestSkipped('Not supported in the legacy API');
+    }
+
+    public function testValidateInSeparateContext()
+    {
+        $this->markTestSkipped('Not supported in the legacy API');
     }
 
     /**

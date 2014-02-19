@@ -24,9 +24,15 @@ use Symfony\Component\Validator\NodeVisitor\NodeValidator;
 use Symfony\Component\Validator\NodeTraverser\NodeTraverser;
 use Symfony\Component\Validator\Tests\Fixtures\Entity;
 use Symfony\Component\Validator\Validator\LegacyValidator;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ValidatorTest extends AbstractValidatorTest
 {
+    /**
+     * @var ValidatorInterface
+     */
+    protected $validator;
+
     protected function createValidator(MetadataFactoryInterface $metadataFactory)
     {
         $nodeTraverser = new NodeTraverser($metadataFactory);
@@ -50,7 +56,7 @@ class ValidatorTest extends AbstractValidatorTest
         return $validator;
     }
 
-    public function testValidateValueAcceptsValid()
+    public function testValidateAcceptsValid()
     {
         $test = $this;
         $entity = new Entity();
@@ -75,7 +81,7 @@ class ValidatorTest extends AbstractValidatorTest
         )));
 
         // This is the same as when calling validateObject()
-        $violations = $this->validator->validateValue($entity, new Valid(), 'Group');
+        $violations = $this->validator->validate($entity, new Valid(), 'Group');
 
         /** @var ConstraintViolationInterface[] $violations */
         $this->assertCount(1, $violations);

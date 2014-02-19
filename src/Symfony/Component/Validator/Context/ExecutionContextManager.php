@@ -72,10 +72,6 @@ class ExecutionContextManager extends AbstractVisitor implements ExecutionContex
             // TODO error, call initialize() first
         }
 
-        if (null !== $this->currentContext) {
-            $this->contextStack->push($this->currentContext);
-        }
-
         $this->currentContext = new LegacyExecutionContext(
             $root,
             $this->validator,
@@ -83,29 +79,24 @@ class ExecutionContextManager extends AbstractVisitor implements ExecutionContex
             $this->translator,
             $this->translationDomain
         );
+        $this->contextStack->push($this->currentContext);
 
         return $this->currentContext;
     }
 
     public function stopContext()
     {
-        $stoppedContext = $this->currentContext;
-
         if (0 === count($this->contextStack)) {
-            $this->currentContext = null;
-
-            return $stoppedContext;
+            return null;
         }
 
-        if (1 === count($this->contextStack)) {
-            $this->contextStack->pop();
-            $this->currentContext = null;
+        // Remove the current context from the stack
+        $stoppedContext = $this->contextStack->pop();
 
-            return $stoppedContext;
-        }
-
-        $this->contextStack->pop();
-        $this->currentContext = $this->contextStack->top();
+        // Adjust the current context to the previous context
+        $this->currentContext = count($this->contextStack) > 0
+            ? $this->contextStack->top()
+            : null;
 
         return $stoppedContext;
     }
@@ -113,11 +104,6 @@ class ExecutionContextManager extends AbstractVisitor implements ExecutionContex
     public function getCurrentContext()
     {
         return $this->currentContext;
-    }
-
-    public function afterTraversal(array $nodes)
-    {
-        $this->contextStack = new \SplStack();
     }
 
     public function enterNode(Node $node)

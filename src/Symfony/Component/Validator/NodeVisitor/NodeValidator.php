@@ -47,8 +47,6 @@ class NodeValidator extends AbstractVisitor implements GroupManagerInterface
 
     private $currentGroup;
 
-    private $currentObjectHash;
-
     private $objectHashStack;
 
     public function __construct(NodeTraverserInterface $nodeTraverser, ConstraintValidatorFactoryInterface $validatorFactory)

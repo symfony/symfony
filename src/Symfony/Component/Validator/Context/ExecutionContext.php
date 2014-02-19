@@ -137,19 +137,13 @@ class ExecutionContext implements ExecutionContextInterface
             return null;
         }
 
-        $poppedNode = $this->node;
+        // Remove the current node from the stack
+        $poppedNode = $this->nodeStack->pop();
 
-        // After removing the last node, the stack is empty and the node
-        // is null
-        if (1 === count($this->nodeStack)) {
-            $this->nodeStack->pop();
-            $this->node = null;
-
-            return $poppedNode;
-        }
-
-        $this->nodeStack->pop();
-        $this->node = $this->nodeStack->top();
+        // Adjust the current node to the previous node
+        $this->node = count($this->nodeStack) > 0
+            ? $this->nodeStack->top()
+            : null;
 
         return $poppedNode;
     }

@@ -164,7 +164,7 @@ EOF;
         if ($optimizable) {
             $optimizedPrefix = $prefix;
 
-            $code .= sprintf("    if (0 === strpos(\$pathinfo, %s)) {\n", var_export($prefix, true));
+            $code .= sprintf("    if (0 === strncmp(\$pathinfo, %s, %d)) {\n", var_export($prefix, true), strlen($prefix));
         }
 
         foreach ($collection as $route) {
@@ -225,7 +225,7 @@ EOF;
             }
         } else {
             if ($compiledRoute->getStaticPrefix() && $compiledRoute->getStaticPrefix() !== $parentPrefix) {
-                $conditions[] = sprintf("0 === strpos(\$pathinfo, %s)", var_export($compiledRoute->getStaticPrefix(), true));
+                $conditions[] = sprintf("0 === strncmp(\$pathinfo, %s, %d)", var_export($compiledRoute->getStaticPrefix(), true), strlen($compiledRoute->getStaticPrefix()));
             }
 
             $regex = $compiledRoute->getRegex();

@@ -14,46 +14,67 @@ namespace Symfony\Component\Debug;
 /**
  * Autoloader checking if the class is really defined in the file found.
  *
- * The ClassLoader will wrap all registered autoloaders providing a
- * findFile method and will throw an exception if a file is found but does
+ * The ClassLoader will wrap all registered autoloaders
+ * and will throw an exception if a file is found but does
  * not declare the class.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Christophe Coevoet <stof@notk.org>
+ * @author Nicolas Grekas <p@tchwork.com>
  *
  * @api
  */
 class DebugClassLoader
 {
-    private $classFinder;
+    private $classLoader;
+    private $isFinder;
+    private $wasFinder;
 
     /**
      * Constructor.
      *
-     * @param object $classFinder
+     * @param callable|object $classLoader
      *
      * @api
+     * @deprecated since 2.5, passing an object is deprecated and support for it will be removed in 3.0
      */
-    public function __construct($classFinder)
+    public function __construct($classLoader)
     {
-        $this->classFinder = $classFinder;
+        $this->wasFinder = is_object($classLoader) && method_exists($classLoader, 'findFile');
+
+        if ($this->wasFinder) {
+            $this->classLoader = array($classLoader, 'loadClass');
+            $this->isFinder = true;
+        } else {
+            $this->classLoader = $classLoader;
+            $this->isFinder = is_array($classLoader) && method_exists($classLoader[0], 'findFile');
+        }
     }
 
     /**
      * Gets the wrapped class loader.
      *
-     * @return object a class loader instance
+     * @return callable|object a class loader
+     *
+     * @deprecated since 2.5, returning an object is deprecated and support for it will be removed in 3.0
      */
     public function getClassLoader()
     {
-        return $this->classFinder;
+        if ($this->wasFinder) {
+            return $this->classLoader[0];
+        } else {
+            return $this->classLoader;
+        }
     }
 
     /**
-     * Replaces all autoloaders implementing a findFile method by a DebugClassLoader wrapper.
+     * Wraps all autoloaders
      */
     public static function enable()
     {
+        // Ensures we don't hit https://bugs.php.net/42098
+        class_exists(__NAMESPACE__.'\ErrorHandler', true);
+
         if (!is_array($functions = spl_autoload_functions())) {
             return;
         }
@@ -63,8 +84,8 @@ class DebugClassLoader
         }
 
         foreach ($functions as $function) {
-            if (is_array($function) && !$function[0] instanceof self && method_exists($function[0], 'findFile')) {
-                $function = array(new static($function[0]), 'loadClass');
+            if (!is_array($function) || !$function[0] instanceof self) {
+                $function = array(new static($function), 'loadClass');
             }
 
             spl_autoload_register($function);
@@ -86,7 +107,7 @@ class DebugClassLoader
 
         foreach ($functions as $function) {
             if (is_array($function) && $function[0] instanceof self) {
-                $function[0] = $function[0]->getClassLoader();
+                $function = $function[0]->getClassLoader();
             }
 
             spl_autoload_register($function);
@@ -99,10 +120,14 @@ class DebugClassLoader
      * @param string $class A class name to resolve to file
      *
      * @return string|null
+     *
+     * @deprecated Deprecated since 2.5, to be removed in 3.0.
      */
     public function findFile($class)
     {
-        return $this->classFinder->findFile($class);
+        if ($this->wasFinder) {
+            return $this->classLoader[0]->findFile($class);
+        }
     }
 
     /**
@@ -116,10 +141,55 @@ class DebugClassLoader
      */
     public function loadClass($class)
     {
-        if ($file = $this->classFinder->findFile($class)) {
-            require $file;
+        ErrorHandler::stackErrors();
 
-            if (!class_exists($class, false) && !interface_exists($class, false) && (!function_exists('trait_exists') || !trait_exists($class, false))) {
+        try {
+            if ($this->isFinder) {
+                if ($file = $this->classLoader[0]->findFile($class)) {
+                    require $file;
+                }
+            } else {
+                call_user_func($this->classLoader, $class);
+                $file = false;
+            }
+        } catch (\Exception $e) {
+            ErrorHandler::unstackErrors();
+
+            throw $e;
+        }
+
+        ErrorHandler::unstackErrors();
+
+        $exists = class_exists($class, false) || interface_exists($class, false) || (function_exists('trait_exists') && trait_exists($class, false));
+
+        if ($exists) {
+            $name = new \ReflectionClass($class);
+            $name = $name->getName();
+
+            if ($name !== $class) {
+                throw new \RuntimeException(sprintf('Case mismatch between loaded and declared class names: %s vs %s', $class, $name));
+            }
+        }
+
+        if ($file) {
+            if ('\\' == $class[0]) {
+                $class = substr($class, 1);
+            }
+
+            $i = -1;
+            $tail = str_replace('\\', DIRECTORY_SEPARATOR, $class).'.php';
+            $len = strlen($tail);
+
+            do {
+                $tail = substr($tail, $i+1);
+                $len -= $i+1;
+
+                if (! substr_compare($file, $tail, -$len, $len, true) && substr_compare($file, $tail, -$len, $len, false)) {
+                    throw new \RuntimeException(sprintf('Case mismatch between class and source file names: %s vs %s', $class, $file));
+                }
+            } while (false !== $i = strpos($tail, '\\'));
+
+            if (! $exists) {
                 if (false !== strpos($class, '/')) {
                     throw new \RuntimeException(sprintf('Trying to autoload a class with an invalid name "%s". Be careful that the namespace separator is "\" in PHP, not "/".', $class));
                 }

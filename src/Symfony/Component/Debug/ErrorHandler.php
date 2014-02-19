@@ -25,6 +25,7 @@ use Symfony\Component\Debug\FatalErrorHandler\FatalErrorHandlerInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Konstantin Myakshin <koc-dp@yandex.ru>
+ * @author Nicolas Grekas <p@tchwork.com>
  */
 class ErrorHandler
 {
@@ -56,6 +57,10 @@ class ErrorHandler
      * @var LoggerInterface[] Loggers for channels
      */
     private static $loggers = array();
+
+    private static $stackedErrors = array();
+
+    private static $stackedErrorLevels = array();
 
     /**
      * Registers the error handler.
@@ -121,44 +126,45 @@ class ErrorHandler
 
         if ($level & (E_USER_DEPRECATED | E_DEPRECATED)) {
             if (isset(self::$loggers['deprecation'])) {
-                if (version_compare(PHP_VERSION, '5.4', '<')) {
-                    $stack = array_map(
-                        function ($row) {
-                            unset($row['args']);
-
-                            return $row;
-                        },
-                        array_slice(debug_backtrace(false), 0, 10)
-                    );
+                if (self::$stackedErrorLevels) {
+                    self::$stackedErrors[] = func_get_args();
                 } else {
-                    $stack = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10);
-                }
+                    if (version_compare(PHP_VERSION, '5.4', '<')) {
+                        $stack = array_map(
+                            function ($row) {
+                                unset($row['args']);
 
-                self::$loggers['deprecation']->warning($message, array('type' => self::TYPE_DEPRECATION, 'stack' => $stack));
+                                return $row;
+                            },
+                            array_slice(debug_backtrace(false), 0, 10)
+                        );
+                    } else {
+                        $stack = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10);
+                    }
+
+                    self::$loggers['deprecation']->warning($message, array('type' => self::TYPE_DEPRECATION, 'stack' => $stack));
+                }
             }
 
             return true;
         }
 
         if ($this->displayErrors && error_reporting() & $level && $this->level & $level) {
-            // make sure the ContextErrorException class is loaded (https://bugs.php.net/bug.php?id=65322)
-            if (!class_exists('Symfony\Component\Debug\Exception\ContextErrorException')) {
-                require __DIR__.'/Exception/ContextErrorException.php';
-            }
-
-            $exception = new ContextErrorException(sprintf('%s: %s in %s line %d', isset($this->levels[$level]) ? $this->levels[$level] : $level, $message, $file, $line), 0, $level, $file, $line, $context);
-
             // Exceptions thrown from error handlers are sometimes not caught by the exception
             // handler, so we invoke it directly (https://bugs.php.net/bug.php?id=54275)
-            $exceptionHandler = set_exception_handler(function () {});
+            $exceptionHandler = set_exception_handler('var_dump');
             restore_exception_handler();
 
             if (is_array($exceptionHandler) && $exceptionHandler[0] instanceof ExceptionHandler) {
-                $exceptionHandler[0]->handle($exception);
+                if (self::$stackedErrorLevels) {
+                    self::$stackedErrors[] = func_get_args();
 
-                if (!class_exists('Symfony\Component\Debug\Exception\DummyException')) {
-                    require __DIR__.'/Exception/DummyException.php';
+                    return true;
                 }
+
+                $exception = sprintf('%s: %s in %s line %d', isset($this->levels[$level]) ? $this->levels[$level] : $level, $message, $file, $line);
+                $exception = new ContextErrorException($exception, 0, $level, $file, $line, $context);
+                $exceptionHandler[0]->handle($exception);
 
                 // we must stop the PHP script execution, as the exception has
                 // already been dealt with, so, let's throw an exception that
@@ -179,13 +185,61 @@ class ErrorHandler
         return false;
     }
 
+    /**
+     * Configure the error handler for delayed handling.
+     * Ensures also that non-catchable fatal errors are never silenced.
+     *
+     * As shown by http://bugs.php.net/42098 and http://bugs.php.net/60724
+     * PHP has a compile stage where it behaves unusually. To workaround it,
+     * we plug an error handler that only stacks errors for later.
+     *
+     * The most important feature of this is to prevent
+     * autoloading until unstackErrors() is called.
+     */
+    public static function stackErrors()
+    {
+        self::$stackedErrorLevels[] = error_reporting(error_reporting() | E_PARSE | E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR);
+    }
+
+    /**
+     * Unstacks stacked errors and forwards to the regular handler
+     */
+    public static function unstackErrors()
+    {
+        $level = array_pop(self::$stackedErrorLevels);
+
+        if (null !== $level) {
+            error_reporting($level);
+        }
+
+        if (empty(self::$stackedErrorLevels)) {
+            $errors = self::$stackedErrors;
+            self::$stackedErrors = array();
+
+            $errorHandler = set_error_handler('var_dump');
+            restore_error_handler();
+
+            if ($errorHandler) {
+                foreach ($errors as $e) {
+                    call_user_func_array($errorHandler, $e);
+                }
+            }
+        }
+    }
+
     public function handleFatal()
     {
-        if (null === $error = error_get_last()) {
+        $this->reservedMemory = '';
+        $error = error_get_last();
+
+        while (self::$stackedErrorLevels) {
+            static::unstackErrors();
+        }
+
+        if (null === $error) {
             return;
         }
 
-        $this->reservedMemory = '';
         $type = $error['type'];
         if (0 === $this->level || !in_array($type, array(E_ERROR, E_CORE_ERROR, E_COMPILE_ERROR, E_PARSE))) {
             return;
@@ -206,7 +260,7 @@ class ErrorHandler
         }
 
         // get current exception handler
-        $exceptionHandler = set_exception_handler(function () {});
+        $exceptionHandler = set_exception_handler('var_dump');
         restore_exception_handler();
 
         if (is_array($exceptionHandler) && $exceptionHandler[0] instanceof ExceptionHandler) {

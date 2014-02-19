@@ -21,7 +21,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\ValidatorInterface as LegacyValidatorInterface;
 
 /**
- * A backwards compatible execution context.
+ * An execution context that is compatible with the legacy API (< 2.5).
  *
  * @since  2.5
  * @author Bernhard Schussek <bschussek@gmail.com>

@@ -12,14 +12,29 @@
 namespace Symfony\Component\Validator\Context;
 
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\Exception\RuntimeException;
 use Symfony\Component\Validator\Group\GroupManagerInterface;
 use Symfony\Component\Validator\Node\Node;
 use Symfony\Component\Validator\NodeVisitor\AbstractVisitor;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
- * @since  %%NextVersion%%
+ * The default implementation of {@link ExecutionContextManagerInterface}.
+ *
+ * This class implements {@link \Symfony\Component\Validator\NodeVisitor\NodeVisitorInterface}
+ * and updates the current context with the current node of the validation
+ * traversal.
+ *
+ * After creating a new instance, the method {@link initialize()} must be
+ * called with a {@link ValidatorInterface} instance. Calling methods such as
+ * {@link startContext()} or {@link enterNode()} without initializing the
+ * manager first will lead to errors.
+ *
+ * @since  2.5
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @see ExecutionContextManagerInterface
+ * @see \Symfony\Component\Validator\NodeVisitor\NodeVisitorInterface
  */
 class ExecutionContextManager extends AbstractVisitor implements ExecutionContextManagerInterface
 {
@@ -53,6 +68,17 @@ class ExecutionContextManager extends AbstractVisitor implements ExecutionContex
      */
     private $translationDomain;
 
+    /**
+     * Creates a new context manager.
+     *
+     * @param GroupManagerInterface $groupManager      The manager for accessing
+     *                                                 the currently validated
+     *                                                 group
+     * @param TranslatorInterface   $translator        The translator
+     * @param string|null           $translationDomain The translation domain to
+     *                                                 use for translating
+     *                                                 violation messages
+     */
     public function __construct(GroupManagerInterface $groupManager, TranslatorInterface $translator, $translationDomain = null)
     {
         $this->groupManager = $groupManager;
@@ -61,15 +87,27 @@ class ExecutionContextManager extends AbstractVisitor implements ExecutionContex
         $this->contextStack = new \SplStack();
     }
 
+    /**
+     * Initializes the manager with a validator.
+     *
+     * @param ValidatorInterface $validator The validator
+     */
     public function initialize(ValidatorInterface $validator)
     {
         $this->validator = $validator;
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @throws RuntimeException If {@link initialize()} wasn't called
+     */
     public function startContext($root)
     {
         if (null === $this->validator) {
-            // TODO error, call initialize() first
+            throw new RuntimeException(
+                'initialize() must be called before startContext().'
+            );
         }
 
         $this->currentContext = new LegacyExecutionContext(
@@ -84,10 +122,18 @@ class ExecutionContextManager extends AbstractVisitor implements ExecutionContex
         return $this->currentContext;
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @throws RuntimeException If {@link startContext()} wasn't called
+     */
     public function stopContext()
     {
         if (0 === count($this->contextStack)) {
-            return null;
+            throw new RuntimeException(
+                'No context was started yet. Call startContext() before '.
+                'stopContext().'
+            );
         }
 
         // Remove the current context from the stack
@@ -101,24 +147,43 @@ class ExecutionContextManager extends AbstractVisitor implements ExecutionContex
         return $stoppedContext;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getCurrentContext()
     {
         return $this->currentContext;
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @throws RuntimeException If {@link initialize()} wasn't called
+     */
     public function enterNode(Node $node)
     {
         if (null === $this->currentContext) {
-            // TODO error call startContext() first
+            throw new RuntimeException(
+                'No context was started yet. Call startContext() before '.
+                'enterNode().'
+            );
         }
 
         $this->currentContext->pushNode($node);
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @throws RuntimeException If {@link initialize()} wasn't called
+     */
     public function leaveNode(Node $node)
     {
         if (null === $this->currentContext) {
-            // error no context started
+            throw new RuntimeException(
+                'No context was started yet. Call startContext() before '.
+                'leaveNode().'
+            );
         }
 
         $this->currentContext->popNode();

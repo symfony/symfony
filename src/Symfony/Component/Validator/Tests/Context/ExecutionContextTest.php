@@ -12,9 +12,6 @@
 namespace Symfony\Component\Validator\Tests\Context;
 
 use Symfony\Component\Validator\Context\ExecutionContext;
-use Symfony\Component\Validator\Mapping\GenericMetadata;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Validator\Node\ClassNode;
 use Symfony\Component\Validator\Node\GenericNode;
 
 /**

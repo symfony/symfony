@@ -13,14 +13,12 @@ namespace Symfony\Component\Validator\Context;
 
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\ClassBasedInterface;
-use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Exception\BadMethodCallException;
 use Symfony\Component\Validator\ExecutionContextInterface as LegacyExecutionContextInterface;
 use Symfony\Component\Validator\Group\GroupManagerInterface;
 use Symfony\Component\Validator\Mapping\PropertyMetadataInterface;
-use Symfony\Component\Validator\MetadataFactoryInterface;
 use Symfony\Component\Validator\Node\Node;
 use Symfony\Component\Validator\Util\PropertyPath;
 use Symfony\Component\Validator\Validator\ValidatorInterface;

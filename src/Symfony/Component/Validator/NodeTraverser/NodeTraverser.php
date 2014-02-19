@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator\NodeTraverser;
 
-use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\NoSuchMetadataException;
 use Symfony\Component\Validator\Mapping\CascadingStrategy;

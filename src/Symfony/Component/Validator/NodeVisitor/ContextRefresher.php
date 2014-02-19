@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Validator\NodeVisitor;
 
-use Symfony\Component\Validator\Context\ExecutionContext;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Exception\RuntimeException;
 use Symfony\Component\Validator\Node\Node;
+use Symfony\Component\Validator\Util\NodeStackInterface;
 
 /**
  * Updates the current context with the current node of the validation
@@ -27,7 +27,7 @@ class ContextRefresher extends AbstractVisitor
 {
     public function enterNode(Node $node, ExecutionContextInterface $context)
     {
-        if (!$context instanceof ExecutionContext) {
+        if (!$context instanceof NodeStackInterface) {
             throw new RuntimeException(sprintf(
                 'The ContextRefresher only supports instances of class '.
                 '"Symfony\Component\Validator\Context\ExecutionContext". '.
@@ -46,7 +46,7 @@ class ContextRefresher extends AbstractVisitor
      */
     public function leaveNode(Node $node, ExecutionContextInterface $context)
     {
-        if (!$context instanceof ExecutionContext) {
+        if (!$context instanceof NodeStackInterface) {
             throw new RuntimeException(sprintf(
                 'The ContextRefresher only supports instances of class '.
                 '"Symfony\Component\Validator\Context\ExecutionContext". '.

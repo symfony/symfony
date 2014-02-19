@@ -20,6 +20,7 @@ use Symfony\Component\Validator\ExecutionContextInterface as LegacyExecutionCont
 use Symfony\Component\Validator\Group\GroupManagerInterface;
 use Symfony\Component\Validator\Mapping\PropertyMetadataInterface;
 use Symfony\Component\Validator\Node\Node;
+use Symfony\Component\Validator\Util\NodeStackInterface;
 use Symfony\Component\Validator\Util\PropertyPath;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilder;
@@ -32,7 +33,7 @@ use Symfony\Component\Validator\Violation\ConstraintViolationBuilder;
  *
  * @see ExecutionContextInterface
  */
-class ExecutionContext implements ExecutionContextInterface, LegacyExecutionContextInterface
+class ExecutionContext implements ExecutionContextInterface, LegacyExecutionContextInterface, NodeStackInterface
 {
     /**
      * @var ValidatorInterface

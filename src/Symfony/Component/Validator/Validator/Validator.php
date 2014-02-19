@@ -98,10 +98,10 @@ class Validator implements ValidatorInterface
             ->getViolations();
     }
 
-    public function validateCollection($collection, $groups = null, $deep = false)
+    public function validateObjects($objects, $groups = null, $deep = false)
     {
-        return $this->startContext($collection)
-            ->validateCollection($collection, $groups, $deep)
+        return $this->startContext($objects)
+            ->validateObjects($objects, $groups, $deep)
             ->getViolations();
     }
 

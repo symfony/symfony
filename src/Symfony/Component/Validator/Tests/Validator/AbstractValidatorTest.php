@@ -67,7 +67,7 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
 
     abstract protected function validateObject($object, $groups = null);
 
-    abstract protected function validateCollection($collection, $groups = null, $deep = false);
+    abstract protected function validateObjects($objects, $groups = null, $deep = false);
 
     abstract protected function validateProperty($object, $propertyName, $groups = null);
 
@@ -249,7 +249,7 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
             'groups' => 'Group',
         )));
 
-        $violations = $this->validateCollection($array, 'Group');
+        $violations = $this->validateObjects($array, 'Group');
 
         /** @var ConstraintViolationInterface[] $violations */
         $this->assertCount(1, $violations);
@@ -287,7 +287,7 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
             'groups' => 'Group',
         )));
 
-        $violations = $this->validateCollection($array, 'Group');
+        $violations = $this->validateObjects($array, 'Group');
 
         /** @var ConstraintViolationInterface[] $violations */
         $this->assertCount(1, $violations);
@@ -325,7 +325,7 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
             'groups' => 'Group',
         )));
 
-        $violations = $this->validateCollection($traversable, 'Group');
+        $violations = $this->validateObjects($traversable, 'Group');
 
         /** @var ConstraintViolationInterface[] $violations */
         $this->assertCount(1, $violations);
@@ -359,7 +359,7 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
             'groups' => 'Group',
         )));
 
-        $this->validateCollection($traversable, 'Group');
+        $this->validateObjects($traversable, 'Group');
     }
 
     public function testRecursiveTraversableRecursiveTraversalEnabled()
@@ -388,7 +388,7 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
             'groups' => 'Group',
         )));
 
-        $violations = $this->validateCollection($traversable, 'Group', true);
+        $violations = $this->validateObjects($traversable, 'Group', true);
 
         /** @var ConstraintViolationInterface[] $violations */
         $this->assertCount(1, $violations);

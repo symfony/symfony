@@ -57,9 +57,9 @@ abstract class AbstractLegacyApiTest extends AbstractValidatorTest
         return $this->validator->validate($object, $groups);
     }
 
-    protected function validateCollection($collection, $groups = null, $deep = false)
+    protected function validateObjects($objects, $groups = null, $deep = false)
     {
-        return $this->validator->validate($collection, $groups, true, $deep);
+        return $this->validator->validate($objects, $groups, true, $deep);
     }
 
     protected function validateProperty($object, $propertyName, $groups = null)

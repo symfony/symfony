@@ -51,7 +51,7 @@ interface ContextualValidatorInterface
      */
     public function validateObject($object, $groups = null);
 
-    public function validateCollection($collection, $groups = null, $deep = false);
+    public function validateObjects($objects, $groups = null, $deep = false);
 
     /**
      * Validates a property of a value against its current value.

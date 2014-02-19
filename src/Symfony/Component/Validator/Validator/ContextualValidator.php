@@ -110,14 +110,14 @@ class ContextualValidator implements ContextualValidatorInterface
         return $this;
     }
 
-    public function validateCollection($collection, $groups = null, $deep = false)
+    public function validateObjects($objects, $groups = null, $deep = false)
     {
         $constraint = new Traverse(array(
             'traverse' => true,
             'deep' => $deep,
         ));
 
-        return $this->validate($collection, $constraint, $groups);
+        return $this->validate($objects, $constraint, $groups);
     }
 
     public function validateProperty($object, $propertyName, $groups = null)

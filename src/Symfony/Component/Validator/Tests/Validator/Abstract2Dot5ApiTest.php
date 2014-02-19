@@ -59,9 +59,9 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
         return $this->validator->validateObject($object, $groups);
     }
 
-    protected function validateCollection($collection, $groups = null, $deep = false)
+    protected function validateObjects($objects, $groups = null, $deep = false)
     {
-        return $this->validator->validateCollection($collection, $groups, $deep);
+        return $this->validator->validateObjects($objects, $groups, $deep);
     }
 
     protected function validateProperty($object, $propertyName, $groups = null)
@@ -276,7 +276,7 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
                 ->getValidator()
                 ->inContext($context)
                 ->atPath('subpath')
-                ->validateCollection(array('key' => $value->reference))
+                ->validateObjects(array('key' => $value->reference))
             ;
         };
 

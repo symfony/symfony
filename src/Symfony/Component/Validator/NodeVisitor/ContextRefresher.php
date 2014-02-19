@@ -30,7 +30,7 @@ class ContextRefresher extends AbstractVisitor
         if (!$context instanceof NodeStackInterface) {
             throw new RuntimeException(sprintf(
                 'The ContextRefresher only supports instances of class '.
-                '"Symfony\Component\Validator\Context\ExecutionContext". '.
+                '"Symfony\Component\Validator\Context\NodeStackInterface". '.
                 'An instance of class "%s" was given.',
                 get_class($context)
             ));
@@ -39,17 +39,12 @@ class ContextRefresher extends AbstractVisitor
         $context->pushNode($node);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @throws RuntimeException If {@link initialize()} wasn't called
-     */
     public function leaveNode(Node $node, ExecutionContextInterface $context)
     {
         if (!$context instanceof NodeStackInterface) {
             throw new RuntimeException(sprintf(
                 'The ContextRefresher only supports instances of class '.
-                '"Symfony\Component\Validator\Context\ExecutionContext". '.
+                '"Symfony\Component\Validator\Context\NodeStackInterface". '.
                 'An instance of class "%s" was given.',
                 get_class($context)
             ));

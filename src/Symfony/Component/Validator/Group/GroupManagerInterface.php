@@ -12,10 +12,18 @@
 namespace Symfony\Component\Validator\Group;
 
 /**
- * @since  %%NextVersion%%
+ * Returns the group that is currently being validated.
+ *
+ * @since  2.5
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 interface GroupManagerInterface
 {
+    /**
+     * Returns the group that is currently being validated.
+     *
+     * @return string|null The current group or null, if no validation is
+     *                     active.
+     */
     public function getCurrentGroup();
 }

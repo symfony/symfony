@@ -44,65 +44,6 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
         error_reporting($this->errorReporting);
     }
 
-    public function testCompileTimeError()
-    {
-        // the ContextErrorException must not be loaded to test the workaround
-        // for https://bugs.php.net/bug.php?id=65322.
-        if (class_exists('Symfony\Component\Debug\Exception\ContextErrorException', false)) {
-            $this->markTestSkipped('The ContextErrorException class is already loaded.');
-        }
-
-        $exceptionHandler = $this->getMock('Symfony\Component\Debug\ExceptionHandler', array('handle'));
-
-        // the following code forces some PHPUnit classes to be loaded
-        // so that they will be available in the exception handler
-        // as they won't be autoloaded by PHP
-        class_exists('PHPUnit_Framework_MockObject_Invocation_Object');
-        $this->assertInstanceOf('stdClass', new \stdClass());
-        $this->assertEquals(1, 1);
-        $this->assertStringStartsWith('foo', 'foobar');
-        $this->assertArrayHasKey('bar', array('bar' => 'foo'));
-
-        $that = $this;
-        $exceptionCheck = function ($exception) use ($that) {
-            $that->assertInstanceOf('Symfony\Component\Debug\Exception\ContextErrorException', $exception);
-            $that->assertEquals(E_STRICT, $exception->getSeverity());
-            $that->assertEquals(2, $exception->getLine());
-            $that->assertStringStartsWith('Runtime Notice: Declaration of _CompileTimeError::foo() should be compatible with', $exception->getMessage());
-            $that->assertArrayHasKey('bar', $exception->getContext());
-        };
-
-        $exceptionHandler->expects($this->once())
-            ->method('handle')
-            ->will($this->returnCallback($exceptionCheck))
-        ;
-
-        ErrorHandler::register();
-        set_exception_handler(array($exceptionHandler, 'handle'));
-
-        // dummy variable to check for in error handler.
-        $bar = 123;
-
-        // trigger compile time error
-        try {
-            eval(<<<'PHP'
-class _BaseCompileTimeError { function foo() {} }
-class _CompileTimeError extends _BaseCompileTimeError { function foo($invalid) {} }
-PHP
-            );
-        } catch (DummyException $e) {
-            // if an exception is thrown, the test passed
-        } catch (\Exception $e) {
-            restore_error_handler();
-            restore_exception_handler();
-
-            throw $e;
-        }
-
-        restore_error_handler();
-        restore_exception_handler();
-    }
-
     public function testNotice()
     {
         $exceptionHandler = $this->getMock('Symfony\Component\Debug\ExceptionHandler', array('handle'));
@@ -112,7 +53,6 @@ PHP
         $exceptionCheck = function ($exception) use ($that) {
             $that->assertInstanceOf('Symfony\Component\Debug\Exception\ContextErrorException', $exception);
             $that->assertEquals(E_NOTICE, $exception->getSeverity());
-            $that->assertEquals(__LINE__ + 44, $exception->getLine());
             $that->assertEquals(__FILE__, $exception->getFile());
             $that->assertRegexp('/^Notice: Undefined variable: (foo|bar)/', $exception->getMessage());
             $that->assertArrayHasKey('foobar', $exception->getContext());

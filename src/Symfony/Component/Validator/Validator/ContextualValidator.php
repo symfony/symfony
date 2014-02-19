@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Validator;
 
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Constraints\Traverse;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Context\ExecutionContextManagerInterface;
@@ -41,6 +42,8 @@ class ContextualValidator extends AbstractValidator implements ContextualValidat
     public function atPath($subPath)
     {
         $this->defaultPropertyPath = $this->context->getPropertyPath($subPath);
+
+        return $this;
     }
 
     /**
@@ -58,6 +61,18 @@ class ContextualValidator extends AbstractValidator implements ContextualValidat
     public function validateObject($object, $groups = null)
     {
         $this->traverseObject($object, $groups);
+
+        return $this->context->getViolations();
+    }
+
+    public function validateCollection($collection, $groups = null, $deep = false)
+    {
+        $constraint = new Traverse(array(
+            'traverse' => true,
+            'deep' => $deep,
+        ));
+
+        $this->traverseValue($collection, $constraint, $groups);
 
         return $this->context->getViolations();
     }

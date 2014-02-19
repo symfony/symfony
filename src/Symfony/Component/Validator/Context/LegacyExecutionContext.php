@@ -12,6 +12,8 @@
 namespace Symfony\Component\Validator\Context;
 
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\Constraints\Traverse;
+use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\ExecutionContextInterface as LegacyExecutionContextInterface;
 use Symfony\Component\Validator\Group\GroupManagerInterface;
@@ -100,7 +102,33 @@ class LegacyExecutionContext extends ExecutionContext implements LegacyExecution
      */
     public function validate($value, $subPath = '', $groups = null, $traverse = false, $deep = false)
     {
-        // TODO handle $traverse and $deep
+        if (is_array($value)) {
+            $constraint = new Traverse(array(
+                'traverse' => true,
+                'deep' => $deep,
+            ));
+
+            return $this
+                ->getValidator()
+                ->inContext($this)
+                ->atPath($subPath)
+                ->validateValue($value, $constraint, $groups)
+            ;
+        }
+
+        if ($traverse && $value instanceof \Traversable) {
+            $constraints = array(
+                new Valid(),
+                new Traverse(array('traverse' => true, 'deep' => $deep)),
+            );
+
+            return $this
+                ->getValidator()
+                ->inContext($this)
+                ->atPath($subPath)
+                ->validateValue($value, $constraints, $groups)
+            ;
+        }
 
         return $this
             ->getValidator()

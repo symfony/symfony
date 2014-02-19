@@ -24,17 +24,21 @@ class LegacyValidator extends Validator implements LegacyValidatorInterface
     public function validate($value, $groups = null, $traverse = false, $deep = false)
     {
         if (is_array($value)) {
-            return $this->validateValue($value, new Traverse(array(
+            $constraint = new Traverse(array(
                 'traverse' => true,
                 'deep' => $deep,
-            )), $groups);
+            ));
+
+            return $this->validateValue($value, $constraint, $groups);
         }
 
         if ($traverse && $value instanceof \Traversable) {
-            return $this->validateValue($value, array(
+            $constraints = array(
                 new Valid(),
                 new Traverse(array('traverse' => true, 'deep' => $deep)),
-            ), $groups);
+            );
+
+            return $this->validateValue($value, $constraints, $groups);
         }
 
         return $this->validateObject($value, $groups);

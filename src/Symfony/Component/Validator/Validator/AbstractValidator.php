@@ -12,9 +12,7 @@
 namespace Symfony\Component\Validator\Validator;
 
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Constraints\Traverse;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Mapping\ClassMetadataInterface;
 use Symfony\Component\Validator\Mapping\GenericMetadata;

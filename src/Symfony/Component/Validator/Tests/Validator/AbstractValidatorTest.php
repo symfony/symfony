@@ -15,6 +15,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\ConstraintViolationInterface;
+use Symfony\Component\Validator\Context\ExecutionContext;
 use Symfony\Component\Validator\ExecutionContextInterface;
 use Symfony\Component\Validator\MetadataFactoryInterface;
 use Symfony\Component\Validator\Tests\Fixtures\FakeMetadataFactory;
@@ -1414,6 +1415,100 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
         /** @var ConstraintViolationInterface[] $violations */
         $this->assertCount(1, $violations);
         $this->assertSame('Violation in Group 2', $violations[0]->getMessage());
+    }
+
+    public function testValidateInContext()
+    {
+        $test = $this;
+        $entity = new Entity();
+        $entity->reference = new Reference();
+
+        $callback1 = function ($value, ExecutionContextInterface $context) {
+            $context->validate($value->reference, 'subpath');
+        };
+
+        $callback2 = function ($value, ExecutionContextInterface $context) use ($test, $entity) {
+            $test->assertSame($test::REFERENCE_CLASS, $context->getClassName());
+            $test->assertNull($context->getPropertyName());
+            $test->assertSame('subpath', $context->getPropertyPath());
+            $test->assertSame('Group', $context->getGroup());
+            $test->assertSame($test->referenceMetadata, $context->getMetadata());
+            $test->assertSame($test->metadataFactory, $context->getMetadataFactory());
+            $test->assertSame($entity, $context->getRoot());
+            $test->assertSame($entity->reference, $context->getValue());
+            $test->assertSame($entity->reference, $value);
+
+            $context->addViolation('Message %param%', array('%param%' => 'value'));
+        };
+
+        $this->metadata->addConstraint(new Callback(array(
+            'callback' => $callback1,
+            'groups' => 'Group',
+        )));
+        $this->referenceMetadata->addConstraint(new Callback(array(
+            'callback' => $callback2,
+            'groups' => 'Group',
+        )));
+
+        $violations = $this->validator->validate($entity, 'Group');
+
+        /** @var ConstraintViolationInterface[] $violations */
+        $this->assertCount(1, $violations);
+        $this->assertSame('Message value', $violations[0]->getMessage());
+        $this->assertSame('Message %param%', $violations[0]->getMessageTemplate());
+        $this->assertSame(array('%param%' => 'value'), $violations[0]->getMessageParameters());
+        $this->assertSame('subpath', $violations[0]->getPropertyPath());
+        $this->assertSame($entity, $violations[0]->getRoot());
+        $this->assertSame($entity->reference, $violations[0]->getInvalidValue());
+        $this->assertNull($violations[0]->getMessagePluralization());
+        $this->assertNull($violations[0]->getCode());
+    }
+
+    public function testValidateArrayInContext()
+    {
+        $test = $this;
+        $entity = new Entity();
+        $entity->reference = new Reference();
+
+        $callback1 = function ($value, ExecutionContextInterface $context) {
+            $context->validate(array('key' => $value->reference), 'subpath');
+        };
+
+        $callback2 = function ($value, ExecutionContextInterface $context) use ($test, $entity) {
+            $test->assertSame($test::REFERENCE_CLASS, $context->getClassName());
+            $test->assertNull($context->getPropertyName());
+            $test->assertSame('subpath[key]', $context->getPropertyPath());
+            $test->assertSame('Group', $context->getGroup());
+            $test->assertSame($test->referenceMetadata, $context->getMetadata());
+            $test->assertSame($test->metadataFactory, $context->getMetadataFactory());
+            $test->assertSame($entity, $context->getRoot());
+            $test->assertSame($entity->reference, $context->getValue());
+            $test->assertSame($entity->reference, $value);
+
+            $context->addViolation('Message %param%', array('%param%' => 'value'));
+        };
+
+        $this->metadata->addConstraint(new Callback(array(
+            'callback' => $callback1,
+            'groups' => 'Group',
+        )));
+        $this->referenceMetadata->addConstraint(new Callback(array(
+            'callback' => $callback2,
+            'groups' => 'Group',
+        )));
+
+        $violations = $this->validator->validate($entity, 'Group');
+
+        /** @var ConstraintViolationInterface[] $violations */
+        $this->assertCount(1, $violations);
+        $this->assertSame('Message value', $violations[0]->getMessage());
+        $this->assertSame('Message %param%', $violations[0]->getMessageTemplate());
+        $this->assertSame(array('%param%' => 'value'), $violations[0]->getMessageParameters());
+        $this->assertSame('subpath[key]', $violations[0]->getPropertyPath());
+        $this->assertSame($entity, $violations[0]->getRoot());
+        $this->assertSame($entity->reference, $violations[0]->getInvalidValue());
+        $this->assertNull($violations[0]->getMessagePluralization());
+        $this->assertNull($violations[0]->getCode());
     }
 
     public function testGetMetadataFactory()

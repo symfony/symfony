@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Validator;
 
+use Symfony\Component\Validator\Constraints\Traverse;
 use Symfony\Component\Validator\Context\ExecutionContextManagerInterface;
 use Symfony\Component\Validator\NodeTraverser\NodeTraverserInterface;
 use Symfony\Component\Validator\MetadataFactoryInterface;
@@ -38,6 +39,20 @@ class Validator extends AbstractValidator
         $this->contextManager->startContext($object);
 
         $this->traverseObject($object, $groups);
+
+        return $this->contextManager->stopContext()->getViolations();
+    }
+
+    public function validateCollection($collection, $groups = null, $deep = false)
+    {
+        $this->contextManager->startContext($collection);
+
+        $constraint = new Traverse(array(
+            'traverse' => true,
+            'deep' => $deep,
+        ));
+
+        $this->traverseValue($collection, $constraint, $groups);
 
         return $this->contextManager->stopContext()->getViolations();
     }

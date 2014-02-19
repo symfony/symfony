@@ -34,6 +34,15 @@ class Validator extends AbstractValidator
         $this->contextManager = $contextManager;
     }
 
+    public function validate($value, $constraints, $groups = null)
+    {
+        $this->contextManager->startContext($value);
+
+        $this->traverseValue($value, $constraints, $groups);
+
+        return $this->contextManager->stopContext()->getViolations();
+    }
+
     public function validateObject($object, $groups = null)
     {
         $this->contextManager->startContext($object);
@@ -74,14 +83,4 @@ class Validator extends AbstractValidator
 
         return $this->contextManager->stopContext()->getViolations();
     }
-
-    public function validateValue($value, $constraints, $groups = null)
-    {
-        $this->contextManager->startContext($value);
-
-        $this->traverseValue($value, $constraints, $groups);
-
-        return $this->contextManager->stopContext()->getViolations();
-    }
-
 }

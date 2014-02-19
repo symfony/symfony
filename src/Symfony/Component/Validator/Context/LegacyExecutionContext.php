@@ -112,7 +112,7 @@ class LegacyExecutionContext extends ExecutionContext implements LegacyExecution
                 ->getValidator()
                 ->inContext($this)
                 ->atPath($subPath)
-                ->validateValue($value, $constraint, $groups)
+                ->validate($value, $constraint, $groups)
             ;
         }
 
@@ -126,7 +126,7 @@ class LegacyExecutionContext extends ExecutionContext implements LegacyExecution
                 ->getValidator()
                 ->inContext($this)
                 ->atPath($subPath)
-                ->validateValue($value, $constraints, $groups)
+                ->validate($value, $constraints, $groups)
             ;
         }
 
@@ -147,7 +147,7 @@ class LegacyExecutionContext extends ExecutionContext implements LegacyExecution
             ->getValidator()
             ->inContext($this)
             ->atPath($subPath)
-            ->validateValue($value, $constraints, $groups)
+            ->validate($value, $constraints, $groups)
         ;
     }
 

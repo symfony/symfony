@@ -22,6 +22,18 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 interface ValidatorInterface
 {
     /**
+     * Validates a value against a constraint or a list of constraints.
+     *
+     * @param mixed                   $value       The value to validate.
+     * @param Constraint|Constraint[] $constraints The constraint(s) to validate against.
+     * @param array|null              $groups      The validation groups to validate.
+     *
+     * @return ConstraintViolationListInterface A list of constraint violations. If the
+     *                                          list is empty, validation succeeded.
+     */
+    public function validate($value, $constraints, $groups = null);
+
+    /**
      * Validates a value.
      *
      * The accepted values depend on the {@link MetadataFactoryInterface}
@@ -68,18 +80,6 @@ interface ValidatorInterface
      *                                          list is empty, validation succeeded.
      */
     public function validatePropertyValue($object, $propertyName, $value, $groups = null);
-
-    /**
-     * Validates a value against a constraint or a list of constraints.
-     *
-     * @param mixed                   $value       The value to validate.
-     * @param Constraint|Constraint[] $constraints The constraint(s) to validate against.
-     * @param array|null              $groups      The validation groups to validate.
-     *
-     * @return ConstraintViolationListInterface A list of constraint violations. If the
-     *                                          list is empty, validation succeeded.
-     */
-    public function validateValue($value, $constraints, $groups = null);
 
     /**
      * @param ExecutionContextInterface $context

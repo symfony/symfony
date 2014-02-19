@@ -12,7 +12,14 @@
 namespace Symfony\Component\Validator\Node;
 
 /**
- * @since  %%NextVersion%%
+ * Represents a value that has neither class metadata nor property metadata
+ * attached to it.
+ *
+ * Together with {@link \Symfony\Component\Validator\Mapping\GenericMetadata},
+ * this node type can be used to validate a value against some given
+ * constraints.
+ *
+ * @since  2.5
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class GenericNode extends Node

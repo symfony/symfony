@@ -11,10 +11,13 @@
 
 namespace Symfony\Component\Validator\Node;
 
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Mapping\ClassMetadataInterface;
 
 /**
- * @since  %%NextVersion%%
+ * Represents an object and its class metadata in the validation graph.
+ *
+ * @since  2.5
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class ClassNode extends Node
@@ -24,19 +27,34 @@ class ClassNode extends Node
      */
     public $metadata;
 
-    public function __construct($value, ClassMetadataInterface $metadata, $propertyPath, array $groups, array $cascadedGroups)
+    /**
+     * Creates a new class node.
+     *
+     * @param object                 $object         The validated object
+     * @param ClassMetadataInterface $metadata       The class metadata of that
+     *                                               object
+     * @param string                 $propertyPath   The property path leading
+     *                                               to this node
+     * @param string[]               $groups         The groups in which this
+     *                                               node should be validated
+     * @param string[]               $cascadedGroups The groups in which
+     *                                               cascaded objects should be
+     *                                               validated
+     *
+     * @throws UnexpectedTypeException If the given value is not an object
+     */
+    public function __construct($object, ClassMetadataInterface $metadata, $propertyPath, array $groups, array $cascadedGroups)
     {
-        if (!is_object($value)) {
-            // error
+        if (!is_object($object)) {
+            throw new UnexpectedTypeException($object, 'object');
         }
 
         parent::__construct(
-            $value,
+            $object,
             $metadata,
             $propertyPath,
             $groups,
             $cascadedGroups
         );
     }
-
 }

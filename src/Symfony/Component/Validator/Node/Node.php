@@ -14,21 +14,60 @@ namespace Symfony\Component\Validator\Node;
 use Symfony\Component\Validator\Mapping\MetadataInterface;
 
 /**
- * @since  %%NextVersion%%
+ * A node in the validated graph.
+ *
+ * @since  2.5
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 abstract class Node
 {
+    /**
+     * The validated value.
+     *
+     * @var mixed
+     */
     public $value;
 
+    /**
+     * The metadata specifying how the value should be validated.
+     *
+     * @var MetadataInterface
+     */
     public $metadata;
 
+    /**
+     * The property path leading to this node.
+     *
+     * @var string
+     */
     public $propertyPath;
 
+    /**
+     * The groups in which the value should be validated.
+     *
+     * @var string[]
+     */
     public $groups;
 
+    /**
+     * The groups in which cascaded values should be validated.
+     *
+     * @var string[]
+     */
     public $cascadedGroups;
 
+    /**
+     * Creates a new property node.
+     *
+     * @param mixed             $value          The property value
+     * @param MetadataInterface $metadata       The property's metadata
+     * @param string            $propertyPath   The property path leading to
+     *                                          this node
+     * @param string[]          $groups         The groups in which this node
+     *                                          should be validated
+     * @param string[]          $cascadedGroups The groups in which cascaded
+     *                                          objects should be validated
+     */
     public function __construct($value, MetadataInterface $metadata, $propertyPath, array $groups, array $cascadedGroups)
     {
         $this->value = $value;

@@ -53,7 +53,7 @@ class ApacheUrlMatcher extends UrlMatcher
                 continue;
             }
 
-            while (0 === strpos($name, 'REDIRECT_')) {
+            while (0 === strncmp($name, 'REDIRECT_', 9)) {
                 $name = substr($name, 9);
             }
 

@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Validator\Tests\Fixtures;
 
-use Symfony\Component\Validator\MetadataFactoryInterface;
 use Symfony\Component\Validator\Exception\NoSuchMetadataException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Symfony\Component\Validator\MetadataFactoryInterface;
+use Symfony\Component\Validator\MetadataInterface;
 
 class FakeMetadataFactory implements MetadataFactoryInterface
 {
@@ -52,5 +53,10 @@ class FakeMetadataFactory implements MetadataFactoryInterface
     public function addMetadata(ClassMetadata $metadata)
     {
         $this->metadatas[$metadata->getClassName()] = $metadata;
+    }
+
+    public function addMetadataForValue($value, MetadataInterface $metadata)
+    {
+        $this->metadatas[$value] = $metadata;
     }
 }

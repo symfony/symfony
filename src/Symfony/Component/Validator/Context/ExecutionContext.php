@@ -13,10 +13,14 @@ namespace Symfony\Component\Validator\Context;
 
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\ClassBasedInterface;
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Component\Validator\Exception\BadMethodCallException;
+use Symfony\Component\Validator\ExecutionContextInterface as LegacyExecutionContextInterface;
 use Symfony\Component\Validator\Group\GroupManagerInterface;
 use Symfony\Component\Validator\Mapping\PropertyMetadataInterface;
+use Symfony\Component\Validator\MetadataFactoryInterface;
 use Symfony\Component\Validator\Node\Node;
 use Symfony\Component\Validator\Util\PropertyPath;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -30,7 +34,7 @@ use Symfony\Component\Validator\Violation\ConstraintViolationBuilder;
  *
  * @see ExecutionContextInterface
  */
-class ExecutionContext implements ExecutionContextInterface
+class ExecutionContext implements ExecutionContextInterface, LegacyExecutionContextInterface
 {
     /**
      * The root value of the validated object graph.
@@ -151,8 +155,12 @@ class ExecutionContext implements ExecutionContextInterface
     /**
      * {@inheritdoc}
      */
-    public function addViolation($message, array $parameters = array())
+    public function addViolation($message, array $parameters = array(), $invalidValue = null, $pluralization = null, $code = null)
     {
+        // The parameters $invalidValue and following are ignored by the new
+        // API, as they are not present in the new interface anymore.
+        // You should use buildViolation() instead.
+
         $this->violations->add(new ConstraintViolation(
             $this->translator->trans($message, $parameters, $this->translationDomain),
             $message,
@@ -258,5 +266,50 @@ class ExecutionContext implements ExecutionContextInterface
         $propertyPath = $this->node ? $this->node->propertyPath : '';
 
         return PropertyPath::append($propertyPath, $subPath);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addViolationAt($subPath, $message, array $parameters = array(), $invalidValue = null, $pluralization = null, $code = null)
+    {
+        throw new BadMethodCallException(
+            'addViolationAt() is not supported anymore in the new API. '.
+            'Please use buildViolation() or enable the legacy mode.'
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function validate($value, $subPath = '', $groups = null, $traverse = false, $deep = false)
+    {
+        throw new BadMethodCallException(
+            'validate() is not supported anymore in the new API. '.
+            'Please use getValidator() or enable the legacy mode.'
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function validateValue($value, $constraints, $subPath = '', $groups = null)
+    {
+        throw new BadMethodCallException(
+            'validateValue() is not supported anymore in the new API. '.
+            'Please use getValidator() or enable the legacy mode.'
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMetadataFactory()
+    {
+        throw new BadMethodCallException(
+            'getMetadataFactory() is not supported anymore in the new API. '.
+            'Please use getMetadataFor() or hasMetadataFor() or enable the '.
+            'legacy mode.'
+        );
     }
 }

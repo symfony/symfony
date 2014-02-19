@@ -110,13 +110,14 @@ class ExecutionContextManager extends AbstractVisitor implements ExecutionContex
             );
         }
 
-        $this->currentContext = new LegacyExecutionContext(
+        $this->currentContext = $this->createContext(
             $root,
             $this->validator,
             $this->groupManager,
             $this->translator,
             $this->translationDomain
         );
+
         $this->contextStack->push($this->currentContext);
 
         return $this->currentContext;
@@ -187,5 +188,28 @@ class ExecutionContextManager extends AbstractVisitor implements ExecutionContex
         }
 
         $this->currentContext->popNode();
+    }
+
+    /**
+     * Creates a new context.
+     *
+     * Can be overridden by subclasses.
+     *
+     * @param mixed                 $root              The root value of the
+     *                                                 validated object graph
+     * @param ValidatorInterface    $validator         The validator
+     * @param GroupManagerInterface $groupManager      The manager for accessing
+     *                                                 the currently validated
+     *                                                 group
+     * @param TranslatorInterface   $translator        The translator
+     * @param string|null           $translationDomain The translation domain to
+     *                                                 use for translating
+     *                                                 violation messages
+     *
+     * @return ExecutionContextInterface The created context
+     */
+    protected function createContext($root, ValidatorInterface $validator, GroupManagerInterface $groupManager, TranslatorInterface $translator, $translationDomain)
+    {
+        return new ExecutionContext($root, $validator, $groupManager, $translator, $translationDomain);
     }
 }

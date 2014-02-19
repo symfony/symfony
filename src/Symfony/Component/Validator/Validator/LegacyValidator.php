@@ -35,7 +35,7 @@ class LegacyValidator extends Validator implements LegacyValidatorInterface
                 'deep' => $deep,
             ));
 
-            return $this->validateValue($value, $constraint, $groups);
+            return parent::validate($value, $constraint, $groups);
         }
 
         if ($traverse && $value instanceof \Traversable) {
@@ -44,7 +44,7 @@ class LegacyValidator extends Validator implements LegacyValidatorInterface
                 new Traverse(array('traverse' => true, 'deep' => $deep)),
             );
 
-            return $this->validateValue($value, $constraints, $groups);
+            return parent::validate($value, $constraints, $groups);
         }
 
         return $this->validateObject($value, $groups);

@@ -72,6 +72,25 @@ abstract class AbstractValidator implements ValidatorInterface
         return $this->metadataFactory->hasMetadataFor($object);
     }
 
+    protected function traverse($value, $constraints, $groups = null)
+    {
+        if (!is_array($constraints)) {
+            $constraints = array($constraints);
+        }
+
+        $metadata = new GenericMetadata();
+        $metadata->addConstraints($constraints);
+        $groups = $groups ? $this->normalizeGroups($groups) : $this->defaultGroups;
+
+        $this->nodeTraverser->traverse(array(new GenericNode(
+            $value,
+            $metadata,
+            $this->defaultPropertyPath,
+            $groups,
+            $groups
+        )));
+    }
+
     protected function traverseObject($object, $groups = null)
     {
         $classMetadata = $this->metadataFactory->getMetadataFor($object);
@@ -156,25 +175,6 @@ abstract class AbstractValidator implements ValidatorInterface
         }
 
         $this->nodeTraverser->traverse($nodes);
-    }
-
-    protected function traverseValue($value, $constraints, $groups = null)
-    {
-        if (!is_array($constraints)) {
-            $constraints = array($constraints);
-        }
-
-        $metadata = new GenericMetadata();
-        $metadata->addConstraints($constraints);
-        $groups = $groups ? $this->normalizeGroups($groups) : $this->defaultGroups;
-
-        $this->nodeTraverser->traverse(array(new GenericNode(
-            $value,
-            $metadata,
-            $this->defaultPropertyPath,
-            $groups,
-            $groups
-        )));
     }
 
     protected function normalizeGroups($groups)

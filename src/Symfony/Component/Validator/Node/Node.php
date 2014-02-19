@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Node;
 
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Mapping\MetadataInterface;
 
 /**
@@ -65,11 +66,17 @@ abstract class Node
      *                                          this node
      * @param string[]          $groups         The groups in which this node
      *                                          should be validated
-     * @param string[]          $cascadedGroups The groups in which cascaded
+     * @param string[]|null     $cascadedGroups The groups in which cascaded
      *                                          objects should be validated
+     *
+     * @throws UnexpectedTypeException If $cascadedGroups is invalid
      */
-    public function __construct($value, MetadataInterface $metadata, $propertyPath, array $groups, array $cascadedGroups)
+    public function __construct($value, MetadataInterface $metadata, $propertyPath, array $groups, $cascadedGroups = null)
     {
+        if (null !== $cascadedGroups && !is_array($cascadedGroups)) {
+            throw new UnexpectedTypeException($cascadedGroups, 'null or array');
+        }
+
         $this->value = $value;
         $this->metadata = $metadata;
         $this->propertyPath = $propertyPath;

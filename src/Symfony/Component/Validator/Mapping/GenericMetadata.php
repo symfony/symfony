@@ -77,8 +77,7 @@ class GenericMetadata  implements MetadataInterface
         if ($constraint instanceof Valid) {
             $this->cascadingStrategy = CascadingStrategy::CASCADE;
 
-            // Continue. Valid extends Traverse, so the return statement in the
-            // next block is going be executed.
+            return $this;
         }
 
         if ($constraint instanceof Traverse) {

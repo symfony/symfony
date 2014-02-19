@@ -46,11 +46,11 @@ class PropertyNode extends Node
      *                                                  to this node
      * @param string[]                  $groups         The groups in which this
      *                                                  node should be validated
-     * @param string[]                  $cascadedGroups The groups in which
+     * @param string[]|null             $cascadedGroups The groups in which
      *                                                  cascaded objects should
      *                                                  be validated
      */
-    public function __construct($value, PropertyMetadataInterface $metadata, $propertyPath, array $groups, array $cascadedGroups)
+    public function __construct($value, PropertyMetadataInterface $metadata, $propertyPath, array $groups, $cascadedGroups = null)
     {
         parent::__construct(
             $value,

@@ -25,6 +25,8 @@ class TraversalStrategy
 
     const RECURSIVE = 4;
 
+    const IGNORE_NON_TRAVERSABLE = 8;
+
     private function __construct()
     {
     }

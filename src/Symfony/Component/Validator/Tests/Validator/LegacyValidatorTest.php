@@ -55,6 +55,41 @@ class LegacyValidatorTest extends AbstractValidatorTest
         $this->markTestSkipped('Not supported in the legacy API');
     }
 
+    public function testArray()
+    {
+        $this->markTestSkipped('Not supported in the legacy API');
+    }
+
+    public function testRecursiveArray()
+    {
+        $this->markTestSkipped('Not supported in the legacy API');
+    }
+
+    public function testTraversableTraverseEnabled()
+    {
+        $this->markTestSkipped('Not supported in the legacy API');
+    }
+
+    public function testRecursiveTraversableRecursiveTraversalDisabled()
+    {
+        $this->markTestSkipped('Not supported in the legacy API');
+    }
+
+    public function testRecursiveTraversableRecursiveTraversalEnabled()
+    {
+        $this->markTestSkipped('Not supported in the legacy API');
+    }
+
+    public function testExpectTraversableIfTraverse()
+    {
+        $this->markTestSkipped('Not supported in the legacy API');
+    }
+
+    public function testExpectTraversableIfTraverseOnClass()
+    {
+        $this->markTestSkipped('Not supported in the legacy API');
+    }
+
     /**
      * @expectedException \Symfony\Component\Validator\Exception\ValidatorException
      */

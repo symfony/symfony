@@ -58,7 +58,7 @@ class ContextualValidator extends AbstractValidator implements ContextualValidat
      */
     public function validate($value, $constraints, $groups = null)
     {
-        $this->traverseValue($value, $constraints, $groups);
+        $this->traverse($value, $constraints, $groups);
 
         return $this->context->getViolations();
     }
@@ -89,7 +89,7 @@ class ContextualValidator extends AbstractValidator implements ContextualValidat
             'deep' => $deep,
         ));
 
-        $this->traverseValue($collection, $constraint, $groups);
+        $this->traverse($collection, $constraint, $groups);
 
         return $this->context->getViolations();
     }

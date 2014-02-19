@@ -38,7 +38,7 @@ class Validator extends AbstractValidator
     {
         $this->contextManager->startContext($value);
 
-        $this->traverseValue($value, $constraints, $groups);
+        $this->traverse($value, $constraints, $groups);
 
         return $this->contextManager->stopContext()->getViolations();
     }
@@ -61,7 +61,7 @@ class Validator extends AbstractValidator
             'deep' => $deep,
         ));
 
-        $this->traverseValue($collection, $constraint, $groups);
+        $this->traverse($collection, $constraint, $groups);
 
         return $this->contextManager->stopContext()->getViolations();
     }

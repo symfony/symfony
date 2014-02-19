@@ -37,13 +37,13 @@ class ClassNode extends Node
      *                                               to this node
      * @param string[]               $groups         The groups in which this
      *                                               node should be validated
-     * @param string[]               $cascadedGroups The groups in which
+     * @param string[]|null          $cascadedGroups The groups in which
      *                                               cascaded objects should be
      *                                               validated
      *
      * @throws UnexpectedTypeException If the given value is not an object
      */
-    public function __construct($object, ClassMetadataInterface $metadata, $propertyPath, array $groups, array $cascadedGroups)
+    public function __construct($object, ClassMetadataInterface $metadata, $propertyPath, array $groups, $cascadedGroups = null)
     {
         if (!is_object($object)) {
             throw new UnexpectedTypeException($object, 'object');

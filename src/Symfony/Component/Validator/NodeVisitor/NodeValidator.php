@@ -146,7 +146,10 @@ class NodeValidator extends AbstractVisitor implements GroupManagerInterface
         foreach ($groupSequence->groups as $groupInSequence) {
             $node = clone $node;
             $node->groups = array($groupInSequence);
-            $node->cascadedGroups = array($groupSequence->cascadedGroup ?: $groupInSequence);
+
+            if (null !== $groupSequence->cascadedGroup) {
+                $node->cascadedGroups = array($groupSequence->cascadedGroup);
+            }
 
             $this->nodeTraverser->traverse(array($node));
 

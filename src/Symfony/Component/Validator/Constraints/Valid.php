@@ -21,12 +21,27 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
  *
  * @api
  */
-class Valid extends Traverse
+class Valid extends Constraint
 {
+    /**
+     * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+     *             Use the {@link Traverse} constraint instead.
+     */
+    public $traverse = true;
+
+    /**
+     * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+     *             Use the {@link Traverse} constraint instead.
+     */
+    public $deep = false;
+
     public function __construct($options = null)
     {
         if (is_array($options) && array_key_exists('groups', $options)) {
-            throw new ConstraintDefinitionException(sprintf('The option "groups" is not supported by the constraint %s', __CLASS__));
+            throw new ConstraintDefinitionException(sprintf(
+                'The option "groups" is not supported by the constraint %s',
+                __CLASS__
+            ));
         }
 
         parent::__construct($options);

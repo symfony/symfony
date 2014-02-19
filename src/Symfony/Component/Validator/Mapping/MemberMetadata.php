@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Mapping;
 
+use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\ValidationVisitorInterface;
 use Symfony\Component\Validator\PropertyMetadataInterface as LegacyPropertyMetadataInterface;
 use Symfony\Component\Validator\Constraint;
@@ -56,6 +57,24 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
                 'The constraint %s cannot be put on properties or getters',
                 get_class($constraint)
             ));
+        }
+
+        // BC with Symfony < 2.5
+        // Only process if the traversal strategy was not already set by the
+        // Traverse constraint
+        if ($constraint instanceof Valid && !$this->traversalStrategy) {
+            if (true === $constraint->traverse) {
+                // Try to traverse cascaded objects, but ignore if they do not
+                // implement Traversable
+                $this->traversalStrategy = TraversalStrategy::TRAVERSE
+                    | TraversalStrategy::IGNORE_NON_TRAVERSABLE;
+
+                if ($constraint->deep) {
+                    $this->traversalStrategy |= TraversalStrategy::RECURSIVE;
+                }
+            } elseif (false === $constraint->traverse) {
+                $this->traversalStrategy = TraversalStrategy::NONE;
+            }
         }
 
         parent::addConstraint($constraint);

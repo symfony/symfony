@@ -23,6 +23,15 @@ use Symfony\Component\Validator\Validator\LegacyValidator;
 
 class LegacyValidatorLegacyApiTest extends AbstractLegacyApiTest
 {
+    protected function setUp()
+    {
+        if (version_compare(PHP_VERSION, '5.3.9', '<')) {
+            $this->markTestSkipped('Not supported prior to PHP 5.3.9');
+        }
+
+        parent::setUp();
+    }
+
     protected function createValidator(MetadataFactoryInterface $metadataFactory)
     {
         $nodeTraverser = new NodeTraverser($metadataFactory);

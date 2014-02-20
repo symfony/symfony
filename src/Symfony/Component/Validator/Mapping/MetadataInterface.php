@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator\Mapping;
 
+use Symfony\Component\Validator\MetadataInterface as LegacyMetadataInterface;
+
 /**
  * A container for validation metadata.
  *
@@ -42,17 +44,8 @@ namespace Symfony\Component\Validator\Mapping;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-interface MetadataInterface
+interface MetadataInterface extends LegacyMetadataInterface
 {
-    /**
-     * Returns all constraints for a given validation group.
-     *
-     * @param string $group The validation group.
-     *
-     * @return \Symfony\Component\Validator\Constraint[] A list of constraint instances.
-     */
-    public function findConstraints($group);
-
     public function getCascadingStrategy();
 
     public function getTraversalStrategy();

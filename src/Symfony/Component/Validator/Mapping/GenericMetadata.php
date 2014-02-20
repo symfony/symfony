@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator\Mapping;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Valid;
+use Symfony\Component\Validator\ValidationVisitorInterface;
 
 /**
  * @since  %%NextVersion%%
@@ -148,5 +149,13 @@ class GenericMetadata  implements MetadataInterface
     public function getTraversalStrategy()
     {
         return $this->traversalStrategy;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function accept(ValidationVisitorInterface $visitor, $value, $group, $propertyPath)
+    {
+        // Thanks PHP < 5.3.9
     }
 }

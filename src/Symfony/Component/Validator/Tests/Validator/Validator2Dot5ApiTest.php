@@ -23,6 +23,15 @@ use Symfony\Component\Validator\Validator\Validator;
 
 class Validator2Dot5ApiTest extends Abstract2Dot5ApiTest
 {
+    protected function setUp()
+    {
+        if (version_compare(PHP_VERSION, '5.3.9', '<')) {
+            $this->markTestSkipped('Not supported prior to PHP 5.3.9');
+        }
+
+        parent::setUp();
+    }
+
     protected function createValidator(MetadataFactoryInterface $metadataFactory)
     {
         $nodeTraverser = new NodeTraverser($metadataFactory);

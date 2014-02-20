@@ -22,7 +22,7 @@ class LanguageValidatorTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        IntlTestHelper::requireIntl($this);
+        IntlTestHelper::requireFullIntl($this);
 
         $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
         $this->validator = new LanguageValidator();

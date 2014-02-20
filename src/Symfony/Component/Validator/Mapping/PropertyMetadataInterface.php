@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Mapping;
 
 use Symfony\Component\Validator\ClassBasedInterface;
+use Symfony\Component\Validator\PropertyMetadataInterface as LegacyPropertyMetadataInterface;
 
 /**
  * A container for validation metadata of a property.
@@ -26,21 +27,6 @@ use Symfony\Component\Validator\ClassBasedInterface;
  *
  * @see MetadataInterface
  */
-interface PropertyMetadataInterface extends MetadataInterface, ClassBasedInterface
+interface PropertyMetadataInterface extends MetadataInterface, LegacyPropertyMetadataInterface, ClassBasedInterface
 {
-    /**
-     * Returns the name of the property.
-     *
-     * @return string The property name.
-     */
-    public function getPropertyName();
-
-    /**
-     * Extracts the value of the property from the given object.
-     *
-     * @param mixed $object The object to extract the property value from.
-     *
-     * @return mixed The value of the property.
-     */
-    public function getPropertyValue($object);
 }

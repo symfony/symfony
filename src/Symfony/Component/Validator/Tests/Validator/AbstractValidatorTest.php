@@ -35,17 +35,17 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
     /**
      * @var FakeMetadataFactory
      */
-    protected $metadataFactory;
+    public $metadataFactory;
 
     /**
      * @var ClassMetadata
      */
-    protected $metadata;
+    public $metadata;
 
     /**
      * @var ClassMetadata
      */
-    protected $referenceMetadata;
+    public $referenceMetadata;
 
     protected function setUp()
     {

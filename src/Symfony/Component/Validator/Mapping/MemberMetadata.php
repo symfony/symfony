@@ -13,11 +13,10 @@ namespace Symfony\Component\Validator\Mapping;
 
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\ValidationVisitorInterface;
-use Symfony\Component\Validator\PropertyMetadataInterface as LegacyPropertyMetadataInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
-abstract class MemberMetadata extends ElementMetadata implements PropertyMetadataInterface, LegacyPropertyMetadataInterface
+abstract class MemberMetadata extends ElementMetadata implements PropertyMetadataInterface
 {
     public $class;
     public $name;

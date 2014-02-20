@@ -46,6 +46,10 @@ class ExecutionContextTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        if (version_compare(PHP_VERSION, '5.3.9', '<')) {
+            $this->markTestSkipped('Not supported prior to PHP 5.3.9');
+        }
+
         $this->validator = $this->getMock('Symfony\Component\Validator\Validator\ValidatorInterface');
         $this->groupManager = $this->getMock('Symfony\Component\Validator\Group\GroupManagerInterface');
         $this->translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');

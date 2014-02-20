@@ -12,29 +12,15 @@
 namespace Symfony\Component\Validator\Mapping;
 
 use Symfony\Component\Validator\ClassBasedInterface;
+use Symfony\Component\Validator\PropertyMetadataContainerInterface as LegacyPropertyMetadataContainerInterface;;
 
 /**
  * @since  %%NextVersion%%
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-interface ClassMetadataInterface extends MetadataInterface, ClassBasedInterface
+interface ClassMetadataInterface extends MetadataInterface, LegacyPropertyMetadataContainerInterface, ClassBasedInterface
 {
     public function getConstrainedProperties();
-
-    public function hasPropertyMetadata($property);
-
-    /**
-     * Returns all metadata instances for the given named property.
-     *
-     * If your implementation does not support properties, simply throw an
-     * exception in this method (for example a <tt>BadMethodCallException</tt>).
-     *
-     * @param string $property The property name.
-     *
-     * @return PropertyMetadataInterface[] A list of metadata instances. Empty if
-     *                                     no metadata exists for the property.
-     */
-    public function getPropertyMetadata($property);
 
     public function hasGroupSequence();
 

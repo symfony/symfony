@@ -12,8 +12,6 @@
 namespace Symfony\Component\Validator\Node;
 
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
-use Symfony\Component\Validator\Exception\UnexpectedTypeException;
-use Symfony\Component\Validator\Mapping\MetadataInterface;
 use Symfony\Component\Validator\Mapping\TraversalStrategy;
 
 /**

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator\Tests\Validator;
 
-use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\ConstraintViolationInterface;

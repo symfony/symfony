@@ -86,8 +86,6 @@ EOF
 
     /**
      * {@inheritdoc}
-     *
-     * @throws \LogicException
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {

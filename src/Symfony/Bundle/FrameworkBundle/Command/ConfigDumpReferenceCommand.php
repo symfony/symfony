@@ -17,15 +17,15 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 /**
  * A console command for dumping available configuration reference
  *
  * @author Kevin Bond <kevinbond@gmail.com>
  * @author Wouter J <waldio.webdesign@gmail.com>
+ * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
-class ConfigDumpReferenceCommand extends ContainerDebugCommand
+class ConfigDumpReferenceCommand extends AbstractConfigCommand
 {
     /**
      * {@inheritdoc}
@@ -43,13 +43,16 @@ class ConfigDumpReferenceCommand extends ContainerDebugCommand
 The <info>%command.name%</info> command dumps the default configuration for an
 extension/bundle.
 
-The extension alias or bundle name can be used:
+Either the extension alias or bundle name can be used:
 
   <info>php %command.full_name% framework</info>
   <info>php %command.full_name% FrameworkBundle</info>
 
 With the <info>format</info> option specifies the format of the configuration,
-this is either <comment>yaml</comment> or <comment>xml</comment>. When the option is not provided, <comment>yaml</comment> is used.
+this is either <comment>yaml</comment> or <comment>xml</comment>.
+When the option is not provided, <comment>yaml</comment> is used.
+
+  <info>php %command.full_name% FrameworkBundle --format=xml</info>
 EOF
             )
         ;
@@ -62,65 +65,24 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $bundles = $this->getContainer()->get('kernel')->getBundles();
-        $containerBuilder = $this->getContainerBuilder();
-
         $name = $input->getArgument('name');
 
         if (empty($name)) {
-            $output->writeln('Available registered bundles with their extension alias if available:');
-
-            $table = $this->getHelperSet()->get('table');
-            $table->setHeaders(array('Bundle name', 'Extension alias'));
-            foreach ($bundles as $bundle) {
-                $extension = $bundle->getContainerExtension();
-                $table->addRow(array($bundle->getName(), $extension ? $extension->getAlias() : ''));
-            }
-            $table->render($output);
+            $this->listBundles($output);
 
             return;
         }
 
-        $extension = null;
+        $extension = $this->findExtention($name);
 
-        if (preg_match('/Bundle$/', $name)) {
-            // input is bundle name
+        $configuration = $extension->getConfiguration(array(), $this->getContainerBuilder());
 
-            if (isset($bundles[$name])) {
-                $extension = $bundles[$name]->getContainerExtension();
-            }
+        $this->validateConfiguration($extension, $configuration);
 
-            if (!$extension) {
-                throw new \LogicException(sprintf('No extensions with configuration available for "%s"', $name));
-            }
-
-            $message = 'Default configuration for "'.$name.'"';
+        if ($name === $extension->getAlias()) {
+            $message = sprintf('Default configuration for extension with alias: "%s"', $name);
         } else {
-            foreach ($bundles as $bundle) {
-                $extension = $bundle->getContainerExtension();
-
-                if ($extension && $extension->getAlias() === $name) {
-                    break;
-                }
-
-                $extension = null;
-            }
-
-            if (!$extension) {
-                throw new \LogicException(sprintf('No extension with alias "%s" is enabled', $name));
-            }
-
-            $message = 'Default configuration for extension with alias: "'.$name.'"';
-        }
-
-        $configuration = $extension->getConfiguration(array(), $containerBuilder);
-
-        if (!$configuration) {
-            throw new \LogicException(sprintf('The extension with alias "%s" does not have it\'s getConfiguration() method setup', $extension->getAlias()));
-        }
-
-        if (!$configuration instanceof ConfigurationInterface) {
-            throw new \LogicException(sprintf('Configuration class "%s" should implement ConfigurationInterface in order to be dumpable', get_class($configuration)));
+            $message = sprintf('Default configuration for "%s"', $name);
         }
 
         switch ($input->getOption('format')) {

@@ -75,7 +75,7 @@ class Filesystem
     public function mkdir($dirs, $mode = 0777)
     {
         foreach ($this->toIterator($dirs) as $dir) {
-            if (is_dir($dir)) {
+            if (is_dir($dir) || "s3://" === substr($dirs, 0, 5)) {
                 continue;
             }
 

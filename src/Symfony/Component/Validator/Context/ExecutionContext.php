@@ -16,7 +16,6 @@ use Symfony\Component\Validator\ClassBasedInterface;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Exception\BadMethodCallException;
-use Symfony\Component\Validator\ExecutionContextInterface as LegacyExecutionContextInterface;
 use Symfony\Component\Validator\Group\GroupManagerInterface;
 use Symfony\Component\Validator\Mapping\PropertyMetadataInterface;
 use Symfony\Component\Validator\Node\Node;
@@ -33,7 +32,7 @@ use Symfony\Component\Validator\Violation\ConstraintViolationBuilder;
  *
  * @see ExecutionContextInterface
  */
-class ExecutionContext implements ExecutionContextInterface, LegacyExecutionContextInterface, NodeObserverInterface
+class ExecutionContext implements ExecutionContextInterface, NodeObserverInterface
 {
     /**
      * @var ValidatorInterface
@@ -121,6 +120,13 @@ class ExecutionContext implements ExecutionContextInterface, LegacyExecutionCont
         // The parameters $invalidValue and following are ignored by the new
         // API, as they are not present in the new interface anymore.
         // You should use buildViolation() instead.
+        if (func_num_args() > 2) {
+            throw new BadMethodCallException(
+                'The parameters $invalidValue, $pluralization and $code are '.
+                'not supported anymore as of Symfony 2.5. Please use '.
+                'buildViolation() instead or enable the legacy mode.'
+            );
+        }
 
         $this->violations->add(new ConstraintViolation(
             $this->translator->trans($message, $parameters, $this->translationDomain),
@@ -235,8 +241,8 @@ class ExecutionContext implements ExecutionContextInterface, LegacyExecutionCont
     public function addViolationAt($subPath, $message, array $parameters = array(), $invalidValue = null, $pluralization = null, $code = null)
     {
         throw new BadMethodCallException(
-            'addViolationAt() is not supported anymore in the new API. '.
-            'Please use buildViolation() or enable the legacy mode.'
+            'addViolationAt() is not supported anymore as of Symfony 2.5. '.
+            'Please use buildViolation() instead or enable the legacy mode.'
         );
     }
 
@@ -246,8 +252,8 @@ class ExecutionContext implements ExecutionContextInterface, LegacyExecutionCont
     public function validate($value, $subPath = '', $groups = null, $traverse = false, $deep = false)
     {
         throw new BadMethodCallException(
-            'validate() is not supported anymore in the new API. '.
-            'Please use getValidator() or enable the legacy mode.'
+            'validate() is not supported anymore as of Symfony 2.5. '.
+            'Please use getValidator() instead or enable the legacy mode.'
         );
     }
 
@@ -257,8 +263,8 @@ class ExecutionContext implements ExecutionContextInterface, LegacyExecutionCont
     public function validateValue($value, $constraints, $subPath = '', $groups = null)
     {
         throw new BadMethodCallException(
-            'validateValue() is not supported anymore in the new API. '.
-            'Please use getValidator() or enable the legacy mode.'
+            'validateValue() is not supported anymore as of Symfony 2.5. '.
+            'Please use getValidator() instead or enable the legacy mode.'
         );
     }
 
@@ -268,9 +274,9 @@ class ExecutionContext implements ExecutionContextInterface, LegacyExecutionCont
     public function getMetadataFactory()
     {
         throw new BadMethodCallException(
-            'getMetadataFactory() is not supported anymore in the new API. '.
-            'Please use getMetadataFor() or hasMetadataFor() or enable the '.
-            'legacy mode.'
+            'getMetadataFactory() is not supported anymore as of Symfony 2.5. '.
+            'Please use getValidator() in combination with getMetadataFor() '.
+            'or hasMetadataFor() instead or enable the legacy mode.'
         );
     }
 }

@@ -15,7 +15,6 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\Traverse;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
-use Symfony\Component\Validator\ExecutionContextInterface as LegacyExecutionContextInterface;
 use Symfony\Component\Validator\Group\GroupManagerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\ValidatorInterface as LegacyValidatorInterface;
@@ -29,7 +28,7 @@ use Symfony\Component\Validator\ValidatorInterface as LegacyValidatorInterface;
  * @deprecated Implemented for backwards compatibility with Symfony < 2.5. To be
  *             removed in 3.0.
  */
-class LegacyExecutionContext extends ExecutionContext implements LegacyExecutionContextInterface
+class LegacyExecutionContext extends ExecutionContext
 {
     /**
      * Creates a new context.
@@ -66,7 +65,7 @@ class LegacyExecutionContext extends ExecutionContext implements LegacyExecution
      */
     public function addViolation($message, array $parameters = array(), $invalidValue = null, $pluralization = null, $code = null)
     {
-        if (func_num_args() >= 3) {
+        if (func_num_args() > 2) {
             $this
                 ->buildViolation($message, $parameters)
                 ->setInvalidValue($invalidValue)
@@ -86,7 +85,7 @@ class LegacyExecutionContext extends ExecutionContext implements LegacyExecution
      */
     public function addViolationAt($subPath, $message, array $parameters = array(), $invalidValue = null, $pluralization = null, $code = null)
     {
-        if (func_num_args() >= 3) {
+        if (func_num_args() > 2) {
             $this
                 ->buildViolation($message, $parameters)
                 ->atPath($subPath)

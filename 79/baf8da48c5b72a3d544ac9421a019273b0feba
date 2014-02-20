@@ -1,0 +1,116 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-01-30T10:43:00Z
+
+I'm -1 for such reflection-based hack.
+
+and I don't think it should be done by ``config:dump-reference``. You are not dumping the reference anymore, but the merged config. This is a different responsibility (and a different output) and so should be a separate command if you want to implement it
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-01-30T11:09:23Z
+
+I implemented this feature in another command, but since 90% of the code is similar, I have merged it with the existing one. But I'm totally fine to create a new command.
+
+For the hack, I don't know how to achieve that without... I will look at.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-01-30T11:14:34Z
+
+@lyrixx extracting the code retrieving the extension to a reusable place would be a better way to limit duplication than having the ``config:dump-reference`` method dumping something else than the reference.
+
+Regarding the hack, I don't think there is a non-hacky way to achieve this actually. You are trying to access to some temporary internal state of the builder, at a point where this state has already been lost
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-01-30T11:17:52Z
+
+Yes, there is no problem, I will create a new command.
+
+But for the hack part ... I'm open to suggestion.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2014-01-30T16:24:03Z
+
+Adding XML support for this requires a lot more work than Yaml. I even think it'll be to complicated to put in the command, you should create an XML dumper. Maybe, you can reuse the XML reference dumper and convert that to a dumper that dumps the given configuration. Then the reference dumper just needs to build the default configuration and pass them to the XML dumper.
+The same can be done for the Yaml Dumper, to be consistent and to have IoC.
+
+If you don't want to do it, I'll create a PR for it after this get merged :)
+
+---------------------------------------------------------------------------
+
+by stof at 2014-01-30T17:18:00Z
+
+@WouterJ the difference is that a reference dumper does not dump configuration, it dumps a node tree. So its input is totally different.
+The current way to dump the configuration to Yaml is far more sensible than trying to hack the reference dumper with 2 different responsibilities based on different input, different requirements and a different output. It simply does not make sense.
+This is also why I said that it does not belong to this command: dumping the current config is not dumping a reference
+
+I don't even think it makes sense to dump the configuration as XML. The processed configuration may not even be something which can be represented as XML in the format supported by the DI extension (because of all the transformation logic). And even if it could, it would involve reversing the normalizations done on the config, which cannot be done (have you ever tried to have an arbitrary callable and its output, and to find the input producing it again ? this is not something you want to do to dump the config).
+The current configuration is
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-01-30T17:24:08Z
+
+According with your comment, I will split my code in 2 commands.
+As the `xml` format is hard, and don't make sens, I leave it for now.
+
+Thanks @stof  @WouterJ
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-01-30T18:02:32Z
+
+Any advice for the command name?
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2014-01-30T18:04:16Z
+
+config:debug ? (it's consistent with container:debug, router:debug, ...)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-01-30T19:14:36Z
+
+done
+
+---------------------------------------------------------------------------
+
+by saro0h at 2014-01-30T20:21:58Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-01-31T10:22:37Z
+
+@WouterJ I fixed some issues. But, you know, almost all code you commented is code that I moved...
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2014-01-31T10:38:57Z
+
+ > But, you know, almost all code you commented is code that I moved...
+
+Well, I didn't review the PR that introduced that code. :) And it's easier to include the fixes here, than doing it in a seperate PR. Thank you!
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-01-31T11:25:01Z
+
+I think it's ok now ;)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-02-10T10:37:04Z
+
+I think this one is mergeable, except if someone has a way to avoid the reflection.
+
+---------------------------------------------------------------------------
+
+by gggeek at 2014-02-13T12:52:12Z
+
++10 for the idea

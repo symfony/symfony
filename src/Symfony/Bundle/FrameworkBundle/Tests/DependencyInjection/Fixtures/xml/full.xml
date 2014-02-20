@@ -13,6 +13,15 @@
         <framework:profiler only-exceptions="true" enabled="false" />
         <framework:router resource="%kernel.root_dir%/config/routing.xml" type="xml" />
         <framework:session gc-maxlifetime="90000" gc-probability="1" gc-divisor="108" storage-id="session.storage.native" handler-id="session.handler.native_file" name="_SYMFONY" cookie-lifetime="86400" cookie-path="/" cookie-domain="example.com" cookie-secure="true" cookie-httponly="true" save-path="/path/to/sessions" />
+        <framework:request>
+            <framework:format name="csv">
+                <framework:mime-type>text/csv</framework:mime-type>
+                <framework:mime-type>text/plain</framework:mime-type>
+            </framework:format>
+            <framework:format name="pdf">
+                <framework:mime-type>application/pdf</framework:mime-type>
+            </framework:format>
+        </framework:request>
         <framework:templating assets-version="SomeVersionScheme" cache="/path/to/cache" >
             <framework:loader>loader.foo</framework:loader>
             <framework:loader>loader.bar</framework:loader>

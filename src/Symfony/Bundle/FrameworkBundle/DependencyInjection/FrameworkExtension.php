@@ -91,6 +91,10 @@ class FrameworkExtension extends Extension
             $this->registerSessionConfiguration($config['session'], $container, $loader);
         }
 
+        if (isset($config['request'])) {
+            $this->registerRequestConfiguration($config['request'], $container, $loader);
+        }
+
         $loader->load('security.xml');
 
         if ($this->isConfigEnabled($container, $config['form'])) {
@@ -380,6 +384,24 @@ class FrameworkExtension extends Extension
         }
 
         $container->setParameter('session.metadata.update_threshold', $config['metadata_update_threshold']);
+    }
+
+    /**
+     * Loads the request configuration.
+     *
+     * @param array            $config    A session configuration array
+     * @param ContainerBuilder $container A ContainerBuilder instance
+     * @param XmlFileLoader    $loader    An XmlFileLoader instance
+     */
+    private function registerRequestConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    {
+        if ($config['formats']) {
+            $loader->load('request.xml');
+            $container
+                ->getDefinition('request.add_request_formats_listener')
+                ->replaceArgument(0, $config['formats'])
+            ;
+        }
     }
 
     /**

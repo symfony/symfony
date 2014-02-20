@@ -16,6 +16,7 @@
             <xsd:element name="profiler" type="profiler" minOccurs="0" maxOccurs="1" />
             <xsd:element name="router" type="router" minOccurs="0" maxOccurs="1" />
             <xsd:element name="session" type="session" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="request" type="request" minOccurs="0" maxOccurs="1" />
             <xsd:element name="templating" type="templating" minOccurs="0" maxOccurs="1" />
             <xsd:element name="translator" type="translator" minOccurs="0" maxOccurs="1" />
             <xsd:element name="validation" type="validation" minOccurs="0" maxOccurs="1" />
@@ -99,6 +100,19 @@
         <xsd:attribute name="gc-divisor" type="xsd:string" />
         <xsd:attribute name="gc-probability" type="xsd:string" />
         <xsd:attribute name="save-path" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="request">
+        <xsd:sequence>
+            <xsd:element name="format" type="format" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="format">
+        <xsd:choice minOccurs="1" maxOccurs="unbounded">
+            <xsd:element name="mime-type" type="xsd:string" />
+        </xsd:choice>
+        <xsd:attribute name="name" type="xsd:string" use="required"/>
     </xsd:complexType>
 
     <xsd:complexType name="templating">

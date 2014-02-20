@@ -74,20 +74,20 @@ class NodeTraverser implements NodeTraverserInterface
             }
         }
 
-        $traversal = new Traversal($context);
+        $nodeQueue = new \SplQueue();
 
         foreach ($nodes as $node) {
-            $traversal->nodeQueue->enqueue($node);
+            $nodeQueue->enqueue($node);
 
-            while (!$traversal->nodeQueue->isEmpty()) {
-                $node = $traversal->nodeQueue->dequeue();
+            while (!$nodeQueue->isEmpty()) {
+                $node = $nodeQueue->dequeue();
 
                 if ($node instanceof ClassNode) {
-                    $this->traverseClassNode($node, $traversal);
+                    $this->traverseClassNode($node, $nodeQueue, $context);
                 } elseif ($node instanceof CollectionNode) {
-                    $this->traverseCollectionNode($node, $traversal);
+                    $this->traverseCollectionNode($node, $nodeQueue, $context);
                 } else {
-                    $this->traverseNode($node, $traversal);
+                    $this->traverseNode($node, $nodeQueue, $context);
                 }
             }
         }
@@ -113,7 +113,7 @@ class NodeTraverser implements NodeTraverserInterface
         return true;
     }
 
-    private function traverseNode(Node $node, Traversal $traversal)
+    private function traverseNode(Node $node, \SplQueue $nodeQueue, ExecutionContextInterface $context)
     {
         // Visitors have two possibilities to influence the traversal:
         //
@@ -122,7 +122,7 @@ class NodeTraverser implements NodeTraverserInterface
         // 2. If a visitor's visit() method removes a group from the node,
         //    that group will be skipped in the subtree of that node.
 
-        if (false === $this->visit($node, $traversal->context)) {
+        if (false === $this->visit($node, $context)) {
             return;
         }
 
@@ -147,7 +147,7 @@ class NodeTraverser implements NodeTraverserInterface
             // Arrays are always traversed, independent of the specified
             // traversal strategy
             // (BC with Symfony < 2.5)
-            $traversal->nodeQueue->enqueue(new CollectionNode(
+            $nodeQueue->enqueue(new CollectionNode(
                 $node->value,
                 $node->propertyPath,
                 $cascadedGroups,
@@ -167,7 +167,7 @@ class NodeTraverser implements NodeTraverserInterface
                 $node->propertyPath,
                 $cascadedGroups,
                 $traversalStrategy,
-                $traversal
+                $nodeQueue
             );
 
             return;
@@ -184,7 +184,7 @@ class NodeTraverser implements NodeTraverserInterface
         }
 
         // If TRAVERSE, the constructor will fail if we have no Traversable
-        $traversal->nodeQueue->enqueue(new CollectionNode(
+        $nodeQueue->enqueue(new CollectionNode(
             $node->value,
             $node->propertyPath,
             $cascadedGroups,
@@ -193,7 +193,7 @@ class NodeTraverser implements NodeTraverserInterface
         ));
     }
 
-    private function traverseClassNode(ClassNode $node, Traversal $traversal)
+    private function traverseClassNode(ClassNode $node, \SplQueue $nodeQueue, ExecutionContextInterface $context)
     {
         // Visitors have two possibilities to influence the traversal:
         //
@@ -202,7 +202,7 @@ class NodeTraverser implements NodeTraverserInterface
         // 2. If a visitor's visit() method removes a group from the node,
         //    that group will be skipped in the subtree of that node.
 
-        if (false === $this->visit($node, $traversal->context)) {
+        if (false === $this->visit($node, $context)) {
             return;
         }
 
@@ -212,7 +212,7 @@ class NodeTraverser implements NodeTraverserInterface
 
         foreach ($node->metadata->getConstrainedProperties() as $propertyName) {
             foreach ($node->metadata->getPropertyMetadata($propertyName) as $propertyMetadata) {
-                $traversal->nodeQueue->enqueue(new PropertyNode(
+                $nodeQueue->enqueue(new PropertyNode(
                     $node->value,
                     $propertyMetadata->getPropertyValue($node->value),
                     $propertyMetadata,
@@ -246,7 +246,7 @@ class NodeTraverser implements NodeTraverserInterface
         }
 
         // If TRAVERSE, the constructor will fail if we have no Traversable
-        $traversal->nodeQueue->enqueue(new CollectionNode(
+        $nodeQueue->enqueue(new CollectionNode(
             $node->value,
             $node->propertyPath,
             $node->groups,
@@ -255,7 +255,7 @@ class NodeTraverser implements NodeTraverserInterface
         ));
     }
 
-    private function traverseCollectionNode(CollectionNode $node, Traversal $traversal)
+    private function traverseCollectionNode(CollectionNode $node, \SplQueue $nodeQueue, ExecutionContextInterface $context)
     {
         // Visitors have two possibilities to influence the traversal:
         //
@@ -264,7 +264,7 @@ class NodeTraverser implements NodeTraverserInterface
         // 2. If a visitor's visit() method removes a group from the node,
         //    that group will be skipped in the subtree of that node.
 
-        if (false === $this->visit($node, $traversal->context)) {
+        if (false === $this->visit($node, $context)) {
             return;
         }
 
@@ -285,7 +285,7 @@ class NodeTraverser implements NodeTraverserInterface
                 // Arrays are always cascaded, independent of the specified
                 // traversal strategy
                 // (BC with Symfony < 2.5)
-                $traversal->nodeQueue->enqueue(new CollectionNode(
+                $nodeQueue->enqueue(new CollectionNode(
                     $value,
                     $node->propertyPath.'['.$key.']',
                     $node->groups,
@@ -304,13 +304,13 @@ class NodeTraverser implements NodeTraverserInterface
                     $node->propertyPath.'['.$key.']',
                     $node->groups,
                     $traversalStrategy,
-                    $traversal
+                    $nodeQueue
                 );
             }
         }
     }
 
-    private function cascadeObject($object, $propertyPath, array $groups, $traversalStrategy, Traversal $traversal)
+    private function cascadeObject($object, $propertyPath, array $groups, $traversalStrategy, \SplQueue $nodeQueue)
     {
         try {
             $classMetadata = $this->metadataFactory->getMetadataFor($object);
@@ -319,7 +319,7 @@ class NodeTraverser implements NodeTraverserInterface
                 // error
             }
 
-            $traversal->nodeQueue->enqueue(new ClassNode(
+            $nodeQueue->enqueue(new ClassNode(
                 $object,
                 $classMetadata,
                 $propertyPath,
@@ -338,7 +338,7 @@ class NodeTraverser implements NodeTraverserInterface
                 throw $e;
             }
 
-            $traversal->nodeQueue->enqueue(new CollectionNode(
+            $nodeQueue->enqueue(new CollectionNode(
                 $object,
                 $propertyPath,
                 $groups,

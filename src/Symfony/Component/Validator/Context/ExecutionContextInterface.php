@@ -11,10 +11,7 @@
 
 namespace Symfony\Component\Validator\Context;
 
-use Symfony\Component\Validator\Constraints\GroupSequence;
-use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\ExecutionContextInterface as LegacyExecutionContextInterface;
-use Symfony\Component\Validator\Mapping\MetadataInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
@@ -24,7 +21,7 @@ use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
  * The context collects all violations generated during the validation. By
  * default, validators execute all validations in a new context:
  *
- *     $violations = $validator->validateObject($object);
+ *     $violations = $validator->validate($object);
  *
  * When you make another call to the validator, while the validation is in
  * progress, the violations will be isolated from each other:
@@ -34,7 +31,7 @@ use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
  *         $validator = $this->context->getValidator();
  *
  *         // The violations are not added to $this->context
- *         $violations = $validator->validateObject($value);
+ *         $violations = $validator->validate($value);
  *     }
  *
  * However, if you want to add the violations to the current context, use the
@@ -47,7 +44,7 @@ use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
  *         // The violations are added to $this->context
  *         $validator
  *             ->inContext($this->context)
- *             ->validateObject($value)
+ *             ->validate($value)
  *         ;
  *     }
  *

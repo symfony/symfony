@@ -26,7 +26,6 @@ class Inline
     private static $exceptionOnInvalidType = false;
     private static $objectSupport = false;
 
-
     /**
      * Converts a YAML string to a PHP array.
      *
@@ -257,7 +256,6 @@ class Inline
 
         return $output;
     }
-
 
     /**
      * Parses a sequence to a YAML string.

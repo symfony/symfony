@@ -240,46 +240,43 @@ class InlineTest extends \PHPUnit_Framework_TestCase
             '[\'foo,bar\', \'foo bar\']' => array('foo,bar', 'foo bar'),
 
             // mappings
-            '{foo:bar,bar:foo,false:false,null:null,integer:12}' => (object)array('foo' => 'bar', 'bar' => 'foo', 'false' => false, 'null' => null, 'integer' => 12),
-            '{ foo  : bar, bar : foo,  false  :   false,  null  :   null,  integer :  12  }' => (object)array('foo' => 'bar', 'bar' => 'foo', 'false' => false, 'null' => null, 'integer' => 12),
-            '{foo: \'bar\', bar: \'foo: bar\'}' => (object)array('foo' => 'bar', 'bar' => 'foo: bar'),
-            '{\'foo\': \'bar\', "bar": \'foo: bar\'}' => (object)array('foo' => 'bar', 'bar' => 'foo: bar'),
-            '{\'foo\'\'\': \'bar\', "bar\"": \'foo: bar\'}' => (object)array('foo\'' => 'bar', "bar\"" => 'foo: bar'),
-            '{\'foo: \': \'bar\', "bar: ": \'foo: bar\'}' => (object)array('foo: ' => 'bar', "bar: " => 'foo: bar'),
+            '{foo:bar,bar:foo,false:false,null:null,integer:12}' => (object) array('foo' => 'bar', 'bar' => 'foo', 'false' => false, 'null' => null, 'integer' => 12),
+            '{ foo  : bar, bar : foo,  false  :   false,  null  :   null,  integer :  12  }' => (object) array('foo' => 'bar', 'bar' => 'foo', 'false' => false, 'null' => null, 'integer' => 12),
+            '{foo: \'bar\', bar: \'foo: bar\'}' => (object) array('foo' => 'bar', 'bar' => 'foo: bar'),
+            '{\'foo\': \'bar\', "bar": \'foo: bar\'}' => (object) array('foo' => 'bar', 'bar' => 'foo: bar'),
+            '{\'foo\'\'\': \'bar\', "bar\"": \'foo: bar\'}' => (object) array('foo\'' => 'bar', "bar\"" => 'foo: bar'),
+            '{\'foo: \': \'bar\', "bar: ": \'foo: bar\'}' => (object) array('foo: ' => 'bar', "bar: " => 'foo: bar'),
 
             // nested sequences and mappings
             '[foo, [bar, foo]]' => array('foo', array('bar', 'foo')),
-            '[foo, {bar: foo}]' => array('foo', (object)array('bar' => 'foo')),
-            '{ foo: {bar: foo} }' => (object)array('foo' => (object)array('bar' => 'foo')),
-            '{ foo: [bar, foo] }' => (object)array('foo' => array('bar', 'foo')),
+            '[foo, {bar: foo}]' => array('foo', (object) array('bar' => 'foo')),
+            '{ foo: {bar: foo} }' => (object) array('foo' => (object) array('bar' => 'foo')),
+            '{ foo: [bar, foo] }' => (object) array('foo' => array('bar', 'foo')),
 
             '[  foo, [  bar, foo  ]  ]' => array('foo', array('bar', 'foo')),
 
-            '[{ foo: {bar: foo} }]' => array((object)array('foo' => (object)array('bar' => 'foo'))),
+            '[{ foo: {bar: foo} }]' => array((object) array('foo' => (object) array('bar' => 'foo'))),
 
             '[foo, [bar, [foo, [bar, foo]], foo]]' => array('foo', array('bar', array('foo', array('bar', 'foo')), 'foo')),
 
-            '[foo, {bar: foo, foo: [foo, {bar: foo}]}, [foo, {bar: foo}]]' => array('foo', (object)array('bar' => 'foo', 'foo' => array('foo', (object)array('bar' => 'foo'))), array('foo', (object)array('bar' => 'foo'))),
+            '[foo, {bar: foo, foo: [foo, {bar: foo}]}, [foo, {bar: foo}]]' => array('foo', (object) array('bar' => 'foo', 'foo' => array('foo', (object) array('bar' => 'foo'))), array('foo', (object) array('bar' => 'foo'))),
 
-            '[foo, bar: { foo: bar }]' => array('foo', '1' => (object)array('bar' => (object)array('foo' => 'bar'))),
-            '[foo, \'@foo.baz\', { \'%foo%\': \'foo is %foo%\', bar: \'%foo%\' }, true, \'@service_container\']' => array('foo', '@foo.baz', (object)array('%foo%' => 'foo is %foo%', 'bar' => '%foo%',), true, '@service_container',),
-
+            '[foo, bar: { foo: bar }]' => array('foo', '1' => (object) array('bar' => (object) array('foo' => 'bar'))),
+            '[foo, \'@foo.baz\', { \'%foo%\': \'foo is %foo%\', bar: \'%foo%\' }, true, \'@service_container\']' => array('foo', '@foo.baz', (object) array('%foo%' => 'foo is %foo%', 'bar' => '%foo%',), true, '@service_container',),
 
             '{}' => new \stdClass(),
-            '{ foo  : bar, bar : {}  }' => (object)array('foo' => 'bar', 'bar' => new \stdClass()),
-            '{ foo  : [], bar : {}  }' => (object)array('foo' => array(), 'bar' => new \stdClass()),
-            '{foo: \'bar\', bar: {} }' => (object)array('foo' => 'bar', 'bar' => new \stdClass()),
-            '{\'foo\': \'bar\', "bar": {}}' => (object)array('foo' => 'bar', 'bar' => new \stdClass()),
-            '{\'foo\': \'bar\', "bar": \'{}\'}' => (object)array('foo' => 'bar', 'bar' => '{}'),
+            '{ foo  : bar, bar : {}  }' => (object) array('foo' => 'bar', 'bar' => new \stdClass()),
+            '{ foo  : [], bar : {}  }' => (object) array('foo' => array(), 'bar' => new \stdClass()),
+            '{foo: \'bar\', bar: {} }' => (object) array('foo' => 'bar', 'bar' => new \stdClass()),
+            '{\'foo\': \'bar\', "bar": {}}' => (object) array('foo' => 'bar', 'bar' => new \stdClass()),
+            '{\'foo\': \'bar\', "bar": \'{}\'}' => (object) array('foo' => 'bar', 'bar' => '{}'),
 
             '[foo, [{}, {}]]' => array('foo', array(new \stdClass(), new \stdClass())),
             '[foo, [[], {}]]' => array('foo', array(array(), new \stdClass())),
             '[foo, [[{}, {}], {}]]' => array('foo', array(array(new \stdClass(), new \stdClass()), new \stdClass())),
-            '[foo, {bar: {}}]' => array('foo', '1' => (object)array('bar' => new \stdClass())),
+            '[foo, {bar: {}}]' => array('foo', '1' => (object) array('bar' => new \stdClass())),
         );
     }
-
-
 
     protected function getTestsForDump()
     {

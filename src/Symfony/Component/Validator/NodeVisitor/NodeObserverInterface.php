@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Validator\Util;
+namespace Symfony\Component\Validator\NodeVisitor;
 
 use Symfony\Component\Validator\Node\Node;
 
@@ -17,9 +17,7 @@ use Symfony\Component\Validator\Node\Node;
  * @since  %%NextVersion%%
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-interface NodeStackInterface
+interface NodeObserverInterface
 {
-    public function pushNode(Node $node);
-
-    public function popNode();
+    public function setCurrentNode(Node $node);
 }

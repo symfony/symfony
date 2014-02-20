@@ -42,29 +42,24 @@ class NodeValidatorVisitor extends AbstractVisitor implements GroupManagerInterf
 
     private $currentGroup;
 
-    private $objectHashStack;
-
     public function __construct(NodeTraverserInterface $nodeTraverser, ConstraintValidatorFactoryInterface $validatorFactory)
     {
         $this->validatorFactory = $validatorFactory;
         $this->nodeTraverser = $nodeTraverser;
-        $this->objectHashStack = new \SplStack();
     }
 
     public function afterTraversal(array $nodes, ExecutionContextInterface $context)
     {
         $this->validatedObjects = array();
         $this->validatedConstraints = array();
-        $this->objectHashStack = new \SplStack();
     }
 
-    public function enterNode(Node $node, ExecutionContextInterface $context)
+    public function visit(Node $node, ExecutionContextInterface $context)
     {
         if ($node instanceof ClassNode) {
             $objectHash = spl_object_hash($node->value);
-            $this->objectHashStack->push($objectHash);
-        } elseif ($node instanceof PropertyNode && count($this->objectHashStack) > 0) {
-            $objectHash = $this->objectHashStack->top();
+        } elseif ($node instanceof PropertyNode) {
+            $objectHash = spl_object_hash($node->object);
         } else {
             $objectHash = null;
         }
@@ -114,13 +109,6 @@ class NodeValidatorVisitor extends AbstractVisitor implements GroupManagerInterf
         }
 
         return true;
-    }
-
-    public function leaveNode(Node $node, ExecutionContextInterface $context)
-    {
-        if ($node instanceof ClassNode) {
-            $this->objectHashStack->pop();
-        }
     }
 
     public function getCurrentGroup()

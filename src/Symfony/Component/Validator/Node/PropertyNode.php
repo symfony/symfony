@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Node;
 
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Mapping\PropertyMetadataInterface;
 
 /**
@@ -33,6 +34,11 @@ use Symfony\Component\Validator\Mapping\PropertyMetadataInterface;
 class PropertyNode extends Node
 {
     /**
+     * @var object
+     */
+    public $object;
+
+    /**
      * @var PropertyMetadataInterface
      */
     public $metadata;
@@ -40,6 +46,8 @@ class PropertyNode extends Node
     /**
      * Creates a new property node.
      *
+     * @param object                    $object         The object the property
+     *                                                  belongs to
      * @param mixed                     $value          The property value
      * @param PropertyMetadataInterface $metadata       The property's metadata
      * @param string                    $propertyPath   The property path leading
@@ -49,9 +57,15 @@ class PropertyNode extends Node
      * @param string[]|null             $cascadedGroups The groups in which
      *                                                  cascaded objects should
      *                                                  be validated
+     *
+     * @throws UnexpectedTypeException If $object is not an object
      */
-    public function __construct($value, PropertyMetadataInterface $metadata, $propertyPath, array $groups, $cascadedGroups = null)
+    public function __construct($object, $value, PropertyMetadataInterface $metadata, $propertyPath, array $groups, $cascadedGroups = null)
     {
+        if (!is_object($object)) {
+            throw new UnexpectedTypeException($object, 'object');
+        }
+
         parent::__construct(
             $value,
             $metadata,
@@ -59,6 +73,8 @@ class PropertyNode extends Node
             $groups,
             $cascadedGroups
         );
+
+        $this->object = $object;
     }
 
 }

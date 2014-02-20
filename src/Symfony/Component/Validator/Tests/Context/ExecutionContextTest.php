@@ -55,41 +55,6 @@ class ExecutionContextTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testPushAndPop()
-    {
-        $metadata = $this->getMock('Symfony\Component\Validator\Mapping\MetadataInterface');
-        $node = new GenericNode('value', $metadata, '', array(), array());
-
-        $this->context->pushNode($node);
-
-        $this->assertSame('value', $this->context->getValue());
-        // the other methods are covered in AbstractValidatorTest
-
-        $this->assertSame($node, $this->context->popNode());
-
-        $this->assertNull($this->context->getValue());
-    }
-
-    public function testPushTwiceAndPop()
-    {
-        $metadata1 = $this->getMock('Symfony\Component\Validator\Mapping\MetadataInterface');
-        $node1 = new GenericNode('value', $metadata1, '', array(), array());
-        $metadata2 = $this->getMock('Symfony\Component\Validator\Mapping\MetadataInterface');
-        $node2 = new GenericNode('other value', $metadata2, '', array(), array());
-
-        $this->context->pushNode($node1);
-        $this->context->pushNode($node2);
-
-        $this->assertSame($node2, $this->context->popNode());
-
-        $this->assertSame('value', $this->context->getValue());
-    }
-
-    public function testPopWithoutPush()
-    {
-        $this->assertNull($this->context->popNode());
-    }
-
     public function testGetGroup()
     {
         $this->groupManager->expects($this->once())

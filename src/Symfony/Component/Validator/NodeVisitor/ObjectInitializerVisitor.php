@@ -43,7 +43,7 @@ class ObjectInitializerVisitor extends AbstractVisitor
         $this->initializers = $initializers;
     }
 
-    public function enterNode(Node $node, ExecutionContextInterface $context)
+    public function visit(Node $node, ExecutionContextInterface $context)
     {
         if (!$node instanceof ClassNode) {
             return;

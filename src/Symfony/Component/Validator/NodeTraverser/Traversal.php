@@ -9,20 +9,23 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Validator\NodeVisitor;
+namespace Symfony\Component\Validator\NodeTraverser;
 
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Symfony\Component\Validator\Node\Node;
 
 /**
  * @since  %%NextVersion%%
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-interface NodeVisitorInterface
+class Traversal
 {
-    public function beforeTraversal(array $nodes, ExecutionContextInterface $context);
+    public $context;
 
-    public function afterTraversal(array $nodes, ExecutionContextInterface $context);
+    public $nodeQueue;
 
-    public function visit(Node $node, ExecutionContextInterface $context);
+    public function __construct(ExecutionContextInterface $context)
+    {
+        $this->context = $context;
+        $this->nodeQueue = new \SplQueue();
+    }
 }

@@ -20,7 +20,7 @@ use Symfony\Component\Validator\ExecutionContextInterface as LegacyExecutionCont
 use Symfony\Component\Validator\Group\GroupManagerInterface;
 use Symfony\Component\Validator\Mapping\PropertyMetadataInterface;
 use Symfony\Component\Validator\Node\Node;
-use Symfony\Component\Validator\Util\NodeStackInterface;
+use Symfony\Component\Validator\NodeVisitor\NodeObserverInterface;
 use Symfony\Component\Validator\Util\PropertyPath;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilder;
@@ -33,7 +33,7 @@ use Symfony\Component\Validator\Violation\ConstraintViolationBuilder;
  *
  * @see ExecutionContextInterface
  */
-class ExecutionContext implements ExecutionContextInterface, LegacyExecutionContextInterface, NodeStackInterface
+class ExecutionContext implements ExecutionContextInterface, LegacyExecutionContextInterface, NodeObserverInterface
 {
     /**
      * @var ValidatorInterface
@@ -77,13 +77,6 @@ class ExecutionContext implements ExecutionContextInterface, LegacyExecutionCont
     private $node;
 
     /**
-     * The trace of nodes from the root node to the current node.
-     *
-     * @var \SplStack
-     */
-    private $nodeStack;
-
-    /**
      * Creates a new execution context.
      *
      * @param ValidatorInterface    $validator         The validator
@@ -108,47 +101,16 @@ class ExecutionContext implements ExecutionContextInterface, LegacyExecutionCont
         $this->translator = $translator;
         $this->translationDomain = $translationDomain;
         $this->violations = new ConstraintViolationList();
-        $this->nodeStack = new \SplStack();
     }
 
     /**
      * Sets the values of the context to match the given node.
      *
-     * Internally, all nodes are stored on a stack and can be removed from that
-     * stack using {@link popNode()}.
-     *
      * @param Node $node The currently validated node
      */
-    public function pushNode(Node $node)
+    public function setCurrentNode(Node $node)
     {
-        $this->nodeStack->push($node);
         $this->node = $node;
-    }
-
-    /**
-     * Sets the values of the context to match the previous node.
-     *
-     * The current node is removed from the internal stack and returned.
-     *
-     * @return Node|null The currently validated node or null, if no node was
-     *                   on the stack
-     */
-    public function popNode()
-    {
-        // Nothing to do if the stack is empty
-        if (0 === count($this->nodeStack)) {
-            return null;
-        }
-
-        // Remove the current node from the stack
-        $poppedNode = $this->nodeStack->pop();
-
-        // Adjust the current node to the previous node
-        $this->node = count($this->nodeStack) > 0
-            ? $this->nodeStack->top()
-            : null;
-
-        return $poppedNode;
     }
 
     /**

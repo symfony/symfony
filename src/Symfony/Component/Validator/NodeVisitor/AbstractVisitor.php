@@ -28,11 +28,7 @@ abstract class AbstractVisitor implements NodeVisitorInterface
     {
     }
 
-    public function enterNode(Node $node, ExecutionContextInterface $context)
-    {
-    }
-
-    public function leaveNode(Node $node, ExecutionContextInterface $context)
+    public function visit(Node $node, ExecutionContextInterface $context)
     {
     }
 }

@@ -141,6 +141,7 @@ class ContextualValidator implements ContextualValidatorInterface
             $propertyValue = $propertyMetadata->getPropertyValue($object);
 
             $nodes[] = new PropertyNode(
+                $object,
                 $propertyValue,
                 $propertyMetadata,
                 PropertyPath::append($this->defaultPropertyPath, $propertyName),
@@ -172,6 +173,7 @@ class ContextualValidator implements ContextualValidatorInterface
 
         foreach ($propertyMetadatas as $propertyMetadata) {
             $nodes[] = new PropertyNode(
+                $object,
                 $value,
                 $propertyMetadata,
                 PropertyPath::append($this->defaultPropertyPath, $propertyName),

@@ -23,7 +23,7 @@ use Symfony\Component\Validator\Node\Node;
  */
 class GroupSequenceResolverVisitor extends AbstractVisitor
 {
-    public function enterNode(Node $node, ExecutionContextInterface $context)
+    public function visit(Node $node, ExecutionContextInterface $context)
     {
         if (!$node instanceof ClassNode) {
             return;

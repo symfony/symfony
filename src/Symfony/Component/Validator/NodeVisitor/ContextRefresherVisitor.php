@@ -14,7 +14,6 @@ namespace Symfony\Component\Validator\NodeVisitor;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Exception\RuntimeException;
 use Symfony\Component\Validator\Node\Node;
-use Symfony\Component\Validator\Util\NodeStackInterface;
 
 /**
  * Updates the current context with the current node of the validation
@@ -25,31 +24,17 @@ use Symfony\Component\Validator\Util\NodeStackInterface;
  */
 class ContextRefresherVisitor extends AbstractVisitor
 {
-    public function enterNode(Node $node, ExecutionContextInterface $context)
+    public function visit(Node $node, ExecutionContextInterface $context)
     {
-        if (!$context instanceof NodeStackInterface) {
+        if (!$context instanceof NodeObserverInterface) {
             throw new RuntimeException(sprintf(
                 'The ContextRefresherVisitor only supports instances of class '.
-                '"Symfony\Component\Validator\Context\NodeStackInterface". '.
+                '"Symfony\Component\Validator\NodeVisitor\NodeObserverInterface". '.
                 'An instance of class "%s" was given.',
                 get_class($context)
             ));
         }
 
-        $context->pushNode($node);
-    }
-
-    public function leaveNode(Node $node, ExecutionContextInterface $context)
-    {
-        if (!$context instanceof NodeStackInterface) {
-            throw new RuntimeException(sprintf(
-                'The ContextRefresherVisitor only supports instances of class '.
-                '"Symfony\Component\Validator\Context\NodeStackInterface". '.
-                'An instance of class "%s" was given.',
-                get_class($context)
-            ));
-        }
-
-        $context->popNode();
+        $context->setCurrentNode($node);
     }
 }

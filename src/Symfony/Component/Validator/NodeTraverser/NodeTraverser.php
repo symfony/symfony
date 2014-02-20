@@ -117,9 +117,9 @@ class NodeTraverser implements NodeTraverserInterface
     {
         // Visitors have two possibilities to influence the traversal:
         //
-        // 1. If a visitor's enterNode() method returns false, the traversal is
+        // 1. If a visitor's visit() method returns false, the traversal is
         //    skipped entirely.
-        // 2. If a visitor's enterNode() method removes a group from the node,
+        // 2. If a visitor's visit() method removes a group from the node,
         //    that group will be skipped in the subtree of that node.
 
         if (false === $this->visit($node, $traversal->context)) {
@@ -197,9 +197,9 @@ class NodeTraverser implements NodeTraverserInterface
     {
         // Visitors have two possibilities to influence the traversal:
         //
-        // 1. If a visitor's enterNode() method returns false, the traversal is
+        // 1. If a visitor's visit() method returns false, the traversal is
         //    skipped entirely.
-        // 2. If a visitor's enterNode() method removes a group from the node,
+        // 2. If a visitor's visit() method removes a group from the node,
         //    that group will be skipped in the subtree of that node.
 
         if (false === $this->visit($node, $traversal->context)) {
@@ -259,9 +259,9 @@ class NodeTraverser implements NodeTraverserInterface
     {
         // Visitors have two possibilities to influence the traversal:
         //
-        // 1. If a visitor's enterNode() method returns false, the traversal is
+        // 1. If a visitor's visit() method returns false, the traversal is
         //    skipped entirely.
-        // 2. If a visitor's enterNode() method removes a group from the node,
+        // 2. If a visitor's visit() method removes a group from the node,
         //    that group will be skipped in the subtree of that node.
 
         if (false === $this->visit($node, $traversal->context)) {

@@ -47,7 +47,7 @@ interface ValidatorInterface
      */
     public function validateObject($object, $groups = null);
 
-    public function validateObjects($objects, $groups = null, $deep = false);
+    public function validateObjects($objects, $groups = null);
 
     /**
      * Validates a property of a value against its current value.

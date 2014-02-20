@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator\Node;
 
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Mapping\PropertyMetadataInterface;
+use Symfony\Component\Validator\Mapping\TraversalStrategy;
 
 /**
  * Represents the value of a property and its associated metadata.
@@ -57,10 +58,11 @@ class PropertyNode extends Node
      * @param string[]|null             $cascadedGroups The groups in which
      *                                                  cascaded objects should
      *                                                  be validated
+     * @param integer                   $traversalStrategy
      *
      * @throws UnexpectedTypeException If $object is not an object
      */
-    public function __construct($object, $value, PropertyMetadataInterface $metadata, $propertyPath, array $groups, $cascadedGroups = null)
+    public function __construct($object, $value, PropertyMetadataInterface $metadata, $propertyPath, array $groups, $cascadedGroups = null, $traversalStrategy = TraversalStrategy::IMPLICIT)
     {
         if (!is_object($object)) {
             throw new UnexpectedTypeException($object, 'object');
@@ -71,7 +73,8 @@ class PropertyNode extends Node
             $metadata,
             $propertyPath,
             $groups,
-            $cascadedGroups
+            $cascadedGroups,
+            $traversalStrategy
         );
 
         $this->object = $object;

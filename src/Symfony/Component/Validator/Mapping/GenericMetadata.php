@@ -77,27 +77,17 @@ class GenericMetadata  implements MetadataInterface
         if ($constraint instanceof Valid) {
             $this->cascadingStrategy = CascadingStrategy::CASCADE;
 
-            return $this;
-        }
-
-        if ($constraint instanceof Traverse) {
-            if (true === $constraint->traverse) {
-                // If traverse is true, traversal should be explicitly enabled
-                $this->traversalStrategy = TraversalStrategy::TRAVERSE;
-
-                if ($constraint->deep) {
-                    $this->traversalStrategy |= TraversalStrategy::RECURSIVE;
-                }
-            } elseif (false === $constraint->traverse) {
-                // If traverse is false, traversal should be explicitly disabled
-                $this->traversalStrategy = TraversalStrategy::NONE;
-            } else {
-                // Else, traverse depending on the contextual information that
-                // is available during validation
+            if ($constraint->traverse) {
+                // Traverse unless the value is not traversable
                 $this->traversalStrategy = TraversalStrategy::IMPLICIT;
+
+                if (!$constraint->deep) {
+                    $this->traversalStrategy |= TraversalStrategy::STOP_RECURSION;
+                }
+            } else {
+                $this->traversalStrategy = TraversalStrategy::NONE;
             }
 
-            // The constraint is not added
             return $this;
         }
 

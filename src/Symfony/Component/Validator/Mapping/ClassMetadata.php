@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Mapping;
 
 use Symfony\Component\Validator\Constraints\GroupSequence;
+use Symfony\Component\Validator\Constraints\Traverse;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\ValidationVisitorInterface;
 use Symfony\Component\Validator\PropertyMetadataContainerInterface;
@@ -188,6 +189,27 @@ class ClassMetadata extends ElementMetadata implements LegacyMetadataInterface, 
                 'The constraint "%s" cannot be put on classes.',
                 get_class($constraint)
             ));
+        }
+
+        if ($constraint instanceof Traverse) {
+            if (true === $constraint->traverse) {
+                // If traverse is true, traversal should be explicitly enabled
+                $this->traversalStrategy = TraversalStrategy::TRAVERSE;
+
+                if (!$constraint->deep) {
+                    $this->traversalStrategy |= TraversalStrategy::STOP_RECURSION;
+                }
+            } elseif (false === $constraint->traverse) {
+                // If traverse is false, traversal should be explicitly disabled
+                $this->traversalStrategy = TraversalStrategy::NONE;
+            } else {
+                // Else, traverse depending on the contextual information that
+                // is available during validation
+                $this->traversalStrategy = TraversalStrategy::IMPLICIT;
+            }
+
+            // The constraint is not added
+            return $this;
         }
 
         $constraint->addImplicitGroupName($this->getDefaultGroup());

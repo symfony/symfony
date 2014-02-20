@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator\Node;
 
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Mapping\MetadataInterface;
+use Symfony\Component\Validator\Mapping\TraversalStrategy;
 
 /**
  * A node in the validated graph.
@@ -32,7 +33,7 @@ abstract class Node
     /**
      * The metadata specifying how the value should be validated.
      *
-     * @var MetadataInterface
+     * @var MetadataInterface|null
      */
     public $metadata;
 
@@ -58,20 +59,26 @@ abstract class Node
     public $cascadedGroups;
 
     /**
+     * @var integer
+     */
+    public $traversalStrategy;
+
+    /**
      * Creates a new property node.
      *
-     * @param mixed             $value          The property value
-     * @param MetadataInterface $metadata       The property's metadata
-     * @param string            $propertyPath   The property path leading to
-     *                                          this node
-     * @param string[]          $groups         The groups in which this node
-     *                                          should be validated
-     * @param string[]|null     $cascadedGroups The groups in which cascaded
-     *                                          objects should be validated
+     * @param mixed                  $value          The property value
+     * @param MetadataInterface|null $metadata       The property's metadata
+     * @param string                 $propertyPath   The property path leading to
+     *                                               this node
+     * @param string[]               $groups         The groups in which this node
+     *                                               should be validated
+     * @param string[]|null          $cascadedGroups The groups in which cascaded
+     *                                               objects should be validated
+     * @param integer                $traversalStrategy
      *
      * @throws UnexpectedTypeException If $cascadedGroups is invalid
      */
-    public function __construct($value, MetadataInterface $metadata, $propertyPath, array $groups, $cascadedGroups = null)
+    public function __construct($value, MetadataInterface $metadata = null, $propertyPath, array $groups, $cascadedGroups = null, $traversalStrategy = TraversalStrategy::IMPLICIT)
     {
         if (null !== $cascadedGroups && !is_array($cascadedGroups)) {
             throw new UnexpectedTypeException($cascadedGroups, 'null or array');
@@ -82,5 +89,6 @@ abstract class Node
         $this->propertyPath = $propertyPath;
         $this->groups = $groups;
         $this->cascadedGroups = $cascadedGroups;
+        $this->traversalStrategy = $traversalStrategy;
     }
 }

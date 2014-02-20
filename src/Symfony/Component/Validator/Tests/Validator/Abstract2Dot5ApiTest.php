@@ -17,6 +17,7 @@ use Symfony\Component\Validator\Constraints\Traverse;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\MetadataFactoryInterface;
 use Symfony\Component\Validator\Tests\Fixtures\Entity;
 use Symfony\Component\Validator\Tests\Fixtures\Reference;
@@ -354,14 +355,43 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
         $this->assertNull($violations[0]->getCode());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
-     */
-    public function testExpectTraversableIfTraverse()
+    public function testTraverseTraversableByDefault()
     {
+        $test = $this;
         $entity = new Entity();
+        $traversable = new \ArrayIterator(array('key' => $entity));
 
-        $this->validator->validate($entity, new Traverse());
+        $callback = function ($value, ExecutionContextInterface $context) use ($test, $entity, $traversable) {
+            $test->assertSame($test::ENTITY_CLASS, $context->getClassName());
+            $test->assertNull($context->getPropertyName());
+            $test->assertSame('[key]', $context->getPropertyPath());
+            $test->assertSame('Group', $context->getGroup());
+            $test->assertSame($test->metadata, $context->getMetadata());
+            $test->assertSame($traversable, $context->getRoot());
+            $test->assertSame($entity, $context->getValue());
+            $test->assertSame($entity, $value);
+
+            $context->addViolation('Message %param%', array('%param%' => 'value'));
+        };
+
+        $this->metadataFactory->addMetadata(new ClassMetadata('ArrayIterator'));
+        $this->metadata->addConstraint(new Callback(array(
+            'callback' => $callback,
+            'groups' => 'Group',
+        )));
+
+        $violations = $this->validateObject($traversable, 'Group');
+
+        /** @var ConstraintViolationInterface[] $violations */
+        $this->assertCount(1, $violations);
+        $this->assertSame('Message value', $violations[0]->getMessage());
+        $this->assertSame('Message %param%', $violations[0]->getMessageTemplate());
+        $this->assertSame(array('%param%' => 'value'), $violations[0]->getMessageParameters());
+        $this->assertSame('[key]', $violations[0]->getPropertyPath());
+        $this->assertSame($traversable, $violations[0]->getRoot());
+        $this->assertSame($entity, $violations[0]->getInvalidValue());
+        $this->assertNull($violations[0]->getMessagePluralization());
+        $this->assertNull($violations[0]->getCode());
     }
 
     /**

@@ -93,6 +93,29 @@ abstract class AbstractLegacyApiTest extends AbstractValidatorTest
         $this->validator->validate($traversable, 'Group');
     }
 
+    /**
+     * @expectedException \Symfony\Component\Validator\Exception\NoSuchMetadataException
+     */
+    public function testRecursiveTraversableRecursiveTraversalDisabled()
+    {
+        $test = $this;
+        $entity = new Entity();
+        $traversable = new \ArrayIterator(array(
+            2 => new \ArrayIterator(array('key' => $entity)),
+        ));
+
+        $callback = function () use ($test) {
+            $test->fail('Should not be called');
+        };
+
+        $this->metadata->addConstraint(new Callback(array(
+            'callback' => $callback,
+            'groups' => 'Group',
+        )));
+
+        $this->validator->validate($traversable, 'Group');
+    }
+
     public function testValidateInContext()
     {
         $test = $this;

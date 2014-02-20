@@ -14,11 +14,15 @@ namespace Symfony\Component\Validator\Validator;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Traverse;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Validator\Exception\NoSuchMetadataException;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Mapping\ClassMetadataInterface;
 use Symfony\Component\Validator\Mapping\GenericMetadata;
+use Symfony\Component\Validator\Mapping\TraversalStrategy;
 use Symfony\Component\Validator\MetadataFactoryInterface;
 use Symfony\Component\Validator\Node\ClassNode;
+use Symfony\Component\Validator\Node\CollectionNode;
 use Symfony\Component\Validator\Node\GenericNode;
 use Symfony\Component\Validator\Node\PropertyNode;
 use Symfony\Component\Validator\NodeTraverser\NodeTraverserInterface;
@@ -110,14 +114,26 @@ class ContextualValidator implements ContextualValidatorInterface
         return $this;
     }
 
-    public function validateObjects($objects, $groups = null, $deep = false)
+    public function validateObjects($objects, $groups = null)
     {
-        $constraint = new Traverse(array(
-            'traverse' => true,
-            'deep' => $deep,
-        ));
+        if (!is_array($objects) && !$objects instanceof \Traversable) {
+            throw new UnexpectedTypeException($objects, 'array or \Traversable');
+        }
 
-        return $this->validate($objects, $constraint, $groups);
+        $traversalStrategy = TraversalStrategy::TRAVERSE;
+        $groups = $groups ? $this->normalizeGroups($groups) : $this->defaultGroups;
+
+        $node = new CollectionNode(
+            $objects,
+            $this->defaultPropertyPath,
+            $groups,
+            null,
+            $traversalStrategy
+        );
+
+        $this->nodeTraverser->traverse(array($node), $this->context);
+
+        return $this;
     }
 
     public function validateProperty($object, $propertyName, $groups = null)

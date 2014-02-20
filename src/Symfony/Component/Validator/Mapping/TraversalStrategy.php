@@ -17,15 +17,16 @@ namespace Symfony\Component\Validator\Mapping;
  */
 class TraversalStrategy
 {
-    const IMPLICIT = 0;
+    /**
+     * @var integer
+     */
+    const IMPLICIT = 1;
 
-    const NONE = 1;
+    const NONE = 2;
 
-    const TRAVERSE = 2;
+    const TRAVERSE = 4;
 
-    const RECURSIVE = 4;
-
-    const IGNORE_NON_TRAVERSABLE = 8;
+    const STOP_RECURSION = 8;
 
     private function __construct()
     {

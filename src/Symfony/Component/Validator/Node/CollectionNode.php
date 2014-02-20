@@ -11,8 +11,10 @@
 
 namespace Symfony\Component\Validator\Node;
 
+use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Mapping\MetadataInterface;
+use Symfony\Component\Validator\Mapping\TraversalStrategy;
 
 /**
  * Represents an traversable collection in the validation graph.
@@ -25,32 +27,35 @@ class CollectionNode extends Node
     /**
      * Creates a new collection node.
      *
-     * @param array|\Traversable     $collection     The validated collection
-     * @param MetadataInterface      $metadata       The class metadata of that
-     *                                               object
-     * @param string                 $propertyPath   The property path leading
+     * @param array|\Traversable $collection         The validated collection
+     * @param string             $propertyPath       The property path leading
      *                                               to this node
-     * @param string[]               $groups         The groups in which this
+     * @param string[]           $groups             The groups in which this
      *                                               node should be validated
-     * @param string[]|null          $cascadedGroups The groups in which
+     * @param string[]|null      $cascadedGroups     The groups in which
      *                                               cascaded objects should be
      *                                               validated
+     * @param integer            $traversalStrategy  The traversal strategy
      *
-     * @throws UnexpectedTypeException If the given value is not an array or
-     *                                 an instance of {@link \Traversable}
+     * @throws \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      */
-    public function __construct($collection, MetadataInterface $metadata, $propertyPath, array $groups, $cascadedGroups = null)
+    public function __construct($collection, $propertyPath, array $groups, $cascadedGroups = null, $traversalStrategy = TraversalStrategy::TRAVERSE)
     {
         if (!is_array($collection) && !$collection instanceof \Traversable) {
-            throw new UnexpectedTypeException($collection, 'object');
+            throw new ConstraintDefinitionException(sprintf(
+                'Traversal was enabled for "%s", but this class '.
+                'does not implement "\Traversable".',
+                get_class($collection)
+            ));
         }
 
         parent::__construct(
             $collection,
-            $metadata,
+            null,
             $propertyPath,
             $groups,
-            $cascadedGroups
+            $cascadedGroups,
+            $traversalStrategy
         );
     }
 }

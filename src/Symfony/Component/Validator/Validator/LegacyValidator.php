@@ -29,22 +29,10 @@ class LegacyValidator extends Validator implements LegacyValidatorInterface
             return parent::validate($value, $groups, $traverse);
         }
 
-        if (is_array($value)) {
-            $constraint = new Traverse(array(
-                'traverse' => true,
-                'deep' => $deep,
-            ));
+        if (is_array($value) || ($traverse && $value instanceof \Traversable)) {
+            $constraint = new Valid(array('deep' => $deep));
 
             return parent::validate($value, $constraint, $groups);
-        }
-
-        if ($traverse && $value instanceof \Traversable) {
-            $constraints = array(
-                new Valid(),
-                new Traverse(array('traverse' => true, 'deep' => $deep)),
-            );
-
-            return parent::validate($value, $constraints, $groups);
         }
 
         return $this->validateObject($value, $groups);

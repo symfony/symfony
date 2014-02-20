@@ -16,6 +16,7 @@ use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Group\GroupManagerInterface;
 use Symfony\Component\Validator\Node\ClassNode;
+use Symfony\Component\Validator\Node\CollectionNode;
 use Symfony\Component\Validator\Node\Node;
 use Symfony\Component\Validator\Node\PropertyNode;
 use Symfony\Component\Validator\NodeTraverser\NodeTraverserInterface;
@@ -56,6 +57,10 @@ class NodeValidatorVisitor extends AbstractVisitor implements GroupManagerInterf
 
     public function visit(Node $node, ExecutionContextInterface $context)
     {
+        if ($node instanceof CollectionNode) {
+            return true;
+        }
+
         if ($node instanceof ClassNode) {
             $objectHash = spl_object_hash($node->value);
         } elseif ($node instanceof PropertyNode) {

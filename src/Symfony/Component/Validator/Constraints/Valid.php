@@ -23,16 +23,8 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
  */
 class Valid extends Constraint
 {
-    /**
-     * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
-     *             Use the {@link Traverse} constraint instead.
-     */
     public $traverse = true;
 
-    /**
-     * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
-     *             Use the {@link Traverse} constraint instead.
-     */
     public $deep = false;
 
     public function __construct($options = null)

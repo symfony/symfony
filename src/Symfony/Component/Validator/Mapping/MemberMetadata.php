@@ -60,17 +60,14 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
         }
 
         // BC with Symfony < 2.5
-        // Only process if the traversal strategy was not already set by the
-        // Traverse constraint
-        if ($constraint instanceof Valid && !$this->traversalStrategy) {
+        if ($constraint instanceof Valid) {
             if (true === $constraint->traverse) {
                 // Try to traverse cascaded objects, but ignore if they do not
                 // implement Traversable
-                $this->traversalStrategy = TraversalStrategy::TRAVERSE
-                    | TraversalStrategy::IGNORE_NON_TRAVERSABLE;
+                $this->traversalStrategy = TraversalStrategy::IMPLICIT;
 
-                if ($constraint->deep) {
-                    $this->traversalStrategy |= TraversalStrategy::RECURSIVE;
+                if (!$constraint->deep) {
+                    $this->traversalStrategy |= TraversalStrategy::STOP_RECURSION;
                 }
             } elseif (false === $constraint->traverse) {
                 $this->traversalStrategy = TraversalStrategy::NONE;
@@ -180,7 +177,7 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
      */
     public function isCollectionCascaded()
     {
-        return (boolean) ($this->traversalStrategy & TraversalStrategy::TRAVERSE);
+        return (boolean) ($this->traversalStrategy & (TraversalStrategy::IMPLICIT | TraversalStrategy::TRAVERSE));
     }
 
     /**
@@ -191,7 +188,7 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
      */
     public function isCollectionCascadedDeeply()
     {
-        return (boolean) ($this->traversalStrategy & TraversalStrategy::RECURSIVE);
+        return !($this->traversalStrategy & TraversalStrategy::STOP_RECURSION);
     }
 
     /**

@@ -339,30 +339,7 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($violations[0]->getCode());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\NoSuchMetadataException
-     */
-    public function testRecursiveTraversableRecursiveTraversalDisabled()
-    {
-        $test = $this;
-        $entity = new Entity();
-        $traversable = new \ArrayIterator(array(
-            2 => new \ArrayIterator(array('key' => $entity)),
-        ));
-
-        $callback = function () use ($test) {
-            $test->fail('Should not be called');
-        };
-
-        $this->metadata->addConstraint(new Callback(array(
-            'callback' => $callback,
-            'groups' => 'Group',
-        )));
-
-        $this->validateObjects($traversable, 'Group');
-    }
-
-    public function testRecursiveTraversableRecursiveTraversalEnabled()
+    public function testRecursiveTraversable()
     {
         $test = $this;
         $entity = new Entity();

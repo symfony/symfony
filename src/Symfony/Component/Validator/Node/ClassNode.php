@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator\Node;
 
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Mapping\ClassMetadataInterface;
+use Symfony\Component\Validator\Mapping\TraversalStrategy;
 
 /**
  * Represents an object and its class metadata in the validation graph.
@@ -40,10 +41,11 @@ class ClassNode extends Node
      * @param string[]|null          $cascadedGroups The groups in which
      *                                               cascaded objects should be
      *                                               validated
+     * @param integer                $traversalStrategy
      *
-     * @throws UnexpectedTypeException If the given value is not an object
+     * @throws \Symfony\Component\Validator\Exception\UnexpectedTypeException
      */
-    public function __construct($object, ClassMetadataInterface $metadata, $propertyPath, array $groups, $cascadedGroups = null)
+    public function __construct($object, ClassMetadataInterface $metadata, $propertyPath, array $groups, $cascadedGroups = null, $traversalStrategy = TraversalStrategy::IMPLICIT)
     {
         if (!is_object($object)) {
             throw new UnexpectedTypeException($object, 'object');
@@ -56,5 +58,7 @@ class ClassNode extends Node
             $groups,
             $cascadedGroups
         );
+
+        $this->traversalStrategy = $traversalStrategy;
     }
 }

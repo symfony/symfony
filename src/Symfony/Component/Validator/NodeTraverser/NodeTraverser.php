@@ -117,16 +117,16 @@ class NodeTraverser implements NodeTraverserInterface
 
     private function traverseNode(Node $node, Traversal $traversal)
     {
+        // Visitors have two possibilities to influence the traversal:
+        //
+        // 1. If a visitor's enterNode() method returns false, the traversal is
+        //    skipped entirely.
+        // 2. If a visitor's enterNode() method removes a group from the node,
+        //    that group will be skipped in the subtree of that node.
+
         if (false === $this->visit($node, $traversal->context)) {
             return;
         }
-
-        // Visitors have two possibilities to influence the traversal:
-        //
-        // 1. If a visitor's visit() method returns false, the traversal is
-        //    skipped entirely.
-        // 2. If a visitor's visit() method removes a group from the node,
-        //    that group will be skipped in the subtree of that node.
 
         if (null === $node->value) {
             return;
@@ -151,9 +151,10 @@ class NodeTraverser implements NodeTraverserInterface
             // (BC with Symfony < 2.5)
             $traversal->nodeQueue->enqueue(new CollectionNode(
                 $node->value,
-                new CollectionMetadata($traversalStrategy),
                 $node->propertyPath,
-                $cascadedGroups
+                $cascadedGroups,
+                null,
+                $traversalStrategy
             ));
 
             return;
@@ -174,44 +175,38 @@ class NodeTraverser implements NodeTraverserInterface
             return;
         }
 
-        // Traverse only if the TRAVERSE bit is set
-        if (!($traversalStrategy & TraversalStrategy::TRAVERSE)) {
+        // Traverse only if IMPLICIT or TRAVERSE
+        if (!($traversalStrategy & (TraversalStrategy::IMPLICIT | TraversalStrategy::TRAVERSE))) {
             return;
         }
 
-        if (!$node->value instanceof \Traversable) {
-            if ($traversalStrategy & TraversalStrategy::IGNORE_NON_TRAVERSABLE) {
-                return;
-            }
-
-            throw new ConstraintDefinitionException(sprintf(
-                'Traversal was enabled for "%s", but this class '.
-                'does not implement "\Traversable".',
-                get_class($node->value)
-            ));
+        // If IMPLICIT, stop unless we deal with a Traversable
+        if ($traversalStrategy & TraversalStrategy::IMPLICIT && !$node->value instanceof \Traversable) {
+            return;
         }
 
+        // If TRAVERSE, the constructor will fail if we have no Traversable
         $traversal->nodeQueue->enqueue(new CollectionNode(
             $node->value,
-            new CollectionMetadata($traversalStrategy),
             $node->propertyPath,
-            $node->groups,
-            $node->cascadedGroups
+            $cascadedGroups,
+            null,
+            $traversalStrategy
         ));
     }
 
-    private function traverseClassNode(ClassNode $node, Traversal $traversal, $traversalStrategy = TraversalStrategy::IMPLICIT)
+    private function traverseClassNode(ClassNode $node, Traversal $traversal)
     {
-        if (false === $this->visit($node, $traversal->context)) {
-            return;
-        }
-
         // Visitors have two possibilities to influence the traversal:
         //
         // 1. If a visitor's enterNode() method returns false, the traversal is
         //    skipped entirely.
         // 2. If a visitor's enterNode() method removes a group from the node,
         //    that group will be skipped in the subtree of that node.
+
+        if (false === $this->visit($node, $traversal->context)) {
+            return;
+        }
 
         if (0 === count($node->groups)) {
             return;
@@ -232,54 +227,58 @@ class NodeTraverser implements NodeTraverserInterface
             }
         }
 
+        $traversalStrategy = $node->traversalStrategy;
+
         // If no specific traversal strategy was requested when this method
         // was called, use the traversal strategy of the class' metadata
-        if (TraversalStrategy::IMPLICIT === $traversalStrategy) {
-            $traversalStrategy = $node->metadata->getTraversalStrategy();
+        if ($traversalStrategy & TraversalStrategy::IMPLICIT) {
+            // Keep the STOP_RECURSION flag, if it was set
+            $traversalStrategy = $node->metadata->getTraversalStrategy()
+                | ($traversalStrategy & TraversalStrategy::STOP_RECURSION);
         }
 
-        // Traverse only if the TRAVERSE bit is set
-        if (!($traversalStrategy & TraversalStrategy::TRAVERSE)) {
+        // Traverse only if IMPLICIT or TRAVERSE
+        if (!($traversalStrategy & (TraversalStrategy::IMPLICIT | TraversalStrategy::TRAVERSE))) {
             return;
         }
 
-        if (!$node->value instanceof \Traversable) {
-            if ($traversalStrategy & TraversalStrategy::IGNORE_NON_TRAVERSABLE) {
-                return;
-            }
-
-            throw new ConstraintDefinitionException(sprintf(
-                'Traversal was enabled for "%s", but this class '.
-                'does not implement "\Traversable".',
-                get_class($node->value)
-            ));
+        // If IMPLICIT, stop unless we deal with a Traversable
+        if ($traversalStrategy & TraversalStrategy::IMPLICIT && !$node->value instanceof \Traversable) {
+            return;
         }
 
+        // If TRAVERSE, the constructor will fail if we have no Traversable
         $traversal->nodeQueue->enqueue(new CollectionNode(
             $node->value,
-            new CollectionMetadata($traversalStrategy),
             $node->propertyPath,
             $node->groups,
-            $node->cascadedGroups
+            $node->cascadedGroups,
+            $traversalStrategy
         ));
     }
 
     private function traverseCollectionNode(CollectionNode $node, Traversal $traversal)
     {
+        // Visitors have two possibilities to influence the traversal:
+        //
+        // 1. If a visitor's enterNode() method returns false, the traversal is
+        //    skipped entirely.
+        // 2. If a visitor's enterNode() method removes a group from the node,
+        //    that group will be skipped in the subtree of that node.
+
         if (false === $this->visit($node, $traversal->context)) {
             return;
         }
 
-        $traversalStrategy = $node->metadata->getTraversalStrategy();
+        if (0 === count($node->groups)) {
+            return;
+        }
 
-        if ($traversalStrategy & TraversalStrategy::RECURSIVE) {
-            // Try to traverse nested objects, but ignore if they do not
-            // implement Traversable
-            $traversalStrategy |= TraversalStrategy::IGNORE_NON_TRAVERSABLE;
+        $traversalStrategy = $node->traversalStrategy;
+
+        if ($traversalStrategy & TraversalStrategy::STOP_RECURSION) {
+            $traversalStrategy = TraversalStrategy::NONE;
         } else {
-            // If the RECURSIVE bit is not set, change the strategy to IMPLICIT
-            // in order to respect the metadata's traversal strategy of each entry
-            // in the collection
             $traversalStrategy = TraversalStrategy::IMPLICIT;
         }
 
@@ -290,9 +289,10 @@ class NodeTraverser implements NodeTraverserInterface
                 // (BC with Symfony < 2.5)
                 $traversal->nodeQueue->enqueue(new CollectionNode(
                     $value,
-                    new CollectionMetadata($traversalStrategy),
                     $node->propertyPath.'['.$key.']',
-                    $node->groups
+                    $node->groups,
+                    null,
+                    $traversalStrategy
                 ));
 
                 continue;
@@ -325,24 +325,27 @@ class NodeTraverser implements NodeTraverserInterface
                 $object,
                 $classMetadata,
                 $propertyPath,
-                $groups
+                $groups,
+                null,
+                $traversalStrategy
             ));
         } catch (NoSuchMetadataException $e) {
-            // Rethrow if the TRAVERSE bit is not set
-            if (!($traversalStrategy & TraversalStrategy::TRAVERSE)) {
+            // Rethrow if not Traversable
+            if (!$object instanceof \Traversable) {
                 throw $e;
             }
 
-            // Rethrow if the object does not implement Traversable
-            if (!$object instanceof \Traversable) {
+            // Rethrow unless IMPLICIT or TRAVERSE
+            if (!($traversalStrategy & (TraversalStrategy::IMPLICIT | TraversalStrategy::TRAVERSE))) {
                 throw $e;
             }
 
             $traversal->nodeQueue->enqueue(new CollectionNode(
                 $object,
-                new CollectionMetadata($traversalStrategy),
                 $propertyPath,
-                $groups
+                $groups,
+                null,
+                $traversalStrategy
             ));
         }
     }

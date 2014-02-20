@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Validator;
 
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\ConstraintViolationInterface;
@@ -47,19 +48,17 @@ abstract class AbstractLegacyApiTest extends AbstractValidatorTest
         $this->validator = $this->createValidator($this->metadataFactory);
     }
 
-    protected function validate($value, $constraints, $groups = null)
+    protected function validate($value, $constraints = null, $groups = null)
     {
+        if (null === $constraints) {
+            $constraints = new Valid();
+        }
+
+        if ($constraints instanceof Valid) {
+            return $this->validator->validate($value, $groups, $constraints->traverse, $constraints->deep);
+        }
+
         return $this->validator->validateValue($value, $constraints, $groups);
-    }
-
-    protected function validateObject($object, $groups = null)
-    {
-        return $this->validator->validate($object, $groups);
-    }
-
-    protected function validateObjects($objects, $groups = null, $deep = false)
-    {
-        return $this->validator->validate($objects, $groups, true, $deep);
     }
 
     protected function validateProperty($object, $propertyName, $groups = null)
@@ -226,7 +225,7 @@ abstract class AbstractLegacyApiTest extends AbstractValidatorTest
 
         $this->metadata->addConstraint(new Callback($callback));
 
-        $violations = $this->validateObject($entity);
+        $violations = $this->validator->validate($entity);
 
         /** @var ConstraintViolationInterface[] $violations */
         $this->assertCount(1, $violations);

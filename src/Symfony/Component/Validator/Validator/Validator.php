@@ -84,24 +84,10 @@ class Validator implements ValidatorInterface
         return $this->metadataFactory->hasMetadataFor($object);
     }
 
-    public function validate($value, $constraints, $groups = null)
+    public function validate($value, $constraints = null, $groups = null)
     {
         return $this->startContext($value)
             ->validate($value, $constraints, $groups)
-            ->getViolations();
-    }
-
-    public function validateObject($object, $groups = null)
-    {
-        return $this->startContext($object)
-            ->validateObject($object, $groups)
-            ->getViolations();
-    }
-
-    public function validateObjects($objects, $groups = null)
-    {
-        return $this->startContext($objects)
-            ->validateObjects($objects, $groups)
             ->getViolations();
     }
 

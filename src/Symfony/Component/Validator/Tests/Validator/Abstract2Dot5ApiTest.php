@@ -50,19 +50,9 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
         $this->validator = $this->createValidator($this->metadataFactory);
     }
 
-    protected function validate($value, $constraints, $groups = null)
+    protected function validate($value, $constraints = null, $groups = null)
     {
         return $this->validator->validate($value, $constraints, $groups);
-    }
-
-    protected function validateObject($object, $groups = null)
-    {
-        return $this->validator->validateObject($object, $groups);
-    }
-
-    protected function validateObjects($objects, $groups = null, $deep = false)
-    {
-        return $this->validator->validateObjects($objects, $groups, $deep);
     }
 
     protected function validateProperty($object, $propertyName, $groups = null)
@@ -88,7 +78,7 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
             'groups' => array('Group 1', 'Group 2'),
         )));
 
-        $violations = $this->validator->validateObject($entity, array('Group 1', 'Group 2'));
+        $violations = $this->validator->validate($entity, new Valid(), array('Group 1', 'Group 2'));
 
         /** @var ConstraintViolationInterface[] $violations */
         $this->assertCount(1, $violations);
@@ -119,7 +109,7 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
         )));
 
         $sequence = new GroupSequence(array('Group 1', 'Group 2', 'Group 3'));
-        $violations = $this->validator->validateObject($entity, $sequence);
+        $violations = $this->validator->validate($entity, new Valid(), $sequence);
 
         /** @var ConstraintViolationInterface[] $violations */
         $this->assertCount(1, $violations);
@@ -149,7 +139,7 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
         )));
 
         $sequence = new GroupSequence(array('Group 1', 'Entity'));
-        $violations = $this->validator->validateObject($entity, $sequence);
+        $violations = $this->validator->validate($entity, new Valid(), $sequence);
 
         /** @var ConstraintViolationInterface[] $violations */
         $this->assertCount(1, $violations);
@@ -167,7 +157,7 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
                 ->getValidator()
                 // Since the validator is not context aware, the group must
                 // be passed explicitly
-                ->validateObject($value->reference, 'Group')
+                ->validate($value->reference, new Valid(), 'Group')
             ;
 
             /** @var ConstraintViolationInterface[] $violations */
@@ -208,7 +198,7 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
             'groups' => 'Group',
         )));
 
-        $violations = $this->validator->validateObject($entity, 'Group');
+        $violations = $this->validator->validate($entity, new Valid(), 'Group');
 
         /** @var ConstraintViolationInterface[] $violations */
         $this->assertCount(1, $violations);
@@ -226,7 +216,7 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
                 ->getValidator()
                 ->inContext($context)
                 ->atPath('subpath')
-                ->validateObject($value->reference)
+                ->validate($value->reference)
             ;
         };
 
@@ -252,7 +242,7 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
             'groups' => 'Group',
         )));
 
-        $violations = $this->validator->validateObject($entity, 'Group');
+        $violations = $this->validator->validate($entity, new Valid(), 'Group');
 
         /** @var ConstraintViolationInterface[] $violations */
         $this->assertCount(1, $violations);
@@ -277,7 +267,7 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
                 ->getValidator()
                 ->inContext($context)
                 ->atPath('subpath')
-                ->validateObjects(array('key' => $value->reference))
+                ->validate(array('key' => $value->reference))
             ;
         };
 
@@ -303,7 +293,7 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
             'groups' => 'Group',
         )));
 
-        $violations = $this->validator->validateObject($entity, 'Group');
+        $violations = $this->validator->validate($entity, new Valid(), 'Group');
 
         /** @var ConstraintViolationInterface[] $violations */
         $this->assertCount(1, $violations);
@@ -313,44 +303,6 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
         $this->assertSame('subpath[key]', $violations[0]->getPropertyPath());
         $this->assertSame($entity, $violations[0]->getRoot());
         $this->assertSame($entity->reference, $violations[0]->getInvalidValue());
-        $this->assertNull($violations[0]->getMessagePluralization());
-        $this->assertNull($violations[0]->getCode());
-    }
-
-    public function testValidateAcceptsValid()
-    {
-        $test = $this;
-        $entity = new Entity();
-
-        $callback = function ($value, ExecutionContextInterface $context) use ($test, $entity) {
-            $test->assertSame($test::ENTITY_CLASS, $context->getClassName());
-            $test->assertNull($context->getPropertyName());
-            $test->assertSame('', $context->getPropertyPath());
-            $test->assertSame('Group', $context->getGroup());
-            $test->assertSame($test->metadata, $context->getMetadata());
-            $test->assertSame($entity, $context->getRoot());
-            $test->assertSame($entity, $context->getValue());
-            $test->assertSame($entity, $value);
-
-            $context->addViolation('Message %param%', array('%param%' => 'value'));
-        };
-
-        $this->metadata->addConstraint(new Callback(array(
-            'callback' => $callback,
-            'groups' => 'Group',
-        )));
-
-        // This is the same as when calling validateObject()
-        $violations = $this->validator->validate($entity, new Valid(), 'Group');
-
-        /** @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(1, $violations);
-        $this->assertSame('Message value', $violations[0]->getMessage());
-        $this->assertSame('Message %param%', $violations[0]->getMessageTemplate());
-        $this->assertSame(array('%param%' => 'value'), $violations[0]->getMessageParameters());
-        $this->assertSame('', $violations[0]->getPropertyPath());
-        $this->assertSame($entity, $violations[0]->getRoot());
-        $this->assertSame($entity, $violations[0]->getInvalidValue());
         $this->assertNull($violations[0]->getMessagePluralization());
         $this->assertNull($violations[0]->getCode());
     }
@@ -380,7 +332,7 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
             'groups' => 'Group',
         )));
 
-        $violations = $this->validateObject($traversable, 'Group');
+        $violations = $this->validate($traversable, new Valid(), 'Group');
 
         /** @var ConstraintViolationInterface[] $violations */
         $this->assertCount(1, $violations);
@@ -403,7 +355,7 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
 
         $this->metadata->addConstraint(new Traverse());
 
-        $this->validator->validateObject($entity);
+        $this->validator->validate($entity);
     }
 
     public function testAddCustomizedViolation()
@@ -421,7 +373,7 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
 
         $this->metadata->addConstraint(new Callback($callback));
 
-        $violations = $this->validator->validateObject($entity);
+        $violations = $this->validator->validate($entity);
 
         /** @var ConstraintViolationInterface[] $violations */
         $this->assertCount(1, $violations);

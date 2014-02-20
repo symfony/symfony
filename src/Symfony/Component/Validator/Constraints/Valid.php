@@ -25,7 +25,7 @@ class Valid extends Constraint
 {
     public $traverse = true;
 
-    public $deep = false;
+    public $deep = true;
 
     public function __construct($options = null)
     {

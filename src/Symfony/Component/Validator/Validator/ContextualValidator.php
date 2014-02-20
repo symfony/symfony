@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator\Validator;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Traverse;
+use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Exception\NoSuchMetadataException;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
@@ -65,9 +66,11 @@ class ContextualValidator implements ContextualValidatorInterface
         return $this;
     }
 
-    public function validate($value, $constraints, $groups = null)
+    public function validate($value, $constraints = null, $groups = null)
     {
-        if (!is_array($constraints)) {
+        if (null === $constraints) {
+            $constraints = array(new Valid());
+        } elseif (!is_array($constraints)) {
             $constraints = array($constraints);
         }
 
@@ -80,55 +83,6 @@ class ContextualValidator implements ContextualValidatorInterface
             $metadata,
             $this->defaultPropertyPath,
             $groups
-        );
-
-        $this->nodeTraverser->traverse(array($node), $this->context);
-
-        return $this;
-    }
-
-    public function validateObject($object, $groups = null)
-    {
-        $classMetadata = $this->metadataFactory->getMetadataFor($object);
-
-        if (!$classMetadata instanceof ClassMetadataInterface) {
-            throw new ValidatorException(sprintf(
-                'The metadata factory should return instances of '.
-                '"\Symfony\Component\Validator\Mapping\ClassMetadataInterface", '.
-                'got: "%s".',
-                is_object($classMetadata) ? get_class($classMetadata) : gettype($classMetadata)
-            ));
-        }
-
-        $groups = $groups ? $this->normalizeGroups($groups) : $this->defaultGroups;
-
-        $node = new ClassNode(
-            $object,
-            $classMetadata,
-            $this->defaultPropertyPath,
-            $groups
-        );
-
-        $this->nodeTraverser->traverse(array($node), $this->context);
-
-        return $this;
-    }
-
-    public function validateObjects($objects, $groups = null)
-    {
-        if (!is_array($objects) && !$objects instanceof \Traversable) {
-            throw new UnexpectedTypeException($objects, 'array or \Traversable');
-        }
-
-        $traversalStrategy = TraversalStrategy::TRAVERSE;
-        $groups = $groups ? $this->normalizeGroups($groups) : $this->defaultGroups;
-
-        $node = new CollectionNode(
-            $objects,
-            $this->defaultPropertyPath,
-            $groups,
-            null,
-            $traversalStrategy
         );
 
         $this->nodeTraverser->traverse(array($node), $this->context);

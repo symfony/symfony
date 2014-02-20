@@ -30,28 +30,16 @@ interface ContextualValidatorInterface
     /**
      * Validates a value against a constraint or a list of constraints.
      *
+     * If no constraint is passed, the constraint
+     * {@link \Symfony\Component\Validator\Constraints\Valid} is assumed.
+     *
      * @param mixed                   $value       The value to validate.
      * @param Constraint|Constraint[] $constraints The constraint(s) to validate against.
      * @param array|null              $groups      The validation groups to validate.
      *
      * @return ContextualValidatorInterface This validator
      */
-    public function validate($value, $constraints, $groups = null);
-
-    /**
-     * Validates a value.
-     *
-     * The accepted values depend on the {@link MetadataFactoryInterface}
-     * implementation.
-     *
-     * @param mixed      $object The value to validate
-     * @param array|null $groups The validation groups to validate.
-     *
-     * @return ContextualValidatorInterface This validator
-     */
-    public function validateObject($object, $groups = null);
-
-    public function validateObjects($objects, $groups = null);
+    public function validate($value, $constraints = null, $groups = null);
 
     /**
      * Validates a property of a value against its current value.

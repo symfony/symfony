@@ -143,7 +143,7 @@ class LegacyExecutionContext extends ExecutionContext implements LegacyExecution
             ->getValidator()
             ->inContext($this)
             ->atPath($subPath)
-            ->validateObject($value, $groups)
+            ->validate($value, null, $groups)
         ;
     }
 

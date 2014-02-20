@@ -12,7 +12,6 @@
 namespace Symfony\Component\Validator\Tests\Context;
 
 use Symfony\Component\Validator\Context\ExecutionContext;
-use Symfony\Component\Validator\Node\GenericNode;
 
 /**
  * @since  2.5

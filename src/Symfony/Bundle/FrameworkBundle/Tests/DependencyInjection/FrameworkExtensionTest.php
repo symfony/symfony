@@ -145,6 +145,22 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertNull($container->getDefinition('session.storage.php_bridge')->getArgument(0));
     }
 
+    public function testRequest()
+    {
+        $container = $this->createContainerFromFile('full');
+
+        $this->assertTrue($container->hasDefinition('request.add_request_formats_listener'), '->registerRequestConfiguration() loads request.xml');
+        $listenerDef = $container->getDefinition('request.add_request_formats_listener');
+        $this->assertEquals(array('csv' => array('text/csv', 'text/plain'), 'pdf' => array('application/pdf')), $listenerDef->getArgument(0));
+    }
+
+    public function testEmptyRequestFormats()
+    {
+        $container = $this->createContainerFromFile('request');
+
+        $this->assertFalse($container->hasDefinition('request.add_request_formats_listener'), '->registerRequestConfiguration() does not load request.xml when no request formats are defined');
+    }
+
     public function testTemplating()
     {
         $container = $this->createContainerFromFile('full');

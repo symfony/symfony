@@ -12,11 +12,9 @@
 namespace Symfony\Component\Validator\NodeTraverser;
 
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\NoSuchMetadataException;
 use Symfony\Component\Validator\Mapping\CascadingStrategy;
 use Symfony\Component\Validator\Mapping\ClassMetadataInterface;
-use Symfony\Component\Validator\Mapping\CollectionMetadata;
 use Symfony\Component\Validator\Mapping\TraversalStrategy;
 use Symfony\Component\Validator\MetadataFactoryInterface;
 use Symfony\Component\Validator\Node\ClassNode;
@@ -132,7 +130,7 @@ class NodeTraverser implements NodeTraverserInterface
             return;
         }
 
-        // The "cascadedGroups" property is set by the NodeValidatorVisitor when
+        // The "cascadedGroups" property is set by the NodeValidationVisitor when
         // traversing group sequences
         $cascadedGroups = null !== $node->cascadedGroups
             ? $node->cascadedGroups

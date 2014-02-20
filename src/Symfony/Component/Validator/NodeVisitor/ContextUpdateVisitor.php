@@ -22,13 +22,13 @@ use Symfony\Component\Validator\Node\Node;
  * @since  2.5
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class ContextRefresherVisitor extends AbstractVisitor
+class ContextUpdateVisitor extends AbstractVisitor
 {
     public function visit(Node $node, ExecutionContextInterface $context)
     {
         if (!$context instanceof NodeObserverInterface) {
             throw new RuntimeException(sprintf(
-                'The ContextRefresherVisitor only supports instances of class '.
+                'The ContextUpdateVisitor only supports instances of class '.
                 '"Symfony\Component\Validator\NodeVisitor\NodeObserverInterface". '.
                 'An instance of class "%s" was given.',
                 get_class($context)

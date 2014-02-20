@@ -20,7 +20,7 @@ use Symfony\Component\Validator\ObjectInitializerInterface;
  * @since  %%NextVersion%%
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class ObjectInitializerVisitor extends AbstractVisitor
+class ObjectInitializationVisitor extends AbstractVisitor
 {
     /**
      * @var ObjectInitializerInterface[]

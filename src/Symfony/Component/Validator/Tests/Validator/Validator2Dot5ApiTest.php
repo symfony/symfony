@@ -15,9 +15,9 @@ use Symfony\Component\Validator\DefaultTranslator;
 use Symfony\Component\Validator\ConstraintValidatorFactory;
 use Symfony\Component\Validator\Context\ExecutionContextFactory;
 use Symfony\Component\Validator\MetadataFactoryInterface;
-use Symfony\Component\Validator\NodeVisitor\ContextRefresherVisitor;
-use Symfony\Component\Validator\NodeVisitor\GroupSequenceResolverVisitor;
-use Symfony\Component\Validator\NodeVisitor\NodeValidatorVisitor;
+use Symfony\Component\Validator\NodeVisitor\ContextUpdateVisitor;
+use Symfony\Component\Validator\NodeVisitor\GroupSequenceResolvingVisitor;
+use Symfony\Component\Validator\NodeVisitor\NodeValidationVisitor;
 use Symfony\Component\Validator\NodeTraverser\NodeTraverser;
 use Symfony\Component\Validator\Validator\Validator;
 
@@ -26,11 +26,11 @@ class Validator2Dot5ApiTest extends Abstract2Dot5ApiTest
     protected function createValidator(MetadataFactoryInterface $metadataFactory)
     {
         $nodeTraverser = new NodeTraverser($metadataFactory);
-        $nodeValidator = new NodeValidatorVisitor($nodeTraverser, new ConstraintValidatorFactory());
+        $nodeValidator = new NodeValidationVisitor($nodeTraverser, new ConstraintValidatorFactory());
         $contextFactory = new ExecutionContextFactory($nodeValidator, new DefaultTranslator());
         $validator = new Validator($contextFactory, $nodeTraverser, $metadataFactory);
-        $groupSequenceResolver = new GroupSequenceResolverVisitor();
-        $contextRefresher = new ContextRefresherVisitor();
+        $groupSequenceResolver = new GroupSequenceResolvingVisitor();
+        $contextRefresher = new ContextUpdateVisitor();
 
         $nodeTraverser->addVisitor($groupSequenceResolver);
         $nodeTraverser->addVisitor($contextRefresher);

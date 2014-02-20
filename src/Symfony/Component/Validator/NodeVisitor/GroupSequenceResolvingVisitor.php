@@ -21,7 +21,7 @@ use Symfony\Component\Validator\Node\Node;
  * @since  %%NextVersion%%
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class GroupSequenceResolverVisitor extends AbstractVisitor
+class GroupSequenceResolvingVisitor extends AbstractVisitor
 {
     public function visit(Node $node, ExecutionContextInterface $context)
     {

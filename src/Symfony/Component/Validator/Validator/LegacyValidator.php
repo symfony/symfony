@@ -17,8 +17,11 @@ use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\ValidatorInterface as LegacyValidatorInterface;
 
 /**
- * @since  %%NextVersion%%
+ * @since  2.5
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated Implemented for backwards compatibility with Symfony < 2.5.
+ *             To be removed in Symfony 3.0.
  */
 class LegacyValidator extends Validator implements LegacyValidatorInterface
 {

@@ -20,6 +20,9 @@ use Symfony\Component\Translation\TranslatorInterface;
  * {@link GlobalExecutionContextInterface}.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+ *             Use {@link NodeVisitor\NodeVisitorInterface} instead.
  */
 class ValidationVisitor implements ValidationVisitorInterface, GlobalExecutionContextInterface
 {

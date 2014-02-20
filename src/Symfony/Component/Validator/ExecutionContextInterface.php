@@ -82,6 +82,9 @@ namespace Symfony\Component\Validator;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @api
+ *
+ * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+ *             Use {@link Context\ExecutionContextInterface} instead.
  */
 interface ExecutionContextInterface
 {
@@ -95,6 +98,10 @@ interface ExecutionContextInterface
      * @param integer|null $code          The violation code.
      *
      * @api
+     *
+     * @deprecated The parameters $invalidValue, $pluralization and $code are
+     *             deprecated since version 2.5 and will be removed in
+     *             Symfony 3.0.
      */
     public function addViolation($message, array $params = array(), $invalidValue = null, $pluralization = null, $code = null);
 
@@ -110,6 +117,10 @@ interface ExecutionContextInterface
      * @param integer|null $code          The violation code.
      *
      * @api
+     *
+     * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+     *             Use {@link Context\ExecutionContextInterface::buildViolation()}
+     *             instead.
      */
     public function addViolationAt($subPath, $message, array $parameters = array(), $invalidValue = null, $pluralization = null, $code = null);
 
@@ -151,6 +162,10 @@ interface ExecutionContextInterface
      *                                       or an instance of <tt>\Traversable</tt>.
      * @param Boolean              $deep     Whether to traverse the value recursively if
      *                                       it is a collection of collections.
+     *
+     * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+     *             Use {@link Context\ExecutionContextInterface::getValidator()}
+     *             instead.
      */
     public function validate($value, $subPath = '', $groups = null, $traverse = false, $deep = false);
 
@@ -180,6 +195,10 @@ interface ExecutionContextInterface
      * @param null|string|string[]    $groups      The groups to validate in. If you don't pass any
      *                                             groups here, the current group of the context
      *                                             will be used.
+     *
+     * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+     *             Use {@link Context\ExecutionContextInterface::getValidator()}
+     *             instead.
      */
     public function validateValue($value, $constraints, $subPath = '', $groups = null);
 
@@ -237,6 +256,12 @@ interface ExecutionContextInterface
      * Returns the used metadata factory.
      *
      * @return MetadataFactoryInterface The metadata factory.
+     *
+     * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+     *             Use {@link Context\ExecutionContextInterface::getValidator()}
+     *             instead and call
+     *             {@link Validator\ValidatorInterface::getMetadataFor()} or
+     *             {@link Validator\ValidatorInterface::hasMetadataFor()} there.
      */
     public function getMetadataFactory();
 

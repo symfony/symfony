@@ -15,6 +15,9 @@ namespace Symfony\Component\Validator;
  * An object backed by a PHP class.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+ *             Use {@link Mapping\ClassMetadataInterface} instead.
  */
 interface ClassBasedInterface
 {

@@ -20,6 +20,9 @@ use Symfony\Component\Translation\TranslatorInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+ *             Use {@link Context\ExecutionContext} instead.
  */
 class ExecutionContext implements ExecutionContextInterface
 {

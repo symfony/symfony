@@ -17,6 +17,9 @@ namespace Symfony\Component\Validator;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @api
+ *
+ * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+ *             Use {@link Validator\ValidatorInterface} instead.
  */
 interface ValidatorInterface
 {
@@ -35,6 +38,10 @@ interface ValidatorInterface
      *                                          list is empty, validation succeeded.
      *
      * @api
+     *
+     * @deprecated The signature changed with Symfony 2.5 (see
+     *             {@link Validator\ValidatorInterface::validate()}. This
+     *             signature will be disabled in Symfony 3.0.
      */
     public function validate($value, $groups = null, $traverse = false, $deep = false);
 
@@ -85,6 +92,9 @@ interface ValidatorInterface
      *                                          list is empty, validation succeeded.
      *
      * @api
+     *
+     * @deprecated Renamed to {@link Validator\ValidatorInterface::validate()}
+     *             in Symfony 2.5. Will be removed in Symfony 3.0.
      */
     public function validateValue($value, $constraints, $groups = null);
 
@@ -94,6 +104,11 @@ interface ValidatorInterface
      * @return MetadataFactoryInterface The metadata factory.
      *
      * @api
+     *
+     * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+     *             Use {@link Validator\ValidatorInterface::getMetadataFor()} or
+     *             {@link Validator\ValidatorInterface::hasMetadataFor()}
+     *             instead.
      */
     public function getMetadataFactory();
 }

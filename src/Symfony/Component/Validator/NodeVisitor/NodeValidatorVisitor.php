@@ -24,7 +24,7 @@ use Symfony\Component\Validator\NodeTraverser\NodeTraverserInterface;
  * @since  %%NextVersion%%
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class NodeValidator extends AbstractVisitor implements GroupManagerInterface
+class NodeValidatorVisitor extends AbstractVisitor implements GroupManagerInterface
 {
     private $validatedObjects = array();
 

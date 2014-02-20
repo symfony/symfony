@@ -137,7 +137,7 @@ class NodeTraverser implements NodeTraverserInterface
             return;
         }
 
-        // The "cascadedGroups" property is set by the NodeValidator when
+        // The "cascadedGroups" property is set by the NodeValidatorVisitor when
         // traversing group sequences
         $cascadedGroups = null !== $node->cascadedGroups
             ? $node->cascadedGroups

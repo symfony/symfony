@@ -23,13 +23,13 @@ use Symfony\Component\Validator\Util\NodeStackInterface;
  * @since  2.5
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class ContextRefresher extends AbstractVisitor
+class ContextRefresherVisitor extends AbstractVisitor
 {
     public function enterNode(Node $node, ExecutionContextInterface $context)
     {
         if (!$context instanceof NodeStackInterface) {
             throw new RuntimeException(sprintf(
-                'The ContextRefresher only supports instances of class '.
+                'The ContextRefresherVisitor only supports instances of class '.
                 '"Symfony\Component\Validator\Context\NodeStackInterface". '.
                 'An instance of class "%s" was given.',
                 get_class($context)
@@ -43,7 +43,7 @@ class ContextRefresher extends AbstractVisitor
     {
         if (!$context instanceof NodeStackInterface) {
             throw new RuntimeException(sprintf(
-                'The ContextRefresher only supports instances of class '.
+                'The ContextRefresherVisitor only supports instances of class '.
                 '"Symfony\Component\Validator\Context\NodeStackInterface". '.
                 'An instance of class "%s" was given.',
                 get_class($context)

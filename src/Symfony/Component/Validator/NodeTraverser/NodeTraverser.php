@@ -16,9 +16,11 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\NoSuchMetadataException;
 use Symfony\Component\Validator\Mapping\CascadingStrategy;
 use Symfony\Component\Validator\Mapping\ClassMetadataInterface;
+use Symfony\Component\Validator\Mapping\CollectionMetadata;
 use Symfony\Component\Validator\Mapping\TraversalStrategy;
 use Symfony\Component\Validator\MetadataFactoryInterface;
 use Symfony\Component\Validator\Node\ClassNode;
+use Symfony\Component\Validator\Node\CollectionNode;
 use Symfony\Component\Validator\Node\Node;
 use Symfony\Component\Validator\Node\PropertyNode;
 use Symfony\Component\Validator\NodeVisitor\NodeVisitorInterface;
@@ -84,6 +86,8 @@ class NodeTraverser implements NodeTraverserInterface
 
                 if ($node instanceof ClassNode) {
                     $this->traverseClassNode($node, $traversal);
+                } elseif ($node instanceof CollectionNode) {
+                    $this->traverseCollectionNode($node, $traversal);
                 } else {
                     $this->traverseNode($node, $traversal);
                 }
@@ -145,13 +149,12 @@ class NodeTraverser implements NodeTraverserInterface
             // Arrays are always traversed, independent of the specified
             // traversal strategy
             // (BC with Symfony < 2.5)
-            $this->cascadeEachObjectIn(
+            $traversal->nodeQueue->enqueue(new CollectionNode(
                 $node->value,
+                new CollectionMetadata($traversalStrategy),
                 $node->propertyPath,
-                $cascadedGroups,
-                $traversalStrategy,
-                $traversal
-            );
+                $cascadedGroups
+            ));
 
             return;
         }
@@ -188,13 +191,13 @@ class NodeTraverser implements NodeTraverserInterface
             ));
         }
 
-        $this->cascadeEachObjectIn(
+        $traversal->nodeQueue->enqueue(new CollectionNode(
             $node->value,
+            new CollectionMetadata($traversalStrategy),
             $node->propertyPath,
-            $cascadedGroups,
-            $traversalStrategy,
-            $traversal
-        );
+            $node->groups,
+            $node->cascadedGroups
+        ));
     }
 
     private function traverseClassNode(ClassNode $node, Traversal $traversal, $traversalStrategy = TraversalStrategy::IMPLICIT)
@@ -252,13 +255,61 @@ class NodeTraverser implements NodeTraverserInterface
             ));
         }
 
-        $this->cascadeEachObjectIn(
+        $traversal->nodeQueue->enqueue(new CollectionNode(
             $node->value,
+            new CollectionMetadata($traversalStrategy),
             $node->propertyPath,
             $node->groups,
-            $traversalStrategy,
-            $traversal
-        );
+            $node->cascadedGroups
+        ));
+    }
+
+    private function traverseCollectionNode(CollectionNode $node, Traversal $traversal)
+    {
+        if (false === $this->visit($node, $traversal->context)) {
+            return;
+        }
+
+        $traversalStrategy = $node->metadata->getTraversalStrategy();
+
+        if ($traversalStrategy & TraversalStrategy::RECURSIVE) {
+            // Try to traverse nested objects, but ignore if they do not
+            // implement Traversable
+            $traversalStrategy |= TraversalStrategy::IGNORE_NON_TRAVERSABLE;
+        } else {
+            // If the RECURSIVE bit is not set, change the strategy to IMPLICIT
+            // in order to respect the metadata's traversal strategy of each entry
+            // in the collection
+            $traversalStrategy = TraversalStrategy::IMPLICIT;
+        }
+
+        foreach ($node->value as $key => $value) {
+            if (is_array($value)) {
+                // Arrays are always cascaded, independent of the specified
+                // traversal strategy
+                // (BC with Symfony < 2.5)
+                $traversal->nodeQueue->enqueue(new CollectionNode(
+                    $value,
+                    new CollectionMetadata($traversalStrategy),
+                    $node->propertyPath.'['.$key.']',
+                    $node->groups
+                ));
+
+                continue;
+            }
+
+            // Scalar and null values in the collection are ignored
+            // (BC with Symfony < 2.5)
+            if (is_object($value)) {
+                $this->cascadeObject(
+                    $value,
+                    $node->propertyPath.'['.$key.']',
+                    $node->groups,
+                    $traversalStrategy,
+                    $traversal
+                );
+            }
+        }
     }
 
     private function cascadeObject($object, $propertyPath, array $groups, $traversalStrategy, Traversal $traversal)
@@ -287,57 +338,12 @@ class NodeTraverser implements NodeTraverserInterface
                 throw $e;
             }
 
-            // In that case, iterate the object and cascade each entry
-            $this->cascadeEachObjectIn(
-                 $object,
-                 $propertyPath,
-                 $groups,
-                 $traversalStrategy,
-                 $traversal
-            );
-        }
-    }
-
-    private function cascadeEachObjectIn($collection, $propertyPath, array $groups, $traversalStrategy, Traversal $traversal)
-    {
-        if ($traversalStrategy & TraversalStrategy::RECURSIVE) {
-            // Try to traverse nested objects, but ignore if they do not
-            // implement Traversable
-            $traversalStrategy |= TraversalStrategy::IGNORE_NON_TRAVERSABLE;
-        } else {
-            // If the RECURSIVE bit is not set, change the strategy to IMPLICIT
-            // in order to respect the metadata's traversal strategy of each entry
-            // in the collection
-            $traversalStrategy = TraversalStrategy::IMPLICIT;
-        }
-
-        foreach ($collection as $key => $value) {
-            if (is_array($value)) {
-                // Arrays are always cascaded, independent of the specified
-                // traversal strategy
-                // (BC with Symfony < 2.5)
-                $this->cascadeEachObjectIn(
-                    $value,
-                    $propertyPath.'['.$key.']',
-                    $groups,
-                    $traversalStrategy,
-                    $traversal
-                );
-
-                continue;
-            }
-
-            // Scalar and null values in the collection are ignored
-            // (BC with Symfony < 2.5)
-            if (is_object($value)) {
-                $this->cascadeObject(
-                    $value,
-                    $propertyPath.'['.$key.']',
-                    $groups,
-                    $traversalStrategy,
-                    $traversal
-                );
-            }
+            $traversal->nodeQueue->enqueue(new CollectionNode(
+                $object,
+                new CollectionMetadata($traversalStrategy),
+                $propertyPath,
+                $groups
+            ));
         }
     }
 }

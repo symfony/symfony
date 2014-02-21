@@ -17,7 +17,9 @@ use Symfony\Component\Validator\NodeTraverser\NodeTraverserInterface;
 use Symfony\Component\Validator\MetadataFactoryInterface;
 
 /**
- * @since  %%NextVersion%%
+ * Default implementation of {@link ValidatorInterface}.
+ *
+ * @since  2.5
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class Validator implements ValidatorInterface
@@ -37,6 +39,16 @@ class Validator implements ValidatorInterface
      */
     protected $metadataFactory;
 
+    /**
+     * Creates a new validator.
+     *
+     * @param ExecutionContextFactoryInterface $contextFactory  The factory for
+     *                                                          creating new contexts
+     * @param NodeTraverserInterface           $nodeTraverser   The node traverser
+     * @param MetadataFactoryInterface         $metadataFactory The factory for
+     *                                                          fetching the metadata
+     *                                                          of validated objects
+     */
     public function __construct(ExecutionContextFactoryInterface $contextFactory, NodeTraverserInterface $nodeTraverser, MetadataFactoryInterface $metadataFactory)
     {
         $this->contextFactory = $contextFactory;
@@ -84,6 +96,9 @@ class Validator implements ValidatorInterface
         return $this->metadataFactory->hasMetadataFor($object);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function validate($value, $constraints = null, $groups = null)
     {
         return $this->startContext($value)
@@ -91,6 +106,9 @@ class Validator implements ValidatorInterface
             ->getViolations();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function validateProperty($object, $propertyName, $groups = null)
     {
         return $this->startContext($object)
@@ -98,6 +116,9 @@ class Validator implements ValidatorInterface
             ->getViolations();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function validatePropertyValue($object, $propertyName, $value, $groups = null)
     {
         return $this->startContext($object)

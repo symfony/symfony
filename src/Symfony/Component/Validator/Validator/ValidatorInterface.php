@@ -16,7 +16,9 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
- * @since  %%NextVersion%%
+ * Validates PHP values against constraints.
+ *
+ * @since  2.5
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 interface ValidatorInterface
@@ -27,60 +29,91 @@ interface ValidatorInterface
      * If no constraint is passed, the constraint
      * {@link \Symfony\Component\Validator\Constraints\Valid} is assumed.
      *
-     * @param mixed                   $value       The value to validate.
-     * @param Constraint|Constraint[] $constraints The constraint(s) to validate against.
-     * @param array|null              $groups      The validation groups to validate.
+     * @param mixed                   $value       The value to validate
+     * @param Constraint|Constraint[] $constraints The constraint(s) to validate
+     *                                             against
+     * @param array|null              $groups      The validation groups to
+     *                                             validate. If none is given,
+     *                                             "Default" is assumed
      *
-     * @return ConstraintViolationListInterface A list of constraint violations. If the
-     *                                          list is empty, validation succeeded.
+     * @return ConstraintViolationListInterface A list of constraint violations.
+     *                                          If the list is empty, validation
+     *                                          succeeded
      */
     public function validate($value, $constraints = null, $groups = null);
 
     /**
-     * Validates a property of a value against its current value.
+     * Validates a property of an object against the constraints specified
+     * for this property.
      *
-     * The accepted values depend on the {@link MetadataFactoryInterface}
-     * implementation.
+     * @param object     $object       The object
+     * @param string     $propertyName The name of the validated property
+     * @param array|null $groups       The validation groups to validate. If
+     *                                 none is given, "Default" is assumed
      *
-     * @param mixed      $object The value containing the property.
-     * @param string     $propertyName        The name of the property to validate.
-     * @param array|null $groups          The validation groups to validate.
-     *
-     * @return ConstraintViolationListInterface A list of constraint violations. If the
-     *                                          list is empty, validation succeeded.
+     * @return ConstraintViolationListInterface A list of constraint violations.
+     *                                          If the list is empty, validation
+     *                                          succeeded
      */
     public function validateProperty($object, $propertyName, $groups = null);
 
     /**
-     * Validate a property of a value against a potential value.
+     * Validates a value against the constraints specified for an object's
+     * property.
      *
-     * The accepted values depend on the {@link MetadataFactoryInterface}
-     * implementation.
+     * @param object     $object       The object
+     * @param string     $propertyName The name of the property
+     * @param mixed      $value        The value to validate against the
+     *                                 property's constraints
+     * @param array|null $groups       The validation groups to validate. If
+     *                                 none is given, "Default" is assumed
      *
-     * @param string     $object The value containing the property.
-     * @param string     $propertyName        The name of the property to validate
-     * @param string     $value           The value to validate against the
-     *                                    constraints of the property.
-     * @param array|null $groups          The validation groups to validate.
-     *
-     * @return ConstraintViolationListInterface A list of constraint violations. If the
-     *                                          list is empty, validation succeeded.
+     * @return ConstraintViolationListInterface A list of constraint violations.
+     *                                          If the list is empty, validation
+     *                                          succeeded
      */
     public function validatePropertyValue($object, $propertyName, $value, $groups = null);
 
     /**
-     * @return ContextualValidatorInterface
+     * Starts a new validation context and returns a validator for that context.
+     *
+     * The returned validator collects all violations generated within its
+     * context. You can access these violations with the
+     * {@link ContextualValidatorInterface::getViolations()} method.
+     *
+     * @return ContextualValidatorInterface The validator for the new context
      */
     public function startContext();
 
     /**
-     * @param ExecutionContextInterface $context
+     * Returns a validator in the given execution context.
      *
-     * @return ContextualValidatorInterface
+     * The returned validator adds all generated violations to the given
+     * context.
+     *
+     * @param ExecutionContextInterface $context The execution context
+     *
+     * @return ContextualValidatorInterface The validator for that context
      */
     public function inContext(ExecutionContextInterface $context);
 
+    /**
+     * Returns the metadata for an object.
+     *
+     * @param object $object The object
+     *
+     * @return \Symfony\Component\Validator\Mapping\MetadataInterface The metadata
+     *
+     * @throws \Symfony\Component\Validator\Exception\NoSuchMetadataException If no metadata exists
+     */
     public function getMetadataFor($object);
 
+    /**
+     * Returns whether the validator has metadata for an object.
+     *
+     * @param object $object The object
+     *
+     * @return Boolean Whether metadata exists for that object
+     */
     public function hasMetadataFor($object);
 }

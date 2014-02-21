@@ -17,8 +17,13 @@ use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\ValidatorInterface as LegacyValidatorInterface;
 
 /**
+ * A validator that supports both the API of Symfony < 2.5 and Symfony 2.5+.
+ *
  * @since  2.5
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @see \Symfony\Component\Validator\ValidatorInterface
+ * @see \Symfony\Component\Validator\Validator\ValidatorInterface
  *
  * @deprecated Implemented for backwards compatibility with Symfony < 2.5.
  *             To be removed in Symfony 3.0.

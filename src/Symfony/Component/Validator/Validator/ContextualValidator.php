@@ -24,7 +24,9 @@ use Symfony\Component\Validator\NodeTraverser\NodeTraverserInterface;
 use Symfony\Component\Validator\Util\PropertyPath;
 
 /**
- * @since  %%NextVersion%%
+ * Default implementation of {@link ContextualValidatorInterface}.
+ *
+ * @since  2.5
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class ContextualValidator implements ContextualValidatorInterface
@@ -44,6 +46,15 @@ class ContextualValidator implements ContextualValidatorInterface
      */
     private $metadataFactory;
 
+    /**
+     * Creates a validator for the given context.
+     *
+     * @param ExecutionContextInterface $context         The execution context
+     * @param NodeTraverserInterface    $nodeTraverser   The node traverser
+     * @param MetadataFactoryInterface  $metadataFactory The factory for fetching
+     *                                                   the metadata of validated
+     *                                                   objects
+     */
     public function __construct(ExecutionContextInterface $context, NodeTraverserInterface $nodeTraverser, MetadataFactoryInterface $metadataFactory)
     {
         $this->context = $context;
@@ -53,13 +64,19 @@ class ContextualValidator implements ContextualValidatorInterface
         $this->metadataFactory = $metadataFactory;
     }
 
-    public function atPath($subPath)
+    /**
+     * {@inheritdoc}
+     */
+    public function atPath($path)
     {
-        $this->defaultPropertyPath = $this->context->getPropertyPath($subPath);
+        $this->defaultPropertyPath = $this->context->getPropertyPath($path);
 
         return $this;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function validate($value, $constraints = null, $groups = null)
     {
         if (null === $constraints) {
@@ -84,6 +101,9 @@ class ContextualValidator implements ContextualValidatorInterface
         return $this;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function validateProperty($object, $propertyName, $groups = null)
     {
         $classMetadata = $this->metadataFactory->getMetadataFor($object);
@@ -118,6 +138,9 @@ class ContextualValidator implements ContextualValidatorInterface
         return $this;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function validatePropertyValue($object, $propertyName, $value, $groups = null)
     {
         $classMetadata = $this->metadataFactory->getMetadataFor($object);
@@ -151,6 +174,21 @@ class ContextualValidator implements ContextualValidatorInterface
         return $this;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getViolations()
+    {
+        return $this->context->getViolations();
+    }
+
+    /**
+     * Normalizes the given group or list of groups to an array.
+     *
+     * @param mixed $groups The groups to normalize
+     *
+     * @return array A group array
+     */
     protected function normalizeGroups($groups)
     {
         if (is_array($groups)) {
@@ -158,10 +196,5 @@ class ContextualValidator implements ContextualValidatorInterface
         }
 
         return array($groups);
-    }
-
-    public function getViolations()
-    {
-        return $this->context->getViolations();
     }
 }

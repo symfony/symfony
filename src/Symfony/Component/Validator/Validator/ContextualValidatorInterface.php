@@ -15,17 +15,24 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
- * @since  %%NextVersion%%
+ * A validator in a specific execution context.
+ *
+ * @since  2.5
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 interface ContextualValidatorInterface
 {
     /**
-     * @param string $subPath
+     * Appends the given path to the property path of the context.
+     *
+     * If called multiple times, the path will always be reset to the context's
+     * original path with the given path appended to it.
+     *
+     * @param string $path The path to append
      *
      * @return ContextualValidatorInterface This validator
      */
-    public function atPath($subPath);
+    public function atPath($path);
 
     /**
      * Validates a value against a constraint or a list of constraints.
@@ -33,46 +40,50 @@ interface ContextualValidatorInterface
      * If no constraint is passed, the constraint
      * {@link \Symfony\Component\Validator\Constraints\Valid} is assumed.
      *
-     * @param mixed                   $value       The value to validate.
-     * @param Constraint|Constraint[] $constraints The constraint(s) to validate against.
-     * @param array|null              $groups      The validation groups to validate.
+     * @param mixed                   $value       The value to validate
+     * @param Constraint|Constraint[] $constraints The constraint(s) to validate
+     *                                             against
+     * @param array|null              $groups      The validation groups to
+     *                                             validate. If none is given,
+     *                                             "Default" is assumed
      *
      * @return ContextualValidatorInterface This validator
      */
     public function validate($value, $constraints = null, $groups = null);
 
     /**
-     * Validates a property of a value against its current value.
+     * Validates a property of an object against the constraints specified
+     * for this property.
      *
-     * The accepted values depend on the {@link MetadataFactoryInterface}
-     * implementation.
-     *
-     * @param mixed      $object       The value containing the property.
-     * @param string     $propertyName The name of the property to validate.
-     * @param array|null $groups       The validation groups to validate.
+     * @param object     $object       The object
+     * @param string     $propertyName The name of the validated property
+     * @param array|null $groups       The validation groups to validate. If
+     *                                 none is given, "Default" is assumed
      *
      * @return ContextualValidatorInterface This validator
      */
     public function validateProperty($object, $propertyName, $groups = null);
 
     /**
-     * Validate a property of a value against a potential value.
+     * Validates a value against the constraints specified for an object's
+     * property.
      *
-     * The accepted values depend on the {@link MetadataFactoryInterface}
-     * implementation.
-     *
-     * @param string     $object       The value containing the property.
-     * @param string     $propertyName The name of the property to validate
-     * @param string     $value        The value to validate against the
-     *                                 constraints of the property.
-     * @param array|null $groups       The validation groups to validate.
+     * @param object     $object       The object
+     * @param string     $propertyName The name of the property
+     * @param mixed      $value        The value to validate against the
+     *                                 property's constraints
+     * @param array|null $groups       The validation groups to validate. If
+     *                                 none is given, "Default" is assumed
      *
      * @return ContextualValidatorInterface This validator
      */
     public function validatePropertyValue($object, $propertyName, $value, $groups = null);
 
     /**
-     * @return ConstraintViolationListInterface
+     * Returns the violations that have been generated so far in the context
+     * of the validator.
+     *
+     * @return ConstraintViolationListInterface The constraint violations
      */
     public function getViolations();
 }

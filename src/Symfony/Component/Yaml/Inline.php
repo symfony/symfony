@@ -328,12 +328,7 @@ class Inline
      */
     private static function parseMapping($mapping, &$i = 0, $objectForMap = false)
     {
-        if ($objectForMap === true) {
-            $output = new \stdClass();
-        } else {
-            $output = array();
-        }
-
+        $output = array();
         $len = strlen($mapping);
         $i += 1;
 
@@ -345,7 +340,11 @@ class Inline
                     ++$i;
                     continue 2;
                 case '}':
-                    return $output;
+                    if ($objectForMap === true) {
+                        return (object)$output;
+                    } else {
+                        return $output;
+                    }
             }
 
             // key
@@ -354,29 +353,24 @@ class Inline
             // value
             $done = false;
 
-            if ($objectForMap === true) {
-                $editPosition = &$output->$key;
-            } else {
-                $editPosition = &$output[$key];
-            }
 
             while ($i < $len) {
                 switch ($mapping[$i]) {
                     case '[':
                         // nested sequence
-                        $editPosition = self::parseSequence($mapping, $i, $objectForMap);
+                        $output[$key] = self::parseSequence($mapping, $i, $objectForMap);
                         $done = true;
                         break;
                     case '{':
                         // nested mapping
-                        $editPosition = self::parseMapping($mapping, $i, $objectForMap);
+                        $output[$key] = self::parseMapping($mapping, $i, $objectForMap);
                         $done = true;
                         break;
                     case ':':
                     case ' ':
                         break;
                     default:
-                        $editPosition = self::parseScalar($mapping, array(',', '}'), array('"', "'"), $i);
+                        $output[$key] = self::parseScalar($mapping, array(',', '}'), array('"', "'"), $i);
                         $done = true;
                         --$i;
                 }

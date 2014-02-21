@@ -18,7 +18,7 @@ use Symfony\Component\Validator\MetadataFactoryInterface;
 use Symfony\Component\Validator\NodeVisitor\ContextUpdateVisitor;
 use Symfony\Component\Validator\NodeVisitor\GroupSequenceResolvingVisitor;
 use Symfony\Component\Validator\NodeVisitor\NodeValidationVisitor;
-use Symfony\Component\Validator\NodeTraverser\NodeTraverser;
+use Symfony\Component\Validator\NodeTraverser\NonRecursiveNodeTraverser;
 use Symfony\Component\Validator\Validator\LegacyValidator;
 
 class LegacyValidator2Dot5ApiTest extends Abstract2Dot5ApiTest
@@ -34,7 +34,7 @@ class LegacyValidator2Dot5ApiTest extends Abstract2Dot5ApiTest
 
     protected function createValidator(MetadataFactoryInterface $metadataFactory)
     {
-        $nodeTraverser = new NodeTraverser($metadataFactory);
+        $nodeTraverser = new NonRecursiveNodeTraverser($metadataFactory);
         $nodeValidator = new NodeValidationVisitor($nodeTraverser, new ConstraintValidatorFactory());
         $contextFactory = new LegacyExecutionContextFactory($nodeValidator, new DefaultTranslator());
         $validator = new LegacyValidator($contextFactory, $nodeTraverser, $metadataFactory);

@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Mapping\MetadataInterface;
 use Symfony\Component\Validator\Mapping\TraversalStrategy;
 
 /**
- * A node in the validated graph.
+ * A node in the validation graph.
  *
  * @since  2.5
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -59,7 +59,11 @@ abstract class Node
     public $cascadedGroups;
 
     /**
+     * The strategy used for traversing the validated value.
+     *
      * @var integer
+     *
+     * @see \Symfony\Component\Validator\Mapping\TraversalStrategy
      */
     public $traversalStrategy;
 

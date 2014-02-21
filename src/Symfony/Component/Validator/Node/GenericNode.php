@@ -16,8 +16,7 @@ namespace Symfony\Component\Validator\Node;
  * attached to it.
  *
  * Together with {@link \Symfony\Component\Validator\Mapping\GenericMetadata},
- * this node type can be used to validate a value against some given
- * constraints.
+ * this node type can be used to validate a value against some constraints.
  *
  * @since  2.5
  * @author Bernhard Schussek <bschussek@gmail.com>

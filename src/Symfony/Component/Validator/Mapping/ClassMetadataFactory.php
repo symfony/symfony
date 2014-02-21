@@ -25,9 +25,9 @@ use Symfony\Component\Validator\Mapping\Cache\CacheInterface;
  * instance will be returned.
  *
  * You can optionally pass a {@link LoaderInterface} instance to the constructor.
- * Whenever a new metadata instance, it will be passed to the loader, which can
- * configure the metadata based on configuration loaded from the filesystem or
- * a database. If you want to use multiple loaders, wrap them in a
+ * Whenever a new metadata instance is created, it is passed to the loader,
+ * which can configure the metadata based on configuration loaded from the
+ * filesystem or a database. If you want to use multiple loaders, wrap them in a
  * {@link Loader\LoaderChain}.
  *
  * You can also optionally pass a {@link CacheInterface} instance to the

@@ -55,6 +55,8 @@ use Symfony\Component\Validator\NodeVisitor\NodeVisitorInterface;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @see NodeTraverserInterface
+ * @see CascadingStrategy
+ * @see TraversalStrategy
  */
 class NonRecursiveNodeTraverser implements NodeTraverserInterface
 {

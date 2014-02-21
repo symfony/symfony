@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator\Mapping;
 
-use Symfony\Component\Validator\Exception\NoSuchMetadataException;
 use Symfony\Component\Validator\MetadataFactoryInterface;
 
 /**
@@ -30,7 +29,7 @@ class BlackholeMetadataFactory implements MetadataFactoryInterface
      */
     public function getMetadataFor($value)
     {
-        throw new NoSuchMetadataException('This class does not support metadata.');
+        throw new \LogicException('This class does not support metadata.');
     }
 
     /**

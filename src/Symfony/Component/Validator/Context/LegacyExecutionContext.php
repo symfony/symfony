@@ -63,13 +63,13 @@ class LegacyExecutionContext extends ExecutionContext
     /**
      * {@inheritdoc}
      */
-    public function addViolation($message, array $parameters = array(), $invalidValue = null, $pluralization = null, $code = null)
+    public function addViolation($message, array $parameters = array(), $invalidValue = null, $plural = null, $code = null)
     {
         if (func_num_args() > 2) {
             $this
                 ->buildViolation($message, $parameters)
                 ->setInvalidValue($invalidValue)
-                ->setPluralization($pluralization)
+                ->setPlural($plural)
                 ->setCode($code)
                 ->addViolation()
             ;
@@ -83,14 +83,14 @@ class LegacyExecutionContext extends ExecutionContext
     /**
      * {@inheritdoc}
      */
-    public function addViolationAt($subPath, $message, array $parameters = array(), $invalidValue = null, $pluralization = null, $code = null)
+    public function addViolationAt($subPath, $message, array $parameters = array(), $invalidValue = null, $plural = null, $code = null)
     {
         if (func_num_args() > 2) {
             $this
                 ->buildViolation($message, $parameters)
                 ->atPath($subPath)
                 ->setInvalidValue($invalidValue)
-                ->setPluralization($pluralization)
+                ->setPlural($plural)
                 ->setCode($code)
                 ->addViolation()
             ;

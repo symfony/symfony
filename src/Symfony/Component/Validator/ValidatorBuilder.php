@@ -13,6 +13,9 @@ namespace Symfony\Component\Validator;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\Validator\Context\ExecutionContextFactory;
+use Symfony\Component\Validator\Context\LegacyExecutionContextFactory;
+use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Mapping\ClassMetadataFactory;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
@@ -28,6 +31,14 @@ use Doctrine\Common\Annotations\Reader;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\CachedReader;
 use Doctrine\Common\Cache\ArrayCache;
+use Symfony\Component\Validator\NodeTraverser\NonRecursiveNodeTraverser;
+use Symfony\Component\Validator\NodeVisitor\ContextUpdateVisitor;
+use Symfony\Component\Validator\NodeVisitor\DefaultGroupReplacingVisitor;
+use Symfony\Component\Validator\NodeVisitor\NodeValidationVisitor;
+use Symfony\Component\Validator\NodeVisitor\ObjectInitializationVisitor;
+use Symfony\Component\Validator\Validator as ValidatorV24;
+use Symfony\Component\Validator\Validator\Validator;
+use Symfony\Component\Validator\Validator\LegacyValidator;
 
 /**
  * The default implementation of {@link ValidatorBuilderInterface}.
@@ -90,6 +101,11 @@ class ValidatorBuilder implements ValidatorBuilderInterface
      * @var PropertyAccessorInterface
      */
     private $propertyAccessor;
+
+    /**
+     * @var integer
+     */
+    private $apiVersion;
 
     /**
      * {@inheritdoc}
@@ -306,6 +322,32 @@ class ValidatorBuilder implements ValidatorBuilderInterface
     /**
      * {@inheritdoc}
      */
+    public function setApiVersion($apiVersion)
+    {
+        if (!($apiVersion & (Validation::API_VERSION_2_4 | Validation::API_VERSION_2_5))) {
+            throw new InvalidArgumentException(sprintf(
+                'The requested API version is invalid: "%s"',
+                $apiVersion
+            ));
+        }
+
+        if (version_compare(PHP_VERSION, '5.3.9', '<') && $apiVersion === (Validation::API_VERSION_2_4 | Validation::API_VERSION_2_5)) {
+            throw new InvalidArgumentException(sprintf(
+                'The Validator API that is compatible with both Symfony 2.4 '.
+                'and Symfony 2.5 can only be used on PHP 5.3.9 and higher. '.
+                'Your current PHP version is %s.',
+                PHP_VERSION
+            ));
+        }
+
+        $this->apiVersion = $apiVersion;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getValidator()
     {
         $metadataFactory = $this->metadataFactory;
@@ -347,7 +389,38 @@ class ValidatorBuilder implements ValidatorBuilderInterface
         $propertyAccessor = $this->propertyAccessor ?: PropertyAccess::createPropertyAccessor();
         $validatorFactory = $this->validatorFactory ?: new ConstraintValidatorFactory($propertyAccessor);
         $translator = $this->translator ?: new DefaultTranslator();
+        $apiVersion = $this->apiVersion;
 
-        return new Validator($metadataFactory, $validatorFactory, $translator, $this->translationDomain, $this->initializers);
+        if (null === $apiVersion) {
+            $apiVersion = version_compare(PHP_VERSION, '5.3.9', '<')
+                ? Validation::API_VERSION_2_4
+                : (Validation::API_VERSION_2_4 | Validation::API_VERSION_2_5);
+        }
+
+        if (Validation::API_VERSION_2_4 === $apiVersion) {
+            return new ValidatorV24($metadataFactory, $validatorFactory, $translator, $this->translationDomain, $this->initializers);
+        }
+
+        $nodeTraverser = new NonRecursiveNodeTraverser($metadataFactory);
+        $nodeValidator = new NodeValidationVisitor($nodeTraverser, $validatorFactory);
+
+        if (Validation::API_VERSION_2_5 === $apiVersion) {
+            $contextFactory = new ExecutionContextFactory($nodeValidator, $translator, $this->translationDomain);
+        } else {
+            $contextFactory = new LegacyExecutionContextFactory($nodeValidator, $translator, $this->translationDomain);
+        }
+
+        $nodeTraverser->addVisitor(new ContextUpdateVisitor());
+        if (count($this->initializers) > 0) {
+            $nodeTraverser->addVisitor(new ObjectInitializationVisitor($this->initializers));
+        }
+        $nodeTraverser->addVisitor(new DefaultGroupReplacingVisitor());
+        $nodeTraverser->addVisitor($nodeValidator);
+
+        if (Validation::API_VERSION_2_5 === $apiVersion) {
+            return new Validator($contextFactory, $nodeTraverser, $metadataFactory);
+        }
+
+        return new LegacyValidator($contextFactory, $nodeTraverser, $metadataFactory);
     }
 }

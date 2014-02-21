@@ -65,6 +65,15 @@ class ClassMetadata extends ElementMetadata implements LegacyMetadataInterface, 
     public $groupSequenceProvider = false;
 
     /**
+     * The strategy for traversing traversable objects.
+     *
+     * By default, only instances of {@link \Traversable} are traversed.
+     *
+     * @var integer
+     */
+    public $traversalStrategy = TraversalStrategy::IMPLICIT;
+
+    /**
      * @var \ReflectionClass
      */
     private $reflClass;
@@ -215,6 +224,8 @@ class ClassMetadata extends ElementMetadata implements LegacyMetadataInterface, 
         $constraint->addImplicitGroupName($this->getDefaultGroup());
 
         parent::addConstraint($constraint);
+
+        return $this;
     }
 
     /**

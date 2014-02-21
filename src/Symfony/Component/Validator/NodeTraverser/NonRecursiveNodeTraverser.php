@@ -13,8 +13,10 @@ namespace Symfony\Component\Validator\NodeTraverser;
 
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Exception\NoSuchMetadataException;
+use Symfony\Component\Validator\Exception\UnsupportedMetadataException;
 use Symfony\Component\Validator\Mapping\CascadingStrategy;
 use Symfony\Component\Validator\Mapping\ClassMetadataInterface;
+use Symfony\Component\Validator\Mapping\PropertyMetadataInterface;
 use Symfony\Component\Validator\Mapping\TraversalStrategy;
 use Symfony\Component\Validator\MetadataFactoryInterface;
 use Symfony\Component\Validator\Node\ClassNode;
@@ -191,6 +193,9 @@ class NonRecursiveNodeTraverser implements NodeTraverserInterface
      * @param \SplStack                 $nodeStack The stack for storing the
      *                                             successor nodes
      *
+     * @throws UnsupportedMetadataException If a property metadata does not
+     *                                      implement {@link PropertyMetadataInterface}
+     *
      * @see ClassNode
      * @see PropertyNode
      * @see CollectionNode
@@ -215,6 +220,15 @@ class NonRecursiveNodeTraverser implements NodeTraverserInterface
 
         foreach ($node->metadata->getConstrainedProperties() as $propertyName) {
             foreach ($node->metadata->getPropertyMetadata($propertyName) as $propertyMetadata) {
+                if (!$propertyMetadata instanceof PropertyMetadataInterface) {
+                    throw new UnsupportedMetadataException(sprintf(
+                        'The property metadata instances should implement '.
+                        '"Symfony\Component\Validator\Mapping\PropertyMetadataInterface", '.
+                        'got: "%s".',
+                        is_object($propertyMetadata) ? get_class($propertyMetadata) : gettype($propertyMetadata)
+                    ));
+                }
+
                 $nodeStack->push(new PropertyNode(
                     $node->value,
                     $propertyMetadata->getPropertyValue($node->value),
@@ -424,24 +438,12 @@ class NonRecursiveNodeTraverser implements NodeTraverserInterface
             return;
         }
 
-        // Traverse only if IMPLICIT or TRAVERSE
-        if (!($traversalStrategy & (TraversalStrategy::IMPLICIT | TraversalStrategy::TRAVERSE))) {
-            return;
-        }
+        // Currently, the traversal strategy can only be TRAVERSE for a
+        // generic node if the cascading strategy is CASCADE. Thus, traversable
+        // objects will always be handled within cascadeObject() and there's
+        // nothing more to do here.
 
-        // If IMPLICIT, stop unless we deal with a Traversable
-        if ($traversalStrategy & TraversalStrategy::IMPLICIT && !$node->value instanceof \Traversable) {
-            return;
-        }
-
-        // If TRAVERSE, the constructor will fail if we have no Traversable
-        $nodeStack->push(new CollectionNode(
-            $node->value,
-            $node->propertyPath,
-            $cascadedGroups,
-            null,
-            $traversalStrategy
-        ));
+        // see GenericMetadata::addConstraint()
     }
 
     /**
@@ -464,7 +466,9 @@ class NonRecursiveNodeTraverser implements NodeTraverserInterface
      *                                 and does not implement {@link \Traversable}
      *                                 or if traversal is disabled via the
      *                                 $traversalStrategy argument
-     *
+     * @throws UnsupportedMetadataException If the metadata returned by the
+     *                                      metadata factory does not implement
+     *                                      {@link ClassMetadataInterface}
      */
     private function cascadeObject($object, $propertyPath, array $groups, $traversalStrategy, \SplStack $nodeStack)
     {
@@ -472,7 +476,12 @@ class NonRecursiveNodeTraverser implements NodeTraverserInterface
             $classMetadata = $this->metadataFactory->getMetadataFor($object);
 
             if (!$classMetadata instanceof ClassMetadataInterface) {
-                // error
+                throw new UnsupportedMetadataException(sprintf(
+                    'The metadata factory should return instances of '.
+                    '"Symfony\Component\Validator\Mapping\ClassMetadataInterface", '.
+                    'got: "%s".',
+                    is_object($classMetadata) ? get_class($classMetadata) : gettype($classMetadata)
+                ));
             }
 
             $nodeStack->push(new ClassNode(

@@ -13,10 +13,13 @@ namespace Symfony\Component\Validator\Mapping;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Valid;
+use Symfony\Component\Validator\Exception\BadMethodCallException;
 use Symfony\Component\Validator\ValidationVisitorInterface;
 
 /**
- * @since  %%NextVersion%%
+ * A generic container of {@link Constraint} objects.
+ *
+ * @since  2.5
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class GenericMetadata  implements MetadataInterface
@@ -31,9 +34,27 @@ class GenericMetadata  implements MetadataInterface
      */
     public $constraintsByGroup = array();
 
+    /**
+     * The strategy for cascading objects.
+     *
+     * By default, objects are not cascaded.
+     *
+     * @var integer
+     *
+     * @see CascadingStrategy
+     */
     public $cascadingStrategy = CascadingStrategy::NONE;
 
-    public $traversalStrategy = TraversalStrategy::IMPLICIT;
+    /**
+     * The strategy for traversing traversable objects.
+     *
+     * By default, traversable objects are not traversed.
+     *
+     * @var integer
+     *
+     * @see TraversalStrategy
+     */
+    public $traversalStrategy = TraversalStrategy::NONE;
 
     /**
      * Returns the names of the properties that should be serialized.
@@ -66,11 +87,22 @@ class GenericMetadata  implements MetadataInterface
     }
 
     /**
-     * Adds a constraint to this element.
+     * Adds a constraint.
      *
-     * @param Constraint $constraint
+     * If the constraint {@link Valid} is added, the cascading strategy will be
+     * changed to {@link CascadingStrategy::CASCADE}. Depending on the
+     * properties $traverse and $deep of that constraint, the traversal strategy
+     * will be set to one of the following:
      *
-     * @return ElementMetadata
+     *  - {@link TraversalStrategy::IMPLICIT} if $traverse is enabled and $deep
+     *    is enabled
+     *  - {@link TraversalStrategy::IMPLICIT} | {@link TraversalStrategy::STOP_RECURSION}
+     *    if $traverse is enabled, but $deep is disabled
+     *  - {@link TraversalStrategy::NONE} if $traverse is disabled
+     *
+     * @param Constraint $constraint The constraint to add
+     *
+     * @return GenericMetadata This object
      */
     public function addConstraint(Constraint $constraint)
     {
@@ -100,17 +132,26 @@ class GenericMetadata  implements MetadataInterface
         return $this;
     }
 
+    /**
+     * Adds an list of constraints.
+     *
+     * @param Constraint[] $constraints The constraints to add
+     *
+     * @return GenericMetadata This object
+     */
     public function addConstraints(array $constraints)
     {
         foreach ($constraints as $constraint) {
             $this->addConstraint($constraint);
         }
+
+        return $this;
     }
 
     /**
      * Returns all constraints of this element.
      *
-     * @return Constraint[] An array of Constraint instances
+     * @return Constraint[] A list of Constraint instances
      */
     public function getConstraints()
     {
@@ -132,30 +173,45 @@ class GenericMetadata  implements MetadataInterface
      *
      * @param string $group The group name
      *
-     * @return array An array with all Constraint instances belonging to the group
+     * @return Constraint[] An list of all the Constraint instances belonging
+     *                      to the group
      */
     public function findConstraints($group)
     {
         return isset($this->constraintsByGroup[$group])
-                ? $this->constraintsByGroup[$group]
-                : array();
+            ? $this->constraintsByGroup[$group]
+            : array();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getCascadingStrategy()
     {
         return $this->cascadingStrategy;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getTraversalStrategy()
     {
         return $this->traversalStrategy;
     }
 
     /**
-     * {@inheritdoc}
+     * Exists for compatibility with the deprecated
+     * {@link Symfony\Component\Validator\MetadataInterface}.
+     *
+     * Should not be used.
+     *
+     * @throws BadMethodCallException
+     *
+     * @deprecated Implemented for backwards compatibility with Symfony < 2.5.
+     *             Will be removed in Symfony 3.0.
      */
     public function accept(ValidationVisitorInterface $visitor, $value, $group, $propertyPath)
     {
-        // Thanks PHP < 5.3.9
+        throw new BadMethodCallException('Not supported.');
     }
 }

@@ -20,6 +20,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\MetadataFactoryInterface;
 use Symfony\Component\Validator\Tests\Fixtures\Entity;
+use Symfony\Component\Validator\Tests\Fixtures\FakeClassMetadata;
 use Symfony\Component\Validator\Tests\Fixtures\Reference;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -385,5 +386,59 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
         $this->assertSame('Invalid value', $violations[0]->getInvalidValue());
         $this->assertSame(2, $violations[0]->getMessagePluralization());
         $this->assertSame('Code', $violations[0]->getCode());
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Validator\Exception\UnsupportedMetadataException
+     */
+    public function testMetadataMustImplementClassMetadataInterface()
+    {
+        $entity = new Entity();
+
+        $metadata = $this->getMock('Symfony\Component\Validator\Tests\Fixtures\LegacyClassMetadata');
+        $metadata->expects($this->any())
+            ->method('getClassName')
+            ->will($this->returnValue(get_class($entity)));
+
+        $this->metadataFactory->addMetadata($metadata);
+
+        $this->validator->validate($entity);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Validator\Exception\UnsupportedMetadataException
+     */
+    public function testReferenceMetadataMustImplementClassMetadataInterface()
+    {
+        $entity = new Entity();
+        $entity->reference = new Reference();
+
+        $metadata = $this->getMock('Symfony\Component\Validator\Tests\Fixtures\LegacyClassMetadata');
+        $metadata->expects($this->any())
+            ->method('getClassName')
+            ->will($this->returnValue(get_class($entity->reference)));
+
+        $this->metadataFactory->addMetadata($metadata);
+
+        $this->metadata->addPropertyConstraint('reference', new Valid());
+
+        $this->validator->validate($entity);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Validator\Exception\UnsupportedMetadataException
+     */
+    public function testPropertyMetadataMustImplementPropertyMetadataInterface()
+    {
+        $entity = new Entity();
+
+        // Legacy interface
+        $propertyMetadata = $this->getMock('Symfony\Component\Validator\MetadataInterface');
+        $metadata = new FakeClassMetadata(get_class($entity));
+        $metadata->addPropertyMetadata('firstName', $propertyMetadata);
+
+        $this->metadataFactory->addMetadata($metadata);
+
+        $this->validator->validate($entity);
     }
 }

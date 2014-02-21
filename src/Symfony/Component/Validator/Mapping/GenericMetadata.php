@@ -21,6 +21,8 @@ use Symfony\Component\Validator\ValidationVisitorInterface;
 /**
  * A generic container of {@link Constraint} objects.
  *
+ * This class supports serialization and cloning.
+ *
  * @since  2.5
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
@@ -28,11 +30,19 @@ class GenericMetadata  implements MetadataInterface
 {
     /**
      * @var Constraint[]
+     *
+     * @internal This property is public in order to reduce the size of the
+     *           class' serialized representation. Do not access it. Use
+     *           {@link getConstraints()} and {@link findConstraints()} instead.
      */
     public $constraints = array();
 
     /**
      * @var array
+     *
+     * @internal This property is public in order to reduce the size of the
+     *           class' serialized representation. Do not access it. Use
+     *           {@link findConstraints()} instead.
      */
     public $constraintsByGroup = array();
 
@@ -44,6 +54,10 @@ class GenericMetadata  implements MetadataInterface
      * @var integer
      *
      * @see CascadingStrategy
+     *
+     * @internal This property is public in order to reduce the size of the
+     *           class' serialized representation. Do not access it. Use
+     *           {@link getCascadingStrategy()} instead.
      */
     public $cascadingStrategy = CascadingStrategy::NONE;
 
@@ -55,13 +69,17 @@ class GenericMetadata  implements MetadataInterface
      * @var integer
      *
      * @see TraversalStrategy
+     *
+     * @internal This property is public in order to reduce the size of the
+     *           class' serialized representation. Do not access it. Use
+     *           {@link getTraversalStrategy()} instead.
      */
     public $traversalStrategy = TraversalStrategy::NONE;
 
     /**
      * Returns the names of the properties that should be serialized.
      *
-     * @return array
+     * @return string[]
      */
     public function __sleep()
     {

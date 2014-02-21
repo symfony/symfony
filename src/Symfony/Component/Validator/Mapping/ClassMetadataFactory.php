@@ -17,7 +17,22 @@ use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
 use Symfony\Component\Validator\Mapping\Cache\CacheInterface;
 
 /**
- * A factory for creating metadata for PHP classes.
+ * Creates new {@link ClassMetadataInterface} instances.
+ *
+ * Whenever {@link getMetadataFor()} is called for the first time with a given
+ * class name or object of that class, a new metadata instance is created and
+ * returned. On subsequent requests for the same class, the same metadata
+ * instance will be returned.
+ *
+ * You can optionally pass a {@link LoaderInterface} instance to the constructor.
+ * Whenever a new metadata instance, it will be passed to the loader, which can
+ * configure the metadata based on configuration loaded from the filesystem or
+ * a database. If you want to use multiple loaders, wrap them in a
+ * {@link Loader\LoaderChain}.
+ *
+ * You can also optionally pass a {@link CacheInterface} instance to the
+ * constructor. This cache will be used for persisting the generated metadata
+ * between multiple PHP requests.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
@@ -25,18 +40,32 @@ class ClassMetadataFactory implements MetadataFactoryInterface
 {
     /**
      * The loader for loading the class metadata
+     *
      * @var LoaderInterface
      */
     protected $loader;
 
     /**
      * The cache for caching class metadata
+     *
      * @var CacheInterface
      */
     protected $cache;
 
+    /**
+     * The loaded metadata, indexed by class name
+     *
+     * @var ClassMetadata[]
+     */
     protected $loadedClasses = array();
 
+    /**
+     * Creates a new metadata factory.
+     *
+     * @param LoaderInterface|null $loader The loader for configuring new metadata
+     * @param CacheInterface|null  $cache  The cache for persisting metadata
+     *                                     between multiple PHP requests
+     */
     public function __construct(LoaderInterface $loader = null, CacheInterface $cache = null)
     {
         $this->loader = $loader;
@@ -44,7 +73,25 @@ class ClassMetadataFactory implements MetadataFactoryInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Returns the metadata for the given class name or object.
+     *
+     * If the method was called with the same class name (or an object of that
+     * class) before, the same metadata instance is returned.
+     *
+     * If the factory was configured with a cache, this method will first look
+     * for an existing metadata instance in the cache. If an existing instance
+     * is found, it will be returned without further ado.
+     *
+     * Otherwise, a new metadata instance is created. If the factory was
+     * configured with a loader, the metadata is passed to the
+     * {@link LoaderInterface::loadClassMetadata()} method for further
+     * configuration. At last, the new object is returned.
+     *
+     * @param string|object $value A class name or an object
+     *
+     * @return MetadataInterface The metadata for the value
+     *
+     * @throws NoSuchMetadataException If no metadata exists for the given value
      */
     public function getMetadataFor($value)
     {
@@ -93,7 +140,12 @@ class ClassMetadataFactory implements MetadataFactoryInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Returns whether the factory is able to return metadata for the given
+     * class name or object.
+     *
+     * @param string|object $value A class name or an object
+     *
+     * @return Boolean Whether metadata can be returned for that class
      */
     public function hasMetadataFor($value)
     {

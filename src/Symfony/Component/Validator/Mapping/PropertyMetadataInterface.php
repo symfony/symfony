@@ -15,17 +15,21 @@ use Symfony\Component\Validator\ClassBasedInterface;
 use Symfony\Component\Validator\PropertyMetadataInterface as LegacyPropertyMetadataInterface;
 
 /**
- * A container for validation metadata of a property.
+ * Stores all metadata needed for validating the value of a class property.
  *
- * What exactly you define as "property" is up to you. The validator expects
- * implementations of {@link MetadataInterface} that contain constraints and
- * optionally a list of named properties that also have constraints (and may
- * have further sub properties). Such properties are mapped by implementations
- * of this interface.
+ * Most importantly, the metadata stores the constraints against which the
+ * property's value should be validated.
  *
+ * Additionally, the metadata stores whether objects stored in the property
+ * should be validated against their class' metadata and whether traversable
+ * objects should be traversed or not.
+ *
+ * @since  2.5
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @see MetadataInterface
+ * @see CascadingStrategy
+ * @see TraversalStrategy
  */
 interface PropertyMetadataInterface extends MetadataInterface, LegacyPropertyMetadataInterface, ClassBasedInterface
 {

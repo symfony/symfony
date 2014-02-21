@@ -11,6 +11,14 @@
 
 namespace Symfony\Component\Validator\Mapping;
 
+/**
+ * Contains the metadata of a structural element.
+ *
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+ *             Extend {@link GenericMetadata} instead.
+ */
 abstract class ElementMetadata extends GenericMetadata
 {
 }

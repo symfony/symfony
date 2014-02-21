@@ -22,7 +22,9 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\GroupDefinitionException;
 
 /**
- * Represents all the configured constraints on a given class.
+ * Default implementation of {@link ClassMetadataInterface}.
+ *
+ * This class supports serialization and cloning.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Fabien Potencier <fabien@symfony.com>
@@ -31,36 +33,64 @@ class ClassMetadata extends ElementMetadata implements LegacyMetadataInterface, 
 {
     /**
      * @var string
+     *
+     * @internal This property is public in order to reduce the size of the
+     *           class' serialized representation. Do not access it. Use
+     *           {@link getClassName()} instead.
      */
     public $name;
 
     /**
      * @var string
+     *
+     * @internal This property is public in order to reduce the size of the
+     *           class' serialized representation. Do not access it. Use
+     *           {@link getDefaultGroup()} instead.
      */
     public $defaultGroup;
 
     /**
      * @var MemberMetadata[]
+     *
+     * @internal This property is public in order to reduce the size of the
+     *           class' serialized representation. Do not access it. Use
+     *           {@link getPropertyMetadata()} instead.
      */
     public $members = array();
 
     /**
      * @var PropertyMetadata[]
+     *
+     * @internal This property is public in order to reduce the size of the
+     *           class' serialized representation. Do not access it. Use
+     *           {@link getPropertyMetadata()} instead.
      */
     public $properties = array();
 
     /**
      * @var GetterMetadata[]
+     *
+     * @internal This property is public in order to reduce the size of the
+     *           class' serialized representation. Do not access it. Use
+     *           {@link getPropertyMetadata()} instead.
      */
     public $getters = array();
 
     /**
      * @var array
+     *
+     * @internal This property is public in order to reduce the size of the
+     *           class' serialized representation. Do not access it. Use
+     *           {@link getGroupSequence()} instead.
      */
     public $groupSequence = array();
 
     /**
      * @var Boolean
+     *
+     * @internal This property is public in order to reduce the size of the
+     *           class' serialized representation. Do not access it. Use
+     *           {@link isGroupSequenceProvider()} instead.
      */
     public $groupSequenceProvider = false;
 
@@ -70,6 +100,10 @@ class ClassMetadata extends ElementMetadata implements LegacyMetadataInterface, 
      * By default, only instances of {@link \Traversable} are traversed.
      *
      * @var integer
+     *
+     * @internal This property is public in order to reduce the size of the
+     *           class' serialized representation. Do not access it. Use
+     *           {@link getTraversalStrategy()} instead.
      */
     public $traversalStrategy = TraversalStrategy::IMPLICIT;
 
@@ -94,6 +128,11 @@ class ClassMetadata extends ElementMetadata implements LegacyMetadataInterface, 
         }
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+     */
     public function accept(ValidationVisitorInterface $visitor, $value, $group, $propertyPath, $propagatedGroup = null)
     {
         if (null === $propagatedGroup && Constraint::DEFAULT_GROUP === $group
@@ -129,9 +168,7 @@ class ClassMetadata extends ElementMetadata implements LegacyMetadataInterface, 
     }
 
     /**
-     * Returns the properties to be serialized
-     *
-     * @return array
+     * {@inheritdoc}
      */
     public function __sleep()
     {
@@ -152,9 +189,7 @@ class ClassMetadata extends ElementMetadata implements LegacyMetadataInterface, 
     }
 
     /**
-     * Returns the fully qualified name of the class
-     *
-     * @return string  The fully qualified class name
+     * {@inheritdoc}
      */
     public function getClassName()
     {
@@ -356,9 +391,7 @@ class ClassMetadata extends ElementMetadata implements LegacyMetadataInterface, 
     }
 
     /**
-     * Returns all properties for which constraints are defined.
-     *
-     * @return array An array of property names
+     * {@inheritdoc}
      */
     public function getConstrainedProperties()
     {
@@ -398,9 +431,7 @@ class ClassMetadata extends ElementMetadata implements LegacyMetadataInterface, 
     }
 
     /**
-     * Returns whether this class has an overridden default group sequence.
-     *
-     * @return Boolean
+     * {@inheritdoc}
      */
     public function hasGroupSequence()
     {
@@ -408,9 +439,7 @@ class ClassMetadata extends ElementMetadata implements LegacyMetadataInterface, 
     }
 
     /**
-     * Returns the default group sequence for this class.
-     *
-     * @return GroupSequence The group sequence or null
+     * {@inheritdoc}
      */
     public function getGroupSequence()
     {
@@ -452,9 +481,7 @@ class ClassMetadata extends ElementMetadata implements LegacyMetadataInterface, 
     }
 
     /**
-     * Returns whether the class is a group sequence provider.
-     *
-     * @return Boolean
+     * {@inheritdoc}
      */
     public function isGroupSequenceProvider()
     {

@@ -16,37 +16,36 @@ use Symfony\Component\Validator\MetadataInterface as LegacyMetadataInterface;
 /**
  * A container for validation metadata.
  *
- * The container contains constraints that may belong to different validation
- * groups. Constraints for a specific group can be fetched by calling
- * {@link findConstraints}.
+ * Most importantly, the metadata stores the constraints against which an object
+ * and its properties should be validated.
  *
- * Implement this interface to add validation metadata to your own metadata
- * layer. Each metadata may have named properties. Each property can be
- * represented by one or more {@link PropertyMetadataInterface} instances that
- * are returned by {@link getPropertyMetadata}. Since
- * <tt>PropertyMetadataInterface</tt> inherits from <tt>MetadataInterface</tt>,
- * each property may be divided into further properties.
+ * Additionally, the metadata stores whether objects should be validated
+ * against their class' metadata and whether traversable objects should be
+ * traversed or not.
  *
- * The {@link accept} method of each metadata implements the Visitor pattern.
- * The method should forward the call to the visitor's
- * {@link ValidationVisitorInterface::visit} method and additionally call
- * <tt>accept()</tt> on all structurally related metadata instances.
- *
- * For example, to store constraints for PHP classes and their properties,
- * create a class <tt>ClassMetadata</tt> (implementing <tt>MetadataInterface</tt>)
- * and a class <tt>PropertyMetadata</tt> (implementing <tt>PropertyMetadataInterface</tt>).
- * <tt>ClassMetadata::getPropertyMetadata($property)</tt> returns all
- * <tt>PropertyMetadata</tt> instances for a property of that class. Its
- * <tt>accept()</tt>-method simply forwards to <tt>ValidationVisitorInterface::visit()</tt>
- * and calls <tt>accept()</tt> on all contained <tt>PropertyMetadata</tt>
- * instances, which themselves call <tt>ValidationVisitorInterface::visit()</tt>
- * again.
- *
+ * @since  2.5
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @see CascadingStrategy
+ * @see TraversalStrategy
  */
 interface MetadataInterface extends LegacyMetadataInterface
 {
+    /**
+     * Returns the strategy for cascading objects.
+     *
+     * @return integer The cascading strategy
+     *
+     * @see CascadingStrategy
+     */
     public function getCascadingStrategy();
 
+    /**
+     * Returns the strategy for traversing traversable objects.
+     *
+     * @return integer The traversal strategy
+     *
+     * @see TraversalStrategy
+     */
     public function getTraversalStrategy();
 }

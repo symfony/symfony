@@ -6,6 +6,6 @@
             <?php echo $formHelper->block($form, 'choice_widget_options', array('choices' => $choice)) ?>
         </optgroup>
     <?php else: ?>
-        <option value="<?php echo $view->escape($choice->value) ?>"<?php if ($is_selected($choice->value, $value)): ?> selected="selected"<?php endif?>><?php echo $view->escape($translatorHelper->trans($choice->label, array(), $translation_domain)) ?></option>
+        <option <?php if (!empty($choice->attributes)): ?><?php echo $view['form']->block($form, 'option_attributes', array('attr' => $choice->attributes)) ?> <?php endif; ?>value="<?php echo $view->escape($choice->value) ?>"<?php if ($is_selected($choice->value, $value)): ?> selected="selected"<?php endif?>><?php echo $view->escape($translatorHelper->trans($choice->label, array(), $translation_domain)) ?></option>
     <?php endif ?>
 <?php endforeach ?>

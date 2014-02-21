@@ -86,6 +86,30 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         ));
     }
 
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\InvalidConfigurationException
+     */
+    public function testChoiceListSpecifiedAndAttributes()
+    {
+        $this->factory->create('choice', null, array(
+            'choice_list' => new ObjectChoiceList(array()),
+            'choices_attr' => array(1),
+        ));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\RuntimeException
+     */
+    public function testChoiceAttributesCallableDoesNotReturnArray()
+    {
+        $this->factory->create('choice', null, array(
+            'choices' => array('a' => 'A', 'b' => 'B', 'c' => 'C'),
+            'choices_attr' => function () {
+                    return false;
+            }
+        ));
+    }
+
     public function testChoiceListAndChoicesCanBeEmpty()
     {
         $this->factory->create('choice');
@@ -1273,5 +1297,126 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
         // Trigger data initialization
         $form->getViewData();
+    }
+
+    public function testPassAttributesToView()
+    {
+        $attributes = array('foo' => 'bar', 'bar' => 'baz');
+
+        $form = $this->factory->create('choice', null, array(
+            'choices' => array('a' => 'A', 'b' => 'B', 'c' => 'C'),
+            'choices_attr' => array('a' => $attributes, 'c' => $attributes),
+        ));
+
+        $view = $form->createView();
+
+        $this->assertEquals(array(
+            new ChoiceView('a', 'a', 'A', $attributes),
+            new ChoiceView('b', 'b', 'B'),
+            new ChoiceView('c', 'c', 'C', $attributes),
+        ), $view->vars['choices']);
+    }
+
+    public function testPassAttributesToViewWithCallable()
+    {
+        $form = $this->factory->create('choice', null, array(
+            'choices' => array('a' => 'A', 'b' => 'B', 'c' => 'C'),
+            'choices_attr' => function ($choice) {
+                    return array('choice' => $choice);
+            }
+        ));
+
+        $view = $form->createView();
+
+        $this->assertEquals(array(
+            new ChoiceView('a', 'a', 'A', array('choice' => 'A')),
+            new ChoiceView('b', 'b', 'B', array('choice' => 'B')),
+            new ChoiceView('c', 'c', 'C', array('choice' => 'C')),
+        ), $view->vars['choices']);
+    }
+
+    public function testPassAttributesToViewNestedWithCallable()
+    {
+        $form = $this->factory->create('choice', null, array(
+            'choices' => array(
+                'Group 1' => array('a' => 'A', 'b' => 'B'),
+                'Group 2' => array('c' => 'C', 'd' => 'D'),
+            ),
+            'choices_attr' => function ($choice) {
+                    return array('choice' => $choice);
+            }
+        ));
+
+        $view = $form->createView();
+
+        $this->assertEquals(array(
+            'Group 1' => array(
+                0 => new ChoiceView('a', 'a', 'A', array('choice' => 'A')),
+                1 => new ChoiceView('b', 'b', 'B', array('choice' => 'B')),
+            ),
+            'Group 2' => array(
+                2 => new ChoiceView('c', 'c', 'C', array('choice' => 'C')),
+                3 => new ChoiceView('d', 'd', 'D', array('choice' => 'D')),
+            ),
+        ), $view->vars['choices']);
+    }
+
+    public function testPassAttributesToViewFromChoiceList()
+    {
+        $attributes = array('foo' => 'bar', 'bar' => 'baz');
+        $obj1 = (object) array('value' => 'a', 'label' => 'A');
+        $obj2 = (object) array('value' => 'b', 'label' => 'B');
+        $obj3 = (object) array('value' => 'c', 'label' => 'C');
+
+        $form = $this->factory->create('choice', null, array(
+            'choice_list' => new ObjectChoiceList(array($obj1, $obj2, $obj3), 'label', array(), null, 'value', null, array($attributes, array(), $attributes))
+        ));
+
+        $view = $form->createView();
+
+        $this->assertEquals(array(
+            new ChoiceView($obj1, 'a', 'A', $attributes),
+            new ChoiceView($obj2, 'b', 'B'),
+            new ChoiceView($obj3, 'c', 'C', $attributes),
+        ), $view->vars['choices']);
+    }
+
+    public function testExpandedAttributesArePassedToChildrenRadios()
+    {
+        $attributes = array('foo' => 'bar', 'bar' => 'baz');
+
+        $form = $this->factory->create('choice', null, array(
+            'choices' => array('a' => 'A', 'b' => 'B', 'c' => 'C'),
+            'choices_attr' => array('a' => $attributes, 'c' => $attributes),
+            'expanded' => true,
+        ));
+
+        $optionsA = $form->get(0)->getConfig()->getOptions();
+        $optionsB = $form->get(1)->getConfig()->getOptions();
+        $optionsC = $form->get(2)->getConfig()->getOptions();
+
+        $this->assertEquals($attributes, $optionsA['attr']);
+        $this->assertEmpty($optionsB['attr']);
+        $this->assertEquals($attributes, $optionsC['attr']);
+    }
+
+    public function testExpandedAttributesArePassedToChildrenCheckboxes()
+    {
+        $attributes = array('foo' => 'bar', 'bar' => 'baz');
+
+        $form = $this->factory->create('choice', null, array(
+            'choices' => array('a' => 'A', 'b' => 'B', 'c' => 'C'),
+            'choices_attr' => array('a' => $attributes, 'c' => $attributes),
+            'expanded' => true,
+            'multiple' => true,
+        ));
+
+        $optionsA = $form->get(0)->getConfig()->getOptions();
+        $optionsB = $form->get(1)->getConfig()->getOptions();
+        $optionsC = $form->get(2)->getConfig()->getOptions();
+
+        $this->assertEquals($attributes, $optionsA['attr']);
+        $this->assertEmpty($optionsB['attr']);
+        $this->assertEquals($attributes, $optionsC['attr']);
     }
 }

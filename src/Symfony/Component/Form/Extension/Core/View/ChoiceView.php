@@ -40,16 +40,25 @@ class ChoiceView
     public $label;
 
     /**
+     * The choice's attributes.
+     *
+     * @var array
+     */
+    public $attributes;
+
+    /**
      * Creates a new ChoiceView.
      *
-     * @param mixed  $data  The original choice.
-     * @param string $value The view representation of the choice.
-     * @param string $label The label displayed to humans.
+     * @param mixed  $data       The original choice.
+     * @param string $value      The view representation of the choice.
+     * @param string $label      The label displayed to humans.
+     * @param array  $attributes The choice's attributes.
      */
-    public function __construct($data, $value, $label)
+    public function __construct($data, $value, $label, array $attributes = array())
     {
         $this->data = $data;
         $this->value = $value;
         $this->label = $label;
+        $this->attributes = $attributes;
     }
 }

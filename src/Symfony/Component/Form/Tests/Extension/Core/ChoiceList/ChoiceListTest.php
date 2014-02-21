@@ -48,6 +48,25 @@ class ChoiceListTest extends AbstractChoiceListTest
         $this->assertEquals(array(0 => new ChoiceView($this->obj1, '0', 'A'), 2 => new ChoiceView($this->obj3, '2', 'C'), 3 => new ChoiceView($this->obj4, '3', 'D')), $this->list->getRemainingViews());
     }
 
+    public function testInitAttributes()
+    {
+        $list = new ChoiceList(
+            array($this->obj1, $this->obj2, $this->obj3, $this->obj4),
+            array('A', 'B', 'C', 'D'),
+            array(),
+            array(array('foo' => 'bar1'), array('foo' => 'bar2'), array('foo' => 'bar3'))
+        );
+
+        $this->assertEquals(array(
+                0 => new ChoiceView($this->obj1, '0', 'A', array('foo' => 'bar1')),
+                1 => new ChoiceView($this->obj2, '1', 'B', array('foo' => 'bar2')),
+                2 => new ChoiceView($this->obj3, '2', 'C', array('foo' => 'bar3')),
+                3 => new ChoiceView($this->obj4, '3', 'D')
+            ),
+            $list->getRemainingViews()
+        );
+    }
+
     /**
      * Necessary for interoperability with MongoDB cursors or ORM relations as
      * choices parameter. A choice itself that is an object implementing \Traversable
@@ -92,6 +111,38 @@ class ChoiceListTest extends AbstractChoiceListTest
             'Group 1' => array(0 => new ChoiceView($this->obj1, '0', 'A')),
             'Group 2' => array(3 => new ChoiceView($this->obj4, '3', 'D'))
         ), $this->list->getRemainingViews());
+    }
+
+    public function testInitNestedAttributes()
+    {
+        $list = new ChoiceList(
+            array(
+                'Group 1' => array($this->obj1, $this->obj2),
+                'Group 2' => array($this->obj3, $this->obj4),
+            ),
+            array(
+                'Group 1' => array('A', 'B'),
+                'Group 2' => array('C', 'D'),
+            ),
+            array(),
+            array(
+                'Group 1' => array(array('foo' => 'bar1'), array('foo' => 'bar2')),
+                'Group 2' => array(array(), array('foo' => 'bar4'))
+            )
+        );
+
+        $this->assertEquals(array(
+                'Group 1' => array(
+                    new ChoiceView($this->obj1, '0', 'A', array('foo' => 'bar1')),
+                    new ChoiceView($this->obj2, '1', 'B', array('foo' => 'bar2'))
+                ),
+                'Group 2' => array(
+                    2 => new ChoiceView($this->obj3, '2', 'C'),
+                    3 => new ChoiceView($this->obj4, '3', 'D', array('foo' => 'bar4'))
+                )
+            ),
+            $list->getRemainingViews()
+        );
     }
 
     /**

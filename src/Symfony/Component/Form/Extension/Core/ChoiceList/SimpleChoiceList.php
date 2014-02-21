@@ -34,18 +34,19 @@ class SimpleChoiceList extends ChoiceList
     /**
      * Creates a new simple choice list.
      *
-     * @param array $choices The array of choices with the choices as keys and
-     *                       the labels as values. Choices may also be given
-     *                       as hierarchy of unlimited depth by creating nested
-     *                       arrays. The title of the sub-hierarchy is stored
-     *                       in the array key pointing to the nested array.
+     * @param array $choices          The array of choices with the choices as keys and
+     *                                the labels as values. Choices may also be given
+     *                                as hierarchy of unlimited depth by creating nested
+     *                                arrays. The title of the sub-hierarchy is stored
+     *                                in the array key pointing to the nested array.
      * @param array $preferredChoices A flat array of choices that should be
      *                                presented to the user with priority.
+     * @param array $attributes       The choices' attributes having the same structure than $choices.
      */
-    public function __construct(array $choices, array $preferredChoices = array())
+    public function __construct(array $choices, array $preferredChoices = array(), array $attributes = array())
     {
         // Flip preferred choices to speed up lookup
-        parent::__construct($choices, $choices, array_flip($preferredChoices));
+        parent::__construct($choices, $choices, array_flip($preferredChoices), $attributes);
     }
 
     /**
@@ -85,11 +86,14 @@ class SimpleChoiceList extends ChoiceList
      * @param array|\Traversable $choices            The list of choices.
      * @param array              $labels             Ignored.
      * @param array              $preferredChoices   The preferred choices.
+     * @param array              $attributes         The choices' attributes.
      */
-    protected function addChoices(array &$bucketForPreferred, array &$bucketForRemaining, $choices, array $labels, array $preferredChoices)
+    protected function addChoices(array &$bucketForPreferred, array &$bucketForRemaining, $choices, array $labels, array $preferredChoices, array $attributes = array())
     {
         // Add choices to the nested buckets
         foreach ($choices as $choice => $label) {
+            $attribute = isset($attributes[$choice]) ? $attributes[$choice] : array();
+
             if (is_array($label)) {
                 // Don't do the work if the array is empty
                 if (count($label) > 0) {
@@ -99,7 +103,8 @@ class SimpleChoiceList extends ChoiceList
                         $bucketForRemaining,
                         $label,
                         $label,
-                        $preferredChoices
+                        $preferredChoices,
+                        $attribute
                     );
                 }
             } else {
@@ -108,7 +113,8 @@ class SimpleChoiceList extends ChoiceList
                     $bucketForRemaining,
                     $choice,
                     $label,
-                    $preferredChoices
+                    $preferredChoices,
+                    $attribute
                 );
             }
         }

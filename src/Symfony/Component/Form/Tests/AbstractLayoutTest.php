@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests;
 
+use Symfony\Component\Form\Extension\Core\ChoiceList\SimpleChoiceList;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
@@ -1968,5 +1969,103 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
         // no foo
         $this->assertSame('<button type="button" id="button" name="button">[trans]Button[/trans]</button>', $html);
+    }
+
+    public function testWidgetChoiceAttributes()
+    {
+        $form = $this->factory->createNamed('choice', 'choice', null, array(
+            'choices' => array('a' => 'A', 'b' => 'B', 'c' => 'C'),
+            'choices_attr' => array(
+                'a' => array('disabled' => true, 'data-foo' => 'bar'),
+                'c' => array('disabled' => true, 'data-bar' => 'baz'),
+            ),
+        ));
+
+        $html = $this->renderWidget($form->createView());
+
+        $this->assertMatchesXpath($html,
+            '/select
+                [@name="choice"]
+                [
+                    ./option[@disabled][@data-foo="bar"][@value="a"]
+                    /following-sibling::option[not(@disabled)][@value="b"]
+                    /following-sibling::option[@disabled][@data-bar="baz"][@value="c"]
+                ]
+            '
+        );
+    }
+
+    public function testWidgetChoiceListAttributes()
+    {
+        $form = $this->factory->createNamed('choice', 'choice', null, array(
+            'choice_list' => new SimpleChoiceList(array('a' => 'A', 'b' => 'B', 'c' => 'C'), array(), array(
+                    'a' => array('disabled' => true, 'data-foo' => 'bar'),
+                    'c' => array('disabled' => true, 'data-bar' => 'baz'),
+                ))
+        ));
+
+        $html = $this->renderWidget($form->createView());
+
+        $this->assertMatchesXpath($html,
+            '/select
+                [@name="choice"]
+                [
+                    ./option[@disabled][@data-foo="bar"][@value="a"]
+                    /following-sibling::option[not(@disabled)][@value="b"]
+                    /following-sibling::option[@disabled][@data-bar="baz"][@value="c"]
+                ]
+            '
+        );
+    }
+
+    public function testWidgetRadioAttributesFromChoice()
+    {
+        $form = $this->factory->createNamed('choice', 'choice', null, array(
+            'choices' => array('a' => 'A', 'b' => 'B', 'c' => 'C'),
+            'choices_attr' => array(
+                'a' => array('disabled' => true, 'data-foo' => 'bar'),
+                'c' => array('disabled' => true, 'data-bar' => 'baz'),
+            ),
+            'expanded' => true,
+        ));
+
+        $html = $this->renderWidget($form->createView());
+
+        $this->assertMatchesXpath($html,
+            '/div
+                [@id="choice"]
+                [
+                    ./input[@type="radio"][@disabled][@data-foo="bar"][@value="a"]
+                    /following-sibling::input[@type="radio"][not(@disabled)][@value="b"]
+                    /following-sibling::input[@type="radio"][@disabled][@data-bar="baz"][@value="c"]
+                ]
+            '
+        );
+    }
+
+    public function testWidgetCheckboxAttributesFromChoice()
+    {
+        $form = $this->factory->createNamed('choice', 'choice', null, array(
+            'choices' => array('a' => 'A', 'b' => 'B', 'c' => 'C'),
+            'choices_attr' => array(
+                'a' => array('disabled' => true, 'data-foo' => 'bar'),
+                'c' => array('disabled' => true, 'data-bar' => 'baz'),
+            ),
+            'expanded' => true,
+            'multiple' => true,
+        ));
+
+        $html = $this->renderWidget($form->createView());
+
+        $this->assertMatchesXpath($html,
+            '/div
+                [@id="choice"]
+                [
+                    ./input[@type="checkbox"][@disabled][@data-foo="bar"][@value="a"]
+                    /following-sibling::input[@type="checkbox"][not(@disabled)][@value="b"]
+                    /following-sibling::input[@type="checkbox"][@disabled][@data-bar="baz"][@value="c"]
+                ]
+            '
+        );
     }
 }

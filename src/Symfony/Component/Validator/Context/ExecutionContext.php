@@ -30,6 +30,9 @@ use Symfony\Component\Validator\Violation\ConstraintViolationBuilder;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @see ExecutionContextInterface
+ *
+ * @internal You should not instantiate or use this class. Code against
+ *           {@link ExecutionContextInterface} instead.
  */
 class ExecutionContext implements ExecutionContextInterface
 {

@@ -17,29 +17,64 @@ use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Util\PropertyPath;
 
 /**
- * @since  %%NextVersion%%
+ * Default implementation of {@link ConstraintViolationBuilderInterface}.
+ *
+ * @since  2.5
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @internal You should not instantiate or use this class. Code against
+ *           {@link ConstraintViolationBuilderInterface} instead.
  */
 class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
 {
+    /**
+     * @var ConstraintViolationList
+     */
     private $violations;
 
+    /**
+     * @var string
+     */
     private $message;
 
+    /**
+     * @var array
+     */
     private $parameters;
 
+    /**
+     * @var mixed
+     */
     private $root;
 
+    /**
+     * @var mixed
+     */
     private $invalidValue;
 
+    /**
+     * @var string
+     */
     private $propertyPath;
 
+    /**
+     * @var TranslatorInterface
+     */
     private $translator;
 
+    /**
+     * @var string|null
+     */
     private $translationDomain;
 
-    private $pluralization;
+    /**
+     * @var integer|null
+     */
+    private $plural;
 
+    /**
+     * @var mixed
+     */
     private $code;
 
     public function __construct(ConstraintViolationList $violations, $message, array $parameters, $root, $propertyPath, $invalidValue, TranslatorInterface $translator, $translationDomain = null)
@@ -54,13 +89,19 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
         $this->translationDomain = $translationDomain;
     }
 
-    public function atPath($subPath)
+    /**
+     * {@inheritdoc}
+     */
+    public function atPath($path)
     {
-        $this->propertyPath = PropertyPath::append($this->propertyPath, $subPath);
+        $this->propertyPath = PropertyPath::append($this->propertyPath, $path);
 
         return $this;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function setParameter($key, $value)
     {
         $this->parameters[$key] = $value;
@@ -68,6 +109,9 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
         return $this;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function setParameters(array $parameters)
     {
         $this->parameters = $parameters;
@@ -75,6 +119,9 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
         return $this;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function setTranslationDomain($translationDomain)
     {
         $this->translationDomain = $translationDomain;
@@ -82,6 +129,9 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
         return $this;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function setInvalidValue($invalidValue)
     {
         $this->invalidValue = $invalidValue;
@@ -89,13 +139,19 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
         return $this;
     }
 
-    public function setPluralization($pluralization)
+    /**
+     * {@inheritdoc}
+     */
+    public function setPlural($number)
     {
-        $this->pluralization = $pluralization;
+        $this->plural = $number;
 
         return $this;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function setCode($code)
     {
         $this->code = $code;
@@ -103,9 +159,12 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
         return $this;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function addViolation()
     {
-        if (null === $this->pluralization) {
+        if (null === $this->plural) {
             $translatedMessage = $this->translator->trans(
                 $this->message,
                 $this->parameters,
@@ -115,7 +174,7 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
             try {
                 $translatedMessage = $this->translator->transChoice(
                     $this->message,
-                    $this->pluralization,
+                    $this->plural,
                     $this->parameters,
                     $this->translationDomain#
                 );
@@ -135,7 +194,7 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
             $this->root,
             $this->propertyPath,
             $this->invalidValue,
-            $this->pluralization,
+            $this->plural,
             $this->code
         ));
     }

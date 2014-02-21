@@ -538,7 +538,7 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
             $context->buildViolation('Message %param%')
                 ->setParameter('%param%', 'value')
                 ->setInvalidValue('Invalid value')
-                ->setPluralization(2)
+                ->setPlural(2)
                 ->setCode('Code')
                 ->addViolation();
         };

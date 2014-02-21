@@ -27,14 +27,14 @@ abstract class AbstractVisitor implements NodeVisitorInterface
     /**
      * {@inheritdoc}
      */
-    public function beforeTraversal(array $nodes, ExecutionContextInterface $context)
+    public function beforeTraversal($nodes, ExecutionContextInterface $context)
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function afterTraversal(array $nodes, ExecutionContextInterface $context)
+    public function afterTraversal($nodes, ExecutionContextInterface $context)
     {
     }
 

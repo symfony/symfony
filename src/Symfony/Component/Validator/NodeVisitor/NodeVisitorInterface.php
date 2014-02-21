@@ -29,9 +29,31 @@ use Symfony\Component\Validator\Node\Node;
  */
 interface NodeVisitorInterface
 {
-    public function beforeTraversal(array $nodes, ExecutionContextInterface $context);
+    /**
+     * Called at the beginning of a traversal.
+     *
+     * @param Node[]                    $nodes   A list of Node instances
+     * @param ExecutionContextInterface $context The execution context
+     *
+     * @return Boolean Whether to continue the traversal
+     */
+    public function beforeTraversal($nodes, ExecutionContextInterface $context);
 
-    public function afterTraversal(array $nodes, ExecutionContextInterface $context);
+    /**
+     * Called at the end of a traversal.
+     *
+     * @param Node[]                    $nodes   A list of Node instances
+     * @param ExecutionContextInterface $context The execution context
+     */
+    public function afterTraversal($nodes, ExecutionContextInterface $context);
 
+    /**
+     * Called for each node during a traversal.
+     *
+     * @param Node                      $node    The current node
+     * @param ExecutionContextInterface $context The execution context
+     *
+     * @return Boolean Whether to traverse the node's successor nodes
+     */
     public function visit(Node $node, ExecutionContextInterface $context);
 }

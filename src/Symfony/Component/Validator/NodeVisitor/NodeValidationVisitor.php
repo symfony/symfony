@@ -30,16 +30,6 @@ use Symfony\Component\Validator\NodeTraverser\NodeTraverserInterface;
 class NodeValidationVisitor extends AbstractVisitor implements GroupManagerInterface
 {
     /**
-     * Stores the hashes of each validated object together with the groups
-     * in which that object was already validated.
-     *
-     * @var array
-     */
-    private $validatedObjects = array();
-
-    private $validatedConstraints = array();
-
-    /**
      * @var ConstraintValidatorFactoryInterface
      */
     private $validatorFactory;
@@ -49,20 +39,37 @@ class NodeValidationVisitor extends AbstractVisitor implements GroupManagerInter
      */
     private $nodeTraverser;
 
+    /**
+     * The currently validated group.
+     *
+     * @var string
+     */
     private $currentGroup;
 
+    /**
+     * Creates a new visitor.
+     *
+     * @param NodeTraverserInterface              $nodeTraverser    The node traverser
+     * @param ConstraintValidatorFactoryInterface $validatorFactory The validator factory
+     */
     public function __construct(NodeTraverserInterface $nodeTraverser, ConstraintValidatorFactoryInterface $validatorFactory)
     {
         $this->validatorFactory = $validatorFactory;
         $this->nodeTraverser = $nodeTraverser;
     }
 
-    public function afterTraversal(array $nodes, ExecutionContextInterface $context)
-    {
-        $this->validatedObjects = array();
-        $this->validatedConstraints = array();
-    }
-
+    /**
+     * Validates a node's value against the constraints defined in the node's
+     * metadata.
+     *
+     * Objects and constraints that were validated before in the same context
+     * will be skipped.
+     *
+     * @param Node                      $node    The current node
+     * @param ExecutionContextInterface $context The execution context
+     *
+     * @return Boolean Whether to traverse the successor nodes
+     */
     public function visit(Node $node, ExecutionContextInterface $context)
     {
         if ($node instanceof CollectionNode) {
@@ -84,21 +91,24 @@ class NodeValidationVisitor extends AbstractVisitor implements GroupManagerInter
         // simply continue traversal (if possible)
 
         foreach ($node->groups as $key => $group) {
-            // Remember which object was validated for which group
-            // Skip validation if the object was already validated for this
-            // group
+            // Even if we remove the following clause, the constraints on an
+            // object won't be validated again due to the measures taken in
+            // validateNodeForGroup().
+            // The following shortcut, however, prevents validatedNodeForGroup()
+            // from being called at all and enhances performance a bit.
             if ($node instanceof ClassNode) {
                 // Use the object hash for group sequences
                 $groupHash = is_object($group) ? spl_object_hash($group) : $group;
 
                 if ($context->isObjectValidatedForGroup($objectHash, $groupHash)) {
-                    // Skip this group when validating properties
+                    // Skip this group when validating the successor nodes
+                    // (property and/or collection nodes)
                     unset($node->groups[$key]);
 
                     continue;
                 }
 
-                //$context->markObjectAsValidatedForGroup($objectHash, $groupHash);
+                $context->markObjectAsValidatedForGroup($objectHash, $groupHash);
             }
 
             // Validate normal group
@@ -108,27 +118,34 @@ class NodeValidationVisitor extends AbstractVisitor implements GroupManagerInter
                 continue;
             }
 
-            // Skip the group sequence when validating properties
-            unset($node->groups[$key]);
-
             // Traverse group sequence until a violation is generated
             $this->traverseGroupSequence($node, $group, $context);
 
-            // Optimization: If the groups only contain the group sequence,
-            // we can skip the traversal for the properties of the object
-            if (1 === count($node->groups)) {
-                return false;
-            }
+            // Skip the group sequence when validating successor nodes
+            unset($node->groups[$key]);
         }
 
         return true;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getCurrentGroup()
     {
         return $this->currentGroup;
     }
 
+    /**
+     * Validates a node's value in each group of a group sequence.
+     *
+     * If any of the groups' constraints generates a violation, subsequent
+     * groups are not validated anymore.
+     *
+     * @param Node                      $node          The validated node
+     * @param GroupSequence             $groupSequence The group sequence
+     * @param ExecutionContextInterface $context       The execution context
+     */
     private function traverseGroupSequence(Node $node, GroupSequence $groupSequence, ExecutionContextInterface $context)
     {
         $violationCount = count($context->getViolations());
@@ -150,6 +167,17 @@ class NodeValidationVisitor extends AbstractVisitor implements GroupManagerInter
         }
     }
 
+    /**
+     * Validates a node's value against all constraints in the given group.
+     *
+     * @param Node                      $node       The validated node
+     * @param string                    $group      The group to validate
+     * @param ExecutionContextInterface $context    The execution context
+     * @param string                    $objectHash The hash of the node's
+     *                                              object (if any)
+     *
+     * @throws \Exception
+     */
     private function validateNodeForGroup(Node $node, $group, ExecutionContextInterface $context, $objectHash)
     {
         try {
@@ -176,8 +204,6 @@ class NodeValidationVisitor extends AbstractVisitor implements GroupManagerInter
 
                         $context->markPropertyConstraintAsValidated($objectHash, $propertyName, $constraintHash);
                     }
-
-                    $this->validatedConstraints[$objectHash][$constraintHash] = true;
                 }
 
                 $validator = $this->validatorFactory->getInstance($constraint);
@@ -187,6 +213,7 @@ class NodeValidationVisitor extends AbstractVisitor implements GroupManagerInter
 
             $this->currentGroup = null;
         } catch (\Exception $e) {
+            // Should be put into a finally block once we switch to PHP 5.5
             $this->currentGroup = null;
 
             throw $e;

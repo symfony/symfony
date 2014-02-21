@@ -25,10 +25,13 @@ use Symfony\Component\Validator\NodeVisitor\NodeVisitorInterface;
  * {@link \Symfony\Component\Validator\NodeVisitor\NodeVisitorInterface::visit()}
  * of each visitor is called. At the end of the traversal, the traverser invokes
  * {@link \Symfony\Component\Validator\NodeVisitor\NodeVisitorInterface::afterTraversal()}
- * on each visitor.
+ * on each visitor. The visitors are called in the same order in which they are
+ * added to the traverser.
  *
- * The visitors should be called in the same order in which they are added to
- * the traverser.
+ * If the {@link traverse()} method is called recursively, the
+ * {@link \Symfony\Component\Validator\NodeVisitor\NodeVisitorInterface::beforeTraversal()}
+ * and {@link \Symfony\Component\Validator\NodeVisitor\NodeVisitorInterface::afterTraversal()}
+ * methods of the visitors will be invoked for each call.
  *
  * The validation graph typically contains nodes of the following types:
  *
@@ -92,5 +95,5 @@ interface NodeTraverserInterface
      * @param Node[]                    $nodes   The nodes to traverse
      * @param ExecutionContextInterface $context The validation context
      */
-    public function traverse(array $nodes, ExecutionContextInterface $context);
+    public function traverse($nodes, ExecutionContextInterface $context);
 }

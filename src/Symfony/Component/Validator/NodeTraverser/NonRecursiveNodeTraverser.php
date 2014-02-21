@@ -69,11 +69,6 @@ class NonRecursiveNodeTraverser implements NodeTraverserInterface
     private $metadataFactory;
 
     /**
-     * @var Boolean
-     */
-    private $traversalStarted = false;
-
-    /**
      * Creates a new traverser.
      *
      * @param MetadataFactoryInterface $metadataFactory The metadata factory
@@ -104,20 +99,20 @@ class NonRecursiveNodeTraverser implements NodeTraverserInterface
     /**
      * {@inheritdoc}
      */
-    public function traverse(array $nodes, ExecutionContextInterface $context)
+    public function traverse($nodes, ExecutionContextInterface $context)
     {
-        // beforeTraversal() and afterTraversal() are only executed for the
-        // top-level call of traverse()
-        $isTopLevelCall = !$this->traversalStarted;
+        if (!is_array($nodes)) {
+            $nodes = array($nodes);
+        }
 
-        if ($isTopLevelCall) {
-            // Remember that the traversal was already started for the case of
-            // recursive calls to traverse()
-            $this->traversalStarted = true;
+        $numberOfInitializedVisitors = $this->beforeTraversal($nodes, $context);
 
-            foreach ($this->visitors as $visitor) {
-                $visitor->beforeTraversal($nodes, $context);
-            }
+        // If any of the visitors requested to abort the traversal, do so, but
+        // clean up before
+        if ($numberOfInitializedVisitors < count($this->visitors)) {
+            $this->afterTraversal($nodes, $context, $numberOfInitializedVisitors);
+
+            return;
         }
 
         // This stack contains all the nodes that should be traversed
@@ -148,13 +143,60 @@ class NonRecursiveNodeTraverser implements NodeTraverserInterface
             }
         }
 
-        if ($isTopLevelCall) {
-            foreach ($this->visitors as $visitor) {
-                $visitor->afterTraversal($nodes, $context);
+        $this->afterTraversal($nodes, $context);
+    }
+
+    /**
+     * Executes the {@link NodeVisitorInterface::beforeTraversal()} method of
+     * each visitor.
+     *
+     * @param Node[]                    $nodes   The traversed nodes
+     * @param ExecutionContextInterface $context The current execution context
+     *
+     * @return integer The number of successful calls. This is lower than
+     *                 the number of visitors if any of the visitors'
+     *                 beforeTraversal() methods returned false
+     */
+    private function beforeTraversal($nodes, ExecutionContextInterface $context)
+    {
+        $numberOfCalls = 1;
+
+        foreach ($this->visitors as $visitor) {
+            if (false === $visitor->beforeTraversal($nodes, $context)) {
+                break;
             }
 
-            // Put the traverser back into its initial state
-            $this->traversalStarted = false;
+            ++$numberOfCalls;
+        }
+
+        return $numberOfCalls;
+    }
+
+    /**
+     * Executes the {@link NodeVisitorInterface::beforeTraversal()} method of
+     * each visitor.
+     *
+     * @param Node[]                    $nodes   The traversed nodes
+     * @param ExecutionContextInterface $context The current execution context
+     * @param integer|null              $limit   Limits the number of visitors
+     *                                           on which beforeTraversal()
+     *                                           should be called. All visitors
+     *                                           will be called by default
+     */
+    private function afterTraversal($nodes, ExecutionContextInterface $context, $limit = null)
+    {
+        if (null === $limit) {
+            $limit = count($this->visitors);
+        }
+
+        $numberOfCalls = 0;
+
+        foreach ($this->visitors as $visitor) {
+            $visitor->afterTraversal($nodes, $context);
+
+            if (++$numberOfCalls === $limit) {
+                return;
+            }
         }
     }
 

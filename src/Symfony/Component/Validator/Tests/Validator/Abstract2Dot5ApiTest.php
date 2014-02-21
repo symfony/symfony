@@ -328,16 +328,206 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
         $this->assertNull($violations[0]->getCode());
     }
 
+    public function testTraversalEnabledOnClass()
+    {
+        $entity = new Entity();
+        $traversable = new \ArrayIterator(array('key' => $entity));
+
+        $callback = function ($value, ExecutionContextInterface $context) {
+            $context->addViolation('Message');
+        };
+
+        $traversableMetadata = new ClassMetadata('ArrayIterator');
+        $traversableMetadata->addConstraint(new Traverse(true));
+
+        $this->metadataFactory->addMetadata($traversableMetadata);
+        $this->metadata->addConstraint(new Callback(array(
+            'callback' => $callback,
+            'groups' => 'Group',
+        )));
+
+        $violations = $this->validate($traversable, new Valid(), 'Group');
+
+        /** @var ConstraintViolationInterface[] $violations */
+        $this->assertCount(1, $violations);
+    }
+
+    public function testTraversalDisabledOnClass()
+    {
+        $test = $this;
+        $entity = new Entity();
+        $traversable = new \ArrayIterator(array('key' => $entity));
+
+        $callback = function ($value, ExecutionContextInterface $context) use ($test) {
+            $test->fail('Should not be called');
+        };
+
+        $traversableMetadata = new ClassMetadata('ArrayIterator');
+        $traversableMetadata->addConstraint(new Traverse(false));
+
+        $this->metadataFactory->addMetadata($traversableMetadata);
+        $this->metadata->addConstraint(new Callback(array(
+            'callback' => $callback,
+            'groups' => 'Group',
+        )));
+
+        $violations = $this->validate($traversable, new Valid(), 'Group');
+
+        /** @var ConstraintViolationInterface[] $violations */
+        $this->assertCount(0, $violations);
+    }
+
     /**
      * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      */
-    public function testExpectTraversableIfTraverseOnClass()
+    public function testExpectTraversableIfTraversalEnabledOnClass()
     {
         $entity = new Entity();
 
-        $this->metadata->addConstraint(new Traverse());
+        $this->metadata->addConstraint(new Traverse(true));
 
         $this->validator->validate($entity);
+    }
+
+    public function testReferenceTraversalDisabledOnClass()
+    {
+        $test = $this;
+        $entity = new Entity();
+        $entity->reference = new \ArrayIterator(array('key' => new Reference()));
+
+        $callback = function ($value, ExecutionContextInterface $context) use ($test) {
+            $test->fail('Should not be called');
+        };
+
+        $traversableMetadata = new ClassMetadata('ArrayIterator');
+        $traversableMetadata->addConstraint(new Traverse(false));
+
+        $this->metadataFactory->addMetadata($traversableMetadata);
+        $this->referenceMetadata->addConstraint(new Callback(array(
+            'callback' => $callback,
+            'groups' => 'Group',
+        )));
+        $this->metadata->addPropertyConstraint('reference', new Valid());
+
+        $violations = $this->validate($entity, new Valid(), 'Group');
+
+        /** @var ConstraintViolationInterface[] $violations */
+        $this->assertCount(0, $violations);
+    }
+
+    public function testReferenceTraversalEnabledOnReferenceDisabledOnClass()
+    {
+        $test = $this;
+        $entity = new Entity();
+        $entity->reference = new \ArrayIterator(array('key' => new Reference()));
+
+        $callback = function ($value, ExecutionContextInterface $context) use ($test) {
+            $test->fail('Should not be called');
+        };
+
+        $traversableMetadata = new ClassMetadata('ArrayIterator');
+        $traversableMetadata->addConstraint(new Traverse(false));
+
+        $this->metadataFactory->addMetadata($traversableMetadata);
+        $this->referenceMetadata->addConstraint(new Callback(array(
+            'callback' => $callback,
+            'groups' => 'Group',
+        )));
+        $this->metadata->addPropertyConstraint('reference', new Valid(array(
+            'traverse' => true,
+        )));
+
+        $violations = $this->validate($entity, new Valid(), 'Group');
+
+        /** @var ConstraintViolationInterface[] $violations */
+        $this->assertCount(0, $violations);
+    }
+
+    public function testReferenceTraversalDisabledOnReferenceEnabledOnClass()
+    {
+        $test = $this;
+        $entity = new Entity();
+        $entity->reference = new \ArrayIterator(array('key' => new Reference()));
+
+        $callback = function ($value, ExecutionContextInterface $context) use ($test) {
+            $test->fail('Should not be called');
+        };
+
+        $traversableMetadata = new ClassMetadata('ArrayIterator');
+        $traversableMetadata->addConstraint(new Traverse(true));
+
+        $this->metadataFactory->addMetadata($traversableMetadata);
+        $this->referenceMetadata->addConstraint(new Callback(array(
+            'callback' => $callback,
+            'groups' => 'Group',
+        )));
+        $this->metadata->addPropertyConstraint('reference', new Valid(array(
+            'traverse' => false,
+        )));
+
+        $violations = $this->validate($entity, new Valid(), 'Group');
+
+        /** @var ConstraintViolationInterface[] $violations */
+        $this->assertCount(0, $violations);
+    }
+
+    public function testReferenceTraversalRecursionEnabledOnReferenceTraversalEnabledOnClass()
+    {
+        $entity = new Entity();
+        $entity->reference = new \ArrayIterator(array(
+            2 => new \ArrayIterator(array('key' => new Reference())),
+        ));
+
+        $callback = function ($value, ExecutionContextInterface $context) {
+            $context->addViolation('Message');
+        };
+
+        $traversableMetadata = new ClassMetadata('ArrayIterator');
+        $traversableMetadata->addConstraint(new Traverse(true));
+
+        $this->metadataFactory->addMetadata($traversableMetadata);
+        $this->referenceMetadata->addConstraint(new Callback(array(
+            'callback' => $callback,
+            'groups' => 'Group',
+        )));
+        $this->metadata->addPropertyConstraint('reference', new Valid(array(
+            'deep' => true,
+        )));
+
+        $violations = $this->validate($entity, new Valid(), 'Group');
+
+        /** @var ConstraintViolationInterface[] $violations */
+        $this->assertCount(1, $violations);
+    }
+
+    public function testReferenceTraversalRecursionDisabledOnReferenceTraversalEnabledOnClass()
+    {
+        $test = $this;
+        $entity = new Entity();
+        $entity->reference = new \ArrayIterator(array(
+            2 => new \ArrayIterator(array('key' => new Reference())),
+        ));
+
+        $callback = function ($value, ExecutionContextInterface $context) use ($test) {
+            $test->fail('Should not be called');
+        };
+
+        $traversableMetadata = new ClassMetadata('ArrayIterator');
+        $traversableMetadata->addConstraint(new Traverse(true));
+
+        $this->metadataFactory->addMetadata($traversableMetadata);
+        $this->referenceMetadata->addConstraint(new Callback(array(
+            'callback' => $callback,
+            'groups' => 'Group',
+        )));
+        $this->metadata->addPropertyConstraint('reference', new Valid(array(
+            'deep' => false,
+        )));
+
+        $violations = $this->validate($entity, new Valid(), 'Group');
+
+        /** @var ConstraintViolationInterface[] $violations */
+        $this->assertCount(0, $violations);
     }
 
     public function testAddCustomizedViolation()

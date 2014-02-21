@@ -58,21 +58,6 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
             ));
         }
 
-        // BC with Symfony < 2.5
-        if ($constraint instanceof Valid) {
-            if (true === $constraint->traverse) {
-                // Try to traverse cascaded objects, but ignore if they do not
-                // implement Traversable
-                $this->traversalStrategy = TraversalStrategy::IMPLICIT;
-
-                if (!$constraint->deep) {
-                    $this->traversalStrategy |= TraversalStrategy::STOP_RECURSION;
-                }
-            } elseif (false === $constraint->traverse) {
-                $this->traversalStrategy = TraversalStrategy::NONE;
-            }
-        }
-
         parent::addConstraint($constraint);
 
         return $this;

@@ -12,8 +12,10 @@
 namespace Symfony\Component\Validator\Mapping;
 
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Constraints\Traverse;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Exception\BadMethodCallException;
+use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\ValidationVisitorInterface;
 
 /**
@@ -103,9 +105,20 @@ class GenericMetadata  implements MetadataInterface
      * @param Constraint $constraint The constraint to add
      *
      * @return GenericMetadata This object
+     *
+     * @throws ConstraintDefinitionException When trying to add the
+     *                                       {@link Traverse} constraint
      */
     public function addConstraint(Constraint $constraint)
     {
+        if ($constraint instanceof Traverse) {
+            throw new ConstraintDefinitionException(sprintf(
+                'The constraint "%s" can only be put on classes. Please use '.
+                '"Symfony\Component\Validator\Constraints\Valid" instead.',
+                get_class($constraint)
+            ));
+        }
+
         if ($constraint instanceof Valid) {
             $this->cascadingStrategy = CascadingStrategy::CASCADE;
 

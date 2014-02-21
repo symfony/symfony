@@ -201,20 +201,12 @@ class ClassMetadata extends ElementMetadata implements LegacyMetadataInterface, 
         }
 
         if ($constraint instanceof Traverse) {
-            if (true === $constraint->traverse) {
+            if ($constraint->traverse) {
                 // If traverse is true, traversal should be explicitly enabled
                 $this->traversalStrategy = TraversalStrategy::TRAVERSE;
-
-                if (!$constraint->deep) {
-                    $this->traversalStrategy |= TraversalStrategy::STOP_RECURSION;
-                }
-            } elseif (false === $constraint->traverse) {
+            } else {
                 // If traverse is false, traversal should be explicitly disabled
                 $this->traversalStrategy = TraversalStrategy::NONE;
-            } else {
-                // Else, traverse depending on the contextual information that
-                // is available during validation
-                $this->traversalStrategy = TraversalStrategy::IMPLICIT;
             }
 
             // The constraint is not added

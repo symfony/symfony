@@ -111,10 +111,8 @@ class LegacyExecutionContext extends ExecutionContext
     public function validate($value, $subPath = '', $groups = null, $traverse = false, $deep = false)
     {
         if (is_array($value)) {
-            $constraint = new Traverse(array(
-                'traverse' => true,
-                'deep' => $deep,
-            ));
+            // The $traverse flag is ignored for arrays
+            $constraint = new Valid(array('traverse' => true, 'deep' => $deep));
 
             return $this
                 ->getValidator()
@@ -125,16 +123,13 @@ class LegacyExecutionContext extends ExecutionContext
         }
 
         if ($traverse && $value instanceof \Traversable) {
-            $constraints = array(
-                new Valid(),
-                new Traverse(array('traverse' => true, 'deep' => $deep)),
-            );
+            $constraint = new Valid(array('traverse' => true, 'deep' => $deep));
 
             return $this
                 ->getValidator()
                 ->inContext($this)
                 ->atPath($subPath)
-                ->validate($value, $constraints, $groups)
+                ->validate($value, $constraint, $groups)
             ;
         }
 

@@ -25,6 +25,9 @@ class Valid extends Constraint
 {
     public $traverse = true;
 
+    /**
+     * @deprecated Deprecated as of version 2.5, to be removed in Symfony 3.0.
+     */
     public $deep = true;
 
     public function __construct($options = null)
@@ -37,12 +40,5 @@ class Valid extends Constraint
         }
 
         parent::__construct($options);
-    }
-
-    public function getDefaultOption()
-    {
-        // Traverse is extended for backwards compatibility reasons
-        // The parent class should be removed in 3.0
-        return null;
     }
 }

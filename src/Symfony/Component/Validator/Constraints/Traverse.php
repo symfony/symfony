@@ -24,8 +24,6 @@ class Traverse extends Constraint
 {
     public $traverse = true;
 
-    public $deep = false;
-
     public function __construct($options = null)
     {
         if (is_array($options) && array_key_exists('groups', $options)) {

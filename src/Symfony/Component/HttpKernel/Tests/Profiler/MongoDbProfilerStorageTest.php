@@ -71,7 +71,7 @@ class MongoDbProfilerStorageTest extends AbstractProfilerStorageTest
         }
     }
 
-    public function providerDsn()
+    public function getDsns()
     {
         return array(
             array('mongodb://localhost/symfony_tests/profiler_data', array(
@@ -114,12 +114,11 @@ class MongoDbProfilerStorageTest extends AbstractProfilerStorageTest
     }
 
     /**
-     * @dataProvider providerDsn
+     * @dataProvider getDsns
      */
     public function testDsnParser($dsn, $expected)
     {
-        $r=new \ReflectionObject(self::$storage);
-        $m=$r->getMethod('parseDsn');
+        $m = new \ReflectionMethod(self::$storage, 'parseDsn');
         $m->setAccessible(true);
 
         $this->assertEquals($expected, $m->invoke(self::$storage, $dsn));

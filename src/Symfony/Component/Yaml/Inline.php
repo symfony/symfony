@@ -314,7 +314,6 @@ class Inline
         throw new ParseException(sprintf('Malformed inline YAML string %s', $sequence));
     }
 
-
     /**
      * Parses a mapping to a YAML string.
      *
@@ -340,11 +339,10 @@ class Inline
                     ++$i;
                     continue 2;
                 case '}':
-                    if ($objectForMap === true) {
-                        return (object)$output;
-                    } else {
-                        return $output;
+                    if (true === $objectForMap ) {
+                        return (object) $output;
                     }
+                    return $output;
             }
 
             // key

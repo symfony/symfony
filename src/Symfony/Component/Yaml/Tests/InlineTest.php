@@ -26,10 +26,10 @@ class InlineTest extends \PHPUnit_Framework_TestCase
     {
         foreach ($this->getTestsForMapObjectParse() as $yaml => $value) {
             $actual = Inline::parse($yaml, false, false, true);
-            if (is_object($value) === true) {
+            if (true === is_object($value)) {
                 $this->assertInstanceOf(get_class($value), $actual);
                 $this->assertEquals(get_object_vars($value), get_object_vars($actual));
-            } elseif (is_array($value) === true) {
+            } elseif (true === is_array($value)) {
                 $this->assertEquals($value, $actual);
                 $this->assertMixedArraysSame($value, $actual);
             } else {
@@ -334,7 +334,7 @@ class InlineTest extends \PHPUnit_Framework_TestCase
                 if (is_array($value)) {
                     $this->assertMixedArraysSame($value, $b[$key]);
                 } else {
-                    if (is_object($value) === true) {
+                    if (true === is_object($value)) {
                         $this->assertEquals($value, $b[$key]);
                         $this->assertInstanceOf(get_class($value), $b[$key]);
                         $this->assertEquals(get_object_vars($value), get_object_vars($b[$key]));

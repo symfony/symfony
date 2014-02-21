@@ -339,9 +339,10 @@ class Inline
                     ++$i;
                     continue 2;
                 case '}':
-                    if (true === $objectForMap ) {
+                    if (true === $objectForMap) {
                         return (object) $output;
                     }
+
                     return $output;
             }
 

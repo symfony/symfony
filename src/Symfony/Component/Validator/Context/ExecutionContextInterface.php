@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Context;
 
 use Symfony\Component\Validator\ExecutionContextInterface as LegacyExecutionContextInterface;
+use Symfony\Component\Validator\Node\Node;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
@@ -97,4 +98,92 @@ interface ExecutionContextInterface extends LegacyExecutionContextInterface
      * @return ValidatorInterface
      */
     public function getValidator();
+
+    /**
+     * Sets the currently traversed node.
+     *
+     * @param Node $node The current node
+     *
+     * @internal Used by the validator engine. Should not be called by user
+     *           code.
+     */
+    public function setCurrentNode(Node $node);
+
+    /**
+     * Marks an object as validated in a specific validation group.
+     *
+     * @param string $objectHash The hash of the object
+     * @param string $groupHash  The group's name or hash, if it is group
+     *                           sequence
+     *
+     * @internal Used by the validator engine. Should not be called by user
+     *           code.
+     */
+    public function markObjectAsValidatedForGroup($objectHash, $groupHash);
+
+    /**
+     * Returns whether an object was validated in a specific validation group.
+     *
+     * @param string $objectHash The hash of the object
+     * @param string $groupHash  The group's name or hash, if it is group
+     *                           sequence
+     *
+     * @return Boolean Whether the object was already validated for that
+     *                 group
+     *
+     * @internal Used by the validator engine. Should not be called by user
+     *           code.
+     */
+    public function isObjectValidatedForGroup($objectHash, $groupHash);
+
+    /**
+     * Marks a constraint as validated for an object.
+     *
+     * @param string $objectHash     The hash of the object
+     * @param string $constraintHash The hash of the constraint
+     *
+     * @internal Used by the validator engine. Should not be called by user
+     *           code.
+     */
+    public function markClassConstraintAsValidated($objectHash, $constraintHash);
+
+    /**
+     * Returns whether a constraint was validated for an object.
+     *
+     * @param string $objectHash     The hash of the object
+     * @param string $constraintHash The hash of the constraint
+     *
+     * @return Boolean Whether the constraint was already validated
+     *
+     * @internal Used by the validator engine. Should not be called by user
+     *           code.
+     */
+    public function isClassConstraintValidated($objectHash, $constraintHash);
+
+    /**
+     * Marks a constraint as validated for an object and a property name.
+     *
+     * @param string $objectHash     The hash of the object
+     * @param string $propertyName   The property name
+     * @param string $constraintHash The hash of the constraint
+     *
+     * @internal Used by the validator engine. Should not be called by user
+     *           code.
+     */
+    public function markPropertyConstraintAsValidated($objectHash, $propertyName, $constraintHash);
+
+    /**
+     * Returns whether a constraint was validated for an object and a property
+     * name.
+     *
+     * @param string $objectHash     The hash of the object
+     * @param string $propertyName   The property name
+     * @param string $constraintHash The hash of the constraint
+     *
+     * @return Boolean Whether the constraint was already validated
+     *
+     * @internal Used by the validator engine. Should not be called by user
+     *           code.
+     */
+    public function isPropertyConstraintValidated($objectHash, $propertyName, $constraintHash);
 }

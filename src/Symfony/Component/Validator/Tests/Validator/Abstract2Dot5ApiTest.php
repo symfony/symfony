@@ -66,25 +66,6 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
         return $this->validator->validatePropertyValue($object, $propertyName, $value, $groups);
     }
 
-    public function testNoDuplicateValidationIfConstraintInMultipleGroups()
-    {
-        $entity = new Entity();
-
-        $callback = function ($value, ExecutionContextInterface $context) {
-            $context->addViolation('Message');
-        };
-
-        $this->metadata->addConstraint(new Callback(array(
-            'callback' => $callback,
-            'groups' => array('Group 1', 'Group 2'),
-        )));
-
-        $violations = $this->validator->validate($entity, new Valid(), array('Group 1', 'Group 2'));
-
-        /** @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(1, $violations);
-    }
-
     public function testGroupSequenceAbortsAfterFailedGroup()
     {
         $entity = new Entity();
@@ -440,5 +421,43 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
         $this->metadataFactory->addMetadata($metadata);
 
         $this->validator->validate($entity);
+    }
+
+    public function testNoDuplicateValidationIfClassConstraintInMultipleGroups()
+    {
+        $entity = new Entity();
+
+        $callback = function ($value, ExecutionContextInterface $context) {
+            $context->addViolation('Message');
+        };
+
+        $this->metadata->addConstraint(new Callback(array(
+            'callback' => $callback,
+            'groups' => array('Group 1', 'Group 2'),
+        )));
+
+        $violations = $this->validator->validate($entity, new Valid(), array('Group 1', 'Group 2'));
+
+        /** @var ConstraintViolationInterface[] $violations */
+        $this->assertCount(1, $violations);
+    }
+
+    public function testNoDuplicateValidationIfPropertyConstraintInMultipleGroups()
+    {
+        $entity = new Entity();
+
+        $callback = function ($value, ExecutionContextInterface $context) {
+            $context->addViolation('Message');
+        };
+
+        $this->metadata->addPropertyConstraint('firstName', new Callback(array(
+            'callback' => $callback,
+            'groups' => array('Group 1', 'Group 2'),
+        )));
+
+        $violations = $this->validator->validate($entity, new Valid(), array('Group 1', 'Group 2'));
+
+        /** @var ConstraintViolationInterface[] $violations */
+        $this->assertCount(1, $violations);
     }
 }

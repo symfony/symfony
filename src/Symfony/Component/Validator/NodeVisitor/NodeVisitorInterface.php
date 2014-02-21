@@ -15,8 +15,17 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Node\Node;
 
 /**
- * @since  %%NextVersion%%
+ * A node visitor invoked by the node traverser.
+ *
+ * At the beginning of the traversal, the method {@link beforeTraversal()} is
+ * called. For each traversed node, the method {@link visit()} is called. At
+ * last, the method {@link afterTraversal()} is called when the traversal is
+ * complete.
+ *
+ * @since  2.5
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @see \Symfony\Component\Validator\NodeTraverser\NodeTraverserInterface
  */
 interface NodeVisitorInterface
 {

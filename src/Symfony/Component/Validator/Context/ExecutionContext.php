@@ -19,7 +19,6 @@ use Symfony\Component\Validator\Exception\BadMethodCallException;
 use Symfony\Component\Validator\Group\GroupManagerInterface;
 use Symfony\Component\Validator\Mapping\PropertyMetadataInterface;
 use Symfony\Component\Validator\Node\Node;
-use Symfony\Component\Validator\NodeVisitor\NodeObserverInterface;
 use Symfony\Component\Validator\Util\PropertyPath;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilder;
@@ -32,7 +31,7 @@ use Symfony\Component\Validator\Violation\ConstraintViolationBuilder;
  *
  * @see ExecutionContextInterface
  */
-class ExecutionContext implements ExecutionContextInterface, NodeObserverInterface
+class ExecutionContext implements ExecutionContextInterface
 {
     /**
      * @var ValidatorInterface
@@ -74,6 +73,27 @@ class ExecutionContext implements ExecutionContextInterface, NodeObserverInterfa
      * @var Node
      */
     private $node;
+
+    /**
+     * Stores which objects have been validated in which group.
+     *
+     * @var array
+     */
+    private $validatedObjects = array();
+
+    /**
+     * Stores which class constraint has been validated for which object.
+     *
+     * @var array
+     */
+    private $validatedClassConstraints = array();
+
+    /**
+     * Stores which property constraint has been validated for which property.
+     *
+     * @var array
+     */
+    private $validatedPropertyConstraints = array();
 
     /**
      * Creates a new execution context.
@@ -278,5 +298,69 @@ class ExecutionContext implements ExecutionContextInterface, NodeObserverInterfa
             'Please use getValidator() in combination with getMetadataFor() '.
             'or hasMetadataFor() instead or enable the legacy mode.'
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function markObjectAsValidatedForGroup($objectHash, $groupHash)
+    {
+        if (!isset($this->validatedObjects[$objectHash])) {
+            $this->validatedObjects[$objectHash] = array();
+        }
+
+        $this->validatedObjects[$objectHash][$groupHash] = true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isObjectValidatedForGroup($objectHash, $groupHash)
+    {
+        return isset($this->validatedObjects[$objectHash][$groupHash]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function markClassConstraintAsValidated($objectHash, $constraintHash)
+    {
+        if (!isset($this->validatedClassConstraints[$objectHash])) {
+            $this->validatedClassConstraints[$objectHash] = array();
+        }
+
+        $this->validatedClassConstraints[$objectHash][$constraintHash] = true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isClassConstraintValidated($objectHash, $constraintHash)
+    {
+        return isset($this->validatedClassConstraints[$objectHash][$constraintHash]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function markPropertyConstraintAsValidated($objectHash, $propertyName, $constraintHash)
+    {
+        if (!isset($this->validatedPropertyConstraints[$objectHash])) {
+            $this->validatedPropertyConstraints[$objectHash] = array();
+        }
+
+        if (!isset($this->validatedPropertyConstraints[$objectHash][$propertyName])) {
+            $this->validatedPropertyConstraints[$objectHash][$propertyName] = array();
+        }
+
+        $this->validatedPropertyConstraints[$objectHash][$propertyName][$constraintHash] = true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isPropertyConstraintValidated($objectHash, $propertyName, $constraintHash)
+    {
+        return isset($this->validatedPropertyConstraints[$objectHash][$propertyName][$constraintHash]);
     }
 }

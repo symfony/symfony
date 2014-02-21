@@ -15,19 +15,32 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Node\Node;
 
 /**
- * @since  %%NextVersion%%
+ * Base visitor with empty method stubs.
+ *
+ * @since  2.5
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @see NodeVisitorInterface
  */
 abstract class AbstractVisitor implements NodeVisitorInterface
 {
+    /**
+     * {@inheritdoc}
+     */
     public function beforeTraversal(array $nodes, ExecutionContextInterface $context)
     {
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function afterTraversal(array $nodes, ExecutionContextInterface $context)
     {
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function visit(Node $node, ExecutionContextInterface $context)
     {
     }

@@ -16,7 +16,7 @@ use Symfony\Component\Validator\ConstraintValidatorFactory;
 use Symfony\Component\Validator\Context\ExecutionContextFactory;
 use Symfony\Component\Validator\MetadataFactoryInterface;
 use Symfony\Component\Validator\NodeVisitor\ContextUpdateVisitor;
-use Symfony\Component\Validator\NodeVisitor\GroupSequenceResolvingVisitor;
+use Symfony\Component\Validator\NodeVisitor\DefaultGroupReplacingVisitor;
 use Symfony\Component\Validator\NodeVisitor\NodeValidationVisitor;
 use Symfony\Component\Validator\NodeTraverser\NonRecursiveNodeTraverser;
 use Symfony\Component\Validator\Validator\Validator;
@@ -29,7 +29,7 @@ class Validator2Dot5ApiTest extends Abstract2Dot5ApiTest
         $nodeValidator = new NodeValidationVisitor($nodeTraverser, new ConstraintValidatorFactory());
         $contextFactory = new ExecutionContextFactory($nodeValidator, new DefaultTranslator());
         $validator = new Validator($contextFactory, $nodeTraverser, $metadataFactory);
-        $groupSequenceResolver = new GroupSequenceResolvingVisitor();
+        $groupSequenceResolver = new DefaultGroupReplacingVisitor();
         $contextRefresher = new ContextUpdateVisitor();
 
         $nodeTraverser->addVisitor($groupSequenceResolver);

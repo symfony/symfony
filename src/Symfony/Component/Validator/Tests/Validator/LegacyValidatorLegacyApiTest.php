@@ -16,7 +16,7 @@ use Symfony\Component\Validator\ConstraintValidatorFactory;
 use Symfony\Component\Validator\Context\LegacyExecutionContextFactory;
 use Symfony\Component\Validator\MetadataFactoryInterface;
 use Symfony\Component\Validator\NodeVisitor\ContextUpdateVisitor;
-use Symfony\Component\Validator\NodeVisitor\GroupSequenceResolvingVisitor;
+use Symfony\Component\Validator\NodeVisitor\DefaultGroupReplacingVisitor;
 use Symfony\Component\Validator\NodeVisitor\NodeValidationVisitor;
 use Symfony\Component\Validator\NodeTraverser\NonRecursiveNodeTraverser;
 use Symfony\Component\Validator\Validator\LegacyValidator;
@@ -38,7 +38,7 @@ class LegacyValidatorLegacyApiTest extends AbstractLegacyApiTest
         $nodeValidator = new NodeValidationVisitor($nodeTraverser, new ConstraintValidatorFactory());
         $contextFactory = new LegacyExecutionContextFactory($nodeValidator, new DefaultTranslator());
         $validator = new LegacyValidator($contextFactory, $nodeTraverser, $metadataFactory);
-        $groupSequenceResolver = new GroupSequenceResolvingVisitor();
+        $groupSequenceResolver = new DefaultGroupReplacingVisitor();
         $contextRefresher = new ContextUpdateVisitor();
 
         $nodeTraverser->addVisitor($groupSequenceResolver);

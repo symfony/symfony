@@ -18,11 +18,25 @@ use Symfony\Component\Validator\Node\ClassNode;
 use Symfony\Component\Validator\Node\Node;
 
 /**
- * @since  %%NextVersion%%
+ * Checks class nodes whether their "Default" group is replaced by a group
+ * sequence and adjusts the validation groups accordingly.
+ *
+ * If the "Default" group is replaced for a class node, and if the validated
+ * groups of the node contain the group "Default", that group is replaced by
+ * the group sequence specified in the class' metadata.
+ *
+ * @since  2.5
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class GroupSequenceResolvingVisitor extends AbstractVisitor
+class DefaultGroupReplacingVisitor extends AbstractVisitor
 {
+    /**
+     * Replaces the "Default" group in the node's groups by the class' group
+     * sequence.
+     *
+     * @param Node                      $node    The current node
+     * @param ExecutionContextInterface $context The execution context
+     */
     public function visit(Node $node, ExecutionContextInterface $context)
     {
         if (!$node instanceof ClassNode) {
@@ -30,16 +44,19 @@ class GroupSequenceResolvingVisitor extends AbstractVisitor
         }
 
         if ($node->metadata->hasGroupSequence()) {
+            // The group sequence is statically defined for the class
             $groupSequence = $node->metadata->getGroupSequence();
         } elseif ($node->metadata->isGroupSequenceProvider()) {
+            // The group sequence is dynamically obtained from the validated
+            // object
             /** @var \Symfony\Component\Validator\GroupSequenceProviderInterface $value */
             $groupSequence = $node->value->getGroupSequence();
 
-            // TODO test
             if (!$groupSequence instanceof GroupSequence) {
                 $groupSequence = new GroupSequence($groupSequence);
             }
         } else {
+            // The "Default" group is not overridden. Quit.
             return;
         }
 

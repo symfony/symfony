@@ -22,11 +22,19 @@ use Symfony\Component\Validator\Node\PropertyNode;
 use Symfony\Component\Validator\NodeTraverser\NodeTraverserInterface;
 
 /**
- * @since  %%NextVersion%%
+ * Validates a node's value against the constraints defined in it's metadata.
+ *
+ * @since  2.5
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class NodeValidationVisitor extends AbstractVisitor implements GroupManagerInterface
 {
+    /**
+     * Stores the hashes of each validated object together with the groups
+     * in which that object was already validated.
+     *
+     * @var array
+     */
     private $validatedObjects = array();
 
     private $validatedConstraints = array();
@@ -83,19 +91,19 @@ class NodeValidationVisitor extends AbstractVisitor implements GroupManagerInter
                 // Use the object hash for group sequences
                 $groupHash = is_object($group) ? spl_object_hash($group) : $group;
 
-                if (isset($this->validatedObjects[$objectHash][$groupHash])) {
+                if ($context->isObjectValidatedForGroup($objectHash, $groupHash)) {
                     // Skip this group when validating properties
                     unset($node->groups[$key]);
 
                     continue;
                 }
 
-                $this->validatedObjects[$objectHash][$groupHash] = true;
+                //$context->markObjectAsValidatedForGroup($objectHash, $groupHash);
             }
 
             // Validate normal group
             if (!$group instanceof GroupSequence) {
-                $this->validateNodeForGroup($objectHash, $node, $group, $context);
+                $this->validateNodeForGroup($node, $group, $context, $objectHash);
 
                 continue;
             }
@@ -142,20 +150,31 @@ class NodeValidationVisitor extends AbstractVisitor implements GroupManagerInter
         }
     }
 
-    private function validateNodeForGroup($objectHash, Node $node, $group, ExecutionContextInterface $context)
+    private function validateNodeForGroup(Node $node, $group, ExecutionContextInterface $context, $objectHash)
     {
         try {
             $this->currentGroup = $group;
 
             foreach ($node->metadata->findConstraints($group) as $constraint) {
-                // Remember the validated constraints of each object to prevent
-                // duplicate validation of constraints that belong to multiple
-                // validated groups
+                // Prevent duplicate validation of constraints, in the case
+                // that constraints belong to multiple validated groups
                 if (null !== $objectHash) {
                     $constraintHash = spl_object_hash($constraint);
 
-                    if (isset($this->validatedConstraints[$objectHash][$constraintHash])) {
-                        continue;
+                    if ($node instanceof ClassNode) {
+                        if ($context->isClassConstraintValidated($objectHash, $constraintHash)) {
+                            continue;
+                        }
+
+                        $context->markClassConstraintAsValidated($objectHash, $constraintHash);
+                    } elseif ($node instanceof PropertyNode) {
+                        $propertyName = $node->metadata->getPropertyName();
+
+                        if ($context->isPropertyConstraintValidated($objectHash, $propertyName, $constraintHash)) {
+                            continue;
+                        }
+
+                        $context->markPropertyConstraintAsValidated($objectHash, $propertyName, $constraintHash);
                     }
 
                     $this->validatedConstraints[$objectHash][$constraintHash] = true;

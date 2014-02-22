@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\Util\StringUtils;
 
 /**
  * Concrete implementation of the RememberMeServicesInterface providing
@@ -77,16 +78,7 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
      */
     private function compareHashes($hash1, $hash2)
     {
-        if (strlen($hash1) !== $c = strlen($hash2)) {
-            return false;
-        }
-
-        $result = 0;
-        for ($i = 0; $i < $c; $i++) {
-            $result |= ord($hash1[$i]) ^ ord($hash2[$i]);
-        }
-
-        return 0 === $result;
+        return StringUtils::equals($hash1, $hash2);
     }
 
     /**

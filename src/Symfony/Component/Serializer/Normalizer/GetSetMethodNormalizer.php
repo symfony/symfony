@@ -88,7 +88,7 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
         $attributes = array();
         foreach ($reflectionMethods as $method) {
             if ($this->isGetMethod($method)) {
-                $attributeName = lcfirst(substr($method->name, 3));
+                $attributeName = lcfirst(substr($method->name, 0 === strpos($method->name, 'is') ? 2 : 3));
 
                 if (in_array($attributeName, $this->ignoredAttributes)) {
                     continue;
@@ -211,17 +211,19 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
     }
 
     /**
-     * Checks if a method's name is get.* and can be called without parameters.
+     * Checks if a method's name is get.* or is.*, and can be called without parameters.
      *
      * @param \ReflectionMethod $method the method to check
      *
-     * @return Boolean whether the method is a getter.
+     * @return Boolean whether the method is a getter or boolean getter.
      */
     private function isGetMethod(\ReflectionMethod $method)
     {
         return (
-            0 === strpos($method->name, 'get') &&
-            3 < strlen($method->name) &&
+            ((0 === strpos($method->name, 'get') &&
+            3 < strlen($method->name)) ||
+            (0 === strpos($method->name, 'is') &&
+            2 < strlen($method->name))) &&
             0 === $method->getNumberOfRequiredParameters()
         );
     }

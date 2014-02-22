@@ -54,7 +54,7 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
             throw new \RuntimeException(sprintf('The UserProviderInterface implementation must return an instance of UserInterface, but returned "%s".', get_class($user)));
         }
 
-        if (true !== $this->compareHashes($hash, $this->generateCookieHash($class, $username, $expires, $user->getPassword()))) {
+        if (true !== StringUtils::equals($hash, $this->generateCookieHash($class, $username, $expires, $user->getPassword()))) {
             throw new AuthenticationException('The cookie\'s hash is invalid.');
         }
 
@@ -63,22 +63,6 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
         }
 
         return $user;
-    }
-
-    /**
-     * Compares two hashes using a constant-time algorithm to avoid (remote)
-     * timing attacks.
-     *
-     * This is the same implementation as used in the BasePasswordEncoder.
-     *
-     * @param string $hash1 The first hash
-     * @param string $hash2 The second hash
-     *
-     * @return Boolean true if the two hashes are the same, false otherwise
-     */
-    private function compareHashes($hash1, $hash2)
-    {
-        return StringUtils::equals($hash1, $hash2);
     }
 
     /**

@@ -34,17 +34,8 @@ class LegacyValidatorLegacyApiTest extends AbstractLegacyApiTest
 
     protected function createValidator(MetadataFactoryInterface $metadataFactory)
     {
-        $nodeTraverser = new NonRecursiveNodeTraverser($metadataFactory);
-        $nodeValidator = new NodeValidationVisitor($nodeTraverser, new ConstraintValidatorFactory());
-        $contextFactory = new LegacyExecutionContextFactory($nodeValidator, new DefaultTranslator());
-        $validator = new LegacyValidator($contextFactory, $nodeTraverser, $metadataFactory);
-        $groupSequenceResolver = new DefaultGroupReplacingVisitor();
-        $contextRefresher = new ContextUpdateVisitor();
+        $contextFactory = new LegacyExecutionContextFactory(new DefaultTranslator());
 
-        $nodeTraverser->addVisitor($groupSequenceResolver);
-        $nodeTraverser->addVisitor($contextRefresher);
-        $nodeTraverser->addVisitor($nodeValidator);
-
-        return $validator;
+        return new LegacyValidator($contextFactory, $metadataFactory, new ConstraintValidatorFactory());
     }
 }

@@ -42,7 +42,7 @@ class LegacyExecutionContext extends ExecutionContext
      * @internal Called by {@link LegacyExecutionContextFactory}. Should not be used
      *           in user code.
      */
-    public function __construct(ValidatorInterface $validator, $root, GroupManagerInterface $groupManager, TranslatorInterface $translator, $translationDomain = null)
+    public function __construct(ValidatorInterface $validator, $root, TranslatorInterface $translator, $translationDomain = null)
     {
         if (!$validator instanceof LegacyValidatorInterface) {
             throw new InvalidArgumentException(
@@ -54,7 +54,6 @@ class LegacyExecutionContext extends ExecutionContext
         parent::__construct(
             $validator,
             $root,
-            $groupManager,
             $translator,
             $translationDomain
         );

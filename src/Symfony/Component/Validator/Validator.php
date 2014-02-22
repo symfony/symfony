@@ -22,7 +22,7 @@ use Symfony\Component\Translation\TranslatorInterface;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
- *             Use {@link Validator\Validator} instead.
+ *             Use {@link Validator\TraversingValidator} instead.
  */
 class Validator implements ValidatorInterface
 {

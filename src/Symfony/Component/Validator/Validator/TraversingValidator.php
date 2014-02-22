@@ -22,7 +22,7 @@ use Symfony\Component\Validator\MetadataFactoryInterface;
  * @since  2.5
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class Validator implements ValidatorInterface
+class TraversingValidator implements ValidatorInterface
 {
     /**
      * @var ExecutionContextFactoryInterface
@@ -61,7 +61,7 @@ class Validator implements ValidatorInterface
      */
     public function startContext($root = null)
     {
-        return new ContextualValidator(
+        return new TraversingContextualValidator(
             $this->contextFactory->createContext($this, $root),
             $this->nodeTraverser,
             $this->metadataFactory
@@ -73,7 +73,7 @@ class Validator implements ValidatorInterface
      */
     public function inContext(ExecutionContextInterface $context)
     {
-        return new ContextualValidator(
+        return new TraversingContextualValidator(
             $context,
             $this->nodeTraverser,
             $this->metadataFactory

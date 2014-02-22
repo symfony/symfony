@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator;
 
+use Doctrine\Common\Annotations\AnnotationRegistry;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Validator\Context\ExecutionContextFactory;
@@ -37,7 +38,7 @@ use Symfony\Component\Validator\NodeVisitor\DefaultGroupReplacingVisitor;
 use Symfony\Component\Validator\NodeVisitor\NodeValidationVisitor;
 use Symfony\Component\Validator\NodeVisitor\ObjectInitializationVisitor;
 use Symfony\Component\Validator\Validator as ValidatorV24;
-use Symfony\Component\Validator\Validator\Validator;
+use Symfony\Component\Validator\Validator\TraversingValidator;
 use Symfony\Component\Validator\Validator\LegacyValidator;
 
 /**
@@ -373,6 +374,19 @@ class ValidatorBuilder implements ValidatorBuilderInterface
 
             if ($this->annotationReader) {
                 $loaders[] = new AnnotationLoader($this->annotationReader);
+
+                AnnotationRegistry::registerLoader(function ($class) {
+                    if (0 === strpos($class, __NAMESPACE__.'\\Constraints\\')) {
+                        $file = str_replace(__NAMESPACE__.'\\Constraints\\', __DIR__.'/Constraints/', $class).'.php';
+
+                        if (is_file($file)) {
+                            require_once $file;
+                            return true;
+                        }
+                    }
+
+                    return false;
+                });
             }
 
             $loader = null;
@@ -401,26 +415,24 @@ class ValidatorBuilder implements ValidatorBuilderInterface
             return new ValidatorV24($metadataFactory, $validatorFactory, $translator, $this->translationDomain, $this->initializers);
         }
 
-        $nodeTraverser = new NonRecursiveNodeTraverser($metadataFactory);
-        $nodeValidator = new NodeValidationVisitor($nodeTraverser, $validatorFactory);
-
         if (Validation::API_VERSION_2_5 === $apiVersion) {
-            $contextFactory = new ExecutionContextFactory($nodeValidator, $translator, $this->translationDomain);
+            $contextFactory = new ExecutionContextFactory($translator, $this->translationDomain);
         } else {
-            $contextFactory = new LegacyExecutionContextFactory($nodeValidator, $translator, $this->translationDomain);
+            $contextFactory = new LegacyExecutionContextFactory($translator, $this->translationDomain);
         }
-
-        $nodeTraverser->addVisitor(new ContextUpdateVisitor());
-        if (count($this->initializers) > 0) {
-            $nodeTraverser->addVisitor(new ObjectInitializationVisitor($this->initializers));
-        }
-        $nodeTraverser->addVisitor(new DefaultGroupReplacingVisitor());
-        $nodeTraverser->addVisitor($nodeValidator);
 
         if (Validation::API_VERSION_2_5 === $apiVersion) {
-            return new Validator($contextFactory, $nodeTraverser, $metadataFactory);
+            $nodeTraverser = new NonRecursiveNodeTraverser($metadataFactory);
+            if (count($this->initializers) > 0) {
+                $nodeTraverser->addVisitor(new ObjectInitializationVisitor($this->initializers));
+            }
+            $nodeTraverser->addVisitor(new ContextUpdateVisitor());
+            $nodeTraverser->addVisitor(new DefaultGroupReplacingVisitor());
+            $nodeTraverser->addVisitor(new NodeValidationVisitor($nodeTraverser, $validatorFactory));
+
+            return new TraversingValidator($contextFactory, $nodeTraverser, $metadataFactory);
         }
 
-        return new LegacyValidator($contextFactory, $nodeTraverser, $metadataFactory);
+        return new LegacyValidator($contextFactory, $metadataFactory, $validatorFactory);
     }
 }

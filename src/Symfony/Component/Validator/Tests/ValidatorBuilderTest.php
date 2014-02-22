@@ -130,7 +130,7 @@ class ValidatorBuilderTest extends \PHPUnit_Framework_TestCase
     public function testSetApiVersion25()
     {
         $this->assertSame($this->builder, $this->builder->setApiVersion(Validation::API_VERSION_2_5));
-        $this->assertInstanceOf('Symfony\Component\Validator\Validator\Validator', $this->builder->getValidator());
+        $this->assertInstanceOf('Symfony\Component\Validator\Validator\TraversingValidator', $this->builder->getValidator());
     }
 
     public function testSetApiVersion24And25()

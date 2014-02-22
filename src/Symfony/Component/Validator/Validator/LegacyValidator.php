@@ -28,7 +28,7 @@ use Symfony\Component\Validator\ValidatorInterface as LegacyValidatorInterface;
  * @deprecated Implemented for backwards compatibility with Symfony < 2.5.
  *             To be removed in Symfony 3.0.
  */
-class LegacyValidator extends Validator implements LegacyValidatorInterface
+class LegacyValidator extends RecursiveValidator implements LegacyValidatorInterface
 {
     public function validate($value, $groups = null, $traverse = false, $deep = false)
     {

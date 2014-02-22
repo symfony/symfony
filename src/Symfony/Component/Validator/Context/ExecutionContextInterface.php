@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Context;
 
 use Symfony\Component\Validator\ExecutionContextInterface as LegacyExecutionContextInterface;
+use Symfony\Component\Validator\Mapping\MetadataInterface;
 use Symfony\Component\Validator\Node\Node;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
@@ -100,14 +101,44 @@ interface ExecutionContextInterface extends LegacyExecutionContextInterface
     public function getValidator();
 
     /**
-     * Sets the currently traversed node.
+     * Sets the currently validated value.
      *
-     * @param Node $node The current node
+     * @param mixed $value The validated value
      *
      * @internal Used by the validator engine. Should not be called by user
      *           code.
      */
-    public function setCurrentNode(Node $node);
+    public function setValue($value);
+
+    /**
+     * Sets the current validation metadata.
+     *
+     * @param MetadataInterface $metadata The validation metadata
+     *
+     * @internal Used by the validator engine. Should not be called by user
+     *           code.
+     */
+    public function setMetadata(MetadataInterface $metadata = null);
+
+    /**
+     * Sets the property path leading to the current value.
+     *
+     * @param string $propertyPath The property path to the current value
+     *
+     * @internal Used by the validator engine. Should not be called by user
+     *           code.
+     */
+    public function setPropertyPath($propertyPath);
+
+    /**
+     * Sets the currently validated group.
+     *
+     * @param string|null $group The validated group
+     *
+     * @internal Used by the validator engine. Should not be called by user
+     *           code.
+     */
+    public function setGroup($group);
 
     /**
      * Marks an object as validated in a specific validation group.

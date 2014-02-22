@@ -17,6 +17,7 @@ use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Exception\BadMethodCallException;
 use Symfony\Component\Validator\Group\GroupManagerInterface;
+use Symfony\Component\Validator\Mapping\MetadataInterface;
 use Symfony\Component\Validator\Mapping\PropertyMetadataInterface;
 use Symfony\Component\Validator\Node\Node;
 use Symfony\Component\Validator\Util\PropertyPath;
@@ -49,11 +50,6 @@ class ExecutionContext implements ExecutionContextInterface
     private $root;
 
     /**
-     * @var GroupManagerInterface
-     */
-    private $groupManager;
-
-    /**
      * @var TranslatorInterface
      */
     private $translator;
@@ -71,11 +67,32 @@ class ExecutionContext implements ExecutionContextInterface
     private $violations;
 
     /**
-     * The current node under validation.
+     * The currently validated value.
      *
-     * @var Node
+     * @var mixed
      */
-    private $node;
+    private $value;
+
+    /**
+     * The property path leading to the current value.
+     *
+     * @var string
+     */
+    private $propertyPath = '';
+
+    /**
+     * The current validation metadata.
+     *
+     * @var MetadataInterface
+     */
+    private $metadata;
+
+    /**
+     * The currently validated group.
+     *
+     * @var string|null
+     */
+    private $group;
 
     /**
      * Stores which objects have been validated in which group.
@@ -104,9 +121,6 @@ class ExecutionContext implements ExecutionContextInterface
      * @param ValidatorInterface    $validator         The validator
      * @param mixed                 $root              The root value of the
      *                                                 validated object graph
-     * @param GroupManagerInterface $groupManager      The manager for accessing
-     *                                                 the currently validated
-     *                                                 group
      * @param TranslatorInterface   $translator        The translator
      * @param string|null           $translationDomain The translation domain to
      *                                                 use for translating
@@ -115,24 +129,45 @@ class ExecutionContext implements ExecutionContextInterface
      * @internal Called by {@link ExecutionContextFactory}. Should not be used
      *           in user code.
      */
-    public function __construct(ValidatorInterface $validator, $root, GroupManagerInterface $groupManager, TranslatorInterface $translator, $translationDomain = null)
+    public function __construct(ValidatorInterface $validator, $root, TranslatorInterface $translator, $translationDomain = null)
     {
         $this->validator = $validator;
         $this->root = $root;
-        $this->groupManager = $groupManager;
         $this->translator = $translator;
         $this->translationDomain = $translationDomain;
         $this->violations = new ConstraintViolationList();
     }
 
     /**
-     * Sets the values of the context to match the given node.
-     *
-     * @param Node $node The currently validated node
+     * {@inheritdoc}
      */
-    public function setCurrentNode(Node $node)
+    public function setValue($value)
     {
-        $this->node = $node;
+        $this->value = $value;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setMetadata(MetadataInterface $metadata = null)
+    {
+        $this->metadata = $metadata;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setPropertyPath($propertyPath)
+    {
+        $this->propertyPath = (string) $propertyPath;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setGroup($group)
+    {
+        $this->group = $group;
     }
 
     /**
@@ -209,7 +244,7 @@ class ExecutionContext implements ExecutionContextInterface
      */
     public function getValue()
     {
-        return $this->node ? $this->node->value : null;
+        return $this->value;
     }
 
     /**
@@ -217,7 +252,7 @@ class ExecutionContext implements ExecutionContextInterface
      */
     public function getMetadata()
     {
-        return $this->node ? $this->node->metadata : null;
+        return $this->metadata;
     }
 
     /**
@@ -225,7 +260,7 @@ class ExecutionContext implements ExecutionContextInterface
      */
     public function getGroup()
     {
-        return $this->groupManager->getCurrentGroup();
+        return $this->group;
     }
 
     /**
@@ -233,9 +268,7 @@ class ExecutionContext implements ExecutionContextInterface
      */
     public function getClassName()
     {
-        $metadata = $this->getMetadata();
-
-        return $metadata instanceof ClassBasedInterface ? $metadata->getClassName() : null;
+        return $this->metadata instanceof ClassBasedInterface ? $this->metadata->getClassName() : null;
     }
 
     /**
@@ -243,9 +276,7 @@ class ExecutionContext implements ExecutionContextInterface
      */
     public function getPropertyName()
     {
-        $metadata = $this->getMetadata();
-
-        return $metadata instanceof PropertyMetadataInterface ? $metadata->getPropertyName() : null;
+        return $this->metadata instanceof PropertyMetadataInterface ? $this->metadata->getPropertyName() : null;
     }
 
     /**
@@ -253,9 +284,7 @@ class ExecutionContext implements ExecutionContextInterface
      */
     public function getPropertyPath($subPath = '')
     {
-        $propertyPath = $this->node ? $this->node->propertyPath : '';
-
-        return PropertyPath::append($propertyPath, $subPath);
+        return PropertyPath::append($this->propertyPath, $subPath);
     }
 
     /**

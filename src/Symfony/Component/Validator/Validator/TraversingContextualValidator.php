@@ -29,7 +29,7 @@ use Symfony\Component\Validator\Util\PropertyPath;
  * @since  2.5
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class ContextualValidator implements ContextualValidatorInterface
+class TraversingContextualValidator implements ContextualValidatorInterface
 {
     /**
      * @var ExecutionContextInterface

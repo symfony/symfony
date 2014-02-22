@@ -14,7 +14,6 @@ namespace Symfony\Component\Validator\NodeVisitor;
 use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Symfony\Component\Validator\Group\GroupManagerInterface;
 use Symfony\Component\Validator\Node\ClassNode;
 use Symfony\Component\Validator\Node\CollectionNode;
 use Symfony\Component\Validator\Node\Node;
@@ -27,7 +26,7 @@ use Symfony\Component\Validator\NodeTraverser\NodeTraverserInterface;
  * @since  2.5
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class NodeValidationVisitor extends AbstractVisitor implements GroupManagerInterface
+class NodeValidationVisitor extends AbstractVisitor
 {
     /**
      * @var ConstraintValidatorFactoryInterface
@@ -38,13 +37,6 @@ class NodeValidationVisitor extends AbstractVisitor implements GroupManagerInter
      * @var NodeTraverserInterface
      */
     private $nodeTraverser;
-
-    /**
-     * The currently validated group.
-     *
-     * @var string
-     */
-    private $currentGroup;
 
     /**
      * Creates a new visitor.
@@ -129,14 +121,6 @@ class NodeValidationVisitor extends AbstractVisitor implements GroupManagerInter
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getCurrentGroup()
-    {
-        return $this->currentGroup;
-    }
-
-    /**
      * Validates a node's value in each group of a group sequence.
      *
      * If any of the groups' constraints generates a violation, subsequent
@@ -181,7 +165,7 @@ class NodeValidationVisitor extends AbstractVisitor implements GroupManagerInter
     private function validateNodeForGroup(Node $node, $group, ExecutionContextInterface $context, $objectHash)
     {
         try {
-            $this->currentGroup = $group;
+            $context->setGroup($group);
 
             foreach ($node->metadata->findConstraints($group) as $constraint) {
                 // Prevent duplicate validation of constraints, in the case
@@ -211,10 +195,10 @@ class NodeValidationVisitor extends AbstractVisitor implements GroupManagerInter
                 $validator->validate($node->value, $constraint);
             }
 
-            $this->currentGroup = null;
+            $context->setGroup(null);
         } catch (\Exception $e) {
             // Should be put into a finally block once we switch to PHP 5.5
-            $this->currentGroup = null;
+            $context->setGroup(null);
 
             throw $e;
         }

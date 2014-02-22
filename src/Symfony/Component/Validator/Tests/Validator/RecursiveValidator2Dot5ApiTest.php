@@ -19,23 +19,15 @@ use Symfony\Component\Validator\NodeVisitor\ContextUpdateVisitor;
 use Symfony\Component\Validator\NodeVisitor\DefaultGroupReplacingVisitor;
 use Symfony\Component\Validator\NodeVisitor\NodeValidationVisitor;
 use Symfony\Component\Validator\NodeTraverser\NonRecursiveNodeTraverser;
-use Symfony\Component\Validator\Validator\Validator;
+use Symfony\Component\Validator\Validator\RecursiveValidator;
+use Symfony\Component\Validator\Validator\TraversingValidator;
 
-class Validator2Dot5ApiTest extends Abstract2Dot5ApiTest
+class RecursiveValidator2Dot5ApiTest extends Abstract2Dot5ApiTest
 {
     protected function createValidator(MetadataFactoryInterface $metadataFactory)
     {
-        $nodeTraverser = new NonRecursiveNodeTraverser($metadataFactory);
-        $nodeValidator = new NodeValidationVisitor($nodeTraverser, new ConstraintValidatorFactory());
-        $contextFactory = new ExecutionContextFactory($nodeValidator, new DefaultTranslator());
-        $validator = new Validator($contextFactory, $nodeTraverser, $metadataFactory);
-        $groupSequenceResolver = new DefaultGroupReplacingVisitor();
-        $contextRefresher = new ContextUpdateVisitor();
+        $contextFactory = new ExecutionContextFactory(new DefaultTranslator());
 
-        $nodeTraverser->addVisitor($groupSequenceResolver);
-        $nodeTraverser->addVisitor($contextRefresher);
-        $nodeTraverser->addVisitor($nodeValidator);
-
-        return $validator;
+        return new RecursiveValidator($contextFactory, $metadataFactory, new ConstraintValidatorFactory());
     }
 }

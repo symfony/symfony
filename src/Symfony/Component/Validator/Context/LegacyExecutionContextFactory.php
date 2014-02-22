@@ -27,11 +27,6 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class LegacyExecutionContextFactory implements ExecutionContextFactoryInterface
 {
     /**
-     * @var GroupManagerInterface
-     */
-    private $groupManager;
-
-    /**
      * @var TranslatorInterface
      */
     private $translator;
@@ -44,17 +39,13 @@ class LegacyExecutionContextFactory implements ExecutionContextFactoryInterface
     /**
      * Creates a new context factory.
      *
-     * @param GroupManagerInterface $groupManager      The manager for accessing
-     *                                                 the currently validated
-     *                                                 group
      * @param TranslatorInterface   $translator        The translator
      * @param string|null           $translationDomain The translation domain to
      *                                                 use for translating
      *                                                 violation messages
      */
-    public function __construct(GroupManagerInterface $groupManager, TranslatorInterface $translator, $translationDomain = null)
+    public function __construct(TranslatorInterface $translator, $translationDomain = null)
     {
-        $this->groupManager = $groupManager;
         $this->translator = $translator;
         $this->translationDomain = $translationDomain;
     }
@@ -67,7 +58,6 @@ class LegacyExecutionContextFactory implements ExecutionContextFactoryInterface
         return new LegacyExecutionContext(
             $validator,
             $root,
-            $this->groupManager,
             $this->translator,
             $this->translationDomain
         );

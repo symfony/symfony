@@ -30,6 +30,8 @@ class ContextUpdateVisitor extends AbstractVisitor
      */
     public function visit(Node $node, ExecutionContextInterface $context)
     {
-        $context->setCurrentNode($node);
+        $context->setValue($node->value);
+        $context->setMetadata($node->metadata);
+        $context->setPropertyPath($node->propertyPath);
     }
 }

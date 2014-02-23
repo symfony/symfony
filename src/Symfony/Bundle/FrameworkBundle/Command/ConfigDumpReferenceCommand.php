@@ -73,7 +73,7 @@ EOF
             return;
         }
 
-        $extension = $this->findExtention($name);
+        $extension = $this->findExtension($name);
 
         $configuration = $extension->getConfiguration(array(), $this->getContainerBuilder());
 

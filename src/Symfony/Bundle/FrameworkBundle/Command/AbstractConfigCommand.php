@@ -38,7 +38,7 @@ class AbstractConfigCommand extends ContainerDebugCommand
         $table->render($output);
     }
 
-    protected function findExtention($name)
+    protected function findExtension($name)
     {
         $extension = null;
 

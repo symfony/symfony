@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by alexpott at 2014-02-23T10:46:31Z
+
+Found another optimisation. Happy to split this into a separate PR if you think it is worth it.
+
+Again this has quite a big impact on the Drupal installer.
+![image](https://f.cloud.github.com/assets/769634/2240139/badc7504-9c77-11e3-9b93-c02c3e7d71d6.png)
+
+---------------------------------------------------------------------------
+
+by dawehner at 2014-02-23T13:12:18Z
+
+Given that the Inline class has quite some test coverage I think we don't need additional coverage.

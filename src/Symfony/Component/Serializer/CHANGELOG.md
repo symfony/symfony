@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.5.0
+-----
+
+ * added support for `is.*` getters in `GetSetMethodNormalizer`
+
 2.4.0
 -----
 

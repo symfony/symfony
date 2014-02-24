@@ -58,6 +58,8 @@ class UniqueEntity extends Constraint
     }
 
     /**
+     * Returns a string with default option.
+     * 
      * @return string
      */
     public function getDefaultOption()

@@ -33,6 +33,13 @@ class FirewallMap implements FirewallMapInterface
         $this->map = $map;
     }
 
+    /**
+     * Returns an array with listeners.
+     * 
+     * @param Request $request
+     * 
+     * @return array
+     */
     public function getListeners(Request $request)
     {
         foreach ($this->map as $contextId => $requestMatcher) {

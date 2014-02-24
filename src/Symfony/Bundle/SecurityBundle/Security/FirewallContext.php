@@ -31,6 +31,8 @@ class FirewallContext
     }
 
     /**
+     * Returns an array with context.
+     * 
      * @return array
      */
     public function getContext()

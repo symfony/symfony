@@ -98,12 +98,6 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
         }
     }
 
-    /**
-     * @param array $services
-     * @param boolean $isListener
-     * 
-     * @return array 
-     */
     private function groupByConnection(array $services, $isListener = false)
     {
         $grouped = array();

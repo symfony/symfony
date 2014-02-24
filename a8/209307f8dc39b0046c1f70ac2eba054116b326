@@ -1,0 +1,46 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2014-02-21T17:02:19Z
+
+Can you also add some unit tests?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-02-21T17:28:46Z
+
+@fabpot done
+I could be even more conservative and check for a getClassMap() method on the loader, then if the class is in the file map, disable case tests.
+What do you think?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-02-21T17:50:48Z
+
+And an other idea: add a new $strict parameter to Debug::enable (), default to true, that could be used to globaly disable case testing.
+Worth?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-02-21T18:28:28Z
+
+@nicolas-grekas would this still detect case mismatch in classes using PSR-4 (i.e. some of the first namespace levels don't appear in the path) ?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-02-21T18:31:12Z
+
+and I would not use ``getClassMap`` to detect this: if you dump an optimized composer autoloader, you would skip PSR-0 based classes without being warned
+
+And the case testing should always account for non-PSR-0 classes, even if you make it optional: it should remain usable for your PSR-0 code even if you rely on a non-PSR-0 dependency. So IMO, this is not really worth it
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-02-21T18:46:50Z
+
+Just added  test for PSR-4 : it works.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-02-22T18:43:22Z
+
+Look at tcpdf: the TCPDF class is declared in a tcpdf.php file. So the current behavior is a false positive. I can't find an other way than checking for getClassMap to keep the benefit of case mismatch checking for PSR0/4 while preserving compatibility with non PSR0/4 loading scheme. Do you?

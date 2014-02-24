@@ -43,7 +43,7 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertEquals('foo', $obj->getFoo());
         $this->assertEquals('bar', $obj->getBar());
-        $this->assertEquals(true, $obj->isBaz());
+        $this->assertTrue($obj->isBaz());
     }
 
     public function testDenormalizeOnCamelCaseFormat()
@@ -86,7 +86,7 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
             __NAMESPACE__.'\GetConstructorDummy', 'any');
         $this->assertEquals('foo', $obj->getFoo());
         $this->assertEquals('bar', $obj->getBar());
-        $this->assertEquals(true, $obj->isBaz());
+        $this->assertTrue($obj->isBaz());
     }
 
     /**

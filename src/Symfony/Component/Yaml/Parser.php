@@ -323,18 +323,16 @@ class Parser
                 break;
             }
 
-            if ($removeComments && $this->isCurrentLineEmpty() || $this->isCurrentLineBlank()) {
-                if ($this->isCurrentLineBlank()) {
-                    $data[] = substr($this->currentLine, $newIndent);
-                }
-
+            if ($this->isCurrentLineBlank()) {
+                $data[] = substr($this->currentLine, $newIndent);
                 continue;
             }
 
-            if (preg_match('#^(?P<text> *)$#', $this->currentLine, $match)) {
-                // empty line
-                $data[] = $match['text'];
-            } elseif ($indent >= $newIndent) {
+            if ($removeComments && $this->isCurrentLineComment()) {
+                continue;
+            }
+
+            if ($indent >= $newIndent) {
                 $data[] = substr($this->currentLine, $newIndent);
             } elseif (0 == $indent) {
                 $this->moveToPreviousLine();

@@ -64,7 +64,7 @@ EOF
             return;
         }
 
-        $extension = $this->findExtention($name);
+        $extension = $this->findExtension($name);
 
         $kernel = $this->getContainer()->get('kernel');
         $method = new \ReflectionMethod($kernel, 'buildContainer');

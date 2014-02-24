@@ -100,7 +100,11 @@ class RedirectController extends ContainerAware
 
         $qs = $request->getQueryString();
         if ($qs) {
-            $qs = '?'.$qs;
+            if (strpos($path, '?') === false) {
+                $qs = '?'.$qs;
+            } else {
+                $qs = '&'.$qs;
+            }
         }
 
         $port = '';

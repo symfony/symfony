@@ -30,6 +30,8 @@ class UniqueEntity extends Constraint
     public $ignoreNull = true;
 
     /**
+     * Returns an array with required options.
+     * 
      * @return array
      */
     public function getRequiredOptions()

@@ -220,7 +220,7 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
     private function isGetMethod(\ReflectionMethod $method)
     {
         $methodLength = strlen($method->name);
-        
+
         return (
             ((0 === strpos($method->name, 'get') && 3 < $methodLength) ||
             (0 === strpos($method->name, 'is') && 2 < $methodLength)) &&

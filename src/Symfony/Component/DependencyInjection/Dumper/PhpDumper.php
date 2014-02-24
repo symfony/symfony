@@ -48,17 +48,17 @@ class PhpDumper extends Dumper
      */
     const NON_FIRST_CHARS = 'abcdefghijklmnopqrstuvwxyz0123456789_';
 
-    private $inlinedDefinitions;
-    private $definitionVariables;
-    private $referenceVariables;
-    private $variableCount;
-    private $reservedVariables = array('instance', 'class');
-    private $expressionLanguage;
+    protected $inlinedDefinitions;
+    protected $definitionVariables;
+    protected $referenceVariables;
+    protected $variableCount;
+    protected $reservedVariables = array('instance', 'class');
+    protected $expressionLanguage;
 
     /**
      * @var \Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface
      */
-    private $proxyDumper;
+    protected $proxyDumper;
 
     /**
      * {@inheritDoc}
@@ -128,7 +128,7 @@ class PhpDumper extends Dumper
      *
      * @return ProxyDumper
      */
-    private function getProxyDumper()
+    protected function getProxyDumper()
     {
         if (!$this->proxyDumper) {
             $this->proxyDumper = new NullDumper();
@@ -145,7 +145,7 @@ class PhpDumper extends Dumper
      *
      * @return string
      */
-    private function addServiceLocalTempVariables($cId, $definition)
+    protected function addServiceLocalTempVariables($cId, $definition)
     {
         static $template = "        \$%s = %s;\n";
 
@@ -192,7 +192,7 @@ class PhpDumper extends Dumper
      *
      * @return string
      */
-    private function addProxyClasses()
+    protected function addProxyClasses()
     {
         /* @var $definitions Definition[] */
         $definitions = array_filter(
@@ -216,7 +216,7 @@ class PhpDumper extends Dumper
      *
      * @return string
      */
-    private function addServiceInclude($id, $definition)
+    protected function addServiceInclude($id, $definition)
     {
         $template = "        require_once %s;\n";
         $code = '';
@@ -249,7 +249,7 @@ class PhpDumper extends Dumper
      * @throws RuntimeException When the factory definition is incomplete
      * @throws ServiceCircularReferenceException When a circular reference is detected
      */
-    private function addServiceInlinedDefinitions($id, $definition)
+    protected function addServiceInlinedDefinitions($id, $definition)
     {
         $code = '';
         $variableMap = $this->definitionVariables;
@@ -311,7 +311,7 @@ class PhpDumper extends Dumper
      *
      * @return string
      */
-    private function addServiceReturn($id, $definition)
+    protected function addServiceReturn($id, $definition)
     {
         if ($this->isSimpleInstance($id, $definition)) {
             return "    }\n";
@@ -331,7 +331,7 @@ class PhpDumper extends Dumper
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    private function addServiceInstance($id, $definition)
+    protected function addServiceInstance($id, $definition)
     {
         $class = $this->dumpValue($definition->getClass());
 
@@ -375,7 +375,7 @@ class PhpDumper extends Dumper
      *
      * @return Boolean
      */
-    private function isSimpleInstance($id, $definition)
+    protected function isSimpleInstance($id, $definition)
     {
         foreach (array_merge(array($definition), $this->getInlinedDefinitions($definition)) as $sDefinition) {
             if ($definition !== $sDefinition && !$this->hasReference($id, $sDefinition->getMethodCalls())) {
@@ -399,7 +399,7 @@ class PhpDumper extends Dumper
      *
      * @return string
      */
-    private function addServiceMethodCalls($id, $definition, $variableName = 'instance')
+    protected function addServiceMethodCalls($id, $definition, $variableName = 'instance')
     {
         $calls = '';
         foreach ($definition->getMethodCalls() as $call) {
@@ -414,7 +414,7 @@ class PhpDumper extends Dumper
         return $calls;
     }
 
-    private function addServiceProperties($id, $definition, $variableName = 'instance')
+    protected function addServiceProperties($id, $definition, $variableName = 'instance')
     {
         $code = '';
         foreach ($definition->getProperties() as $name => $value) {
@@ -431,7 +431,7 @@ class PhpDumper extends Dumper
      * @param Definition $definition
      * @return string
      */
-    private function addServiceInlinedDefinitionsSetup($id, $definition)
+    protected function addServiceInlinedDefinitionsSetup($id, $definition)
     {
         $this->referenceVariables[$id] = new Variable('instance');
 
@@ -475,7 +475,7 @@ class PhpDumper extends Dumper
      *
      * @return string
      */
-    private function addServiceConfigurator($id, $definition, $variableName = 'instance')
+    protected function addServiceConfigurator($id, $definition, $variableName = 'instance')
     {
         if (!$callable = $definition->getConfigurator()) {
             return '';
@@ -507,7 +507,7 @@ class PhpDumper extends Dumper
      *
      * @return string
      */
-    private function addService($id, $definition)
+    protected function addService($id, $definition)
     {
         $this->definitionVariables = new \SplObjectStorage();
         $this->referenceVariables = array();
@@ -617,7 +617,7 @@ EOF;
      *
      * @return string
      */
-    private function addServices()
+    protected function addServices()
     {
         $publicServices = $privateServices = $synchronizers = '';
         $definitions = $this->container->getDefinitions();
@@ -641,7 +641,7 @@ EOF;
      * @param string     $id         A service identifier
      * @param Definition $definition A Definition instance
      */
-    private function addServiceSynchronizer($id, Definition $definition)
+    protected function addServiceSynchronizer($id, Definition $definition)
     {
         if (!$definition->isSynchronized()) {
             return;
@@ -686,7 +686,7 @@ $code    }
 EOF;
     }
 
-    private function addNewInstance($id, Definition $definition, $return, $instantiation)
+    protected function addNewInstance($id, Definition $definition, $return, $instantiation)
     {
         $class = $this->dumpValue($definition->getClass());
 
@@ -730,7 +730,7 @@ EOF;
      *
      * @return string
      */
-    private function startClass($class, $baseClass, $namespace)
+    protected function startClass($class, $baseClass, $namespace)
     {
         $bagClass = $this->container->isFrozen() ? 'use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;' : 'use Symfony\Component\DependencyInjection\ParameterBag\\ParameterBag;';
         $namespaceLine = $namespace ? "namespace $namespace;\n" : '';
@@ -762,7 +762,7 @@ EOF;
      *
      * @return string
      */
-    private function addConstructor()
+    protected function addConstructor()
     {
         $arguments = $this->container->getParameterBag()->all() ? 'new ParameterBag($this->getDefaultParameters())' : null;
 
@@ -799,7 +799,7 @@ EOF;
      *
      * @return string
      */
-    private function addFrozenConstructor()
+    protected function addFrozenConstructor()
     {
         $code = <<<EOF
 
@@ -851,7 +851,7 @@ EOF;
      *
      * @return string
      */
-    private function addMethodMap()
+    protected function addMethodMap()
     {
         if (!$definitions = $this->container->getDefinitions()) {
             return '';
@@ -871,7 +871,7 @@ EOF;
      *
      * @return string
      */
-    private function addAliases()
+    protected function addAliases()
     {
         if (!$aliases = $this->container->getAliases()) {
             if ($this->container->isFrozen()) {
@@ -899,7 +899,7 @@ EOF;
      *
      * @return string
      */
-    private function addDefaultParametersMethod()
+    protected function addDefaultParametersMethod()
     {
         if (!$this->container->getParameterBag()->all()) {
             return '';
@@ -909,7 +909,23 @@ EOF;
 
         $code = '';
         if ($this->container->isFrozen()) {
-            $code .= <<<EOF
+            $code .= $this->getCodeForGetParameter();
+            $code .= $this->getCodeForHasParameter();
+            $code .= $this->getCodeForSetParameter();
+            $code .= $this->getCodeForGetParameterBag();
+        }
+
+        $code .= $this->getCodeForGetDefaultParameters($parameters);
+
+        return $code;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getCodeForGetParameter()
+    {
+        return <<<EOF
 
     /**
      * {@inheritdoc}
@@ -924,6 +940,16 @@ EOF;
 
         return \$this->parameters[\$name];
     }
+EOF;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getCodeForHasParameter()
+    {
+        return <<<EOF
+
 
     /**
      * {@inheritdoc}
@@ -934,6 +960,16 @@ EOF;
 
         return isset(\$this->parameters[\$name]) || array_key_exists(\$name, \$this->parameters);
     }
+EOF;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getCodeForSetParameter()
+    {
+        return <<<EOF
+
 
     /**
      * {@inheritdoc}
@@ -942,6 +978,16 @@ EOF;
     {
         throw new LogicException('Impossible to call set() on a frozen ParameterBag.');
     }
+EOF;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getCodeForGetParameterBag()
+    {
+        return <<<EOF
+
 
     /**
      * {@inheritDoc}
@@ -955,9 +1001,15 @@ EOF;
         return \$this->parameterBag;
     }
 EOF;
-        }
+    }
 
-        $code .= <<<EOF
+    /**
+     * @param $parameters
+     * @return string
+     */
+    protected function getCodeForGetDefaultParameters($parameters)
+    {
+        return <<<EOF
 
     /**
      * Gets the default parameters.
@@ -970,8 +1022,6 @@ EOF;
     }
 
 EOF;
-
-        return $code;
     }
 
     /**
@@ -985,7 +1035,7 @@ EOF;
      *
      * @throws InvalidArgumentException
      */
-    private function exportParameters($parameters, $path = '', $indent = 12)
+    protected function exportParameters($parameters, $path = '', $indent = 12)
     {
         $php = array();
         foreach ($parameters as $key => $value) {
@@ -1014,7 +1064,7 @@ EOF;
      *
      * @return string
      */
-    private function endClass()
+    protected function endClass()
     {
         return <<<EOF
 }
@@ -1030,7 +1080,7 @@ EOF;
      *
      * @return string
      */
-    private function wrapServiceConditionals($value, $code)
+    protected function wrapServiceConditionals($value, $code)
     {
         if (!$services = ContainerBuilder::getServiceConditionals($value)) {
             return $code;
@@ -1054,7 +1104,7 @@ EOF;
      * @param array  &$calls    By reference
      * @param array  &$behavior By reference
      */
-    private function getServiceCallsFromArguments(array $arguments, array &$calls, array &$behavior)
+    protected function getServiceCallsFromArguments(array $arguments, array &$calls, array &$behavior)
     {
         foreach ($arguments as $argument) {
             if (is_array($argument)) {
@@ -1083,7 +1133,7 @@ EOF;
      *
      * @return array
      */
-    private function getInlinedDefinitions(Definition $definition)
+    protected function getInlinedDefinitions(Definition $definition)
     {
         if (false === $this->inlinedDefinitions->contains($definition)) {
             $definitions = array_merge(
@@ -1108,7 +1158,7 @@ EOF;
      *
      * @return array
      */
-    private function getDefinitionsFromArguments(array $arguments)
+    protected function getDefinitionsFromArguments(array $arguments)
     {
         $definitions = array();
         foreach ($arguments as $argument) {
@@ -1136,7 +1186,7 @@ EOF;
      *
      * @return Boolean
      */
-    private function hasReference($id, array $arguments, $deep = false, array $visited = array())
+    protected function hasReference($id, array $arguments, $deep = false, array $visited = array())
     {
         foreach ($arguments as $argument) {
             if (is_array($argument)) {
@@ -1175,7 +1225,7 @@ EOF;
      *
      * @throws RuntimeException
      */
-    private function dumpValue($value, $interpolate = true)
+    protected function dumpValue($value, $interpolate = true)
     {
         if (is_array($value)) {
             $code = array();
@@ -1257,7 +1307,7 @@ EOF;
      *
      * @return string
      */
-    private function dumpLiteralClass($class)
+    protected function dumpLiteralClass($class)
     {
          return '\\'.substr(str_replace('\\\\', '\\', $class), 1, -1);
     }
@@ -1286,7 +1336,7 @@ EOF;
      *
      * @return string
      */
-    private function getServiceCall($id, Reference $reference = null)
+    protected function getServiceCall($id, Reference $reference = null)
     {
         if ('service_container' === $id) {
             return '$this';
@@ -1312,7 +1362,7 @@ EOF;
      *
      * @throws InvalidArgumentException
      */
-    private function camelize($id)
+    protected function camelize($id)
     {
         $name = Container::camelize($id);
 
@@ -1328,7 +1378,7 @@ EOF;
      *
      * @return string
      */
-    private function getNextVariableName()
+    protected function getNextVariableName()
     {
         $firstChars = self::FIRST_CHARS;
         $firstCharsLength = strlen($firstChars);
@@ -1361,7 +1411,7 @@ EOF;
         }
     }
 
-    private function getExpressionLanguage()
+    protected function getExpressionLanguage()
     {
         if (null === $this->expressionLanguage) {
             if (!class_exists('Symfony\Component\ExpressionLanguage\ExpressionLanguage')) {

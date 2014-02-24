@@ -140,12 +140,35 @@ class DebugClassLoaderTest extends \PHPUnit_Framework_TestCase
     {
         class_exists(__NAMESPACE__.'\Fixtures\CaseMismatch', true);
     }
+
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testPsr4CaseMismatch()
+    {
+        class_exists(__NAMESPACE__.'\Fixtures\Psr4CaseMismatch', true);
+    }
+
+    public function testNotPsr0()
+    {
+        $this->assertTrue(class_exists(__NAMESPACE__.'\Fixtures\NotPSR0', true));
+    }
+
+    public function testNotPsr0Bis()
+    {
+        $this->assertTrue(class_exists(__NAMESPACE__.'\Fixtures\NotPSR0bis', true));
+    }
 }
 
 class ClassLoader
 {
     public function loadClass($class)
     {
+    }
+
+    public function getClassMap()
+    {
+        return array(__NAMESPACE__.'\Fixtures\NotPSR0bis' => __DIR__ . '/Fixtures/notPsr0Bis.php');
     }
 
     public function findFile($class)
@@ -158,6 +181,12 @@ class ClassLoader
             eval('namespace '.__NAMESPACE__.'; class TestingCaseMisMatch {}');
         } elseif (__NAMESPACE__.'\Fixtures\CaseMismatch' === $class) {
             return __DIR__ . '/Fixtures/casemismatch.php';
+        } elseif (__NAMESPACE__.'\Fixtures\Psr4CaseMismatch' === $class) {
+            return __DIR__ . '/Fixtures/psr4/Psr4CaseMismatch.php';
+        } elseif (__NAMESPACE__.'\Fixtures\NotPSR0' === $class) {
+            return __DIR__ . '/Fixtures/reallyNotPsr0.php';
+        } elseif (__NAMESPACE__.'\Fixtures\NotPSR0bis' === $class) {
+            return __DIR__ . '/Fixtures/notPsr0Bis.php';
         }
     }
 }

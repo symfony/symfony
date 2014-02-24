@@ -176,18 +176,30 @@ class DebugClassLoader
                 $class = substr($class, 1);
             }
 
-            $i = -1;
-            $tail = str_replace('\\', DIRECTORY_SEPARATOR, $class).'.php';
+            $i = 0;
+            $tail = DIRECTORY_SEPARATOR . str_replace('\\', DIRECTORY_SEPARATOR, $class).'.php';
             $len = strlen($tail);
 
             do {
-                $tail = substr($tail, $i+1);
-                $len -= $i+1;
+                $tail = substr($tail, $i);
+                $len -= $i;
 
-                if (! substr_compare($file, $tail, -$len, $len, true) && substr_compare($file, $tail, -$len, $len, false)) {
-                    throw new \RuntimeException(sprintf('Case mismatch between class and source file names: %s vs %s', $class, $file));
+                if (0 === substr_compare($file, $tail, -$len, $len, true)) {
+                    if (0 !== substr_compare($file, $tail, -$len, $len, false)) {
+                        if (method_exists($this->classLoader[0], 'getClassMap')) {
+                            $map = $this->classLoader[0]->getClassMap();
+                        } else {
+                            $map = array();
+                        }
+
+                        if (! isset($map[$class])) {
+                            throw new \RuntimeException(sprintf('Case mismatch between class and source file names: %s vs %s', $class, $file));
+                        }
+                    }
+
+                    break;
                 }
-            } while (false !== $i = strpos($tail, '\\'));
+            } while (false !== $i = strpos($tail, DIRECTORY_SEPARATOR, 1));
 
             if (! $exists) {
                 if (false !== strpos($class, '/')) {

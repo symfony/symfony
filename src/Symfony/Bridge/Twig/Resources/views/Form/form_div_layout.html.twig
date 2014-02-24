@@ -19,13 +19,16 @@
 
 {% block form_widget_compound %}
 {% spaceless %}
-    <div {{ block('widget_container_attributes') }}>
-        {% if form.parent is empty %}
-            {{ form_errors(form) }}
-        {% endif %}
+    {% if form.parent is empty %}
+        {{ form_errors(form) }}
         {{ block('form_rows') }}
         {{ form_rest(form) }}
-    </div>
+    {% else %}
+        <div {{ block('widget_container_attributes') }}>
+            {{ block('form_rows') }}
+            {{ form_rest(form) }}
+        </div>
+    {% endif %}
 {% endspaceless %}
 {% endblock form_widget_compound %}
 

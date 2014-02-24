@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\Extension\Extension;
  * @author Wouter J <waldio.webdesign@gmail.com>
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
-class AbstractConfigCommand extends ContainerDebugCommand
+abstract class AbstractConfigCommand extends ContainerDebugCommand
 {
     protected function listBundles(OutputInterface $output)
     {

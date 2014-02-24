@@ -76,7 +76,7 @@ class ProcessPipes
     public function close()
     {
         $this->closeUnixPipes();
-        foreach ($this->fileHandles as $offset => $handle) {
+        foreach ($this->fileHandles as $handle) {
             fclose($handle);
         }
         $this->fileHandles = array();
@@ -218,6 +218,8 @@ class ProcessPipes
     /**
      * Reads data in file handles.
      *
+     * @param Boolean $close Whether to close file handles or not.
+     *
      * @return array An array of read data indexed by their fd.
      */
     private function readFileHandles($close = false)
@@ -253,6 +255,7 @@ class ProcessPipes
      * Reads data in file pipes streams.
      *
      * @param Boolean $blocking Whether to use blocking calls or not.
+     * @param Boolean $close    Whether to close file handles or not.
      *
      * @return array An array of read data indexed by their fd.
      */

@@ -83,7 +83,7 @@ class DoctrineDataCollector extends DataCollector
     /**
      * Returns number of array elements.
      * 
-     * @return int
+     * @return integer
      */
     public function getQueryCount()
     {

@@ -21,7 +21,7 @@ UPGRADE FROM 2.x to 3.0
 ### Console
 
  * The methods `isQuiet`, `isVerbose`, `isVeryVerbose` and `isDebug` were added
-   to `Symfony\Component\Console\Output\OutputInteface`.
+   to `Symfony\Component\Console\Output\OutputInterface`.
 
 ### EventDispatcher
 

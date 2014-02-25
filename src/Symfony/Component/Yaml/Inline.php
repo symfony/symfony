@@ -220,7 +220,9 @@ class Inline
                 throw new ParseException(sprintf('Malformed inline YAML string (%s).', $scalar));
             }
 
-            $output = $evaluate ? self::evaluateScalar($output) : $output;
+            if ($evaluate) {
+                $output = self::evaluateScalar($output);
+            }
         }
 
         return $output;
@@ -388,9 +390,9 @@ class Inline
         $scalar = trim($scalar);
         $scalarLower = strtolower($scalar);
         switch (true) {
-            case 'null' == $scalarLower:
-            case '' == $scalar:
-            case '~' == $scalar:
+            case 'null' === $scalarLower:
+            case '' === $scalar:
+            case '~' === $scalar:
                 return null;
             case 'true' === $scalarLower:
                 return true;
@@ -425,10 +427,10 @@ class Inline
                         return '0' == $scalar[1] ? octdec($scalar) : (((string) $raw == (string) $cast) ? $cast : $raw);
                     case is_numeric($scalar):
                         return '0x' == $scalar[0].$scalar[1] ? hexdec($scalar) : floatval($scalar);
-                    case 0 == strcasecmp($scalar, '.inf'):
-                    case 0 == strcasecmp($scalar, '.NaN'):
+                    case '.inf' === $scalarLower:
+                    case '.nan' === $scalarLower:
                         return -log(0);
-                    case 0 == strcasecmp($scalar, '-.inf'):
+                    case '-.inf' === $scalarLower:
                         return log(0);
                     case preg_match('/^(-|\+)?[0-9,]+(\.[0-9]+)?$/', $scalar):
                         return floatval(str_replace(',', '', $scalar));

@@ -60,7 +60,19 @@ class YamlFileLoader extends FileLoader
             $this->yamlParser = new YamlParser();
         }
 
-        $config = $this->yamlParser->parse(file_get_contents($path));
+        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+            // encode Windows paths
+            $config = $this->yamlParser->parse(iconv('cp1251', 'utf-8', file_get_contents($path)));
+            if (is_array($config)) {
+                foreach ($config as $key => $node) {
+                    if (!empty($node['resource'])) {
+                        $config[$key]['resource'] = iconv('utf-8', 'cp1251', $node['resource']);
+                    }
+                }
+            }
+        } else {
+            $config = $this->yamlParser->parse(file_get_contents($path));
+        }
 
         $collection = new RouteCollection();
         $collection->addResource(new FileResource($path));

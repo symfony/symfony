@@ -54,4 +54,14 @@ class ExpressionLanguageTest extends \PHPUnit_Framework_TestCase
         $expressionLanguage = new ExpressionLanguage();
         $this->assertEquals('constant("PHP_VERSION")', $expressionLanguage->compile('constant("PHP_VERSION")'));
     }
+
+    public function testLazyOperator()
+    {
+        $expressionLanguage = new ExpressionLanguage();
+
+        $object = $this->getMockBuilder('stdClass')->setMethods(array('foo'))->getMock();
+        $object->expects($this->never())->method('foo');
+
+        $this->assertFalse($expressionLanguage->evaluate('false and object.foo()', array('object' => $object)));
+    }
 }

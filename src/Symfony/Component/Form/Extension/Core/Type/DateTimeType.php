@@ -93,7 +93,7 @@ class DateTimeType extends AbstractType
         }
 
         if ('single_text' === $options['widget']) {
-            if ((self::HTML5_FORMAT === $pattern) && !$options['lenient_date_parsing']) {
+            if (self::HTML5_FORMAT === $pattern && !$options['lenient_date_parsing']) {
                 $builder->addViewTransformer(new DateTimeToRfc3339Transformer(
                     $options['model_timezone'],
                     $options['view_timezone']

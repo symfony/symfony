@@ -39,7 +39,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
      * @param integer $timeFormat          The time format
      * @param integer $calendar            One of the \IntlDateFormatter calendar constants
      * @param string  $pattern             A pattern to pass to \IntlDateFormatter
-     * @param bool    $lenientDateParsing  Flag, whether the date parser should use lenient parsing
+     * @param Boolean $lenientDateParsing  Flag, whether the date parser should use lenient parsing
      *
      * @throws UnexpectedTypeException If a format is not supported or if a timezone is not a string
      */

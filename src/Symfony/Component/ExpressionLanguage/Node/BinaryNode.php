@@ -83,9 +83,10 @@ class BinaryNode extends Node
     {
         $operator = $this->attributes['operator'];
         $left = $this->nodes['left']->evaluate($functions, $values);
-        $right = $this->nodes['right']->evaluate($functions, $values);
 
         if (isset(self::$functions[$operator])) {
+            $right = $this->nodes['right']->evaluate($functions, $values);
+
             if ('not in' == $operator) {
                 return !call_user_func('in_array', $left, $right);
             }
@@ -96,10 +97,15 @@ class BinaryNode extends Node
         switch ($operator) {
             case 'or':
             case '||':
-                return $left || $right;
+                return $left || $this->nodes['right']->evaluate($functions, $values);
             case 'and':
             case '&&':
-                return $left && $right;
+                return $left && $this->nodes['right']->evaluate($functions, $values);
+        }
+
+        $right = $this->nodes['right']->evaluate($functions, $values);
+
+        switch ($operator) {
             case '|':
                 return $left | $right;
             case '^':

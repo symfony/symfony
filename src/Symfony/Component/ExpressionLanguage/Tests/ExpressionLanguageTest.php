@@ -12,7 +12,6 @@
 namespace Symfony\Component\ExpressionLanguage\Tests;
 
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
-use Symfony\Component\ExpressionLanguage\ParsedExpression;
 
 class ExpressionLanguageTest extends \PHPUnit_Framework_TestCase
 {
@@ -53,5 +52,48 @@ class ExpressionLanguageTest extends \PHPUnit_Framework_TestCase
 
         $expressionLanguage = new ExpressionLanguage();
         $this->assertEquals('constant("PHP_VERSION")', $expressionLanguage->compile('constant("PHP_VERSION")'));
+    }
+
+    /**
+     * @dataProvider shortCircuitProviderEvaluate
+     */
+    public function testShortCircuitOperatorsEvaluate($expression, array $values, $expected)
+    {
+        $expressionLanguage = new ExpressionLanguage();
+        $this->assertEquals($expected, $expressionLanguage->evaluate($expression, $values));
+    }
+
+    /**
+     * @dataProvider shortCircuitProviderCompile
+     */
+    public function testShortCircuitOperatorsCompile($expression, array $names, $expected)
+    {
+        $result = null;
+        $expressionLanguage = new ExpressionLanguage();
+        eval(sprintf('$result = %s;', $expressionLanguage->compile($expression, $names)));
+        $this->assertSame($expected, $result);
+    }
+
+    public function shortCircuitProviderEvaluate()
+    {
+        $object = $this->getMockBuilder('stdClass')->setMethods(array('foo'))->getMock();
+        $object->expects($this->never())->method('foo');
+
+        return array(
+            array('false and object.foo()', array('object' => $object), false),
+            array('false && object.foo()', array('object' => $object), false),
+            array('true || object.foo()', array('object' => $object), true),
+            array('true or object.foo()', array('object' => $object), true),
+        );
+    }
+
+    public function shortCircuitProviderCompile()
+    {
+        return array(
+            array('false and foo', array('foo' => 'foo'), false),
+            array('false && foo', array('foo' => 'foo'), false),
+            array('true || foo', array('foo' => 'foo'), true),
+            array('true or foo', array('foo' => 'foo'), true),
+        );
     }
 }

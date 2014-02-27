@@ -131,5 +131,40 @@ abstract class BaseTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $this->assertFalse($view->vars['multipart']);
     }
 
+    public function testBlockName()
+    {
+        $form = $this->factory->createNamedBuilder('parent', 'form')
+            ->add('child', $this->getTestedType(), array('block_name' => 'custom'))
+            ->getForm();
+
+        $type = $form->get('child')->getConfig()->getType()->getName();
+
+        $view = $form->createView();
+
+        $expected = array(
+            $type,
+            '_parent_custom'
+            );
+        $this->assertEquals($expected, $view['child']->vars['block_prefixes']);
+    }
+
+    public function testBlockNameWithRootSign()
+    {
+        $form = $this->factory->createNamedBuilder('parent', 'form')
+            ->add('child', $this->getTestedType(), array('block_name' => '@custom'))
+            ->getForm();
+
+        $type = $form->get('child')->getConfig()->getType()->getName();
+
+        $view = $form->createView();
+
+        $expected = array(
+            $type,
+            '_parent_custom',
+            'custom'
+            );
+        $this->assertEquals($expected, $view['child']->vars['block_prefixes']);
+    }
+
     abstract protected function getTestedType();
 }

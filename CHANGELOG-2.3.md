@@ -7,6 +7,14 @@ in 2.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.3.0...v2.3.1
 
+* 2.3.11 (2014-02-27)
+
+ * bug #10146 [WebProfilerBundle] fixed parsing Mongo DSN and added Test for it (malarzm)
+ * bug #10299 [Finder] () is also a valid delimiter (WouterJ)
+ * bug #10255 [FrameworkBundle] Fixed wrong redirect url if path contains some query parameters (pulzarraider)
+ * bug #10285 Bypass sigchild detection if phpinfo is not available (Seldaek)
+ * bug #10269 [Form] Revert "Fix "Array was modified outside object" in ResizeFormListener." (norzechowicz)
+
 * 2.3.10 (2014-02-12)
 
  * bug #10231 [Console] removed problematic regex (fabpot)

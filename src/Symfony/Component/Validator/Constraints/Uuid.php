@@ -25,7 +25,7 @@ class Uuid extends Constraint
     const V2_DCE = 2;
     const V3_MD5 = 3;
     const V4_RANDOM = 4;
-    const V4_SHA1 = 5;
+    const V5_SHA1 = 5;
 
     /**
      * Message to display when validation fails
@@ -55,6 +55,6 @@ class Uuid extends Constraint
         self::V2_DCE,
         self::V3_MD5,
         self::V4_RANDOM,
-        self::V4_SHA1
+        self::V5_SHA1
     );
 }

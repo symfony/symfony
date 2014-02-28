@@ -20,10 +20,12 @@ class FileLoaderTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers Symfony\Component\Config\Loader\FileLoader
      */
-    public function testImport()
+    public function testImportWithFileLocatorDelegation()
     {
         $locatorMock = $this->getMock('Symfony\Component\Config\FileLocatorInterface');
-        $locatorMock->expects($this->any())->method('locate')->will($this->onConsecutiveCalls(
+
+        $locatorMockForAdditionalLoader = $this->getMock('Symfony\Component\Config\FileLocatorInterface');
+        $locatorMockForAdditionalLoader->expects($this->any())->method('locate')->will($this->onConsecutiveCalls(
                 array('path/to/file1'),                    // Default
                 array('path/to/file1', 'path/to/file2'),   // First is imported
                 array('path/to/file1', 'path/to/file2'),   // Second is imported
@@ -32,8 +34,13 @@ class FileLoaderTest extends \PHPUnit_Framework_TestCase
                 ));
 
         $fileLoader = new TestFileLoader($locatorMock);
+        $fileLoader->setSupports(false);
         $fileLoader->setCurrentDir('.');
-        $fileLoader->setResolver($loaderResolver = new LoaderResolver(array($fileLoader)));
+
+        $additionalLoader = new TestFileLoader($locatorMockForAdditionalLoader);
+        $additionalLoader->setCurrentDir('.');
+
+        $fileLoader->setResolver($loaderResolver = new LoaderResolver(array($fileLoader, $additionalLoader)));
 
         // Default case
         $this->assertSame('path/to/file1', $fileLoader->import('my_resource'));
@@ -66,6 +73,8 @@ class FileLoaderTest extends \PHPUnit_Framework_TestCase
 
 class TestFileLoader extends FileLoader
 {
+    private $supports = true;
+
     public function load($resource, $type = null)
     {
         return $resource;
@@ -73,7 +82,7 @@ class TestFileLoader extends FileLoader
 
     public function supports($resource, $type = null)
     {
-        return true;
+        return $this->supports;
     }
 
     public function addLoading($resource)
@@ -89,5 +98,10 @@ class TestFileLoader extends FileLoader
     public function clearLoading()
     {
         self::$loading = array();
+    }
+
+    public function setSupports($supports)
+    {
+        $this->supports = $supports;
     }
 }

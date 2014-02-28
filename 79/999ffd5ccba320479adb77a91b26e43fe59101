@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by msumme at 2014-02-28T00:35:42Z
+
+Moving this to 2.3 as a pull request as recommended by @cordoval
+
+Old pull request: https://github.com/symfony/symfony/pull/10346
+
+---------------------------------------------------------------------------
+
+by msumme at 2014-02-28T00:58:53Z
+
+ok - blank line removed.

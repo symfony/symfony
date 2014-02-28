@@ -155,7 +155,7 @@ class ErrorHandler
             $exceptionHandler = set_exception_handler('var_dump');
             restore_exception_handler();
 
-            if (is_array($exceptionHandler) && $exceptionHandler[0] instanceof ExceptionHandler) {
+            if (is_array($exceptionHandler) && $exceptionHandler[0] instanceof ExceptionHandlerInterface) {
                 if (self::$stackedErrorLevels) {
                     self::$stackedErrors[] = func_get_args();
 
@@ -263,7 +263,7 @@ class ErrorHandler
         $exceptionHandler = set_exception_handler('var_dump');
         restore_exception_handler();
 
-        if (is_array($exceptionHandler) && $exceptionHandler[0] instanceof ExceptionHandler) {
+        if (is_array($exceptionHandler) && $exceptionHandler[0] instanceof ExceptionHandlerInterface) {
             $this->handleFatalError($exceptionHandler[0], $error);
         }
     }
@@ -284,7 +284,7 @@ class ErrorHandler
         );
     }
 
-    private function handleFatalError(ExceptionHandler $exceptionHandler, array $error)
+    private function handleFatalError(ExceptionHandlerInterface $exceptionHandler, array $error)
     {
         $level = isset($this->levels[$error['type']]) ? $this->levels[$error['type']] : $error['type'];
         $message = sprintf('%s: %s in %s line %d', $level, $error['message'], $error['file'], $error['line']);

@@ -90,6 +90,8 @@ class ControllerResolver implements ControllerResolverInterface
      * {@inheritdoc}
      *
      * @api
+     *
+     * @deprecated Deprecated since Symfony 2.6, will be removed in Symfony 3.0. Use ArgumentResolvers instead
      */
     public function getArguments(Request $request, $controller)
     {
@@ -105,6 +107,9 @@ class ControllerResolver implements ControllerResolverInterface
         return $this->doGetArguments($request, $controller, $r->getParameters());
     }
 
+    /**
+     * @deprecated Deprecated since Symfony 2.6, will be removed in Symfony 3.0. Use ArgumentResolvers instead
+     */
     protected function doGetArguments(Request $request, $controller, array $parameters)
     {
         $attributes = $request->attributes->all();

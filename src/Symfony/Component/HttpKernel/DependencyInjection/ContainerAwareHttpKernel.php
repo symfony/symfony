@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\HttpKernel;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolverManager;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -39,10 +40,11 @@ class ContainerAwareHttpKernel extends HttpKernel
      * @param ContainerInterface          $container          A ContainerInterface instance
      * @param ControllerResolverInterface $controllerResolver A ControllerResolverInterface instance
      * @param RequestStack                $requestStack       A stack for master/sub requests
+     * @param ArgumentResolverManager     $argumentResolver An ArgumentResolverManager instance
      */
-    public function __construct(EventDispatcherInterface $dispatcher, ContainerInterface $container, ControllerResolverInterface $controllerResolver, RequestStack $requestStack = null)
+    public function __construct(EventDispatcherInterface $dispatcher, ContainerInterface $container, ControllerResolverInterface $controllerResolver, RequestStack $requestStack = null, ArgumentResolverManager $argumentResolver = null)
     {
-        parent::__construct($dispatcher, $controllerResolver, $requestStack);
+        parent::__construct($dispatcher, $controllerResolver, $requestStack, $argumentResolver);
 
         $this->container = $container;
 

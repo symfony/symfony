@@ -42,7 +42,7 @@ class ContainerAwareHttpKernelTest extends \PHPUnit_Framework_TestCase
         $dispatcher = new EventDispatcher();
         $resolver = $this->getResolverMockFor($controller, $request);
         $stack = new RequestStack();
-        $kernel = new ContainerAwareHttpKernel($dispatcher, $container, $resolver, $stack);
+        $kernel = new ContainerAwareHttpKernel($dispatcher, $container, $resolver, $stack, $this->getArgumentsResolverMockFor($controller, $request));
 
         $actual = $kernel->handle($request, $type);
 
@@ -67,7 +67,7 @@ class ContainerAwareHttpKernelTest extends \PHPUnit_Framework_TestCase
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $dispatcher = new EventDispatcher();
         $resolver = $this->getResolverMockFor($controller, $request);
-        $kernel = new ContainerAwareHttpKernel($dispatcher, $container, $resolver, $stack);
+        $kernel = new ContainerAwareHttpKernel($dispatcher, $container, $resolver, $stack, $this->getArgumentsResolverMockFor($controller, $request));
 
         $kernel->handle($request, $type);
     }
@@ -95,7 +95,7 @@ class ContainerAwareHttpKernelTest extends \PHPUnit_Framework_TestCase
         $resolver = $this->getMock('Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface');
         $resolver = $this->getResolverMockFor($controller, $request);
         $stack = new RequestStack();
-        $kernel = new ContainerAwareHttpKernel($dispatcher, $container, $resolver, $stack);
+        $kernel = new ContainerAwareHttpKernel($dispatcher, $container, $resolver, $stack, $this->getArgumentsResolverMockFor($controller, $request));
 
         try {
             $kernel->handle($request, $type);
@@ -118,16 +118,21 @@ class ContainerAwareHttpKernelTest extends \PHPUnit_Framework_TestCase
     private function getResolverMockFor($controller, $request)
     {
         $resolver = $this->getMock('Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface');
-        $resolver->expects($this->once())
+        $resolver->expects($this->any())
             ->method('getController')
             ->with($request)
             ->will($this->returnValue($controller));
-        $resolver->expects($this->once())
+
+        return $resolver;
+    }
+
+    private function getArgumentsResolverMockFor($controller, $request)
+    {
+        $resolver = $this->getMock('Symfony\\Component\\HttpKernel\\Controller\\ArgumentsResolverManager');
+        $resolver->expects($this->any())
             ->method('getArguments')
             ->with($request, $controller)
             ->will($this->returnValue(array()));
-
-        return $resolver;
     }
 
     private function expectsSetRequestWithAt($container, $with, $at)

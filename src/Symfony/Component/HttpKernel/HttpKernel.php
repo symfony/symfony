@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpKernel;
 
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolverManager;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
@@ -37,22 +39,25 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
 {
     protected $dispatcher;
     protected $resolver;
+    protected $argumentResolver;
     protected $requestStack;
 
     /**
      * Constructor.
      *
-     * @param EventDispatcherInterface    $dispatcher   An EventDispatcherInterface instance
-     * @param ControllerResolverInterface $resolver     A ControllerResolverInterface instance
-     * @param RequestStack                $requestStack A stack for master/sub requests
+     * @param EventDispatcherInterface    $dispatcher       An EventDispatcherInterface instance
+     * @param ControllerResolverInterface $resolver         A ControllerResolverInterface instance
+     * @param RequestStack                $requestStack     A stack for master/sub requests
+     * @param ArgumentResolverManager     $argumentResolver An ArgumentResolverManager instance
      *
      * @api
      */
-    public function __construct(EventDispatcherInterface $dispatcher, ControllerResolverInterface $resolver, RequestStack $requestStack = null)
+    public function __construct(EventDispatcherInterface $dispatcher, ControllerResolverInterface $resolver, RequestStack $requestStack = null, ArgumentResolverManager $argumentResolver = null)
     {
         $this->dispatcher = $dispatcher;
         $this->resolver = $resolver;
         $this->requestStack = $requestStack ?: new RequestStack();
+        $this->argumentResolver = $argumentResolver;
     }
 
     /**
@@ -141,7 +146,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
         $controller = $event->getController();
 
         // controller arguments
-        $arguments = $this->resolver->getArguments($request, $controller);
+        $arguments = $this->getArgumentResolver()->getArguments($request, $controller);
 
         // call controller
         $response = call_user_func_array($controller, $arguments);
@@ -289,5 +294,20 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
         }
 
         return (string) $var;
+    }
+
+    /**
+     * @return ArgumentResolverManager
+     */
+    protected function getArgumentResolver()
+    {
+        if (null === $this->argumentResolver) {
+            // to keep BC
+            $this->argumentResolver = new ArgumentResolverManager();
+            $this->argumentResolver->addResolver(new ArgumentResolver\RequestArgumentResolver());
+            $this->argumentResolver->addResolver(new ArgumentResolver\RequestAttributesArgumentResolver());
+        }
+
+        return $this->argumentResolver;
     }
 }

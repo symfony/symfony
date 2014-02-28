@@ -4,6 +4,8 @@ CHANGELOG
 3.0.0
 -----
 
+ * added argument resolvers
+ * deprecated `Symfony\Component\HttpKernel\Controller\ControllerResolver#getArguments()` and `doGetArguments()`, use argument resolvers instead
  * removed `Symfony\Component\HttpKernel\Kernel::init()`
  * removed `Symfony\Component\HttpKernel\Kernel::isClassInActiveBundle()` and `Symfony\Component\HttpKernel\KernelInterface::isClassInActiveBundle()`
 

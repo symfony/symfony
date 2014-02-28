@@ -144,7 +144,7 @@ class InlineFragmentRendererTest extends \PHPUnit_Framework_TestCase
     {
         $resolver = $this->getMock('Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface');
         $resolver
-            ->expects($this->once())
+            ->expects($this->any())
             ->method('getController')
             ->will($this->returnValue(function () {
                 ob_start();
@@ -152,13 +152,15 @@ class InlineFragmentRendererTest extends \PHPUnit_Framework_TestCase
                 throw new \RuntimeException();
             }))
         ;
-        $resolver
-            ->expects($this->once())
+
+        $argumentResolver = $this->getMock('Symfony\\Component\\HttpKernel\\Controller\\ArgumentResolverManager');
+        $argumentResolver
+            ->expects($this->any())
             ->method('getArguments')
             ->will($this->returnValue(array()))
         ;
 
-        $kernel = new HttpKernel(new EventDispatcher(), $resolver);
+        $kernel = new HttpKernel(new EventDispatcher(), $resolver, null, $argumentResolver);
         $renderer = new InlineFragmentRenderer($kernel);
 
         // simulate a main request with output buffering

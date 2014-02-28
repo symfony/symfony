@@ -274,6 +274,10 @@ class KernelTest extends \PHPUnit_Framework_TestCase
 
 $string = 'string should not be   modified';
 
+$string = 'string should not be
+
+modified';
+
 
 $heredoc = <<<HD
 
@@ -308,16 +312,17 @@ EOF;
         $expected = <<<'EOF'
 <?php
 $string = 'string should not be   modified';
-$heredoc =
-<<<HD
+$string = 'string should not be
+
+modified';
+$heredoc = <<<HD
 
 
 Heredoc should not be   modified
 
 
 HD;
-$nowdoc =
-<<<'ND'
+$nowdoc = <<<'ND'
 
 
 Nowdoc should not be   modified
@@ -328,7 +333,7 @@ class TestClass
 {
     public function doStuff()
     {
-            }
+        }
 }
 EOF;
 

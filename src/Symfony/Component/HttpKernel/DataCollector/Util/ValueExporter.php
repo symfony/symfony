@@ -19,12 +19,12 @@ class ValueExporter
     /**
      * Converts a PHP value to a string.
      *
-     * @param mixed $value The PHP value
-     * @param integer $depth The depth of the value to export
+     * @param mixed   $value The PHP value
+     * @param integer $depth The depth of the value to export (only for internal usage)
      *
      * @return string The string representation of the given value
      */
-    public function exportValue($value, $depth = 0)
+    public function exportValue($value, $depth = 1, $deep = false)
     {
         if (is_object($value)) {
             return sprintf('Object(%s)', get_class($value));
@@ -39,10 +39,17 @@ class ValueExporter
 
             $a = array();
             foreach ($value as $k => $v) {
-                $a[] = sprintf('%s  %s => %s', $indent, $k, $this->exportValue($v, $depth + 1));
+                if (is_array($v)) {
+                    $deep = true;
+                }
+                $a[] = sprintf('%s => %s', $k, $this->exportValue($v, $depth + 1, $deep));
             }
 
-            return sprintf("[\n%s%s\n%s]", $indent, implode(sprintf(", \n%s", $indent), $a), $indent);
+            if ($deep) {
+                return sprintf("[\n%s%s\n%s]", $indent, implode(sprintf(", \n%s", $indent), $a), str_repeat('  ', $depth - 1));
+            }
+
+            return sprintf("[%s]", implode(', ', $a));
         }
 
         if (is_resource($value)) {

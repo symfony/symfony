@@ -106,7 +106,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
         $application->add(new \FooCommand());
         $commands = $application->all('foo');
-        $this->assertEquals(1, count($commands), '->all() takes a namespace as its first argument');
+        $this->assertCount(1, $commands, '->all() takes a namespace as its first argument');
     }
 
     public function testRegister()

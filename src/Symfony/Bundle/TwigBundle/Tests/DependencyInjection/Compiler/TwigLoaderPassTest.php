@@ -73,7 +73,7 @@ class TwigLoaderPassTest extends \PHPUnit_Framework_TestCase
 
         $this->pass->process($this->builder);
         $calls = $this->chainLoader->getMethodCalls();
-        $this->assertEquals(2, count($calls));
+        $this->assertCount(2, $calls);
         $this->assertEquals('addLoader', $calls[0][0]);
     }
 

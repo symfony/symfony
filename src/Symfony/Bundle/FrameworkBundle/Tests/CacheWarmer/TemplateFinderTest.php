@@ -46,7 +46,7 @@ class TemplateFinderTest extends TestCase
             $finder->findAllTemplates()
         );
 
-        $this->assertEquals(6, count($templates), '->findAllTemplates() find all templates in the bundles and global folders');
+        $this->assertCount(6, $templates, '->findAllTemplates() find all templates in the bundles and global folders');
         $this->assertContains('BaseBundle::base.format.engine', $templates);
         $this->assertContains('BaseBundle::this.is.a.template.format.engine', $templates);
         $this->assertContains('BaseBundle:controller:base.format.engine', $templates);

@@ -44,48 +44,12 @@ class ProgressBar
     private $step;
     private $max;
     private $startTime;
+    private $stepWidth;
+    private $percent;
     private $lastMessagesLength;
     private $barCharOriginal;
 
-    /**
-     * List of formatting variables
-     *
-     * @var array
-     */
-    private $defaultFormatVars = array(
-        'current',
-        'max',
-        'bar',
-        'percent',
-        'elapsed',
-    );
-
-    /**
-     * Available formatting variables
-     *
-     * @var array
-     */
-    private $formatVars;
-
-    /**
-     * Various time formats
-     *
-     * @var array
-     */
-    private $timeFormats = array(
-        array(0, '???'),
-        array(2, '1 sec'),
-        array(59, 'secs', 1),
-        array(60, '1 min'),
-        array(3600, 'mins', 60),
-        array(5400, '1 hr'),
-        array(86400, 'hrs', 3600),
-        array(129600, '1 day'),
-        array(604800, 'days', 86400),
-    );
-
-    private $stepWidth;
-    private $percent;
+    static private $formatters;
 
     /**
      * Constructor.
@@ -99,6 +63,77 @@ class ProgressBar
         $this->output = $output->isDecorated() ? $output : new NullOutput();
         $this->max = (int) $max;
         $this->stepWidth = $this->max > 0 ? Helper::strlen($this->max) : 4;
+
+        if (!self::$formatters) {
+            self::$formatters = self::initPlaceholderFormatters();
+        }
+    }
+
+    /**
+     * Sets a placeholder formatter for a given name.
+     *
+     * This method also allow you to override an existing placeholder.
+     *
+     * @param string   $name     The placeholder name (including the delimiter char like %)
+     * @param callable $callable A PHP callable
+     */
+    public static function setPlaceholderFormatter($name, $callable)
+    {
+        if (!self::$formatters) {
+            self::$formatters = self::initPlaceholderFormatters();
+        }
+
+        self::$formatters[$name] = $callable;
+    }
+
+    /**
+     * Gets the progress bar start time.
+     *
+     * @return int The progress bar start time
+     */
+    public function getStartTime()
+    {
+        return $this->startTime;
+    }
+
+    /**
+     * Gets the progress bar maximal steps.
+     *
+     * @return int The progress bar max steps
+     */
+    public function getMaxSteps()
+    {
+        return $this->max;
+    }
+
+    /**
+     * Gets the progress bar step.
+     *
+     * @return int The progress bar step
+     */
+    public function getStep()
+    {
+        return $this->step;
+    }
+
+    /**
+     * Gets the progress bar step width.
+     *
+     * @return int The progress bar step width
+     */
+    public function getStepWidth()
+    {
+        return $this->stepWidth;
+    }
+
+    /**
+     * Gets the current progress bar percent.
+     *
+     * @return int The current progress bar percent
+     */
+    public function getProgressPercent()
+    {
+        return $this->percent;
     }
 
     /**
@@ -112,6 +147,16 @@ class ProgressBar
     }
 
     /**
+     * Gets the progress bar width.
+     *
+     * @return int The progress bar size
+     */
+    public function getBarWidth()
+    {
+        return $this->barWidth;
+    }
+
+    /**
      * Sets the bar character.
      *
      * @param string $char A character
@@ -119,6 +164,16 @@ class ProgressBar
     public function setBarCharacter($char)
     {
         $this->barChar = $char;
+    }
+
+    /**
+     * Gets the bar character.
+     *
+     * @return string A character
+     */
+    public function getBarCharacter()
+    {
+        return $this->barChar;
     }
 
     /**
@@ -132,6 +187,16 @@ class ProgressBar
     }
 
     /**
+     * Gets the empty bar character.
+     *
+     * @return string A character
+     */
+    public function getEmptyBarCharacter()
+    {
+        return $this->emptyBarChar;
+    }
+
+    /**
      * Sets the progress bar character.
      *
      * @param string $char A character
@@ -139,6 +204,16 @@ class ProgressBar
     public function setProgressCharacter($char)
     {
         $this->progressChar = $char;
+    }
+
+    /**
+     * Gets the progress bar character.
+     *
+     * @return string A character
+     */
+    public function getProgressCharacter()
+    {
+        return $this->progressChar;
     }
 
     /**
@@ -174,13 +249,6 @@ class ProgressBar
 
         if (null === $this->format) {
             $this->format = $this->determineBestFormat();
-        }
-
-        $this->formatVars = array();
-        foreach ($this->defaultFormatVars as $var) {
-            if (false !== strpos($this->format, "%{$var}%")) {
-                $this->formatVars[$var] = true;
-            }
         }
 
         if (!$this->max) {
@@ -267,11 +335,11 @@ class ProgressBar
             throw new \LogicException('You must start the progress bar before calling display().');
         }
 
-        $message = $this->format;
-        foreach ($this->generate() as $name => $value) {
-            $message = str_replace("%{$name}%", $value, $message);
-        }
-        $this->overwrite($message);
+        $regex = implode('|', array_keys(self::$formatters));
+        $self = $this;
+        $this->overwrite(preg_replace_callback("{($regex)}", function ($matches) use ($self) {
+            return call_user_func(self::$formatters[$matches[1]], $self);
+        }, $this->format));
     }
 
     /**
@@ -284,72 +352,6 @@ class ProgressBar
     public function clear()
     {
         $this->overwrite('');
-    }
-
-    /**
-     * Generates the array map of format variables to values.
-     *
-     * @return array Array of format vars and values
-     */
-    private function generate()
-    {
-        $vars = array();
-
-        if (isset($this->formatVars['bar'])) {
-            $completeBars = floor($this->max > 0 ? $this->percent * $this->barWidth : $this->step % $this->barWidth);
-            $emptyBars = $this->barWidth - $completeBars - Helper::strlen($this->progressChar);
-            $bar = str_repeat($this->barChar, $completeBars);
-            if ($completeBars < $this->barWidth) {
-                $bar .= $this->progressChar;
-                $bar .= str_repeat($this->emptyBarChar, $emptyBars);
-            }
-
-            $vars['bar'] = $bar;
-        }
-
-        if (isset($this->formatVars['elapsed'])) {
-            $elapsed = time() - $this->startTime;
-            $vars['elapsed'] = str_pad($this->humaneTime($elapsed), 6, ' ', STR_PAD_LEFT);
-        }
-
-        if (isset($this->formatVars['current'])) {
-            $vars['current'] = str_pad($this->step, $this->stepWidth, ' ', STR_PAD_LEFT);
-        }
-
-        if (isset($this->formatVars['max'])) {
-            $vars['max'] = $this->max;
-        }
-
-        if (isset($this->formatVars['percent'])) {
-            $vars['percent'] = str_pad(floor($this->percent * 100), 3, ' ', STR_PAD_LEFT);
-        }
-
-        return $vars;
-    }
-
-    /**
-     * Converts seconds into human-readable format.
-     *
-     * @param integer $secs Number of seconds
-     *
-     * @return string Time in readable format
-     */
-    private function humaneTime($secs)
-    {
-        $text = '';
-        foreach ($this->timeFormats as $format) {
-            if ($secs < $format[0]) {
-                if (count($format) == 2) {
-                    $text = $format[1];
-                    break;
-                } else {
-                    $text = ceil($secs / $format[2]).' '.$format[1];
-                    break;
-                }
-            }
-        }
-
-        return $text;
     }
 
     /**
@@ -399,5 +401,33 @@ class ProgressBar
         }
 
         return $format;
+    }
+
+    static private function initPlaceholderFormatters()
+    {
+        return array(
+            '%bar%' => function (ProgressBar $bar) {
+                $completeBars = floor($bar->getMaxSteps() > 0 ? $bar->getProgressPercent() * $bar->getBarWidth() : $bar->getStep() % $bar->getBarWidth());
+                $emptyBars = $bar->getBarWidth() - $completeBars - Helper::strlen($bar->getProgressCharacter());
+                $display = str_repeat($bar->getBarCharacter(), $completeBars);
+                if ($completeBars < $bar->getBarWidth()) {
+                    $display .= $bar->getProgressCharacter().str_repeat($bar->getEmptyBarCharacter(), $emptyBars);
+                }
+
+                return $display;
+            },
+            '%elapsed%' => function (ProgressBar $bar) {
+                return str_pad(Helper::formatTime(time() - $bar->getStartTime()), 6, ' ', STR_PAD_LEFT);
+            },
+            '%current%' => function (ProgressBar $bar) {
+                return str_pad($bar->getStep(), $bar->getStepWidth(), ' ', STR_PAD_LEFT);
+            },
+            '%max%' => function (ProgressBar $bar) {
+                return $bar->getMaxSteps();
+            },
+            '%percent%' => function (ProgressBar $bar) {
+                return str_pad(floor($bar->getProgressPercent() * 100), 3, ' ', STR_PAD_LEFT);
+            },
+        );
     }
 }

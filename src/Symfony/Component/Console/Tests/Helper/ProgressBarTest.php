@@ -298,6 +298,27 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testAddingPlaceholderFormatter()
+    {
+        ProgressBar::setPlaceholderFormatter('%remaining_steps%', function (ProgressBar $bar) {
+            return $bar->getMaxSteps() - $bar->getStep();
+        });
+        $bar = new ProgressBar($output = $this->getOutputStream(), 3);
+        $bar->setFormat(' %remaining_steps% [%bar%]');
+
+        $bar->start();
+        $bar->advance();
+        $bar->finish();
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            $this->generateOutput(' 3 [>---------------------------]').
+            $this->generateOutput(' 2 [=========>------------------]').
+            $this->generateOutput(' 0 [============================]'),
+            stream_get_contents($output->getStream())
+        );
+    }
+
     protected function getOutputStream($decorated = true)
     {
         return new StreamOutput(fopen('php://memory', 'r+', false), StreamOutput::VERBOSITY_NORMAL, $decorated);

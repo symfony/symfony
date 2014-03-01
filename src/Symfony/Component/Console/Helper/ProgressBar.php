@@ -23,11 +23,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 class ProgressBar
 {
     const FORMAT_QUIET         = ' %percent%%';
-    const FORMAT_NORMAL        = ' %current%/%max% [%bar%] %percent%%';
-    const FORMAT_VERBOSE       = ' %current%/%max% [%bar%] %percent%% Elapsed: %elapsed%';
+    const FORMAT_NORMAL        = ' %current%/%max% [%bar%] %percent:3s%%';
+    const FORMAT_VERBOSE       = ' %current%/%max% [%bar%] %percent:3s%% Elapsed: %elapsed:6s%';
     const FORMAT_QUIET_NOMAX   = ' %current%';
     const FORMAT_NORMAL_NOMAX  = ' %current% [%bar%]';
-    const FORMAT_VERBOSE_NOMAX = ' %current% [%bar%] Elapsed: %elapsed%';
+    const FORMAT_VERBOSE_NOMAX = ' %current% [%bar%] Elapsed: %elapsed:6s%';
 
     // options
     private $barWidth     = 28;
@@ -49,6 +49,7 @@ class ProgressBar
     private $lastMessagesLength;
     private $barCharOriginal;
     private $formatLineCount;
+    private $messages;
 
     static private $formatters;
 
@@ -85,6 +86,16 @@ class ProgressBar
         }
 
         self::$formatters[$name] = $callable;
+    }
+
+    public function setMessage($message, $name = 'message')
+    {
+        $this->messages[$name] = $message;
+    }
+
+    public function getMessage($name = 'message')
+    {
+        return $this->messages[$name];
     }
 
     /**
@@ -337,10 +348,21 @@ class ProgressBar
             throw new \LogicException('You must start the progress bar before calling display().');
         }
 
-        $regex = implode('|', array_keys(self::$formatters));
         $self = $this;
-        $this->overwrite(preg_replace_callback("{($regex)}", function ($matches) use ($self) {
-            return call_user_func(self::$formatters[$matches[1]], $self);
+        $this->overwrite(preg_replace_callback("{%([a-z\-_]+)(?:\:([^%]+))?%}i", function ($matches) use ($self) {
+            if (isset(self::$formatters[$matches[1]])) {
+                $text = call_user_func(self::$formatters[$matches[1]], $self);
+            } elseif (isset($this->messages[$matches[1]])) {
+                $text = $this->messages[$matches[1]];
+            } else {
+                return $matches[0];
+            }
+
+            if (isset($matches[2])) {
+                $text = sprintf('%'.$matches[2], $text);
+            }
+
+            return $text;
         }, $this->format));
     }
 
@@ -413,7 +435,7 @@ class ProgressBar
     static private function initPlaceholderFormatters()
     {
         return array(
-            '%bar%' => function (ProgressBar $bar) {
+            'bar' => function (ProgressBar $bar) {
                 $completeBars = floor($bar->getMaxSteps() > 0 ? $bar->getProgressPercent() * $bar->getBarWidth() : $bar->getStep() % $bar->getBarWidth());
                 $emptyBars = $bar->getBarWidth() - $completeBars - Helper::strlen($bar->getProgressCharacter());
                 $display = str_repeat($bar->getBarCharacter(), $completeBars);
@@ -423,10 +445,10 @@ class ProgressBar
 
                 return $display;
             },
-            '%elapsed%' => function (ProgressBar $bar) {
-                return str_pad(Helper::formatTime(time() - $bar->getStartTime()), 6, ' ', STR_PAD_LEFT);
+            'elapsed' => function (ProgressBar $bar) {
+                return Helper::formatTime(time() - $bar->getStartTime());
             },
-            '%remaining%' => function (ProgressBar $bar) {
+            'remaining' => function (ProgressBar $bar) {
                 if (!$bar->getMaxSteps()) {
                     throw new \LogicException('Unable to display the remaining time if the maximum number of steps is not set.');
                 }
@@ -437,9 +459,9 @@ class ProgressBar
                     $remaining = round((time() - $bar->getStartTime()) / $bar->getStep() * ($bar->getMaxSteps() - $bar->getStep()));
                 }
 
-                return str_pad(Helper::formatTime($remaining), 6, ' ', STR_PAD_LEFT);
+                return Helper::formatTime($remaining);
             },
-            '%estimated%' => function (ProgressBar $bar) {
+            'estimated' => function (ProgressBar $bar) {
                 if (!$bar->getMaxSteps()) {
                     throw new \LogicException('Unable to display the estimated time if the maximum number of steps is not set.');
                 }
@@ -450,19 +472,19 @@ class ProgressBar
                     $estimated = round((time() - $bar->getStartTime()) / $bar->getStep() * $bar->getMaxSteps());
                 }
 
-                return str_pad(Helper::formatTime($estimated), 6, ' ', STR_PAD_LEFT);
+                return Helper::formatTime($estimated);
             },
-            '%memory%' => function (ProgressBar $bar) {
-                return str_pad(Helper::formatMemory(memory_get_usage(true)), 6, ' ', STR_PAD_LEFT);;
+            'memory' => function (ProgressBar $bar) {
+                return Helper::formatMemory(memory_get_usage(true));
             },
-            '%current%' => function (ProgressBar $bar) {
+            'current' => function (ProgressBar $bar) {
                 return str_pad($bar->getStep(), $bar->getStepWidth(), ' ', STR_PAD_LEFT);
             },
-            '%max%' => function (ProgressBar $bar) {
+            'max' => function (ProgressBar $bar) {
                 return $bar->getMaxSteps();
             },
-            '%percent%' => function (ProgressBar $bar) {
-                return str_pad(floor($bar->getProgressPercent() * 100), 3, ' ', STR_PAD_LEFT);
+            'percent' => function (ProgressBar $bar) {
+                return floor($bar->getProgressPercent() * 100);
             },
         );
     }

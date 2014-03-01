@@ -69,7 +69,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
         $bar->setBarCharacter('_');
         $bar->setEmptyBarCharacter(' ');
         $bar->setProgressCharacter('/');
-        $bar->setFormat(' %current%/%max% [%bar%] %percent%%');
+        $bar->setFormat(' %current%/%max% [%bar%] %percent:3s%%');
         $bar->start();
         $bar->advance();
 
@@ -102,7 +102,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
     public function testOverwriteWithShorterLine()
     {
         $bar = new ProgressBar($output = $this->getOutputStream(), 50);
-        $bar->setFormat(' %current%/%max% [%bar%] %percent%%');
+        $bar->setFormat(' %current%/%max% [%bar%] %percent:3s%%');
         $bar->start();
         $bar->display();
         $bar->advance();
@@ -300,7 +300,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
 
     public function testAddingPlaceholderFormatter()
     {
-        ProgressBar::setPlaceholderFormatter('%remaining_steps%', function (ProgressBar $bar) {
+        ProgressBar::setPlaceholderFormatter('remaining_steps', function (ProgressBar $bar) {
             return $bar->getMaxSteps() - $bar->getStep();
         });
         $bar = new ProgressBar($output = $this->getOutputStream(), 3);

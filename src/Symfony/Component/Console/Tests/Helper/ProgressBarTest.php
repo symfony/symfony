@@ -319,6 +319,26 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testMultilineFormat()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(), 3);
+        $bar->setFormat("%bar%\nfoobar");
+
+        $bar->start();
+        $bar->advance();
+        $bar->clear();
+        $bar->finish();
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            $this->generateOutput(">---------------------------\nfoobar").
+            $this->generateOutput("=========>------------------\nfoobar").
+            $this->generateOutput("\n").
+            $this->generateOutput("============================\nfoobar"),
+            stream_get_contents($output->getStream())
+        );
+    }
+
     protected function getOutputStream($decorated = true)
     {
         return new StreamOutput(fopen('php://memory', 'r+', false), StreamOutput::VERBOSITY_NORMAL, $decorated);
@@ -334,6 +354,8 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
 
         $this->lastMessagesLength = strlen($expectedout);
 
-        return "\x0D".$expectedout;
+        $count = substr_count($expected, "\n");
+
+        return "\x0D".($count ? sprintf("\033[%dA", $count) : '').$expectedout;
     }
 }

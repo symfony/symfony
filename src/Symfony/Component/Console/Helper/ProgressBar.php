@@ -48,6 +48,7 @@ class ProgressBar
     private $percent;
     private $lastMessagesLength;
     private $barCharOriginal;
+    private $formatLineCount;
 
     static private $formatters;
 
@@ -224,6 +225,7 @@ class ProgressBar
     public function setFormat($format)
     {
         $this->format = $format;
+        $this->formatLineCount = substr_count($format, "\n");
     }
 
     /**
@@ -248,7 +250,7 @@ class ProgressBar
         $this->barCharOriginal = '';
 
         if (null === $this->format) {
-            $this->format = $this->determineBestFormat();
+            $this->setFormat($this->determineBestFormat());
         }
 
         if (!$this->max) {
@@ -351,7 +353,7 @@ class ProgressBar
      */
     public function clear()
     {
-        $this->overwrite('');
+        $this->overwrite(str_repeat("\n", $this->formatLineCount));
     }
 
     /**
@@ -364,12 +366,17 @@ class ProgressBar
         $length = Helper::strlen($message);
 
         // append whitespace to match the last line's length
+// FIXME: on each line!!!!!
+// FIXME: max of each line for lastMessagesLength or an array?
         if (null !== $this->lastMessagesLength && $this->lastMessagesLength > $length) {
             $message = str_pad($message, $this->lastMessagesLength, "\x20", STR_PAD_RIGHT);
         }
 
-        // carriage return
+        // move back to the beginning of the progress bar before redrawing it
         $this->output->write("\x0D");
+        if ($this->formatLineCount) {
+            $this->output->write(sprintf("\033[%dA", $this->formatLineCount));
+        }
         $this->output->write($message);
 
         $this->lastMessagesLength = Helper::strlen($message);

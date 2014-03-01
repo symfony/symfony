@@ -83,7 +83,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         }
 
         $xml = $m->invoke($loader, self::$fixturesPath.'/xml/services1.xml');
-        $this->assertEquals('Symfony\\Component\\DependencyInjection\\SimpleXMLElement', get_class($xml), '->parseFile() returns an SimpleXMLElement object');
+        $this->assertInstanceOf('Symfony\\Component\\DependencyInjection\\SimpleXMLElement', $xml, '->parseFile() returns an SimpleXMLElement object');
     }
 
     public function testLoadParameters()
@@ -167,20 +167,20 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
         $loader->load('services5.xml');
         $services = $container->getDefinitions();
-        $this->assertEquals(4, count($services), '->load() attributes unique ids to anonymous services');
+        $this->assertCount(4, $services, '->load() attributes unique ids to anonymous services');
 
         // anonymous service as an argument
         $args = $services['foo']->getArguments();
-        $this->assertEquals(1, count($args), '->load() references anonymous services as "normal" ones');
-        $this->assertEquals('Symfony\\Component\\DependencyInjection\\Reference', get_class($args[0]), '->load() converts anonymous services to references to "normal" services');
+        $this->assertCount(1, $args, '->load() references anonymous services as "normal" ones');
+        $this->assertInstanceOf('Symfony\\Component\\DependencyInjection\\Reference', $args[0], '->load() converts anonymous services to references to "normal" services');
         $this->assertTrue(isset($services[(string) $args[0]]), '->load() makes a reference to the created ones');
         $inner = $services[(string) $args[0]];
         $this->assertEquals('BarClass', $inner->getClass(), '->load() uses the same configuration as for the anonymous ones');
 
         // inner anonymous services
         $args = $inner->getArguments();
-        $this->assertEquals(1, count($args), '->load() references anonymous services as "normal" ones');
-        $this->assertEquals('Symfony\\Component\\DependencyInjection\\Reference', get_class($args[0]), '->load() converts anonymous services to references to "normal" services');
+        $this->assertCount(1, $args, '->load() references anonymous services as "normal" ones');
+        $this->assertInstanceOf('Symfony\\Component\\DependencyInjection\\Reference', $args[0], '->load() converts anonymous services to references to "normal" services');
         $this->assertTrue(isset($services[(string) $args[0]]), '->load() makes a reference to the created ones');
         $inner = $services[(string) $args[0]];
         $this->assertEquals('BazClass', $inner->getClass(), '->load() uses the same configuration as for the anonymous ones');
@@ -188,7 +188,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         // anonymous service as a property
         $properties = $services['foo']->getProperties();
         $property = $properties['p'];
-        $this->assertEquals('Symfony\\Component\\DependencyInjection\\Reference', get_class($property), '->load() converts anonymous services to references to "normal" services');
+        $this->assertInstanceOf('Symfony\\Component\\DependencyInjection\\Reference', $property, '->load() converts anonymous services to references to "normal" services');
         $this->assertTrue(isset($services[(string) $property]), '->load() makes a reference to the created ones');
         $inner = $services[(string) $property];
         $this->assertEquals('BazClass', $inner->getClass(), '->load() uses the same configuration as for the anonymous ones');
@@ -201,7 +201,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader->load('services6.xml');
         $services = $container->getDefinitions();
         $this->assertTrue(isset($services['foo']), '->load() parses <service> elements');
-        $this->assertEquals('Symfony\\Component\\DependencyInjection\\Definition', get_class($services['foo']), '->load() converts <service> element to Definition instances');
+        $this->assertInstanceOf('Symfony\\Component\\DependencyInjection\\Definition', $services['foo'], '->load() converts <service> element to Definition instances');
         $this->assertEquals('FooClass', $services['foo']->getClass(), '->load() parses the class attribute');
         $this->assertEquals('container', $services['scope.container']->getScope());
         $this->assertEquals('custom', $services['scope.custom']->getScope());
@@ -394,11 +394,11 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader1 = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml/extension1'));
         $loader1->load('services.xml');
         $services = $container->getDefinitions();
-        $this->assertEquals(2, count($services), '->load() attributes unique ids to anonymous services');
+        $this->assertCount(2, $services, '->load() attributes unique ids to anonymous services');
         $loader2 = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml/extension2'));
         $loader2->load('services.xml');
         $services = $container->getDefinitions();
-        $this->assertEquals(4, count($services), '->load() attributes unique ids to anonymous services');
+        $this->assertCount(4, $services, '->load() attributes unique ids to anonymous services');
 
         $services = $container->getDefinitions();
         $args1 = $services['extension1.foo']->getArguments();

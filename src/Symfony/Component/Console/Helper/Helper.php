@@ -47,7 +47,7 @@ abstract class Helper implements HelperInterface
      *
      * @return integer The length of the string
      */
-    protected function strlen($string)
+    public static function strlen($string)
     {
         if (!function_exists('mb_strlen')) {
             return strlen($string);

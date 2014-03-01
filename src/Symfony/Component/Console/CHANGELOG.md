@@ -6,6 +6,7 @@ CHANGELOG
 
 * added a way to set a default command instead of `ListCommand`
 * added a way to set the process name of a command
+* added ContainerAwareCommand
 
 2.4.0
 -----

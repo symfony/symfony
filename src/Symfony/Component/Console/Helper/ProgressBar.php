@@ -22,13 +22,6 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ProgressBar
 {
-    const FORMAT_QUIET         = ' %percent%%';
-    const FORMAT_NORMAL        = ' %current%/%max% [%bar%] %percent:3s%%';
-    const FORMAT_VERBOSE       = ' %current%/%max% [%bar%] %percent:3s%% Elapsed: %elapsed:6s%';
-    const FORMAT_QUIET_NOMAX   = ' %current%';
-    const FORMAT_NORMAL_NOMAX  = ' %current% [%bar%]';
-    const FORMAT_VERBOSE_NOMAX = ' %current% [%bar%] Elapsed: %elapsed:6s%';
-
     // options
     private $barWidth     = 28;
     private $barChar      = '=';
@@ -52,6 +45,7 @@ class ProgressBar
     private $messages;
 
     static private $formatters;
+    static private $formats;
 
     /**
      * Constructor.
@@ -69,6 +63,10 @@ class ProgressBar
         if (!self::$formatters) {
             self::$formatters = self::initPlaceholderFormatters();
         }
+
+        if (!self::$formats) {
+            self::$formats = self::initFormats();
+        }
     }
 
     /**
@@ -79,13 +77,30 @@ class ProgressBar
      * @param string   $name     The placeholder name (including the delimiter char like %)
      * @param callable $callable A PHP callable
      */
-    public static function setPlaceholderFormatter($name, $callable)
+    public static function setPlaceholderFormatterDefinition($name, $callable)
     {
         if (!self::$formatters) {
             self::$formatters = self::initPlaceholderFormatters();
         }
 
         self::$formatters[$name] = $callable;
+    }
+
+    /**
+     * Sets a format for a given name.
+     *
+     * This method also allow you to override an existing format.
+     *
+     * @param string $name   The format name
+     * @param string $format A format string
+     */
+    public static function setFormatDefinition($name, $format)
+    {
+        if (!self::$formats) {
+            self::$formats = self::initFormats();
+        }
+
+        self::$formats[$name] = $format;
     }
 
     public function setMessage($message, $name = 'message')
@@ -235,8 +250,8 @@ class ProgressBar
      */
     public function setFormat($format)
     {
-        $this->format = $format;
-        $this->formatLineCount = substr_count($format, "\n");
+        $this->format = isset(self::$formats[$format]) ? self::$formats[$format] : $format;
+        $this->formatLineCount = substr_count($this->format, "\n");
     }
 
     /**
@@ -408,28 +423,14 @@ class ProgressBar
     {
         switch ($this->output->getVerbosity()) {
             case OutputInterface::VERBOSITY_QUIET:
-                $format = self::FORMAT_QUIET_NOMAX;
-                if ($this->max > 0) {
-                    $format = self::FORMAT_QUIET;
-                }
-                break;
+                return $this->max > 0 ? 'quiet' : 'quiet_nomax';
             case OutputInterface::VERBOSITY_VERBOSE:
             case OutputInterface::VERBOSITY_VERY_VERBOSE:
             case OutputInterface::VERBOSITY_DEBUG:
-                $format = self::FORMAT_VERBOSE_NOMAX;
-                if ($this->max > 0) {
-                    $format = self::FORMAT_VERBOSE;
-                }
-                break;
+                return $this->max > 0 ? 'verbose' : 'verbose_nomax';
             default:
-                $format = self::FORMAT_NORMAL_NOMAX;
-                if ($this->max > 0) {
-                    $format = self::FORMAT_NORMAL;
-                }
-                break;
+                return $this->max > 0 ? 'normal' : 'normal_nomax';
         }
-
-        return $format;
     }
 
     static private function initPlaceholderFormatters()
@@ -486,6 +487,18 @@ class ProgressBar
             'percent' => function (ProgressBar $bar) {
                 return floor($bar->getProgressPercent() * 100);
             },
+        );
+    }
+
+    static private function initFormats()
+    {
+        return array(
+            'quiet'         => ' %percent%%',
+            'normal'        => ' %current%/%max% [%bar%] %percent:3s%%',
+            'verbose'       => ' %current%/%max% [%bar%] %percent:3s%% Elapsed: %elapsed:6s%',
+            'quiet_nomax'   => ' %current%',
+            'normal_nomax'  => ' %current% [%bar%]',
+            'verbose_nomax' => ' %current% [%bar%] Elapsed: %elapsed:6s%',
         );
     }
 }

@@ -44,8 +44,8 @@ class ProgressBar
     private $formatLineCount;
     private $messages;
 
-    static private $formatters;
-    static private $formats;
+    private static $formatters;
+    private static $formats;
 
     /**
      * Constructor.
@@ -87,6 +87,18 @@ class ProgressBar
     }
 
     /**
+     * Gets the placeholder formatter for a given name.
+     *
+     * @param string $name The placeholder name (including the delimiter char like %)
+     *
+     * @return callable|null A PHP callable
+     */
+    public static function getPlaceholderFormatterDefinition($name)
+    {
+        return isset(self::$formatters[$name]) ? self::$formatters[$name] : null;
+    }
+
+    /**
      * Sets a format for a given name.
      *
      * This method also allow you to override an existing format.
@@ -103,6 +115,18 @@ class ProgressBar
         self::$formats[$name] = $format;
     }
 
+    /**
+     * Gets the format for a given name.
+     *
+     * @param string $name The format name
+     *
+     * @return string|null A format string
+     */
+    public static function getFormatDefinition($name)
+    {
+        return isset(self::$formats[$name]) ? self::$formats[$name] : null;
+    }
+
     public function setMessage($message, $name = 'message')
     {
         $this->messages[$name] = $message;
@@ -116,7 +140,7 @@ class ProgressBar
     /**
      * Gets the progress bar start time.
      *
-     * @return int The progress bar start time
+     * @return integer The progress bar start time
      */
     public function getStartTime()
     {
@@ -126,7 +150,7 @@ class ProgressBar
     /**
      * Gets the progress bar maximal steps.
      *
-     * @return int The progress bar max steps
+     * @return integer The progress bar max steps
      */
     public function getMaxSteps()
     {
@@ -136,7 +160,7 @@ class ProgressBar
     /**
      * Gets the progress bar step.
      *
-     * @return int The progress bar step
+     * @return integer The progress bar step
      */
     public function getStep()
     {
@@ -146,7 +170,7 @@ class ProgressBar
     /**
      * Gets the progress bar step width.
      *
-     * @return int The progress bar step width
+     * @return integer The progress bar step width
      */
     public function getStepWidth()
     {
@@ -156,7 +180,7 @@ class ProgressBar
     /**
      * Gets the current progress bar percent.
      *
-     * @return int The current progress bar percent
+     * @return integer The current progress bar percent
      */
     public function getProgressPercent()
     {
@@ -166,7 +190,7 @@ class ProgressBar
     /**
      * Sets the progress bar width.
      *
-     * @param int $size The progress bar size
+     * @param integer $size The progress bar size
      */
     public function setBarWidth($size)
     {
@@ -176,7 +200,7 @@ class ProgressBar
     /**
      * Gets the progress bar width.
      *
-     * @return int The progress bar size
+     * @return integer The progress bar size
      */
     public function getBarWidth()
     {
@@ -257,7 +281,7 @@ class ProgressBar
     /**
      * Sets the redraw frequency.
      *
-     * @param int $freq The frequency in steps
+     * @param integer $freq The frequency in steps
      */
     public function setRedrawFrequency($freq)
     {
@@ -365,8 +389,8 @@ class ProgressBar
 
         $self = $this;
         $this->overwrite(preg_replace_callback("{%([a-z\-_]+)(?:\:([^%]+))?%}i", function ($matches) use ($self) {
-            if (isset(self::$formatters[$matches[1]])) {
-                $text = call_user_func(self::$formatters[$matches[1]], $self);
+            if ($formatter = $self::getPlaceholderFormatterDefinition($matches[1])) {
+                $text = call_user_func($formatter, $self);
             } elseif (isset($this->messages[$matches[1]])) {
                 $text = $this->messages[$matches[1]];
             } else {
@@ -433,7 +457,7 @@ class ProgressBar
         }
     }
 
-    static private function initPlaceholderFormatters()
+    private static function initPlaceholderFormatters()
     {
         return array(
             'bar' => function (ProgressBar $bar) {
@@ -490,7 +514,7 @@ class ProgressBar
         );
     }
 
-    static private function initFormats()
+    private static function initFormats()
     {
         return array(
             'quiet'         => ' %percent%%',

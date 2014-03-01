@@ -1,6 +1,8 @@
 CHANGELOG
 =========
 
+* added support for labels to ProgressHelper
+
 2.5.0
 -----
 

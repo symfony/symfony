@@ -175,7 +175,7 @@ class ProgressHelperTest extends \PHPUnit_Framework_TestCase
 
         rewind($output->getStream());
         $this->assertEquals(
-            $this->generateOutput(' 25/50 [==============>-------------]  50%') . $this->generateOutput(''),
+            $this->generateOutput(' 25/50 [==============>-------------]  50%') . $this->generateOutput(str_repeat("\x20", 42)),
             stream_get_contents($output->getStream())
         );
     }
@@ -202,23 +202,85 @@ class ProgressHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('', stream_get_contents($output->getStream()));
     }
 
+    public function testLabelDefault()
+    {
+        $progress = new ProgressHelper();
+        $progress->setLabel('label');
+        $progress->start($output = $this->getOutputStream(), 10);
+        $progress->display();
+
+        rewind($output->getStream());
+        $this->assertEquals($this->generateOutput('  0/10 [>---------------------------]   0%'.PHP_EOL.'                  label                   '), stream_get_contents($output->getStream()));
+    }
+
+    public function testLabelTop()
+    {
+        $progress = new ProgressHelper();
+        $progress->setLabel('label', ProgressHelper::LABEL_TOP);
+        $progress->start($output = $this->getOutputStream(), 10);
+        $progress->display();
+
+        rewind($output->getStream());
+        $this->assertEquals($this->generateOutput('                  label                   '.PHP_EOL.'  0/10 [>---------------------------]   0%'), stream_get_contents($output->getStream()));
+    }
+
+    public function testLabelAlignLeft()
+    {
+        $progress = new ProgressHelper();
+        $progress->setLabel('label', ProgressHelper::LABEL_BOTTOM, ProgressHelper::LABEL_LEFT);
+        $progress->start($output = $this->getOutputStream(), 10);
+        $progress->display();
+
+        rewind($output->getStream());
+        $this->assertEquals($this->generateOutput('  0/10 [>---------------------------]   0%'.PHP_EOL.'                                     label'), stream_get_contents($output->getStream()));
+    }
+
+    public function testLabelAlignRight()
+    {
+        $progress = new ProgressHelper();
+        $progress->setLabel('label', ProgressHelper::LABEL_BOTTOM, ProgressHelper::LABEL_RIGHT);
+        $progress->start($output = $this->getOutputStream(), 10);
+
+        $progress->display();
+
+        rewind($output->getStream());
+        $this->assertEquals($this->generateOutput('  0/10 [>---------------------------]   0%'.PHP_EOL.'label                                     '), stream_get_contents($output->getStream()));
+    }
+
+    public function testLabelUpdate()
+    {
+        $progress = new ProgressHelper();
+        $progress->setLabel('label');
+        $progress->start($output = $this->getOutputStream(), 10);
+        $progress->display();
+        $progress->updateLabel('label 1');
+        $progress->advance();
+
+
+        rewind($output->getStream());
+        $this->assertEquals($this->generateOutput('  0/10 [>---------------------------]   0%'.PHP_EOL.'                  label                   ').$this->generateOutput('  1/10 [==>-------------------------]  10%'.PHP_EOL.'                 label 1                  '), stream_get_contents($output->getStream()));
+    }
+
     protected function getOutputStream($decorated = true)
     {
         return new StreamOutput(fopen('php://memory', 'r+', false), StreamOutput::VERBOSITY_NORMAL, $decorated);
     }
 
-    protected $lastMessagesLength;
+    protected $haveWritten = false;
 
     protected function generateOutput($expected)
     {
-        $expectedout = $expected;
-
-        if ($this->lastMessagesLength !== null) {
-            $expectedout = str_pad($expected, $this->lastMessagesLength, "\x20", STR_PAD_RIGHT);
+        $expectedout = '';
+        if (true === $this->haveWritten) {
+            $expectedout .= "\x0D";
+            if ($count = substr_count($expected, PHP_EOL)) {
+                $expectedout .= "\033[{$count}A";
+            }
+        } else {
+            $this->haveWritten = true;
         }
+        $expectedout .= $expected;
 
-        $this->lastMessagesLength = strlen($expectedout);
-
-        return "\x0D".$expectedout;
+        return $expectedout;
     }
 }

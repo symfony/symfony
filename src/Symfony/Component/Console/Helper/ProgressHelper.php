@@ -29,6 +29,12 @@ class ProgressHelper extends Helper
     const FORMAT_NORMAL_NOMAX  = ' %current% [%bar%]';
     const FORMAT_VERBOSE_NOMAX = ' %current% [%bar%] Elapsed: %elapsed%';
 
+    const LABEL_TOP     = 1;
+    const LABEL_BOTTOM  = 2;
+    const LABEL_LEFT    = STR_PAD_LEFT;
+    const LABEL_CENTER  = STR_PAD_BOTH;
+    const LABEL_RIGHT   = STR_PAD_RIGHT;
+
     // options
     private $barWidth     = 28;
     private $barChar      = '=';
@@ -36,6 +42,18 @@ class ProgressHelper extends Helper
     private $progressChar = '>';
     private $format       = null;
     private $redrawFreq   = 1;
+
+    // Label options
+    private $label          = '';
+    private $labelPosition  = self::LABEL_BOTTOM;
+    private $labelAlignment = self::LABEL_CENTER;
+
+    /**
+     * Whether or not to show the label based on verbosity level.
+     *
+     * @var boolean
+     */
+    private $showLabel = true;
 
     private $lastMessagesLength;
     private $barCharOriginal;
@@ -116,6 +134,13 @@ class ProgressHelper extends Helper
     );
 
     /**
+     * Whether or not overwrite() has yet been called.
+     *
+     * @var boolean
+     */
+    private $haveWritten = false;
+
+    /**
      * Sets the progress bar width.
      *
      * @param int $size The progress bar size
@@ -176,6 +201,30 @@ class ProgressHelper extends Helper
     }
 
     /**
+     * Add a label to the progress bar.
+     *
+     * @param string    $label      The label to add
+     * @param int       $position   Where to show the label
+     * @param int       $align      How to align the label
+     */
+    public function setLabel($label, $position = self::LABEL_BOTTOM, $align = self::LABEL_CENTER)
+    {
+        $this->label            = $label;
+        $this->labelPosition    = $position;
+        $this->labelAlignment   = $align;
+    }
+
+    /**
+     * Update current label.
+     *
+     * @param string $label Label's text
+     */
+    public function updateLabel($label)
+    {
+        $this->label = $label;
+    }
+
+    /**
      * Starts the progress output.
      *
      * @param OutputInterface $output An Output instance
@@ -199,6 +248,7 @@ class ProgressHelper extends Helper
                     if ($this->max > 0) {
                         $this->format = self::FORMAT_QUIET;
                     }
+                    $this->showLabel = false;
                     break;
                 case OutputInterface::VERBOSITY_VERBOSE:
                 case OutputInterface::VERBOSITY_VERY_VERBOSE:
@@ -284,8 +334,30 @@ class ProgressHelper extends Helper
         foreach ($this->generate($finish) as $name => $value) {
             $message = str_replace("%{$name}%", $value, $message);
         }
-        $this->overwrite($this->output, $message);
+
+        $length = $this->strlen($message);
+
+        // append whitespace to match the last line's length
+        if (null !== $this->lastMessagesLength && $this->lastMessagesLength > $length) {
+            $message = str_pad($message, $this->lastMessagesLength, "\x20", STR_PAD_RIGHT);
+        }
+
+        $this->lastMessagesLength = $this->strlen($message);
+
+        $lines[] = $message;
+
+        if (true === $this->showLabel && !empty($this->label)) {
+            $label = str_pad($this->label, $this->lastMessagesLength, "\x20", $this->labelAlignment);
+            if (self::LABEL_TOP === $this->labelPosition) {
+                array_unshift($lines, $label);
+            } else {
+                $lines[] = $label;
+            }
+        }
+
+        $this->overwrite($this->output, $lines);
     }
+
 
     /**
      * Removes the progress bar from the current line.
@@ -296,7 +368,12 @@ class ProgressHelper extends Helper
      */
     public function clear()
     {
-        $this->overwrite($this->output, '');
+        $emptyLine = str_repeat("\x20", $this->lastMessagesLength);
+        $lines = array($emptyLine);
+        if (true === $this->showLabel && !empty($this->label)) {
+            $lines[] = $emptyLine;
+        }
+        $this->overwrite($this->output, $lines);
     }
 
     /**
@@ -427,22 +504,27 @@ class ProgressHelper extends Helper
      * Overwrites a previous message to the output.
      *
      * @param OutputInterface $output   An Output instance
-     * @param string          $message  The message
+     * @param array           $lines    Lines to output
      */
-    private function overwrite(OutputInterface $output, $message)
+    private function overwrite(OutputInterface $output, array $lines)
     {
-        $length = $this->strlen($message);
+        $numberOfLines = count($lines);
+        $glue = $numberOfLines > 1 ? PHP_EOL : '';
+        if (true === $this->haveWritten) {
+            // carriage return
+            $output->write("\x0D");
 
-        // append whitespace to match the last line's length
-        if (null !== $this->lastMessagesLength && $this->lastMessagesLength > $length) {
-            $message = str_pad($message, $this->lastMessagesLength, "\x20", STR_PAD_RIGHT);
+            // Move the cursor up if we are outputting more than one line
+            if ($numberOfLines > 1) {
+                // We move up number of lines - 1 because \r removes a line
+                $line = $numberOfLines - 1;
+                $output->write("\033[{$line}A");
+            }
+        } else {
+            $this->haveWritten = true;
         }
 
-        // carriage return
-        $output->write("\x0D");
-        $output->write($message);
-
-        $this->lastMessagesLength = $this->strlen($message);
+        $output->write(join($glue, $lines));
     }
 
     /**

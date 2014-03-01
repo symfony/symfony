@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Console\Helper;
 
+use Symfony\Component\Console\Formatter\OutputFormatterInterface;
+
 /**
  * Helper is the base class for all helper classes.
  *
@@ -102,5 +104,18 @@ abstract class Helper implements HelperInterface
         }
 
         return sprintf('%d B', $memory);
+    }
+
+    public static function strlenWithoutDecoration(OutputFormatterInterface $formatter, $string)
+    {
+        $isDecorated = $formatter->isDecorated();
+        $formatter->setDecorated(false);
+        // remove <...> formatting
+        $string = $formatter->format($string);
+        // remove already formatted characters
+        $string = preg_replace("/\033\[[^m]*m/", '', $string);
+        $formatter->setDecorated($isDecorated);
+
+        return self::strlen($string);
     }
 }

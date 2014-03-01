@@ -387,12 +387,15 @@ class ProgressBar
             throw new \LogicException('You must start the progress bar before calling display().');
         }
 
+        // these 3 variables can be removed in favor of using $this in the closure when support for PHP 5.3 will be dropped.
         $self = $this;
-        $this->overwrite(preg_replace_callback("{%([a-z\-_]+)(?:\:([^%]+))?%}i", function ($matches) use ($self) {
+        $output = $this->output;
+        $messages = $this->messages;
+        $this->overwrite(preg_replace_callback("{%([a-z\-_]+)(?:\:([^%]+))?%}i", function ($matches) use ($self, $output, $messages) {
             if ($formatter = $self::getPlaceholderFormatterDefinition($matches[1])) {
-                $text = call_user_func($formatter, $self);
-            } elseif (isset($this->messages[$matches[1]])) {
-                $text = $this->messages[$matches[1]];
+                $text = call_user_func($formatter, $self, $output);
+            } elseif (isset($messages[$matches[1]])) {
+                $text = $messages[$matches[1]];
             } else {
                 return $matches[0];
             }
@@ -424,13 +427,15 @@ class ProgressBar
      */
     private function overwrite($message)
     {
-        $length = Helper::strlen($message);
+        $lines = explode("\n", $message);
 
-        // append whitespace to match the last line's length
-// FIXME: on each line!!!!!
-// FIXME: max of each line for lastMessagesLength or an array?
-        if (null !== $this->lastMessagesLength && $this->lastMessagesLength > $length) {
-            $message = str_pad($message, $this->lastMessagesLength, "\x20", STR_PAD_RIGHT);
+        // append whitespace to match the line's length
+        if (null !== $this->lastMessagesLength) {
+            foreach ($lines as $i => $line) {
+                if ($this->lastMessagesLength > Helper::strlenWithoutDecoration($this->output->getFormatter(), $line)) {
+                    $lines[$i] = str_pad($line, $this->lastMessagesLength, "\x20", STR_PAD_RIGHT);
+                }
+            }
         }
 
         // move back to the beginning of the progress bar before redrawing it
@@ -438,9 +443,15 @@ class ProgressBar
         if ($this->formatLineCount) {
             $this->output->write(sprintf("\033[%dA", $this->formatLineCount));
         }
-        $this->output->write($message);
+        $this->output->write(implode("\n", $lines));
 
-        $this->lastMessagesLength = Helper::strlen($message);
+        $this->lastMessagesLength = 0;
+        foreach ($lines as $line) {
+            $len = Helper::strlenWithoutDecoration($this->output->getFormatter(), $line);
+            if ($len > $this->lastMessagesLength) {
+                $this->lastMessagesLength = $len;
+            }
+        }
     }
 
     private function determineBestFormat()
@@ -460,11 +471,11 @@ class ProgressBar
     private static function initPlaceholderFormatters()
     {
         return array(
-            'bar' => function (ProgressBar $bar) {
+            'bar' => function (ProgressBar $bar, OutputInterface $output) {
                 $completeBars = floor($bar->getMaxSteps() > 0 ? $bar->getProgressPercent() * $bar->getBarWidth() : $bar->getStep() % $bar->getBarWidth());
-                $emptyBars = $bar->getBarWidth() - $completeBars - Helper::strlen($bar->getProgressCharacter());
                 $display = str_repeat($bar->getBarCharacter(), $completeBars);
                 if ($completeBars < $bar->getBarWidth()) {
+                    $emptyBars = $bar->getBarWidth() - $completeBars - Helper::strlenWithoutDecoration($output->getFormatter(), $bar->getProgressCharacter());
                     $display .= $bar->getProgressCharacter().str_repeat($bar->getEmptyBarCharacter(), $emptyBars);
                 }
 

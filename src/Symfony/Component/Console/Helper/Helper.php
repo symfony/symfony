@@ -86,4 +86,21 @@ abstract class Helper implements HelperInterface
             return ceil($secs / $format[2]).' '.$format[1];
         }
     }
+
+    public static function formatMemory($memory)
+    {
+        if ($memory >= 1024 * 1024 * 1024) {
+            return sprintf('%.1f GB', $memory / 1024 / 1024 / 1024);
+        }
+
+        if ($memory >= 1024 * 1024) {
+            return sprintf('%.1f MB', $memory / 1024 / 1024);
+        }
+
+        if ($memory >= 1024) {
+            return sprintf('%d kB', $memory / 1024);
+        }
+
+        return sprintf('%d B', $memory);
+    }
 }

@@ -419,6 +419,35 @@ class ProgressBar
             '%elapsed%' => function (ProgressBar $bar) {
                 return str_pad(Helper::formatTime(time() - $bar->getStartTime()), 6, ' ', STR_PAD_LEFT);
             },
+            '%remaining%' => function (ProgressBar $bar) {
+                if (!$bar->getMaxSteps()) {
+                    throw new \LogicException('Unable to display the remaining time if the maximum number of steps is not set.');
+                }
+
+                if (!$bar->getStep()) {
+                    $remaining = 0;
+                } else {
+                    $remaining = round((time() - $bar->getStartTime()) / $bar->getStep() * ($bar->getMaxSteps() - $bar->getStep()));
+                }
+
+                return str_pad(Helper::formatTime($remaining), 6, ' ', STR_PAD_LEFT);
+            },
+            '%estimated%' => function (ProgressBar $bar) {
+                if (!$bar->getMaxSteps()) {
+                    throw new \LogicException('Unable to display the estimated time if the maximum number of steps is not set.');
+                }
+
+                if (!$bar->getStep()) {
+                    $estimated = 0;
+                } else {
+                    $estimated = round((time() - $bar->getStartTime()) / $bar->getStep() * $bar->getMaxSteps());
+                }
+
+                return str_pad(Helper::formatTime($estimated), 6, ' ', STR_PAD_LEFT);
+            },
+            '%memory%' => function (ProgressBar $bar) {
+                return str_pad(Helper::formatMemory(memory_get_usage(true)), 6, ' ', STR_PAD_LEFT);;
+            },
             '%current%' => function (ProgressBar $bar) {
                 return str_pad($bar->getStep(), $bar->getStepWidth(), ' ', STR_PAD_LEFT);
             },

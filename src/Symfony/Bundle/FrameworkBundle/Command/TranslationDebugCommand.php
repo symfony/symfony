@@ -12,11 +12,13 @@
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Component\Translation\Catalogue\MergeOperation;
+use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Translation\MessageCatalogue;
+use Symfony\Component\Translation\Translator;
 
 /**
  * Helps finding unused or missing translation messages in a given locale
@@ -46,10 +48,11 @@ class TranslationDebugCommand extends ContainerAwareCommand
             ))
             ->setDescription('Displays translation messages informations')
             ->setHelp(<<<EOF
-The <info>%command.name%</info> command helps finding unused or missing translation messages and
-comparing them with the fallback ones by inspecting the templates and translation files of a given bundle.
+The <info>%command.name%</info> command helps finding unused or missing translation
+messages and comparing them with the fallback ones by inspecting the
+templates and translation files of a given bundle.
 
-You can display informations about a bundle translations in a specific locale:
+You can display information about bundle translations in a specific locale:
 
 <info>php %command.full_name% en AcmeDemoBundle</info>
 
@@ -81,12 +84,13 @@ EOF
 
         // Extract used messages
         $extractedCatalogue = new MessageCatalogue($locale);
-        $this->getContainer()->get('translation.extractor')
-            ->extract($bundle->getPath().'/Resources/views/', $extractedCatalogue);
+        $this->getContainer()->get('translation.extractor')->extract($bundle->getPath().'/Resources/views', $extractedCatalogue);
 
         // Load defined messages
         $currentCatalogue = new MessageCatalogue($locale);
-        $loader->loadMessages($bundle->getPath().'/Resources/translations', $currentCatalogue);
+        if (is_dir($bundle->getPath().'/Resources/translations')) {
+            $loader->loadMessages($bundle->getPath().'/Resources/translations', $currentCatalogue);
+        }
 
         // Merge defined and extracted messages to get all message ids
         $mergeOperation = new MergeOperation($extractedCatalogue, $currentCatalogue);
@@ -110,32 +114,28 @@ EOF
 
         // Load the fallback catalogues
         $fallbackCatalogues = array();
-        foreach ($this->getContainer()->get('translator')->getFallbackLocales() as $fallbackLocale) {
-            if ($fallbackLocale === $locale) {
-                continue;
-            }
+        $translator = $this->getContainer()->get('translator');
+        if ($translator instanceof Translator) {
+            foreach ($translator->getFallbackLocales() as $fallbackLocale) {
+                if ($fallbackLocale === $locale) {
+                    continue;
+                }
 
-            $fallbackCatalogue = new MessageCatalogue($fallbackLocale);
-            $loader->loadMessages($bundle->getPath().'/Resources/translations', $fallbackCatalogue);
-            $fallbackCatalogues[] = $fallbackCatalogue;
+                $fallbackCatalogue = new MessageCatalogue($fallbackLocale);
+                $loader->loadMessages($bundle->getPath().'/Resources/translations', $fallbackCatalogue);
+                $fallbackCatalogues[] = $fallbackCatalogue;
+            }
         }
 
-        // Display legend
-        $output->writeln(sprintf('Legend: %s Missing message %s Unused message %s Equals fallback message',
-            $this->formatState(self::MESSAGE_MISSING),
-            $this->formatState(self::MESSAGE_UNUSED),
-            $this->formatState(self::MESSAGE_EQUALS_FALLBACK)
-        ));
-
-        /** @var \Symfony\Component\Console\Helper\TableHelper $tableHelper */
-        $tableHelper = $this->getHelperSet()->get('table');
+        /** @var \Symfony\Component\Console\Helper\Table $table */
+        $table = new Table($output);
 
         // Display header line
         $headers = array('State(s)', 'Id', sprintf('Message Preview (%s)', $locale));
         foreach ($fallbackCatalogues as $fallbackCatalogue) {
             $headers[] = sprintf('Fallback Message Preview (%s)', $fallbackCatalogue->getLocale());
         }
-        $tableHelper->setHeaders($headers);
+        $table->setHeaders($headers);
 
         // Iterate all message ids and determine their state
         foreach ($allMessages as $domain => $messages) {
@@ -157,9 +157,9 @@ EOF
                 }
 
                 foreach ($fallbackCatalogues as $fallbackCatalogue) {
-                    if ($fallbackCatalogue->defines($messageId, $domain)
-                        && $value === $fallbackCatalogue->get($messageId, $domain)) {
+                    if ($fallbackCatalogue->defines($messageId, $domain) && $value === $fallbackCatalogue->get($messageId, $domain)) {
                         $states[] = self::MESSAGE_EQUALS_FALLBACK;
+
                         break;
                     }
                 }
@@ -169,25 +169,31 @@ EOF
                     $row[] = $this->sanitizeString($fallbackCatalogue->get($messageId, $domain));
                 }
 
-                $tableHelper->addRow($row);
+                $table->addRow($row);
             }
         }
 
-        $tableHelper->render($output);
+        $table->render();
+
+        $output->writeln('');
+        $output->writeln('<info>Legend:</info>');
+        $output->writeln(sprintf(' %s Missing message', $this->formatState(self::MESSAGE_MISSING)));
+        $output->writeln(sprintf(' %s Unused message', $this->formatState(self::MESSAGE_UNUSED)));
+        $output->writeln(sprintf(' %s Same as the fallback message', $this->formatState(self::MESSAGE_EQUALS_FALLBACK)));
     }
 
     private function formatState($state)
     {
         if (self::MESSAGE_MISSING === $state) {
-            return '<fg=red;options=bold>x</fg=red;options=bold>';
+            return '<fg=red>x</>';
         }
 
         if (self::MESSAGE_UNUSED === $state) {
-            return '<fg=yellow;options=bold>o</fg=yellow;options=bold>';
+            return '<fg=yellow>o</>';
         }
 
         if (self::MESSAGE_EQUALS_FALLBACK === $state) {
-            return '<fg=green;options=bold>=</fg=green;options=bold>';
+            return '<fg=green>=</>';
         }
 
         return $state;
@@ -208,16 +214,16 @@ EOF
         return sprintf('<fg=cyan;options=bold>%s</fg=cyan;options=bold>', $id);
     }
 
-    private function sanitizeString($string, $lenght = 40)
+    private function sanitizeString($string, $length = 40)
     {
         $string = trim(preg_replace('/\s+/', ' ', $string));
 
         if (function_exists('mb_strlen') && false !== $encoding = mb_detect_encoding($string)) {
-            if (mb_strlen($string, $encoding) > $lenght) {
-                return mb_substr($string, 0, $lenght - 3, $encoding).'...';
+            if (mb_strlen($string, $encoding) > $length) {
+                return mb_substr($string, 0, $length - 3, $encoding).'...';
             }
-        } elseif (strlen($string) > $lenght) {
-            return substr($string, 0, $lenght - 3).'...';
+        } elseif (strlen($string) > $length) {
+            return substr($string, 0, $length - 3).'...';
         }
 
         return $string;

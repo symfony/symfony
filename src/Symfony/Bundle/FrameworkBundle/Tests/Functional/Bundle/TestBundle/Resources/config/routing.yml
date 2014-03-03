@@ -44,3 +44,43 @@ fragment_home:
 fragment_inlined:
     path:     /fragment_inlined
     defaults: { _controller: TestBundle:Fragment:inlined }
+
+form_php_choice_single_required:
+    path:     /form_php/choice_single_required
+    defaults: { _controller: TestBundle:Form:phpChoiceSingleRequired }
+
+form_twig_choice_single_required:
+    path:     /form_twig/choice_single_required
+    defaults: { _controller: TestBundle:Form:twigChoiceSingleRequired }
+
+form_php_choice_multiple_required:
+    path:     /form_php/choice_multiple_required
+    defaults: { _controller: TestBundle:Form:phpChoiceMultipleRequired }
+
+form_twig_choice_multiple_required:
+    path:     /form_twig/choice_multiple_required
+    defaults: { _controller: TestBundle:Form:twigChoiceMultipleRequired }
+
+form_php_choice_single_not_required:
+    path:     /form_php/choice_single_not_required
+    defaults: { _controller: TestBundle:Form:phpChoiceSingleNotRequired }
+
+form_twig_choice_single_not_required:
+    path:     /form_twig/choice_single_not_required
+    defaults: { _controller: TestBundle:Form:twigChoiceSingleNotRequired }
+
+form_php_choice_multiple_not_required:
+    path:     /form_php/choice_multiple_not_required
+    defaults: { _controller: TestBundle:Form:phpChoiceMultipleNotRequired }
+
+form_twig_choice_multiple_not_required:
+    path:     /form_twig/choice_multiple_not_required
+    defaults: { _controller: TestBundle:Form:twigChoiceMultipleNotRequired }
+
+form_php_choice_single_not_required_empty_value:
+    path:     /form_php/choice_single_not_required_empty_value
+    defaults: { _controller: TestBundle:Form:phpChoiceSingleNotRequiredEmptyValue }
+
+form_twig_choice_single_not_required_empty_value:
+    path:     /form_twig/choice_single_not_required_empty_value
+    defaults: { _controller: TestBundle:Form:twigChoiceSingleNotRequiredEmptyValue }

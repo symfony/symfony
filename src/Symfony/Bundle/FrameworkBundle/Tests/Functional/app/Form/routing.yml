@@ -1,0 +1,2 @@
+_formtest_bundle:
+    resource: @TestBundle/Resources/config/routing.yml

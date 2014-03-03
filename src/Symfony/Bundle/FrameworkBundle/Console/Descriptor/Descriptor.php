@@ -180,6 +180,14 @@ abstract class Descriptor implements DescriptorInterface
     abstract protected function describeContainerAlias(Alias $alias, array $options = array());
 
     /**
+     * Describes a container parameter.
+     *
+     * @param parameter
+     * @param array $options
+     */
+    abstract protected function describeContainerParameter($parameter, array $options = array());
+
+    /**
      * Formats a value as string.
      *
      * @param mixed $value

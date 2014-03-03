@@ -97,6 +97,10 @@ class ProgressBar
      */
     public static function getPlaceholderFormatterDefinition($name)
     {
+        if (!self::$formatters) {
+            self::$formatters = self::initPlaceholderFormatters();
+        }
+
         return isset(self::$formatters[$name]) ? self::$formatters[$name] : null;
     }
 
@@ -126,6 +130,10 @@ class ProgressBar
      */
     public static function getFormatDefinition($name)
     {
+        if (!self::$formats) {
+            self::$formats = self::initFormats();
+        }
+
         return isset(self::$formats[$name]) ? self::$formats[$name] : null;
     }
 

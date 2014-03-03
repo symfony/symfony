@@ -110,19 +110,19 @@ class Table
     /**
      * Sets table style.
      *
-     * @param string $name The style name
+     * @param TableStyle|string $name The style name or a TableStyle instance
      *
      * @return Table
      */
     public function setStyle($name)
     {
-        if (isset(self::$styles[$name])) {
+        if ($name instanceof TableStyle) {
+            $this->style = $name;
+        } elseif (isset(self::$styles[$name])) {
             $this->style = self::$styles[$name];
-
-            return $this;
+        } else {
+            throw new \InvalidArgumentException(sprintf('Style "%s" is not defined.', $name));
         }
-
-        throw new \InvalidArgumentException(sprintf('Style "%s" is not defined.', $name));
     }
 
     /**

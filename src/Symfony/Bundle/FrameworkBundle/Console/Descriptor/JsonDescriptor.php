@@ -135,6 +135,16 @@ class JsonDescriptor extends Descriptor
     }
 
     /**
+     * {@inheritdoc}
+     */
+    protected function describeContainerParameter($parameter, array $options = array())
+    {
+        $key = isset($options['parameter']) ? $options['parameter'] : '';
+
+        $this->writeData(array($key => $this->formatParameter($parameter)), $options);
+    }
+
+    /**
      * Writes data as json.
      *
      * @param array $data

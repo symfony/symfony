@@ -115,17 +115,6 @@ abstract class Descriptor implements DescriptorInterface
     abstract protected function describeRoute(Route $route, array $options = array());
 
     /**
-     * Describes a specific container parameter.
-     *
-     * @param mixed $parameterValue
-     * @param array $options
-     */
-    protected function describeContainerParameter($parameterValue, array $options = array())
-    {
-        $this->write($this->formatParameter($parameterValue));
-    }
-
-    /**
      * Describes container parameters.
      *
      * @param ParameterBag $parameters
@@ -178,6 +167,14 @@ abstract class Descriptor implements DescriptorInterface
      * @param array $options
      */
     abstract protected function describeContainerAlias(Alias $alias, array $options = array());
+
+    /**
+     * Describes a container parameter.
+     *
+     * @param parameter
+     * @param array $options
+     */
+    abstract protected function describeContainerParameter($parameter, array $options = array());
 
     /**
      * Formats a value as string.

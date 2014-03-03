@@ -59,7 +59,7 @@ abstract class FileDumper implements DumperInterface
             } else {
                 $directory = dirname($fullpath);
                 if (!file_exists($directory) && !@mkdir($directory, 0777, true)) {
-                    throw new \RuntimeException(sprintf('Cannot create the directory "%s"', $directory));
+                    throw new \RuntimeException(sprintf('Unable to create directory "%s".', $directory));
                 }
             }
             // save file

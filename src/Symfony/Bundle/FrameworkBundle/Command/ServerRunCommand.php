@@ -43,7 +43,7 @@ class ServerRunCommand extends ContainerAwareCommand
     {
         $this
             ->setDefinition(array(
-                new InputArgument('address', InputArgument::OPTIONAL, 'Address:port', 'localhost:8000'),
+                new InputArgument('address', InputArgument::OPTIONAL, 'Address:port', '127.0.0.1:8000'),
                 new InputOption('docroot', 'd', InputOption::VALUE_REQUIRED, 'Document root', 'web/'),
                 new InputOption('router', 'r', InputOption::VALUE_REQUIRED, 'Path to custom router script'),
             ))
@@ -84,20 +84,14 @@ EOF
             $output->writeln('<error>Running PHP built-in server in production environment is NOT recommended!</error>');
         }
 
-        $router = $input->getOption('router') ?: $this
-            ->getContainer()
-            ->get('kernel')
-            ->locateResource(sprintf('@FrameworkBundle/Resources/config/router_%s.php', $env))
-        ;
-
         $output->writeln(sprintf("Server running on <info>%s</info>\n", $input->getArgument('address')));
 
         if (defined('HHVM_VERSION')) {
-            $this->executeWithHHVM($input, $output, $env);
-            return;
+            $builder = $this->createHhvmProcessBuilder($input, $output, $env);
+        } else {
+            $builder = $this->createPhpProcessBuilder($input, $output, $env);
         }
 
-        $builder = new ProcessBuilder(array(PHP_BINARY, '-S', $input->getArgument('address'), $router));
         $builder->setWorkingDirectory($input->getOption('docroot'));
         $builder->setTimeout(null);
         $builder->getProcess()->run(function ($type, $buffer) use ($output) {
@@ -107,12 +101,23 @@ EOF
         });
     }
 
-    protected function executeWithHHVM(InputInterface $input, OutputInterface $output, $env)
+    private function createPhpProcessBuilder(InputInterface $input, OutputInterface $output, $env)
+    {
+        $router = $input->getOption('router') ?: $this
+            ->getContainer()
+            ->get('kernel')
+            ->locateResource(sprintf('@FrameworkBundle/Resources/config/router_%s.php', $env))
+        ;
+
+        return new ProcessBuilder(array(PHP_BINARY, '-S', $input->getArgument('address'), $router));
+    }
+
+    private function createHhvmProcessBuilder(InputInterface $input, OutputInterface $output, $env)
     {
         list($ip, $port) = explode(':', $input->getArgument('address'));
-        $output->writeln(sprintf("Server(with HHVM) running on <info>$ip:$port</info>\n", $ip, $port));
+
         $docroot = realpath($input->getOption('docroot'));
-        $bootstrap = ('prod' === $env ? 'app.php' : 'app_dev.php');
+        $bootstrap = 'prod' === $env ? 'app.php' : 'app_dev.php';
         $config = <<<EOF
 Server {
   IP = $ip
@@ -123,9 +128,9 @@ Server {
 }
 
 VirtualHost {
- * {
-   Pattern = .*
-   RewriteRules {
+  * {
+    Pattern = .*
+    RewriteRules {
       * {
         pattern = .?
 
@@ -135,8 +140,8 @@ VirtualHost {
         # append the original query string
         qsa = true
       }
-   }
- }
+    }
+  }
 }
 
 StaticFile {
@@ -155,16 +160,10 @@ StaticFile {
   }
 }
 EOF;
-        $tmpfile = $this->getContainer()->get('kernel')->getCacheDir().DIRECTORY_SEPARATOR.'hhvm-server-'.md5($config).'.hdf';
-        file_put_contents($tmpfile, $config);
-        $builder = new ProcessBuilder(array(PHP_BINARY, '-ms', "-c$tmpfile"));
-        $builder->setWorkingDirectory($docroot);
-        $builder->setTimeout(null);
-        $builder->getProcess()->run(function ($type, $buffer) use ($output) {
-            if (OutputInterface::VERBOSITY_VERBOSE <= $output->getVerbosity()) {
-                $output->write($buffer);
-            }
-        });
-    }
 
+        $configFile = $this->getContainer()->get('kernel')->getCacheDir().'/hhvm-server-'.md5($config).'.hdf';
+        file_put_contents($configFile, $config);
+
+        return new ProcessBuilder(array(PHP_BINARY, '--mode', 'server', '--config', $configFile));
+    }
 }

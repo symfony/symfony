@@ -244,7 +244,7 @@ class Configuration implements ConfigurationInterface
                         ->booleanNode('cookie_secure')->end()
                         ->booleanNode('cookie_httponly')->end()
                         ->scalarNode('gc_divisor')->end()
-                        ->scalarNode('gc_probability')->end()
+                        ->scalarNode('gc_probability')->defaultValue(1)->end()
                         ->scalarNode('gc_maxlifetime')->end()
                         ->scalarNode('save_path')->defaultValue('%kernel.cache_dir%/sessions')->end()
                         ->integerNode('metadata_update_threshold')

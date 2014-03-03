@@ -158,8 +158,18 @@ class Table
         return $this;
     }
 
-    public function addRow(array $row)
+    public function addRow($row)
     {
+        if ($row instanceof TableSeparator) {
+            $this->rows[] = $row;
+
+            return;
+        }
+
+        if (!is_array($row)) {
+            throw new InvalidArgumentException('A row must be an array or a TableSeparator instance.');
+        }
+
         $this->rows[] = array_values($row);
 
         $keys = array_keys($this->rows);
@@ -217,7 +227,11 @@ class Table
             $this->renderRowSeparator();
         }
         foreach ($this->rows as $row) {
-            $this->renderRow($row, $this->style->getCellRowFormat());
+            if ($row instanceof TableSeparator) {
+                $this->renderRowSeparator();
+            } else {
+                $this->renderRow($row, $this->style->getCellRowFormat());
+            }
         }
         if (!empty($this->rows)) {
             $this->renderRowSeparator();
@@ -337,6 +351,10 @@ class Table
 
         $lengths = array($this->getCellWidth($this->headers, $column));
         foreach ($this->rows as $row) {
+            if ($row instanceof TableSeparator) {
+                continue;
+            }
+
             $lengths[] = $this->getCellWidth($row, $column);
         }
 

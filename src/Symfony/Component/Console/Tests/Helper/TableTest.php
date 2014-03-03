@@ -13,6 +13,7 @@ namespace Symfony\Component\Console\Tests\Helper;
 
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableStyle;
+use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Output\StreamOutput;
 
 class TableTest extends \PHPUnit_Framework_TestCase
@@ -305,6 +306,37 @@ TABLE;
 .......
 . Bar .
 .......
+
+TABLE;
+
+        $this->assertEquals($expected, $this->getOutputContent($output));
+    }
+
+    public function testRowSeparator()
+    {
+        $table = new Table($output = $this->getOutputStream());
+        $table
+            ->setHeaders(array('Foo'))
+            ->setRows(array(
+                array('Bar1'),
+                new TableSeparator(),
+                array('Bar2'),
+                new TableSeparator(),
+                array('Bar3'),
+            ));
+        $table->render();
+
+        $expected =
+<<<TABLE
++------+
+| Foo  |
++------+
+| Bar1 |
++------+
+| Bar2 |
++------+
+| Bar3 |
++------+
 
 TABLE;
 

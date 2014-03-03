@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by alexsegura at 2014-02-24T09:13:36Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by cordoval at 2014-02-24T14:00:59Z
+
+just run curl http://fabbot.io/patch/symfony/symfony/10314/2999fd166db06f2bc12d4886657380817a93892d/cs.diff | patch -p0 and push and it shall be well
+
+---------------------------------------------------------------------------
+
+by tiraeth at 2014-02-24T16:36:40Z
+
+:thumbsup: Done :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-02-24T16:40:11Z
+
+Can you add a note about this new feature in the CHANGELOG file of the component?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-02-24T16:41:36Z
+
+Also, I think adding a note in the documentation about which kind of methods are supported would be a nice simple improvement. Can you take care of this as well?
+
+---------------------------------------------------------------------------
+
+by tiraeth at 2014-02-24T16:41:39Z
+
+Under what version? 2.4.0? 2.5.0?
+
+I will handle the docs update, sure thing.
+
+---------------------------------------------------------------------------
+
+by tiraeth at 2014-02-24T17:05:09Z
+
+Assumed `2.5.0`. PR for DOCS opened.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-02-24T17:18:44Z
+
+Yep, it's going to be on 2.5.

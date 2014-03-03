@@ -31,8 +31,8 @@ abstract class KernelTestCase extends \PHPUnit_Framework_TestCase
     /**
      * Finds the directory where the phpunit.xml(.dist) is stored.
      *
-     * If you run tests with the PHPUnit CLI tool, everything will work as
-     * expected. If not, override this method in your test classes.
+     * If you run tests with the PHPUnit CLI tool, everything will work as expected.
+     * If not, override this method in your test classes.
      *
      * @return string The directory where phpunit.xml(.dist) is stored
      *
@@ -41,7 +41,7 @@ abstract class KernelTestCase extends \PHPUnit_Framework_TestCase
     protected static function getPhpUnitXmlDir()
     {
         if (!isset($_SERVER['argv']) || false === strpos($_SERVER['argv'][0], 'phpunit')) {
-            throw new \RuntimeException('You must override the WebTestCase::createKernel() method.');
+            throw new \RuntimeException('You must override the KernelTestCase::createKernel() method.');
         }
 
         $dir = static::getPhpUnitCliConfigArgument();
@@ -66,10 +66,10 @@ abstract class KernelTestCase extends \PHPUnit_Framework_TestCase
     /**
      * Finds the value of the CLI configuration option.
      *
-     * PHPUnit will use the last configuration argument on the command line, so
-     * this only returns the last configuration argument.
+     * PHPUnit will use the last configuration argument on the command line, so this only returns
+     * the last configuration argument.
      *
-     * @return string The value of the PHPUnit cli configuration option
+     * @return string The value of the PHPUnit CLI configuration option
      */
     private static function getPhpUnitCliConfigArgument()
     {
@@ -100,13 +100,21 @@ abstract class KernelTestCase extends \PHPUnit_Framework_TestCase
      */
     protected static function getKernelClass()
     {
-        $dir = isset($_SERVER['KERNEL_DIR']) ? $_SERVER['KERNEL_DIR'] : static::getPhpUnitXmlDir();
+        $dir = $phpUnitDir = static::getPhpUnitXmlDir();
+
+        if (isset($_SERVER['KERNEL_DIR'])) {
+            $dir = $_SERVER['KERNEL_DIR'];
+
+            if (!is_dir($dir) && is_dir("$phpUnitDir/$dir")) {
+                $dir = "$phpUnitDir/$dir";
+            }
+        }
 
         $finder = new Finder();
         $finder->name('*Kernel.php')->depth(0)->in($dir);
         $results = iterator_to_array($finder);
         if (!count($results)) {
-            throw new \RuntimeException('Either set KERNEL_DIR in your phpunit.xml according to http://symfony.com/doc/current/book/testing.html#your-first-functional-test or override the WebTestCase::createKernel() method.');
+            throw new \RuntimeException('Either set KERNEL_DIR in your phpunit.xml according to http://symfony.com/doc/current/book/testing.html#your-first-functional-test or override the KernelTestCase::createKernel() method.');
         }
 
         $file = current($results);
@@ -155,7 +163,7 @@ abstract class KernelTestCase extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Shutdown the Kernel.
+     * Shuts the kernel down if it was used in the test.
      */
     protected static function ensureKernelShutdown()
     {

@@ -287,6 +287,43 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         // unchanged if it can't be found
         $this->assertEquals('some_message2', $translator->transChoice('some_message2', 10, array('%count%' => 10)));
     }
+
+    public function testTransWithNoTranslationIsLogged()
+    {
+        if (!interface_exists('Psr\Log\LoggerInterface')) {
+            $this->markTestSkipped('The "LoggerInterface" is not available');
+        }
+
+        $logger = $this->getMock('Psr\Log\LoggerInterface');
+        $logger->expects($this->once())
+            ->method('warning')
+            ->with('Translation not found.')
+        ;
+
+        $translator = new Translator('ar');
+        $translator->setLogger($logger);
+        $translator->trans('bar');
+    }
+
+    public function testTransChoiceFallbackIsLogged()
+    {
+        if (!interface_exists('Psr\Log\LoggerInterface')) {
+            $this->markTestSkipped('The "LoggerInterface" is not available');
+        }
+
+        $logger = $this->getMock('Psr\Log\LoggerInterface');
+        $logger->expects($this->once())
+            ->method('debug')
+            ->with('Translation use fallback catalogue.')
+        ;
+
+        $translator = new Translator('ar');
+        $translator->setLogger($logger);
+        $translator->setFallbackLocales(array('en'));
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', array('some_message2' => 'one thing|%count% things'), 'en');
+        $translator->transChoice('some_message2', 10, array('%count%' => 10));
+    }
 }
 
 class String

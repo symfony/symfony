@@ -607,6 +607,15 @@ class FrameworkExtension extends Extension
         }
         $translator->addMethodCall('setFallbackLocales', array($config['fallback']));
 
+        // Inject logger into translation
+        if ($container->getParameter('kernel.debug')) {
+            $logger = new Reference('logger', ContainerInterface::IGNORE_ON_INVALID_REFERENCE);
+
+            $translator
+                ->addTag('monolog.logger', array('channel' => 'translation'))
+                ->addMethodCall('setLogger', array($logger));
+        }
+
         // Discover translation directories
         $dirs = array();
         if (class_exists('Symfony\Component\Validator\Validator')) {

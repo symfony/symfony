@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-03-03T10:28:01Z
+
+Is it possible to refactor the deprecated TableHelper to make it use a Table internally ? this would avoid maintaining the logic twice until 3.0
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-03-03T11:36:24Z
+
+@stof PR is complete now.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-03-03T13:09:50Z
+
+@fabpot is it possible to fix fabbot so that it does not try to trim trailing whitespaces inside strings, or is it based on regexes like PHP-CS-Fixer ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-03-03T13:11:28Z
+
+@stof fabbot.io is using PHP-CS-Fixer.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-03-03T13:18:50Z
+
+hmm, too bad then.
+The PHP-CS-Fixer for Symfony will need to be adapted to avoid trimming trailing whitespaces on the TableTest.php file to avoid breaking the test by mistake.
+
+anyway, it is a :+1: from me.

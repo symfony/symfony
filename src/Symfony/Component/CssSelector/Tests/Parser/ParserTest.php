@@ -47,7 +47,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     {
         $parser = new Parser();
         $selectors = $parser->parse($source);
-        $this->assertEquals(1, count($selectors));
+        $this->assertCount(1, $selectors);
 
         /** @var SelectorNode $selector */
         $selector = $selectors[0];
@@ -60,7 +60,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     {
         $parser = new Parser();
         $selectors = $parser->parse($source);
-        $this->assertEquals(1, count($selectors));
+        $this->assertCount(1, $selectors);
 
         /** @var SelectorNode $selector */
         $selector = $selectors[0];
@@ -72,7 +72,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     {
         $parser = new Parser();
         $selectors = $parser->parse(sprintf(':nth-child(%s)', $series));
-        $this->assertEquals(1, count($selectors));
+        $this->assertCount(1, $selectors);
 
         /** @var FunctionNode $function */
         $function = $selectors[0]->getTree();
@@ -84,7 +84,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     {
         $parser = new Parser();
         $selectors = $parser->parse(sprintf(':nth-child(%s)', $series));
-        $this->assertEquals(1, count($selectors));
+        $this->assertCount(1, $selectors);
 
         /** @var FunctionNode $function */
         $function = $selectors[0]->getTree();

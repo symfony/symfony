@@ -99,6 +99,9 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
                     $attributeValue = call_user_func($this->callbacks[$attributeName], $attributeValue);
                 }
                 if (null !== $attributeValue && !is_scalar($attributeValue)) {
+                    if (!$this->serializer instanceof NormalizerInterface) {
+                        throw new \LogicException(sprintf('Cannot normalize attribute "%s" because injected serializer is not a normalizer', $attributeName));
+                    }
                     $attributeValue = $this->serializer->normalize($attributeValue, $format);
                 }
 

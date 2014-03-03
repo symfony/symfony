@@ -79,11 +79,11 @@ class PdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
     {
         $storage = new PdoSessionHandler($this->pdo, array('db_table' => 'sessions'), array());
         $storage->write('foo', 'bar');
-        $this->assertEquals(1, count($this->pdo->query('SELECT * FROM sessions')->fetchAll()));
+        $this->assertCount(1, $this->pdo->query('SELECT * FROM sessions')->fetchAll());
 
         $storage->destroy('foo');
 
-        $this->assertEquals(0, count($this->pdo->query('SELECT * FROM sessions')->fetchAll()));
+        $this->assertCount(0, $this->pdo->query('SELECT * FROM sessions')->fetchAll());
     }
 
     public function testSessionGC()
@@ -93,10 +93,10 @@ class PdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
         $storage->write('foo', 'bar');
         $storage->write('baz', 'bar');
 
-        $this->assertEquals(2, count($this->pdo->query('SELECT * FROM sessions')->fetchAll()));
+        $this->assertCount(2, $this->pdo->query('SELECT * FROM sessions')->fetchAll());
 
         $storage->gc(-1);
-        $this->assertEquals(0, count($this->pdo->query('SELECT * FROM sessions')->fetchAll()));
+        $this->assertCount(0, $this->pdo->query('SELECT * FROM sessions')->fetchAll());
     }
 
     public function testGetConnection()

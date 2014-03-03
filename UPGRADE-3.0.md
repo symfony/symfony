@@ -23,6 +23,31 @@ UPGRADE FROM 2.x to 3.0
  * The methods `isQuiet`, `isVerbose`, `isVeryVerbose` and `isDebug` were added
    to `Symfony\Component\Console\Output\OutputInterface`.
 
+ * `ProgressHelper` has been removed in favor of `ProgressBar`.
+
+   Before:
+
+   ```
+   $h = new ProgressHelper();
+   $h->start($output, 10);
+   for ($i = 1; $i < 5; $i++) {
+       usleep(200000);
+       $h->advance();
+   }
+   $h->finish();
+   ```
+
+   After:
+
+   ```
+   $bar = new ProgressBar($output, 10);
+   $bar->start();
+   for ($i = 1; $i < 5; $i++) {
+       usleep(200000);
+       $bar->advance();
+   }
+   ```
+
 ### EventDispatcher
 
  * The interface `Symfony\Component\EventDispatcher\Debug\TraceableEventDispatcherInterface`

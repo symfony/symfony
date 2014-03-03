@@ -19,6 +19,8 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * @author Chris Jones <leeked@gmail.com>
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated Deprecated since 2.5, to be removed in 3.0; use ProgressBar instead.
  */
 class ProgressHelper extends Helper
 {

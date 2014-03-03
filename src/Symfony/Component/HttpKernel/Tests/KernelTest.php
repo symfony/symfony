@@ -77,11 +77,7 @@ class KernelTest extends \PHPUnit_Framework_TestCase
     public function testBootSetsTheBootedFlagToTrue()
     {
         // use test kernel to access isBooted()
-        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest')
-            ->setConstructorArgs(array('test', false))
-            ->setMethods(array('initializeBundles', 'initializeContainer'))
-            ->getMock();
-
+        $kernel = $this->getKernelForTest(array('initializeBundles', 'initializeContainer'));
         $kernel->boot();
 
         $this->assertTrue($kernel->isBooted());
@@ -575,12 +571,7 @@ EOF;
         $child = $this->getBundle(null, 'ParentABundle', 'ChildABundle');
 
         // use test kernel so we can access getBundleMap()
-        $kernel = $this
-            ->getMockBuilder('Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest')
-            ->setMethods(array('registerBundles'))
-            ->setConstructorArgs(array('test', false))
-            ->getMock()
-        ;
+        $kernel = $this->getKernelForTest(array('registerBundles'));
         $kernel
             ->expects($this->once())
             ->method('registerBundles')
@@ -599,18 +590,12 @@ EOF;
         $child = $this->getBundle(null, 'ParentBBundle', 'ChildBBundle');
 
         // use test kernel so we can access getBundleMap()
-        $kernel = $this
-            ->getMockBuilder('Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest')
-            ->setMethods(array('registerBundles'))
-            ->setConstructorArgs(array('test', false))
-            ->getMock()
-        ;
+        $kernel = $this->getKernelForTest(array('registerBundles'));
         $kernel
             ->expects($this->once())
             ->method('registerBundles')
             ->will($this->returnValue(array($grandparent, $parent, $child)))
         ;
-
         $kernel->boot();
 
         $map = $kernel->getBundleMap();
@@ -637,18 +622,12 @@ EOF;
         $child = $this->getBundle(null, 'ParentCBundle', 'ChildCBundle');
 
         // use test kernel so we can access getBundleMap()
-        $kernel = $this
-            ->getMockBuilder('Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest')
-            ->setMethods(array('registerBundles'))
-            ->setConstructorArgs(array('test', false))
-            ->getMock()
-        ;
+        $kernel = $this->getKernelForTest(array('registerBundles'));
         $kernel
             ->expects($this->once())
             ->method('registerBundles')
             ->will($this->returnValue(array($parent, $grandparent, $child)))
         ;
-
         $kernel->boot();
 
         $map = $kernel->getBundleMap();
@@ -793,17 +772,34 @@ EOF;
      */
     protected function getKernel(array $methods = array(), array $bundles = array())
     {
+        $methods[] = 'registerBundles';
+
         $kernel = $this
             ->getMockBuilder('Symfony\Component\HttpKernel\Kernel')
             ->setMethods($methods)
             ->setConstructorArgs(array('test', false))
             ->getMockForAbstractClass()
         ;
-
         $kernel->expects($this->any())
             ->method('registerBundles')
             ->will($this->returnValue($bundles))
         ;
+        $p = new \ReflectionProperty($kernel, 'rootDir');
+        $p->setAccessible(true);
+        $p->setValue($kernel, __DIR__.'/Fixtures');
+
+        return $kernel;
+    }
+
+    protected function getKernelForTest(array $methods = array())
+    {
+        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest')
+            ->setConstructorArgs(array('test', false))
+            ->setMethods($methods)
+            ->getMock();
+        $p = new \ReflectionProperty($kernel, 'rootDir');
+        $p->setAccessible(true);
+        $p->setValue($kernel, __DIR__.'/Fixtures');
 
         return $kernel;
     }

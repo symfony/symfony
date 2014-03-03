@@ -44,6 +44,8 @@ class ApacheMatcherDumper extends MatcherDumper
         $options = array_merge(array(
             'script_name' => 'app.php',
             'base_uri'    => '',
+            'http_port'   => '',
+            'https_port'  => ''
         ), $options);
 
         $options['script_name'] = self::escape($options['script_name'], ' ', '\\');
@@ -177,14 +179,40 @@ class ApacheMatcherDumper extends MatcherDumper
             $rule[] = 'RewriteRule .* $0/ [QSA,L,R=301]';
         }
 
-        // the main rule
+        $requiredSchemes = $route->getSchemes();
+        if (count($requiredSchemes) === 1) {
 
-        if ($compiledRoute->getHostRegex()) {
-            $rule[] = sprintf("RewriteCond %%{ENV:__ROUTING_host_%s} =1", $hostRegexUnique);
+            $scheme = $requiredSchemes[0];
+
+            // redirect for wrong scheme
+            if ($compiledRoute->getHostRegex()) {
+                $rule[] = sprintf("RewriteCond %%{ENV:__ROUTING_host_%s} =1", $hostRegexUnique);
+            }
+
+            $targetPort = (!empty($options[$scheme . '_port']) ? ':' . $options[$scheme . '_port'] : '');
+
+            $rule[] = 'RewriteCond %{HTTPS} ' . ($scheme === 'http' ? 'on' : 'off');
+            $rule[] = "RewriteCond %{REQUEST_URI} $regex";
+            $rule[] = 'RewriteRule ^(.*)$ ' . $scheme . '://%{SERVER_NAME}' . $targetPort . '%{REQUEST_URI} [L,R=301]';
+
+            // main rule for correct scheme
+            if ($compiledRoute->getHostRegex()) {
+                $rule[] = sprintf("RewriteCond %%{ENV:__ROUTING_host_%s} =1", $hostRegexUnique);
+            }
+            $rule[] = 'RewriteCond %{HTTPS} ' . ($scheme === 'http' ? 'off' : 'on');
+            $rule[] = "RewriteCond %{REQUEST_URI} $regex";
+            $rule[] = "RewriteRule .* {$options['script_name']} [QSA,L,$variables]";
+
+        } else {
+
+            // the main rule
+            if ($compiledRoute->getHostRegex()) {
+                $rule[] = sprintf("RewriteCond %%{ENV:__ROUTING_host_%s} =1", $hostRegexUnique);
+            }
+
+            $rule[] = "RewriteCond %{REQUEST_URI} $regex";
+            $rule[] = "RewriteRule .* {$options['script_name']} [QSA,L,$variables]";
         }
-
-        $rule[] = "RewriteCond %{REQUEST_URI} $regex";
-        $rule[] = "RewriteRule .* {$options['script_name']} [QSA,L,$variables]";
 
         return implode("\n", $rule);
     }

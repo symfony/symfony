@@ -1,0 +1,10 @@
+---------------------------------------------------------------------------
+
+by florianv at 2014-01-25T20:29:20Z
+
+Finally created a `ConcreteDumper` to test the abstract class as done is a few places:
+
+- https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Security/Core/Tests/Authentication/Token/AbstractTokenTest.php#L33
+- https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Form/Tests/AbstractExtensionTest.php#L33
+
+I think it is ready to merge.

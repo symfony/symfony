@@ -129,7 +129,7 @@ class CompoundFormTest extends AbstractFormTest
         $child = $factory->create('file', null, array('auto_initialize' => false));
 
         $this->form->add($child);
-        $this->form->submit(array('file' => null));
+        $this->form->submit(array('file' => null), false);
 
         $this->assertCount(0, $this->form->getExtraData());
     }

@@ -29,7 +29,7 @@ abstract class FileDumper implements DumperInterface
      *
      * @var string
      */
-    protected $relativePathTemplate = '{domain}.{locale}.{extension}';
+    protected $relativePathTemplate = '%domain%.%locale%.%extension%';
 
     /**
      * Sets the template for the relative paths to files.
@@ -95,9 +95,9 @@ abstract class FileDumper implements DumperInterface
     private function getRelativePath($domain, $locale)
     {
         return strtr($this->relativePathTemplate, array(
-            '{domain}' => $domain,
-            '{locale}' => $locale,
-            '{extension}' => $this->getExtension()
+            '%domain%' => $domain,
+            '%locale%' => $locale,
+            '%extension%' => $this->getExtension()
         ));
     }
 }

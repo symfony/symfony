@@ -46,7 +46,7 @@ class FileDumperTest extends \PHPUnit_Framework_TestCase
         $catalogue->add(array('foo' => 'bar'));
 
         $dumper = new ConcreteFileDumper();
-        $dumper->setRelativePathTemplate('test/translations/{domain}.{locale}.{extension}');
+        $dumper->setRelativePathTemplate('test/translations/%domain%.%locale%.%extension%');
         $dumper->dump($catalogue, array('path' => $tempDir));
 
         $this->assertTrue(file_exists($file));

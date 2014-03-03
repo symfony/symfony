@@ -31,8 +31,8 @@ class IcuResFileDumperTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(file_get_contents(__DIR__.'/../fixtures/resourcebundle/res/en.res'), file_get_contents($tempDir.'/messages/en.res'));
 
-        unlink($tempDir.'/messages/en.res');
-        rmdir($tempDir.'/messages');
-        rmdir($tempDir);
+        @unlink($tempDir.'/messages/en.res');
+        @rmdir($tempDir.'/messages');
+        @rmdir($tempDir);
     }
 }

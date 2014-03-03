@@ -23,7 +23,7 @@ class IcuResFileDumper extends FileDumper
     /**
      * {@inheritDoc}
      */
-    protected $relativePathTemplate = '{domain}/{locale}.{extension}';
+    protected $relativePathTemplate = '%domain%/%locale%.%extension%';
 
     /**
      * {@inheritDoc}

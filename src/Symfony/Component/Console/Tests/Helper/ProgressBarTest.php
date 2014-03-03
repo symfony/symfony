@@ -363,7 +363,6 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
         $bar->finish();
 
         rewind($output->getStream());
-
         $this->assertEquals(
             $this->generateOutput(
                 " \033[44;37m Starting the demo... fingers crossed  \033[0m\n".
@@ -380,6 +379,27 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
                 " 15/15 ".str_repeat($done, 28)." 100%\n".
                 " 🏁  1 sec                       \033[41;37m 195 kB \033[0m"
             ),
+            stream_get_contents($output->getStream())
+        );
+    }
+
+    public function testSetFormat()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream());
+        $bar->setFormat('normal');
+        $bar->start();
+        rewind($output->getStream());
+        $this->assertEquals(
+            $this->generateOutput('    0 [>---------------------------]'),
+            stream_get_contents($output->getStream())
+        );
+
+        $bar = new ProgressBar($output = $this->getOutputStream(), 10);
+        $bar->setFormat('normal');
+        $bar->start();
+        rewind($output->getStream());
+        $this->assertEquals(
+            $this->generateOutput('  0/10 [>---------------------------]   0%'),
             stream_get_contents($output->getStream())
         );
     }

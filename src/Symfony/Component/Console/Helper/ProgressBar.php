@@ -67,6 +67,8 @@ class ProgressBar
         if (!self::$formats) {
             self::$formats = self::initFormats();
         }
+
+        $this->setFormat($this->determineBestFormat());
     }
 
     /**
@@ -274,7 +276,15 @@ class ProgressBar
      */
     public function setFormat($format)
     {
-        $this->format = isset(self::$formats[$format]) ? self::$formats[$format] : $format;
+        // try to use the _nomax variant if available
+        if (!$this->max && isset(self::$formats[$format.'_nomax'])) {
+            $this->format = self::$formats[$format.'_nomax'];
+        } elseif (isset(self::$formats[$format])) {
+            $this->format = self::$formats[$format];
+        } else {
+            $this->format = $format;
+        }
+
         $this->formatLineCount = substr_count($this->format, "\n");
     }
 
@@ -298,10 +308,6 @@ class ProgressBar
         $this->percent = 0;
         $this->lastMessagesLength = 0;
         $this->barCharOriginal = '';
-
-        if (null === $this->format) {
-            $this->setFormat($this->determineBestFormat());
-        }
 
         if (!$this->max) {
             $this->barCharOriginal = $this->barChar;
@@ -457,12 +463,13 @@ class ProgressBar
     private function determineBestFormat()
     {
         switch ($this->output->getVerbosity()) {
-            case OutputInterface::VERBOSITY_QUIET:
-                return $this->max > 0 ? 'quiet' : 'quiet_nomax';
+            // OutputInterface::VERBOSITY_QUIET: display is disabled anyway
             case OutputInterface::VERBOSITY_VERBOSE:
-            case OutputInterface::VERBOSITY_VERY_VERBOSE:
-            case OutputInterface::VERBOSITY_DEBUG:
                 return $this->max > 0 ? 'verbose' : 'verbose_nomax';
+            case OutputInterface::VERBOSITY_VERY_VERBOSE:
+                return $this->max > 0 ? 'very_verbose' : 'very_verbose_nomax';
+            case OutputInterface::VERBOSITY_DEBUG:
+                return $this->max > 0 ? 'debug' : 'debug_nomax';
             default:
                 return $this->max > 0 ? 'normal' : 'normal_nomax';
         }
@@ -528,12 +535,17 @@ class ProgressBar
     private static function initFormats()
     {
         return array(
-            'quiet'         => ' %percent%%',
-            'normal'        => ' %current%/%max% [%bar%] %percent:3s%%',
-            'verbose'       => ' %current%/%max% [%bar%] %percent:3s%% Elapsed: %elapsed:6s%',
-            'quiet_nomax'   => ' %current%',
-            'normal_nomax'  => ' %current% [%bar%]',
-            'verbose_nomax' => ' %current% [%bar%] Elapsed: %elapsed:6s%',
+            'normal'             => ' %current%/%max% [%bar%] %percent:3s%%',
+            'normal_nomax'       => ' %current% [%bar%]',
+
+            'verbose'            => ' %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%',
+            'verbose_nomax'      => ' %current% [%bar%] %percent:3s%% %elapsed:6s%',
+
+            'very_verbose'       => ' %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%',
+            'very_verbose_nomax' => ' %current% [%bar%] %percent:3s%% %elapsed:6s%',
+
+            'debug'              => ' %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%',
+            'debug_nomax'        => ' %current% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%',
         );
     }
 }

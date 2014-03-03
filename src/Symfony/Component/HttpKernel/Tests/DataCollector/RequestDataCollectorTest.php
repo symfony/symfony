@@ -144,6 +144,22 @@ class RequestDataCollectorTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     * Test data collector serialisation.
+     *
+     * @dataProvider provider
+     */
+    public function testDataCollectorSerialization(Request $request, Response $response)
+    {
+        if (class_exists('Symfony\Component\HttpFoundation\Session\Session') && class_exists('PDO')) {
+            $c = new RequestDataCollector();
+            $c->collect($request, $response);
+            $this->assertContains('"Object(Symfony\Component\HttpFoundation\Session\Session)"', $c->serialize());
+        } else {
+            $this->markTestSkipped('"Symfony\Component\HttpFoundation\Session\Session" or "PDO" class does not exists');
+        }
+    }
+
     public function provider()
     {
         if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
@@ -154,6 +170,15 @@ class RequestDataCollectorTest extends \PHPUnit_Framework_TestCase
         $request->attributes->set('foo', 'bar');
         $request->attributes->set('_route', 'foobar');
         $request->attributes->set('_route_params', array('name' => 'foo'));
+
+        if (class_exists('Symfony\Component\HttpFoundation\Session\Session') && class_exists('PDO')) {
+            $pdo = new \PDO("sqlite::memory:");
+            $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+            $handler = new \Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler($pdo, array('db_table' => 'sessions'));
+            $bridge = new \Symfony\Component\HttpFoundation\Session\Storage\PhpBridgeSessionStorage($handler);
+            $session = new \Symfony\Component\HttpFoundation\Session\Session($bridge);
+            $request->attributes->set('session', $session);
+        }
 
         $response = new Response();
         $response->setStatusCode(200);

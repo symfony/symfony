@@ -993,9 +993,10 @@ class Response
 
 
         $ret = array();
-        foreach($vary as $item) {
+        foreach ($vary as $item) {
           $ret = array_merge($ret, preg_split('/[\s,]+/', $item));
         }
+
         return $ret;
     }
 

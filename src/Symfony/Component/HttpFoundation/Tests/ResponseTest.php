@@ -306,7 +306,9 @@ class ResponseTest extends ResponseTestCase
         $this->assertEquals(array('Accept-Language', 'User-Agent'), $response->getVary(), '->setVary() replace the vary header by default');
 
         $response->setVary('X-Foo', false);
-        $this->assertEquals(array('Accept-Language', 'User-Agent'), $response->getVary(), '->setVary() doesn\'t change the Vary header if replace is set to false');
+        $this->assertTrue(in_array('Accept-Language', $response->getVary()), '->setVary() doesn\'t wipe out earlier Vary headers if replace is set to false');
+        $this->assertTrue(in_array('User-Agent', $response->getVary()), '->setVary() doesn\'t wipe out earlier Vary headers if replace is set to false');
+        $this->assertTrue(in_array('X-Foo', $response->getVary()), '->setVary() adds new Vary headers when replace is set to false');
     }
 
     public function testDefaultContentType()

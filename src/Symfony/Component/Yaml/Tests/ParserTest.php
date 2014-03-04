@@ -62,9 +62,9 @@ class ParserTest extends \PHPUnit_Framework_TestCase
                 if (isset($test['todo']) && $test['todo']) {
                     // TODO
                 } else {
-                    $expected = var_export(eval('return '.trim($test['php']).';'), true);
+                    eval('$expected = '.trim($test['php']).';');
 
-                    $tests[] = array($file, $expected, $test['yaml'], $test['test']);
+                    $tests[] = array($file, var_export($expected, true), $test['yaml'], $test['test']);
                 }
             }
         }

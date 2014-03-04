@@ -385,7 +385,7 @@ class XmlDescriptor extends Descriptor
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->appendChild($parameterXML = $dom->createElement('parameter'));
 
-        if (isset( $options['parameter'])) {
+        if (isset($options['parameter'])) {
             $parameterXML->setAttribute('key', $options['parameter']);
         }
 

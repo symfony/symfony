@@ -140,6 +140,10 @@ class TimeType extends AbstractType
 
         if ('single_text' === $options['widget']) {
             $view->vars['type'] = 'time';
+
+            if ($options['with_seconds'] && !isset($view->vars['attr']['step'])) {
+                $view->vars['attr']['step'] = 1;
+            }
         }
     }
 

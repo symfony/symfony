@@ -46,6 +46,8 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
      * @param callable[] $callbacks help normalize the result
      *
      * @throws InvalidArgumentException if a non-callable callback is set
+     *
+     * @return GetSetMethodNormalizer
      */
     public function setCallbacks(array $callbacks)
     {
@@ -55,26 +57,36 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
             }
         }
         $this->callbacks = $callbacks;
+
+        return $this;
     }
 
     /**
      * Set ignored attributes for normalization
      *
      * @param array $ignoredAttributes
+     *
+     * @return GetSetMethodNormalizer
      */
     public function setIgnoredAttributes(array $ignoredAttributes)
     {
         $this->ignoredAttributes = $ignoredAttributes;
+
+        return $this;
     }
 
     /**
      * Set attributes to be camelized on denormalize
      *
      * @param array $camelizedAttributes
+     *
+     * @return GetSetMethodNormalizer
      */
     public function setCamelizedAttributes(array $camelizedAttributes)
     {
         $this->camelizedAttributes = $camelizedAttributes;
+
+        return $this;
     }
 
     /**

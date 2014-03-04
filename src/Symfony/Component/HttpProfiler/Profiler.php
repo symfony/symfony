@@ -80,13 +80,13 @@ class Profiler
      *
      * @return Profile A Profile instance
      */
-    public function loadProfileFromResponse(Response $response)
+    public function loadFromResponse(Response $response)
     {
         if (!$token = $response->headers->get('X-Debug-Token')) {
             return false;
         }
 
-        return $this->loadProfile($token);
+        return $this->load($token);
     }
 
     /**
@@ -96,7 +96,7 @@ class Profiler
      *
      * @return Profile A Profile instance
      */
-    public function loadProfile($token)
+    public function load($token)
     {
         return $this->storage->read($token);
     }
@@ -108,7 +108,7 @@ class Profiler
      *
      * @return Boolean
      */
-    public function saveProfile(Profile $profile)
+    public function save(Profile $profile)
     {
         // late collect
         foreach ($profile->getCollectors() as $collector) {
@@ -159,7 +159,7 @@ class Profiler
             return false;
         }
 
-        $this->saveProfile($profile);
+        $this->save($profile);
 
         return $profile;
     }

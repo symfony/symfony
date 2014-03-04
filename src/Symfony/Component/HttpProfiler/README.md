@@ -30,10 +30,10 @@ explore problems after the fact.
     // profiles are uniquely identified by a token
     $token = $profile->getToken();
 
-    $profiler->saveProfile($profile);
+    $profiler->save($profile);
 
     // in another process, get back a profile
-    $profile = $profiler->loadProfile($token);
+    $profile = $profiler->load($token);
 
 Resources
 ---------

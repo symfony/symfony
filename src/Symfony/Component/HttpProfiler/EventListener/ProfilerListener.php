@@ -135,7 +135,7 @@ class ProfilerListener implements EventSubscriberInterface
 
         // save profiles
         foreach ($this->profiles as $request) {
-            $this->profiler->saveProfile($this->profiles[$request]);
+            $this->profiler->save($this->profiles[$request]);
         }
 
         $this->profiles = new \SplObjectStorage();

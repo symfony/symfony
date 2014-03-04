@@ -41,7 +41,7 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
         $profiler->add($collector);
         $profile = $profiler->collect($request, $response);
 
-        $profile = $profiler->loadProfile($profile->getToken());
+        $profile = $profiler->load($profile->getToken());
         $this->assertEquals(array('foo' => 'bar'), $profiler->get('request')->getRequestQuery()->all());
 
         @unlink($tmp);

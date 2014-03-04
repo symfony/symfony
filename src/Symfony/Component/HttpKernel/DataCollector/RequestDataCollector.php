@@ -304,7 +304,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
                 }
             }
 
-            $cookie .= '; expires='.substr(\DateTime::createFromFormat('U', $expires, new \DateTimeZone('UTC'))->format('D, d-M-Y H:i:s T'), 0, -5);
+            $cookie .= '; expires='.str_replace('+0000', '', \DateTime::createFromFormat('U', $expires, new \DateTimeZone('GMT'))->format('D, d-M-Y H:i:s T'));
         }
 
         if ($domain) {

@@ -96,7 +96,7 @@ class Cookie
                 throw new \UnexpectedValueException(sprintf('The cookie expiration time "%s" is not valid.'), $this->expires);
             }
 
-            $cookie .= '; expires='.substr($dateTime->format(self::$dateFormats[0]), 0, -5);
+            $cookie .= '; expires='.str_replace('+0000', '', $dateTime->format(self::$dateFormats[0]));
         }
 
         if ('' !== $this->domain) {

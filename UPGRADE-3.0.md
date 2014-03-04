@@ -371,6 +371,14 @@ UPGRADE FROM 2.x to 3.0
  * The `Symfony\Component\HttpKernel\DependencyInjection\RegisterListenersPass` has been renamed to
    `Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass` and moved to the EventDispatcher component.
 
+ * The profiler was moved to the HttpProfiler component:
+ 
+    * `Symfony\Component\HttpKernel\DataCollector` -> `Symfony\Component\HttpProfiler\DataCollector`
+    * `Symfony\Component\HttpKernel\EventDispatcher\ProfilerListener` -> `Symfony\Component\HttpProfiler\EventDispatcher\ProfilerListener`
+    * `Symfony\Component\HttpKernel\Profiler` -> `Symfony\Component\HttpProfiler\Storage`
+    * `Symfony\Component\HttpKernel\Profiler\Profiler` -> `Symfony\Component\HttpProfiler\Profiler`
+    * `Symfony\Component\HttpKernel\Profiler\Profile` -> `Symfony\Component\HttpProfiler\Profile`
+
 ### Locale
 
  * The Locale component was removed and replaced by the Intl component.

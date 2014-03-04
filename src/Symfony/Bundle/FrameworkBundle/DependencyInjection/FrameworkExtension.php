@@ -248,13 +248,13 @@ class FrameworkExtension extends Extension
 
         // Choose storage class based on the DSN
         $supported = array(
-            'sqlite'    => 'Symfony\Component\HttpKernel\Profiler\SqliteProfilerStorage',
-            'mysql'     => 'Symfony\Component\HttpKernel\Profiler\MysqlProfilerStorage',
-            'file'      => 'Symfony\Component\HttpKernel\Profiler\FileProfilerStorage',
-            'mongodb'   => 'Symfony\Component\HttpKernel\Profiler\MongoDbProfilerStorage',
-            'memcache'  => 'Symfony\Component\HttpKernel\Profiler\MemcacheProfilerStorage',
-            'memcached' => 'Symfony\Component\HttpKernel\Profiler\MemcachedProfilerStorage',
-            'redis'     => 'Symfony\Component\HttpKernel\Profiler\RedisProfilerStorage',
+            'sqlite'    => 'Symfony\Component\HttpProfiler\Storage\SqliteProfilerStorage',
+            'mysql'     => 'Symfony\Component\HttpProfiler\Storage\MysqlProfilerStorage',
+            'file'      => 'Symfony\Component\HttpProfiler\Storage\FileProfilerStorage',
+            'mongodb'   => 'Symfony\Component\HttpProfiler\Storage\MongoDbProfilerStorage',
+            'memcache'  => 'Symfony\Component\HttpProfiler\Storage\MemcacheProfilerStorage',
+            'memcached' => 'Symfony\Component\HttpProfiler\Storage\MemcachedProfilerStorage',
+            'redis'     => 'Symfony\Component\HttpProfiler\Storage\RedisProfilerStorage',
         );
         list($class, ) = explode(':', $config['dsn'], 2);
         if (!isset($supported[$class])) {

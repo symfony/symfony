@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\WebProfilerBundle\Controller;
 
-use Symfony\Component\HttpKernel\Profiler\Profiler;
+use Symfony\Component\HttpProfiler\Profiler;
 use Symfony\Component\Debug\ExceptionHandler;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpFoundation\Response;

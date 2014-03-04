@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by aeoris at 2014-03-03T15:08:16Z
+
+@fabpot just asking out of curiosity: shouldn't this value (and to the same extent, all default session values) be taken from infamous `ini_get` function calls? Different values may be defined in the global `php.ini`, `.htaccess` et al.
+
+Even though it could and will introduce testing issues, we shouldn't expect users or devops all share the very same server configuration values, should we? At least it should be documented that we are forcing default values that may differ from those in the `php.ini` and other configuration files, imho.
+
+---------------------------------------------------------------------------
+
+by cordoval at 2014-03-03T15:10:24Z
+
+@aeoris it is documented I believe no?
+
+---------------------------------------------------------------------------
+
+by aeoris at 2014-03-03T15:19:12Z
+
+@cordoval maybe, is it? I can't really find those docs. But my main point is that we either should get all the default values from the proper configuration files or none at all. And if we do the former, we should document it. I did not check if this PR affects something that's already documented, though.
+
+---------------------------------------------------------------------------
+
+by cordoval at 2014-03-03T15:21:08Z
+
+https://github.com/symfony/symfony-docs/blob/6058408c19a27950aa9cc8958b7b23e8c3001b80/components/http_foundation/session_configuration.rst#configuring-garbage-collection
+
+---------------------------------------------------------------------------
+
+by stof at 2014-03-03T16:15:34Z
+
+@aeoris It cannot be taken from ``ini_get``, because the point is precisely to workaround Linux distributions changing the PHP configuration by setting it to 0 and there running a cronjob to clear the sessions (which will not clear them if you store them inside the Symfony cache).
+And this value is then used to set it through ``ini_set``. So using ``ini_get`` for the default value is strictly equivalent to the current code omitting the config by default
+
+---------------------------------------------------------------------------
+
+by zefrog at 2014-03-03T20:51:12Z
+
+@fabpot thank you for this PR. I think it's the best way to fix the problem.
+
+Setting the gc_probability in php.ini (or overriding it globally) is not a solution because other apps using the default save_path would then raise a notice when running the default gc function, being unable to read the /var/lib/php5 directory. The permissions have been restricted to avoid session hijacking by other users, that's why Debian is using a cron job running as root.
+
+Other projects had (or have) the same issue, and a lot of applications don't have a skilled sysadmin behind to take care of this.
+
+---------------------------------------------------------------------------
+
+by emmanuelballery at 2014-03-03T20:59:43Z
+
+Fortunately, @zefrog is a skilled sysadmin ;)
++1 for this

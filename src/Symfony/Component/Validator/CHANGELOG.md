@@ -6,6 +6,7 @@ CHANGELOG
 
  * deprecated `ApcCache` in favor of `DoctrineCache`
  * added `DoctrineCache` to adapt any Doctrine cache
+ * [BC BREAK] `EmailValidator` now has a lighter validation by default, uses `Egulias\EmailValidator` for strict validation
 
 2.4.0
 -----

@@ -284,6 +284,16 @@ class ResponseTest extends ResponseTestCase
         $response = new Response();
         $response->headers->set('Vary', 'Accept-Language,User-Agent,    X-Foo');
         $this->assertEquals(array('Accept-Language', 'User-Agent', 'X-Foo'), $response->getVary(), '->getVary() parses multiple header name values separated by commas');
+
+        $response = new Response();
+        $vary = array(
+            'Accept-Language',
+            'User-Agent',
+            'X-foo',
+        );
+        $response->headers->set('Vary', $vary);
+        $this->assertEquals($response->headers->get('Vary', NULL, FALSE) , $response->getVary(), '->getVary() parses multiple header name values in arrays');
+
     }
 
     public function testSetVary()

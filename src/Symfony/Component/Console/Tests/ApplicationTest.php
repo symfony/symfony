@@ -139,6 +139,34 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $application->add(new \Foo5Command());
     }
 
+    /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage Command "foo:bar" already exists.
+     */
+    public function testAddCommandWithTheSameName()
+    {
+        $application = new Application();
+        $application->add(new \FooCommand());
+        $application->add(new \FooCommand());
+    }
+
+    /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage Command alias "afoobar" is already in use by "foo:bar".
+     */
+    public function testAddCommandWithExistingAlias()
+    {
+        $fooCommand = new \FooCommand();
+        $fooCommand->setAliases(array('afoobar'));
+
+        $foo1Command = new \Foo1Command();
+        $foo1Command->setAliases(array('afoobar'));
+
+        $application = new Application();
+        $application->add($fooCommand);
+        $application->add($foo1Command);
+    }
+
     public function testHasGet()
     {
         $application = new Application();

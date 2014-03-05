@@ -387,11 +387,12 @@ class Application
     /**
      * Adds a command object.
      *
-     * If a command with the same name already exists, it will be overridden.
      *
      * @param Command $command A Command object
      *
      * @return Command The registered command
+     *
+     * @throws \LogicException If a command with the same name already exists or command has no definition
      *
      * @api
      */
@@ -409,9 +410,17 @@ class Application
             throw new \LogicException(sprintf('Command class "%s" is not correctly initialized. You probably forgot to call the parent constructor.', get_class($command)));
         }
 
+        if (isset($this->commands[$command->getName()])) {
+            throw new \LogicException(sprintf('Command "%s" already exists.', $command->getName()));
+        }
+
         $this->commands[$command->getName()] = $command;
 
         foreach ($command->getAliases() as $alias) {
+            if (isset($this->commands[$alias])) {
+                throw new \LogicException(sprintf('Command alias "%s" is already in use by "%s".', $alias, $this->commands[$alias]->getName()));
+            }
+
             $this->commands[$alias] = $command;
         }
 

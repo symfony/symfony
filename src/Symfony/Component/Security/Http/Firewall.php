@@ -58,10 +58,10 @@ class Firewall implements EventSubscriberInterface
         }
 
         // register listeners for this firewall
-        list($listeners, $exception) = $this->map->getListeners($event->getRequest());
-        if (null !== $exception) {
-            $this->exceptionListeners[$event->getRequest()] = $exception;
-            $exception->register($this->dispatcher);
+        list($listeners, $exceptionListener) = $this->map->getListeners($event->getRequest());
+        if (null !== $exceptionListener) {
+            $this->exceptionListeners[$event->getRequest()] = $exceptionListener;
+            $exceptionListener->register($this->dispatcher);
         }
 
         // initiate the listener chain

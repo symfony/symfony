@@ -17,6 +17,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Validator\Exception\RuntimeException;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
@@ -44,6 +45,10 @@ class ExpressionValidator extends ConstraintValidator
      */
     public function validate($value, Constraint $constraint)
     {
+        if (!$constraint instanceof Expression) {
+            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Expression');
+        }
+
         if (null === $value || '' === $value) {
             return;
         }

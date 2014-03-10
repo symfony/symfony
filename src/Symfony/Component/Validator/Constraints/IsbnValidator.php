@@ -29,6 +29,10 @@ class IsbnValidator extends ConstraintValidator
      */
     public function validate($value, Constraint $constraint)
     {
+        if (!$constraint instanceof Isbn) {
+            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Isbn');
+        }
+
         if (null === $value || '' === $value) {
             return;
         }

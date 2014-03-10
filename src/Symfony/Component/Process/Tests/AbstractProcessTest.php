@@ -280,7 +280,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
     {
         $process = $this->getProcess('php -m');
         $process->run();
-        $this->assertEquals(0, $process->getExitCode());
+        $this->assertSame(0, $process->getExitCode());
     }
 
     public function testStatus()

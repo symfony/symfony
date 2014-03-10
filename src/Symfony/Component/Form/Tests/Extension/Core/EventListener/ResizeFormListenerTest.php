@@ -254,7 +254,20 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(), $event->getData());
     }
 
-    public function testOnSubmitDealsWithIteratorAggregate()
+    public function testOnSubmitDealsWithObjectBackedIteratorAggregate()
+    {
+        $this->form->add($this->getForm('1'));
+
+        $data = new \ArrayObject(array(0 => 'first', 1 => 'second', 2 => 'third'));
+        $event = new FormEvent($this->form, $data);
+        $listener = new ResizeFormListener('text', array(), false, true);
+        $listener->onSubmit($event);
+
+        $this->assertArrayNotHasKey(0, $event->getData());
+        $this->assertArrayNotHasKey(2, $event->getData());
+    }
+
+    public function testOnSubmitDealsWithArrayBackedIteratorAggregate()
     {
         $this->form->add($this->getForm('1'));
 

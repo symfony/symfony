@@ -147,6 +147,14 @@ class SigchildDisabledProcessTest extends AbstractProcessTest
     /**
      * @expectedException \Symfony\Component\Process\Exception\RuntimeException
      */
+    public function testTTYCommandExitCode()
+    {
+        parent::testTTYCommandExitCode();
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Process\Exception\RuntimeException
+     */
     public function testSignal()
     {
         parent::testSignal();

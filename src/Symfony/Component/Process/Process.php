@@ -248,8 +248,6 @@ class Process
         $this->processPipes->unblock();
 
         if ($this->tty) {
-            $this->status = self::STATUS_TERMINATED;
-
             return;
         }
 

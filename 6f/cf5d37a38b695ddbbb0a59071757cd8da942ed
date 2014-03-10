@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2014-03-10T17:29:03Z
+
+There is a conflict when merging this. Can you rebase on current 2.3?
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-03-10T18:05:58Z
+
+Well, I forgot to rebase my branch ; the diff is finally much more simpler. `Process::isSuccessful` was already fixed

@@ -268,6 +268,9 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      */
     private function traverseClassNode($value, ClassMetadataInterface $metadata = null, $propertyPath, array $groups, $cascadedGroups, $traversalStrategy, ExecutionContextInterface $context)
     {
+        // Replace "Default" group by group sequence, if appropriate
+        $groups = $this->replaceDefaultGroup($value, $metadata, $groups);
+
         $groups = $this->validateNode($value, $value, $metadata, $propertyPath, $groups, $traversalStrategy, $context);
 
         if (0 === count($groups)) {
@@ -566,10 +569,6 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
         $context->setMetadata($metadata);
         $context->setPropertyPath($propertyPath);
 
-        if ($metadata instanceof ClassMetadataInterface) {
-            $groups = $this->replaceDefaultGroup($value, $metadata, $groups);
-        }
-
         $objectHash = is_object($object) ? spl_object_hash($object) : null;
 
         // if group (=[<G1,G2>,G3,G4]) contains group sequence (=<G1,G2>)
@@ -599,18 +598,18 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                 $context->markObjectAsValidatedForGroup($objectHash, $groupHash);
             }
 
-            // Validate normal group
-            if (!$group instanceof GroupSequence) {
-                $this->validateNodeForGroup($value, $objectHash, $metadata, $group, $context);
+            if ($group instanceof GroupSequence) {
+                // Traverse group sequence until a violation is generated
+                $this->stepThroughGroupSequence($value, $object, $metadata, $propertyPath, $traversalStrategy, $group, $context);
+
+                // Skip the group sequence when validating successor nodes
+                unset($groups[$key]);
 
                 continue;
             }
 
-            // Traverse group sequence until a violation is generated
-            $this->stepThroughGroupSequence($value, $object, $metadata, $propertyPath, $traversalStrategy, $group, $context);
-
-            // Skip the group sequence when validating successor nodes
-            unset($groups[$key]);
+            // Validate normal group
+            $this->validateNodeForGroup($value, $objectHash, $metadata, $group, $context);
         }
 
         return $groups;

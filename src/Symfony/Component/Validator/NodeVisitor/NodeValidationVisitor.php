@@ -103,18 +103,18 @@ class NodeValidationVisitor extends AbstractVisitor
                 $context->markObjectAsValidatedForGroup($objectHash, $groupHash);
             }
 
-            // Validate normal group
-            if (!$group instanceof GroupSequence) {
-                $this->validateNodeForGroup($node, $group, $context, $objectHash);
+            if ($group instanceof GroupSequence) {
+                // Traverse group sequence until a violation is generated
+                $this->traverseGroupSequence($node, $group, $context);
+
+                // Skip the group sequence when validating successor nodes
+                unset($node->groups[$key]);
 
                 continue;
             }
 
-            // Traverse group sequence until a violation is generated
-            $this->traverseGroupSequence($node, $group, $context);
-
-            // Skip the group sequence when validating successor nodes
-            unset($node->groups[$key]);
+            // Validate normal group
+            $this->validateNodeForGroup($node, $group, $context, $objectHash);
         }
 
         return true;

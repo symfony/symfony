@@ -353,7 +353,6 @@ class ProgressHelper extends Helper
         }
 
         if (isset($this->formatVars['bar'])) {
-            $completeBars = 0;
 
             if ($this->max > 0) {
                 $completeBars = floor($percent * $this->barWidth);
@@ -423,8 +422,8 @@ class ProgressHelper extends Helper
     /**
      * Overwrites a previous message to the output.
      *
-     * @param OutputInterface $output   An Output instance
-     * @param string          $message  The message
+     * @param OutputInterface $output  An Output instance
+     * @param string          $message The message
      */
     private function overwrite(OutputInterface $output, $message)
     {

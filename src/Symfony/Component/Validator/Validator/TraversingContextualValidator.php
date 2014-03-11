@@ -12,12 +12,15 @@
 namespace Symfony\Component\Validator\Validator;
 
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Validator\Exception\RuntimeException;
+use Symfony\Component\Validator\Exception\UnsupportedMetadataException;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Mapping\ClassMetadataInterface;
 use Symfony\Component\Validator\Mapping\GenericMetadata;
 use Symfony\Component\Validator\MetadataFactoryInterface;
+use Symfony\Component\Validator\Node\ClassNode;
+use Symfony\Component\Validator\Node\CollectionNode;
 use Symfony\Component\Validator\Node\GenericNode;
 use Symfony\Component\Validator\Node\PropertyNode;
 use Symfony\Component\Validator\NodeTraverser\NodeTraverserInterface;
@@ -79,22 +82,53 @@ class TraversingContextualValidator implements ContextualValidatorInterface
      */
     public function validate($value, $constraints = null, $groups = null)
     {
-        if (null === $constraints) {
-            $constraints = array(new Valid());
-        } elseif (!is_array($constraints)) {
-            $constraints = array($constraints);
-        }
-
-        $metadata = new GenericMetadata();
-        $metadata->addConstraints($constraints);
         $groups = $groups ? $this->normalizeGroups($groups) : $this->defaultGroups;
 
-        $node = new GenericNode(
-            $value,
-            $metadata,
-            $this->defaultPropertyPath,
-            $groups
-        );
+        if (null !== $constraints) {
+            if (!is_array($constraints)) {
+                $constraints = array($constraints);
+            }
+
+            $metadata = new GenericMetadata();
+            $metadata->addConstraints($constraints);
+
+            $node = new GenericNode(
+                $value,
+                $metadata,
+                $this->defaultPropertyPath,
+                $groups
+            );
+        } elseif (is_array($value) || $value instanceof \Traversable && !$this->metadataFactory->hasMetadataFor($value)) {
+            $node = new CollectionNode(
+                $value,
+                $this->defaultPropertyPath,
+                $groups
+            );
+        } elseif (is_object($value)) {
+            $metadata = $this->metadataFactory->getMetadataFor($value);
+
+            if (!$metadata instanceof ClassMetadataInterface) {
+                throw new UnsupportedMetadataException(sprintf(
+                    'The metadata factory should return instances of '.
+                    '"\Symfony\Component\Validator\Mapping\ClassMetadataInterface", '.
+                    'got: "%s".',
+                    is_object($metadata) ? get_class($metadata) : gettype($metadata)
+                ));
+            }
+
+            $node = new ClassNode(
+                $value,
+                $metadata,
+                $this->defaultPropertyPath,
+                $groups
+            );
+        } else {
+            throw new RuntimeException(sprintf(
+                'Cannot validate values of type "%s" automatically. Please '.
+                'provide a constraint.',
+                gettype($value)
+            ));
+        }
 
         $this->nodeTraverser->traverse(array($node), $this->context);
 
@@ -109,6 +143,8 @@ class TraversingContextualValidator implements ContextualValidatorInterface
         $classMetadata = $this->metadataFactory->getMetadataFor($object);
 
         if (!$classMetadata instanceof ClassMetadataInterface) {
+            // Cannot be UnsupportedMetadataException because of BC with
+            // Symfony < 2.5
             throw new ValidatorException(sprintf(
                 'The metadata factory should return instances of '.
                 '"\Symfony\Component\Validator\Mapping\ClassMetadataInterface", '.
@@ -146,6 +182,8 @@ class TraversingContextualValidator implements ContextualValidatorInterface
         $classMetadata = $this->metadataFactory->getMetadataFor($object);
 
         if (!$classMetadata instanceof ClassMetadataInterface) {
+            // Cannot be UnsupportedMetadataException because of BC with
+            // Symfony < 2.5
             throw new ValidatorException(sprintf(
                 'The metadata factory should return instances of '.
                 '"\Symfony\Component\Validator\Mapping\ClassMetadataInterface", '.

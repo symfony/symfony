@@ -13,11 +13,11 @@ namespace Symfony\Component\Validator\Validator;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\GroupSequence;
-use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\NoSuchMetadataException;
+use Symfony\Component\Validator\Exception\RuntimeException;
 use Symfony\Component\Validator\Exception\UnsupportedMetadataException;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Mapping\CascadingStrategy;
@@ -90,28 +90,59 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      */
     public function validate($value, $constraints = null, $groups = null)
     {
-        if (null === $constraints) {
-            $constraints = array(new Valid());
-        } elseif (!is_array($constraints)) {
-            $constraints = array($constraints);
-        }
-
-        $metadata = new GenericMetadata();
-        $metadata->addConstraints($constraints);
         $groups = $groups ? $this->normalizeGroups($groups) : $this->defaultGroups;
 
-        $this->traverseGenericNode(
-            $value,
-            null,
-            $metadata,
-            $this->defaultPropertyPath,
-            $groups,
-            null,
-            TraversalStrategy::IMPLICIT,
-            $this->context
-        );
+        if (null !== $constraints) {
+            if (!is_array($constraints)) {
+                $constraints = array($constraints);
+            }
 
-        return $this;
+            $metadata = new GenericMetadata();
+            $metadata->addConstraints($constraints);
+
+            $this->traverseGenericNode(
+                $value,
+                null,
+                $metadata,
+                $this->defaultPropertyPath,
+                $groups,
+                null,
+                TraversalStrategy::IMPLICIT,
+                $this->context
+            );
+
+            return $this;
+        }
+
+        if (is_object($value)) {
+            $this->cascadeObject(
+                 $value,
+                 $this->defaultPropertyPath,
+                 $groups,
+                 TraversalStrategy::IMPLICIT,
+                 $this->context
+            );
+
+            return $this;
+        }
+
+        if (is_array($value)) {
+            $this->cascadeCollection(
+                 $value,
+                 $this->defaultPropertyPath,
+                 $groups,
+                 TraversalStrategy::IMPLICIT,
+                 $this->context
+            );
+
+            return $this;
+        }
+
+        throw new RuntimeException(sprintf(
+            'Cannot validate values of type "%s" automatically. Please '.
+            'provide a constraint.',
+            gettype($value)
+        ));
     }
 
     /**
@@ -122,6 +153,8 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
         $classMetadata = $this->metadataFactory->getMetadataFor($object);
 
         if (!$classMetadata instanceof ClassMetadataInterface) {
+            // Cannot be UnsupportedMetadataException because of BC with
+            // Symfony < 2.5
             throw new ValidatorException(sprintf(
                 'The metadata factory should return instances of '.
                 '"\Symfony\Component\Validator\Mapping\ClassMetadataInterface", '.
@@ -159,6 +192,8 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
         $classMetadata = $this->metadataFactory->getMetadataFor($object);
 
         if (!$classMetadata instanceof ClassMetadataInterface) {
+            // Cannot be UnsupportedMetadataException because of BC with
+            // Symfony < 2.5
             throw new ValidatorException(sprintf(
                 'The metadata factory should return instances of '.
                 '"\Symfony\Component\Validator\Mapping\ClassMetadataInterface", '.

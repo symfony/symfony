@@ -650,4 +650,12 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
         /** @var ConstraintViolationInterface[] $violations */
         $this->assertCount(1, $violations);
     }
+
+    /**
+     * @expectedException \Symfony\Component\Validator\Exception\RuntimeException
+     */
+    public function testValidateFailsIfNoConstraintsAndNoObjectOrArray()
+    {
+        $this->validate('Foobar');
+    }
 }

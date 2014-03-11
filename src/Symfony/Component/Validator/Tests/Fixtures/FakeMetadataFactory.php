@@ -49,8 +49,8 @@ class FakeMetadataFactory implements MetadataFactoryInterface
         $hash = null;
 
         if (is_object($class)) {
+            $hash = spl_object_hash($class);
             $class = get_class($class);
-            $hash = spl_object_hash($hash);
         }
 
         if (!is_string($class)) {

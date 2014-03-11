@@ -11,10 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Fixtures;
 
-use Symfony\Component\Validator\ClassBasedInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Validator\MetadataInterface;
-use Symfony\Component\Validator\PropertyMetadataContainerInterface;
 
 class FakeClassMetadata extends ClassMetadata
 {

@@ -415,11 +415,7 @@ class ValidatorBuilder implements ValidatorBuilderInterface
             return new ValidatorV24($metadataFactory, $validatorFactory, $translator, $this->translationDomain, $this->initializers);
         }
 
-        if (Validation::API_VERSION_2_5 === $apiVersion) {
-            $contextFactory = new ExecutionContextFactory($translator, $this->translationDomain);
-        } else {
-            $contextFactory = new LegacyExecutionContextFactory($translator, $this->translationDomain);
-        }
+        $contextFactory = new LegacyExecutionContextFactory($metadataFactory, $translator, $this->translationDomain);
 
         if (Validation::API_VERSION_2_5 === $apiVersion) {
             $nodeTraverser = new NonRecursiveNodeTraverser($metadataFactory);

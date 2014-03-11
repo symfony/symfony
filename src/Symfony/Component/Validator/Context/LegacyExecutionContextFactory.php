@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator\Context;
 
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Group\GroupManagerInterface;
+use Symfony\Component\Validator\MetadataFactoryInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
@@ -27,6 +28,11 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class LegacyExecutionContextFactory implements ExecutionContextFactoryInterface
 {
     /**
+     * @var MetadataFactoryInterface
+     */
+    private $metadataFactory;
+
+    /**
      * @var TranslatorInterface
      */
     private $translator;
@@ -39,13 +45,15 @@ class LegacyExecutionContextFactory implements ExecutionContextFactoryInterface
     /**
      * Creates a new context factory.
      *
-     * @param TranslatorInterface   $translator        The translator
-     * @param string|null           $translationDomain The translation domain to
-     *                                                 use for translating
-     *                                                 violation messages
+     * @param MetadataFactoryInterface $metadataFactory   The metadata factory
+     * @param TranslatorInterface      $translator        The translator
+     * @param string|null              $translationDomain The translation domain
+     *                                                    to use for translating
+     *                                                    violation messages
      */
-    public function __construct(TranslatorInterface $translator, $translationDomain = null)
+    public function __construct(MetadataFactoryInterface $metadataFactory, TranslatorInterface $translator, $translationDomain = null)
     {
+        $this->metadataFactory = $metadataFactory;
         $this->translator = $translator;
         $this->translationDomain = $translationDomain;
     }
@@ -58,6 +66,7 @@ class LegacyExecutionContextFactory implements ExecutionContextFactoryInterface
         return new LegacyExecutionContext(
             $validator,
             $root,
+            $this->metadataFactory,
             $this->translator,
             $this->translationDomain
         );

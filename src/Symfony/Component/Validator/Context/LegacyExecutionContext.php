@@ -16,6 +16,7 @@ use Symfony\Component\Validator\Constraints\Traverse;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Group\GroupManagerInterface;
+use Symfony\Component\Validator\MetadataFactoryInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\ValidatorInterface as LegacyValidatorInterface;
 
@@ -31,32 +32,28 @@ use Symfony\Component\Validator\ValidatorInterface as LegacyValidatorInterface;
 class LegacyExecutionContext extends ExecutionContext
 {
     /**
+     * @var MetadataFactoryInterface
+     */
+    private $metadataFactory;
+
+    /**
      * Creates a new context.
-     *
-     * This constructor ensures that the given validator implements the
-     * deprecated {@link \Symfony\Component\Validator\ValidatorInterface}. If
-     * it does not, an {@link InvalidArgumentException} is thrown.
      *
      * @see ExecutionContext::__construct()
      *
      * @internal Called by {@link LegacyExecutionContextFactory}. Should not be used
      *           in user code.
      */
-    public function __construct(ValidatorInterface $validator, $root, TranslatorInterface $translator, $translationDomain = null)
+    public function __construct(ValidatorInterface $validator, $root, MetadataFactoryInterface $metadataFactory, TranslatorInterface $translator, $translationDomain = null)
     {
-        if (!$validator instanceof LegacyValidatorInterface) {
-            throw new InvalidArgumentException(
-                'The validator passed to LegacyExecutionContext must implement '.
-                '"Symfony\Component\Validator\ValidatorInterface".'
-            );
-        }
-
         parent::__construct(
             $validator,
             $root,
             $translator,
             $translationDomain
         );
+
+        $this->metadataFactory = $metadataFactory;
     }
 
     /**
@@ -158,6 +155,6 @@ class LegacyExecutionContext extends ExecutionContext
      */
     public function getMetadataFactory()
     {
-        return $this->getValidator()->getMetadataFactory();
+        return $this->metadataFactory;
     }
 }

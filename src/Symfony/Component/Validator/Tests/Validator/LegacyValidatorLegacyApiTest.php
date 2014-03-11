@@ -34,7 +34,7 @@ class LegacyValidatorLegacyApiTest extends AbstractLegacyApiTest
 
     protected function createValidator(MetadataFactoryInterface $metadataFactory)
     {
-        $contextFactory = new LegacyExecutionContextFactory(new DefaultTranslator());
+        $contextFactory = new LegacyExecutionContextFactory($metadataFactory, new DefaultTranslator());
 
         return new LegacyValidator($contextFactory, $metadataFactory, new ConstraintValidatorFactory());
     }

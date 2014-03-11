@@ -646,43 +646,34 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      */
     private function validateNodeForGroup($value, $objectHash, MetadataInterface $metadata = null, $group, ExecutionContextInterface $context)
     {
-        try {
-            $context->setGroup($group);
+        $context->setGroup($group);
 
-            foreach ($metadata->findConstraints($group) as $constraint) {
-                // Prevent duplicate validation of constraints, in the case
-                // that constraints belong to multiple validated groups
-                if (null !== $objectHash) {
-                    $constraintHash = spl_object_hash($constraint);
+        foreach ($metadata->findConstraints($group) as $constraint) {
+            // Prevent duplicate validation of constraints, in the case
+            // that constraints belong to multiple validated groups
+            if (null !== $objectHash) {
+                $constraintHash = spl_object_hash($constraint);
 
-                    if ($metadata instanceof ClassMetadataInterface) {
-                        if ($context->isClassConstraintValidated($objectHash, $constraintHash)) {
-                            continue;
-                        }
-
-                        $context->markClassConstraintAsValidated($objectHash, $constraintHash);
-                    } elseif ($metadata instanceof PropertyMetadataInterface) {
-                        $propertyName = $metadata->getPropertyName();
-
-                        if ($context->isPropertyConstraintValidated($objectHash, $propertyName, $constraintHash)) {
-                            continue;
-                        }
-
-                        $context->markPropertyConstraintAsValidated($objectHash, $propertyName, $constraintHash);
+                if ($metadata instanceof ClassMetadataInterface) {
+                    if ($context->isClassConstraintValidated($objectHash, $constraintHash)) {
+                        continue;
                     }
-                }
 
-                $validator = $this->validatorFactory->getInstance($constraint);
-                $validator->initialize($context);
-                $validator->validate($value, $constraint);
+                    $context->markClassConstraintAsValidated($objectHash, $constraintHash);
+                } elseif ($metadata instanceof PropertyMetadataInterface) {
+                    $propertyName = $metadata->getPropertyName();
+
+                    if ($context->isPropertyConstraintValidated($objectHash, $propertyName, $constraintHash)) {
+                        continue;
+                    }
+
+                    $context->markPropertyConstraintAsValidated($objectHash, $propertyName, $constraintHash);
+                }
             }
 
-            $context->setGroup(null);
-        } catch (\Exception $e) {
-            // Should be put into a finally block once we switch to PHP 5.5
-            $context->setGroup(null);
-
-            throw $e;
+            $validator = $this->validatorFactory->getInstance($constraint);
+            $validator->initialize($context);
+            $validator->validate($value, $constraint);
         }
     }
 

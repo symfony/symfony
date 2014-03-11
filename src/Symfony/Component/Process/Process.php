@@ -448,7 +448,7 @@ class Process
     public function getExitCode()
     {
         if ($this->isSigchildEnabled() && !$this->enhanceSigchildCompatibility) {
-            throw new RuntimeException('This PHP has been compiled with --enable-sigchild. You must use setEnhanceSigchildCompatibility() to use this method');
+            throw new RuntimeException('This PHP has been compiled with --enable-sigchild. You must use setEnhanceSigchildCompatibility() to use this method.');
         }
 
         $this->updateStatus(false);
@@ -500,7 +500,7 @@ class Process
     public function hasBeenSignaled()
     {
         if ($this->isSigchildEnabled()) {
-            throw new RuntimeException('This PHP has been compiled with --enable-sigchild. Term signal can not be retrieved');
+            throw new RuntimeException('This PHP has been compiled with --enable-sigchild. Term signal can not be retrieved.');
         }
 
         $this->updateStatus(false);
@@ -522,7 +522,7 @@ class Process
     public function getTermSignal()
     {
         if ($this->isSigchildEnabled()) {
-            throw new RuntimeException('This PHP has been compiled with --enable-sigchild. Term signal can not be retrieved');
+            throw new RuntimeException('This PHP has been compiled with --enable-sigchild. Term signal can not be retrieved.');
         }
 
         $this->updateStatus(false);

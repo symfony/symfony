@@ -166,7 +166,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testGetErrorOutput()
     {
-        $p = new Process(sprintf('php -r %s', escapeshellarg('$n = 0; while ($n < 3) { file_put_contents(\'php://stderr\', \'ERROR\'); $n++; }')));
+        $p = $this->getProcess(sprintf('php -r %s', escapeshellarg('$n = 0; while ($n < 3) { file_put_contents(\'php://stderr\', \'ERROR\'); $n++; }')));
 
         $p->run();
         $this->assertEquals(3, preg_match_all('/ERROR/', $p->getErrorOutput(), $matches));
@@ -174,7 +174,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testGetIncrementalErrorOutput()
     {
-        $p = new Process(sprintf('php -r %s', escapeshellarg('$n = 0; while ($n < 3) { usleep(50000); file_put_contents(\'php://stderr\', \'ERROR\'); $n++; }')));
+        $p = $this->getProcess(sprintf('php -r %s', escapeshellarg('$n = 0; while ($n < 3) { usleep(50000); file_put_contents(\'php://stderr\', \'ERROR\'); $n++; }')));
 
         $p->start();
         while ($p->isRunning()) {
@@ -185,7 +185,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testGetOutput()
     {
-        $p = new Process(sprintf('php -r %s', escapeshellarg('$n=0;while ($n<3) {echo \' foo \';$n++; usleep(500); }')));
+        $p = $this->getProcess(sprintf('php -r %s', escapeshellarg('$n=0;while ($n<3) {echo \' foo \';$n++; usleep(500); }')));
 
         $p->run();
         $this->assertEquals(3, preg_match_all('/foo/', $p->getOutput(), $matches));
@@ -193,7 +193,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testGetIncrementalOutput()
     {
-        $p = new Process(sprintf('php -r %s', escapeshellarg('$n=0;while ($n<3) { echo \' foo \'; usleep(50000); $n++; }')));
+        $p = $this->getProcess(sprintf('php -r %s', escapeshellarg('$n=0;while ($n<3) { echo \' foo \'; usleep(50000); $n++; }')));
 
         $p->start();
         while ($p->isRunning()) {

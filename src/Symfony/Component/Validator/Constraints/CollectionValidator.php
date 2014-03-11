@@ -27,6 +27,10 @@ class CollectionValidator extends ConstraintValidator
      */
     public function validate($value, Constraint $constraint)
     {
+        if (!$constraint instanceof Collection) {
+            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Collection');
+        }
+
         if (null === $value) {
             return;
         }

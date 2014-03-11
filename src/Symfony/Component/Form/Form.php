@@ -780,7 +780,33 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function getErrors($deep = false, $flatten = true)
     {
-        return new FormErrorIterator($this->errors, $this, $deep, $flatten);
+        $errors = $this->errors;
+
+        // Copy the errors of nested forms to the $errors array
+        if ($deep) {
+            foreach ($this as $child) {
+                /** @var FormInterface $child */
+                if ($child->isSubmitted() && $child->isValid()) {
+                    continue;
+                }
+
+                $iterator = $child->getErrors(true, $flatten);
+
+                if (0 === count($iterator)) {
+                    continue;
+                }
+
+                if ($flatten) {
+                    foreach ($iterator as $error) {
+                        $errors[] = $error;
+                    }
+                } else {
+                    $errors[] = $iterator;
+                }
+            }
+        }
+
+        return new FormErrorIterator($this, $errors);
     }
 
     /**

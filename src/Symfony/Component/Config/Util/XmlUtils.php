@@ -132,7 +132,7 @@ class XmlUtils
         $nodeValue = false;
         foreach ($element->childNodes as $node) {
             if ($node instanceof \DOMText) {
-                if (trim($node->nodeValue)) {
+                if (strlen(trim($node->nodeValue)) > 0) {
                     $nodeValue = trim($node->nodeValue);
                     $empty = false;
                 }

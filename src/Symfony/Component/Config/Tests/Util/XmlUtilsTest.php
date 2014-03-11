@@ -80,6 +80,7 @@ class XmlUtilsTest extends \PHPUnit_Framework_TestCase
             array(array('foo' => null), '<foo />'),
             array(array('foo' => 'bar'), '<foo>bar</foo>'),
             array(array('foo' => array('foo' => 'bar')), '<foo foo="bar"/>'),
+            array(array('foo' => array('foo' => 0)), '<foo><foo>0</foo></foo>'),
             array(array('foo' => array('foo' => 'bar')), '<foo><foo>bar</foo></foo>'),
             array(array('foo' => array('foo' => 'bar', 'value' => 'text')), '<foo foo="bar">text</foo>'),
             array(array('foo' => array('attr' => 'bar', 'foo' => 'text')), '<foo attr="bar"><foo>text</foo></foo>'),

@@ -14,7 +14,6 @@ namespace Symfony\Component\Validator;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-use Symfony\Component\Validator\Context\ExecutionContextFactory;
 use Symfony\Component\Validator\Context\LegacyExecutionContextFactory;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Mapping\ClassMetadataFactory;
@@ -33,8 +32,6 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\CachedReader;
 use Doctrine\Common\Cache\ArrayCache;
 use Symfony\Component\Validator\NodeTraverser\NonRecursiveNodeTraverser;
-use Symfony\Component\Validator\NodeVisitor\ContextUpdateVisitor;
-use Symfony\Component\Validator\NodeVisitor\DefaultGroupReplacingVisitor;
 use Symfony\Component\Validator\NodeVisitor\NodeValidationVisitor;
 use Symfony\Component\Validator\NodeVisitor\ObjectInitializationVisitor;
 use Symfony\Component\Validator\Validator as ValidatorV24;
@@ -422,8 +419,6 @@ class ValidatorBuilder implements ValidatorBuilderInterface
             if (count($this->initializers) > 0) {
                 $nodeTraverser->addVisitor(new ObjectInitializationVisitor($this->initializers));
             }
-            $nodeTraverser->addVisitor(new ContextUpdateVisitor());
-            $nodeTraverser->addVisitor(new DefaultGroupReplacingVisitor());
             $nodeTraverser->addVisitor(new NodeValidationVisitor($nodeTraverser, $validatorFactory));
 
             return new TraversingValidator($contextFactory, $nodeTraverser, $metadataFactory);

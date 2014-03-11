@@ -34,7 +34,7 @@ use Symfony\Component\Validator\Node\PropertyNode;
 use Symfony\Component\Validator\Util\PropertyPath;
 
 /**
- * Default implementation of {@link ContextualValidatorInterface}.
+ * Recursive implementation of {@link ContextualValidatorInterface}.
  *
  * @since  2.5
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -51,15 +51,20 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      */
     private $metadataFactory;
 
+    /**
+     * @var ConstraintValidatorFactoryInterface
+     */
     private $validatorFactory;
 
     /**
      * Creates a validator for the given context.
      *
-     * @param ExecutionContextInterface $context         The execution context
-     * @param MetadataFactoryInterface  $metadataFactory The factory for fetching
-     *                                                   the metadata of validated
-     *                                                   objects
+     * @param ExecutionContextInterface           $context          The execution context
+     * @param MetadataFactoryInterface            $metadataFactory  The factory for
+     *                                                              fetching the metadata
+     *                                                              of validated objects
+     * @param ConstraintValidatorFactoryInterface $validatorFactory The factory for creating
+     *                                                              constraint validators
      */
     public function __construct(ExecutionContextInterface $context, MetadataFactoryInterface $metadataFactory, ConstraintValidatorFactoryInterface $validatorFactory)
     {

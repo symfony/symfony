@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\MetadataFactoryInterface;
 
 /**
- * Default implementation of {@link ValidatorInterface}.
+ * Recursive implementation of {@link ValidatorInterface}.
  *
  * @since  2.5
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -34,16 +34,21 @@ class RecursiveValidator implements ValidatorInterface
      */
     protected $metadataFactory;
 
+    /**
+     * @var ConstraintValidatorFactoryInterface
+     */
     protected $validatorFactory;
 
     /**
      * Creates a new validator.
      *
-     * @param ExecutionContextFactoryInterface $contextFactory  The factory for
-     *                                                          creating new contexts
-     * @param MetadataFactoryInterface         $metadataFactory The factory for
-     *                                                          fetching the metadata
-     *                                                          of validated objects
+     * @param ExecutionContextFactoryInterface    $contextFactory   The factory for
+     *                                                              creating new contexts
+     * @param MetadataFactoryInterface            $metadataFactory  The factory for
+     *                                                              fetching the metadata
+     *                                                              of validated objects
+     * @param ConstraintValidatorFactoryInterface $validatorFactory The factory for creating
+     *                                                              constraint validators
      */
     public function __construct(ExecutionContextFactoryInterface $contextFactory, MetadataFactoryInterface $metadataFactory, ConstraintValidatorFactoryInterface $validatorFactory)
     {

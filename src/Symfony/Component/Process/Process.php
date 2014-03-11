@@ -232,7 +232,11 @@ class Process
         $commandline = $this->commandline;
 
         if (defined('PHP_WINDOWS_VERSION_BUILD') && $this->enhanceWindowsCompatibility) {
-            $commandline = 'cmd /V:ON /E:ON /C "'.$commandline.'"';
+            $commandline = 'cmd /V:ON /E:ON /C "('.$commandline.')"';
+            foreach ($this->processPipes->getFiles() as $offset => $filename) {
+                $commandline .= ' '.$offset.'>'.$filename;
+            }
+
             if (!isset($this->options['bypass_shell'])) {
                 $this->options['bypass_shell'] = true;
             }
@@ -618,6 +622,12 @@ class Process
     {
         $timeoutMicro = microtime(true) + $timeout;
         if ($this->isRunning()) {
+            if (defined('PHP_WINDOWS_VERSION_BUILD') && !$this->isSigchildEnabled()) {
+                exec(sprintf("taskkill /F /T /PID %d 2>&1", $this->getPid()), $output, $exitCode);
+                if ($exitCode > 0) {
+                    throw new RuntimeException('Unable to kill the process');
+                }
+            }
             proc_terminate($this->process);
             do {
                 usleep(1000);

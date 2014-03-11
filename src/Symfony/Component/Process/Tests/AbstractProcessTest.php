@@ -256,11 +256,12 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testStartIsNonBlocking()
     {
-        $process = $this->getProcess('php -r "sleep(4);"');
+        $process = $this->getProcess('php -r "usleep(500000);"');
         $start = microtime(true);
         $process->start();
         $end = microtime(true);
-        $this->assertLessThan(1 , $end-$start);
+        $this->assertLessThan(0.2, $end-$start);
+        $process->wait();
     }
 
     public function testUpdateStatus()
@@ -347,10 +348,10 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testIsNotSuccessful()
     {
-        $process = $this->getProcess('php -r "sleep(4);"');
+        $process = $this->getProcess('php -r "usleep(500000);throw new \Exception(\'BOUM\');"');
         $process->start();
         $this->assertTrue($process->isRunning());
-        $process->stop();
+        $process->wait();
         $this->assertFalse($process->isSuccessful());
     }
 
@@ -468,7 +469,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
     public function testRunProcessWithTimeout()
     {
         $timeout = 0.5;
-        $process = $this->getProcess('php -r "sleep(3);"');
+        $process = $this->getProcess('php -r "usleep(600000);"');
         $process->setTimeout($timeout);
         $start = microtime(true);
         try {
@@ -509,7 +510,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testStartAfterATimeout()
     {
-        $process = $this->getProcess('php -r "while (true) {echo \'\'; usleep(1000); }"');
+        $process = $this->getProcess('php -r "$n = 1000; while ($n--) {echo \'\'; usleep(1000); }"');
         $process->setTimeout(0.1);
         try {
             $process->run();
@@ -524,10 +525,10 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testGetPid()
     {
-        $process = $this->getProcess('php -r "sleep(1);"');
+        $process = $this->getProcess('php -r "usleep(500000);"');
         $process->start();
         $this->assertGreaterThan(0, $process->getPid());
-        $process->stop();
+        $process->wait();
     }
 
     public function testGetPidIsNullBeforeStart()

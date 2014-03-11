@@ -184,9 +184,11 @@ class Button implements \IteratorAggregate, FormInterface
     /**
      * {@inheritdoc}
      */
-    public function getErrors()
+    public function getErrors($deep = false, $flatten = true)
     {
-        return array();
+        $errors = array();
+
+        return new FormErrorIterator($errors, $this, $deep, $flatten);
     }
 
     /**

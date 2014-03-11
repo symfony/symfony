@@ -29,13 +29,7 @@ class TraversingValidator2Dot5ApiTest extends Abstract2Dot5ApiTest
         $contextFactory = new ExecutionContextFactory(new DefaultTranslator());
         $validator = new TraversingValidator($contextFactory, $nodeTraverser, $metadataFactory);
 
-        $groupSequenceResolver = new DefaultGroupReplacingVisitor();
-        $contextRefresher = new ContextUpdateVisitor();
-        $nodeValidator = new NodeValidationVisitor($nodeTraverser, new ConstraintValidatorFactory());
-
-        $nodeTraverser->addVisitor($groupSequenceResolver);
-        $nodeTraverser->addVisitor($contextRefresher);
-        $nodeTraverser->addVisitor($nodeValidator);
+        $nodeTraverser->addVisitor(new NodeValidationVisitor($nodeTraverser, new ConstraintValidatorFactory()));
 
         return $validator;
     }

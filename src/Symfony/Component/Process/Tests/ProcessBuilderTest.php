@@ -193,4 +193,16 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals("'/usr/bin/php'", $process->getCommandLine());
         }
     }
+
+    public function testPipeASequenceOfCommands()
+    {
+        $process = ProcessBuilder::create(array('echo', "foo\nbar\nfoo bar\nbar foo"))
+            ->pipe(array('grep', 'foo'))
+            ->pipe(array('cut', '-d', ' ', '-f', 1))
+            ->pipe(array('head', '-1'))
+            ->getProcess();
+        $process->run();
+
+        $this->assertEquals('foo', trim($process->getOutput()));
+    }
 }

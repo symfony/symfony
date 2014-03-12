@@ -31,6 +31,7 @@ class ProcessUtilsTest extends \PHPUnit_Framework_TestCase
                 array('^%"path"^%', '%path%'),
                 array('"<|>"\\"" "\\""\'f"', '<|>" "\'f'),
                 array('""', ''),
+                array('"with\trailingbs\\\\"', 'with\trailingbs\\'),
             );
         }
 
@@ -39,6 +40,7 @@ class ProcessUtilsTest extends \PHPUnit_Framework_TestCase
             array("'%path%'", '%path%'),
             array("'<|>\" \"'\\''f'", '<|>" "\'f'),
             array("''", ''),
+            array("'with\\trailingbs\\'", 'with\trailingbs\\'),
         );
     }
 }

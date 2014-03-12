@@ -186,7 +186,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testFlushErrorOutput()
     {
-        $p = new Process(sprintf('php -r %s', escapeshellarg('$n = 0; while ($n < 3) { file_put_contents(\'php://stderr\', \'ERROR\'); $n++; }')));
+        $p = $this->getProcess(sprintf('php -r %s', escapeshellarg('$n = 0; while ($n < 3) { file_put_contents(\'php://stderr\', \'ERROR\'); $n++; }')));
 
         $p->run();
         $p->clearErrorOutput();
@@ -214,7 +214,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testFlushOutput()
     {
-        $p = new Process(sprintf('php -r %s', escapeshellarg('$n=0;while ($n<3) {echo \' foo \';$n++;}')));
+        $p = $this->getProcess(sprintf('php -r %s', escapeshellarg('$n=0;while ($n<3) {echo \' foo \';$n++;}')));
 
         $p->run();
         $p->clearOutput();

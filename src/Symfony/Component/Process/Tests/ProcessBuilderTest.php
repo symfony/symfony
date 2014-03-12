@@ -193,4 +193,23 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals("'/usr/bin/php'", $process->getCommandLine());
         }
     }
+
+    public function testShouldReturnProcessWithDisabledOutput()
+    {
+        $process = ProcessBuilder::create(array('/usr/bin/php'))
+            ->disableOutput()
+            ->getProcess();
+
+        $this->assertTrue($process->isOutputDisabled());
+    }
+
+    public function testShouldReturnProcessWithEnabledOutput()
+    {
+        $process = ProcessBuilder::create(array('/usr/bin/php'))
+            ->disableOutput()
+            ->enableOutput()
+            ->getProcess();
+
+        $this->assertFalse($process->isOutputDisabled());
+    }
 }

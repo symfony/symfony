@@ -700,6 +700,84 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $process->signal('Céphalopodes');
     }
 
+    public function testDisableOutputDisablesTheOutput()
+    {
+        $p = $this->getProcess('php -r "usleep(500000);"');
+        $this->assertFalse($p->isOutputDisabled());
+        $p->disableOutput();
+        $this->assertTrue($p->isOutputDisabled());
+        $p->enableOutput();
+        $this->assertFalse($p->isOutputDisabled());
+    }
+
+    public function testDisableOutputWhileRunningThrowsException()
+    {
+        $p = $this->getProcess('php -r "usleep(500000);"');
+        $p->start();
+        $this->setExpectedException('Symfony\Component\Process\Exception\RuntimeException', 'Disabling output while the process is running is not possible.');
+        $p->disableOutput();
+    }
+
+    public function testEnableOutputWhileRunningThrowsException()
+    {
+        $p = $this->getProcess('php -r "usleep(500000);"');
+        $p->disableOutput();
+        $p->start();
+        $this->setExpectedException('Symfony\Component\Process\Exception\RuntimeException', 'Enabling output while the process is running is not possible.');
+        $p->enableOutput();
+    }
+
+    public function testEnableOrDisableOutputAfterRunDoesNotThrowException()
+    {
+        $p = $this->getProcess('php -r "usleep(500000);"');
+        $p->disableOutput();
+        $p->start();
+        $p->wait();
+        $p->enableOutput();
+        $p->disableOutput();
+    }
+
+    /**
+     * @dataProvider provideStartMethods
+     */
+    public function testStartWithACallbackAndDisabledOutput($startMethod)
+    {
+        $p = $this->getProcess('php -r "usleep(500000);"');
+        $p->disableOutput();
+        $this->setExpectedException('Symfony\Component\Process\Exception\LogicException', 'Output has been disabled, enable it to allow the use of a callback.');
+        call_user_func(array($p, $startMethod), function () {});
+    }
+
+    public function provideStartMethods()
+    {
+        return array(
+            array('start'),
+            array('run'),
+            array('mustRun'),
+        );
+    }
+
+    /**
+     * @dataProvider provideOutputFetchingMethods
+     */
+    public function testGetOutputWhileDisabled($fetchMethod)
+    {
+        $p = $this->getProcess('php -r "usleep(500000);"');
+        $p->disableOutput();
+        $this->setExpectedException('Symfony\Component\Process\Exception\LogicException', 'Output has been disabled.');
+        call_user_func(array($p, $fetchMethod));
+    }
+
+    public function provideOutputFetchingMethods()
+    {
+        return array(
+            array('getOutput'),
+            array('getIncrementalOutput'),
+            array('getErrorOutput'),
+            array('getIncrementalErrorOutput'),
+        );
+    }
+
     public function responsesCodeProvider()
     {
         return array(

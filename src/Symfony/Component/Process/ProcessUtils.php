@@ -52,6 +52,9 @@ class ProcessUtils
                 } elseif ('%' === $part) {
                     $escapedArgument .= '^%';
                 } else {
+                    if ('\\' === substr($part, -1)) {
+                        $part .= '\\';
+                    }
                     $escapedArgument .= escapeshellarg($part);
                 }
             }

@@ -86,9 +86,8 @@ class ExpressionLanguageTest extends \PHPUnit_Framework_TestCase
             function($name, array $values, array $args) {
                 if (array_key_exists($name, $values)) {
                     return call_user_func_array($values[$name], $args);
-                } else {
-                    return call_user_func_array($name, $args);
                 }
+                return call_user_func_array($name, $args);
             }
         );
 
@@ -109,7 +108,7 @@ class ExpressionLanguageTest extends \PHPUnit_Framework_TestCase
         $g = function($x) { return $x + 1; };
 
         $expected = 65;
-        $this->assertEquals($expected, $expressionLanguage->evaluate('g(f(x))', array('x'=>8, 'f'=>$f, 'g'=>$g)));
+        $this->assertEquals($expected, $expressionLanguage->evaluate('g(f(x))', array('x' => 8, 'f' => $f, 'g' => $g)));
     }
 
     public function shortCircuitProviderEvaluate()

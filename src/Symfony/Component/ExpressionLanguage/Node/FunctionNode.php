@@ -37,9 +37,8 @@ class FunctionNode extends Node
         if (is_null($function)) {
             $function = $compiler->getFunction('*');
             $compiler->raw(call_user_func_array($function['compiler'], array($name, $this->names, $arguments)));
-        } else {
-            $compiler->raw(call_user_func_array($function['compiler'], $arguments));
         }
+        $compiler->raw(call_user_func_array($function['compiler'], $arguments));
     }
 
     public function evaluate($functions, $values)
@@ -51,8 +50,7 @@ class FunctionNode extends Node
         $name = $this->attributes['name'];
         if (array_key_exists($name, $functions)) {
             return call_user_func_array($functions[$name]['evaluator'], array_merge(array($values), $arguments));
-        } else {
-            return call_user_func_array($functions['*']['evaluator'], array($name, $values, $arguments));
         }
+        return call_user_func_array($functions['*']['evaluator'], array($name, $values, $arguments));
     }
 }

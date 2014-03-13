@@ -90,7 +90,7 @@ EOF
             ->locateResource(sprintf('@FrameworkBundle/Resources/config/router_%s.php', $env))
         ;
 
-        $output->writeln(sprintf("Server running on <info>%s</info>\n", $input->getArgument('address')));
+        $output->writeln(sprintf("Server running on <info>http://%s</info>\n", $input->getArgument('address')));
 
         $builder = new ProcessBuilder(array(PHP_BINARY, '-S', $input->getArgument('address'), $router));
         $builder->setWorkingDirectory($input->getOption('docroot'));

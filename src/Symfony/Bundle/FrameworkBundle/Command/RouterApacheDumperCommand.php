@@ -63,6 +63,7 @@ These can then be used with the ApacheUrlMatcher to use Apache for route
 matching.
 
   <info>php %command.full_name%</info>
+
 EOF
             )
         ;

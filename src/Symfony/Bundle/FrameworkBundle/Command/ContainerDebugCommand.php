@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
 
 /**
- * A console command for retrieving information about services
+ * A console command for retrieving information about services.
  *
  * @author Ryan Weaver <ryan@thatsquality.com>
  */
@@ -41,8 +41,8 @@ class ContainerDebugCommand extends ContainerAwareCommand
             ->setName('container:debug')
             ->setDefinition(array(
                 new InputArgument('name', InputArgument::OPTIONAL, 'A service name (foo)'),
-                new InputOption('show-private', null, InputOption::VALUE_NONE, 'Use to show public *and* private services'),
-                new InputOption('tag', null, InputOption::VALUE_REQUIRED, 'Show all services with a specific tag'),
+                new InputOption('show-private', null, InputOption::VALUE_NONE, 'Used to show public *and* private services'),
+                new InputOption('tag', null, InputOption::VALUE_REQUIRED, 'Shows all services with a specific tag'),
                 new InputOption('tags', null, InputOption::VALUE_NONE, 'Displays tagged services for an application'),
                 new InputOption('parameter', null, InputOption::VALUE_REQUIRED, 'Displays a specific parameter for an application'),
                 new InputOption('parameters', null, InputOption::VALUE_NONE, 'Displays parameters for an application'),
@@ -79,6 +79,7 @@ Use the --parameters option to display all parameters:
 Display a specific parameter by specifying his name with the --parameter option:
 
   <info>php %command.full_name% --parameter=kernel.debug</info>
+
 EOF
             )
         ;

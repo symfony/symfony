@@ -24,7 +24,7 @@ use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Parser;
 
 /**
- * Validates YAML files syntax and output encountered errors.
+ * Validates YAML files syntax and outputs encountered errors.
  *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
@@ -57,6 +57,7 @@ Or all YAML files in a bundle:
 You can also pass the YAML contents from STDIN:
 
 <info>cat filename | php %command.full_name%</info>
+
 EOF
             )
         ;

@@ -66,6 +66,7 @@ message.
 
 <info>php %command.full_name% --dump-messages en AcmeBundle</info>
 <info>php %command.full_name% --force --prefix="new_" fr AcmeBundle</info>
+
 EOF
             )
         ;

@@ -19,7 +19,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * A console command for dumping available configuration reference
+ * A console command for dumping available configuration reference.
  *
  * @author Kevin Bond <kevinbond@gmail.com>
  * @author Wouter J <waldio.webdesign@gmail.com>
@@ -53,6 +53,7 @@ this is either <comment>yaml</comment> or <comment>xml</comment>.
 When the option is not provided, <comment>yaml</comment> is used.
 
   <info>php %command.full_name% FrameworkBundle --format=xml</info>
+
 EOF
             )
         ;

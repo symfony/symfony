@@ -43,6 +43,7 @@ and debug mode:
 
 <info>php %command.full_name% --env=dev</info>
 <info>php %command.full_name% --env=prod --no-debug</info>
+
 EOF
             )
         ;
@@ -107,9 +108,9 @@ EOF
     }
 
     /**
-     * @param string $warmupDir
-     * @param string $realCacheDir
-     * @param bool   $enableOptionalWarmers
+     * @param string  $warmupDir
+     * @param string  $realCacheDir
+     * @param Boolean $enableOptionalWarmers
      */
     protected function warmup($warmupDir, $realCacheDir, $enableOptionalWarmers = true)
     {

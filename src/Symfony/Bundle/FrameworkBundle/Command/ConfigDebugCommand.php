@@ -15,11 +15,10 @@ use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Yaml\Yaml;
 
 /**
- * A console command for dumping available configuration reference
+ * A console command for dumping available configuration reference.
  *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */

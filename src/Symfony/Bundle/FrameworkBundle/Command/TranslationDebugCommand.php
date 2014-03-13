@@ -67,6 +67,7 @@ You can only display missing messages:
 You can only display unused messages:
 
 <info>php %command.full_name% --only-unused en AcmeDemoBundle</info>
+
 EOF
             )
         ;

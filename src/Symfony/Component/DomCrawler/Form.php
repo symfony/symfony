@@ -408,8 +408,7 @@ class Form extends Link implements \ArrayAccess
 
                 // restore the original name of the input node
                 $this->button->setAttribute('name', $name);
-            }
-            else {
+            } else {
                 $this->set(new Field\InputFormField($document->importNode($this->button, true)));
             }
         }

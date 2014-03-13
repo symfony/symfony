@@ -15,8 +15,11 @@ use Symfony\Component\ExpressionLanguage\Compiler;
 
 class FunctionNode extends Node
 {
-    public function __construct($name, Node $arguments)
+    protected $names;
+
+    public function __construct($name, Node $arguments, $names)
     {
+        $this->names = $names;
         parent::__construct(
             array('arguments' => $arguments),
             array('name' => $name)
@@ -29,19 +32,27 @@ class FunctionNode extends Node
         foreach ($this->nodes['arguments']->nodes as $node) {
             $arguments[] = $compiler->subcompile($node);
         }
-
-        $function = $compiler->getFunction($this->attributes['name']);
-
-        $compiler->raw(call_user_func_array($function['compiler'], $arguments));
+        $name = $this->attributes['name'];
+        $function = $compiler->getFunction($name);
+        if (is_null($function)) {
+            $function = $compiler->getFunction('*');
+            $compiler->raw(call_user_func_array($function['compiler'], array($name, $this->names, $arguments)));
+        } else {
+            $compiler->raw(call_user_func_array($function['compiler'], $arguments));
+        }
     }
 
     public function evaluate($functions, $values)
     {
-        $arguments = array($values);
+        $arguments = array();
         foreach ($this->nodes['arguments']->nodes as $node) {
             $arguments[] = $node->evaluate($functions, $values);
         }
-
-        return call_user_func_array($functions[$this->attributes['name']]['evaluator'], $arguments);
+        $name = $this->attributes['name'];
+        if (array_key_exists($name, $functions)) {
+            return call_user_func_array($functions[$name]['evaluator'], array_merge(array($values), $arguments));
+        } else {
+            return call_user_func_array($functions['*']['evaluator'], array($name, $values, $arguments));
+        }
     }
 }

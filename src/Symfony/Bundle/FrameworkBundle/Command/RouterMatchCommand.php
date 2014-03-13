@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Routing\RouterInterface;
@@ -50,12 +51,16 @@ class RouterMatchCommand extends ContainerAwareCommand
             ->setName('router:match')
             ->setDefinition(array(
                 new InputArgument('path_info', InputArgument::REQUIRED, 'A path info'),
+                new InputOption('method', null, InputOption::VALUE_REQUIRED, 'Sets the HTTP method', 'GET'),
+                new InputOption('host', null, InputOption::VALUE_REQUIRED, 'Sets the HTTP host', 'localhost'),
             ))
             ->setDescription('Helps debug routes by simulating a path info match')
             ->setHelp(<<<EOF
 The <info>%command.name%</info> simulates a path info match:
 
   <info>php %command.full_name% /foo</info>
+  or
+  <info>php %command.full_name% /foo --method POST --host symfony.com</info>
 
 EOF
             )
@@ -68,7 +73,11 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $router = $this->getContainer()->get('router');
-        $matcher = new TraceableUrlMatcher($router->getRouteCollection(), $router->getContext());
+        $context = $router->getContext();
+        $context->setMethod($input->getOption('method'));
+        $context->setHost($input->getOption('host'));
+
+        $matcher = new TraceableUrlMatcher($router->getRouteCollection(), $context);
 
         $traces = $matcher->getTraces($input->getArgument('path_info'));
 

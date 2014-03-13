@@ -78,6 +78,16 @@ class Command
     {
         $this->ignoreValidationErrors = true;
     }
+    
+    /**
+     * Check if ignore validation errors
+     * 
+     * @return boolean True if ignore validation errors
+     */
+    public function isIgnoreValidationErrors()
+    {
+        return $this->ignoreValidationErrors;
+    }
 
     /**
      * Sets the application instance for this command.
@@ -213,11 +223,11 @@ class Command
      */
     public function run(InputInterface $input, OutputInterface $output)
     {
-        if (null !== $this->processName) {
+        if (null !== $this->getProcessName()) {
             if (function_exists('cli_set_process_title')) {
-                cli_set_process_title($this->processName);
+                cli_set_process_title($this->getProcessName());
             } elseif (function_exists('setproctitle')) {
-                setproctitle($this->processName);
+                setproctitle($this->getProcessName());
             } elseif (OutputInterface::VERBOSITY_VERY_VERBOSE === $output->getVerbosity()) {
                 $output->writeln('<comment>Install the proctitle PECL to be able to change the process title.</comment>');
             }
@@ -231,9 +241,9 @@ class Command
 
         // bind the input against the command specific arguments/options
         try {
-            $input->bind($this->definition);
+            $input->bind($this->getDefinition());
         } catch (\Exception $e) {
-            if (!$this->ignoreValidationErrors) {
+            if (!$this->isIgnoreValidationErrors()) {
                 throw $e;
             }
         }
@@ -246,8 +256,8 @@ class Command
 
         $input->validate();
 
-        if ($this->code) {
-            $statusCode = call_user_func($this->code, $input, $output);
+        if ($this->getCode()) {
+            $statusCode = call_user_func($this->getCode(), $input, $output);
         } else {
             $statusCode = $this->execute($input, $output);
         }
@@ -280,6 +290,18 @@ class Command
         $this->code = $code;
 
         return $this;
+    }
+    
+    /**
+     * Return the code to execute when running this command.
+     * 
+     * @return callable
+     * 
+     * @api
+     */
+    public function getCode()
+    {
+        return $this-code;
     }
 
     /**
@@ -439,6 +461,16 @@ class Command
         $this->processName = $name;
 
         return $this;
+    }
+    
+    /**
+     * Get the process name of the command.
+     * 
+     * @return string The process name
+     */
+    public function getProcessName()
+    {
+        return $this->processName;
     }
 
     /**

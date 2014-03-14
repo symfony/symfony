@@ -737,6 +737,29 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $p->disableOutput();
     }
 
+    public function testDisableOutputWhileIdleTimeoutIsSet()
+    {
+        $process = $this->getProcess('sleep 3');
+        $process->setIdleTimeout(1);
+        $this->setExpectedException('Symfony\Component\Process\Exception\LogicException', 'Output can not be disabled while an idle timeout is set.');
+        $process->disableOutput();
+    }
+
+    public function testSetIdleTimeoutWhileOutputIsDisabled()
+    {
+        $process = $this->getProcess('sleep 3');
+        $process->disableOutput();
+        $this->setExpectedException('Symfony\Component\Process\Exception\LogicException', 'Idle timeout can not be set while the output is disabled.');
+        $process->setIdleTimeout(1);
+    }
+
+    public function testSetNullIdleTimeoutWhileOutputIsDisabled()
+    {
+        $process = $this->getProcess('sleep 3');
+        $process->disableOutput();
+        $process->setIdleTimeout(null);
+    }
+
     /**
      * @dataProvider provideStartMethods
      */

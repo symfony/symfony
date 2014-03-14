@@ -40,7 +40,7 @@
         "symfony/yaml": "For using the YamlExtension",
         "symfony/security": "For using the SecurityExtension",
         "symfony/stopwatch": "For using the StopwatchExtension",
-        "symfony/expression": "For using the ExpressionExtension"
+        "symfony/expression-language": "For using the ExpressionExtension"
     },
     "autoload": {
         "psr-0": { "Symfony\\Bridge\\Twig\\": "" }

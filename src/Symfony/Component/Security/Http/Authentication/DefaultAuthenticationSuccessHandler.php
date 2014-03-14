@@ -18,8 +18,6 @@ use Symfony\Component\Security\Http\HttpUtils;
 /**
  * Class with the default authentication success handling logic.
  *
- * Use this to extend the base default behavior.
- *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  * @author Alexander <iam.asm89@gmail.com>

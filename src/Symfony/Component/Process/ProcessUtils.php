@@ -57,7 +57,7 @@ class ProcessUtils
                         $part .= '\\';
                     }
                     $part = escapeshellarg($part);
-                    if ($part[0] === '"' && $part[strlen($part) - 1] === '"') {
+                    if ('"' === $part[0] && '"' === $part[strlen($part) - 1]) {
                         $part = substr($part, 1, -1);
                         $quote = true;
                     }
@@ -65,7 +65,7 @@ class ProcessUtils
                 }
             }
             if ($quote) {
-                $escapedArgument = '"' . $escapedArgument . '"';
+                $escapedArgument = '"'.$escapedArgument.'"';
             }
 
             return $escapedArgument;

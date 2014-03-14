@@ -203,7 +203,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testGetIncrementalErrorOutput()
     {
-        $p = $this->getProcess(sprintf('php -r %s', escapeshellarg('$n = 0; while ($n < 3) { usleep(50000); file_put_contents(\'php://stderr\', \'ERROR\'); $n++; }')));
+        $p = $this->getProcess(sprintf('php -r %s', escapeshellarg('$n = 0; while ($n < 3) { usleep(100000); file_put_contents(\'php://stderr\', \'ERROR\'); $n++; }')));
 
         $p->start();
         while ($p->isRunning()) {
@@ -250,7 +250,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('Windows does have /dev/tty support');
         }
 
-        $process = $this->getProcess('echo "foo" >> /dev/null');
+        $process = $this->getProcess('echo "foo" >> /dev/null && php -r "usleep(100000);"');
         $process->setTTY(true);
         $process->start();
         $this->assertTrue($process->isRunning());
@@ -471,7 +471,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $process1->run();
         $process2 = $process1->restart();
 
-        usleep(300000); // wait for output
+        $process2->wait(); // wait for output
 
         // Ensure that both processed finished and the output is numeric
         $this->assertFalse($process1->isRunning());

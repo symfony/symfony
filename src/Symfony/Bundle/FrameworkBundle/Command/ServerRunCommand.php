@@ -85,7 +85,7 @@ EOF
             $output->writeln('<error>Running PHP built-in server in production environment is NOT recommended!</error>');
         }
 
-        $output->writeln(sprintf("Server running on <info>%s</info>\n", $input->getArgument('address')));
+        $output->writeln(sprintf("Server running on <info>http://%s</info>\n", $input->getArgument('address')));
 
         if (defined('HHVM_VERSION')) {
             $builder = $this->createHhvmProcessBuilder($input, $output, $env);

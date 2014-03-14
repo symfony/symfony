@@ -27,6 +27,7 @@ class ProcessUtilsTest extends \PHPUnit_Framework_TestCase
     {
         if (defined('PHP_WINDOWS_VERSION_BUILD')) {
             return array(
+                array('"\"php\" \"-v\""', '"php" "-v"'),
                 array('"foo bar"', 'foo bar'),
                 array('^%"path"^%', '%path%'),
                 array('"<|>"\\"" "\\""\'f"', '<|>" "\'f'),
@@ -36,6 +37,7 @@ class ProcessUtilsTest extends \PHPUnit_Framework_TestCase
         }
 
         return array(
+            array("'\"php\" \"-v\"'", '"php" "-v"'),
             array("'foo bar'", 'foo bar'),
             array("'%path%'", '%path%'),
             array("'<|>\" \"'\\''f'", '<|>" "\'f'),

@@ -418,6 +418,9 @@ class Process
         if ($this->isRunning()) {
             throw new RuntimeException('Disabling output while the process is running is not possible.');
         }
+        if (null !== $this->idleTimeout) {
+            throw new LogicException('Output can not be disabled while an idle timeout is set.');
+        }
 
         $this->outputDisabled = true;
 
@@ -870,6 +873,10 @@ class Process
      */
     public function setIdleTimeout($timeout)
     {
+        if (null !== $timeout && $this->outputDisabled) {
+            throw new LogicException('Idle timeout can not be set while the output is disabled.');
+        }
+
         $this->idleTimeout = $this->validateTimeout($timeout);
 
         return $this;

@@ -17,7 +17,6 @@ use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
-use Symfony\Component\Serializer\Exception\RuntimeException;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
@@ -144,13 +143,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
      */
     public function supportsNormalization($data, $format = null)
     {
-        try {
-            $this->getNormalizer($data, $format);
-        } catch (RuntimeException $e) {
-            return false;
-        }
-
-        return true;
+        return (bool) $this->getNormalizer($data, $format);
     }
 
     /**
@@ -158,27 +151,18 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
      */
     public function supportsDenormalization($data, $type, $format = null)
     {
-        try {
-            $this->getDenormalizer($data, $type, $format = null);
-        } catch (RuntimeException $e) {
-            return false;
-        }
-
-        return true;
+        return (bool) $this->getDenormalizer($data, $type, $format = null);
     }
 
     /**
      * Returns a matching normalizer.
      *
-     * @param $data
-     * @param null $format
+     * @param object $data The object to get the serializer for
+     * @param string $format format name, present to give the option to normalizers to act differently based on formats
      *
-     * @return mixed
-     *
-     * @throws Exception\LogicException
-     * @throws Exception\UnexpectedValueException
+     * @return NormalizerInterface|null
      */
-    private function getNormalizer($data, $format = null)
+    private function getNormalizer($data, $format)
     {
 
         $class = get_class($data);
@@ -194,36 +178,33 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
             }
         }
 
-        throw new RuntimeException(sprintf('No normalizer found for format "%s".', $format));
+        return null;
     }
 
     /**
      * Returns a matching denormalizer.
      *
-     * @param $data
-     * @param $type
-     * @param null $format
+     * @param mixed  $data   data to restore
+     * @param string $class  the expected class to instantiate
+     * @param string $format format name, present to give the option to normalizers to act differently based on formats
      *
-     * @return mixed
-     *
-     * @throws Exception\LogicException
-     * @throws Exception\UnexpectedValueException
+     * @return DenormalizerInterface|null
      */
-    private function getDenormalizer($data, $type, $format = null)
+    private function getDenormalizer($data, $class, $format)
     {
-        if (isset($this->denormalizerCache[$type][$format])) {
-            return $this->denormalizerCache[$type][$format];
+        if (isset($this->denormalizerCache[$class][$format])) {
+            return $this->denormalizerCache[$class][$format];
         }
 
         foreach ($this->normalizers as $normalizer) {
-            if ($normalizer instanceof DenormalizerInterface && $normalizer->supportsDenormalization($data, $type, $format)) {
-                $this->denormalizerCache[$type][$format] = $normalizer;
+            if ($normalizer instanceof DenormalizerInterface && $normalizer->supportsDenormalization($data, $class, $format)) {
+                $this->denormalizerCache[$class][$format] = $normalizer;
 
                 return $normalizer;
             }
         }
 
-        throw new RuntimeException(sprintf('No denormalizer found for format "%s".', $format));
+        return null;
     }
 
     /**
@@ -254,17 +235,16 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
      * @throws LogicException
      * @throws UnexpectedValueException
      */
-    private function normalizeObject($object, $format = null, array $context = array())
+    private function normalizeObject($object, $format, array $context = array())
     {
         if (!$this->normalizers) {
             throw new LogicException('You must register at least one normalizer to be able to normalize objects.');
         }
 
-        try {
-            return $this->getNormalizer($object, $format)->normalize($object, $format, $context);
-        } catch (RuntimeException $e) {
-            throw new UnexpectedValueException(sprintf('Could not normalize object of type %s, no supporting normalizer found.', get_class($object)));
+        if ($normalizer = $this->getNormalizer($object, $format)) {
+            return $normalizer->normalize($object, $format, $context);
         }
+        throw new UnexpectedValueException(sprintf('Could not normalize object of type %s, no supporting normalizer found.', get_class($object)));
     }
 
     /**
@@ -280,17 +260,16 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
      * @throws LogicException
      * @throws UnexpectedValueException
      */
-    private function denormalizeObject($data, $class, $format = null, array $context = array())
+    private function denormalizeObject($data, $class, $format, array $context = array())
     {
         if (!$this->normalizers) {
             throw new LogicException('You must register at least one normalizer to be able to denormalize objects.');
         }
 
-        try {
-            return $this->getDenormalizer($data, $class, $format)->denormalize($data, $class, $format, $context);
-        } catch (RuntimeException $e) {
-            throw new UnexpectedValueException(sprintf('Could not denormalize object of type %s, no supporting normalizer found.', $class));
+        if ($normalizer = $this->getDenormalizer($data, $class, $format)) {
+            return $normalizer->denormalize($data, $class, $format, $context);
         }
+        throw new UnexpectedValueException(sprintf('Could not denormalize object of type %s, no supporting normalizer found.', $class));
     }
 
     /**

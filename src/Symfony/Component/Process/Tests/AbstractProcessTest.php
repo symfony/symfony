@@ -13,6 +13,7 @@ namespace Symfony\Component\Process\Tests;
 
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\RuntimeException;
+use Symfony\Component\Process\ProcessPipes;
 
 /**
  * @author Robert Schönthal <seroscho@googlemail.com>
@@ -87,18 +88,20 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         // has terminated so the internal pipes array is already empty. normally
         // the call to start() will not read any data as the process will not have
         // generated output, but this is non-deterministic so we must count it as
-        // a possibility.  therefore we need 2 * 8192 plus another byte which will
-        // never be read.
-        $expectedOutputSize = 16385;
+        // a possibility.  therefore we need 2 * ProcessPipes::CHUNK_SIZE plus
+        // another byte which will never be read.
+        $expectedOutputSize = ProcessPipes::CHUNK_SIZE * 2 + 2;
 
         $code = sprintf('echo str_repeat(\'*\', %d);', $expectedOutputSize);
         $p = $this->getProcess(sprintf('php -r %s', escapeshellarg($code)));
 
         $p->start();
-        usleep(250000);
+        // Let's wait enough time for process to finish...
+        // Here we don't call Process::run or Process::wait to avoid any read of pipes
+        usleep(500000);
 
         if ($p->isRunning()) {
-            $this->fail('Process execution did not complete in the required time frame');
+            $this->markTestSkipped('Process execution did not complete in the required time frame');
         }
 
         $o = $p->getOutput();
@@ -200,7 +203,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testGetIncrementalErrorOutput()
     {
-        $p = $this->getProcess(sprintf('php -r %s', escapeshellarg('$n = 0; while ($n < 3) { usleep(50000); file_put_contents(\'php://stderr\', \'ERROR\'); $n++; }')));
+        $p = $this->getProcess(sprintf('php -r %s', escapeshellarg('$n = 0; while ($n < 3) { usleep(100000); file_put_contents(\'php://stderr\', \'ERROR\'); $n++; }')));
 
         $p->start();
         while ($p->isRunning()) {
@@ -247,7 +250,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('Windows does have /dev/tty support');
         }
 
-        $process = $this->getProcess('echo "foo" >> /dev/null');
+        $process = $this->getProcess('echo "foo" >> /dev/null && php -r "usleep(100000);"');
         $process->setTTY(true);
         $process->start();
         $this->assertTrue($process->isRunning());
@@ -468,7 +471,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $process1->run();
         $process2 = $process1->restart();
 
-        usleep(300000); // wait for output
+        $process2->wait(); // wait for output
 
         // Ensure that both processed finished and the output is numeric
         $this->assertFalse($process1->isRunning());

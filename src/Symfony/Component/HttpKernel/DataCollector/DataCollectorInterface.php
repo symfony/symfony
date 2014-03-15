@@ -11,35 +11,9 @@
 
 namespace Symfony\Component\HttpKernel\DataCollector;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-
 /**
- * DataCollectorInterface.
- *
- * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
+ * @deprecated Deprecated in 2.5, to be removed in 3.0. Use the HttpProfiler component instead.
  */
-interface DataCollectorInterface
+interface DataCollectorInterface extends \Symfony\Component\HttpProfiler\DataCollector\DataCollectorInterface
 {
-    /**
-     * Collects data for the given Request and Response.
-     *
-     * @param Request    $request   A Request instance
-     * @param Response   $response  A Response instance
-     * @param \Exception $exception An Exception instance
-     *
-     * @api
-     */
-    public function collect(Request $request, Response $response, \Exception $exception = null);
-
-    /**
-     * Returns the name of the collector.
-     *
-     * @return string The collector name
-     *
-     * @api
-     */
-    public function getName();
 }

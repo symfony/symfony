@@ -13,6 +13,8 @@ namespace Symfony\Bundle\WebProfilerBundle\Tests\Profiler;
 
 use Symfony\Bundle\WebProfilerBundle\Tests\TestCase;
 use Symfony\Bundle\WebProfilerBundle\Profiler\TemplateManager;
+use Symfony\Component\HttpProfiler\Profiler;
+use Symfony\Bundle\WebProfilerBundle\Profiler\TemplateManager;
 
 /**
  * Test for TemplateManager class.
@@ -27,7 +29,7 @@ class TemplateManagerTest extends TestCase
     protected $twigEnvironment;
 
     /**
-     * @var \Symfony\Component\HttpKernel\Profiler\Profiler
+     * @var Profiler
      */
     protected $profiler;
 
@@ -37,7 +39,7 @@ class TemplateManagerTest extends TestCase
     protected $profile;
 
     /**
-     * @var \Symfony\Bundle\WebProfilerBundle\Profiler\TemplateManager
+     * @var TemplateManager
      */
     protected $templateManager;
 
@@ -153,7 +155,7 @@ class TemplateManagerTest extends TestCase
 
     protected function mockProfiler()
     {
-        $this->profiler = $this->getMockBuilder('Symfony\Component\HttpKernel\Profiler\Profiler')
+        $this->profiler = $this->getMockBuilder('Symfony\Component\HttpProfiler\Profiler')
             ->disableOriginalConstructor()
             ->getMock();
 

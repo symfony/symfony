@@ -108,7 +108,7 @@ class UploadedFile extends File
      * Returns the original file name.
      *
      * It is extracted from the request from which the file has been uploaded.
-     * Then is should not be considered as a safe value.
+     * Then it should not be considered as a safe value.
      *
      * @return string|null The original name
      *
@@ -123,7 +123,7 @@ class UploadedFile extends File
      * Returns the original file extension
      *
      * It is extracted from the original file name that was uploaded.
-     * Then is should not be considered as a safe value.
+     * Then it should not be considered as a safe value.
      *
      * @return string The extension
      */
@@ -181,7 +181,7 @@ class UploadedFile extends File
      * Returns the file size.
      *
      * It is extracted from the request from which the file has been uploaded.
-     * Then is should not be considered as a safe value.
+     * Then it should not be considered as a safe value.
      *
      * @return integer|null The file size
      *

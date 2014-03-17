@@ -55,7 +55,7 @@ class ClassNode extends Node
      *
      * @see \Symfony\Component\Validator\Mapping\TraversalStrategy
      */
-    public function __construct($object, ClassMetadataInterface $metadata, $propertyPath, array $groups, $cascadedGroups = null, $traversalStrategy = TraversalStrategy::IMPLICIT)
+    public function __construct($object, $cacheKey, ClassMetadataInterface $metadata, $propertyPath, array $groups, $cascadedGroups = null, $traversalStrategy = TraversalStrategy::IMPLICIT)
     {
         if (!is_object($object)) {
             throw new UnexpectedTypeException($object, 'object');
@@ -63,12 +63,12 @@ class ClassNode extends Node
 
         parent::__construct(
             $object,
+            $cacheKey,
             $metadata,
             $propertyPath,
             $groups,
-            $cascadedGroups
+            $cascadedGroups,
+            $traversalStrategy
         );
-
-        $this->traversalStrategy = $traversalStrategy;
     }
 }

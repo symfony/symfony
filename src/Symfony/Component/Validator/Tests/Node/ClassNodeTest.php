@@ -26,6 +26,6 @@ class ClassNodeTest extends \PHPUnit_Framework_TestCase
     {
         $metadata = $this->getMock('Symfony\Component\Validator\Mapping\ClassMetadataInterface');
 
-        new ClassNode('foobar', $metadata, '', array(), array());
+        new ClassNode('foobar', null, $metadata, '', array(), array());
     }
 }

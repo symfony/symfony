@@ -124,19 +124,19 @@ interface ExecutionContextInterface extends LegacyExecutionContextInterface
     /**
      * Marks an object as validated in a specific validation group.
      *
-     * @param string $objectHash The hash of the object
+     * @param string $cacheKey The hash of the object
      * @param string $groupHash  The group's name or hash, if it is group
      *                           sequence
      *
      * @internal Used by the validator engine. Should not be called by user
      *           code.
      */
-    public function markObjectAsValidatedForGroup($objectHash, $groupHash);
+    public function markGroupAsValidated($cacheKey, $groupHash);
 
     /**
      * Returns whether an object was validated in a specific validation group.
      *
-     * @param string $objectHash The hash of the object
+     * @param string $cacheKey The hash of the object
      * @param string $groupHash  The group's name or hash, if it is group
      *                           sequence
      *
@@ -146,23 +146,23 @@ interface ExecutionContextInterface extends LegacyExecutionContextInterface
      * @internal Used by the validator engine. Should not be called by user
      *           code.
      */
-    public function isObjectValidatedForGroup($objectHash, $groupHash);
+    public function isGroupValidated($cacheKey, $groupHash);
 
     /**
      * Marks a constraint as validated for an object.
      *
-     * @param string $objectHash     The hash of the object
+     * @param string $cacheKey     The hash of the object
      * @param string $constraintHash The hash of the constraint
      *
      * @internal Used by the validator engine. Should not be called by user
      *           code.
      */
-    public function markClassConstraintAsValidated($objectHash, $constraintHash);
+    public function markConstraintAsValidated($cacheKey, $constraintHash);
 
     /**
      * Returns whether a constraint was validated for an object.
      *
-     * @param string $objectHash     The hash of the object
+     * @param string $cacheKey     The hash of the object
      * @param string $constraintHash The hash of the constraint
      *
      * @return Boolean Whether the constraint was already validated
@@ -170,32 +170,5 @@ interface ExecutionContextInterface extends LegacyExecutionContextInterface
      * @internal Used by the validator engine. Should not be called by user
      *           code.
      */
-    public function isClassConstraintValidated($objectHash, $constraintHash);
-
-    /**
-     * Marks a constraint as validated for an object and a property name.
-     *
-     * @param string $objectHash     The hash of the object
-     * @param string $propertyName   The property name
-     * @param string $constraintHash The hash of the constraint
-     *
-     * @internal Used by the validator engine. Should not be called by user
-     *           code.
-     */
-    public function markPropertyConstraintAsValidated($objectHash, $propertyName, $constraintHash);
-
-    /**
-     * Returns whether a constraint was validated for an object and a property
-     * name.
-     *
-     * @param string $objectHash     The hash of the object
-     * @param string $propertyName   The property name
-     * @param string $constraintHash The hash of the constraint
-     *
-     * @return Boolean Whether the constraint was already validated
-     *
-     * @internal Used by the validator engine. Should not be called by user
-     *           code.
-     */
-    public function isPropertyConstraintValidated($objectHash, $propertyName, $constraintHash);
+    public function isConstraintValidated($cacheKey, $constraintHash);
 }

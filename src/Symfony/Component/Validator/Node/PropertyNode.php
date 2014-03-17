@@ -42,11 +42,6 @@ use Symfony\Component\Validator\Mapping\TraversalStrategy;
 class PropertyNode extends Node
 {
     /**
-     * @var object
-     */
-    public $object;
-
-    /**
      * @var PropertyMetadataInterface
      */
     public $metadata;
@@ -71,22 +66,17 @@ class PropertyNode extends Node
      *
      * @see \Symfony\Component\Validator\Mapping\TraversalStrategy
      */
-    public function __construct($object, $value, PropertyMetadataInterface $metadata, $propertyPath, array $groups, $cascadedGroups = null, $traversalStrategy = TraversalStrategy::IMPLICIT)
+    public function __construct($value, $cacheKey, PropertyMetadataInterface $metadata, $propertyPath, array $groups, $cascadedGroups = null, $traversalStrategy = TraversalStrategy::IMPLICIT)
     {
-        if (!is_object($object)) {
-            throw new UnexpectedTypeException($object, 'object');
-        }
-
         parent::__construct(
             $value,
+            $cacheKey,
             $metadata,
             $propertyPath,
             $groups,
             $cascadedGroups,
             $traversalStrategy
         );
-
-        $this->object = $object;
     }
 
 }

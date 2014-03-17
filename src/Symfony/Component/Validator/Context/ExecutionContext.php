@@ -104,7 +104,7 @@ class ExecutionContext implements ExecutionContextInterface
      *
      * @var array
      */
-    private $validatedClassConstraints = array();
+    private $validatedConstraints = array();
 
     /**
      * Stores which property constraint has been validated for which property.
@@ -319,64 +319,36 @@ class ExecutionContext implements ExecutionContextInterface
     /**
      * {@inheritdoc}
      */
-    public function markObjectAsValidatedForGroup($objectHash, $groupHash)
+    public function markGroupAsValidated($cacheKey, $groupHash)
     {
-        if (!isset($this->validatedObjects[$objectHash])) {
-            $this->validatedObjects[$objectHash] = array();
+        if (!isset($this->validatedObjects[$cacheKey])) {
+            $this->validatedObjects[$cacheKey] = array();
         }
 
-        $this->validatedObjects[$objectHash][$groupHash] = true;
+        $this->validatedObjects[$cacheKey][$groupHash] = true;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function isObjectValidatedForGroup($objectHash, $groupHash)
+    public function isGroupValidated($cacheKey, $groupHash)
     {
-        return isset($this->validatedObjects[$objectHash][$groupHash]);
+        return isset($this->validatedObjects[$cacheKey][$groupHash]);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function markClassConstraintAsValidated($objectHash, $constraintHash)
+    public function markConstraintAsValidated($cacheKey, $constraintHash)
     {
-        if (!isset($this->validatedClassConstraints[$objectHash])) {
-            $this->validatedClassConstraints[$objectHash] = array();
-        }
-
-        $this->validatedClassConstraints[$objectHash][$constraintHash] = true;
+        $this->validatedConstraints[$cacheKey.':'.$constraintHash] = true;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function isClassConstraintValidated($objectHash, $constraintHash)
+    public function isConstraintValidated($cacheKey, $constraintHash)
     {
-        return isset($this->validatedClassConstraints[$objectHash][$constraintHash]);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function markPropertyConstraintAsValidated($objectHash, $propertyName, $constraintHash)
-    {
-        if (!isset($this->validatedPropertyConstraints[$objectHash])) {
-            $this->validatedPropertyConstraints[$objectHash] = array();
-        }
-
-        if (!isset($this->validatedPropertyConstraints[$objectHash][$propertyName])) {
-            $this->validatedPropertyConstraints[$objectHash][$propertyName] = array();
-        }
-
-        $this->validatedPropertyConstraints[$objectHash][$propertyName][$constraintHash] = true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isPropertyConstraintValidated($objectHash, $propertyName, $constraintHash)
-    {
-        return isset($this->validatedPropertyConstraints[$objectHash][$propertyName][$constraintHash]);
+        return isset($this->validatedConstraints[$cacheKey.':'.$constraintHash]);
     }
 }

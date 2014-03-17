@@ -71,14 +71,6 @@ class NodeValidationVisitor extends AbstractVisitor
 
         $context->setNode($node->value, $node->metadata, $node->propertyPath);
 
-        if ($node instanceof ClassNode) {
-            $objectHash = spl_object_hash($node->value);
-        } elseif ($node instanceof PropertyNode) {
-            $objectHash = spl_object_hash($node->object);
-        } else {
-            $objectHash = null;
-        }
-
         // if group (=[<G1,G2>,G3,G4]) contains group sequence (=<G1,G2>)
         // then call traverse() with each entry of the group sequence and abort
         // if necessary (G1, G2)
@@ -97,7 +89,7 @@ class NodeValidationVisitor extends AbstractVisitor
                 // Use the object hash for group sequences
                 $groupHash = is_object($group) ? spl_object_hash($group) : $group;
 
-                if ($context->isObjectValidatedForGroup($objectHash, $groupHash)) {
+                if ($context->isGroupValidated($node->cacheKey, $groupHash)) {
                     // Skip this group when validating the successor nodes
                     // (property and/or collection nodes)
                     unset($node->groups[$key]);
@@ -105,7 +97,7 @@ class NodeValidationVisitor extends AbstractVisitor
                     continue;
                 }
 
-                $context->markObjectAsValidatedForGroup($objectHash, $groupHash);
+                $context->markGroupAsValidated($node->cacheKey, $groupHash);
 
                 // Replace the "Default" group by the group sequence defined
                 // for the class, if applicable
@@ -144,7 +136,7 @@ class NodeValidationVisitor extends AbstractVisitor
             }
 
             // Validate normal group
-            $this->validateNodeForGroup($node, $group, $context, $objectHash);
+            $this->validateInGroup($node, $group, $context);
         }
 
         return true;
@@ -190,31 +182,21 @@ class NodeValidationVisitor extends AbstractVisitor
      *
      * @throws \Exception
      */
-    private function validateNodeForGroup(Node $node, $group, ExecutionContextInterface $context, $objectHash)
+    private function validateInGroup(Node $node, $group, ExecutionContextInterface $context)
     {
         $context->setGroup($group);
 
         foreach ($node->metadata->findConstraints($group) as $constraint) {
             // Prevent duplicate validation of constraints, in the case
             // that constraints belong to multiple validated groups
-            if (null !== $objectHash) {
+            if (null !== $node->cacheKey) {
                 $constraintHash = spl_object_hash($constraint);
 
-                if ($node instanceof ClassNode) {
-                    if ($context->isClassConstraintValidated($objectHash, $constraintHash)) {
-                        continue;
-                    }
-
-                    $context->markClassConstraintAsValidated($objectHash, $constraintHash);
-                } elseif ($node instanceof PropertyNode) {
-                    $propertyName = $node->metadata->getPropertyName();
-
-                    if ($context->isPropertyConstraintValidated($objectHash, $propertyName, $constraintHash)) {
-                        continue;
-                    }
-
-                    $context->markPropertyConstraintAsValidated($objectHash, $propertyName, $constraintHash);
+                if ($context->isConstraintValidated($node->cacheKey, $constraintHash)) {
+                    continue;
                 }
+
+                $context->markConstraintAsValidated($node->cacheKey, $constraintHash);
             }
 
             $validator = $this->validatorFactory->getInstance($constraint);

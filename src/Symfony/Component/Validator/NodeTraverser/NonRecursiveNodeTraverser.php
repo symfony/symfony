@@ -274,8 +274,8 @@ class NonRecursiveNodeTraverser implements NodeTraverserInterface
                 }
 
                 $nodeStack->push(new PropertyNode(
-                    $node->value,
                     $propertyMetadata->getPropertyValue($node->value),
+                    $node->cacheKey.':'.$propertyName,
                     $propertyMetadata,
                     $node->propertyPath
                         ? $node->propertyPath.'.'.$propertyName
@@ -530,6 +530,7 @@ class NonRecursiveNodeTraverser implements NodeTraverserInterface
 
             $nodeStack->push(new ClassNode(
                 $object,
+                spl_object_hash($object),
                 $classMetadata,
                 $propertyPath,
                 $groups,

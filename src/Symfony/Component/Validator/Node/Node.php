@@ -30,6 +30,8 @@ abstract class Node
      */
     public $value;
 
+    public $cacheKey;
+
     /**
      * The metadata specifying how the value should be validated.
      *
@@ -82,13 +84,14 @@ abstract class Node
      *
      * @throws UnexpectedTypeException If $cascadedGroups is invalid
      */
-    public function __construct($value, MetadataInterface $metadata = null, $propertyPath, array $groups, $cascadedGroups = null, $traversalStrategy = TraversalStrategy::IMPLICIT)
+    public function __construct($value, $cacheKey, MetadataInterface $metadata = null, $propertyPath, array $groups, $cascadedGroups = null, $traversalStrategy = TraversalStrategy::IMPLICIT)
     {
         if (null !== $cascadedGroups && !is_array($cascadedGroups)) {
             throw new UnexpectedTypeException($cascadedGroups, 'null or array');
         }
 
         $this->value = $value;
+        $this->cacheKey = $cacheKey;
         $this->metadata = $metadata;
         $this->propertyPath = $propertyPath;
         $this->groups = $groups;

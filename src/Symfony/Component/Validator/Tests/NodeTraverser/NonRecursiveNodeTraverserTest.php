@@ -40,7 +40,7 @@ class NonRecursiveNodeTraverserTest extends \PHPUnit_Framework_TestCase
 
     public function testVisitorsMayPreventTraversal()
     {
-        $nodes = array(new GenericNode('value', new GenericMetadata(), '', array('Default')));
+        $nodes = array(new GenericNode('value', null, new GenericMetadata(), '', array('Default')));
         $context = $this->getMock('Symfony\Component\Validator\Context\ExecutionContextInterface');
 
         $visitor1 = $this->getMock('Symfony\Component\Validator\NodeVisitor\NodeVisitorInterface');

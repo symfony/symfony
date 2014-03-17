@@ -94,6 +94,7 @@ class TraversingContextualValidator implements ContextualValidatorInterface
 
             $node = new GenericNode(
                 $value,
+                is_object($value) ? spl_object_hash($value) : null,
                 $metadata,
                 $this->defaultPropertyPath,
                 $groups
@@ -118,6 +119,7 @@ class TraversingContextualValidator implements ContextualValidatorInterface
 
             $node = new ClassNode(
                 $value,
+                spl_object_hash($value),
                 $metadata,
                 $this->defaultPropertyPath,
                 $groups
@@ -155,14 +157,15 @@ class TraversingContextualValidator implements ContextualValidatorInterface
 
         $propertyMetadatas = $classMetadata->getPropertyMetadata($propertyName);
         $groups = $groups ? $this->normalizeGroups($groups) : $this->defaultGroups;
+        $cacheKey = spl_object_hash($object);
         $nodes = array();
 
         foreach ($propertyMetadatas as $propertyMetadata) {
             $propertyValue = $propertyMetadata->getPropertyValue($object);
 
             $nodes[] = new PropertyNode(
-                $object,
                 $propertyValue,
+                $cacheKey.':'.$propertyName,
                 $propertyMetadata,
                 PropertyPath::append($this->defaultPropertyPath, $propertyName),
                 $groups
@@ -194,12 +197,13 @@ class TraversingContextualValidator implements ContextualValidatorInterface
 
         $propertyMetadatas = $classMetadata->getPropertyMetadata($propertyName);
         $groups = $groups ? $this->normalizeGroups($groups) : $this->defaultGroups;
+        $cacheKey = spl_object_hash($object);
         $nodes = array();
 
         foreach ($propertyMetadatas as $propertyMetadata) {
             $nodes[] = new PropertyNode(
-                $object,
                 $value,
+                $cacheKey.':'.$propertyName,
                 $propertyMetadata,
                 PropertyPath::append($this->defaultPropertyPath, $propertyName),
                 $groups,

@@ -56,6 +56,7 @@ class CollectionNode extends Node
         parent::__construct(
             $collection,
             null,
+            null,
             $propertyPath,
             $groups,
             $cascadedGroups,

@@ -66,7 +66,7 @@ If you have custom docroot directory layout, you can specify your own
 router script using <info>--router</info> option:
 
   <info>%command.full_name% --router=app/config/router.php</info>
-  
+
 Specifing a router script is required when the used environment is not "dev" or
 "prod".
 

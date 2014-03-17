@@ -581,9 +581,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      */
     public function validateNode($value, $valueHash, $container, $containerHash, MetadataInterface $metadata = null, $propertyPath, array $groups, $traversalStrategy, ExecutionContextInterface $context)
     {
-        $context->setValue($value);
-        $context->setMetadata($metadata);
-        $context->setPropertyPath($propertyPath);
+        $context->setNode($value, $metadata, $propertyPath);
 
         // if group (=[<G1,G2>,G3,G4]) contains group sequence (=<G1,G2>)
         // then call traverse() with each entry of the group sequence and abort

@@ -69,9 +69,7 @@ class NodeValidationVisitor extends AbstractVisitor
             return true;
         }
 
-        $context->setValue($node->value);
-        $context->setMetadata($node->metadata);
-        $context->setPropertyPath($node->propertyPath);
+        $context->setNode($node->value, $node->metadata, $node->propertyPath);
 
         if ($node instanceof ClassNode) {
             $this->replaceDefaultGroup($node);
@@ -171,43 +169,34 @@ class NodeValidationVisitor extends AbstractVisitor
      */
     private function validateNodeForGroup(Node $node, $group, ExecutionContextInterface $context, $objectHash)
     {
-        try {
-            $context->setGroup($group);
+        $context->setGroup($group);
 
-            foreach ($node->metadata->findConstraints($group) as $constraint) {
-                // Prevent duplicate validation of constraints, in the case
-                // that constraints belong to multiple validated groups
-                if (null !== $objectHash) {
-                    $constraintHash = spl_object_hash($constraint);
+        foreach ($node->metadata->findConstraints($group) as $constraint) {
+            // Prevent duplicate validation of constraints, in the case
+            // that constraints belong to multiple validated groups
+            if (null !== $objectHash) {
+                $constraintHash = spl_object_hash($constraint);
 
-                    if ($node instanceof ClassNode) {
-                        if ($context->isClassConstraintValidated($objectHash, $constraintHash)) {
-                            continue;
-                        }
-
-                        $context->markClassConstraintAsValidated($objectHash, $constraintHash);
-                    } elseif ($node instanceof PropertyNode) {
-                        $propertyName = $node->metadata->getPropertyName();
-
-                        if ($context->isPropertyConstraintValidated($objectHash, $propertyName, $constraintHash)) {
-                            continue;
-                        }
-
-                        $context->markPropertyConstraintAsValidated($objectHash, $propertyName, $constraintHash);
+                if ($node instanceof ClassNode) {
+                    if ($context->isClassConstraintValidated($objectHash, $constraintHash)) {
+                        continue;
                     }
-                }
 
-                $validator = $this->validatorFactory->getInstance($constraint);
-                $validator->initialize($context);
-                $validator->validate($node->value, $constraint);
+                    $context->markClassConstraintAsValidated($objectHash, $constraintHash);
+                } elseif ($node instanceof PropertyNode) {
+                    $propertyName = $node->metadata->getPropertyName();
+
+                    if ($context->isPropertyConstraintValidated($objectHash, $propertyName, $constraintHash)) {
+                        continue;
+                    }
+
+                    $context->markPropertyConstraintAsValidated($objectHash, $propertyName, $constraintHash);
+                }
             }
 
-            $context->setGroup(null);
-        } catch (\Exception $e) {
-            // Should be put into a finally block once we switch to PHP 5.5
-            $context->setGroup(null);
-
-            throw $e;
+            $validator = $this->validatorFactory->getInstance($constraint);
+            $validator->initialize($context);
+            $validator->validate($node->value, $constraint);
         }
     }
 

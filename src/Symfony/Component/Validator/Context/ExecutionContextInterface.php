@@ -102,32 +102,14 @@ interface ExecutionContextInterface extends LegacyExecutionContextInterface
     /**
      * Sets the currently validated value.
      *
-     * @param mixed $value The validated value
+     * @param mixed             $value        The validated value
+     * @param MetadataInterface $metadata     The validation metadata
+     * @param string            $propertyPath The property path to the current value
      *
      * @internal Used by the validator engine. Should not be called by user
      *           code.
      */
-    public function setValue($value);
-
-    /**
-     * Sets the current validation metadata.
-     *
-     * @param MetadataInterface $metadata The validation metadata
-     *
-     * @internal Used by the validator engine. Should not be called by user
-     *           code.
-     */
-    public function setMetadata(MetadataInterface $metadata = null);
-
-    /**
-     * Sets the property path leading to the current value.
-     *
-     * @param string $propertyPath The property path to the current value
-     *
-     * @internal Used by the validator engine. Should not be called by user
-     *           code.
-     */
-    public function setPropertyPath($propertyPath);
+    public function setNode($value, MetadataInterface $metadata = null, $propertyPath);
 
     /**
      * Sets the currently validated group.

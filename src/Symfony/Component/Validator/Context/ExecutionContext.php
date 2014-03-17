@@ -139,24 +139,10 @@ class ExecutionContext implements ExecutionContextInterface
     /**
      * {@inheritdoc}
      */
-    public function setValue($value)
+    public function setNode($value, MetadataInterface $metadata = null, $propertyPath)
     {
         $this->value = $value;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setMetadata(MetadataInterface $metadata = null)
-    {
         $this->metadata = $metadata;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setPropertyPath($propertyPath)
-    {
         $this->propertyPath = (string) $propertyPath;
     }
 

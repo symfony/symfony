@@ -68,6 +68,7 @@ class Application
     private $dispatcher;
     private $terminalDimensions;
     private $defaultCommand;
+    private $processTitle = '%app% - %cmd%';
 
     /**
      * Constructor.
@@ -883,6 +884,15 @@ class Application
      */
     protected function doRunCommand(Command $command, InputInterface $input, OutputInterface $output)
     {
+        if (version_compare(PHP_VERSION, '5.5.0') >= 0) {
+            $processTitle = strtr($this->processTitle, array(
+                '%app%' => $this->name,
+                '%cmd%' => $command->getName(),
+            ));
+
+            @cli_set_process_title($processTitle);
+        }
+
         foreach ($command->getHelperSet() as $helper) {
             if ($helper instanceof InputAwareInterface) {
                 $helper->setInput($input);
@@ -1108,5 +1118,19 @@ class Application
     public function setDefaultCommand($commandName)
     {
         $this->defaultCommand = $commandName;
+    }
+
+    /**
+     * Sets the process title visible in tools such as top and ps.
+     * The available placeholders are:
+     *
+     * - %app% This application name
+     * - %cmd% The running command name
+     *
+     * @param string $processTitle The process title
+     */
+    public function setProcessTitle($processTitle)
+    {
+        $this->processTitle = $processTitle;
     }
 }

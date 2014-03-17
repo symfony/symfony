@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Debug;
 
+use Psr\Log\LogLevel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Debug\Exception\ContextErrorException;
 use Symfony\Component\Debug\Exception\FatalErrorException;
@@ -44,7 +45,7 @@ class ErrorHandler
         E_ERROR             => 'Error',
         E_CORE_ERROR        => 'Core Error',
         E_COMPILE_ERROR     => 'Compile Error',
-        E_PARSE             => 'Parse',
+        E_PARSE             => 'Parse Error',
     );
 
     private $level;
@@ -108,7 +109,7 @@ class ErrorHandler
      * Sets a logger for the given channel.
      *
      * @param LoggerInterface $logger  A logger interface
-     * @param string          $channel The channel associated with the logger (deprecation or emergency)
+     * @param string          $channel The channel associated with the logger (deprecation, emergency or scream)
      */
     public static function setLogger(LoggerInterface $logger, $channel = 'deprecation')
     {
@@ -120,10 +121,6 @@ class ErrorHandler
      */
     public function handle($level, $message, $file = 'unknown', $line = 0, $context = array())
     {
-        if (0 === $this->level) {
-            return false;
-        }
-
         if ($level & (E_USER_DEPRECATED | E_DEPRECATED)) {
             if (isset(self::$loggers['deprecation'])) {
                 if (self::$stackedErrorLevels) {
@@ -179,6 +176,35 @@ class ErrorHandler
                 });
 
                 throw new DummyException();
+            }
+        }
+
+        if (isset(self::$loggers['scream']) && !(error_reporting() & $level)) {
+            if (self::$stackedErrorLevels) {
+                self::$stackedErrors[] = func_get_args();
+            } else {
+                switch ($level) {
+                    case E_USER_ERROR:
+                    case E_RECOVERABLE_ERROR:
+                        $logLevel = LogLevel::ERROR;
+                        break;
+
+                    case E_WARNING:
+                    case E_USER_WARNING:
+                        $logLevel = LogLevel::WARNING;
+                        break;
+
+                    default:
+                        $logLevel = LogLevel::NOTICE;
+                        break;
+                }
+
+                self::$loggers['scream']->log($logLevel, $message, array(
+                    'type' => $level,
+                    'file' => $file,
+                    'line' => $line,
+                    'scream' => error_reporting(),
+                ));
             }
         }
 

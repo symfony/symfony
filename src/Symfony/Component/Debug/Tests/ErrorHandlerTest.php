@@ -174,6 +174,28 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
             $handler->handle(E_USER_DEPRECATED, 'foo', 'foo.php', 12, 'foo');
 
             restore_error_handler();
+
+            $logger = $this->getMock('Psr\Log\LoggerInterface');
+
+            $that = $this;
+            $logArgCheck = function ($level, $message, $context) use ($that) {
+                $that->assertEquals('Undefined variable: undefVar', $message);
+                $that->assertArrayHasKey('type', $context);
+                $that->assertEquals($context['type'], E_NOTICE);
+            };
+
+            $logger
+                ->expects($this->once())
+                ->method('log')
+                ->will($this->returnCallback($logArgCheck))
+            ;
+
+            $handler = ErrorHandler::register(E_NOTICE);
+            $handler->setLogger($logger, 'scream');
+            unset($undefVar);
+            @$undefVar++;
+
+            restore_error_handler();
         } catch (\Exception $e) {
             restore_error_handler();
 

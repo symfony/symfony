@@ -32,5 +32,12 @@
             <argument>deprecation</argument>
             <argument type="service" id="logger" on-invalid="null" />
         </service>
+
+        <service id="debug.scream_logger_listener" class="%debug.errors_logger_listener.class%">
+            <tag name="kernel.event_subscriber" />
+            <tag name="monolog.logger" channel="scream" />
+            <argument>scream</argument>
+            <argument type="service" id="logger" on-invalid="null" />
+        </service>
     </services>
 </container>

@@ -4,6 +4,7 @@ CHANGELOG
 2.5.0
 -----
 
+ * Added `router_test.php` to support PHP built-in server test environment
  * Added `translation:debug` command
  * Added `config:debug` command
  * Added `yaml:lint` command

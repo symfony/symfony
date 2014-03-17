@@ -72,8 +72,6 @@ class NodeValidationVisitor extends AbstractVisitor
         $context->setNode($node->value, $node->metadata, $node->propertyPath);
 
         if ($node instanceof ClassNode) {
-            $this->replaceDefaultGroup($node);
-
             $objectHash = spl_object_hash($node->value);
         } elseif ($node instanceof PropertyNode) {
             $objectHash = spl_object_hash($node->object);
@@ -88,6 +86,8 @@ class NodeValidationVisitor extends AbstractVisitor
         // simply continue traversal (if possible)
 
         foreach ($node->groups as $key => $group) {
+            $cascadedGroup = null;
+
             // Even if we remove the following clause, the constraints on an
             // object won't be validated again due to the measures taken in
             // validateNodeForGroup().
@@ -106,11 +106,36 @@ class NodeValidationVisitor extends AbstractVisitor
                 }
 
                 $context->markObjectAsValidatedForGroup($objectHash, $groupHash);
+
+                // Replace the "Default" group by the group sequence defined
+                // for the class, if applicable
+                // This is done after checking the cache, so that
+                // spl_object_hash() isn't called for this sequence and
+                // "Default" is used instead in the cache. This is useful
+                // if the getters below return different group sequences in
+                // every call.
+                if (Constraint::DEFAULT_GROUP === $group) {
+                    if ($node->metadata->hasGroupSequence()) {
+                        // The group sequence is statically defined for the class
+                        $group = $node->metadata->getGroupSequence();
+                        $cascadedGroup = Constraint::DEFAULT_GROUP;
+                    } elseif ($node->metadata->isGroupSequenceProvider()) {
+                        // The group sequence is dynamically obtained from the validated
+                        // object
+                        /** @var \Symfony\Component\Validator\GroupSequenceProviderInterface $value */
+                        $group = $node->value->getGroupSequence();
+                        $cascadedGroup = Constraint::DEFAULT_GROUP;
+
+                        if (!$group instanceof GroupSequence) {
+                            $group = new GroupSequence($group);
+                        }
+                    }
+                }
             }
 
             if ($group instanceof GroupSequence) {
                 // Traverse group sequence until a violation is generated
-                $this->traverseGroupSequence($node, $group, $context);
+                $this->traverseGroupSequence($node, $group, $cascadedGroup, $context);
 
                 // Skip the group sequence when validating successor nodes
                 unset($node->groups[$key]);
@@ -135,17 +160,15 @@ class NodeValidationVisitor extends AbstractVisitor
      * @param GroupSequence             $groupSequence The group sequence
      * @param ExecutionContextInterface $context       The execution context
      */
-    private function traverseGroupSequence(Node $node, GroupSequence $groupSequence, ExecutionContextInterface $context)
+    private function traverseGroupSequence(Node $node, GroupSequence $groupSequence, $cascadedGroup, ExecutionContextInterface $context)
     {
         $violationCount = count($context->getViolations());
+        $cascadedGroups = $cascadedGroup ? array($cascadedGroup) : null;
 
         foreach ($groupSequence->groups as $groupInSequence) {
             $node = clone $node;
             $node->groups = array($groupInSequence);
-
-            if (null !== $groupSequence->cascadedGroup) {
-                $node->cascadedGroups = array($groupSequence->cascadedGroup);
-            }
+            $node->cascadedGroups = $cascadedGroups;
 
             $this->nodeTraverser->traverse(array($node), $context);
 
@@ -197,46 +220,6 @@ class NodeValidationVisitor extends AbstractVisitor
             $validator = $this->validatorFactory->getInstance($constraint);
             $validator->initialize($context);
             $validator->validate($node->value, $constraint);
-        }
-    }
-
-    /**
-     * Checks class nodes whether their "Default" group is replaced by a group
-     * sequence and adjusts the validation groups accordingly.
-     *
-     * If the "Default" group is replaced for a class node, and if the validated
-     * groups of the node contain the group "Default", that group is replaced by
-     * the group sequence specified in the class' metadata.
-     *
-     * @param ClassNode $node The node
-     */
-    private function replaceDefaultGroup(ClassNode $node)
-    {
-        if ($node->metadata->hasGroupSequence()) {
-            // The group sequence is statically defined for the class
-            $groupSequence = $node->metadata->getGroupSequence();
-        } elseif ($node->metadata->isGroupSequenceProvider()) {
-            // The group sequence is dynamically obtained from the validated
-            // object
-            /** @var \Symfony\Component\Validator\GroupSequenceProviderInterface $value */
-            $groupSequence = $node->value->getGroupSequence();
-
-            if (!$groupSequence instanceof GroupSequence) {
-                $groupSequence = new GroupSequence($groupSequence);
-            }
-        } else {
-            // The "Default" group is not overridden. Quit.
-            return;
-        }
-
-        $key = array_search(Constraint::DEFAULT_GROUP, $node->groups);
-
-        if (false !== $key) {
-            // Replace the "Default" group by the group sequence
-            $node->groups[$key] = $groupSequence;
-
-            // Cascade the "Default" group when validating the sequence
-            $groupSequence->cascadedGroup = Constraint::DEFAULT_GROUP;
         }
     }
 }

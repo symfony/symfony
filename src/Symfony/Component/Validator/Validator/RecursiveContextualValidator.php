@@ -277,9 +277,6 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      */
     private function traverseClassNode($value, $valueHash, ClassMetadataInterface $metadata = null, $propertyPath, array $groups, $cascadedGroups, $traversalStrategy, ExecutionContextInterface $context)
     {
-        // Replace "Default" group by group sequence, if appropriate
-        $groups = $this->replaceDefaultGroup($value, $metadata, $groups);
-
         $groups = $this->validateNode($value, $valueHash, null, null, $metadata, $propertyPath, $groups, $traversalStrategy, $context);
 
         if (0 === count($groups)) {
@@ -444,13 +441,12 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
             return;
         }
 
-        // The "cascadedGroups" property is set by the NodeValidationVisitor when
-        // traversing group sequences
-        $cascadedGroups = count($cascadedGroups) > 0
-            ? $cascadedGroups
-            : $groups;
-
         $cascadingStrategy = $metadata->getCascadingStrategy();
+
+        // Quit unless we have an array or a cascaded object
+        if (!is_array($value) && !($cascadingStrategy & CascadingStrategy::CASCADE)) {
+            return;
+        }
 
         // If no specific traversal strategy was requested when this method
         // was called, use the traversal strategy of the node's metadata
@@ -459,6 +455,12 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
             $traversalStrategy = $metadata->getTraversalStrategy()
                 | ($traversalStrategy & TraversalStrategy::STOP_RECURSION);
         }
+
+        // The "cascadedGroups" property is set by the NodeValidationVisitor when
+        // traversing group sequences
+        $cascadedGroups = count($cascadedGroups) > 0
+            ? $cascadedGroups
+            : $groups;
 
         if (is_array($value)) {
             // Arrays are always traversed, independent of the specified
@@ -475,21 +477,17 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
             return;
         }
 
-        if ($cascadingStrategy & CascadingStrategy::CASCADE) {
-            // If the value is a scalar, pass it anyway, because we want
-            // a NoSuchMetadataException to be thrown in that case
-            // (BC with Symfony < 2.5)
-            $this->cascadeObject(
-                $value,
-                $valueHash,
-                $propertyPath,
-                $cascadedGroups,
-                $traversalStrategy,
-                $context
-            );
-
-            return;
-        }
+        // If the value is a scalar, pass it anyway, because we want
+        // a NoSuchMetadataException to be thrown in that case
+        // (BC with Symfony < 2.5)
+        $this->cascadeObject(
+            $value,
+            $valueHash,
+            $propertyPath,
+            $cascadedGroups,
+            $traversalStrategy,
+            $context
+        );
 
         // Currently, the traversal strategy can only be TRAVERSE for a
         // generic node if the cascading strategy is CASCADE. Thus, traversable
@@ -590,6 +588,8 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
         // simply continue traversal (if possible)
 
         foreach ($groups as $key => $group) {
+            $cascadedGroup = null;
+
             // Even if we remove the following clause, the constraints on an
             // object won't be validated again due to the measures taken in
             // validateNodeForGroup().
@@ -608,11 +608,36 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                 }
 
                 $context->markObjectAsValidatedForGroup($valueHash, $groupHash);
+
+                // Replace the "Default" group by the group sequence defined
+                // for the class, if applicable
+                // This is done after checking the cache, so that
+                // spl_object_hash() isn't called for this sequence and
+                // "Default" is used instead in the cache. This is useful
+                // if the getters below return different group sequences in
+                // every call.
+                if (Constraint::DEFAULT_GROUP === $group) {
+                    if ($metadata->hasGroupSequence()) {
+                        // The group sequence is statically defined for the class
+                        $group = $metadata->getGroupSequence();
+                        $cascadedGroup = Constraint::DEFAULT_GROUP;
+                    } elseif ($metadata->isGroupSequenceProvider()) {
+                        // The group sequence is dynamically obtained from the validated
+                        // object
+                        /** @var \Symfony\Component\Validator\GroupSequenceProviderInterface $value */
+                        $group = $value->getGroupSequence();
+                        $cascadedGroup = Constraint::DEFAULT_GROUP;
+
+                        if (!$group instanceof GroupSequence) {
+                            $group = new GroupSequence($group);
+                        }
+                    }
+                }
             }
 
             if ($group instanceof GroupSequence) {
                 // Traverse group sequence until a violation is generated
-                $this->stepThroughGroupSequence($value, $valueHash, $container, $containerHash, $metadata, $propertyPath, $traversalStrategy, $group, $context);
+                $this->stepThroughGroupSequence($value, $valueHash, $container, $containerHash, $metadata, $propertyPath, $traversalStrategy, $group, $cascadedGroup, $context);
 
                 // Skip the group sequence when validating successor nodes
                 unset($groups[$key]);
@@ -637,17 +662,13 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      * @param GroupSequence             $groupSequence The group sequence
      * @param ExecutionContextInterface $context       The execution context
      */
-    private function stepThroughGroupSequence($value, $valueHash, $container, $containerHash, MetadataInterface $metadata = null, $propertyPath, $traversalStrategy, GroupSequence $groupSequence, ExecutionContextInterface $context)
+    private function stepThroughGroupSequence($value, $valueHash, $container, $containerHash, MetadataInterface $metadata = null, $propertyPath, $traversalStrategy, GroupSequence $groupSequence, $cascadedGroup, ExecutionContextInterface $context)
     {
         $violationCount = count($context->getViolations());
+        $cascadedGroups = $cascadedGroup ? array($cascadedGroup) : null;
 
         foreach ($groupSequence->groups as $groupInSequence) {
             $groups = array($groupInSequence);
-            $cascadedGroups = null;
-
-            if (null !== $groupSequence->cascadedGroup) {
-                $cascadedGroups = array($groupSequence->cascadedGroup);
-            }
 
             if ($metadata instanceof ClassMetadataInterface) {
                 $this->traverseClassNode(
@@ -726,45 +747,5 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
             $validator->initialize($context);
             $validator->validate($value, $constraint);
         }
-    }
-
-    /**
-     * @param                   $value
-     * @param ClassMetadataInterface $metadata
-     * @param array             $groups
-     *
-     * @return array
-     */
-    private function replaceDefaultGroup($value, ClassMetadataInterface $metadata, array $groups)
-    {
-        $groupSequence = null;
-
-        if ($metadata->hasGroupSequence()) {
-            // The group sequence is statically defined for the class
-            $groupSequence = $metadata->getGroupSequence();
-        } elseif ($metadata->isGroupSequenceProvider()) {
-            // The group sequence is dynamically obtained from the validated
-            // object
-            /** @var \Symfony\Component\Validator\GroupSequenceProviderInterface $value */
-            $groupSequence = $value->getGroupSequence();
-
-            if (!$groupSequence instanceof GroupSequence) {
-                $groupSequence = new GroupSequence($groupSequence);
-            }
-        }
-
-        if (null !== $groupSequence) {
-            $key = array_search(Constraint::DEFAULT_GROUP, $groups);
-
-            if (false !== $key) {
-                // Replace the "Default" group by the group sequence
-                $groups[$key] = $groupSequence;
-
-                // Cascade the "Default" group when validating the sequence
-                $groupSequence->cascadedGroup = Constraint::DEFAULT_GROUP;
-            }
-        }
-
-        return $groups;
     }
 }

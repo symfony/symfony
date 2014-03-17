@@ -102,6 +102,8 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
 
             $this->traverseGenericNode(
                 $value,
+                is_object($value) ? spl_object_hash($value) : null,
+                null,
                 null,
                 $metadata,
                 $this->defaultPropertyPath,
@@ -116,11 +118,12 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
 
         if (is_object($value)) {
             $this->cascadeObject(
-                 $value,
-                 $this->defaultPropertyPath,
-                 $groups,
-                 TraversalStrategy::IMPLICIT,
-                 $this->context
+                $value,
+                spl_object_hash($value),
+                $this->defaultPropertyPath,
+                $groups,
+                TraversalStrategy::IMPLICIT,
+                $this->context
             );
 
             return $this;
@@ -128,11 +131,11 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
 
         if (is_array($value)) {
             $this->cascadeCollection(
-                 $value,
-                 $this->defaultPropertyPath,
-                 $groups,
-                 TraversalStrategy::IMPLICIT,
-                 $this->context
+                $value,
+                $this->defaultPropertyPath,
+                $groups,
+                TraversalStrategy::IMPLICIT,
+                $this->context
             );
 
             return $this;
@@ -148,9 +151,9 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
     /**
      * {@inheritdoc}
      */
-    public function validateProperty($object, $propertyName, $groups = null)
+    public function validateProperty($container, $propertyName, $groups = null)
     {
-        $classMetadata = $this->metadataFactory->getMetadataFor($object);
+        $classMetadata = $this->metadataFactory->getMetadataFor($container);
 
         if (!$classMetadata instanceof ClassMetadataInterface) {
             // Cannot be UnsupportedMetadataException because of BC with
@@ -165,13 +168,16 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
 
         $propertyMetadatas = $classMetadata->getPropertyMetadata($propertyName);
         $groups = $groups ? $this->normalizeGroups($groups) : $this->defaultGroups;
+        $containerHash = spl_object_hash($container);
 
         foreach ($propertyMetadatas as $propertyMetadata) {
-            $propertyValue = $propertyMetadata->getPropertyValue($object);
+            $propertyValue = $propertyMetadata->getPropertyValue($container);
 
             $this->traverseGenericNode(
                 $propertyValue,
-                $object,
+                is_object($propertyValue) ? spl_object_hash($propertyValue) : null,
+                $container,
+                $containerHash,
                 $propertyMetadata,
                 PropertyPath::append($this->defaultPropertyPath, $propertyName),
                 $groups,
@@ -187,9 +193,9 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
     /**
      * {@inheritdoc}
      */
-    public function validatePropertyValue($object, $propertyName, $value, $groups = null)
+    public function validatePropertyValue($container, $propertyName, $value, $groups = null)
     {
-        $classMetadata = $this->metadataFactory->getMetadataFor($object);
+        $classMetadata = $this->metadataFactory->getMetadataFor($container);
 
         if (!$classMetadata instanceof ClassMetadataInterface) {
             // Cannot be UnsupportedMetadataException because of BC with
@@ -204,11 +210,14 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
 
         $propertyMetadatas = $classMetadata->getPropertyMetadata($propertyName);
         $groups = $groups ? $this->normalizeGroups($groups) : $this->defaultGroups;
+        $containerHash = spl_object_hash($container);
 
         foreach ($propertyMetadatas as $propertyMetadata) {
             $this->traverseGenericNode(
                 $value,
-                $object,
+                is_object($value) ? spl_object_hash($value) : null,
+                $container,
+                $containerHash,
                 $propertyMetadata,
                 PropertyPath::append($this->defaultPropertyPath, $propertyName),
                 $groups,
@@ -266,12 +275,12 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      * @see CollectionNode
      * @see TraversalStrategy
      */
-    private function traverseClassNode($value, ClassMetadataInterface $metadata = null, $propertyPath, array $groups, $cascadedGroups, $traversalStrategy, ExecutionContextInterface $context)
+    private function traverseClassNode($value, $valueHash, ClassMetadataInterface $metadata = null, $propertyPath, array $groups, $cascadedGroups, $traversalStrategy, ExecutionContextInterface $context)
     {
         // Replace "Default" group by group sequence, if appropriate
         $groups = $this->replaceDefaultGroup($value, $metadata, $groups);
 
-        $groups = $this->validateNode($value, $value, $metadata, $propertyPath, $groups, $traversalStrategy, $context);
+        $groups = $this->validateNode($value, $valueHash, null, null, $metadata, $propertyPath, $groups, $traversalStrategy, $context);
 
         if (0 === count($groups)) {
             return;
@@ -288,9 +297,13 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                     ));
                 }
 
+                $propertyValue = $propertyMetadata->getPropertyValue($value);
+
                 $this->traverseGenericNode(
-                    $propertyMetadata->getPropertyValue($value),
+                    $propertyValue,
+                    is_object($propertyValue) ? spl_object_hash($propertyValue) : null,
                     $value,
+                    $valueHash,
                     $propertyMetadata,
                     $propertyPath
                         ? $propertyPath.'.'.$propertyName
@@ -392,6 +405,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
             if (is_object($value)) {
                 $this->cascadeObject(
                     $value,
+                    spl_object_hash($value),
                     $propertyPath.'['.$key.']',
                     $groups,
                     $traversalStrategy,
@@ -418,9 +432,9 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      * @param Node                      $node      The node
      * @param ExecutionContextInterface $context   The current execution context
      */
-    private function traverseGenericNode($value, $object, MetadataInterface $metadata = null, $propertyPath, array $groups, $cascadedGroups, $traversalStrategy, ExecutionContextInterface $context)
+    private function traverseGenericNode($value, $valueHash, $container, $containerHash, MetadataInterface $metadata = null, $propertyPath, array $groups, $cascadedGroups, $traversalStrategy, ExecutionContextInterface $context)
     {
-        $groups = $this->validateNode($value, $object, $metadata, $propertyPath, $groups, $traversalStrategy, $context);
+        $groups = $this->validateNode($value, $valueHash, $container, $containerHash, $metadata, $propertyPath, $groups, $traversalStrategy, $context);
 
         if (0 === count($groups)) {
             return;
@@ -467,6 +481,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
             // (BC with Symfony < 2.5)
             $this->cascadeObject(
                 $value,
+                $valueHash,
                 $propertyPath,
                 $cascadedGroups,
                 $traversalStrategy,
@@ -492,7 +507,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      * traversal of the object, a new collection node is put on the stack.
      * Otherwise, an exception is thrown.
      *
-     * @param object    $object            The object to cascade
+     * @param object    $container            The object to cascade
      * @param string    $propertyPath      The current property path
      * @param string[]  $groups            The validated groups
      * @param integer   $traversalStrategy The strategy for traversing the
@@ -507,10 +522,10 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      *                                      metadata factory does not implement
      *                                      {@link ClassMetadataInterface}
      */
-    private function cascadeObject($object, $propertyPath, array $groups, $traversalStrategy, ExecutionContextInterface $context)
+    private function cascadeObject($container, $containerHash, $propertyPath, array $groups, $traversalStrategy, ExecutionContextInterface $context)
     {
         try {
-            $classMetadata = $this->metadataFactory->getMetadataFor($object);
+            $classMetadata = $this->metadataFactory->getMetadataFor($container);
 
             if (!$classMetadata instanceof ClassMetadataInterface) {
                 throw new UnsupportedMetadataException(sprintf(
@@ -522,7 +537,8 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
             }
 
             $this->traverseClassNode(
-                $object,
+                $container,
+                $containerHash,
                 $classMetadata,
                 $propertyPath,
                 $groups,
@@ -532,7 +548,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
             );
         } catch (NoSuchMetadataException $e) {
             // Rethrow if not Traversable
-            if (!$object instanceof \Traversable) {
+            if (!$container instanceof \Traversable) {
                 throw $e;
             }
 
@@ -542,7 +558,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
             }
 
             $this->cascadeCollection(
-                $object,
+                $container,
                 $propertyPath,
                 $groups,
                 $traversalStrategy,
@@ -563,13 +579,11 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      *
      * @return array The groups in which the successor nodes should be validated
      */
-    public function validateNode($value, $object, MetadataInterface $metadata = null, $propertyPath, array $groups, $traversalStrategy, ExecutionContextInterface $context)
+    public function validateNode($value, $valueHash, $container, $containerHash, MetadataInterface $metadata = null, $propertyPath, array $groups, $traversalStrategy, ExecutionContextInterface $context)
     {
         $context->setValue($value);
         $context->setMetadata($metadata);
         $context->setPropertyPath($propertyPath);
-
-        $objectHash = is_object($object) ? spl_object_hash($object) : null;
 
         // if group (=[<G1,G2>,G3,G4]) contains group sequence (=<G1,G2>)
         // then call traverse() with each entry of the group sequence and abort
@@ -587,7 +601,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                 // Use the object hash for group sequences
                 $groupHash = is_object($group) ? spl_object_hash($group) : $group;
 
-                if ($context->isObjectValidatedForGroup($objectHash, $groupHash)) {
+                if ($context->isObjectValidatedForGroup($valueHash, $groupHash)) {
                     // Skip this group when validating the successor nodes
                     // (property and/or collection nodes)
                     unset($groups[$key]);
@@ -595,12 +609,12 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                     continue;
                 }
 
-                $context->markObjectAsValidatedForGroup($objectHash, $groupHash);
+                $context->markObjectAsValidatedForGroup($valueHash, $groupHash);
             }
 
             if ($group instanceof GroupSequence) {
                 // Traverse group sequence until a violation is generated
-                $this->stepThroughGroupSequence($value, $object, $metadata, $propertyPath, $traversalStrategy, $group, $context);
+                $this->stepThroughGroupSequence($value, $valueHash, $container, $containerHash, $metadata, $propertyPath, $traversalStrategy, $group, $context);
 
                 // Skip the group sequence when validating successor nodes
                 unset($groups[$key]);
@@ -609,7 +623,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
             }
 
             // Validate normal group
-            $this->validateNodeForGroup($value, $objectHash, $metadata, $group, $context);
+            $this->validateNodeForGroup($value, $valueHash, $containerHash, $metadata, $group, $context);
         }
 
         return $groups;
@@ -625,7 +639,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      * @param GroupSequence             $groupSequence The group sequence
      * @param ExecutionContextInterface $context       The execution context
      */
-    private function stepThroughGroupSequence($value, $object, MetadataInterface $metadata = null, $propertyPath, $traversalStrategy, GroupSequence $groupSequence, ExecutionContextInterface $context)
+    private function stepThroughGroupSequence($value, $valueHash, $container, $containerHash, MetadataInterface $metadata = null, $propertyPath, $traversalStrategy, GroupSequence $groupSequence, ExecutionContextInterface $context)
     {
         $violationCount = count($context->getViolations());
 
@@ -640,6 +654,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
             if ($metadata instanceof ClassMetadataInterface) {
                 $this->traverseClassNode(
                      $value,
+                     $valueHash,
                      $metadata,
                      $propertyPath,
                      $groups,
@@ -650,7 +665,9 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
             } else {
                 $this->traverseGenericNode(
                      $value,
-                     $object,
+                     $valueHash,
+                     $container,
+                     $containerHash,
                      $metadata,
                      $propertyPath,
                      $groups,
@@ -673,36 +690,38 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      * @param Node                      $node       The validated node
      * @param string                    $group      The group to validate
      * @param ExecutionContextInterface $context    The execution context
-     * @param string                    $objectHash The hash of the node's
+     * @param string                    $containerHash The hash of the node's
      *                                              object (if any)
      *
      * @throws \Exception
      */
-    private function validateNodeForGroup($value, $objectHash, MetadataInterface $metadata = null, $group, ExecutionContextInterface $context)
+    private function validateNodeForGroup($value, $valueHash, $containerHash, MetadataInterface $metadata = null, $group, ExecutionContextInterface $context)
     {
         $context->setGroup($group);
+
+        $propertyName = $metadata instanceof PropertyMetadataInterface
+            ? $metadata->getPropertyName()
+            : null;
 
         foreach ($metadata->findConstraints($group) as $constraint) {
             // Prevent duplicate validation of constraints, in the case
             // that constraints belong to multiple validated groups
-            if (null !== $objectHash) {
+            if (null !== $propertyName) {
                 $constraintHash = spl_object_hash($constraint);
 
-                if ($metadata instanceof ClassMetadataInterface) {
-                    if ($context->isClassConstraintValidated($objectHash, $constraintHash)) {
-                        continue;
-                    }
-
-                    $context->markClassConstraintAsValidated($objectHash, $constraintHash);
-                } elseif ($metadata instanceof PropertyMetadataInterface) {
-                    $propertyName = $metadata->getPropertyName();
-
-                    if ($context->isPropertyConstraintValidated($objectHash, $propertyName, $constraintHash)) {
-                        continue;
-                    }
-
-                    $context->markPropertyConstraintAsValidated($objectHash, $propertyName, $constraintHash);
+                if ($context->isPropertyConstraintValidated($containerHash, $propertyName, $constraintHash)) {
+                    continue;
                 }
+
+                $context->markPropertyConstraintAsValidated($containerHash, $propertyName, $constraintHash);
+            } elseif (null !== $valueHash) {
+                $constraintHash = spl_object_hash($constraint);
+
+                if ($context->isClassConstraintValidated($valueHash, $constraintHash)) {
+                    continue;
+                }
+
+                $context->markClassConstraintAsValidated($valueHash, $constraintHash);
             }
 
             $validator = $this->validatorFactory->getInstance($constraint);

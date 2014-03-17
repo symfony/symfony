@@ -13,8 +13,8 @@ namespace Symfony\Component\Validator\Validator;
 
 use Symfony\Component\Validator\Context\ExecutionContextFactoryInterface;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Symfony\Component\Validator\NodeTraverser\NodeTraverserInterface;
 use Symfony\Component\Validator\MetadataFactoryInterface;
+use Symfony\Component\Validator\NodeTraverser\NodeTraverserInterface;
 
 /**
  * Default implementation of {@link ValidatorInterface}.

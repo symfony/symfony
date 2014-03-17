@@ -13,7 +13,6 @@ namespace Symfony\Component\Validator\Context;
 
 use Symfony\Component\Validator\ExecutionContextInterface as LegacyExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\MetadataInterface;
-use Symfony\Component\Validator\Node\Node;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 

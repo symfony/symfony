@@ -11,15 +11,15 @@
 
 namespace Symfony\Component\Validator\Mapping;
 
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\Constraints\Traverse;
 use Symfony\Component\Validator\Constraints\Valid;
-use Symfony\Component\Validator\ValidationVisitorInterface;
-use Symfony\Component\Validator\PropertyMetadataContainerInterface;
-use Symfony\Component\Validator\MetadataInterface as LegacyMetadataInterface;
-use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\GroupDefinitionException;
+use Symfony\Component\Validator\MetadataInterface as LegacyMetadataInterface;
+use Symfony\Component\Validator\PropertyMetadataContainerInterface;
+use Symfony\Component\Validator\ValidationVisitorInterface;
 
 /**
  * Default implementation of {@link ClassMetadataInterface}.

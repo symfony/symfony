@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Validator\Mapping;
 
-use Symfony\Component\Validator\ValidationVisitorInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
+use Symfony\Component\Validator\ValidationVisitorInterface;
 
 /**
  * Stores all metadata needed for validating a class property.

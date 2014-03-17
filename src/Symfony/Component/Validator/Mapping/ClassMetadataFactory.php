@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Validator\Mapping;
 
-use Symfony\Component\Validator\MetadataFactoryInterface;
 use Symfony\Component\Validator\Exception\NoSuchMetadataException;
-use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
 use Symfony\Component\Validator\Mapping\Cache\CacheInterface;
+use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
+use Symfony\Component\Validator\MetadataFactoryInterface;
 
 /**
  * Creates new {@link ClassMetadataInterface} instances.

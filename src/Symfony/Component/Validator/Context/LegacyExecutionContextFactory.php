@@ -12,7 +12,6 @@
 namespace Symfony\Component\Validator\Context;
 
 use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Validator\Group\GroupManagerInterface;
 use Symfony\Component\Validator\MetadataFactoryInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 

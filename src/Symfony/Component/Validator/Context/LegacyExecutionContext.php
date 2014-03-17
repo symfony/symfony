@@ -12,13 +12,9 @@
 namespace Symfony\Component\Validator\Context;
 
 use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Validator\Constraints\Traverse;
 use Symfony\Component\Validator\Constraints\Valid;
-use Symfony\Component\Validator\Exception\InvalidArgumentException;
-use Symfony\Component\Validator\Group\GroupManagerInterface;
 use Symfony\Component\Validator\MetadataFactoryInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Component\Validator\ValidatorInterface as LegacyValidatorInterface;
 
 /**
  * An execution context that is compatible with the legacy API (< 2.5).

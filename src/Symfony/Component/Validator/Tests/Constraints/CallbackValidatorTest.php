@@ -12,9 +12,9 @@
 namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\ExecutionContext;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\CallbackValidator;
+use Symfony\Component\Validator\ExecutionContext;
 
 class CallbackValidatorTest_Class
 {

@@ -11,32 +11,32 @@
 
 namespace Symfony\Component\Validator;
 
+use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
+use Doctrine\Common\Annotations\CachedReader;
+use Doctrine\Common\Annotations\Reader;
+use Doctrine\Common\Cache\ArrayCache;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Context\LegacyExecutionContextFactory;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
-use Symfony\Component\Validator\Mapping\ClassMetadataFactory;
 use Symfony\Component\Validator\Exception\ValidatorException;
-use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
 use Symfony\Component\Validator\Mapping\Cache\CacheInterface;
-use Symfony\Component\Validator\Mapping\Loader\StaticMethodLoader;
-use Symfony\Component\Validator\Mapping\Loader\YamlFileLoader;
+use Symfony\Component\Validator\Mapping\ClassMetadataFactory;
 use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
-use Symfony\Component\Validator\Mapping\Loader\YamlFilesLoader;
+use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
+use Symfony\Component\Validator\Mapping\Loader\StaticMethodLoader;
 use Symfony\Component\Validator\Mapping\Loader\XmlFileLoader;
 use Symfony\Component\Validator\Mapping\Loader\XmlFilesLoader;
-use Symfony\Component\Translation\TranslatorInterface;
-use Doctrine\Common\Annotations\Reader;
-use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\Common\Annotations\CachedReader;
-use Doctrine\Common\Cache\ArrayCache;
+use Symfony\Component\Validator\Mapping\Loader\YamlFileLoader;
+use Symfony\Component\Validator\Mapping\Loader\YamlFilesLoader;
 use Symfony\Component\Validator\NodeTraverser\NonRecursiveNodeTraverser;
 use Symfony\Component\Validator\NodeVisitor\NodeValidationVisitor;
 use Symfony\Component\Validator\NodeVisitor\ObjectInitializationVisitor;
-use Symfony\Component\Validator\Validator as ValidatorV24;
-use Symfony\Component\Validator\Validator\TraversingValidator;
 use Symfony\Component\Validator\Validator\LegacyValidator;
+use Symfony\Component\Validator\Validator\TraversingValidator;
+use Symfony\Component\Validator\Validator as ValidatorV24;
 
 /**
  * The default implementation of {@link ValidatorBuilderInterface}.
@@ -378,6 +378,7 @@ class ValidatorBuilder implements ValidatorBuilderInterface
 
                         if (is_file($file)) {
                             require_once $file;
+
                             return true;
                         }
                     }

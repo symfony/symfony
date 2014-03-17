@@ -12,12 +12,12 @@
 namespace Symfony\Component\Validator\Tests;
 
 use Symfony\Component\Validator\Constraints\Valid;
+use Symfony\Component\Validator\ConstraintValidatorFactory;
+use Symfony\Component\Validator\DefaultTranslator;
 use Symfony\Component\Validator\MetadataFactoryInterface;
 use Symfony\Component\Validator\Tests\Fixtures\Entity;
 use Symfony\Component\Validator\Tests\Validator\AbstractLegacyApiTest;
 use Symfony\Component\Validator\Validator as LegacyValidator;
-use Symfony\Component\Validator\DefaultTranslator;
-use Symfony\Component\Validator\ConstraintValidatorFactory;
 
 class ValidatorTest extends AbstractLegacyApiTest
 {

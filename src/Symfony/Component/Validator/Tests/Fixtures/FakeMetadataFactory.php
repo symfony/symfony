@@ -12,7 +12,6 @@
 namespace Symfony\Component\Validator\Tests\Fixtures;
 
 use Symfony\Component\Validator\Exception\NoSuchMetadataException;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\MetadataFactoryInterface;
 use Symfony\Component\Validator\MetadataInterface;
 

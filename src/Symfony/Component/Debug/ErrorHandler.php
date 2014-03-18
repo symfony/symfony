@@ -278,7 +278,7 @@ class ErrorHandler
                 'line' => $error['line'],
             );
 
-            self::$loggers['emergency']->emerg($error['message'], $fatal);
+            self::$loggers['emergency']->emergency($error['message'], $fatal);
         }
 
         if (!$this->displayErrors) {

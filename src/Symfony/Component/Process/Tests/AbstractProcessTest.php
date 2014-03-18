@@ -272,6 +272,12 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($process->isSuccessful());
     }
 
+    public function testExitCodeTextIsNullWhenExitCodeIsNull()
+    {
+        $process = $this->getProcess('');
+        $this->assertNull($process->getExitCodeText());
+    }
+
     public function testExitCodeText()
     {
         $process = $this->getProcess('');
@@ -512,6 +518,19 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertLessThan($timeout + Process::TIMEOUT_PRECISION, $duration);
     }
 
+    public function testCheckTimeoutOnNonStartedProcess()
+    {
+        $process = $this->getProcess('php -r "sleep(3);"');
+        $process->checkTimeout();
+    }
+
+    public function testCheckTimeoutOnTerminatedProcess()
+    {
+        $process = $this->getProcess('php -v');
+        $process->run();
+        $process->checkTimeout();
+    }
+
     public function testCheckTimeoutOnStartedProcess()
     {
         $timeout = 0.5;
@@ -615,6 +634,55 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $this->verifyPosixIsEnabled();
         $process = $this->getProcess('php -m');
         $process->signal(SIGHUP);
+    }
+
+    /**
+     * @dataProvider provideMethodsThatNeedARunningProcess
+     */
+    public function testMethodsThatNeedARunningProcess($method)
+    {
+        $process = $this->getProcess('php -m');
+        $this->setExpectedException('Symfony\Component\Process\Exception\LogicException', sprintf('Process must be started before calling %s.', $method));
+        call_user_func(array($process, $method));
+    }
+
+    public function provideMethodsThatNeedARunningProcess()
+    {
+        return array(
+            array('getOutput'),
+            array('getIncrementalOutput'),
+            array('getErrorOutput'),
+            array('getIncrementalErrorOutput'),
+            array('wait'),
+        );
+    }
+
+    /**
+     * @dataProvider provideMethodsThatNeedATerminatedProcess
+     */
+    public function testMethodsThatNeedATerminatedProcess($method)
+    {
+        $process = $this->getProcess('php -r "sleep(1);"');
+        $process->start();
+        try {
+            call_user_func(array($process, $method));
+            $process->stop(0);
+            $this->fail('A LogicException must have been thrown');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('Symfony\Component\Process\Exception\LogicException', $e);
+            $this->assertEquals(sprintf('Process must be terminated before calling %s.', $method), $e->getMessage());
+        }
+        $process->stop(0);
+    }
+
+    public function provideMethodsThatNeedATerminatedProcess()
+    {
+        return array(
+            array('hasBeenSignaled'),
+            array('getTermSignal'),
+            array('hasBeenStopped'),
+            array('getStopSignal'),
+        );
     }
 
     private function verifyPosixIsEnabled()

@@ -21,6 +21,8 @@ class ProcessPipes
     /** @var array */
     public $pipes = array();
     /** @var array */
+    private $files = array();
+    /** @var array */
     private $fileHandles = array();
     /** @var array */
     private $readBytes = array();
@@ -39,20 +41,21 @@ class ProcessPipes
         // Fix for PHP bug #51800: reading from STDOUT pipe hangs forever on Windows if the output is too big.
         // Workaround for this problem is to use temporary files instead of pipes on Windows platform.
         //
-        // Please note that this work around prevents hanging but
-        // another issue occurs : In some race conditions, some data may be
-        // lost or corrupted.
-        //
         // @see https://bugs.php.net/bug.php?id=51800
         if ($this->useFiles) {
-            $this->fileHandles = array(
-                Process::STDOUT => tmpfile(),
+            $this->files = array(
+                Process::STDOUT => tempnam(sys_get_temp_dir(), 'sf_proc_stdout'),
+                Process::STDERR => tempnam(sys_get_temp_dir(), 'sf_proc_stderr'),
             );
-            if (false === $this->fileHandles[Process::STDOUT]) {
-                throw new RuntimeException('A temporary file could not be opened to write the process output to, verify that your TEMP environment variable is writable');
+            foreach ($this->files as $offset => $file) {
+                $this->fileHandles[$offset] = fopen($this->files[$offset], 'rb');
+                if (false === $this->fileHandles[$offset]) {
+                    throw new RuntimeException('A temporary file could not be opened to write the process output to, verify that your TEMP environment variable is writable');
+                }
             }
             $this->readBytes = array(
                 Process::STDOUT => 0,
+                Process::STDERR => 0,
             );
         }
     }
@@ -60,6 +63,7 @@ class ProcessPipes
     public function __destruct()
     {
         $this->close();
+        $this->removeFiles();
     }
 
     /**
@@ -105,11 +109,13 @@ class ProcessPipes
     public function getDescriptors()
     {
         if ($this->useFiles) {
+            // We're not using pipe on Windows platform as it hangs (https://bugs.php.net/bug.php?id=51800)
+            // We're not using file handles as it can produce corrupted output https://bugs.php.net/bug.php?id=65650
+            // So we redirect output within the commandline and pass the nul device to the process
             return array(
                 array('pipe', 'r'),
-                $this->fileHandles[Process::STDOUT],
-                // Use a file handle only for STDOUT. Using for both STDOUT and STDERR would trigger https://bugs.php.net/bug.php?id=65650
-                array('pipe', 'w'),
+                array('file', 'NUL', 'w'),
+                array('file', 'NUL', 'w'),
             );
         }
 
@@ -126,6 +132,20 @@ class ProcessPipes
             array('pipe', 'w'), // stdout
             array('pipe', 'w'), // stderr
         );
+    }
+
+    /**
+     * Returns an array of filenames indexed by their related stream in case these pipes use temporary files.
+     *
+     * @return array
+     */
+    public function getFiles()
+    {
+        if ($this->useFiles) {
+            return $this->files;
+        }
+
+        return array();
     }
 
     /**
@@ -321,5 +341,18 @@ class ProcessPipes
 
         // stream_select returns false when the `select` system call is interrupted by an incoming signal
         return isset($lastError['message']) && false !== stripos($lastError['message'], 'interrupted system call');
+    }
+
+    /**
+     * Removes temporary files
+     */
+    private function removeFiles()
+    {
+        foreach ($this->files as $filename) {
+            if (file_exists($filename)) {
+                @unlink($filename);
+            }
+        }
+        $this->files = array();
     }
 }

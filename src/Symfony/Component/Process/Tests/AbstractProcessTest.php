@@ -272,6 +272,12 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($process->isSuccessful());
     }
 
+    public function testExitCodeTextIsNullWhenExitCodeIsNull()
+    {
+        $process = $this->getProcess('');
+        $this->assertNull($process->getExitCodeText());
+    }
+
     public function testExitCodeText()
     {
         $process = $this->getProcess('');
@@ -512,6 +518,19 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertLessThan($timeout + Process::TIMEOUT_PRECISION, $duration);
     }
 
+    public function testCheckTimeoutOnNonStartedProcess()
+    {
+        $process = $this->getProcess('php -r "sleep(3);"');
+        $process->checkTimeout();
+    }
+
+    public function testCheckTimeoutOnTerminatedProcess()
+    {
+        $process = $this->getProcess('php -v');
+        $process->run();
+        $process->checkTimeout();
+    }
+
     public function testCheckTimeoutOnStartedProcess()
     {
         $timeout = 0.5;
@@ -618,33 +637,52 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Process\Exception\LogicException
-     * @expectedExceptionMessage Process must be started before calling getOutput
+     * @dataProvider provideMethodsThatNeedARunningProcess
      */
-    public function testGetOutputProcessNotStarted()
+    public function testMethodsThatNeedARunningProcess($method)
     {
         $process = $this->getProcess('php -m');
-        $process->getOutput();
+        $this->setExpectedException('Symfony\Component\Process\Exception\LogicException', sprintf('Process must be started before calling %s.', $method));
+        call_user_func(array($process, $method));
+    }
+
+    public function provideMethodsThatNeedARunningProcess()
+    {
+        return array(
+            array('getOutput'),
+            array('getIncrementalOutput'),
+            array('getErrorOutput'),
+            array('getIncrementalErrorOutput'),
+            array('wait'),
+        );
     }
 
     /**
-     * @expectedException \Symfony\Component\Process\Exception\LogicException
-     * @expectedExceptionMessage Process must be started before calling getErrorOutput
+     * @dataProvider provideMethodsThatNeedATerminatedProcess
      */
-    public function testGetErrorOutputProcessNotStarted()
+    public function testMethodsThatNeedATerminatedProcess($method)
     {
-        $process = $this->getProcess('php -m');
-        $process->getErrorOutput();
+        $process = $this->getProcess('php -r "sleep(1);"');
+        $process->start();
+        try {
+            call_user_func(array($process, $method));
+            $process->stop(0);
+            $this->fail('A LogicException must have been thrown');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('Symfony\Component\Process\Exception\LogicException', $e);
+            $this->assertEquals(sprintf('Process must be terminated before calling %s.', $method), $e->getMessage());
+        }
+        $process->stop(0);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\LogicException
-     * @expectedExceptionMessage Process must be started before calling wait
-     */
-    public function testWaitProcessWithoutTimeoutNotStarted()
+    public function provideMethodsThatNeedATerminatedProcess()
     {
-        $process = $this->getProcess('php -m')->setTimeout(null);
-        $process->wait();
+        return array(
+            array('hasBeenSignaled'),
+            array('getTermSignal'),
+            array('hasBeenStopped'),
+            array('getStopSignal'),
+        );
     }
 
     private function verifyPosixIsEnabled()

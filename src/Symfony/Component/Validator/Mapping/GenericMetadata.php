@@ -26,7 +26,7 @@ use Symfony\Component\Validator\ValidationVisitorInterface;
  * @since  2.5
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class GenericMetadata  implements MetadataInterface
+class GenericMetadata implements MetadataInterface
 {
     /**
      * @var Constraint[]

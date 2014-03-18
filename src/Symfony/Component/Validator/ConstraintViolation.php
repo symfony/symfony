@@ -72,7 +72,7 @@ class ConstraintViolation implements ConstraintViolationInterface
      * @param mixed        $invalidValue    The invalid value that caused this
      *                                      violation
      * @param integer|null $plural          The number for determining the plural
-     *                                      form when translation the message
+     *                                      form when translating the message
      * @param mixed        $code            The error code of the violation
      */
     public function __construct($message, $messageTemplate, array $parameters, $root, $propertyPath, $invalidValue, $plural = null, $code = null)

@@ -19,14 +19,14 @@ use Symfony\Component\Validator\Exception\OutOfBoundsException;
  * When validating a group sequence, each group will only be validated if all
  * of the previous groups in the sequence succeeded. For example:
  *
- *     $validator->validate($address, new Valid(), new GroupSequence('Basic', 'Strict'));
+ *     $validator->validate($address, null, new GroupSequence('Basic', 'Strict'));
  *
  * In the first step, all constraints that belong to the group "Basic" will be
  * validated. If none of the constraints fail, the validator will then validate
  * the constraints in group "Strict". This is useful, for example, if "Strict"
  * contains expensive checks that require a lot of CPU or slow, external
  * services. You usually don't want to run expensive checks if any of the cheap
- * checks fails.
+ * checks fail.
  *
  * When adding metadata to a class, you can override the "Default" group of
  * that class with a group sequence:
@@ -42,12 +42,12 @@ use Symfony\Component\Validator\Exception\OutOfBoundsException;
  * Whenever you validate that object in the "Default" group, the group sequence
  * will be validated:
  *
- *     $validator->validate($address, new Valid());
+ *     $validator->validate($address);
  *
  * If you want to execute the constraints of the "Default" group for a class
  * with an overridden default group, pass the class name as group name instead:
  *
- *     $validator->validate($address, new Valid(), "Address")
+ *     $validator->validate($address, null, "Address")
  *
  * @Annotation
  *

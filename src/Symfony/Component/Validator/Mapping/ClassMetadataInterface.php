@@ -14,8 +14,6 @@ namespace Symfony\Component\Validator\Mapping;
 use Symfony\Component\Validator\ClassBasedInterface;
 use Symfony\Component\Validator\PropertyMetadataContainerInterface as LegacyPropertyMetadataContainerInterface;
 
-;
-
 /**
  * Stores all metadata needed for validating objects of specific class.
  *

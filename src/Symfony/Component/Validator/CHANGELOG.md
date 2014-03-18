@@ -57,6 +57,8 @@ CHANGELOG
  * added `Exception\UnsupportedMetadataException`
  * made `Exception\ValidatorException` extend `Exception\RuntimeException`
  * added `Util\PropertyPath`
+ * made the PropertyAccess component an optional dependency
+ * deprecated `ValidatorBuilder::setPropertyAccessor()`
 
 
 2.4.0

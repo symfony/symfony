@@ -16,7 +16,6 @@ use Doctrine\Common\Annotations\AnnotationRegistry;
 use Doctrine\Common\Annotations\CachedReader;
 use Doctrine\Common\Annotations\Reader;
 use Doctrine\Common\Cache\ArrayCache;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Context\LegacyExecutionContextFactory;
@@ -395,8 +394,7 @@ class ValidatorBuilder implements ValidatorBuilderInterface
             $metadataFactory = new ClassMetadataFactory($loader, $this->metadataCache);
         }
 
-        $propertyAccessor = $this->propertyAccessor ?: PropertyAccess::createPropertyAccessor();
-        $validatorFactory = $this->validatorFactory ?: new ConstraintValidatorFactory($propertyAccessor);
+        $validatorFactory = $this->validatorFactory ?: new ConstraintValidatorFactory($this->propertyAccessor);
         $translator = $this->translator ?: new DefaultTranslator();
         $apiVersion = $this->apiVersion;
 

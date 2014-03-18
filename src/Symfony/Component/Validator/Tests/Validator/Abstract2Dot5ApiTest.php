@@ -658,4 +658,24 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
     {
         $this->validate('Foobar');
     }
+
+    public function testAccessCurrentObject()
+    {
+        $test = $this;
+        $called = false;
+        $entity = new Entity();
+        $entity->firstName = 'Bernhard';
+
+        $callback = function ($value, ExecutionContextInterface $context) use ($test, $entity, &$called) {
+            $called = true;
+            $test->assertSame($entity, $context->getObject());
+        };
+
+        $this->metadata->addConstraint(new Callback($callback));
+        $this->metadata->addPropertyConstraint('firstName', new Callback($callback));
+
+        $this->validator->validate($entity);
+
+        $this->assertTrue($called);
+    }
 }

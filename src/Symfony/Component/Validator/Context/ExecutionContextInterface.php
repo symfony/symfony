@@ -100,6 +100,20 @@ interface ExecutionContextInterface extends LegacyExecutionContextInterface
     public function getValidator();
 
     /**
+     * Returns the currently validated object.
+     *
+     * If the validator is currently validating a class constraint, the
+     * object of that class is returned. If it is a validating a property or
+     * getter constraint, the object that the property/getter belongs to is
+     * returned.
+     *
+     * In other cases, null is returned.
+     *
+     * @return object|null The currently validated object or null.
+     */
+    public function getObject();
+
+    /**
      * Sets the currently validated value.
      *
      * @param mixed             $value        The validated value

@@ -235,6 +235,14 @@ class ExecutionContext implements ExecutionContextInterface
     /**
      * {@inheritdoc}
      */
+    public function getObject()
+    {
+        return $this->object;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getMetadata()
     {
         return $this->metadata;

@@ -265,7 +265,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $calls = $container->getDefinition('validator.builder')->getMethodCalls();
 
         $this->assertCount(6, $calls);
-        $this->assertSame('setValidatorFactory', $calls[0][0]);
+        $this->assertSame('setConstraintValidatorFactory', $calls[0][0]);
         $this->assertEquals(array(new Reference('validator.validator_factory')), $calls[0][1]);
         $this->assertSame('setTranslator', $calls[1][0]);
         $this->assertEquals(array(new Reference('translator')), $calls[1][1]);
@@ -275,8 +275,9 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame(array($xmlMappings), $calls[3][1]);
         $this->assertSame('addMethodMapping', $calls[4][0]);
         $this->assertSame(array('loadClassMetadata'), $calls[4][1]);
-        $this->assertSame('setCache', $calls[5][0]);
+        $this->assertSame('setMetadataCache', $calls[5][0]);
         $this->assertEquals(array(new Reference('validator.mapping.cache.apc')), $calls[5][1]);
+        $this->assertInstanceOf('Symfony\Component\Validator\ValidatorInterface', $container->get('validator'));
     }
 
     public function testAnnotations()

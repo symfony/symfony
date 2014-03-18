@@ -30,7 +30,7 @@ class ProcessUtilsTest extends \PHPUnit_Framework_TestCase
                 array('"\"php\" \"-v\""', '"php" "-v"'),
                 array('"foo bar"', 'foo bar'),
                 array('^%"path"^%', '%path%'),
-                array('"<|>"\\"" "\\""\'f"', '<|>" "\'f'),
+                array('"<|>\\" \\"\'f"', '<|>" "\'f'),
                 array('""', ''),
                 array('"with\trailingbs\\\\"', 'with\trailingbs\\'),
             );

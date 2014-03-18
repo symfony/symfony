@@ -22,9 +22,9 @@ use Symfony\Component\Validator\Exception\ValidatorException;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
- *             Use {@link Validator\TraversingValidator} instead.
+ *             Use {@link Validator\RecursiveValidator} instead.
  */
-class Validator implements ValidatorInterface
+class Validator implements ValidatorInterface, Mapping\Factory\MetadataFactoryInterface
 {
     /**
      * @var MetadataFactoryInterface
@@ -80,6 +80,14 @@ class Validator implements ValidatorInterface
     public function getMetadataFor($value)
     {
         return $this->metadataFactory->getMetadataFor($value);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function hasMetadataFor($value)
+    {
+        return $this->metadataFactory->hasMetadataFor($value);
     }
 
     /**

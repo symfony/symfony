@@ -14,6 +14,7 @@ namespace Symfony\Component\Validator\Validator;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
 
 /**
  * Validates PHP values against constraints.
@@ -21,7 +22,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
  * @since  2.5
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-interface ValidatorInterface
+interface ValidatorInterface extends MetadataFactoryInterface
 {
     /**
      * Validates a value against a constraint or a list of constraints.
@@ -96,24 +97,4 @@ interface ValidatorInterface
      * @return ContextualValidatorInterface The validator for that context
      */
     public function inContext(ExecutionContextInterface $context);
-
-    /**
-     * Returns the metadata for an object.
-     *
-     * @param object $object The object
-     *
-     * @return \Symfony\Component\Validator\Mapping\MetadataInterface The metadata
-     *
-     * @throws \Symfony\Component\Validator\Exception\NoSuchMetadataException If no metadata exists
-     */
-    public function getMetadataFor($object);
-
-    /**
-     * Returns whether the validator has metadata for an object.
-     *
-     * @param object $object The object
-     *
-     * @return Boolean Whether metadata exists for that object
-     */
-    public function hasMetadataFor($object);
 }

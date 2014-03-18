@@ -319,14 +319,14 @@ class ValidatorBuilder implements ValidatorBuilderInterface
      */
     public function setApiVersion($apiVersion)
     {
-        if (!($apiVersion & (Validation::API_VERSION_2_4 | Validation::API_VERSION_2_5))) {
+        if (!in_array($apiVersion, array(Validation::API_VERSION_2_4, Validation::API_VERSION_2_5, Validation::API_VERSION_2_5_BC))) {
             throw new InvalidArgumentException(sprintf(
                 'The requested API version is invalid: "%s"',
                 $apiVersion
             ));
         }
 
-        if (version_compare(PHP_VERSION, '5.3.9', '<') && $apiVersion === (Validation::API_VERSION_2_4 | Validation::API_VERSION_2_5)) {
+        if (version_compare(PHP_VERSION, '5.3.9', '<') && $apiVersion === Validation::API_VERSION_2_5_BC) {
             throw new InvalidArgumentException(sprintf(
                 'The Validator API that is compatible with both Symfony 2.4 '.
                 'and Symfony 2.5 can only be used on PHP 5.3.9 and higher. '.
@@ -403,7 +403,7 @@ class ValidatorBuilder implements ValidatorBuilderInterface
         if (null === $apiVersion) {
             $apiVersion = version_compare(PHP_VERSION, '5.3.9', '<')
                 ? Validation::API_VERSION_2_4
-                : (Validation::API_VERSION_2_4 | Validation::API_VERSION_2_5);
+                : Validation::API_VERSION_2_5_BC;
         }
 
         if (Validation::API_VERSION_2_4 === $apiVersion) {

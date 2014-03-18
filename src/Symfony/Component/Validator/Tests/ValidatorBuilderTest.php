@@ -139,7 +139,7 @@ class ValidatorBuilderTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('Not supported prior to PHP 5.3.9');
         }
 
-        $this->assertSame($this->builder, $this->builder->setApiVersion(Validation::API_VERSION_2_4 | Validation::API_VERSION_2_5));
+        $this->assertSame($this->builder, $this->builder->setApiVersion(Validation::API_VERSION_2_5_BC));
         $this->assertInstanceOf('Symfony\Component\Validator\Validator\LegacyValidator', $this->builder->getValidator());
     }
 }

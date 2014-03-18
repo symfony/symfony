@@ -21,6 +21,7 @@ use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Validator\Validation;
 
 /**
  * FrameworkExtension.
@@ -674,27 +675,57 @@ class FrameworkExtension extends Extension
 
         $loader->load('validator.xml');
 
+        $validatorBuilder = $container->getDefinition('validator.builder');
+
         $container->setParameter('validator.translation_domain', $config['translation_domain']);
-        $container->setParameter('validator.mapping.loader.xml_files_loader.mapping_files', $this->getValidatorXmlMappingFiles($container));
-        $container->setParameter('validator.mapping.loader.yaml_files_loader.mapping_files', $this->getValidatorYamlMappingFiles($container));
+
+        $xmlMappings = $this->getValidatorXmlMappingFiles($container);
+        $yamlMappings = $this->getValidatorYamlMappingFiles($container);
+
+        if (count($xmlMappings) > 0) {
+            $validatorBuilder->addMethodCall('addXmlMappings', array($xmlMappings));
+        }
+
+        if (count($yamlMappings) > 0) {
+            $validatorBuilder->addMethodCall('addYamlMappings', array($yamlMappings));
+        }
 
         $definition = $container->findDefinition('validator.email');
         $definition->replaceArgument(0, $config['strict_email']);
 
         if (array_key_exists('enable_annotations', $config) && $config['enable_annotations']) {
-            $loaderChain = $container->getDefinition('validator.mapping.loader.loader_chain');
-            $arguments = $loaderChain->getArguments();
-            array_unshift($arguments[0], new Reference('validator.mapping.loader.annotation_loader'));
-            $loaderChain->setArguments($arguments);
+            $validatorBuilder->addMethodCall('enableAnnotations', array(new Reference('annotation_reader')));
+        }
+
+        if (array_key_exists('static_method', $config) && $config['static_method']) {
+            foreach ($config['static_method'] as $methodName) {
+                $validatorBuilder->addMethodCall('addMethodMapping', array($methodName));
+            }
         }
 
         if (isset($config['cache'])) {
-            $container->getDefinition('validator.mapping.class_metadata_factory')
-                ->replaceArgument(1, new Reference('validator.mapping.cache.'.$config['cache']));
             $container->setParameter(
                 'validator.mapping.cache.prefix',
                 'validator_'.hash('sha256', $container->getParameter('kernel.root_dir'))
             );
+
+            $validatorBuilder->addMethodCall('setCache', array(new Reference('validator.mapping.cache.'.$config['cache'])));
+        }
+
+        if ('auto' !== $config['api']) {
+            switch ($config['api']) {
+                case '2.4':
+                    $api = Validation::API_VERSION_2_4;
+                    break;
+                case '2.5':
+                    $api = Validation::API_VERSION_2_5;
+                    break;
+                default:
+                    $api = Validation::API_VERSION_2_5_BC;
+                    break;
+            }
+
+            $validatorBuilder->addMethodCall('setApiVersion', array($api));
         }
     }
 

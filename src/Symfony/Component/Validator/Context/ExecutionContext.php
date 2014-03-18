@@ -72,6 +72,13 @@ class ExecutionContext implements ExecutionContextInterface
     private $value;
 
     /**
+     * The currently validated object.
+     *
+     * @var object|null
+     */
+    private $object;
+
+    /**
      * The property path leading to the current value.
      *
      * @var string
@@ -132,9 +139,10 @@ class ExecutionContext implements ExecutionContextInterface
     /**
      * {@inheritdoc}
      */
-    public function setNode($value, MetadataInterface $metadata = null, $propertyPath)
+    public function setNode($value, $object, MetadataInterface $metadata, $propertyPath)
     {
         $this->value = $value;
+        $this->object = $object;
         $this->metadata = $metadata;
         $this->propertyPath = (string) $propertyPath;
     }

@@ -27,10 +27,6 @@ use Symfony\Component\Validator\Mapping\MetadataInterface;
 use Symfony\Component\Validator\Mapping\PropertyMetadataInterface;
 use Symfony\Component\Validator\Mapping\TraversalStrategy;
 use Symfony\Component\Validator\MetadataFactoryInterface;
-use Symfony\Component\Validator\Node\ClassNode;
-use Symfony\Component\Validator\Node\CollectionNode;
-use Symfony\Component\Validator\Node\Node;
-use Symfony\Component\Validator\Node\PropertyNode;
 use Symfony\Component\Validator\Util\PropertyPath;
 
 /**
@@ -92,7 +88,11 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
     {
         $groups = $groups ? $this->normalizeGroups($groups) : $this->defaultGroups;
 
+        // If explicit constraints are passed, validate the value against
+        // those constraints
         if (null !== $constraints) {
+            // You can pass a single constraint or an array of constraints
+            // Make sure to deal with an array in the rest of the code
             if (!is_array($constraints)) {
                 $constraints = array($constraints);
             }
@@ -102,6 +102,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
 
             $this->validateGenericNode(
                 $value,
+                null,
                 is_object($value) ? spl_object_hash($value) : null,
                 $metadata,
                 $this->defaultPropertyPath,
@@ -114,8 +115,10 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
             return $this;
         }
 
+        // If an object is passed without explicit constraints, validate that
+        // object against the constraints defined for the object's class
         if (is_object($value)) {
-            $this->cascadeObject(
+            $this->validateObject(
                 $value,
                 $this->defaultPropertyPath,
                 $groups,
@@ -126,12 +129,14 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
             return $this;
         }
 
+        // If an array is passed without explicit constraints, validate each
+        // object in the array
         if (is_array($value)) {
-            $this->cascadeCollection(
+            $this->validateEachObjectIn(
                 $value,
                 $this->defaultPropertyPath,
                 $groups,
-                TraversalStrategy::IMPLICIT,
+                true,
                 $this->context
             );
 
@@ -148,9 +153,9 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
     /**
      * {@inheritdoc}
      */
-    public function validateProperty($container, $propertyName, $groups = null)
+    public function validateProperty($object, $propertyName, $groups = null)
     {
-        $classMetadata = $this->metadataFactory->getMetadataFor($container);
+        $classMetadata = $this->metadataFactory->getMetadataFor($object);
 
         if (!$classMetadata instanceof ClassMetadataInterface) {
             // Cannot be UnsupportedMetadataException because of BC with
@@ -165,13 +170,14 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
 
         $propertyMetadatas = $classMetadata->getPropertyMetadata($propertyName);
         $groups = $groups ? $this->normalizeGroups($groups) : $this->defaultGroups;
-        $cacheKey = spl_object_hash($container);
+        $cacheKey = spl_object_hash($object);
 
         foreach ($propertyMetadatas as $propertyMetadata) {
-            $propertyValue = $propertyMetadata->getPropertyValue($container);
+            $propertyValue = $propertyMetadata->getPropertyValue($object);
 
             $this->validateGenericNode(
                 $propertyValue,
+                $object,
                 $cacheKey.':'.$propertyName,
                 $propertyMetadata,
                 PropertyPath::append($this->defaultPropertyPath, $propertyName),
@@ -188,9 +194,9 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
     /**
      * {@inheritdoc}
      */
-    public function validatePropertyValue($container, $propertyName, $value, $groups = null)
+    public function validatePropertyValue($object, $propertyName, $value, $groups = null)
     {
-        $classMetadata = $this->metadataFactory->getMetadataFor($container);
+        $classMetadata = $this->metadataFactory->getMetadataFor($object);
 
         if (!$classMetadata instanceof ClassMetadataInterface) {
             // Cannot be UnsupportedMetadataException because of BC with
@@ -205,11 +211,12 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
 
         $propertyMetadatas = $classMetadata->getPropertyMetadata($propertyName);
         $groups = $groups ? $this->normalizeGroups($groups) : $this->defaultGroups;
-        $cacheKey = spl_object_hash($container);
+        $cacheKey = spl_object_hash($object);
 
         foreach ($propertyMetadatas as $propertyMetadata) {
             $this->validateGenericNode(
                 $value,
+                $object,
                 $cacheKey.':'.$propertyName,
                 $propertyMetadata,
                 PropertyPath::append($this->defaultPropertyPath, $propertyName),
@@ -246,53 +253,197 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
 
         return array($groups);
     }
+    /**
+     * Validates an object against the constraints defined for its class.
+     *
+     * If no metadata is available for the class, but the class is an instance
+     * of {@link \Traversable} and the selected traversal strategy allows
+     * traversal, the object will be iterated and each nested object will be
+     * validated instead.
+     *
+     * @param object    $object            The object to cascade
+     * @param string    $propertyPath      The current property path
+     * @param string[]  $groups            The validated groups
+     * @param integer   $traversalStrategy The strategy for traversing the
+     *                                     cascaded object
+     * @param ExecutionContextInterface $context The current execution context
+     *
+     * @throws NoSuchMetadataException If the object has no associated metadata
+     *                                 and does not implement {@link \Traversable}
+     *                                 or if traversal is disabled via the
+     *                                 $traversalStrategy argument
+     * @throws UnsupportedMetadataException If the metadata returned by the
+     *                                      metadata factory does not implement
+     *                                      {@link ClassMetadataInterface}
+     */
+    private function validateObject($object, $propertyPath, array $groups, $traversalStrategy, ExecutionContextInterface $context)
+    {
+        try {
+            $classMetadata = $this->metadataFactory->getMetadataFor($object);
+
+            if (!$classMetadata instanceof ClassMetadataInterface) {
+                throw new UnsupportedMetadataException(sprintf(
+                    'The metadata factory should return instances of '.
+                    '"Symfony\Component\Validator\Mapping\ClassMetadataInterface", '.
+                    'got: "%s".',
+                    is_object($classMetadata) ? get_class($classMetadata) : gettype($classMetadata)
+                ));
+            }
+
+            $this->validateClassNode(
+                $object,
+                spl_object_hash($object),
+                $classMetadata,
+                $propertyPath,
+                $groups,
+                null,
+                $traversalStrategy,
+                $context
+            );
+        } catch (NoSuchMetadataException $e) {
+            // Rethrow if not Traversable
+            if (!$object instanceof \Traversable) {
+                throw $e;
+            }
+
+            // Rethrow unless IMPLICIT or TRAVERSE
+            if (!($traversalStrategy & (TraversalStrategy::IMPLICIT | TraversalStrategy::TRAVERSE))) {
+                throw $e;
+            }
+
+            $this->validateEachObjectIn(
+                $object,
+                $propertyPath,
+                $groups,
+                $traversalStrategy & TraversalStrategy::STOP_RECURSION,
+                $context
+            );
+        }
+    }
 
     /**
-     * Traverses a class node.
+     * Validates each object in a collection against the constraints defined
+     * for their classes.
      *
-     * At first, each visitor is invoked for this node. Then, unless any
-     * of the visitors aborts the traversal by returning false, a property
-     * node is put on the node stack for each constrained property of the class.
-     * At last, if the class is traversable and should be traversed according
-     * to the selected traversal strategy, a new collection node is put on the
-     * stack.
+     * If the parameter $recursive is set to true, nested {@link \Traversable}
+     * objects are iterated as well. Nested arrays are always iterated,
+     * regardless of the value of $recursive.
      *
-     * @param ClassNode                 $node      The class node
-     * @param ExecutionContextInterface $context   The current execution context
-     *
-     * @throws UnsupportedMetadataException If a property metadata does not
-     *                                      implement {@link PropertyMetadataInterface}
+     * @param array|\Traversable        $collection    The collection
+     * @param string                    $propertyPath  The current property path
+     * @param string[]                  $groups        The validated groups
+     * @param Boolean $stopRecursion                   Whether to disable
+     *                                                 recursive iteration. For
+     *                                                 backwards compatibility
+     *                                                 with Symfony < 2.5.
+     * @param ExecutionContextInterface $context      The current execution context
      *
      * @see ClassNode
-     * @see PropertyNode
      * @see CollectionNode
+     */
+    private function validateEachObjectIn($collection, $propertyPath, array $groups, $stopRecursion, ExecutionContextInterface $context)
+    {
+        if ($stopRecursion) {
+            $traversalStrategy = TraversalStrategy::NONE;
+        } else {
+            $traversalStrategy = TraversalStrategy::IMPLICIT;
+        }
+
+        foreach ($collection as $key => $value) {
+            if (is_array($value)) {
+                // Arrays are always cascaded, independent of the specified
+                // traversal strategy
+                // (BC with Symfony < 2.5)
+                $this->validateEachObjectIn(
+                    $value,
+                    $propertyPath.'['.$key.']',
+                    $groups,
+                    $stopRecursion,
+                    $context
+                );
+
+                continue;
+            }
+
+            // Scalar and null values in the collection are ignored
+            // (BC with Symfony < 2.5)
+            if (is_object($value)) {
+                $this->validateObject(
+                    $value,
+                    $propertyPath.'['.$key.']',
+                    $groups,
+                    $traversalStrategy,
+                    $context
+                );
+            }
+        }
+    }
+
+    /**
+     * Validates a class node.
+     *
+     * A class node is a combination of an object with a {@link ClassMetadataInterface}
+     * instance. Each class node (conceptionally) has zero or more succeeding
+     * property nodes:
+     *
+     *     (Article:class node)
+     *                \
+     *        ($title:property node)
+     *
+     * This method validates the passed objects against all constraints defined
+     * at class level. It furthermore triggers the validation of each of the
+     * class' properties against the constraints for that property.
+     *
+     * If the selected traversal strategy allows traversal, the object is
+     * iterated and each nested object is validated against its own constraints.
+     * The object is not traversed if traversal is disabled in the class
+     * metadata.
+     *
+     * If the passed groups contain the group "Default", the validator will
+     * check whether the "Default" group has been replaced by a group sequence
+     * in the class metadata. If this is the case, the group sequence is
+     * validated instead.
+     *
+     * @param object                    $object            The validated object
+     * @param string                    $cacheKey          The key for caching
+     *                                                     the validated object
+     * @param ClassMetadataInterface    $metadata          The class metadata of
+     *                                                     the object
+     * @param string                    $propertyPath      The property path leading
+     *                                                     to the object
+     * @param string[]                  $groups            The groups in which the
+     *                                                     object should be validated
+     * @param string[]|null             $cascadedGroups    The groups in which
+     *                                                     cascaded objects should
+     *                                                     be validated
+     * @param integer                   $traversalStrategy The strategy used for
+     *                                                     traversing the object
+     * @param ExecutionContextInterface $context           The current execution context
+     *
+     * @throws UnsupportedMetadataException  If a property metadata does not
+     *                                       implement {@link PropertyMetadataInterface}
+     * @throws ConstraintDefinitionException If traversal was enabled but the
+     *                                       object does not implement
+     *                                       {@link \Traversable}
+     *
      * @see TraversalStrategy
      */
-    private function validateClassNode($value, $cacheKey, ClassMetadataInterface $metadata = null, $propertyPath, array $groups, $cascadedGroups, $traversalStrategy, ExecutionContextInterface $context)
+    private function validateClassNode($object, $cacheKey, ClassMetadataInterface $metadata = null, $propertyPath, array $groups, $cascadedGroups, $traversalStrategy, ExecutionContextInterface $context)
     {
-        $context->setNode($value, $metadata, $propertyPath);
-
-        // if group (=[<G1,G2>,G3,G4]) contains group sequence (=<G1,G2>)
-        // then call traverse() with each entry of the group sequence and abort
-        // if necessary (G1, G2)
-        // finally call traverse() with remaining entries ([G3,G4]) or
-        // simply continue traversal (if possible)
+        $context->setNode($object, $object, $metadata, $propertyPath);
 
         foreach ($groups as $key => $group) {
-            $cascadedGroup = null;
-
-            // Even if we remove the following clause, the constraints on an
-            // object won't be validated again due to the measures taken in
-            // validateNodeForGroup().
-            // The following shortcut, however, prevents validatedNodeForGroup()
-            // from being called at all and enhances performance a bit.
+            // If the "Default" group is replaced by a group sequence, remember
+            // to cascade the "Default" group when traversing the group
+            // sequence
+            $defaultOverridden = false;
 
             // Use the object hash for group sequences
             $groupHash = is_object($group) ? spl_object_hash($group) : $group;
 
             if ($context->isGroupValidated($cacheKey, $groupHash)) {
-                // Skip this group when validating the successor nodes
-                // (property and/or collection nodes)
+                // Skip this group when validating the properties and when
+                // traversing the object
                 unset($groups[$key]);
 
                 continue;
@@ -301,7 +452,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
             $context->markGroupAsValidated($cacheKey, $groupHash);
 
             // Replace the "Default" group by the group sequence defined
-            // for the class, if applicable
+            // for the class, if applicable.
             // This is done after checking the cache, so that
             // spl_object_hash() isn't called for this sequence and
             // "Default" is used instead in the cache. This is useful
@@ -311,13 +462,13 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                 if ($metadata->hasGroupSequence()) {
                     // The group sequence is statically defined for the class
                     $group = $metadata->getGroupSequence();
-                    $cascadedGroup = Constraint::DEFAULT_GROUP;
+                    $defaultOverridden = true;
                 } elseif ($metadata->isGroupSequenceProvider()) {
                     // The group sequence is dynamically obtained from the validated
                     // object
-                    /** @var \Symfony\Component\Validator\GroupSequenceProviderInterface $value */
-                    $group = $value->getGroupSequence();
-                    $cascadedGroup = Constraint::DEFAULT_GROUP;
+                    /** @var \Symfony\Component\Validator\GroupSequenceProviderInterface $object */
+                    $group = $object->getGroupSequence();
+                    $defaultOverridden = true;
 
                     if (!$group instanceof GroupSequence) {
                         $group = new GroupSequence($group);
@@ -325,23 +476,43 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                 }
             }
 
+            // If the groups (=[<G1,G2>,G3,G4]) contain a group sequence
+            // (=<G1,G2>), then call validateClassNode() with each entry of the
+            // group sequence and abort if necessary (G1, G2)
             if ($group instanceof GroupSequence) {
-                $this->stepThroughGroupSequence($value, $cacheKey, $metadata, $propertyPath, $traversalStrategy, $group, $cascadedGroup, $context);
+                $this->stepThroughGroupSequence(
+                     $object,
+                     $object,
+                     $cacheKey,
+                     $metadata,
+                     $propertyPath,
+                     $traversalStrategy,
+                     $group,
+                     $defaultOverridden ? Constraint::DEFAULT_GROUP : null,
+                     $context
+                );
 
-                // Skip the group sequence when validating successor nodes
+                // Skip the group sequence when validating properties, because
+                // stepThroughGroupSequence() already validates the properties
                 unset($groups[$key]);
 
                 continue;
             }
 
-            $this->validateInGroup($value, $cacheKey, $metadata, $group, $context);
+            $this->validateInGroup($object, $cacheKey, $metadata, $group, $context);
         }
 
+        // If no more groups should be validated for the property nodes,
+        // we can safely quit
         if (0 === count($groups)) {
             return;
         }
 
+        // Validate all properties against their constraints
         foreach ($metadata->getConstrainedProperties() as $propertyName) {
+            // If constraints are defined both on the getter of a property as
+            // well as on the property itself, then getPropertyMetadata()
+            // returns two metadata objects, not just one
             foreach ($metadata->getPropertyMetadata($propertyName) as $propertyMetadata) {
                 if (!$propertyMetadata instanceof PropertyMetadataInterface) {
                     throw new UnsupportedMetadataException(sprintf(
@@ -352,10 +523,11 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                     ));
                 }
 
-                $propertyValue = $propertyMetadata->getPropertyValue($value);
+                $propertyValue = $propertyMetadata->getPropertyValue($object);
 
                 $this->validateGenericNode(
                     $propertyValue,
+                    $object,
                     $cacheKey.':'.$propertyName,
                     $propertyMetadata,
                     $propertyPath
@@ -383,56 +555,85 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
         }
 
         // If IMPLICIT, stop unless we deal with a Traversable
-        if ($traversalStrategy & TraversalStrategy::IMPLICIT && !$value instanceof \Traversable) {
+        if ($traversalStrategy & TraversalStrategy::IMPLICIT && !$object instanceof \Traversable) {
             return;
         }
 
         // If TRAVERSE, fail if we have no Traversable
-        if (!$value instanceof \Traversable) {
+        if (!$object instanceof \Traversable) {
             // Must throw a ConstraintDefinitionException for backwards
             // compatibility reasons with Symfony < 2.5
             throw new ConstraintDefinitionException(sprintf(
                 'Traversal was enabled for "%s", but this class '.
                 'does not implement "\Traversable".',
-                get_class($value)
+                get_class($object)
             ));
         }
 
-        $this->cascadeCollection(
-            $value,
+        $this->validateEachObjectIn(
+            $object,
             $propertyPath,
             $groups,
-            $traversalStrategy,
+            $traversalStrategy & TraversalStrategy::STOP_RECURSION,
             $context
         );
     }
 
     /**
-     * Traverses a node that is neither a class nor a collection node.
+     * Validates a node that is not a class node.
      *
-     * At first, each visitor is invoked for this node. Then, unless any
-     * of the visitors aborts the traversal by returning false, the successor
-     * nodes of the collection node are put on the stack:
+     * Currently, two such node types exist:
      *
-     *  - if the node contains an object with associated class metadata, a new
-     *    class node is put on the stack;
-     *  - if the node contains a traversable object without associated class
-     *    metadata and traversal is enabled according to the selected traversal
-     *    strategy, a collection node is put on the stack;
-     *  - if the node contains an array, a collection node is put on the stack.
+     *  - property nodes, which consist of the value of an object's
+     *    property together with a {@link PropertyMetadataInterface} instance
+     *  - generic nodes, which consist of a value and some arbitrary
+     *    constraints defined in a {@link MetadataInterface} container
      *
-     * @param Node                      $node      The node
-     * @param ExecutionContextInterface $context   The current execution context
+     * In both cases, the value is validated against all constraints defined
+     * in the passed metadata object. Then, if the value is an instance of
+     * {@link \Traversable} and the selected traversal strategy permits it,
+     * the value is traversed and each nested object validated against its own
+     * constraints. Arrays are always traversed.
+     *
+     * @param mixed                     $value             The validated value
+     * @param object|null               $object            The current object
+     * @param string                    $cacheKey          The key for caching
+     *                                                     the validated value
+     * @param MetadataInterface         $metadata          The metadata of the
+     *                                                     value
+     * @param string                    $propertyPath      The property path leading
+     *                                                     to the value
+     * @param string[]                  $groups            The groups in which the
+     *                                                     value should be validated
+     * @param string[]|null             $cascadedGroups    The groups in which
+     *                                                     cascaded objects should
+     *                                                     be validated
+     * @param integer                   $traversalStrategy The strategy used for
+     *                                                     traversing the value
+     * @param ExecutionContextInterface $context           The current execution context
+     *
+     * @see TraversalStrategy
      */
-    private function validateGenericNode($value, $cacheKey, MetadataInterface $metadata = null, $propertyPath, array $groups, $cascadedGroups, $traversalStrategy, ExecutionContextInterface $context)
+    private function validateGenericNode($value, $object, $cacheKey, MetadataInterface $metadata = null, $propertyPath, array $groups, $cascadedGroups, $traversalStrategy, ExecutionContextInterface $context)
     {
-        $context->setNode($value, $metadata, $propertyPath);
+        $context->setNode($value, $object, $metadata, $propertyPath);
 
         foreach ($groups as $key => $group) {
             if ($group instanceof GroupSequence) {
-                $this->stepThroughGroupSequence($value, $cacheKey, $metadata, $propertyPath, $traversalStrategy, $group, null, $context);
+                $this->stepThroughGroupSequence(
+                     $value,
+                     $object,
+                     $cacheKey,
+                     $metadata,
+                     $propertyPath,
+                     $traversalStrategy,
+                     $group,
+                     null,
+                     $context
+                );
 
-                // Skip the group sequence when validating successor nodes
+                // Skip the group sequence when cascading, as the cascading
+                // logic is already done in stepThroughGroupSequence()
                 unset($groups[$key]);
 
                 continue;
@@ -464,8 +665,9 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                 | ($traversalStrategy & TraversalStrategy::STOP_RECURSION);
         }
 
-        // The "cascadedGroups" property is set by the NodeValidationVisitor when
-        // traversing group sequences
+        // The $cascadedGroups property is set, if the "Default" group is
+        // overridden by a group sequence
+        // See validateClassNode()
         $cascadedGroups = count($cascadedGroups) > 0
             ? $cascadedGroups
             : $groups;
@@ -474,11 +676,11 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
             // Arrays are always traversed, independent of the specified
             // traversal strategy
             // (BC with Symfony < 2.5)
-            $this->cascadeCollection(
+            $this->validateEachObjectIn(
                 $value,
                 $propertyPath,
                 $cascadedGroups,
-                $traversalStrategy,
+                $traversalStrategy & TraversalStrategy::STOP_RECURSION,
                 $context
             );
 
@@ -488,7 +690,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
         // If the value is a scalar, pass it anyway, because we want
         // a NoSuchMetadataException to be thrown in that case
         // (BC with Symfony < 2.5)
-        $this->cascadeObject(
+        $this->validateObject(
             $value,
             $propertyPath,
             $cascadedGroups,
@@ -498,151 +700,36 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
 
         // Currently, the traversal strategy can only be TRAVERSE for a
         // generic node if the cascading strategy is CASCADE. Thus, traversable
-        // objects will always be handled within cascadeObject() and there's
+        // objects will always be handled within validateObject() and there's
         // nothing more to do here.
 
         // see GenericMetadata::addConstraint()
     }
 
     /**
-     * Executes the cascading logic for an object.
+     * Sequentially validates a node's value in each group of a group sequence.
      *
-     * If class metadata is available for the object, a class node is put on
-     * the node stack. Otherwise, if the selected traversal strategy allows
-     * traversal of the object, a new collection node is put on the stack.
-     * Otherwise, an exception is thrown.
+     * If any of the constraints generates a violation, subsequent groups in the
+     * group sequence are skipped.
      *
-     * @param object    $container            The object to cascade
-     * @param string    $propertyPath      The current property path
-     * @param string[]  $groups            The validated groups
-     * @param integer   $traversalStrategy The strategy for traversing the
-     *                                     cascaded object
-     * @param ExecutionContextInterface $context The current execution context
-     *
-     * @throws NoSuchMetadataException If the object has no associated metadata
-     *                                 and does not implement {@link \Traversable}
-     *                                 or if traversal is disabled via the
-     *                                 $traversalStrategy argument
-     * @throws UnsupportedMetadataException If the metadata returned by the
-     *                                      metadata factory does not implement
-     *                                      {@link ClassMetadataInterface}
+     * @param mixed                     $value             The validated value
+     * @param object|null               $object            The current object
+     * @param string                    $cacheKey          The key for caching
+     *                                                     the validated value
+     * @param MetadataInterface         $metadata          The metadata of the
+     *                                                     value
+     * @param string                    $propertyPath      The property path leading
+     *                                                     to the value
+     * @param integer                   $traversalStrategy The strategy used for
+     *                                                     traversing the value
+     * @param GroupSequence             $groupSequence     The group sequence
+     * @param string[]|null             $cascadedGroup     The group that should
+     *                                                     be passed to cascaded
+     *                                                     objects instead of
+     *                                                     the group sequence
+     * @param ExecutionContextInterface $context           The execution context
      */
-    private function cascadeObject($container, $propertyPath, array $groups, $traversalStrategy, ExecutionContextInterface $context)
-    {
-        try {
-            $classMetadata = $this->metadataFactory->getMetadataFor($container);
-
-            if (!$classMetadata instanceof ClassMetadataInterface) {
-                throw new UnsupportedMetadataException(sprintf(
-                    'The metadata factory should return instances of '.
-                    '"Symfony\Component\Validator\Mapping\ClassMetadataInterface", '.
-                    'got: "%s".',
-                    is_object($classMetadata) ? get_class($classMetadata) : gettype($classMetadata)
-                ));
-            }
-
-            $this->validateClassNode(
-                $container,
-                spl_object_hash($container),
-                $classMetadata,
-                $propertyPath,
-                $groups,
-                null,
-                $traversalStrategy,
-                $context
-            );
-        } catch (NoSuchMetadataException $e) {
-            // Rethrow if not Traversable
-            if (!$container instanceof \Traversable) {
-                throw $e;
-            }
-
-            // Rethrow unless IMPLICIT or TRAVERSE
-            if (!($traversalStrategy & (TraversalStrategy::IMPLICIT | TraversalStrategy::TRAVERSE))) {
-                throw $e;
-            }
-
-            $this->cascadeCollection(
-                $container,
-                $propertyPath,
-                $groups,
-                $traversalStrategy,
-                $context
-            );
-        }
-    }
-
-    /**
-     * Traverses a collection node.
-     *
-     * At first, each visitor is invoked for this node. Then, unless any
-     * of the visitors aborts the traversal by returning false, the successor
-     * nodes of the collection node are put on the stack:
-     *
-     *  - for each object in the collection with associated class metadata, a
-     *    new class node is put on the stack;
-     *  - if an object has no associated class metadata, but is traversable, and
-     *    unless the {@link TraversalStrategy::STOP_RECURSION} flag is set for
-     *    collection node, a new collection node is put on the stack for that
-     *    object;
-     *  - for each array in the collection, a new collection node is put on the
-     *    stack.
-     *
-     * @param CollectionNode            $node      The collection node
-     * @param ExecutionContextInterface $context   The current execution context
-     *
-     * @see ClassNode
-     * @see CollectionNode
-     */
-    private function cascadeCollection($collection, $propertyPath, array $groups, $traversalStrategy, ExecutionContextInterface $context)
-    {
-        if ($traversalStrategy & TraversalStrategy::STOP_RECURSION) {
-            $traversalStrategy = TraversalStrategy::NONE;
-        } else {
-            $traversalStrategy = TraversalStrategy::IMPLICIT;
-        }
-
-        foreach ($collection as $key => $value) {
-            if (is_array($value)) {
-                // Arrays are always cascaded, independent of the specified
-                // traversal strategy
-                // (BC with Symfony < 2.5)
-                $this->cascadeCollection(
-                    $value,
-                    $propertyPath.'['.$key.']',
-                    $groups,
-                    $traversalStrategy,
-                    $context
-                );
-
-                continue;
-            }
-
-            // Scalar and null values in the collection are ignored
-            // (BC with Symfony < 2.5)
-            if (is_object($value)) {
-                $this->cascadeObject(
-                    $value,
-                    $propertyPath.'['.$key.']',
-                    $groups,
-                    $traversalStrategy,
-                    $context
-                );
-            }
-        }
-    }
-
-    /**
-     * Validates a node's value in each group of a group sequence.
-     *
-     * If any of the groups' constraints generates a violation, subsequent
-     * groups are not validated anymore.
-     *
-     * @param Node                      $node          The validated node
-     * @param GroupSequence             $groupSequence The group sequence
-     * @param ExecutionContextInterface $context       The execution context
-     */
-    private function stepThroughGroupSequence($value, $cacheKey, MetadataInterface $metadata = null, $propertyPath, $traversalStrategy, GroupSequence $groupSequence, $cascadedGroup, ExecutionContextInterface $context)
+    private function stepThroughGroupSequence($value, $object, $cacheKey, MetadataInterface $metadata = null, $propertyPath, $traversalStrategy, GroupSequence $groupSequence, $cascadedGroup, ExecutionContextInterface $context)
     {
         $violationCount = count($context->getViolations());
         $cascadedGroups = $cascadedGroup ? array($cascadedGroup) : null;
@@ -664,6 +751,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
             } else {
                 $this->validateGenericNode(
                      $value,
+                     $object,
                      $cacheKey,
                      $metadata,
                      $propertyPath,
@@ -684,13 +772,12 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
     /**
      * Validates a node's value against all constraints in the given group.
      *
-     * @param Node                      $node       The validated node
+     * @param mixed                     $value      The validated value
+     * @param string                    $cacheKey   The key for caching the
+     *                                              validated value
+     * @param MetadataInterface         $metadata   The metadata of the value
      * @param string                    $group      The group to validate
      * @param ExecutionContextInterface $context    The execution context
-     * @param string                    $containerHash The hash of the node's
-     *                                              object (if any)
-     *
-     * @throws \Exception
      */
     private function validateInGroup($value, $cacheKey, MetadataInterface $metadata, $group, ExecutionContextInterface $context)
     {

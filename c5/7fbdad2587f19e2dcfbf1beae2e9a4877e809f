@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-03-18T15:52:49Z
+
+shouldn't we add tests covering this ?
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-03-18T16:01:18Z
+
+@stof what tests are missing ? It seems everything is unit tested in this PR, isn't it ?
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-03-18T16:02:55Z
+
+@Tobion comment addressed
+
+---------------------------------------------------------------------------
+
+by stof at 2014-03-18T16:29:48Z
+
+well, the case which are currently throwing a fatal error are not tested.
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-03-18T16:34:39Z
+
+@stof Yes it is : https://github.com/romainneutron/symfony/blob/fix_fatals/src/Symfony/Component/Process/Tests/AbstractProcessTest.php#L642-647
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-03-18T17:06:30Z
+
+PR updated, comments addressed
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-03-18T17:54:38Z
+
++1

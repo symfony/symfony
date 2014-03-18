@@ -73,6 +73,11 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
         return isset($this->data['logs']) ? $this->data['logs'] : array();
     }
 
+    public function getPriorities()
+    {
+        return isset($this->data['priorities']) ? $this->data['priorities'] : array();
+    }
+
     public function countDeprecations()
     {
         return isset($this->data['deprecation_count']) ? $this->data['deprecation_count'] : 0;
@@ -127,9 +132,19 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
             'error_count' => $this->logger->countErrors(),
             'deprecation_count' => 0,
             'scream_count' => 0,
+            'priorities' => array(),
         );
 
         foreach ($this->logger->getLogs() as $log) {
+            if (isset($count['priorities'][$log['priority']])) {
+                ++$count['priorities'][$log['priority']]['count'];
+            } else {
+                $count['priorities'][$log['priority']] = array(
+                    'count' => 1,
+                    'name' => $log['priorityName'],
+                );
+            }
+
             if (isset($log['context']['type'])) {
                 if (ErrorHandler::TYPE_DEPRECATION === $log['context']['type']) {
                     ++$count['deprecation_count'];
@@ -138,6 +153,8 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
                 }
             }
         }
+
+        ksort($count['priorities']);
 
         return $count;
     }

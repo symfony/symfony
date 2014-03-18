@@ -62,12 +62,21 @@
             <td>
                 <form id="priority-form" action="" method="get" style="display: inline">
                     <input type="hidden" name="panel" value="logger">
-                    <label for="priority">Priority</label>
+                    <label for="priority">Min. Priority</label>
                     <select id="priority" name="priority" onchange="document.getElementById('priority-form').submit(); ">
                         {# values < 0 are custom levels #}
-                        {% for value, text in { 100: 'DEBUG', 200: 'INFO', 250: 'NOTICE', 300: 'WARNING', 400: 'ERROR', 500: 'CRITICAL', 550: 'ALERT', 600: 'EMERGENCY', '-100': 'DEPRECATION only' } %}
-                            <option value="{{ value }}"{{ value == priority ? ' selected' : '' }}>{{ text }}</option>
+                        {% for value, level in collector.priorities %}
+                            {% if not priority and value > 100 %}
+                                {% set priority = value %}
+                            {% endif %}
+                            <option value="{{ value }}"{{ value == priority ? ' selected' : '' }}>{{ level.name }} ({{ level.count }})</option>
                         {% endfor %}
+                        {% if collector.countdeprecations %}
+                            {% if not priority %}
+                                {% set priority = "-100" %}
+                            {% endif %}
+                            <option value="-100"{{ "-100" == priority ? ' selected' : '' }}>DEPRECATION only ({{ collector.countdeprecations }})</option>
+                        {% endif %}
                     </select>
                     <noscript>
                         <input type="submit" value="refresh">

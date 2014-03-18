@@ -107,13 +107,6 @@ class ExecutionContext implements ExecutionContextInterface
     private $validatedConstraints = array();
 
     /**
-     * Stores which property constraint has been validated for which property.
-     *
-     * @var array
-     */
-    private $validatedPropertyConstraints = array();
-
-    /**
      * Creates a new execution context.
      *
      * @param ValidatorInterface    $validator         The validator

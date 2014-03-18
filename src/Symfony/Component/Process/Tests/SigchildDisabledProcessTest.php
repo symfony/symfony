@@ -137,6 +137,15 @@ class SigchildDisabledProcessTest extends AbstractProcessTest
      * @expectedException \Symfony\Component\Process\Exception\RuntimeException
      * @expectedExceptionMessage This PHP has been compiled with --enable-sigchild. You must use setEnhanceSigchildCompatibility() to use this method.
      */
+    public function testExitCodeTextIsNullWhenExitCodeIsNull()
+    {
+        parent::testExitCodeTextIsNullWhenExitCodeIsNull();
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Process\Exception\RuntimeException
+     * @expectedExceptionMessage This PHP has been compiled with --enable-sigchild. You must use setEnhanceSigchildCompatibility() to use this method.
+     */
     public function testIsSuccessful()
     {
         parent::testIsSuccessful();

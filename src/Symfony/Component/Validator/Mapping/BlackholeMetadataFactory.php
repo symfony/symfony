@@ -11,32 +11,14 @@
 
 namespace Symfony\Component\Validator\Mapping;
 
-use Symfony\Component\Validator\MetadataFactoryInterface;
-
 /**
- * Metadata factory that does not store metadata.
- *
- * This implementation is useful if you want to validate values against
- * constraints only and you don't need to add constraints to classes and
- * properties.
+ * Alias of {@link Factory\BlackHoleMetadataFactory}.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+ *             Use {@link Factory\BlackHoleMetadataFactory} instead.
  */
-class BlackholeMetadataFactory implements MetadataFactoryInterface
+class BlackholeMetadataFactory extends \Symfony\Component\Validator\Mapping\Factory\BlackHoleMetadataFactory
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getMetadataFor($value)
-    {
-        throw new \LogicException('This class does not support metadata.');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function hasMetadataFor($value)
-    {
-        return false;
-    }
 }

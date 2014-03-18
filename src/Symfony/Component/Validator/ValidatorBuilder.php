@@ -31,12 +31,8 @@ use Symfony\Component\Validator\Mapping\Loader\XmlFileLoader;
 use Symfony\Component\Validator\Mapping\Loader\XmlFilesLoader;
 use Symfony\Component\Validator\Mapping\Loader\YamlFileLoader;
 use Symfony\Component\Validator\Mapping\Loader\YamlFilesLoader;
-use Symfony\Component\Validator\NodeTraverser\NonRecursiveNodeTraverser;
-use Symfony\Component\Validator\NodeVisitor\NodeValidationVisitor;
-use Symfony\Component\Validator\NodeVisitor\ObjectInitializationVisitor;
 use Symfony\Component\Validator\Validator\LegacyValidator;
 use Symfony\Component\Validator\Validator\RecursiveValidator;
-use Symfony\Component\Validator\Validator\TraversingValidator;
 use Symfony\Component\Validator\Validator as ValidatorV24;
 
 /**

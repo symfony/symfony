@@ -158,7 +158,7 @@ class ExecutionContext implements ExecutionContextInterface
     /**
      * {@inheritdoc}
      */
-    public function addViolation($message, array $parameters = array(), $invalidValue = null, $pluralization = null, $code = null)
+    public function addViolation($message, array $parameters = array(), $invalidValue = null, $plural = null, $code = null)
     {
         // The parameters $invalidValue and following are ignored by the new
         // API, as they are not present in the new interface anymore.
@@ -275,7 +275,7 @@ class ExecutionContext implements ExecutionContextInterface
     /**
      * {@inheritdoc}
      */
-    public function addViolationAt($subPath, $message, array $parameters = array(), $invalidValue = null, $pluralization = null, $code = null)
+    public function addViolationAt($subPath, $message, array $parameters = array(), $invalidValue = null, $plural = null, $code = null)
     {
         throw new BadMethodCallException(
             'addViolationAt() is not supported anymore as of Symfony 2.5. '.

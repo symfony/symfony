@@ -91,11 +91,11 @@ interface ExecutionContextInterface
     /**
      * Adds a violation at the current node of the validation graph.
      *
-     * @param string       $message       The error message.
-     * @param array        $params        The parameters substituted in the error message.
-     * @param mixed        $invalidValue  The invalid, validated value.
-     * @param integer|null $pluralization The number to use to pluralize of the message.
-     * @param integer|null $code          The violation code.
+     * @param string       $message      The error message
+     * @param array        $params       The parameters substituted in the error message
+     * @param mixed        $invalidValue The invalid, validated value
+     * @param integer|null $plural       The number to use to pluralize of the message
+     * @param integer|null $code         The violation code
      *
      * @api
      *
@@ -103,18 +103,18 @@ interface ExecutionContextInterface
      *             deprecated since version 2.5 and will be removed in
      *             Symfony 3.0.
      */
-    public function addViolation($message, array $params = array(), $invalidValue = null, $pluralization = null, $code = null);
+    public function addViolation($message, array $params = array(), $invalidValue = null, $plural = null, $code = null);
 
     /**
      * Adds a violation at the validation graph node with the given property
      * path relative to the current property path.
      *
-     * @param string       $subPath       The relative property path for the violation.
-     * @param string       $message       The error message.
-     * @param array        $parameters    The parameters substituted in the error message.
-     * @param mixed        $invalidValue  The invalid, validated value.
-     * @param integer|null $pluralization The number to use to pluralize of the message.
-     * @param integer|null $code          The violation code.
+     * @param string       $subPath       The relative property path for the violation
+     * @param string       $message       The error message
+     * @param array        $parameters    The parameters substituted in the error message
+     * @param mixed        $invalidValue  The invalid, validated value
+     * @param integer|null $plural        The number to use to pluralize of the message
+     * @param integer|null $code          The violation code
      *
      * @api
      *
@@ -122,7 +122,7 @@ interface ExecutionContextInterface
      *             Use {@link Context\ExecutionContextInterface::buildViolation()}
      *             instead.
      */
-    public function addViolationAt($subPath, $message, array $parameters = array(), $invalidValue = null, $pluralization = null, $code = null);
+    public function addViolationAt($subPath, $message, array $parameters = array(), $invalidValue = null, $plural = null, $code = null);
 
     /**
      * Validates the given value within the scope of the current validation.

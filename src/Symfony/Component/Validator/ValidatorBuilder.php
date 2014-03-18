@@ -35,6 +35,7 @@ use Symfony\Component\Validator\NodeTraverser\NonRecursiveNodeTraverser;
 use Symfony\Component\Validator\NodeVisitor\NodeValidationVisitor;
 use Symfony\Component\Validator\NodeVisitor\ObjectInitializationVisitor;
 use Symfony\Component\Validator\Validator\LegacyValidator;
+use Symfony\Component\Validator\Validator\RecursiveValidator;
 use Symfony\Component\Validator\Validator\TraversingValidator;
 use Symfony\Component\Validator\Validator as ValidatorV24;
 
@@ -416,13 +417,7 @@ class ValidatorBuilder implements ValidatorBuilderInterface
         $contextFactory = new LegacyExecutionContextFactory($metadataFactory, $translator, $this->translationDomain);
 
         if (Validation::API_VERSION_2_5 === $apiVersion) {
-            $nodeTraverser = new NonRecursiveNodeTraverser($metadataFactory);
-            if (count($this->initializers) > 0) {
-                $nodeTraverser->addVisitor(new ObjectInitializationVisitor($this->initializers));
-            }
-            $nodeTraverser->addVisitor(new NodeValidationVisitor($nodeTraverser, $validatorFactory));
-
-            return new TraversingValidator($contextFactory, $nodeTraverser, $metadataFactory);
+            return new RecursiveValidator($contextFactory, $metadataFactory, $validatorFactory);
         }
 
         return new LegacyValidator($contextFactory, $metadataFactory, $validatorFactory);

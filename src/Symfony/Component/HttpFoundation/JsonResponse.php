@@ -95,7 +95,7 @@ class JsonResponse extends Response
      */
     public function setData($data = array())
     {
-        $this->data = @json_encode($data, $this->encodingOptions);
+        $this->data = @json_encode($data, $this->getEncodingOptions());
 
         if (JSON_ERROR_NONE !== json_last_error()) {
             throw new \InvalidArgumentException($this->transformJsonError());

@@ -49,7 +49,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $translator->registerExtension(new HtmlExtension($translator));
         $document = new \DOMDocument();
         $document->strictErrorChecking = false;
-        libxml_use_internal_errors(true);
+        $internalErrors = libxml_use_internal_errors(true);
         $document->loadHTMLFile(__DIR__.'/Fixtures/ids.html');
         $document = simplexml_import_dom($document);
         $elements = $document->xpath($translator->cssToXPath($css));
@@ -59,6 +59,8 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
                 $this->assertTrue(in_array($element->attributes()->id, $elementsId));
             }
         }
+        libxml_clear_errors();
+        libxml_use_internal_errors($internalErrors);
     }
 
     /** @dataProvider getHtmlShakespearTestData */

@@ -102,6 +102,12 @@
     <getter property="lastName">
       <constraint name="NotNull" />
     </getter>
+    <getter property="valid">
+      <constraint name="True" />
+    </getter>
+    <getter property="permissions">
+      <constraint name="True" />
+    </getter>
   </class>
 
   <class name="Symfony\Component\Validator\Tests\Fixtures\GroupSequenceProviderEntity">

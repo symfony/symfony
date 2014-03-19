@@ -1,0 +1,69 @@
+---------------------------------------------------------------------------
+
+by stof at 2013-09-21T13:42:34Z
+
+This requires tests, and support in the other mapping loaders
+
+---------------------------------------------------------------------------
+
+by jakzal at 2013-12-23T12:55:56Z
+
+ping @bicpi
+
+---------------------------------------------------------------------------
+
+by bicpi at 2013-12-23T14:02:08Z
+
+Thanks for the reminder, @jakzal. I still have this in mind; I remember that I could not find the mentioned mapping loaders or the appropriate tests for the "isser" as a template for the "hasser". I'll try to solve this during the winter holidays in the the next 2 weeks. I appreciate any suggestions :-)
+
+---------------------------------------------------------------------------
+
+by jakzal at 2013-12-23T15:20:38Z
+
+You can find other loaders in the `src/Symfony/Component/Validator/Mapping/Loader` directory. All of the loaders should be able to handle "hassers".
+
+Tests are located in `src/Symfony/Component/Validator/Tests/Mapping/Loader/*Test.php` files (each class should have a corresponding test class). The behaviour you should test belongs to `loadClassMetadata()` method.
+
+---------------------------------------------------------------------------
+
+by bicpi at 2013-12-24T09:57:06Z
+
+I've implemented the "hasser" support for all loaders now (YAML, XML, Annotations), but I couldn't find a test for the existing "isser" support to use as a template and the line https://github.com/bicpi/symfony/blob/33efb029e7b7a5d186c3475b5c9ebe28a63e5a46/src/Symfony/Component/Validator/Mapping/GetterMetadata.php#L35 is not yet covered by a test. Maybe it makes sense to introduce two new methods to the `Entity` fixture for testing the "isser" and "hasser" support? Currently only the `getLastName` method is used to test the "getter" support.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-12-28T13:49:04Z
+
+@bicpi Can you indeed add the missing tests (by adding new methods on the Entity class)?
+
+---------------------------------------------------------------------------
+
+by bicpi at 2013-12-29T20:43:42Z
+
+Yes, I'll add the tests.
+
+---------------------------------------------------------------------------
+
+by bicpi at 2014-01-17T17:21:50Z
+
+Any feedback on the added tests so I may improve this PR?
+
+I'm sorry that I merged the upstream instead of rebasing. I can re-create a clean PR or something if it gets approved.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-01-18T09:11:37Z
+
+@bicpi You can rebase your code and push -f to remove the merge commit.
+
+---------------------------------------------------------------------------
+
+by bicpi at 2014-01-18T13:21:17Z
+
+@fabpot Thanks a lot, now the commit history looks fine again.
+
+---------------------------------------------------------------------------
+
+by bicpi at 2014-03-19T09:41:16Z
+
+Anything I can still do for this PR?

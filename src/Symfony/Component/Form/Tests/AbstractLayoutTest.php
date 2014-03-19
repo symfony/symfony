@@ -635,6 +635,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
     {
         $form = $this->factory->createNamed('name', 'choice', array('&a'), array(
             'choices' => array('&a' => 'Choice&A', '&b' => 'Choice&B'),
+            'required' => true,
             'multiple' => true,
             'expanded' => false,
         ));
@@ -642,6 +643,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/select
     [@name="name[]"]
+    [@required="required"]
     [@multiple="multiple"]
     [
         ./option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]

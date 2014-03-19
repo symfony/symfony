@@ -30,14 +30,20 @@ class IbanValidator extends ConstraintValidator
             return;
         }
 
+        if ($constraint->acceptLowercase) {
+            $valueToCheck = strtoupper($value);
+        } else {
+            $valueToCheck = $value;
+        }
+
         // An IBAN without a country code is not an IBAN.
-        if (0 === preg_match('/[A-Za-z]/', $value)) {
+        if (0 === preg_match('/[A-Z]/', $valueToCheck)) {
             $this->context->addViolation($constraint->message, array('{{ value }}' => $value));
 
             return;
         }
 
-        $teststring = preg_replace('/\s+/', '', $value);
+        $teststring = preg_replace('/\s+/', '', $valueToCheck);
 
         if (strlen($teststring) < 4) {
             $this->context->addViolation($constraint->message, array('{{ value }}' => $value));
@@ -50,7 +56,7 @@ class IbanValidator extends ConstraintValidator
             .strval(ord($teststring{1}) - 55)
             .substr($teststring, 2, 2);
 
-        $teststring = preg_replace_callback('/[A-Za-z]/', function ($letter) {
+        $teststring = preg_replace_callback('/[A-Z]/', function ($letter) {
             return intval(ord(strtolower($letter[0])) - 87);
         }, $teststring);
 

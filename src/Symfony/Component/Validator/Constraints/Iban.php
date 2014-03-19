@@ -19,4 +19,5 @@ use Symfony\Component\Validator\Constraint;
 class Iban extends Constraint
 {
     public $message = 'This is not a valid International Bank Account Number (IBAN).';
+    public $acceptLowercase = false;
 }

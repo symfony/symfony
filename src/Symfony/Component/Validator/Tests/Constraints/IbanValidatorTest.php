@@ -41,16 +41,62 @@ class IbanValidatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider getValidIbans
+     * @dataProvider getValidIbansUppercase
      */
-    public function testValidIbans($iban)
+    public function testValidIbansUppercaseOnly($iban)
     {
         $this->context->expects($this->never())->method('addViolation');
 
         $this->validator->validate($iban, new Iban());
     }
 
-    public function getValidIbans()
+    /**
+     * @dataProvider getValidIbansUpperAndLowercase
+     */
+    public function testValidIbansUpperAndLowercase($iban)
+    {
+        $this->context->expects($this->never())->method('addViolation');
+
+        $this->validator->validate($iban, new Iban(array('acceptLowercase' => true)));
+    }
+
+    /**
+     * @dataProvider getInvalidIbansWhenUppercaseOnly
+     */
+    public function testInvalidIbansWhenUppercaseOnly($iban)
+    {
+        $constraint = new Iban(array(
+            'message' => 'myMessage'
+        ));
+
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('myMessage', array(
+                '{{ value }}' => $iban,
+            ));
+
+        $this->validator->validate($iban, $constraint);
+    }
+
+    /**
+     * @dataProvider getInvalidIbansWhenUpperAndLowercase
+     */
+    public function testInvalidIbansWhenUpperAndLowercase($iban)
+    {
+        $constraint = new Iban(array(
+            'message' => 'myMessage'
+        ));
+
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('myMessage', array(
+                '{{ value }}' => $iban,
+            ));
+
+        $this->validator->validate($iban, $constraint);
+    }
+
+    public function getValidIbansUppercase()
     {
         return array(
             array('CH9300762011623852957'), // Switzerland without spaces
@@ -151,25 +197,24 @@ class IbanValidatorTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /**
-     * @dataProvider getInvalidIbans
-     */
-    public function testInvalidIbans($iban)
+    public function getValidIbansLowercase()
     {
-        $constraint = new Iban(array(
-            'message' => 'myMessage'
-        ));
+        $validIbansLowercase = array();
 
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('myMessage', array(
-                '{{ value }}' => $iban,
-            ));
+        foreach ($this->getValidIbansUppercase() as $iban) {
+            $iban[0] = strtolower($iban[0]);
+            $validIbansLowercase[] = $iban;
+        }
 
-        $this->validator->validate($iban, $constraint);
+        return $validIbansLowercase;
     }
 
-    public function getInvalidIbans()
+    public function getValidIbansUpperAndLowercase()
+    {
+        return $this->getValidIbansUppercase() + $this->getValidIbansLowercase();
+    }
+
+    public function getInvalidIbansUppercase()
     {
         return array(
             array('CH93 0076 2011 6238 5295'),
@@ -183,5 +228,27 @@ class IbanValidatorTest extends \PHPUnit_Framework_TestCase
             array('123'),
             array('0750447346'),
         );
+    }
+
+    public function getInvalidIbansLowercase()
+    {
+        $invalidIbansLowercase = array();
+
+        foreach ($this->getInvalidIbansUppercase() as $iban) {
+            $iban[0] = strtolower($iban[0]);
+            $invalidIbansLowercase[] = $iban;
+        }
+
+        return $invalidIbansLowercase;
+    }
+
+    public function getInvalidIbansWhenUppercaseOnly()
+    {
+        return $this->getInvalidIbansUppercase() + $this->getValidIbansLowercase();
+    }
+
+    public function getInvalidIbansWhenUpperAndLowercase()
+    {
+        return $this->getInvalidIbansUppercase() + $this->getInvalidIbansLowercase();
     }
 }

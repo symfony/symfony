@@ -324,10 +324,6 @@ class Process
         }
 
         if ($this->processInformation['signaled']) {
-            if ($this->isSigchildEnabled()) {
-                throw new RuntimeException('The process has been signaled.');
-            }
-
             throw new RuntimeException(sprintf('The process has been signaled with signal "%s".', $this->processInformation['termsig']));
         }
 
@@ -1188,7 +1184,7 @@ class Process
 
         if (true !== @proc_terminate($this->process, $signal)) {
             if ($throwException) {
-                throw new RuntimeException(sprintf('Error while sending signal `%d`.', $signal));
+                throw new RuntimeException(sprintf('Error while sending signal `%s`.', $signal));
             }
 
             return false;

@@ -56,8 +56,8 @@ class Process
     private $enhanceSigchildCompatibility;
     private $process;
     private $status = self::STATUS_READY;
-    private $incrementalOutputOffset;
-    private $incrementalErrorOutputOffset;
+    private $incrementalOutputOffset = 0;
+    private $incrementalErrorOutputOffset = 0;
     private $tty;
 
     private $useFileHandles = false;
@@ -186,7 +186,8 @@ class Process
      *
      * @return integer The exit status code
      *
-     * @throws RuntimeException When process can't be launch or is stopped
+     * @throws RuntimeException When process can't be launched
+     * @throws RuntimeException When process stopped after receiving signal
      *
      * @api
      */
@@ -215,7 +216,7 @@ class Process
      * @param callback|null $callback A PHP callback to run whenever there is some
      *                                output available on STDOUT or STDERR
      *
-     * @throws RuntimeException When process can't be launch or is stopped
+     * @throws RuntimeException When process can't be launched
      * @throws RuntimeException When process is already running
      */
     public function start($callback = null)
@@ -270,7 +271,7 @@ class Process
      *
      * @return Process The new process
      *
-     * @throws RuntimeException When process can't be launch or is stopped
+     * @throws RuntimeException When process can't be launched
      * @throws RuntimeException When process is already running
      *
      * @see start()
@@ -355,6 +356,7 @@ class Process
      * Sends a POSIX signal to the process.
      *
      * @param  integer $signal A valid POSIX signal (see http://www.php.net/manual/en/pcntl.constants.php)
+     *
      * @return Process
      *
      * @throws LogicException   In case the process is not running
@@ -511,7 +513,7 @@ class Process
      * @return Boolean
      *
      * @throws RuntimeException In case --enable-sigchild is activated
-     * @throws LogicException   In case the process is not terminated.
+     * @throws LogicException   In case the process is not terminated
      *
      * @api
      */
@@ -536,7 +538,7 @@ class Process
      * @return integer
      *
      * @throws RuntimeException In case --enable-sigchild is activated
-     * @throws LogicException   In case the process is not terminated.
+     * @throws LogicException   In case the process is not terminated
      *
      * @api
      */
@@ -560,7 +562,7 @@ class Process
      *
      * @return Boolean
      *
-     * @throws LogicException   In case the process is not terminated.
+     * @throws LogicException In case the process is not terminated
      *
      * @api
      */
@@ -580,7 +582,7 @@ class Process
      *
      * @return integer
      *
-     * @throws LogicException   In case the process is not terminated.
+     * @throws LogicException In case the process is not terminated
      *
      * @api
      */
@@ -685,8 +687,6 @@ class Process
         if ($this->processInformation['running']) {
             $this->close();
         }
-
-        $this->status = self::STATUS_TERMINATED;
 
         return $this->exitcode;
     }
@@ -1039,7 +1039,7 @@ class Process
     /**
      * Updates the status of the process, reads pipes.
      *
-     * @param Boolean $blocking Whether to use a clocking read call.
+     * @param Boolean $blocking Whether to use a blocking read call.
      */
     protected function updateStatus($blocking)
     {
@@ -1054,7 +1054,6 @@ class Process
 
         if (!$this->processInformation['running']) {
             $this->close();
-            $this->status = self::STATUS_TERMINATED;
         }
     }
 
@@ -1119,17 +1118,17 @@ class Process
      */
     private function close()
     {
-        $exitcode = -1;
-
         $this->processPipes->close();
         if (is_resource($this->process)) {
             $exitcode = proc_close($this->process);
+        } else {
+            $exitcode = -1;
         }
 
-        $this->exitcode = $this->exitcode !== null ? $this->exitcode : -1;
-        $this->exitcode = -1 != $exitcode ? $exitcode : $this->exitcode;
+        $this->exitcode = -1 !== $exitcode ? $exitcode : (null !== $this->exitcode ? $this->exitcode : -1);
+        $this->status = self::STATUS_TERMINATED;
 
-        if (-1 == $this->exitcode && null !== $this->fallbackExitcode) {
+        if (-1 === $this->exitcode && null !== $this->fallbackExitcode) {
             $this->exitcode = $this->fallbackExitcode;
         } elseif (-1 === $this->exitcode && $this->processInformation['signaled'] && 0 < $this->processInformation['termsig']) {
             // if process has been signaled, no exitcode but a valid termsig, apply Unix convention
@@ -1161,7 +1160,8 @@ class Process
      * Sends a POSIX signal to the process.
      *
      * @param  integer $signal         A valid POSIX signal (see http://www.php.net/manual/en/pcntl.constants.php)
-     * @param  Boolean $throwException True to throw exception in case signal failed, false otherwise
+     * @param  Boolean $throwException Whether to throw exception in case signal failed
+     *
      * @return Boolean True if the signal was sent successfully, false otherwise
      *
      * @throws LogicException   In case the process is not running

@@ -1,0 +1,117 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-02-03T22:56:42Z
+
+the message should not always been written IMO. A message at the debug level should not be written in normal verbosity (see how the Monolog ConsoleHandler handles it)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2014-02-03T23:09:02Z
+
+@stof Thanks for your review. I agree with the verbosity handling.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2014-02-03T23:30:45Z
+
+All reports of @stof closed and verbosity system added.
+
+I'm not sure about this map: https://github.com/symfony/symfony/pull/10194/files#diff-84e574ab0bb629e124c5752bb81259ccR37
+Hints are welcome.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2014-02-04T07:08:57Z
+
+Why `array_replace` is better @GromNan? According to http://stackoverflow.com/questions/8537384/array-replace-vs-union-operator-in-php and http://www.nyamsprod.com/blog/2013/array_merge-vs-array_replace-vs-union/ it is similar with `array_merge` but the `+` (union) operator is better for performance (I'll use this one).
+
+---------------------------------------------------------------------------
+
+by dunglas at 2014-02-04T08:18:02Z
+
+Changes done.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2014-02-04T08:41:32Z
+
+Added a way to configure the format (similar to how configuring the verbosity works).
+
+---------------------------------------------------------------------------
+
+by stof at 2014-02-04T09:55:16Z
+
+@dunglas To be exact, ``array_merge`` and ``array_replace`` are equivalent only when you have string keys in your arrays. When you have numeric keys, the output will not be the same anymore
+
+---------------------------------------------------------------------------
+
+by dunglas at 2014-02-04T10:12:05Z
+
+@stof yes I would "say equivalent" here because keys are strings.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2014-02-11T09:49:54Z
+
+Is this PR ready to be merged? Can I start working on the PR in the doc?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2014-02-15T10:21:56Z
+
+`DummyOutput` class put in the `Fixtures` namespace and PHPDoc fixed.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-02-24T16:30:46Z
+
+@dunglas We need the PR for the documentation **before** merging the PR.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2014-02-24T16:55:19Z
+
+Fine. I'll do it ASAP.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-03-19T09:56:30Z
+
+@dunglas Any news on the docs? We need to finish this ASAP to be able to merge this PR before 2.5.
+
+---------------------------------------------------------------------------
+
+by cordoval at 2014-03-19T12:05:01Z
+
+nice contribution, this is exactly what i need, if you work on a documentation PR maybe it would be good to do a cookbook? :baby:, what do you think about wrapping your ConsoleLogger into a helper, or it is not important?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2014-03-19T13:39:49Z
+
+@fabpot I start working on the doc PR.
+@cordoval what kind of helper?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-03-19T13:41:42Z
+
+@dunglas As soon as you can create the PR on the docs, please reference it here and we will be good to merge.
+
+---------------------------------------------------------------------------
+
+by cordoval at 2014-03-19T14:38:54Z
+
+@dunglas more like the table helper or other custom helpers like in https://github.com/gushphp/gush/tree/master/src/Helper
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-03-19T14:41:43Z
+
+I don't see the need for a helper here.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2014-03-19T15:07:12Z
+
+Draft of the doc added: symfony/symfony-docs#3696

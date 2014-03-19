@@ -20,12 +20,12 @@ class CompilerDebugDumpPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
+        $filename = self::getCompilerLogFilename($container);
+
         $filesystem = new Filesystem();
-        $filesystem->dumpFile(
-            self::getCompilerLogFilename($container),
-            implode("\n", $container->getCompiler()->getLog()),
-            0666 & ~umask()
-        );
+        $filesystem->dumpFile($filename, implode("\n", $container->getCompiler()->getLog()), null);
+        // discard chmod failure (some filesystem may not support it)
+        @chmod($filename, 0666 & ~umask());
     }
 
     public static function getCompilerLogFilename(ContainerInterface $container)

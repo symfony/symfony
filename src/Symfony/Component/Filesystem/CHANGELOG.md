@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.3.12
+------
+
+ * deprecated dumpFile() file mode argument.
+
 2.3.0
 -----
 

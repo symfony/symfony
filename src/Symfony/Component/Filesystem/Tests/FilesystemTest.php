@@ -925,6 +925,21 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testDumpFileWithNullMode()
+    {
+        $filename = $this->workspace.DIRECTORY_SEPARATOR.'foo'.DIRECTORY_SEPARATOR.'baz.txt';
+
+        $this->filesystem->dumpFile($filename, 'bar', null);
+
+        $this->assertFileExists($filename);
+        $this->assertSame('bar', file_get_contents($filename));
+
+        // skip mode check on Windows
+        if (!defined('PHP_WINDOWS_VERSION_MAJOR')) {
+            $this->assertEquals(600, $this->getFilePermissions($filename));
+        }
+    }
+
     public function testDumpFileOverwritesAnExistingFile()
     {
         $filename = $this->workspace.DIRECTORY_SEPARATOR.'foo.txt';

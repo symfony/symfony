@@ -28,11 +28,10 @@ class ContainerBuilderDebugDumpPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         $dumper = new XmlDumper($container);
+        $filename = $container->getParameter('debug.container.dump');
         $filesystem = new Filesystem();
-        $filesystem->dumpFile(
-            $container->getParameter('debug.container.dump'),
-            $dumper->dump(),
-            0666 & ~umask()
-        );
+        $filesystem->dumpFile($filename, $dumper->dump(), null);
+        // discard chmod failure (some filesystem may not support it)
+        @chmod($filename, 0666 & ~umask());
     }
 }

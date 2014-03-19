@@ -29,6 +29,16 @@ class FormType extends BaseType
      */
     private $propertyAccessor;
 
+    /**
+     * @var string
+     */
+    private $dataClass;
+
+    /**
+     * @var array
+     */
+    private $validationGroups;
+
     public function __construct(PropertyAccessorInterface $propertyAccessor = null)
     {
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
@@ -171,7 +181,7 @@ class FormType extends BaseType
         ));
 
         $resolver->setDefaults(array(
-            'data_class'         => $dataClass,
+            'data_class'         => $dataClass ?: $this->dataClass,
             'empty_data'         => $emptyData,
             'trim'               => true,
             'required'           => true,
@@ -187,6 +197,7 @@ class FormType extends BaseType
             'inherit_data'       => $inheritData,
             'compound'           => true,
             'method'             => 'POST',
+            'validation_groups'  => $this->validationGroups,
             // According to RFC 2396 (http://www.ietf.org/rfc/rfc2396.txt)
             // section 4.2., empty URIs are considered same-document references
             'action'             => '',
@@ -195,6 +206,26 @@ class FormType extends BaseType
         $resolver->setAllowedTypes(array(
             'label_attr' => 'array',
         ));
+    }
+
+    /**
+     * Allow to set data class in that form.
+     *
+     * @param string $dataClass
+     */
+    public function setDataClass($dataClass)
+    {
+        $this->dataClass = $dataClass;
+    }
+
+    /**
+     * Allow to set validation groups or disable them in that form.
+     *
+     * @param array $validationGroups
+     */
+    public function setValidationGroups(array $validationGroups)
+    {
+        $this->validationGroups = $validationGroups;
     }
 
     /**

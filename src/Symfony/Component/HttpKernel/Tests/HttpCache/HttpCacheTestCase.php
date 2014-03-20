@@ -107,7 +107,7 @@ class HttpCacheTestCase extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->kernel->isCatchingExceptions());
     }
 
-    public function request($method, $uri = '/', $server = array(), $cookies = array(), $esi = false)
+    public function request($method, $uri = '/', $server = array(), $cookies = array(), $esi = false, $headers = array())
     {
         if (null === $this->kernel) {
             throw new \LogicException('You must call setNextResponse() before calling request().');
@@ -122,6 +122,7 @@ class HttpCacheTestCase extends \PHPUnit_Framework_TestCase
         $this->esi = $esi ? new Esi() : null;
         $this->cache = new HttpCache($this->kernel, $this->store, $this->esi, $this->cacheConfig);
         $this->request = Request::create($uri, $method, array(), $cookies, array(), $server);
+        $this->request->headers->add($headers);
 
         $this->response = $this->cache->handle($this->request, HttpKernelInterface::MASTER_REQUEST, $this->catch);
 

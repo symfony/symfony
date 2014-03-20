@@ -308,7 +308,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         if ($this->options['allow_reload'] && $request->isNoCache()) {
             $this->record($request, 'reload');
 
-            return $this->fetch($request);
+            return $this->fetch($request, $catch);
         }
 
         try {

@@ -112,24 +112,25 @@ class FileValidator extends ConstraintValidator
         }
 
         if ($constraint->maxSize) {
-            if (ctype_digit((string) $constraint->maxSize)) {
-                $size = filesize($path);
-                $limit = (int) $constraint->maxSize;
-                $suffix = 'bytes';
-            } elseif (preg_match('/^\d++k$/', $constraint->maxSize)) {
-                $size = round(filesize($path) / 1000, 2);
-                $limit = (int) $constraint->maxSize;
-                $suffix = 'kB';
-            } elseif (preg_match('/^\d++M$/', $constraint->maxSize)) {
-                $size = round(filesize($path) / 1000000, 2);
-                $limit = (int) $constraint->maxSize;
-                $suffix = 'MB';
-            } else {
-                throw new ConstraintDefinitionException(sprintf('"%s" is not a valid maximum size', $constraint->maxSize));
-            }
+            list($size, $limit, $suffix) = $this->parseSize($constraint->maxSize, $path);
 
             if ($size > $limit) {
                 $this->context->addViolation($constraint->maxSizeMessage, array(
+                    '{{ size }}'    => $size,
+                    '{{ limit }}'   => $limit,
+                    '{{ suffix }}'  => $suffix,
+                    '{{ file }}'    => $path,
+                ));
+
+                return;
+            }
+        }
+
+        if ($constraint->minSize) {
+            list($size, $limit, $suffix) = $this->parseSize($constraint->minSize, $path);
+
+            if ($size < $limit) {
+                $this->context->addViolation($constraint->minSizeMessage, array(
                     '{{ size }}'    => $size,
                     '{{ limit }}'   => $limit,
                     '{{ suffix }}'  => $suffix,
@@ -171,5 +172,40 @@ class FileValidator extends ConstraintValidator
                 ));
             }
         }
+    }
+
+    /**
+     * Parse size, limit and suffix from constraint size.
+     *
+     * @param string $constraintSize Constraint size
+     * @param string $path Path
+     *
+     * @return array
+     *
+     * @throws ConstraintDefinitionException
+     */
+    private function parseSize($constraintSize, $path)
+    {
+        if (ctype_digit((string) $constraintSize)) {
+            $size = filesize($path);
+            $limit = (int) $constraintSize;
+            $suffix = 'bytes';
+        } elseif (preg_match('/^\d++k$/', $constraintSize)) {
+            $size = round(filesize($path) / 1000, 2);
+            $limit = (int) $constraintSize;
+            $suffix = 'kB';
+        } elseif (preg_match('/^\d++M$/', $constraintSize)) {
+            $size = round(filesize($path) / 1000000, 2);
+            $limit = (int) $constraintSize;
+            $suffix = 'MB';
+        } else {
+            throw new ConstraintDefinitionException(sprintf('"%s" is not a valid size', $constraintSize));
+        }
+
+        return array(
+            $size,
+            $limit,
+            $suffix,
+        );
     }
 }

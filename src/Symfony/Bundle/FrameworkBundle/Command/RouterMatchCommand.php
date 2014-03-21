@@ -52,15 +52,16 @@ class RouterMatchCommand extends ContainerAwareCommand
             ->setDefinition(array(
                 new InputArgument('path_info', InputArgument::REQUIRED, 'A path info'),
                 new InputOption('method', null, InputOption::VALUE_REQUIRED, 'Sets the HTTP method'),
-                new InputOption('host', null, InputOption::VALUE_REQUIRED, 'Sets the HTTP host'),
+                new InputOption('scheme', null, InputOption::VALUE_REQUIRED, 'Sets the URI scheme (usually http or https)'),
+                new InputOption('host', null, InputOption::VALUE_REQUIRED, 'Sets the URI host'),
             ))
             ->setDescription('Helps debug routes by simulating a path info match')
             ->setHelp(<<<EOF
-The <info>%command.name%</info> simulates a path info match:
+The <info>%command.name%</info> shows which routes match a given request and which don't and for what reason:
 
   <info>php %command.full_name% /foo</info>
   or
-  <info>php %command.full_name% /foo --method POST --host symfony.com</info>
+  <info>php %command.full_name% /foo --method POST --scheme https --host symfony.com --verbose</info>
 
 EOF
             )
@@ -76,6 +77,9 @@ EOF
         $context = $router->getContext();
         if (null !== $method = $input->getOption('method')) {
             $context->setMethod($method);
+        }
+        if (null !== $scheme = $input->getOption('scheme')) {
+            $context->setScheme($scheme);
         }
         if (null !== $host = $input->getOption('host')) {
             $context->setHost($host);

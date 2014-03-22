@@ -159,7 +159,8 @@ class Router implements RouterInterface, RequestMatcherInterface
     /**
      * @param ExpressionLanguage $expressionLanguage
      */
-    public function setExpressionLanguage(ExpressionLanguage $expressionLanguage = null) {
+    public function setExpressionLanguage(ExpressionLanguage $expressionLanguage = null)
+    {
         $this->expressionLanguage = $expressionLanguage;
     }
     /**
@@ -260,6 +261,7 @@ class Router implements RouterInterface, RequestMatcherInterface
             $this->matcher = new $this->options['matcher_class']($this->getRouteCollection(), $this->context);
             if (method_exists($this->matcher,'setExpressionLanguage'))
                 $this->matcher->setExpressionLanguage($this->expressionLanguage);
+
             return $this->matcher = new $this->options['matcher_class']($this->getRouteCollection(), $this->context);
         }
 
@@ -269,6 +271,7 @@ class Router implements RouterInterface, RequestMatcherInterface
             $dumper = $this->getMatcherDumperInstance();
             if (method_exists($dumper,'setExpressionLanguage'))
                  $dumper->setExpressionLanguage($this->expressionLanguage);
+
             $options = array(
                 'class'      => $class,
                 'base_class' => $this->options['matcher_base_class'],
@@ -282,6 +285,7 @@ class Router implements RouterInterface, RequestMatcherInterface
         $this->matcher = new $class($this->context);
         if (method_exists($this->matcher,'setExpressionLanguage'))
             $this->matcher->setExpressionLanguage($this->expressionLanguage);
+
         return $this->matcher;
     }
 

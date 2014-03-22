@@ -27,6 +27,13 @@ class PhpMatcherDumper extends MatcherDumper
     private $expressionLanguage;
 
     /**
+     * @param ExpressionLanguage $expressionLanguage
+     */
+    public function setExpressionLanguage(ExpressionLanguage $expressionLanguage = null) {
+        $this->expressionLanguage = $expressionLanguage;
+    }
+
+    /**
      * Dumps a set of routes to a PHP class.
      *
      * Available options:

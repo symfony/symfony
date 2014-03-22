@@ -286,7 +286,7 @@ class Router implements RouterInterface, RequestMatcherInterface
         require_once $cache;
 
         $this->matcher = new $class($this->context);
-        if (method_exists($this->matcher, 'setExpressionLanguage')){
+        if (method_exists($this->matcher, 'setExpressionLanguage')) {
              $this->matcher->setExpressionLanguage($this->expressionLanguage);
         }
 

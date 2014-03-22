@@ -87,6 +87,7 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
     {
         $this->expressionLanguage = $expressionLanguage;
     }
+
     /**
      * {@inheritdoc}
      */

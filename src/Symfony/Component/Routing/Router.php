@@ -163,6 +163,7 @@ class Router implements RouterInterface, RequestMatcherInterface
     {
         $this->expressionLanguage = $expressionLanguage;
     }
+
     /**
      * Gets an option value.
      *
@@ -259,8 +260,9 @@ class Router implements RouterInterface, RequestMatcherInterface
 
         if (null === $this->options['cache_dir'] || null === $this->options['matcher_cache_class']) {
             $this->matcher = new $this->options['matcher_class']($this->getRouteCollection(), $this->context);
-            if (method_exists($this->matcher,'setExpressionLanguage'))
+            if (method_exists($this->matcher, 'setExpressionLanguage')) {
                 $this->matcher->setExpressionLanguage($this->expressionLanguage);
+            }
 
             return $this->matcher = new $this->options['matcher_class']($this->getRouteCollection(), $this->context);
         }
@@ -269,8 +271,9 @@ class Router implements RouterInterface, RequestMatcherInterface
         $cache = new ConfigCache($this->options['cache_dir'].'/'.$class.'.php', $this->options['debug']);
         if (!$cache->isFresh()) {
             $dumper = $this->getMatcherDumperInstance();
-            if (method_exists($dumper,'setExpressionLanguage'))
+            if (method_exists($dumper, 'setExpressionLanguage')) {
                  $dumper->setExpressionLanguage($this->expressionLanguage);
+            }
 
             $options = array(
                 'class'      => $class,
@@ -283,8 +286,9 @@ class Router implements RouterInterface, RequestMatcherInterface
         require_once $cache;
 
         $this->matcher = new $class($this->context);
-        if (method_exists($this->matcher,'setExpressionLanguage'))
-            $this->matcher->setExpressionLanguage($this->expressionLanguage);
+        if (method_exists($this->matcher, 'setExpressionLanguage')){
+             $this->matcher->setExpressionLanguage($this->expressionLanguage);
+        }
 
         return $this->matcher;
     }

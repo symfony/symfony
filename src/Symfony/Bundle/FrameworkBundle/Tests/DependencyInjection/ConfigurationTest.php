@@ -105,6 +105,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'field_name' => '_token',
             ),
             'esi'                 => array('enabled' => false),
+            'ssi'                 => array('enabled' => false),
             'fragments'           => array(
                 'enabled' => false,
                 'path'    => '/_fragment',

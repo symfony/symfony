@@ -39,7 +39,7 @@ abstract class HttpCache extends BaseHttpCache
         $this->kernel = $kernel;
         $this->cacheDir = $cacheDir;
 
-        parent::__construct($kernel, $this->createStore(), $this->createEsi(), array_merge(array('debug' => $kernel->isDebug()), $this->getOptions()));
+        parent::__construct($kernel, $this->createStore(), $this->createSurrogate(), array_merge(array('debug' => $kernel->isDebug()), $this->getOptions()));
     }
 
     /**
@@ -55,7 +55,7 @@ abstract class HttpCache extends BaseHttpCache
     {
         $this->getKernel()->boot();
         $this->getKernel()->getContainer()->set('cache', $this);
-        $this->getKernel()->getContainer()->set('esi', $this->getEsi());
+        $this->getKernel()->getContainer()->set($this->getSurrogate()->getName(), $this->getSurrogate());
 
         return parent::forward($request, $raw, $entry);
     }
@@ -70,6 +70,18 @@ abstract class HttpCache extends BaseHttpCache
         return array();
     }
 
+    protected function createSurrogate()
+    {
+        return $this->createEsi();
+    }
+
+    /**
+     * Creates new ESI instance
+     *
+     * @return Esi
+     *
+     * @deprecated Deprecated since version 2.6, to be removed in 3.0. Use createSurrogate() instead
+     */
     protected function createEsi()
     {
         return new Esi();

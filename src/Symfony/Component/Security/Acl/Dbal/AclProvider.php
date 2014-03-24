@@ -194,7 +194,8 @@ class AclProvider implements AclProviderInterface
         foreach ($oids as $oid) {
             if (!$result->contains($oid)) {
                 if (1 === count($oids)) {
-                    throw new AclNotFoundException(sprintf('No ACL found for %s.', $oid));
+                    $objectName = method_exists($oid, '__toString') ? $oid : get_class($oid);
+                    throw new AclNotFoundException(sprintf('No ACL found for %s.', $objectName));
                 }
 
                 $partialResultException = new NotAllAclsFoundException('The provider could not find ACLs for all object identities.');
@@ -283,7 +284,8 @@ SELECTCLAUSE;
         if (1 === count($types)) {
             $ids = array();
             for ($i = 0; $i < $count; $i++) {
-                $ids[] = $this->connection->quote($batch[$i]->getIdentifier());
+                $identifier = (string) $batch[$i]->getIdentifier();
+                $ids[] = $this->connection->quote($identifier);
             }
 
             $sql .= sprintf(
@@ -325,17 +327,17 @@ SELECTCLAUSE;
             $query = <<<FINDCHILDREN
                 SELECT o.object_identifier, c.class_type
                 FROM
-                    {$this->options['oid_table_name']} as o
-                INNER JOIN {$this->options['class_table_name']} as c ON c.id = o.class_id
-                INNER JOIN {$this->options['oid_ancestors_table_name']} as a ON a.object_identity_id = o.id
+                    {$this->options['oid_table_name']} o
+                INNER JOIN {$this->options['class_table_name']} c ON c.id = o.class_id
+                INNER JOIN {$this->options['oid_ancestors_table_name']} a ON a.object_identity_id = o.id
                 WHERE
                     a.ancestor_id = %d AND a.object_identity_id != a.ancestor_id
 FINDCHILDREN;
         } else {
             $query = <<<FINDCHILDREN
                 SELECT o.object_identifier, c.class_type
-                FROM {$this->options['oid_table_name']} as o
-                INNER JOIN {$this->options['class_table_name']} as c ON c.id = o.class_id
+                FROM {$this->options['oid_table_name']} o
+                INNER JOIN {$this->options['class_table_name']} c ON c.id = o.class_id
                 WHERE o.parent_object_identity_id = %d
 FINDCHILDREN;
         }
@@ -363,8 +365,8 @@ QUERY;
             $query,
             $this->options['oid_table_name'],
             $this->options['class_table_name'],
-            $this->connection->quote($oid->getIdentifier()),
-            $this->connection->quote($oid->getType())
+            $this->connection->quote((string) $oid->getIdentifier()),
+            $this->connection->quote((string) $oid->getType())
         );
     }
 
@@ -419,8 +421,8 @@ QUERY;
         $ancestorIds = array();
         foreach ($this->connection->executeQuery($sql)->fetchAll() as $data) {
             // FIXME: skip ancestors which are cached
-
-            $ancestorIds[] = $data['ancestor_id'];
+            // Fix: Oracle returns keys in uppercase
+            $ancestorIds[] = reset($data);
         }
 
         return $ancestorIds;
@@ -524,7 +526,7 @@ QUERY;
                  $auditSuccess,
                  $auditFailure,
                  $username,
-                 $securityIdentifier) = $data;
+                 $securityIdentifier) = array_values($data);
 
             // has the ACL been hydrated during this hydration cycle?
             if (isset($acls[$aclId])) {

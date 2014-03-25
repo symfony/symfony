@@ -15,17 +15,15 @@ use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * ConfigCache manages PHP cache files.
- *
- * When debug is enabled, it knows when to flush the cache
- * thanks to an array of ResourceInterface instances.
+ * ConfigCache is a backwards-compatible way of using the
+ * cache implementation classes.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Matthias Pigulla <mp@webfactory.de>
  */
 class ConfigCache
 {
-    private $debug;
-    private $file;
+    private $cacheImplementation;
 
     /**
      * Constructor.
@@ -35,8 +33,11 @@ class ConfigCache
      */
     public function __construct($file, $debug)
     {
-        $this->file = $file;
-        $this->debug = (Boolean) $debug;
+        if ($debug) {
+            $this->cacheImplementation = new ResourceValidatingCache($file);
+        } else {
+            $this->cacheImplementation = new NonvalidatingCache($file);
+        }
     }
 
     /**
@@ -46,7 +47,7 @@ class ConfigCache
      */
     public function __toString()
     {
-        return $this->file;
+        return $this->cacheImplementation->__toString();
     }
 
     /**
@@ -59,28 +60,7 @@ class ConfigCache
      */
     public function isFresh()
     {
-        if (!is_file($this->file)) {
-            return false;
-        }
-
-        if (!$this->debug) {
-            return true;
-        }
-
-        $metadata = $this->getMetaFile();
-        if (!is_file($metadata)) {
-            return false;
-        }
-
-        $time = filemtime($this->file);
-        $meta = unserialize(file_get_contents($metadata));
-        foreach ($meta as $resource) {
-            if (!$resource->isFresh($time)) {
-                return false;
-            }
-        }
-
-        return true;
+        return $this->cacheImplementation->isFresh();
     }
 
     /**
@@ -89,27 +69,10 @@ class ConfigCache
      * @param string              $content  The content to write in the cache
      * @param ResourceInterface[] $metadata An array of ResourceInterface instances
      *
-     * @throws \RuntimeException When cache file can't be wrote
+     * @throws \RuntimeException When the cache file cannot be written.
      */
     public function write($content, array $metadata = null)
     {
-        $mode = 0666 & ~umask();
-        $filesystem = new Filesystem();
-        $filesystem->dumpFile($this->file, $content, $mode);
-
-        if (null !== $metadata && true === $this->debug) {
-            $filesystem->dumpFile($this->getMetaFile(), serialize($metadata), $mode);
-        }
+        $this->cacheImplementation->write($content, $metadata);
     }
-
-    /**
-     * Gets the meta file path.
-     *
-     * @return string The meta file path
-     */
-    private function getMetaFile()
-    {
-        return $this->file.'.meta';
-    }
-
 }

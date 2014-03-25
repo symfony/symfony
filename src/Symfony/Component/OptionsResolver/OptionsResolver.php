@@ -276,7 +276,7 @@ class OptionsResolver implements OptionsResolverInterface
             ksort($diff);
 
             throw new MissingOptionsException(sprintf(
-                count($diff) > 1 ? 'The required options "%s" are missing.' : 'The required option "%s" is  missing.',
+                count($diff) > 1 ? 'The required options "%s" are missing.' : 'The required option "%s" is missing.',
                 implode('", "', array_keys($diff))
             ));
         }

@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by sstok at 2013-12-04T15:30:16Z
+
+Removing the AS will fail with PostgreSQL <8.4 (if any one still uses this version).
+
+---------------------------------------------------------------------------
+
+by skolodyazhnyy at 2013-12-04T15:58:34Z
+
+@sstok Any idea how to handle it? I see there is a Doctrine\DBAL\Connection::getDriver() method which can be used to check database driver, but this method is not a part of Doctrine\DBAL\Driver\Connection interface.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-03-03T18:04:41Z
+
+What's the status of this PR? Anyone willing to finish it?
+
+---------------------------------------------------------------------------
+
+by sstok at 2014-03-04T08:43:21Z
+
+I think its save to merge, the `AS` problem only applies for PostgreSQL <8.4 which is no longer maintained. The minimum version still supported is 8.4
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-03-20T14:48:16Z
+
+:+1: I confirm @sstok: see point 4 at http://www.postgresql.org/docs/8.4/static/release-8-4.html#AEN97161

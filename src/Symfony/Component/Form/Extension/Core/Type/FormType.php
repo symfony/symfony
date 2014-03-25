@@ -190,6 +190,7 @@ class FormType extends BaseType
             // According to RFC 2396 (http://www.ietf.org/rfc/rfc2396.txt)
             // section 4.2., empty URIs are considered same-document references
             'action'             => '',
+            'allow_extra_fields' => false,
         ));
 
         $resolver->setAllowedTypes(array(

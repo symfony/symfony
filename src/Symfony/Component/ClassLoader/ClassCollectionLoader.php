@@ -10,6 +10,7 @@
  */
 
 namespace Symfony\Component\ClassLoader;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * ClassCollectionLoader.
@@ -229,7 +230,8 @@ class ClassCollectionLoader
      */
     private static function writeCacheFile($file, $content)
     {
-        $tmpFile = tempnam(dirname($file), basename($file));
+        $tmpFile = Filesystem::tempnam2(dirname($file), basename($file));
+
         if (false !== @file_put_contents($tmpFile, $content) && @rename($tmpFile, $file)) {
             @chmod($file, 0666 & ~umask());
 

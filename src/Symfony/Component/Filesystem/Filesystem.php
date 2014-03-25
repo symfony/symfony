@@ -448,7 +448,7 @@ class Filesystem
             throw new IOException(sprintf('Unable to write to the "%s" directory.', $dir), 0, null, $dir);
         }
 
-        $tmpFile = tempnam($dir, basename($filename));
+        $tmpFile = self::tempnam2($dir, basename($filename));
 
         if (false === @file_put_contents($tmpFile, $content)) {
             throw new IOException(sprintf('Failed to write file "%s".', $filename), 0, null, $filename);
@@ -470,5 +470,38 @@ class Filesystem
         }
 
         return $files;
+    }
+
+    /** adapted from: http://www.deltascripts.com/board/viewtopic.php?id=7843 */
+    public static function tempnam2($dir, $prefix, $postfix='')
+    {
+        if (!getenv('DISABLE_FUNCTIONS')) {
+            return tempnam($dir, $prefix);
+        }
+
+        if ($dir[strlen($dir) - 1] == '/') {
+            $trailing_slash = "";
+        } else {
+            $trailing_slash = "/";
+        }
+
+        /* The PHP function is_dir returns true on files that have no extension.
+        The file type function will tell you correctly what the file is */
+        if (!is_dir(realpath($dir)) || filetype(realpath($dir)) != "dir") {
+            // The specified dir is not actually a dir
+            return false;
+        }
+        if (!is_writable($dir)) {
+            // The directory will not let us create a file there
+            return false;
+        }
+
+        do {
+            $seed = substr(md5(microtime().posix_getpid()), 0, 8);
+            $filename = $dir.$trailing_slash.$prefix.$seed.$postfix;
+        } while (file_exists($filename));
+        touch($filename);
+
+        return $filename;
     }
 }

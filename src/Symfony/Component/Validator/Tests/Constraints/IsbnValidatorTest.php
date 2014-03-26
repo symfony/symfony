@@ -220,4 +220,18 @@ class IsbnValidatorTest extends \PHPUnit_Framework_TestCase
 
         $this->validator->validate($isbn, $constraint);
     }
+
+    /**
+     * @dataProvider getInvalidIsbn
+     */
+    public function testInvalidIsbnMixed($isbn)
+    {
+        $constraint = new Isbn(array('isbn10' => false, 'isbn13' => true));
+        $this->context
+            ->expects($this->once())
+            ->method('addViolation')
+            ->with($constraint->isbn13Message);
+
+        $this->validator->validate($isbn, $constraint);
+    }
 }

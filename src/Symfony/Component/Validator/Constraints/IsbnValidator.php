@@ -45,7 +45,7 @@ class IsbnValidator extends ConstraintValidator
         $value = strtoupper($value);
         $valueLength = strlen($value);
 
-        if (10 === $valueLength && null !== $constraint->isbn10) {
+        if (10 === $valueLength && null !== $constraint->isbn10  && false !== $constraint->isbn10) {
             for ($i = 0; $i < 10; $i++) {
                 if ($value[$i] == 'X') {
                     $validation += 10 * intval(10 - $i);
@@ -55,13 +55,13 @@ class IsbnValidator extends ConstraintValidator
             }
 
             if ($validation % 11 != 0) {
-                if (null !== $constraint->isbn13) {
+                if (null !== $constraint->isbn13 && false !== $constraint->isbn13) {
                     $this->context->addViolation($constraint->bothIsbnMessage);
                 } else {
                     $this->context->addViolation($constraint->isbn10Message);
                 }
             }
-        } elseif (13 === $valueLength && null !== $constraint->isbn13) {
+        } elseif (13 === $valueLength && null !== $constraint->isbn13 && false !== $constraint->isbn13) {
             for ($i = 0; $i < 13; $i += 2) {
                 $validation += intval($value[$i]);
             }
@@ -70,16 +70,18 @@ class IsbnValidator extends ConstraintValidator
             }
 
             if ($validation % 10 != 0) {
-                if (null !== $constraint->isbn10) {
+                if (null !== $constraint->isbn10 && false !== $constraint->isbn10) {
                     $this->context->addViolation($constraint->bothIsbnMessage);
                 } else {
                     $this->context->addViolation($constraint->isbn13Message);
                 }
             }
         } else {
-            if (null !== $constraint->isbn10 && null !== $constraint->isbn13) {
+            if (null !== $constraint->isbn10 && null !== $constraint->isbn13 &&
+                false !== $constraint->isbn10 && false !== $constraint->isbn13
+            ) {
                 $this->context->addViolation($constraint->bothIsbnMessage);
-            } elseif (null !== $constraint->isbn10) {
+            } elseif (null !== $constraint->isbn10 && false !== $constraint->isbn10) {
                 $this->context->addViolation($constraint->isbn10Message);
             } else {
                 $this->context->addViolation($constraint->isbn13Message);

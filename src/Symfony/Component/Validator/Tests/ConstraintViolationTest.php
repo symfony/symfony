@@ -33,4 +33,23 @@ EOF;
 
         $this->assertSame($expected, (string) $violation);
     }
+
+    public function testToStringHandlesArraysRootAsValue()
+    {
+        $violation = new ConstraintViolation(
+            'Array',
+            '{{ value }}',
+            array('{{ value }}' => array(1, 2, 3)),
+            array(),
+            'property.path',
+            null
+        );
+
+        $expected = <<<EOF
+Array.property.path:
+    Array
+EOF;
+
+        $this->assertSame($expected, (string) $violation);
+    }
 }

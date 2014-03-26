@@ -182,6 +182,10 @@ class IbanValidatorTest extends \PHPUnit_Framework_TestCase
             array('foo'),
             array('123'),
             array('0750447346'),
+
+            //Ibans with lower case values are invalid
+            array('Ae260211000000230064016'),
+            array('ae260211000000230064016')
         );
     }
 }

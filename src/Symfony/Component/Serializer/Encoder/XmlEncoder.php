@@ -68,6 +68,10 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
      */
     public function decode($data, $format, array $context = array())
     {
+        if ('' === trim($data)) {
+            throw new UnexpectedValueException('Invalid XML data, it can not be empty.');
+        }
+
         $internalErrors = libxml_use_internal_errors(true);
         $disableEntities = libxml_disable_entity_loader(true);
         libxml_clear_errors();
@@ -79,6 +83,8 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
         libxml_disable_entity_loader($disableEntities);
 
         if ($error = libxml_get_last_error()) {
+            libxml_clear_errors();
+
             throw new UnexpectedValueException($error->message);
         }
 

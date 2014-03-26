@@ -56,4 +56,12 @@ class QtFileLoaderTest extends \PHPUnit_Framework_TestCase
         $resource = __DIR__.'/../fixtures/invalid-xml-resources.xlf';
         $loader->load($resource, 'en', 'domain1');
     }
+
+    public function testLoadEmptyResource()
+    {
+        $loader = new QtFileLoader();
+        $resource = __DIR__.'/../fixtures/empty.xlf';
+        $this->setExpectedException('Symfony\Component\Translation\Exception\InvalidResourceException', sprintf('Unable to load "%s".', $resource));
+        $loader->load($resource, 'en', 'domain1');
+    }
 }

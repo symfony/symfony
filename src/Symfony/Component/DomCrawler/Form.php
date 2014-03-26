@@ -143,8 +143,13 @@ class Form extends Link implements \ArrayAccess
      */
     public function getPhpValues()
     {
-        $qs = http_build_query($this->getValues(), '', '&');
-        parse_str($qs, $values);
+        $values = array();
+        foreach ($this->getValues() as $name => $value) {
+            $qs = http_build_query(array($name => $value), '', '&');
+            parse_str($qs, $expandedValue);
+            $varName = substr($name, 0, strlen(key($expandedValue)));
+            $values = array_replace_recursive($values, array($varName => current($expandedValue)));
+        }
 
         return $values;
     }
@@ -161,8 +166,13 @@ class Form extends Link implements \ArrayAccess
      */
     public function getPhpFiles()
     {
-        $qs = http_build_query($this->getFiles(), '', '&');
-        parse_str($qs, $values);
+        $values = array();
+        foreach ($this->getFiles() as $name => $value) {
+            $qs = http_build_query(array($name => $value), '', '&');
+            parse_str($qs, $expandedValue);
+            $varName = substr($name, 0, strlen(key($expandedValue)));
+            $values = array_replace_recursive($values, array($varName => current($expandedValue)));
+        }
 
         return $values;
     }
@@ -414,8 +424,7 @@ class Form extends Link implements \ArrayAccess
 
                 // restore the original name of the input node
                 $this->button->setAttribute('name', $name);
-            }
-            else {
+            } else {
                 $this->set(new Field\InputFormField($document->importNode($this->button, true)));
             }
         }

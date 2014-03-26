@@ -323,6 +323,30 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertTrue($this->filesystem->exists($basePath.'folder'));
     }
 
+    public function testIsFile()
+    {
+        $basePath = $this->workspace.DIRECTORY_SEPARATOR.'directory'.DIRECTORY_SEPARATOR;
+
+        mkdir($basePath);
+        touch($basePath.'file1');
+        mkdir($basePath.'folder');
+
+        $this->assertTrue($this->filesystem->isFile($basePath.'file1'));
+        $this->assertFalse($this->filesystem->isFile($basePath.'folder'));
+    }
+
+    public function testIsDirectory()
+    {
+        $basePath = $this->workspace.DIRECTORY_SEPARATOR.'directory'.DIRECTORY_SEPARATOR;
+
+        mkdir($basePath);
+        touch($basePath.'file1');
+        mkdir($basePath.'folder');
+
+        $this->assertFalse($this->filesystem->isDirectory($basePath.'file1'));
+        $this->assertTrue($this->filesystem->isDirectory($basePath.'folder'));
+    }
+
     public function testFilesExistsTraversableObjectOfFilesAndDirectories()
     {
         $basePath = $this->workspace.DIRECTORY_SEPARATOR;

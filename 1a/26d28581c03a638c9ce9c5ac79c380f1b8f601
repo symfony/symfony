@@ -1,0 +1,81 @@
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-03-19T15:32:15Z
+
+Added #9483 as solved issue.
+
+For testers, these changes should fix your issue :
+https://github.com/romainneutron/symfony/blob/fix-9731/src/Symfony/Component/Serializer/Encoder/XmlEncoder.php#L74 and https://github.com/romainneutron/symfony/blob/fix-9731/src/Symfony/Component/Config/Util/XmlUtils.php#L49, rest of the changes is cosmetic
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-03-19T15:50:55Z
+
+So it will still not load the xml or schema, but just surpress the error message, or?
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-03-19T15:59:00Z
+
+Hi @Tobion. No, it will load the XML. It's about restoring global XML settings after an error occured to avoid trigger https://bugs.php.net/bug.php?id=62577.
+
+What I think is that `DOMDocument::loadXML` is called at https://github.com/symfony/symfony/blob/2.3/src/Symfony/Component/Config/Util/XmlUtils.php#L49 with a wrong XML, then a warning is emitted and thrown as an exception.
+Since the next line is not called and `libxml_disable_entity_loader` is not thread safe, next call using libxml might trigger https://bugs.php.net/bug.php?id=62577. Issues described that only a restart of php-fpm solves the error.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-03-19T16:13:29Z
+
+I see. What about using `try .. catch` around $dom->load instead of using `@`?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-03-19T16:14:49Z
+
+I think QtFileLoader could use XmlUtils to reuse some code. Config Component is required for this class anyway.
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-03-19T17:10:31Z
+
+I've reproduced the issue and added a test.
+The bug is now identified, here are the step to reproduce:
+
+A method call `libxml_disable_entity_loader` with `true` prior `DOMDocument::load`, `DOMDocument::loadXML`, `DOMDocument::loadHTML` or `DOMDocument::loadHTMLFile` . If an empty XML is passed, then a `E_WARNING` error is generated, thrown as an exception because of an error handler, and the previous value of `libxml_disable_entity_loader` is not restored.
+
+I'm gonna check other calls and ensure that empty XML will be discard before an exception is thrown
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-03-19T17:21:49Z
+
+Updating the issue to WIP, add tasks
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-03-20T09:24:43Z
+
+PR updated, I've addressed comments.
+
+@Tobion I've updated QtFileLoader as well as XliffFileLoader so they use XmlUtils. XmlUtils throws an exception if a document type is present in the XML whereas QtFileLoader did not. Should we throw an exception in case a XML containing a document type is passed to QtFileLoader ? In case we should not, I must revert changes
+
+Outside of that check, I think things are done
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-03-20T10:37:32Z
+
+@romainneutron IMO QtFileLoader should also forbig doc types definitions. As far as I know, they have been disabled for the other loaders because of potential security issues. See http://phpsecurity.readthedocs.org/en/latest/Injection-Attacks.html#xml-external-entity-injection
+So it should be forbidden for all xml loaders.
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-03-20T13:22:19Z
+
+I've addressed comments, this PR is updated
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-03-20T14:04:08Z
+
++1

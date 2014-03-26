@@ -1252,7 +1252,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
     public function testEmailWithMaxLength()
     {
         $form = $this->factory->createNamed('name', 'email', 'foo&bar', array(
-            'max_length' => 123,
+            'attr' => array('maxlength' => 123),
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
@@ -1418,7 +1418,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
     public function testPasswordWithMaxLength()
     {
         $form = $this->factory->createNamed('name', 'password', 'foo&bar', array(
-            'max_length' => 123,
+            'attr' => array('maxlength' => 123),
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
@@ -1489,7 +1489,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
     public function testTextarea()
     {
         $form = $this->factory->createNamed('name', 'textarea', 'foo&bar', array(
-            'pattern' => 'foo',
+            'attr' => array('pattern' => 'foo'),
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
@@ -1518,7 +1518,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
     public function testTextWithMaxLength()
     {
         $form = $this->factory->createNamed('name', 'text', 'foo&bar', array(
-            'max_length' => 123,
+            'attr' => array('maxlength' => 123),
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
@@ -1898,9 +1898,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
             'required' => true,
             'disabled' => true,
             'read_only' => true,
-            'max_length' => 10,
-            'pattern' => '\d+',
-            'attr' => array('class' => 'foobar', 'data-foo' => 'bar'),
+            'attr' => array('maxlength' => 10, 'pattern' => '\d+', 'class' => 'foobar', 'data-foo' => 'bar'),
         ));
 
         $html = $this->renderWidget($form->createView());

@@ -27,6 +27,13 @@ use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
 class UploadedFile extends File
 {
     /**
+     * List of files that were uploaded outside of PHP's standard POST multipart/form-data method.
+     *
+     * @var array
+     */
+    public static $files = array();
+
+    /**
      * Whether the test mode is activated.
      *
      * Local files are used in test mode hence the code should not enforce HTTP uploads.
@@ -214,7 +221,7 @@ class UploadedFile extends File
     {
         $isOk = $this->error === UPLOAD_ERR_OK;
 
-        return $this->test ? $isOk : $isOk && is_uploaded_file($this->getPathname());
+        return $this->test ? $isOk : $isOk && (is_uploaded_file($this->getPathname()) || in_array($this->getPathname(), self::$files));
     }
 
     /**
@@ -238,7 +245,7 @@ class UploadedFile extends File
 
             $target = $this->getTargetFile($directory, $name);
 
-            if (!@move_uploaded_file($this->getPathname(), $target)) {
+            if (!@rename($this->getPathname(), $target)) {
                 $error = error_get_last();
                 throw new FileException(sprintf('Could not move the file "%s" to "%s" (%s)', $this->getPathname(), $target, strip_tags($error['message'])));
             }

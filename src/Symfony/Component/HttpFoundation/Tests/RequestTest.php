@@ -970,6 +970,18 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         unset($_POST['_method'], $_POST['foo6'], $_SERVER['REQUEST_METHOD']);
         $this->disableHttpMethodParameterOverride();
+
+        $_SERVER['REQUEST_METHOD'] = $method;
+        $_SERVER['CONTENT_TYPE'] = 'multipart/form-data';
+        $request = MultiPartFormDataRequestContentProxy::createFromGlobals();
+        $this->assertEquals('value', $request->request->get('field'), '::fromGlobals() decodes data from multipart-formdata');
+        $this->assertTrue($request->files->has('file'), '::fromGlobals() decodes files from multipart-formdata');
+        $file = $request->files->get('file');
+        $this->assertEquals('chekote_tiny.png', $file->getClientOriginalName(), '::fromGlobals() decodes file name from multipart-formdata');
+        $this->assertEquals('image/png', $file->getClientMimeType(), '::fromGlobals() decodes file type from multipart-formdata');
+        $this->assertEquals(7411, $file->getClientSize(), '::fromGlobals() decodes file size from multipart-formdata');
+
+        unset($_SERVER['REQUEST_METHOD'], $_SERVER['CONTENT_TYPE']);
     }
 
     public function testOverrideGlobals()
@@ -1593,5 +1605,13 @@ class RequestContentProxy extends Request
     public function getContent($asResource = false)
     {
         return http_build_query(array('_method' => 'PUT', 'content' => 'mycontent'));
+    }
+}
+
+class MultiPartFormDataRequestContentProxy extends Request
+{
+    public function getContent($asResource = false)
+    {
+        return file_get_contents(__DIR__.'/Fixtures/multipart-formdata');
     }
 }

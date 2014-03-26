@@ -655,7 +655,9 @@ class FrameworkExtension extends Extension
         $container->setParameter('validator.translation_domain', $config['translation_domain']);
         $container->setParameter('validator.mapping.loader.xml_files_loader.mapping_files', $this->getValidatorXmlMappingFiles($container));
         $container->setParameter('validator.mapping.loader.yaml_files_loader.mapping_files', $this->getValidatorYamlMappingFiles($container));
-        $container->setParameter('validator.strict_email', $config['strict_email']);
+
+        $definition = $container->findDefinition('validator.email');
+        $definition->replaceArgument(0, $config['strict_email']);
 
         if (array_key_exists('enable_annotations', $config) && $config['enable_annotations']) {
             $loaderChain = $container->getDefinition('validator.mapping.loader.loader_chain');

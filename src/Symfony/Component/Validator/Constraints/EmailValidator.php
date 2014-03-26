@@ -55,7 +55,7 @@ class EmailValidator extends ConstraintValidator
 
         if ($constraint->strict && class_exists('\Egulias\EmailValidator\EmailValidator')) {
             $strictValidator = new StrictEmailValidator();
-            $valid = $strictValidator->isValid($value, $constraint->checkMX);
+            $valid = $strictValidator->isValid($value, false);
         } elseif ($constraint->strict === true) {
             throw new \RuntimeException('Strict email validation requires egulias/email-validator');
         } else {

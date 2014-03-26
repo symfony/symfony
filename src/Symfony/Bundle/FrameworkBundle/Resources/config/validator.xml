@@ -72,7 +72,7 @@
         </service>
 
         <service id="validator.email" class="%validator.email.class%">
-            <argument>%validator.strict_email%</argument>
+            <argument></argument>
             <tag name="validator.constraint_validator" alias="validator.email" />
         </service>
     </services>

@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2014-03-02T21:26:51Z
+
+@FineWolf this PR makes all the formats return the same output. So, for example, we won't get a valid XML for an XML format.
+
+---------------------------------------------------------------------------
+
+by FineWolf at 2014-03-02T23:15:07Z
+
+@jakzal Yes. That behavior is consistent with dumping all parameters and the 2.3 behavior. Regardless of the format requested, the actual parameter value is ALWAYS in a JSON representation. Only the payload format changes. For example, here is the return value of `container:dump --parameters --format=xml`:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<parameters>
+  <!-- ... -->
+  <parameter key="data_collector.templates">{"data_collector.config":["config","@WebProfiler\/Collector\ ...</parameter>
+  <!-- ... -->
+  <parameter key="doctrine.entity_managers">{"default":"doctrine.orm.default_entity_manager"}</parameter>
+  <!-- ... -->
+</parameters>
+```
+
+As you can see, the `--parameters` function already dumps **parameters values** in JSON format wrapped in XML tags.
+
+`--parameter` is meant to quickly analyze the return value of one specific parameter as was always meant that way. If we need to add an extra wrapping around the actual value, then we simply need to override the new `describeContainerParameter` function. However, this is out of scope of this bug fix.

@@ -104,6 +104,30 @@ class Filesystem
     }
 
     /**
+     * Checks if a document exists and is a file
+     *
+     * @param string
+     *
+     * @return Boolean true if the file exists and it is a file, false otherwise
+     */
+    public function isFile($filename)
+    {
+        return $this->exists($filename) && is_file($filename);
+    }
+
+    /**
+     * Checks if a document exists and is a directory
+     *
+     * @param string
+     *
+     * @return Boolean true if the filename exists and it is a directory, false otherwise
+     */
+    public function isDirectory($filename)
+    {
+        return $this->exists($filename) && is_dir($filename);
+    }
+
+    /**
      * Sets access and modification time of file.
      *
      * @param string|array|\Traversable $files A filename, an array of files, or a \Traversable instance to create

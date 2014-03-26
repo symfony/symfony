@@ -16,24 +16,17 @@ use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @api
- *
- * @deprecated Deprecated in 2.5, to be removed in 3.0. Use
- *             {@link \Symfony\Component\Validator\Constraints\EachValidator} instead.
+ * @author Marc Morera Merino <yuhu@mmoreram.com>
+ * @author Marc Morales Valldepérez <marcmorales83@gmail.com>
  */
-class AllValidator extends ConstraintValidator
+class NoneValidator extends ConstraintValidator
 {
+
     /**
      * {@inheritDoc}
      */
     public function validate($value, Constraint $constraint)
     {
-        if (!$constraint instanceof All) {
-            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\All');
-        }
-
         if (null === $value) {
             return;
         }
@@ -44,10 +37,21 @@ class AllValidator extends ConstraintValidator
 
         $group = $this->context->getGroup();
 
+        $totalIterations = count($value) * count($constraint->constraints);
+
         foreach ($value as $key => $element) {
             foreach ($constraint->constraints as $constr) {
-                $this->context->validateValue($element, $constr, '['.$key.']', $group);
+                $this->context->validateValue($element, $constr, '[' . $key . ']', $group);
             }
+        }
+
+        $constraintsSuccess = $totalIterations - (int) $this->context->getViolations()->count();
+
+        //We clear all violations as just current Validator should add real Violations
+        $this->context->clearViolations();
+
+        if ($constraintsSuccess > 0) {
+            $this->context->addViolation($constraint->message);
         }
     }
 }

@@ -26,7 +26,8 @@
         "symfony/yaml": "~2.0",
         "symfony/config": "~2.2",
         "doctrine/annotations": "~1.0",
-        "doctrine/cache": "~1.0"
+        "doctrine/cache": "~1.0",
+        "symfony/expression-language": "2.5.*@dev"
     },
     "suggest": {
         "doctrine/annotations": "For using the annotation mapping. You will also need doctrine/cache.",

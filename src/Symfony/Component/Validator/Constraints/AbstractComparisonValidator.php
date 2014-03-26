@@ -47,7 +47,7 @@ abstract class AbstractComparisonValidator extends ConstraintValidator
     /**
      * Returns a string representation of the type of the value.
      *
-     * @param  mixed $value
+     * @param mixed $value
      *
      * @return string
      */
@@ -59,7 +59,7 @@ abstract class AbstractComparisonValidator extends ConstraintValidator
     /**
      * Returns a string representation of the value.
      *
-     * @param  mixed  $value
+     * @param mixed $value
      *
      * @return string
      */
@@ -79,8 +79,8 @@ abstract class AbstractComparisonValidator extends ConstraintValidator
     /**
      * Compares the two given values to find if their relationship is valid
      *
-     * @param mixed      $value1     The first value to compare
-     * @param mixed      $value2     The second value to compare
+     * @param mixed $value1 The first value to compare
+     * @param mixed $value2 The second value to compare
      *
      * @return Boolean true if the relationship is valid, false otherwise
      */

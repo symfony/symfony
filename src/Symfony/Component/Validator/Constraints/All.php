@@ -20,6 +20,9 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @api
+ *
+ * @deprecated Deprecated in 2.5, to be removed in 3.0. Use
+ *             {@link \Symfony\Component\Validator\Constraints\Each} instead.
  */
 class All extends Constraint
 {
@@ -56,4 +59,5 @@ class All extends Constraint
     {
         return array('constraints');
     }
+
 }

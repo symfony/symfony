@@ -12,34 +12,52 @@
 namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Exception\MissingOptionsException;
 
 /**
  * @Annotation
  *
  * @author The Whole Life To Learn <thewholelifetolearn@gmail.com>
+ * @author Manuel Reinhard <manu@sprain.ch>
+ *
+ * @api
  */
 class Isbn extends Constraint
 {
-    public $isbn10Message = 'This value is not a valid ISBN-10.';
-    public $isbn13Message = 'This value is not a valid ISBN-13.';
+    public $isbn10Message   = 'This value is not a valid ISBN-10.';
+    public $isbn13Message   = 'This value is not a valid ISBN-13.';
     public $bothIsbnMessage = 'This value is neither a valid ISBN-10 nor a valid ISBN-13.';
-    public $isbn10;
-    public $isbn13;
+    public $type;
+    public $message;
+
+    /**
+     * @deprecated Deprecated since version 2.3.12, to be removed in 2.5. Use option "type" instead.
+     * @var bool
+     */
+    public $isbn10 = false;
+
+    /**
+     * @deprecated Deprecated since version 2.3.12, to be removed in 2.5. Use option "type" instead.
+     * @var bool
+     */
+    public $isbn13 = false;
 
     public function __construct($options = null)
     {
-        if (null !== $options && !is_array($options)) {
-            $options = array(
-                'isbn10' => $options,
-                'isbn13' => $options,
-            );
-        }
-
         parent::__construct($options);
 
-        if (null === $this->isbn10 && null === $this->isbn13) {
-            throw new MissingOptionsException(sprintf('Either option "isbn10" or "isbn13" must be given for constraint "%s".', __CLASS__), array('isbn10', 'isbn13'));
+        if ($this->isbn10 || $this->isbn13) {
+            trigger_error(
+                'The options "isbn10" and "isbn13" are deprecated since version 2.3.12 and will be removed in 2.5. Use option "type" instead.',
+                E_USER_DEPRECATED
+            );
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getDefaultOption()
+    {
+        return 'type';
     }
 }

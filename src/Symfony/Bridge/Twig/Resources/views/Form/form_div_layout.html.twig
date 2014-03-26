@@ -96,7 +96,7 @@
                 {{ block('choice_widget_options') }}
             </optgroup>
         {% else %}
-            <option value="{{ choice.value }}"{% if choice is selectedchoice(value) %} selected="selected"{% endif %}>{{ choice.label|trans({}, translation_domain) }}</option>
+            <option {{ block('option_data_attributes') }} value="{{ choice.value }}"{% if choice is selectedchoice(value) %} selected="selected"{% endif %}>{{ choice.label|trans({}, translation_domain) }}</option>
         {% endif %}
     {% endfor %}
 {% endspaceless %}
@@ -421,3 +421,16 @@
     {%- endfor -%}
 {% endspaceless %}
 {% endblock button_attributes %}
+
+{% block option_data_attributes %}
+{% spaceless %}
+    {%- for attrname, attrvalue in choice.attr -%}
+        {{- " " -}}
+        data-{{attrname}}="{{attrvalue}}"
+    {%- endfor -%}
+
+    {% if choice.prototype %}
+        data-prototype="{{ form_row(choice.prototype)|e }}"
+    {% endif %}
+{% endspaceless %}
+{% endblock option_data_attributes %}

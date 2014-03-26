@@ -1497,7 +1497,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/textarea
     [@name="name"]
-    [not(@pattern)]
+    [@pattern="foo"]
     [.="foo&bar"]
 '
         );

@@ -890,7 +890,7 @@ class FilesystemTest extends FilesystemTestCase
 
         // skip mode check on Windows
         if (!defined('PHP_WINDOWS_VERSION_MAJOR')) {
-            $this->assertEquals(600, $this->getFilePermissions($filename));
+            $this->assertFilePermissions(600, $filename);
         }
     }
 

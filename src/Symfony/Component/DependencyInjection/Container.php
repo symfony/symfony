@@ -294,7 +294,7 @@ class Container implements IntrospectableContainerInterface
                 }
 
                 $alternatives = array();
-                if ($levenshtein) {
+                if ($this->levenshtein) {
                     foreach (array_keys($this->services) as $key) {
                         $lev = levenshtein($id, $key);
                         if ($lev <= strlen($id) / 3 || false !== strpos($key, $id)) {

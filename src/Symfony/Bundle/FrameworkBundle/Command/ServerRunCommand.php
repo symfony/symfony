@@ -67,6 +67,9 @@ router script using <info>--router</info> option:
 
   <info>%command.full_name% --router=app/config/router.php</info>
 
+Specifing a router script is required when the used environment is not "dev" or
+"prod".
+
 See also: http://www.php.net/manual/en/features.commandline.webserver.php
 
 EOF
@@ -85,7 +88,13 @@ EOF
             $output->writeln('<error>Running PHP built-in server in production environment is NOT recommended!</error>');
         }
 
-        $output->writeln(sprintf("Server running on <info>%s</info>\n", $input->getArgument('address')));
+        $output->writeln(sprintf("Server running on <info>http://%s</info>\n", $input->getArgument('address')));
+
+        $router = $input->getOption('router') ?: $this
+            ->getContainer()
+            ->get('kernel')
+            ->locateResource(sprintf('@FrameworkBundle/Resources/config/router_%s.php', $env))
+        ;
 
         if (defined('HHVM_VERSION')) {
             $builder = $this->createHhvmProcessBuilder($input, $output, $env);

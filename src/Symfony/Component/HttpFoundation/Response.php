@@ -1048,11 +1048,16 @@ class Response
      */
     public function getVary()
     {
-        if (!$vary = $this->headers->get('Vary')) {
+        if (!$vary = $this->headers->get('Vary', null, false)) {
             return array();
         }
 
-        return is_array($vary) ? $vary : preg_split('/[\s,]+/', $vary);
+        $ret = array();
+        foreach ($vary as $item) {
+            $ret = array_merge($ret, preg_split('/[\s,]+/', $item));
+        }
+
+        return $ret;
     }
 
     /**

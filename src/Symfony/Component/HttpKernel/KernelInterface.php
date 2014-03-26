@@ -27,7 +27,7 @@ use Symfony\Component\Config\Loader\LoaderInterface;
 interface KernelInterface extends HttpKernelInterface, \Serializable
 {
     /**
-     * Returns an array of bundles to registers.
+     * Returns an array of bundles to register.
      *
      * @return BundleInterface[] An array of bundle instances.
      *
@@ -36,7 +36,7 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
     public function registerBundles();
 
     /**
-     * Loads the container configuration
+     * Loads the container configuration.
      *
      * @param LoaderInterface $loader A LoaderInterface instance
      *
@@ -125,7 +125,7 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
     public function locateResource($name, $dir = null, $first = true);
 
     /**
-     * Gets the name of the kernel
+     * Gets the name of the kernel.
      *
      * @return string The kernel name
      *

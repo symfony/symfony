@@ -15,6 +15,7 @@ class SigchildEnabledProcessTest extends AbstractProcessTest
 {
     /**
      * @expectedException \Symfony\Component\Process\Exception\RuntimeException
+     * @expectedExceptionMessage This PHP has been compiled with --enable-sigchild. Term signal can not be retrieved.
      */
     public function testProcessIsSignaledIfStopped()
     {
@@ -23,6 +24,7 @@ class SigchildEnabledProcessTest extends AbstractProcessTest
 
     /**
      * @expectedException \Symfony\Component\Process\Exception\RuntimeException
+     * @expectedExceptionMessage This PHP has been compiled with --enable-sigchild. Term signal can not be retrieved.
      */
     public function testProcessWithTermSignal()
     {
@@ -31,6 +33,7 @@ class SigchildEnabledProcessTest extends AbstractProcessTest
 
     /**
      * @expectedException \Symfony\Component\Process\Exception\RuntimeException
+     * @expectedExceptionMessage This PHP has been compiled with --enable-sigchild. Term signal can not be retrieved.
      */
     public function testProcessIsNotSignaled()
     {
@@ -39,6 +42,7 @@ class SigchildEnabledProcessTest extends AbstractProcessTest
 
     /**
      * @expectedException \Symfony\Component\Process\Exception\RuntimeException
+     * @expectedExceptionMessage This PHP has been compiled with --enable-sigchild. Term signal can not be retrieved.
      */
     public function testProcessWithoutTermSignal()
     {
@@ -47,6 +51,7 @@ class SigchildEnabledProcessTest extends AbstractProcessTest
 
     /**
      * @expectedException \Symfony\Component\Process\Exception\RuntimeException
+     * @expectedExceptionMessage This PHP has been compiled with --enable-sigchild. The process identifier can not be retrieved.
      */
     public function testGetPid()
     {
@@ -55,6 +60,7 @@ class SigchildEnabledProcessTest extends AbstractProcessTest
 
     /**
      * @expectedException \Symfony\Component\Process\Exception\RuntimeException
+     * @expectedExceptionMessage This PHP has been compiled with --enable-sigchild. The process identifier can not be retrieved.
      */
     public function testGetPidIsNullBeforeStart()
     {
@@ -63,6 +69,7 @@ class SigchildEnabledProcessTest extends AbstractProcessTest
 
     /**
      * @expectedException \Symfony\Component\Process\Exception\RuntimeException
+     * @expectedExceptionMessage This PHP has been compiled with --enable-sigchild. The process identifier can not be retrieved.
      */
     public function testGetPidIsNullAfterRun()
     {
@@ -79,6 +86,7 @@ class SigchildEnabledProcessTest extends AbstractProcessTest
 
     /**
      * @expectedException \Symfony\Component\Process\Exception\RuntimeException
+     * @expectedExceptionMessage This PHP has been compiled with --enable-sigchild. The process can not be signaled.
      */
     public function testSignal()
     {
@@ -87,6 +95,7 @@ class SigchildEnabledProcessTest extends AbstractProcessTest
 
     /**
      * @expectedException \Symfony\Component\Process\Exception\RuntimeException
+     * @expectedExceptionMessage This PHP has been compiled with --enable-sigchild. Term signal can not be retrieved.
      */
     public function testProcessWithoutTermSignalIsNotSignaled()
     {
@@ -101,6 +110,14 @@ class SigchildEnabledProcessTest extends AbstractProcessTest
     public function testExitCodeIsAvailableAfterSignal()
     {
         $this->markTestSkipped('Signal is not supported in sigchild environment');
+    }
+
+    public function testStartAfterATimeout()
+    {
+        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+            $this->markTestSkipped('Restarting a timed-out process on Windows is not supported in sigchild environment');
+        }
+        parent::testStartAfterATimeout();
     }
 
     /**

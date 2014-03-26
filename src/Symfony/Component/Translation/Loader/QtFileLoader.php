@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Translation\Loader;
 
+use Symfony\Component\Config\Util\XmlUtils;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Exception\InvalidResourceException;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
@@ -40,11 +41,14 @@ class QtFileLoader implements LoaderInterface
             throw new NotFoundResourceException(sprintf('File "%s" not found.', $resource));
         }
 
-        $dom = new \DOMDocument();
-        $current = libxml_use_internal_errors(true);
-        if (!@$dom->load($resource, defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0)) {
-            throw new InvalidResourceException(implode("\n", $this->getXmlErrors()));
+        try {
+            $dom = XmlUtils::loadFile($resource);
+        } catch (\InvalidArgumentException $e) {
+            throw new InvalidResourceException(sprintf('Unable to load "%s".', $resource), $e->getCode(), $e);
         }
+
+        $internalErrors = libxml_use_internal_errors(true);
+        libxml_clear_errors();
 
         $xpath = new \DOMXPath($dom);
         $nodes = $xpath->evaluate('//TS/context/name[text()="'.$domain.'"]');
@@ -67,33 +71,8 @@ class QtFileLoader implements LoaderInterface
             $catalogue->addResource(new FileResource($resource));
         }
 
-        libxml_use_internal_errors($current);
+        libxml_use_internal_errors($internalErrors);
 
         return $catalogue;
-    }
-
-    /**
-     * Returns the XML errors of the internal XML parser
-     *
-     * @return array An array of errors
-     */
-    private function getXmlErrors()
-    {
-        $errors = array();
-        foreach (libxml_get_errors() as $error) {
-            $errors[] = sprintf('[%s %s] %s (in %s - line %d, column %d)',
-                LIBXML_ERR_WARNING == $error->level ? 'WARNING' : 'ERROR',
-                $error->code,
-                trim($error->message),
-                $error->file ? $error->file : 'n/a',
-                $error->line,
-                $error->column
-            );
-        }
-
-        libxml_clear_errors();
-        libxml_use_internal_errors(false);
-
-        return $errors;
     }
 }

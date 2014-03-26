@@ -95,10 +95,12 @@ class ConfigCache
     {
         $mode = 0666 & ~umask();
         $filesystem = new Filesystem();
-        $filesystem->dumpFile($this->file, $content, $mode);
+        $filesystem->dumpFile($this->file, $content, null);
+        @chmod($this->file, $mode);
 
         if (null !== $metadata && true === $this->debug) {
-            $filesystem->dumpFile($this->getMetaFile(), serialize($metadata), $mode);
+            $filesystem->dumpFile($this->getMetaFile(), serialize($metadata), null);
+            @chmod($this->getMetaFile(), $mode);
         }
     }
 

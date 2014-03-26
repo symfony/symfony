@@ -347,6 +347,12 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testDecodeEmptyXml()
+    {
+        $this->setExpectedException('Symfony\Component\Serializer\Exception\UnexpectedValueException', 'Invalid XML data, it can not be empty.');
+        $this->encoder->decode(' ', 'xml');
+    }
+
     protected function getXmlSource()
     {
         return '<?xml version="1.0"?>'."\n".

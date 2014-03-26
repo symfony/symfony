@@ -24,7 +24,7 @@
                 We don't need to be able to add more extensions.
                  * more types can be registered with the form.type tag
                  * more type extensions can be registered with the form.type_extension tag
-                 * more type_guessers can be registered with the form.type.type_guesser tag
+                 * more type_guessers can be registered with the form.type_guesser tag
                 -->
                 <argument type="service" id="form.extension" />
             </argument>

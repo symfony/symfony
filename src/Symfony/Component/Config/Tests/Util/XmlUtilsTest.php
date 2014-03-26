@@ -80,6 +80,7 @@ class XmlUtilsTest extends \PHPUnit_Framework_TestCase
             array(array('foo' => null), '<foo />'),
             array(array('foo' => 'bar'), '<foo>bar</foo>'),
             array(array('foo' => array('foo' => 'bar')), '<foo foo="bar"/>'),
+            array(array('foo' => array('foo' => 0)), '<foo><foo>0</foo></foo>'),
             array(array('foo' => array('foo' => 'bar')), '<foo><foo>bar</foo></foo>'),
             array(array('foo' => array('foo' => 'bar', 'value' => 'text')), '<foo foo="bar">text</foo>'),
             array(array('foo' => array('attr' => 'bar', 'foo' => 'text')), '<foo attr="bar"><foo>text</foo></foo>'),
@@ -131,6 +132,45 @@ class XmlUtilsTest extends \PHPUnit_Framework_TestCase
             array('foo', 'foo'),
             array(6, '0b0110'),
         );
+    }
+
+    public function testLoadEmptyXmlFile()
+    {
+        $file = __DIR__.'/../Fixtures/foo.xml';
+        $this->setExpectedException('InvalidArgumentException', 'File '.$file.' does not contain valid XML, it is empty.');
+        XmlUtils::loadFile($file);
+    }
+
+    // test for issue https://github.com/symfony/symfony/issues/9731
+    public function testLoadWrongEmptyXMLWithErrorHandler()
+    {
+        $originalDisableEntities = libxml_disable_entity_loader(false);
+        $errorReporting = error_reporting(-1);
+
+        set_error_handler(function ($errno, $errstr) {
+            throw new \Exception($errstr, $errno);
+        });
+
+        $file = __DIR__.'/../Fixtures/foo.xml';
+        try {
+            XmlUtils::loadFile($file);
+            $this->fail('An exception should have been raised');
+        } catch (\InvalidArgumentException $e) {
+            $this->assertEquals(sprintf('File %s does not contain valid XML, it is empty.', $file), $e->getMessage());
+        }
+
+        restore_error_handler();
+        error_reporting($errorReporting);
+
+        $disableEntities = libxml_disable_entity_loader(true);
+        libxml_disable_entity_loader($disableEntities);
+
+        libxml_disable_entity_loader($originalDisableEntities);
+
+        $this->assertFalse($disableEntities);
+
+        // should not throw an exception
+        XmlUtils::loadFile(__DIR__.'/../Fixtures/Util/valid.xml', __DIR__.'/../Fixtures/Util/schema.xsd');
     }
 }
 

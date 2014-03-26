@@ -40,13 +40,18 @@ class XmlUtils
      */
     public static function loadFile($file, $schemaOrCallable = null)
     {
+        $content = @file_get_contents($file);
+        if ('' === trim($content)) {
+            throw new \InvalidArgumentException(sprintf('File %s does not contain valid XML, it is empty.', $file));
+        }
+
         $internalErrors = libxml_use_internal_errors(true);
         $disableEntities = libxml_disable_entity_loader(true);
         libxml_clear_errors();
 
         $dom = new \DOMDocument();
         $dom->validateOnParse = true;
-        if (!$dom->loadXML(file_get_contents($file), LIBXML_NONET | (defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0))) {
+        if (!$dom->loadXML($content, LIBXML_NONET | (defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0))) {
             libxml_disable_entity_loader($disableEntities);
 
             throw new \InvalidArgumentException(implode("\n", static::getXmlErrors($internalErrors)));
@@ -132,7 +137,7 @@ class XmlUtils
         $nodeValue = false;
         foreach ($element->childNodes as $node) {
             if ($node instanceof \DOMText) {
-                if (trim($node->nodeValue)) {
+                if ('' !== trim($node->nodeValue)) {
                     $nodeValue = trim($node->nodeValue);
                     $empty = false;
                 }

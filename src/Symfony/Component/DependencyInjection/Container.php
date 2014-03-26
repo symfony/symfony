@@ -75,6 +75,7 @@ class Container implements IntrospectableContainerInterface
     protected $scopedServices = array();
     protected $scopeStacks = array();
     protected $loading = array();
+    protected $levenshtein = true;
 
     /**
      * Constructor.
@@ -293,10 +294,12 @@ class Container implements IntrospectableContainerInterface
                 }
 
                 $alternatives = array();
-                foreach (array_keys($this->services) as $key) {
-                    $lev = levenshtein($id, $key);
-                    if ($lev <= strlen($id) / 3 || false !== strpos($key, $id)) {
-                        $alternatives[] = $key;
+                if ($levenshtein) {
+                    foreach (array_keys($this->services) as $key) {
+                        $lev = levenshtein($id, $key);
+                        if ($lev <= strlen($id) / 3 || false !== strpos($key, $id)) {
+                            $alternatives[] = $key;
+                        }
                     }
                 }
 

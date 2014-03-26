@@ -84,6 +84,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     private $expressionLanguage;
 
+    protected $levenshtein = false;
+
     /**
      * Sets the track resources flag.
      *

@@ -157,6 +157,81 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->validate($this->path, $constraint);
     }
 
+    public function testTooSmallBytes()
+    {
+        fwrite($this->file, str_repeat('0', 1));
+
+        $constraint = new File(array(
+            'minSize'           => 10,
+            'minSizeMessage'    => 'myMessage',
+        ));
+
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('myMessage', array(
+                '{{ limit }}'   => '10',
+                '{{ size }}'    => '1',
+                '{{ suffix }}'  => 'bytes',
+                '{{ file }}'    => $this->path,
+            ));
+
+        $this->validator->validate($this->getFile($this->path), $constraint);
+    }
+
+    public function testTooSmallKiloBytes()
+    {
+        fwrite($this->file, str_repeat('0', 400));
+
+        $constraint = new File(array(
+            'minSize'           => '1k',
+            'minSizeMessage'    => 'myMessage',
+        ));
+
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('myMessage', array(
+                '{{ limit }}'   => '1',
+                '{{ size }}'    => '0.4',
+                '{{ suffix }}'  => 'kB',
+                '{{ file }}'    => $this->path,
+            ));
+
+        $this->validator->validate($this->getFile($this->path), $constraint);
+    }
+
+    public function testTooSmallMegaBytes()
+    {
+        fwrite($this->file, str_repeat('0', 400000));
+
+        $constraint = new File(array(
+            'minSize'           => '1M',
+            'minSizeMessage'    => 'myMessage',
+        ));
+
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('myMessage', array(
+                '{{ limit }}'   => '1',
+                '{{ size }}'    => '0.4',
+                '{{ suffix }}'  => 'MB',
+                '{{ file }}'    => $this->path,
+            ));
+
+        $this->validator->validate($this->getFile($this->path), $constraint);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
+     */
+    public function testInvalidMinSize()
+    {
+        $constraint = new File(array(
+            'minSize' => '1abc',
+        ));
+
+        $this->validator->validate($this->path, $constraint);
+    }
+
     public function testValidMimeType()
     {
         $file = $this

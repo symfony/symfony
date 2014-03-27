@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2014-03-26T15:09:52Z
+
+As previously mentioned in #10258 im :-1: on removing levenshtein as the container builder should be only used in development.
+
+This PR makes levenshtein optional, which is a bit better, but it shouldn't change the default behaviour (which it does).
+
+---------------------------------------------------------------------------
+
+by catch56 at 2014-03-26T15:37:09Z
+
+For Drupal, we have to support changes to the container on the production site - since there is a UI for enabling and disabling modules (and those in turn define services).
+
+Due to this, we compile and dump the container on the fly: for those requests where a compiled container isn't available, it falls back to ContainerBuilder, then compiles and dumps for that request. So this only happens rarely but it's not entirely a 'development-only' situation.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-03-27T07:38:25Z
+
+I'm not sure I understand the use case. The levenshtein function is only called to create an exception for when a service does not exist, which should only occur when there is a DIC configuration issue. So, do you mean that people using the UI can get this exception? How do you deal with it then? Do you catch it somewhere and "fix" this on the fly?
+
+---------------------------------------------------------------------------
+
+by catch56 at 2014-03-27T10:15:23Z
+
+Pushed a new commit, this should show what's going on a bit better and I think it's the correct fix.
+
+The problem is that ContainerBuilder::get() catches the exceptions thrown from parent::get(), and those will not even get seen since it's got its own logic to instantiate the service anyway.
+
+It also throws its own exceptions if it can't instantiate the service itself, which is all that's needed.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-03-27T10:55:41Z
+
+@catch56 Thanks, got it now.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-03-27T14:53:56Z
+
+@catch56 Can you rebase on master as I've added a new unit test to ensure that we don't break BC with this change? Thanks.
+
+---------------------------------------------------------------------------
+
+by catch56 at 2014-03-27T15:37:16Z
+
+Rebased :)

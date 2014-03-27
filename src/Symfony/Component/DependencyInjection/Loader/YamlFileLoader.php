@@ -52,7 +52,7 @@ class YamlFileLoader extends FileLoader
         }
 
         // imports
-        $this->parseImports($content, $file);
+        $this->parseImports($content, $path);
 
         // parameters
         if (isset($content['parameters'])) {

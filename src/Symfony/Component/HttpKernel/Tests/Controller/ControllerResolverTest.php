@@ -17,66 +17,119 @@ use Symfony\Component\HttpFoundation\Request;
 
 class ControllerResolverTest extends \PHPUnit_Framework_TestCase
 {
-    public function testGetController()
+    public function testGetControllerWithoutControllerParameter()
     {
-        $logger = new Logger();
+        $logger = $this->getMock('Psr\Log\LoggerInterface');
+        $logger->expects($this->once())->method('warning')->with('Unable to look for the controller as the "_controller" parameter is missing');
         $resolver = new ControllerResolver($logger);
 
         $request = Request::create('/');
         $this->assertFalse($resolver->getController($request), '->getController() returns false when the request has no _controller attribute');
-        $this->assertEquals(array('Unable to look for the controller as the "_controller" parameter is missing'), $logger->getLogs('warning'));
+    }
 
-        $request->attributes->set('_controller', 'Symfony\Component\HttpKernel\Tests\Controller\ControllerResolverTest::testGetController');
-        $controller = $resolver->getController($request);
-        $this->assertInstanceOf('Symfony\Component\HttpKernel\Tests\Controller\ControllerResolverTest', $controller[0], '->getController() returns a PHP callable');
+    public function testGetControllerWithLambda()
+    {
+        $resolver = new ControllerResolver();
 
+        $request = Request::create('/');
         $request->attributes->set('_controller', $lambda = function () {});
         $controller = $resolver->getController($request);
         $this->assertSame($lambda, $controller);
+    }
 
+    public function testGetControllerWithObjectAndInvokeMethod()
+    {
+        $resolver = new ControllerResolver();
+
+        $request = Request::create('/');
         $request->attributes->set('_controller', $this);
         $controller = $resolver->getController($request);
         $this->assertSame($this, $controller);
+    }
 
-        $request->attributes->set('_controller', 'Symfony\Component\HttpKernel\Tests\Controller\ControllerResolverTest');
-        $controller = $resolver->getController($request);
-        $this->assertInstanceOf('Symfony\Component\HttpKernel\Tests\Controller\ControllerResolverTest', $controller);
+    public function testGetControllerWithObjectAndMethod()
+    {
+        $resolver = new ControllerResolver();
 
+        $request = Request::create('/');
         $request->attributes->set('_controller', array($this, 'controllerMethod1'));
         $controller = $resolver->getController($request);
         $this->assertSame(array($this, 'controllerMethod1'), $controller);
+    }
 
+    public function testGetControllerWithClassAndMethod()
+    {
+        $resolver = new ControllerResolver();
+
+        $request = Request::create('/');
         $request->attributes->set('_controller', array('Symfony\Component\HttpKernel\Tests\Controller\ControllerResolverTest', 'controllerMethod4'));
         $controller = $resolver->getController($request);
         $this->assertSame(array('Symfony\Component\HttpKernel\Tests\Controller\ControllerResolverTest', 'controllerMethod4'), $controller);
+    }
 
+    public function testGetControllerWithObjectAndMethodAsString()
+    {
+        $resolver = new ControllerResolver();
+
+        $request = Request::create('/');
+        $request->attributes->set('_controller', 'Symfony\Component\HttpKernel\Tests\Controller\ControllerResolverTest::controllerMethod1');
+        $controller = $resolver->getController($request);
+        $this->assertInstanceOf('Symfony\Component\HttpKernel\Tests\Controller\ControllerResolverTest', $controller[0], '->getController() returns a PHP callable');
+    }
+
+    public function testGetControllerWithClassAndInvokeMethod()
+    {
+        $resolver = new ControllerResolver();
+
+        $request = Request::create('/');
+        $request->attributes->set('_controller', 'Symfony\Component\HttpKernel\Tests\Controller\ControllerResolverTest');
+        $controller = $resolver->getController($request);
+        $this->assertInstanceOf('Symfony\Component\HttpKernel\Tests\Controller\ControllerResolverTest', $controller);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testGetControllerOnObjectWithoutInvokeMethod()
+    {
+        $resolver = new ControllerResolver();
+
+        $request = Request::create('/');
+        $request->attributes->set('_controller', new \stdClass());
+        $resolver->getController($request);
+    }
+
+    public function testGetControllerWithFunction()
+    {
+        $resolver = new ControllerResolver();
+
+        $request = Request::create('/');
         $request->attributes->set('_controller', 'Symfony\Component\HttpKernel\Tests\Controller\some_controller_function');
         $controller = $resolver->getController($request);
         $this->assertSame('Symfony\Component\HttpKernel\Tests\Controller\some_controller_function', $controller);
+    }
 
-        $request->attributes->set('_controller', 'foo');
-        try {
-            $resolver->getController($request);
-            $this->fail('->getController() throws an \InvalidArgumentException if the _controller attribute is not well-formatted');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->getController() throws an \InvalidArgumentException if the _controller attribute is not well-formatted');
-        }
+    /**
+     * @dataProvider      getUndefinedControllers
+     * @expectedException \InvalidArgumentException
+     */
+    public function testGetControllerOnNonUndefinedFunction($controller)
+    {
+        $resolver = new ControllerResolver();
 
-        $request->attributes->set('_controller', 'foo::bar');
-        try {
-            $resolver->getController($request);
-            $this->fail('->getController() throws an \InvalidArgumentException if the _controller attribute contains a non-existent class');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->getController() throws an \InvalidArgumentException if the _controller attribute contains a non-existent class');
-        }
+        $request = Request::create('/');
+        $request->attributes->set('_controller', $controller);
+        $resolver->getController($request);
+    }
 
-        $request->attributes->set('_controller', 'Symfony\Component\HttpKernel\Tests\Controller\ControllerResolverTest::bar');
-        try {
-            $resolver->getController($request);
-            $this->fail('->getController() throws an \InvalidArgumentException if the _controller attribute contains a non-existent method');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->getController() throws an \InvalidArgumentException if the _controller attribute contains a non-existent method');
-        }
+    public function getUndefinedControllers()
+    {
+        return array(
+            array('foo'),
+            array('foo::bar'),
+            array('stdClass'),
+            array('Symfony\Component\HttpKernel\Tests\Controller\ControllerResolverTest::bar'),
+        );
     }
 
     public function testGetArguments()
@@ -158,7 +211,7 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
     {
     }
 
-    protected function controllerMethod1($foo)
+    public function controllerMethod1($foo)
     {
     }
 

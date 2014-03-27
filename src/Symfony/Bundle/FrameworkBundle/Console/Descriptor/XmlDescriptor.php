@@ -375,8 +375,8 @@ class XmlDescriptor extends Descriptor
     }
 
     /**
-     * @param $parameter
-     * @param array $options
+     * @param string $parameter
+     * @param array  $options
      *
      * @return \DOMDocument
      */

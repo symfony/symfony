@@ -171,8 +171,8 @@ abstract class Descriptor implements DescriptorInterface
     /**
      * Describes a container parameter.
      *
-     * @param parameter
-     * @param array $options
+     * @param string $parameter
+     * @param array  $options
      */
     abstract protected function describeContainerParameter($parameter, array $options = array());
 

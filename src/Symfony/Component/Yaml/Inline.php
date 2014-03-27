@@ -25,6 +25,7 @@ class Inline
 
     private static $exceptionOnInvalidType = false;
     private static $objectSupport = false;
+    private static $objectForMap = false;
 
     /**
      * Converts a YAML string to a PHP array.
@@ -36,12 +37,13 @@ class Inline
      *
      * @return array A PHP array representing the YAML string
      *
-     * @throws Exception\ParseException
+     * @throws ParseException
      */
     public static function parse($value, $exceptionOnInvalidType = false, $objectSupport = false, $objectForMap = false)
     {
         self::$exceptionOnInvalidType = $exceptionOnInvalidType;
         self::$objectSupport = $objectSupport;
+        self::$objectForMap = $objectForMap;
 
         $value = trim($value);
 
@@ -57,11 +59,11 @@ class Inline
         $i = 0;
         switch ($value[0]) {
             case '[':
-                $result = self::parseSequence($value, $i, $objectForMap);
+                $result = self::parseSequence($value, $i);
                 ++$i;
                 break;
             case '{':
-                $result = self::parseMapping($value, $i, $objectForMap);
+                $result = self::parseMapping($value, $i);
                 ++$i;
                 break;
             default:
@@ -264,13 +266,12 @@ class Inline
      *
      * @param string  $sequence
      * @param int     &$i
-     * @param bool    $objectForMap true if maps should return a stdClass instead of array()
      *
      * @return string A YAML string
      *
-     * @throws Exception\ParseException
+     * @throws ParseException When malformed inline YAML string is parsed
      */
-    private static function parseSequence($sequence, &$i = 0, $objectForMap = false)
+    private static function parseSequence($sequence, &$i = 0)
     {
         $output = array();
         $len = strlen($sequence);
@@ -281,11 +282,11 @@ class Inline
             switch ($sequence[$i]) {
                 case '[':
                     // nested sequence
-                    $output[] = self::parseSequence($sequence, $i, $objectForMap);
+                    $output[] = self::parseSequence($sequence, $i);
                     break;
                 case '{':
                     // nested mapping
-                    $output[] = self::parseMapping($sequence, $i, $objectForMap);
+                    $output[] = self::parseMapping($sequence, $i);
                     break;
                 case ']':
                     return $output;
@@ -299,8 +300,7 @@ class Inline
                     if (!$isQuoted && false !== strpos($value, ': ')) {
                         // embedded mapping?
                         try {
-                            $j = 0;
-                            $value = self::parseMapping('{'.$value.'}', $j, $objectForMap);
+                            $value = self::parseMapping('{'.$value.'}');
                         } catch (\InvalidArgumentException $e) {
                             // no, it's not
                         }
@@ -322,13 +322,12 @@ class Inline
      *
      * @param string  $mapping
      * @param int     &$i
-     * @param bool    $objectForMap true if maps should return a stdClass instead of array()
      *
      * @return string A YAML string
      *
-     * @throws Exception\ParseException
+     * @throws ParseException When malformed inline YAML string is parsed
      */
-    private static function parseMapping($mapping, &$i = 0, $objectForMap = false)
+    private static function parseMapping($mapping, &$i = 0)
     {
         $output = array();
         $len = strlen($mapping);
@@ -342,7 +341,7 @@ class Inline
                     ++$i;
                     continue 2;
                 case '}':
-                    if (true === $objectForMap) {
+                    if (self::$objectForMap) {
                         return (object) $output;
                     }
 
@@ -355,12 +354,11 @@ class Inline
             // value
             $done = false;
 
-
             while ($i < $len) {
                 switch ($mapping[$i]) {
                     case '[':
                         // nested sequence
-                        $value = self::parseSequence($mapping, $i, $objectForMap);
+                        $value = self::parseSequence($mapping, $i);
                         // Spec: Keys MUST be unique; first one wins.
                         // Parser cannot abort this mapping earlier, since lines
                         // are processed sequentially.
@@ -371,7 +369,7 @@ class Inline
                         break;
                     case '{':
                         // nested mapping
-                        $value = self::parseMapping($mapping, $i, $objectForMap);
+                        $value = self::parseMapping($mapping, $i);
                         // Spec: Keys MUST be unique; first one wins.
                         // Parser cannot abort this mapping earlier, since lines
                         // are processed sequentially.

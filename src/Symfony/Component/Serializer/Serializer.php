@@ -143,7 +143,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
      */
     public function supportsNormalization($data, $format = null)
     {
-        return (bool) $this->getNormalizer($data, $format);
+        return null !== $this->getNormalizer($data, $format);
     }
 
     /**
@@ -151,7 +151,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
      */
     public function supportsDenormalization($data, $type, $format = null)
     {
-        return (bool) $this->getDenormalizer($data, $type, $format);
+        return null !== $this->getDenormalizer($data, $type, $format);
     }
 
     /**

@@ -57,8 +57,16 @@ class ControllerResolver implements ControllerResolverInterface
             return false;
         }
 
-        if (is_array($controller) || (is_object($controller) && method_exists($controller, '__invoke'))) {
+        if (is_array($controller)) {
             return $controller;
+        }
+
+        if (is_object($controller)) {
+            if (method_exists($controller, '__invoke')) {
+                return $controller;
+            }
+
+            throw new \InvalidArgumentException(sprintf('Controller "%s" for URI "%s" is not callable.', get_class($controller), $request->getPathInfo()));
         }
 
         if (false === strpos($controller, ':')) {
@@ -72,7 +80,7 @@ class ControllerResolver implements ControllerResolverInterface
         $callable = $this->createController($controller);
 
         if (!is_callable($callable)) {
-            throw new \InvalidArgumentException(sprintf('The controller for URI "%s" is not callable.', $request->getPathInfo()));
+            throw new \InvalidArgumentException(sprintf('Controller "%s" for URI "%s" is not callable.', $controller, $request->getPathInfo()));
         }
 
         return $callable;

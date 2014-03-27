@@ -549,4 +549,38 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $client->setServerParameter('HTTP_USER_AGENT', 'testua');
         $this->assertEquals('testua', $client->getServerParameter('HTTP_USER_AGENT'));
     }
+
+    public function testSetServerParameterInRequest()
+    {
+        $client = new TestClient();
+
+        $this->assertEquals('localhost', $client->getServerParameter('HTTP_HOST'));
+        $this->assertEquals('Symfony2 BrowserKit', $client->getServerParameter('HTTP_USER_AGENT'));
+
+        $client->request('GET', 'https://www.example.com/https/www.example.com', array(), array(), array(
+            'HTTP_HOST'       => 'testhost',
+            'HTTP_USER_AGENT' => 'testua',
+            'HTTPS'           => false,
+            'NEW_SERVER_KEY'  => 'new-server-key-value'
+        ));
+
+        $this->assertEquals('localhost', $client->getServerParameter('HTTP_HOST'));
+        $this->assertEquals('Symfony2 BrowserKit', $client->getServerParameter('HTTP_USER_AGENT'));
+
+        $this->assertEquals('http://testhost/https/www.example.com', $client->getRequest()->getUri());
+
+        $server = $client->getRequest()->getServer();
+
+        $this->assertArrayHasKey('HTTP_USER_AGENT', $server);
+        $this->assertEquals('testua', $server['HTTP_USER_AGENT']);
+
+        $this->assertArrayHasKey('HTTP_HOST', $server);
+        $this->assertEquals('testhost', $server['HTTP_HOST']);
+
+        $this->assertArrayHasKey('NEW_SERVER_KEY', $server);
+        $this->assertEquals('new-server-key-value', $server['NEW_SERVER_KEY']);
+
+        $this->assertArrayHasKey('HTTPS', $server);
+        $this->assertFalse($server['HTTPS']);
+    }
 }

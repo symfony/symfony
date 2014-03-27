@@ -461,9 +461,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     public function get($id, $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE)
     {
         $id = strtolower($id);
+
         if ($service = parent::get($id, ContainerInterface::NULL_ON_INVALID_REFERENCE)) {
-          return $service;
+            return $service;
         }
+
         if (isset($this->loading[$id])) {
             throw new LogicException(sprintf('The service "%s" has a circular reference to itself.', $id), 0, $e);
         }

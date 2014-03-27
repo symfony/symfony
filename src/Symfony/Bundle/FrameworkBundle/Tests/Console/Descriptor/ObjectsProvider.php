@@ -66,6 +66,16 @@ class ObjectsProvider
         );
     }
 
+    public static function getContainerParameter()
+    {
+        $builder = new ContainerBuilder();
+        $builder->setParameter('database_name', 'symfony');
+
+        return array(
+            'parameter' =>  $builder
+        );
+    }
+
     public static function getContainerBuilders()
     {
         $builder1 = new ContainerBuilder();

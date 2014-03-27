@@ -593,7 +593,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('localhost', $client->getServerParameter('HTTP_HOST'));
         $this->assertEquals('Symfony2 BrowserKit', $client->getServerParameter('HTTP_USER_AGENT'));
 
-        $client->request('GET', 'https://www.example.com/foo', array(), array(), array(
+        $client->request('GET', 'https://www.example.com/https/www.example.com', array(), array(), array(
             'HTTP_HOST'       => 'testhost',
             'HTTP_USER_AGENT' => 'testua',
             'HTTPS'           => false,
@@ -603,7 +603,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('localhost', $client->getServerParameter('HTTP_HOST'));
         $this->assertEquals('Symfony2 BrowserKit', $client->getServerParameter('HTTP_USER_AGENT'));
 
-        $this->assertEquals('http://testhost/foo', $client->getRequest()->getUri());
+        $this->assertEquals('http://testhost/https/www.example.com', $client->getRequest()->getUri());
 
         $server = $client->getRequest()->getServer();
 

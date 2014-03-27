@@ -84,8 +84,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     private $expressionLanguage;
 
-    protected $levenshtein = false;
-
     /**
      * Sets the track resources flag.
      *
@@ -461,16 +459,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     public function get($id, $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE)
     {
         $id = strtolower($id);
-
-        try {
-            return parent::get($id, ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE);
-        } catch (InactiveScopeException $e) {
-            if (ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $invalidBehavior) {
-                return null;
-            }
-
-            throw $e;
-        } catch (InvalidArgumentException $e) {
+        if ($service = parent::get($id, ContainerInterface::NULL_ON_INVALID_REFERENCE)) {
+          return $service;
+        }
+        else {
             if (isset($this->loading[$id])) {
                 throw new LogicException(sprintf('The service "%s" has a circular reference to itself.', $id), 0, $e);
             }

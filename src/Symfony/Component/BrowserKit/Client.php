@@ -613,7 +613,8 @@ abstract class Client
     private function updateServerFromUri($server, $uri)
     {
         $server['HTTP_HOST'] = parse_url($uri, PHP_URL_HOST);
-        $server['HTTPS'] = 'https' == parse_url($uri, PHP_URL_SCHEME);
+        $scheme = parse_url($uri, PHP_URL_SCHEME);
+        $server['HTTPS'] = null === $scheme ? $server['HTTPS'] : 'https' == $scheme;
         unset($server['HTTP_IF_NONE_MATCH'], $server['HTTP_IF_MODIFIED_SINCE']);
 
         return $server;

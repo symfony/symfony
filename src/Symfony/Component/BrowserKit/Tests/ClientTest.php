@@ -399,7 +399,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('http://www.example.com/redirected', $client->getRequest()->getUri(), '->followRedirect() follows relative URLs');
 
         $client = new TestClient();
-        $client->setNextResponse(new Response('', 302, array('Location' => 'https://www.example.org/')));
+        $client->setNextResponse(new Response('', 302, array('Location' => '//www.example.org/')));
         $client->request('GET', 'https://www.example.com/');
 
         $this->assertEquals('https://www.example.org/', $client->getRequest()->getUri(), '->followRedirect() follows protocol-relative URLs');

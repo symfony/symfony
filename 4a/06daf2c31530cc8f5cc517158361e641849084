@@ -1,0 +1,157 @@
+---------------------------------------------------------------------------
+
+by hugohenrique at 2013-12-19T01:20:44Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by gido at 2013-12-19T08:56:37Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by zufrieden at 2013-12-19T08:59:14Z
+
+:+1: for the frontend guys
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2013-12-19T09:04:27Z
+
+Is it possible to move it to `Bridge\Twig` and do not extending the `ContainerAwareCommand`? That would make this command usable without Symfony full-stack (sure Silex, maybe Drupal)
+
+---------------------------------------------------------------------------
+
+by gagarine at 2013-12-19T09:04:40Z
+
+@Seldaek this is going to save my life! I just tried https://github.com/Elao/WebProfilerExtraBundle but the bundle don't give you the arguments of the functions so it's useless.
+
+---------------------------------------------------------------------------
+
+by Burgov at 2013-12-19T09:41:33Z
+
+:+1:
+
+Maybe a verbose option could also add the relevant docblock to the output?
+
+So for the date filter this would add https://github.com/fabpot/Twig/blob/master/lib/Twig/Extension/Core.php#L432 to the output:
+
+```
+Converts a date to the given format.
+
+<pre>
+  {{ post.published_at|date("m/d/Y") }}
+</pre>
+
+@param Twig_Environment             $env      A Twig_Environment instance
+@param DateTime|DateInterval|string $date     A date
+@param string                       $format   A format
+@param DateTimeZone|string          $timezone A timezone
+
+@return string The formatted date
+```
+
+Some parsing might have to be done on the @param parts; the first one being irrelevant for the user and the second one being the variable that is being filtered
+
+-edit: ah, you already said that in your PR message :)
+
+---------------------------------------------------------------------------
+
+by Yago31 at 2013-12-19T10:30:03Z
+
+:+1:
+
+Awesome, the missing stuff of Symfony !!
+
+---------------------------------------------------------------------------
+
+by deguif at 2013-12-19T10:31:08Z
+
+Would be interesting to do like it was done for container and router commands, use a format option (xml, markdown, json, text).
+
+---------------------------------------------------------------------------
+
+by XWB at 2013-12-19T19:26:48Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2013-12-19T20:06:35Z
+
+I fixed the format option so this can be merged for Symfony at least.
+
+@GromNaN I agree it'd be nicer to avoid binding to FrameworkBundle, but I'm not sure how it would work to avoid using the container there and don't have the time to dig into it. So I'd be happy if this can be merged and then someone else looks at making it more reusable.
+
+Similarly extracting at least the short description from the docblocks would be a great improvement if someone feels like helping :)
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2013-12-19T21:25:21Z
+
+I think that such commands should be declared as service with the tag `console.command`.
+I'll make a PR to move both commands (lint & doc) to the bridge once this PR get merged.
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2013-12-20T10:28:02Z
+
+@GromNaN that would be great thanks.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2013-12-20T10:52:18Z
+
++1 (it has been on my list for a couple of months :wink:)
+
+However, wouldn't it be better if we are consistent and call it `twig:dump` or `twig:debug` instead of `twig:doc`?
+
+---------------------------------------------------------------------------
+
+by deguif at 2013-12-20T10:58:18Z
+
+:+1: for twig:debug
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-12-20T11:00:23Z
+
+It's not about debugging per se, so what about `twig:help`?
+
+---------------------------------------------------------------------------
+
+by stloyd at 2013-12-20T11:06:54Z
+
+IMO `twig:help` is confusing with normal `--help` calls, but to be honest I can't see any good name, yet `twig:command[s]` is long, but says everything I guess =)
+
+---------------------------------------------------------------------------
+
+by Tobion at 2013-12-20T14:06:14Z
+
+`twig:debug` would be consistent with `router:debug` which is not only for debugging as well.
+
+---------------------------------------------------------------------------
+
+by deguif at 2013-12-20T14:18:56Z
+
+as well as ```container:debug```
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2013-12-20T16:09:33Z
+
+Alright I renamed to twig:debug
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2014-03-25T13:07:07Z
+
+Ping @fabpot? Anything missing here?
+
+---------------------------------------------------------------------------
+
+by cordoval at 2014-03-25T13:59:05Z
+
+maybe tests are missing?

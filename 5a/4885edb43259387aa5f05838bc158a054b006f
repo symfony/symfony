@@ -1,0 +1,188 @@
+---------------------------------------------------------------------------
+
+by egulias at 2013-09-27T19:26:23Z
+
+Hi @stof thanks for the review.
+What the xml was intended for (I re read the xsd, so I delete since it won't serve) was to be the mechanism by which the global `strict` configuration would be transmitted to the `Validator\EmailValidator` or it constraint.
+I read the code in `FrameworkBundle` DI for validators and the `Validator`component but couldn't find a way for that and ended with a wrong approach.
+Which is the mechanism to do this?
+
+---------------------------------------------------------------------------
+
+by yjv at 2013-09-30T14:15:02Z
+
+Why is this a gobal configuration and not just local to each constraint? Seems like other constraint configurations of this type is defined for each constraint definition.
+
+---------------------------------------------------------------------------
+
+by egulias at 2013-09-30T20:57:46Z
+
+Please see the discussion in #1581
+
+---------------------------------------------------------------------------
+
+by egulias at 2013-10-01T12:44:32Z
+
+@fabpot I hope now is correct. I would like to know if there is a mechanism to inject the global config to the EmailValidator so I can complete the work.
+Thanks.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-10-02T17:27:49Z
+
+@egulias The only possible way would be by passing it as a constructor argument to validator. But it is registered in the CoreExtension, which is automatically created in `Forms`. So, I don't see any **simple** solution. What do you think @bschussek?
+
+---------------------------------------------------------------------------
+
+by egulias at 2013-10-13T18:38:01Z
+
+Hi @fabpot @bschussek
+in the last commit is a possible solution. Basically is the same approach you've taken for the Expression constraint.
+Is the one you were thinking of?
+
+---------------------------------------------------------------------------
+
+by egulias at 2013-10-27T21:17:04Z
+
+ping @fabpot @bschussek
+Thanks
+
+---------------------------------------------------------------------------
+
+by yjv at 2013-10-28T03:26:44Z
+
+@egulias If one were to pull in the validator component alone then the Email constraint would not be pointing correctly to its validator. If you want to allow for a global configuration in a symphony standard context then maybe it would be better to have an email constraint that is in the framework bundle or a bridge. That way when using the Email constraint alone it would point to the validator class and then the extended one would point to the service.
+
+---------------------------------------------------------------------------
+
+by egulias at 2013-11-10T18:25:27Z
+
+@yjv I think your solution doesn't improve the case. You are adding more classes and in the end you still need the lib and the validator still points to it (I think it even adds some deps over the FrameqorkBundle in the Validator).
+
+---------------------------------------------------------------------------
+
+by egulias at 2013-11-10T18:25:49Z
+
+Apart form adding the composer.json key for suggesting/requiring (depending on the final decision over the default value) the lib, are there any other considerations?
+Thanks.
+
+---------------------------------------------------------------------------
+
+by yjv at 2013-11-12T04:31:17Z
+
+@egulias the problem with your implementation right now though is that when using the validator component alone it uses the  Symfony\Component\Validator\ConstraintValidatorFactory class it expects that validatedBy will return  a class name. when used in the context of the full stack framework it is replaced by a factory that also checks for tagged services. But when the validator component is used alone it will not load the emailvalidator.
+
+---------------------------------------------------------------------------
+
+by egulias at 2013-11-18T22:17:44Z
+
+@yjv `Symfony\Component\Validator\Constraint` implements `validatedBy()` [here](https://github.com/egulias/symfony/blob/58c6e8d6f4b42a9c9efed870bcc7a0e82ed7c019/src/Symfony/Component/Validator/Constraint.php). It will get EmailValidator as class name. The service definition it is only used in the framework bundle to inject the configuration into the EmailValidator class.
+
+---------------------------------------------------------------------------
+
+by egulias at 2013-11-18T22:39:18Z
+
+I'll update Changelog (this issue) and Upgrade (BC now not using filter_var) files for the  when 2.4 stable is released.
+
+---------------------------------------------------------------------------
+
+by egulias at 2013-11-22T17:37:10Z
+
+ping @fabpot @bschussek @stof
+thanks.
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-04T20:31:27Z
+
+please add https://github.com/symfony/symfony/issues/4930 if so to the tickets related?
+
+---------------------------------------------------------------------------
+
+by egulias at 2013-12-08T17:46:10Z
+
+Yes, is related. See [this test](https://github.com/egulias/EmailValidator/blob/master/tests/egulias/Tests/EmailValidator/EmailValidatorTest.php#L40)
+
+---------------------------------------------------------------------------
+
+by egulias at 2014-01-13T22:20:23Z
+
+Documentation is ready, referencing the change as of version 2.5 (master).
+
+---------------------------------------------------------------------------
+
+by egulias at 2014-01-16T23:13:43Z
+
+I don't know why the tests failed for `PHP 5.4` for StopWatch and Process on one test each :S
+
+---------------------------------------------------------------------------
+
+by egulias at 2014-01-26T18:25:18Z
+
+Any news on when this will be merged or if any other action is needed? Thanks @fabpot @cordoval @stof @jakzal
+
+---------------------------------------------------------------------------
+
+by egulias at 2014-01-28T22:27:00Z
+
+thanks @cordoval @stof I hope now is fine.
+
+---------------------------------------------------------------------------
+
+by egulias at 2014-02-04T09:06:15Z
+
+@fabpot @stof will this be merged for sf2.5?
+
+---------------------------------------------------------------------------
+
+by egulias at 2014-02-14T12:15:27Z
+
+Any news on this?
+
+---------------------------------------------------------------------------
+
+by egulias at 2014-02-24T22:42:47Z
+
+Will this be merged? Thanks @javiereguiluz @stof @cordoval @fabpot
+
+---------------------------------------------------------------------------
+
+by cordoval at 2014-02-24T22:48:10Z
+
+it will be (imo) I believe, it would be very sad if it is not merged after all the work you put in. It would require a strong reason not to merge this. @fabpot is out of vacations so maybe he can take a deep deep look.
+
+---------------------------------------------------------------------------
+
+by egulias at 2014-02-24T23:07:46Z
+
+Thanks for your support @cordoval. I didn't knew he was on vacation.
+
+---------------------------------------------------------------------------
+
+by egulias at 2014-03-04T14:03:55Z
+
+ping @fabpot
+
+---------------------------------------------------------------------------
+
+by egulias at 2014-03-19T22:29:32Z
+
+@fabpot I'll meet you at Sensio Labs meetings in Madrid, I hope you'll have  a minute to talk about this.
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-03-20T14:37:03Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-03-26T16:46:52Z
+
+@egulias Can you make the small changes I suggested in the comments? Everything else looks good to me.
+
+---------------------------------------------------------------------------
+
+by egulias at 2014-03-26T17:59:41Z
+
+@fabpot I'll do them tonight.

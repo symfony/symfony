@@ -148,7 +148,7 @@
 {% block time_widget %}
 {% spaceless %}
     {% if widget == 'single_text' %}
-        {% if with_minutes %}
+        {% if with_seconds %}
             {% set attr = attr|merge({'step': 1 }) %}
         {% endif %}
         {{ block('form_widget_simple') }}

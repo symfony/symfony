@@ -61,7 +61,7 @@ Validator
 
    Strict email validation has to be explicitly activated in the configuration file by adding
    ```
-   framework_bundle:
+   framework:
       //...
       validation:
           strict_email: true

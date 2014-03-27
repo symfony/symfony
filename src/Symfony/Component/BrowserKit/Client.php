@@ -304,11 +304,11 @@ abstract class Client
         $uri = $this->getAbsoluteUri($uri);
 
         if (isset($server['HTTP_HOST'])) {
-            $uri = str_replace(parse_url($uri, PHP_URL_HOST), $server['HTTP_HOST'], $uri);
+            $uri = preg_replace('{^(https?\://)'.parse_url($uri, PHP_URL_HOST).'}', '\\1'.$server['HTTP_HOST'], $uri);
         }
 
         if (isset($server['HTTPS'])) {
-            $uri = str_replace(parse_url($uri, PHP_URL_SCHEME), $server['HTTPS'] ? 'https' : 'http', $uri);
+            $uri = preg_replace('{^'.parse_url($uri, PHP_URL_SCHEME).'}', $server['HTTPS'] ? 'https' : 'http', $uri);
         }
 
         $server = array_merge($this->server, $server);

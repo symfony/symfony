@@ -160,12 +160,12 @@ class PropertyAccessor implements PropertyAccessorInterface
      *
      * @return mixed The value of the key
      *
-     * @throws NoSuchPropertyException If the array does not implement \ArrayAccess or it is not an array
+     * @throws NoSuchIndexException If the array does not implement \ArrayAccess or it is not an array
      */
     private function &readIndex(&$array, $index)
     {
         if (!$array instanceof \ArrayAccess && !is_array($array)) {
-            throw new NoSuchPropertyException(sprintf('Index "%s" cannot be read from object of type "%s" because it doesn\'t implement \ArrayAccess', $index, get_class($array)));
+            throw new NoSuchIndexException(sprintf('Index "%s" cannot be read from object of type "%s" because it doesn\'t implement \ArrayAccess', $index, get_class($array)));
         }
 
         // Use an array instead of an object since performance is very crucial here
@@ -271,12 +271,12 @@ class PropertyAccessor implements PropertyAccessorInterface
      * @param string|integer     $index The index to write at
      * @param mixed              $value The value to write
      *
-     * @throws NoSuchPropertyException If the array does not implement \ArrayAccess or it is not an array
+     * @throws NoSuchIndexException If the array does not implement \ArrayAccess or it is not an array
      */
     private function writeIndex(&$array, $index, $value)
     {
         if (!$array instanceof \ArrayAccess && !is_array($array)) {
-            throw new NoSuchPropertyException(sprintf('Index "%s" cannot be modified in object of type "%s" because it doesn\'t implement \ArrayAccess', $index, get_class($array)));
+            throw new NoSuchIndexException(sprintf('Index "%s" cannot be modified in object of type "%s" because it doesn\'t implement \ArrayAccess', $index, get_class($array)));
         }
 
         $array[$index] = $value;

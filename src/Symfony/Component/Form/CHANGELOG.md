@@ -11,6 +11,7 @@ CHANGELOG
  * [BC BREAK] added two optional parameters to FormInterface::getErrors() and
    changed the method to return a Symfony\Component\Form\FormErrorIterator
    instance instead of an array
+ * you can now pass interface names in the "data_class" option
 
 2.4.0
 -----

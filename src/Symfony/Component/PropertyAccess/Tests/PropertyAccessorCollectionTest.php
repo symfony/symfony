@@ -210,11 +210,63 @@ abstract class PropertyAccessorCollectionTest extends \PHPUnit_Framework_TestCas
      * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      * @expectedExceptionMessage Neither the property "axes" nor one of the methods "addAx()", "addAxe()", "addAxis()", "setAxes()", "__set()" or "__call()" exist and have public access in class "Mock_PropertyAccessorCollectionTest_CarNoAdderAndRemover
      */
-    public function testSetValueFailsIfNoAdderAndNoRemoverFound()
+    public function testSetValueFailsIfNoAdderNorRemoverFound()
     {
         $car = $this->getMock(__CLASS__.'_CarNoAdderAndRemover');
         $axes = $this->getCollection(array(0 => 'first', 1 => 'second', 2 => 'third'));
 
         $this->propertyAccessor->setValue($car, 'axes', $axes);
+    }
+
+    /**
+     * @dataProvider getValidPropertyPaths
+     */
+    public function testIsReadable(array $array, $path)
+    {
+        $collection = $this->getCollection($array);
+
+        $this->assertTrue($this->propertyAccessor->isReadable($collection, $path));
+    }
+
+    /**
+     * @dataProvider getValidPropertyPaths
+     */
+    public function testIsWritable(array $array, $path)
+    {
+        $collection = $this->getCollection($array);
+
+        $this->assertTrue($this->propertyAccessor->isWritable($collection, $path, 'Updated'));
+    }
+
+    public function testIsWritableReturnsTrueIfAdderAndRemoverExists()
+    {
+        $car = $this->getMock(__CLASS__.'_Car');
+        $axes = $this->getCollection(array(1 => 'first', 2 => 'second', 3 => 'third'));
+
+        $this->assertTrue($this->propertyAccessor->isWritable($car, 'axes', $axes));
+    }
+
+    public function testIsWritableReturnsFalseIfOnlyAdderExists()
+    {
+        $car = $this->getMock(__CLASS__.'_CarOnlyAdder');
+        $axes = $this->getCollection(array(1 => 'first', 2 => 'second', 3 => 'third'));
+
+        $this->assertFalse($this->propertyAccessor->isWritable($car, 'axes', $axes));
+    }
+
+    public function testIsWritableReturnsFalseIfOnlyRemoverExists()
+    {
+        $car = $this->getMock(__CLASS__.'_CarOnlyRemover');
+        $axes = $this->getCollection(array(1 => 'first', 2 => 'second', 3 => 'third'));
+
+        $this->assertFalse($this->propertyAccessor->isWritable($car, 'axes', $axes));
+    }
+
+    public function testIsWritableReturnsFalseIfNoAdderNorRemoverExists()
+    {
+        $car = $this->getMock(__CLASS__.'_CarNoAdderAndRemover');
+        $axes = $this->getCollection(array(1 => 'first', 2 => 'second', 3 => 'third'));
+
+        $this->assertFalse($this->propertyAccessor->isWritable($car, 'axes', $axes));
     }
 }

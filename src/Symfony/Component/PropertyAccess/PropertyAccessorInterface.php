@@ -19,7 +19,7 @@ namespace Symfony\Component\PropertyAccess;
 interface PropertyAccessorInterface
 {
     /**
-     * Sets the value at the end of the property path of the object
+     * Sets the value at the end of the property path of the object graph.
      *
      * Example:
      *
@@ -50,7 +50,7 @@ interface PropertyAccessorInterface
     public function setValue(&$objectOrArray, $propertyPath, $value);
 
     /**
-     * Returns the value at the end of the property path of the object
+     * Returns the value at the end of the property path of the object graph.
      *
      * Example:
      *
@@ -78,4 +78,31 @@ interface PropertyAccessorInterface
      * @throws Exception\NoSuchPropertyException If a property does not exist or is not public.
      */
     public function getValue($objectOrArray, $propertyPath);
+
+    /**
+     * Returns whether a value can be written at a given property path.
+     *
+     * Whenever this method returns true, {@link setValue()} is guaranteed not
+     * to throw an exception when called with the same arguments.
+     *
+     * @param object|array                 $objectOrArray The object or array to check
+     * @param string|PropertyPathInterface $propertyPath  The property path to check
+     * @param mixed                        $value         The value to set at the end of the property path
+     *
+     * @return Boolean Whether the value can be set
+     */
+    public function isWritable($objectOrArray, $propertyPath, $value);
+
+    /**
+     * Returns whether a property path can be read from an object graph.
+     *
+     * Whenever this method returns true, {@link getValue()} is guaranteed not
+     * to throw an exception when called with the same arguments.
+     *
+     * @param object|array                 $objectOrArray The object or array to check
+     * @param string|PropertyPathInterface $propertyPath  The property path to check
+     *
+     * @return Boolean Whether the property path can be read
+     */
+    public function isReadable($objectOrArray, $propertyPath);
 }

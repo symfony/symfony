@@ -8,6 +8,7 @@ CHANGELOG
  * [BC BREAK] when accessing an index on an object that does not implement
    ArrayAccess, a NoSuchIndexException is now thrown instead of the
    semantically wrong NoSuchPropertyException
+ * [BC BREAK] added isReadable() and isWritable() to PropertyAccessorInterface
 
 2.3.0
 ------

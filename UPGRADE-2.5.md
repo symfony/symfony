@@ -45,6 +45,47 @@ Form
    {
    ```
 
+PropertyAccess
+--------------
+
+ * The methods `isReadable()` and `isWritable()` were added to
+   `PropertyAccessorInterface`. If you implemented this interface in your own
+   code, you should add these two methods.
+
+ * The methods `getValue()` and `setValue()` now throw an
+   `NoSuchIndexException` instead of a `NoSuchPropertyException` when an index
+   is accessed on an object that does not implement `ArrayAccess`. If you catch
+   this exception in your code, you should adapt the catch statement:
+
+   Before:
+
+   ```php
+   $object = new \stdClass();
+
+   try {
+       $propertyAccessor->getValue($object, '[index]');
+       $propertyAccessor->setValue($object, '[index]', 'New value');
+   } catch (NoSuchPropertyException $e) {
+       // ...
+   }
+   ```
+
+   After:
+
+   ```php
+   $object = new \stdClass();
+
+   try {
+       $propertyAccessor->getValue($object, '[index]');
+       $propertyAccessor->setValue($object, '[index]', 'New value');
+   } catch (NoSuchIndexException $e) {
+       // ...
+   }
+   ```
+
+   A `NoSuchPropertyException` is still thrown when a non-existing property is
+   accessed on an object or an array.
+
 Validator
 ---------
 
@@ -56,7 +97,7 @@ Validator
 
    After:
 
-   Default email validation is now done via a simple regex which may cause invalid emails (not RFC compilant) to be 
+   Default email validation is now done via a simple regex which may cause invalid emails (not RFC compilant) to be
    valid. This is the default behaviour.
 
    Strict email validation has to be explicitly activated in the configuration file by adding

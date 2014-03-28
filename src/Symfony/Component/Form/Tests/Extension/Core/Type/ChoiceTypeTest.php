@@ -1216,6 +1216,47 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         ));
     }
 
+    // https://github.com/symfony/symfony/issues/10409
+    public function testReuseNonUtf8ChoiceLists()
+    {
+        $form1 = $this->factory->createNamed('name', 'choice', null, array(
+            'choices' => array(
+                'meter' => 'm',
+                'millimeter' => 'mm',
+                'micrometer' => chr(181).'meter',
+            ),
+        ));
+
+        $form2 = $this->factory->createNamed('name', 'choice', null, array(
+            'choices' => array(
+                'meter' => 'm',
+                'millimeter' => 'mm',
+                'micrometer' => chr(181).'meter',
+            ),
+        ));
+
+        $form3 = $this->factory->createNamed('name', 'choice', null, array(
+            'choices' => array(
+                'meter' => 'm',
+                'millimeter' => 'mm',
+                'micrometer' => null,
+            ),
+        ));
+
+        // $form1 and $form2 use the same ChoiceList
+        $this->assertSame(
+            $form1->getConfig()->getOption('choice_list'),
+            $form2->getConfig()->getOption('choice_list')
+        );
+
+        // $form3 doesn't, but used to use the same when using json_encode()
+        // instead of serialize for the hashing algorithm
+        $this->assertNotSame(
+            $form1->getConfig()->getOption('choice_list'),
+            $form3->getConfig()->getOption('choice_list')
+        );
+    }
+
     public function testInitializeWithDefaultObjectChoice()
     {
         $obj1 = (object) array('value' => 'a', 'label' => 'A');

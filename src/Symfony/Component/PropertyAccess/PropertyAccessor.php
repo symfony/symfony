@@ -33,7 +33,7 @@ class PropertyAccessor implements PropertyAccessorInterface
     /**
      * @var Boolean
      */
-    private $throwExceptionOnInvalidIndex;
+    private $ignoreInvalidIndices;
 
     /**
      * Should not be used by application code. Use
@@ -42,7 +42,7 @@ class PropertyAccessor implements PropertyAccessorInterface
     public function __construct($magicCall = false, $throwExceptionOnInvalidIndex = false)
     {
         $this->magicCall = $magicCall;
-        $this->throwExceptionOnInvalidIndex = $throwExceptionOnInvalidIndex;
+        $this->ignoreInvalidIndices = !$throwExceptionOnInvalidIndex;
     }
 
     /**
@@ -56,7 +56,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             throw new UnexpectedTypeException($propertyPath, 'string or Symfony\Component\PropertyAccess\PropertyPathInterface');
         }
 
-        $propertyValues =& $this->readPropertiesUntil($objectOrArray, $propertyPath, $propertyPath->getLength(), $this->throwExceptionOnInvalidIndex);
+        $propertyValues =& $this->readPropertiesUntil($objectOrArray, $propertyPath, $propertyPath->getLength(), $this->ignoreInvalidIndices);
 
         return $propertyValues[count($propertyValues) - 1][self::VALUE];
     }
@@ -117,7 +117,7 @@ class PropertyAccessor implements PropertyAccessorInterface
         }
 
         try {
-            $this->readPropertiesUntil($objectOrArray, $propertyPath, $propertyPath->getLength(), $this->throwExceptionOnInvalidIndex);
+            $this->readPropertiesUntil($objectOrArray, $propertyPath, $propertyPath->getLength(), $this->ignoreInvalidIndices);
 
             return true;
         } catch (NoSuchIndexException $e) {
@@ -186,15 +186,18 @@ class PropertyAccessor implements PropertyAccessorInterface
     /**
      * Reads the path from an object up to a given path index.
      *
-     * @param object|array          $objectOrArray The object or array to read from
-     * @param PropertyPathInterface $propertyPath  The property path to read
-     * @param integer               $lastIndex     The index up to which should be read
+     * @param object|array          $objectOrArray        The object or array to read from
+     * @param PropertyPathInterface $propertyPath         The property path to read
+     * @param integer               $lastIndex            The index up to which should be read
+     * @param Boolean               $ignoreInvalidIndices Whether to ignore invalid indices
+     *                                                    or throw an exception
      *
      * @return array The values read in the path.
      *
      * @throws UnexpectedTypeException If a value within the path is neither object nor array.
+     * @throws NoSuchIndexException If a non-existing index is accessed
      */
-    private function &readPropertiesUntil(&$objectOrArray, PropertyPathInterface $propertyPath, $lastIndex, $throwExceptionOnInvalidIndex = false)
+    private function &readPropertiesUntil(&$objectOrArray, PropertyPathInterface $propertyPath, $lastIndex, $ignoreInvalidIndices = true)
     {
         $propertyValues = array();
 
@@ -209,7 +212,7 @@ class PropertyAccessor implements PropertyAccessorInterface
 
             // Create missing nested arrays on demand
             if ($isIndex && $isArrayAccess && !isset($objectOrArray[$property])) {
-                if ($throwExceptionOnInvalidIndex) {
+                if (!$ignoreInvalidIndices) {
                     throw new NoSuchIndexException(sprintf('Cannot read property "%s". Available properties are "%s"', $property, print_r(array_keys($objectOrArray), true)));
                 }
 

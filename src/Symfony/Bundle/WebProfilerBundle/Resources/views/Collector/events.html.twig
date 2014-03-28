@@ -36,9 +36,9 @@
         {% endfor %}
     </table>
 
-    {% if collector.notcalledlisteners %}
-        <h2>Not Called Listeners</h2>
+    <h2>Not Called Listeners</h2>
 
+    {% if collector.notcalledlisteners %}
         <table>
             <tr>
                 <th>Event name</th>
@@ -52,6 +52,17 @@
                 </tr>
             {% endfor %}
         </table>
+    {% else %}
+        <p>
+            <strong>No uncalled listeners</strong>.
+        </p>
+        <p>
+
+            All listeners were called for this request or an error occurred
+            when trying to collect uncalled listeners (in which case check the
+            logs to get more information).
+
+        </p>
     {% endif %}
 {% endblock %}
 

@@ -31,7 +31,6 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 
     public function getValidPropertyPaths()
     {
-
         return array(
             array(array('Bernhard', 'Schussek'), '[0]', 'Bernhard'),
             array(array('Bernhard', 'Schussek'), '[1]', 'Schussek'),
@@ -64,7 +63,6 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 
     public function getPathsWithMissingProperty()
     {
-
         return array(
             array((object) array('firstName' => 'Bernhard'), 'lastName'),
             array((object) array('property' => (object) array('firstName' => 'Bernhard')), 'property.lastName'),
@@ -127,6 +125,14 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     {
         $this->propertyAccessor = new PropertyAccessor(false, true);
         $this->propertyAccessor->getValue($objectOrArray, $path);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
+     */
+    public function testGetValueThrowsExceptionIfNotArrayAccess()
+    {
+        $this->propertyAccessor->getValue(new \stdClass(), '[index]');
     }
 
     public function testGetValueReadsMagicGet()
@@ -225,6 +231,14 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
         $this->propertyAccessor->setValue($objectOrArray, $path, 'Updated');
 
         $this->assertSame('Updated', $this->propertyAccessor->getValue($objectOrArray, $path));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
+     */
+    public function testSetValueThrowsExceptionIfNotArrayAccess()
+    {
+        $this->propertyAccessor->setValue(new \stdClass(), '[index]', 'Updated');
     }
 
     public function testSetValueUpdatesMagicSet()

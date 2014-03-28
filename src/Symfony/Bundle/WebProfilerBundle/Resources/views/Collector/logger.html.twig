@@ -12,12 +12,12 @@
                 {% set status_color = "yellow" %}
             {% endif %}
             {% set error_count = collector.counterrors + collector.countdeprecations + collector.countscreams %}
-            <span class="sf-toolbar-status{% if status_color is defined %}} sf-toolbar-status-{{ status_color }}{% endif %}">{{ error_count }}</span>
+            <span class="sf-toolbar-status{% if status_color is defined %} sf-toolbar-status-{{ status_color }}{% endif %}">{{ error_count }}</span>
         {% endset %}
         {% set text %}
             {% if collector.counterrors %}
                 <div class="sf-toolbar-info-piece">
-                    <b>Exception</b>
+                    <b>Errors</b>
                     <span class="sf-toolbar-status sf-toolbar-status-red">{{ collector.counterrors }}</span>
                 </div>
             {% endif %}

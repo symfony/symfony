@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2014-03-28T10:15:45Z
+
+Just to make sure, if a user removes an input field from a form manuelly (like firebug), which means the field is not submitted anymore, the field on the model will still be validated, or? Otherwise it would be a security problem.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-03-28T10:36:17Z
+
+@Tobion what is not validated anymore are constraints attached on the field itself (and only for PATCH)

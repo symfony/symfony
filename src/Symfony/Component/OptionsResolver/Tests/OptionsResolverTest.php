@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\OptionsResolver\Tests;
 
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\Options;
 
@@ -716,5 +717,53 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
             'one' => '1',
             'three' => '3',
         ), $clone->resolve());
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testRemoveUnknownAndIgnoreUnknownAreMutuallyExclusive()
+    {
+        $this->resolver->resolve(array(
+            'one' => 'one',
+            'two' => 'two'
+        ), OptionsResolverInterface::REMOVE_UNKNOWN | OptionsResolverInterface::IGNORE_UNKNOWN);
+    }
+
+    public function testRemoveUnknownOption()
+    {
+        $this->resolver->setDefaults(array(
+            'one' => 'default',
+            'two' => 'default'
+        ));
+
+        $options = $this->resolver->resolve(array(
+            'one' => 'keep',
+            'three' => 'remove'
+        ), OptionsResolverInterface::REMOVE_UNKNOWN);
+
+        $this->assertEquals($options, array(
+            'one' => 'keep',
+            'two' => 'default'
+        ));
+    }
+
+    public function testIgnoreUnknownOption()
+    {
+        $this->resolver->setDefaults(array(
+            'one' => 'default',
+            'two' => 'default'
+        ));
+
+        $options = $this->resolver->resolve(array(
+            'one' => 'keep',
+            'three' => 'ignored'
+        ), OptionsResolverInterface::IGNORE_UNKNOWN);
+
+        $this->assertEquals($options, array(
+            'one' => 'keep',
+            'two' => 'default',
+            'three' => 'ignored'
+        ));
     }
 }

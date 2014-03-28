@@ -160,9 +160,19 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
      */
     public function getNotCalledListeners()
     {
-        $notCalled = array();
+        try {
+            $allListeners = $this->getListeners();
+        } catch (\Exception $e) {
+            if (null !== $this->logger) {
+                $this->logger->info(sprintf('An exception was thrown while getting the uncalled listeners (%s)', $e->getMessage()), array('exception' => $e));
+            }
 
-        foreach ($this->getListeners() as $name => $listeners) {
+            // unable to retrieve the uncalled listeners
+            return array();
+        }
+
+        $notCalled = array();
+        foreach ($allListeners as $name => $listeners) {
             foreach ($listeners as $listener) {
                 $info = $this->getListenerInfo($listener, null, $name);
                 if (!isset($this->called[$name.'.'.$info['pretty']])) {

@@ -68,7 +68,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('MyBundle:Blog:show', $route->getDefault('_controller'));
         $this->assertSame('\w+', $route->getRequirement('slug'));
         $this->assertSame('en|fr|de', $route->getRequirement('_locale'));
-        $this->assertSame(null, $route->getDefault('slug'));
+        $this->assertNull($route->getDefault('slug'));
         $this->assertSame('RouteCompiler', $route->getOption('compiler_class'));
     }
 

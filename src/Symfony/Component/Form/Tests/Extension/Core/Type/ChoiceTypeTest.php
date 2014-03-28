@@ -380,7 +380,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
         $form->submit('foobar');
 
-        $this->assertSame(null, $form->getData());
+        $this->assertNull($form->getData());
         $this->assertSame('foobar', $form->getViewData());
         $this->assertEmpty($form->getExtraData());
         $this->assertFalse($form->isSynchronized());
@@ -445,7 +445,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
         $form->submit('foobar');
 
-        $this->assertSame(null, $form->getData());
+        $this->assertNull($form->getData());
         $this->assertSame('foobar', $form->getViewData());
         $this->assertEmpty($form->getExtraData());
         $this->assertFalse($form->isSynchronized());

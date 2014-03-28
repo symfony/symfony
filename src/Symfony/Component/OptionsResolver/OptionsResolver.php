@@ -216,17 +216,27 @@ class OptionsResolver implements OptionsResolverInterface
      */
     public function resolve(array $options = array(), $flags = 0)
     {
-        if (($flags & OptionsResolverInterface::REMOVE_UNKNOWN) && ($flags & OptionsResolverInterface::IGNORE_UNKNOWN)) {
-            throw new \InvalidArgumentException('OptionsResolverInterface::REMOVE_UNKNOWN and OptionsResolverInterface::IGNORE_UNKNOWN are mutually exclusive');
+        if (!($flags & (self::FORBID_UNKNOWN | self::REMOVE_UNKNOWN | self::IGNORE_UNKNOWN))) {
+            $flags |= self::FORBID_UNKNOWN;
         }
 
-        if ($flags & OptionsResolverInterface::REMOVE_UNKNOWN) {
-            $options = $this->removeUnknownOptions($options);
-        } elseif (!($flags & OptionsResolverInterface::IGNORE_UNKNOWN)) {
+        if (!($flags & (self::FORBID_MISSING | self::IGNORE_MISSING))) {
+            $flags |= self::FORBID_MISSING;
+        }
+
+        if (($flags & self::REMOVE_UNKNOWN) && ($flags & self::IGNORE_UNKNOWN)) {
+            throw new \InvalidArgumentException('self::REMOVE_UNKNOWN and self::IGNORE_UNKNOWN are mutually exclusive');
+        }
+
+        if ($flags & self::FORBID_UNKNOWN) {
             $this->validateOptionsExistence($options);
+        } elseif ($flags & self::REMOVE_UNKNOWN) {
+            $options = array_intersect_key($options, $this->knownOptions);
         }
 
-        $this->validateOptionsCompleteness($options);
+        if  ($flags & self::FORBID_MISSING) {
+            $this->validateOptionsCompleteness($options);
+        }
 
         // Make sure this method can be called multiple times
         $combinedOptions = clone $this->defaultOptions;
@@ -243,18 +253,6 @@ class OptionsResolver implements OptionsResolverInterface
         $this->validateOptionTypes($resolvedOptions);
 
         return $resolvedOptions;
-    }
-
-    /**
-     * Remove unknown options
-     *
-     * @param array $options A list of option names as keys.
-     *
-     * @return array Options with all unknown options removed
-     */
-    private function removeUnknownOptions(array $options)
-    {
-        return array_intersect_key($options, $this->knownOptions);
     }
 
     /**

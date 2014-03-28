@@ -17,16 +17,29 @@ namespace Symfony\Component\OptionsResolver;
 interface OptionsResolverInterface
 {
     /**
-     * Remove unknown options passed to the resolve() method
-     * Is mutually exclusive with IGNORE_UNKNOWN
+     * Throw an exception if unknown options are passed to {@link resolve()}.
      */
-    const REMOVE_UNKNOWN = 1;
+    const FORBID_UNKNOWN = 1;
 
     /**
-     * Ignore unknown options passed to the resolve() method
-     * Is mutually exclusive with REMOVE_UNKNOWN
+     * Remove unknown options passed to {@link resolve()}.
      */
-    const IGNORE_UNKNOWN = 2;
+    const REMOVE_UNKNOWN = 2;
+
+    /**
+     * Ignore unknown options passed to {@link resolve()}.
+     */
+    const IGNORE_UNKNOWN = 4;
+
+    /**
+     * Throw an exception if a required option is missing in {@link resolve()}.
+     */
+    const FORBID_MISSING = 32;
+
+    /**
+     * Ignore missing required options in {@link resolve()}.
+     */
+    const IGNORE_MISSING = 64;
 
     /**
      * Sets default option values.
@@ -207,8 +220,9 @@ interface OptionsResolverInterface
     /**
      * Returns the combination of the default and the passed options.
      *
-     * @param array $options The custom option values.
-     * @param int   $flags   Can be REMOVE_UNKNOWN or IGNORE_UNKNOWN
+     * @param array   $options The custom option values.
+     * @param integer $flags   A combination of the flag constants in this
+     *                         interface.
      *
      * @return array A list of options and their values.
      *

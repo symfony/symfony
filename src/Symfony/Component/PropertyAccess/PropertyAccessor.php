@@ -116,7 +116,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      *
      * @throws UnexpectedTypeException If a value within the path is neither object nor array.
      */
-    private function &readPropertiesUntil(&$objectOrArray, PropertyPathInterface $propertyPath, $lastIndex, $throwExceptionOnNonexistantIndex = false)
+    private function &readPropertiesUntil(&$objectOrArray, PropertyPathInterface $propertyPath, $lastIndex, $throwExceptionOnInvalidIndex = false)
     {
         $propertyValues = array();
 
@@ -131,9 +131,10 @@ class PropertyAccessor implements PropertyAccessorInterface
 
             // Create missing nested arrays on demand
             if ($isIndex && $isArrayAccess && !isset($objectOrArray[$property])) {
-                if ($throwExceptionOnNonexistantIndex) {
+                if ($throwExceptionOnInvalidIndex) {
                     throw new NoSuchIndexException(sprintf('Cannot read property "%s". Available properties are "%s"', $property, print_r(array_keys($objectOrArray), true)));
                 }
+
                 $objectOrArray[$property] = $i + 1 < $propertyPath->getLength() ? array() : null;
             }
 
@@ -412,8 +413,8 @@ class PropertyAccessor implements PropertyAccessorInterface
             $addMethod = 'add'.$singular;
             $removeMethod = 'remove'.$singular;
 
-            $addMethodFound = $this->isAccessible($reflClass, $addMethod, 1);
-            $removeMethodFound = $this->isAccessible($reflClass, $removeMethod, 1);
+            $addMethodFound = $this->isMethodAccessible($reflClass, $addMethod, 1);
+            $removeMethodFound = $this->isMethodAccessible($reflClass, $removeMethod, 1);
 
             if ($addMethodFound && $removeMethodFound) {
                 return array($addMethod, $removeMethod);
@@ -442,7 +443,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      * @return Boolean Whether the method is public and has $parameters
      *                                      required parameters
      */
-    private function isAccessible(\ReflectionClass $class, $methodName, $parameters)
+    private function isMethodAccessible(\ReflectionClass $class, $methodName, $parameters)
     {
         if ($class->hasMethod($methodName)) {
             $method = $class->getMethod($methodName);

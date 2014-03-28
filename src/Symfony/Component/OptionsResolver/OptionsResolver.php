@@ -234,7 +234,7 @@ class OptionsResolver implements OptionsResolverInterface
             $options = array_intersect_key($options, $this->knownOptions);
         }
 
-        if  ($flags & self::FORBID_MISSING) {
+        if ($flags & self::FORBID_MISSING) {
             $this->validateOptionsCompleteness($options);
         }
 

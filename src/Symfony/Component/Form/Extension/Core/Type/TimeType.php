@@ -64,6 +64,7 @@ class TimeType extends AbstractType
                 // Only pass a subset of the options to children
                 $hourOptions['choices'] = $hours;
                 $hourOptions['empty_value'] = $options['empty_value']['hour'];
+                $hourOptions['preferred_choices'] = $options['preferred_choices']['hours'];
 
                 if ($options['with_minutes']) {
                     foreach ($options['minutes'] as $minute) {
@@ -72,6 +73,7 @@ class TimeType extends AbstractType
 
                     $minuteOptions['choices'] = $minutes;
                     $minuteOptions['empty_value'] = $options['empty_value']['minute'];
+                    $minuteOptions['preferred_choices'] = $options['preferred_choices']['minutes'];
                 }
 
                 if ($options['with_seconds']) {
@@ -83,6 +85,7 @@ class TimeType extends AbstractType
 
                     $secondOptions['choices'] = $seconds;
                     $secondOptions['empty_value'] = $options['empty_value']['second'];
+                    $secondOptions['preferred_choices'] = $options['preferred_choices']['seconds'];
                 }
 
                 // Append generic carry-along options
@@ -173,12 +176,30 @@ class TimeType extends AbstractType
             );
         };
 
+        $preferredChoicesNormalizer = function (Options $options, $preferredChoices) {
+            if (is_array($preferredChoices)) {
+                $default = array();
+
+                return array_merge(
+                    array('hours' => $default, 'minutes' => $default, 'seconds' => $default),
+                    $preferredChoices
+                );
+            }
+
+            return array(
+                'hours' => $default,
+                'minutes' => $default,
+                'seconds' => $default
+            );
+        };
+
         $resolver->setDefaults(array(
             'hours'          => range(0, 23),
             'minutes'        => range(0, 59),
             'seconds'        => range(0, 59),
             'widget'         => 'choice',
             'input'          => 'datetime',
+            'preferred_choices'=> array(),
             'with_minutes'   => true,
             'with_seconds'   => false,
             'model_timezone' => null,
@@ -198,6 +219,7 @@ class TimeType extends AbstractType
 
         $resolver->setNormalizers(array(
             'empty_value' => $emptyValueNormalizer,
+            'preferred_choices' => $preferredChoicesNormalizer,
         ));
 
         $resolver->setAllowedValues(array(

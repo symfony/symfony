@@ -11,6 +11,8 @@ CHANGELOG
  * [BC BREAK] added two optional parameters to FormInterface::getErrors() and
    changed the method to return a Symfony\Component\Form\FormErrorIterator
    instance instead of an array
+ * ObjectChoiceList now compares choices by their value, if a value path is
+   given
 
 2.4.0
 -----

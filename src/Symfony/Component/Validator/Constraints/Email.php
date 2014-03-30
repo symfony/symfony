@@ -26,12 +26,4 @@ class Email extends Constraint
     public $checkMX = false;
     public $checkHost = false;
     public $strict = null;
-
-    /**
-     * {@inheritDoc}
-     */
-    public function validatedBy()
-    {
-        return 'validator.email';
-    }
 }

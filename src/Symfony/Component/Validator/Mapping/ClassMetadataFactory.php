@@ -11,16 +11,16 @@
 
 namespace Symfony\Component\Validator\Mapping;
 
-use Symfony\Component\Validator\Mapping\Factory\LazyMetadataFactory;
+use Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory;
 
 /**
- * Alias of {@link LazyMetadataFactory}.
+ * Alias of {@link LazyLoadingMetadataFactory}.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
- *             Use {@link LazyMetadataFactory} instead.
+ *             Use {@link LazyLoadingMetadataFactory} instead.
  */
-class ClassMetadataFactory extends LazyMetadataFactory
+class ClassMetadataFactory extends LazyLoadingMetadataFactory
 {
 }

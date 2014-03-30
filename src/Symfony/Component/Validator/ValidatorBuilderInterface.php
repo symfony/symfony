@@ -172,21 +172,15 @@ interface ValidatorBuilderInterface
     public function setPropertyAccessor(PropertyAccessorInterface $propertyAccessor);
 
     /**
-     * Sets the API versions that the returned validator should support.
+     * Sets the API version that the returned validator should support.
      *
-     * Use a bitwise "or" to pass multiple versions:
-     *
-     *     $builder->setApiVersion(Validation::API_VERSION_2_4 | Validation::API_VERSION_2_5);
-     *
-     * The builder will try to return an implementation that supports all
-     * requested versions.
-     *
-     * @param integer $apiVersion The supported API version(s)
+     * @param integer $apiVersion The required API version
      *
      * @return ValidatorBuilderInterface The builder object
      *
      * @see Validation::API_VERSION_2_4
      * @see Validation::API_VERSION_2_5
+     * @see Validation::API_VERSION_2_5_BC
      */
     public function setApiVersion($apiVersion);
 

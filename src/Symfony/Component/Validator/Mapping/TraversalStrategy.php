@@ -50,6 +50,9 @@ class TraversalStrategy
     /**
      * Specifies that nested instances of {@link \Traversable} should never be
      * iterated. Can be combined with {@link IMPLICIT} or {@link TRAVERSE}.
+     *
+     * @deprecated This constant was added for backwards compatibility only.
+     *             It will be removed in Symfony 3.0.
      */
     const STOP_RECURSION = 8;
 

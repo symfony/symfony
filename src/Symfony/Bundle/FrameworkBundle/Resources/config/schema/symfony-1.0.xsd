@@ -9,9 +9,10 @@
 
     <xsd:simpleType name="validator_api_version">
         <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="auto" />
             <xsd:enumeration value="2.4" />
             <xsd:enumeration value="2.5" />
-            <xsd:enumeration value="2.5-api" />
+            <xsd:enumeration value="2.5-bc" />
         </xsd:restriction>
     </xsd:simpleType>
 

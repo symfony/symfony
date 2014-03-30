@@ -37,7 +37,7 @@ use Symfony\Component\Validator\Mapping\MetadataInterface;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class LazyMetadataFactory implements MetadataFactoryInterface
+class LazyLoadingMetadataFactory implements MetadataFactoryInterface
 {
     /**
      * The loader for loading the class metadata

@@ -28,7 +28,7 @@ CHANGELOG
  * deprecated `Mapping\ClassMetadataFactory`
  * added `Mapping\Factory\MetadataFactoryInterface`
  * added `Mapping\Factory\BlackHoleMetadataFactory`
- * added `Mapping\Factory\LazyMetadataFactory`
+ * added `Mapping\Factory\LazyLoadingMetadataFactory`
  * deprecated `ExecutionContextInterface`
  * deprecated `ExecutionContext`
  * deprecated `GlobalExecutionContextInterface`

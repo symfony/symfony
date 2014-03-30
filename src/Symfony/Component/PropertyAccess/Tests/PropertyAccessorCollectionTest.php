@@ -172,41 +172,7 @@ abstract class PropertyAccessorCollectionTest extends \PHPUnit_Framework_TestCas
 
     /**
      * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
-     * @expectedExceptionMessage Found the public method "addAxis()", but did not find a public "removeAxis()" on class Mock_PropertyAccessorCollectionTest_CarOnlyAdder
-     */
-    public function testSetValueFailsIfOnlyAdderFound()
-    {
-        $car = $this->getMock(__CLASS__.'_CarOnlyAdder');
-        $axesBefore = $this->getCollection(array(1 => 'second', 3 => 'fourth'));
-        $axesAfter = $this->getCollection(array(0 => 'first', 1 => 'second', 2 => 'third'));
-
-        $car->expects($this->any())
-            ->method('getAxes')
-            ->will($this->returnValue($axesBefore));
-
-        $this->propertyAccessor->setValue($car, 'axes', $axesAfter);
-    }
-
-    /**
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
-     * @expectedExceptionMessage Found the public method "removeAxis()", but did not find a public "addAxis()" on class Mock_PropertyAccessorCollectionTest_CarOnlyRemover
-     */
-    public function testSetValueFailsIfOnlyRemoverFound()
-    {
-        $car = $this->getMock(__CLASS__.'_CarOnlyRemover');
-        $axesBefore = $this->getCollection(array(1 => 'second', 3 => 'fourth'));
-        $axesAfter = $this->getCollection(array(0 => 'first', 1 => 'second', 2 => 'third'));
-
-        $car->expects($this->any())
-            ->method('getAxes')
-            ->will($this->returnValue($axesBefore));
-
-        $this->propertyAccessor->setValue($car, 'axes', $axesAfter);
-    }
-
-    /**
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
-     * @expectedExceptionMessage Neither the property "axes" nor one of the methods "addAx()", "addAxe()", "addAxis()", "setAxes()", "__set()" or "__call()" exist and have public access in class "Mock_PropertyAccessorCollectionTest_CarNoAdderAndRemover
+     * @expectedExceptionMessage Neither the property "axes" nor one of the methods "addAx()"/"removeAx()", "addAxe()"/"removeAxe()", "addAxis()"/"removeAxis()", "setAxes()", "__set()" or "__call()" exist and have public access in class "Mock_PropertyAccessorCollectionTest_CarNoAdderAndRemover
      */
     public function testSetValueFailsIfNoAdderNorRemoverFound()
     {

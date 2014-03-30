@@ -789,17 +789,6 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
         ), $clone->resolve());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testRemoveUnknownAndIgnoreUnknownAreMutuallyExclusive()
-    {
-        $this->resolver->resolve(array(
-            'one' => 'one',
-            'two' => 'two'
-        ), OptionsResolverInterface::REMOVE_UNKNOWN | OptionsResolverInterface::IGNORE_UNKNOWN);
-    }
-
     public function testRemoveUnknownOption()
     {
         $this->resolver->setDefaults(array(

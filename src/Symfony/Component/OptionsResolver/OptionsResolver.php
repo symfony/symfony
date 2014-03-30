@@ -224,10 +224,6 @@ class OptionsResolver implements OptionsResolverInterface
             $flags |= self::FORBID_MISSING;
         }
 
-        if (($flags & self::REMOVE_UNKNOWN) && ($flags & self::IGNORE_UNKNOWN)) {
-            throw new \InvalidArgumentException('self::REMOVE_UNKNOWN and self::IGNORE_UNKNOWN are mutually exclusive');
-        }
-
         if ($flags & self::FORBID_UNKNOWN) {
             $this->validateOptionsExistence($options);
         } elseif ($flags & self::REMOVE_UNKNOWN) {

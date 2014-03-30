@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\OptionsResolver\Tests;
 
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\Options;
 
@@ -175,7 +176,7 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
-    public function testResolveFailsIfNonExistingOption()
+    public function testResolveFailsIfUnknownOption()
     {
         $this->resolver->setDefaults(array(
             'one' => '1',
@@ -194,6 +195,57 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
         ));
     }
 
+    public function testResolveRemovesUnknownOptionIfFlagIsSet()
+    {
+        $this->resolver->setDefaults(array(
+            'one' => '1',
+        ));
+
+        $this->resolver->setRequired(array(
+            'two',
+        ));
+
+        $this->resolver->setOptional(array(
+            'three',
+        ));
+
+        $options = $this->resolver->resolve(array(
+            'foo' => 'bar',
+            'two' => '20',
+        ), OptionsResolverInterface::REMOVE_UNKNOWN);
+
+        $this->assertEquals(array(
+            'one' => '1',
+            'two' => '20'
+        ), $options);
+    }
+
+    public function testResolveIgnoresUnknownOptionsIfFlagIsSet()
+    {
+        $this->resolver->setDefaults(array(
+            'one' => '1',
+        ));
+
+        $this->resolver->setRequired(array(
+            'two',
+        ));
+
+        $this->resolver->setOptional(array(
+            'three',
+        ));
+
+        $options = $this->resolver->resolve(array(
+            'foo' => 'bar',
+            'two' => '20',
+        ), OptionsResolverInterface::IGNORE_UNKNOWN);
+
+        $this->assertEquals(array(
+            'one' => '1',
+            'foo' => 'bar',
+            'two' => '20',
+        ), $options);
+    }
+
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
      */
@@ -210,6 +262,25 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
         $this->resolver->resolve(array(
             'two' => '20',
         ));
+    }
+
+    public function testResolveIgnoresMissingRequiredOptionIfFlagIsSet()
+    {
+        $this->resolver->setRequired(array(
+            'one',
+        ));
+
+        $this->resolver->setDefaults(array(
+            'two' => '2',
+        ));
+
+        $options = $this->resolver->resolve(array(
+            'two' => '20',
+        ), OptionsResolverInterface::IGNORE_MISSING);
+
+        $this->assertEquals(array(
+            'two' => '20',
+        ), $options);
     }
 
     public function testResolveSucceedsIfOptionValueAllowed()
@@ -716,5 +787,42 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
             'one' => '1',
             'three' => '3',
         ), $clone->resolve());
+    }
+
+    public function testRemoveUnknownOption()
+    {
+        $this->resolver->setDefaults(array(
+            'one' => 'default',
+            'two' => 'default'
+        ));
+
+        $options = $this->resolver->resolve(array(
+            'one' => 'keep',
+            'three' => 'remove'
+        ), OptionsResolverInterface::REMOVE_UNKNOWN);
+
+        $this->assertEquals($options, array(
+            'one' => 'keep',
+            'two' => 'default'
+        ));
+    }
+
+    public function testIgnoreUnknownOption()
+    {
+        $this->resolver->setDefaults(array(
+            'one' => 'default',
+            'two' => 'default'
+        ));
+
+        $options = $this->resolver->resolve(array(
+            'one' => 'keep',
+            'three' => 'ignored'
+        ), OptionsResolverInterface::IGNORE_UNKNOWN);
+
+        $this->assertEquals($options, array(
+            'one' => 'keep',
+            'two' => 'default',
+            'three' => 'ignored'
+        ));
     }
 }

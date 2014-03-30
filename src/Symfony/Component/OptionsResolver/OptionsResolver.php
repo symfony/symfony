@@ -214,10 +214,25 @@ class OptionsResolver implements OptionsResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function resolve(array $options = array())
+    public function resolve(array $options = array(), $flags = 0)
     {
-        $this->validateOptionsExistence($options);
-        $this->validateOptionsCompleteness($options);
+        if (!($flags & (self::FORBID_UNKNOWN | self::REMOVE_UNKNOWN | self::IGNORE_UNKNOWN))) {
+            $flags |= self::FORBID_UNKNOWN;
+        }
+
+        if (!($flags & (self::FORBID_MISSING | self::IGNORE_MISSING))) {
+            $flags |= self::FORBID_MISSING;
+        }
+
+        if ($flags & self::FORBID_UNKNOWN) {
+            $this->validateOptionsExistence($options);
+        } elseif ($flags & self::REMOVE_UNKNOWN) {
+            $options = array_intersect_key($options, $this->knownOptions);
+        }
+
+        if ($flags & self::FORBID_MISSING) {
+            $this->validateOptionsCompleteness($options);
+        }
 
         // Make sure this method can be called multiple times
         $combinedOptions = clone $this->defaultOptions;
@@ -240,7 +255,7 @@ class OptionsResolver implements OptionsResolverInterface
      * Validates that the given option names exist and throws an exception
      * otherwise.
      *
-     * @param array $options An list of option names as keys.
+     * @param array $options A list of option names as keys.
      *
      * @throws InvalidOptionsException If any of the options has not been defined.
      */
@@ -264,7 +279,7 @@ class OptionsResolver implements OptionsResolverInterface
      * Validates that all required options are given and throws an exception
      * otherwise.
      *
-     * @param array $options An list of option names as keys.
+     * @param array $options A list of option names as keys.
      *
      * @throws MissingOptionsException If a required option is missing.
      */

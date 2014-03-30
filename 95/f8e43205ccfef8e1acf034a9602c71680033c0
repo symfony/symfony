@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by egulias at 2014-03-29T12:01:02Z
+
+Tests failure is due to
+ ```
+Symfony\Component\Process\Tests\SigchildDisabledProcessTest::testMustRun
+```
+See [here](https://travis-ci.org/symfony/symfony/jobs/21821298#L582)

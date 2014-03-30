@@ -18,6 +18,7 @@
         <parameter key="validator.mapping.loader.xml_files_loader.mapping_files" type="collection" />
         <parameter key="validator.mapping.loader.yaml_files_loader.mapping_files" type="collection" />
         <parameter key="validator.expression.class">Symfony\Component\Validator\Constraints\ExpressionValidator</parameter>
+        <parameter key="validator.email.class">Symfony\Component\Validator\Constraints\EmailValidator</parameter>
     </parameters>
 
     <services>
@@ -68,6 +69,11 @@
         <service id="validator.expression" class="%validator.expression.class%">
             <argument type="service" id="property_accessor" />
             <tag name="validator.constraint_validator" alias="validator.expression" />
+        </service>
+
+        <service id="validator.email" class="%validator.email.class%">
+            <argument></argument>
+            <tag name="validator.constraint_validator" alias="validator.email" />
         </service>
     </services>
 </container>

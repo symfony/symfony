@@ -87,6 +87,21 @@ abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
         return $this->getDescriptionTestData(ObjectsProvider::getContainerAliases());
     }
 
+    /** @dataProvider getDescribeContainerParameterTestData */
+    public function testDescribeContainerParameter($parameter, $expectedDescription, array $options)
+    {
+        $this->assertDescription($expectedDescription, $parameter, $options);
+    }
+
+    public function getDescribeContainerParameterTestData()
+    {
+        $data = $this->getDescriptionTestData(ObjectsProvider::getContainerParameter());
+
+        array_push($data[0], array('parameter' => 'database_name'));
+
+        return $data;
+    }
+
     abstract protected function getDescriptor();
     abstract protected function getFormat();
 

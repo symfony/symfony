@@ -55,7 +55,7 @@ class TemplateFinder implements TemplateFinderInterface
 
         $templates = array();
 
-        foreach ($this->kernel->getBundles() as $name => $bundle) {
+        foreach ($this->kernel->getBundles() as $bundle) {
             $templates = array_merge($templates, $this->findTemplatesInBundle($bundle));
         }
 

@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+2.5.0
+-----
+
+ * Added `translation:debug` command
+ * Added `config:debug` command
+ * Added `yaml:lint` command
+ * Deprecated the `RouterApacheDumperCommand` which will be removed in Symfony 3.0.
+
 2.4.0
 -----
 

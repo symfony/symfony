@@ -207,6 +207,14 @@ class MarkdownDescriptor extends Descriptor
         $this->write(isset($options['id']) ? sprintf("%s\n%s\n\n%s\n", $options['id'], str_repeat('~', strlen($options['id'])), $output) : $output);
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    protected function describeContainerParameter($parameter, array $options = array())
+    {
+        $this->write(isset($options['parameter']) ? sprintf("%s\n%s\n\n%s", $options['parameter'], str_repeat('=', strlen($options['parameter'])), $this->formatParameter($parameter)): $parameter);
+    }
+
     private function formatRouterConfig(array $array)
     {
         if (!count($array)) {

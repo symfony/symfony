@@ -27,13 +27,16 @@ class GetterMetadata extends MemberMetadata
     {
         $getMethod = 'get'.ucfirst($property);
         $isMethod = 'is'.ucfirst($property);
+        $hasMethod = 'has'.ucfirst($property);
 
         if (method_exists($class, $getMethod)) {
             $method = $getMethod;
         } elseif (method_exists($class, $isMethod)) {
             $method = $isMethod;
+        } elseif (method_exists($class, $hasMethod)) {
+            $method = $hasMethod;
         } else {
-            throw new ValidatorException(sprintf('Neither method %s nor %s exists in class %s', $getMethod, $isMethod, $class));
+            throw new ValidatorException(sprintf('Neither of these methods exist in class %s: %s, %s, %s', $class, $getMethod, $isMethod, $hasMethod));
         }
 
         parent::__construct($class, $method, $property);

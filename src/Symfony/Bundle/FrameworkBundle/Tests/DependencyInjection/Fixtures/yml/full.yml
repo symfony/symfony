@@ -55,3 +55,7 @@ framework:
         debug:   true
         file_cache_dir: %kernel.cache_dir%/annotations
     ide: file%%link%%format
+    request:
+        formats:
+            csv: ['text/csv', 'text/plain']
+            pdf: 'application/pdf'

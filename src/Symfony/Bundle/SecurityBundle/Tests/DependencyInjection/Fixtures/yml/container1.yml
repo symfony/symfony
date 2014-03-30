@@ -56,6 +56,7 @@ security:
         host:
             pattern: /test
             host: foo\.example\.org
+            methods: [GET,POST]
             anonymous: true
             http_basic: true
 

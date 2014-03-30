@@ -91,6 +91,10 @@ class FrameworkExtension extends Extension
             $this->registerSessionConfiguration($config['session'], $container, $loader);
         }
 
+        if (isset($config['request'])) {
+            $this->registerRequestConfiguration($config['request'], $container, $loader);
+        }
+
         $loader->load('security.xml');
 
         if ($this->isConfigEnabled($container, $config['form'])) {
@@ -383,6 +387,24 @@ class FrameworkExtension extends Extension
     }
 
     /**
+     * Loads the request configuration.
+     *
+     * @param array            $config    A session configuration array
+     * @param ContainerBuilder $container A ContainerBuilder instance
+     * @param XmlFileLoader    $loader    An XmlFileLoader instance
+     */
+    private function registerRequestConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    {
+        if ($config['formats']) {
+            $loader->load('request.xml');
+            $container
+                ->getDefinition('request.add_request_formats_listener')
+                ->replaceArgument(0, $config['formats'])
+            ;
+        }
+    }
+
+    /**
      * Loads the templating configuration.
      *
      * @param array            $config    A templating configuration array
@@ -655,6 +677,9 @@ class FrameworkExtension extends Extension
         $container->setParameter('validator.translation_domain', $config['translation_domain']);
         $container->setParameter('validator.mapping.loader.xml_files_loader.mapping_files', $this->getValidatorXmlMappingFiles($container));
         $container->setParameter('validator.mapping.loader.yaml_files_loader.mapping_files', $this->getValidatorYamlMappingFiles($container));
+
+        $definition = $container->findDefinition('validator.email');
+        $definition->replaceArgument(0, $config['strict_email']);
 
         if (array_key_exists('enable_annotations', $config) && $config['enable_annotations']) {
             $loaderChain = $container->getDefinition('validator.mapping.loader.loader_chain');

@@ -56,6 +56,22 @@ class Entity extends EntityParent implements EntityInterface
         return $this->lastName;
     }
 
+    /**
+     * @Assert\True
+     */
+    public function isValid()
+    {
+        return 'valid';
+    }
+
+    /**
+     * @Assert\True
+     */
+    public function hasPermissions()
+    {
+        return 'permissions';
+    }
+
     public function getData()
     {
         return 'Overridden data';

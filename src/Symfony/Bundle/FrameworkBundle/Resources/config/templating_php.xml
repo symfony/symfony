@@ -67,12 +67,12 @@
 
         <service id="templating.helper.request" class="%templating.helper.request.class%">
             <tag name="templating.helper" alias="request" />
-            <argument type="service" id="request" strict="false" />
+            <argument type="service" id="request_stack" />
         </service>
 
         <service id="templating.helper.session" class="%templating.helper.session.class%">
             <tag name="templating.helper" alias="session" />
-            <argument type="service" id="request" strict="false" />
+            <argument type="service" id="request_stack" />
         </service>
 
         <service id="templating.helper.router" class="%templating.helper.router.class%">

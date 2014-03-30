@@ -673,6 +673,10 @@ class Form implements \IteratorAggregate, FormInterface
     public function addError(FormError $error)
     {
         if ($this->parent && $this->config->getErrorBubbling()) {
+            if (null === $error->getOrigin()) {
+                $error->setOrigin($this);
+            }
+
             $this->parent->addError($error);
         } else {
             $this->errors[] = $error;
@@ -774,9 +778,35 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * {@inheritdoc}
      */
-    public function getErrors()
+    public function getErrors($deep = false, $flatten = true)
     {
-        return $this->errors;
+        $errors = $this->errors;
+
+        // Copy the errors of nested forms to the $errors array
+        if ($deep) {
+            foreach ($this as $child) {
+                /** @var FormInterface $child */
+                if ($child->isSubmitted() && $child->isValid()) {
+                    continue;
+                }
+
+                $iterator = $child->getErrors(true, $flatten);
+
+                if (0 === count($iterator)) {
+                    continue;
+                }
+
+                if ($flatten) {
+                    foreach ($iterator as $error) {
+                        $errors[] = $error;
+                    }
+                } else {
+                    $errors[] = $iterator;
+                }
+            }
+        }
+
+        return new FormErrorIterator($this, $errors);
     }
 
     /**
@@ -787,24 +817,13 @@ class Form implements \IteratorAggregate, FormInterface
      * @param integer $level The indentation level (used internally)
      *
      * @return string A string representation of all errors
+     *
+     * @deprecated Deprecated since version 2.5, to be removed in 3.0. Use
+     *             {@link getErrors()} instead and cast the result to a string.
      */
     public function getErrorsAsString($level = 0)
     {
-        $errors = '';
-        foreach ($this->errors as $error) {
-            $errors .= str_repeat(' ', $level).'ERROR: '.$error->getMessage()."\n";
-        }
-
-        foreach ($this->children as $key => $child) {
-            $errors .= str_repeat(' ', $level).$key.":\n";
-            if ($child instanceof self && $err = $child->getErrorsAsString($level + 4)) {
-                $errors .= $err;
-            } else {
-                $errors .= str_repeat(' ', $level + 4)."No errors\n";
-            }
-        }
-
-        return $errors;
+        return self::indent((string) $this->getErrors(true, false), $level);
     }
 
     /**
@@ -899,7 +918,9 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         if (isset($this->children[$name])) {
-            $this->children[$name]->setParent(null);
+            if (!$this->children[$name]->isSubmitted()) {
+                $this->children[$name]->setParent(null);
+            }
 
             unset($this->children[$name]);
         }
@@ -1108,5 +1129,20 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         return $value;
+    }
+
+    /**
+     * Utility function for indenting multi-line strings.
+     *
+     * @param string  $string The string
+     * @param integer $level  The number of spaces to use for indentation
+     *
+     * @return string The indented string
+     */
+    private static function indent($string, $level)
+    {
+        $indentation = str_repeat(' ', $level);
+
+        return rtrim($indentation.str_replace("\n", "\n".$indentation, $string), ' ');
     }
 }

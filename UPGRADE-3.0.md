@@ -18,6 +18,77 @@ UPGRADE FROM 2.x to 3.0
    `DebugClassLoader`. The difference is that the constructor now takes a
    loader to wrap.
 
+### Console
+
+ * The methods `isQuiet`, `isVerbose`, `isVeryVerbose` and `isDebug` were added
+   to `Symfony\Component\Console\Output\OutputInterface`.
+
+ * `ProgressHelper` has been removed in favor of `ProgressBar`.
+
+   Before:
+
+   ```
+   $h = new ProgressHelper();
+   $h->start($output, 10);
+   for ($i = 1; $i < 5; $i++) {
+       usleep(200000);
+       $h->advance();
+   }
+   $h->finish();
+   ```
+
+   After:
+
+   ```
+   $bar = new ProgressBar($output, 10);
+   $bar->start();
+   for ($i = 1; $i < 5; $i++) {
+       usleep(200000);
+       $bar->advance();
+   }
+   ```
+
+ * `TableHelper` has been removed in favor of `Table`.
+
+   Before:
+
+   ```
+   $table = $app->getHelperSet()->get('table');
+   $table
+       ->setHeaders(array('ISBN', 'Title', 'Author'))
+       ->setRows(array(
+           array('99921-58-10-7', 'Divine Comedy', 'Dante Alighieri'),
+           array('9971-5-0210-0', 'A Tale of Two Cities', 'Charles Dickens'),
+           array('960-425-059-0', 'The Lord of the Rings', 'J. R. R. Tolkien'),
+           array('80-902734-1-6', 'And Then There Were None', 'Agatha Christie'),
+       ))
+   ;
+   $table->render($output);
+   ```
+
+   After:
+
+   ```
+   use Symfony\Component\Console\Helper\Table;
+
+   $table = new Table($output);
+   $table
+       ->setHeaders(array('ISBN', 'Title', 'Author'))
+       ->setRows(array(
+           array('99921-58-10-7', 'Divine Comedy', 'Dante Alighieri'),
+           array('9971-5-0210-0', 'A Tale of Two Cities', 'Charles Dickens'),
+           array('960-425-059-0', 'The Lord of the Rings', 'J. R. R. Tolkien'),
+           array('80-902734-1-6', 'And Then There Were None', 'Agatha Christie'),
+       ))
+   ;
+   $table->render();
+   ```
+
+### EventDispatcher
+
+ * The interface `Symfony\Component\EventDispatcher\Debug\TraceableEventDispatcherInterface`
+   extends `Symfony\Component\EventDispatcher\EventDispatcherInterface`.
+
 ### Form
 
  * The methods `Form::bind()` and `Form::isBound()` were removed. You should
@@ -175,6 +246,22 @@ UPGRADE FROM 2.x to 3.0
  * The options "csrf_provider" and "intention" were renamed to "csrf_token_generator"
    and "csrf_token_id".
 
+ * The method `Form::getErrorsAsString()` was removed. Use `Form::getErrors()`
+   instead with the argument `$deep` set to true and `$flatten` set to false
+   and cast the returned iterator to a string (if not done implicitly by PHP).
+
+   Before:
+
+   ```
+   echo $form->getErrorsAsString();
+   ```
+
+   After:
+
+   ```
+   echo $form->getErrors(true, false);
+   ```
+
 
 ### FrameworkBundle
 
@@ -212,6 +299,9 @@ UPGRADE FROM 2.x to 3.0
        }
    }
    ```
+
+ * The `request` service was removed. You must inject the `request_stack`
+   service instead.
 
  * The `enctype` method of the `form` helper was removed. You should use the
    new method `start` instead.
@@ -263,6 +353,8 @@ UPGRADE FROM 2.x to 3.0
    <?php echo $view['form']->end($form) ?>
    ```
 
+ * The `RouterApacheDumperCommand` was removed.
+
 ### HttpKernel
 
  * The `Symfony\Component\HttpKernel\Log\LoggerInterface` has been removed in
@@ -291,6 +383,9 @@ UPGRADE FROM 2.x to 3.0
 
  * The `Symfony\Component\HttpKernel\EventListener\ExceptionListener` now
    passes the Request format as the `_format` argument instead of `format`.
+
+ * The `Symfony\Component\HttpKernel\DependencyInjection\RegisterListenersPass` has been renamed to
+   `Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass` and moved to the EventDispatcher component.
 
 ### Locale
 
@@ -370,6 +465,10 @@ UPGRADE FROM 2.x to 3.0
    $route->setSchemes('https');
    ```
 
+ * The `ApacheMatcherDumper` and `ApacheUrlMatcher` were removed since
+   the performance gains were minimal and it's hard to replicate the behaviour
+   of PHP implementation.
+
 ### Security
 
  * The `Resources/` directory was moved to `Core/Resources/`
@@ -434,6 +533,29 @@ UPGRADE FROM 2.x to 3.0
    ```
 
 ### Validator
+
+ * The class `Symfony\Component\Validator\Mapping\Cache\ApcCache` has been removed in favor
+   of `Symfony\Component\Validator\Mapping\Cache\DoctrineCache`.
+
+   Before:
+
+   ```
+   use Symfony\Component\Validator\Mapping\Cache\ApcCache;
+
+   $cache = new ApcCache('symfony.validator');
+   ```
+
+   After:
+
+   ```
+   use Symfony\Component\Validator\Mapping\Cache\DoctrineCache;
+   use Doctrine\Common\Cache\ApcCache;
+
+   $apcCache = new ApcCache();
+   $apcCache->setNamespace('symfony.validator');
+
+   $cache = new DoctrineCache($apcCache);
+   ```
 
  * The constraints `Optional` and `Required` were moved to the
    `Symfony\Component\Validator\Constraints\` namespace. You should adapt

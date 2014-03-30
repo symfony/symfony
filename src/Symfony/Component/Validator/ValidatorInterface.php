@@ -29,6 +29,10 @@ interface ValidatorInterface
      * The accepted values depend on the {@link MetadataFactoryInterface}
      * implementation.
      *
+     * The signature changed with Symfony 2.5 (see
+     * {@link Validator\ValidatorInterface::validate()}. This signature will be
+     * disabled in Symfony 3.0.
+     *
      * @param mixed      $value    The value to validate
      * @param array|null $groups   The validation groups to validate.
      * @param Boolean    $traverse Whether to traverse the value if it is traversable.
@@ -38,10 +42,6 @@ interface ValidatorInterface
      *                                          list is empty, validation succeeded.
      *
      * @api
-     *
-     * @deprecated The signature changed with Symfony 2.5 (see
-     *             {@link Validator\ValidatorInterface::validate()}. This
-     *             signature will be disabled in Symfony 3.0.
      */
     public function validate($value, $groups = null, $traverse = false, $deep = false);
 

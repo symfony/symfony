@@ -313,10 +313,15 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testMustRun()
     {
-        $process = $this->getProcess('echo "foo"');
+        $process = $this->getProcess('echo foo');
 
         $this->assertSame($process, $process->mustRun());
-        $this->assertEquals("foo\n", $process->getOutput());
+        $this->assertEquals("foo".PHP_EOL, $process->getOutput());
+    }
+
+    public function testSuccessfulMustRunHasCorrectExitCode()
+    {
+        $process = $this->getProcess('echo foo')->mustRun();
         $this->assertEquals(0, $process->getExitCode());
     }
 
@@ -612,7 +617,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
      */
     public function testIdleTimeout()
     {
-        $process = $this->getProcess('sleep 3');
+        $process = $this->getProcess('php -r "sleep(3);"');
         $process->setTimeout(10);
         $process->setIdleTimeout(0.5);
 
@@ -632,7 +637,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
      */
     public function testIdleTimeoutNotExceededWhenOutputIsSent()
     {
-        $process = $this->getProcess('echo "foo" && sleep 1 && echo "foo" && sleep 1 && echo "foo" && sleep 1');
+        $process = $this->getProcess('php -r "echo \'foo\'; sleep(1); echo \'foo\'; sleep(1); echo \'foo\'; sleep(1); "');
         $process->setTimeout(2);
         $process->setIdleTimeout(1.5);
 

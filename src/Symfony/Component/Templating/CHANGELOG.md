@@ -1,10 +1,11 @@
 CHANGELOG
 =========
 
-2.2.0
+2.5.0
 -----
 
- * added ability to set a specific version of the asset
+ * added ability to generate versioned URLs
+ * added ability to generate absolute URLs
 
 2.1.0
 -----

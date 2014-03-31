@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-use Symfony\Component\Validator\ExecutionContext;
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\CallbackValidator;
+use Symfony\Component\Validator\ExecutionContext;
 
 class CallbackValidatorTest_Class
 {
@@ -128,6 +129,23 @@ class CallbackValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->validate($object, $constraint);
     }
 
+    public function testClosureNullObject()
+    {
+        $constraint = new Callback(function ($object, ExecutionContext $context) {
+            $context->addViolation('My message', array('{{ value }}' => 'foobar'), 'invalidValue');
+
+            return false;
+        });
+
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('My message', array(
+                '{{ value }}' => 'foobar',
+            ));
+
+        $this->validator->validate(null, $constraint);
+    }
+
     public function testClosureExplicitName()
     {
         $object = new CallbackValidatorTest_Object();
@@ -160,6 +178,19 @@ class CallbackValidatorTest extends \PHPUnit_Framework_TestCase
             ));
 
         $this->validator->validate($object, $constraint);
+    }
+
+    public function testArrayCallableNullObject()
+    {
+        $constraint = new Callback(array(__CLASS__.'_Class', 'validateCallback'));
+
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('Callback message', array(
+                '{{ value }}' => 'foobar',
+            ));
+
+        $this->validator->validate(null, $constraint);
     }
 
     public function testArrayCallableExplicitName()
@@ -320,8 +351,9 @@ class CallbackValidatorTest extends \PHPUnit_Framework_TestCase
     public function testConstraintGetTargets()
     {
         $constraint = new Callback(array('foo'));
+        $targets = array(Constraint::CLASS_CONSTRAINT, Constraint::PROPERTY_CONSTRAINT);
 
-        $this->assertEquals('class', $constraint->getTargets());
+        $this->assertEquals($targets, $constraint->getTargets());
     }
 
     // Should succeed. Needed when defining constraints as annotations.

@@ -36,7 +36,7 @@
         "symfony/intl": "",
         "symfony/yaml": "",
         "symfony/config": "",
-        "egulias/email-validator": "Strict (RFC compliant) email validation"
+        "egulias/email-validator": "Strict (RFC compliant) email validation",
         "symfony/property-access": "For using the 2.4 Validator API"
     },
     "autoload": {

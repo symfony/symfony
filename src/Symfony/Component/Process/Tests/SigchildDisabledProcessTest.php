@@ -51,11 +51,11 @@ class SigchildDisabledProcessTest extends AbstractProcessTest
 
     /**
      * @expectedException \Symfony\Component\Process\Exception\RuntimeException
-     * @expectedExceptionMessage his PHP has been compiled with --enable-sigchild. Term signal can not be retrieved.
+     * @expectedExceptionMessage This PHP has been compiled with --enable-sigchild. You must use setEnhanceSigchildCompatibility() to use this method.
      */
-    public function testMustRun()
+    public function testSuccessfulMustRunHasCorrectExitCode()
     {
-        parent::testMustRun();
+        parent::testSuccessfulMustRunHasCorrectExitCode();
     }
 
     /**

@@ -14,6 +14,7 @@ CHANGELOG
  * errors mapped to unsubmitted forms are discarded now
  * ObjectChoiceList now compares choices by their value, if a value path is
    given
+ * you can now pass interface names in the "data_class" option
 
 2.4.0
 -----

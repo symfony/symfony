@@ -146,6 +146,37 @@ class FormTypeTest extends BaseTypeTest
         $this->assertSame(10, $view->vars['attr']['maxlength']);
     }
 
+    public function testDataClassMayBeNull()
+    {
+        $this->factory->createBuilder('form', null, array(
+            'data_class' => null,
+        ));
+    }
+
+    public function testDataClassMayBeAbstractClass()
+    {
+        $this->factory->createBuilder('form', null, array(
+            'data_class' => 'Symfony\Component\Form\Tests\Fixtures\AbstractAuthor',
+        ));
+    }
+
+    public function testDataClassMayBeInterface()
+    {
+        $this->factory->createBuilder('form', null, array(
+            'data_class' => 'Symfony\Component\Form\Tests\Fixtures\AuthorInterface',
+        ));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\InvalidArgumentException
+     */
+    public function testDataClassMustBeValidClassOrInterface()
+    {
+        $this->factory->createBuilder('form', null, array(
+            'data_class' => 'foobar',
+        ));
+    }
+
     public function testSubmitWithEmptyDataCreatesObjectIfClassAvailable()
     {
         $builder = $this->factory->createBuilder('form', null, array(

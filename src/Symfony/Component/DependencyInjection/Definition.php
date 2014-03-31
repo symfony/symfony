@@ -104,22 +104,32 @@ class Definition
     /**
      * Sets the service that this service is decorating.
      *
-     * @param string $id        The decorated service id
-     * @param string $renamedId The new decorated service id
+     * @param null|string $id        The decorated service id, use null to remove decoration
+     * @param null|string $renamedId The new decorated service id
+     *
+     * @return Definition The current instance
+     *
+     * @throws InvalidArgumentException In case the decorated service id and the new decorated service id are equals.
      */
     public function setDecoratedService($id, $renamedId = null)
     {
         if ($renamedId && $id == $renamedId) {
-            throw new \LogicException(sprintf('The decorated service parent name for "%s" must be different than the service name itself.', $id));
+            throw new \InvalidArgumentException(sprintf('The decorated service inner name for "%s" must be different than the service name itself.', $id));
         }
 
-        $this->decoratedService = array($id, $renamedId);
+        if (null === $id) {
+            $this->decoratedService = null;
+        } else {
+            $this->decoratedService = array($id, $renamedId);
+        }
+
+        return $this;
     }
 
     /**
      * Gets the service that decorates this service.
      *
-     * @return array An array composed of the decorated service id and the new id for it
+     * @return null|array An array composed of the decorated service id and the new id for it, null if no service is decorated
      */
     public function getDecoratedService()
     {

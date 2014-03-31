@@ -79,5 +79,14 @@ services:
     configured_service:
         class: stdClass
         configurator: ['@configurator_service', configureStdClass]
+    decorated:
+        class: stdClass
+    decorator_service:
+        class: stdClass
+        decorates: decorated
+    decorator_service_with_name:
+        class: stdClass
+        decorates: decorated
+        decoration-inner-name: decorated.pif-pouf
     alias_for_foo: @foo
     alias_for_alias: @foo

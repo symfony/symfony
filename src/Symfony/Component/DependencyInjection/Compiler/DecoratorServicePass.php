@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Alias;
 
@@ -29,26 +28,27 @@ class DecoratorServicePass implements CompilerPassInterface
             if (!$decorated = $definition->getDecoratedService()) {
                 continue;
             }
+            $definition->setDecoratedService(null);
 
-            list ($decorated, $renamedId) = $decorated;
+            list ($inner, $renamedId) = $decorated;
             if (!$renamedId) {
                 $renamedId = $id.'.inner';
             }
 
             // we create a new alias/service for the service we are replacing
             // to be able to reference it in the new one
-            if ($container->hasAlias($decorated)) {
-                $alias = $container->getAlias($decorated);
+            if ($container->hasAlias($inner)) {
+                $alias = $container->getAlias($inner);
                 $public = $alias->isPublic();
                 $container->setAlias($renamedId, new Alias((string) $alias, false));
             } else {
-                $definition = $container->getDefinition($decorated);
+                $definition = $container->getDefinition($inner);
                 $public = $definition->isPublic();
                 $definition->setPublic(false);
                 $container->setDefinition($renamedId, $definition);
             }
 
-            $container->setAlias($decorated, new Alias($id, $public));
+            $container->setAlias($inner, new Alias($id, $public));
         }
     }
 }

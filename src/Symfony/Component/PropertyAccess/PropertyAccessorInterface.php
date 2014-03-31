@@ -44,7 +44,7 @@ interface PropertyAccessorInterface
      * @param mixed                        $value         The value to set at the end of the property path
      *
      * @throws Exception\InvalidArgumentException If the property path is invalid
-     * @throws Exception\NoSuchPropertyException  If a property does not exist or is not public.
+     * @throws Exception\AccessException          If a property/index does not exist or is not public
      * @throws Exception\UnexpectedTypeException  If a value within the path is neither object
      *                                            nor array
      */
@@ -77,7 +77,9 @@ interface PropertyAccessorInterface
      * @return mixed The value at the end of the property path
      *
      * @throws Exception\InvalidArgumentException If the property path is invalid
-     * @throws Exception\NoSuchPropertyException  If a property does not exist or is not public.
+     * @throws Exception\AccessException          If a property/index does not exist or is not public
+     * @throws Exception\UnexpectedTypeException  If a value within the path is neither object
+     *                                            nor array
      */
     public function getValue($objectOrArray, $propertyPath);
 

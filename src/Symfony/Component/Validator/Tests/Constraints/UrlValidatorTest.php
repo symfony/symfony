@@ -114,6 +114,8 @@ class UrlValidatorTest extends \PHPUnit_Framework_TestCase
             array('http://xn--espaa-rta.xn--ca-ol-fsay5a/'),
             array('http://xn--d1abbgf6aiiy.xn--p1ai/'),
             array('http://☎.com/'),
+            array('http://url_with.undescore.com/'),
+            array('http://url~with.tilde.com/'),
         );
     }
 
@@ -142,7 +144,6 @@ class UrlValidatorTest extends \PHPUnit_Framework_TestCase
             array('://google.com'),
             array('http ://google.com'),
             array('http:/google.com'),
-            array('http://goog_le.com'),
             array('http://google.com::aa'),
             array('http://google.com:aa'),
             array('http://symfony.com?'),

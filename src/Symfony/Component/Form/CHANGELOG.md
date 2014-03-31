@@ -12,6 +12,8 @@ CHANGELOG
    changed the method to return a Symfony\Component\Form\FormErrorIterator
    instance instead of an array
  * errors mapped to unsubmitted forms are discarded now
+ * ObjectChoiceList now compares choices by their value, if a value path is
+   given
 
 2.4.0
 -----

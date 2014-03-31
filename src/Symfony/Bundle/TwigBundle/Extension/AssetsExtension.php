@@ -48,15 +48,16 @@ class AssetsExtension extends \Twig_Extension
      *
      * Absolute paths (i.e. http://...) are returned unmodified.
      *
-     * @param string  $path        A public path
-     * @param string  $packageName The name of the asset package to use
-     * @param Boolean $absolute    Whether to return an absolute URL or a relative one
+     * @param string              $path        A public path
+     * @param string              $packageName The name of the asset package to use
+     * @param Boolean             $absolute    Whether to return an absolute URL or a relative one
+     * @param string|Boolean|null $version     A specific version
      *
      * @return string A public path which takes into account the base path and URL path
      */
-    public function getAssetUrl($path, $packageName = null, $absolute = false)
+    public function getAssetUrl($path, $packageName = null, $absolute = false, $version = null)
     {
-        $url = $this->container->get('templating.helper.assets')->getUrl($path, $packageName);
+        $url = $this->container->get('templating.helper.assets')->getUrl($path, $packageName, $version);
 
         if (!$absolute) {
             return $url;

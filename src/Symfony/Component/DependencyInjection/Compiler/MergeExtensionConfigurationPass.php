@@ -49,6 +49,9 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
 
             $extension->load($config, $tmpContainer);
 
+            // ensure, that all next extensions use overrided parameters
+            $tmpContainer->getParameterBag()->add($parameters);
+
             $container->merge($tmpContainer);
         }
 

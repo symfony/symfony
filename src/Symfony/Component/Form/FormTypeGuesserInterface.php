@@ -43,6 +43,8 @@ interface FormTypeGuesserInterface
      * @param string $property The name of the property to guess for
      *
      * @return Guess\ValueGuess|null A guess for the field's maximum length
+     *
+     * @deprecated since 2.5, to be removed in 3.0. Use guessAttributes() instead.
      */
     public function guessMaxLength($class, $property);
 
@@ -59,6 +61,19 @@ interface FormTypeGuesserInterface
      * @param string $property The name of the property to guess for
      *
      * @return Guess\ValueGuess|null A guess for the field's required pattern
+     *
+     * @deprecated since 2.5, to be removed in 3.0. Use guessAttributes() instead.
      */
     public function guessPattern($class, $property);
+
+    /**
+     * Returns an array of guessed attributes
+     *
+     * @param string                    $class    The fully qualified class name
+     * @param string                    $property The name of the property to guess for
+     * @param ResolvedFormTypeInterface $type     Field's type
+     *
+     * @return Guess\ValueGuess[] An array of guesses for the field's attributes
+     */
+    public function guessAttributes($class, $property);
 }

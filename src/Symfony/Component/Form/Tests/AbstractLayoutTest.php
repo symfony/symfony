@@ -1334,6 +1334,21 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         );
     }
 
+    public function testIntegerWithMinAndMax()
+    {
+        $form = $this->factory->createNamed('name', 'integer', 123, array('attr' => array('min' => -276, 'max' => 100)));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/input
+    [@type="number"]
+    [@name="name"]
+    [@value="123"]
+    [@min="-276"]
+    [@max="100"]
+'
+        );
+    }
+
     public function testLanguage()
     {
         $form = $this->factory->createNamed('name', 'language', 'de');
@@ -1906,7 +1921,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         $html = $this->renderWidget($form->createView());
 
         // compare plain HTML to check the whitespace
-        $this->assertSame('<input type="text" id="text" name="text" readonly="readonly" disabled="disabled" required="required" maxlength="10" pattern="\d+" class="foobar" data-foo="bar" value="value" />', $html);
+        $this->assertSame('<input type="text" id="text" name="text" readonly="readonly" disabled="disabled" required="required" pattern="\d+" maxlength="10" class="foobar" data-foo="bar" value="value" />', $html);
     }
 
     public function testWidgetAttributeNameRepeatedIfTrue()

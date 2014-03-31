@@ -12,9 +12,8 @@
 namespace Symfony\Component\Form\Tests\Extension\Validator;
 
 use Symfony\Component\Form\Extension\Validator\ValidatorTypeGuesser;
-use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Validator\Constraints\Length;
-use Symfony\Component\Validator\Constraints\Type;
+use Symfony\Component\Validator\Constraints\Range;
 
 /**
 * @author franek <franek@chicour.net>
@@ -29,49 +28,95 @@ class ValidatorTypeGuesserTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('The "Validator" component is not available');
         }
 
-        $metadataFactory = $this->getMock('Symfony\Component\Validator\MetadataFactoryInterface');
+        $this->metadataFactory = $this->getMock('Symfony\Component\Validator\MetadataFactoryInterface');
 
-        $this->typeGuesser = new ValidatorTypeGuesser($metadataFactory);
+        $this->typeGuesser = new ValidatorTypeGuesser($this->metadataFactory);
     }
 
-    public function testGuessMaxLengthForConstraintWithMaxValue()
+    public function testGuessOptionsForConstraintWithMaxLength()
     {
-        $constraint = new Length(array('max' => '2'));
+        $class = new \stdClass();
 
-        $result = $this->typeGuesser->guessMaxLengthForConstraint($constraint);
-        $this->assertInstanceOf('Symfony\Component\Form\Guess\ValueGuess', $result);
-        $this->assertEquals(2, $result->getValue());
-        $this->assertEquals(Guess::HIGH_CONFIDENCE, $result->getConfidence());
+        $this->setupMetadata($class, 'foo', array(new Length(array('max' => '2'))));
+
+        $result = $this->typeGuesser->guessAttributes($class, 'foo');
+
+        $this->assertArrayHasKey('maxlength', $result);
+        $this->assertEquals(2, $result['maxlength']->getValue());
+        $this->assertFalse(isset($result['min']));
     }
 
-    public function testGuessMaxLengthForConstraintWithMinValue()
+    public function testGuessOptionsForConstraintWithMinLength()
     {
-        $constraint = new Length(array('min' => '2'));
+        $class = new \stdClass();
 
-        $result = $this->typeGuesser->guessMaxLengthForConstraint($constraint);
-        $this->assertNull($result);
+        $this->setupMetadata($class, 'foo', array(new Length(array('min' => '2'))));
+
+        $result = $this->typeGuesser->guessAttributes($class, 'foo');
+
+        $this->assertFalse(isset($result['maxlength']));
     }
 
-    /**
-* @dataProvider dataProviderTestGuessMaxLengthForConstraintWithType
-*/
-    public function testGuessMaxLengthForConstraintWithType($type)
+    public function testGuessOptionsForConstraintWithMinValue()
     {
-        $constraint = new Type($type);
+        $class = new \stdClass();
 
-        $result = $this->typeGuesser->guessMaxLengthForConstraint($constraint);
-        $this->assertInstanceOf('Symfony\Component\Form\Guess\ValueGuess', $result);
-        $this->assertEquals(null, $result->getValue());
-        $this->assertEquals(Guess::MEDIUM_CONFIDENCE, $result->getConfidence());
+        $this->setupMetadata($class, 'foo', array(new Range(array('min' => '2'))));
+
+        $result = $this->typeGuesser->guessAttributes($class, 'foo');
+
+        $this->assertArrayHasKey('min', $result);
+        $this->assertEquals(2, $result['min']->getValue());
     }
 
-    public static function dataProviderTestGuessMaxLengthForConstraintWithType()
+    public function testGuessOptionsForConstraintWithMaxValue()
     {
-        return array (
-            array('double'),
-            array('float'),
-            array('numeric'),
-            array('real')
-        );
+        $class = new \stdClass();
+
+        $this->setupMetadata($class, 'foo', array(new Range(array('max' => '2'))));
+
+        $result = $this->typeGuesser->guessAttributes($class, 'foo');
+
+        $this->assertArrayHasKey('max', $result);
+        $this->assertEquals(2, $result['max']->getValue());
+    }
+
+    public function testGuessOptionsForConstraintWithMinAndMaxValue()
+    {
+        $class = new \stdClass();
+
+        $this->setupMetadata($class, 'foo', array(new Range(array('min' => 1, 'max' => '2'))));
+
+        $result = $this->typeGuesser->guessAttributes($class, 'foo');
+
+        $this->assertArrayHasKey('min', $result);
+        $this->assertEquals(1, $result['min']->getValue());
+        $this->assertArrayHasKey('max', $result);
+        $this->assertEquals(2, $result['max']->getValue());
+    }
+
+    private function setupMetadata($class, $property, array $constraints)
+    {
+        $this->elementMetadata = $this->getMock('Symfony\Component\Validator\Mapping\ElementMetadata');
+        $this->elementMetadata->expects($this->any())
+            ->method('getConstraints')
+            ->will($this->returnValue($constraints));
+
+        $this->metadata = $this->getMockBuilder('Symfony\Component\Validator\Mapping\ClassMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->metadata->expects($this->any())
+            ->method('hasMemberMetadatas')
+            ->with($property)
+            ->will($this->returnValue(true));
+        $this->metadata->expects($this->any())
+            ->method('getMemberMetadatas')
+            ->with($property)
+            ->will($this->returnValue(array($this->elementMetadata)));
+
+        $this->metadataFactory->expects($this->any())
+            ->method('getMetadataFor')
+            ->with($class)
+            ->will($this->returnValue($this->metadata));
     }
 }

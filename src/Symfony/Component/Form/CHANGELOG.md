@@ -11,6 +11,7 @@ CHANGELOG
  * [BC BREAK] added two optional parameters to FormInterface::getErrors() and
    changed the method to return a Symfony\Component\Form\FormErrorIterator
    instance instead of an array
+ * added the guessing of "min" and "max" attributes
 
 2.4.0
 -----

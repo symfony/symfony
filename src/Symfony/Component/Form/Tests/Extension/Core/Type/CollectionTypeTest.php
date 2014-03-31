@@ -31,7 +31,7 @@ class CollectionTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $form = $this->factory->create('collection', null, array(
             'type' => 'text',
             'options' => array(
-                'attr' => array('maxlength' => 20),
+                'attr' => array('maxlength' => 20)
             ),
         ));
         $form->setData(array('foo@foo.com', 'foo@bar.com'));
@@ -41,18 +41,21 @@ class CollectionTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $this->assertCount(2, $form);
         $this->assertEquals('foo@foo.com', $form[0]->getData());
         $this->assertEquals('foo@bar.com', $form[1]->getData());
-        $formAttrs0 = $form[0]->getConfig()->getOption('attr');
-        $formAttrs1 = $form[1]->getConfig()->getOption('attr');
-        $this->assertEquals(20, $formAttrs0['maxlength']);
-        $this->assertEquals(20, $formAttrs1['maxlength']);
+
+        $attrsForm0 = $form[0]->getConfig()->getOption('attr');
+        $attrsForm1 = $form[1]->getConfig()->getOption('attr');
+
+        $this->assertEquals(20, $attrsForm0['maxlength']);
+        $this->assertEquals(20, $attrsForm1['maxlength']);
 
         $form->setData(array('foo@baz.com'));
         $this->assertInstanceOf('Symfony\Component\Form\Form', $form[0]);
         $this->assertFalse(isset($form[1]));
         $this->assertCount(1, $form);
         $this->assertEquals('foo@baz.com', $form[0]->getData());
-        $formAttrs0 = $form[0]->getConfig()->getOption('attr');
-        $this->assertEquals(20, $formAttrs0['maxlength']);
+
+        $attrsForm0 = $form[0]->getConfig()->getOption('attr');
+        $this->assertEquals(20, $attrsForm0['maxlength']);
     }
 
     public function testThrowsExceptionIfObjectIsNotTraversable()

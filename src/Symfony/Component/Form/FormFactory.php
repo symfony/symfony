@@ -25,6 +25,25 @@ class FormFactory implements FormFactoryInterface
      */
     private $resolvedTypeFactory;
 
+    protected $supportedAttributes = array(
+        // rendered as input[type=text]
+        'text' => array('maxlength', 'pattern'),
+        'email' => array('maxlength', 'pattern'),
+        'money' => array('maxlength', 'pattern'),
+        'number' => array('maxlength', 'pattern'),
+        'percent' => array('maxlength', 'pattern'),
+        // rendered as input[type=number]
+        'integer' => array('max', 'min'),
+        // rendered as input[type=password]
+        'password' => array('maxlength', 'pattern'),
+        // rendered as input[type=search]
+        'search' => array('maxlength', 'pattern'),
+        // rendered as input[type=url]
+        'url' => array('maxlength', 'pattern'),
+        // rendered as textarea
+        'textarea' => array('maxlength'),
+    );
+
     public function __construct(FormRegistryInterface $registry, ResolvedFormTypeFactoryInterface $resolvedTypeFactory)
     {
         $this->registry = $registry;
@@ -103,30 +122,31 @@ class FormFactory implements FormFactoryInterface
         }
 
         $typeGuess = $guesser->guessType($class, $property);
-        $maxLengthGuess = $guesser->guessMaxLength($class, $property);
-        $requiredGuess = $guesser->guessRequired($class, $property);
-        $patternGuess = $guesser->guessPattern($class, $property);
+        $guessedAttributes = $guesser->guessAttributes($class, $property);
 
         $type = $typeGuess ? $typeGuess->getType() : 'text';
 
-        $maxLength = $maxLengthGuess ? $maxLengthGuess->getValue() : null;
-        $pattern   = $patternGuess ? $patternGuess->getValue() : null;
-
-        if (null !== $pattern) {
-            $options = array_merge(array('attr' => array('pattern' => $pattern)), $options);
-        }
-
-        if (null !== $maxLength) {
-            $options = array_merge(array('attr' => array('maxlength' => $maxLength)), $options);
-        }
-
-        if ($requiredGuess) {
+        if ($requiredGuess = $guesser->guessRequired($class, $property)) {
             $options = array_merge(array('required' => $requiredGuess->getValue()), $options);
         }
 
         // user options may override guessed options
         if ($typeGuess) {
             $options = array_merge($typeGuess->getOptions(), $options);
+        }
+
+        $filteredAttributes = array();
+
+        foreach ($guessedAttributes as $key => $value) {
+            if (null !== $value->getValue() && isset($this->supportedAttributes[$type]) && in_array($key, $this->supportedAttributes[$type])) {
+                $filteredAttributes[$key] = $value->getValue();
+            }
+        }
+
+        if (!empty($filteredAttributes)) {
+            $options = array_merge(array(
+                'attr' => $filteredAttributes
+            ), $options);
         }
 
         return $this->createNamedBuilder($property, $type, $data, $options);

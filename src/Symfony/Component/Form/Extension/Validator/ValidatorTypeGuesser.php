@@ -17,6 +17,7 @@ use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\Form\Guess\ValueGuess;
 use Symfony\Component\Validator\MetadataFactoryInterface;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Constraints\Range;
 
 class ValidatorTypeGuesser implements FormTypeGuesserInterface
 {
@@ -42,6 +43,32 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
     /**
      * {@inheritDoc}
      */
+    public function guessAttributes($class, $property)
+    {
+        $attributes = array();
+
+        if ($guess = $this->guessMaxLength($class, $property)) {
+            $attributes['maxlength'] = $guess;
+        }
+
+        if ($guess = $this->guessMinValue($class, $property)) {
+            $attributes['min'] = $guess;
+        }
+
+        if ($guess = $this->guessMaxValue($class, $property)) {
+            $attributes['max'] = $guess;
+        }
+
+        if ($guess = $this->guessPattern($class, $property)) {
+            $attributes['pattern'] = $guess;
+        }
+
+        return $attributes;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function guessRequired($class, $property)
     {
         $guesser = $this;
@@ -62,6 +89,40 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
 
         return $this->guess($class, $property, function (Constraint $constraint) use ($guesser) {
             return $guesser->guessMaxLengthForConstraint($constraint);
+        });
+    }
+
+    /**
+     * Returns a guess about the field's maximum value
+     *
+     * @param string $class    The fully qualified class name
+     * @param string $property The name of the property to guess for
+     *
+     * @return Guess\ValueGuess|null A guess for the field's maximum value
+     */
+    public function guessMaxValue($class, $property)
+    {
+        $guesser = $this;
+
+        return $this->guess($class, $property, function (Constraint $constraint) use ($guesser) {
+            return $guesser->guessMaxValueForConstraint($constraint);
+        });
+    }
+
+    /**
+     * Returns a guess about the field's minimum value
+     *
+     * @param string $class    The fully qualified class name
+     * @param string $property The name of the property to guess for
+     *
+     * @return Guess\ValueGuess|null A guess for the field's minimum value
+     */
+    public function guessMinValue($class, $property)
+    {
+        $guesser = $this;
+
+        return $this->guess($class, $property, function (Constraint $constraint) use ($guesser) {
+            return $guesser->guessMinValueForConstraint($constraint);
         });
     }
 
@@ -209,6 +270,38 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
                     return new ValueGuess(strlen((string) $constraint->max), Guess::LOW_CONFIDENCE);
                 }
                 break;
+        }
+
+        return null;
+    }
+
+    /**
+     * Guesses a field's maximum value based on the given constraint
+     *
+     * @param Constraint $constraint The constraint to guess for
+     *
+     * @return ValueGuess|null The guess for the maximum value
+     */
+    public function guessMaxValueForConstraint(Constraint $constraint)
+    {
+        if ($constraint instanceof Range && is_numeric($constraint->max)) {
+            return new ValueGuess($constraint->max, Guess::HIGH_CONFIDENCE);
+        }
+
+        return null;
+    }
+
+    /**
+     * Guesses a field's minimum value based on the given constraint
+     *
+     * @param Constraint $constraint The constraint to guess for
+     *
+     * @return ValueGuess|null The guess for the minimum value
+     */
+    public function guessMinValueForConstraint(Constraint $constraint)
+    {
+        if ($constraint instanceof Range && is_numeric($constraint->min)) {
+            return new ValueGuess($constraint->min, Guess::HIGH_CONFIDENCE);
         }
 
         return null;

@@ -81,6 +81,33 @@ class FormTypeGuesserChain implements FormTypeGuesserInterface
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function guessAttributes($class, $property)
+    {
+        $attributes = array();
+
+        // Cleanup attributes if I get the same attribute from different guessers.
+        foreach ($this->guessers as $guesser) {
+            $guessedAttributes = $guesser->guessAttributes($class, $property);
+
+            if (!is_array($guessedAttributes)) {
+                continue;
+            }
+
+            foreach ($guessedAttributes as $key => $value) {
+                if (isset($attributes[$key])) {
+                    $attributes[$key] = Guess::getBestGuess(array($attributes[$key], $value));
+                } else {
+                    $attributes[$key] = $value;
+                }
+            }
+        }
+
+        return $attributes;
+    }
+
+    /**
      * Executes a closure for each guesser and returns the best guess from the
      * return values
      *

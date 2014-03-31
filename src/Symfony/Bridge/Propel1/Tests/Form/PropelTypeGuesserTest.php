@@ -30,33 +30,34 @@ class PropelTypeGuesserTest extends Propel1TestCase
 
     public function testGuessMaxLengthWithText()
     {
-        $value = $this->guesser->guessMaxLength(self::CLASS_NAME, 'value');
+        $attributes = $this->guesser->guessAttributes(self::CLASS_NAME, 'value');
 
-        $this->assertNotNull($value);
-        $this->assertEquals(255, $value->getValue());
+        $this->assertArrayHasKey('maxlength', $attributes);
+        $this->assertEquals(255, $attributes['maxlength']->getValue());
     }
 
     public function testGuessMaxLengthWithFloat()
     {
-        $value = $this->guesser->guessMaxLength(self::CLASS_NAME, 'price');
+        $attributes = $this->guesser->guessAttributes(self::CLASS_NAME, 'price');
 
-        $this->assertNotNull($value);
-        $this->assertNull($value->getValue());
+        $this->assertArrayHasKey('maxlength', $attributes);
+        $this->assertNull($attributes['maxlength']->getValue());
     }
 
     public function testGuessMinLengthWithText()
     {
-        $value = $this->guesser->guessPattern(self::CLASS_NAME, 'value');
+        $attributes = $this->guesser->guessAttributes(self::CLASS_NAME, 'price');
 
-        $this->assertNull($value);
+        $this->assertArrayHasKey('maxlength', $attributes);
+        $this->assertNull($attributes['maxlength']->getValue());
     }
 
     public function testGuessMinLengthWithFloat()
     {
-        $value = $this->guesser->guessPattern(self::CLASS_NAME, 'price');
+        $attributes = $this->guesser->guessAttributes(self::CLASS_NAME, 'price');
 
-        $this->assertNotNull($value);
-        $this->assertNull($value->getValue());
+        $this->assertArrayHasKey('maxlength', $attributes);
+        $this->assertNull($attributes['maxlength']->getValue());
     }
 
     public function testGuessRequired()

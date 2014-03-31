@@ -101,6 +101,7 @@ Validator
    valid. This is the default behaviour.
 
    Strict email validation has to be explicitly activated in the configuration file by adding
+
    ```
    framework:
       //...
@@ -109,7 +110,119 @@ Validator
       //...
 
    ```
+
    Also you have to add to your composer.json:
+
    ```
    "egulias/email-validator": "1.1.*"
    ```
+
+ * `ClassMetadata::getGroupSequence()` now returns `GroupSequence` instances
+   instead of an array. The sequence implements `\Traversable`, `\ArrayAccess`
+   and `\Countable`, so in most cases you should be fine. If you however use the
+   sequence with PHP's `array_*()` functions, you should cast it to an array
+   first using `iterator_to_array()`:
+
+   Before:
+
+   ```
+   $sequence = $metadata->getGroupSequence();
+   $result = array_map($callback, $sequence);
+   ```
+
+   After:
+
+   ```
+   $sequence = iterator_to_array($metadata->getGroupSequence());
+   $result = array_map($callback, $sequence);
+   ```
+
+ * The array type hint in `ClassMetadata::setGroupSequence()` was removed. If
+   you overwrite this method, make sure to remove the type hint as well. The
+   method should now accept `GroupSequence` instances just as well as arrays.
+
+   Before:
+
+   ```
+   public function setGroupSequence(array $groups)
+   {
+       // ...
+   }
+   ```
+
+   After:
+
+   ```
+   public function setGroupSequence($groupSequence)
+   {
+       // ...
+   }
+   ```
+
+ * The validation engine in `Symfony\Component\Validator\Validator` was replaced
+   by a new one in `Symfony\Component\Validator\Validator\RecursiveValidator`.
+   With that change, several classes were deprecated that will be removed in
+   Symfony 3.0. Also, the API of the validator was slightly changed. More
+   details about that can be found in UPGRADE-3.0.
+
+   You can choose the desired API via the new "api" entry in
+   app/config/config.yml:
+
+   ```
+   framework:
+       validation:
+           enabled: true
+           api: auto
+   ```
+
+   When running PHP 5.3.9 or higher, Symfony will then use an implementation
+   that supports both the old API and the new one:
+
+   ```
+   framework:
+       validation:
+           enabled: true
+           api: 2.5-bc
+   ```
+
+   When running PHP lower than 5.3.9, that compatibility layer is not supported.
+   On those versions, the old implementation will be used instead:
+
+   ```
+   framework:
+       validation:
+           enabled: true
+           api: 2.4
+   ```
+
+   If you develop a new application that doesn't rely on the old API, you can
+   also set the API to 2.5. In that case, the backwards compatibility layer
+   will not be activated:
+
+   ```
+   framework:
+       validation:
+           enabled: true
+           api: 2.5
+   ```
+
+   When using the validator outside of the Symfony full-stack framework, the
+   desired API can be selected using `setApiVersion()` on the validator builder:
+
+   ```
+   // Previous implementation
+   $validator = Validation::createValidatorBuilder()
+       ->setApiVersion(Validation::API_VERSION_2_4)
+       ->getValidator();
+
+   // New implementation with backwards compatibility support
+   $validator = Validation::createValidatorBuilder()
+       ->setApiVersion(Validation::API_VERSION_2_5_BC)
+       ->getValidator();
+
+   // New implementation without backwards compatibility support
+   $validator = Validation::createValidatorBuilder()
+       ->setApiVersion(Validation::API_VERSION_2_5)
+       ->getValidator();
+   ```
+

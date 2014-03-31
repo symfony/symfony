@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Validator\Mapping\Cache;
 
-use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Doctrine\Common\Cache\Cache;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
  * Adapts a Doctrine cache to a CacheInterface.

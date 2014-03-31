@@ -13,6 +13,23 @@ namespace Symfony\Component\Validator\Mapping;
 
 use Symfony\Component\Validator\Exception\ValidatorException;
 
+/**
+ * Stores all metadata needed for validating a class property via its getter
+ * method.
+ *
+ * A property getter is any method that is equal to the property's name,
+ * prefixed with either "get" or "is". That method will be used to access the
+ * property's value.
+ *
+ * The getter will be invoked by reflection, so the access of private and
+ * protected getters is supported.
+ *
+ * This class supports serialization and cloning.
+ *
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @see PropertyMetadataInterface
+ */
 class GetterMetadata extends MemberMetadata
 {
     /**

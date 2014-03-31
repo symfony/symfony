@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Validator\Tests\Mapping\Cache;
 
-use Symfony\Component\Validator\Mapping\Cache\DoctrineCache;
 use Doctrine\Common\Cache\ArrayCache;
+use Symfony\Component\Validator\Mapping\Cache\DoctrineCache;
 
 class DoctrineCacheTest extends \PHPUnit_Framework_TestCase
 {

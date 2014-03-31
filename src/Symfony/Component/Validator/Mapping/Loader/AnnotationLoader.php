@@ -12,12 +12,12 @@
 namespace Symfony\Component\Validator\Mapping\Loader;
 
 use Doctrine\Common\Annotations\Reader;
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Callback;
-use Symfony\Component\Validator\Exception\MappingException;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\Constraints\GroupSequenceProvider;
-use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Exception\MappingException;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 class AnnotationLoader implements LoaderInterface
 {

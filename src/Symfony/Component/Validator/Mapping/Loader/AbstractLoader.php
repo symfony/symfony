@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Validator\Mapping\Loader;
 
-use Symfony\Component\Validator\Exception\MappingException;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Exception\MappingException;
 
 abstract class AbstractLoader implements LoaderInterface
 {

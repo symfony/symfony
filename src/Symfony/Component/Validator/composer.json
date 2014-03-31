@@ -17,14 +17,14 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "symfony/translation": "~2.0",
-        "symfony/property-access": "~2.2"
+        "symfony/translation": "~2.0"
     },
     "require-dev": {
         "symfony/http-foundation": "~2.1",
         "symfony/intl": "~2.3",
         "symfony/yaml": "~2.0",
         "symfony/config": "~2.2",
+        "symfony/property-access": "~2.2",
         "doctrine/annotations": "~1.0",
         "doctrine/cache": "~1.0",
         "egulias/email-validator": "~1.0"
@@ -37,6 +37,7 @@
         "symfony/yaml": "",
         "symfony/config": "",
         "egulias/email-validator": "Strict (RFC compliant) email validation"
+        "symfony/property-access": "For using the 2.4 Validator API"
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\Validator\\": "" }

@@ -11,13 +11,13 @@
 
 namespace Symfony\Component\Validator\Tests;
 
+use Symfony\Component\Validator\Constraints\Collection;
+use Symfony\Component\Validator\ConstraintValidatorFactory;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\ExecutionContext;
-use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 use Symfony\Component\Validator\ValidationVisitor;
-use Symfony\Component\Validator\ConstraintValidatorFactory;
 
 class ExecutionContextTest extends \PHPUnit_Framework_TestCase
 {

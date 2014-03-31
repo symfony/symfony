@@ -5,6 +5,10 @@ CHANGELOG
 ------
 
  * allowed non alpha numeric characters in second level and deeper object properties names
+ * [BC BREAK] when accessing an index on an object that does not implement
+   ArrayAccess, a NoSuchIndexException is now thrown instead of the
+   semantically wrong NoSuchPropertyException
+ * [BC BREAK] added isReadable() and isWritable() to PropertyAccessorInterface
 
 2.3.0
 ------

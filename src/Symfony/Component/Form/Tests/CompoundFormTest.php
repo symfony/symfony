@@ -51,22 +51,6 @@ class CompoundFormTest extends AbstractFormTest
         $this->assertFalse($this->form->isValid());
     }
 
-    public function testValidIfChildIsNotSubmitted()
-    {
-        $this->form->add($this->getBuilder('firstName')->getForm());
-        $this->form->add($this->getBuilder('lastName')->getForm());
-
-        $this->form->submit(array(
-            'firstName' => 'Bernhard',
-        ));
-
-        // "lastName" is not "valid" because it was not submitted. This happens
-        // for example in PATCH requests. The parent form should still be
-        // considered valid.
-
-        $this->assertTrue($this->form->isValid());
-    }
-
     public function testDisabledFormsValidEvenIfChildrenInvalid()
     {
         $form = $this->getBuilder('person')

@@ -197,6 +197,11 @@ class XmlFileLoader extends FileLoader
             $definition->addTag((string) $tag['name'], $parameters);
         }
 
+        if (isset($service['decorates'])) {
+            $renameId = isset($service['decoration-inner-name']) ? (string) $service['decoration-inner-name'] : null;
+            $definition->setDecoratedService((string) $service['decorates'], $renameId);
+        }
+
         $this->container->setDefinition($id, $definition);
     }
 

@@ -27,6 +27,9 @@ class ProjectServiceContainer extends Container
             'baz' => 'getBazService',
             'configurator_service' => 'getConfiguratorServiceService',
             'configured_service' => 'getConfiguredServiceService',
+            'decorated' => 'getDecoratedService',
+            'decorator_service' => 'getDecoratorServiceService',
+            'decorator_service_with_name' => 'getDecoratorServiceWithNameService',
             'depends_on_request' => 'getDependsOnRequestService',
             'factory_service' => 'getFactoryServiceService',
             'foo' => 'getFooService',
@@ -94,6 +97,45 @@ class ProjectServiceContainer extends Container
         $this->get('configurator_service')->configureStdClass($instance);
 
         return $instance;
+    }
+
+    /**
+     * Gets the 'decorated' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return stdClass A stdClass instance.
+     */
+    protected function getDecoratedService()
+    {
+        return $this->services['decorated'] = new \stdClass();
+    }
+
+    /**
+     * Gets the 'decorator_service' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return stdClass A stdClass instance.
+     */
+    protected function getDecoratorServiceService()
+    {
+        return $this->services['decorator_service'] = new \stdClass();
+    }
+
+    /**
+     * Gets the 'decorator_service_with_name' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return stdClass A stdClass instance.
+     */
+    protected function getDecoratorServiceWithNameService()
+    {
+        return $this->services['decorator_service_with_name'] = new \stdClass();
     }
 
     /**

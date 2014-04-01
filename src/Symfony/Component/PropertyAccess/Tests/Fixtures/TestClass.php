@@ -18,6 +18,9 @@ class TestClass
     private $privateProperty;
 
     private $publicAccessor;
+    private $publicAccessorWithDefaultValue;
+    private $publicAccessorWithRequiredAndDefaultValue;
+    private $publicAccessorWithMoreRequiredParameters;
     private $publicIsAccessor;
     private $publicHasAccessor;
 
@@ -25,6 +28,9 @@ class TestClass
     {
         $this->publicProperty = $value;
         $this->publicAccessor = $value;
+        $this->publicAccessorWithDefaultValue = $value;
+        $this->publicAccessorWithRequiredAndDefaultValue = $value;
+        $this->publicAccessorWithMoreRequiredParameters = $value;
         $this->publicIsAccessor = $value;
         $this->publicHasAccessor = $value;
     }
@@ -34,9 +40,39 @@ class TestClass
         $this->publicAccessor = $value;
     }
 
+    public function setPublicAccessorWithDefaultValue($value = null)
+    {
+        $this->publicAccessorWithDefaultValue = $value;
+    }
+
+    public function setPublicAccessorWithRequiredAndDefaultValue($value, $optional = null)
+    {
+        $this->publicAccessorWithRequiredAndDefaultValue = $value;
+    }
+
+    public function setPublicAccessorWithMoreRequiredParameters($value, $needed)
+    {
+        $this->publicAccessorWithMoreRequiredParameters = $value;
+    }
+
     public function getPublicAccessor()
     {
         return $this->publicAccessor;
+    }
+
+    public function getPublicAccessorWithDefaultValue()
+    {
+        return $this->publicAccessorWithDefaultValue;
+    }
+
+    public function getPublicAccessorWithRequiredAndDefaultValue()
+    {
+        return $this->publicAccessorWithRequiredAndDefaultValue;
+    }
+
+    public function getPublicAccessorWithMoreRequiredParameters()
+    {
+        return $this->publicAccessorWithMoreRequiredParameters;
     }
 
     public function setPublicIsAccessor($value)

@@ -43,6 +43,8 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
             // Accessor methods
             array(new TestClass('Bernhard'), 'publicProperty', 'Bernhard'),
             array(new TestClass('Bernhard'), 'publicAccessor', 'Bernhard'),
+            array(new TestClass('Bernhard'), 'publicAccessorWithDefaultValue', 'Bernhard'),
+            array(new TestClass('Bernhard'), 'publicAccessorWithRequiredAndDefaultValue', 'Bernhard'),
             array(new TestClass('Bernhard'), 'publicIsAccessor', 'Bernhard'),
             array(new TestClass('Bernhard'), 'publicHasAccessor', 'Bernhard'),
 
@@ -248,6 +250,14 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
         $this->propertyAccessor->setValue($author, 'magicProperty', 'Updated');
 
         $this->assertEquals('Updated', $author->__get('magicProperty'));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
+     */
+    public function testSetValueThrowsExceptionIfThereAreMissingParameters()
+    {
+        $this->propertyAccessor->setValue(new TestClass('Bernhard'), 'publicAccessorWithMoreRequiredParameters', 'Updated');
     }
 
     /**

@@ -570,7 +570,7 @@ class PropertyAccessor implements PropertyAccessorInterface
     }
 
     /**
-     * Returns whether a method is public and has a specific number of required parameters.
+     * Returns whether a method is public and has the number of required parameters.
      *
      * @param  \ReflectionClass $class      The class of the method
      * @param  string           $methodName The method name
@@ -584,7 +584,9 @@ class PropertyAccessor implements PropertyAccessorInterface
         if ($class->hasMethod($methodName)) {
             $method = $class->getMethod($methodName);
 
-            if ($method->isPublic() && $method->getNumberOfRequiredParameters() === $parameters) {
+            if ($method->isPublic()
+                && $method->getNumberOfRequiredParameters() <= $parameters
+                && $method->getNumberOfParameters() >= $parameters) {
                 return true;
             }
         }

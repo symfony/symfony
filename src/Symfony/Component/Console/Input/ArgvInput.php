@@ -227,14 +227,16 @@ class ArgvInput extends Input
         if (null === $value && $option->acceptValue() && count($this->parsed)) {
             // if option accepts an optional or mandatory argument
             // let's see if there is one provided
-            $next = array_shift($this->parsed);
-            if (isset($next[0]) && '-' !== $next[0]) {
-                $value = $next;
-            } elseif (empty($next)) {
-                $value = '';
-            } else {
-                array_unshift($this->parsed, $next);
-            }
+            /* [This code should not be used]
+                $next = array_shift($this->parsed);
+                if (isset($next[0]) && '-' !== $next[0]) {
+                    $value = $next;
+                } elseif (empty($next)) {
+                    $value = '';
+                } else {
+                    array_unshift($this->parsed, $next);
+                }
+            */
         }
 
         if (null === $value) {
@@ -313,7 +315,7 @@ class ArgvInput extends Input
         $tokens = $this->tokens;
         while ($token = array_shift($tokens)) {
             foreach ($values as $value) {
-                if ($token === $value || 0 === strpos($token, $value.'=')) {
+                if (substr($token, 0, strpos($token, '=')) === $value || 0 === strpos($token, $value.'=')) {
                     if (false !== $pos = strpos($token, '=')) {
                         return substr($token, $pos + 1);
                     }

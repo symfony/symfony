@@ -29,32 +29,75 @@ class ChoiceQuestion extends Question
 
         $this->choices = $choices;
         $this->setValidator($this->getDefaultValidator());
-        $this->setAutocompleter(array_keys($choices));
+        $this->setAutocompleterValues(array_keys($choices));
     }
 
+    /**
+     * Returns available choices.
+     *
+     * @return array
+     */
     public function getChoices()
     {
         return $this->choices;
     }
 
+    /**
+     * Sets multiselect option.
+     *
+     * When multiselect is set to true, multiple choices can be answered.
+     *
+     * @param Boolean $multiselect
+     *
+     * @return ChoiceQuestion The current instance
+     */
     public function setMultiselect($multiselect)
     {
         $this->multiselect = $multiselect;
+        $this->setValidator($this->getDefaultValidator());
+
+        return $this;
     }
 
+    /**
+     * Gets the prompt for choices.
+     *
+     * @return string
+     */
     public function getPrompt()
     {
         return $this->prompt;
     }
 
+    /**
+     * Sets the prompt for choices.
+     *
+     * @param string $prompt
+     *
+     * @return ChoiceQuestion The current instance
+     */
     public function setPrompt($prompt)
     {
         $this->prompt = $prompt;
+
+        return $this;
     }
 
+    /**
+     * Sets the error message for invalid values.
+     *
+     * The error message has a string placeholder (%s) for the invalid value.
+     *
+     * @param string $errorMessage
+     *
+     * @return ChoiceQuestion The current instance
+     */
     public function setErrorMessage($errorMessage)
     {
         $this->errorMessage = $errorMessage;
+        $this->setValidator($this->getDefaultValidator());
+
+        return $this;
     }
 
     private function getDefaultValidator()
@@ -82,14 +125,14 @@ class ChoiceQuestion extends Question
                 if (empty($choices[$value])) {
                     throw new \InvalidArgumentException(sprintf($errorMessage, $value));
                 }
-                array_push($multiselectChoices, $value);
+                array_push($multiselectChoices, $choices[$value]);
             }
 
             if ($multiselect) {
                 return $multiselectChoices;
             }
 
-            return $selected;
+            return $choices[$selected];
         };
     }
 }

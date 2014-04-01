@@ -10,6 +10,7 @@
  */
 
 namespace Symfony\Component\Console\Question;
+use Doctrine\Common\Proxy\Exception\InvalidArgumentException;
 
 /**
  * Represents a Question.
@@ -19,10 +20,10 @@ namespace Symfony\Component\Console\Question;
 class Question
 {
     private $question;
-    private $attempts = false;
+    private $attempts;
     private $hidden = false;
     private $hiddenFallback = true;
-    private $autocompleter;
+    private $autocompleterValues;
     private $validator;
     private $default;
     private $normalizer;
@@ -39,82 +40,198 @@ class Question
         $this->default = $default;
     }
 
+    /**
+     * Returns the question.
+     *
+     * @return string
+     */
     public function getQuestion()
     {
         return $this->question;
     }
 
+    /**
+     * Returns the default answer.
+     *
+     * @return mixed
+     */
     public function getDefault()
     {
         return $this->default;
     }
 
+    /**
+     * Returns whether the user response must be hidden.
+     *
+     * @return Boolean
+     */
     public function isHidden()
     {
         return $this->hidden;
     }
 
+    /**
+     * Sets whether the user response must be hidden or not.
+     *
+     * @param Boolean $hidden
+     *
+     * @return Question The current instance
+     *
+     * @throws \LogicException In case the autocompleter is also used
+     */
     public function setHidden($hidden)
     {
-        if ($this->autocompleter) {
+        if ($this->autocompleterValues) {
             throw new \LogicException('A hidden question cannot use the autocompleter.');
         }
 
         $this->hidden = (Boolean) $hidden;
+
+        return $this;
     }
 
+    /**
+     * In case the response can not be hidden, whether to fallback on non-hidden question or not.
+     *
+     * @return Boolean
+     */
     public function isHiddenFallback()
     {
-        return $this->fallback;
+        return $this->hiddenFallback;
     }
 
     /**
      * Sets whether to fallback on non-hidden question if the response can not be hidden.
+     *
+     * @param Boolean $fallback
+     *
+     * @return Question The current instance
      */
     public function setHiddenFallback($fallback)
     {
-        $this->fallback = (Boolean) $fallback;
+        $this->hiddenFallback = (Boolean) $fallback;
+
+        return $this;
     }
 
-    public function getAutocompleter()
+    /**
+     * Gets values for the autocompleter.
+     *
+     * @return null|array|Traversable
+     */
+    public function getAutocompleterValues()
     {
-        return $this->autocompleter;
+        return $this->autocompleterValues;
     }
 
-    public function setAutocompleter($autocompleter)
+    /**
+     * Sets values for the autocompleter.
+     *
+     * @param null|array|Traversable $values
+     *
+     * @return Question The current instance
+     *
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     */
+    public function setAutocompleterValues($values)
     {
+        if (null !== $values && !is_array($values)) {
+            if (!$values instanceof \Traversable || $values instanceof \Countable) {
+                throw new \InvalidArgumentException('Autocompleter values can be either an array, `null` or an object implementing both `Countable` and `Traversable` interfaces.');
+            }
+        }
+
         if ($this->hidden) {
             throw new \LogicException('A hidden question cannot use the autocompleter.');
         }
 
-        $this->autocompleter = $autocompleter;
+        $this->autocompleterValues = $values;
+
+        return $this;
     }
 
+    /**
+     * Sets a validator for the question.
+     *
+     * @param null|callable $validator
+     *
+     * @return Question The current instance
+     */
     public function setValidator($validator)
     {
         $this->validator = $validator;
+
+        return $this;
     }
 
+    /**
+     * Gets the validator for the question
+     *
+     * @return null|callable
+     */
     public function getValidator()
     {
         return $this->validator;
     }
 
-    public function setMaxAttemps($attempts)
+    /**
+     * Sets the maximum number of attempts.
+     *
+     * Null means an unlimited number of attempts.
+     *
+     * @param null|integer $attempts
+     *
+     * @return Question The current instance
+     *
+     * @throws InvalidArgumentException In case the number of attempts is invalid.
+     */
+    public function setMaxAttempts($attempts)
     {
+        if (null !== $attempts && $attempts < 1) {
+            throw new \InvalidArgumentException('Maximum number of attempts must be a positive value.');
+        }
+
         $this->attempts = $attempts;
+
+        return $this;
     }
 
-    public function getMaxAttemps()
+    /**
+     * Gets the maximum number of attempts.
+     *
+     * Null means an unlimited number of attempts.
+     *
+     * @return null|integer
+     */
+    public function getMaxAttempts()
     {
         return $this->attempts;
     }
 
+    /**
+     * Sets a normalizer for the response.
+     *
+     * The normalizer can ba a callable (a string), a closure or a class implementing __invoke.
+     *
+     * @param string|Closure $normalizer
+     *
+     * @return Question The current instance
+     */
     public function setNormalizer($normalizer)
     {
         $this->normalizer = $normalizer;
+
+        return $this;
     }
 
+    /**
+     * Gets the normalizer for the response.
+     *
+     * The normalizer can ba a callable (a string), a closure or a class implementing __invoke.
+     *
+     * @return string|Closure
+     */
     public function getNormalizer()
     {
         return $this->normalizer;

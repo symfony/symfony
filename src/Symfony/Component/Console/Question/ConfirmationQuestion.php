@@ -18,9 +18,9 @@ namespace Symfony\Component\Console\Question;
  */
 class ConfirmationQuestion extends Question
 {
-    public function __construct($question, $default = false)
+    public function __construct($question, $default = true)
     {
-        parent::__construct($question, $default);
+        parent::__construct($question, (Boolean) $default);
 
         $this->setNormalizer($this->getDefaultNormalizer());
     }
@@ -35,10 +35,10 @@ class ConfirmationQuestion extends Question
             }
 
             if (false === $default) {
-                return $answer && 'y' == strtolower($answer[0]);
+                return $answer && 'y' === strtolower($answer[0]);
             }
 
-            return !$answer || 'y' == strtolower($answer[0]);
+            return !$answer || 'y' === strtolower($answer[0]);
         };
     }
 }

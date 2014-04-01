@@ -11,14 +11,14 @@
 
 namespace Symfony\Component\Console\Helper;
 
-use Symfony\Component\Console\Helper\Helper;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
-use Symfony\Component\Console\Dialog\Question;
-use Symfony\Component\Console\Dialog\ChoiceQuestion;
+use Symfony\Component\Console\Question\Question;
+use Symfony\Component\Console\Question\ChoiceQuestion;
 
 /**
- * The Question class provides helpers to interact with the user.
+ * The QuestionHelper class provides helpers to interact with the user.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -36,22 +36,27 @@ class QuestionHelper extends Helper
     /**
      * Asks a question to the user.
      *
-     * @param OutputInterface $output   An Output instance
+     * @param InputInterface  $input    An InputInterface instance
+     * @param OutputInterface $output   An OutputInterface instance
      * @param Question        $question The question to ask
      *
      * @return string The user answer
      *
      * @throws \RuntimeException If there is no data to read in the input stream
      */
-    public function ask(OutputInterface $output, Question $question)
+    public function ask(InputInterface $input, OutputInterface $output, Question $question)
     {
-        $that = $this;
-
-        if (!$question->getValidator()) {
-            return $that->doAsk($output, $question);
+        if (!$input->isInteractive()) {
+            return $question->getDefault();
         }
 
-        $interviewer = function() use ($output, $question, $that) {
+        if (!$question->getValidator()) {
+            return $this->doAsk($output, $question);
+        }
+
+        $that = $this;
+
+        $interviewer = function () use ($output, $question, $that) {
             return $that->doAsk($output, $question);
         };
 
@@ -64,23 +69,48 @@ class QuestionHelper extends Helper
      * This is mainly useful for testing purpose.
      *
      * @param resource $stream The input stream
+     *
+     * @throws \InvalidArgumentException In case the stream is not a resource
      */
     public function setInputStream($stream)
     {
+        if (!is_resource($stream)) {
+            throw new \InvalidArgumentException('Input stream must be a valid resource.');
+        }
+
         $this->inputStream = $stream;
     }
 
     /**
      * Returns the helper's input stream
      *
-     * @return string
+     * @return resource
      */
     public function getInputStream()
     {
         return $this->inputStream;
     }
 
-    private function doAsk($output, $question)
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return 'question';
+    }
+
+    /**
+     * Asks the question to the user.
+     *
+     * @param OutputInterface $output
+     * @param Question        $question
+     *
+     * @return bool|mixed|null|string
+     *
+     * @throws \Exception
+     * @throws \RuntimeException
+     */
+    private function doAsk(OutputInterface $output, Question $question)
     {
         $message = $question->getQuestion();
         if ($question instanceof ChoiceQuestion) {
@@ -98,12 +128,12 @@ class QuestionHelper extends Helper
 
         $output->write($message);
 
-        $autocomplete = $question->getAutocompleter();
+        $autocomplete = $question->getAutocompleterValues();
         if (null === $autocomplete || !$this->hasSttyAvailable()) {
             $ret = false;
             if ($question->isHidden()) {
                 try {
-                    $ret = trim($this->askHiddenResponse($output, $question));
+                    $ret = trim($this->getHiddenResponse($output));
                 } catch (\RuntimeException $e) {
                     if (!$question->isHiddenFallback()) {
                         throw $e;
@@ -119,7 +149,7 @@ class QuestionHelper extends Helper
                 $ret = trim($ret);
             }
         } else {
-            $ret = $this->autocomplete($output, $question);
+            $ret = trim($this->autocomplete($output, $question));
         }
 
         $ret = strlen($ret) > 0 ? $ret : $question->getDefault();
@@ -131,9 +161,17 @@ class QuestionHelper extends Helper
         return $ret;
     }
 
+    /**
+     * Autocompletes a question.
+     *
+     * @param OutputInterface $output
+     * @param Question $question
+     *
+     * @return string
+     */
     private function autocomplete(OutputInterface $output, Question $question)
     {
-        $autocomplete = $question->getAutocompleter();
+        $autocomplete = $question->getAutocompleterValues();
         $ret = '';
 
         $i = 0;
@@ -241,16 +279,15 @@ class QuestionHelper extends Helper
     }
 
     /**
-     * Asks a question to the user, the response is hidden
+     * Gets a hidden response from user.
      *
      * @param OutputInterface $output   An Output instance
-     * @param string|array    $question The question
      *
      * @return string         The answer
      *
-     * @throws \RuntimeException In case the fallback is deactivated and the response can not be hidden
+     * @throws \RuntimeException In case the fallback is deactivated and the response cannot be hidden
      */
-    private function askHiddenResponse(OutputInterface $output, Question $question)
+    private function getHiddenResponse(OutputInterface $output)
     {
         if (defined('PHP_WINDOWS_VERSION_BUILD')) {
             $exe = __DIR__.'/../Resources/bin/hiddeninput.exe';
@@ -298,7 +335,7 @@ class QuestionHelper extends Helper
             return $value;
         }
 
-        throw new \RuntimeException('Unable to hide the response');
+        throw new \RuntimeException('Unable to hide the response.');
     }
 
     /**
@@ -315,8 +352,8 @@ class QuestionHelper extends Helper
     private function validateAttempts($interviewer, OutputInterface $output, Question $question)
     {
         $error = null;
-        $attempts = $question->getMaxAttemps();
-        while (false === $attempts || $attempts--) {
+        $attempts = $question->getMaxAttempts();
+        while (null === $attempts || $attempts--) {
             if (null !== $error) {
                 $output->writeln($this->getHelperSet()->get('formatter')->formatBlock($error->getMessage(), 'error'));
             }
@@ -331,7 +368,7 @@ class QuestionHelper extends Helper
     }
 
     /**
-     * Return a valid unix shell
+     * Returns a valid unix shell.
      *
      * @return string|Boolean  The valid shell name, false in case no valid shell is found
      */
@@ -357,6 +394,11 @@ class QuestionHelper extends Helper
         return self::$shell;
     }
 
+    /**
+     * Returns whether Stty is available or not.
+     *
+     * @return Boolean
+     */
     private function hasSttyAvailable()
     {
         if (null !== self::$stty) {
@@ -366,13 +408,5 @@ class QuestionHelper extends Helper
         exec('stty 2>&1', $output, $exitcode);
 
         return self::$stty = $exitcode === 0;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getName()
-    {
-        return 'question';
     }
 }

@@ -88,6 +88,9 @@
     <service id="configured_service" class="stdClass">
       <configurator service="configurator_service" method="configureStdClass"/>
     </service>
+    <service id="decorated" class="stdClass"/>
+    <service id="decorator_service" class="stdClass" decorates="decorated"/>
+    <service id="decorator_service_with_name" class="stdClass" decorates="decorated" decoration-inner-name="decorated.pif-pouf"/>
     <service id="alias_for_foo" alias="foo"/>
     <service id="alias_for_alias" alias="foo"/>
   </services>

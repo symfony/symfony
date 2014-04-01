@@ -30,3 +30,8 @@ services:
         synthetic: true
         synchronized: true
         lazy: true
+    decorator_service:
+        decorates: decorated
+    decorator_service_with_name:
+        decorates: decorated
+        decoration-inner-name: decorated.pif-pouf

@@ -62,6 +62,26 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $def->getClass(), '->getClass() returns the class name');
     }
 
+    public function testSetGetDecoratedService()
+    {
+        $def = new Definition('stdClass');
+        $this->assertNull($def->getDecoratedService());
+        $def->setDecoratedService('foo', 'foo.renamed');
+        $this->assertEquals(array('foo', 'foo.renamed'), $def->getDecoratedService());
+        $def->setDecoratedService(null);
+        $this->assertNull($def->getDecoratedService());
+
+        $def = new Definition('stdClass');
+        $def->setDecoratedService('foo');
+        $this->assertEquals(array('foo', null), $def->getDecoratedService());
+        $def->setDecoratedService(null);
+        $this->assertNull($def->getDecoratedService());
+
+        $def = new Definition('stdClass');
+        $this->setExpectedException('InvalidArgumentException', 'The decorated service inner name for "foo" must be different than the service name itself.');
+        $def->setDecoratedService('foo', 'foo');
+    }
+
     /**
      * @covers Symfony\Component\DependencyInjection\Definition::setArguments
      * @covers Symfony\Component\DependencyInjection\Definition::getArguments

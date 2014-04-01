@@ -139,6 +139,14 @@ class YamlDumper extends Dumper
             $code .= sprintf("        scope: %s\n", $scope);
         }
 
+        if (null !== $decorated = $definition->getDecoratedService()) {
+            list ($decorated, $renamedId) = $decorated;
+            $code .= sprintf("        decorates: %s\n", $decorated);
+            if (null !== $renamedId) {
+                $code .= sprintf("        decoration-inner-name: %s\n", $renamedId);
+            }
+        }
+
         if ($callable = $definition->getConfigurator()) {
             if (is_array($callable)) {
                 if ($callable[0] instanceof Reference) {

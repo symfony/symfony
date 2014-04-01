@@ -92,5 +92,16 @@ $container
     ->register('configured_service', 'stdClass')
     ->setConfigurator(array(new Reference('configurator_service'), 'configureStdClass'))
 ;
+$container
+    ->register('decorated', 'stdClass')
+;
+$container
+    ->register('decorator_service', 'stdClass')
+    ->setDecoratedService('decorated')
+;
+$container
+    ->register('decorator_service_with_name', 'stdClass')
+    ->setDecoratedService('decorated', 'decorated.pif-pouf')
+;
 
 return $container;

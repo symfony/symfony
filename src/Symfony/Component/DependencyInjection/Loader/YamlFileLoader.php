@@ -234,6 +234,11 @@ class YamlFileLoader extends FileLoader
             }
         }
 
+        if (isset($service['decorates'])) {
+            $renameId = isset($service['decoration-inner-name']) ? $service['decoration-inner-name'] : null;
+            $definition->setDecoratedService($service['decorates'], $renameId);
+        }
+
         $this->container->setDefinition($id, $definition);
     }
 

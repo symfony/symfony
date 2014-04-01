@@ -12,7 +12,7 @@
 namespace Symfony\Component\Security\Tests\Core\Authentication\Provider;
 
 use Symfony\Component\Security\Core\Authentication\Provider\RememberMeAuthenticationProvider;
-use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
+use Symfony\Component\Security\Core\Exception\AccountExpiredException;
 use Symfony\Component\Security\Core\Role\Role;
 
 class RememberMeAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
@@ -52,7 +52,7 @@ class RememberMeAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
         $userChecker = $this->getMock('Symfony\Component\Security\Core\User\UserCheckerInterface');
         $userChecker->expects($this->once())
                     ->method('checkPostAuth')
-                    ->will($this->throwException($this->getMock('Symfony\Component\Security\Core\Exception\AccountExpiredException', null, array(), '', false)))
+                    ->will($this->throwException(new AccountExpiredException()))
         ;
 
         $provider = $this->getProvider($userChecker);

@@ -1,7 +1,6 @@
 <?php
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
-
 use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
@@ -46,7 +45,6 @@ class TestExtension extends Extension
         return 'test_extension';
     }
 
-
 }
 
 class TestExtension2 extends Extension
@@ -71,6 +69,5 @@ class TestExtension2 extends Extension
     {
         return 'test_extension_2';
     }
-
 
 }

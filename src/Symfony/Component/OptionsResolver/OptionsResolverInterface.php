@@ -17,6 +17,31 @@ namespace Symfony\Component\OptionsResolver;
 interface OptionsResolverInterface
 {
     /**
+     * Throw an exception if unknown options are passed to {@link resolve()}.
+     */
+    const FORBID_UNKNOWN = 1;
+
+    /**
+     * Remove unknown options passed to {@link resolve()}.
+     */
+    const REMOVE_UNKNOWN = 2;
+
+    /**
+     * Ignore unknown options passed to {@link resolve()}.
+     */
+    const IGNORE_UNKNOWN = 4;
+
+    /**
+     * Throw an exception if a required option is missing in {@link resolve()}.
+     */
+    const FORBID_MISSING = 32;
+
+    /**
+     * Ignore missing required options in {@link resolve()}.
+     */
+    const IGNORE_MISSING = 64;
+
+    /**
      * Sets default option values.
      *
      * The options can either be values of any types or closures that
@@ -195,7 +220,9 @@ interface OptionsResolverInterface
     /**
      * Returns the combination of the default and the passed options.
      *
-     * @param array $options The custom option values.
+     * @param array   $options The custom option values.
+     * @param integer $flags   A combination of the flag constants in this
+     *                         interface.
      *
      * @return array A list of options and their values.
      *
@@ -206,5 +233,5 @@ interface OptionsResolverInterface
      * @throws Exception\OptionDefinitionException If a cyclic dependency is detected
      *                                             between two lazy options.
      */
-    public function resolve(array $options = array());
+    public function resolve(array $options = array(), $flags = 0);
 }

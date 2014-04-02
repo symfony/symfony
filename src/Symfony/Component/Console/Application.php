@@ -13,6 +13,7 @@ namespace Symfony\Component\Console;
 
 use Symfony\Component\Console\Descriptor\TextDescriptor;
 use Symfony\Component\Console\Descriptor\XmlDescriptor;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -968,6 +969,7 @@ class Application
             new DialogHelper(),
             new ProgressHelper(),
             new TableHelper(),
+            new QuestionHelper(),
         ));
     }
 

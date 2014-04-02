@@ -20,6 +20,8 @@ UPGRADE FROM 2.x to 3.0
 
 ### Console
 
+ * The `dialog` helper has been removed in favor of the `question` helper.
+
  * The methods `isQuiet`, `isVerbose`, `isVeryVerbose` and `isDebug` were added
    to `Symfony\Component\Console\Output\OutputInterface`.
 

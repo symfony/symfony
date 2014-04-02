@@ -36,6 +36,7 @@ class AssetsInstallCommand extends ContainerAwareCommand
             ))
             ->addOption('symlink', null, InputOption::VALUE_NONE, 'Symlinks the assets instead of copying it')
             ->addOption('relative', null, InputOption::VALUE_NONE, 'Make relative symlinks')
+            ->addOption('dirname', null, InputOption::VALUE_REQUIRED, 'Directory name to dump the assets', 'bundles')
             ->setDescription('Installs bundles web assets under a public web directory')
             ->setHelp(<<<EOT
 The <info>%command.name%</info> command installs bundle assets into a given
@@ -68,6 +69,7 @@ EOT
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $targetArg = rtrim($input->getArgument('target'), '/');
+        $dirName = rtrim($input->getOption("dirname"), '/');
 
         if (!is_dir($targetArg)) {
             throw new \InvalidArgumentException(sprintf('The target directory "%s" does not exist.', $input->getArgument('target')));
@@ -80,7 +82,7 @@ EOT
         $filesystem = $this->getContainer()->get('filesystem');
 
         // Create the bundles directory otherwise symlink will fail.
-        $bundlesDir = $targetArg.'/bundles/';
+        $bundlesDir = $targetArg.'/'.$dirName.'/';
         $filesystem->mkdir($bundlesDir, 0777);
 
         $output->writeln(sprintf('Installing assets as <comment>%s</comment>', $input->getOption('symlink') ? 'symlinks' : 'hard copies'));

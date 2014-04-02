@@ -302,7 +302,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $calls = $container->getDefinition('validator.builder')->getMethodCalls();
 
         $this->assertCount(6, $calls);
-        $this->assertSame('enableAnnotations', $calls[4][0]);
+        $this->assertSame('enableAnnotationMapping', $calls[4][0]);
         $this->assertEquals(array(new Reference('annotation_reader')), $calls[4][1]);
         $this->assertSame('addMethodMapping', $calls[5][0]);
         $this->assertSame(array('loadClassMetadata'), $calls[5][1]);
@@ -322,7 +322,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertCount(7, $calls);
         $this->assertSame('addXmlMappings', $calls[3][0]);
         $this->assertSame('addYamlMappings', $calls[4][0]);
-        $this->assertSame('enableAnnotations', $calls[5][0]);
+        $this->assertSame('enableAnnotationMapping', $calls[5][0]);
         $this->assertSame('addMethodMapping', $calls[6][0]);
         $this->assertSame(array('loadClassMetadata'), $calls[6][1]);
 

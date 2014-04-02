@@ -102,6 +102,8 @@ class QuestionHelper extends Helper
     /**
      * Asks the question to the user.
      *
+     * This method is public for PHP 5.3 compatibility, it should be private.
+     *
      * @param OutputInterface $output
      * @param Question        $question
      *
@@ -110,7 +112,7 @@ class QuestionHelper extends Helper
      * @throws \Exception
      * @throws \RuntimeException
      */
-    private function doAsk(OutputInterface $output, Question $question)
+    public function doAsk(OutputInterface $output, Question $question)
     {
         $message = $question->getQuestion();
         if ($question instanceof ChoiceQuestion) {

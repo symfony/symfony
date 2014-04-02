@@ -53,37 +53,37 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
     {
         $loader = new XmlFileLoader(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/ini'));
         $r = new \ReflectionObject($loader);
-        $m = $r->getMethod('parseFile');
+        $m = $r->getMethod('parseFileToDOM');
         $m->setAccessible(true);
 
         try {
             $m->invoke($loader, self::$fixturesPath.'/ini/parameters.ini');
-            $this->fail('->parseFile() throws an InvalidArgumentException if the loaded file is not a valid XML file');
+            $this->fail('->parseFileToDOM() throws an InvalidArgumentException if the loaded file is not a valid XML file');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('Symfony\\Component\\DependencyInjection\\Exception\\InvalidArgumentException', $e, '->parseFile() throws an InvalidArgumentException if the loaded file is not a valid XML file');
-            $this->assertRegExp(sprintf('#^Unable to parse file ".+%s".$#', 'parameters.ini'), $e->getMessage(), '->parseFile() throws an InvalidArgumentException if the loaded file is not a valid XML file');
+            $this->assertInstanceOf('Symfony\\Component\\DependencyInjection\\Exception\\InvalidArgumentException', $e, '->parseFileToDOM() throws an InvalidArgumentException if the loaded file is not a valid XML file');
+            $this->assertRegExp(sprintf('#^Unable to parse file ".+%s".$#', 'parameters.ini'), $e->getMessage(), '->parseFileToDOM() throws an InvalidArgumentException if the loaded file is not a valid XML file');
 
             $e = $e->getPrevious();
-            $this->assertInstanceOf('InvalidArgumentException', $e, '->parseFile() throws an InvalidArgumentException if the loaded file is not a valid XML file');
-            $this->assertStringStartsWith('[ERROR 4] Start tag expected, \'<\' not found (in', $e->getMessage(), '->parseFile() throws an InvalidArgumentException if the loaded file is not a valid XML file');
+            $this->assertInstanceOf('InvalidArgumentException', $e, '->parseFileToDOM() throws an InvalidArgumentException if the loaded file is not a valid XML file');
+            $this->assertStringStartsWith('[ERROR 4] Start tag expected, \'<\' not found (in', $e->getMessage(), '->parseFileToDOM() throws an InvalidArgumentException if the loaded file is not a valid XML file');
         }
 
         $loader = new XmlFileLoader(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/xml'));
 
         try {
             $m->invoke($loader, self::$fixturesPath.'/xml/nonvalid.xml');
-            $this->fail('->parseFile() throws an InvalidArgumentException if the loaded file does not validate the XSD');
+            $this->fail('->parseFileToDOM() throws an InvalidArgumentException if the loaded file does not validate the XSD');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('Symfony\\Component\\DependencyInjection\\Exception\\InvalidArgumentException', $e, '->parseFile() throws an InvalidArgumentException if the loaded file does not validate the XSD');
-            $this->assertRegExp(sprintf('#^Unable to parse file ".+%s".$#', 'nonvalid.xml'), $e->getMessage(), '->parseFile() throws an InvalidArgumentException if the loaded file is not a valid XML file');
+            $this->assertInstanceOf('Symfony\\Component\\DependencyInjection\\Exception\\InvalidArgumentException', $e, '->parseFileToDOM() throws an InvalidArgumentException if the loaded file does not validate the XSD');
+            $this->assertRegExp(sprintf('#^Unable to parse file ".+%s".$#', 'nonvalid.xml'), $e->getMessage(), '->parseFileToDOM() throws an InvalidArgumentException if the loaded file is not a valid XML file');
 
             $e = $e->getPrevious();
-            $this->assertInstanceOf('InvalidArgumentException', $e, '->parseFile() throws an InvalidArgumentException if the loaded file does not validate the XSD');
-            $this->assertStringStartsWith('[ERROR 1845] Element \'nonvalid\': No matching global declaration available for the validation root. (in', $e->getMessage(), '->parseFile() throws an InvalidArgumentException if the loaded file does not validate the XSD');
+            $this->assertInstanceOf('InvalidArgumentException', $e, '->parseFileToDOM() throws an InvalidArgumentException if the loaded file does not validate the XSD');
+            $this->assertStringStartsWith('[ERROR 1845] Element \'nonvalid\': No matching global declaration available for the validation root. (in', $e->getMessage(), '->parseFileToDOM() throws an InvalidArgumentException if the loaded file does not validate the XSD');
         }
 
         $xml = $m->invoke($loader, self::$fixturesPath.'/xml/services1.xml');
-        $this->assertInstanceOf('Symfony\\Component\\DependencyInjection\\SimpleXMLElement', $xml, '->parseFile() returns an SimpleXMLElement object');
+        $this->assertInstanceOf('DOMDocument', $xml, '->parseFileToDOM() returns an SimpleXMLElement object');
     }
 
     public function testLoadParameters()

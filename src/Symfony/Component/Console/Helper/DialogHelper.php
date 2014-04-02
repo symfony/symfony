@@ -109,115 +109,23 @@ class DialogHelper extends InputAwareHelper
 
         $inputStream = $this->inputStream ?: STDIN;
 
-        if (null === $autocomplete || !$this->hasSttyAvailable()) {
+        if (!InputReader::isEachKeyPressModeAvailable()) {
             $ret = fgets($inputStream, 4096);
             if (false === $ret) {
                 throw new \RuntimeException('Aborted');
             }
             $ret = trim($ret);
         } else {
-            $ret = '';
-
-            $i = 0;
-            $ofs = -1;
-            $matches = $autocomplete;
-            $numMatches = count($matches);
-
-            $sttyMode = shell_exec('stty -g');
-
-            // Disable icanon (so we can fread each keypress) and echo (we'll do echoing here instead)
-            shell_exec('stty -icanon -echo');
-
             // Add highlighted text style
             $output->getFormatter()->setStyle('hl', new OutputFormatterStyle('black', 'white'));
-
-            // Read a keypress
-            while (!feof($inputStream)) {
-                $c = fread($inputStream, 1);
-
-                // Backspace Character
-                if ("\177" === $c) {
-                    if (0 === $numMatches && 0 !== $i) {
-                        $i--;
-                        // Move cursor backwards
-                        $output->write("\033[1D");
-                    }
-
-                    if ($i === 0) {
-                        $ofs = -1;
-                        $matches = $autocomplete;
-                        $numMatches = count($matches);
-                    } else {
-                        $numMatches = 0;
-                    }
-
-                    // Pop the last character off the end of our string
-                    $ret = substr($ret, 0, $i);
-                } elseif ("\033" === $c) { // Did we read an escape sequence?
-                    $c .= fread($inputStream, 2);
-
-                    // A = Up Arrow. B = Down Arrow
-                    if ('A' === $c[2] || 'B' === $c[2]) {
-                        if ('A' === $c[2] && -1 === $ofs) {
-                            $ofs = 0;
-                        }
-
-                        if (0 === $numMatches) {
-                            continue;
-                        }
-
-                        $ofs += ('A' === $c[2]) ? -1 : 1;
-                        $ofs = ($numMatches + $ofs) % $numMatches;
-                    }
-                } elseif (ord($c) < 32) {
-                    if ("\t" === $c || "\n" === $c) {
-                        if ($numMatches > 0 && -1 !== $ofs) {
-                            $ret = $matches[$ofs];
-                            // Echo out remaining chars for current match
-                            $output->write(substr($ret, $i));
-                            $i = strlen($ret);
-                        }
-
-                        if ("\n" === $c) {
-                            $output->write($c);
-                            break;
-                        }
-
-                        $numMatches = 0;
-                    }
-
-                    continue;
-                } else {
-                    $output->write($c);
-                    $ret .= $c;
-                    $i++;
-
-                    $numMatches = 0;
-                    $ofs = 0;
-
-                    foreach ($autocomplete as $value) {
-                        // If typed characters match the beginning chunk of value (e.g. [AcmeDe]moBundle)
-                        if (0 === strpos($value, $ret) && $i !== strlen($value)) {
-                            $matches[$numMatches++] = $value;
-                        }
-                    }
-                }
-
-                // Erase characters from cursor to end of line
-                $output->write("\033[K");
-
-                if ($numMatches > 0 && -1 !== $ofs) {
-                    // Save cursor position
-                    $output->write("\0337");
-                    // Write highlighted text
-                    $output->write('<hl>'.substr($matches[$ofs], $i).'</hl>');
-                    // Restore cursor position
-                    $output->write("\0338");
-                }
+            $reader = new SuggestionInputReader($inputStream);
+            if ($autocomplete) {
+                $reader->setWraps('<hl>', '</hl>');
+                $reader->setSuggestions($autocomplete);
             }
-
-            // Reset stty so it behaves normally again
-            shell_exec(sprintf('stty %s', $sttyMode));
+            $ret = $reader->read($output);
+            $output->write(PHP_EOL);
+            $ret = trim($ret);
         }
 
         return strlen($ret) > 0 ? $ret : $default;

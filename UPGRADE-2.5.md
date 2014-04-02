@@ -45,6 +45,38 @@ Form
    {
    ```
 
+OptionsResolver
+---------------
+
+ * A new parameter `$flags` was added to `OptionsResolverInterface::resolve()`.
+   The parameter takes a bitwise combination of the new flag constants in that
+   interface.
+
+   If you implement the interface in your code, you should add the parameter as
+   well.
+
+   Before:
+
+   ```
+   public function resolve(array $options = array())
+   {
+       // ...
+   }
+   ```
+
+   After:
+
+   ```
+   public function resolve(array $options = array(), $flags = 0)
+   {
+       if ($flags & self::FORBID_UNKNOWN) {
+           // ...
+       }
+
+       // ...
+   }
+   ```
+
 Validator
 ---------
 
@@ -56,7 +88,7 @@ Validator
 
    After:
 
-   Default email validation is now done via a simple regex which may cause invalid emails (not RFC compilant) to be 
+   Default email validation is now done via a simple regex which may cause invalid emails (not RFC compilant) to be
    valid. This is the default behaviour.
 
    Strict email validation has to be explicitly activated in the configuration file by adding

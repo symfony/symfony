@@ -335,6 +335,42 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $this->assertEquals(array('2', '3'), $form->getViewData());
     }
 
+    /**
+     * @return array
+     */
+    public function provideForChoiceListCacheTest()
+    {
+        return array(
+            array(array('field1' => 0, 'field2' => 3), array('field1' => 0, 'field2' => 3)),
+            array(array('field1' => 0, 'field2' => 4), array('field1' => 0)),
+        );
+    }
+
+    /**
+     * @param array $submitted
+     * @param array $expectedData
+     *
+     * @dataProvider provideForChoiceListCacheTest
+     */
+    public function testSubmitObjectChoiceWithUniqueHash($submitted, $expectedData)
+    {
+        $choice = $this->factory->createNamed('field1', 'choice', null, array(
+            'choices' => $this->objectChoices,
+            'auto_initialize' => false
+        ));
+        array_pop($this->objectChoices);
+        $anotherChoice = $this->factory->createNamed('field2', 'choice', null, array(
+            'choices' => $this->objectChoices,
+            'auto_initialize' => false
+        ));
+
+        $form = $this->factory->create();
+        $form->add($choice)
+            ->add($anotherChoice);
+        $form->submit($submitted);
+        $this->assertEquals($expectedData, $form->getData());
+    }
+
     public function testSubmitSingleExpandedRequired()
     {
         $form = $this->factory->create('choice', null, array(
@@ -380,7 +416,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
         $form->submit('foobar');
 
-        $this->assertSame(null, $form->getData());
+        $this->assertNull($form->getData());
         $this->assertSame('foobar', $form->getViewData());
         $this->assertEmpty($form->getExtraData());
         $this->assertFalse($form->isSynchronized());
@@ -445,7 +481,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
         $form->submit('foobar');
 
-        $this->assertSame(null, $form->getData());
+        $this->assertNull($form->getData());
         $this->assertSame('foobar', $form->getViewData());
         $this->assertEmpty($form->getExtraData());
         $this->assertFalse($form->isSynchronized());

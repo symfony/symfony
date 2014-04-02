@@ -4,6 +4,7 @@ CHANGELOG
 2.5.0
 -----
 
+ * added a Process helper
  * deprecated TableHelper in favor of Table
  * deprecated ProgressHelper in favor of ProgressBar
  * added a way to set a default command instead of `ListCommand`

@@ -197,35 +197,18 @@ class XmlFileLoader extends FileLoader
                     $parameters[$normalizedName] = XmlUtils::phpize($node->nodeValue);
                 }
                 // keep not normalized key for BC too
-                $parameters[$name] = SimpleXMLElement::phpize($value);
+                $parameters[$name] = XmlUtils::phpize($node->nodeValue);
             }
 
-//            $definition->addTag((string) $tag['name'], $parameters);
             $definition->addTag($tag->getAttribute('name'), $parameters);
         }
 
-        if (isset($service['decorates'])) {
-            $renameId = isset($service['decoration-inner-name']) ? (string) $service['decoration-inner-name'] : null;
-            $definition->setDecoratedService((string) $service['decorates'], $renameId);
+        if ($value = $service->getAttribute('decorates')) {
+            $renameId = $service->hasAttribute('decoration-inner-name') ? $service->getAttribute('decoration-inner-name') : null;
+            $definition->setDecoratedService($value, $renameId);
         }
 
         $this->container->setDefinition($id, $definition);
-    }
-
-    /**
-     * Parses a XML file.
-     *
-     * @param string $file Path to a file
-     *
-     * @return SimpleXMLElement
-     *
-     * @throws InvalidArgumentException When loading of XML file returns error
-     */
-    protected function parseFile($file)
-    {
-        $dom = $this->parseFileToDOM($file);
-
-        return simplexml_import_dom($dom, 'Symfony\\Component\\DependencyInjection\\SimpleXMLElement');
     }
 
     /**
@@ -237,7 +220,7 @@ class XmlFileLoader extends FileLoader
      *
      * @throws InvalidArgumentException When loading of XML file returns error
      */
-    protected function parseFileToDOM($file)
+    private function parseFileToDOM($file)
     {
         try {
             $dom = XmlUtils::loadFile($file, array($this, 'validateSchema'));

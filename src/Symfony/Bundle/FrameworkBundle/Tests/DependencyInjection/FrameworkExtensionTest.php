@@ -277,6 +277,23 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame(array('loadClassMetadata'), $calls[4][1]);
         $this->assertSame('setMetadataCache', $calls[5][0]);
         $this->assertEquals(array(new Reference('validator.mapping.cache.apc')), $calls[5][1]);
+    }
+
+    public function testFullyConfiguredValidationService()
+    {
+        if (!extension_loaded('apc')) {
+            $this->markTestSkipped('The apc extension is not available.');
+        }
+
+        $container = $this->createContainerFromFile('full');
+
+        $this->assertInstanceOf('Symfony\Component\Validator\ValidatorInterface', $container->get('validator'));
+    }
+
+    public function testValidationService()
+    {
+        $container = $this->createContainerFromFile('validation_annotations');
+
         $this->assertInstanceOf('Symfony\Component\Validator\ValidatorInterface', $container->get('validator'));
     }
 

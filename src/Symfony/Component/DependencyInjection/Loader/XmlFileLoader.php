@@ -307,12 +307,14 @@ class XmlFileLoader extends FileLoader
     {
         $arguments = array();
         foreach ($this->getChildren($node, $name) as $arg) {
-            if ($nameAttr = $arg->getAttribute('name')) {
-                $arg->setAttribute('key', $nameAttr);
+            if ($arg->hasAttribute('name')) {
+                $arg->setAttribute('key', $arg->getAttribute('name'));
             }
 
-            if (!$key = $arg->getAttribute('key')) {
+            if (!$arg->hasAttribute('key')) {
                 $key = !$arguments ? 0 : max(array_keys($arguments)) + 1;
+            } else {
+                $key = $arg->getAttribute('key');
             }
 
             // parameter keys are case insensitive
@@ -322,8 +324,8 @@ class XmlFileLoader extends FileLoader
 
             // this is used by DefinitionDecorator to overwrite a specific
             // argument of the parent definition
-            if ($index = $arg->getAttribute('index')) {
-                $key = 'index_'.$index;
+            if ($arg->hasAttribute('index')) {
+                $key = 'index_'.$arg->getAttribute('index');
             }
 
             switch ($arg->getAttribute('type')) {

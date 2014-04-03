@@ -444,4 +444,13 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(1, count($services['foo']->getTag('foo.tag')), '->load parses <srv:tag> elements');
         $this->assertEquals(array(array('setBar', array('foo'))), $services['foo']->getMethodCalls(), '->load() parses the <srv:call> tag');
     }
+
+    public function testLoadIndexedArguments()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('services14.xml');
+
+        $this->assertEquals(array('index_0' => 'app'), $container->findDefinition('logger')->getArguments());
+    }
 }

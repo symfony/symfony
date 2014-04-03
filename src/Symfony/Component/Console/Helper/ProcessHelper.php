@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\Console\Helper;
 
-use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
+use Symfony\Component\Process\ProcessBuilder;
 
 /**
- * The Process class provides helpers to run external processes.
+ * The ProcessHelper class provides helpers to run external processes.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -25,40 +26,72 @@ class ProcessHelper extends Helper
     /**
      * Runs an external process.
      *
-     * @param OutputInterface $output   An OutputInterface instance
-     * @param string|Process  $cmd      An instance of Process or a command to run
-     * @param string|null     $error    An error message that must be displayed if something went wrong
-     * @param callback|null   $callback A PHP callback to run whenever there is some
-     *                                  output available on STDOUT or STDERR
+     * @param OutputInterface      $output   An OutputInterface instance
+     * @param string|array|Process $cmd      An instance of Process or an array of arguments to escape and run or a command to run
+     * @param string|null          $error    An error message that must be displayed if something went wrong
+     * @param callable|null        $callback A PHP callback to run whenever there is some
+     *                                       output available on STDOUT or STDERR
      *
      * @return Process The process that ran
      */
     public function run(OutputInterface $output, $cmd, $error = null, $callback = null)
     {
-        $verbose = $output->getVerbosity() >= OutputInterface::VERBOSITY_VERY_VERBOSE;
-        $debug = $output->getVerbosity() >= OutputInterface::VERBOSITY_DEBUG;
-
         $formatter = $this->getHelperSet()->get('debug_formatter');
 
-        $process = $cmd instanceof Process ? $cmd : new Process($cmd);
+        if (is_array($cmd)) {
+            $process = ProcessBuilder::create($cmd)->getProcess();
+        } elseif ($cmd instanceof Process) {
+            $process = $cmd;
+        } else {
+            $process = new Process($cmd);
+        }
 
-        if ($verbose) {
+        if ($output->isVeryVerbose()) {
             $output->write($formatter->start(spl_object_hash($process), $process->getCommandLine()));
         }
 
-        if ($debug) {
+        if ($output->isDebug()) {
             $callback = $this->wrapCallback($output, $process, $callback);
         }
 
         $process->run($callback);
 
-        if ($verbose) {
-            $message = $process->isSuccessful() ? 'Command ran successfully' : sprintf('%s Command did not run sucessfully', $process->getExitCode());
+        if ($output->isVeryVerbose()) {
+            $message = $process->isSuccessful() ? 'Command ran successfully' : sprintf('%s Command did not run successfully', $process->getExitCode());
             $output->write($formatter->stop(spl_object_hash($process), $message, $process->isSuccessful()));
         }
 
         if (!$process->isSuccessful() && null !== $error) {
-            $output->writeln(sprintf('<error>%s</error>'), $error);
+            $output->writeln(sprintf('<error>%s</error>', $error));
+        }
+
+        return $process;
+    }
+
+    /**
+     * Runs the process.
+     *
+     * This is identical to run() except that an exception is thrown if the process
+     * exits with a non-zero exit code.
+     *
+     * @param OutputInterface $output   An OutputInterface instance
+     * @param string|Process  $cmd      An instance of Process or a command to run
+     * @param string|null     $error    An error message that must be displayed if something went wrong
+     * @param callable|null   $callback A PHP callback to run whenever there is some
+     *                                  output available on STDOUT or STDERR
+     *
+     * @return Process The process that ran
+     *
+     * @throws ProcessFailedException
+     *
+     * @see run()
+     */
+    public function mustRun(OutputInterface $output, $cmd, $error = null, $callback = null)
+    {
+        $process = $this->run($output, $cmd, $error, $callback);
+
+        if (!$process->isSuccessful()) {
+            throw new ProcessFailedException($process);
         }
 
         return $process;
@@ -68,23 +101,26 @@ class ProcessHelper extends Helper
      * Wraps a Process callback to add debugging output.
      *
      * @param OutputInterface $output   An OutputInterface interface
+     * @param Process         $process  The Process
      * @param callable|null   $callback A PHP callable
+     *
+     * @return callable
      */
     public function wrapCallback(OutputInterface $output, Process $process, $callback = null)
     {
         $formatter = $this->getHelperSet()->get('debug_formatter');
 
         return function ($type, $buffer) use ($output, $process, $callback, $formatter) {
-            $output->write($formatter->progress(spl_object_hash($process), $buffer, 'err' === $type));
+            $output->write($formatter->progress(spl_object_hash($process), $buffer, Process::ERR === $type));
 
             if (null !== $callback) {
-                $callback($type, $buffer);
+                call_user_func($callback, $type, $buffer);
             }
         };
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getName()
     {

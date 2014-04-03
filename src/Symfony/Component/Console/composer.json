@@ -20,6 +20,7 @@
     },
     "require-dev": {
         "symfony/event-dispatcher": "~2.1",
+        "symfony/process": "~2.1",
         "psr/log": "~1.0"
     },
     "suggest": {

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Core\Tests\Authentication\Provider;
 
 use Symfony\Component\Security\Core\Authentication\Provider\PreAuthenticatedAuthenticationProvider;
+use Symfony\Component\Security\Core\Exception\LockedException;
 
 class PreAuthenticatedAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
 {
@@ -79,7 +80,7 @@ class PreAuthenticatedAuthenticationProviderTest extends \PHPUnit_Framework_Test
         $userChecker = $this->getMock('Symfony\Component\Security\Core\User\UserCheckerInterface');
         $userChecker->expects($this->once())
                     ->method('checkPostAuth')
-                    ->will($this->throwException($this->getMock('Symfony\Component\Security\Core\Exception\LockedException', null, array(), '', false)))
+                    ->will($this->throwException(new LockedException()))
         ;
 
         $provider = $this->getProvider($user, $userChecker);

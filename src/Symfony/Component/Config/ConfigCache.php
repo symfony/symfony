@@ -12,6 +12,7 @@
 namespace Symfony\Component\Config;
 
 use Symfony\Component\Config\Resource\ResourceInterface;
+use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -93,14 +94,23 @@ class ConfigCache
      */
     public function write($content, array $metadata = null)
     {
-        $mode = 0666 & ~umask();
+        $mode = 0666;
+        $umask = umask();
         $filesystem = new Filesystem();
         $filesystem->dumpFile($this->file, $content, null);
-        @chmod($this->file, $mode);
+        try {
+            $filesystem->chmod($this->file, $mode, $umask);
+        } catch (IOException $e) {
+            // discard chmod failure (some filesystem may not support it)
+        }
 
         if (null !== $metadata && true === $this->debug) {
             $filesystem->dumpFile($this->getMetaFile(), serialize($metadata), null);
-            @chmod($this->getMetaFile(), $mode);
+            try {
+                $filesystem->chmod($this->getMetaFile(), $mode, $umask);
+            } catch (IOException $e) {
+                // discard chmod failure (some filesystem may not support it)
+            }
         }
     }
 

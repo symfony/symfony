@@ -11,10 +11,12 @@
 
 namespace Symfony\Component\Security\Core\Tests\Authentication\Provider;
 
-use Symfony\Component\Security\Core\Authentication\Provider\UserAuthenticationProvider;
+use Symfony\Component\Security\Core\Exception\AccountExpiredException;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
+use Symfony\Component\Security\Core\Exception\CredentialsExpiredException;
+use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\Role\Role;
 use Symfony\Component\Security\Core\Role\SwitchUserRole;
-use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 
 class UserAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
 {
@@ -41,7 +43,7 @@ class UserAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
         $provider = $this->getProvider(false, false);
         $provider->expects($this->once())
                  ->method('retrieveUser')
-                 ->will($this->throwException($this->getMock('Symfony\Component\Security\Core\Exception\UsernameNotFoundException', null, array(), '', false)))
+                 ->will($this->throwException(new UsernameNotFoundException()))
         ;
 
         $provider->authenticate($this->getSupportedToken());
@@ -55,7 +57,7 @@ class UserAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
         $provider = $this->getProvider(false, true);
         $provider->expects($this->once())
                  ->method('retrieveUser')
-                 ->will($this->throwException($this->getMock('Symfony\Component\Security\Core\Exception\UsernameNotFoundException', null, array(), '', false)))
+                 ->will($this->throwException(new UsernameNotFoundException()))
         ;
 
         $provider->authenticate($this->getSupportedToken());
@@ -83,7 +85,7 @@ class UserAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
         $userChecker = $this->getMock('Symfony\Component\Security\Core\User\UserCheckerInterface');
         $userChecker->expects($this->once())
                     ->method('checkPreAuth')
-                    ->will($this->throwException($this->getMock('Symfony\Component\Security\Core\Exception\CredentialsExpiredException', null, array(), '', false)))
+                    ->will($this->throwException(new CredentialsExpiredException()))
         ;
 
         $provider = $this->getProvider($userChecker);
@@ -103,7 +105,7 @@ class UserAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
         $userChecker = $this->getMock('Symfony\Component\Security\Core\User\UserCheckerInterface');
         $userChecker->expects($this->once())
                     ->method('checkPostAuth')
-                    ->will($this->throwException($this->getMock('Symfony\Component\Security\Core\Exception\AccountExpiredException', null, array(), '', false)))
+                    ->will($this->throwException(new AccountExpiredException()))
         ;
 
         $provider = $this->getProvider($userChecker);
@@ -128,7 +130,7 @@ class UserAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
         ;
         $provider->expects($this->once())
                  ->method('checkAuthentication')
-                 ->will($this->throwException($this->getMock('Symfony\Component\Security\Core\Exception\BadCredentialsException', null, array(), '', false)))
+                 ->will($this->throwException(new BadCredentialsException()))
         ;
 
         $provider->authenticate($this->getSupportedToken());

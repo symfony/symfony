@@ -460,51 +460,45 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     {
         $id = strtolower($id);
 
+        if ($service = parent::get($id, ContainerInterface::NULL_ON_INVALID_REFERENCE)) {
+            return $service;
+        }
+
+        if (isset($this->loading[$id])) {
+            throw new LogicException(sprintf('The service "%s" has a circular reference to itself.', $id), 0, $e);
+        }
+
+        if (!$this->hasDefinition($id) && isset($this->aliasDefinitions[$id])) {
+            return $this->get($this->aliasDefinitions[$id]);
+        }
+
         try {
-            return parent::get($id, ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE);
-        } catch (InactiveScopeException $e) {
+            $definition = $this->getDefinition($id);
+        } catch (InvalidArgumentException $e) {
             if (ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $invalidBehavior) {
                 return null;
             }
 
             throw $e;
-        } catch (InvalidArgumentException $e) {
-            if (isset($this->loading[$id])) {
-                throw new LogicException(sprintf('The service "%s" has a circular reference to itself.', $id), 0, $e);
-            }
+        }
 
-            if (!$this->hasDefinition($id) && isset($this->aliasDefinitions[$id])) {
-                return $this->get($this->aliasDefinitions[$id]);
-            }
+        $this->loading[$id] = true;
 
-            try {
-                $definition = $this->getDefinition($id);
-            } catch (InvalidArgumentException $e) {
-                if (ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $invalidBehavior) {
-                    return null;
-                }
-
-                throw $e;
-            }
-
-            $this->loading[$id] = true;
-
-            try {
-                $service = $this->createService($definition, $id);
-            } catch (\Exception $e) {
-                unset($this->loading[$id]);
-
-                if ($e instanceof InactiveScopeException && self::EXCEPTION_ON_INVALID_REFERENCE !== $invalidBehavior) {
-                    return null;
-                }
-
-                throw $e;
-            }
-
+        try {
+            $service = $this->createService($definition, $id);
+        } catch (\Exception $e) {
             unset($this->loading[$id]);
 
-            return $service;
+            if ($e instanceof InactiveScopeException && self::EXCEPTION_ON_INVALID_REFERENCE !== $invalidBehavior) {
+                return null;
+            }
+
+            throw $e;
         }
+
+        unset($this->loading[$id]);
+
+        return $service;
     }
 
     /**

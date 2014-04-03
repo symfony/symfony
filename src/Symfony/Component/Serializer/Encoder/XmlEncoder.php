@@ -226,7 +226,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
     {
         return $name &&
             false === strpos($name, ' ') &&
-            preg_match('#^[\pL_][\pL0-9._-]*$#ui', $name);
+            preg_match('#^[\pL_][\pL0-9._:-]*$#ui', $name);
     }
 
     /**
@@ -244,40 +244,79 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
                 $data['@'.$attrkey] = (string) $attr;
             }
         }
-        foreach ($node->children() as $key => $subnode) {
-            if ($subnode->count()) {
-                $value = $this->parseXml($subnode);
-            } elseif ($subnode->attributes()) {
-                $value = array();
-                foreach ($subnode->attributes() as $attrkey => $attr) {
-                    $value['@'.$attrkey] = (string) $attr;
-                }
-                $value['#'] = (string) $subnode;
-            } else {
-                $value = (string) $subnode;
-            }
 
-            if ($key === 'item') {
-                if (isset($value['@key'])) {
-                    if (isset($value['#'])) {
-                        $data[$value['@key']] = $value['#'];
-                    } else {
-                        $data[$value['@key']] = $value;
+        // Parse documents with namespaces
+        if ($namespaces = $node->getDocNamespaces()) {
+            foreach ($namespaces as $prefix => $namespace) {
+                // Build strings for node namespace prefixes and root node xmlns attribute names
+                $xmlns  = 'xmlns';
+                if (!empty($prefix)) {
+                    $xmlns = $xmlns.':'.$prefix;
+                    $prefix = $prefix.':';
+                }
+                // Add the namespaces as attributes to the root node 
+                if (!count($node->xpath("parent::*"))) {
+                    $data['@'.$xmlns] = (string) $namespace;
+                }
+                // Parse attributes in namespace
+                if ($node->attributes($namespace)) {
+                    foreach ($node->attributes($namespace) as $attrkey => $attr) {
+                        $data['@'.$prefix.$attrkey] = (string) $attr;
                     }
-                } else {
-                    $data['item'][] = $value;
                 }
-            } elseif (array_key_exists($key, $data) || $key == "entry") {
-                if ((false === is_array($data[$key]))  || (false === isset($data[$key][0]))) {
-                    $data[$key] = array($data[$key]);
+                // Parse children in namespace
+                foreach ($node->children($namespace) as $key => $subnode) {
+                    $this->parseXmlSubnode($data, $subnode, $prefix.$key);
                 }
-                $data[$key][] = $value;
-            } else {
-                $data[$key] = $value;
+            }
+        } else { // XML doc has no (root) namespaces
+            // Parse children
+            foreach ($node->children() as $key => $subnode) {
+                $this->parseXmlSubnode($data, $subnode, $key);
             }
         }
 
         return $data;
+    }
+
+    /**
+     * Parse the input SimpleXmlElement into an array.
+     *
+     * @param array             $data       array to fill
+     * @param \SimpleXMLElement $subnode    xml to parse
+     * @param string            $key        name of the subnode including any namespace prefix
+     */
+    private function parseXmlSubnode(&$data, \SimpleXMLElement $subnode, $key)
+    {
+        if ($subnode->count()) {
+            $value = $this->parseXml($subnode);
+        } elseif ($subnode->attributes()) {
+            $value = array();
+            foreach ($subnode->attributes() as $attrkey => $attr) {
+                $value['@'.$attrkey] = (string) $attr;
+            }
+            $value['#'] = (string) $subnode;
+        } else {
+            $value = (string) $subnode;
+        }
+        if ($key === 'item') {
+            if (isset($value['@key'])) {
+                if (isset($value['#'])) {
+                    $data[(string) $value['@key']] = $value['#'];
+                } else {
+                    $data[(string) $value['@key']] = $value;
+                }
+            } else {
+                $data['item'][] = $value;
+            }
+        } elseif (array_key_exists($key, $data) || $key == "entry") {
+            if ((false === is_array($data[$key]))  || (false === isset($data[$key][0]))) {
+                $data[$key] = array($data[$key]);
+            }
+            $data[$key][] = $value;
+        } else {
+            $data[$key] = $value;
+        }
     }
 
     /**

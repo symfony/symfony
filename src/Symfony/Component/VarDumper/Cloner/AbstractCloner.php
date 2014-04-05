@@ -29,6 +29,9 @@ abstract class AbstractCloner implements ClonerInterface
         'o:Symfony\Component\VarDumper\Exception\ThrowingCasterException'
                            => 'Symfony\Component\VarDumper\Caster\ExceptionCaster::castThrowingCasterException',
 
+        'o:PDO'            => 'Symfony\Component\VarDumper\Caster\PdoCaster::castPdo',
+        'o:PDOStatement'   => 'Symfony\Component\VarDumper\Caster\PdoCaster::castPdoStatement',
+
         'o:ArrayObject'         => 'Symfony\Component\VarDumper\Caster\SplCaster::castArrayObject',
         'o:SplDoublyLinkedList' => 'Symfony\Component\VarDumper\Caster\SplCaster::castDoublyLinkedList',
         'o:SplFixedArray'       => 'Symfony\Component\VarDumper\Caster\SplCaster::castFixedArray',

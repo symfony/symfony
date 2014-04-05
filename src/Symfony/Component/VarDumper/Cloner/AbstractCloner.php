@@ -29,6 +29,13 @@ abstract class AbstractCloner implements ClonerInterface
         'o:Symfony\Component\VarDumper\Exception\ThrowingCasterException'
                            => 'Symfony\Component\VarDumper\Caster\ExceptionCaster::castThrowingCasterException',
 
+        'o:ArrayObject'         => 'Symfony\Component\VarDumper\Caster\SplCaster::castArrayObject',
+        'o:SplDoublyLinkedList' => 'Symfony\Component\VarDumper\Caster\SplCaster::castDoublyLinkedList',
+        'o:SplFixedArray'       => 'Symfony\Component\VarDumper\Caster\SplCaster::castFixedArray',
+        'o:SplHeap'             => 'Symfony\Component\VarDumper\Caster\SplCaster::castHeap',
+        'o:SplObjectStorage'    => 'Symfony\Component\VarDumper\Caster\SplCaster::castObjectStorage',
+        'o:SplPriorityQueue'    => 'Symfony\Component\VarDumper\Caster\SplCaster::castHeap',
+
         'r:curl'           => 'Symfony\Component\VarDumper\Caster\ResourceCaster::castCurl',
         'r:dba'            => 'Symfony\Component\VarDumper\Caster\ResourceCaster::castDba',
         'r:dba persistent' => 'Symfony\Component\VarDumper\Caster\ResourceCaster::castDba',

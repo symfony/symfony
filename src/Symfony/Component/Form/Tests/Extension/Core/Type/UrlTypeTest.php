@@ -43,8 +43,20 @@ class UrlTypeTest extends TypeTestCase
 
         $form->submit('');
 
-        $this->assertNull($form->getData());
+        $this->assertSame('',$form->getData()); // the data given was empty string so we should compare it to empty
         $this->assertSame('', $form->getViewData());
+    }
+
+    public function testSubmitAddsNoDefaultProtocolIfNull()
+    {
+      $form = $this->factory->create('url', null, array(
+        'default_protocol' => 'http',
+      ));
+
+      $form->submit(null);
+
+      $this->assertNull($form->getData());
+      $this->assertSame('', $form->getViewData());
     }
 
     public function testSubmitAddsNoDefaultProtocolIfSetToNull()

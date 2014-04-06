@@ -142,8 +142,8 @@ class FormType extends BaseType
                 };
             }
 
-            return function (FormInterface $form) {
-                return $form->getConfig()->getCompound() ? array() : '';
+            return function (FormInterface $form, $defaultValue = '') {
+                return $form->getConfig()->getCompound() ? array() : $defaultValue;
             };
         };
 

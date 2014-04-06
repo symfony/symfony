@@ -1117,7 +1117,7 @@ class Form implements \IteratorAggregate, FormInterface
         $transformers = $this->config->getViewTransformers();
 
         if (!$transformers) {
-            return '' === $value ? null : $value;
+            return $value;
         }
 
         for ($i = count($transformers) - 1; $i >= 0; --$i) {

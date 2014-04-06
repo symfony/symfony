@@ -14,6 +14,7 @@ namespace Symfony\Component\Console\Tests;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\FormatterHelper;
+use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputArgument;
@@ -22,6 +23,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Tester\ApplicationTester;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleExceptionEvent;
@@ -40,7 +42,9 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         require_once self::$fixturesPath.'/Foo2Command.php';
         require_once self::$fixturesPath.'/Foo3Command.php';
         require_once self::$fixturesPath.'/Foo4Command.php';
+        require_once self::$fixturesPath.'/Foo5Command.php';
         require_once self::$fixturesPath.'/FoobarCommand.php';
+        require_once self::$fixturesPath.'/BarBucCommand.php';
     }
 
     protected function normalizeLineBreaks($text)
@@ -98,11 +102,11 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     {
         $application = new Application();
         $commands = $application->all();
-        $this->assertEquals('Symfony\\Component\\Console\\Command\\HelpCommand', get_class($commands['help']), '->all() returns the registered commands');
+        $this->assertInstanceOf('Symfony\\Component\\Console\\Command\\HelpCommand', $commands['help'], '->all() returns the registered commands');
 
         $application->add(new \FooCommand());
         $commands = $application->all('foo');
-        $this->assertEquals(1, count($commands), '->all() takes a namespace as its first argument');
+        $this->assertCount(1, $commands, '->all() takes a namespace as its first argument');
     }
 
     public function testRegister()
@@ -123,6 +127,16 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $application->addCommands(array($foo = new \FooCommand(), $foo1 = new \Foo1Command()));
         $commands = $application->all();
         $this->assertEquals(array($foo, $foo1), array($commands['foo:bar'], $commands['foo:bar1']), '->addCommands() registers an array of commands');
+    }
+
+    /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage Command class "Foo5Command" is not correctly initialized. You probably forgot to call the parent constructor.
+     */
+    public function testAddCommandWithEmptyConstructor()
+    {
+        $application = new Application();
+        $application->add(new \Foo5Command());
     }
 
     public function testHasGet()
@@ -194,6 +208,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     public function testFindAmbiguousNamespace()
     {
         $application = new Application();
+        $application->add(new \BarBucCommand());
         $application->add(new \FooCommand());
         $application->add(new \Foo2Command());
         $application->findNamespace('f');
@@ -378,6 +393,19 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testFindAlternativeCommandsWithAnAlias()
+    {
+        $fooCommand = new \FooCommand();
+        $fooCommand->setAliases(array('foo2'));
+
+        $application = new Application();
+        $application->add($fooCommand);
+
+        $result = $application->find('foo');
+
+        $this->assertSame($fooCommand, $result);
+    }
+
     public function testFindAlternativeNamespace()
     {
         $application = new Application();
@@ -443,7 +471,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     public function testAsText()
     {
         $application = new Application();
-        $application->add(new \FooCommand);
+        $application->add(new \FooCommand());
         $this->ensureStaticCommandHelp($application);
         $this->assertStringEqualsFile(self::$fixturesPath.'/application_astext1.txt', $this->normalizeLineBreaks($application->asText()), '->asText() returns a text representation of the application');
         $this->assertStringEqualsFile(self::$fixturesPath.'/application_astext2.txt', $this->normalizeLineBreaks($application->asText('foo')), '->asText() returns a text representation of the application');
@@ -452,7 +480,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     public function testAsXml()
     {
         $application = new Application();
-        $application->add(new \FooCommand);
+        $application->add(new \FooCommand());
         $this->ensureStaticCommandHelp($application);
         $this->assertXmlStringEqualsXmlFile(self::$fixturesPath.'/application_asxml1.txt', $application->asXml(), '->asXml() returns an XML representation of the application');
         $this->assertXmlStringEqualsXmlFile(self::$fixturesPath.'/application_asxml2.txt', $application->asXml('foo'), '->asXml() returns an XML representation of the application');
@@ -476,7 +504,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $tester->run(array('command' => 'list', '--foo' => true), array('decorated' => false));
         $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception2.txt', $tester->getDisplay(true), '->renderException() renders the command synopsis when an exception occurs in the context of a command');
 
-        $application->add(new \Foo3Command);
+        $application->add(new \Foo3Command());
         $tester = new ApplicationTester($application);
         $tester->run(array('command' => 'foo3:bar'), array('decorated' => false));
         $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception3.txt', $tester->getDisplay(true), '->renderException() renders a pretty exceptions with previous exceptions');
@@ -507,8 +535,8 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $application->run();
         ob_end_clean();
 
-        $this->assertSame('Symfony\Component\Console\Input\ArgvInput', get_class($command->input), '->run() creates an ArgvInput by default if none is given');
-        $this->assertSame('Symfony\Component\Console\Output\ConsoleOutput', get_class($command->output), '->run() creates a ConsoleOutput by default if none is given');
+        $this->assertInstanceOf('Symfony\Component\Console\Input\ArgvInput', $command->input, '->run() creates an ArgvInput by default if none is given');
+        $this->assertInstanceOf('Symfony\Component\Console\Output\ConsoleOutput', $command->output, '->run() creates a ConsoleOutput by default if none is given');
 
         $application = new Application();
         $application->setAutoExit(false);
@@ -585,6 +613,29 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
         $tester->run(array('command' => 'foo:bar', '-n' => true), array('decorated' => false));
         $this->assertSame('called'.PHP_EOL, $tester->getDisplay(), '->run() does not call interact() if -n is passed');
+    }
+
+    /**
+     * Issue #9285
+     *
+     * If the "verbose" option is just before an argument in ArgvInput,
+     * an argument value should not be treated as verbosity value.
+     * This test will fail with "Not enough arguments." if broken
+     */
+    public function testVerboseValueNotBreakArguments()
+    {
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->setCatchExceptions(false);
+        $application->add(new \FooCommand());
+
+        $output = new StreamOutput(fopen('php://memory', 'w', false));
+
+        $input = new ArgvInput(array('cli.php', '-v', 'foo:bar'));
+        $application->run($input, $output);
+
+        $input = new ArgvInput(array('cli.php', '--verbose', 'foo:bar'));
+        $application->run($input, $output);
     }
 
     public function testRunReturnsIntegerExitCode()
@@ -826,7 +877,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
     protected function getDispatcher()
     {
-        $dispatcher = new EventDispatcher;
+        $dispatcher = new EventDispatcher();
         $dispatcher->addListener('console.command', function (ConsoleCommandEvent $event) {
             $event->getOutput()->write('before.');
         });
@@ -842,6 +893,28 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         });
 
         return $dispatcher;
+    }
+
+    public function testSetRunCustomDefaultCommand()
+    {
+        $command = new \FooCommand();
+
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->add($command);
+        $application->setDefaultCommand($command->getName());
+
+        $tester = new ApplicationTester($application);
+        $tester->run(array());
+        $this->assertEquals('interact called'.PHP_EOL.'called'.PHP_EOL, $tester->getDisplay(), 'Application runs the default set command if different from \'list\' command');
+
+        $application = new CustomDefaultCommandApplication();
+        $application->setAutoExit(false);
+
+        $tester = new ApplicationTester($application);
+        $tester->run(array());
+
+        $this->assertEquals('interact called'.PHP_EOL.'called'.PHP_EOL, $tester->getDisplay(), 'Application runs the default set command if different from \'list\' command');
     }
 }
 
@@ -865,5 +938,20 @@ class CustomApplication extends Application
     protected function getDefaultHelperSet()
     {
         return new HelperSet(array(new FormatterHelper()));
+    }
+}
+
+class CustomDefaultCommandApplication extends Application
+{
+    /**
+     * Overwrites the constructor in order to set a different default command.
+     */
+    public function __construct()
+    {
+        parent::__construct();
+
+        $command = new \FooCommand();
+        $this->add($command);
+        $this->setDefaultCommand($command->getName());
     }
 }

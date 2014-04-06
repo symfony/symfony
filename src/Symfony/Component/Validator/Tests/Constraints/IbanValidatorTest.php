@@ -53,7 +53,6 @@ class IbanValidatorTest extends \PHPUnit_Framework_TestCase
     public function getValidIbans()
     {
         return array(
-            array('CH93 0076 2011 6238 5295 7'), //Switzerland
             array('CH9300762011623852957'), // Switzerland without spaces
 
             //Country list
@@ -182,6 +181,11 @@ class IbanValidatorTest extends \PHPUnit_Framework_TestCase
             array('CY170020 128 0000 0012 0052 7600'),
             array('foo'),
             array('123'),
+            array('0750447346'),
+
+            //Ibans with lower case values are invalid
+            array('Ae260211000000230064016'),
+            array('ae260211000000230064016')
         );
     }
 }

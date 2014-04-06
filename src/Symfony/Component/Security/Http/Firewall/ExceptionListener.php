@@ -87,86 +87,92 @@ class ExceptionListener
     public function onKernelException(GetResponseForExceptionEvent $event)
     {
         $exception = $event->getException();
-        $request = $event->getRequest();
+        do {
+            if ($exception instanceof AuthenticationException) {
+                return $this->handleAuthenticationException($event, $exception);
+            } elseif ($exception instanceof AccessDeniedException) {
+                return $this->handleAccessDeniedException($event, $exception);
+            } elseif ($exception instanceof LogoutException) {
+                return $this->handleLogoutException($event, $exception);
+            }
+        } while (null !== $exception = $exception->getPrevious());
+    }
 
-        // determine the actual cause for the exception
-        while (null !== $previous = $exception->getPrevious()) {
-            $exception = $previous;
+    private function handleAuthenticationException(GetResponseForExceptionEvent $event, AuthenticationException $exception)
+    {
+        if (null !== $this->logger) {
+            $this->logger->info(sprintf('Authentication exception occurred; redirecting to authentication entry point (%s)', $exception->getMessage()));
         }
 
-        if ($exception instanceof AuthenticationException) {
+        try {
+            $event->setResponse($this->startAuthentication($event->getRequest(), $exception));
+        } catch (\Exception $e) {
+            $event->setException($e);
+        }
+    }
+
+    private function handleAccessDeniedException(GetResponseForExceptionEvent $event, AccessDeniedException $exception)
+    {
+        $event->setException(new AccessDeniedHttpException($exception->getMessage(), $exception));
+
+        $token = $this->context->getToken();
+        if (!$this->authenticationTrustResolver->isFullFledged($token)) {
             if (null !== $this->logger) {
-                $this->logger->info(sprintf('Authentication exception occurred; redirecting to authentication entry point (%s)', $exception->getMessage()));
+                $this->logger->debug(sprintf('Access is denied (user is not fully authenticated) by "%s" at line %s; redirecting to authentication entry point', $exception->getFile(), $exception->getLine()));
             }
 
             try {
-                $response = $this->startAuthentication($request, $exception);
+                $insufficientAuthenticationException = new InsufficientAuthenticationException('Full authentication is required to access this resource.', 0, $exception);
+                $insufficientAuthenticationException->setToken($token);
+
+                $event->setResponse($this->startAuthentication($event->getRequest(), $insufficientAuthenticationException));
             } catch (\Exception $e) {
                 $event->setException($e);
-
-                return;
-            }
-        } elseif ($exception instanceof AccessDeniedException) {
-            $event->setException(new AccessDeniedHttpException($exception->getMessage(), $exception));
-
-            $token = $this->context->getToken();
-            if (!$this->authenticationTrustResolver->isFullFledged($token)) {
-                if (null !== $this->logger) {
-                    $this->logger->debug(sprintf('Access is denied (user is not fully authenticated) by "%s" at line %s; redirecting to authentication entry point', $exception->getFile(), $exception->getLine()));
-                }
-
-                try {
-                    $insufficientAuthenticationException = new InsufficientAuthenticationException('Full authentication is required to access this resource.', 0, $exception);
-                    $insufficientAuthenticationException->setToken($token);
-                    $response = $this->startAuthentication($request, $insufficientAuthenticationException);
-                } catch (\Exception $e) {
-                    $event->setException($e);
-
-                    return;
-                }
-            } else {
-                if (null !== $this->logger) {
-                    $this->logger->debug(sprintf('Access is denied (and user is neither anonymous, nor remember-me) by "%s" at line %s', $exception->getFile(), $exception->getLine()));
-                }
-
-                try {
-                    if (null !== $this->accessDeniedHandler) {
-                        $response = $this->accessDeniedHandler->handle($request, $exception);
-
-                        if (!$response instanceof Response) {
-                            return;
-                        }
-                    } elseif (null !== $this->errorPage) {
-                        $subRequest = $this->httpUtils->createRequest($request, $this->errorPage);
-                        $subRequest->attributes->set(SecurityContextInterface::ACCESS_DENIED_ERROR, $exception);
-
-                        $response = $event->getKernel()->handle($subRequest, HttpKernelInterface::SUB_REQUEST, true);
-                    } else {
-                        return;
-                    }
-                } catch (\Exception $e) {
-                    if (null !== $this->logger) {
-                        $this->logger->error(sprintf('Exception thrown when handling an exception (%s: %s)', get_class($e), $e->getMessage()));
-                    }
-
-                    $event->setException(new \RuntimeException('Exception thrown when handling an exception.', 0, $e));
-
-                    return;
-                }
-            }
-        } elseif ($exception instanceof LogoutException) {
-            if (null !== $this->logger) {
-                $this->logger->info(sprintf('Logout exception occurred; wrapping with AccessDeniedHttpException (%s)', $exception->getMessage()));
             }
 
-            return;
-        } else {
             return;
         }
 
-        $event->setResponse($response);
+        if (null !== $this->logger) {
+            $this->logger->debug(sprintf('Access is denied (and user is neither anonymous, nor remember-me) by "%s" at line %s', $exception->getFile(), $exception->getLine()));
+        }
+
+        try {
+            if (null !== $this->accessDeniedHandler) {
+                $response = $this->accessDeniedHandler->handle($event->getRequest(), $exception);
+
+                if ($response instanceof Response) {
+                    $event->setResponse($response);
+                }
+            } elseif (null !== $this->errorPage) {
+                $subRequest = $this->httpUtils->createRequest($event->getRequest(), $this->errorPage);
+                $subRequest->attributes->set(SecurityContextInterface::ACCESS_DENIED_ERROR, $exception);
+
+                $event->setResponse($event->getKernel()->handle($subRequest, HttpKernelInterface::SUB_REQUEST, true));
+            }
+        } catch (\Exception $e) {
+            if (null !== $this->logger) {
+                $this->logger->error(sprintf('Exception thrown when handling an exception (%s: %s)', get_class($e), $e->getMessage()));
+            }
+
+            $event->setException(new \RuntimeException('Exception thrown when handling an exception.', 0, $e));
+        }
     }
 
+    private function handleLogoutException(GetResponseForExceptionEvent $event, LogoutException $exception)
+    {
+        if (null !== $this->logger) {
+            $this->logger->info(sprintf('Logout exception occurred; wrapping with AccessDeniedHttpException (%s)', $exception->getMessage()));
+        }
+    }
+
+    /**
+     * @param Request                 $request
+     * @param AuthenticationException $authException
+     *
+     * @return Response
+     * @throws AuthenticationException
+     */
     private function startAuthentication(Request $request, AuthenticationException $authException)
     {
         if (null === $this->authenticationEntryPoint) {
@@ -187,9 +193,12 @@ class ExceptionListener
         return $this->authenticationEntryPoint->start($request, $authException);
     }
 
+    /**
+     * @param Request $request
+     */
     protected function setTargetPath(Request $request)
     {
-        // session isn't required when using http basic authentication mechanism for example
+        // session isn't required when using HTTP basic authentication mechanism for example
         if ($request->hasSession() && $request->isMethodSafe()) {
             $request->getSession()->set('_security.'.$this->providerKey.'.target_path', $request->getUri());
         }

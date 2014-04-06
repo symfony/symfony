@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\ExpressionLanguage\Tests\Node;
+namespace Symfony\Component\ExpressionLanguage\Tests;
 
 use Symfony\Component\ExpressionLanguage\Lexer;
 use Symfony\Component\ExpressionLanguage\Token;
@@ -30,6 +30,10 @@ class LexerTest extends \PHPUnit_Framework_TestCase
     public function getTokenizeData()
     {
         return array(
+            array(
+                array(new Token('name', 'a', 3)),
+                '  a  ',
+            ),
             array(
                 array(new Token('name', 'a', 1)),
                 'a',
@@ -69,6 +73,10 @@ class LexerTest extends \PHPUnit_Framework_TestCase
                     new Token('punctuation', ']', 27),
                 ),
                 '(3 + 5) ~ foo("bar").baz[4]',
+            ),
+            array(
+                array(new Token('operator', '..', 1)),
+                '..',
             ),
         );
     }

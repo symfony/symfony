@@ -30,6 +30,24 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $env['MY_VAR_1']);
     }
 
+    public function testAddEnvironmentVariables()
+    {
+        $pb = new ProcessBuilder();
+        $env = array(
+            'foo' => 'bar',
+            'foo2' => 'bar2',
+        );
+        $proc = $pb
+            ->add('command')
+            ->setEnv('foo', 'bar2')
+            ->addEnvironmentVariables($env)
+            ->inheritEnvironmentVariables(false)
+            ->getProcess()
+        ;
+
+        $this->assertSame($env, $proc->getEnv());
+    }
+
     public function testProcessShouldInheritAndOverrideEnvironmentVars()
     {
         $_ENV['MY_VAR_1'] = 'foo';
@@ -120,13 +138,13 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldEscapeArguments()
     {
-        $pb = new ProcessBuilder(array('%path%', 'foo " bar'));
+        $pb = new ProcessBuilder(array('%path%', 'foo " bar', '%baz%baz'));
         $proc = $pb->getProcess();
 
         if (defined('PHP_WINDOWS_VERSION_BUILD')) {
-            $this->assertSame('^%"path"^% "foo "\\"" bar"', $proc->getCommandLine());
+            $this->assertSame('^%"path"^% "foo \\" bar" "%baz%baz"', $proc->getCommandLine());
         } else {
-            $this->assertSame("'%path%' 'foo \" bar'", $proc->getCommandLine());
+            $this->assertSame("'%path%' 'foo \" bar' '%baz%baz'", $proc->getCommandLine());
         }
     }
 
@@ -174,5 +192,24 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
         } else {
             $this->assertEquals("'/usr/bin/php'", $process->getCommandLine());
         }
+    }
+
+    public function testShouldReturnProcessWithDisabledOutput()
+    {
+        $process = ProcessBuilder::create(array('/usr/bin/php'))
+            ->disableOutput()
+            ->getProcess();
+
+        $this->assertTrue($process->isOutputDisabled());
+    }
+
+    public function testShouldReturnProcessWithEnabledOutput()
+    {
+        $process = ProcessBuilder::create(array('/usr/bin/php'))
+            ->disableOutput()
+            ->enableOutput()
+            ->getProcess();
+
+        $this->assertFalse($process->isOutputDisabled());
     }
 }

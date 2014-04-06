@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Security\Core\Encoder;
 
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
+
 /**
  * MessageDigestPasswordEncoder uses a message digest algorithm.
  *
@@ -41,7 +43,9 @@ class MessageDigestPasswordEncoder extends BasePasswordEncoder
      */
     public function encodePassword($raw, $salt)
     {
-        $this->checkPasswordLength($raw);
+        if ($this->isPasswordTooLong($raw)) {
+            throw new BadCredentialsException('Invalid password.');
+        }
 
         if (!in_array($this->algorithm, hash_algos(), true)) {
             throw new \LogicException(sprintf('The algorithm "%s" is not supported.', $this->algorithm));
@@ -63,8 +67,6 @@ class MessageDigestPasswordEncoder extends BasePasswordEncoder
      */
     public function isPasswordValid($encoded, $raw, $salt)
     {
-        $this->checkPasswordLength($raw);
-
-        return $this->comparePasswords($encoded, $this->encodePassword($raw, $salt));
+        return !$this->isPasswordTooLong($raw) && $this->comparePasswords($encoded, $this->encodePassword($raw, $salt));
     }
 }

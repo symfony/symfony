@@ -126,7 +126,7 @@ class RememberMeFactory implements SecurityFactoryInterface
             ->scalarNode('token_provider')->end()
             ->arrayNode('user_providers')
                 ->beforeNormalization()
-                    ->ifString()->then(function($v) { return array($v); })
+                    ->ifString()->then(function ($v) { return array($v); })
                 ->end()
                 ->prototype('scalar')->end()
             ->end()

@@ -6,8 +6,6 @@ use Symfony\Component\DependencyInjection\Exception\InactiveScopeException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
-use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 
 /**
@@ -18,6 +16,8 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  */
 class ProjectServiceContainer extends Container
 {
+    private $parameters;
+
     /**
      * Constructor.
      */
@@ -36,6 +36,9 @@ class ProjectServiceContainer extends Container
         $this->methodMap = array(
             'bar' => 'getBarService',
             'baz' => 'getBazService',
+            'configured_service' => 'getConfiguredServiceService',
+            'decorator_service' => 'getDecoratorServiceService',
+            'decorator_service_with_name' => 'getDecoratorServiceWithNameService',
             'depends_on_request' => 'getDependsOnRequestService',
             'factory_service' => 'getFactoryServiceService',
             'foo' => 'getFooService',
@@ -48,6 +51,7 @@ class ProjectServiceContainer extends Container
         $this->aliases = array(
             'alias_for_alias' => 'foo',
             'alias_for_foo' => 'foo',
+            'decorated' => 'decorator_service_with_name',
         );
     }
 
@@ -57,13 +61,15 @@ class ProjectServiceContainer extends Container
      * This service is shared.
      * This method always returns the same instance of the service.
      *
-     * @return FooClass A FooClass instance.
+     * @return Bar\FooClass A Bar\FooClass instance.
      */
     protected function getBarService()
     {
-        $this->services['bar'] = $instance = new \FooClass('foo', $this->get('foo.baz'), $this->getParameter('foo_bar'));
+        $a = $this->get('foo.baz');
 
-        $this->get('foo.baz')->configure($instance);
+        $this->services['bar'] = $instance = new \Bar\FooClass('foo', $a, $this->getParameter('foo_bar'));
+
+        $a->configure($instance);
 
         return $instance;
     }
@@ -83,6 +89,52 @@ class ProjectServiceContainer extends Container
         $instance->setFoo($this->get('foo_with_inline'));
 
         return $instance;
+    }
+
+    /**
+     * Gets the 'configured_service' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return stdClass A stdClass instance.
+     */
+    protected function getConfiguredServiceService()
+    {
+        $a = new \ConfClass();
+        $a->setFoo($this->get('baz'));
+
+        $this->services['configured_service'] = $instance = new \stdClass();
+
+        $a->configureStdClass($instance);
+
+        return $instance;
+    }
+
+    /**
+     * Gets the 'decorator_service' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return stdClass A stdClass instance.
+     */
+    protected function getDecoratorServiceService()
+    {
+        return $this->services['decorator_service'] = new \stdClass();
+    }
+
+    /**
+     * Gets the 'decorator_service_with_name' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return stdClass A stdClass instance.
+     */
+    protected function getDecoratorServiceWithNameService()
+    {
+        return $this->services['decorator_service_with_name'] = new \stdClass();
     }
 
     /**
@@ -121,18 +173,19 @@ class ProjectServiceContainer extends Container
      * This service is shared.
      * This method always returns the same instance of the service.
      *
-     * @return FooClass A FooClass instance.
+     * @return Bar\FooClass A Bar\FooClass instance.
      */
     protected function getFooService()
     {
         $a = $this->get('foo.baz');
 
-        $this->services['foo'] = $instance = call_user_func(array('FooClass', 'getInstance'), 'foo', $a, array('bar' => 'foo is bar', 'foobar' => 'bar'), true, $this);
+        $this->services['foo'] = $instance = \Bar\FooClass::getInstance('foo', $a, array('bar' => 'foo is bar', 'foobar' => 'bar'), true, $this);
 
         $instance->setBar($this->get('bar'));
         $instance->initialize();
         $instance->foo = 'bar';
         $instance->moo = $a;
+        $instance->qux = array('bar' => 'foo is bar', 'foobar' => 'bar');
         sc_configure($instance);
 
         return $instance;
@@ -148,9 +201,9 @@ class ProjectServiceContainer extends Container
      */
     protected function getFoo_BazService()
     {
-        $this->services['foo.baz'] = $instance = call_user_func(array('BazClass', 'getInstance'));
+        $this->services['foo.baz'] = $instance = \BazClass::getInstance();
 
-        call_user_func(array('BazClass', 'configureStatic1'), $instance);
+        \BazClass::configureStatic1($instance);
 
         return $instance;
     }
@@ -158,11 +211,11 @@ class ProjectServiceContainer extends Container
     /**
      * Gets the 'foo_bar' service.
      *
-     * @return FooClass A FooClass instance.
+     * @return Bar\FooClass A Bar\FooClass instance.
      */
     protected function getFooBarService()
     {
-        return new \FooClass();
+        return new \Bar\FooClass();
     }
 
     /**
@@ -193,13 +246,13 @@ class ProjectServiceContainer extends Container
      * This service is shared.
      * This method always returns the same instance of the service.
      *
-     * @return FooClass A FooClass instance.
+     * @return Bar\FooClass A Bar\FooClass instance.
      */
     protected function getMethodCall1Service()
     {
         require_once '%path%foo.php';
 
-        $this->services['method_call1'] = $instance = new \FooClass();
+        $this->services['method_call1'] = $instance = new \Bar\FooClass();
 
         $instance->setBar($this->get('foo'));
         $instance->setBar(NULL);
@@ -283,7 +336,7 @@ class ProjectServiceContainer extends Container
     {
         return array(
             'baz_class' => 'BazClass',
-            'foo_class' => 'FooClass',
+            'foo_class' => 'Bar\\FooClass',
             'foo' => 'bar',
         );
     }

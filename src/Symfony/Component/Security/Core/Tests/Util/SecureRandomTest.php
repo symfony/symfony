@@ -68,7 +68,7 @@ class SecureRandomTest extends \PHPUnit_Framework_TestCase
             $runs[$i] = 0;
         }
 
-        $addRun = function($run) use (&$runs) {
+        $addRun = function ($run) use (&$runs) {
             if ($run > 6) {
                 $run = 6;
             }
@@ -111,8 +111,8 @@ class SecureRandomTest extends \PHPUnit_Framework_TestCase
     {
         $b = $this->getBitSequence($secureRandom, 20000);
 
-        $longestRun = 0;
-        $currentRun = $lastBit = null;
+        $longestRun = $currentRun = 0;
+        $lastBit = null;
         for ($i = 0; $i < 20000; $i++) {
             if ($lastBit === $b[$i]) {
                 $currentRun += 1;

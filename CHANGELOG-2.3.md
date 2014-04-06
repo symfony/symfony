@@ -7,6 +7,246 @@ in 2.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.3.0...v2.3.1
 
+* 2.3.12 (2014-04-03)
+
+ * bug #10586 Fixes URL validator to accept single part urls (merk)
+ * bug #10591 [Form] Buttons are now disabled if their containing form is disabled (webmozart)
+ * bug #10579 HHVM fixes (fabpot)
+ * bug #10564 fixed the profiler when an uncalled listener throws an exception when instantiated (fabpot)
+ * bug #10568 [Form] Fixed hashing of choice lists containing non-UTF-8 characters (webmozart)
+ * bug #10536 Avoid levenshtein comparison when using ContainerBuilder. (catch56)
+ * bug #10549 Fixed server values in BrowserKit (fabpot)
+ * bug #10540 [HttpKernel] made parsing controllers more robust (fabpot)
+ * bug #10545 [DependencyInjection] Fixed YamlFileLoader imports path (jrnickell)
+ * bug #10523 [Debug] Check headers sent before sending PHP response (GromNaN)
+ * bug #10275 [Validator] Fixed ACE domain checks on UrlValidator (#10031) (aeoris)
+ * bug #10123 handle array root element (greg0ire)
+ * bug #10532 Fixed regression when using Symfony on filesystems without chmod support (fabpot)
+ * bug #10502 [HttpKernel] Fix #10437: Catch exceptions when reloading a no-cache request (romainneutron)
+ * bug #10493  Fix libxml_use_internal_errors and libxml_disable_entity_loader usage (romainneutron)
+ * bug #9784 [HttpFoundation] Removed ini check to make Uploadedfile work on Google App Engine (micheleorselli)
+ * bug #10416 [Form] Allow options to be grouped by objects (felds)
+ * bug #10410 [Form] Fix "Array was modified outside object" in ResizeFormListener. (Chekote)
+ * bug #10494 [Validator] Minor fix in IBAN validator (sprain)
+ * bug #10491 Fixed bug that incorrectly causes the "required" attribute to be omitted from select even though it contains the "multiple" attribute (fabpot)
+ * bug #10479 [Process] Fix escaping on Windows (romainneutron)
+ * bug #10480 [Process] Fixed fatal errors in getOutput and getErrorOutput when process was not started  (romainneutron)
+ * bug #10420 [Process] Make Process::start non-blocking on Windows platform (romainneutron)
+ * bug #10455 [Process] Fix random failures in test suite on TravisCI (romainneutron)
+ * bug #10448 [Process] Fix quoted arguments escaping (romainneutron)
+ * bug #10444 [DomCrawler] Fixed incorrect value name conversion in getPhpValues() and getPhpFiles() (romainneutron)
+ * bug #10423 [Config] XmlUtils::convertDomElementToArray does not handle '0' (bendavies)
+ * bug #10153 [Process] Fixed data in pipe being truncated if not read before process termination (astephens25)
+ * bug #10429 [Process] Fix #9160 : escaping an argument with a trailing backslash on windows fails (romainneutron)
+ * bug #10412 [Process] Fix process status in TTY mode (romainneutron)
+ * bug #10382 10158 get vary multiple (bbinkovitz)
+ * bug #10251 [Form] Fixes empty file-inputs getting treated as extra field. (jenkoian)
+ * bug #10351 [HttpKernel] fix stripComments() normalizing new-lines (sstok)
+ * bug #10348 Update FileLoader to fix issue #10339 (msumme)
+
+* 2.3.11 (2014-02-27)
+
+ * bug #10146 [WebProfilerBundle] fixed parsing Mongo DSN and added Test for it (malarzm)
+ * bug #10299 [Finder] () is also a valid delimiter (WouterJ)
+ * bug #10255 [FrameworkBundle] Fixed wrong redirect url if path contains some query parameters (pulzarraider)
+ * bug #10285 Bypass sigchild detection if phpinfo is not available (Seldaek)
+ * bug #10269 [Form] Revert "Fix "Array was modified outside object" in ResizeFormListener." (norzechowicz)
+
+* 2.3.10 (2014-02-12)
+
+ * bug #10231 [Console] removed problematic regex (fabpot)
+ * bug #10245 [DomCrawler] Added support for <area> tags to be treated as links (shamess)
+ * bug #10232 [Form] Fix "Array was modified outside object" in ResizeFormListener. (Chekote)
+ * bug #10215 [Routing] reduced recursion in dumper (arnaud-lb)
+ * bug #10207 [DomCrawler] Fixed filterXPath() chaining (robbertkl)
+ * bug #10205 [DomCrawler] Fixed incorrect handling of image inputs (robbertkl)
+ * bug #10191 [HttpKernel] fixed wrong reference in TraceableEventDispatcher (fabpot)
+ * bug #10195 [Debug] Fixed recursion level incrementing in FlattenException::flattenArgs(). (sun)
+ * bug #10151 [Form] Update DateTime objects only if the actual value has changed (peterrehm)
+ * bug #10140 allow the TextAreaFormField to be used with valid/invalid HTML (dawehner)
+ * bug #10131 added lines to exceptions for the trans and transchoice tags (fabpot)
+ * bug #10119 [Validator] Minor fix in XmlFileLoader (florianv)
+ * bug #10078 [BrowserKit] add non-standard port to HTTP_HOST server param (kbond)
+ * bug #10091 [Translation] Update PluralizationRules.php (guilhermeblanco)
+ * bug #10053 [Form] fixed allow render 0 numeric input value (dczech)
+ * bug #10033 [HttpKernel] Bugfix - Logger Deprecation Notice (Rican7)
+ * bug #10023 [FrameworkBundle] Thrown an HttpException instead returning a Response in RedirectController::redirectAction() (jakzal)
+ * bug #9985 Prevent WDT from creating a session (mvrhov)
+ * bug #10000 [Console] Fixed the compatibility with HHVM (stof)
+ * bug #9979 [Doctrine Bridge][Validator] Fix for null values in assosiated properties when using UniqueEntityValidator (vpetrovych)
+ * bug #9983 [TwigBridge] Update min. version of Twig (stloyd)
+ * bug #9970 [CssSelector] fixed numeric attribute issue (jfsimon)
+ * bug #9747 [DoctrineBridge] Fix: Add type detection. Needed by pdo_dblib (iamluc)
+ * bug #9962 [Process] Fix #9861 : Revert TTY mode (romainneutron)
+ * bug #9960 [Form] Update minimal requirement in composer.json (stloyd)
+ * bug #9952 [Translator] Fix Empty translations with Qt files (vlefort)
+ * bug #9948 [WebProfilerBundle] Fixed profiler toolbar icons for XHTML. (rafalwrzeszcz)
+ * bug #9933 Propel1 exception message (jaugustin)
+ * bug #9949 [BrowserKit] Throw exception on invalid cookie expiration timestamp (anlutro)
+
+* 2.3.9 (2014-01-05)
+
+ * bug #9938 [Process] Add support SAPI cli-server (peter-gribanov)
+ * bug #9940 [EventDispatcher] Fix hardcoded listenerTag name in error message (lemoinem)
+ * bug #9908 [HttpFoundation] Throw proper exception when invalid data is passed to JsonResponse class (stloyd)
+ * bug #9902 [Security] fixed pre/post authentication checks (fabpot)
+ * bug #9899 [Filesystem | WCM] 9339 fix stat on url for filesystem copy (cordoval)
+ * bug #9589 [DependencyInjection] Fixed #9020 - Added support for collections in service#parameters (lavoiesl)
+ * bug #9889 [Console] fixed column width when using the Table helper with some decoration in cells (fabpot)
+ * bug #9323 [DomCrawler]fix #9321 Crawler::addHtmlContent add gbk encoding support (bronze1man)
+ * bug #8997 [Security] Fixed problem with losing ROLE_PREVIOUS_ADMIN role. (pawaclawczyk)
+ * bug #9557 [DoctrineBridge] Fix for cache-key conflict when having a \Traversable as choices (DRvanR)
+ * bug #9879 [Security] Fix ExceptionListener to catch correctly AccessDeniedException if is not first exception (fabpot)
+ * bug #9885 [Dependencyinjection] Fixed handling of inlined references in the AnalyzeServiceReferencesPass (fabpot)
+ * bug #9884 [DomCrawler] Fixed creating form objects from named form nodes (jakzal)
+ * bug #9882 Add support for HHVM in the getting of the PHP executable (fabpot)
+ * bug #9850 [Validator] Fixed IBAN validator with 0750447346 value (stewe)
+ * bug #9865 [Validator] Fixes message value for objects (jongotlin)
+ * bug #9441 [Form][DateTimeToArrayTransformer] Check for hour, minute & second validity (egeloen)
+ * bug #9867 #9866 [Filesystem] Fixed mirror for symlinks (COil)
+ * bug #9806 [Security] Fix parent serialization of user object (ddeboer)
+ * bug #9834 [DependencyInjection] Fixed support for backslashes in service ids. (jakzal)
+ * bug #9826 fix #9356 [Security] Logger should manipulate the user reloaded from provider (matthieuauger)
+ * bug #9769 [BrowserKit] fixes #8311 CookieJar is totally ignorant of RFC 6265 edge cases (jzawadzki)
+ * bug #9697 [Config] fix 5528 let ArrayNode::normalizeValue respect order of value array provided (cordoval)
+ * bug #9701 [Config] fix #7243 allow 0 as arraynode name (cordoval)
+ * bug #9795 [Form] Fixed issue in BaseDateTimeTransformer when invalid timezone cause Trans... (tyomo4ka)
+ * bug #9714 [HttpFoundation] BinaryFileResponse should also return 416 or 200 on some range-requets (SimonSimCity)
+ * bug #9601 [Routing] Remove usage of deprecated _scheme requirement (Danez)
+ * bug #9489 [DependencyInjection] Add normalization to tag options (WouterJ)
+ * bug #9135 [Form] [Validator] fix maxLength guesser (franek)
+ * bug #9790 [Filesystem] Changed the mode for a target file in copy() to be write only (jakzal)
+
+* 2.3.8 (2013-12-16)
+
+ * bug #9758 [Console] fixed TableHelper when cell value has new line (k-przybyszewski)
+ * bug #9760 [Routing] Fix router matching pattern against multiple hosts (karolsojko)
+ * bug #9674 [Form] rename validators.ua.xlf to validators.uk.xlf (craue)
+ * bug #9722 [Validator]Fixed getting wrong msg when value is an object in Exception (aitboudad)
+ * bug #9750 allow TraceableEventDispatcher to reuse event instance in nested events (evillemez)
+ * bug #9718 [validator] throw an exception if isn't an instance of ConstraintValidatorInterface. (aitboudad)
+ * bug #9716 Reset the box model to content-box in the web debug toolbar (stof)
+ * bug #9711 [FrameworkBundle] Allowed "0" as a checkbox value in php templates (jakzal)
+ * bug #9665 [Bridge/Doctrine] ORMQueryBuilderLoader - handled the scenario when no entity manager is passed with closure query builder (jakzal)
+ * bug #9656 [DoctrineBridge] normalized class names in the ORM type guesser (fabpot)
+ * bug #9647 use the correct class name to retrieve mapped class' metadata and reposi... (xabbuh)
+ * bug #9648 [Debug] ensured that a fatal PHP error is actually fatal after being handled by our error handler (fabpot)
+ * bug #9643 [WebProfilerBundle] Fixed js escaping in time.html.twig (hason)
+ * bug #9641 [Debug] Avoid notice from being "eaten" by fatal error. (fabpot)
+ * bug #9639 Modified guessDefaultEscapingStrategy to not escape txt templates (fabpot)
+ * bug #9314 [Form] Fix DateType for 32bits computers. (WedgeSama)
+ * bug #9443 [FrameworkBundle] Fixed the registration of validation.xml file when the form is disabled (hason)
+ * bug #9625 [HttpFoundation] Do not return an empty session id if the session was closed (Taluu)
+ * bug #9637 [Validator] Replaced inexistent interface (jakzal)
+ * bug #9605 Adjusting CacheClear Warmup method to namespaced kernels (rdohms)
+ * bug #9610 Container::camelize also takes backslashes into consideration (ondrejmirtes)
+ * bug #9447 [BrowserKit] fixed protocol-relative url redirection (jong99)
+ * bug #9535 No Entity Manager defined exception (armetiz)
+ * bug #9485 [Acl] Fix for issue #9433 (guilro)
+ * bug #9516 [AclProvider] Fix incorrect behavior when partial results returned from cache (superdav42)
+ * bug #9352 [Intl] make currency bundle merge fallback locales when accessing data, ... (shieldo)
+ * bug #9537 [FrameworkBundle] Fix mistake in translation's service definition. (phpmike)
+ * bug #9367 [Process] Check if the pipe array is empty before calling stream_select() (jfposton)
+ * bug #9211 [Form] Fixed memory leak in FormValidator (bschussek)
+ * bug #9469 [Propel1] re-factor Propel1 ModelChoiceList (havvg)
+
+* 2.3.7 (2013-11-14)
+
+ * bug #9499 Request::overrideGlobals() may call invalid ini value (denkiryokuhatsuden)
+ * bug #9420 [Console][ProgressHelper] Fix ProgressHelper redraw when redrawFreq is greater than 1 (giosh94mhz)
+ * bug #9212 [Validator] Force Luhn Validator to only work with strings (Richtermeister)
+ * bug #9476 Fixed bug with lazy services (peterrehm)
+ * bug #9431 [DependencyInjection] fixed YamlDumper did not make services private. (realityking)
+ * bug #9416 fixed issue with clone now the children of the original form are preserved and the clone form is given new children (yjv)
+ * bug #9412 [HttpFoundation] added content length header to BinaryFileResponse (kbond)
+ * bug #9395 [HttpKernel] fixed memory limit display in MemoryDataCollector (hhamon)
+ * bug #9388 [Form] Fixed: The "data" option is taken into account even if it is NULL (bschussek)
+ * bug #9391 [Serializer] Fixed the error handling when decoding invalid XML to avoid a Warning (stof)
+ * bug #9378 [DomCrawler] [HttpFoundation] Make `Content-Type` attributes identification case-insensitive (matthieuprat)
+ * bug #9354 [Process] Fix #9343 : revert file handle usage on Windows platform (romainneutron)
+ * bug #9334 [Form] Improved FormTypeCsrfExtension to use the type class as default intention if the form name is empty (bschussek)
+ * bug #9333 [Form] Improved FormTypeCsrfExtension to use the type class as default intention if the form name is empty (bschussek)
+ * bug #9338 [DoctrineBridge] Added type check to prevent calling clear() on arrays (bschussek)
+ * bug #9328 [Form] Changed FormTypeCsrfExtension to use the form's name as default intention (bschussek)
+ * bug #9327 [Form] Changed FormTypeCsrfExtension to use the form's name as default intention (bschussek)
+ * bug #9308 [DoctrineBridge] Loosened CollectionToArrayTransformer::transform() to accept arrays (bschussek)
+ * bug #9274 [Yaml] Fixed the escaping of strings starting with a dash when dumping (stof)
+ * bug #9270 [Templating] Fix in ChainLoader.php (janschoenherr)
+ * bug #9246 [Session] fixed wrong started state (tecbot)
+
+* 2.3.6 (2013-10-10)
+
+ * [Security] limited the password length passed to encoders
+ * bug #9259 [Process] Fix latest merge from 2.2 in 2.3 (romainneutron)
+ * bug #9237 [FrameworkBundle] assets:install command should mirror .dotfiles (.htaccess) (FineWolf)
+ * bug #9223 [Translator] PoFileDumper - PO headers (Padam87)
+ * bug #9257 [Process] Fix 9182 : random failure on pipes tests (romainneutron)
+ * bug #9222 [Bridge] [Propel1] Fixed guessed relations (ClementGautier)
+ * bug #9214 [FramworkBundle] Check event listener services are not abstract (lyrixx)
+ * bug #9207 [HttpKernel] Check for lock existence before unlinking (ollietb)
+ * bug #9184 Fixed cache warmup of paths which contain back-slashes (fabpot)
+ * bug #9192 [Form] remove MinCount and MaxCount constraints in ValidatorTypeGuesser (franek)
+ * bug #9190 Fix: duplicate usage of Symfony\Component\HttpFoundation\Response (realsim)
+ * bug #9188 [Form] add support for Length and Range constraint in ValidatorTypeGuesser (franek)
+ * bug #8809 [Form] enforce correct timezone (Burgov)
+ * bug #9169 Fixed client insulation when using the terminable event (fabpot)
+ * bug #9154 Fix problem with Windows file links (backslash in JavaScript string) (fabpot)
+ * bug #9153 [DependencyInjection] Prevented inlining of lazy loaded private service definitions (jakzal)
+ * bug #9103 [HttpFoundation] Header `HTTP_X_FORWARDED_PROTO` can contain various values (stloyd)
+
+* 2.3.5 (2013-09-27)
+
+ * 8980954: bugix: CookieJar returns cookies with domain "domain.com" for domain "foodomain.com"
+ * bb59ac2: fixed HTML5 form attribute handling XPath query
+ * 3108c71: [Locale] added support for the position argument to NumberFormatter::parse()
+ * 0774c79: [Locale] added some more stubs for the number formatter
+ * e5282e8: [DomCrawler]Crawler guess charset from html
+ * 0e80d88: fixes RequestDataCollector bug, visible when used on Drupal8
+ * c8d0342: [Console] fixed exception rendering when nested styles
+ * a47d663: [Console] fixed the formatter for single-char tags
+ * c6c35b3: [Console] Escape exception message during the rendering of an exception
+ * 04e730e: [DomCrawler] fixed HTML5 form attribute handling
+ * 0e437c5: [BrowserKit] Fixed the handling of parameters when redirecting
+ * d84df4c: [Process] Properly close pipes after a Process::stop call
+ * b3ae29d: fixed bytes conversion when used on 32-bits systems
+ * a273e79: [Form] Fixed: "required" attribute is not added to <select> tag if no empty value
+ * 958ec09: NativeSessionStorage regenerate
+ * 0d6af5c: Use setTimeZone if this method exists.
+ * 42019f6: [Console] Fixed argument parsing when a single dash is passed.
+ * 097b376: [WebProfilerBundle] fixed toolbar for IE8 (refs #8380)
+ * 4f5b8f0: [HttpFoundation] tried to keep the original Request URI as much as possible to avoid different behavior between ::createFromGlobals() and ::create()
+ * 4c1dbc7: [TwigBridge] fixed form rendering when used in a template with dynamic inheritance
+ * 8444339: [HttpKernel] added a check for private event listeners/subscribers
+ * 427ee19: [FrameworkBundle] fixed registration of the register listener pass
+ * ce7de37: [DependencyInjection] fixed a non-detected circular reference in PhpDumper (closes #8425)
+ * 37102dc: [Process] Close unix pipes before calling `proc_close` to avoid a deadlock
+ * 8c2a733: [HttpFoundation] fixed format duplication in Request
+ * 1e75cf9: [Process] Fix #8970 : read output once the process is finished, enable pipe tests on Windows
+ * 9542d72: [Form] Fixed expanded choice field to be marked invalid when unknown choices are submitted
+ * 72b8807: [Form] Fixed ChoiceList::get*By*() methods to preserve order and array keys
+ * b65a515: [Form] Fixed FormValidator::findClickedButton() not to be called exponentially
+ * 49f5027: [HttpKernel] fixer HInclude src (closes #8951)
+ * c567262: Fixed escaping of service identifiers in configuration
+ * 4a76c76: [Process][2.2] Fix Process component on windows
+ * 65814ba: Request->getPort() should prefer HTTP_HOST over SERVER_PORT
+ * e75d284: Fixing broken http auth digest in some circumstances (php-fpm + apache).
+ * 970405f: fixed some circular references
+ * 899f176: [Security] fixed a leak in ExceptionListener
+ * 2fd8a7a: [Security] fixed a leak in the ContextListener
+ * 6362fa4: Button missing getErrorsAsString() fixes #8084 Debug: Not calling undefined method anymore. If the form contained a submit button the call would fail and the debug of the form wasn't possible. Now it will work in all cases. This fixes #8084
+ * e4b3039: Use isset() instead of array_key_exists() in DIC
+ * 2d34e78: [BrowserKit] fixed method/files/content when redirecting a request
+ * 64e1655: [BrowserKit] removed some headers when redirecting a request
+ * 96a4b00: [BrowserKit] fixed headers when redirecting if history is set to false (refs #8697)
+ * c931eb7: [HttpKernel] fixed route parameters storage in the Request data collector (closes #8867)
+ * 96bb731: optimized circular reference checker
+ * 39b610d: Clear lazy loading initializer after the service is successfully initialized
+ * 91234cd: [HttpKernel] changed fragment URLs to be relative by default (closes #8458)
+ * 4922a80: [FrameworkBundle] added support for double-quoted strings in the extractor (closes #8797)
+ * 52d8676: [Intl] made RegionBundle and LanguageBundle merge fallback data when using a country-specific locale
+ * 0d07af8: [BrowserKit] Pass headers when `followRedirect()` is called
+ * d400b5a: Return BC compatibility for `@Route` parameters and default values
+
 * 2.3.4 (2013-08-27)
 
  * f936b41: clearToken exception is thrown at wrong place.

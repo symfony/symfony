@@ -26,6 +26,7 @@ class JsonResponse extends Response
 {
     protected $data;
     protected $callback;
+    protected $encodingOptions;
 
     /**
      * Constructor.
@@ -41,6 +42,10 @@ class JsonResponse extends Response
         if (null === $data) {
             $data = new \ArrayObject();
         }
+
+        // Encode <, >, ', &, and " for RFC4627-compliant JSON, which may also be embedded into HTML.
+        $this->encodingOptions = JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT;
+
         $this->setData($data);
     }
 
@@ -55,11 +60,11 @@ class JsonResponse extends Response
     /**
      * Sets the JSONP callback.
      *
-     * @param string $callback
+     * @param string|null $callback The JSONP callback or null to use none
      *
      * @return JsonResponse
      *
-     * @throws \InvalidArgumentException
+     * @throws \InvalidArgumentException When the callback name is not valid
      */
     public function setCallback($callback = null)
     {
@@ -80,22 +85,51 @@ class JsonResponse extends Response
     }
 
     /**
-     * Sets the data to be sent as json.
+     * Sets the data to be sent as JSON.
      *
      * @param mixed $data
      *
      * @return JsonResponse
+     *
+     * @throws \InvalidArgumentException
      */
     public function setData($data = array())
     {
-        // Encode <, >, ', &, and " for RFC4627-compliant JSON, which may also be embedded into HTML.
-        $this->data = json_encode($data, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT);
+        $this->data = @json_encode($data, $this->encodingOptions);
+
+        if (JSON_ERROR_NONE !== json_last_error()) {
+            throw new \InvalidArgumentException($this->transformJsonError());
+        }
 
         return $this->update();
     }
 
     /**
-     * Updates the content and headers according to the json data and callback.
+     * Returns options used while encoding data to JSON.
+     *
+     * @return integer
+     */
+    public function getEncodingOptions()
+    {
+        return $this->encodingOptions;
+    }
+
+    /**
+     * Sets options used while encoding data to JSON.
+     *
+     * @param integer $encodingOptions
+     *
+     * @return JsonResponse
+     */
+    public function setEncodingOptions($encodingOptions)
+    {
+        $this->encodingOptions = (integer) $encodingOptions;
+
+        return $this->setData(json_decode($this->data));
+    }
+
+    /**
+     * Updates the content and headers according to the JSON data and callback.
      *
      * @return JsonResponse
      */
@@ -115,5 +149,32 @@ class JsonResponse extends Response
         }
 
         return $this->setContent($this->data);
+    }
+
+    private function transformJsonError()
+    {
+        if (function_exists('json_last_error_msg')) {
+            return json_last_error_msg();
+        }
+
+        switch (json_last_error()) {
+            case JSON_ERROR_DEPTH:
+                return 'Maximum stack depth exceeded.';
+
+            case JSON_ERROR_STATE_MISMATCH:
+                return 'Underflow or the modes mismatch.';
+
+            case JSON_ERROR_CTRL_CHAR:
+                return 'Unexpected control character found.';
+
+            case JSON_ERROR_SYNTAX:
+                return 'Syntax error, malformed JSON.';
+
+            case JSON_ERROR_UTF8:
+                return 'Malformed UTF-8 characters, possibly incorrectly encoded.';
+
+            default:
+                return 'Unknown error.';
+        }
     }
 }

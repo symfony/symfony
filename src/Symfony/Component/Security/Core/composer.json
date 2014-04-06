@@ -20,6 +20,7 @@
     },
     "require-dev": {
         "symfony/event-dispatcher": "~2.1",
+        "symfony/expression-language": "~2.4",
         "symfony/http-foundation": "~2.4",
         "symfony/validator": "~2.2",
         "psr/log": "~1.0",
@@ -28,8 +29,9 @@
     "suggest": {
         "symfony/event-dispatcher": "",
         "symfony/http-foundation": "",
-        "symfony/validator": "",
-        "ircmaxell/password-compat": ""
+        "symfony/validator": "For using the user password constraint",
+        "symfony/expression-language": "For using the expression voter",
+        "ircmaxell/password-compat": "For using the BCrypt password encoder in PHP <5.5"
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\Security\\Core\\": "" }
@@ -38,7 +40,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.4-dev"
+            "dev-master": "2.5-dev"
         }
     }
 }

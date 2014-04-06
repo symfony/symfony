@@ -17,13 +17,12 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "symfony/security": "~2.2",
+        "symfony/security": "~2.4",
         "symfony/http-kernel": "~2.2"
     },
     "require-dev": {
         "symfony/framework-bundle": "~2.2",
         "symfony/twig-bundle": "~2.2",
-        "symfony/form": "~2.1",
         "symfony/validator": "~2.2",
         "symfony/yaml": "~2.0",
         "symfony/expression-language": "~2.4"
@@ -35,7 +34,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.4-dev"
+            "dev-master": "2.5-dev"
         }
     }
 }

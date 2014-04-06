@@ -2,6 +2,7 @@
 
 /*
  * This file is part of the Symfony package.
+ *
  * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
@@ -219,7 +220,9 @@ class Inline
                 throw new ParseException(sprintf('Malformed inline YAML string (%s).', $scalar));
             }
 
-            $output = $evaluate ? self::evaluateScalar($output) : $output;
+            if ($evaluate) {
+                $output = self::evaluateScalar($output);
+            }
         }
 
         return $output;
@@ -385,51 +388,55 @@ class Inline
     private static function evaluateScalar($scalar)
     {
         $scalar = trim($scalar);
-
+        $scalarLower = strtolower($scalar);
         switch (true) {
-            case 'null' == strtolower($scalar):
-            case '' == $scalar:
-            case '~' == $scalar:
+            case 'null' === $scalarLower:
+            case '' === $scalar:
+            case '~' === $scalar:
                 return null;
-            case 0 === strpos($scalar, '!str'):
-                return (string) substr($scalar, 5);
-            case 0 === strpos($scalar, '! '):
-                return intval(self::parseScalar(substr($scalar, 2)));
-            case 0 === strpos($scalar, '!!php/object:'):
-                if (self::$objectSupport) {
-                    return unserialize(substr($scalar, 13));
-                }
-
-                if (self::$exceptionOnInvalidType) {
-                    throw new ParseException('Object support when parsing a YAML file has been disabled.');
-                }
-
-                return null;
-            case ctype_digit($scalar):
-                $raw = $scalar;
-                $cast = intval($scalar);
-
-                return '0' == $scalar[0] ? octdec($scalar) : (((string) $raw == (string) $cast) ? $cast : $raw);
-            case '-' === $scalar[0] && ctype_digit(substr($scalar, 1)):
-                $raw = $scalar;
-                $cast = intval($scalar);
-
-                return '0' == $scalar[1] ? octdec($scalar) : (((string) $raw == (string) $cast) ? $cast : $raw);
-            case 'true' === strtolower($scalar):
+            case 'true' === $scalarLower:
                 return true;
-            case 'false' === strtolower($scalar):
+            case 'false' === $scalarLower:
                 return false;
-            case is_numeric($scalar):
-                return '0x' == $scalar[0].$scalar[1] ? hexdec($scalar) : floatval($scalar);
-            case 0 == strcasecmp($scalar, '.inf'):
-            case 0 == strcasecmp($scalar, '.NaN'):
-                return -log(0);
-            case 0 == strcasecmp($scalar, '-.inf'):
-                return log(0);
-            case preg_match('/^(-|\+)?[0-9,]+(\.[0-9]+)?$/', $scalar):
-                return floatval(str_replace(',', '', $scalar));
-            case preg_match(self::getTimestampRegex(), $scalar):
-                return strtotime($scalar);
+            // Optimise for returning strings.
+            case $scalar[0] === '+' || $scalar[0] === '-' || $scalar[0] === '.' || $scalar[0] === '!' || is_numeric($scalar[0]):
+                switch (true) {
+                    case 0 === strpos($scalar, '!str'):
+                        return (string) substr($scalar, 5);
+                    case 0 === strpos($scalar, '! '):
+                        return intval(self::parseScalar(substr($scalar, 2)));
+                    case 0 === strpos($scalar, '!!php/object:'):
+                        if (self::$objectSupport) {
+                            return unserialize(substr($scalar, 13));
+                        }
+
+                        if (self::$exceptionOnInvalidType) {
+                            throw new ParseException('Object support when parsing a YAML file has been disabled.');
+                        }
+
+                        return null;
+                    case ctype_digit($scalar):
+                        $raw = $scalar;
+                        $cast = intval($scalar);
+
+                        return '0' == $scalar[0] ? octdec($scalar) : (((string) $raw == (string) $cast) ? $cast : $raw);
+                    case '-' === $scalar[0] && ctype_digit(substr($scalar, 1)):
+                        $raw = $scalar;
+                        $cast = intval($scalar);
+
+                        return '0' == $scalar[1] ? octdec($scalar) : (((string) $raw == (string) $cast) ? $cast : $raw);
+                    case is_numeric($scalar):
+                        return '0x' == $scalar[0].$scalar[1] ? hexdec($scalar) : floatval($scalar);
+                    case '.inf' === $scalarLower:
+                    case '.nan' === $scalarLower:
+                        return -log(0);
+                    case '-.inf' === $scalarLower:
+                        return log(0);
+                    case preg_match('/^(-|\+)?[0-9,]+(\.[0-9]+)?$/', $scalar):
+                        return floatval(str_replace(',', '', $scalar));
+                    case preg_match(self::getTimestampRegex(), $scalar):
+                        return strtotime($scalar);
+                }
             default:
                 return (string) $scalar;
         }

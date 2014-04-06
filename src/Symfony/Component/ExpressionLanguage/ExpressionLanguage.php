@@ -29,12 +29,11 @@ class ExpressionLanguage
     private $parser;
     private $compiler;
 
-    protected $functions;
+    protected $functions = array();
 
     public function __construct(ParserCacheInterface $cache = null)
     {
         $this->cache = $cache ?: new ArrayParserCache();
-        $this->functions = array();
         $this->registerFunctions();
     }
 
@@ -68,6 +67,7 @@ class ExpressionLanguage
      * Parses an expression.
      *
      * @param Expression|string $expression The expression to parse
+     * @param array             $names      An array of valid names
      *
      * @return ParsedExpression A ParsedExpression instance
      */
@@ -91,6 +91,18 @@ class ExpressionLanguage
 
     /**
      * Registers a function.
+     *
+     * A function is defined by two PHP callables. The callables are used
+     * by the language to compile and/or evaluate the function.
+     *
+     * The first function is used at compilation time and must return a
+     * PHP representation of the function call (it receives the function
+     * arguments as arguments).
+     *
+     * The second function is used for expression evaluation and must return
+     * the value of the function call based on the values defined for the
+     * expression (it receives the values as a first argument and the function
+     * arguments as remaining arguments).
      *
      * @param string   $name      The function name
      * @param callable $compiler  A callable able to compile the function

@@ -99,21 +99,19 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
      */
     protected function getMongo()
     {
-        if ($this->mongo === null) {
-            if (preg_match('#^(mongodb://.*)/(.*)/(.*)$#', $this->dsn, $matches)) {
-                $server = $matches[1].(!empty($matches[2]) ? '/'.$matches[2] : '');
-                $database = $matches[2];
-                $collection = $matches[3];
-
-                $mongoClass = (version_compare(phpversion('mongo'), '1.3.0', '<')) ? '\Mongo' : '\MongoClient';
-                $mongo = new $mongoClass($server);
-                $this->mongo = $mongo->selectCollection($database, $collection);
-            } else {
-                throw new \RuntimeException(sprintf('Please check your configuration. You are trying to use MongoDB with an invalid dsn "%s". The expected format is "mongodb://[user:pass@]host/database/collection"', $this->dsn));
-            }
+        if (null !== $this->mongo) {
+            return $this->mongo;
         }
 
-        return $this->mongo;
+        if (!$parsedDsn = $this->parseDsn($this->dsn)) {
+            throw new \RuntimeException(sprintf('Please check your configuration. You are trying to use MongoDB with an invalid dsn "%s". The expected format is "mongodb://[user:pass@]host/database/collection"', $this->dsn));
+        }
+
+        list($server, $database, $collection) = $parsedDsn;
+        $mongoClass = version_compare(phpversion('mongo'), '1.3.0', '<') ? '\Mongo' : '\MongoClient';
+        $mongo = new $mongoClass($server);
+
+        return $this->mongo = $mongo->selectCollection($database, $collection);
     }
 
     /**
@@ -232,5 +230,28 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
         $profile->setCollectors(unserialize(base64_decode($data['data'])));
 
         return $profile;
+    }
+
+    /**
+     * @param string $dsn
+     *
+     * @return null|array Array($server, $database, $collection)
+     */
+    private function parseDsn($dsn)
+    {
+        if (!preg_match('#^(mongodb://.*)/(.*)/(.*)$#', $dsn, $matches)) {
+            return;
+        }
+
+        $server = $matches[1];
+        $database = $matches[2];
+        $collection = $matches[3];
+        preg_match('#^mongodb://(([^:]+):?(.*)(?=@))?@?([^/]*)(.*)$#', $server, $matchesServer);
+
+        if ('' == $matchesServer[5] && '' != $matches[2]) {
+            $server .= '/'.$matches[2];
+        }
+
+        return array($server, $database, $collection);
     }
 }

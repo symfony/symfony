@@ -43,6 +43,7 @@ and debug mode:
 
 <info>php %command.full_name% --env=dev</info>
 <info>php %command.full_name% --env=prod --no-debug</info>
+
 EOF
             )
         ;
@@ -77,25 +78,39 @@ EOF
             $warmupDir = substr($realCacheDir, 0, -1).'_';
 
             if ($filesystem->exists($warmupDir)) {
+                if ($output->isVerbose()) {
+                    $output->writeln('  Clearing outdated warmup directory');
+                }
                 $filesystem->remove($warmupDir);
             }
 
+            if ($output->isVerbose()) {
+                $output->writeln('  Warming up cache');
+            }
             $this->warmup($warmupDir, $realCacheDir, !$input->getOption('no-optional-warmers'));
 
             $filesystem->rename($realCacheDir, $oldCacheDir);
             if (defined('PHP_WINDOWS_VERSION_BUILD')) {
-                sleep(1);  // workaround for windows php rename bug
+                sleep(1);  // workaround for Windows PHP rename bug
             }
             $filesystem->rename($warmupDir, $realCacheDir);
         }
 
+        if ($output->isVerbose()) {
+            $output->writeln('  Removing old cache directory');
+        }
+
         $filesystem->remove($oldCacheDir);
+
+        if ($output->isVerbose()) {
+            $output->writeln('  Done');
+        }
     }
 
     /**
-     * @param string $warmupDir
-     * @param string $realCacheDir
-     * @param bool   $enableOptionalWarmers
+     * @param string  $warmupDir
+     * @param string  $realCacheDir
+     * @param Boolean $enableOptionalWarmers
      */
     protected function warmup($warmupDir, $realCacheDir, $enableOptionalWarmers = true)
     {
@@ -120,17 +135,22 @@ EOF
         $warmer->warmUp($warmupDir);
 
         // fix references to the Kernel in .meta files
+        $safeTempKernel = str_replace('\\', '\\\\', get_class($tempKernel));
+        $realKernelFQN = get_class($realKernel);
+
         foreach (Finder::create()->files()->name('*.meta')->in($warmupDir) as $file) {
             file_put_contents($file, preg_replace(
-                '/(C\:\d+\:)"'.get_class($tempKernel).'"/',
-                sprintf('$1"%s"', $realKernelClass),
+                '/(C\:\d+\:)"'.$safeTempKernel.'"/',
+                sprintf('$1"%s"', $realKernelFQN),
                 file_get_contents($file)
             ));
         }
 
         // fix references to cached files with the real cache directory name
+        $search  = array($warmupDir, str_replace('\\', '\\\\', $warmupDir));
+        $replace = str_replace('\\', '/', $realCacheDir);
         foreach (Finder::create()->files()->in($warmupDir) as $file) {
-            $content = str_replace($warmupDir, $realCacheDir, file_get_contents($file));
+            $content = str_replace($search, $replace, file_get_contents($file));
             file_put_contents($file, $content);
         }
 

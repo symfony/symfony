@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Console;
 
-use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Process\ProcessBuilder;
@@ -32,7 +31,7 @@ class Shell
     private $history;
     private $output;
     private $hasReadline;
-    private $processIsolation;
+    private $processIsolation = false;
 
     /**
      * Constructor.
@@ -48,7 +47,6 @@ class Shell
         $this->application = $application;
         $this->history = getenv('HOME').'/.history_'.$application->getName();
         $this->output = new ConsoleOutput();
-        $this->processIsolation = false;
     }
 
     /**
@@ -105,7 +103,7 @@ EOF
                 ;
 
                 $output = $this->output;
-                $process->run(function($type, $data) use ($output) {
+                $process->run(function ($type, $data) use ($output) {
                     $output->writeln($data);
                 });
 

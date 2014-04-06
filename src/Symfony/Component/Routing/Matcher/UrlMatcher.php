@@ -205,12 +205,10 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
         }
 
         // check HTTP scheme requirement
-        $scheme = $route->getRequirement('_scheme');
-        if ($scheme && $scheme !== $this->context->getScheme()) {
-            return array(self::REQUIREMENT_MISMATCH, null);
-        }
+        $scheme = $this->context->getScheme();
+        $status = $route->getSchemes() && !$route->hasScheme($scheme) ? self::REQUIREMENT_MISMATCH : self::REQUIREMENT_MATCH;
 
-        return array(self::REQUIREMENT_MATCH, null);
+        return array($status, null);
     }
 
     /**
@@ -236,7 +234,7 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
     {
         if (null === $this->expressionLanguage) {
             if (!class_exists('Symfony\Component\ExpressionLanguage\ExpressionLanguage')) {
-                throw new RuntimeException('Unable to use expressions as the Symfony ExpressionLanguage component is not installed.');
+                throw new \RuntimeException('Unable to use expressions as the Symfony ExpressionLanguage component is not installed.');
             }
             $this->expressionLanguage = new ExpressionLanguage();
         }

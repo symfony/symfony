@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\ExpressionLanguage\Tests\Node;
+namespace Symfony\Component\ExpressionLanguage\Tests;
 
 use Symfony\Component\ExpressionLanguage\Parser;
 use Symfony\Component\ExpressionLanguage\Lexer;
@@ -119,6 +119,10 @@ class ParserTest extends \PHPUnit_Framework_TestCase
             array(
                 new Node\ConditionalNode(new Node\ConstantNode(true), new Node\ConstantNode(true), new Node\ConstantNode(false)),
                 'true ? true : false',
+            ),
+            array(
+                new Node\BinaryNode('matches', new Node\ConstantNode('foo'), new Node\ConstantNode('/foo/')),
+                '"foo" matches "/foo/"',
             ),
 
             // chained calls

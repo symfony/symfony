@@ -288,14 +288,15 @@ EOF;
 EOF;
         }
 
-        if ($scheme = $route->getRequirement('_scheme')) {
+        if ($schemes = $route->getSchemes()) {
             if (!$supportsRedirections) {
-                throw new \LogicException('The "_scheme" requirement is only supported for URL matchers that implement RedirectableUrlMatcherInterface.');
+                throw new \LogicException('The "schemes" requirement is only supported for URL matchers that implement RedirectableUrlMatcherInterface.');
             }
-
+            $schemes = str_replace("\n", '', var_export(array_flip($schemes), true));
             $code .= <<<EOF
-            if (\$this->context->getScheme() !== '$scheme') {
-                return \$this->redirect(\$pathinfo, '$name', '$scheme');
+            \$requiredSchemes = $schemes;
+            if (!isset(\$requiredSchemes[\$this->context->getScheme()])) {
+                return \$this->redirect(\$pathinfo, '$name', key(\$requiredSchemes));
             }
 
 
@@ -313,8 +314,11 @@ EOF;
             }
             $vars[] = "array('_route' => '$name')";
 
-            $code .= sprintf("            return \$this->mergeDefaults(array_replace(%s), %s);\n"
-                , implode(', ', $vars), str_replace("\n", '', var_export($route->getDefaults(), true)));
+            $code .= sprintf(
+                "            return \$this->mergeDefaults(array_replace(%s), %s);\n",
+                implode(', ', $vars),
+                str_replace("\n", '', var_export($route->getDefaults(), true))
+            );
 
         } elseif ($route->getDefaults()) {
             $code .= sprintf("            return %s;\n", str_replace("\n", '', var_export(array_replace($route->getDefaults(), array('_route' => $name)), true)));
@@ -388,7 +392,7 @@ EOF;
     {
         if (null === $this->expressionLanguage) {
             if (!class_exists('Symfony\Component\ExpressionLanguage\ExpressionLanguage')) {
-                throw new RuntimeException('Unable to use expressions as the Symfony ExpressionLanguage component is not installed.');
+                throw new \RuntimeException('Unable to use expressions as the Symfony ExpressionLanguage component is not installed.');
             }
             $this->expressionLanguage = new ExpressionLanguage();
         }

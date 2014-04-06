@@ -30,7 +30,7 @@ class ExpressionExtension extends \Twig_Extension
         );
     }
 
-    private function createExpression($expression)
+    public function createExpression($expression)
     {
         return new Expression($expression);
     }

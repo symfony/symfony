@@ -19,15 +19,17 @@ class AddValidatorInitializersPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition('validator')) {
+        if (!$container->hasDefinition('validator.builder')) {
             return;
         }
+
+        $validatorBuilder = $container->getDefinition('validator.builder');
 
         $initializers = array();
         foreach ($container->findTaggedServiceIds('validator.initializer') as $id => $attributes) {
             $initializers[] = new Reference($id);
         }
 
-        $container->getDefinition('validator')->replaceArgument(4, $initializers);
+        $validatorBuilder->addMethodCall('addObjectInitializers', array($initializers));
     }
 }

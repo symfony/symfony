@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bridge\ProxyManager\LazyProxy\Tests\Instantiator;
+namespace Symfony\Bridge\ProxyManager\Tests\LazyProxy\PhpDumper;
 
 use Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper;
 use Symfony\Component\DependencyInjection\Definition;
@@ -56,8 +56,8 @@ class ProxyDumperTest extends \PHPUnit_Framework_TestCase
         $code = $this->dumper->getProxyCode($definition);
 
         $this->assertStringMatchesFormat(
-            '%Aclass SymfonyBridgeProxyManagerLazyProxyTestsInstantiatorProxyDumperTest%aextends%w'
-                . '\Symfony\Bridge\ProxyManager\LazyProxy\Tests\Instantiator%a',
+            '%Aclass SymfonyBridgeProxyManagerTestsLazyProxyPhpDumperProxyDumperTest%aextends%w'
+                . '\Symfony\Bridge\ProxyManager\Tests\LazyProxy\PhpDumper\ProxyDumperTest%a',
             $code
         );
     }
@@ -72,7 +72,7 @@ class ProxyDumperTest extends \PHPUnit_Framework_TestCase
 
         $this->assertStringMatchesFormat(
             '%wif ($lazyLoad) {%w$container = $this;%wreturn $this->services[\'foo\'] = new '
-            . 'SymfonyBridgeProxyManagerLazyProxyTestsInstantiatorProxyDumperTest_%s(%wfunction '
+            . 'SymfonyBridgeProxyManagerTestsLazyProxyPhpDumperProxyDumperTest_%s(%wfunction '
             . '(&$wrappedInstance, \ProxyManager\Proxy\LazyLoadingInterface $proxy) use ($container) {'
             . '%w$wrappedInstance = $container->getFooService(false);%w$proxy->setProxyInitializer(null);'
             . '%wreturn true;%w}%w);%w}%w',

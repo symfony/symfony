@@ -20,7 +20,7 @@
             </trans-unit>
             <trans-unit id="5">
                 <source>The value you selected is not a valid choice.</source>
-                <target>Nid yw'r gwerth � ddewiswyd yn ddilys.</target>
+                <target>Nid yw'r gwerth â ddewiswyd yn ddilys.</target>
             </trans-unit>
             <trans-unit id="6">
                 <source>You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.</source>
@@ -64,11 +64,11 @@
             </trans-unit>
             <trans-unit id="16">
                 <source>The file is too large ({{ size }} {{ suffix }}). Allowed maximum size is {{ limit }} {{ suffix }}.</source>
-                <target>Mae'r ffeil yn rhy fawr ({{ size }} {{ suffix }}). Yr uchafswm � ganiateir yw {{ limit }} {{ suffix }}.</target>
+                <target>Mae'r ffeil yn rhy fawr ({{ size }} {{ suffix }}). Yr uchafswm â ganiateir yw {{ limit }} {{ suffix }}.</target>
             </trans-unit>
             <trans-unit id="17">
                 <source>The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}.</source>
-                <target>Nid yw math mime y ffeil yn ddilys ({{ type }}). Dyma'r mathau � ganiateir {{ types }}.</target>
+                <target>Nid yw math mime y ffeil yn ddilys ({{ type }}). Dyma'r mathau â ganiateir {{ types }}.</target>
             </trans-unit>
             <trans-unit id="18">
                 <source>This value should be {{ limit }} or less.</source>
@@ -116,7 +116,7 @@
             </trans-unit>
             <trans-unit id="32">
                 <source>The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.</source>
-                <target>Mae'r ffeil yn rhy fawr. Yr uchafswm � ganiateir yw {{ limit }} {{ suffix }}.</target>
+                <target>Mae'r ffeil yn rhy fawr. Yr uchafswm â ganiateir yw {{ limit }} {{ suffix }}.</target>
             </trans-unit>
             <trans-unit id="33">
                 <source>The file is too large.</source>
@@ -124,7 +124,7 @@
             </trans-unit>
             <trans-unit id="34">
                 <source>The file could not be uploaded.</source>
-                <target>Methwyd � uwchlwytho'r ffeil. </target>
+                <target>Methwyd ag uwchlwytho'r ffeil.</target>
             </trans-unit>
             <trans-unit id="35">
                 <source>This value should be a valid number.</source>
@@ -156,23 +156,23 @@
             </trans-unit>
             <trans-unit id="42">
                 <source>The size of the image could not be detected.</source>
-                <target>Methwyd � darganfod maint y ddelwedd.</target>
+                <target>Methwyd â darganfod maint y ddelwedd.</target>
             </trans-unit>
             <trans-unit id="43">
                 <source>The image width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px.</source>
-                <target>Mae lled y ddelwedd yn rhy fawr ({{ width }}px). Y lled mwyaf � ganiateir yw {{ max_width }}px.</target>
+                <target>Mae lled y ddelwedd yn rhy fawr ({{ width }}px). Y lled mwyaf â ganiateir yw {{ max_width }}px.</target>
             </trans-unit>
             <trans-unit id="44">
                 <source>The image width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px.</source>
-                <target>Mae lled y ddelwedd yn rhy fach ({{ width }}px). Y lled lleiaf � ganiateir yw {{ min_width }}px.</target>
+                <target>Mae lled y ddelwedd yn rhy fach ({{ width }}px). Y lled lleiaf â ganiateir yw {{ min_width }}px.</target>
             </trans-unit>
             <trans-unit id="45">
                 <source>The image height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px.</source>
-                <target>Mae uchder y ddelwedd yn rhy fawr ({{ width }}px). Yr uchder mwyaf � ganiateir yw {{ max_height }}px.</target>
+                <target>Mae uchder y ddelwedd yn rhy fawr ({{ width }}px). Yr uchder mwyaf â ganiateir yw {{ max_height }}px.</target>
             </trans-unit>
             <trans-unit id="46">
                 <source>The image height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px.</source>
-                <target>Mae uchder y ddelwedd yn rhy fach ({{ width }}px). Yr uchder lleiaf � ganiateir yw {{ min_height }}px.</target>
+                <target>Mae uchder y ddelwedd yn rhy fach ({{ width }}px). Yr uchder lleiaf â ganiateir yw {{ min_height }}px.</target>
             </trans-unit>
             <trans-unit id="47">
                 <source>This value should be the user current password.</source>
@@ -184,7 +184,7 @@
             </trans-unit>
             <trans-unit id="49">
                 <source>The file was only partially uploaded.</source>
-                <target>Dim ond rhan o'r ffeil � uwchlwythwyd.</target>
+                <target>Dim ond rhan o'r ffeil ag uwchlwythwyd.</target>
             </trans-unit>
             <trans-unit id="50">
                 <source>No file was uploaded.</source>
@@ -196,11 +196,11 @@
             </trans-unit>
             <trans-unit id="52">
                 <source>Cannot write temporary file to disk.</source>
-                <target>Methwyd � ysgrifennu'r ffeil dros-dro ar ddisg.</target>
+                <target>Methwyd ag ysgrifennu'r ffeil dros-dro ar ddisg.</target>
             </trans-unit>
             <trans-unit id="53">
                 <source>A PHP extension caused the upload to fail.</source>
-                <target>Methwyd � uwchlwytho oherwydd ategyn PHP.</target>
+                <target>Methwyd ag uwchlwytho oherwydd ategyn PHP.</target>
             </trans-unit>
             <trans-unit id="54">
                 <source>This collection should contain {{ limit }} element or more.|This collection should contain {{ limit }} elements or more.</source>

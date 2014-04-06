@@ -17,7 +17,7 @@ class UserTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @covers Symfony\Component\Security\Core\User\User::__construct
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      */
     public function testConstructorException()
     {

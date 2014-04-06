@@ -64,6 +64,8 @@ class Request
     protected static $httpMethodParameterOverride = false;
 
     /**
+     * Custom parameters
+     *
      * @var \Symfony\Component\HttpFoundation\ParameterBag
      *
      * @api
@@ -71,6 +73,8 @@ class Request
     public $attributes;
 
     /**
+     * Request body parameters ($_POST)
+     *
      * @var \Symfony\Component\HttpFoundation\ParameterBag
      *
      * @api
@@ -78,6 +82,8 @@ class Request
     public $request;
 
     /**
+     * Query string parameters ($_GET)
+     *
      * @var \Symfony\Component\HttpFoundation\ParameterBag
      *
      * @api
@@ -85,6 +91,8 @@ class Request
     public $query;
 
     /**
+     * Server and execution environment parameters ($_SERVER)
+     *
      * @var \Symfony\Component\HttpFoundation\ServerBag
      *
      * @api
@@ -92,6 +100,8 @@ class Request
     public $server;
 
     /**
+     * Uploaded files ($_FILES)
+     *
      * @var \Symfony\Component\HttpFoundation\FileBag
      *
      * @api
@@ -99,6 +109,8 @@ class Request
     public $files;
 
     /**
+     * Cookies ($_COOKIE)
+     *
      * @var \Symfony\Component\HttpFoundation\ParameterBag
      *
      * @api
@@ -106,6 +118,8 @@ class Request
     public $cookies;
 
     /**
+     * Headers (taken from the $_SERVER)
+     *
      * @var \Symfony\Component\HttpFoundation\HeaderBag
      *
      * @api
@@ -187,6 +201,8 @@ class Request
      */
     protected static $formats;
 
+    protected static $requestFactory;
+
     /**
      * Constructor.
      *
@@ -252,7 +268,7 @@ class Request
      */
     public static function createFromGlobals()
     {
-        $request = new static($_GET, $_POST, array(), $_COOKIE, $_FILES, $_SERVER);
+        $request = self::createRequestFromFactory($_GET, $_POST, array(), $_COOKIE, $_FILES, $_SERVER);
 
         if (0 === strpos($request->headers->get('CONTENT_TYPE'), 'application/x-www-form-urlencoded')
             && in_array(strtoupper($request->server->get('REQUEST_METHOD', 'GET')), array('PUT', 'DELETE', 'PATCH'))
@@ -370,7 +386,21 @@ class Request
         $server['REQUEST_URI'] = $components['path'].('' !== $queryString ? '?'.$queryString : '');
         $server['QUERY_STRING'] = $queryString;
 
-        return new static($query, $request, array(), $cookies, $files, $server, $content);
+        return self::createRequestFromFactory($query, $request, array(), $cookies, $files, $server, $content);
+    }
+
+    /**
+     * Sets a callable able to create a Request instance.
+     *
+     * This is mainly useful when you need to override the Request class
+     * to keep BC with an existing system. It should not be used for any
+     * other purpose.
+     *
+     * @param callable|null $callable A PHP callable
+     */
+    public static function setFactory($callable)
+    {
+        self::$requestFactory = $callable;
     }
 
     /**
@@ -487,7 +517,7 @@ class Request
 
         $request = array('g' => $_GET, 'p' => $_POST, 'c' => $_COOKIE);
 
-        $requestOrder = ini_get('request_order') ?: ini_get('variable_order');
+        $requestOrder = ini_get('request_order') ?: ini_get('variables_order');
         $requestOrder = preg_replace('#[^cgp]#', '', strtolower($requestOrder)) ?: 'gp';
 
         $_REQUEST = array();
@@ -739,9 +769,9 @@ class Request
     /**
      * Returns the client IP addresses.
      *
-     * The least trusted IP address is first, and the most trusted one last.
-     * The "real" client IP address is the first one, but this is also the
-     * least trusted one.
+     * In the returned array the most trusted IP address is first, and the
+     * least trusted one last. The "real" client IP address is the last one,
+     * but this is also the least trusted one. Trusted proxies are stripped.
      *
      * Use this method carefully; you should use getClientIp() instead.
      *
@@ -762,19 +792,18 @@ class Request
         }
 
         $clientIps = array_map('trim', explode(',', $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_IP])));
-        $clientIps[] = $ip;
+        $clientIps[] = $ip; // Complete the IP chain with the IP the request actually came from
 
-        $trustedProxies = !self::$trustedProxies ? array($ip) : self::$trustedProxies;
-        $ip = $clientIps[0];
+        $ip = $clientIps[0]; // Fallback to this when the client IP falls into the range of trusted proxies
 
+        // Eliminate all IPs from the forwarded IP chain which are trusted proxies
         foreach ($clientIps as $key => $clientIp) {
-            if (IpUtils::checkIp($clientIp, $trustedProxies)) {
+            if (IpUtils::checkIp($clientIp, self::$trustedProxies)) {
                 unset($clientIps[$key]);
-
-                continue;
             }
         }
 
+        // Now the IP chain contains only untrusted proxies and the client IP
         return $clientIps ? array_reverse($clientIps) : array($ip);
     }
 
@@ -866,14 +895,14 @@ class Request
     }
 
     /**
-     * Returns the root url from which this request is executed.
+     * Returns the root URL from which this request is executed.
      *
      * The base URL never ends with a /.
      *
      * This is similar to getBasePath(), except that it also includes the
      * script filename (e.g. index.php) if one exists.
      *
-     * @return string The raw url (i.e. not urldecoded)
+     * @return string The raw URL (i.e. not urldecoded)
      *
      * @api
      */
@@ -1091,7 +1120,7 @@ class Request
     public function isSecure()
     {
         if (self::$trustedProxies && self::$trustedHeaders[self::HEADER_CLIENT_PROTO] && $proto = $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_PROTO])) {
-            return in_array(strtolower($proto), array('https', 'on', '1'));
+            return in_array(strtolower(current(explode(',', $proto))), array('https', 'on', 'ssl', '1'));
         }
 
         return 'on' == strtolower($this->server->get('HTTPS')) || 1 == $this->server->get('HTTPS');
@@ -1600,13 +1629,13 @@ class Request
             $requestUri = $this->headers->get('X_REWRITE_URL');
             $this->headers->remove('X_REWRITE_URL');
         } elseif ($this->server->get('IIS_WasUrlRewritten') == '1' && $this->server->get('UNENCODED_URL') != '') {
-            // IIS7 with URL Rewrite: make sure we get the unencoded url (double slash problem)
+            // IIS7 with URL Rewrite: make sure we get the unencoded URL (double slash problem)
             $requestUri = $this->server->get('UNENCODED_URL');
             $this->server->remove('UNENCODED_URL');
             $this->server->remove('IIS_WasUrlRewritten');
         } elseif ($this->server->has('REQUEST_URI')) {
             $requestUri = $this->server->get('REQUEST_URI');
-            // HTTP proxy reqs setup request uri with scheme and host [and port] + the url path, only use url path
+            // HTTP proxy reqs setup request URI with scheme and host [and port] + the URL path, only use URL path
             $schemeAndHttpHost = $this->getSchemeAndHttpHost();
             if (strpos($requestUri, $schemeAndHttpHost) === 0) {
                 $requestUri = substr($requestUri, strlen($schemeAndHttpHost));
@@ -1806,5 +1835,20 @@ class Request
         }
 
         return false;
+    }
+
+    private static function createRequestFromFactory(array $query = array(), array $request = array(), array $attributes = array(), array $cookies = array(), array $files = array(), array $server = array(), $content = null)
+    {
+        if (self::$requestFactory) {
+            $request = call_user_func(self::$requestFactory, $query, $request, $attributes, $cookies, $files, $server, $content);
+
+            if (!$request instanceof Request) {
+                throw new \LogicException('The Request factory must return an instance of Symfony\Component\HttpFoundation\Request.');
+            }
+
+            return $request;
+        }
+
+        return new static($query, $request, $attributes, $cookies, $files, $server, $content);
     }
 }

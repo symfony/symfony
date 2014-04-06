@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\Test;
+namespace Symfony\Component\Form\Tests;
 
 class FormRendererTest extends \PHPUnit_Framework_TestCase
 {

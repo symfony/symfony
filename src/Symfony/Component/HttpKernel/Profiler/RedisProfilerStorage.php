@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\HttpKernel\Profiler;
 
-
 /**
  * RedisProfilerStorage stores profiling information in Redis.
  *
@@ -215,7 +214,7 @@ class RedisProfilerStorage implements ProfilerStorageInterface
                 throw new \RuntimeException('RedisProfilerStorage requires that the redis extension is loaded.');
             }
 
-            $redis = new \Redis;
+            $redis = new \Redis();
             $redis->connect($data['host'], $data['port']);
 
             if (isset($data['path'])) {

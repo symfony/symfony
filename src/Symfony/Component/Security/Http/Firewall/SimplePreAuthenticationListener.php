@@ -70,7 +70,7 @@ class SimplePreAuthenticationListener implements ListenerInterface
             $this->logger->info(sprintf('Attempting simple pre-authorization %s', $this->providerKey));
         }
 
-        if (null !== $this->context->getToken() && !$this->context->getToken() instanceof AnonymousToken) {
+        if (null !== $this->securityContext->getToken() && !$this->securityContext->getToken() instanceof AnonymousToken) {
             return;
         }
 

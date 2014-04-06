@@ -113,7 +113,7 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($exception->getMessage(), $flattened->getMessage(), 'The message is copied from the original exception.');
         $this->assertEquals($exception->getCode(), $flattened->getCode(), 'The code is copied from the original exception.');
-        $this->assertEquals(get_class($exception), $flattened->getClass(), 'The class is set to the class of the original exception');
+        $this->assertInstanceOf($flattened->getClass(), $exception, 'The class is set to the class of the original exception');
 
     }
 

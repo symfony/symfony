@@ -13,6 +13,7 @@ namespace Symfony\Component\Console;
 
 use Symfony\Component\Console\Descriptor\TextDescriptor;
 use Symfony\Component\Console\Descriptor\XmlDescriptor;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -56,17 +57,18 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class Application
 {
-    private $commands;
+    private $commands = array();
     private $wantHelps = false;
     private $runningCommand;
     private $name;
     private $version;
-    private $catchExceptions;
-    private $autoExit;
+    private $catchExceptions = true;
+    private $autoExit = true;
     private $definition;
     private $helperSet;
     private $dispatcher;
     private $terminalDimensions;
+    private $defaultCommand;
 
     /**
      * Constructor.
@@ -80,9 +82,7 @@ class Application
     {
         $this->name = $name;
         $this->version = $version;
-        $this->catchExceptions = true;
-        $this->autoExit = true;
-        $this->commands = array();
+        $this->defaultCommand = 'list';
         $this->helperSet = $this->getDefaultHelperSet();
         $this->definition = $this->getDefaultInputDefinition();
 
@@ -148,9 +148,8 @@ class Application
             if ($exitCode > 255) {
                 $exitCode = 255;
             }
-            // @codeCoverageIgnoreStart
+
             exit($exitCode);
-            // @codeCoverageIgnoreEnd
         }
 
         return $exitCode;
@@ -183,8 +182,8 @@ class Application
         }
 
         if (!$name) {
-            $name = 'list';
-            $input = new ArrayInput(array('command' => 'list'));
+            $name = $this->defaultCommand;
+            $input = new ArrayInput(array('command' => $this->defaultCommand));
         }
 
         // the command name MUST be the first element of the input
@@ -407,6 +406,10 @@ class Application
             return;
         }
 
+        if (null === $command->getDefinition()) {
+            throw new \LogicException(sprintf('Command class "%s" is not correctly initialized. You probably forgot to call the parent constructor.', get_class($command)));
+        }
+
         $this->commands[$command->getName()] = $command;
 
         foreach ($command->getAliases() as $alias) {
@@ -514,8 +517,8 @@ class Application
         }
 
         $exact = in_array($namespace, $namespaces, true);
-        if (1 < count($namespaces) && !$exact) {
-            throw new \InvalidArgumentException(sprintf('The namespace "%s" is ambiguous (%s).', $namespace, $this->getAbbreviationSuggestions($namespaces)));
+        if (count($namespaces) > 1 && !$exact) {
+            throw new \InvalidArgumentException(sprintf('The namespace "%s" is ambiguous (%s).', $namespace, $this->getAbbreviationSuggestions(array_values($namespaces))));
         }
 
         return $exact ? $namespace : reset($namespaces);
@@ -559,6 +562,16 @@ class Application
             }
 
             throw new \InvalidArgumentException($message);
+        }
+
+        // filter out aliases for commands which are already on the list
+        if (count($commands) > 1) {
+            $commandList = $this->commands;
+            $commands = array_filter($commands, function ($nameOrAlias) use ($commandList, $commands) {
+                $commandName = $commandList[$nameOrAlias]->getName();
+
+                return $commandName === $nameOrAlias || !in_array($commandName, $commands);
+            });
         }
 
         $exact = in_array($name, $commands, true);
@@ -684,7 +697,8 @@ class Application
         do {
             $title = sprintf('  [%s]  ', get_class($e));
             $len = $strlen($title);
-            $width = $this->getTerminalWidth() ? $this->getTerminalWidth() - 1 : PHP_INT_MAX;
+            // HHVM only accepts 32 bits integer in str_split, even when PHP_INT_MAX is a 64 bit integer: https://github.com/facebook/hhvm/issues/1327
+            $width = $this->getTerminalWidth() ? $this->getTerminalWidth() - 1 : (defined('HHVM_VERSION') ? 1 << 31 : PHP_INT_MAX);
             $formatter = $output->getFormatter();
             $lines = array();
             foreach (preg_split('/\r?\n/', $e->getMessage()) as $line) {
@@ -955,6 +969,7 @@ class Application
             new DialogHelper(),
             new ProgressHelper(),
             new TableHelper(),
+            new QuestionHelper(),
         ));
     }
 
@@ -1037,10 +1052,11 @@ class Application
     }
 
     /**
-     * Finds alternative of $name among $collection
+     * Finds alternative of $name among $collection,
+     * if nothing is found in $collection, try in $abbrevs
      *
      * @param string               $name       The string
-     * @param array|Traversable    $collection The collection
+     * @param array|\Traversable   $collection The collection
      *
      * @return array A sorted array of similar string
      */
@@ -1084,5 +1100,15 @@ class Application
         asort($alternatives);
 
         return array_keys($alternatives);
+    }
+
+    /**
+     * Sets the default Command name.
+     *
+     * @param string $commandName The Command name
+     */
+    public function setDefaultCommand($commandName)
+    {
+        $this->defaultCommand = $commandName;
     }
 }

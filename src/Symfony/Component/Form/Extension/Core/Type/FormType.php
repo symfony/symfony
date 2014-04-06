@@ -31,7 +31,7 @@ class FormType extends BaseType
 
     public function __construct(PropertyAccessorInterface $propertyAccessor = null)
     {
-        $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::getPropertyAccessor();
+        $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
     }
 
     /**
@@ -40,6 +40,8 @@ class FormType extends BaseType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         parent::buildForm($builder, $options);
+
+        $isDataOptionSet = array_key_exists('data', $options);
 
         $builder
             ->setRequired($options['required'])
@@ -50,8 +52,8 @@ class FormType extends BaseType
             ->setByReference($options['by_reference'])
             ->setInheritData($options['inherit_data'])
             ->setCompound($options['compound'])
-            ->setData(isset($options['data']) ? $options['data'] : null)
-            ->setDataLocked(isset($options['data']))
+            ->setData($isDataOptionSet ? $options['data'] : null)
+            ->setDataLocked($isDataOptionSet)
             ->setDataMapper($options['compound'] ? new PropertyPathMapper($this->propertyAccessor) : null)
             ->setMethod($options['method'])
             ->setAction($options['action'])
@@ -90,13 +92,14 @@ class FormType extends BaseType
             'value'      => $form->getViewData(),
             'data'       => $form->getNormData(),
             'required'   => $form->isRequired(),
-            'max_length' => $options['max_length'],
-            'pattern'    => $options['pattern'],
+            'max_length' => isset($options['attr']['maxlength']) ? $options['attr']['maxlength'] : null, // Deprecated
+            'pattern'    => isset($options['attr']['pattern']) ? $options['attr']['pattern'] : null, // Deprecated
             'size'       => null,
             'label_attr' => $options['label_attr'],
             'compound'   => $form->getConfig()->getCompound(),
             'method'     => $form->getConfig()->getMethod(),
             'action'     => $form->getConfig()->getAction(),
+            'submitted'  => $form->isSubmitted(),
         ));
     }
 
@@ -167,6 +170,22 @@ class FormType extends BaseType
             'data',
         ));
 
+        // BC clause for the "max_length" and "pattern" option
+        // Add these values to the "attr" option instead
+        $defaultAttr = function (Options $options) {
+            $attributes = array();
+
+            if (null !== $options['max_length']) {
+                $attributes['maxlength'] = $options['max_length'];
+            }
+
+            if (null !== $options['pattern']) {
+                $attributes['pattern'] = $options['pattern'];
+            }
+
+            return $attributes;
+        };
+
         $resolver->setDefaults(array(
             'data_class'         => $dataClass,
             'empty_data'         => $emptyData,
@@ -187,6 +206,7 @@ class FormType extends BaseType
             // According to RFC 2396 (http://www.ietf.org/rfc/rfc2396.txt)
             // section 4.2., empty URIs are considered same-document references
             'action'             => '',
+            'attr'               => $defaultAttr
         ));
 
         $resolver->setAllowedTypes(array(

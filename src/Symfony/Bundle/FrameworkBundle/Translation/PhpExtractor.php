@@ -16,7 +16,7 @@ use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Extractor\ExtractorInterface;
 
 /**
- * PhpExtractor extracts translation messages from a php template.
+ * PhpExtractor extracts translation messages from a PHP template.
  *
  * @author Michel Salib <michelsalib@hotmail.com>
  */
@@ -88,7 +88,7 @@ class PhpExtractor implements ExtractorInterface
     }
 
     /**
-     * Extracts trans message from php tokens.
+     * Extracts trans message from PHP tokens.
      *
      * @param array            $tokens
      * @param MessageCatalogue $catalog

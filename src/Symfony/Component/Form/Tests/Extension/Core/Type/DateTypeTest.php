@@ -745,8 +745,8 @@ class DateTypeTest extends TypeTestCase
         ));
         $form['year']->addError($error);
 
-        $this->assertSame(array(), $form['year']->getErrors());
-        $this->assertSame(array($error), $form->getErrors());
+        $this->assertSame(array(), iterator_to_array($form['year']->getErrors()));
+        $this->assertSame(array($error), iterator_to_array($form->getErrors()));
     }
 
     /**
@@ -760,8 +760,8 @@ class DateTypeTest extends TypeTestCase
         ));
         $form['month']->addError($error);
 
-        $this->assertSame(array(), $form['month']->getErrors());
-        $this->assertSame(array($error), $form->getErrors());
+        $this->assertSame(array(), iterator_to_array($form['month']->getErrors()));
+        $this->assertSame(array($error), iterator_to_array($form->getErrors()));
     }
 
     /**
@@ -775,7 +775,28 @@ class DateTypeTest extends TypeTestCase
         ));
         $form['day']->addError($error);
 
-        $this->assertSame(array(), $form['day']->getErrors());
-        $this->assertSame(array($error), $form->getErrors());
+        $this->assertSame(array(), iterator_to_array($form['day']->getErrors()));
+        $this->assertSame(array($error), iterator_to_array($form->getErrors()));
+    }
+
+    public function testYearsFor32BitsMachines()
+    {
+        if (4 !== PHP_INT_SIZE) {
+            $this->markTestSkipped(
+                'PHP must be compiled in 32 bit mode to run this test');
+        }
+
+        $form = $this->factory->create('date', null, array(
+            'years' => range(1900, 2040),
+        ));
+
+        $view = $form->createView();
+
+        $listChoices = array();
+        foreach (range(1902, 2037) as $y) {
+            $listChoices[] = new ChoiceView($y, $y, $y);
+        }
+
+        $this->assertEquals($listChoices, $view['year']->vars['choices']);
     }
 }

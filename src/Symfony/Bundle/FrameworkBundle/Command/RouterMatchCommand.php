@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Routing\RouterInterface;
@@ -50,12 +51,18 @@ class RouterMatchCommand extends ContainerAwareCommand
             ->setName('router:match')
             ->setDefinition(array(
                 new InputArgument('path_info', InputArgument::REQUIRED, 'A path info'),
+                new InputOption('method', null, InputOption::VALUE_REQUIRED, 'Sets the HTTP method'),
+                new InputOption('scheme', null, InputOption::VALUE_REQUIRED, 'Sets the URI scheme (usually http or https)'),
+                new InputOption('host', null, InputOption::VALUE_REQUIRED, 'Sets the URI host'),
             ))
             ->setDescription('Helps debug routes by simulating a path info match')
             ->setHelp(<<<EOF
-The <info>%command.name%</info> simulates a path info match:
+The <info>%command.name%</info> shows which routes match a given request and which don't and for what reason:
 
   <info>php %command.full_name% /foo</info>
+  or
+  <info>php %command.full_name% /foo --method POST --scheme https --host symfony.com --verbose</info>
+
 EOF
             )
         ;
@@ -67,12 +74,23 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $router = $this->getContainer()->get('router');
-        $matcher = new TraceableUrlMatcher($router->getRouteCollection(), $router->getContext());
+        $context = $router->getContext();
+        if (null !== $method = $input->getOption('method')) {
+            $context->setMethod($method);
+        }
+        if (null !== $scheme = $input->getOption('scheme')) {
+            $context->setScheme($scheme);
+        }
+        if (null !== $host = $input->getOption('host')) {
+            $context->setHost($host);
+        }
+
+        $matcher = new TraceableUrlMatcher($router->getRouteCollection(), $context);
 
         $traces = $matcher->getTraces($input->getArgument('path_info'));
 
         $matches = false;
-        foreach ($traces as $i => $trace) {
+        foreach ($traces as $trace) {
             if (TraceableUrlMatcher::ROUTE_ALMOST_MATCHES == $trace['level']) {
                 $output->writeln(sprintf('<fg=yellow>Route "%s" almost matches but %s</>', $trace['name'], lcfirst($trace['log'])));
             } elseif (TraceableUrlMatcher::ROUTE_MATCHES == $trace['level']) {

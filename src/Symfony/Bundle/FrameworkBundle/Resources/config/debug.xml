@@ -19,7 +19,6 @@
             <argument type="service" id="debug.event_dispatcher.parent" />
             <argument type="service" id="debug.stopwatch" />
             <argument type="service" id="logger" on-invalid="null" />
-            <call method="setProfiler"><argument type="service" id="profiler" on-invalid="null" /></call>
         </service>
 
         <service id="debug.controller_resolver" class="%debug.controller_resolver.class%">
@@ -31,6 +30,13 @@
             <tag name="kernel.event_subscriber" />
             <tag name="monolog.logger" channel="deprecation" />
             <argument>deprecation</argument>
+            <argument type="service" id="logger" on-invalid="null" />
+        </service>
+
+        <service id="debug.scream_logger_listener" class="%debug.errors_logger_listener.class%">
+            <tag name="kernel.event_subscriber" />
+            <tag name="monolog.logger" channel="scream" />
+            <argument>scream</argument>
             <argument type="service" id="logger" on-invalid="null" />
         </service>
     </services>

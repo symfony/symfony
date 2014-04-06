@@ -21,8 +21,10 @@ class GetAttrNode extends Node
 
     public function __construct(Node $node, Node $attribute, ArrayNode $arguments, $type)
     {
-        $this->nodes = array('node' => $node, 'attribute' => $attribute, 'arguments' => $arguments);
-        $this->attributes = array('type' => $type);
+        parent::__construct(
+            array('node' => $node, 'attribute' => $attribute, 'arguments' => $arguments),
+            array('type' => $type)
+        );
     }
 
     public function compile(Compiler $compiler)
@@ -79,12 +81,12 @@ class GetAttrNode extends Node
                 return call_user_func_array(array($obj, $this->nodes['attribute']->evaluate($functions, $values)), $this->nodes['arguments']->evaluate($functions, $values));
 
             case self::ARRAY_CALL:
-                $values = $this->nodes['node']->evaluate($functions, $values);
-                if (!is_array($values) && !$values instanceof \ArrayAccess) {
+                $array = $this->nodes['node']->evaluate($functions, $values);
+                if (!is_array($array) && !$array instanceof \ArrayAccess) {
                     throw new \RuntimeException('Unable to get an item on a non-array.');
                 }
 
-                return $values[$this->nodes['attribute']->evaluate($functions, $values)];
+                return $array[$this->nodes['attribute']->evaluate($functions, $values)];
         }
     }
 }

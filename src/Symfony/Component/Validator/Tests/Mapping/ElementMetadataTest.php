@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Validator\Tests\Mapping;
 
+use Symfony\Component\Validator\Mapping\ElementMetadata;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintB;
-use Symfony\Component\Validator\Mapping\ElementMetadata;
 
 class ElementMetadataTest extends \PHPUnit_Framework_TestCase
 {
@@ -21,7 +21,7 @@ class ElementMetadataTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->metadata = new TestElementMetadata('Symfony\Component\Validator\Tests\Fixtures\Entity');
+        $this->metadata = new TestElementMetadata();
     }
 
     protected function tearDown()

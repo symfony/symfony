@@ -276,7 +276,7 @@ class OptionsResolver implements OptionsResolverInterface
             ksort($diff);
 
             throw new MissingOptionsException(sprintf(
-                count($diff) > 1 ? 'The required options "%s" are missing.' : 'The required option "%s" is  missing.',
+                count($diff) > 1 ? 'The required options "%s" are missing.' : 'The required option "%s" is missing.',
                 implode('", "', array_keys($diff))
             ));
         }
@@ -294,8 +294,14 @@ class OptionsResolver implements OptionsResolverInterface
     private function validateOptionValues(array $options)
     {
         foreach ($this->allowedValues as $option => $allowedValues) {
-            if (isset($options[$option]) && !in_array($options[$option], $allowedValues, true)) {
-                throw new InvalidOptionsException(sprintf('The option "%s" has the value "%s", but is expected to be one of "%s"', $option, $options[$option], implode('", "', $allowedValues)));
+            if (isset($options[$option])) {
+                if (is_array($allowedValues) && !in_array($options[$option], $allowedValues, true)) {
+                    throw new InvalidOptionsException(sprintf('The option "%s" has the value "%s", but is expected to be one of "%s"', $option, $options[$option], implode('", "', $allowedValues)));
+                }
+
+                if (is_callable($allowedValues) && !call_user_func($allowedValues, $options[$option])) {
+                    throw new InvalidOptionsException(sprintf('The option "%s" has the value "%s", which it is not valid', $option, $options[$option]));
+                }
             }
         }
     }

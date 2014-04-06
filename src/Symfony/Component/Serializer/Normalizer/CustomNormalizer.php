@@ -29,7 +29,7 @@ class CustomNormalizer extends SerializerAwareNormalizer implements NormalizerIn
      */
     public function denormalize($data, $class, $format = null, array $context = array())
     {
-        $object = new $class;
+        $object = new $class();
         $object->denormalize($this->serializer, $data, $format, $context);
 
         return $object;

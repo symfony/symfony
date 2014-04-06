@@ -17,7 +17,10 @@ class NameNode extends Node
 {
     public function __construct($name)
     {
-        $this->attributes = array('name' => $name);
+        parent::__construct(
+            array(),
+            array('name' => $name)
+        );
     }
 
     public function compile(Compiler $compiler)

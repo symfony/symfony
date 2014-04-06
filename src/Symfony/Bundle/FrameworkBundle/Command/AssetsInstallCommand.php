@@ -83,7 +83,7 @@ EOT
         $bundlesDir = $targetArg.'/bundles/';
         $filesystem->mkdir($bundlesDir, 0777);
 
-        $output->writeln(sprintf("Installing assets using the <comment>%s</comment> option", $input->getOption('symlink') ? 'symlink' : 'hard copy'));
+        $output->writeln(sprintf('Installing assets as <comment>%s</comment>', $input->getOption('symlink') ? 'symlinks' : 'hard copies'));
 
         foreach ($this->getContainer()->get('kernel')->getBundles() as $bundle) {
             if (is_dir($originDir = $bundle->getPath().'/Resources/public')) {
@@ -103,7 +103,7 @@ EOT
                 } else {
                     $filesystem->mkdir($targetDir, 0777);
                     // We use a custom iterator to ignore VCS files
-                    $filesystem->mirror($originDir, $targetDir, Finder::create()->in($originDir));
+                    $filesystem->mirror($originDir, $targetDir, Finder::create()->ignoreDotFiles(false)->in($originDir));
                 }
             }
         }

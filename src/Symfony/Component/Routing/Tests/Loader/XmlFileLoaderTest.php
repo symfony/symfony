@@ -34,10 +34,12 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $routeCollection = $loader->load('validpattern.xml');
         $routes = $routeCollection->all();
 
-        $this->assertCount(2, $routes, 'Two routes are loaded');
+        $this->assertCount(3, $routes, 'Three routes are loaded');
         $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
 
-        foreach ($routes as $route) {
+        $identicalRoutes = array_slice($routes, 0, 2);
+
+        foreach ($identicalRoutes as $route) {
             $this->assertSame('/blog/{slug}', $route->getPath());
             $this->assertSame('{locale}.example.com', $route->getHost());
             $this->assertSame('MyBundle:Blog:show', $route->getDefault('_controller'));
@@ -62,7 +64,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('MyBundle:Blog:show', $route->getDefault('_controller'));
         $this->assertSame('\w+', $route->getRequirement('slug'));
         $this->assertSame('en|fr|de', $route->getRequirement('_locale'));
-        $this->assertSame(null, $route->getDefault('slug'));
+        $this->assertNull($route->getDefault('slug'));
         $this->assertSame('RouteCompiler', $route->getOption('compiler_class'));
     }
 
@@ -72,7 +74,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $routeCollection = $loader->load('validresource.xml');
         $routes = $routeCollection->all();
 
-        $this->assertCount(2, $routes, 'Two routes are loaded');
+        $this->assertCount(3, $routes, 'Three routes are loaded');
         $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
 
         foreach ($routes as $route) {
@@ -81,6 +83,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
             $this->assertSame('\d+', $route->getRequirement('foo'));
             $this->assertSame('bar', $route->getOption('foo'));
             $this->assertSame('', $route->getHost());
+            $this->assertSame('context.getMethod() == "POST"', $route->getCondition());
         }
     }
 

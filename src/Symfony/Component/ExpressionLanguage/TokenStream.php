@@ -21,7 +21,7 @@ class TokenStream
     public $current;
 
     private $tokens;
-    private $position;
+    private $position = 0;
 
     /**
      * Constructor.
@@ -31,7 +31,6 @@ class TokenStream
     public function __construct(array $tokens)
     {
         $this->tokens = $tokens;
-        $this->position = 0;
         $this->current = $tokens[0];
     }
 

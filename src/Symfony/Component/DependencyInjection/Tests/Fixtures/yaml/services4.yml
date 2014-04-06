@@ -1,6 +1,7 @@
 imports:
     - { resource: services2.yml }
     - { resource: services3.yml }
+    - { resource: "../php/simple.php" }
     - { resource: "../ini/parameters.ini", class: Symfony\Component\DependencyInjection\Loader\IniFileLoader }
     - { resource: "../ini/parameters2.ini" }
     - { resource: "../xml/services13.xml" }

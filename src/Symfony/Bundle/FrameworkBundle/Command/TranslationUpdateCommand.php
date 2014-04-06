@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Translation\Catalogue\DiffOperation;
 use Symfony\Component\Translation\Catalogue\MergeOperation;
 use Symfony\Component\Console\Input\InputInterface;
@@ -67,6 +66,7 @@ message.
 
 <info>php %command.full_name% --dump-messages en AcmeBundle</info>
 <info>php %command.full_name% --force --prefix="new_" fr AcmeBundle</info>
+
 EOF
             )
         ;

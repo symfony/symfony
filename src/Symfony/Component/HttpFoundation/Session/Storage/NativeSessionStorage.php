@@ -13,7 +13,6 @@ namespace Symfony\Component\HttpFoundation\Session\Storage;
 
 use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeSessionHandler;
-use Symfony\Component\HttpFoundation\Session\Storage\MetadataBag;
 use Symfony\Component\HttpFoundation\Session\Storage\Proxy\NativeProxy;
 use Symfony\Component\HttpFoundation\Session\Storage\Proxy\AbstractProxy;
 use Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy;
@@ -163,7 +162,7 @@ class NativeSessionStorage implements SessionStorageInterface
      */
     public function getId()
     {
-        if (!$this->started) {
+        if (!$this->started && !$this->closed) {
             return ''; // returning empty is consistent with session_id() behaviour
         }
 
@@ -239,6 +238,7 @@ class NativeSessionStorage implements SessionStorageInterface
         }
 
         $this->closed = true;
+        $this->started = false;
     }
 
     /**

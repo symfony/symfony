@@ -12,7 +12,6 @@
 namespace Symfony\Component\ExpressionLanguage\Tests\Node;
 
 use Symfony\Component\ExpressionLanguage\Node\ArgumentsNode;
-use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
 
 class ArgumentsNodeTest extends ArrayNodeTest
 {

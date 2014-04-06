@@ -24,7 +24,7 @@ use Doctrine\DBAL\Schema\SchemaException;
 class InitAclCommand extends ContainerAwareCommand
 {
     /**
-     * @see Command
+     * {@inheritdoc}
      */
     protected function configure()
     {
@@ -47,7 +47,7 @@ EOF
     }
 
     /**
-     * @see Command::execute()
+     * {@inheritdoc}
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {

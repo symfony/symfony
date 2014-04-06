@@ -240,6 +240,7 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
 
     public function testEventReceivesTheDispatcherInstance()
     {
+        $dispatcher = null;
         $this->dispatcher->addListener('test', function ($event) use (&$dispatcher) {
             $dispatcher = $event->getDispatcher();
         });
@@ -270,7 +271,7 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
     {
         $dispatcher = new EventDispatcher();
         $dispatcher->addListener('bug.62976', new CallableClass());
-        $dispatcher->removeListener('bug.62976', function() {});
+        $dispatcher->removeListener('bug.62976', function () {});
         $this->assertTrue($dispatcher->hasListeners('bug.62976'));
     }
 }

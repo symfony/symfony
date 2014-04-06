@@ -63,12 +63,18 @@ table th, table td {
     font-size: 12px;
     padding: 8px 10px;
 }
+table td em {
+    color: #aaa;
+}
 fieldset {
     border: none;
 }
 abbr {
     border-bottom: 1px dotted #000;
     cursor: help;
+}
+pre, code {
+    font-size: 0.9em;
 }
 .clear {
     clear: both;
@@ -163,6 +169,10 @@ abbr {
 #collector-content {
     margin-left: 250px;
     padding: 30px 40px 40px;
+}
+#collector-content pre {
+    white-space: pre-wrap;
+    word-break: break-all;
 }
 #navigation {
     float: left;
@@ -264,6 +274,9 @@ ul.alt li.error {
 ul.alt li.warning {
     background-color: #ffcc00;
     margin-bottom: 1px;
+}
+ul.alt li.scream, ul.alt li.scream strong {
+    color: gray;
 }
 ul.sf-call-stack li {
     text-size: small;

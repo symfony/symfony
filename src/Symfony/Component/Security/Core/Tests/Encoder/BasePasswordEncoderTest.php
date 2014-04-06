@@ -46,11 +46,17 @@ class BasePasswordEncoderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      */
     public function testMergePasswordAndSaltWithException()
     {
         $this->invokeMergePasswordAndSalt('password', '{foo}');
+    }
+
+    public function testIsPasswordTooLong()
+    {
+        $this->assertTrue($this->invokeIsPasswordTooLong(str_repeat('a', 10000)));
+        $this->assertFalse($this->invokeIsPasswordTooLong(str_repeat('a', 10)));
     }
 
     protected function invokeDemergePasswordAndSalt($password)
@@ -81,5 +87,15 @@ class BasePasswordEncoderTest extends \PHPUnit_Framework_TestCase
         $m->setAccessible(true);
 
         return $m->invoke($encoder, $p1, $p2);
+    }
+
+    protected function invokeIsPasswordTooLong($p)
+    {
+        $encoder = new PasswordEncoder();
+        $r = new \ReflectionObject($encoder);
+        $m = $r->getMethod('isPasswordTooLong');
+        $m->setAccessible(true);
+
+        return $m->invoke($encoder, $p);
     }
 }

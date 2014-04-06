@@ -103,4 +103,12 @@ class XliffFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader = new XliffFileLoader();
         $loader->load(__DIR__.'/../fixtures/withdoctype.xlf', 'en', 'domain1');
     }
+
+    public function testParseEmptyFile()
+    {
+        $loader = new XliffFileLoader();
+        $resource = __DIR__.'/../fixtures/empty.xlf';
+        $this->setExpectedException('Symfony\Component\Translation\Exception\InvalidResourceException', sprintf('Unable to load "%s":', $resource));
+        $loader->load($resource, 'en', 'domain1');
+    }
 }

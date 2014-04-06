@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Validator\Mapping\Loader;
 
-use Symfony\Component\Validator\Exception\MappingException;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Exception\MappingException;
 
 abstract class AbstractLoader implements LoaderInterface
 {
@@ -36,10 +36,10 @@ abstract class AbstractLoader implements LoaderInterface
     /**
      * Creates a new constraint instance for the given constraint name.
      *
-     * @param string $name The constraint name. Either a constraint relative
-     *                        to the default constraint namespace, or a fully
-     *                        qualified class name
-     * @param array $options The constraint options
+     * @param string $name   The constraint name. Either a constraint relative
+     *                       to the default constraint namespace, or a fully
+     *                       qualified class name
+     * @param mixed $options The constraint options
      *
      * @return Constraint
      *

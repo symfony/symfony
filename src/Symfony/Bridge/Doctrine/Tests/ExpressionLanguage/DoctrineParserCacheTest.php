@@ -29,6 +29,19 @@ class DoctrineParserCacheTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $result);
     }
 
+    public function testFetchUnexisting()
+    {
+        $doctrineCacheMock = $this->getMock('Doctrine\Common\Cache\Cache');
+        $parserCache = new DoctrineParserCache($doctrineCacheMock);
+
+        $doctrineCacheMock
+            ->expects($this->once())
+            ->method('fetch')
+            ->will($this->returnValue(false));
+
+        $this->assertNull($parserCache->fetch(''));
+    }
+
     public function testSave()
     {
         $doctrineCacheMock = $this->getMock('Doctrine\Common\Cache\Cache');

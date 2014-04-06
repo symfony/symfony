@@ -11,11 +11,10 @@
 
 namespace Symfony\Component\Validator\Tests\Mapping;
 
-use Symfony\Component\Validator\Tests\Fixtures\Entity;
-use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
-use Symfony\Component\Validator\Mapping\ClassMetadataFactory;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Symfony\Component\Validator\Mapping\ClassMetadataFactory;
 use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
+use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 
 class ClassMetadataFactoryTest extends \PHPUnit_Framework_TestCase
 {
@@ -77,7 +76,7 @@ class ClassMetadataFactoryTest extends \PHPUnit_Framework_TestCase
               ->will($this->returnValue(false));
         $cache->expects($this->once())
               ->method('write')
-              ->will($this->returnCallback(function($metadata) use ($tester, $constraints) {
+              ->will($this->returnCallback(function ($metadata) use ($tester, $constraints) {
                   $tester->assertEquals($constraints, $metadata->getConstraints());
               }));
 

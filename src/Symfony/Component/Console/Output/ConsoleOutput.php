@@ -12,7 +12,6 @@
 namespace Symfony\Component\Console\Output;
 
 use Symfony\Component\Console\Formatter\OutputFormatterInterface;
-use Symfony\Component\Console\Output\ConsoleOutputInterface;
 
 /**
  * ConsoleOutput is the default class for all CLI output. It uses STDOUT.

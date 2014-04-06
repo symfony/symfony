@@ -24,7 +24,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 class HttpKernelTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @expectedException RuntimeException
+     * @expectedException \RuntimeException
      */
     public function testHandleWhenControllerThrowsAnExceptionAndRawIsTrue()
     {
@@ -34,7 +34,7 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException RuntimeException
+     * @expectedException \RuntimeException
      */
     public function testHandleWhenControllerThrowsAnExceptionAndRawIsFalseAndNoListenerIsRegistered()
     {
@@ -136,7 +136,7 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException LogicException
+     * @expectedException \LogicException
      */
     public function testHandleWhenTheControllerIsNotACallable()
     {
@@ -188,7 +188,7 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException LogicException
+     * @expectedException \LogicException
      */
     public function testHandleWhenTheControllerDoesNotReturnAResponse()
     {

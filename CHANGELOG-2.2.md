@@ -7,6 +7,106 @@ in 2.2 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.2.0...v2.2.1
 
+* 2.2.11 (2013-12-02)
+
+ * bug #9656 [DoctrineBridge] normalized class names in the ORM type guesser (fabpot)
+ * bug #9647 use the correct class name to retrieve mapped class' metadata and reposi... (xabbuh)
+ * bug #9643 [WebProfilerBundle] Fixed js escaping in time.html.twig (hason)
+ * bug #9639 Modified guessDefaultEscapingStrategy to not escape txt templates (fabpot)
+ * bug #9314 [Form] Fix DateType for 32bits computers. (WedgeSama)
+ * bug #9443 [FrameworkBundle] Fixed the registration of validation.xml file when the form is disabled (hason)
+ * bug #9625 [HttpFoundation] Do not return an empty session id if the session was closed (Taluu)
+ * bug #9447 [BrowserKit] fixed protocol-relative url redirection (jong99)
+ * bug #9535 No Entity Manager defined exception (armetiz)
+ * bug #9485 [Acl] Fix for issue #9433 (guilro)
+ * bug #9516 [AclProvider] Fix incorrect behavior when partial results returned from cache (superdav42)
+ * bug #9537 [FrameworkBundle] Fix mistake in translation's service definition. (phpmike)
+ * bug #9367 [Process] Check if the pipe array is empty before calling stream_select() (jfposton)
+ * bug #9469 [Propel1] re-factor Propel1 ModelChoiceList (havvg)
+
+* 2.2.10 (2013-11-13)
+
+ * bug #9499 Request::overrideGlobals() may call invalid ini value (denkiryokuhatsuden)
+ * bug #9212 [Validator] Force Luhn Validator to only work with strings (Richtermeister)
+ * bug #9431 [DependencyInjection] fixed YamlDumper did not make services private. (realityking)
+ * bug #9412 [HttpFoundation] added content length header to BinaryFileResponse (kbond)
+ * bug #9388 [Form] Fixed: The "data" option is taken into account even if it is NULL (bschussek)
+ * bug #9391 [Serializer] Fixed the error handling when decoding invalid XML to avoid a Warning (stof)
+ * bug #9378 [DomCrawler] [HttpFoundation] Make `Content-Type` attributes identification case-insensitive (matthieuprat)
+ * bug #9354 [Process] Fix #9343 : revert file handle usage on Windows platform (romainneutron)
+ * bug #9333 [Form] Improved FormTypeCsrfExtension to use the type class as default intention if the form name is empty (bschussek)
+ * bug #9338 [DoctrineBridge] Added type check to prevent calling clear() on arrays (bschussek)
+ * bug #9327 [Form] Changed FormTypeCsrfExtension to use the form's name as default intention (bschussek)
+ * bug #9308 [DoctrineBridge] Loosened CollectionToArrayTransformer::transform() to accept arrays (bschussek)
+ * bug #9274 [Yaml] Fixed the escaping of strings starting with a dash when dumping (stof)
+ * bug #9270 [Templating] Fix in ChainLoader.php (janschoenherr)
+ * bug #9246 [Session] fixed wrong started state (tecbot)
+
+* 2.2.9 (2013-10-10)
+
+ * [Security] limited the password length passed to encoders
+ * bug #9237 [FrameworkBundle] assets:install command should mirror .dotfiles (.htaccess) (FineWolf)
+ * bug #9223 [Translator] PoFileDumper - PO headers (Padam87)
+ * bug #9257 [Process] Fix 9182 : random failure on pipes tests (romainneutron)
+ * bug #9222 [Bridge] [Propel1] Fixed guessed relations (ClementGautier)
+ * bug #9214 [FramworkBundle] Check event listener services are not abstract (lyrixx)
+ * bug #9207 [HttpKernel] Check for lock existence before unlinking (ollietb)
+ * bug #9184 Fixed cache warmup of paths which contain back-slashes (fabpot)
+ * bug #9192 [Form] remove MinCount and MaxCount constraints in ValidatorTypeGuesser (franek)
+ * bug #9190 Fix: duplicate usage of Symfony\Component\HttpFoundation\Response (realsim)
+ * bug #9188 [Form] add support for Length and Range constraint in ValidatorTypeGuesser (franek)
+ * bug #8809 [Form] enforce correct timezone (Burgov)
+ * bug #9169 Fixed client insulation when using the terminable event (fabpot)
+ * bug #9154 Fix problem with Windows file links (backslash in JavaScript string) (fabpot)
+ * bug #9103 [HttpFoundation] Header `HTTP_X_FORWARDED_PROTO` can contain various values (stloyd)
+
+* 2.2.8 (2013-09-25)
+
+ * same as 2.2.7
+
+* 2.2.7 (2013-09-25)
+
+ * 8980954: bugix: CookieJar returns cookies with domain "domain.com" for domain "foodomain.com"
+ * 3108c71: [Locale] added support for the position argument to NumberFormatter::parse()
+ * 0774c79: [Locale] added some more stubs for the number formatter
+ * e5282e8: [DomCrawler]Crawler guess charset from html
+ * 0e80d88: fixes RequestDataCollector bug, visible when used on Drupal8
+ * c8d0342: [Console] fixed exception rendering when nested styles
+ * a47d663: [Console] fixed the formatter for single-char tags
+ * c6c35b3: [Console] Escape exception message during the rendering of an exception
+ * 0e437c5: [BrowserKit] Fixed the handling of parameters when redirecting
+ * 958ec09: NativeSessionStorage regenerate
+ * 0d6af5c: Use setTimeZone if this method exists.
+ * 773e716: [HttpFoundation] Fixed the way path to directory is trimmed.
+ * 42019f6: [Console] Fixed argument parsing when a single dash is passed.
+ * b591419: [HttpFoundation] removed double-slashes (closes #8388)
+ * 4f5b8f0: [HttpFoundation] tried to keep the original Request URI as much as possible to avoid different behavior between ::createFromGlobals() and ::create()
+ * 4c1dbc7: [TwigBridge] fixed form rendering when used in a template with dynamic inheritance
+ * 8444339: [HttpKernel] added a check for private event listeners/subscribers
+ * ce7de37: [DependencyInjection] fixed a non-detected circular reference in PhpDumper (closes #8425)
+ * 37102dc: [Process] Close unix pipes before calling `proc_close` to avoid a deadlock
+ * 8c2a733: [HttpFoundation] fixed format duplication in Request
+ * 1e75cf9: [Process] Fix #8970 : read output once the process is finished, enable pipe tests on Windows
+ * ed83752: [Form] Fixed expanded choice field to be marked invalid when unknown choices are submitted
+ * 30aa1de: [Form] Fixed ChoiceList::get*By*() methods to preserve order and array keys
+ * 49f5027: [HttpKernel] fixer HInclude src (closes #8951)
+ * c567262: Fixed escaping of service identifiers in configuration
+ * 4a76c76: [Process][2.2] Fix Process component on windows
+ * 65814ba: Request->getPort() should prefer HTTP_HOST over SERVER_PORT
+ * e75d284: Fixing broken http auth digest in some circumstances (php-fpm + apache).
+ * 899f176: [Security] fixed a leak in ExceptionListener
+ * 2fd8a7a: [Security] fixed a leak in the ContextListener
+ * 4e9d990: Ignore posix_istatty warnings
+ * 2d34e78: [BrowserKit] fixed method/files/content when redirecting a request
+ * 64e1655: [BrowserKit] removed some headers when redirecting a request
+ * 96a4b00: [BrowserKit] fixed headers when redirecting if history is set to false (refs #8697)
+ * c931eb7: [HttpKernel] fixed route parameters storage in the Request data collector (closes #8867)
+ * 96bb731: optimized circular reference checker
+ * 91234cd: [HttpKernel] changed fragment URLs to be relative by default (closes #8458)
+ * 4922a80: [FrameworkBundle] added support for double-quoted strings in the extractor (closes #8797)
+ * 0d07af8: [BrowserKit] Pass headers when `followRedirect()` is called
+ * d400b5a: Return BC compatibility for `@Route` parameters and default values
+
 * 2.2.6 (2013-08-26)
 
  * f936b41: clearToken exception is thrown at wrong place.

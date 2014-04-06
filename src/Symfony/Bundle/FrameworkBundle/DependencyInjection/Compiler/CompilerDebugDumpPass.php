@@ -14,18 +14,22 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 
 class CompilerDebugDumpPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
+        $filename = self::getCompilerLogFilename($container);
+
         $filesystem = new Filesystem();
-        $filesystem->dumpFile(
-            $this->getCompilerLogFilename($container),
-            implode("\n", $container->getCompiler()->getLog()),
-            0666 & ~umask()
-        );
+        $filesystem->dumpFile($filename, implode("\n", $container->getCompiler()->getLog()), null);
+        try {
+            $filesystem->chmod($filename, 0666, umask());
+        } catch (IOException $e) {
+            // discard chmod failure (some filesystem may not support it)
+        }
     }
 
     public static function getCompilerLogFilename(ContainerInterface $container)

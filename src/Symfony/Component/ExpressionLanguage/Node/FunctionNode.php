@@ -17,8 +17,10 @@ class FunctionNode extends Node
 {
     public function __construct($name, Node $arguments)
     {
-        $this->nodes = array('arguments' => $arguments);
-        $this->attributes = array('name' => $name);
+        parent::__construct(
+            array('arguments' => $arguments),
+            array('name' => $name)
+        );
     }
 
     public function compile(Compiler $compiler)

@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * Validates a PAN using the LUHN Algorithm
@@ -34,8 +35,19 @@ class LuhnValidator extends ConstraintValidator
      */
     public function validate($value, Constraint $constraint)
     {
+        if (!$constraint instanceof Luhn) {
+            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Luhn');
+        }
+
         if (null === $value || '' === $value) {
             return;
+        }
+
+        /**
+         * need to work with strings only because long numbers are treated as floats and don't work with strlen
+         */
+        if (!is_string($value)) {
+            throw new UnexpectedTypeException($value, 'string');
         }
 
         if (!is_numeric($value)) {

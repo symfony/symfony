@@ -13,7 +13,6 @@ namespace Symfony\Component\Finder\Tests;
 
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\Adapter;
-use Symfony\Component\Finder\Tests\FakeAdapter;
 
 class FinderTest extends Iterator\RealIteratorTestCase
 {
@@ -337,6 +336,17 @@ class FinderTest extends Iterator\RealIteratorTestCase
     /**
      * @dataProvider getAdaptersTestData
      */
+    public function testInWithGlobBrace($adapter)
+    {
+        $finder = $this->buildFinder($adapter);
+        $finder->in(array(__DIR__.'/Fixtures/{A,copy/A}/B/C'))->getIterator();
+
+        $this->assertIterator($this->toAbsoluteFixtures(array('A/B/C/abc.dat', 'copy/A/B/C/abc.dat.copy')), $finder);
+    }
+
+    /**
+     * @dataProvider getAdaptersTestData
+     */
     public function testGetIterator($adapter)
     {
         $finder = $this->buildFinder($adapter);
@@ -555,7 +565,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $finder = $this->buildFinder($adapter);
         $finder->in($locations)->depth('< 1')->name('test.php');
 
-        $this->assertEquals(1, count($finder));
+        $this->assertCount(1, $finder);
     }
 
     /**
@@ -583,7 +593,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
         $this->assertEquals(
             array('c', 'e', 'a', 'd', 'b'),
-            array_map(function(Adapter\AdapterInterface $adapter) {
+            array_map(function (Adapter\AdapterInterface $adapter) {
                 return $adapter->getName();
             }, $finder->getAdapters())
         );
@@ -609,7 +619,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     public function getAdaptersTestData()
     {
         return array_map(
-            function ($adapter)  { return array($adapter); },
+            function ($adapter) { return array($adapter); },
             $this->getValidAdapters()
         );
     }
@@ -723,7 +733,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     public function testAccessDeniedException(Adapter\AdapterInterface $adapter)
     {
         if (defined('PHP_WINDOWS_VERSION_MAJOR')) {
-            $this->markTestSkipped('chmod is not supported on windows');
+            $this->markTestSkipped('chmod is not supported on Windows');
         }
 
         $finder = $this->buildFinder($adapter);
@@ -736,7 +746,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
             $this->assertIterator($this->toAbsolute(array('foo bar', 'test.php', 'test.py')), $finder->getIterator());
             $this->fail('Finder should throw an exception when opening a non-readable directory.');
         } catch (\Exception $e) {
-            $this->assertEquals('Symfony\\Component\\Finder\\Exception\\AccessDeniedException', get_class($e));
+            $this->assertInstanceOf('Symfony\\Component\\Finder\\Exception\\AccessDeniedException', $e);
         }
 
         // restore original permissions
@@ -749,7 +759,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     public function testIgnoredAccessDeniedException(Adapter\AdapterInterface $adapter)
     {
         if (defined('PHP_WINDOWS_VERSION_MAJOR')) {
-            $this->markTestSkipped('chmod is not supported on windows');
+            $this->markTestSkipped('chmod is not supported on Windows');
         }
 
         $finder = $this->buildFinder($adapter);
@@ -791,7 +801,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
                 new Adapter\GnuFindAdapter(),
                 new Adapter\PhpAdapter()
             ),
-            function (Adapter\AdapterInterface $adapter)  {
+            function (Adapter\AdapterInterface $adapter) {
                 return $adapter->isSupported();
             }
         );

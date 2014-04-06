@@ -12,6 +12,7 @@
 namespace Symfony\Component\Filesystem;
 
 use Symfony\Component\Filesystem\Exception\IOException;
+use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 
 /**
  * Provides basic utility to manipulate the file system.
@@ -31,17 +32,18 @@ class Filesystem
      * @param string  $targetFile The target filename
      * @param boolean $override   Whether to override an existing file or not
      *
-     * @throws IOException When copy fails
+     * @throws FileNotFoundException    When originFile doesn't exist
+     * @throws IOException              When copy fails
      */
     public function copy($originFile, $targetFile, $override = false)
     {
         if (stream_is_local($originFile) && !is_file($originFile)) {
-            throw new IOException(sprintf('Failed to copy %s because file not exists', $originFile));
+            throw new FileNotFoundException(sprintf('Failed to copy "%s" because file does not exist.', $originFile), 0, null, $originFile);
         }
 
         $this->mkdir(dirname($targetFile));
 
-        if (!$override && is_file($targetFile)) {
+        if (!$override && is_file($targetFile) && null === parse_url($originFile, PHP_URL_HOST)) {
             $doCopy = filemtime($originFile) > filemtime($targetFile);
         } else {
             $doCopy = true;
@@ -50,14 +52,14 @@ class Filesystem
         if ($doCopy) {
             // https://bugs.php.net/bug.php?id=64634
             $source = fopen($originFile, 'r');
-            $target = fopen($targetFile, 'w+');
+            $target = fopen($targetFile, 'w');
             stream_copy_to_stream($source, $target);
             fclose($source);
             fclose($target);
             unset($source, $target);
 
             if (!is_file($targetFile)) {
-                throw new IOException(sprintf('Failed to copy %s to %s', $originFile, $targetFile));
+                throw new IOException(sprintf('Failed to copy "%s" to "%s".', $originFile, $targetFile), 0, null, $originFile);
             }
         }
     }
@@ -78,7 +80,7 @@ class Filesystem
             }
 
             if (true !== @mkdir($dir, $mode, true)) {
-                throw new IOException(sprintf('Failed to create %s', $dir));
+                throw new IOException(sprintf('Failed to create "%s".', $dir), 0, null, $dir);
             }
         }
     }
@@ -105,8 +107,8 @@ class Filesystem
      * Sets access and modification time of file.
      *
      * @param string|array|\Traversable $files A filename, an array of files, or a \Traversable instance to create
-     * @param integer                   $time  The touch time as a unix timestamp
-     * @param integer                   $atime The access time as a unix timestamp
+     * @param integer                   $time  The touch time as a Unix timestamp
+     * @param integer                   $atime The access time as a Unix timestamp
      *
      * @throws IOException When touch fails
      */
@@ -115,7 +117,7 @@ class Filesystem
         foreach ($this->toIterator($files) as $file) {
             $touch = $time ? @touch($file, $time, $atime) : @touch($file);
             if (true !== $touch) {
-                throw new IOException(sprintf('Failed to touch %s', $file));
+                throw new IOException(sprintf('Failed to touch "%s".', $file), 0, null, $file);
             }
         }
     }
@@ -140,17 +142,17 @@ class Filesystem
                 $this->remove(new \FilesystemIterator($file));
 
                 if (true !== @rmdir($file)) {
-                    throw new IOException(sprintf('Failed to remove directory %s', $file));
+                    throw new IOException(sprintf('Failed to remove directory "%s".', $file), 0, null, $file);
                 }
             } else {
                 // https://bugs.php.net/bug.php?id=52176
                 if (defined('PHP_WINDOWS_VERSION_MAJOR') && is_dir($file)) {
                     if (true !== @rmdir($file)) {
-                        throw new IOException(sprintf('Failed to remove file %s', $file));
+                        throw new IOException(sprintf('Failed to remove file "%s".', $file), 0, null, $file);
                     }
                 } else {
                     if (true !== @unlink($file)) {
-                        throw new IOException(sprintf('Failed to remove file %s', $file));
+                        throw new IOException(sprintf('Failed to remove file "%s".', $file), 0, null, $file);
                     }
                 }
             }
@@ -174,7 +176,7 @@ class Filesystem
                 $this->chmod(new \FilesystemIterator($file), $mode, $umask, true);
             }
             if (true !== @chmod($file, $mode & ~$umask)) {
-                throw new IOException(sprintf('Failed to chmod file %s', $file));
+                throw new IOException(sprintf('Failed to chmod file "%s".', $file), 0, null, $file);
             }
         }
     }
@@ -196,11 +198,11 @@ class Filesystem
             }
             if (is_link($file) && function_exists('lchown')) {
                 if (true !== @lchown($file, $user)) {
-                    throw new IOException(sprintf('Failed to chown file %s', $file));
+                    throw new IOException(sprintf('Failed to chown file "%s".', $file), 0, null, $file);
                 }
             } else {
                 if (true !== @chown($file, $user)) {
-                    throw new IOException(sprintf('Failed to chown file %s', $file));
+                    throw new IOException(sprintf('Failed to chown file "%s".', $file), 0, null, $file);
                 }
             }
         }
@@ -223,11 +225,11 @@ class Filesystem
             }
             if (is_link($file) && function_exists('lchgrp')) {
                 if (true !== @lchgrp($file, $group)) {
-                    throw new IOException(sprintf('Failed to chgrp file %s', $file));
+                    throw new IOException(sprintf('Failed to chgrp file "%s".', $file), 0, null, $file);
                 }
             } else {
                 if (true !== @chgrp($file, $group)) {
-                    throw new IOException(sprintf('Failed to chgrp file %s', $file));
+                    throw new IOException(sprintf('Failed to chgrp file "%s".', $file), 0, null, $file);
                 }
             }
         }
@@ -247,11 +249,11 @@ class Filesystem
     {
         // we check that target does not exist
         if (!$overwrite && is_readable($target)) {
-            throw new IOException(sprintf('Cannot rename because the target "%s" already exist.', $target));
+            throw new IOException(sprintf('Cannot rename because the target "%s" already exists.', $target), 0, null, $target);
         }
 
         if (true !== @rename($origin, $target)) {
-            throw new IOException(sprintf('Cannot rename "%s" to "%s".', $origin, $target));
+            throw new IOException(sprintf('Cannot rename "%s" to "%s".', $origin, $target), 0, null, $target);
         }
     }
 
@@ -291,7 +293,8 @@ class Filesystem
                         throw new IOException('Unable to create symlink due to error code 1314: \'A required privilege is not held by the client\'. Do you have the required Administrator-rights?');
                     }
                 }
-                throw new IOException(sprintf('Failed to create symbolic link from %s to %s', $originDir, $targetDir));
+
+                throw new IOException(sprintf('Failed to create symbolic link from "%s" to "%s".', $originDir, $targetDir), 0, null, $targetDir);
             }
         }
     }
@@ -306,7 +309,7 @@ class Filesystem
      */
     public function makePathRelative($endPath, $startPath)
     {
-        // Normalize separators on windows
+        // Normalize separators on Windows
         if (defined('PHP_WINDOWS_VERSION_MAJOR')) {
             $endPath = strtr($endPath, '\\', '/');
             $startPath = strtr($startPath, '\\', '/');
@@ -389,17 +392,17 @@ class Filesystem
                 } elseif (is_dir($file)) {
                     $this->mkdir($target);
                 } else {
-                    throw new IOException(sprintf('Unable to guess "%s" file type.', $file));
+                    throw new IOException(sprintf('Unable to guess "%s" file type.', $file), 0, null, $file);
                 }
             } else {
                 if (is_link($file)) {
-                    $this->symlink($file, $target);
+                    $this->symlink($file->getLinkTarget(), $target);
                 } elseif (is_dir($file)) {
                     $this->mkdir($target);
                 } elseif (is_file($file)) {
                     $this->copy($file, $target, isset($options['override']) ? $options['override'] : false);
                 } else {
-                    throw new IOException(sprintf('Unable to guess "%s" file type.', $file));
+                    throw new IOException(sprintf('Unable to guess "%s" file type.', $file), 0, null, $file);
                 }
             }
         }
@@ -428,6 +431,37 @@ class Filesystem
     }
 
     /**
+     * Atomically dumps content into a file.
+     *
+     * @param  string       $filename The file to be written to.
+     * @param  string       $content  The data to write into the file.
+     * @param  null|integer $mode     The file mode (octal). If null, file permissions are not modified
+     *                                Deprecated since version 2.3.12, to be removed in 3.0.
+     * @throws IOException            If the file cannot be written to.
+     */
+    public function dumpFile($filename, $content, $mode = 0666)
+    {
+        $dir = dirname($filename);
+
+        if (!is_dir($dir)) {
+            $this->mkdir($dir);
+        } elseif (!is_writable($dir)) {
+            throw new IOException(sprintf('Unable to write to the "%s" directory.', $dir), 0, null, $dir);
+        }
+
+        $tmpFile = tempnam($dir, basename($filename));
+
+        if (false === @file_put_contents($tmpFile, $content)) {
+            throw new IOException(sprintf('Failed to write file "%s".', $filename), 0, null, $filename);
+        }
+
+        $this->rename($tmpFile, $filename, true);
+        if (null !== $mode) {
+            $this->chmod($filename, $mode);
+        }
+    }
+
+    /**
      * @param mixed $files
      *
      * @return \Traversable
@@ -439,33 +473,5 @@ class Filesystem
         }
 
         return $files;
-    }
-
-    /**
-     * Atomically dumps content into a file.
-     *
-     * @param  string  $filename The file to be written to.
-     * @param  string  $content  The data to write into the file.
-     * @param  integer $mode     The file mode (octal).
-     * @throws IOException       If the file cannot be written to.
-     */
-    public function dumpFile($filename, $content, $mode = 0666)
-    {
-        $dir = dirname($filename);
-
-        if (!is_dir($dir)) {
-            $this->mkdir($dir);
-        } elseif (!is_writable($dir)) {
-            throw new IOException(sprintf('Unable to write to the "%s" directory.', $dir));
-        }
-
-        $tmpFile = tempnam($dir, basename($filename));
-
-        if (false === @file_put_contents($tmpFile, $content)) {
-            throw new IOException(sprintf('Failed to write file "%s".', $filename));
-        }
-
-        $this->rename($tmpFile, $filename, true);
-        $this->chmod($filename, $mode);
     }
 }

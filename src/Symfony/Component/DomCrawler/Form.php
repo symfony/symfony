@@ -143,8 +143,13 @@ class Form extends Link implements \ArrayAccess
      */
     public function getPhpValues()
     {
-        $qs = http_build_query($this->getValues(), '', '&');
-        parse_str($qs, $values);
+        $values = array();
+        foreach ($this->getValues() as $name => $value) {
+            $qs = http_build_query(array($name => $value), '', '&');
+            parse_str($qs, $expandedValue);
+            $varName = substr($name, 0, strlen(key($expandedValue)));
+            $values = array_replace_recursive($values, array($varName => current($expandedValue)));
+        }
 
         return $values;
     }
@@ -161,8 +166,13 @@ class Form extends Link implements \ArrayAccess
      */
     public function getPhpFiles()
     {
-        $qs = http_build_query($this->getFiles(), '', '&');
-        parse_str($qs, $values);
+        $values = array();
+        foreach ($this->getFiles() as $name => $value) {
+            $qs = http_build_query(array($name => $value), '', '&');
+            parse_str($qs, $expandedValue);
+            $varName = substr($name, 0, strlen(key($expandedValue)));
+            $values = array_replace_recursive($values, array($varName => current($expandedValue)));
+        }
 
         return $values;
     }
@@ -331,6 +341,22 @@ class Form extends Link implements \ArrayAccess
     }
 
     /**
+     * Disables validation
+     *
+     * @return self
+     */
+    public function disableValidation()
+    {
+        foreach ($this->fields->all() as $field) {
+            if ($field instanceof Field\ChoiceFormField) {
+                $field->disableValidation();
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * Sets the node for the form.
      *
      * Expects a 'submit' button \DOMNode and finds the corresponding form element.
@@ -383,8 +409,24 @@ class Form extends Link implements \ArrayAccess
         $root = $document->appendChild($document->createElement('_root'));
 
         // add submitted button if it has a valid name
-        if ($this->button->hasAttribute('name') && $this->button->getAttribute('name')) {
-            $this->set(new Field\InputFormField($document->importNode($this->button, true)));
+        if ('form' !== $this->button->nodeName && $this->button->hasAttribute('name') && $this->button->getAttribute('name')) {
+            if ('input' == $this->button->nodeName && 'image' == $this->button->getAttribute('type')) {
+                $name = $this->button->getAttribute('name');
+                $this->button->setAttribute('value', '0');
+
+                // temporarily change the name of the input node for the x coordinate
+                $this->button->setAttribute('name', $name.'.x');
+                $this->set(new Field\InputFormField($document->importNode($this->button, true)));
+
+                // temporarily change the name of the input node for the y coordinate
+                $this->button->setAttribute('name', $name.'.y');
+                $this->set(new Field\InputFormField($document->importNode($this->button, true)));
+
+                // restore the original name of the input node
+                $this->button->setAttribute('name', $name);
+            } else {
+                $this->set(new Field\InputFormField($document->importNode($this->button, true)));
+            }
         }
 
         // find form elements corresponding to the current form
@@ -395,7 +437,7 @@ class Form extends Link implements \ArrayAccess
 
             // corresponding elements are either descendants or have a matching HTML5 form attribute
             $formId = Crawler::xpathLiteral($this->node->getAttribute('id'));
-            $fieldNodes = $xpath->query(sprintf('descendant::input[@form=%s] | descendant::button[@form=%s] | descendant::textarea[@form=%s] | descendant::select[@form=%s] | //form[@id=%s]/input[not(@form)] | //form[@id=%s]/button[not(@form)] | //form[@id=%s]/textarea[not(@form)] | //form[@id=%s]/select[not(@form)]', $formId, $formId, $formId, $formId, $formId, $formId, $formId, $formId), $root);
+            $fieldNodes = $xpath->query(sprintf('descendant::input[@form=%s] | descendant::button[@form=%s] | descendant::textarea[@form=%s] | descendant::select[@form=%s] | //form[@id=%s]//input[not(@form)] | //form[@id=%s]//button[not(@form)] | //form[@id=%s]//textarea[not(@form)] | //form[@id=%s]//select[not(@form)]', $formId, $formId, $formId, $formId, $formId, $formId, $formId, $formId), $root);
             foreach ($fieldNodes as $node) {
                 $this->addField($node);
             }

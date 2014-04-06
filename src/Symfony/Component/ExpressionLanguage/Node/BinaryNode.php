@@ -16,9 +16,9 @@ use Symfony\Component\ExpressionLanguage\Compiler;
 class BinaryNode extends Node
 {
     private static $operators = array(
-        '~'     => '.',
-        'and'   => '&&',
-        'or'    => '||',
+        '~'   => '.',
+        'and' => '&&',
+        'or'  => '||',
     );
 
     private static $functions = array(
@@ -30,17 +30,19 @@ class BinaryNode extends Node
 
     public function __construct($operator, Node $left, Node $right)
     {
-        $this->nodes = array('left' => $left, 'right' => $right);
-        $this->attributes = array('operator' => $operator);
+        parent::__construct(
+            array('left' => $left, 'right' => $right),
+            array('operator' => $operator)
+        );
     }
 
     public function compile(Compiler $compiler)
     {
         $operator = $this->attributes['operator'];
 
-        if ('=~' == $operator || '!~' == $operator) {
+        if ('matches' == $operator) {
             $compiler
-                ->raw(('!~' == $operator ? '!' : '').'preg_match(')
+                ->raw('preg_match(')
                 ->compile($this->nodes['right'])
                 ->raw(', ')
                 ->compile($this->nodes['left'])
@@ -81,9 +83,10 @@ class BinaryNode extends Node
     {
         $operator = $this->attributes['operator'];
         $left = $this->nodes['left']->evaluate($functions, $values);
-        $right = $this->nodes['right']->evaluate($functions, $values);
 
         if (isset(self::$functions[$operator])) {
+            $right = $this->nodes['right']->evaluate($functions, $values);
+
             if ('not in' == $operator) {
                 return !call_user_func('in_array', $left, $right);
             }
@@ -94,10 +97,15 @@ class BinaryNode extends Node
         switch ($operator) {
             case 'or':
             case '||':
-                return $left || $right;
+                return $left || $this->nodes['right']->evaluate($functions, $values);
             case 'and':
             case '&&':
-                return $left && $right;
+                return $left && $this->nodes['right']->evaluate($functions, $values);
+        }
+
+        $right = $this->nodes['right']->evaluate($functions, $values);
+
+        switch ($operator) {
             case '|':
                 return $left | $right;
             case '^':
@@ -136,10 +144,8 @@ class BinaryNode extends Node
                 return $left / $right;
             case '%':
                 return $left % $right;
-            case '=~':
+            case 'matches':
                 return preg_match($right, $left);
-            case '!~':
-                return !preg_match($right, $left);
         }
     }
 }

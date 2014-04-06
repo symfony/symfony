@@ -16,7 +16,6 @@ use Symfony\Component\Form\Util\InheritDataAwareIterator;
 use Symfony\Component\PropertyAccess\PropertyPathIterator;
 use Symfony\Component\PropertyAccess\PropertyPathBuilder;
 use Symfony\Component\PropertyAccess\PropertyPathIteratorInterface;
-use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationPathIterator;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Validator\ConstraintViolation;
 
@@ -129,7 +128,8 @@ class ViolationMapper implements ViolationMapperInterface
                 $violation->getMessage(),
                 $violation->getMessageTemplate(),
                 $violation->getMessageParameters(),
-                $violation->getMessagePluralization()
+                $violation->getMessagePluralization(),
+                $violation
             ));
         }
     }
@@ -294,6 +294,9 @@ class ViolationMapper implements ViolationMapperInterface
      */
     private function acceptsErrors(FormInterface $form)
     {
-        return $this->allowNonSynchronized || $form->isSynchronized();
+        // Ignore non-submitted forms. This happens, for example, in PATCH
+        // requests.
+        // https://github.com/symfony/symfony/pull/10567
+        return $form->isSubmitted() && ($this->allowNonSynchronized || $form->isSynchronized());
     }
 }

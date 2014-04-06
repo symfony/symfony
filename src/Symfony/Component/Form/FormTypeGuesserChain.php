@@ -21,7 +21,7 @@ class FormTypeGuesserChain implements FormTypeGuesserInterface
     /**
      * Constructor.
      *
-     * @param array $guessers Guessers as instances of FormTypeGuesserInterface
+     * @param FormTypeGuesserInterface[] $guessers Guessers as instances of FormTypeGuesserInterface
      *
      * @throws UnexpectedTypeException if any guesser does not implement FormTypeGuesserInterface
      */
@@ -87,7 +87,7 @@ class FormTypeGuesserChain implements FormTypeGuesserInterface
      * @param \Closure $closure The closure to execute. Accepts a guesser
      *                            as argument and should return a Guess instance
      *
-     * @return Guess The guess with the highest confidence
+     * @return Guess|null The guess with the highest confidence
      */
     private function guess(\Closure $closure)
     {

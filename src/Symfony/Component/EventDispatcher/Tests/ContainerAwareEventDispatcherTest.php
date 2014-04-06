@@ -175,8 +175,6 @@ class ContainerAwareEventDispatcherTest extends \PHPUnit_Framework_TestCase
 
     public function testGetListenersOnLazyLoad()
     {
-        $event = new Event();
-
         $service = $this->getMock('Symfony\Component\EventDispatcher\Tests\Service');
 
         $container = new Container();
@@ -194,8 +192,6 @@ class ContainerAwareEventDispatcherTest extends \PHPUnit_Framework_TestCase
 
     public function testRemoveAfterDispatch()
     {
-        $event = new Event();
-
         $service = $this->getMock('Symfony\Component\EventDispatcher\Tests\Service');
 
         $container = new Container();
@@ -211,8 +207,6 @@ class ContainerAwareEventDispatcherTest extends \PHPUnit_Framework_TestCase
 
     public function testRemoveBeforeDispatch()
     {
-        $event = new Event();
-
         $service = $this->getMock('Symfony\Component\EventDispatcher\Tests\Service');
 
         $container = new Container();

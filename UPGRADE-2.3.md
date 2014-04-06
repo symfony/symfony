@@ -137,7 +137,7 @@ Form
 
    ```
    $form = $factory->create('form');
-   $form->add($factory->createNamed('field', 'text', array(
+   $form->add($factory->createNamed('field', 'text', array(), array(
        'auto_initialize' => false,
    )));
    ```
@@ -168,6 +168,32 @@ Form
    $builder = $factory->createBuilder('form');
    $builder->add('field', 'text');
    $form = $builder->getForm();
+   ```
+
+ * Previously, when the "data" option of a field was set to `null` and the
+   containing form was mapped to an object, the field would receive the data
+   from the object as default value. This functionality was unintended and fixed
+   to use `null` as default value in Symfony 2.3.
+
+   In cases where you made use of the previous behavior, you should now remove
+   the "data" option altogether.
+
+   Before:
+
+   ```
+   $builder->add('field', 'text', array(
+      'data' => $defaultData ?: null,
+   ));
+   ```
+
+   After:
+
+   ```
+   $options = array();
+   if ($defaultData) {
+       $options['data'] = $defaultData;
+   }
+   $builder->add('field', 'text', $options);
    ```
 
 PropertyAccess

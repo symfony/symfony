@@ -22,7 +22,7 @@ class CurrencyValidatorTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        IntlTestHelper::requireIntl($this);
+        IntlTestHelper::requireFullIntl($this);
 
         $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
         $this->validator = new CurrencyValidator();
@@ -64,6 +64,18 @@ class CurrencyValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidCurrencies($currency)
     {
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
+        $this->validator->validate($currency, new Currency());
+    }
+
+    /**
+     * @dataProvider getValidCurrencies
+     **/
+    public function testValidCurrenciesWithCountrySpecificLocale($currency)
+    {
+        \Locale::setDefault('en_GB');
         $this->context->expects($this->never())
             ->method('addViolation');
 

@@ -66,7 +66,7 @@ class XmlDumperTest extends \PHPUnit_Framework_TestCase
 
     public function testDumpAnonymousServices()
     {
-        include self::$fixturesPath.'/containers/container11.php';
+        $container = include self::$fixturesPath.'/containers/container11.php';
         $dumper = new XmlDumper($container);
         $this->assertEquals("<?xml version=\"1.0\" encoding=\"utf-8\"?>
 <container xmlns=\"http://symfony.com/schema/dic/services\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd\">
@@ -87,7 +87,7 @@ class XmlDumperTest extends \PHPUnit_Framework_TestCase
 
     public function testDumpEntities()
     {
-        include self::$fixturesPath.'/containers/container12.php';
+        $container = include self::$fixturesPath.'/containers/container12.php';
         $dumper = new XmlDumper($container);
         $this->assertEquals("<?xml version=\"1.0\" encoding=\"utf-8\"?>
 <container xmlns=\"http://symfony.com/schema/dic/services\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd\">
@@ -99,5 +99,36 @@ class XmlDumperTest extends \PHPUnit_Framework_TestCase
   </services>
 </container>
 ", $dumper->dump());
+    }
+
+    /**
+     * @dataProvider provideDecoratedServicesData
+     */
+    public function testDumpDecoratedServices($expectedXmlDump, $container)
+    {
+        $dumper = new XmlDumper($container);
+        $this->assertEquals($expectedXmlDump, $dumper->dump());
+    }
+
+    public function provideDecoratedServicesData()
+    {
+        $fixturesPath = realpath(__DIR__.'/../Fixtures/');
+
+        return array(
+            array("<?xml version=\"1.0\" encoding=\"utf-8\"?>
+<container xmlns=\"http://symfony.com/schema/dic/services\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd\">
+  <services>
+    <service id=\"foo\" class=\"FooClass\Foo\" decorates=\"bar\" decoration-inner-name=\"bar.woozy\"/>
+  </services>
+</container>
+", include $fixturesPath.'/containers/container15.php'),
+            array("<?xml version=\"1.0\" encoding=\"utf-8\"?>
+<container xmlns=\"http://symfony.com/schema/dic/services\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd\">
+  <services>
+    <service id=\"foo\" class=\"FooClass\Foo\" decorates=\"bar\"/>
+  </services>
+</container>
+", include $fixturesPath.'/containers/container16.php'),
+        );
     }
 }

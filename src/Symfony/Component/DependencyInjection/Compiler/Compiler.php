@@ -12,7 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 
 /**
  * This class is used to remove circular dependencies between individual passes.
@@ -24,7 +23,7 @@ use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 class Compiler
 {
     private $passConfig;
-    private $log;
+    private $log = array();
     private $loggingFormatter;
     private $serviceReferenceGraph;
 
@@ -36,7 +35,6 @@ class Compiler
         $this->passConfig = new PassConfig();
         $this->serviceReferenceGraph = new ServiceReferenceGraph();
         $this->loggingFormatter = new LoggingFormatter();
-        $this->log = array();
     }
 
     /**

@@ -52,7 +52,7 @@ class YamlFileLoader extends FileLoader
         }
 
         // imports
-        $this->parseImports($content, $file);
+        $this->parseImports($content, $path);
 
         // parameters
         if (isset($content['parameters'])) {
@@ -232,6 +232,11 @@ class YamlFileLoader extends FileLoader
 
                 $definition->addTag($name, $tag);
             }
+        }
+
+        if (isset($service['decorates'])) {
+            $renameId = isset($service['decoration-inner-name']) ? $service['decoration-inner-name'] : null;
+            $definition->setDecoratedService($service['decorates'], $renameId);
         }
 
         $this->container->setDefinition($id, $definition);

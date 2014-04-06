@@ -14,11 +14,12 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Bundle\FrameworkBundle\Controller\RedirectController;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 
 /**
- * @author Marcin Sikon<marcin.sikon@gmail.com>
+ * @author Marcin Sikon <marcin.sikon@gmail.com>
  */
 class RedirectControllerTest extends TestCase
 {
@@ -27,13 +28,19 @@ class RedirectControllerTest extends TestCase
         $request = new Request();
         $controller = new RedirectController();
 
-        $returnResponse = $controller->redirectAction($request, '', true);
-        $this->assertInstanceOf('\Symfony\Component\HttpFoundation\Response', $returnResponse);
-        $this->assertEquals(410, $returnResponse->getStatusCode());
+        try {
+            $controller->redirectAction($request, '', true);
+            $this->fail('Expected Symfony\Component\HttpKernel\Exception\HttpException to be thrown');
+        } catch (HttpException $e) {
+            $this->assertSame(410, $e->getStatusCode());
+        }
 
-        $returnResponse = $controller->redirectAction($request, '', false);
-        $this->assertInstanceOf('\Symfony\Component\HttpFoundation\Response', $returnResponse);
-        $this->assertEquals(404, $returnResponse->getStatusCode());
+        try {
+            $controller->redirectAction($request, '', false);
+            $this->fail('Expected Symfony\Component\HttpKernel\Exception\HttpException to be thrown');
+        } catch (HttpException $e) {
+            $this->assertSame(404, $e->getStatusCode());
+        }
     }
 
     /**
@@ -98,13 +105,19 @@ class RedirectControllerTest extends TestCase
         $request = new Request();
         $controller = new RedirectController();
 
-        $returnResponse = $controller->urlRedirectAction($request, '', true);
-        $this->assertInstanceOf('\Symfony\Component\HttpFoundation\Response', $returnResponse);
-        $this->assertEquals(410, $returnResponse->getStatusCode());
+        try {
+            $controller->urlRedirectAction($request, '', true);
+            $this->fail('Expected Symfony\Component\HttpKernel\Exception\HttpException to be thrown');
+        } catch (HttpException $e) {
+            $this->assertSame(410, $e->getStatusCode());
+        }
 
-        $returnResponse = $controller->urlRedirectAction($request, '', false);
-        $this->assertInstanceOf('\Symfony\Component\HttpFoundation\Response', $returnResponse);
-        $this->assertEquals(404, $returnResponse->getStatusCode());
+        try {
+            $controller->urlRedirectAction($request, '', false);
+            $this->fail('Expected Symfony\Component\HttpKernel\Exception\HttpException to be thrown');
+        } catch (HttpException $e) {
+            $this->assertSame(404, $e->getStatusCode());
+        }
     }
 
     public function testFullURL()
@@ -186,7 +199,36 @@ class RedirectControllerTest extends TestCase
         $this->assertRedirectUrl($returnValue, $expectedUrl);
     }
 
-    private function createRequestObject($scheme, $host, $port, $baseUrl)
+    public function pathQueryParamsProvider()
+    {
+        return array(
+            array('http://www.example.com/base/redirect-path', '/redirect-path',  ''),
+            array('http://www.example.com/base/redirect-path?foo=bar', '/redirect-path?foo=bar',  ''),
+            array('http://www.example.com/base/redirect-path?foo=bar', '/redirect-path', 'foo=bar'),
+            array('http://www.example.com/base/redirect-path?foo=bar&abc=example', '/redirect-path?foo=bar', 'abc=example'),
+            array('http://www.example.com/base/redirect-path?foo=bar&abc=example&baz=def', '/redirect-path?foo=bar', 'abc=example&baz=def'),
+        );
+    }
+
+    /**
+     * @dataProvider pathQueryParamsProvider
+     */
+    public function testPathQueryParams($expectedUrl, $path, $queryString)
+    {
+        $scheme = 'http';
+        $host = 'www.example.com';
+        $baseUrl = '/base';
+        $port = 80;
+
+        $request = $this->createRequestObject($scheme, $host, $port, $baseUrl, $queryString);
+
+        $controller = $this->createRedirectController();
+
+        $returnValue = $controller->urlRedirectAction($request, $path, false, $scheme, $port, null);
+        $this->assertRedirectUrl($returnValue, $expectedUrl);
+    }
+
+    private function createRequestObject($scheme, $host, $port, $baseUrl, $queryString = '')
     {
         $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
         $request
@@ -205,6 +247,10 @@ class RedirectControllerTest extends TestCase
             ->expects($this->any())
             ->method('getBaseUrl')
             ->will($this->returnValue($baseUrl));
+        $request
+            ->expects($this->any())
+            ->method('getQueryString')
+            ->will($this->returnValue($queryString));
 
         return $request;
     }

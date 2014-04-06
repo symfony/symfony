@@ -22,7 +22,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
  *
  * @runTestsInSeparateProcesses
  */
-class NullSessionStorageTest extends \PHPUnit_Framework_TestCase
+class NullSessionHandlerTest extends \PHPUnit_Framework_TestCase
 {
     public function testSaveHandlers()
     {

@@ -12,8 +12,8 @@
 namespace Symfony\Component\Security\Http\Authorization;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * This is used by the ExceptionListener to translate an AccessDeniedException

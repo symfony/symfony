@@ -29,7 +29,7 @@ if (!defined('ENT_SUBSTITUTE')) {
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ExceptionHandler
+class ExceptionHandler implements ExceptionHandlerInterface
 {
     private $debug;
     private $charset;
@@ -57,13 +57,13 @@ class ExceptionHandler
     }
 
     /**
+     * {@inheritDoc}
+     *
      * Sends a response for the given Exception.
      *
      * If you have the Symfony HttpFoundation component installed,
      * this method will use it to create and send the response. If not,
      * it will fallback to plain PHP functions.
-     *
-     * @param \Exception $exception An \Exception instance
      *
      * @see sendPhpResponse
      * @see createResponse
@@ -91,9 +91,11 @@ class ExceptionHandler
             $exception = FlattenException::create($exception);
         }
 
-        header(sprintf('HTTP/1.0 %s', $exception->getStatusCode()));
-        foreach ($exception->getHeaders() as $name => $value) {
-            header($name.': '.$value, false);
+        if (!headers_sent()) {
+            header(sprintf('HTTP/1.0 %s', $exception->getStatusCode()));
+            foreach ($exception->getHeaders() as $name => $value) {
+                header($name.': '.$value, false);
+            }
         }
 
         echo $this->decorate($this->getContent($exception), $this->getStylesheet($exception));

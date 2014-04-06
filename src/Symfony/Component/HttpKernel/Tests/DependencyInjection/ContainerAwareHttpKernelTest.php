@@ -27,7 +27,7 @@ class ContainerAwareHttpKernelTest extends \PHPUnit_Framework_TestCase
     {
         $request = new Request();
         $expected = new Response();
-        $controller = function() use ($expected) {
+        $controller = function () use ($expected) {
             return $expected;
         };
 
@@ -56,7 +56,7 @@ class ContainerAwareHttpKernelTest extends \PHPUnit_Framework_TestCase
     {
         $request = new Request();
         $expected = new Response();
-        $controller = function() use ($expected) {
+        $controller = function () use ($expected) {
             return $expected;
         };
 
@@ -79,7 +79,7 @@ class ContainerAwareHttpKernelTest extends \PHPUnit_Framework_TestCase
     {
         $request = new Request();
         $expected = new \Exception();
-        $controller = function() use ($expected) {
+        $controller = function () use ($expected) {
             throw $expected;
         };
 
@@ -137,6 +137,7 @@ class ContainerAwareHttpKernelTest extends \PHPUnit_Framework_TestCase
             ->method('set')
             ->with($this->equalTo('request'), $this->equalTo($with), $this->equalTo('request'))
         ;
+
         return $this;
     }
 

@@ -14,7 +14,6 @@ namespace Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
-use Symfony\Component\Validator\Constraints\Optional;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -28,6 +27,10 @@ class CollectionValidator extends ConstraintValidator
      */
     public function validate($value, Constraint $constraint)
     {
+        if (!$constraint instanceof Collection) {
+            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Collection');
+        }
+
         if (null === $value) {
             return;
         }

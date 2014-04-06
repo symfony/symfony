@@ -48,14 +48,17 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
             $responseHeaders['Set-Cookie'] = $cookies;
         }
 
+        // attributes are serialized and as they can be anything, they need to be converted to strings.
         $attributes = array();
         foreach ($request->attributes->all() as $key => $value) {
             if ('_route' === $key && is_object($value)) {
-                $attributes['_route'] = $this->varToString($value->getPath());
+                $attributes[$key] = $this->varToString($value->getPath());
             } elseif ('_route_params' === $key) {
-                foreach ($value as $key => $v) {
-                    $attributes['_route_params'][$key] = $this->varToString($v);
+                // we need to keep route params as an array (see getRouteParams())
+                foreach ($value as $k => $v) {
+                    $value[$k] = $this->varToString($v);
                 }
+                $attributes[$key] = $value;
             } else {
                 $attributes[$key] = $this->varToString($value);
             }
@@ -304,7 +307,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
                 }
             }
 
-            $cookie .= '; expires='.substr(\DateTime::createFromFormat('U', $expires, new \DateTimeZone('UTC'))->format('D, d-M-Y H:i:s T'), 0, -5);
+            $cookie .= '; expires='.str_replace('+0000', '', \DateTime::createFromFormat('U', $expires, new \DateTimeZone('GMT'))->format('D, d-M-Y H:i:s T'));
         }
 
         if ($domain) {

@@ -359,6 +359,84 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($newParentParentAcl->getId(), $reloadedAcl->getParentAcl()->getParentAcl()->getId());
     }
 
+    public function testUpdateAclInsertingMultipleObjectFieldAcesThrowsDBConstraintViolations()
+    {
+        $provider = $this->getProvider();
+        $oid = new ObjectIdentity(1, 'Foo');
+        $sid1 = new UserSecurityIdentity('johannes', 'FooClass');
+        $sid2 = new UserSecurityIdentity('guilro', 'FooClass');
+        $sid3 = new UserSecurityIdentity('bmaz', 'FooClass');
+        $fieldName = 'fieldName';
+
+        $acl = $provider->createAcl($oid);
+        $acl->insertObjectFieldAce($fieldName, $sid1, 4);
+        $provider->updateAcl($acl);
+
+        $acl = $provider->findAcl($oid);
+        $acl->insertObjectFieldAce($fieldName, $sid2, 4);
+        $provider->updateAcl($acl);
+
+        $acl = $provider->findAcl($oid);
+        $acl->insertObjectFieldAce($fieldName, $sid3, 4);
+        $provider->updateAcl($acl);
+    }
+
+    public function testUpdateAclDeletingObjectFieldAcesThrowsDBConstraintViolations()
+    {
+        $provider = $this->getProvider();
+        $oid = new ObjectIdentity(1, 'Foo');
+        $sid1 = new UserSecurityIdentity('johannes', 'FooClass');
+        $sid2 = new UserSecurityIdentity('guilro', 'FooClass');
+        $sid3 = new UserSecurityIdentity('bmaz', 'FooClass');
+        $fieldName = 'fieldName';
+
+        $acl = $provider->createAcl($oid);
+        $acl->insertObjectFieldAce($fieldName, $sid1, 4);
+        $provider->updateAcl($acl);
+
+        $acl = $provider->findAcl($oid);
+        $acl->insertObjectFieldAce($fieldName, $sid2, 4);
+        $provider->updateAcl($acl);
+
+        $index = 0;
+        $acl->deleteObjectFieldAce($index, $fieldName);
+        $provider->updateAcl($acl);
+
+        $acl = $provider->findAcl($oid);
+        $acl->insertObjectFieldAce($fieldName, $sid3, 4);
+        $provider->updateAcl($acl);
+    }
+
+    public function testUpdateUserSecurityIdentity()
+    {
+        $provider = $this->getProvider();
+        $acl = $provider->createAcl(new ObjectIdentity(1, 'Foo'));
+        $sid = new UserSecurityIdentity('johannes', 'FooClass');
+        $acl->setEntriesInheriting(!$acl->isEntriesInheriting());
+
+        $acl->insertObjectAce($sid, 1);
+        $acl->insertClassAce($sid, 5, 0, false);
+        $acl->insertObjectAce($sid, 2, 1, true);
+        $acl->insertClassFieldAce('field', $sid, 2, 0, true);
+        $provider->updateAcl($acl);
+
+        $newSid = new UserSecurityIdentity('mathieu', 'FooClass');
+        $provider->updateUserSecurityIdentity($newSid, 'johannes');
+
+        $reloadProvider = $this->getProvider();
+        $reloadedAcl = $reloadProvider->findAcl(new ObjectIdentity(1, 'Foo'));
+
+        $this->assertNotSame($acl, $reloadedAcl);
+        $this->assertSame($acl->isEntriesInheriting(), $reloadedAcl->isEntriesInheriting());
+
+        $aces = $acl->getObjectAces();
+        $reloadedAces = $reloadedAcl->getObjectAces();
+        $this->assertEquals(count($aces), count($reloadedAces));
+        foreach ($reloadedAces as $ace) {
+            $this->assertTrue($ace->getSecurityIdentity()->equals($newSid));
+        }
+    }
+
     /**
      * Data must have the following format:
      * array(

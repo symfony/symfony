@@ -11,22 +11,17 @@
 
 namespace Symfony\Component\Form\Extension\Validator\Constraints;
 
-use Symfony\Component\Form\ClickableInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Extension\Validator\Util\ServerParams;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class FormValidator extends ConstraintValidator
 {
-    /**
-     * @var \SplObjectStorage
-     */
-    private static $clickedButtons;
-
     /**
      * @var ServerParams
      */
@@ -48,18 +43,12 @@ class FormValidator extends ConstraintValidator
      */
     public function validate($form, Constraint $constraint)
     {
+        if (!$constraint instanceof Form) {
+            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Form');
+        }
+
         if (!$form instanceof FormInterface) {
             return;
-        }
-
-        if (null === static::$clickedButtons) {
-            static::$clickedButtons = new \SplObjectStorage();
-        }
-
-        // If the form was previously validated, remove it from the cache in
-        // case the clicked button has changed
-        if (static::$clickedButtons->contains($form)) {
-            static::$clickedButtons->detach($form);
         }
 
         /* @var FormInterface $form */
@@ -187,20 +176,15 @@ class FormValidator extends ConstraintValidator
      */
     private static function getValidationGroups(FormInterface $form)
     {
-        $root = $form->getRoot();
-
         // Determine the clicked button of the complete form tree
-        if (!static::$clickedButtons->contains($root)) {
-            // Only call findClickedButton() once to prevent an exponential
-            // runtime
-            // https://github.com/symfony/symfony/issues/8317
-            static::$clickedButtons->attach($root, self::findClickedButton($root));
+        $clickedButton = null;
+
+        if (method_exists($form, 'getClickedButton')) {
+            $clickedButton = $form->getClickedButton();
         }
 
-        $button = static::$clickedButtons->offsetGet($root);
-
-        if (null !== $button) {
-            $groups = $button->getConfig()->getOption('validation_groups');
+        if (null !== $clickedButton) {
+            $groups = $clickedButton->getConfig()->getOption('validation_groups');
 
             if (null !== $groups) {
                 return self::resolveValidationGroups($groups, $form);
@@ -218,28 +202,6 @@ class FormValidator extends ConstraintValidator
         } while (null !== $form);
 
         return array(Constraint::DEFAULT_GROUP);
-    }
-
-    /**
-     * Extracts a clicked button from a form tree, if one exists.
-     *
-     * @param FormInterface $form The root form.
-     *
-     * @return ClickableInterface|null The clicked button or null.
-     */
-    private static function findClickedButton(FormInterface $form)
-    {
-        if ($form instanceof ClickableInterface && $form->isClicked()) {
-            return $form;
-        }
-
-        foreach ($form as $child) {
-            if (null !== ($button = self::findClickedButton($child))) {
-                return $button;
-            }
-        }
-
-        return null;
     }
 
     /**

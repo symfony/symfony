@@ -12,7 +12,6 @@
 namespace Symfony\Component\Security\Core\Encoder;
 
 use Symfony\Component\Security\Core\Util\StringUtils;
-use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 
 /**
  * BasePasswordEncoder is the base class for all password encoders.
@@ -87,10 +86,15 @@ abstract class BasePasswordEncoder implements PasswordEncoderInterface
         return StringUtils::equals($password1, $password2);
     }
 
-    protected function checkPasswordLength($password)
+    /**
+     * Checks if the password is too long.
+     *
+     * @param string $password The password
+     *
+     * @return Boolean true if the password is too long, false otherwise
+     */
+    protected function isPasswordTooLong($password)
     {
-        if (strlen($password) > self::MAX_PASSWORD_LENGTH) {
-            throw new BadCredentialsException('Invalid password.');
-        }
+        return strlen($password) > self::MAX_PASSWORD_LENGTH;
     }
 }

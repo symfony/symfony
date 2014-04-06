@@ -19,6 +19,22 @@ namespace Symfony\Component\Validator;
 final class Validation
 {
     /**
+     * The Validator API provided by Symfony 2.4 and older.
+     */
+    const API_VERSION_2_4 = 1;
+
+    /**
+     * The Validator API provided by Symfony 2.5 and newer.
+     */
+    const API_VERSION_2_5 = 2;
+
+    /**
+     * The Validator API provided by Symfony 2.5 and newer with a backwards
+     * compatibility layer for 2.4 and older.
+     */
+    const API_VERSION_2_5_BC = 3;
+
+    /**
      * Creates a new validator.
      *
      * If you want to configure the validator, use

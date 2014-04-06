@@ -2,6 +2,7 @@
 
 /*
  * This file is part of the Symfony package.
+ *
  * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
@@ -311,7 +312,9 @@ class Parser
         $removeComments = !preg_match($removeCommentsPattern, $this->currentLine);
 
         while ($this->moveToNextLine()) {
-            if ($this->getCurrentLineIndentation() === $newIndent) {
+            $indent = $this->getCurrentLineIndentation();
+
+            if ($indent === $newIndent) {
                 $removeComments = !preg_match($removeCommentsPattern, $this->currentLine);
             }
 
@@ -320,20 +323,16 @@ class Parser
                 break;
             }
 
-            if ($removeComments && $this->isCurrentLineEmpty() || $this->isCurrentLineBlank()) {
-                if ($this->isCurrentLineBlank()) {
-                    $data[] = substr($this->currentLine, $newIndent);
-                }
-
+            if ($this->isCurrentLineBlank()) {
+                $data[] = substr($this->currentLine, $newIndent);
                 continue;
             }
 
-            $indent = $this->getCurrentLineIndentation();
+            if ($removeComments && $this->isCurrentLineComment()) {
+                continue;
+            }
 
-            if (preg_match('#^(?P<text> *)$#', $this->currentLine, $match)) {
-                // empty line
-                $data[] = $match['text'];
-            } elseif ($indent >= $newIndent) {
+            if ($indent >= $newIndent) {
                 $data[] = substr($this->currentLine, $newIndent);
             } elseif (0 == $indent) {
                 $this->moveToPreviousLine();

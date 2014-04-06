@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * @author Manuel Reinhard <manu@sprain.ch>
@@ -26,7 +27,18 @@ class IbanValidator extends ConstraintValidator
      */
     public function validate($value, Constraint $constraint)
     {
+        if (!$constraint instanceof Iban) {
+            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Iban');
+        }
+
         if (null === $value || '' === $value) {
+            return;
+        }
+
+        // An IBAN without a country code is not an IBAN.
+        if (0 === preg_match('/[A-Z]/', $value)) {
+            $this->context->addViolation($constraint->message, array('{{ value }}' => $value));
+
             return;
         }
 
@@ -43,7 +55,7 @@ class IbanValidator extends ConstraintValidator
             .strval(ord($teststring{1}) - 55)
             .substr($teststring, 2, 2);
 
-        $teststring = preg_replace_callback('/[A-Za-z]/', function ($letter) {
+        $teststring = preg_replace_callback('/[A-Z]/', function ($letter) {
             return intval(ord(strtolower($letter[0])) - 87);
         }, $teststring);
 

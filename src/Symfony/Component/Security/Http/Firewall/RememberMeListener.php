@@ -35,7 +35,7 @@ class RememberMeListener implements ListenerInterface
     private $dispatcher;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param SecurityContextInterface       $securityContext
      * @param RememberMeServicesInterface    $rememberMeServices

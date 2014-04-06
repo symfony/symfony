@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Security\Core\Encoder;
 
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
+
 /**
  * Pbkdf2PasswordEncoder uses the PBKDF2 (Password-Based Key Derivation Function 2).
  *
@@ -54,7 +56,9 @@ class Pbkdf2PasswordEncoder extends BasePasswordEncoder
      */
     public function encodePassword($raw, $salt)
     {
-        $this->checkPasswordLength($raw);
+        if ($this->isPasswordTooLong($raw)) {
+            throw new BadCredentialsException('Invalid password.');
+        }
 
         if (!in_array($this->algorithm, hash_algos(), true)) {
             throw new \LogicException(sprintf('The algorithm "%s" is not supported.', $this->algorithm));
@@ -74,9 +78,7 @@ class Pbkdf2PasswordEncoder extends BasePasswordEncoder
      */
     public function isPasswordValid($encoded, $raw, $salt)
     {
-        $this->checkPasswordLength($raw);
-
-        return $this->comparePasswords($encoded, $this->encodePassword($raw, $salt));
+        return !$this->isPasswordTooLong($raw) && $this->comparePasswords($encoded, $this->encodePassword($raw, $salt));
     }
 
     private function hashPbkdf2($algorithm, $password, $salt, $iterations, $length = 0)

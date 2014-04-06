@@ -63,6 +63,15 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('foo' => 'foo', 'bar' => 'bar', 'compiler_class' => 'Symfony\\Component\\Routing\\RouteCompiler'), $route->getOptions(), '->addDefaults() keep previous defaults');
     }
 
+    public function testOption()
+    {
+        $route = new Route('/{foo}');
+        $this->assertFalse($route->hasOption('foo'), '->hasOption() return false if option is not set');
+        $this->assertEquals($route, $route->setOption('foo', 'bar'), '->setOption() implements a fluent interface');
+        $this->assertEquals('bar', $route->getOption('foo'), '->setOption() sets the option');
+        $this->assertTrue($route->hasOption('foo'), '->hasOption() return true if option is set');
+    }
+
     public function testDefaults()
     {
         $route = new Route('/{foo}');
@@ -75,7 +84,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
 
         $route->setDefault('foo2', 'bar2');
         $this->assertEquals('bar2', $route->getDefault('foo2'), '->getDefault() return the default value');
-        $this->assertNull($route->getDefault('not_defined'), '->getDefault() return null if default value is not setted');
+        $this->assertNull($route->getDefault('not_defined'), '->getDefault() return null if default value is not set');
 
         $route->setDefault('_controller', $closure = function () { return 'Hello'; });
         $this->assertEquals($closure, $route->getDefault('_controller'), '->setDefault() sets a default value');
@@ -106,8 +115,10 @@ class RouteTest extends \PHPUnit_Framework_TestCase
     public function testRequirement()
     {
         $route = new Route('/{foo}');
+        $this->assertFalse($route->hasRequirement('foo'), '->hasRequirement() return false if requirement is not set');
         $route->setRequirement('foo', '^\d+$');
         $this->assertEquals('\d+', $route->getRequirement('foo'), '->setRequirement() removes ^ and $ from the path');
+        $this->assertTrue($route->hasRequirement('foo'), '->hasRequirement() return true if requirement is set');
     }
 
     /**
@@ -142,10 +153,15 @@ class RouteTest extends \PHPUnit_Framework_TestCase
     {
         $route = new Route('/');
         $this->assertEquals(array(), $route->getSchemes(), 'schemes is initialized with array()');
+        $this->assertFalse($route->hasScheme('http'));
         $route->setSchemes('hTTp');
         $this->assertEquals(array('http'), $route->getSchemes(), '->setSchemes() accepts a single scheme string and lowercases it');
+        $this->assertTrue($route->hasScheme('htTp'));
+        $this->assertFalse($route->hasScheme('httpS'));
         $route->setSchemes(array('HttpS', 'hTTp'));
         $this->assertEquals(array('https', 'http'), $route->getSchemes(), '->setSchemes() accepts an array of schemes and lowercases them');
+        $this->assertTrue($route->hasScheme('htTp'));
+        $this->assertTrue($route->hasScheme('httpS'));
     }
 
     public function testSchemeIsBC()
@@ -154,6 +170,9 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $route->setRequirement('_scheme', 'http|https');
         $this->assertEquals('http|https', $route->getRequirement('_scheme'));
         $this->assertEquals(array('http', 'https'), $route->getSchemes());
+        $this->assertTrue($route->hasScheme('https'));
+        $this->assertTrue($route->hasScheme('http'));
+        $this->assertFalse($route->hasScheme('ftp'));
         $route->setSchemes(array('hTTp'));
         $this->assertEquals('http', $route->getRequirement('_scheme'));
         $route->setSchemes(array());
@@ -197,5 +216,25 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($compiled, $route->compile(), '->compile() only compiled the route once if unchanged');
         $route->setRequirement('foo', '.*');
         $this->assertNotSame($compiled, $route->compile(), '->compile() recompiles if the route was modified');
+    }
+
+    public function testPattern()
+    {
+        $route = new Route('/{foo}');
+        $this->assertEquals('/{foo}', $route->getPattern());
+
+        $route->setPattern('/bar');
+        $this->assertEquals('/bar', $route->getPattern());
+    }
+
+    public function testSerialize()
+    {
+        $route = new Route('/{foo}', array('foo' => 'default'), array('foo' => '\d+'));
+
+        $serialized = serialize($route);
+        $unserialized = unserialize($serialized);
+
+        $this->assertEquals($route, $unserialized);
+        $this->assertNotSame($route, $unserialized);
     }
 }

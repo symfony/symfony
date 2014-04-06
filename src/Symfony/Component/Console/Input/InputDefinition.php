@@ -429,7 +429,7 @@ class InputDefinition
         $descriptor = new TextDescriptor();
         $output = new BufferedOutput(BufferedOutput::VERBOSITY_NORMAL, true);
         $descriptor->describe($output, $this, array('raw_output' => true));
-        
+
         return $output->fetch();
     }
 
@@ -445,14 +445,14 @@ class InputDefinition
     public function asXml($asDom = false)
     {
         $descriptor = new XmlDescriptor();
-        
+
         if ($asDom) {
             return $descriptor->getInputDefinitionDocument($this);
         }
-        
+
         $output = new BufferedOutput();
         $descriptor->describe($output, $this);
-        
+
         return $output->fetch();
     }
 }

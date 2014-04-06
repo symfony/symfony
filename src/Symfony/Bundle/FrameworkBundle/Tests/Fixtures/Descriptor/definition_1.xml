@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definition class="Full\Qualified\Class1" factory-class="Full\Qualified\FactoryClass" factory-method="get" scope="container" public="true" synthetic="false" lazy="true" synchronized="true" abstract="true" file=""/>

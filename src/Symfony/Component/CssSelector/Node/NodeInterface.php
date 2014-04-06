@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\CssSelector\Node;
 
-use Symfony\Component\CssSelector\XPathExpr;
-use Symfony\Component\CssSelector\Exception\ParseException;
-
 /**
  * Interface for nodes.
  *

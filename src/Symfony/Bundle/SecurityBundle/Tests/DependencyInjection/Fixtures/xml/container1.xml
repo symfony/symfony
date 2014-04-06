@@ -57,7 +57,7 @@
             <logout />
         </firewall>
 
-        <firewall name="host" pattern="/test" host="foo\.example\.org">
+        <firewall name="host" pattern="/test" host="foo\.example\.org" methods="GET,POST">
             <anonymous />
             <http-basic />
         </firewall>
@@ -68,6 +68,6 @@
 
         <rule path="/blog/524" role="ROLE_USER" requires-channel="https" methods="get,POST" />
         <rule role='IS_AUTHENTICATED_ANONYMOUSLY' path="/blog/.*" />
-        <rule role='IS_AUTHENTICATED_ANONYMOUSLY' allow-if="token.getUsername() =~ '/^admin/'" path="/blog/524" />
+        <rule role='IS_AUTHENTICATED_ANONYMOUSLY' allow-if="token.getUsername() matches '/^admin/'" path="/blog/524" />
     </config>
 </srv:container>

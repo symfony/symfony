@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="security.secure_random.class">Symfony\Component\Security\Core\Util\SecureRandom</parameter>
+    </parameters>
+
+    <services>
+        <!-- Pseudo-Random Number Generator -->
+        <service id="security.secure_random" class="%security.secure_random.class%">
+            <tag name="monolog.logger" channel="security" />
+            <argument>%kernel.cache_dir%/secure_random.seed</argument>
+            <argument type="service" id="logger" on-invalid="ignore" />
+        </service>
+    </services>
+</container>

@@ -87,7 +87,7 @@ class ObjectChoiceList extends ChoiceList
      */
     public function __construct($choices, $labelPath = null, array $preferredChoices = array(), $groupPath = null, $valuePath = null, PropertyAccessorInterface $propertyAccessor = null)
     {
-        $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::getPropertyAccessor();
+        $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
         $this->labelPath = null !== $labelPath ? new PropertyPath($labelPath) : null;
         $this->groupPath = null !== $groupPath ? new PropertyPath($groupPath) : null;
         $this->valuePath = null !== $valuePath ? new PropertyPath($valuePath) : null;
@@ -128,11 +128,13 @@ class ObjectChoiceList extends ChoiceList
                 if (null === $group) {
                     $groupedChoices[$i] = $choice;
                 } else {
-                    if (!isset($groupedChoices[$group])) {
-                        $groupedChoices[$group] = array();
+                    $groupName = (string) $group;
+
+                    if (!isset($groupedChoices[$groupName])) {
+                        $groupedChoices[$groupName] = array();
                     }
 
-                    $groupedChoices[$group][$i] = $choice;
+                    $groupedChoices[$groupName][$i] = $choice;
                 }
             }
 
@@ -144,6 +146,80 @@ class ObjectChoiceList extends ChoiceList
         $this->extractLabels($choices, $labels);
 
         parent::initialize($choices, $labels, $preferredChoices);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getValuesForChoices(array $choices)
+    {
+        if (!$this->valuePath) {
+            return parent::getValuesForChoices($choices);
+        }
+
+        // Use the value path to compare the choices
+        $choices = $this->fixChoices($choices);
+        $values = array();
+
+        foreach ($choices as $i => $givenChoice) {
+            // Ignore non-readable choices
+            if (!is_object($givenChoice) && !is_array($givenChoice)) {
+                continue;
+            }
+
+            $givenValue = (string) $this->propertyAccessor->getValue($givenChoice, $this->valuePath);
+
+            foreach ($this->values as $value) {
+                if ($value === $givenValue) {
+                    $values[$i] = $value;
+                    unset($choices[$i]);
+
+                    if (0 === count($choices)) {
+                        break 2;
+                    }
+                }
+            }
+        }
+
+        return $values;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @deprecated Deprecated since version 2.4, to be removed in 3.0.
+     */
+    public function getIndicesForChoices(array $choices)
+    {
+        if (!$this->valuePath) {
+            return parent::getIndicesForChoices($choices);
+        }
+
+        // Use the value path to compare the choices
+        $choices = $this->fixChoices($choices);
+        $indices = array();
+
+        foreach ($choices as $i => $givenChoice) {
+            // Ignore non-readable choices
+            if (!is_object($givenChoice) && !is_array($givenChoice)) {
+                continue;
+            }
+
+            $givenValue = (string) $this->propertyAccessor->getValue($givenChoice, $this->valuePath);
+
+            foreach ($this->values as $j => $value) {
+                if ($value === $givenValue) {
+                    $indices[$i] = $j;
+                    unset($choices[$i]);
+
+                    if (0 === count($choices)) {
+                        break 2;
+                    }
+                }
+            }
+        }
+
+        return $indices;
     }
 
     /**

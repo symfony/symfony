@@ -12,64 +12,30 @@
 namespace Symfony\Component\Console\Helper;
 
 use Symfony\Component\Console\Output\OutputInterface;
-use InvalidArgumentException;
+use Symfony\Component\Console\Output\NullOutput;
 
 /**
  * Provides helpers to display table output.
  *
  * @author Саша Стаменковић <umpirsky@gmail.com>
+ * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated Deprecated since 2.5, to be removed in 3.0; use Table instead.
  */
 class TableHelper extends Helper
 {
     const LAYOUT_DEFAULT = 0;
     const LAYOUT_BORDERLESS = 1;
+    const LAYOUT_COMPACT = 2;
 
     /**
-     * Table headers.
-     *
-     * @var array
+     * @var Table
      */
-    private $headers = array();
-
-    /**
-     * Table rows.
-     *
-     * @var array
-     */
-    private $rows = array();
-
-    // Rendering options
-    private $paddingChar;
-    private $horizontalBorderChar;
-    private $verticalBorderChar;
-    private $crossingChar;
-    private $cellHeaderFormat;
-    private $cellRowFormat;
-    private $borderFormat;
-    private $padType;
-
-    /**
-     * Column widths cache.
-     *
-     * @var array
-     */
-    private $columnWidths = array();
-
-    /**
-     * Number of columns cache.
-     *
-     * @var array
-     */
-    private $numberOfColumns;
-
-    /**
-     * @var OutputInterface
-     */
-    private $output;
+    private $table;
 
     public function __construct()
     {
-        $this->setLayout(self::LAYOUT_DEFAULT);
+        $this->table = new Table(new NullOutput());
     }
 
     /**
@@ -83,33 +49,19 @@ class TableHelper extends Helper
     {
         switch ($layout) {
             case self::LAYOUT_BORDERLESS:
-                $this
-                    ->setPaddingChar(' ')
-                    ->setHorizontalBorderChar('=')
-                    ->setVerticalBorderChar(' ')
-                    ->setCrossingChar(' ')
-                    ->setCellHeaderFormat('<info>%s</info>')
-                    ->setCellRowFormat('<comment>%s</comment>')
-                    ->setBorderFormat('%s')
-                    ->setPadType(STR_PAD_RIGHT)
-                ;
+                $this->table->setStyle('borderless');
+                break;
+
+            case self::LAYOUT_COMPACT:
+                $this->table->setStyle('compact');
                 break;
 
             case self::LAYOUT_DEFAULT:
-                $this
-                    ->setPaddingChar(' ')
-                    ->setHorizontalBorderChar('-')
-                    ->setVerticalBorderChar('|')
-                    ->setCrossingChar('+')
-                    ->setCellHeaderFormat('<info>%s</info>')
-                    ->setCellRowFormat('<comment>%s</comment>')
-                    ->setBorderFormat('%s')
-                    ->setPadType(STR_PAD_RIGHT)
-                ;
+                $this->table->setStyle('default');
                 break;
 
             default:
-                throw new InvalidArgumentException(sprintf('Invalid table layout "%s".', $layout));
+                throw new \InvalidArgumentException(sprintf('Invalid table layout "%s".', $layout));
                 break;
         };
 
@@ -118,37 +70,35 @@ class TableHelper extends Helper
 
     public function setHeaders(array $headers)
     {
-        $this->headers = array_values($headers);
+        $this->table->setHeaders($headers);
 
         return $this;
     }
 
     public function setRows(array $rows)
     {
-        $this->rows = array();
+        $this->table->setRows($rows);
 
-        return $this->addRows($rows);
+        return $this;
     }
 
     public function addRows(array $rows)
     {
-        foreach ($rows as $row) {
-            $this->addRow($row);
-        }
+        $this->table->addRows($rows);
 
         return $this;
     }
 
     public function addRow(array $row)
     {
-        $this->rows[] = array_values($row);
+        $this->table->addRow($row);
 
         return $this;
     }
 
     public function setRow($column, array $row)
     {
-        $this->rows[$column] = $row;
+        $this->table->setRow($column, $row);
 
         return $this;
     }
@@ -162,7 +112,7 @@ class TableHelper extends Helper
      */
     public function setPaddingChar($paddingChar)
     {
-        $this->paddingChar = $paddingChar;
+        $this->table->getStyle()->setPaddingChar($paddingChar);
 
         return $this;
     }
@@ -176,7 +126,7 @@ class TableHelper extends Helper
      */
     public function setHorizontalBorderChar($horizontalBorderChar)
     {
-        $this->horizontalBorderChar = $horizontalBorderChar;
+        $this->table->getStyle()->setHorizontalBorderChar($horizontalBorderChar);
 
         return $this;
     }
@@ -190,7 +140,7 @@ class TableHelper extends Helper
      */
     public function setVerticalBorderChar($verticalBorderChar)
     {
-        $this->verticalBorderChar = $verticalBorderChar;
+        $this->table->getStyle()->setVerticalBorderChar($verticalBorderChar);
 
         return $this;
     }
@@ -204,7 +154,7 @@ class TableHelper extends Helper
      */
     public function setCrossingChar($crossingChar)
     {
-        $this->crossingChar = $crossingChar;
+        $this->table->getStyle()->setCrossingChar($crossingChar);
 
         return $this;
     }
@@ -218,7 +168,7 @@ class TableHelper extends Helper
      */
     public function setCellHeaderFormat($cellHeaderFormat)
     {
-        $this->cellHeaderFormat = $cellHeaderFormat;
+        $this->table->getStyle()->setCellHeaderFormat($cellHeaderFormat);
 
         return $this;
     }
@@ -232,7 +182,21 @@ class TableHelper extends Helper
      */
     public function setCellRowFormat($cellRowFormat)
     {
-        $this->cellRowFormat = $cellRowFormat;
+        $this->table->getStyle()->setCellHeaderFormat($cellRowFormat);
+
+        return $this;
+    }
+
+    /**
+     * Sets row cell content format.
+     *
+     * @param string $cellRowContentFormat
+     *
+     * @return TableHelper
+     */
+    public function setCellRowContentFormat($cellRowContentFormat)
+    {
+        $this->table->getStyle()->setCellRowContentFormat($cellRowContentFormat);
 
         return $this;
     }
@@ -246,7 +210,7 @@ class TableHelper extends Helper
      */
     public function setBorderFormat($borderFormat)
     {
-        $this->borderFormat = $borderFormat;
+        $this->table->getStyle()->setBorderFormat($borderFormat);
 
         return $this;
     }
@@ -260,7 +224,7 @@ class TableHelper extends Helper
      */
     public function setPadType($padType)
     {
-        $this->padType = $padType;
+        $this->table->getStyle()->setPadType($padType);
 
         return $this;
     }
@@ -281,172 +245,11 @@ class TableHelper extends Helper
      */
     public function render(OutputInterface $output)
     {
-        $this->output = $output;
+        $p = new \ReflectionProperty($this->table, 'output');
+        $p->setAccessible(true);
+        $p->setValue($this->table, $output);
 
-        $this->renderRowSeparator();
-        $this->renderRow($this->headers, $this->cellHeaderFormat);
-        if (!empty($this->headers)) {
-            $this->renderRowSeparator();
-        }
-        foreach ($this->rows as $row) {
-            $this->renderRow($row, $this->cellRowFormat);
-        }
-        if (!empty($this->rows)) {
-            $this->renderRowSeparator();
-        }
-
-        $this->cleanup();
-    }
-
-    /**
-     * Renders horizontal header separator.
-     *
-     * Example: +-----+-----------+-------+
-     */
-    private function renderRowSeparator()
-    {
-        if (0 === $count = $this->getNumberOfColumns()) {
-            return;
-        }
-
-        $markup = $this->crossingChar;
-        for ($column = 0; $column < $count; $column++) {
-            $markup .= str_repeat($this->horizontalBorderChar, $this->getColumnWidth($column))
-                    .$this->crossingChar
-            ;
-        }
-
-        $this->output->writeln(sprintf($this->borderFormat, $markup));
-    }
-
-    /**
-     * Renders vertical column separator.
-     */
-    private function renderColumnSeparator()
-    {
-        $this->output->write(sprintf($this->borderFormat, $this->verticalBorderChar));
-    }
-
-    /**
-     * Renders table row.
-     *
-     * Example: | 9971-5-0210-0 | A Tale of Two Cities  | Charles Dickens  |
-     *
-     * @param array  $row
-     * @param string $cellFormat
-     */
-    private function renderRow(array $row, $cellFormat)
-    {
-        if (empty($row)) {
-            return;
-        }
-
-        $this->renderColumnSeparator();
-        for ($column = 0, $count = $this->getNumberOfColumns(); $column < $count; $column++) {
-            $this->renderCell($row, $column, $cellFormat);
-            $this->renderColumnSeparator();
-        }
-        $this->output->writeln('');
-    }
-
-    /**
-     * Renders table cell with padding.
-     *
-     * @param array   $row
-     * @param integer $column
-     * @param string  $cellFormat
-     */
-    private function renderCell(array $row, $column, $cellFormat)
-    {
-        $cell = isset($row[$column]) ? $row[$column] : '';
-        $width = $this->getColumnWidth($column);
-
-        // str_pad won't work properly with multi-byte strings, we need to fix the padding
-        if (function_exists('mb_strlen') && false !== $encoding = mb_detect_encoding($cell)) {
-            $width += strlen($cell) - mb_strlen($cell, $encoding);
-        }
-
-        $this->output->write(sprintf(
-            $cellFormat,
-            str_pad(
-                $this->paddingChar.$cell.$this->paddingChar,
-                $width,
-                $this->paddingChar,
-                $this->padType
-            )
-        ));
-    }
-
-    /**
-     * Gets number of columns for this table.
-     *
-     * @return int
-     */
-    private function getNumberOfColumns()
-    {
-        if (null !== $this->numberOfColumns) {
-            return $this->numberOfColumns;
-        }
-
-        $columns = array(0);
-        $columns[] = count($this->headers);
-        foreach ($this->rows as $row) {
-            $columns[] = count($row);
-        }
-
-        return $this->numberOfColumns = max($columns);
-    }
-
-    /**
-     * Gets column width.
-     *
-     * @param integer $column
-     *
-     * @return int
-     */
-    private function getColumnWidth($column)
-    {
-        if (isset($this->columnWidths[$column])) {
-            return $this->columnWidths[$column];
-        }
-
-        $lengths = array(0);
-        $lengths[] = $this->getCellWidth($this->headers, $column);
-        foreach ($this->rows as $row) {
-            $lengths[] = $this->getCellWidth($row, $column);
-        }
-
-        return $this->columnWidths[$column] = max($lengths) + 2;
-    }
-
-    /**
-     * Gets cell width.
-     *
-     * @param array   $row
-     * @param integer $column
-     *
-     * @return int
-     */
-    private function getCellWidth(array $row, $column)
-    {
-        if ($column < 0) {
-            return 0;
-        }
-
-        if (isset($row[$column])) {
-            return $this->strlen($row[$column]);
-        }
-
-        return $this->getCellWidth($row, $column - 1);
-    }
-
-    /**
-     * Called after rendering to cleanup cache data.
-     */
-    private function cleanup()
-    {
-        $this->columnWidths = array();
-        $this->numberOfColumns = null;
+        $this->table->render();
     }
 
     /**

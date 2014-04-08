@@ -281,31 +281,34 @@ class ProfilerController
         $this->profiler->disable();
 
         if (null === $session = $request->getSession()) {
-            $ip     =
-            $method =
-            $url    =
-            $start  =
-            $end    =
-            $limit  =
-            $token  = null;
+            $ip       =
+            $method   =
+            $url      =
+            $start    =
+            $end      =
+            $limit    =
+            $token    =
+            $duration = null;
         } else {
-            $ip     = $session->get('_profiler_search_ip');
-            $method = $session->get('_profiler_search_method');
-            $url    = $session->get('_profiler_search_url');
-            $start  = $session->get('_profiler_search_start');
-            $end    = $session->get('_profiler_search_end');
-            $limit  = $session->get('_profiler_search_limit');
-            $token  = $session->get('_profiler_search_token');
+            $ip       = $session->get('_profiler_search_ip');
+            $method   = $session->get('_profiler_search_method');
+            $url      = $session->get('_profiler_search_url');
+            $start    = $session->get('_profiler_search_start');
+            $end      = $session->get('_profiler_search_end');
+            $limit    = $session->get('_profiler_search_limit');
+            $token    = $session->get('_profiler_search_token');
+            $duration = $session->get('_profiler_search_duration');
         }
 
         return new Response($this->twig->render('@WebProfiler/Profiler/search.html.twig', array(
-            'token'  => $token,
-            'ip'     => $ip,
-            'method' => $method,
-            'url'    => $url,
-            'start'  => $start,
-            'end'    => $end,
-            'limit'  => $limit,
+            'token'    => $token,
+            'ip'       => $ip,
+            'method'   => $method,
+            'url'      => $url,
+            'start'    => $start,
+            'end'      => $end,
+            'limit'    => $limit,
+            'duration' => $duration,
         )), 200, array('Content-Type' => 'text/html'));
     }
 
@@ -329,12 +332,13 @@ class ProfilerController
 
         $profile = $this->profiler->loadProfile($token);
 
-        $ip     = $request->query->get('ip');
-        $method = $request->query->get('method');
-        $url    = $request->query->get('url');
-        $start  = $request->query->get('start', null);
-        $end    = $request->query->get('end', null);
-        $limit  = $request->query->get('limit');
+        $ip       = $request->query->get('ip');
+        $method   = $request->query->get('method');
+        $url      = $request->query->get('url');
+        $start    = $request->query->get('start', null);
+        $end      = $request->query->get('end', null);
+        $limit    = $request->query->get('limit');
+        $duration = $request->query->get('duration');
 
         return new Response($this->twig->render('@WebProfiler/Profiler/results.html.twig', array(
             'token'     => $token,
@@ -346,6 +350,7 @@ class ProfilerController
             'start'     => $start,
             'end'       => $end,
             'limit'     => $limit,
+            'duration'  => $duration,
             'panel'     => null,
         )), 200, array('Content-Type' => 'text/html'));
     }
@@ -367,13 +372,14 @@ class ProfilerController
 
         $this->profiler->disable();
 
-        $ip     = preg_replace('/[^:\d\.]/', '', $request->query->get('ip'));
-        $method = $request->query->get('method');
-        $url    = $request->query->get('url');
-        $start  = $request->query->get('start', null);
-        $end    = $request->query->get('end', null);
-        $limit  = $request->query->get('limit');
-        $token  = $request->query->get('token');
+        $ip       = preg_replace('/[^:\d\.]/', '', $request->query->get('ip'));
+        $method   = $request->query->get('method');
+        $url      = $request->query->get('url');
+        $start    = $request->query->get('start', null);
+        $end      = $request->query->get('end', null);
+        $limit    = $request->query->get('limit');
+        $token    = $request->query->get('token');
+        $duration = $request->query->get('duration');
 
         if (null !== $session = $request->getSession()) {
             $session->set('_profiler_search_ip', $ip);
@@ -383,6 +389,7 @@ class ProfilerController
             $session->set('_profiler_search_end', $end);
             $session->set('_profiler_search_limit', $limit);
             $session->set('_profiler_search_token', $token);
+            $session->set('_profiler_search_duration', $duration);
         }
 
         if (!empty($token)) {
@@ -392,13 +399,14 @@ class ProfilerController
         $tokens = $this->profiler->find($ip, $url, $limit, $method, $start, $end);
 
         return new RedirectResponse($this->generator->generate('_profiler_search_results', array(
-            'token'  => $tokens ? $tokens[0]['token'] : 'empty',
-            'ip'     => $ip,
-            'method' => $method,
-            'url'    => $url,
-            'start'  => $start,
-            'end'    => $end,
-            'limit'  => $limit,
+            'token'    => $tokens ? $tokens[0]['token'] : 'empty',
+            'ip'       => $ip,
+            'method'   => $method,
+            'url'      => $url,
+            'start'    => $start,
+            'end'      => $end,
+            'limit'    => $limit,
+            'duration' => $duration,
         )), 302, array('Content-Type' => 'text/html'));
     }
 

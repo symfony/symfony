@@ -11,6 +11,7 @@
 namespace Symfony\Component\HttpKernel\Tests\Profiler;
 
 use Symfony\Component\HttpKernel\Profiler\Profile;
+use Symfony\Component\HttpKernel\Profiler\ProfilerStorageInterface;
 
 abstract class AbstractProfilerStorageTest extends \PHPUnit_Framework_TestCase
 {
@@ -155,7 +156,7 @@ abstract class AbstractProfilerStorageTest extends \PHPUnit_Framework_TestCase
 
     public function testStoreTime()
     {
-        $dt = new \DateTime('now');
+        $dt = new \DateTime();
         $start = $dt->getTimestamp();
 
         for ($i = 0; $i < 3; $i++) {
@@ -176,6 +177,31 @@ abstract class AbstractProfilerStorageTest extends \PHPUnit_Framework_TestCase
 
         $records = $this->getStorage()->find('', '', 3, 'GET', $start, time() + 2 * 60);
         $this->assertCount(2, $records, '->find() should return only first two of the previously added records');
+    }
+
+    public function testStoreDuration()
+    {
+        $dt = new \DateTime();
+        $dt->modify('+11 seconds');
+        $duration = $dt->getTimestamp();
+
+        for ($i = 0; $i < 3; $i++) {
+            $profile = new Profile('duration_'.$i);
+            $profile->setIp('127.0.0.1');
+            $profile->setUrl('http://foo.bar');
+            $profile->setTime($dt->getTimestamp());
+            $profile->setDuration($duration - $dt->getTimestamp());
+            $profile->setMethod('GET');
+            $this->getStorage()->write($profile);
+
+            $dt->modify('+10 seconds');
+        }
+
+        $records = $this->getStorage()->find('', '', 3, 'GET', null, null, 10);
+        $this->assertCount(3, $records);
+
+        $records = $this->getStorage()->find('', '', 3, 'GET', null, null, 30);
+        $this->assertCount(2, $records);
     }
 
     public function testRetrieveByEmptyUrlAndIp()
@@ -247,7 +273,7 @@ abstract class AbstractProfilerStorageTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \Symfony\Component\HttpKernel\Profiler\ProfilerStorageInterface
+     * @return ProfilerStorageInterface
      */
     abstract protected function getStorage();
 }

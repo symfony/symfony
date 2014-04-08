@@ -40,7 +40,7 @@ class SqliteProfilerStorage extends PdoProfilerStorage
             }
 
             $db->exec('PRAGMA temp_store=MEMORY; PRAGMA journal_mode=MEMORY;');
-            $db->exec('CREATE TABLE IF NOT EXISTS sf_profiler_data (token STRING, data STRING, ip STRING, method STRING, url STRING, time INTEGER, parent STRING, created_at INTEGER)');
+            $db->exec('CREATE TABLE IF NOT EXISTS sf_profiler_data (token STRING, data STRING, ip STRING, method STRING, url STRING, time INTEGER, duration INTEGER, parent STRING, created_at INTEGER)');
             $db->exec('CREATE INDEX IF NOT EXISTS data_created_at ON sf_profiler_data (created_at)');
             $db->exec('CREATE INDEX IF NOT EXISTS data_ip ON sf_profiler_data (ip)');
             $db->exec('CREATE INDEX IF NOT EXISTS data_method ON sf_profiler_data (method)');
@@ -97,7 +97,7 @@ class SqliteProfilerStorage extends PdoProfilerStorage
     /**
      * {@inheritdoc}
      */
-    protected function buildCriteria($ip, $url, $start, $end, $limit, $method)
+    protected function buildCriteria($ip, $url, $start, $end, $limit, $method, $duration = null)
     {
         $criteria = array();
         $args = array();
@@ -125,6 +125,11 @@ class SqliteProfilerStorage extends PdoProfilerStorage
         if (!empty($end)) {
             $criteria[] = 'time <= :end';
             $args[':end'] = $end;
+        }
+
+        if (!empty($duration)) {
+            $criteria[] = 'duration >= :duration';
+            $args[':duration'] = $duration;
         }
 
         return array($criteria, $args);

@@ -227,9 +227,15 @@ class PdoSessionHandler implements \SessionHandlerInterface
                 return "INSERT INTO $this->table ($this->idCol, $this->dataCol, $this->timeCol) VALUES (:id, :data, :time) " .
                     "ON DUPLICATE KEY UPDATE $this->dataCol = VALUES($this->dataCol), $this->timeCol = VALUES($this->timeCol)";
             case 'oci':
+                // DUAL is Oracle specific dummy table
                 return "MERGE INTO $this->table USING DUAL ON ($this->idCol = :id) " .
                     "WHEN NOT MATCHED THEN INSERT ($this->idCol, $this->dataCol, $this->timeCol) VALUES (:id, :data, :time) " .
                     "WHEN MATCHED THEN UPDATE SET $this->dataCol = :data";
+            case 'sqlsrv':
+                // MS SQL Server requires MERGE be terminated by semicolon
+                return "MERGE INTO $this->table USING (SELECT 'x' AS dummy) AS src ON ($this->idCol = :id) " .
+                    "WHEN NOT MATCHED THEN INSERT ($this->idCol, $this->dataCol, $this->timeCol) VALUES (:id, :data, :time) " .
+                    "WHEN MATCHED THEN UPDATE SET $this->dataCol = :data;";
         }
 
         return null;

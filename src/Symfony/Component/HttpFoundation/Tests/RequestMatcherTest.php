@@ -43,6 +43,25 @@ class RequestMatcherTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testScheme()
+    {
+        $httpRequest = $request = $request = Request::create('');
+        $httpsRequest = $request = $request = Request::create('', 'get', array(), array(), array(), array('HTTPS' => 'on'));
+
+        $matcher = new RequestMatcher();
+        $matcher->matchScheme('https');
+        $this->assertFalse($matcher->matches($httpRequest));
+        $this->assertTrue($matcher->matches($httpsRequest));
+
+        $matcher->matchScheme('http');
+        $this->assertFalse($matcher->matches($httpsRequest));
+        $this->assertTrue($matcher->matches($httpRequest));
+
+        $matcher = new RequestMatcher();
+        $this->assertTrue($matcher->matches($httpsRequest));
+        $this->assertTrue($matcher->matches($httpRequest));
+    }
+
     /**
      * @dataProvider testHostFixture
      */
@@ -68,7 +87,8 @@ class RequestMatcherTest extends \PHPUnit_Framework_TestCase
             array('.*\.example\.COM', true),
             array('\.example\.COM$', true),
             array('^.*\.example\.COM$', true),
-            array('.*\.sensio\.COM', false),        );
+            array('.*\.sensio\.COM', false),
+        );
     }
 
     public function testPath()

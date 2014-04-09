@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class PasswordType extends AbstractType
@@ -33,8 +34,14 @@ class PasswordType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
+        // BC with old "always_empty" option
+        $resetOnSubmit = function (Options $options) {
+            return $options['always_empty'];
+        };
+
         $resolver->setDefaults(array(
-            'reset_on_submit' => true,
+            'reset_on_submit' => $resetOnSubmit,
+            'always_empty' => true, // Deprecated use reset_on_submit unstead
             'trim'         => false,
         ));
     }

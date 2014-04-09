@@ -31,7 +31,7 @@ class AssetsExtensionTest extends TestCase
         $this->assertEquals($expectedUrl, $extension->getAssetUrl($path, $packageName, $absolute));
     }
 
-    public function testGetAssetWithtoutHost()
+    public function testGetAssetWithoutHost()
     {
         $path = '/path/to/asset';
         $packageName = null;

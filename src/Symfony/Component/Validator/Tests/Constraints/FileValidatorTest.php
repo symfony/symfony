@@ -116,8 +116,8 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolation')
             ->with('myMessage', array(
                 '{{ limit }}'   => '1',
-                '{{ size }}'    => '1.4',
-                '{{ suffix }}'  => 'kB',
+                '{{ size }}'    => '1.37',
+                '{{ suffix }}'  => 'KiB',
                 '{{ file }}'    => $this->path,
             ));
 
@@ -137,11 +137,35 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolation')
             ->with('myMessage', array(
                 '{{ limit }}'   => '1',
-                '{{ size }}'    => '1.4',
-                '{{ suffix }}'  => 'MB',
+                '{{ size }}'    => '1.34',
+                '{{ suffix }}'  => 'MiB',
                 '{{ file }}'    => $this->path,
             ));
 
+        $this->validator->validate($this->getFile($this->path), $constraint);
+    }
+
+    public function testMaxSizeKiloBytes()
+    {
+        fwrite($this->file, str_repeat('0', 1010));
+
+        $constraint = new File(array(
+            'maxSize' => '1k',
+        ));
+
+        $this->context->expects($this->never())->method('addViolation');
+        $this->validator->validate($this->getFile($this->path), $constraint);
+    }
+
+    public function testMaxSizeMegaBytes()
+    {
+        fwrite($this->file, str_repeat('0', (1024 * 1022)));
+
+        $constraint = new File(array(
+            'maxSize' => '1M',
+        ));
+
+        $this->context->expects($this->never())->method('addViolation');
         $this->validator->validate($this->getFile($this->path), $constraint);
     }
 

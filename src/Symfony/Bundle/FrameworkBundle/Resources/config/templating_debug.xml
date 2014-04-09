@@ -20,6 +20,7 @@
             <argument type="service" id="templating.loader" />
             <argument type="service" id="debug.stopwatch" />
             <argument type="service" id="templating.globals" />
+            <call method="setCharset"><argument>%kernel.charset%</argument></call>
         </service>
     </services>
 </container>

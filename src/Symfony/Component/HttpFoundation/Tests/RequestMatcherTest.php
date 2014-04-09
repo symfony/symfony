@@ -45,23 +45,21 @@ class RequestMatcherTest extends \PHPUnit_Framework_TestCase
 
     public function testScheme()
     {
+        $httpsRequest = $request = $request = Request::create('', 'get', array(), array(), array(), array('HTTPS' => 'on'));
+        $httpRequest = $request = $request = Request::create('', 'get', array(), array(), array(), array('HTTPS' => 'off'));
+
         $matcher = new RequestMatcher();
-        $request = Request::create('', 'get', array(), array(), array(), array('HTTPS' => 'off'));
         $matcher->matchScheme('https');
-        $this->assertFalse($matcher->matches($request));
+        $this->assertFalse($matcher->matches($httpRequest));
+        $this->assertTrue($matcher->matches($httpsRequest));
+
+        $matcher->matchScheme('http');
+        $this->assertFalse($matcher->matches($httpsRequest));
+        $this->assertTrue($matcher->matches($httpRequest));
 
         $matcher = new RequestMatcher();
-        $request = Request::create('', 'get', array(), array(), array(), array('HTTPS' => 'on'));
-        $matcher->matchScheme('https');
-        $this->assertTrue($matcher->matches($request));
-
-        $matcher = new RequestMatcher();
-        $request = Request::create('', 'get', array(), array(), array(), array('HTTPS' => 'on'));
-        $this->assertTrue($matcher->matches($request));
-
-        $matcher = new RequestMatcher();
-        $request = Request::create('', 'get', array(), array(), array(), array('HTTPS' => 'on'));
-        $this->assertTrue($matcher->matches($request));
+        $this->assertTrue($matcher->matches($httpsRequest));
+        $this->assertTrue($matcher->matches($httpRequest));
     }
 
     /**

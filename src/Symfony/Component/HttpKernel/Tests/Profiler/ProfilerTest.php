@@ -19,38 +19,69 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ProfilerTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-    }
+    private $tmp;
+    private $storage;
 
     public function testCollect()
     {
-        if (!class_exists('SQLite3') && (!class_exists('PDO') || !in_array('sqlite', \PDO::getAvailableDrivers()))) {
-            $this->markTestSkipped('This test requires SQLite support in your environment');
-        }
-
         $request = new Request();
         $request->query->set('foo', 'bar');
         $response = new Response();
         $collector = new RequestDataCollector();
 
-        $tmp = tempnam(sys_get_temp_dir(), 'sf2_profiler');
-        if (file_exists($tmp)) {
-            @unlink($tmp);
-        }
-        $storage = new SqliteProfilerStorage('sqlite:'.$tmp);
-        $storage->purge();
-
-        $profiler = new Profiler($storage);
+        $profiler = new Profiler($this->storage);
         $profiler->add($collector);
         $profile = $profiler->collect($request, $response);
 
         $profile = $profiler->loadProfile($profile->getToken());
         $this->assertEquals(array('foo' => 'bar'), $profiler->get('request')->getRequestQuery()->all());
+    }
 
-        @unlink($tmp);
+    public function testFindWorksWithDates()
+    {
+        $profiler = new Profiler($this->storage);
+
+        $this->assertCount(0, $profiler->find(null, null, null, null, '7th April 2014', '9th April 2014'));
+    }
+
+    public function testFindWorksWithTimestamps()
+    {
+        $profiler = new Profiler($this->storage);
+
+        $this->assertCount(0, $profiler->find(null, null, null, null, '1396828800', '1397001600'));
+    }
+
+    public function testFindWorksWithInvalidDates()
+    {
+        $profiler = new Profiler($this->storage);
+
+        $this->assertCount(0, $profiler->find(null, null, null, null, 'some string', ''));
+    }
+
+    protected function setUp()
+    {
+        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
+            $this->markTestSkipped('The "HttpFoundation" component is not available');
+        }
+
+        if (!class_exists('SQLite3') && (!class_exists('PDO') || !in_array('sqlite', \PDO::getAvailableDrivers()))) {
+            $this->markTestSkipped('This test requires SQLite support in your environment');
+        }
+
+        $this->tmp = tempnam(sys_get_temp_dir(), 'sf2_profiler');
+        if (file_exists($this->tmp)) {
+            @unlink($this->tmp);
+        }
+
+        $this->storage = new SqliteProfilerStorage('sqlite:'.$this->tmp);
+        $this->storage->purge();
+    }
+
+    protected function tearDown()
+    {
+        $this->storage->purge();
+        $this->storage = null;
+
+        @unlink($this->tmp);
     }
 }

@@ -41,7 +41,7 @@ class PasswordType extends AbstractType
 
         $resolver->setDefaults(array(
             'reset_on_submit' => $resetOnSubmit,
-            'always_empty' => true, // Deprecated use reset_on_submit unstead
+            'always_empty' => true, // Deprecated use reset_on_submit instead
             'trim'         => false,
         ));
     }

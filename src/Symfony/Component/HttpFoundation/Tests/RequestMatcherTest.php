@@ -43,6 +43,27 @@ class RequestMatcherTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testScheme()
+    {
+        $matcher = new RequestMatcher();
+        $request = Request::create('', 'get', array(), array(), array(), array('HTTPS' => 'off'));
+        $matcher->matchScheme('https');
+        $this->assertFalse($matcher->matches($request));
+
+        $matcher = new RequestMatcher();
+        $request = Request::create('', 'get', array(), array(), array(), array('HTTPS' => 'on'));
+        $matcher->matchScheme('https');
+        $this->assertTrue($matcher->matches($request));
+
+        $matcher = new RequestMatcher();
+        $request = Request::create('', 'get', array(), array(), array(), array('HTTPS' => 'on'));
+        $this->assertTrue($matcher->matches($request));
+
+        $matcher = new RequestMatcher();
+        $request = Request::create('', 'get', array(), array(), array(), array('HTTPS' => 'on'));
+        $this->assertTrue($matcher->matches($request));
+    }
+
     /**
      * @dataProvider testHostFixture
      */
@@ -68,7 +89,8 @@ class RequestMatcherTest extends \PHPUnit_Framework_TestCase
             array('.*\.example\.COM', true),
             array('\.example\.COM$', true),
             array('^.*\.example\.COM$', true),
-            array('.*\.sensio\.COM', false),        );
+            array('.*\.sensio\.COM', false),
+        );
     }
 
     public function testPath()

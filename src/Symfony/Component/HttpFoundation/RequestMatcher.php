@@ -56,6 +56,7 @@ class RequestMatcher implements RequestMatcherInterface
      * @param string|string[]|null $methods
      * @param string|string[]|null $ips
      * @param array                $attributes
+     * @param array                $schemes
      */
     public function __construct(
         $path = null,
@@ -130,7 +131,7 @@ class RequestMatcher implements RequestMatcherInterface
     /**
      * Adds a check for the HTTP method.
      *
-     * @param string|string[]|null $method An HTTP method or an array of HTTP methods
+     * @param string|string[] $method An HTTP method or an array of HTTP methods
      */
     public function matchMethod($method)
     {

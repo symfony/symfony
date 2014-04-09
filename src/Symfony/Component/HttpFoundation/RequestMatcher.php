@@ -48,7 +48,7 @@ class RequestMatcher implements RequestMatcherInterface
     /**
      * @var string[]
      */
-    protected $schemes = array();
+    private $schemes = array();
 
     /**
      * @param string|null          $path

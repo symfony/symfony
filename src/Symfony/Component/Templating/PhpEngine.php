@@ -32,6 +32,9 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 {
     protected $loader;
     protected $current;
+    /**
+     * @var HelperInterface[]
+     */
     protected $helpers;
     protected $parents;
     protected $stack;
@@ -368,6 +371,10 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     public function setCharset($charset)
     {
         $this->charset = $charset;
+
+        foreach ($this->helpers as $helper) {
+            $helper->setCharset($this->charset);
+        }
     }
 
     /**

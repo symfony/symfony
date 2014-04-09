@@ -1294,7 +1294,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
     public function testReadOnly()
     {
         $form = $this->factory->createNamed('name', 'text', null, array(
-            'read_only' => true,
+            'attr' => array('readonly' => 'readonly'),
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
@@ -1899,8 +1899,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         $form = $this->factory->createNamed('text', 'text', 'value', array(
             'required' => true,
             'disabled' => true,
-            'read_only' => true,
-            'attr' => array('maxlength' => 10, 'pattern' => '\d+', 'class' => 'foobar', 'data-foo' => 'bar'),
+            'attr' => array('maxlength' => 10, 'pattern' => '\d+', 'class' => 'foobar', 'data-foo' => 'bar', 'readonly' => true),
         ));
 
         $html = $this->renderWidget($form->createView());

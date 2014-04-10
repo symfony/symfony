@@ -126,10 +126,10 @@ class FileValidator extends ConstraintValidator
 
             if ($size > $limit) {
                 $this->context->addViolation($constraint->maxSizeMessage, array(
-                    '{{ size }}'    => $size,
-                    '{{ limit }}'   => $limit,
-                    '{{ suffix }}'  => $suffix,
-                    '{{ file }}'    => $path,
+                    '{{ size }}' => $size,
+                    '{{ limit }}' => $limit,
+                    '{{ suffix }}' => $suffix,
+                    '{{ file }}' => $path,
                 ));
 
                 return;
@@ -161,9 +161,9 @@ class FileValidator extends ConstraintValidator
 
             if (false === $valid) {
                 $this->context->addViolation($constraint->mimeTypesMessage, array(
-                    '{{ type }}'    => '"'.$mime.'"',
-                    '{{ types }}'   => '"'.implode('", "', $mimeTypes) .'"',
-                    '{{ file }}'    => $path,
+                    '{{ type }}' => '"'.$mime.'"',
+                    '{{ types }}' => '"'.implode('", "', $mimeTypes) .'"',
+                    '{{ file }}' => $path,
                 ));
             }
         }

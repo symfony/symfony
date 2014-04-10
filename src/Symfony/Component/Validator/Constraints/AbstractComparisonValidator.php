@@ -40,34 +40,6 @@ abstract class AbstractComparisonValidator extends ConstraintValidator
     }
 
     /**
-     * Returns a string representation of the type of the value.
-     *
-     * @param  mixed $value
-     *
-     * @return string
-     */
-    private function valueToType($value)
-    {
-        return is_object($value) ? get_class($value) : gettype($value);
-    }
-
-    /**
-     * Returns a string representation of the value.
-     *
-     * @param  mixed  $value
-     *
-     * @return string
-     */
-    private function valueToString($value)
-    {
-        if ($value instanceof \DateTime) {
-            return $value->format('Y-m-d H:i:s');
-        }
-
-        return var_export($value, true);
-    }
-
-    /**
      * Compares the two given values to find if their relationship is valid
      *
      * @param mixed      $value1     The first value to compare

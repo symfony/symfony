@@ -33,7 +33,9 @@ class NullValidator extends ConstraintValidator
                 $value = 'Array';
             }
 
-            $this->context->addViolation($constraint->message, array('{{ value }}' => $value));
+            $this->context->addViolation($constraint->message, array(
+                '{{ value }}' => $value,
+            ));
         }
     }
 }

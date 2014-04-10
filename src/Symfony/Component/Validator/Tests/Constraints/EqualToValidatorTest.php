@@ -49,9 +49,9 @@ class EqualToValidatorTest extends AbstractComparisonValidatorTestCase
     public function provideInvalidComparisons()
     {
         return array(
-            array(1, 2, '2', 'integer'),
-            array('22', '333', "'333'", 'string'),
-            array(new \DateTime('2001-01-01'), new \DateTime('2000-01-01'), '2000-01-01 00:00:00', 'DateTime')
+            array(1, '1', 2, '2', 'integer'),
+            array('22', '"22"', '333', '"333"', 'string'),
+            array(new \DateTime('2001-01-01'), 'Jan 1, 2001 12:00 AM', new \DateTime('2000-01-01'), 'Jan 1, 2000 12:00 AM', 'DateTime')
         );
     }
 }

@@ -29,6 +29,8 @@ abstract class AbstractComparisonValidatorTestCase extends \PHPUnit_Framework_Te
             ->disableOriginalConstructor()
             ->getMock();
         $this->validator->initialize($this->context);
+
+        \Locale::setDefault('en');
     }
 
     /**
@@ -75,7 +77,7 @@ abstract class AbstractComparisonValidatorTestCase extends \PHPUnit_Framework_Te
      * @param mixed  $comparedValueString
      * @param string $comparedValueType
      */
-    public function testInvalidComparisonToValue($dirtyValue, $comparedValue, $comparedValueString, $comparedValueType)
+    public function testInvalidComparisonToValue($dirtyValue, $dirtyValueAsString, $comparedValue, $comparedValueString, $comparedValueType)
     {
         $constraint = $this->createConstraint(array('value' => $comparedValue));
         $constraint->message = 'Constraint Message';
@@ -87,7 +89,7 @@ abstract class AbstractComparisonValidatorTestCase extends \PHPUnit_Framework_Te
         $this->context->expects($this->once())
             ->method('addViolation')
             ->with('Constraint Message', array(
-                '{{ value }}' => $comparedValueString,
+                '{{ value }}' => $dirtyValueAsString,
                 '{{ compared_value }}' => $comparedValueString,
                 '{{ compared_value_type }}' => $comparedValueType
             ));

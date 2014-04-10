@@ -11,13 +11,14 @@
 
 namespace Symfony\Component\Validator\Tests;
 
+use Symfony\Component\Validator\Constraints\Collection;
+use Symfony\Component\Validator\Constraints\All;
+use Symfony\Component\Validator\ConstraintValidatorFactory;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\ExecutionContext;
-use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 use Symfony\Component\Validator\ValidationVisitor;
-use Symfony\Component\Validator\ConstraintValidatorFactory;
 
 class ExecutionContextTest extends \PHPUnit_Framework_TestCase
 {
@@ -277,22 +278,50 @@ class ExecutionContextTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bam.baz', $this->context->getPropertyPath('bam.baz'));
     }
 
-    public function testGetPropertyPathWithNestedCollectionsMixed()
+    public function testGetPropertyPathWithNestedCollectionsAndAllMixed()
     {
         $constraints = new Collection(array(
-            'foo' => new Collection(array(
-                'foo' => new ConstraintA(),
-                'bar' => new ConstraintA(),
-             )),
+            'shelves' => new All(array('constraints' => array(
+                new Collection(array(
+                    'name'  => new ConstraintA(),
+                    'books' => new All(array('constraints' => array(
+                        new ConstraintA()
+                    )))
+                ))
+            ))),
             'name' => new ConstraintA()
         ));
+        $data = array(
+            'shelves' => array(
+                array(
+                    'name' => 'Research',
+                    'books' => array('foo', 'bar'),
+                ),
+                array(
+                    'name' => 'VALID',
+                    'books' => array('foozy', 'VALID', 'bazzy'),
+                ),
+            ),
+            'name' => 'Library',
+        );
+        $expectedViolationPaths = array(
+            '[shelves][0][name]',
+            '[shelves][0][books][0]',
+            '[shelves][0][books][1]',
+            '[shelves][1][books][0]',
+            '[shelves][1][books][2]',
+            '[name]'
+        );
 
         $visitor = new ValidationVisitor('Root', $this->metadataFactory, new ConstraintValidatorFactory(), $this->translator);
         $context = new ExecutionContext($visitor, $this->translator, self::TRANS_DOMAIN);
-        $context->validateValue(array('foo' => array('foo' => 'VALID')), $constraints);
-        $violations = $context->getViolations();
+        $context->validateValue($data, $constraints);
 
-        $this->assertEquals('[name]', $violations[1]->getPropertyPath());
+        foreach ($context->getViolations() as $violation) {
+            $violationPaths[] = $violation->getPropertyPath();
+        }
+
+        $this->assertEquals($expectedViolationPaths, $violationPaths);
     }
 }
 

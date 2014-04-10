@@ -45,16 +45,7 @@ class ConstraintValidatorFactory implements ConstraintValidatorFactoryInterface
     {
         $className = $constraint->validatedBy();
 
-        // The second condition is a hack that is needed when CollectionValidator
-        // calls itself recursively (Collection constraints can be nested).
-        // Since the context of the validator is overwritten when initialize()
-        // is called for the nested constraint, the outer validator is
-        // acting on the wrong context when the nested validation terminates.
-        //
-        // A better solution - which should be approached in Symfony 3.0 - is to
-        // remove the initialize() method and pass the context as last argument
-        // to validate() instead.
-        if (!isset($this->validators[$className]) || 'Symfony\Component\Validator\Constraints\CollectionValidator' === $className) {
+        if (!isset($this->validators[$className])) {
             $this->validators[$className] = 'validator.expression' === $className
                 ? new ExpressionValidator($this->propertyAccessor)
                 : new $className();

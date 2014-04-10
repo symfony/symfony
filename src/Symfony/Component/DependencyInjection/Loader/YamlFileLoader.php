@@ -235,7 +235,7 @@ class YamlFileLoader extends FileLoader
         }
 
         if (isset($service['decorates'])) {
-            $renameId = isset($service['decoration-inner-name']) ? $service['decoration-inner-name'] : null;
+            $renameId = isset($service['decoration_inner_name']) ? $service['decoration_inner_name'] : null;
             $definition->setDecoratedService($service['decorates'], $renameId);
         }
 

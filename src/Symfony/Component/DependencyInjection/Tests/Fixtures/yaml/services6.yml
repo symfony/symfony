@@ -34,4 +34,4 @@ services:
         decorates: decorated
     decorator_service_with_name:
         decorates: decorated
-        decoration-inner-name: decorated.pif-pouf
+        decoration_inner_name: decorated.pif-pouf

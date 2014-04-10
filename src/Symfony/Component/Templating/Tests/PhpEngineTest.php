@@ -13,7 +13,6 @@ namespace Symfony\Component\Templating\Tests;
 
 use Symfony\Component\Templating\PhpEngine;
 use Symfony\Component\Templating\Loader\Loader;
-use Symfony\Component\Templating\Storage\Storage;
 use Symfony\Component\Templating\Storage\StringStorage;
 use Symfony\Component\Templating\Helper\SlotsHelper;
 use Symfony\Component\Templating\TemplateNameParser;
@@ -126,10 +125,14 @@ class PhpEngineTest extends \PHPUnit_Framework_TestCase
 
     public function testGetSetCharset()
     {
-        $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader);
-        $this->assertEquals('UTF-8', $engine->getCharset(), '->getCharset() returns UTF-8 by default');
+        $helper = new SlotsHelper();
+        $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader, array($helper));
+        $this->assertEquals('UTF-8', $engine->getCharset(), 'EngineInterface::getCharset() returns UTF-8 by default');
+        $this->assertEquals('UTF-8', $helper->getCharset(), 'HelperInterface::getCharset() returns UTF-8 by default');
+
         $engine->setCharset('ISO-8859-1');
-        $this->assertEquals('ISO-8859-1', $engine->getCharset(), '->setCharset() changes the default charset to use');
+        $this->assertEquals('ISO-8859-1', $engine->getCharset(), 'EngineInterface::setCharset() changes the default charset to use');
+        $this->assertEquals('ISO-8859-1', $helper->getCharset(), 'EngineInterface::setCharset() changes the default charset of helper');
     }
 
     public function testGlobalVariables()

@@ -32,8 +32,8 @@ class EsiFragmentRenderer extends RoutableFragmentRenderer
      * The "fallback" strategy when ESI is not available should always be an
      * instance of InlineFragmentRenderer.
      *
-     * @param Esi                    $esi            An Esi instance
-     * @param InlineFragmentRenderer $inlineStrategy The inline strategy to use when ESI is not supported
+     * @param Esi                       $esi            An Esi instance
+     * @param FragmentRendererInterface $inlineStrategy The inline strategy to use when ESI is not supported
      */
     public function __construct(Esi $esi = null, InlineFragmentRenderer $inlineStrategy)
     {

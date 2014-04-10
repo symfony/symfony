@@ -143,7 +143,7 @@ class YamlDumper extends Dumper
             list ($decorated, $renamedId) = $decorated;
             $code .= sprintf("        decorates: %s\n", $decorated);
             if (null !== $renamedId) {
-                $code .= sprintf("        decoration-inner-name: %s\n", $renamedId);
+                $code .= sprintf("        decoration_inner_name: %s\n", $renamedId);
             }
         }
 

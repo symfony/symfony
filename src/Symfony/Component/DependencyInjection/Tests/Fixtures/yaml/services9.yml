@@ -87,6 +87,6 @@ services:
     decorator_service_with_name:
         class: stdClass
         decorates: decorated
-        decoration-inner-name: decorated.pif-pouf
+        decoration_inner_name: decorated.pif-pouf
     alias_for_foo: @foo
     alias_for_alias: @foo

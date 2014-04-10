@@ -278,6 +278,26 @@
                 <source>This value should not be identical to {{ compared_value_type }} {{ compared_value }}.</source>
                 <target>Este valor no debería ser idéntico a {{ compared_value_type }} {{ compared_value }}.</target>
             </trans-unit>
+            <trans-unit id="73">
+                <source>The image ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
+                <target>La proporción de la imagen es demasiado grande ({{ ratio }}). Maxima proporción permitida es {{ max_ratio }}.</target>
+            </trans-unit>
+            <trans-unit id="74">
+                <source>The image ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.</source>
+                <target>La proporción de la imagen es demasiado pequeña ({{ ratio }}). Mínima proporción permitida es {{ min_ratio }}.</target>
+            </trans-unit>
+            <trans-unit id="75">
+                <source>The image is square ({{ width }}x{{ height }}px). Square images are not allowed.</source>
+                <target>La imagen es cuadrada ({{ width }}x{{ height }}px). Imágenes cuadradas no son permitidas.</target>
+            </trans-unit>
+            <trans-unit id="76">
+                <source>The image is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented images are not allowed.</source>
+                <target>La imagen está orientada horizontal ({{ width }}x{{ height }}px). Imágenes orientada horizontal no está permitido.</target>
+            </trans-unit>
+            <trans-unit id="77">
+                <source>The image is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented images are not allowed.</source>
+                <target>La imagen está orientada vertical ({{ width }}x{{ height }}px). Imágenes orientada vertical no está permitido.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

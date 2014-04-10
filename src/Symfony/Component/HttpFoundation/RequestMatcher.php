@@ -64,7 +64,7 @@ class RequestMatcher implements RequestMatcherInterface
         $methods = null,
         $ips = null,
         array $attributes = array(),
-        array $schemes = array()
+        $schemes = null
     )
     {
         $this->matchPath($path);

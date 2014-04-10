@@ -655,6 +655,7 @@ class MimeTypeExtensionGuesser implements ExtensionGuesserInterface
         'chemical/x-csml' => 'csml',
         'chemical/x-xyz' => 'xyz',
         'image/bmp' => 'bmp',
+        'image/x-ms-bmp' => 'bmp',
         'image/cgm' => 'cgm',
         'image/g3fax' => 'g3',
         'image/gif' => 'gif',

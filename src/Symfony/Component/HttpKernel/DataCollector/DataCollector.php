@@ -55,7 +55,7 @@ abstract class DataCollector implements DataCollectorInterface, \Serializable
         }
 
         if (is_resource($var)) {
-            return sprintf('Resource(%s)', get_resource_type($var));
+            return sprintf('Resource(%s#%d)', get_resource_type($var), $var);
         }
 
         if (null === $var) {

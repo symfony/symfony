@@ -48,13 +48,14 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
     /**
      * Returns a string representation of the value.
      *
-     * @param  mixed  $value
+     * @param mixed   $value
+     * @param Boolean $formatDates
      *
      * @return string
      */
-    protected function valueToString($value)
+    protected function valueToString($value, $formatDates = false)
     {
-        if ($value instanceof \DateTime) {
+        if ($formatDates && $value instanceof \DateTime) {
             if (class_exists('IntlDateFormatter')) {
                 $locale = \Locale::getDefault();
                 $formatter = new \IntlDateFormatter($locale, \IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT);

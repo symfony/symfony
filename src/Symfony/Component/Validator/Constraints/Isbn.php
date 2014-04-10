@@ -42,5 +42,8 @@ class Isbn extends Constraint
         if (null === $this->isbn10 && null === $this->isbn13) {
             throw new MissingOptionsException(sprintf('Either option "isbn10" or "isbn13" must be given for constraint "%s".', __CLASS__), array('isbn10', 'isbn13'));
         }
+
+        $this->isbn10 = (bool) $this->isbn10;
+        $this->isbn13 = (bool) $this->isbn13;
     }
 }

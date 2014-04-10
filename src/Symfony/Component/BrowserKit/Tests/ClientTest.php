@@ -421,6 +421,16 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($headers, $client->getRequest()->getServer());
     }
 
+    public function testFollowRedirectWithIpHost()
+    {
+        $client = new TestClient();
+        $client->request('GET', 'http://127.0.0.1/foo', array(), array(), array(
+            'HTTP_HOST' => "127.0.0.1",
+        ));
+
+        $this->assertEquals('http://127.0.0.1/foo', $client->getRequest()->getUri());
+    }
+
     public function testFollowRedirectWithPort()
     {
         $headers = array(

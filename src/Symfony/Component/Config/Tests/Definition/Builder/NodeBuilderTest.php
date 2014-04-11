@@ -79,7 +79,7 @@ class NodeBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testNumericNodeCreation()
     {
-        $builder = new NodeBuilder();
+        $builder = new BaseNodeBuilder();
 
         $node = $builder->integerNode('foo')->min(3)->max(5);
         $this->assertInstanceOf('Symfony\Component\Config\Definition\Builder\IntegerNodeDefinition', $node);

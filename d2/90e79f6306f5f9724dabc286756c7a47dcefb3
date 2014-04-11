@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by idn2104 at 2014-04-11T04:22:05Z
+
+https://github.com/symfony/symfony/commit/e295bfc7a5d4b832982cf8b18c681a3712666e9b explains the change, the test I'm modifying was added later and didn't use the alias.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-04-11T08:34:00Z
+
+:+1:

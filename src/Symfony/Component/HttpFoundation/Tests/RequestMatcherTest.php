@@ -45,8 +45,8 @@ class RequestMatcherTest extends \PHPUnit_Framework_TestCase
 
     public function testScheme()
     {
+        $httpRequest = $request = $request = Request::create('');
         $httpsRequest = $request = $request = Request::create('', 'get', array(), array(), array(), array('HTTPS' => 'on'));
-        $httpRequest = $request = $request = Request::create('', 'get', array(), array(), array(), array('HTTPS' => 'off'));
 
         $matcher = new RequestMatcher();
         $matcher->matchScheme('https');

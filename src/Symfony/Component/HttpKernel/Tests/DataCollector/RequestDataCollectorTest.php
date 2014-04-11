@@ -42,7 +42,7 @@ class RequestDataCollectorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array('name' => 'foo'), $c->getRouteParams());
         $this->assertSame(array(), $c->getSessionAttributes());
         $this->assertSame('en', $c->getLocale());
-        $this->assertSame('Resource(stream#86)', $attributes->get('resource'));
+        $this->assertRegExp('/Resource\(stream#\d+\)/', $attributes->get('resource'));
         $this->assertSame('Object(stdClass)', $attributes->get('object'));
 
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\HeaderBag', $c->getResponseHeaders());

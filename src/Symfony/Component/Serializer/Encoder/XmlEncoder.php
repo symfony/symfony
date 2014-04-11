@@ -231,11 +231,11 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
     }
 
     /**
-     * Parse the input DOMNode into an array.
+     * Parse the input DOMNode into an array or a string.
      *
      * @param \DOMNode $node xml to parse
      *
-     * @return array
+     * @return array|string
      */
     private function parseXml(\DOMNode $node)
     {

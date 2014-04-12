@@ -40,7 +40,7 @@ class IcuResFileLoader implements LoaderInterface
             $rb = new \ResourceBundle($locale, $resource);
         } catch (\Exception $e) {
             // HHVM compatibility: constructor throws on invalid resource
-            $rb = false;
+            $rb = null;
         }
 
         if (!$rb) {

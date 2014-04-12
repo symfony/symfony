@@ -34,16 +34,17 @@ class RedirectController extends ContainerAware
      * In case the route name is empty, the status code will be 404 when permanent is false
      * and 410 otherwise.
      *
-     * @param Request       $request          The request instance
-     * @param string        $route            The route name to redirect to
-     * @param Boolean       $permanent        Whether the redirection is permanent
-     * @param Boolean|array $ignoreAttributes Whether to ignore attributes or an array of attributes to ignore
+     * @param Request       $request           The request instance
+     * @param string        $route             The route name to redirect to
+     * @param Boolean       $permanent         Whether the redirection is permanent
+     * @param Boolean|array $ignoreAttributes  Whether to ignore attributes or an array of attributes to ignore
+     * @param Boolean|array $ignoreQueryParams Whether to ignore query parameters or an array of query parameters to ignore
      *
      * @return Response A Response instance
      *
      * @throws HttpException In case the route name is empty
      */
-    public function redirectAction(Request $request, $route, $permanent = false, $ignoreAttributes = false)
+    public function redirectAction(Request $request, $route, $permanent = false, $ignoreAttributes = false, $ignoreQueryParams = false)
     {
         if ('' == $route) {
             throw new HttpException($permanent ? 410 : 404);
@@ -52,13 +53,28 @@ class RedirectController extends ContainerAware
         $attributes = array();
         if (false === $ignoreAttributes || is_array($ignoreAttributes)) {
             $attributes = $request->attributes->get('_route_params');
-            unset($attributes['route'], $attributes['permanent'], $attributes['ignoreAttributes']);
+            unset($attributes['route'], $attributes['permanent'], $attributes['ignoreAttributes'], $attributes['ignoreQueryParams']);
             if ($ignoreAttributes) {
                 $attributes = array_diff_key($attributes, array_flip($ignoreAttributes));
             }
         }
 
-        return new RedirectResponse($this->container->get('router')->generate($route, $attributes, UrlGeneratorInterface::ABSOLUTE_URL), $permanent ? 301 : 302);
+        $queryParams = array();
+        if (false === $ignoreQueryParams || is_array($ignoreQueryParams)) {
+            $queryParams = $request->query->all();
+            if ($ignoreQueryParams) {
+                $queryParams = array_diff_key($queryParams, array_flip($ignoreQueryParams));
+            }
+        }
+
+        return new RedirectResponse(
+            $this->container->get('router')->generate(
+                $route,
+                array_merge($attributes, $queryParams),
+                UrlGeneratorInterface::ABSOLUTE_URL
+            ),
+            $permanent ? 301 : 302
+        );
     }
 
     /**

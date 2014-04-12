@@ -88,7 +88,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function setResourceTracking($track)
     {
-        $this->trackResources = (Boolean) $track;
+        $this->trackResources = (bool) $track;
     }
 
     /**

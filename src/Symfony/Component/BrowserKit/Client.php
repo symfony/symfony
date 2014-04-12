@@ -76,7 +76,7 @@ abstract class Client
      */
     public function followRedirects($followRedirect = true)
     {
-        $this->followRedirects = (Boolean) $followRedirect;
+        $this->followRedirects = (bool) $followRedirect;
     }
 
     /**
@@ -107,7 +107,7 @@ abstract class Client
             // @codeCoverageIgnoreEnd
         }
 
-        $this->insulated = (Boolean) $insulated;
+        $this->insulated = (bool) $insulated;
     }
 
     /**

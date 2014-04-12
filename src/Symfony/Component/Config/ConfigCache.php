@@ -37,7 +37,7 @@ class ConfigCache
     public function __construct($file, $debug)
     {
         $this->file = $file;
-        $this->debug = (Boolean) $debug;
+        $this->debug = (bool) $debug;
     }
 
     /**

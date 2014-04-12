@@ -45,8 +45,8 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
 
         $this->voters = $voters;
         $this->strategy = 'decide'.ucfirst($strategy);
-        $this->allowIfAllAbstainDecisions = (Boolean) $allowIfAllAbstainDecisions;
-        $this->allowIfEqualGrantedDeniedDecisions = (Boolean) $allowIfEqualGrantedDeniedDecisions;
+        $this->allowIfAllAbstainDecisions = (bool) $allowIfAllAbstainDecisions;
+        $this->allowIfEqualGrantedDeniedDecisions = (bool) $allowIfEqualGrantedDeniedDecisions;
     }
 
     /**

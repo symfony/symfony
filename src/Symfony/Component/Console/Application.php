@@ -276,7 +276,7 @@ class Application
      */
     public function setCatchExceptions($boolean)
     {
-        $this->catchExceptions = (Boolean) $boolean;
+        $this->catchExceptions = (bool) $boolean;
     }
 
     /**
@@ -288,7 +288,7 @@ class Application
      */
     public function setAutoExit($boolean)
     {
-        $this->autoExit = (Boolean) $boolean;
+        $this->autoExit = (bool) $boolean;
     }
 
     /**

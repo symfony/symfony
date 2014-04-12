@@ -95,7 +95,7 @@ class UploadedFile extends File
         $this->mimeType = $mimeType ?: 'application/octet-stream';
         $this->size = $size;
         $this->error = $error ?: UPLOAD_ERR_OK;
-        $this->test = (Boolean) $test;
+        $this->test = (bool) $test;
 
         parent::__construct($path, UPLOAD_ERR_OK === $this->error);
     }

@@ -309,7 +309,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      */
     public function normalizeKeys($bool)
     {
-        $this->normalizeKeys = (Boolean) $bool;
+        $this->normalizeKeys = (bool) $bool;
 
         return $this;
     }

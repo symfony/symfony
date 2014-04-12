@@ -40,7 +40,7 @@ class AnalyzeServiceReferencesPass implements RepeatablePassInterface
      */
     public function __construct($onlyConstructorArguments = false)
     {
-        $this->onlyConstructorArguments = (Boolean) $onlyConstructorArguments;
+        $this->onlyConstructorArguments = (bool) $onlyConstructorArguments;
     }
 
     /**

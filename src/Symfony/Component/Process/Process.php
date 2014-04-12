@@ -776,7 +776,7 @@ class Process
      */
     public function setTty($tty)
     {
-        $this->tty = (Boolean) $tty;
+        $this->tty = (bool) $tty;
 
         return $this;
     }
@@ -928,7 +928,7 @@ class Process
      */
     public function setEnhanceWindowsCompatibility($enhance)
     {
-        $this->enhanceWindowsCompatibility = (Boolean) $enhance;
+        $this->enhanceWindowsCompatibility = (bool) $enhance;
 
         return $this;
     }
@@ -956,7 +956,7 @@ class Process
      */
     public function setEnhanceSigchildCompatibility($enhance)
     {
-        $this->enhanceSigchildCompatibility = (Boolean) $enhance;
+        $this->enhanceSigchildCompatibility = (bool) $enhance;
 
         return $this;
     }

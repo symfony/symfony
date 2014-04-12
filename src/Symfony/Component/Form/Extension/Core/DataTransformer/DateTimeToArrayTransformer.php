@@ -45,7 +45,7 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
         }
 
         $this->fields = $fields;
-        $this->pad = (Boolean) $pad;
+        $this->pad = (bool) $pad;
     }
 
     /**

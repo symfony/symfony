@@ -70,8 +70,8 @@ class Cookie
         $this->domain = $domain;
         $this->expire = $expire;
         $this->path = empty($path) ? '/' : $path;
-        $this->secure = (Boolean) $secure;
-        $this->httpOnly = (Boolean) $httpOnly;
+        $this->secure = (bool) $secure;
+        $this->httpOnly = (bool) $httpOnly;
     }
 
     /**

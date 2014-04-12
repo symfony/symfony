@@ -77,7 +77,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     public function __construct($environment, $debug)
     {
         $this->environment = $environment;
-        $this->debug = (Boolean) $debug;
+        $this->debug = (bool) $debug;
         $this->booted = false;
         $this->rootDir = $this->getRootDir();
         $this->name = $this->getName();

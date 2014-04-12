@@ -142,7 +142,7 @@ abstract class BaseNode implements NodeInterface
      */
     public function setRequired($boolean)
     {
-        $this->required = (Boolean) $boolean;
+        $this->required = (bool) $boolean;
     }
 
     /**
@@ -152,7 +152,7 @@ abstract class BaseNode implements NodeInterface
      */
     public function setAllowOverwrite($allow)
     {
-        $this->allowOverwrite = (Boolean) $allow;
+        $this->allowOverwrite = (bool) $allow;
     }
 
     /**

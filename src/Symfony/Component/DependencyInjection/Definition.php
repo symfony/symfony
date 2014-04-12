@@ -556,7 +556,7 @@ class Definition
      */
     public function setPublic($boolean)
     {
-        $this->public = (Boolean) $boolean;
+        $this->public = (bool) $boolean;
 
         return $this;
     }
@@ -584,7 +584,7 @@ class Definition
      */
     public function setSynchronized($boolean)
     {
-        $this->synchronized = (Boolean) $boolean;
+        $this->synchronized = (bool) $boolean;
 
         return $this;
     }
@@ -610,7 +610,7 @@ class Definition
      */
     public function setLazy($lazy)
     {
-        $this->lazy = (Boolean) $lazy;
+        $this->lazy = (bool) $lazy;
 
         return $this;
     }
@@ -637,7 +637,7 @@ class Definition
      */
     public function setSynthetic($boolean)
     {
-        $this->synthetic = (Boolean) $boolean;
+        $this->synthetic = (bool) $boolean;
 
         return $this;
     }
@@ -667,7 +667,7 @@ class Definition
      */
     public function setAbstract($boolean)
     {
-        $this->abstract = (Boolean) $boolean;
+        $this->abstract = (bool) $boolean;
 
         return $this;
     }

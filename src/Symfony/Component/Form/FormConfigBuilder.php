@@ -603,7 +603,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
         }
 
-        $this->disabled = (Boolean) $disabled;
+        $this->disabled = (bool) $disabled;
 
         return $this;
     }
@@ -631,7 +631,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
         }
 
-        $this->errorBubbling = null === $errorBubbling ? null : (Boolean) $errorBubbling;
+        $this->errorBubbling = null === $errorBubbling ? null : (bool) $errorBubbling;
 
         return $this;
     }
@@ -645,7 +645,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
         }
 
-        $this->required = (Boolean) $required;
+        $this->required = (bool) $required;
 
         return $this;
     }
@@ -855,7 +855,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     public function setAutoInitialize($initialize)
     {
-        $this->autoInitialize = (Boolean) $initialize;
+        $this->autoInitialize = (bool) $initialize;
 
         return $this;
     }

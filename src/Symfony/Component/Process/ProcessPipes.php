@@ -35,8 +35,8 @@ class ProcessPipes
 
     public function __construct($useFiles, $ttyMode)
     {
-        $this->useFiles = (Boolean) $useFiles;
-        $this->ttyMode = (Boolean) $ttyMode;
+        $this->useFiles = (bool) $useFiles;
+        $this->ttyMode = (bool) $ttyMode;
 
         // Fix for PHP bug #51800: reading from STDOUT pipe hangs forever on Windows if the output is too big.
         // Workaround for this problem is to use temporary files instead of pipes on Windows platform.
@@ -180,10 +180,10 @@ class ProcessPipes
     public function hasOpenHandles()
     {
         if (!$this->useFiles) {
-            return (Boolean) $this->pipes;
+            return (bool) $this->pipes;
         }
 
-        return (Boolean) $this->pipes && (Boolean) $this->fileHandles;
+        return (bool) $this->pipes && (bool) $this->fileHandles;
     }
 
     /**

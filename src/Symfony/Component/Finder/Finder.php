@@ -638,7 +638,7 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public function ignoreUnreadableDirs($ignore = true)
     {
-        $this->ignoreUnreadableDirs = (Boolean) $ignore;
+        $this->ignoreUnreadableDirs = (bool) $ignore;
 
         return $this;
     }

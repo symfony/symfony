@@ -200,7 +200,7 @@ class ClassCollectionLoader
      */
     public static function enableTokenizer($bool)
     {
-        self::$useTokenizer = (Boolean) $bool;
+        self::$useTokenizer = (bool) $bool;
     }
 
     /**

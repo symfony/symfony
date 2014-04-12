@@ -53,7 +53,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
 
     public function setNormalizeKeys($normalizeKeys)
     {
-        $this->normalizeKeys = (Boolean) $normalizeKeys;
+        $this->normalizeKeys = (bool) $normalizeKeys;
     }
 
     /**
@@ -113,7 +113,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      */
     public function setAddIfNotSet($boolean)
     {
-        $this->addIfNotSet = (Boolean) $boolean;
+        $this->addIfNotSet = (bool) $boolean;
     }
 
     /**
@@ -123,7 +123,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      */
     public function setAllowFalse($allow)
     {
-        $this->allowFalse = (Boolean) $allow;
+        $this->allowFalse = (bool) $allow;
     }
 
     /**
@@ -133,7 +133,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      */
     public function setAllowNewKeys($allow)
     {
-        $this->allowNewKeys = (Boolean) $allow;
+        $this->allowNewKeys = (bool) $allow;
     }
 
     /**
@@ -143,7 +143,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      */
     public function setPerformDeepMerging($boolean)
     {
-        $this->performDeepMerging = (Boolean) $boolean;
+        $this->performDeepMerging = (bool) $boolean;
     }
 
     /**
@@ -153,7 +153,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      */
     public function setIgnoreExtraKeys($boolean)
     {
-        $this->ignoreExtraKeys = (Boolean) $boolean;
+        $this->ignoreExtraKeys = (bool) $boolean;
     }
 
     /**

@@ -59,7 +59,7 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
         $criteria = $criteria ? 'WHERE '.implode(' AND ', $criteria) : '';
 
         $db = $this->initDb();
-        $tokens = $this->fetch($db, 'SELECT token, ip, method, url, time, parent FROM sf_profiler_data '.$criteria.' ORDER BY time DESC LIMIT '.((integer) $limit), $args);
+        $tokens = $this->fetch($db, 'SELECT token, ip, method, url, time, parent FROM sf_profiler_data '.$criteria.' ORDER BY time DESC LIMIT '.((int) $limit), $args);
         $this->close($db);
 
         return $tokens;

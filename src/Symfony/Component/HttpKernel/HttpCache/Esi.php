@@ -107,7 +107,7 @@ class Esi
             return false;
         }
 
-        return (Boolean) preg_match('#content="[^"]*ESI/1.0[^"]*"#', $control);
+        return (bool) preg_match('#content="[^"]*ESI/1.0[^"]*"#', $control);
     }
 
     /**

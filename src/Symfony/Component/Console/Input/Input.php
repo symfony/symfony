@@ -94,7 +94,7 @@ abstract class Input implements InputInterface
      */
     public function setInteractive($interactive)
     {
-        $this->interactive = (Boolean) $interactive;
+        $this->interactive = (bool) $interactive;
     }
 
     /**

@@ -49,8 +49,8 @@ class ProfilerListener implements EventSubscriberInterface
     {
         $this->profiler = $profiler;
         $this->matcher = $matcher;
-        $this->onlyException = (Boolean) $onlyException;
-        $this->onlyMasterRequests = (Boolean) $onlyMasterRequests;
+        $this->onlyException = (bool) $onlyException;
+        $this->onlyMasterRequests = (bool) $onlyMasterRequests;
         $this->children = new \SplObjectStorage();
         $this->profiles = array();
     }

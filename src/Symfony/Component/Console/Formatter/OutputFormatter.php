@@ -46,7 +46,7 @@ class OutputFormatter implements OutputFormatterInterface
      */
     public function __construct($decorated = false, array $styles = array())
     {
-        $this->decorated = (Boolean) $decorated;
+        $this->decorated = (bool) $decorated;
 
         $this->setStyle('error', new OutputFormatterStyle('white', 'red'));
         $this->setStyle('info', new OutputFormatterStyle('green'));
@@ -69,7 +69,7 @@ class OutputFormatter implements OutputFormatterInterface
      */
     public function setDecorated($decorated)
     {
-        $this->decorated = (Boolean) $decorated;
+        $this->decorated = (bool) $decorated;
     }
 
     /**

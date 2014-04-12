@@ -41,7 +41,7 @@ class FormAuthenticationEntryPoint implements AuthenticationEntryPointInterface
         $this->httpKernel = $kernel;
         $this->httpUtils = $httpUtils;
         $this->loginPath = $loginPath;
-        $this->useForward = (Boolean) $useForward;
+        $this->useForward = (bool) $useForward;
     }
 
     /**

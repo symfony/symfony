@@ -16,15 +16,11 @@ use Symfony\Component\Security\Http\Firewall\RemoteUserAuthenticationListener;
 
 class RemoteUserAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @dataProvider dataProviderGetPreAuthenticatedData
-     */
-    public function testGetPreAuthenticatedData($user)
+    public function testGetPreAuthenticatedData()
     {
-        $serverVars = array();
-        if ('' !== $user) {
-            $serverVars['REMOTE_USER'] = $user;
-        }
+        $serverVars = array(
+            'REMOTE_USER' => 'TheUser'
+        );
 
         $request = new Request(array(), array(), array(), array(), array(), $serverVars);
 
@@ -42,14 +38,7 @@ class RemoteUserAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
         $method->setAccessible(true);
 
         $result = $method->invokeArgs($listener, array($request));
-        $this->assertSame($result, array($user, null));
-    }
-
-    public static function dataProviderGetPreAuthenticatedData()
-    {
-        return array(
-            'validValues' => array('TheUser'),
-        );
+        $this->assertSame($result, array('TheUser', null));
     }
 
     /**
@@ -80,8 +69,7 @@ class RemoteUserAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
         $userCredentials = array('TheUser', null);
 
         $request = new Request(array(), array(), array(), array(), array(), array(
-            'TheUserKey' => 'TheUser',
-            'TheCredentialsKey' => 'TheCredentials'
+            'TheUserKey' => 'TheUser'
         ));
         $context = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
 

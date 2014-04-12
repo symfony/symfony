@@ -35,7 +35,6 @@ class RemoteUserFactory implements SecurityFactoryInterface
             ->addArgument($id)
         ;
 
-        // listener
         $listenerId = 'security.authentication.listener.remote_user.'.$id;
         $listener = $container->setDefinition($listenerId, new DefinitionDecorator('security.authentication.listener.remote_user'));
         $listener->replaceArgument(2, $id);

@@ -119,7 +119,12 @@ class LocaleBundleTransformationRule implements TransformationRuleInterface
             }
 
             // Delete locales that have no content (i.e. only "Version" key)
-            $bundle = new \ResourceBundle($locale, $tempDir);
+            try {
+                $bundle = new \ResourceBundle($locale, $tempDir);
+            } catch (\Exception $e) {
+                // HHVM compatibility: constructor throws on invalid resource
+                $bundle = null;
+            }
 
             if (null === $bundle) {
                 throw new RuntimeException('The resource bundle for locale ' . $locale . ' could not be loaded from directory ' . $tempDir);

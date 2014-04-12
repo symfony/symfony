@@ -28,7 +28,12 @@ class BinaryBundleReader extends AbstractBundleReader implements BundleReaderInt
     {
         // Point for future extension: Modify this class so that it works also
         // if the \ResourceBundle class is not available.
-        $bundle = new \ResourceBundle($locale, $path);
+        try {
+            $bundle = new \ResourceBundle($locale, $path);
+        } catch (\Exception $e) {
+            // HHVM compatibility: constructor throws on invalid resource
+            $bundle = null;
+        }
 
         if (null === $bundle) {
             throw new RuntimeException(sprintf(

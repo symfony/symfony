@@ -62,7 +62,8 @@ class DateType extends AbstractType
                 $dateFormat,
                 $timeFormat,
                 $calendar,
-                $pattern
+                $pattern,
+                $options['lenient_date_parsing']
             ));
         } else {
             $yearOptions = $monthOptions = $dayOptions = array(
@@ -190,25 +191,28 @@ class DateType extends AbstractType
         };
 
         $resolver->setDefaults(array(
-            'years'          => range(date('Y') - 5, date('Y') + 5),
-            'months'         => range(1, 12),
-            'days'           => range(1, 31),
-            'widget'         => 'choice',
-            'input'          => 'datetime',
-            'format'         => $format,
-            'model_timezone' => null,
-            'view_timezone'  => null,
-            'empty_value'    => $emptyValue,
+            'years'                => range(date('Y') - 5, date('Y') + 5),
+            'months'               => range(1, 12),
+            'days'                 => range(1, 31),
+            'widget'               => 'choice',
+            'input'                => 'datetime',
+            'format'               => $format,
+            'model_timezone'       => null,
+            'view_timezone'        => null,
+            'empty_value'          => $emptyValue,
             // Don't modify \DateTime classes by reference, we treat
             // them like immutable value objects
-            'by_reference'   => false,
-            'error_bubbling' => false,
+            'by_reference'         => false,
+            'error_bubbling'       => false,
             // If initialized with a \DateTime object, FormType initializes
             // this option to "\DateTime". Since the internal, normalized
             // representation is not \DateTime, but an array, we need to unset
             // this option.
-            'data_class'     => null,
-            'compound'       => $compound,
+            'data_class'           => null,
+            'compound'             => $compound,
+            // Enables lenient parsing of dates. If set to true, some invalid date formats
+            // will be automatically adjusted (for example 35.12.2013 -> 04.01.2013)
+            'lenient_date_parsing' => false,
         ));
 
         $resolver->setNormalizers(array(

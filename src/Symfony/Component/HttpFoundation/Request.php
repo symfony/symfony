@@ -680,7 +680,7 @@ class Request
      *
      * @param string  $key     the key
      * @param mixed   $default the default value
-     * @param Boolean $deep    is parameter deep in multidimensional array
+     * @param bool    $deep    is parameter deep in multidimensional array
      *
      * @return mixed
      */
@@ -1398,7 +1398,7 @@ class Request
     /**
      * Returns the request body content.
      *
-     * @param Boolean $asResource If true, a resource will be returned
+     * @param bool    $asResource If true, a resource will be returned
      *
      * @return string|resource The request body content or a resource to read the body stream.
      *

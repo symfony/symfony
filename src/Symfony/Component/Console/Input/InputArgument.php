@@ -33,7 +33,7 @@ class InputArgument
      * Constructor.
      *
      * @param string  $name        The argument name
-     * @param integer $mode        The argument mode: self::REQUIRED or self::OPTIONAL
+     * @param int     $mode        The argument mode: self::REQUIRED or self::OPTIONAL
      * @param string  $description A description text
      * @param mixed   $default     The default value (for self::OPTIONAL mode only)
      *

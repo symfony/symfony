@@ -42,8 +42,8 @@ class ProfilerListener implements EventSubscriberInterface
      *
      * @param Profiler                $profiler           A Profiler instance
      * @param RequestMatcherInterface $matcher            A RequestMatcher instance
-     * @param Boolean                 $onlyException      true if the profiler only collects data when an exception occurs, false otherwise
-     * @param Boolean                 $onlyMasterRequests true if the profiler only collects data when the request is a master request, false otherwise
+     * @param bool                    $onlyException      true if the profiler only collects data when an exception occurs, false otherwise
+     * @param bool                    $onlyMasterRequests true if the profiler only collects data when the request is a master request, false otherwise
      */
     public function __construct(Profiler $profiler, RequestMatcherInterface $matcher = null, $onlyException = false, $onlyMasterRequests = false)
     {

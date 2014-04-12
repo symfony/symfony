@@ -31,7 +31,7 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
      * @param string  $dsn      A data source name
      * @param string  $username The username for the database
      * @param string  $password The password for the database
-     * @param integer $lifetime The lifetime to use for the purge
+     * @param int     $lifetime The lifetime to use for the purge
      */
     public function __construct($dsn, $username = '', $password = '', $lifetime = 86400)
     {

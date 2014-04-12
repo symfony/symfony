@@ -55,7 +55,7 @@ class FileResource implements ResourceInterface, \Serializable
     /**
      * Returns true if the resource has not been updated since the given timestamp.
      *
-     * @param integer $timestamp The last time the resource was loaded
+     * @param int     $timestamp The last time the resource was loaded
      *
      * @return Boolean true if the resource has not been updated, false otherwise
      */

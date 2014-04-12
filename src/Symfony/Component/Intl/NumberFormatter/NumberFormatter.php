@@ -693,7 +693,7 @@ class NumberFormatter
     /**
      * Rounds a value.
      *
-     * @param integer|float $value     The value to round
+     * @param int    |float $value     The value to round
      * @param int           $precision The number of decimal digits to round to
      *
      * @return integer|float The rounded value
@@ -711,7 +711,7 @@ class NumberFormatter
     /**
      * Formats a number.
      *
-     * @param integer|float $value     The numeric value to format
+     * @param int    |float $value     The numeric value to format
      * @param int           $precision The number of decimal digits to use
      *
      * @return string The formatted number
@@ -726,7 +726,7 @@ class NumberFormatter
     /**
      * Returns the precision value if the DECIMAL style is being used and the FRACTION_DIGITS attribute is unitialized.
      *
-     * @param integer|float $value     The value to get the precision from if the FRACTION_DIGITS attribute is unitialized
+     * @param int    |float $value     The value to get the precision from if the FRACTION_DIGITS attribute is unitialized
      * @param int           $precision The precision value to returns if the FRACTION_DIGITS attribute is initialized
      *
      * @return int The precision value

@@ -105,7 +105,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     /**
      * Adds children with a default value when none are defined.
      *
-     * @param integer|string|array|null $children The number of children|The child name|The children names to be added
+     * @param int    |string|array|null $children The number of children|The child name|The children names to be added
      *
      * This method is applicable to prototype nodes only.
      *
@@ -185,7 +185,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      * This method is applicable to prototype nodes only.
      *
      * @param string  $name          The name of the key
-     * @param Boolean $removeKeyItem Whether or not the key item should be removed.
+     * @param bool    $removeKeyItem Whether or not the key item should be removed.
      *
      * @return ArrayNodeDefinition
      */
@@ -200,7 +200,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     /**
      * Sets whether the node can be unset.
      *
-     * @param Boolean $allow
+     * @param bool    $allow
      *
      * @return ArrayNodeDefinition
      */
@@ -303,7 +303,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     /**
      * Sets key normalization.
      *
-     * @param Boolean $bool Whether to enable key normalization
+     * @param bool    $bool Whether to enable key normalization
      *
      * @return ArrayNodeDefinition
      */

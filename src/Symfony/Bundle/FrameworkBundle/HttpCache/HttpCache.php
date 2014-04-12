@@ -46,7 +46,7 @@ abstract class HttpCache extends BaseHttpCache
      * Forwards the Request to the backend and returns the Response.
      *
      * @param Request  $request A Request instance
-     * @param Boolean  $raw     Whether to catch exceptions or not
+     * @param bool     $raw     Whether to catch exceptions or not
      * @param Response $entry   A Response instance (the stale entry if present, null otherwise)
      *
      * @return Response A Response instance

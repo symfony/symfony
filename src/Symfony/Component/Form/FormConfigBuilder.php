@@ -713,7 +713,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * Alias of {@link setInheritData()}.
      *
-     * @param Boolean $inheritData Whether the form should inherit its parent's data.
+     * @param bool    $inheritData Whether the form should inherit its parent's data.
      *
      * @return FormConfigBuilder The configuration object.
      *

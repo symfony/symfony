@@ -117,7 +117,7 @@ class XmlUtils
      *  * The nested-tags are converted to keys (<foo><foo>bar</foo></foo>)
      *
      * @param \DomElement $element     A \DomElement instance
-     * @param Boolean     $checkPrefix Check prefix in an element or an attribute name
+     * @param bool        $checkPrefix Check prefix in an element or an attribute name
      *
      * @return array A PHP array
      */

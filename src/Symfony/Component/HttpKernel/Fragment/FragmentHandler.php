@@ -36,7 +36,7 @@ class FragmentHandler
      * Constructor.
      *
      * @param FragmentRendererInterface[] $renderers An array of FragmentRendererInterface instances
-     * @param Boolean                     $debug     Whether the debug mode is enabled or not
+     * @param bool                        $debug     Whether the debug mode is enabled or not
      */
     public function __construct(array $renderers = array(), $debug = false)
     {

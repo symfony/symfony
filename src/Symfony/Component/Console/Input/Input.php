@@ -90,7 +90,7 @@ abstract class Input implements InputInterface
     /**
      * Sets the input interactivity.
      *
-     * @param Boolean $interactive If the input should be interactive
+     * @param bool    $interactive If the input should be interactive
      */
     public function setInteractive($interactive)
     {

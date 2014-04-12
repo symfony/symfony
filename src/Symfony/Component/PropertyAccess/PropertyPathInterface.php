@@ -54,7 +54,7 @@ interface PropertyPathInterface extends \Traversable
     /**
      * Returns the element at the given index in the property path
      *
-     * @param  integer $index The index key
+     * @param  int     $index The index key
      *
      * @return string A property or index name
      *
@@ -65,7 +65,7 @@ interface PropertyPathInterface extends \Traversable
     /**
      * Returns whether the element at the given index is a property
      *
-     * @param  integer $index The index in the property path
+     * @param  int     $index The index in the property path
      *
      * @return Boolean Whether the element at this index is a property
      *
@@ -76,7 +76,7 @@ interface PropertyPathInterface extends \Traversable
     /**
      * Returns whether the element at the given index is an array index
      *
-     * @param  integer $index The index in the property path
+     * @param  int     $index The index in the property path
      *
      * @return Boolean Whether the element at this index is an array index
      *

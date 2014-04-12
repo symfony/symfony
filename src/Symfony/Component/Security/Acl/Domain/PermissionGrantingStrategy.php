@@ -128,7 +128,7 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
      * @param EntryInterface[]            $aces               An array of ACE to check against
      * @param array                       $masks              An array of permission masks
      * @param SecurityIdentityInterface[] $sids               An array of SecurityIdentityInterface implementations
-     * @param Boolean                     $administrativeMode True turns off audit logging
+     * @param bool                        $administrativeMode True turns off audit logging
      *
      * @return Boolean true, or false; either granting, or denying access respectively.
      *
@@ -188,7 +188,7 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
      * Strategy EQUAL:
      * The ACE will be considered applicable when the bitmasks are equal.
      *
-     * @param integer        $requiredMask
+     * @param int            $requiredMask
      * @param EntryInterface $ace
      *
      * @return Boolean

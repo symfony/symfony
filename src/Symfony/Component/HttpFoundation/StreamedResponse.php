@@ -35,7 +35,7 @@ class StreamedResponse extends Response
      * Constructor.
      *
      * @param mixed   $callback A valid PHP callback
-     * @param integer $status   The response status code
+     * @param int     $status   The response status code
      * @param array   $headers  An array of response headers
      *
      * @api

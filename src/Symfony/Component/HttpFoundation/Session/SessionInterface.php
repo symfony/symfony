@@ -73,7 +73,7 @@ interface SessionInterface
      * Clears all session attributes and flashes and regenerates the
      * session and deletes the old session from persistence.
      *
-     * @param integer $lifetime Sets the cookie lifetime for the session cookie. A null value
+     * @param int     $lifetime Sets the cookie lifetime for the session cookie. A null value
      *                          will leave the system settings unchanged, 0 sets the cookie
      *                          to expire with browser session. Time is in seconds, and is
      *                          not a Unix timestamp.
@@ -88,8 +88,8 @@ interface SessionInterface
      * Migrates the current session to a new session id while maintaining all
      * session attributes.
      *
-     * @param Boolean $destroy  Whether to delete the old session or leave it to garbage collection.
-     * @param integer $lifetime Sets the cookie lifetime for the session cookie. A null value
+     * @param bool    $destroy  Whether to delete the old session or leave it to garbage collection.
+     * @param int     $lifetime Sets the cookie lifetime for the session cookie. A null value
      *                          will leave the system settings unchanged, 0 sets the cookie
      *                          to expire with browser session. Time is in seconds, and is
      *                          not a Unix timestamp.

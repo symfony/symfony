@@ -90,7 +90,7 @@ interface SessionHandlerInterface
      *
      * @see http://php.net/sessionhandlerinterface.gc
      *
-     * @param integer $lifetime Max lifetime in seconds to keep sessions stored.
+     * @param int     $lifetime Max lifetime in seconds to keep sessions stored.
      *
      * @throws \RuntimeException On fatal error.
      *

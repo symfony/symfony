@@ -109,7 +109,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      * Sets whether to add default values for this array if it has not been
      * defined in any of the configuration files.
      *
-     * @param Boolean $boolean
+     * @param bool    $boolean
      */
     public function setAddIfNotSet($boolean)
     {
@@ -119,7 +119,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     /**
      * Sets whether false is allowed as value indicating that the array should be unset.
      *
-     * @param Boolean $allow
+     * @param bool    $allow
      */
     public function setAllowFalse($allow)
     {
@@ -129,7 +129,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     /**
      * Sets whether new keys can be defined in subsequent configurations.
      *
-     * @param Boolean $allow
+     * @param bool    $allow
      */
     public function setAllowNewKeys($allow)
     {
@@ -139,7 +139,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     /**
      * Sets if deep merging should occur.
      *
-     * @param Boolean $boolean
+     * @param bool    $boolean
      */
     public function setPerformDeepMerging($boolean)
     {
@@ -149,7 +149,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     /**
      * Whether extra keys should just be ignore without an exception.
      *
-     * @param Boolean $boolean To allow extra keys
+     * @param bool    $boolean To allow extra keys
      */
     public function setIgnoreExtraKeys($boolean)
     {

@@ -103,7 +103,7 @@ class ClassLoader
     /**
      * Turns on searching the include for class files.
      *
-     * @param Boolean $useIncludePath
+     * @param bool    $useIncludePath
      */
     public function setUseIncludePath($useIncludePath)
     {
@@ -124,7 +124,7 @@ class ClassLoader
     /**
      * Registers this instance as an autoloader.
      *
-     * @param Boolean $prepend Whether to prepend the autoloader or not
+     * @param bool    $prepend Whether to prepend the autoloader or not
      */
     public function register($prepend = false)
     {

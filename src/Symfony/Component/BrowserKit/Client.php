@@ -70,7 +70,7 @@ abstract class Client
     /**
      * Sets whether to automatically follow redirects or not.
      *
-     * @param Boolean $followRedirect Whether to follow redirects
+     * @param bool    $followRedirect Whether to follow redirects
      *
      * @api
      */
@@ -82,7 +82,7 @@ abstract class Client
     /**
      * Sets the maximum number of requests that crawler can follow.
      *
-     * @param integer $maxRedirects
+     * @param int     $maxRedirects
      */
     public function setMaxRedirects($maxRedirects)
     {
@@ -93,7 +93,7 @@ abstract class Client
     /**
      * Sets the insulated flag.
      *
-     * @param Boolean $insulated Whether to insulate the requests or not
+     * @param bool    $insulated Whether to insulate the requests or not
      *
      * @throws \RuntimeException When Symfony Process Component is not installed
      *
@@ -287,7 +287,7 @@ abstract class Client
      * @param array   $files         The files
      * @param array   $server        The server parameters (HTTP headers are referenced with a HTTP_ prefix as PHP does)
      * @param string  $content       The raw body data
-     * @param Boolean $changeHistory Whether to update the history or not (only used internally for back(), forward(), and reload())
+     * @param bool    $changeHistory Whether to update the history or not (only used internally for back(), forward(), and reload())
      *
      * @return Crawler
      *
@@ -601,7 +601,7 @@ abstract class Client
      * Makes a request from a Request object directly.
      *
      * @param Request $request       A Request instance
-     * @param Boolean $changeHistory Whether to update the history or not (only used internally for back(), forward(), and reload())
+     * @param bool    $changeHistory Whether to update the history or not (only used internally for back(), forward(), and reload())
      *
      * @return Crawler
      */

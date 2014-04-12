@@ -21,7 +21,7 @@ interface FileLocatorInterface
      *
      * @param mixed   $name        The file name to locate
      * @param string  $currentPath The current path
-     * @param Boolean $first       Whether to return the first occurrence or an array of filenames
+     * @param bool    $first       Whether to return the first occurrence or an array of filenames
      *
      * @return string|array The full path to the file|An array of file paths
      *

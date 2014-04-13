@@ -107,7 +107,7 @@ class Crawler extends \SplObjectStorage
 
         // DOM only for HTML/XML content
         if (!preg_match('/(x|ht)ml/i', $type, $xmlMatches)) {
-            return null;
+            return;
         }
 
         $charset = null;
@@ -294,7 +294,7 @@ class Crawler extends \SplObjectStorage
     /**
      * Returns a node given its position in the node list.
      *
-     * @param integer $position The position
+     * @param int     $position The position
      *
      * @return Crawler A new instance of the Crawler with the selected node, or an empty Crawler if it does not exist.
      *
@@ -337,6 +337,19 @@ class Crawler extends \SplObjectStorage
         }
 
         return $data;
+    }
+
+    /**
+     * Slices the list of nodes by $offset and $length.
+     *
+     * @param int     $offset
+     * @param int     $length
+     *
+     * @return Crawler A Crawler instance with the sliced nodes.
+     */
+    public function slice($offset = 0, $length = -1)
+    {
+        return new static(iterator_to_array(new \LimitIterator($this, $offset, $length)), $this->uri);
     }
 
     /**
@@ -806,7 +819,7 @@ class Crawler extends \SplObjectStorage
     }
 
     /**
-     * @param integer $position
+     * @param int     $position
      *
      * @return \DOMElement|null
      */
@@ -818,7 +831,7 @@ class Crawler extends \SplObjectStorage
             }
         }
 
-        return null;
+        return;
     }
 
     /**

@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\TwigBundle\Debug;
 
 use Symfony\Bundle\TwigBundle\TwigEngine;
-use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
 use Symfony\Component\Templating\TemplateNameParserInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\Config\FileLocatorInterface;
@@ -33,11 +32,10 @@ class TimedTwigEngine extends TwigEngine
      * @param TemplateNameParserInterface $parser      A TemplateNameParserInterface instance
      * @param FileLocatorInterface        $locator     A FileLocatorInterface instance
      * @param Stopwatch                   $stopwatch   A Stopwatch instance
-     * @param GlobalVariables             $globals     A GlobalVariables instance
      */
-    public function __construct(\Twig_Environment $environment, TemplateNameParserInterface $parser, FileLocatorInterface $locator, Stopwatch $stopwatch, GlobalVariables $globals = null)
+    public function __construct(\Twig_Environment $environment, TemplateNameParserInterface $parser, FileLocatorInterface $locator, Stopwatch $stopwatch)
     {
-        parent::__construct($environment, $parser, $locator, $globals);
+        parent::__construct($environment, $parser, $locator);
 
         $this->stopwatch = $stopwatch;
     }

@@ -91,6 +91,13 @@
     <service id="decorated" class="stdClass"/>
     <service id="decorator_service" class="stdClass" decorates="decorated"/>
     <service id="decorator_service_with_name" class="stdClass" decorates="decorated" decoration-inner-name="decorated.pif-pouf"/>
+    <service id="new_factory" class="FactoryClass" public="false">
+      <property name="foo">bar</property>
+    </service>
+    <service id="new_factory_service" class="FooBarBaz">
+      <property name="foo">bar</property>
+      <factory service="new_factory" method="getInstance"/>
+    </service>
     <service id="alias_for_foo" alias="foo"/>
     <service id="alias_for_alias" alias="foo"/>
   </services>

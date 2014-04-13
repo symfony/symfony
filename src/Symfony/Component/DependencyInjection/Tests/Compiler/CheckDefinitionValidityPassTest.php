@@ -50,6 +50,17 @@ class CheckDefinitionValidityPassTest extends \PHPUnit_Framework_TestCase
         $this->process($container);
     }
 
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     */
+    public function testProcessDetectsBothFactorySyntaxesUsed()
+    {
+        $container = new ContainerBuilder();
+        $container->register('a')->setFactory(array('a', 'b'))->setFactoryClass('a');
+
+        $this->process($container);
+    }
+
     public function testProcess()
     {
         $container = new ContainerBuilder();

@@ -52,5 +52,14 @@
     <service id="request" class="Request" synthetic="true" synchronized="true" lazy="true"/>
     <service id="decorator_service" decorates="decorated" />
     <service id="decorator_service_with_name" decorates="decorated" decoration-inner-name="decorated.pif-pouf"/>
+    <service id="new_factory1" class="FooBarClass">
+      <factory function="factory" />
+    </service>
+    <service id="new_factory2" class="FooBarClass">
+      <factory service="baz" method="getClass" />
+    </service>
+    <service id="new_factory3" class="FooBarClass">
+      <factory class="BazClass" method="getInstance" />
+    </service>
   </services>
 </container>

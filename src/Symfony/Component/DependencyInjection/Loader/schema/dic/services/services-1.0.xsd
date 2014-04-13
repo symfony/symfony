@@ -64,7 +64,7 @@
     <xsd:attribute name="ignore-errors" type="boolean" />
   </xsd:complexType>
 
-  <xsd:complexType name="configurator">
+  <xsd:complexType name="callable">
     <xsd:attribute name="id" type="xsd:string" />
     <xsd:attribute name="service" type="xsd:string" />
     <xsd:attribute name="class" type="xsd:string" />
@@ -76,7 +76,8 @@
     <xsd:choice maxOccurs="unbounded">
       <xsd:element name="file" type="xsd:string" minOccurs="0" maxOccurs="1" />
       <xsd:element name="argument" type="argument" minOccurs="0" maxOccurs="unbounded" />
-      <xsd:element name="configurator" type="configurator" minOccurs="0" maxOccurs="1" />
+      <xsd:element name="configurator" type="callable" minOccurs="0" maxOccurs="1" />
+      <xsd:element name="factory" type="callable" minOccurs="0" maxOccurs="1" />
       <xsd:element name="call" type="call" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="tag" type="tag" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="property" type="property" minOccurs="0" maxOccurs="unbounded" />

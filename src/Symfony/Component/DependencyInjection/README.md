@@ -38,8 +38,7 @@ If your service is retrieved by calling a static method:
 
     $sc
         ->register('bar', '%bar.class%')
-        ->setFactoryClass('%bar.class%')
-        ->setFactoryMethod('getInstance')
+        ->setFactory(array('%bar.class%', 'getInstance'))
         ->addArgument('Aarrg!!!')
     ;
     $sc->setParameter('bar.class', 'Bar');

@@ -81,6 +81,18 @@ class DefinitionDecorator extends Definition
      *
      * @api
      */
+    public function setFactory($callable)
+    {
+        $this->changes['factory'] = true;
+
+        return parent::setFactory($callable);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @api
+     */
     public function setFactoryClass($class)
     {
         $this->changes['factory_class'] = true;

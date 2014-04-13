@@ -56,9 +56,16 @@ class CheckDefinitionValidityPass implements CompilerPassInterface
                 ));
             }
 
+            if ($definition->getFactory() && ($definition->getFactoryClass() || $definition->getFactoryService() || $definition->getFactoryMethod())) {
+                throw new RuntimeException(sprintf(
+                   'A service ("%s") can use either the old or the new factory syntax, not both.',
+                   $id
+                ));
+            }
+
             // non-synthetic, non-abstract service has class
             if (!$definition->isAbstract() && !$definition->isSynthetic() && !$definition->getClass()) {
-                if ($definition->getFactoryClass() || $definition->getFactoryService()) {
+                if ($definition->getFactory() || $definition->getFactoryClass() || $definition->getFactoryService()) {
                     throw new RuntimeException(sprintf(
                         'Please add the class to service "%s" even if it is constructed by a factory '
                        .'since we might need to add method calls based on compile-time checks.',

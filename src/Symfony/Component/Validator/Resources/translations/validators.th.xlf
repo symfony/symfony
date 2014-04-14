@@ -4,15 +4,15 @@
         <body>
             <trans-unit id="1">
                 <source>This value should be false.</source>
-                <target>ค่านี้ควรจะเป็น false.</target>
+                <target>ค่านี้ควรจะเป็น false</target>
             </trans-unit>
             <trans-unit id="2">
                 <source>This value should be true.</source>
-                <target>ค่านี้ควรจะเป็น true.</target>
+                <target>ค่านี้ควรจะเป็น true</target>
             </trans-unit>
             <trans-unit id="3">
                 <source>This value should be of type {{ type }}.</source>
-                <target>ค่านี้ควรจะเป็นแบบ {{ type }}.</target>
+                <target>ค่านี้ควรจะเป็นชนิด {{ type }}</target>
             </trans-unit>
             <trans-unit id="4">
                 <source>This value should be blank.</source>

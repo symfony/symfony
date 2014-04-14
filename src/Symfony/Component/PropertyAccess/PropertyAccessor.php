@@ -231,7 +231,11 @@ class PropertyAccessor implements PropertyAccessorInterface
             // Create missing nested arrays on demand
             if ($isIndex && $isArrayAccess && !isset($objectOrArray[$property])) {
                 if (!$ignoreInvalidIndices) {
-                    throw new NoSuchIndexException(sprintf('Cannot read property "%s". Available properties are "%s"', $property, print_r(array_keys($objectOrArray), true)));
+                    $message = sprintf('Cannot read property "%s".', $property);
+                    if (is_array($objectOrArray)) {
+                        $message .= sprintf(' Available properties are "%s"', print_r(array_keys($objectOrArray), true));
+                    }
+                    throw new NoSuchIndexException($message);
                 }
 
                 $objectOrArray[$property] = $i + 1 < $propertyPath->getLength() ? array() : null;

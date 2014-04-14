@@ -278,6 +278,26 @@
                 <source>This value should not be identical to {{ compared_value_type }} {{ compared_value }}.</source>
                 <target>Tato hodnota nesmí být typu {{ compared_value_type }} a zároveň nesmí být rovna {{ compared_value }}.</target>
             </trans-unit>
+            <trans-unit id="73">
+                <source>The image ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
+                <target>Poměr stran obrázku je příliš velký ({{ ratio }}). Maximální povolený poměr stran obrázku je {{ max_ratio }}.</target>
+            </trans-unit>
+            <trans-unit id="74">
+                <source>The image ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.</source>
+                <target>Poměr stran obrázku je příliš malý ({{ ratio }}). Minimální povolený poměr stran obrázku je {{ min_ratio }}.</target>
+            </trans-unit>
+            <trans-unit id="75">
+                <source>The image is square ({{ width }}x{{ height }}px). Square images are not allowed.</source>
+                <target>Strany obrázku jsou čtvercové ({{ width }}x{{ height }}px). Čtvercové obrázky nejsou povolené.</target>
+            </trans-unit>
+            <trans-unit id="76">
+                <source>The image is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented images are not allowed.</source>
+                <target>Obrázek je orientovaný na šířku ({{ width }}x{{ height }}px). Obrázky orientované na šířku nejsou povolené.</target>
+            </trans-unit>
+            <trans-unit id="77">
+                <source>The image is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented images are not allowed.</source>
+                <target>Obrázek je orientovaný na výšku ({{ width }}x{{ height }}px). Obrázky orientované na výšku nejsou povolené.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

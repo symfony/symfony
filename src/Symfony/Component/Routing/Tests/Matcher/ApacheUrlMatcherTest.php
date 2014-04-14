@@ -40,7 +40,7 @@ class ApacheUrlMatcherTest extends \PHPUnit_Framework_TestCase
 
         $_SERVER = $server;
 
-        $result = $matcher->match($pathinfo, $server);
+        $result = $matcher->match($pathinfo);
         $this->assertSame(var_export($expect, true), var_export($result, true));
     }
 

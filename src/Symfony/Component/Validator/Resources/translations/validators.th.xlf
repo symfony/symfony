@@ -44,15 +44,15 @@
             </trans-unit>
             <trans-unit id="11">
                 <source>This value is not a valid date.</source>
-                <target>วันที่ไม่ถูกต้อง</target>
+                <target>ค่าของวันที่ไม่ถูกต้อง</target>
             </trans-unit>
             <trans-unit id="12">
                 <source>This value is not a valid datetime.</source>
-                <target>วันที่และเวลาไม่ถูกต้อง</target>
+                <target>ค่าของวันที่และเวลาไม่ถูกต้อง</target>
             </trans-unit>
             <trans-unit id="13">
                 <source>This value is not a valid email address.</source>
-                <target>อีเมล์ไม่ถูกต้อง</target>
+                <target>ค่าของอีเมล์ไม่ถูกต้อง</target>
             </trans-unit>
             <trans-unit id="14">
                 <source>The file could not be found.</source>

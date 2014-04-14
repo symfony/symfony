@@ -192,7 +192,7 @@
             </trans-unit>
             <trans-unit id="51">
                 <source>No temporary folder was configured in php.ini.</source>
-                <target>ไม่พบไฟล์ temp ควรจะกำหนดใน php.ini.</target>
+                <target>ไม่พบไฟล์ temp ควรจะกำหนดใน php.ini</target>
             </trans-unit>
             <trans-unit id="52">
                 <source>Cannot write temporary file to disk.</source>
@@ -256,7 +256,7 @@
             </trans-unit>
             <trans-unit id="67">
                 <source>This value should be greater than or equal to {{ compared_value }}.</source>
-                <target>ค่านี้ควรจะมากกว่าหรือตรงกับ {{ compared_value }}.</target>
+                <target>ค่านี้ควรจะมากกว่าหรือตรงกับ {{ compared_value }}</target>
             </trans-unit>
             <trans-unit id="68">
                 <source>This value should be identical to {{ compared_value_type }} {{ compared_value }}.</source>
@@ -268,15 +268,15 @@
             </trans-unit>
             <trans-unit id="70">
                 <source>This value should be less than or equal to {{ compared_value }}.</source>
-                <target>ค่านี้ควรจะน้อยกว่าหรือเท่ากับ {{ compared_value }}.</target>
+                <target>ค่านี้ควรจะน้อยกว่าหรือเท่ากับ {{ compared_value }}</target>
             </trans-unit>
             <trans-unit id="71">
                 <source>This value should not be equal to {{ compared_value }}.</source>
-                <target>ค่านี้ไม่ควรเท่ากันกับ {{ compared_value }}.</target>
+                <target>ค่านี้ไม่ควรเท่ากันกับ {{ compared_value }}</target>
             </trans-unit>
             <trans-unit id="72">
                 <source>This value should not be identical to {{ compared_value_type }} {{ compared_value }}.</source>
-                <target>ค่านี้ไม่ควรเหมือนกันกับ {{ compared_value_type }} {{ compared_value }}.</target>
+                <target>ค่านี้ไม่ควรเหมือนกันกับ {{ compared_value_type }} {{ compared_value }}</target>
             </trans-unit>
         </body>
     </file>

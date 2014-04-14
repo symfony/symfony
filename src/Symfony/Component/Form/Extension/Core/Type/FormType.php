@@ -196,7 +196,7 @@ class FormType extends BaseType
             'empty_data'         => $emptyData,
             'trim'               => true,
             'required'           => true,
-            'read_only'          => false, //Deprecated use attr['read_only'] instead
+            'read_only'          => false, //Deprecated use attr['readonly'] instead
             'max_length'         => null,
             'pattern'            => null,
             'property_path'      => null,

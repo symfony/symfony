@@ -559,7 +559,7 @@
                 {% endfor %}
             </optgroup>
         {% else %}
-            <option value="{{ choice.value }}"{% if choice is selectedchoice(value) %} selected="selected"{% endif %}>
+            <option value="{{ choice.value }}"{% if choice is selectedchoice(choices) %} selected="selected"{% endif %}>
                 {{ label }}
             </option>
         {% endif %}

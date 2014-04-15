@@ -17,14 +17,14 @@ namespace Symfony\Component\Finder\Adapter;
 interface AdapterInterface
 {
     /**
-     * @param Boolean $followLinks
+     * @param bool    $followLinks
      *
      * @return AdapterInterface Current instance
      */
     public function setFollowLinks($followLinks);
 
     /**
-     * @param integer $mode
+     * @param int     $mode
      *
      * @return AdapterInterface Current instance
      */
@@ -115,7 +115,7 @@ interface AdapterInterface
     public function setNotPath(array $notPaths);
 
     /**
-     * @param boolean $ignore
+     * @param bool    $ignore
      *
      * @return AdapterInterface Current instance
      */

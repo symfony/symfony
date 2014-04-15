@@ -220,7 +220,7 @@ EOF;
 
     public function setProcessIsolation($processIsolation)
     {
-        $this->processIsolation = (Boolean) $processIsolation;
+        $this->processIsolation = (bool) $processIsolation;
 
         if ($this->processIsolation && !class_exists('Symfony\\Component\\Process\\Process')) {
             throw new \RuntimeException('Unable to isolate processes as the Symfony Process Component is not installed.');

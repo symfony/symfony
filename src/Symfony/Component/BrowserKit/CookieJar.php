@@ -201,7 +201,7 @@ class CookieJar
      * Returns not yet expired cookie values for the given URI.
      *
      * @param string  $uri             A URI
-     * @param Boolean $returnsRawValue Returns raw value or urldecoded value
+     * @param bool    $returnsRawValue Returns raw value or urldecoded value
      *
      * @return array An array of cookie values
      */

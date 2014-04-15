@@ -72,7 +72,7 @@ class ConstraintViolation implements ConstraintViolationInterface
      *                                            value.
      * @param mixed        $invalidValue          The invalid value causing the
      *                                            violation.
-     * @param integer|null $messagePluralization  The pluralization parameter.
+     * @param int    |null $messagePluralization  The pluralization parameter.
      * @param mixed        $code                  The error code of the
      *                                            violation, if any.
      */

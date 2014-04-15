@@ -121,6 +121,6 @@ abstract class Extension implements ExtensionInterface, ConfigurationExtensionIn
             throw new InvalidArgumentException("The config array has no 'enabled' key.");
         }
 
-        return (Boolean) $container->getParameterBag()->resolveValue($config['enabled']);
+        return (bool) $container->getParameterBag()->resolveValue($config['enabled']);
     }
 }

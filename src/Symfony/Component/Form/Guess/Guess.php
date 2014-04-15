@@ -86,7 +86,7 @@ abstract class Guess
     /**
      * Constructor.
      *
-     * @param integer $confidence The confidence
+     * @param int     $confidence The confidence
      *
      * @throws InvalidArgumentException if the given value of confidence is unknown
      */

@@ -112,6 +112,6 @@ class GlobalVariables
      */
     public function getDebug()
     {
-        return (Boolean) $this->container->getParameter('kernel.debug');
+        return (bool) $this->container->getParameter('kernel.debug');
     }
 }

@@ -169,7 +169,7 @@ class MoFileLoader extends ArrayLoader implements LoaderInterface
      * Reads an unsigned long from stream respecting endianess.
      *
      * @param  resource $stream
-     * @param  boolean  $isBigEndian
+     * @param  bool     $isBigEndian
      * @return integer
      */
     private function readLong($stream, $isBigEndian)
@@ -177,6 +177,6 @@ class MoFileLoader extends ArrayLoader implements LoaderInterface
         $result = unpack($isBigEndian ? 'N1' : 'V1', fread($stream, 4));
         $result = current($result);
 
-        return (integer) substr($result, -8);
+        return (int) substr($result, -8);
     }
 }

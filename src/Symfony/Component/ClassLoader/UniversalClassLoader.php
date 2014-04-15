@@ -70,7 +70,7 @@ class UniversalClassLoader
      * Turns on searching the include for class files. Allows easy loading
      * of installed PEAR packages
      *
-     * @param Boolean $useIncludePath
+     * @param bool    $useIncludePath
      */
     public function useIncludePath($useIncludePath)
     {
@@ -229,7 +229,7 @@ class UniversalClassLoader
     /**
      * Registers this instance as an autoloader.
      *
-     * @param Boolean $prepend Whether to prepend the autoloader or not
+     * @param bool    $prepend Whether to prepend the autoloader or not
      *
      * @api
      */

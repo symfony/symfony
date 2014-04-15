@@ -29,7 +29,7 @@ class Filesystem
      *
      * @param string  $originFile The original filename
      * @param string  $targetFile The target filename
-     * @param boolean $override   Whether to override an existing file or not
+     * @param bool    $override   Whether to override an existing file or not
      *
      * @throws IOException When copy fails
      */
@@ -66,7 +66,7 @@ class Filesystem
      * Creates a directory recursively.
      *
      * @param string|array|\Traversable $dirs The directory path
-     * @param integer                   $mode The directory mode
+     * @param int                       $mode The directory mode
      *
      * @throws IOException On any directory creation failure
      */
@@ -105,8 +105,8 @@ class Filesystem
      * Sets access and modification time of file.
      *
      * @param string|array|\Traversable $files A filename, an array of files, or a \Traversable instance to create
-     * @param integer                   $time  The touch time as a Unix timestamp
-     * @param integer                   $atime The access time as a Unix timestamp
+     * @param int                       $time  The touch time as a Unix timestamp
+     * @param int                       $atime The access time as a Unix timestamp
      *
      * @throws IOException When touch fails
      */
@@ -161,9 +161,9 @@ class Filesystem
      * Change mode for an array of files or directories.
      *
      * @param string|array|\Traversable $files     A filename, an array of files, or a \Traversable instance to change mode
-     * @param integer                   $mode      The new mode (octal)
-     * @param integer                   $umask     The mode mask (octal)
-     * @param Boolean                   $recursive Whether change the mod recursively or not
+     * @param int                       $mode      The new mode (octal)
+     * @param int                       $umask     The mode mask (octal)
+     * @param bool                      $recursive Whether change the mod recursively or not
      *
      * @throws IOException When the change fail
      */
@@ -184,7 +184,7 @@ class Filesystem
      *
      * @param string|array|\Traversable $files     A filename, an array of files, or a \Traversable instance to change owner
      * @param string                    $user      The new owner user name
-     * @param Boolean                   $recursive Whether change the owner recursively or not
+     * @param bool                      $recursive Whether change the owner recursively or not
      *
      * @throws IOException When the change fail
      */
@@ -211,7 +211,7 @@ class Filesystem
      *
      * @param string|array|\Traversable $files     A filename, an array of files, or a \Traversable instance to change group
      * @param string                    $group     The group name
-     * @param Boolean                   $recursive Whether change the group recursively or not
+     * @param bool                      $recursive Whether change the group recursively or not
      *
      * @throws IOException When the change fail
      */
@@ -238,7 +238,7 @@ class Filesystem
      *
      * @param string  $origin    The origin filename or directory
      * @param string  $target    The new filename or directory
-     * @param Boolean $overwrite Whether to overwrite the target if it already exists
+     * @param bool    $overwrite Whether to overwrite the target if it already exists
      *
      * @throws IOException When target file or directory already exists
      * @throws IOException When origin cannot be renamed
@@ -260,7 +260,7 @@ class Filesystem
      *
      * @param string  $originDir     The origin directory path
      * @param string  $targetDir     The symbolic link name
-     * @param Boolean $copyOnWindows Whether to copy files if on Windows
+     * @param bool    $copyOnWindows Whether to copy files if on Windows
      *
      * @throws IOException When symlink fails
      */

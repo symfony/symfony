@@ -146,7 +146,7 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface
      *                                     themes.
      * @param array    $blockNameHierarchy The block hierarchy, with the most
      *                                     specific block name at the end.
-     * @param integer  $hierarchyLevel     The level in the block hierarchy that
+     * @param int      $hierarchyLevel     The level in the block hierarchy that
      *                                     should be loaded.
      *
      * @return Boolean True if the resource could be loaded, false otherwise.

@@ -41,8 +41,8 @@ class WebDebugToolbarListener implements EventSubscriberInterface
     public function __construct(\Twig_Environment $twig, $interceptRedirects = false, $mode = self::ENABLED, $position = 'bottom')
     {
         $this->twig = $twig;
-        $this->interceptRedirects = (Boolean) $interceptRedirects;
-        $this->mode = (integer) $mode;
+        $this->interceptRedirects = (bool) $interceptRedirects;
+        $this->mode = (int) $mode;
         $this->position = $position;
     }
 

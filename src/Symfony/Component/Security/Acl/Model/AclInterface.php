@@ -82,7 +82,7 @@ interface AclInterface extends \Serializable
      * @param string  $field
      * @param array   $masks
      * @param array   $securityIdentities
-     * @param Boolean $administrativeMode
+     * @param bool    $administrativeMode
      * @return Boolean
      */
     public function isFieldGranted($field, array $masks, array $securityIdentities, $administrativeMode = false);
@@ -93,7 +93,7 @@ interface AclInterface extends \Serializable
      * @throws NoAceFoundException when no ACE was applicable for this request
      * @param array   $masks
      * @param array   $securityIdentities
-     * @param Boolean $administrativeMode
+     * @param bool    $administrativeMode
      * @return Boolean
      */
     public function isGranted(array $masks, array $securityIdentities, $administrativeMode = false);

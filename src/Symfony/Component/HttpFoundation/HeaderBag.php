@@ -119,7 +119,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      *
      * @param string  $key     The header name
      * @param mixed   $default The default value
-     * @param Boolean $first   Whether to return the first value or all header values
+     * @param bool    $first   Whether to return the first value or all header values
      *
      * @return string|array The first header value if $first is true, an array of values otherwise
      *
@@ -149,7 +149,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      *
      * @param string       $key     The key
      * @param string|array $values  The value or an array of values
-     * @param Boolean      $replace Whether to replace the actual value or not (true by default)
+     * @param bool         $replace Whether to replace the actual value or not (true by default)
      *
      * @api
      */

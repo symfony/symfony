@@ -100,7 +100,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      *
      * @param object|array          $objectOrArray The object or array to read from
      * @param PropertyPathInterface $propertyPath  The property path to read
-     * @param integer               $lastIndex     The index up to which should be read
+     * @param int                   $lastIndex     The index up to which should be read
      *
      * @return array The values read in the path.
      *
@@ -424,7 +424,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      *
      * @param  \ReflectionClass $class      The class of the method
      * @param  string           $methodName The method name
-     * @param  integer          $parameters The number of parameters
+     * @param  int              $parameters The number of parameters
      *
      * @return Boolean Whether the method is public and has $parameters
      *                                      required parameters

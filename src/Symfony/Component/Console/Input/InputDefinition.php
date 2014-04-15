@@ -433,7 +433,7 @@ class InputDefinition
     /**
      * Returns an XML representation of the InputDefinition.
      *
-     * @param Boolean $asDom Whether to return a DOM or an XML string
+     * @param bool    $asDom Whether to return a DOM or an XML string
      *
      * @return string|\DOMDocument An XML string representing the InputDefinition
      *

@@ -124,7 +124,7 @@ class XliffFileLoader implements LoaderInterface
     /**
      * Returns the XML errors of the internal XML parser
      *
-     * @param Boolean $internalErrors
+     * @param bool    $internalErrors
      *
      * @return array An array of errors
      */

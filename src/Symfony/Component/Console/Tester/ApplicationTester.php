@@ -78,7 +78,7 @@ class ApplicationTester
     /**
      * Gets the display returned by the last execution of the application.
      *
-     * @param Boolean $normalize Whether to normalize end of lines to \n or not
+     * @param bool    $normalize Whether to normalize end of lines to \n or not
      *
      * @return string The display
      */

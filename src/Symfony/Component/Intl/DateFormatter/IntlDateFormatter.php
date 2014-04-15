@@ -187,7 +187,7 @@ class IntlDateFormatter
     /**
      * Format the date/time value (timestamp) as a string
      *
-     * @param integer|\DateTime $timestamp The timestamp to format. \DateTime objects
+     * @param int    |\DateTime $timestamp The timestamp to format. \DateTime objects
      *                                     are supported as of PHP 5.3.4.
      *
      * @return string|Boolean The formatted value or false if formatting failed.
@@ -489,7 +489,7 @@ class IntlDateFormatter
      * patterns, parsing as much as possible to obtain a value. Extra space, unrecognized tokens, or
      * invalid values ("February 30th") are not accepted.
      *
-     * @param Boolean $lenient Sets whether the parser is lenient or not. Currently
+     * @param bool    $lenient Sets whether the parser is lenient or not. Currently
      *                         only false (strict) is supported.
      *
      * @return Boolean true on success or false on failure

@@ -39,7 +39,7 @@ class ReferenceDumper
 
     /**
      * @param NodeInterface $node
-     * @param integer       $depth
+     * @param int           $depth
      */
     private function writeNode(NodeInterface $node, $depth = 0)
     {

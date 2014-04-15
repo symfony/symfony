@@ -36,7 +36,7 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
      *
      * @param string  $path
      * @param int     $flags
-     * @param boolean $ignoreUnreadableDirs
+     * @param bool    $ignoreUnreadableDirs
      *
      * @throws \RuntimeException
      */

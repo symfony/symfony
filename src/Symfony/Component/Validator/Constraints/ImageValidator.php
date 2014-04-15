@@ -23,7 +23,7 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 class ImageValidator extends FileValidator
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function validate($value, Constraint $constraint)
     {

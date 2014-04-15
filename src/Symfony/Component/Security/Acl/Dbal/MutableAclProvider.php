@@ -36,7 +36,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
     private $propertyChanges;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function __construct(Connection $connection, PermissionGrantingStrategyInterface $permissionGrantingStrategy, array $options, AclCacheInterface $cache = null)
     {
@@ -46,7 +46,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function createAcl(ObjectIdentityInterface $oid)
     {
@@ -73,7 +73,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function deleteAcl(ObjectIdentityInterface $oid)
     {
@@ -109,7 +109,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function findAcls(array $oids, array $sids = array())
     {
@@ -216,7 +216,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function updateAcl(MutableAclInterface $acl)
     {

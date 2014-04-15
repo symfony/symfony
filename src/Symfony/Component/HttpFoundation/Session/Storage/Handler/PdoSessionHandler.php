@@ -81,7 +81,7 @@ class PdoSessionHandler implements \SessionHandlerInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function open($path, $name)
     {
@@ -89,7 +89,7 @@ class PdoSessionHandler implements \SessionHandlerInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function close()
     {
@@ -97,7 +97,7 @@ class PdoSessionHandler implements \SessionHandlerInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function destroy($id)
     {
@@ -116,7 +116,7 @@ class PdoSessionHandler implements \SessionHandlerInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function gc($lifetime)
     {
@@ -135,7 +135,7 @@ class PdoSessionHandler implements \SessionHandlerInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function read($id)
     {
@@ -160,7 +160,7 @@ class PdoSessionHandler implements \SessionHandlerInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function write($id, $data)
     {

@@ -56,7 +56,7 @@ class Entry implements AuditableEntryInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getAcl()
     {
@@ -64,7 +64,7 @@ class Entry implements AuditableEntryInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getMask()
     {
@@ -72,7 +72,7 @@ class Entry implements AuditableEntryInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getId()
     {
@@ -80,7 +80,7 @@ class Entry implements AuditableEntryInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getSecurityIdentity()
     {
@@ -88,7 +88,7 @@ class Entry implements AuditableEntryInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getStrategy()
     {
@@ -96,7 +96,7 @@ class Entry implements AuditableEntryInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function isAuditFailure()
     {
@@ -104,7 +104,7 @@ class Entry implements AuditableEntryInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function isAuditSuccess()
     {
@@ -112,7 +112,7 @@ class Entry implements AuditableEntryInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function isGranting()
     {

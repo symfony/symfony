@@ -126,7 +126,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function generate($name, $parameters = array(), $referenceType = self::ABSOLUTE_PATH)
     {

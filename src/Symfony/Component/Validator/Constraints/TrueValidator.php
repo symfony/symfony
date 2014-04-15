@@ -22,7 +22,7 @@ use Symfony\Component\Validator\ConstraintValidator;
 class TrueValidator extends ConstraintValidator
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function validate($value, Constraint $constraint)
     {

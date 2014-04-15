@@ -19,7 +19,7 @@ namespace Symfony\Component\Intl\DateFormatter\DateFormat;
 class DayTransformer extends Transformer
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function format(\DateTime $dateTime, $length)
     {
@@ -27,7 +27,7 @@ class DayTransformer extends Transformer
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getReverseMatchingRegExp($length)
     {
@@ -35,7 +35,7 @@ class DayTransformer extends Transformer
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function extractDateOptions($matched, $length)
     {

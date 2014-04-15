@@ -78,7 +78,7 @@ abstract class Extension implements ExtensionInterface, ConfigurationExtensionIn
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getConfiguration(array $config, ContainerBuilder $container)
     {

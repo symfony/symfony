@@ -393,7 +393,7 @@ class DialogHelper extends Helper
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getName()
     {

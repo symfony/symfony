@@ -166,7 +166,7 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function addConstraint(Constraint $constraint)
     {

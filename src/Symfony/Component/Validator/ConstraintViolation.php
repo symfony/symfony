@@ -118,7 +118,7 @@ class ConstraintViolation implements ConstraintViolationInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getMessageTemplate()
     {
@@ -126,7 +126,7 @@ class ConstraintViolation implements ConstraintViolationInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getMessageParameters()
     {
@@ -134,7 +134,7 @@ class ConstraintViolation implements ConstraintViolationInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getMessagePluralization()
     {
@@ -142,7 +142,7 @@ class ConstraintViolation implements ConstraintViolationInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getMessage()
     {
@@ -150,7 +150,7 @@ class ConstraintViolation implements ConstraintViolationInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getRoot()
     {
@@ -158,7 +158,7 @@ class ConstraintViolation implements ConstraintViolationInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getPropertyPath()
     {
@@ -166,7 +166,7 @@ class ConstraintViolation implements ConstraintViolationInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getInvalidValue()
     {
@@ -174,7 +174,7 @@ class ConstraintViolation implements ConstraintViolationInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getCode()
     {

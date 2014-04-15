@@ -28,7 +28,7 @@ class Regex extends Constraint
     public $match = true;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getDefaultOption()
     {
@@ -36,7 +36,7 @@ class Regex extends Constraint
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getRequiredOptions()
     {

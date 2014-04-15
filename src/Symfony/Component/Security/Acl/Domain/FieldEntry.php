@@ -45,7 +45,7 @@ class FieldEntry extends Entry implements FieldEntryInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getField()
     {
@@ -53,7 +53,7 @@ class FieldEntry extends Entry implements FieldEntryInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function serialize()
     {
@@ -64,7 +64,7 @@ class FieldEntry extends Entry implements FieldEntryInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function unserialize($serialized)
     {

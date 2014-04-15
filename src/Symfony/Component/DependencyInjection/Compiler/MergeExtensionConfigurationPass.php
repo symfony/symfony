@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 class MergeExtensionConfigurationPass implements CompilerPassInterface
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
     {

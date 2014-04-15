@@ -46,7 +46,7 @@ abstract class RedirectableUrlMatcher extends UrlMatcher implements Redirectable
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     protected function handleRouteRequirements($pathinfo, $name, Route $route)
     {

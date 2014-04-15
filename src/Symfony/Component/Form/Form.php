@@ -238,7 +238,7 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function isDisabled()
     {

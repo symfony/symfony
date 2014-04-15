@@ -25,7 +25,7 @@ class Callback extends Constraint
     public $methods;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getRequiredOptions()
     {
@@ -33,7 +33,7 @@ class Callback extends Constraint
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getDefaultOption()
     {
@@ -41,7 +41,7 @@ class Callback extends Constraint
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getTargets()
     {

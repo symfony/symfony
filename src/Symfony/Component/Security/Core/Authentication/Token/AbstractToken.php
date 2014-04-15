@@ -229,7 +229,7 @@ abstract class AbstractToken implements TokenInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function __toString()
     {

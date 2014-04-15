@@ -51,7 +51,7 @@ class StreamedResponse extends Response
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public static function create($callback = null, $status = 200, $headers = array())
     {

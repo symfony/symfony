@@ -392,7 +392,7 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
     /**
      * Sets whether a group sequence provider should be used.
      *
-     * @param Boolean $active
+     * @param bool    $active
      *
      * @throws GroupDefinitionException
      */

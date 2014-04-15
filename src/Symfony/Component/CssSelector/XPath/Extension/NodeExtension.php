@@ -53,7 +53,7 @@ class NodeExtension extends AbstractExtension
 
     /**
      * @param int     $flag
-     * @param boolean $on
+     * @param bool    $on
      *
      * @return NodeExtension
      */

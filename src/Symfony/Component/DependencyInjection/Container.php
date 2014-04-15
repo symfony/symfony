@@ -254,7 +254,7 @@ class Container implements IntrospectableContainerInterface
      * with a get{$id}Service() method, the former has always precedence.
      *
      * @param string  $id              The service identifier
-     * @param integer $invalidBehavior The behavior when the service does not exist
+     * @param int     $invalidBehavior The behavior when the service does not exist
      *
      * @return object The associated service
      *

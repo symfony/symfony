@@ -412,7 +412,7 @@ EOF
      * Renders list of tagged services grouped by tag
      *
      * @param OutputInterface $output
-     * @param Boolean         $showPrivate
+     * @param bool            $showPrivate
      */
     protected function outputTags(OutputInterface $output, $showPrivate = false)
     {

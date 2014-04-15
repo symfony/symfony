@@ -53,7 +53,7 @@ class HttpUtils
      *
      * @param Request $request A Request instance
      * @param string  $path    A path (an absolute path (/foo), an absolute URL (http://...), or a route name (foo))
-     * @param integer $status  The status code
+     * @param int     $status  The status code
      *
      * @return RedirectResponse A RedirectResponse instance
      */

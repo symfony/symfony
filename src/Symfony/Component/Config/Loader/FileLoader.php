@@ -53,7 +53,7 @@ abstract class FileLoader extends Loader
      *
      * @param mixed   $resource       A Resource
      * @param string  $type           The resource type
-     * @param Boolean $ignoreErrors   Whether to ignore import errors or not
+     * @param bool    $ignoreErrors   Whether to ignore import errors or not
      * @param string  $sourceResource The original resource importing the new resource
      *
      * @return mixed

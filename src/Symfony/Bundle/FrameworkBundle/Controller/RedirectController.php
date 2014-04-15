@@ -36,8 +36,8 @@ class RedirectController extends ContainerAware
      *
      * @param Request       $request          The request instance
      * @param string        $route            The route name to redirect to
-     * @param Boolean       $permanent        Whether the redirection is permanent
-     * @param Boolean|array $ignoreAttributes Whether to ignore attributes or an array of attributes to ignore
+     * @param bool          $permanent        Whether the redirection is permanent
+     * @param bool|array    $ignoreAttributes Whether to ignore attributes or an array of attributes to ignore
      *
      * @return Response A Response instance
      *
@@ -72,10 +72,10 @@ class RedirectController extends ContainerAware
      *
      * @param Request      $request   The request instance
      * @param string       $path      The absolute path or URL to redirect to
-     * @param Boolean      $permanent Whether the redirect is permanent or not
+     * @param bool         $permanent Whether the redirect is permanent or not
      * @param string|null  $scheme    The URL scheme (null to keep the current one)
-     * @param integer|null $httpPort  The HTTP port (null to keep the current one for the same scheme or the configured port in the container)
-     * @param integer|null $httpsPort The HTTPS port (null to keep the current one for the same scheme or the configured port in the container)
+     * @param int    |null $httpPort  The HTTP port (null to keep the current one for the same scheme or the configured port in the container)
+     * @param int    |null $httpsPort The HTTPS port (null to keep the current one for the same scheme or the configured port in the container)
      *
      * @return Response A Response instance
      *

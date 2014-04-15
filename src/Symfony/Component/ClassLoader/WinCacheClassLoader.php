@@ -76,7 +76,7 @@ class WinCacheClassLoader
     /**
      * Registers this instance as an autoloader.
      *
-     * @param Boolean $prepend Whether to prepend the autoloader or not
+     * @param bool    $prepend Whether to prepend the autoloader or not
      */
     public function register($prepend = false)
     {

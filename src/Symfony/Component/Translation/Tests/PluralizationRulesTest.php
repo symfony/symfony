@@ -95,7 +95,7 @@ class PluralizationRulesTest  extends \PHPUnit_Framework_TestCase
      *
      * @param string  $nplural       plural expected
      * @param array   $matrix        containing langcodes and their plural index values.
-     * @param boolean $expectSuccess
+     * @param bool    $expectSuccess
      */
     protected function validateMatrix($nplural, $matrix, $expectSuccess = true)
     {

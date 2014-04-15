@@ -216,7 +216,7 @@ abstract class AbstractAdapter implements AdapterInterface
      */
     public function ignoreUnreadableDirs($ignore = true)
     {
-        $this->ignoreUnreadableDirs = (Boolean) $ignore;
+        $this->ignoreUnreadableDirs = (bool) $ignore;
 
         return $this;
     }

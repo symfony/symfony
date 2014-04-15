@@ -198,7 +198,7 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
      * In this example, "address" and "office" map to forms, while
      * "street does not.
      *
-     * @param  integer $index The element index.
+     * @param  int     $index The element index.
      *
      * @return Boolean Whether the element maps to a form.
      *

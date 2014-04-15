@@ -35,8 +35,8 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
     /**
      * Constructor.
      *
-     * @param integer                       $verbosity The verbosity level (one of the VERBOSITY constants in OutputInterface)
-     * @param Boolean|null                  $decorated Whether to decorate messages (null for auto-guessing)
+     * @param int                           $verbosity The verbosity level (one of the VERBOSITY constants in OutputInterface)
+     * @param bool|null                     $decorated Whether to decorate messages (null for auto-guessing)
      * @param OutputFormatterInterface|null $formatter Output formatter instance (null to use default OutputFormatter)
      *
      * @api

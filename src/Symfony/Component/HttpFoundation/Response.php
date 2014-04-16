@@ -1182,7 +1182,7 @@ class Response
      */
     public function isEmpty()
     {
-        return in_array($this->statusCode, array(201, 204, 304));
+        return in_array($this->statusCode, array(204, 304));
     }
 
     /**

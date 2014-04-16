@@ -26,8 +26,7 @@ use Doctrine\DBAL\Platforms\SQLServerPlatform;
  * DBAL based session storage.
  *
  * This implementation is very similar to Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler
- * but uses the Doctrine driver connection interface for non-PDO-based drivers like mysqli or OCI8.
- * It is recommended to use the wrapper Doctrine\DBAL\Connection for lazy connections and optimized database-specific queries.
+ * but uses the Doctrine driver connection interface and thus also works with non-PDO-based drivers like mysqli and OCI8.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
@@ -63,7 +62,7 @@ class DbalSessionHandler implements \SessionHandlerInterface
     /**
      * Constructor.
      *
-     * @param DriverConnection $con       A driver connection, preferably a wrapper Doctrine\DBAL\Connection
+     * @param DriverConnection $con       A driver connection, preferably a wrapper Doctrine\DBAL\Connection for lazy connections
      * @param string           $tableName Table name
      */
     public function __construct(DriverConnection $con, $tableName = 'sessions')

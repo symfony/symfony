@@ -107,7 +107,7 @@ class MemcachedSessionHandler implements \SessionHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function gc($lifetime)
+    public function gc($maxlifetime)
     {
         // not required here because memcached will auto expire the records anyhow.
         return true;

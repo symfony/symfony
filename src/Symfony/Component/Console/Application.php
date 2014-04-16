@@ -820,8 +820,8 @@ class Application
      *
      * Can be useful to force terminal dimensions for functional tests.
      *
-     * @param integer $width  The width
-     * @param integer $height The height
+     * @param int     $width  The width
+     * @param int     $height The height
      *
      * @return Application The current application
      */

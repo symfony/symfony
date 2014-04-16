@@ -60,7 +60,7 @@ class ConsoleHandler extends AbstractProcessingHandler implements EventSubscribe
      *
      * @param OutputInterface|null $output            The console output to use (the handler remains disabled when passing null
      *                                                until the output is set, e.g. by using console events)
-     * @param Boolean              $bubble            Whether the messages that are handled can bubble up the stack
+     * @param bool                 $bubble            Whether the messages that are handled can bubble up the stack
      * @param array                $verbosityLevelMap Array that maps the OutputInterface verbosity to a minimum logging
      *                                                level (leave empty to use the default mapping)
      */

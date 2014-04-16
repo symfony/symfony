@@ -81,7 +81,7 @@ class ErrorHandler
     /**
      * Sets the level at which the conversion to Exception is done.
      *
-     * @param integer|null $level The level (null to use the error_reporting() value and 0 to disable)
+     * @param int|null     $level The level (null to use the error_reporting() value and 0 to disable)
      */
     public function setLevel($level)
     {
@@ -91,7 +91,7 @@ class ErrorHandler
     /**
      * Sets the display_errors flag value.
      *
-     * @param integer $displayErrors The display_errors flag value
+     * @param int     $displayErrors The display_errors flag value
      */
     public function setDisplayErrors($displayErrors)
     {

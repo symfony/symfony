@@ -807,7 +807,7 @@ class Process
      *
      * To disable the timeout, set this value to null.
      *
-     * @param integer|float|null $timeout The timeout in seconds
+     * @param int|float|null     $timeout The timeout in seconds
      *
      * @return self The current Process instance.
      *
@@ -1136,7 +1136,7 @@ class Process
     /**
      * Validates and returns the filtered timeout.
      *
-     * @param integer|float|null $timeout
+     * @param int|float|null     $timeout
      *
      * @return float|null
      */

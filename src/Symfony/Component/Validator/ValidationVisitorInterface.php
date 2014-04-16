@@ -57,8 +57,8 @@ interface ValidationVisitorInterface
      * @param mixed   $value        The value to validate.
      * @param string  $group        The validation group to validate.
      * @param string  $propertyPath The current property path in the validation graph.
-     * @param Boolean $traverse     Whether to traverse the value if it is traversable.
-     * @param Boolean $deep         Whether to traverse nested traversable values recursively.
+     * @param bool    $traverse     Whether to traverse the value if it is traversable.
+     * @param bool    $deep         Whether to traverse nested traversable values recursively.
      *
      * @throws Exception\NoSuchMetadataException If no metadata can be found for
      *                                           the given value.

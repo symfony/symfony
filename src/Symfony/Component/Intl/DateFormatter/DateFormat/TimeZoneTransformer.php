@@ -21,7 +21,7 @@ use Symfony\Component\Intl\Exception\NotImplementedException;
 class TimeZoneTransformer extends Transformer
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      *
      * @throws NotImplementedException  When time zone is different than UTC or GMT (Etc/GMT)
      */
@@ -40,7 +40,7 @@ class TimeZoneTransformer extends Transformer
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getReverseMatchingRegExp($length)
     {
@@ -48,7 +48,7 @@ class TimeZoneTransformer extends Transformer
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function extractDateOptions($matched, $length)
     {

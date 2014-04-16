@@ -157,7 +157,7 @@ class CodeExtension extends \Twig_Extension
      * Formats a file path.
      *
      * @param string  $file An absolute file path
-     * @param integer $line The line number
+     * @param int     $line The line number
      * @param string  $text Use this text for the link rather than the file path
      *
      * @return string
@@ -186,7 +186,7 @@ class CodeExtension extends \Twig_Extension
      * Returns the link for a given file/line pair.
      *
      * @param string  $file An absolute file path
-     * @param integer $line The line number
+     * @param int     $line The line number
      *
      * @return string A link of false
      */

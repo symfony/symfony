@@ -23,7 +23,7 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
      * @param string  $dsn      A data source name
      * @param string  $username Not used
      * @param string  $password Not used
-     * @param integer $lifetime The lifetime to use for the purge
+     * @param int     $lifetime The lifetime to use for the purge
      */
     public function __construct($dsn, $username = '', $password = '', $lifetime = 86400)
     {
@@ -87,7 +87,7 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
 
         $result = $this->getMongo()->update(array('_id' => $profile->getToken()), array_filter($record, function ($v) { return !empty($v); }), array('upsert' => true));
 
-        return (boolean) (isset($result['ok']) ? $result['ok'] : $result);
+        return (bool) (isset($result['ok']) ? $result['ok'] : $result);
     }
 
     /**

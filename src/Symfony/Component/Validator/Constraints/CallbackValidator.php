@@ -26,7 +26,7 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 class CallbackValidator extends ConstraintValidator
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function validate($object, Constraint $constraint)
     {

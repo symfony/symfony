@@ -58,8 +58,8 @@ class TextBundleWriter implements BundleWriterInterface
      *
      * @param resource $file          The file handle to write to.
      * @param mixed    $value         The value of the node.
-     * @param integer  $indentation   The number of levels to indent.
-     * @param Boolean  $requireBraces Whether to require braces to be printed
+     * @param int      $indentation   The number of levels to indent.
+     * @param bool     $requireBraces Whether to require braces to be printed
      *                                around the value.
      *
      * @see http://source.icu-project.org/repos/icu/icuhtml/trunk/design/bnf_rb.txt
@@ -103,7 +103,7 @@ class TextBundleWriter implements BundleWriterInterface
      * Writes an "integer" node.
      *
      * @param resource $file  The file handle to write to.
-     * @param integer  $value The value of the node.
+     * @param int      $value The value of the node.
      *
      * @see http://source.icu-project.org/repos/icu/icuhtml/trunk/design/bnf_rb.txt
      */
@@ -117,7 +117,7 @@ class TextBundleWriter implements BundleWriterInterface
      *
      * @param resource $file        The file handle to write to.
      * @param array    $value       The value of the node.
-     * @param integer  $indentation The number of levels to indent.
+     * @param int      $indentation The number of levels to indent.
      *
      * @see http://source.icu-project.org/repos/icu/icuhtml/trunk/design/bnf_rb.txt
      */
@@ -137,7 +137,7 @@ class TextBundleWriter implements BundleWriterInterface
      *
      * @param resource $file         The file handle to write to.
      * @param string   $value        The value of the node.
-     * @param Boolean  $requireBraces Whether to require braces to be printed
+     * @param bool     $requireBraces Whether to require braces to be printed
      *                                around the value.
      *
      * @see http://source.icu-project.org/repos/icu/icuhtml/trunk/design/bnf_rb.txt
@@ -158,7 +158,7 @@ class TextBundleWriter implements BundleWriterInterface
      *
      * @param resource $file        The file handle to write to.
      * @param array    $value       The value of the node.
-     * @param integer  $indentation The number of levels to indent.
+     * @param int      $indentation The number of levels to indent.
      *
      * @see http://source.icu-project.org/repos/icu/icuhtml/trunk/design/bnf_rb.txt
      */
@@ -182,7 +182,7 @@ class TextBundleWriter implements BundleWriterInterface
      *
      * @param resource $file        The file handle to write to.
      * @param array    $value       The value of the node.
-     * @param integer  $indentation The number of levels to indent.
+     * @param int      $indentation The number of levels to indent.
      */
     private function writeTable($file, array $value, $indentation)
     {

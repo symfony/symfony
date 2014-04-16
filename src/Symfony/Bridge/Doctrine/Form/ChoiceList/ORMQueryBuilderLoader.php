@@ -64,7 +64,7 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getEntities()
     {
@@ -72,7 +72,7 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getEntitiesByIds($identifier, array $values)
     {

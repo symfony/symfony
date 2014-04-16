@@ -87,7 +87,7 @@ class BasicPermissionMap implements PermissionMapInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getMasks($permission, $object)
     {
@@ -99,7 +99,7 @@ class BasicPermissionMap implements PermissionMapInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function contains($permission)
     {

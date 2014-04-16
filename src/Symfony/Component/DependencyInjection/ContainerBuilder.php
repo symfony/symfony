@@ -90,11 +90,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * If you are not using the loaders and therefore don't want
      * to depend on the Config component, set this flag to false.
      *
-     * @param Boolean $track true if you want to track resources, false otherwise
+     * @param bool    $track true if you want to track resources, false otherwise
      */
     public function setResourceTracking($track)
     {
-        $this->trackResources = (Boolean) $track;
+        $this->trackResources = (bool) $track;
     }
 
     /**
@@ -443,7 +443,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * Gets a service.
      *
      * @param string  $id              The service identifier
-     * @param integer $invalidBehavior The behavior when the service does not exist
+     * @param int     $invalidBehavior The behavior when the service does not exist
      *
      * @return object The associated service
      *
@@ -903,7 +903,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @param Definition $definition A service definition instance
      * @param string     $id         The service identifier
-     * @param Boolean    $tryProxy   Whether to try proxying the service with a lazy proxy
+     * @param bool       $tryProxy   Whether to try proxying the service with a lazy proxy
      *
      * @return object The service described by the service definition
      *

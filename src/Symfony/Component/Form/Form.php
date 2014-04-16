@@ -238,7 +238,7 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function isDisabled()
     {
@@ -784,7 +784,7 @@ class Form implements \IteratorAggregate, FormInterface
      *
      * This method should only be used to help debug a form.
      *
-     * @param integer $level The indentation level (used internally)
+     * @param int     $level The indentation level (used internally)
      *
      * @return string A string representation of all errors
      */

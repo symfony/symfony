@@ -74,7 +74,7 @@ final class ObjectIdentity implements ObjectIdentityInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getIdentifier()
     {
@@ -82,7 +82,7 @@ final class ObjectIdentity implements ObjectIdentityInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getType()
     {
@@ -90,7 +90,7 @@ final class ObjectIdentity implements ObjectIdentityInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function equals(ObjectIdentityInterface $identity)
     {

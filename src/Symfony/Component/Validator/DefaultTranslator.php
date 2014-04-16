@@ -118,7 +118,7 @@ class DefaultTranslator implements TranslatorInterface
      *     // -> These are 3 donkeys.
      *
      * @param string  $id         The message id
-     * @param integer $number     The number to use to find the index of the message
+     * @param int     $number     The number to use to find the index of the message
      * @param array   $parameters An array of parameters for the message
      * @param string  $domain     Ignored
      * @param string  $locale     Ignored

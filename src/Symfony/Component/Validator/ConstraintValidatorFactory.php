@@ -39,7 +39,7 @@ class ConstraintValidatorFactory implements ConstraintValidatorFactoryInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getInstance(Constraint $constraint)
     {

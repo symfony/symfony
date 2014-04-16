@@ -107,7 +107,7 @@ class Esi
             return false;
         }
 
-        return (Boolean) preg_match('#content="[^"]*ESI/1.0[^"]*"#', $control);
+        return (bool) preg_match('#content="[^"]*ESI/1.0[^"]*"#', $control);
     }
 
     /**
@@ -115,7 +115,7 @@ class Esi
      *
      * @param string  $uri          A URI
      * @param string  $alt          An alternate URI
-     * @param Boolean $ignoreErrors Whether to ignore errors or not
+     * @param bool    $ignoreErrors Whether to ignore errors or not
      * @param string  $comment      A comment to add as an esi:include tag
      *
      * @return string
@@ -185,7 +185,7 @@ class Esi
      * @param HttpCache $cache        An HttpCache instance
      * @param string    $uri          The main URI
      * @param string    $alt          An alternative URI
-     * @param Boolean   $ignoreErrors Whether to ignore errors or not
+     * @param bool      $ignoreErrors Whether to ignore errors or not
      *
      * @return string
      *

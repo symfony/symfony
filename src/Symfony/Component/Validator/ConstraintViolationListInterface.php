@@ -41,7 +41,7 @@ interface ConstraintViolationListInterface extends \Traversable, \Countable, \Ar
     /**
      * Returns the violation at a given offset.
      *
-     * @param  integer $offset The offset of the violation.
+     * @param  int     $offset The offset of the violation.
      *
      * @return ConstraintViolationInterface The violation.
      *
@@ -54,7 +54,7 @@ interface ConstraintViolationListInterface extends \Traversable, \Countable, \Ar
     /**
      * Returns whether the given offset exists.
      *
-     * @param  integer $offset The violation offset.
+     * @param  int     $offset The violation offset.
      *
      * @return Boolean Whether the offset exists.
      *
@@ -65,7 +65,7 @@ interface ConstraintViolationListInterface extends \Traversable, \Countable, \Ar
     /**
      * Sets a violation at a given offset.
      *
-     * @param integer                      $offset    The violation offset.
+     * @param int                          $offset    The violation offset.
      * @param ConstraintViolationInterface $violation The violation.
      *
      * @api
@@ -75,7 +75,7 @@ interface ConstraintViolationListInterface extends \Traversable, \Countable, \Ar
     /**
      * Removes a violation at a given offset.
      *
-     * @param integer $offset The offset to remove.
+     * @param int     $offset The offset to remove.
      *
      * @api
      */

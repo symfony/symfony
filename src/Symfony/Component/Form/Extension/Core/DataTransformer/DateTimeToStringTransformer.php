@@ -56,7 +56,7 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
      * @param string  $inputTimezone  The name of the input timezone
      * @param string  $outputTimezone The name of the output timezone
      * @param string  $format         The date format
-     * @param Boolean $parseUsingPipe Whether to parse by appending a pipe "|" to the parse format
+     * @param bool    $parseUsingPipe Whether to parse by appending a pipe "|" to the parse format
      *
      * @throws UnexpectedTypeException if a timezone is not a string
      */

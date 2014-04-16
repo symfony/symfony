@@ -28,7 +28,7 @@ class ChoiceToBooleanArrayTransformer implements DataTransformerInterface
      * Constructor.
      *
      * @param ChoiceListInterface $choiceList
-     * @param Boolean             $placeholderPresent
+     * @param bool                $placeholderPresent
      */
     public function __construct(ChoiceListInterface $choiceList, $placeholderPresent)
     {

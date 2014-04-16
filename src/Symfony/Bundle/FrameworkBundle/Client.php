@@ -31,7 +31,7 @@ class Client extends BaseClient
     private $profiler = false;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function __construct(KernelInterface $kernel, array $server = array(), History $history = null, CookieJar $cookieJar = null)
     {

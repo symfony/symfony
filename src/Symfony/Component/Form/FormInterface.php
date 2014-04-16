@@ -41,7 +41,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Adds or replaces a child to the form.
      *
-     * @param FormInterface|string|integer $child   The FormInterface instance or the name of the child.
+     * @param FormInterface|string|int     $child   The FormInterface instance or the name of the child.
      * @param string|null                  $type    The child's type, if a name was passed.
      * @param array                        $options The child's options, if a name was passed.
      *
@@ -253,7 +253,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      * Submits data to the form, transforms and validates it.
      *
      * @param null|string|array $submittedData The submitted data.
-     * @param Boolean           $clearMissing  Whether to set fields to NULL
+     * @param bool              $clearMissing  Whether to set fields to NULL
      *                                         when they are missing in the
      *                                         submitted data.
      *

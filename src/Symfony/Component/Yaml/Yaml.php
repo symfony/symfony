@@ -39,8 +39,8 @@ class Yaml
      * as an input is a deprecated feature and will be removed in 3.0.
      *
      * @param string  $input                  Path to a YAML file or a string containing YAML
-     * @param Boolean $exceptionOnInvalidType True if an exception must be thrown on invalid types false otherwise
-     * @param Boolean $objectSupport          True if object support is enabled, false otherwise
+     * @param bool    $exceptionOnInvalidType True if an exception must be thrown on invalid types false otherwise
+     * @param bool    $objectSupport          True if object support is enabled, false otherwise
      *
      * @return array The YAML converted to a PHP array
      *
@@ -81,10 +81,10 @@ class Yaml
      * to convert the array into friendly YAML.
      *
      * @param array   $array                  PHP array
-     * @param integer $inline                 The level where you switch to inline YAML
-     * @param integer $indent                 The amount of spaces to use for indentation of nested nodes.
-     * @param Boolean $exceptionOnInvalidType true if an exception must be thrown on invalid types (a PHP resource or object), false otherwise
-     * @param Boolean $objectSupport          true if object support is enabled, false otherwise
+     * @param int     $inline                 The level where you switch to inline YAML
+     * @param int     $indent                 The amount of spaces to use for indentation of nested nodes.
+     * @param bool    $exceptionOnInvalidType true if an exception must be thrown on invalid types (a PHP resource or object), false otherwise
+     * @param bool    $objectSupport          true if object support is enabled, false otherwise
      *
      * @return string A YAML string representing the original PHP array
      *

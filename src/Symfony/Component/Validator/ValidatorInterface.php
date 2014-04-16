@@ -28,8 +28,8 @@ interface ValidatorInterface
      *
      * @param mixed      $value    The value to validate
      * @param array|null $groups   The validation groups to validate.
-     * @param Boolean    $traverse Whether to traverse the value if it is traversable.
-     * @param Boolean    $deep     Whether to traverse nested traversable values recursively.
+     * @param bool       $traverse Whether to traverse the value if it is traversable.
+     * @param bool       $deep     Whether to traverse nested traversable values recursively.
      *
      * @return ConstraintViolationListInterface A list of constraint violations. If the
      *                                          list is empty, validation succeeded.

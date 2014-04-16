@@ -24,14 +24,14 @@ interface MutableAclInterface extends AclInterface
     /**
      * Deletes a class-based ACE
      *
-     * @param integer $index
+     * @param int     $index
      */
     public function deleteClassAce($index);
 
     /**
      * Deletes a class-field-based ACE
      *
-     * @param integer $index
+     * @param int     $index
      * @param string  $field
      */
     public function deleteClassFieldAce($index, $field);
@@ -39,14 +39,14 @@ interface MutableAclInterface extends AclInterface
     /**
      * Deletes an object-based ACE
      *
-     * @param integer $index
+     * @param int     $index
      */
     public function deleteObjectAce($index);
 
     /**
      * Deletes an object-field-based ACE
      *
-     * @param integer $index
+     * @param int     $index
      * @param string  $field
      */
     public function deleteObjectFieldAce($index, $field);
@@ -62,9 +62,9 @@ interface MutableAclInterface extends AclInterface
      * Inserts a class-based ACE
      *
      * @param SecurityIdentityInterface $sid
-     * @param integer                   $mask
-     * @param integer                   $index
-     * @param Boolean                   $granting
+     * @param int                       $mask
+     * @param int                       $index
+     * @param bool                      $granting
      * @param string                    $strategy
      */
     public function insertClassAce(SecurityIdentityInterface $sid, $mask, $index = 0, $granting = true, $strategy = null);
@@ -74,9 +74,9 @@ interface MutableAclInterface extends AclInterface
      *
      * @param string                    $field
      * @param SecurityIdentityInterface $sid
-     * @param integer                   $mask
-     * @param integer                   $index
-     * @param Boolean                   $granting
+     * @param int                       $mask
+     * @param int                       $index
+     * @param bool                      $granting
      * @param string                    $strategy
      */
     public function insertClassFieldAce($field, SecurityIdentityInterface $sid, $mask, $index = 0, $granting = true, $strategy = null);
@@ -85,9 +85,9 @@ interface MutableAclInterface extends AclInterface
      * Inserts an object-based ACE
      *
      * @param SecurityIdentityInterface $sid
-     * @param integer                   $mask
-     * @param integer                   $index
-     * @param Boolean                   $granting
+     * @param int                       $mask
+     * @param int                       $index
+     * @param bool                      $granting
      * @param string                    $strategy
      */
     public function insertObjectAce(SecurityIdentityInterface $sid, $mask, $index = 0, $granting = true, $strategy = null);
@@ -97,9 +97,9 @@ interface MutableAclInterface extends AclInterface
      *
      * @param string                    $field
      * @param SecurityIdentityInterface $sid
-     * @param integer                   $mask
-     * @param integer                   $index
-     * @param Boolean                   $granting
+     * @param int                       $mask
+     * @param int                       $index
+     * @param bool                      $granting
      * @param string                    $strategy
      */
     public function insertObjectFieldAce($field, SecurityIdentityInterface $sid, $mask, $index = 0, $granting = true, $strategy = null);
@@ -107,7 +107,7 @@ interface MutableAclInterface extends AclInterface
     /**
      * Sets whether entries are inherited
      *
-     * @param Boolean $boolean
+     * @param bool    $boolean
      */
     public function setEntriesInheriting($boolean);
 
@@ -121,8 +121,8 @@ interface MutableAclInterface extends AclInterface
     /**
      * Updates a class-based ACE
      *
-     * @param integer $index
-     * @param integer $mask
+     * @param int     $index
+     * @param int     $mask
      * @param string  $strategy if null the strategy should not be changed
      */
     public function updateClassAce($index, $mask, $strategy = null);
@@ -130,9 +130,9 @@ interface MutableAclInterface extends AclInterface
     /**
      * Updates a class-field-based ACE
      *
-     * @param integer $index
+     * @param int     $index
      * @param string  $field
-     * @param integer $mask
+     * @param int     $mask
      * @param string  $strategy if null the strategy should not be changed
      */
     public function updateClassFieldAce($index, $field, $mask, $strategy = null);
@@ -140,8 +140,8 @@ interface MutableAclInterface extends AclInterface
     /**
      * Updates an object-based ACE
      *
-     * @param integer $index
-     * @param integer $mask
+     * @param int     $index
+     * @param int     $mask
      * @param string  $strategy if null the strategy should not be changed
      */
     public function updateObjectAce($index, $mask, $strategy = null);
@@ -149,9 +149,9 @@ interface MutableAclInterface extends AclInterface
     /**
      * Updates an object-field-based ACE
      *
-     * @param integer $index
+     * @param int     $index
      * @param string  $field
-     * @param integer $mask
+     * @param int     $mask
      * @param string  $strategy if null the strategy should not be changed
      */
     public function updateObjectFieldAce($index, $field, $mask, $strategy = null);

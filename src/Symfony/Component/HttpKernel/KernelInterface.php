@@ -84,7 +84,7 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      * Returns a bundle and optionally its descendants by its name.
      *
      * @param string  $name  Bundle name
-     * @param Boolean $first Whether to return the first bundle only or together with its descendants
+     * @param bool    $first Whether to return the first bundle only or together with its descendants
      *
      * @return BundleInterface|BundleInterface[] A BundleInterface instance or an array of BundleInterface instances if $first is false
      *
@@ -113,7 +113,7 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      *
      * @param string  $name  A resource name to locate
      * @param string  $dir   A directory where to look for the resource first
-     * @param Boolean $first Whether to return the first path or paths for all matching bundles
+     * @param bool    $first Whether to return the first path or paths for all matching bundles
      *
      * @return string|array The absolute path of the resource or an array if $first is false
      *

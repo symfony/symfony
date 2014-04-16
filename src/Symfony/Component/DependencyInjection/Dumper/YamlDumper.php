@@ -283,7 +283,7 @@ class YamlDumper extends Dumper
      * Prepares parameters.
      *
      * @param array   $parameters
-     * @param Boolean $escape
+     * @param bool    $escape
      *
      * @return array
      */

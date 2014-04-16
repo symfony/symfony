@@ -75,7 +75,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * This method should not be invoked.
      *
-     * @param string|integer|FormBuilderInterface $child
+     * @param string|int|FormBuilderInterface     $child
      * @param string|FormTypeInterface            $type
      * @param array                               $options
      *
@@ -169,7 +169,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * @param string   $eventName
      * @param callable $listener
-     * @param integer  $priority
+     * @param int      $priority
      *
      * @throws BadMethodCallException
      */
@@ -198,7 +198,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      * This method should not be invoked.
      *
      * @param DataTransformerInterface $viewTransformer
-     * @param Boolean                  $forcePrepend
+     * @param bool                     $forcePrepend
      *
      * @throws BadMethodCallException
      */
@@ -225,7 +225,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      * This method should not be invoked.
      *
      * @param DataTransformerInterface $modelTransformer
-     * @param Boolean                  $forceAppend
+     * @param bool                     $forceAppend
      *
      * @throws BadMethodCallException
      */
@@ -279,7 +279,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     /**
      * Set whether the button is disabled.
      *
-     * @param Boolean $disabled Whether the button is disabled
+     * @param bool    $disabled Whether the button is disabled
      *
      * @return ButtonBuilder The button builder.
      */
@@ -307,7 +307,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * This method should not be invoked.
      *
-     * @param Boolean $errorBubbling
+     * @param bool    $errorBubbling
      *
      * @throws BadMethodCallException
      */
@@ -321,7 +321,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * This method should not be invoked.
      *
-     * @param Boolean $required
+     * @param bool    $required
      *
      * @throws BadMethodCallException
      */
@@ -349,7 +349,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * This method should not be invoked.
      *
-     * @param Boolean $mapped
+     * @param bool    $mapped
      *
      * @throws BadMethodCallException
      */
@@ -363,7 +363,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * This method should not be invoked.
      *
-     * @param Boolean $byReference
+     * @param bool    $byReference
      *
      * @throws BadMethodCallException
      */
@@ -377,7 +377,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * This method should not be invoked.
      *
-     * @param Boolean $virtual
+     * @param bool    $virtual
      *
      * @throws BadMethodCallException
      */
@@ -391,7 +391,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * This method should not be invoked.
      *
-     * @param Boolean $compound
+     * @param bool    $compound
      *
      * @throws BadMethodCallException
      */
@@ -431,7 +431,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * This method should not be invoked.
      *
-     * @param Boolean $locked
+     * @param bool    $locked
      *
      * @throws BadMethodCallException
      */
@@ -495,7 +495,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     /**
      * Unsupported method.
      *
-     * @param Boolean $initialize
+     * @param bool    $initialize
      *
      * @throws BadMethodCallException
      */
@@ -511,7 +511,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     /**
      * Unsupported method.
      *
-     * @param Boolean $inheritData
+     * @param bool    $inheritData
      *
      * @throws BadMethodCallException
      */

@@ -126,7 +126,7 @@ class Process
      * @param string|null        $cwd         The working directory or null to use the working dir of the current PHP process
      * @param array|null         $env         The environment variables or null to inherit
      * @param string|null        $stdin       The STDIN content
-     * @param integer|float|null $timeout     The timeout in seconds or null to disable
+     * @param int|float|null     $timeout     The timeout in seconds or null to disable
      * @param array              $options     An array of options for proc_open
      *
      * @throws RuntimeException When proc_open is not installed
@@ -356,7 +356,7 @@ class Process
     /**
      * Sends a POSIX signal to the process.
      *
-     * @param  integer $signal A valid POSIX signal (see http://www.php.net/manual/en/pcntl.constants.php)
+     * @param  int     $signal A valid POSIX signal (see http://www.php.net/manual/en/pcntl.constants.php)
      *
      * @return Process
      *
@@ -677,8 +677,8 @@ class Process
     /**
      * Stops the process.
      *
-     * @param integer|float $timeout The timeout in seconds
-     * @param integer       $signal  A POSIX signal to send in case the process has not stop at timeout, default is SIGKILL
+     * @param int|float     $timeout The timeout in seconds
+     * @param int           $signal  A POSIX signal to send in case the process has not stop at timeout, default is SIGKILL
      *
      * @return integer The exit-code of the process
      *
@@ -789,7 +789,7 @@ class Process
      *
      * To disable the timeout, set this value to null.
      *
-     * @param integer|float|null $timeout The timeout in seconds
+     * @param int|float|null     $timeout The timeout in seconds
      *
      * @return self The current Process instance
      *
@@ -823,13 +823,13 @@ class Process
     /**
      * Enables or disables the TTY mode.
      *
-     * @param boolean $tty True to enabled and false to disable
+     * @param bool    $tty True to enabled and false to disable
      *
      * @return self The current Process instance
      */
     public function setTty($tty)
     {
-        $this->tty = (Boolean) $tty;
+        $this->tty = (bool) $tty;
 
         return $this;
     }
@@ -975,13 +975,13 @@ class Process
     /**
      * Sets whether or not Windows compatibility is enabled.
      *
-     * @param Boolean $enhance
+     * @param bool    $enhance
      *
      * @return self The current Process instance
      */
     public function setEnhanceWindowsCompatibility($enhance)
     {
-        $this->enhanceWindowsCompatibility = (Boolean) $enhance;
+        $this->enhanceWindowsCompatibility = (bool) $enhance;
 
         return $this;
     }
@@ -1003,13 +1003,13 @@ class Process
      * determine the success of a process when PHP has been compiled with
      * the --enable-sigchild option
      *
-     * @param Boolean $enhance
+     * @param bool    $enhance
      *
      * @return self The current Process instance
      */
     public function setEnhanceSigchildCompatibility($enhance)
     {
-        $this->enhanceSigchildCompatibility = (Boolean) $enhance;
+        $this->enhanceSigchildCompatibility = (bool) $enhance;
 
         return $this;
     }
@@ -1094,7 +1094,7 @@ class Process
     /**
      * Updates the status of the process, reads pipes.
      *
-     * @param Boolean $blocking Whether to use a blocking read call.
+     * @param bool    $blocking Whether to use a blocking read call.
      */
     protected function updateStatus($blocking)
     {
@@ -1156,8 +1156,8 @@ class Process
     /**
      * Reads pipes, executes callback.
      *
-     * @param Boolean $blocking Whether to use blocking calls or not.
-     * @param Boolean $close    Whether to close file handles or not.
+     * @param bool    $blocking Whether to use blocking calls or not.
+     * @param bool    $close    Whether to close file handles or not.
      */
     private function readPipes($blocking, $close)
     {
@@ -1234,8 +1234,8 @@ class Process
     /**
      * Sends a POSIX signal to the process.
      *
-     * @param  integer $signal         A valid POSIX signal (see http://www.php.net/manual/en/pcntl.constants.php)
-     * @param  Boolean $throwException Whether to throw exception in case signal failed
+     * @param  int     $signal         A valid POSIX signal (see http://www.php.net/manual/en/pcntl.constants.php)
+     * @param  bool    $throwException Whether to throw exception in case signal failed
      *
      * @return Boolean True if the signal was sent successfully, false otherwise
      *

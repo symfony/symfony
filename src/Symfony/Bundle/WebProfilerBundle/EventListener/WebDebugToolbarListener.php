@@ -43,8 +43,8 @@ class WebDebugToolbarListener implements EventSubscriberInterface
     {
         $this->twig = $twig;
         $this->urlGenerator = $urlGenerator;
-        $this->interceptRedirects = (Boolean) $interceptRedirects;
-        $this->mode = (integer) $mode;
+        $this->interceptRedirects = (bool) $interceptRedirects;
+        $this->mode = (int) $mode;
         $this->position = $position;
     }
 

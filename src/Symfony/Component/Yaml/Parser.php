@@ -31,7 +31,7 @@ class Parser
     /**
      * Constructor
      *
-     * @param integer $offset The offset of YAML document (used for line numbers in error messages)
+     * @param int     $offset The offset of YAML document (used for line numbers in error messages)
      */
     public function __construct($offset = 0)
     {
@@ -42,8 +42,8 @@ class Parser
      * Parses a YAML string to a PHP value.
      *
      * @param string  $value                  A YAML string
-     * @param Boolean $exceptionOnInvalidType true if an exception must be thrown on invalid types (a PHP resource or object), false otherwise
-     * @param Boolean $objectSupport          true if object support is enabled, false otherwise
+     * @param bool    $exceptionOnInvalidType true if an exception must be thrown on invalid types (a PHP resource or object), false otherwise
+     * @param bool    $objectSupport          true if object support is enabled, false otherwise
      *
      * @return mixed  A PHP value
      *
@@ -281,7 +281,7 @@ class Parser
     /**
      * Returns the next embed block of YAML.
      *
-     * @param integer $indentation The indent level at which the block is to be read, or null for default
+     * @param int     $indentation The indent level at which the block is to be read, or null for default
      *
      * @return string A YAML string
      *
@@ -374,8 +374,8 @@ class Parser
      * Parses a YAML value.
      *
      * @param string  $value                  A YAML value
-     * @param Boolean $exceptionOnInvalidType True if an exception must be thrown on invalid types false otherwise
-     * @param Boolean $objectSupport          True if object support is enabled, false otherwise
+     * @param bool    $exceptionOnInvalidType True if an exception must be thrown on invalid types false otherwise
+     * @param bool    $objectSupport          True if object support is enabled, false otherwise
      *
      * @return mixed  A PHP value
      *
@@ -418,7 +418,7 @@ class Parser
      *
      * @param string  $separator   The separator that was used to begin this folded scalar (| or >)
      * @param string  $indicator   The indicator that was used to begin this folded scalar (+ or -)
-     * @param integer $indentation The indentation that was used to begin this folded scalar
+     * @param int     $indentation The indentation that was used to begin this folded scalar
      *
      * @return string  The text value
      */

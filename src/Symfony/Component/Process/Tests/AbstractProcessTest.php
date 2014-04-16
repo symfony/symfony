@@ -837,7 +837,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
      * @param null    $cwd
      * @param array   $env
      * @param null    $stdin
-     * @param integer $timeout
+     * @param int     $timeout
      * @param array   $options
      *
      * @return Process

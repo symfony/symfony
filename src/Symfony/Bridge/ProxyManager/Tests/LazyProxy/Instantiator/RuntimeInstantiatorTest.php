@@ -31,7 +31,7 @@ class RuntimeInstantiatorTest extends \PHPUnit_Framework_TestCase
     protected $instantiator;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function setUp()
     {

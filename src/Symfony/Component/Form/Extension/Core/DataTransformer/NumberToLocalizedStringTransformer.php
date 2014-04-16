@@ -117,7 +117,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
     /**
      * Transforms a number type into localized number.
      *
-     * @param integer|float $value Number value.
+     * @param int|float     $value Number value.
      *
      * @return string Localized value.
      *

@@ -110,7 +110,7 @@ EOF
     /**
      * @param string  $warmupDir
      * @param string  $realCacheDir
-     * @param Boolean $enableOptionalWarmers
+     * @param bool    $enableOptionalWarmers
      */
     protected function warmup($warmupDir, $realCacheDir, $enableOptionalWarmers = true)
     {

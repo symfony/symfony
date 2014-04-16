@@ -107,7 +107,7 @@ class ProcessPipes
     /**
      * Returns an array of descriptors for the use of proc_open.
      *
-     * @param Boolean $disableOutput Whether to redirect STDOUT and STDERR to /dev/null or not.
+     * @param bool    $disableOutput Whether to redirect STDOUT and STDERR to /dev/null or not.
      *
      * @return array
      */

@@ -299,7 +299,7 @@ class XmlFileLoader extends FileLoader
      *
      * @param \DOMElement $node
      * @param string      $name
-     * @param Boolean     $lowercase
+     * @param bool        $lowercase
      *
      * @return mixed
      */

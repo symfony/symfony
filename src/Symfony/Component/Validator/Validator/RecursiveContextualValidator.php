@@ -264,7 +264,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      * @param object    $object            The object to cascade
      * @param string    $propertyPath      The current property path
      * @param string[]  $groups            The validated groups
-     * @param integer   $traversalStrategy The strategy for traversing the
+     * @param int       $traversalStrategy The strategy for traversing the
      *                                     cascaded object
      * @param ExecutionContextInterface $context The current execution context
      *
@@ -332,7 +332,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      * @param array|\Traversable        $collection    The collection
      * @param string                    $propertyPath  The current property path
      * @param string[]                  $groups        The validated groups
-     * @param Boolean $stopRecursion                   Whether to disable
+     * @param bool    $stopRecursion                   Whether to disable
      *                                                 recursive iteration. For
      *                                                 backwards compatibility
      *                                                 with Symfony < 2.5.
@@ -416,7 +416,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      * @param string[]|null             $cascadedGroups    The groups in which
      *                                                     cascaded objects should
      *                                                     be validated
-     * @param integer                   $traversalStrategy The strategy used for
+     * @param int                       $traversalStrategy The strategy used for
      *                                                     traversing the object
      * @param ExecutionContextInterface $context           The current execution context
      *
@@ -608,7 +608,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      * @param string[]|null             $cascadedGroups    The groups in which
      *                                                     cascaded objects should
      *                                                     be validated
-     * @param integer                   $traversalStrategy The strategy used for
+     * @param int                       $traversalStrategy The strategy used for
      *                                                     traversing the value
      * @param ExecutionContextInterface $context           The current execution context
      *
@@ -720,7 +720,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      *                                                     value
      * @param string                    $propertyPath      The property path leading
      *                                                     to the value
-     * @param integer                   $traversalStrategy The strategy used for
+     * @param int                       $traversalStrategy The strategy used for
      *                                                     traversing the value
      * @param GroupSequence             $groupSequence     The group sequence
      * @param string[]|null             $cascadedGroup     The group that should

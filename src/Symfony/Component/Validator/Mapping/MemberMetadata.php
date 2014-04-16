@@ -190,7 +190,7 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
      */
     public function isCascaded()
     {
-        return (boolean) ($this->cascadingStrategy & CascadingStrategy::CASCADE);
+        return (bool) ($this->cascadingStrategy & CascadingStrategy::CASCADE);
     }
 
     /**
@@ -204,7 +204,7 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
      */
     public function isCollectionCascaded()
     {
-        return (boolean) ($this->traversalStrategy & (TraversalStrategy::IMPLICIT | TraversalStrategy::TRAVERSE));
+        return (bool) ($this->traversalStrategy & (TraversalStrategy::IMPLICIT | TraversalStrategy::TRAVERSE));
     }
 
     /**

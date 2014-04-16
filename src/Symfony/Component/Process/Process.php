@@ -940,13 +940,13 @@ class Process
     /**
      * Sets PTY mode.
      *
-     * @param Boolean $bool
+     * @param bool    $bool
      *
      * @return self
      */
     public function setPty($bool)
     {
-        $this->pty = (Boolean) $bool;
+        $this->pty = (bool) $bool;
 
         return $this;
     }

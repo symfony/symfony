@@ -109,7 +109,7 @@ class GroupSequence implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * Returns whether the given offset exists in the sequence.
      *
-     * @param integer $offset The offset
+     * @param int     $offset The offset
      *
      * @return Boolean Whether the offset exists
      *
@@ -124,7 +124,7 @@ class GroupSequence implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * Returns the group at the given offset.
      *
-     * @param integer $offset The offset
+     * @param int     $offset The offset
      *
      * @return string The group a the given offset
      *
@@ -148,7 +148,7 @@ class GroupSequence implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * Sets the group at the given offset.
      *
-     * @param integer $offset The offset
+     * @param int     $offset The offset
      * @param string  $value  The group name
      *
      * @deprecated Implemented for backwards compatibility with Symfony < 2.5.
@@ -168,7 +168,7 @@ class GroupSequence implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * Removes the group at the given offset.
      *
-     * @param integer $offset The offset
+     * @param int     $offset The offset
      *
      * @deprecated Implemented for backwards compatibility with Symfony < 2.5.
      *             To be removed in Symfony 3.0.

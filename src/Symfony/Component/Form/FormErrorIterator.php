@@ -159,7 +159,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
     /**
      * Returns whether a position exists in the iterator.
      *
-     * @param integer $position The position
+     * @param int     $position The position
      *
      * @return Boolean Whether that position exists
      */
@@ -171,7 +171,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
     /**
      * Returns the element at a position in the iterator.
      *
-     * @param integer $position The position
+     * @param int     $position The position
      *
      * @return FormError|FormErrorIterator The element at the given position
      *
@@ -250,7 +250,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
     /**
      * Sets the position of the iterator.
      *
-     * @param integer $position The new position
+     * @param int     $position The new position
      *
      * @throws OutOfBoundsException If the position is invalid
      */

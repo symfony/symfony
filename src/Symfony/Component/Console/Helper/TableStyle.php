@@ -228,7 +228,7 @@ class TableStyle
     /**
      * Sets cell padding type.
      *
-     * @param integer $padType STR_PAD_*
+     * @param int     $padType STR_PAD_*
      *
      * @return TableStyle
      */
@@ -242,7 +242,7 @@ class TableStyle
     /**
      * Gets cell padding type.
      *
-     * @param integer
+     * @param int
      */
     public function getPadType()
     {

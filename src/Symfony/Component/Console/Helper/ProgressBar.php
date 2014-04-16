@@ -51,7 +51,7 @@ class ProgressBar
      * Constructor.
      *
      * @param OutputInterface $output An OutputInterface instance
-     * @param integer         $max    Maximum steps (0 if unknown)
+     * @param int             $max    Maximum steps (0 if unknown)
      */
     public function __construct(OutputInterface $output, $max = 0)
     {
@@ -200,7 +200,7 @@ class ProgressBar
     /**
      * Sets the progress bar width.
      *
-     * @param integer $size The progress bar size
+     * @param int     $size The progress bar size
      */
     public function setBarWidth($size)
     {
@@ -299,7 +299,7 @@ class ProgressBar
     /**
      * Sets the redraw frequency.
      *
-     * @param integer $freq The frequency in steps
+     * @param int     $freq The frequency in steps
      */
     public function setRedrawFrequency($freq)
     {
@@ -328,7 +328,7 @@ class ProgressBar
     /**
      * Advances the progress output X steps.
      *
-     * @param integer $step Number of steps to advance
+     * @param int     $step Number of steps to advance
      *
      * @throws \LogicException
      */
@@ -340,7 +340,7 @@ class ProgressBar
     /**
      * Sets the current progress.
      *
-     * @param integer $step The current progress
+     * @param int     $step The current progress
      *
      * @throws \LogicException
      */

@@ -295,7 +295,7 @@ class Table
      * Renders table cell with padding.
      *
      * @param array   $row
-     * @param integer $column
+     * @param int     $column
      * @param string  $cellFormat
      */
     private function renderCell(array $row, $column, $cellFormat)
@@ -337,7 +337,7 @@ class Table
     /**
      * Gets column width.
      *
-     * @param integer $column
+     * @param int     $column
      *
      * @return integer
      */
@@ -363,7 +363,7 @@ class Table
      * Gets cell width.
      *
      * @param array   $row
-     * @param integer $column
+     * @param int     $column
      *
      * @return integer
      */

@@ -50,8 +50,8 @@ class AssetsExtension extends \Twig_Extension
      *
      * @param string              $path        A public path
      * @param string              $packageName The name of the asset package to use
-     * @param Boolean             $absolute    Whether to return an absolute URL or a relative one
-     * @param string|Boolean|null $version     A specific version
+     * @param bool                $absolute    Whether to return an absolute URL or a relative one
+     * @param string|bool|null    $version     A specific version
      *
      * @return string A public path which takes into account the base path and URL path
      */

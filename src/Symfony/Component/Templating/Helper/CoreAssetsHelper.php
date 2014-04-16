@@ -107,7 +107,7 @@ class CoreAssetsHelper extends Helper implements PackageInterface
      *
      * @param string              $path        A public path
      * @param string              $packageName The name of the asset package to use
-     * @param string|Boolean|null $version     A specific version
+     * @param string|bool|null    $version     A specific version
      *
      * @return string A public path which takes into account the base path and URL path
      */

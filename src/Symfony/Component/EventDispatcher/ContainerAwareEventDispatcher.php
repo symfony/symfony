@@ -153,7 +153,7 @@ class ContainerAwareEventDispatcher extends EventDispatcher
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      *
      * Lazily loads listeners for this event from the dependency injection
      * container.

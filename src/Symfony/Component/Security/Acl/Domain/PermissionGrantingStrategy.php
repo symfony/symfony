@@ -42,7 +42,7 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function isGranted(AclInterface $acl, array $masks, array $sids, $administrativeMode = false)
     {
@@ -74,7 +74,7 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function isFieldGranted(AclInterface $acl, $field, array $masks, array $sids, $administrativeMode = false)
     {

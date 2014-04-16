@@ -38,7 +38,7 @@ abstract class AbstractAdapter implements AdapterInterface
     private static $areSupported = array();
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function isSupported()
     {

@@ -21,7 +21,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 class IntegerNode extends NumericNode
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     protected function validateType($value)
     {

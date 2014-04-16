@@ -28,7 +28,7 @@ abstract class ManagerRegistry extends AbstractManagerRegistry implements Contai
     protected $container;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function getService($name)
     {
@@ -36,7 +36,7 @@ abstract class ManagerRegistry extends AbstractManagerRegistry implements Contai
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function resetService($name)
     {
@@ -44,7 +44,7 @@ abstract class ManagerRegistry extends AbstractManagerRegistry implements Contai
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function setContainer(ContainerInterface $container = null)
     {

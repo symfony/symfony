@@ -51,7 +51,7 @@ class RedirectResponse extends Response
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public static function create($url = '', $status = 302, $headers = array())
     {

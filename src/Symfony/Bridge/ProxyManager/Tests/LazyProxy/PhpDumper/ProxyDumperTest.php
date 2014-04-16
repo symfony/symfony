@@ -29,7 +29,7 @@ class ProxyDumperTest extends \PHPUnit_Framework_TestCase
     protected $dumper;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function setUp()
     {

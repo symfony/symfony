@@ -28,7 +28,7 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
     protected $allowEmptyValue = true;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function setDefaultValue($value)
     {
@@ -37,7 +37,7 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function hasDefaultValue()
     {
@@ -45,7 +45,7 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getDefaultValue()
     {
@@ -63,7 +63,7 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function setName($name)
     {
@@ -71,14 +71,14 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     protected function validateType($value)
     {
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     protected function finalizeValue($value)
     {
@@ -97,7 +97,7 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     protected function normalizeValue($value)
     {
@@ -105,7 +105,7 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     protected function mergeValues($leftSide, $rightSide)
     {

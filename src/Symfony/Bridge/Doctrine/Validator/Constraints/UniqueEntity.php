@@ -45,7 +45,7 @@ class UniqueEntity extends Constraint
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getTargets()
     {

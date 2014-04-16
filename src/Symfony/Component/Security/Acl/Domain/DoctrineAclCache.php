@@ -51,7 +51,7 @@ class DoctrineAclCache implements AclCacheInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function clearCache()
     {
@@ -59,7 +59,7 @@ class DoctrineAclCache implements AclCacheInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function evictFromCacheById($aclId)
     {
@@ -77,7 +77,7 @@ class DoctrineAclCache implements AclCacheInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function evictFromCacheByIdentity(ObjectIdentityInterface $oid)
     {
@@ -90,7 +90,7 @@ class DoctrineAclCache implements AclCacheInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getFromCacheById($aclId)
     {
@@ -110,7 +110,7 @@ class DoctrineAclCache implements AclCacheInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getFromCacheByIdentity(ObjectIdentityInterface $oid)
     {
@@ -123,7 +123,7 @@ class DoctrineAclCache implements AclCacheInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function putInCache(AclInterface $acl)
     {

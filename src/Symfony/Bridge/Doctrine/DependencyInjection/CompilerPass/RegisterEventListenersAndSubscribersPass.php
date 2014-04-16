@@ -45,7 +45,7 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
     {

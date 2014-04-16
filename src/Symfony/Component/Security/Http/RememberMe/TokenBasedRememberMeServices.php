@@ -27,7 +27,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class TokenBasedRememberMeServices extends AbstractRememberMeServices
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     protected function processAutoLoginCookie(array $cookieParts, Request $request)
     {
@@ -90,7 +90,7 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     protected function onLoginSuccess(Request $request, Response $response, TokenInterface $token)
     {

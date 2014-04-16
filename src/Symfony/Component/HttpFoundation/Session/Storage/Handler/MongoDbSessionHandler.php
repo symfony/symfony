@@ -69,7 +69,7 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function open($savePath, $sessionName)
     {
@@ -77,7 +77,7 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function close()
     {
@@ -85,7 +85,7 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function destroy($sessionId)
     {
@@ -97,7 +97,7 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function gc($lifetime)
     {
@@ -119,7 +119,7 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
     }
 
     /**
-     * {@inheritDoc]
+     * {@inheritdoc}
      */
     public function write($sessionId, $data)
     {
@@ -136,7 +136,7 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function read($sessionId)
     {

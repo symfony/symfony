@@ -119,7 +119,7 @@ class ApplicationTester
     /**
      * Gets the status code returned by the last execution of the application.
      *
-     * @return integer The status code
+     * @return int     The status code
      */
     public function getStatusCode()
     {

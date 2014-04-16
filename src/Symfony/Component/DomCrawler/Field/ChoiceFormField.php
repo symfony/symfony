@@ -35,7 +35,7 @@ class ChoiceFormField extends FormField
      */
     private $options;
     /**
-     * @var boolean
+     * @var bool
      */
     private $validationDisabled = false;
 

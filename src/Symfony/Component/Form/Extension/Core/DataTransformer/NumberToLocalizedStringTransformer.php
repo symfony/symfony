@@ -250,7 +250,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
      *
      * @param int|float     $number A number.
      *
-     * @return integer|float The rounded number.
+     * @return int|float     The rounded number.
      */
     private function round($number)
     {

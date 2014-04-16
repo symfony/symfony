@@ -24,7 +24,7 @@ class PropertyAccessorBuilder
     private $magicCall = false;
 
     /**
-     * @var Boolean
+     * @var bool
      */
     private $throwExceptionOnInvalidIndex = false;
 
@@ -85,7 +85,7 @@ class PropertyAccessorBuilder
     }
 
     /**
-     * @return Boolean true is exceptions in read context for array is enabled
+     * @return bool    true is exceptions in read context for array is enabled
      */
     public function isExceptionOnInvalidIndexEnabled()
     {

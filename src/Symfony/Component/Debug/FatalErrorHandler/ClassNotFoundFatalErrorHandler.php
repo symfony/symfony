@@ -172,7 +172,7 @@ class ClassNotFoundFatalErrorHandler implements FatalErrorHandlerInterface
     /**
      * @param string $class
      *
-     * @return Boolean
+     * @return bool
      */
     private function classExists($class)
     {

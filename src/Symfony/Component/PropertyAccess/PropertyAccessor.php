@@ -26,12 +26,12 @@ class PropertyAccessor implements PropertyAccessorInterface
     const IS_REF = 1;
 
     /**
-     * @var Boolean
+     * @var bool
      */
     private $magicCall;
 
     /**
-     * @var Boolean
+     * @var bool
      */
     private $throwExceptionOnInvalidIndex;
 

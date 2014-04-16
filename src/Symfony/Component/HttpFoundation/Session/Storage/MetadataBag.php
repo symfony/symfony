@@ -49,7 +49,7 @@ class MetadataBag implements SessionBagInterface
     private $lastUsed;
 
     /**
-     * @var integer
+     * @var int
      */
     private $updateThreshold;
 

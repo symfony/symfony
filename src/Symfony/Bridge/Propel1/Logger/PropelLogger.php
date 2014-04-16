@@ -38,7 +38,7 @@ class PropelLogger implements \BasicLogger
     protected $stopwatch;
 
     /**
-     * @var Boolean
+     * @var bool
      */
     private $isPrepared = false;
 

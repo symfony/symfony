@@ -26,7 +26,7 @@ interface PropertyMetadataContainerInterface
      *
      * @param string $property The property name.
      *
-     * @return Boolean
+     * @return bool
      */
     public function hasPropertyMetadata($property);
 

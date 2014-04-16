@@ -48,7 +48,7 @@ abstract class MultiplePcreFilterIterator extends FilterIterator
      *
      * @param string $str
      *
-     * @return Boolean Whether the given string is a regex
+     * @return bool    Whether the given string is a regex
      */
     protected function isRegex($str)
     {

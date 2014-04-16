@@ -97,7 +97,7 @@ class Response
     protected $version;
 
     /**
-     * @var integer
+     * @var int
      */
     protected $statusCode;
 
@@ -506,7 +506,7 @@ class Response
     /**
      * Retrieves the status code for the current web response.
      *
-     * @return integer Status code
+     * @return int     Status code
      *
      * @api
      */
@@ -552,7 +552,7 @@ class Response
      * Responses with neither a freshness lifetime (Expires, max-age) nor cache
      * validator (Last-Modified, ETag) are considered uncacheable.
      *
-     * @return Boolean true if the response is worth caching, false otherwise
+     * @return bool    true if the response is worth caching, false otherwise
      *
      * @api
      */
@@ -576,7 +576,7 @@ class Response
      * origin. A response is considered fresh when it includes a Cache-Control/max-age
      * indicator or Expires header and the calculated age is less than the freshness lifetime.
      *
-     * @return Boolean true if the response is fresh, false otherwise
+     * @return bool    true if the response is fresh, false otherwise
      *
      * @api
      */
@@ -589,7 +589,7 @@ class Response
      * Returns true if the response includes headers that can be used to validate
      * the response with the origin server using a conditional GET request.
      *
-     * @return Boolean true if the response is validateable, false otherwise
+     * @return bool    true if the response is validateable, false otherwise
      *
      * @api
      */
@@ -640,7 +640,7 @@ class Response
      * When present, the TTL of the response should not be overridden to be
      * greater than the value provided by the origin.
      *
-     * @return Boolean true if the response must be revalidated by a cache, false otherwise
+     * @return bool    true if the response must be revalidated by a cache, false otherwise
      *
      * @api
      */
@@ -683,7 +683,7 @@ class Response
     /**
      * Returns the age of the response.
      *
-     * @return integer The age of the response in seconds
+     * @return int     The age of the response in seconds
      */
     public function getAge()
     {
@@ -758,7 +758,7 @@ class Response
      * First, it checks for a s-maxage directive, then a max-age directive, and then it falls
      * back on an expires header. It returns null when no maximum age can be established.
      *
-     * @return integer|null Number of seconds
+     * @return int|null     Number of seconds
      *
      * @api
      */
@@ -824,7 +824,7 @@ class Response
      * When the responses TTL is <= 0, the response may not be served from cache without first
      * revalidating with the origin.
      *
-     * @return integer|null The TTL in seconds
+     * @return int|null     The TTL in seconds
      *
      * @api
      */
@@ -1030,7 +1030,7 @@ class Response
     /**
      * Returns true if the response includes a Vary header.
      *
-     * @return Boolean true if the response includes a Vary header, false otherwise
+     * @return bool    true if the response includes a Vary header, false otherwise
      *
      * @api
      */
@@ -1086,7 +1086,7 @@ class Response
      *
      * @param Request $request A Request instance
      *
-     * @return Boolean true if the Response validators match the Request, false otherwise
+     * @return bool    true if the Response validators match the Request, false otherwise
      *
      * @api
      */
@@ -1115,7 +1115,7 @@ class Response
     /**
      * Is response invalid?
      *
-     * @return Boolean
+     * @return bool
      *
      * @api
      */
@@ -1127,7 +1127,7 @@ class Response
     /**
      * Is response informative?
      *
-     * @return Boolean
+     * @return bool
      *
      * @api
      */
@@ -1139,7 +1139,7 @@ class Response
     /**
      * Is response successful?
      *
-     * @return Boolean
+     * @return bool
      *
      * @api
      */
@@ -1151,7 +1151,7 @@ class Response
     /**
      * Is the response a redirect?
      *
-     * @return Boolean
+     * @return bool
      *
      * @api
      */
@@ -1163,7 +1163,7 @@ class Response
     /**
      * Is there a client error?
      *
-     * @return Boolean
+     * @return bool
      *
      * @api
      */
@@ -1175,7 +1175,7 @@ class Response
     /**
      * Was there a server side error?
      *
-     * @return Boolean
+     * @return bool
      *
      * @api
      */
@@ -1187,7 +1187,7 @@ class Response
     /**
      * Is the response OK?
      *
-     * @return Boolean
+     * @return bool
      *
      * @api
      */
@@ -1199,7 +1199,7 @@ class Response
     /**
      * Is the response forbidden?
      *
-     * @return Boolean
+     * @return bool
      *
      * @api
      */
@@ -1211,7 +1211,7 @@ class Response
     /**
      * Is the response a not found error?
      *
-     * @return Boolean
+     * @return bool
      *
      * @api
      */
@@ -1225,7 +1225,7 @@ class Response
      *
      * @param string $location
      *
-     * @return Boolean
+     * @return bool
      *
      * @api
      */
@@ -1237,7 +1237,7 @@ class Response
     /**
      * Is the response empty?
      *
-     * @return Boolean
+     * @return bool
      *
      * @api
      */

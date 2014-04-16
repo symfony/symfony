@@ -19,7 +19,7 @@ namespace Symfony\Component\Form;
 class SubmitButton extends Button implements ClickableInterface
 {
     /**
-     * @var Boolean
+     * @var bool
      */
     private $clicked = false;
 

@@ -41,7 +41,7 @@ class FileBinaryMimeTypeGuesser implements MimeTypeGuesserInterface
     /**
      * Returns whether this guesser is supported on the current OS
      *
-     * @return Boolean
+     * @return bool
      */
     public static function isSupported()
     {

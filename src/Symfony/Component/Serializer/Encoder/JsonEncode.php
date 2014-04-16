@@ -31,7 +31,7 @@ class JsonEncode implements EncoderInterface
     /**
      * Returns the last encoding error (if any).
      *
-     * @return integer
+     * @return int
      *
      * @deprecated since 2.5, encode() throws an exception if error found, will be removed in 3.0
      *

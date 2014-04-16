@@ -201,7 +201,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * @param string $name The helper name
      *
-     * @return Boolean true if the helper is defined, false otherwise
+     * @return bool    true if the helper is defined, false otherwise
      *
      * @api
      */
@@ -287,7 +287,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * @param string $name The helper name
      *
-     * @return Boolean true if the helper is defined, false otherwise
+     * @return bool    true if the helper is defined, false otherwise
      *
      * @api
      */

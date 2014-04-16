@@ -297,7 +297,7 @@ class Cookie
     /**
      * Returns the secure flag of the cookie.
      *
-     * @return Boolean The cookie secure flag
+     * @return bool    The cookie secure flag
      *
      * @api
      */
@@ -309,7 +309,7 @@ class Cookie
     /**
      * Returns the httponly flag of the cookie.
      *
-     * @return Boolean The cookie httponly flag
+     * @return bool    The cookie httponly flag
      *
      * @api
      */
@@ -321,7 +321,7 @@ class Cookie
     /**
      * Returns true if the cookie has expired.
      *
-     * @return Boolean true if the cookie has expired, false otherwise
+     * @return bool    true if the cookie has expired, false otherwise
      *
      * @api
      */

@@ -26,9 +26,9 @@ class ProcessPipes
     private $fileHandles = array();
     /** @var array */
     private $readBytes = array();
-    /** @var Boolean */
+    /** @var bool    */
     private $useFiles;
-    /** @var Boolean */
+    /** @var bool    */
     private $ttyMode;
     /** @var Boolean */
     private $ptyMode;
@@ -196,7 +196,7 @@ class ProcessPipes
     /**
      * Returns if the current state has open file handles or pipes.
      *
-     * @return Boolean
+     * @return bool
      */
     public function hasOpenHandles()
     {
@@ -354,7 +354,7 @@ class ProcessPipes
     /**
      * Returns true if a system call has been interrupted.
      *
-     * @return Boolean
+     * @return bool
      */
     private function hasSystemCallBeenInterrupted()
     {

@@ -38,14 +38,14 @@ interface NodeInterface
     /**
      * Returns true when the node is required.
      *
-     * @return Boolean If the node is required
+     * @return bool    If the node is required
      */
     public function isRequired();
 
     /**
      * Returns true when the node has a default value.
      *
-     * @return Boolean If the node has a default value
+     * @return bool    If the node has a default value
      */
     public function hasDefaultValue();
 

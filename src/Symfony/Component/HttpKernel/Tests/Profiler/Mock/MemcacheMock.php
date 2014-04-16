@@ -28,7 +28,7 @@ class MemcacheMock
      * @param int     $port
      * @param int     $timeout
      *
-     * @return boolean
+     * @return bool
      */
     public function connect($host, $port = null, $timeout = null)
     {
@@ -48,7 +48,7 @@ class MemcacheMock
      * @param int     $port
      * @param int     $timeout
      *
-     * @return boolean
+     * @return bool
      */
     public function pconnect($host, $port = null, $timeout = null)
     {
@@ -74,7 +74,7 @@ class MemcacheMock
      * @param callable $failure_callback
      * @param int      $timeoutms
      *
-     * @return boolean
+     * @return bool
      */
     public function addServer($host, $port = 11211, $persistent = null, $weight = null, $timeout = null, $retry_interval = null, $status = null, $failure_callback = null, $timeoutms = null)
     {
@@ -95,7 +95,7 @@ class MemcacheMock
      * @param int     $flag
      * @param int     $expire
      *
-     * @return boolean
+     * @return bool
      */
     public function add($key, $var, $flag = null, $expire = null)
     {
@@ -120,7 +120,7 @@ class MemcacheMock
      * @param int     $flag
      * @param int     $expire
      *
-     * @return boolean
+     * @return bool
      */
     public function set($key, $var, $flag = null, $expire = null)
     {
@@ -141,7 +141,7 @@ class MemcacheMock
      * @param int     $flag
      * @param int     $expire
      *
-     * @return boolean
+     * @return bool
      */
     public function replace($key, $var, $flag = null, $expire = null)
     {
@@ -191,7 +191,7 @@ class MemcacheMock
      *
      * @param string $key
      *
-     * @return boolean
+     * @return bool
      */
     public function delete($key)
     {
@@ -211,7 +211,7 @@ class MemcacheMock
     /**
      * Flush all existing items at the server
      *
-     * @return boolean
+     * @return bool
      */
     public function flush()
     {
@@ -227,7 +227,7 @@ class MemcacheMock
     /**
      * Close memcached server connection
      *
-     * @return boolean
+     * @return bool
      */
     public function close()
     {

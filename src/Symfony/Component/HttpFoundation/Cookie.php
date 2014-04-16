@@ -151,7 +151,7 @@ class Cookie
     /**
      * Gets the time the cookie expires.
      *
-     * @return integer
+     * @return int
      *
      * @api
      */
@@ -175,7 +175,7 @@ class Cookie
     /**
      * Checks whether the cookie should only be transmitted over a secure HTTPS connection from the client.
      *
-     * @return Boolean
+     * @return bool
      *
      * @api
      */
@@ -187,7 +187,7 @@ class Cookie
     /**
      * Checks whether the cookie will be made accessible only through the HTTP protocol.
      *
-     * @return Boolean
+     * @return bool
      *
      * @api
      */
@@ -199,7 +199,7 @@ class Cookie
     /**
      * Whether this cookie is about to be cleared
      *
-     * @return Boolean
+     * @return bool
      *
      * @api
      */

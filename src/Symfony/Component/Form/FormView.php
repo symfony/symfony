@@ -46,7 +46,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      * Row implicitly includes widget, however certain rendering mechanisms
      * have to skip widget rendering when a row is rendered.
      *
-     * @var Boolean
+     * @var bool
      */
     private $rendered = false;
 
@@ -58,7 +58,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * Returns whether the view was already rendered.
      *
-     * @return Boolean Whether this view's widget is rendered.
+     * @return bool    Whether this view's widget is rendered.
      */
     public function isRendered()
     {
@@ -110,7 +110,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      *
      * @param string $name The child name
      *
-     * @return Boolean Whether the child view exists
+     * @return bool    Whether the child view exists
      */
     public function offsetExists($name)
     {
@@ -150,7 +150,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * Implements \Countable.
      *
-     * @return integer The number of children views
+     * @return int     The number of children views
      */
     public function count()
     {

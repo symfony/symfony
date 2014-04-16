@@ -39,7 +39,7 @@ class Version
      * @param int|null     $precision The number of components to compare. Pass
      *                                NULL to compare the versions unchanged.
      *
-     * @return Boolean Whether the comparison succeeded.
+     * @return bool    Whether the comparison succeeded.
      *
      * @see normalize()
      */

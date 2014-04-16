@@ -149,7 +149,7 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
      *
      * @param object|string $objectOrClassName The object or the class name
      *
-     * @return Boolean
+     * @return bool
      */
     public function isPublic($objectOrClassName)
     {
@@ -161,7 +161,7 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
      *
      * @param object|string $objectOrClassName The object or the class name
      *
-     * @return Boolean
+     * @return bool
      */
     public function isProtected($objectOrClassName)
     {
@@ -173,7 +173,7 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
      *
      * @param object|string $objectOrClassName The object or the class name
      *
-     * @return Boolean
+     * @return bool
      */
     public function isPrivate($objectOrClassName)
     {
@@ -183,7 +183,7 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
     /**
      * Returns whether objects stored in this member should be validated.
      *
-     * @return Boolean
+     * @return bool
      *
      * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
      *             Use {@link getCascadingStrategy()} instead.
@@ -197,7 +197,7 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
      * Returns whether arrays or traversable objects stored in this member
      * should be traversed and validated in each entry.
      *
-     * @return Boolean
+     * @return bool
      *
      * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
      *             Use {@link getTraversalStrategy()} instead.
@@ -211,7 +211,7 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
      * Returns whether arrays or traversable objects stored in this member
      * should be traversed recursively for inner arrays/traversable objects.
      *
-     * @return Boolean
+     * @return bool
      *
      * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
      *             Use {@link getTraversalStrategy()} instead.

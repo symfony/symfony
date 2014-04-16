@@ -39,7 +39,7 @@ class DialogHelper extends InputAwareHelper
      * @param string          $errorMessage Message which will be shown if invalid value from choice list would be picked
      * @param bool            $multiselect  Select more than one value separated by comma
      *
-     * @return integer|string|array The selected value or values (the key of the choices array)
+     * @return int|string|array     The selected value or values (the key of the choices array)
      *
      * @throws \InvalidArgumentException
      */
@@ -232,7 +232,7 @@ class DialogHelper extends InputAwareHelper
      * @param string|array    $question The question to ask
      * @param bool            $default  The default answer if the user enters nothing
      *
-     * @return Boolean true if the user has confirmed, false otherwise
+     * @return bool    true if the user has confirmed, false otherwise
      */
     public function askConfirmation(OutputInterface $output, $question, $default = true)
     {
@@ -410,7 +410,7 @@ class DialogHelper extends InputAwareHelper
     /**
      * Return a valid Unix shell
      *
-     * @return string|Boolean  The valid shell name, false in case no valid shell is found
+     * @return string|bool     The valid shell name, false in case no valid shell is found
      */
     private function getShell()
     {

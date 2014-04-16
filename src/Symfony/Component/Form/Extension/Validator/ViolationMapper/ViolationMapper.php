@@ -25,7 +25,7 @@ use Symfony\Component\Validator\ConstraintViolation;
 class ViolationMapper implements ViolationMapperInterface
 {
     /**
-     * @var Boolean
+     * @var bool
      */
     private $allowNonSynchronized;
 
@@ -290,7 +290,7 @@ class ViolationMapper implements ViolationMapperInterface
     /**
      * @param FormInterface $form
      *
-     * @return Boolean
+     * @return bool
      */
     private function acceptsErrors(FormInterface $form)
     {

@@ -65,7 +65,7 @@ class BooleanToStringTransformer implements DataTransformerInterface
      *
      * @param string $value String value.
      *
-     * @return Boolean Boolean value.
+     * @return bool    Boolean value.
      *
      * @throws TransformationFailedException If the given value is not a string.
      */

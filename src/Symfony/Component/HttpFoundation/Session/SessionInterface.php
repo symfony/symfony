@@ -23,7 +23,7 @@ interface SessionInterface
     /**
      * Starts the session storage.
      *
-     * @return Boolean True if session started.
+     * @return bool    True if session started.
      *
      * @throws \RuntimeException If session fails to start.
      *
@@ -78,7 +78,7 @@ interface SessionInterface
      *                          to expire with browser session. Time is in seconds, and is
      *                          not a Unix timestamp.
      *
-     * @return Boolean True if session invalidated, false if error.
+     * @return bool    True if session invalidated, false if error.
      *
      * @api
      */
@@ -94,7 +94,7 @@ interface SessionInterface
      *                          to expire with browser session. Time is in seconds, and is
      *                          not a Unix timestamp.
      *
-     * @return Boolean True if session migrated, false if error.
+     * @return bool    True if session migrated, false if error.
      *
      * @api
      */
@@ -114,7 +114,7 @@ interface SessionInterface
      *
      * @param string $name The attribute name
      *
-     * @return Boolean true if the attribute is defined, false otherwise
+     * @return bool    true if the attribute is defined, false otherwise
      *
      * @api
      */
@@ -179,7 +179,7 @@ interface SessionInterface
     /**
      * Checks if the session was started.
      *
-     * @return Boolean
+     * @return bool
      */
     public function isStarted();
 

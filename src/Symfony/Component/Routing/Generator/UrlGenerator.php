@@ -40,7 +40,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
     protected $context;
 
     /**
-     * @var Boolean|null
+     * @var bool|null
      */
     protected $strictRequirements = true;
 

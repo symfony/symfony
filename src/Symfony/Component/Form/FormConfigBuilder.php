@@ -48,7 +48,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     );
 
     /**
-     * @var Boolean
+     * @var bool
      */
     protected $locked = false;
 
@@ -68,22 +68,22 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     private $propertyPath;
 
     /**
-     * @var Boolean
+     * @var bool
      */
     private $mapped = true;
 
     /**
-     * @var Boolean
+     * @var bool
      */
     private $byReference = true;
 
     /**
-     * @var Boolean
+     * @var bool
      */
     private $inheritData = false;
 
     /**
-     * @var Boolean
+     * @var bool
      */
     private $compound = false;
 
@@ -108,17 +108,17 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     private $dataMapper;
 
     /**
-     * @var Boolean
+     * @var bool
      */
     private $required = true;
 
     /**
-     * @var Boolean
+     * @var bool
      */
     private $disabled = false;
 
     /**
-     * @var Boolean
+     * @var bool
      */
     private $errorBubbling = false;
 
@@ -143,7 +143,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     private $dataClass;
 
     /**
-     * @var Boolean
+     * @var bool
      */
     private $dataLocked;
 
@@ -168,7 +168,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     private $requestHandler;
 
     /**
-     * @var Boolean
+     * @var bool
      */
     private $autoInitialize = false;
 
@@ -910,7 +910,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      *
      * @param string $name The tested form name.
      *
-     * @return Boolean Whether the name is valid.
+     * @return bool    Whether the name is valid.
      */
     public static function isValidName($name)
     {

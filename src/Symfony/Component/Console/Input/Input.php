@@ -81,7 +81,7 @@ abstract class Input implements InputInterface
     /**
      * Checks if the input is interactive.
      *
-     * @return Boolean Returns true if the input is interactive
+     * @return bool    Returns true if the input is interactive
      */
     public function isInteractive()
     {
@@ -148,7 +148,7 @@ abstract class Input implements InputInterface
      *
      * @param string|int     $name The InputArgument name or position
      *
-     * @return Boolean true if the InputArgument object exists, false otherwise
+     * @return bool    true if the InputArgument object exists, false otherwise
      */
     public function hasArgument($name)
     {
@@ -205,7 +205,7 @@ abstract class Input implements InputInterface
      *
      * @param string $name The InputOption name
      *
-     * @return Boolean true if the InputOption object exists, false otherwise
+     * @return bool    true if the InputOption object exists, false otherwise
      */
     public function hasOption($name)
     {

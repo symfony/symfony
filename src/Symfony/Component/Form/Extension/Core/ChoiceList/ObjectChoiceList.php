@@ -231,7 +231,7 @@ class ObjectChoiceList extends ChoiceList
      *
      * @param mixed $choice The choice to create a value for
      *
-     * @return integer|string A unique value without character limitations.
+     * @return int|string     A unique value without character limitations.
      */
     protected function createValue($choice)
     {

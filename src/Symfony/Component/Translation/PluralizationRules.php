@@ -26,7 +26,7 @@ class PluralizationRules
      * @param int     $number The number
      * @param string  $locale The locale
      *
-     * @return integer The plural position
+     * @return int     The plural position
      */
     public static function get($number, $locale)
     {

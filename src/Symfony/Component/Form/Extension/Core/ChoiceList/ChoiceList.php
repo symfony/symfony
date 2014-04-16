@@ -381,7 +381,7 @@ class ChoiceList implements ChoiceListInterface
      * @param mixed $choice           The choice to test.
      * @param array $preferredChoices An array of preferred choices.
      *
-     * @return Boolean Whether the choice is preferred.
+     * @return bool    Whether the choice is preferred.
      */
     protected function isPreferred($choice, array $preferredChoices)
     {
@@ -395,7 +395,7 @@ class ChoiceList implements ChoiceListInterface
      *
      * @param mixed $choice The choice to create an index for
      *
-     * @return integer|string A unique index containing only ASCII letters,
+     * @return int|string     A unique index containing only ASCII letters,
      *                        digits and underscores.
      */
     protected function createIndex($choice)
@@ -455,7 +455,7 @@ class ChoiceList implements ChoiceListInterface
      *
      * @param mixed $index The choice index.
      *
-     * @return integer|string The index as PHP array key.
+     * @return int|string     The index as PHP array key.
      */
     protected function fixIndex($index)
     {

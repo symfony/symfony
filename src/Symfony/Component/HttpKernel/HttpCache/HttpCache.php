@@ -496,7 +496,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      * @param Request  $request A Request instance
      * @param Response $entry   A Response instance
      *
-     * @return Boolean true if the cache entry if fresh enough, false otherwise
+     * @return bool    true if the cache entry if fresh enough, false otherwise
      */
     protected function isFreshEnough(Request $request, Response $entry)
     {
@@ -517,7 +517,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      * @param Request  $request A Request instance
      * @param Response $entry   A Response instance
      *
-     * @return Boolean true if the cache entry can be returned even if it is staled, false otherwise
+     * @return bool    true if the cache entry can be returned even if it is staled, false otherwise
      */
     protected function lock(Request $request, Response $entry)
     {
@@ -651,7 +651,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      *
      * @param Request $request A Request instance
      *
-     * @return Boolean true if the Request is private, false otherwise
+     * @return bool    true if the Request is private, false otherwise
      */
     private function isPrivateRequest(Request $request)
     {

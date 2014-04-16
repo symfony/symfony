@@ -26,25 +26,25 @@ abstract class Guess
 {
     /**
      * Marks an instance with a value that is extremely likely to be correct
-     * @var integer
+     * @var int
      */
     const VERY_HIGH_CONFIDENCE = 3;
 
     /**
      * Marks an instance with a value that is very likely to be correct
-     * @var integer
+     * @var int
      */
     const HIGH_CONFIDENCE = 2;
 
     /**
      * Marks an instance with a value that is likely to be correct
-     * @var integer
+     * @var int
      */
     const MEDIUM_CONFIDENCE = 1;
 
     /**
      * Marks an instance with a value that may be correct
-     * @var integer
+     * @var int
      */
     const LOW_CONFIDENCE = 0;
 
@@ -54,7 +54,7 @@ abstract class Guess
      * One of VERY_HIGH_CONFIDENCE, HIGH_CONFIDENCE, MEDIUM_CONFIDENCE
      * and LOW_CONFIDENCE.
      *
-     * @var integer
+     * @var int
      */
     private $confidence;
 
@@ -103,7 +103,7 @@ abstract class Guess
     /**
      * Returns the confidence that the guessed value is correct.
      *
-     * @return integer One of the constants VERY_HIGH_CONFIDENCE,
+     * @return int     One of the constants VERY_HIGH_CONFIDENCE,
      *                 HIGH_CONFIDENCE, MEDIUM_CONFIDENCE and LOW_CONFIDENCE
      */
     public function getConfidence()

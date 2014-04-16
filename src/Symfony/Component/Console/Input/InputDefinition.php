@@ -173,7 +173,7 @@ class InputDefinition
      *
      * @param string|int     $name The InputArgument name or position
      *
-     * @return Boolean true if the InputArgument object exists, false otherwise
+     * @return bool    true if the InputArgument object exists, false otherwise
      *
      * @api
      */
@@ -199,7 +199,7 @@ class InputDefinition
     /**
      * Returns the number of InputArguments.
      *
-     * @return integer The number of InputArguments
+     * @return int     The number of InputArguments
      */
     public function getArgumentCount()
     {
@@ -209,7 +209,7 @@ class InputDefinition
     /**
      * Returns the number of required InputArguments.
      *
-     * @return integer The number of required InputArguments
+     * @return int     The number of required InputArguments
      */
     public function getArgumentRequiredCount()
     {
@@ -315,7 +315,7 @@ class InputDefinition
      *
      * @param string $name The InputOption name
      *
-     * @return Boolean true if the InputOption object exists, false otherwise
+     * @return bool    true if the InputOption object exists, false otherwise
      *
      * @api
      */
@@ -341,7 +341,7 @@ class InputDefinition
      *
      * @param string $name The InputOption shortcut
      *
-     * @return Boolean true if the InputOption object exists, false otherwise
+     * @return bool    true if the InputOption object exists, false otherwise
      */
     public function hasShortcut($name)
     {

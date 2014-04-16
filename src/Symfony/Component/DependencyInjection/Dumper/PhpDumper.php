@@ -373,7 +373,7 @@ class PhpDumper extends Dumper
      * @param string     $id
      * @param Definition $definition
      *
-     * @return Boolean
+     * @return bool
      */
     private function isSimpleInstance($id, $definition)
     {
@@ -1134,7 +1134,7 @@ EOF;
      * @param bool    $deep
      * @param array   $visited
      *
-     * @return Boolean
+     * @return bool
      */
     private function hasReference($id, array $arguments, $deep = false, array $visited = array())
     {

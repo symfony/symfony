@@ -68,7 +68,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
     protected $routeAnnotationClass = 'Symfony\\Component\\Routing\\Annotation\\Route';
 
     /**
-     * @var integer
+     * @var int
      */
     protected $defaultRouteIndex = 0;
 

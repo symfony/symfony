@@ -34,7 +34,7 @@ class ConstraintViolation implements ConstraintViolationInterface
     private $parameters;
 
     /**
-     * @var integer|null
+     * @var int|null
      */
     private $plural;
 

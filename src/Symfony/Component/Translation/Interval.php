@@ -39,7 +39,7 @@ class Interval
      * @param int     $number   A number
      * @param string  $interval An interval
      *
-     * @return Boolean
+     * @return bool
      *
      * @throws \InvalidArgumentException
      */

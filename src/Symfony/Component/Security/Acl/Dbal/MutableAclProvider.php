@@ -737,7 +737,7 @@ QUERY;
      * If the type does not yet exist in the database, it will be created.
      *
      * @param string $classType
-     * @return integer
+     * @return int
      */
     private function createOrRetrieveClassId($classType)
     {
@@ -757,7 +757,7 @@ QUERY;
      * created.
      *
      * @param SecurityIdentityInterface $sid
-     * @return integer
+     * @return int
      */
     private function createOrRetrieveSecurityIdentityId(SecurityIdentityInterface $sid)
     {

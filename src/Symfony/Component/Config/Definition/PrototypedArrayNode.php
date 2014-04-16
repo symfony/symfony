@@ -100,7 +100,7 @@ class PrototypedArrayNode extends ArrayNode
     /**
      * Checks if the node has a default value.
      *
-     * @return Boolean
+     * @return bool
      */
     public function hasDefaultValue()
     {

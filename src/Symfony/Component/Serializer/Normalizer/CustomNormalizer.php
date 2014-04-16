@@ -41,7 +41,7 @@ class CustomNormalizer extends SerializerAwareNormalizer implements NormalizerIn
      * @param mixed  $data   Data to normalize.
      * @param string $format The format being (de-)serialized from or into.
      *
-     * @return Boolean
+     * @return bool
      */
     public function supportsNormalization($data, $format = null)
     {
@@ -55,7 +55,7 @@ class CustomNormalizer extends SerializerAwareNormalizer implements NormalizerIn
      * @param string $type   The class to which the data should be denormalized.
      * @param string $format The format being deserialized from.
      *
-     * @return Boolean
+     * @return bool
      */
     public function supportsDenormalization($data, $type, $format = null)
     {

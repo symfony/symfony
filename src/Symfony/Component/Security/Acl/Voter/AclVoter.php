@@ -134,7 +134,7 @@ class AclVoter implements VoterInterface
      *
      * @param string $class The class name
      *
-     * @return Boolean
+     * @return bool
      */
     public function supportsClass($class)
     {

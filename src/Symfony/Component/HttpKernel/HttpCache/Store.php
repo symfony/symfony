@@ -69,7 +69,7 @@ class Store implements StoreInterface
      *
      * @param Request $request A Request instance
      *
-     * @return Boolean|string true if the lock is acquired, the path to the current lock otherwise
+     * @return bool|string    true if the lock is acquired, the path to the current lock otherwise
      */
     public function lock(Request $request)
     {
@@ -95,7 +95,7 @@ class Store implements StoreInterface
      *
      * @param Request $request A Request instance
      *
-     * @return Boolean False if the lock file does not exist or cannot be unlocked, true otherwise
+     * @return bool    False if the lock file does not exist or cannot be unlocked, true otherwise
      */
     public function unlock(Request $request)
     {
@@ -258,7 +258,7 @@ class Store implements StoreInterface
      * @param array  $env1 A Request HTTP header array
      * @param array  $env2 A Request HTTP header array
      *
-     * @return Boolean true if the two environments match, false otherwise
+     * @return bool    true if the two environments match, false otherwise
      */
     private function requestsMatch($vary, $env1, $env2)
     {
@@ -301,7 +301,7 @@ class Store implements StoreInterface
      *
      * @param string $url A URL
      *
-     * @return Boolean true if the URL exists and has been purged, false otherwise
+     * @return bool    true if the URL exists and has been purged, false otherwise
      */
     public function purge($url)
     {
@@ -334,7 +334,7 @@ class Store implements StoreInterface
      * @param string $key  The store key
      * @param string $data The data to store
      *
-     * @return Boolean
+     * @return bool
      */
     private function save($key, $data)
     {

@@ -104,7 +104,7 @@ class MaskBuilder
     /**
      * Returns the mask of this permission
      *
-     * @return integer
+     * @return int
      */
     public function get()
     {

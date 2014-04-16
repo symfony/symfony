@@ -57,7 +57,7 @@ class FileResource implements ResourceInterface, \Serializable
      *
      * @param int     $timestamp The last time the resource was loaded
      *
-     * @return Boolean true if the resource has not been updated, false otherwise
+     * @return bool    true if the resource has not been updated, false otherwise
      */
     public function isFresh($timestamp)
     {

@@ -39,7 +39,7 @@ class MoFileLoader extends ArrayLoader implements LoaderInterface
     /**
      * The size of the header of a MO file in bytes.
      *
-     * @var integer Number of bytes.
+     * @var int     Number of bytes.
      */
     const MO_HEADER_SIZE = 28;
 
@@ -170,7 +170,7 @@ class MoFileLoader extends ArrayLoader implements LoaderInterface
      *
      * @param  resource $stream
      * @param  bool     $isBigEndian
-     * @return integer
+     * @return int
      */
     private function readLong($stream, $isBigEndian)
     {

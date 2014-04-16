@@ -86,7 +86,7 @@ class ClassMetadata extends ElementMetadata implements LegacyMetadataInterface, 
     public $groupSequence = array();
 
     /**
-     * @var Boolean
+     * @var bool
      *
      * @internal This property is public in order to reduce the size of the
      *           class' serialized representation. Do not access it. Use
@@ -355,7 +355,7 @@ class ClassMetadata extends ElementMetadata implements LegacyMetadataInterface, 
      *
      * @param string $property The name of the property
      *
-     * @return Boolean
+     * @return bool
      */
     public function hasMemberMetadatas($property)
     {

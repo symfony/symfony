@@ -48,7 +48,7 @@ interface ProfilerStorageInterface
      *
      * @param Profile $profile A Profile instance
      *
-     * @return Boolean Write operation successful
+     * @return bool    Write operation successful
      */
     public function write(Profile $profile);
 

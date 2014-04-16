@@ -189,7 +189,7 @@ class PropertyPathBuilder
     /**
      * Returns the length of the current path.
      *
-     * @return integer The path length
+     * @return int     The path length
      */
     public function getLength()
     {

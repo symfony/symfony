@@ -21,7 +21,7 @@ if (!function_exists('intl_is_failure')) {
      *
      * @param int     $errorCode  The error code returned by intl_get_error_code().
      *
-     * @return Boolean Whether the error code indicates an error.
+     * @return bool    Whether the error code indicates an error.
      *
      * @see \Symfony\Component\Intl\Globals\StubIntlGlobals::isFailure
      */
@@ -36,7 +36,7 @@ if (!function_exists('intl_is_failure')) {
      *
      * @author Bernhard Schussek <bschussek@gmail.com>
      *
-     * @return Boolean The error code of the last intl function call or
+     * @return bool    The error code of the last intl function call or
      *                 IntlGlobals::U_ZERO_ERROR if no error occurred.
      *
      * @see \Symfony\Component\Intl\Globals\StubIntlGlobals::getErrorCode
@@ -52,7 +52,7 @@ if (!function_exists('intl_is_failure')) {
      *
      * @author Bernhard Schussek <bschussek@gmail.com>
      *
-     * @return Boolean The error message of the last intl function call or
+     * @return bool    The error message of the last intl function call or
      *                 "U_ZERO_ERROR" if no error occurred.
      *
      * @see \Symfony\Component\Intl\Globals\StubIntlGlobals::getErrorMessage

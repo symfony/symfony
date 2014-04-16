@@ -22,12 +22,12 @@ use Symfony\Component\Finder\SplFileInfo;
 class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
 {
     /**
-     * @var boolean
+     * @var bool
      */
     private $ignoreUnreadableDirs;
 
     /**
-     * @var Boolean
+     * @var bool
      */
     private $rewindable;
 
@@ -97,7 +97,7 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
     /**
      * Checks if the stream is rewindable.
      *
-     * @return Boolean true when the stream is rewindable, false otherwise
+     * @return bool    true when the stream is rewindable, false otherwise
      */
     public function isRewindable()
     {

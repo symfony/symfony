@@ -27,12 +27,12 @@ class PropertyAccessor implements PropertyAccessorInterface
     const IS_REF = 1;
 
     /**
-     * @var Boolean
+     * @var bool
      */
     private $magicCall;
 
     /**
-     * @var Boolean
+     * @var bool
      */
     private $ignoreInvalidIndices;
 
@@ -576,7 +576,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      * @param  string           $methodName The method name
      * @param  int              $parameters The number of parameters
      *
-     * @return Boolean Whether the method is public and has $parameters
+     * @return bool    Whether the method is public and has $parameters
      *                                      required parameters
      */
     private function isMethodAccessible(\ReflectionClass $class, $methodName, $parameters)

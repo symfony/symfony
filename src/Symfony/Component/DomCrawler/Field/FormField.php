@@ -39,7 +39,7 @@ abstract class FormField
      */
     protected $xpath;
     /**
-     * @var Boolean
+     * @var bool
      */
     protected $disabled;
 
@@ -98,7 +98,7 @@ abstract class FormField
     /**
      * Returns true if the field should be included in the submitted values.
      *
-     * @return Boolean true if the field should be included in the submitted values, false otherwise
+     * @return bool    true if the field should be included in the submitted values, false otherwise
      */
     public function hasValue()
     {
@@ -108,7 +108,7 @@ abstract class FormField
     /**
      * Check if the current field is disabled
      *
-     * @return Boolean
+     * @return bool
      */
     public function isDisabled()
     {

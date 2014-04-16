@@ -56,7 +56,7 @@ class Esi
      *
      * @param Request $request A Request instance
      *
-     * @return Boolean true if one surrogate has ESI/1.0 capability, false otherwise
+     * @return bool    true if one surrogate has ESI/1.0 capability, false otherwise
      */
     public function hasSurrogateEsiCapability(Request $request)
     {
@@ -99,7 +99,7 @@ class Esi
      *
      * @param Response $response A Response instance
      *
-     * @return Boolean true if the Response needs to be parsed, false otherwise
+     * @return bool    true if the Response needs to be parsed, false otherwise
      */
     public function needsEsiParsing(Response $response)
     {

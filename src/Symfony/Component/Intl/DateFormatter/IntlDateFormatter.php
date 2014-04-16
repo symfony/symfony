@@ -49,7 +49,7 @@ class IntlDateFormatter
     /**
      * The error code from the last operation
      *
-     * @var integer
+     * @var int
      */
     protected $errorCode = IntlGlobals::U_ZERO_ERROR;
 
@@ -117,7 +117,7 @@ class IntlDateFormatter
     private $dateTimeZone;
 
     /**
-     * @var Boolean
+     * @var bool
      */
     private $unitializedTimeZoneId = false;
 
@@ -190,7 +190,7 @@ class IntlDateFormatter
      * @param int|\DateTime     $timestamp The timestamp to format. \DateTime objects
      *                                     are supported as of PHP 5.3.4.
      *
-     * @return string|Boolean The formatted value or false if formatting failed.
+     * @return string|bool    The formatted value or false if formatting failed.
      *
      * @see http://www.php.net/manual/en/intldateformatter.format.php
      *
@@ -400,7 +400,7 @@ class IntlDateFormatter
     /**
      * Returns whether the formatter is lenient
      *
-     * @return Boolean Currently always returns false.
+     * @return bool    Currently always returns false.
      *
      * @see http://www.php.net/manual/en/intldateformatter.islenient.php
      *
@@ -470,7 +470,7 @@ class IntlDateFormatter
      *
      * @param string $calendar The calendar to use. Default is IntlDateFormatter::GREGORIAN.
      *
-     * @return Boolean true on success or false on failure
+     * @return bool    true on success or false on failure
      *
      * @see http://www.php.net/manual/en/intldateformatter.setcalendar.php
      *
@@ -492,7 +492,7 @@ class IntlDateFormatter
      * @param bool    $lenient Sets whether the parser is lenient or not. Currently
      *                         only false (strict) is supported.
      *
-     * @return Boolean true on success or false on failure
+     * @return bool    true on success or false on failure
      *
      * @see http://www.php.net/manual/en/intldateformatter.setlenient.php
      *
@@ -512,7 +512,7 @@ class IntlDateFormatter
      *
      * @param string $pattern A pattern string in conformance with the ICU IntlDateFormatter documentation
      *
-     * @return Boolean true on success or false on failure
+     * @return bool    true on success or false on failure
      *
      * @see http://www.php.net/manual/en/intldateformatter.setpattern.php
      * @see http://userguide.icu-project.org/formatparse/datetime
@@ -535,7 +535,7 @@ class IntlDateFormatter
      *                               If NULL or the empty string, the default time zone for the
      *                               runtime is used.
      *
-     * @return Boolean true on success or false on failure
+     * @return bool    true on success or false on failure
      *
      * @see http://www.php.net/manual/en/intldateformatter.settimezoneid.php
      */
@@ -584,7 +584,7 @@ class IntlDateFormatter
      *
      * @param  mixed $timeZone
      *
-     * @return Boolean true on success or false on failure
+     * @return bool    true on success or false on failure
      *
      * @see http://www.php.net/manual/en/intldateformatter.settimezone.php
      */

@@ -49,7 +49,7 @@ class UuidValidator extends ConstraintValidator
     const STRICT_UUID_LENGTH = 36;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function validate($value, Constraint $constraint)
     {

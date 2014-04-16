@@ -91,7 +91,7 @@ class Validator implements ValidatorInterface, Mapping\Factory\MetadataFactoryIn
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function validate($value, $groups = null, $traverse = false, $deep = false)
     {

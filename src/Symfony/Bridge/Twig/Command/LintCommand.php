@@ -32,7 +32,7 @@ class LintCommand extends Command
     private $twig;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function __construct($name = 'twig:lint')
     {

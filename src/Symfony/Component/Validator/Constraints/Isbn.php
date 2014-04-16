@@ -40,7 +40,7 @@ class Isbn extends Constraint
     public $isbn13 = false;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getDefaultOption()
     {

@@ -57,7 +57,7 @@ class ExceptionHandler implements ExceptionHandlerInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      *
      * Sends a response for the given Exception.
      *

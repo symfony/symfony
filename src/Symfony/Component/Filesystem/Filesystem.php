@@ -446,7 +446,7 @@ class Filesystem
      *
      * @param  string       $filename The file to be written to.
      * @param  string       $content  The data to write into the file.
-     * @param  null|integer $mode     The file mode (octal). If null, file permissions are not modified
+     * @param  null|int     $mode     The file mode (octal). If null, file permissions are not modified
      *                                Deprecated since version 2.3.12, to be removed in 3.0.
      * @throws IOException            If the file cannot be written to.
      */

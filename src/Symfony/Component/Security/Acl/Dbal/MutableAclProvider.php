@@ -415,7 +415,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
      * Constructs the SQL for inserting an ACE.
      *
      * @param int          $classId
-     * @param int    |null $objectIdentityId
+     * @param int|null     $objectIdentityId
      * @param string|null  $field
      * @param int          $aceOrder
      * @param int          $securityIdentityId

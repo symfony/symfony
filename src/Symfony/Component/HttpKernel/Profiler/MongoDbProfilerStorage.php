@@ -87,7 +87,7 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
 
         $result = $this->getMongo()->update(array('_id' => $profile->getToken()), array_filter($record, function ($v) { return !empty($v); }), array('upsert' => true));
 
-        return (boolean) (isset($result['ok']) ? $result['ok'] : $result);
+        return (bool) (isset($result['ok']) ? $result['ok'] : $result);
     }
 
     /**

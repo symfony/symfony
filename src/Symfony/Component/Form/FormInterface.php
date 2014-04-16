@@ -41,7 +41,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Adds or replaces a child to the form.
      *
-     * @param FormInterface|string|integer $child   The FormInterface instance or the name of the child.
+     * @param FormInterface|string|int     $child   The FormInterface instance or the name of the child.
      * @param string|null                  $type    The child's type, if a name was passed.
      * @param array                        $options The child's options, if a name was passed.
      *

@@ -31,7 +31,7 @@ class SortableIterator implements \IteratorAggregate
      * Constructor.
      *
      * @param \Traversable     $iterator The Iterator to filter
-     * @param int    |callback $sort     The sort type (SORT_BY_NAME, SORT_BY_TYPE, or a PHP callback)
+     * @param int|callback     $sort     The sort type (SORT_BY_NAME, SORT_BY_TYPE, or a PHP callback)
      *
      * @throws \InvalidArgumentException
      */

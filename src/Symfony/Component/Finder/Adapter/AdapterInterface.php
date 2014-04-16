@@ -94,7 +94,7 @@ interface AdapterInterface
     public function setFilters(array $filters);
 
     /**
-     * @param \Closure|integer $sort
+     * @param \Closure|int     $sort
      *
      * @return AdapterInterface Current instance
      */

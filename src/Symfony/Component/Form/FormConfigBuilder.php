@@ -180,7 +180,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * Creates an empty form configuration.
      *
-     * @param string|integer           $name       The form name
+     * @param string|int               $name       The form name
      * @param string                   $dataClass  The class of the form's data
      * @param EventDispatcherInterface $dispatcher The event dispatcher
      * @param array                    $options    The form options
@@ -879,7 +879,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * Validates whether the given variable is a valid form name.
      *
-     * @param string|integer $name The tested form name.
+     * @param string|int     $name The tested form name.
      *
      * @throws UnexpectedTypeException   If the name is not a string or an integer.
      * @throws InvalidArgumentException If the name contains invalid characters.

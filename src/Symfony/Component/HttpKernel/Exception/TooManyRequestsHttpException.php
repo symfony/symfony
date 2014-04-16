@@ -22,7 +22,7 @@ class TooManyRequestsHttpException extends HttpException
     /**
      * Constructor.
      *
-     * @param int    |string $retryAfter The number of seconds or HTTP-date after which the request may be retried
+     * @param int|string     $retryAfter The number of seconds or HTTP-date after which the request may be retried
      * @param string         $message    The internal exception message
      * @param \Exception     $previous   The previous exception
      * @param int            $code       The internal exception code

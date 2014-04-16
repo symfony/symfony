@@ -123,7 +123,7 @@ class Process
      * @param string|null        $cwd         The working directory or null to use the working dir of the current PHP process
      * @param array|null         $env         The environment variables or null to inherit
      * @param string|null        $stdin       The STDIN content
-     * @param int    |float|null $timeout     The timeout in seconds or null to disable
+     * @param int|float|null     $timeout     The timeout in seconds or null to disable
      * @param array              $options     An array of options for proc_open
      *
      * @throws RuntimeException When proc_open is not installed
@@ -646,7 +646,7 @@ class Process
     /**
      * Stops the process.
      *
-     * @param int    |float $timeout The timeout in seconds
+     * @param int|float     $timeout The timeout in seconds
      * @param int           $signal  A POSIX signal to send in case the process has not stop at timeout, default is SIGKILL
      *
      * @return integer The exit-code of the process
@@ -746,7 +746,7 @@ class Process
      *
      * To disable the timeout, set this value to null.
      *
-     * @param int    |float|null $timeout The timeout in seconds
+     * @param int|float|null     $timeout The timeout in seconds
      *
      * @return self The current Process instance
      *

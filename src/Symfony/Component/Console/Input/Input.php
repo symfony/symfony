@@ -145,7 +145,7 @@ abstract class Input implements InputInterface
     /**
      * Returns true if an InputArgument object exists by name or position.
      *
-     * @param string|integer $name The InputArgument name or position
+     * @param string|int     $name The InputArgument name or position
      *
      * @return Boolean true if the InputArgument object exists, false otherwise
      */
@@ -186,7 +186,7 @@ abstract class Input implements InputInterface
      * Sets an option value by name.
      *
      * @param string         $name  The option name
-     * @param string|boolean $value The option value
+     * @param string|bool    $value The option value
      *
      * @throws \InvalidArgumentException When option given doesn't exist
      */

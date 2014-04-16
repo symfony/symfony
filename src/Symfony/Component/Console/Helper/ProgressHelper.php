@@ -178,7 +178,7 @@ class ProgressHelper extends Helper
      * Starts the progress output.
      *
      * @param OutputInterface $output An Output instance
-     * @param int    |null    $max    Maximum steps
+     * @param int|null        $max    Maximum steps
      */
     public function start(OutputInterface $output, $max = null)
     {

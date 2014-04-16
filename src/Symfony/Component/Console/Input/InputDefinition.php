@@ -148,7 +148,7 @@ class InputDefinition
     /**
      * Returns an InputArgument by name or by position.
      *
-     * @param string|integer $name The InputArgument name or position
+     * @param string|int     $name The InputArgument name or position
      *
      * @return InputArgument An InputArgument object
      *
@@ -170,7 +170,7 @@ class InputDefinition
     /**
      * Returns true if an InputArgument object exists by name or position.
      *
-     * @param string|integer $name The InputArgument name or position
+     * @param string|int     $name The InputArgument name or position
      *
      * @return Boolean true if the InputArgument object exists, false otherwise
      *

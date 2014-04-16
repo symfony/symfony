@@ -168,7 +168,7 @@ class MemcacheMock
      * Retrieve item from the server.
      *
      * @param string|array  $key
-     * @param int    |array $flags
+     * @param int|array     $flags
      *
      * @return mixed
      */

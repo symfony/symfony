@@ -74,8 +74,8 @@ class RedirectController extends ContainerAware
      * @param string       $path      The absolute path or URL to redirect to
      * @param bool         $permanent Whether the redirect is permanent or not
      * @param string|null  $scheme    The URL scheme (null to keep the current one)
-     * @param int    |null $httpPort  The HTTP port (null to keep the current one for the same scheme or the configured port in the container)
-     * @param int    |null $httpsPort The HTTPS port (null to keep the current one for the same scheme or the configured port in the container)
+     * @param int|null     $httpPort  The HTTP port (null to keep the current one for the same scheme or the configured port in the container)
+     * @param int|null     $httpsPort The HTTPS port (null to keep the current one for the same scheme or the configured port in the container)
      *
      * @return Response A Response instance
      *

@@ -187,7 +187,7 @@ class IntlDateFormatter
     /**
      * Format the date/time value (timestamp) as a string
      *
-     * @param int    |\DateTime $timestamp The timestamp to format. \DateTime objects
+     * @param int|\DateTime     $timestamp The timestamp to format. \DateTime objects
      *                                     are supported as of PHP 5.3.4.
      *
      * @return string|Boolean The formatted value or false if formatting failed.

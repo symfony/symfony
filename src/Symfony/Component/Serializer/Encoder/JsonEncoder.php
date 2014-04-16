@@ -39,7 +39,7 @@ class JsonEncoder implements EncoderInterface, DecoderInterface
     /**
      * Returns the last encoding error (if any)
      *
-     * @return integer
+     * @return int
      */
     public function getLastEncodingError()
     {
@@ -49,7 +49,7 @@ class JsonEncoder implements EncoderInterface, DecoderInterface
     /**
      * Returns the last decoding error (if any)
      *
-     * @return integer
+     * @return int
      */
     public function getLastDecodingError()
     {

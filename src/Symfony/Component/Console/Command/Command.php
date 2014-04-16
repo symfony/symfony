@@ -133,7 +133,7 @@ class Command
      * Override this to check for x or y and return false if the command can not
      * run properly under the current conditions.
      *
-     * @return Boolean
+     * @return bool
      */
     public function isEnabled()
     {
@@ -158,7 +158,7 @@ class Command
      * @param InputInterface  $input  An InputInterface instance
      * @param OutputInterface $output An OutputInterface instance
      *
-     * @return null|integer null or 0 if everything went fine, or an error code
+     * @return null|int     null or 0 if everything went fine, or an error code
      *
      * @throws \LogicException When this abstract method is not implemented
      * @see    setCode()
@@ -201,7 +201,7 @@ class Command
      * @param InputInterface  $input  An InputInterface instance
      * @param OutputInterface $output An OutputInterface instance
      *
-     * @return integer The command exit code
+     * @return int     The command exit code
      *
      * @throws \Exception
      *

@@ -36,7 +36,7 @@ class Alias
     /**
      * Checks if this DI Alias should be public or not.
      *
-     * @return Boolean
+     * @return bool
      *
      * @api
      */

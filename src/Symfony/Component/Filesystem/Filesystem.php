@@ -90,7 +90,7 @@ class Filesystem
      *
      * @param string|array|\Traversable $files A filename, an array of files, or a \Traversable instance to check
      *
-     * @return Boolean true if the file exists, false otherwise
+     * @return bool    true if the file exists, false otherwise
      */
     public function exists($files)
     {
@@ -413,7 +413,7 @@ class Filesystem
      *
      * @param string $file A file path
      *
-     * @return Boolean
+     * @return bool
      */
     public function isAbsolutePath($file)
     {

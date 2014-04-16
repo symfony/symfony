@@ -111,7 +111,7 @@ abstract class Extension implements ExtensionInterface, ConfigurationExtensionIn
      * @param ContainerBuilder $container
      * @param array            $config
      *
-     * @return Boolean Whether the configuration is enabled
+     * @return bool    Whether the configuration is enabled
      *
      * @throws InvalidArgumentException When the config is not enableable
      */

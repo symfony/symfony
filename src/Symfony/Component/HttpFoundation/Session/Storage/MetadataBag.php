@@ -44,7 +44,7 @@ class MetadataBag implements SessionBagInterface
     /**
      * Unix timestamp.
      *
-     * @var integer
+     * @var int
      */
     private $lastUsed;
 
@@ -87,7 +87,7 @@ class MetadataBag implements SessionBagInterface
     /**
      * Gets the lifetime that the session cookie was set with.
      *
-     * @return integer
+     * @return int
      */
     public function getLifetime()
     {
@@ -118,7 +118,7 @@ class MetadataBag implements SessionBagInterface
     /**
      * Gets the created timestamp metadata.
      *
-     * @return integer Unix timestamp
+     * @return int     Unix timestamp
      */
     public function getCreated()
     {
@@ -128,7 +128,7 @@ class MetadataBag implements SessionBagInterface
     /**
      * Gets the last used metadata.
      *
-     * @return integer Unix timestamp
+     * @return int     Unix timestamp
      */
     public function getLastUsed()
     {

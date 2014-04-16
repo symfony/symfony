@@ -67,7 +67,7 @@ interface FormBuilderInterface extends \Traversable, \Countable, FormConfigBuild
      *
      * @param string $name
      *
-     * @return Boolean
+     * @return bool
      */
     public function has($name);
 

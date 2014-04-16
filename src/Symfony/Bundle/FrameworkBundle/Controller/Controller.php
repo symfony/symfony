@@ -237,7 +237,7 @@ class Controller extends ContainerAware
      *
      * @param string $id The service id
      *
-     * @return Boolean true if the service id is defined, false otherwise
+     * @return bool    true if the service id is defined, false otherwise
      */
     public function has($id)
     {

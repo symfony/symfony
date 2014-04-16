@@ -21,7 +21,7 @@ class Dumper
     /**
      * The amount of spaces to use for indentation of nested nodes.
      *
-     * @var integer
+     * @var int
      */
     protected $indentation = 4;
 

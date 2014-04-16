@@ -55,14 +55,14 @@ class ModelChoiceList extends ObjectChoiceList
     /**
      * Whether the model objects have already been loaded.
      *
-     * @var Boolean
+     * @var bool
      */
     protected $loaded = false;
 
     /**
      * Whether to use the identifier for index generation.
      *
-     * @var Boolean
+     * @var bool
      */
     private $identifierAsIndex = false;
 
@@ -360,7 +360,7 @@ class ModelChoiceList extends ObjectChoiceList
      *
      * @param mixed $model The choice to create an index for
      *
-     * @return integer|string A unique index containing only ASCII letters,
+     * @return int|string     A unique index containing only ASCII letters,
      *                        digits and underscores.
      */
     protected function createIndex($model)
@@ -381,7 +381,7 @@ class ModelChoiceList extends ObjectChoiceList
      *
      * @param mixed $model The choice to create a value for
      *
-     * @return integer|string A unique value without character limitations.
+     * @return int|string     A unique value without character limitations.
      */
     protected function createValue($model)
     {
@@ -458,7 +458,7 @@ class ModelChoiceList extends ObjectChoiceList
      *
      * @param \ColumnMap $column
      *
-     * @return Boolean
+     * @return bool
      */
     private function isScalar(\ColumnMap $column)
     {
@@ -475,7 +475,7 @@ class ModelChoiceList extends ObjectChoiceList
      * @param mixed $choice
      * @param mixed $givenChoice
      *
-     * @return Boolean
+     * @return bool
      */
     private function isEqual($choice, $givenChoice)
     {

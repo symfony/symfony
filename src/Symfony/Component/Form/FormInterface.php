@@ -69,7 +69,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @param string $name The name of the child
      *
-     * @return Boolean
+     * @return bool
      */
     public function has($name);
 
@@ -152,7 +152,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns whether the form is submitted.
      *
-     * @return Boolean true if the form is submitted, false otherwise
+     * @return bool    true if the form is submitted, false otherwise
      */
     public function isSubmitted();
 
@@ -184,7 +184,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * If the form is not submitted, this method always returns false.
      *
-     * @return Boolean
+     * @return bool
      */
     public function isValid();
 
@@ -195,7 +195,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      * will always return false. Otherwise the value set with setRequired()
      * is returned.
      *
-     * @return Boolean
+     * @return bool
      */
     public function isRequired();
 
@@ -208,21 +208,21 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      * Forms whose parents are disabled are considered disabled regardless of
      * their own state.
      *
-     * @return Boolean
+     * @return bool
      */
     public function isDisabled();
 
     /**
      * Returns whether the form is empty.
      *
-     * @return Boolean
+     * @return bool
      */
     public function isEmpty();
 
     /**
      * Returns whether the data in the different formats is synchronized.
      *
-     * @return Boolean
+     * @return bool
      */
     public function isSynchronized();
 
@@ -273,7 +273,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns whether the field is the root of the form tree.
      *
-     * @return Boolean
+     * @return bool
      */
     public function isRoot();
 

@@ -69,7 +69,7 @@ interface OutputInterface
     /**
      * Gets the current verbosity of the output.
      *
-     * @return integer The current level of verbosity (one of the VERBOSITY constants)
+     * @return int     The current level of verbosity (one of the VERBOSITY constants)
      *
      * @api
      */
@@ -87,7 +87,7 @@ interface OutputInterface
     /**
      * Gets the decorated flag.
      *
-     * @return Boolean true if the output will decorate messages, false otherwise
+     * @return bool    true if the output will decorate messages, false otherwise
      *
      * @api
      */

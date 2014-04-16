@@ -130,7 +130,7 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
      * @param SecurityIdentityInterface[] $sids               An array of SecurityIdentityInterface implementations
      * @param bool                        $administrativeMode True turns off audit logging
      *
-     * @return Boolean true, or false; either granting, or denying access respectively.
+     * @return bool    true, or false; either granting, or denying access respectively.
      *
      * @throws NoAceFoundException
      */
@@ -191,7 +191,7 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
      * @param int            $requiredMask
      * @param EntryInterface $ace
      *
-     * @return Boolean
+     * @return bool
      *
      * @throws \RuntimeException if the ACE strategy is not supported
      */

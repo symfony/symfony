@@ -32,7 +32,7 @@ class Scope
     private $data = array();
 
     /**
-     * @var boolean
+     * @var bool
      */
     private $left = false;
 
@@ -95,7 +95,7 @@ class Scope
      *
      * @param string $key
      *
-     * @return boolean
+     * @return bool
      */
     public function has($key)
     {

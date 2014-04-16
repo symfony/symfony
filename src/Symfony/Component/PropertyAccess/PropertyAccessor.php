@@ -439,7 +439,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      * @param  string           $methodName The method name
      * @param  int              $parameters The number of parameters
      *
-     * @return Boolean Whether the method is public and has $parameters
+     * @return bool    Whether the method is public and has $parameters
      *                                      required parameters
      */
     private function isAccessible(\ReflectionClass $class, $methodName, $parameters)

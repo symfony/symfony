@@ -304,7 +304,7 @@ class Locale
      *
      * @param string $locale The locale code
      *
-     * @return Boolean true on success or false on failure
+     * @return bool    true on success or false on failure
      *
      * @see http://www.php.net/manual/en/locale.parselocale.php
      *

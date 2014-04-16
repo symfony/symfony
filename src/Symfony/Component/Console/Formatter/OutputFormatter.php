@@ -75,7 +75,7 @@ class OutputFormatter implements OutputFormatterInterface
     /**
      * Gets the decorated flag.
      *
-     * @return Boolean true if the output will decorate messages, false otherwise
+     * @return bool    true if the output will decorate messages, false otherwise
      *
      * @api
      */
@@ -102,7 +102,7 @@ class OutputFormatter implements OutputFormatterInterface
      *
      * @param string $name
      *
-     * @return Boolean
+     * @return bool
      *
      * @api
      */
@@ -194,7 +194,7 @@ class OutputFormatter implements OutputFormatterInterface
      *
      * @param string $string
      *
-     * @return OutputFormatterStyle|Boolean false if string is not format string
+     * @return OutputFormatterStyle|bool    false if string is not format string
      */
     private function createStyleFromString($string)
     {

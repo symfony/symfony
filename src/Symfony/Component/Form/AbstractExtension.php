@@ -39,7 +39,7 @@ abstract class AbstractExtension implements FormExtensionInterface
 
     /**
      * Whether the type guesser has been loaded
-     * @var Boolean
+     * @var bool
      */
     private $typeGuesserLoaded = false;
 

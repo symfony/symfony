@@ -52,7 +52,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
      * process. If any option is changed after being read, all evaluated
      * lazy options that depend on this option would become invalid.
      *
-     * @var Boolean
+     * @var bool
      */
     private $reading = false;
 
@@ -244,7 +244,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
      *
      * @param string $option The option name.
      *
-     * @return Boolean Whether the option exists.
+     * @return bool    Whether the option exists.
      */
     public function has($option)
     {
@@ -324,7 +324,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
      *
      * @param string $option The option name.
      *
-     * @return Boolean Whether the option exists.
+     * @return bool    Whether the option exists.
      *
      * @see \ArrayAccess::offsetExists()
      */

@@ -85,7 +85,7 @@ interface ConstraintViolationInterface
      * This method returns the value of the parameter for choosing the right
      * pluralization form (in this case "choices").
      *
-     * @return integer|null The number to use to pluralize of the message.
+     * @return int|null     The number to use to pluralize of the message.
      */
     public function getMessagePluralization();
 

@@ -36,7 +36,7 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
     private $defaultTokenManager;
 
     /**
-     * @var Boolean
+     * @var bool
      */
     private $defaultEnabled;
 

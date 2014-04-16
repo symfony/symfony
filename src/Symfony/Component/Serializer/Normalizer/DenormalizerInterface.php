@@ -37,7 +37,7 @@ interface DenormalizerInterface
      * @param string $type   The class to which the data should be denormalized.
      * @param string $format The format being deserialized from.
      *
-     * @return Boolean
+     * @return bool
      */
     public function supportsDenormalization($data, $type, $format = null);
 }

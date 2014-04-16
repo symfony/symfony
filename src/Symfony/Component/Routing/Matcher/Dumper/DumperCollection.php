@@ -116,7 +116,7 @@ class DumperCollection implements \IteratorAggregate
      *
      * @param string $name The attribute name
      *
-     * @return Boolean true if the attribute is defined, false otherwise
+     * @return bool    true if the attribute is defined, false otherwise
      */
     public function hasAttribute($name)
     {

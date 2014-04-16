@@ -100,7 +100,7 @@ class ParseException extends RuntimeException
     /**
      * Gets the line where the error occurred.
      *
-     * @return integer The file line
+     * @return int     The file line
      */
     public function getParsedLine()
     {

@@ -56,7 +56,7 @@ interface ConstraintViolationListInterface extends \Traversable, \Countable, \Ar
      *
      * @param  int     $offset The violation offset.
      *
-     * @return Boolean Whether the offset exists.
+     * @return bool    Whether the offset exists.
      *
      * @api
      */

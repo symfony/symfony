@@ -30,7 +30,7 @@ class FormUtil
      *
      * @param  mixed $data
      *
-     * @return Boolean
+     * @return bool
      */
     public static function isEmpty($data)
     {

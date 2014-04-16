@@ -119,7 +119,7 @@ class TimeDataCollector extends DataCollector implements LateDataCollectorInterf
     /**
      * Gets the request time.
      *
-     * @return integer The time
+     * @return int     The time
      */
     public function getStartTime()
     {

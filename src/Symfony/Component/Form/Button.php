@@ -211,7 +211,6 @@ class Button implements \IteratorAggregate, FormInterface
      */
     public function getData()
     {
-        return null;
     }
 
     /**
@@ -221,7 +220,6 @@ class Button implements \IteratorAggregate, FormInterface
      */
     public function getNormData()
     {
-        return null;
     }
 
     /**
@@ -231,7 +229,6 @@ class Button implements \IteratorAggregate, FormInterface
      */
     public function getViewData()
     {
-        return null;
     }
 
     /**
@@ -281,7 +278,6 @@ class Button implements \IteratorAggregate, FormInterface
      */
     public function getPropertyPath()
     {
-        return null;
     }
 
     /**

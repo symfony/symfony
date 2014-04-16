@@ -209,7 +209,7 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         if (null === $this->getName() || '' === $this->getName()) {
-            return null;
+            return;
         }
 
         $parent = $this->parent;
@@ -767,8 +767,6 @@ class Form implements \IteratorAggregate, FormInterface
         if ($this->parent && method_exists($this->parent, 'getClickedButton')) {
             return $this->parent->getClickedButton();
         }
-
-        return null;
     }
 
     /**

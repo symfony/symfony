@@ -393,7 +393,7 @@ class Inline
             case 'null' === $scalarLower:
             case '' === $scalar:
             case '~' === $scalar:
-                return null;
+                return;
             case 'true' === $scalarLower:
                 return true;
             case 'false' === $scalarLower:
@@ -414,7 +414,7 @@ class Inline
                             throw new ParseException('Object support when parsing a YAML file has been disabled.');
                         }
 
-                        return null;
+                        return;
                     case ctype_digit($scalar):
                         $raw = $scalar;
                         $cast = intval($scalar);

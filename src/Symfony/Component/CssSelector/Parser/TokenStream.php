@@ -162,7 +162,7 @@ class TokenStream
         }
 
         if ($next->isDelimiter(array('*'))) {
-            return null;
+            return;
         }
 
         throw SyntaxErrorException::unexpectedToken('identifier or "*"', $next);

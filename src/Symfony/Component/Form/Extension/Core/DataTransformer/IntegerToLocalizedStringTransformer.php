@@ -31,7 +31,7 @@ class IntegerToLocalizedStringTransformer extends NumberToLocalizedStringTransfo
         }
 
         if ('' === $value) {
-            return null;
+            return;
         }
 
         if ('NaN' === $value) {

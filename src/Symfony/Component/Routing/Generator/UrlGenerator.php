@@ -171,7 +171,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
                             $this->logger->error($message);
                         }
 
-                        return null;
+                        return;
                     }
 
                     $url = $token[1].$mergedParams[$token[3]].$url;
@@ -224,7 +224,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
                                 $this->logger->error($message);
                             }
 
-                            return null;
+                            return;
                         }
 
                         $routeHost = $token[1].$mergedParams[$token[3]].$routeHost;

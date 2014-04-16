@@ -239,7 +239,5 @@ class PdoSessionHandler implements \SessionHandlerInterface
             case 'sqlite':
                 return "INSERT OR REPLACE INTO $this->table ($this->idCol, $this->dataCol, $this->timeCol) VALUES (:id, :data, :time)";
         }
-
-        return null;
     }
 }

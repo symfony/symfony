@@ -26,7 +26,6 @@ class ButtonType extends BaseType implements ButtonTypeInterface
      */
     public function getParent()
     {
-        return null;
     }
 
     /**

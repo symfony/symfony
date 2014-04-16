@@ -379,8 +379,6 @@ class IntlDateFormatter
         if (version_compare(PHP_VERSION, '5.5.0-dev', '>=')) {
             return date_default_timezone_get();
         }
-
-        return null;
     }
 
     /**

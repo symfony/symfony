@@ -142,8 +142,6 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
         }
 
         $this->cancelCookie($request);
-
-        return null;
     }
 
     /**

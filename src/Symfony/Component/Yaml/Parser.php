@@ -261,7 +261,7 @@ class Parser
     /**
      * Returns the current line number (takes the offset into account).
      *
-     * @return integer The current line number
+     * @return int     The current line number
      */
     private function getRealCurrentLineNb()
     {
@@ -271,7 +271,7 @@ class Parser
     /**
      * Returns the current line indentation.
      *
-     * @return integer The current line indentation
+     * @return int     The current line indentation
      */
     private function getCurrentLineIndentation()
     {
@@ -349,7 +349,7 @@ class Parser
     /**
      * Moves the parser to the next line.
      *
-     * @return Boolean
+     * @return bool
      */
     private function moveToNextLine()
     {
@@ -497,7 +497,7 @@ class Parser
     /**
      * Returns true if the next line is indented.
      *
-     * @return Boolean Returns true if the next line is indented, false otherwise
+     * @return bool    Returns true if the next line is indented, false otherwise
      */
     private function isNextLineIndented()
     {
@@ -525,7 +525,7 @@ class Parser
     /**
      * Returns true if the current line is blank or if it is a comment line.
      *
-     * @return Boolean Returns true if the current line is empty or if it is a comment line, false otherwise
+     * @return bool    Returns true if the current line is empty or if it is a comment line, false otherwise
      */
     private function isCurrentLineEmpty()
     {
@@ -535,7 +535,7 @@ class Parser
     /**
      * Returns true if the current line is blank.
      *
-     * @return Boolean Returns true if the current line is blank, false otherwise
+     * @return bool    Returns true if the current line is blank, false otherwise
      */
     private function isCurrentLineBlank()
     {
@@ -545,7 +545,7 @@ class Parser
     /**
      * Returns true if the current line is a comment line.
      *
-     * @return Boolean Returns true if the current line is a comment line, false otherwise
+     * @return bool    Returns true if the current line is a comment line, false otherwise
      */
     private function isCurrentLineComment()
     {
@@ -596,7 +596,7 @@ class Parser
     /**
      * Returns true if the next line starts unindented collection
      *
-     * @return Boolean Returns true if the next line starts unindented collection, false otherwise
+     * @return bool    Returns true if the next line starts unindented collection, false otherwise
      */
     private function isNextLineUnIndentedCollection()
     {
@@ -628,7 +628,7 @@ class Parser
     /**
      * Returns true if the string is un-indented collection item
      *
-     * @return Boolean Returns true if the string is un-indented collection item, false otherwise
+     * @return bool    Returns true if the string is un-indented collection item, false otherwise
      */
     private function isStringUnIndentedCollectionItem()
     {

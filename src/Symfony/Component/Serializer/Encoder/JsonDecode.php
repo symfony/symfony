@@ -21,14 +21,14 @@ class JsonDecode implements DecoderInterface
     /**
      * Specifies if the returned result should be an associative array or a nested stdClass object hierarchy.
      *
-     * @var Boolean
+     * @var bool
      */
     private $associative;
 
     /**
      * Specifies the recursion depth.
      *
-     * @var integer
+     * @var int
      */
     private $recursionDepth;
 
@@ -50,7 +50,7 @@ class JsonDecode implements DecoderInterface
     /**
      * Returns the last decoding error (if any).
      *
-     * @return integer
+     * @return int
      *
      * @see http://php.net/manual/en/function.json-last-error.php json_last_error
      */

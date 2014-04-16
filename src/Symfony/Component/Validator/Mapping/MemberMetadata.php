@@ -127,7 +127,7 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
      *
      * @param object|string $objectOrClassName The object or the class name
      *
-     * @return Boolean
+     * @return bool
      */
     public function isPublic($objectOrClassName)
     {
@@ -139,7 +139,7 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
      *
      * @param object|string $objectOrClassName The object or the class name
      *
-     * @return Boolean
+     * @return bool
      */
     public function isProtected($objectOrClassName)
     {
@@ -151,7 +151,7 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
      *
      * @param object|string $objectOrClassName The object or the class name
      *
-     * @return Boolean
+     * @return bool
      */
     public function isPrivate($objectOrClassName)
     {
@@ -161,7 +161,7 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
     /**
      * Returns whether objects stored in this member should be validated
      *
-     * @return Boolean
+     * @return bool
      */
     public function isCascaded()
     {
@@ -172,7 +172,7 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
      * Returns whether arrays or traversable objects stored in this member
      * should be traversed and validated in each entry
      *
-     * @return Boolean
+     * @return bool
      */
     public function isCollectionCascaded()
     {
@@ -183,7 +183,7 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
      * Returns whether arrays or traversable objects stored in this member
      * should be traversed recursively for inner arrays/traversable objects
      *
-     * @return Boolean
+     * @return bool
      */
     public function isCollectionCascadedDeeply()
     {

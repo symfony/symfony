@@ -94,7 +94,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Checks if resources are tracked.
      *
-     * @return Boolean true if resources are tracked, false otherwise
+     * @return bool    true if resources are tracked, false otherwise
      */
     public function isTrackingResources()
     {
@@ -168,7 +168,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @param string $name The name of the extension
      *
-     * @return Boolean If the extension exists
+     * @return bool    If the extension exists
      *
      * @api
      */
@@ -430,7 +430,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @param string $id The service identifier
      *
-     * @return Boolean true if the service is defined, false otherwise
+     * @return bool    true if the service is defined, false otherwise
      *
      * @api
      */
@@ -713,7 +713,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @param string $id The service identifier
      *
-     * @return Boolean true if the alias exists, false otherwise
+     * @return bool    true if the alias exists, false otherwise
      *
      * @api
      */
@@ -843,7 +843,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @param string $id The service identifier
      *
-     * @return Boolean true if the service definition exists, false otherwise
+     * @return bool    true if the service definition exists, false otherwise
      *
      * @api
      */

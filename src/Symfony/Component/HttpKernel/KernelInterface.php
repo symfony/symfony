@@ -74,7 +74,7 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      *
      * @param string $class A class name
      *
-     * @return Boolean true if the class belongs to an active bundle, false otherwise
+     * @return bool    true if the class belongs to an active bundle, false otherwise
      *
      * @api
      */
@@ -145,7 +145,7 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
     /**
      * Checks if debug mode is enabled.
      *
-     * @return Boolean true if debug mode is enabled, false otherwise
+     * @return bool    true if debug mode is enabled, false otherwise
      *
      * @api
      */
@@ -172,7 +172,7 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
     /**
      * Gets the request start time (not available if debug is disabled).
      *
-     * @return integer The request start timestamp
+     * @return int     The request start timestamp
      *
      * @api
      */

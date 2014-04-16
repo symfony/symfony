@@ -156,7 +156,7 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
      *
      * @param ContainerBuilder $container
      *
-     * @return boolean whether this compiler pass really should register the mappings
+     * @return bool    whether this compiler pass really should register the mappings
      */
     protected function enabled(ContainerBuilder $container)
     {

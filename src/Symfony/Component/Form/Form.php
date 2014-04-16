@@ -86,7 +86,7 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * Whether this form was submitted
-     * @var Boolean
+     * @var bool
      */
     private $submitted = false;
 
@@ -124,7 +124,7 @@ class Form implements \IteratorAggregate, FormInterface
      * Whether the data in model, normalized and view format is
      * synchronized. Data may not be synchronized if transformation errors
      * occur.
-     * @var Boolean
+     * @var bool
      */
     private $synchronized = true;
 
@@ -138,13 +138,13 @@ class Form implements \IteratorAggregate, FormInterface
      * manually, making the initialization with the configured default value
      * superfluous.
      *
-     * @var Boolean
+     * @var bool
      */
     private $defaultDataSet = false;
 
     /**
      * Whether setData() is currently being called.
-     * @var Boolean
+     * @var bool
      */
     private $lockSetData = false;
 
@@ -932,7 +932,7 @@ class Form implements \IteratorAggregate, FormInterface
      *
      * @param string $name The name of the child
      *
-     * @return Boolean
+     * @return bool
      */
     public function offsetExists($name)
     {
@@ -994,7 +994,7 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Returns the number of form children (implements the \Countable interface).
      *
-     * @return integer The number of embedded form children
+     * @return int     The number of embedded form children
      */
     public function count()
     {

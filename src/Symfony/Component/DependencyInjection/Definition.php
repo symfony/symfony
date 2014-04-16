@@ -359,7 +359,7 @@ class Definition
      *
      * @param string $method The method name to search for
      *
-     * @return Boolean
+     * @return bool
      *
      * @api
      */
@@ -450,7 +450,7 @@ class Definition
      *
      * @param string $name
      *
-     * @return Boolean
+     * @return bool
      *
      * @api
      */
@@ -564,7 +564,7 @@ class Definition
     /**
      * Whether this service is public facing
      *
-     * @return Boolean
+     * @return bool
      *
      * @api
      */
@@ -592,7 +592,7 @@ class Definition
     /**
      * Whether this service is synchronized.
      *
-     * @return Boolean
+     * @return bool
      *
      * @api
      */
@@ -618,7 +618,7 @@ class Definition
     /**
      * Whether this service is lazy.
      *
-     * @return Boolean
+     * @return bool
      */
     public function isLazy()
     {
@@ -646,7 +646,7 @@ class Definition
      * Whether this definition is synthetic, that is not constructed by the
      * container, but dynamically injected.
      *
-     * @return Boolean
+     * @return bool
      *
      * @api
      */
@@ -676,7 +676,7 @@ class Definition
      * Whether this definition is abstract, that means it merely serves as a
      * template for other definitions.
      *
-     * @return Boolean
+     * @return bool
      *
      * @api
      */

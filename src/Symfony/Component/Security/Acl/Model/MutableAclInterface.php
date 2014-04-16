@@ -54,7 +54,7 @@ interface MutableAclInterface extends AclInterface
     /**
      * Returns the primary key of this ACL
      *
-     * @return integer
+     * @return int
      */
     public function getId();
 

@@ -167,7 +167,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
      *
      * @param string $key The key
      *
-     * @return Boolean true if the parameter exists, false otherwise
+     * @return bool    true if the parameter exists, false otherwise
      *
      * @api
      */
@@ -244,7 +244,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
      * @param mixed   $default The default value if the parameter key does not exist
      * @param bool    $deep    If true, a path like foo[bar] will find deeper items
      *
-     * @return integer The filtered value
+     * @return int     The filtered value
      *
      * @api
      */

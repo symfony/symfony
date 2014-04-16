@@ -63,7 +63,7 @@ class Reference
     /**
      * Returns true when this Reference is strict
      *
-     * @return Boolean
+     * @return bool
      */
     public function isStrict()
     {

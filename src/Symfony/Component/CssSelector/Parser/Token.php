@@ -81,7 +81,7 @@ class Token
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isFileEnd()
     {
@@ -91,7 +91,7 @@ class Token
     /**
      * @param array $values
      *
-     * @return boolean
+     * @return bool
      */
     public function isDelimiter(array $values = array())
     {
@@ -107,7 +107,7 @@ class Token
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isWhitespace()
     {
@@ -115,7 +115,7 @@ class Token
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isIdentifier()
     {
@@ -123,7 +123,7 @@ class Token
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isHash()
     {
@@ -131,7 +131,7 @@ class Token
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isNumber()
     {
@@ -139,7 +139,7 @@ class Token
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isString()
     {

@@ -293,7 +293,7 @@ class RequestContext
      *
      * @param string $name A parameter name
      *
-     * @return Boolean true if the parameter value is set, false otherwise
+     * @return bool    true if the parameter value is set, false otherwise
      */
     public function hasParameter($name)
     {

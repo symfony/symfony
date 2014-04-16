@@ -92,7 +92,7 @@ class Response
     /**
      * Gets the response status code.
      *
-     * @return integer The response status code
+     * @return int     The response status code
      *
      * @api
      */

@@ -44,7 +44,7 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
      *
      * This only works as of PHP 5.3.7.
      *
-     * @var Boolean
+     * @var bool
      */
     private $parseUsingPipe;
 

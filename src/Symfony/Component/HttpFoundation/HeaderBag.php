@@ -175,7 +175,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      *
      * @param string $key The HTTP header
      *
-     * @return Boolean true if the parameter exists, false otherwise
+     * @return bool    true if the parameter exists, false otherwise
      *
      * @api
      */
@@ -190,7 +190,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      * @param string $key   The HTTP header name
      * @param string $value The HTTP value
      *
-     * @return Boolean true if the value is contained in the header, false otherwise
+     * @return bool    true if the value is contained in the header, false otherwise
      *
      * @api
      */

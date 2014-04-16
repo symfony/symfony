@@ -178,7 +178,7 @@ abstract class BaseNode implements NodeInterface
     /**
      * Checks if this node is required.
      *
-     * @return Boolean
+     * @return bool
      */
     public function isRequired()
     {

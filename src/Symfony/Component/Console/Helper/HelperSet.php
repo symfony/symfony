@@ -57,7 +57,7 @@ class HelperSet
      *
      * @param string $name The helper name
      *
-     * @return Boolean true if the helper is defined, false otherwise
+     * @return bool    true if the helper is defined, false otherwise
      */
     public function has($name)
     {

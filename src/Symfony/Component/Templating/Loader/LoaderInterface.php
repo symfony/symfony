@@ -28,7 +28,7 @@ interface LoaderInterface
      *
      * @param TemplateReferenceInterface $template A template
      *
-     * @return Storage|Boolean false if the template cannot be loaded, a Storage instance otherwise
+     * @return Storage|bool    false if the template cannot be loaded, a Storage instance otherwise
      *
      * @api
      */
@@ -40,7 +40,7 @@ interface LoaderInterface
      * @param TemplateReferenceInterface $template A template
      * @param int                        $time     The last modification time of the cached template (timestamp)
      *
-     * @return Boolean
+     * @return bool
      *
      * @api
      */

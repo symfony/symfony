@@ -80,7 +80,7 @@ class FileLocator implements FileLocatorInterface
      *
      * @param string $file A file path
      *
-     * @return Boolean
+     * @return bool
      */
     private function isAbsolutePath($file)
     {

@@ -56,7 +56,7 @@ class ConfigCache
      * This method always returns true when debug is off and the
      * cache file exists.
      *
-     * @return Boolean true if the cache is fresh, false otherwise
+     * @return bool    true if the cache is fresh, false otherwise
      */
     public function isFresh()
     {

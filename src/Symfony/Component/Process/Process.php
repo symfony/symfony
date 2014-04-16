@@ -184,7 +184,7 @@ class Process
      * @param callback|null $callback A PHP callback to run whenever there is some
      *                                output available on STDOUT or STDERR
      *
-     * @return integer The exit status code
+     * @return int     The exit status code
      *
      * @throws RuntimeException When process can't be launched
      * @throws RuntimeException When process stopped after receiving signal
@@ -297,7 +297,7 @@ class Process
      *
      * @param callback|null $callback A valid PHP callback
      *
-     * @return integer The exitcode of the process
+     * @return int     The exitcode of the process
      *
      * @throws RuntimeException When process timed out
      * @throws RuntimeException When process stopped after receiving signal
@@ -333,7 +333,7 @@ class Process
     /**
      * Returns the Pid (process identifier), if applicable.
      *
-     * @return integer|null The process id if running, null otherwise
+     * @return int|null     The process id if running, null otherwise
      *
      * @throws RuntimeException In case --enable-sigchild is activated
      */
@@ -450,7 +450,7 @@ class Process
     /**
      * Returns the exit code returned by the process.
      *
-     * @return null|integer The exit status code, null if the Process is not terminated
+     * @return null|int     The exit status code, null if the Process is not terminated
      *
      * @throws RuntimeException In case --enable-sigchild is activated and the sigchild compatibility mode is disabled
      *
@@ -492,7 +492,7 @@ class Process
     /**
      * Checks if the process ended successfully.
      *
-     * @return Boolean true if the process ended successfully, false otherwise
+     * @return bool    true if the process ended successfully, false otherwise
      *
      * @api
      */
@@ -506,7 +506,7 @@ class Process
      *
      * It always returns false on Windows.
      *
-     * @return Boolean
+     * @return bool
      *
      * @throws RuntimeException In case --enable-sigchild is activated
      * @throws LogicException   In case the process is not terminated
@@ -531,7 +531,7 @@ class Process
      *
      * It is only meaningful if hasBeenSignaled() returns true.
      *
-     * @return integer
+     * @return int
      *
      * @throws RuntimeException In case --enable-sigchild is activated
      * @throws LogicException   In case the process is not terminated
@@ -556,7 +556,7 @@ class Process
      *
      * It always returns false on Windows.
      *
-     * @return Boolean
+     * @return bool
      *
      * @throws LogicException In case the process is not terminated
      *
@@ -576,7 +576,7 @@ class Process
      *
      * It is only meaningful if hasBeenStopped() returns true.
      *
-     * @return integer
+     * @return int
      *
      * @throws LogicException In case the process is not terminated
      *
@@ -594,7 +594,7 @@ class Process
     /**
      * Checks if the process is currently running.
      *
-     * @return Boolean true if the process is currently running, false otherwise
+     * @return bool    true if the process is currently running, false otherwise
      */
     public function isRunning()
     {
@@ -610,7 +610,7 @@ class Process
     /**
      * Checks if the process has been started with no regard to the current state.
      *
-     * @return Boolean true if status is ready, false otherwise
+     * @return bool    true if status is ready, false otherwise
      */
     public function isStarted()
     {
@@ -620,7 +620,7 @@ class Process
     /**
      * Checks if the process is terminated.
      *
-     * @return Boolean true if process is terminated, false otherwise
+     * @return bool    true if process is terminated, false otherwise
      */
     public function isTerminated()
     {
@@ -649,7 +649,7 @@ class Process
      * @param int|float     $timeout The timeout in seconds
      * @param int           $signal  A POSIX signal to send in case the process has not stop at timeout, default is SIGKILL
      *
-     * @return integer The exit-code of the process
+     * @return int     The exit-code of the process
      *
      * @throws RuntimeException if the process got signaled
      */
@@ -784,7 +784,7 @@ class Process
     /**
      * Checks if the TTY mode is enabled.
      *
-     * @return Boolean true if the TTY mode is enabled, false otherwise
+     * @return bool    true if the TTY mode is enabled, false otherwise
      */
     public function isTty()
     {
@@ -912,7 +912,7 @@ class Process
      *
      * This is true by default.
      *
-     * @return Boolean
+     * @return bool
      */
     public function getEnhanceWindowsCompatibility()
     {
@@ -936,7 +936,7 @@ class Process
     /**
      * Returns whether sigchild compatibility mode is activated or not.
      *
-     * @return Boolean
+     * @return bool
      */
     public function getEnhanceSigchildCompatibility()
     {
@@ -1056,7 +1056,7 @@ class Process
     /**
      * Returns whether PHP has been compiled with the '--enable-sigchild' option or not.
      *
-     * @return Boolean
+     * @return bool
      */
     protected function isSigchildEnabled()
     {
@@ -1110,7 +1110,7 @@ class Process
     /**
      * Closes process resource, closes file handles, sets the exitcode.
      *
-     * @return Integer The exitcode
+     * @return int     The exitcode
      */
     private function close()
     {
@@ -1158,7 +1158,7 @@ class Process
      * @param  int     $signal         A valid POSIX signal (see http://www.php.net/manual/en/pcntl.constants.php)
      * @param  bool    $throwException Whether to throw exception in case signal failed
      *
-     * @return Boolean True if the signal was sent successfully, false otherwise
+     * @return bool    True if the signal was sent successfully, false otherwise
      *
      * @throws LogicException   In case the process is not running
      * @throws RuntimeException In case --enable-sigchild is activated

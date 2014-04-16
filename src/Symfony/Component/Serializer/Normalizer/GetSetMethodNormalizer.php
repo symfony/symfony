@@ -195,7 +195,7 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
      *
      * @param string $class
      *
-     * @return Boolean
+     * @return bool
      */
     private function supports($class)
     {
@@ -215,7 +215,7 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
      *
      * @param \ReflectionMethod $method the method to check
      *
-     * @return Boolean whether the method is a getter.
+     * @return bool    whether the method is a getter.
      */
     private function isGetMethod(\ReflectionMethod $method)
     {

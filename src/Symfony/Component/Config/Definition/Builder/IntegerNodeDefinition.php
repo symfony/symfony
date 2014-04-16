@@ -23,7 +23,7 @@ class IntegerNodeDefinition extends NumericNodeDefinition
     /**
      * Instantiates a Node.
      *
-     * @return IntegerNode The node
+     * @return intNode     The node
      */
     protected function instantiateNode()
     {

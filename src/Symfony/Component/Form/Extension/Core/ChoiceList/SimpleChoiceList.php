@@ -124,7 +124,7 @@ class SimpleChoiceList extends ChoiceList
      * @param mixed $choice           The choice to test.
      * @param array $preferredChoices An array of preferred choices.
      *
-     * @return Boolean Whether the choice is preferred.
+     * @return bool    Whether the choice is preferred.
      */
     protected function isPreferred($choice, array $preferredChoices)
     {
@@ -137,7 +137,7 @@ class SimpleChoiceList extends ChoiceList
      *
      * @param mixed $choice The choice.
      *
-     * @return string|integer A valid PHP array key.
+     * @return string|int     A valid PHP array key.
      */
     protected function fixChoice($choice)
     {

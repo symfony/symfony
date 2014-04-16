@@ -116,7 +116,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * @param mixed $name A template name or a TemplateReferenceInterface instance
      *
-     * @return Boolean true if the template exists, false otherwise
+     * @return bool    true if the template exists, false otherwise
      *
      * @api
      */
@@ -136,7 +136,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * @param mixed $name A template name or a TemplateReferenceInterface instance
      *
-     * @return Boolean true if this class supports the given resource, false otherwise
+     * @return bool    true if this class supports the given resource, false otherwise
      *
      * @api
      */
@@ -205,7 +205,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * @param string $name The helper name
      *
-     * @return Boolean true if the helper is defined, false otherwise
+     * @return bool    true if the helper is defined, false otherwise
      *
      * @api
      */
@@ -291,7 +291,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * @param string $name The helper name
      *
-     * @return Boolean true if the helper is defined, false otherwise
+     * @return bool    true if the helper is defined, false otherwise
      *
      * @api
      */

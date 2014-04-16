@@ -71,7 +71,7 @@ class TwigEngine implements EngineInterface, StreamingEngineInterface
      *
      * @param mixed $name A template name
      *
-     * @return Boolean true if the template exists, false otherwise
+     * @return bool    true if the template exists, false otherwise
      */
     public function exists($name)
     {
@@ -99,7 +99,7 @@ class TwigEngine implements EngineInterface, StreamingEngineInterface
      *
      * @param string $name A template name
      *
-     * @return Boolean True if this class supports the given resource, false otherwise
+     * @return bool    True if this class supports the given resource, false otherwise
      */
     public function supports($name)
     {

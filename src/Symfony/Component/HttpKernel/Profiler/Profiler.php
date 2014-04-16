@@ -39,7 +39,7 @@ class Profiler
     private $logger;
 
     /**
-     * @var Boolean
+     * @var bool
      */
     private $enabled = true;
 
@@ -104,7 +104,7 @@ class Profiler
      *
      * @param Profile $profile A Profile instance
      *
-     * @return Boolean
+     * @return bool
      */
     public function saveProfile(Profile $profile)
     {
@@ -245,7 +245,7 @@ class Profiler
      *
      * @param string $name A collector name
      *
-     * @return Boolean
+     * @return bool
      */
     public function has($name)
     {

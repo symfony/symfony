@@ -31,7 +31,7 @@ class UploadedFile extends File
      *
      * Local files are used in test mode hence the code should not enforce HTTP uploads.
      *
-     * @var Boolean
+     * @var bool
      */
     private $test = false;
 
@@ -59,7 +59,7 @@ class UploadedFile extends File
     /**
      * The UPLOAD_ERR_XXX constant provided by the uploader.
      *
-     * @var integer
+     * @var int
      */
     private $error;
 
@@ -179,7 +179,7 @@ class UploadedFile extends File
      * It is extracted from the request from which the file has been uploaded.
      * Then it should not be considered as a safe value.
      *
-     * @return integer|null The file size
+     * @return int|null     The file size
      *
      * @api
      */
@@ -194,7 +194,7 @@ class UploadedFile extends File
      * If the upload was successful, the constant UPLOAD_ERR_OK is returned.
      * Otherwise one of the other UPLOAD_ERR_XXX constants is returned.
      *
-     * @return integer The upload error
+     * @return int     The upload error
      *
      * @api
      */
@@ -206,7 +206,7 @@ class UploadedFile extends File
     /**
      * Returns whether the file was uploaded successfully.
      *
-     * @return Boolean True if the file has been uploaded with HTTP and no error occurred.
+     * @return bool    True if the file has been uploaded with HTTP and no error occurred.
      *
      * @api
      */

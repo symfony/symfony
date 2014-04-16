@@ -55,7 +55,7 @@ interface CurrencyBundleInterface extends ResourceBundleInterface
      *
      * @param string $currency A currency code (e.g. "EUR").
      *
-     * @return integer|null The number of digits after the comma or NULL if not found.
+     * @return int|null     The number of digits after the comma or NULL if not found.
      */
     public function getFractionDigits($currency);
 
@@ -68,7 +68,7 @@ interface CurrencyBundleInterface extends ResourceBundleInterface
      *
      * @param string $currency A currency code (e.g. "EUR").
      *
-     * @return float|integer|null The rounding increment or NULL if not found.
+     * @return float|int|null     The rounding increment or NULL if not found.
      */
     public function getRoundingIncrement($currency);
 }

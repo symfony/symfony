@@ -128,7 +128,7 @@ interface FormRendererEngineInterface
      *                                              the first element of
      *                                              $blockNameHierarchy.
      *
-     * @return integer|Boolean The hierarchy level or false, if no resource was found.
+     * @return int|bool        The hierarchy level or false, if no resource was found.
      */
     public function getResourceHierarchyLevel(FormView $view, array $blockNameHierarchy, $hierarchyLevel);
 

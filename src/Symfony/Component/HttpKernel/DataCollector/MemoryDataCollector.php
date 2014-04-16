@@ -40,7 +40,7 @@ class MemoryDataCollector extends DataCollector
     /**
      * Gets the memory.
      *
-     * @return integer The memory
+     * @return int     The memory
      */
     public function getMemory()
     {
@@ -50,7 +50,7 @@ class MemoryDataCollector extends DataCollector
     /**
      * Gets the PHP memory limit.
      *
-     * @return integer The memory limit
+     * @return int     The memory limit
      */
     public function getMemoryLimit()
     {

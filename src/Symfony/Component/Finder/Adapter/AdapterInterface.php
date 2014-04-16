@@ -131,7 +131,7 @@ interface AdapterInterface
     /**
      * Tests adapter support for current platform.
      *
-     * @return Boolean
+     * @return bool
      */
     public function isSupported();
 

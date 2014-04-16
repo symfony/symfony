@@ -192,7 +192,7 @@ abstract class AbstractToken implements TokenInterface
      *
      * @param string $name The attribute name
      *
-     * @return Boolean true if the attribute exists, false otherwise
+     * @return bool    true if the attribute exists, false otherwise
      */
     public function hasAttribute($name)
     {

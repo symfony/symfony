@@ -656,7 +656,7 @@ class Request
     /**
      * Checks whether support for the _method request parameter is enabled.
      *
-     * @return Boolean True when the _method request parameter is enabled, false otherwise
+     * @return bool    True when the _method request parameter is enabled, false otherwise
      */
     public static function getHttpMethodParameterOverride()
     {
@@ -705,7 +705,7 @@ class Request
      * Whether the request contains a Session which was started in one of the
      * previous requests.
      *
-     * @return Boolean
+     * @return bool
      *
      * @api
      */
@@ -722,7 +722,7 @@ class Request
      * like whether the session is started or not. It is just a way to check if this Request
      * is associated with a Session instance.
      *
-     * @return Boolean true when the Request contains a Session object, false otherwise
+     * @return bool    true when the Request contains a Session object, false otherwise
      *
      * @api
      */
@@ -1090,7 +1090,7 @@ class Request
      * ("SSL_HTTPS" for instance), configure it via "setTrustedHeaderName()" with
      * the "client-proto" key.
      *
-     * @return Boolean
+     * @return bool
      *
      * @api
      */
@@ -1376,7 +1376,7 @@ class Request
      *
      * @param string $method Uppercase request method (GET, POST etc).
      *
-     * @return Boolean
+     * @return bool
      */
     public function isMethod($method)
     {
@@ -1386,7 +1386,7 @@ class Request
     /**
      * Checks whether the method is safe or not.
      *
-     * @return Boolean
+     * @return bool
      *
      * @api
      */
@@ -1434,7 +1434,7 @@ class Request
     }
 
     /**
-     * @return Boolean
+     * @return bool
      */
     public function isNoCache()
     {
@@ -1559,7 +1559,7 @@ class Request
      * It is known to work with common JavaScript frameworks:
      * @link http://en.wikipedia.org/wiki/List_of_Ajax_frameworks#JavaScript
      *
-     * @return Boolean true if the request is an XMLHttpRequest, false otherwise
+     * @return bool    true if the request is an XMLHttpRequest, false otherwise
      *
      * @api
      */

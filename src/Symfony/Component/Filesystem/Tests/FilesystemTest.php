@@ -956,7 +956,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
      *
      * @param string $filePath
      *
-     * @return integer
+     * @return int
      */
     private function getFilePermissions($filePath)
     {

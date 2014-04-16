@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 class RepeatedPass implements CompilerPassInterface
 {
     /**
-     * @var Boolean
+     * @var bool
      */
     private $repeat = false;
 

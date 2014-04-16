@@ -90,7 +90,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
      *
      * @param string $value The localized value
      *
-     * @return integer|float The numeric value
+     * @return int|float     The numeric value
      *
      * @throws TransformationFailedException If the given value is not a string
      *                                       or if the value can not be transformed.

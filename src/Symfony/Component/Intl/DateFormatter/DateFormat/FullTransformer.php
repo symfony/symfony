@@ -210,7 +210,7 @@ class FullTransformer
      *
      * @param string $quoteMatch The string to check
      *
-     * @return Boolean              true if matches, false otherwise
+     * @return bool                 true if matches, false otherwise
      */
     public function isQuoteMatch($quoteMatch)
     {
@@ -284,7 +284,7 @@ class FullTransformer
      * @param \DateTime $dateTime The DateTime object to be used to calculate the timestamp
      * @param array     $options  An array with the matched values to be used to calculate the timestamp
      *
-     * @return Boolean|int        The calculated timestamp or false if matched date is invalid
+     * @return bool|int           The calculated timestamp or false if matched date is invalid
      */
     protected function calculateUnixTimestamp(\DateTime $dateTime, array $options)
     {

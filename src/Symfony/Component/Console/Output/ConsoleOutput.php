@@ -104,7 +104,7 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
      * STDOUT and doesn't properly convert ASCII to EBCDIC, resulting in garbage
      * output.
      *
-     * @return boolean
+     * @return bool
      */
     protected function hasStdoutSupport()
     {

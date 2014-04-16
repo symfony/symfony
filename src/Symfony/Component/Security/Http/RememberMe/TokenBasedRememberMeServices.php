@@ -73,7 +73,7 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
      * @param string $hash1 The first hash
      * @param string $hash2 The second hash
      *
-     * @return Boolean true if the two hashes are the same, false otherwise
+     * @return bool    true if the two hashes are the same, false otherwise
      */
     private function compareHashes($hash1, $hash2)
     {

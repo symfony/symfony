@@ -919,14 +919,14 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
     abstract protected function getIntlErrorMessage();
 
     /**
-     * @return integer
+     * @return int
      */
     abstract protected function getIntlErrorCode();
 
     /**
      * @param int     $errorCode
      *
-     * @return Boolean
+     * @return bool
      */
     abstract protected function isIntlFailure($errorCode);
 }

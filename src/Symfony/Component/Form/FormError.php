@@ -37,7 +37,7 @@ class FormError
 
     /**
      * The value for error message pluralization
-     * @var integer|null
+     * @var int|null
      */
     protected $messagePluralization;
 
@@ -96,7 +96,7 @@ class FormError
     /**
      * Returns the value for error message pluralization.
      *
-     * @return integer|null
+     * @return int|null
      */
     public function getMessagePluralization()
     {

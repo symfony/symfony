@@ -58,7 +58,7 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
     public $groupSequence = array();
 
     /**
-     * @var Boolean
+     * @var bool
      */
     public $groupSequenceProvider = false;
 
@@ -282,7 +282,7 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
      *
      * @param string $property The name of the property
      *
-     * @return Boolean
+     * @return bool
      */
     public function hasMemberMetadatas($property)
     {
@@ -358,7 +358,7 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
     /**
      * Returns whether this class has an overridden default group sequence.
      *
-     * @return Boolean
+     * @return bool
      */
     public function hasGroupSequence()
     {
@@ -412,7 +412,7 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
     /**
      * Returns whether the class is a group sequence provider.
      *
-     * @return Boolean
+     * @return bool
      */
     public function isGroupSequenceProvider()
     {

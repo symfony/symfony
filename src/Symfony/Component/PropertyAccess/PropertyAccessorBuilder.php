@@ -19,7 +19,7 @@ namespace Symfony\Component\PropertyAccess;
 class PropertyAccessorBuilder
 {
     /**
-     * @var Boolean
+     * @var bool
      */
     private $magicCall = false;
 
@@ -48,7 +48,7 @@ class PropertyAccessorBuilder
     }
 
     /**
-     * @return Boolean true if the use of "__call" by the ProperyAccessor is enabled
+     * @return bool    true if the use of "__call" by the ProperyAccessor is enabled
      */
     public function isMagicCallEnabled()
     {

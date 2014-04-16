@@ -351,14 +351,7 @@ class Crawler extends \SplObjectStorage
      */
     public function slice($offset = 0, $length = -1)
     {
-    	$nodes = array();
-
-        $iterator = new \LimitIterator($this, $offset, $length);
-        foreach($iterator as $i => $node) {
-            $nodes[] = $node;
-        }
-
-        return new static($nodes, $this->uri);
+        return new static(iterator_to_array(new \LimitIterator($this, $offset, $length)), $this->uri);
     }
 
     /**

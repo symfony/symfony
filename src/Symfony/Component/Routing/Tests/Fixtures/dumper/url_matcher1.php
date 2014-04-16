@@ -240,27 +240,33 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
         }
 
         if (preg_match('#^(?P<var1>[^\\.]++)\\.example\\.com$#s', $host, $hostMatches)) {
-            if (0 === strpos($pathinfo, '/route1')) {
-                // route11
-                if ($pathinfo === '/route11') {
-                    return $this->mergeDefaults(array_replace($hostMatches, array('_route' => 'route11')), array ());
-                }
+            // route11
+            if ($pathinfo === '/route11') {
+                return $this->mergeDefaults(array_replace($hostMatches, array('_route' => 'route11')), array ());
+            }
 
-                // route12
-                if ($pathinfo === '/route12') {
-                    return $this->mergeDefaults(array_replace($hostMatches, array('_route' => 'route12')), array (  'var1' => 'val',));
-                }
+        }
 
-                // route13
-                if (0 === strpos($pathinfo, '/route13') && preg_match('#^/route13/(?P<name>[^/]++)$#s', $pathinfo, $matches)) {
-                    return $this->mergeDefaults(array_replace($hostMatches, $matches, array('_route' => 'route13')), array ());
-                }
+        if (preg_match('#^(?:(?P<var1>[^\\.]++)\\.)?example\\.com$#s', $host, $hostMatches)) {
+            // route12
+            if ($pathinfo === '/route12') {
+                return $this->mergeDefaults(array_replace($hostMatches, array('_route' => 'route12')), array (  'var1' => 'val',));
+            }
 
-                // route14
-                if (0 === strpos($pathinfo, '/route14') && preg_match('#^/route14/(?P<name>[^/]++)$#s', $pathinfo, $matches)) {
-                    return $this->mergeDefaults(array_replace($hostMatches, $matches, array('_route' => 'route14')), array (  'var1' => 'val',));
-                }
+        }
 
+        if (preg_match('#^(?P<var1>[^\\.]++)\\.example\\.com$#s', $host, $hostMatches)) {
+            // route13
+            if (0 === strpos($pathinfo, '/route13') && preg_match('#^/route13/(?P<name>[^/]++)$#s', $pathinfo, $matches)) {
+                return $this->mergeDefaults(array_replace($hostMatches, $matches, array('_route' => 'route13')), array ());
+            }
+
+        }
+
+        if (preg_match('#^(?:(?P<var1>[^\\.]++)\\.)?example\\.com$#s', $host, $hostMatches)) {
+            // route14
+            if (0 === strpos($pathinfo, '/route14') && preg_match('#^/route14/(?P<name>[^/]++)$#s', $pathinfo, $matches)) {
+                return $this->mergeDefaults(array_replace($hostMatches, $matches, array('_route' => 'route14')), array (  'var1' => 'val',));
             }
 
         }

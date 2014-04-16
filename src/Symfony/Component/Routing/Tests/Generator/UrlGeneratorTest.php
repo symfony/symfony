@@ -497,6 +497,25 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testWithOptionalSubDomainAndAbsolute()
+    {
+        $routes = $this->getRoutes('test', new Route('/', array('opt1' => '', 'opt2' => ''), array(), array(), '{opt1}.{opt2}.{mand}.example.com'));
+
+        $this->assertEquals('http://sub1.example.com/app.php/', $this->getGenerator($routes, array('host' => 'sub1.example.com'))->generate('test', array('mand' => 'sub1'), true));
+        $this->assertEquals('http://sub2.sub1.example.com/app.php/', $this->getGenerator($routes, array('host' => 'sub2.sub1.example.com'))->generate('test', array('mand' => 'sub1', 'opt2' => 'sub2'), true));
+        $this->assertEquals('http://sub3.sub2.sub1.example.com/app.php/', $this->getGenerator($routes, array('host' => 'sub3.sub2.sub1.example.com'))->generate('test', array('mand' => 'sub1', 'opt2' => 'sub2', 'opt1' => 'sub3'), true));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Routing\Exception\InvalidParameterException
+     */
+    public function testWithInvalidOptionalSubDomainOrder()
+    {
+        $routes = $this->getRoutes('test', new Route('/', array('opt1' => '', 'opt2' => ''), array(), array(), '{opt1}.{opt2}.example.com'));
+
+        $this->getGenerator($routes, array('host' => 'sub2.sub1.example.com'))->generate('test', array('opt1' => 'sub1'), true);
+    }
+
     public function testGenerateRelativePath()
     {
         $routes = new RouteCollection();

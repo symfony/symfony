@@ -346,8 +346,6 @@ class Crawler extends \SplObjectStorage
      * @param integer $length
      * 
      * @return Crawler A Crawler instance with the sliced nodes.
-     * 
-     * @api
      */
     public function slice($offset = 0, $length = -1)
     {

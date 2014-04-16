@@ -52,7 +52,7 @@ class PhpExtractor implements ExtractorInterface
     );
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function extract($directory, MessageCatalogue $catalog)
     {
@@ -65,7 +65,7 @@ class PhpExtractor implements ExtractorInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function setPrefix($prefix)
     {

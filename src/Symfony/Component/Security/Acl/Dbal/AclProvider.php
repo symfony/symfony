@@ -64,7 +64,7 @@ class AclProvider implements AclProviderInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function findChildren(ObjectIdentityInterface $parentOid, $directChildrenOnly = false)
     {
@@ -79,7 +79,7 @@ class AclProvider implements AclProviderInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function findAcl(ObjectIdentityInterface $oid, array $sids = array())
     {
@@ -87,7 +87,7 @@ class AclProvider implements AclProviderInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function findAcls(array $oids, array $sids = array())
     {

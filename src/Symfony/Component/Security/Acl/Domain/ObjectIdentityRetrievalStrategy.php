@@ -22,7 +22,7 @@ use Symfony\Component\Security\Acl\Model\ObjectIdentityRetrievalStrategyInterfac
 class ObjectIdentityRetrievalStrategy implements ObjectIdentityRetrievalStrategyInterface
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getObjectIdentity($domainObject)
     {

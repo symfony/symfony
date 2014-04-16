@@ -30,7 +30,7 @@ class GreaterThanOrEqualValidatorTest extends AbstractComparisonValidatorTestCas
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function provideValidComparisons()
     {
@@ -46,7 +46,7 @@ class GreaterThanOrEqualValidatorTest extends AbstractComparisonValidatorTestCas
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function provideInvalidComparisons()
     {

@@ -21,7 +21,7 @@ use Symfony\Component\Translation\MessageCatalogue;
 class XliffFileDumper extends FileDumper
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     protected function format(MessageCatalogue $messages, $domain)
     {
@@ -57,7 +57,7 @@ class XliffFileDumper extends FileDumper
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     protected function getExtension()
     {

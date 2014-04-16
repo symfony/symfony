@@ -26,7 +26,7 @@ class Type extends Constraint
     public $type;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getDefaultOption()
     {
@@ -34,7 +34,7 @@ class Type extends Constraint
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getRequiredOptions()
     {

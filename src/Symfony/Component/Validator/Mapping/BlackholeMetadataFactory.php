@@ -21,7 +21,7 @@ use Symfony\Component\Validator\MetadataFactoryInterface;
 class BlackholeMetadataFactory implements MetadataFactoryInterface
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getMetadataFor($value)
     {
@@ -29,7 +29,7 @@ class BlackholeMetadataFactory implements MetadataFactoryInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function hasMetadataFor($value)
     {

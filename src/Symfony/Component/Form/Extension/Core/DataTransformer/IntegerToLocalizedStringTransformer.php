@@ -22,7 +22,7 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 class IntegerToLocalizedStringTransformer extends NumberToLocalizedStringTransformer
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function reverseTransform($value)
     {

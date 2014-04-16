@@ -45,7 +45,7 @@ class JsonResponse extends Response
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public static function create($data = null, $status = 200, $headers = array())
     {

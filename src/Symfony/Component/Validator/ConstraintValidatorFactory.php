@@ -23,7 +23,7 @@ class ConstraintValidatorFactory implements ConstraintValidatorFactoryInterface
     protected $validators = array();
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getInstance(Constraint $constraint)
     {

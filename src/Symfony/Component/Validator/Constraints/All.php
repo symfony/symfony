@@ -26,7 +26,7 @@ class All extends Constraint
     public $constraints = array();
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function __construct($options = null)
     {

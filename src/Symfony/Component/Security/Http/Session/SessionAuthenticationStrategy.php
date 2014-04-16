@@ -38,7 +38,7 @@ class SessionAuthenticationStrategy implements SessionAuthenticationStrategyInte
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function onAuthentication(Request $request, TokenInterface $token)
     {

@@ -66,7 +66,7 @@ class DefinitionDecorator extends Definition
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      *
      * @api
      */
@@ -78,7 +78,7 @@ class DefinitionDecorator extends Definition
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      *
      * @api
      */
@@ -90,7 +90,7 @@ class DefinitionDecorator extends Definition
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      *
      * @api
      */
@@ -102,7 +102,7 @@ class DefinitionDecorator extends Definition
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      *
      * @api
      */
@@ -114,7 +114,7 @@ class DefinitionDecorator extends Definition
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      *
      * @api
      */
@@ -126,7 +126,7 @@ class DefinitionDecorator extends Definition
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      *
      * @api
      */
@@ -138,7 +138,7 @@ class DefinitionDecorator extends Definition
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      *
      * @api
      */
@@ -150,7 +150,7 @@ class DefinitionDecorator extends Definition
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      *
      * @api
      */

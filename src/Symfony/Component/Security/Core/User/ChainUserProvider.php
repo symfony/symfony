@@ -40,7 +40,7 @@ class ChainUserProvider implements UserProviderInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function loadUserByUsername($username)
     {
@@ -58,7 +58,7 @@ class ChainUserProvider implements UserProviderInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function refreshUser(UserInterface $user)
     {
@@ -85,7 +85,7 @@ class ChainUserProvider implements UserProviderInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function supportsClass($class)
     {

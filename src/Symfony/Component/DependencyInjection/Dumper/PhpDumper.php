@@ -58,7 +58,7 @@ class PhpDumper extends Dumper
     private $proxyDumper;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      *
      * @api
      */
@@ -920,7 +920,7 @@ EOF;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getParameterBag()
     {

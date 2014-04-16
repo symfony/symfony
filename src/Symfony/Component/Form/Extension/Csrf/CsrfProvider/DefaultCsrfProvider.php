@@ -41,7 +41,7 @@ class DefaultCsrfProvider implements CsrfProviderInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function generateCsrfToken($intention)
     {
@@ -49,7 +49,7 @@ class DefaultCsrfProvider implements CsrfProviderInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function isCsrfTokenValid($intention, $token)
     {

@@ -446,7 +446,7 @@ class ProgressHelper extends Helper
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getName()
     {

@@ -36,7 +36,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     protected $normalizeKeys;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function __construct($name, NodeParentInterface $parent = null)
     {
@@ -351,7 +351,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     protected function createNode()
     {

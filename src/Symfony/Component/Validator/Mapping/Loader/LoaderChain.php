@@ -47,7 +47,7 @@ class LoaderChain implements LoaderInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function loadClassMetadata(ClassMetadata $metadata)
     {

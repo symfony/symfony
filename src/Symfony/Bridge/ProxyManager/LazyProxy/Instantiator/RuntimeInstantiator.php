@@ -44,7 +44,7 @@ class RuntimeInstantiator implements InstantiatorInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function instantiateProxy(ContainerInterface $container, Definition $definition, $id, $realInstantiator)
     {

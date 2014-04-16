@@ -33,7 +33,7 @@ class DoctrineValidationPass implements CompilerPassInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
     {

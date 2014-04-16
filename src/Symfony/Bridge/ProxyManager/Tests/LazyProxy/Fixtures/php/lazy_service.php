@@ -155,7 +155,7 @@ class stdClass_c1d194250ee2e2b7d2eab8b8212368a8 extends \stdClass implements \Pr
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function setProxyInitializer(\Closure $initializer = null)
     {
@@ -163,7 +163,7 @@ class stdClass_c1d194250ee2e2b7d2eab8b8212368a8 extends \stdClass implements \Pr
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getProxyInitializer()
     {
@@ -171,7 +171,7 @@ class stdClass_c1d194250ee2e2b7d2eab8b8212368a8 extends \stdClass implements \Pr
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function initializeProxy()
     {
@@ -179,7 +179,7 @@ class stdClass_c1d194250ee2e2b7d2eab8b8212368a8 extends \stdClass implements \Pr
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function isProxyInitialized()
     {
@@ -187,7 +187,7 @@ class stdClass_c1d194250ee2e2b7d2eab8b8212368a8 extends \stdClass implements \Pr
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getWrappedValueHolderValue()
     {

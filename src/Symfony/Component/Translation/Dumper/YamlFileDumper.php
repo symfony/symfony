@@ -22,7 +22,7 @@ use Symfony\Component\Yaml\Yaml;
 class YamlFileDumper extends FileDumper
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     protected function format(MessageCatalogue $messages, $domain)
     {
@@ -30,7 +30,7 @@ class YamlFileDumper extends FileDumper
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     protected function getExtension()
     {

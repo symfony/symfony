@@ -29,7 +29,7 @@ class RouteCompiler implements RouteCompilerInterface
     const SEPARATORS = '/,;.:-_~+*=@|';
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      *
      * @throws \LogicException  If a variable is referenced more than once
      * @throws \DomainException If a variable name is numeric because PHP raises an error for such

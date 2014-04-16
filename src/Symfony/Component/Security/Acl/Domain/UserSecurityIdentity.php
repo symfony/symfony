@@ -96,7 +96,7 @@ final class UserSecurityIdentity implements SecurityIdentityInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function equals(SecurityIdentityInterface $sid)
     {

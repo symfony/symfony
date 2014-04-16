@@ -21,7 +21,7 @@ use Symfony\Component\Translation\MessageCatalogue;
 class PoFileDumper extends FileDumper
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function format(MessageCatalogue $messages, $domain = 'messages')
     {
@@ -47,7 +47,7 @@ class PoFileDumper extends FileDumper
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     protected function getExtension()
     {

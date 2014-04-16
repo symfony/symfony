@@ -30,7 +30,7 @@ class NotIdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function provideValidComparisons()
     {
@@ -45,7 +45,7 @@ class NotIdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function provideInvalidComparisons()
     {

@@ -28,7 +28,7 @@ class AnnotationLoader implements LoaderInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function loadClassMetadata(ClassMetadata $metadata)
     {

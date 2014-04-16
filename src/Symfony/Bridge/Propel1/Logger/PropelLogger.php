@@ -55,7 +55,7 @@ class PropelLogger implements \BasicLogger
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function alert($message)
     {
@@ -63,7 +63,7 @@ class PropelLogger implements \BasicLogger
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function crit($message)
     {
@@ -71,7 +71,7 @@ class PropelLogger implements \BasicLogger
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function err($message)
     {
@@ -79,7 +79,7 @@ class PropelLogger implements \BasicLogger
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function warning($message)
     {
@@ -87,7 +87,7 @@ class PropelLogger implements \BasicLogger
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function notice($message)
     {
@@ -95,7 +95,7 @@ class PropelLogger implements \BasicLogger
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function info($message)
     {
@@ -103,7 +103,7 @@ class PropelLogger implements \BasicLogger
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function debug($message)
     {
@@ -132,7 +132,7 @@ class PropelLogger implements \BasicLogger
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function log($message, $severity = null)
     {

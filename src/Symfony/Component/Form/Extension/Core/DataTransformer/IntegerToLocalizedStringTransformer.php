@@ -36,7 +36,7 @@ class IntegerToLocalizedStringTransformer extends NumberToLocalizedStringTransfo
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function reverseTransform($value)
     {

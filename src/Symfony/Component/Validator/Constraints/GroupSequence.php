@@ -111,7 +111,7 @@ class GroupSequence implements \ArrayAccess, \IteratorAggregate, \Countable
      *
      * @param int     $offset The offset
      *
-     * @return Boolean Whether the offset exists
+     * @return bool    Whether the offset exists
      *
      * @deprecated Implemented for backwards compatibility with Symfony < 2.5.
      *             To be removed in Symfony 3.0.
@@ -181,7 +181,7 @@ class GroupSequence implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * Returns the number of groups in the sequence.
      *
-     * @return integer The number of groups
+     * @return int     The number of groups
      *
      * @deprecated Implemented for backwards compatibility with Symfony < 2.5.
      *             To be removed in Symfony 3.0.

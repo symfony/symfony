@@ -128,7 +128,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
     /**
      * Returns the current position of the iterator.
      *
-     * @return integer The 0-indexed position.
+     * @return int     The 0-indexed position.
      */
     public function key()
     {
@@ -138,7 +138,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
     /**
      * Returns whether the iterator's position is valid.
      *
-     * @return Boolean Whether the iterator is valid.
+     * @return bool    Whether the iterator is valid.
      */
     public function valid()
     {
@@ -161,7 +161,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
      *
      * @param int     $position The position
      *
-     * @return Boolean Whether that position exists
+     * @return bool    Whether that position exists
      */
     public function offsetExists($position)
     {
@@ -210,7 +210,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
      * Returns whether the current element of the iterator can be recursed
      * into.
      *
-     * @return Boolean Whether the current element is an instance of this class
+     * @return bool    Whether the current element is an instance of this class
      */
     public function hasChildren()
     {
@@ -240,7 +240,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
      *
      *     $count = count($form->getErrors(true, true));
      *
-     * @return integer The number of iterated elements
+     * @return int     The number of iterated elements
      */
     public function count()
     {

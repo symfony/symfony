@@ -60,7 +60,7 @@ class Psr4ClassLoader
     /**
      * @param string $class
      *
-     * @return Boolean
+     * @return bool
      */
     public function loadClass($class)
     {

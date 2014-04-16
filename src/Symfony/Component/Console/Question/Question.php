@@ -63,7 +63,7 @@ class Question
     /**
      * Returns whether the user response must be hidden.
      *
-     * @return Boolean
+     * @return bool
      */
     public function isHidden()
     {
@@ -93,7 +93,7 @@ class Question
     /**
      * In case the response can not be hidden, whether to fallback on non-hidden question or not.
      *
-     * @return Boolean
+     * @return bool
      */
     public function isHiddenFallback()
     {
@@ -202,7 +202,7 @@ class Question
      *
      * Null means an unlimited number of attempts.
      *
-     * @return null|integer
+     * @return null|int
      */
     public function getMaxAttempts()
     {

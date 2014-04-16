@@ -372,7 +372,7 @@ class QuestionHelper extends Helper
     /**
      * Returns a valid unix shell.
      *
-     * @return string|Boolean  The valid shell name, false in case no valid shell is found
+     * @return string|bool     The valid shell name, false in case no valid shell is found
      */
     private function getShell()
     {
@@ -399,7 +399,7 @@ class QuestionHelper extends Helper
     /**
      * Returns whether Stty is available or not.
      *
-     * @return Boolean
+     * @return bool
      */
     private function hasSttyAvailable()
     {

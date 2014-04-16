@@ -68,7 +68,7 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
     private $translationDomain;
 
     /**
-     * @var integer|null
+     * @var int|null
      */
     private $plural;
 

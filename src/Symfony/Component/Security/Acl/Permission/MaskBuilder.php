@@ -198,7 +198,7 @@ class MaskBuilder
      *
      * @param mixed $code
      *
-     * @return integer
+     * @return int
      *
      * @throws \InvalidArgumentException
      */

@@ -150,7 +150,7 @@ class ProgressBar
     /**
      * Gets the progress bar start time.
      *
-     * @return integer The progress bar start time
+     * @return int     The progress bar start time
      */
     public function getStartTime()
     {
@@ -160,7 +160,7 @@ class ProgressBar
     /**
      * Gets the progress bar maximal steps.
      *
-     * @return integer The progress bar max steps
+     * @return int     The progress bar max steps
      */
     public function getMaxSteps()
     {
@@ -170,7 +170,7 @@ class ProgressBar
     /**
      * Gets the progress bar step.
      *
-     * @return integer The progress bar step
+     * @return int     The progress bar step
      */
     public function getStep()
     {
@@ -180,7 +180,7 @@ class ProgressBar
     /**
      * Gets the progress bar step width.
      *
-     * @return integer The progress bar step width
+     * @return int     The progress bar step width
      */
     public function getStepWidth()
     {
@@ -190,7 +190,7 @@ class ProgressBar
     /**
      * Gets the current progress bar percent.
      *
-     * @return integer The current progress bar percent
+     * @return int     The current progress bar percent
      */
     public function getProgressPercent()
     {
@@ -210,7 +210,7 @@ class ProgressBar
     /**
      * Gets the progress bar width.
      *
-     * @return integer The progress bar size
+     * @return int     The progress bar size
      */
     public function getBarWidth()
     {

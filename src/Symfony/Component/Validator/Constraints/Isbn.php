@@ -29,13 +29,13 @@ class Isbn extends Constraint
 
     /**
      * @deprecated Deprecated since version 2.5, to be removed in 3.0. Use option "type" instead.
-     * @var Boolean
+     * @var bool
      */
     public $isbn10 = false;
 
     /**
      * @deprecated Deprecated since version 2.5, to be removed in 3.0. Use option "type" instead.
-     * @var Boolean
+     * @var bool
      */
     public $isbn13 = false;
 

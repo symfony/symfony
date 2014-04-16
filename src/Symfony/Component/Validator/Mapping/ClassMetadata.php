@@ -99,7 +99,7 @@ class ClassMetadata extends ElementMetadata implements LegacyMetadataInterface, 
      *
      * By default, only instances of {@link \Traversable} are traversed.
      *
-     * @var integer
+     * @var int
      *
      * @internal This property is public in order to reduce the size of the
      *           class' serialized representation. Do not access it. Use
@@ -491,7 +491,7 @@ class ClassMetadata extends ElementMetadata implements LegacyMetadataInterface, 
     /**
      * Class nodes are never cascaded.
      *
-     * @return Boolean Always returns false.
+     * @return bool    Always returns false.
      */
     public function getCascadingStrategy()
     {

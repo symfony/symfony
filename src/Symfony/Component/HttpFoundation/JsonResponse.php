@@ -107,7 +107,7 @@ class JsonResponse extends Response
     /**
      * Returns options used while encoding data to JSON.
      *
-     * @return integer
+     * @return int
      */
     public function getEncodingOptions()
     {

@@ -441,7 +441,7 @@ class Process
     /**
      * Returns true in case the output is disabled, false otherwise.
      *
-     * @return Boolean
+     * @return bool
      */
     public function isOutputDisabled()
     {
@@ -954,7 +954,7 @@ class Process
     /**
      * Returns PTY state.
      *
-     * @return Boolean
+     * @return bool
      */
     public function isPty()
     {
@@ -1161,7 +1161,7 @@ class Process
     /**
      * Returns whether PTY is supported on the current operating system.
      *
-     * @return Boolean
+     * @return bool
      */
     public static function isPtySupported()
     {

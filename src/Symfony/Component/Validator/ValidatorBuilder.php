@@ -97,7 +97,7 @@ class ValidatorBuilder implements ValidatorBuilderInterface
     private $propertyAccessor;
 
     /**
-     * @var integer
+     * @var int
      */
     private $apiVersion;
 

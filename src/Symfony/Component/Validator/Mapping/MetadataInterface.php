@@ -34,7 +34,7 @@ interface MetadataInterface extends LegacyMetadataInterface
     /**
      * Returns the strategy for cascading objects.
      *
-     * @return integer The cascading strategy
+     * @return int     The cascading strategy
      *
      * @see CascadingStrategy
      */
@@ -43,7 +43,7 @@ interface MetadataInterface extends LegacyMetadataInterface
     /**
      * Returns the strategy for traversing traversable objects.
      *
-     * @return integer The traversal strategy
+     * @return int     The traversal strategy
      *
      * @see TraversalStrategy
      */

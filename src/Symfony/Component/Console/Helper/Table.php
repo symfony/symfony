@@ -318,7 +318,7 @@ class Table
     /**
      * Gets number of columns for this table.
      *
-     * @return integer
+     * @return int
      */
     private function getNumberOfColumns()
     {
@@ -339,7 +339,7 @@ class Table
      *
      * @param int     $column
      *
-     * @return integer
+     * @return int
      */
     private function getColumnWidth($column)
     {
@@ -365,7 +365,7 @@ class Table
      * @param array   $row
      * @param int     $column
      *
-     * @return integer
+     * @return int
      */
     private function getCellWidth(array $row, $column)
     {

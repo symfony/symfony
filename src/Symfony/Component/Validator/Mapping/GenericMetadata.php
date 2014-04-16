@@ -51,7 +51,7 @@ class GenericMetadata implements MetadataInterface
      *
      * By default, objects are not cascaded.
      *
-     * @var integer
+     * @var int
      *
      * @see CascadingStrategy
      *
@@ -66,7 +66,7 @@ class GenericMetadata implements MetadataInterface
      *
      * By default, traversable objects are not traversed.
      *
-     * @var integer
+     * @var int
      *
      * @see TraversalStrategy
      *
@@ -192,7 +192,7 @@ class GenericMetadata implements MetadataInterface
     /**
      * Returns whether this element has any constraints.
      *
-     * @return Boolean
+     * @return bool
      */
     public function hasConstraints()
     {

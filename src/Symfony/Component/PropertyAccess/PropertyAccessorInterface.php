@@ -92,7 +92,7 @@ interface PropertyAccessorInterface
      * @param object|array                 $objectOrArray The object or array to check
      * @param string|PropertyPathInterface $propertyPath  The property path to check
      *
-     * @return Boolean Whether the value can be set
+     * @return bool    Whether the value can be set
      *
      * @throws Exception\InvalidArgumentException If the property path is invalid
      */
@@ -107,7 +107,7 @@ interface PropertyAccessorInterface
      * @param object|array                 $objectOrArray The object or array to check
      * @param string|PropertyPathInterface $propertyPath  The property path to check
      *
-     * @return Boolean Whether the property path can be read
+     * @return bool    Whether the property path can be read
      *
      * @throws Exception\InvalidArgumentException If the property path is invalid
      */

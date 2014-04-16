@@ -30,7 +30,7 @@ class ProcessPipes
     private $useFiles;
     /** @var bool    */
     private $ttyMode;
-    /** @var Boolean */
+    /** @var bool    */
     private $ptyMode;
 
     const CHUNK_SIZE = 16384;

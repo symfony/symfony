@@ -252,7 +252,7 @@ class Route implements \Serializable
      *
      * @param string $scheme
      *
-     * @return Boolean true if the scheme requirement exists, otherwise false
+     * @return bool    true if the scheme requirement exists, otherwise false
      */
     public function hasScheme($scheme)
     {

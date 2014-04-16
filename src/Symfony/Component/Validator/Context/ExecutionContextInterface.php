@@ -155,7 +155,7 @@ interface ExecutionContextInterface extends LegacyExecutionContextInterface
      * @param string $groupHash  The group's name or hash, if it is group
      *                           sequence
      *
-     * @return Boolean Whether the object was already validated for that
+     * @return bool    Whether the object was already validated for that
      *                 group
      *
      * @internal Used by the validator engine. Should not be called by user
@@ -180,7 +180,7 @@ interface ExecutionContextInterface extends LegacyExecutionContextInterface
      * @param string $cacheKey     The hash of the object
      * @param string $constraintHash The hash of the constraint
      *
-     * @return Boolean Whether the constraint was already validated
+     * @return bool    Whether the constraint was already validated
      *
      * @internal Used by the validator engine. Should not be called by user
      *           code.

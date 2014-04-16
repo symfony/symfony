@@ -46,7 +46,7 @@ class ResizeFormListener implements EventSubscriberInterface
     protected $allowDelete;
 
     /**
-     * @var Boolean
+     * @var bool
      */
     private $deleteEmpty;
 

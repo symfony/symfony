@@ -824,6 +824,10 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
     public function testNonSeekableStream()
     {
+        if (!in_array('ftp', stream_get_wrappers())) {
+            $this->markTestSkipped(sprintf('Unavailable stream "%s".', 'ftp'));
+        }
+
         try {
             $i = Finder::create()->in('ftp://ftp.mozilla.org/')->depth(0)->getIterator();
         } catch (\UnexpectedValueException $e) {

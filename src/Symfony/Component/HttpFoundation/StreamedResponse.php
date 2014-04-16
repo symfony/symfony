@@ -35,7 +35,7 @@ class StreamedResponse extends Response
      * Constructor.
      *
      * @param callable|null $callback A valid PHP callback or null to set it later
-     * @param integer       $status   The response status code
+     * @param int           $status   The response status code
      * @param array         $headers  An array of response headers
      *
      * @api
@@ -54,7 +54,7 @@ class StreamedResponse extends Response
      * Factory method for chainability
      *
      * @param callable|null $callback A valid PHP callback or null to set it later
-     * @param integer       $status   The response status code
+     * @param int           $status   The response status code
      * @param array         $headers  An array of response headers
      *
      * @return StreamedResponse

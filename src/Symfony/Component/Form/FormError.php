@@ -65,7 +65,7 @@ class FormError implements \Serializable
      * @param string|null  $messageTemplate      The template for the error message
      * @param array        $messageParameters    The parameters that should be
      *                                           substituted in the message template
-     * @param integer|null $messagePluralization The value for error message pluralization
+     * @param int|null     $messagePluralization The value for error message pluralization
      * @param mixed        $cause                The cause of the error
      *
      * @see \Symfony\Component\Translation\Translator

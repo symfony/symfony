@@ -30,7 +30,7 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
     private $currentId;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function setRepeatedPass(RepeatedPass $repeatedPass)
     {

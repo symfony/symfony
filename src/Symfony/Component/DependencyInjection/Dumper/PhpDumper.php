@@ -61,7 +61,7 @@ class PhpDumper extends Dumper
     private $proxyDumper;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      *
      * @api
      */
@@ -557,7 +557,7 @@ EOF;
 
         if ($definition->isLazy()) {
             $lazyInitialization    = '$lazyLoad = true';
-            $lazyInitializationDoc = "\n     * @param boolean \$lazyLoad whether to try lazy-loading the service with a proxy\n     *";
+            $lazyInitializationDoc = "\n     * @param bool    \$lazyLoad whether to try lazy-loading the service with a proxy\n     *";
         } else {
             $lazyInitialization    = '';
             $lazyInitializationDoc = '';
@@ -944,7 +944,7 @@ EOF;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getParameterBag()
     {
@@ -979,7 +979,7 @@ EOF;
      *
      * @param array   $parameters
      * @param string  $path
-     * @param integer $indent
+     * @param int     $indent
      *
      * @return string
      *
@@ -1131,7 +1131,7 @@ EOF;
      *
      * @param string  $id
      * @param array   $arguments
-     * @param Boolean $deep
+     * @param bool    $deep
      * @param array   $visited
      *
      * @return Boolean
@@ -1169,7 +1169,7 @@ EOF;
      * Dumps values.
      *
      * @param array   $value
-     * @param Boolean $interpolate
+     * @param bool    $interpolate
      *
      * @return string
      *

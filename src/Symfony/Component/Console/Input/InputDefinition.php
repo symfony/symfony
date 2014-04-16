@@ -149,7 +149,7 @@ class InputDefinition
     /**
      * Returns an InputArgument by name or by position.
      *
-     * @param string|integer $name The InputArgument name or position
+     * @param string|int     $name The InputArgument name or position
      *
      * @return InputArgument An InputArgument object
      *
@@ -171,7 +171,7 @@ class InputDefinition
     /**
      * Returns true if an InputArgument object exists by name or position.
      *
-     * @param string|integer $name The InputArgument name or position
+     * @param string|int     $name The InputArgument name or position
      *
      * @return Boolean true if the InputArgument object exists, false otherwise
      *
@@ -436,7 +436,7 @@ class InputDefinition
     /**
      * Returns an XML representation of the InputDefinition.
      *
-     * @param Boolean $asDom Whether to return a DOM or an XML string
+     * @param bool    $asDom Whether to return a DOM or an XML string
      *
      * @return string|\DOMDocument An XML string representing the InputDefinition
      *

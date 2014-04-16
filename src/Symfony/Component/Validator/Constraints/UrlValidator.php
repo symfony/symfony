@@ -38,7 +38,7 @@ class UrlValidator extends ConstraintValidator
         $~ixu';
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function validate($value, Constraint $constraint)
     {

@@ -199,7 +199,7 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getName()
     {

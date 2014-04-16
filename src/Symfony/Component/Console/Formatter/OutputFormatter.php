@@ -39,14 +39,14 @@ class OutputFormatter implements OutputFormatterInterface
     /**
      * Initializes console output formatter.
      *
-     * @param Boolean          $decorated Whether this formatter should actually decorate strings
+     * @param bool             $decorated Whether this formatter should actually decorate strings
      * @param OutputFormatterStyleInterface[] $styles    Array of "name => FormatterStyle" instances
      *
      * @api
      */
     public function __construct($decorated = false, array $styles = array())
     {
-        $this->decorated = (Boolean) $decorated;
+        $this->decorated = (bool) $decorated;
 
         $this->setStyle('error', new OutputFormatterStyle('white', 'red'));
         $this->setStyle('info', new OutputFormatterStyle('green'));
@@ -63,13 +63,13 @@ class OutputFormatter implements OutputFormatterInterface
     /**
      * Sets the decorated flag.
      *
-     * @param Boolean $decorated Whether to decorate the messages or not
+     * @param bool    $decorated Whether to decorate the messages or not
      *
      * @api
      */
     public function setDecorated($decorated)
     {
-        $this->decorated = (Boolean) $decorated;
+        $this->decorated = (bool) $decorated;
     }
 
     /**

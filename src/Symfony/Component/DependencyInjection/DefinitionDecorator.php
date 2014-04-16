@@ -65,7 +65,7 @@ class DefinitionDecorator extends Definition
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      *
      * @api
      */
@@ -77,7 +77,7 @@ class DefinitionDecorator extends Definition
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      *
      * @api
      */
@@ -89,7 +89,7 @@ class DefinitionDecorator extends Definition
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      *
      * @api
      */
@@ -101,7 +101,7 @@ class DefinitionDecorator extends Definition
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      *
      * @api
      */
@@ -113,7 +113,7 @@ class DefinitionDecorator extends Definition
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      *
      * @api
      */
@@ -125,7 +125,7 @@ class DefinitionDecorator extends Definition
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      *
      * @api
      */
@@ -137,7 +137,7 @@ class DefinitionDecorator extends Definition
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      *
      * @api
      */
@@ -149,7 +149,7 @@ class DefinitionDecorator extends Definition
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      *
      * @api
      */
@@ -166,7 +166,7 @@ class DefinitionDecorator extends Definition
      * If replaceArgument() has been used to replace an argument, this method
      * will return the replacement value.
      *
-     * @param integer $index
+     * @param int     $index
      *
      * @return mixed The argument value
      *
@@ -197,7 +197,7 @@ class DefinitionDecorator extends Definition
      * certain conventions when you want to overwrite the arguments of the
      * parent definition, otherwise your arguments will only be appended.
      *
-     * @param integer $index
+     * @param int     $index
      * @param mixed   $value
      *
      * @return DefinitionDecorator the current instance

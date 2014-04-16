@@ -36,7 +36,7 @@ interface StructuredBundleReaderInterface extends BundleReaderInterface
      * @param string   $path     The path to the resource bundle.
      * @param string   $locale   The locale to read.
      * @param string[] $indices  The indices to read from the bundle.
-     * @param Boolean  $fallback Whether to merge the value with the value from
+     * @param bool     $fallback Whether to merge the value with the value from
      *                           the fallback locale (e.g. "en" for "en_GB").
      *                           Only applicable if the result is multivalued
      *                           (i.e. array or \ArrayAccess) or cannot be found

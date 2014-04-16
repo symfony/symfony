@@ -182,7 +182,7 @@ class JsonDescriptor extends Descriptor
 
     /**
      * @param Definition $definition
-     * @param boolean    $omitTags
+     * @param bool       $omitTags
      *
      * @return array
      */

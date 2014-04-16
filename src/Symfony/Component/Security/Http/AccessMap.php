@@ -37,7 +37,7 @@ class AccessMap implements AccessMapInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getPatterns(Request $request)
     {

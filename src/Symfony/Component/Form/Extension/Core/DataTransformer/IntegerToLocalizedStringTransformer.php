@@ -22,9 +22,9 @@ class IntegerToLocalizedStringTransformer extends NumberToLocalizedStringTransfo
     /**
      * Constructs a transformer.
      *
-     * @param integer $precision    Unused.
-     * @param Boolean $grouping     Whether thousands should be grouped.
-     * @param integer $roundingMode One of the ROUND_ constants in this class.
+     * @param int  $precision    Unused.
+     * @param bool $grouping     Whether thousands should be grouped.
+     * @param int  $roundingMode One of the ROUND_ constants in this class.
      */
     public function __construct($precision = 0, $grouping = false, $roundingMode = self::ROUND_DOWN)
     {
@@ -36,7 +36,7 @@ class IntegerToLocalizedStringTransformer extends NumberToLocalizedStringTransfo
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function reverseTransform($value)
     {

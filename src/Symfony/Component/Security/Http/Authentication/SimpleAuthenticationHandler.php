@@ -51,7 +51,7 @@ class SimpleAuthenticationHandler implements AuthenticationFailureHandlerInterfa
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function onAuthenticationSuccess(Request $request, TokenInterface $token)
     {
@@ -78,7 +78,7 @@ class SimpleAuthenticationHandler implements AuthenticationFailureHandlerInterfa
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
     {

@@ -287,7 +287,7 @@ class Command
      *
      * This method is not part of public API and should not be used directly.
      *
-     * @param Boolean $mergeArgs Whether to merge or not the Application definition arguments to Command definition arguments
+     * @param bool    $mergeArgs Whether to merge or not the Application definition arguments to Command definition arguments
      */
     public function mergeApplicationDefinition($mergeArgs = true)
     {
@@ -362,7 +362,7 @@ class Command
      * Adds an argument.
      *
      * @param string  $name        The argument name
-     * @param integer $mode        The argument mode: InputArgument::REQUIRED or InputArgument::OPTIONAL
+     * @param int     $mode        The argument mode: InputArgument::REQUIRED or InputArgument::OPTIONAL
      * @param string  $description A description text
      * @param mixed   $default     The default value (for InputArgument::OPTIONAL mode only)
      *
@@ -382,7 +382,7 @@ class Command
      *
      * @param string  $name        The option name
      * @param string  $shortcut    The shortcut (can be null)
-     * @param integer $mode        The option mode: One of the InputOption::VALUE_* constants
+     * @param int     $mode        The option mode: One of the InputOption::VALUE_* constants
      * @param string  $description A description text
      * @param mixed   $default     The default value (must be null for InputOption::VALUE_REQUIRED or InputOption::VALUE_NONE)
      *
@@ -614,7 +614,7 @@ class Command
     /**
      * Returns an XML representation of the command.
      *
-     * @param Boolean $asDom Whether to return a DOM or an XML string
+     * @param bool    $asDom Whether to return a DOM or an XML string
      *
      * @return string|\DOMDocument An XML string representing the command
      *

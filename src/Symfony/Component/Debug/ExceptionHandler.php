@@ -43,7 +43,7 @@ class ExceptionHandler implements ExceptionHandlerInterface
     /**
      * Registers the exception handler.
      *
-     * @param Boolean $debug
+     * @param bool    $debug
      *
      * @return ExceptionHandler The registered exception handler
      */

@@ -75,7 +75,7 @@ class Validator implements ValidatorInterface, Mapping\Factory\MetadataFactoryIn
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getMetadataFor($value)
     {
@@ -83,7 +83,7 @@ class Validator implements ValidatorInterface, Mapping\Factory\MetadataFactoryIn
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function hasMetadataFor($value)
     {
@@ -105,7 +105,7 @@ class Validator implements ValidatorInterface, Mapping\Factory\MetadataFactoryIn
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      *
      * @throws ValidatorException If the metadata for the value does not support properties.
      */
@@ -136,7 +136,7 @@ class Validator implements ValidatorInterface, Mapping\Factory\MetadataFactoryIn
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      *
      * @throws ValidatorException If the metadata for the value does not support properties.
      */
@@ -167,7 +167,7 @@ class Validator implements ValidatorInterface, Mapping\Factory\MetadataFactoryIn
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function validateValue($value, $constraints, $groups = null)
     {

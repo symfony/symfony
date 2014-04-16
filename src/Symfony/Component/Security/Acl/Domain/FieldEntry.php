@@ -27,15 +27,15 @@ class FieldEntry extends Entry implements FieldEntryInterface
     /**
      * Constructor
      *
-     * @param integer                   $id
+     * @param int                       $id
      * @param AclInterface              $acl
      * @param string                    $field
      * @param SecurityIdentityInterface $sid
      * @param string                    $strategy
-     * @param integer                   $mask
-     * @param Boolean                   $granting
-     * @param Boolean                   $auditFailure
-     * @param Boolean                   $auditSuccess
+     * @param int                       $mask
+     * @param bool                      $granting
+     * @param bool                      $auditFailure
+     * @param bool                      $auditSuccess
      */
     public function __construct($id, AclInterface $acl, $field, SecurityIdentityInterface $sid, $strategy, $mask, $granting, $auditFailure, $auditSuccess)
     {
@@ -45,7 +45,7 @@ class FieldEntry extends Entry implements FieldEntryInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getField()
     {
@@ -53,7 +53,7 @@ class FieldEntry extends Entry implements FieldEntryInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function serialize()
     {
@@ -64,7 +64,7 @@ class FieldEntry extends Entry implements FieldEntryInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function unserialize($serialized)
     {

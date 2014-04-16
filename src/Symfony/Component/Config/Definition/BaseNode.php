@@ -133,21 +133,21 @@ abstract class BaseNode implements NodeInterface
     /**
      * Set this node as required.
      *
-     * @param Boolean $boolean Required node
+     * @param bool    $boolean Required node
      */
     public function setRequired($boolean)
     {
-        $this->required = (Boolean) $boolean;
+        $this->required = (bool) $boolean;
     }
 
     /**
      * Sets if this node can be overridden.
      *
-     * @param Boolean $allow
+     * @param bool    $allow
      */
     public function setAllowOverwrite($allow)
     {
-        $this->allowOverwrite = (Boolean) $allow;
+        $this->allowOverwrite = (bool) $allow;
     }
 
     /**

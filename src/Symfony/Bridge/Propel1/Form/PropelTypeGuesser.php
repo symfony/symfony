@@ -26,7 +26,7 @@ class PropelTypeGuesser implements FormTypeGuesserInterface
     private $cache = array();
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function guessType($class, $property)
     {
@@ -108,7 +108,7 @@ class PropelTypeGuesser implements FormTypeGuesserInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function guessRequired($class, $property)
     {
@@ -118,7 +118,7 @@ class PropelTypeGuesser implements FormTypeGuesserInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function guessMaxLength($class, $property)
     {
@@ -137,7 +137,7 @@ class PropelTypeGuesser implements FormTypeGuesserInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function guessPattern($class, $property)
     {

@@ -23,7 +23,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 class NullValidator extends ConstraintValidator
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function validate($value, Constraint $constraint)
     {

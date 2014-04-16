@@ -189,7 +189,7 @@ class Response
      * Constructor.
      *
      * @param mixed   $content The response content, see setContent()
-     * @param integer $status  The response status code
+     * @param int     $status  The response status code
      * @param array   $headers An array of response headers
      *
      * @throws \InvalidArgumentException When the HTTP status code is not valid
@@ -216,7 +216,7 @@ class Response
      *         ->setSharedMaxAge(300);
      *
      * @param mixed   $content The response content, see setContent()
-     * @param integer $status  The response status code
+     * @param int     $status  The response status code
      * @param array   $headers An array of response headers
      *
      * @return Response
@@ -467,7 +467,7 @@ class Response
     /**
      * Sets the response status code.
      *
-     * @param integer $code HTTP status code
+     * @param int     $code HTTP status code
      * @param mixed   $text HTTP status text
      *
      * If the status text is null it will be automatically populated for the known
@@ -784,7 +784,7 @@ class Response
      *
      * This methods sets the Cache-Control max-age directive.
      *
-     * @param integer $value Number of seconds
+     * @param int     $value Number of seconds
      *
      * @return Response
      *
@@ -802,7 +802,7 @@ class Response
      *
      * This methods sets the Cache-Control s-maxage directive.
      *
-     * @param integer $value Number of seconds
+     * @param int     $value Number of seconds
      *
      * @return Response
      *
@@ -842,7 +842,7 @@ class Response
      *
      * This method adjusts the Cache-Control/s-maxage directive.
      *
-     * @param integer $seconds Number of seconds
+     * @param int     $seconds Number of seconds
      *
      * @return Response
      *
@@ -860,7 +860,7 @@ class Response
      *
      * This method adjusts the Cache-Control/max-age directive.
      *
-     * @param integer $seconds Number of seconds
+     * @param int     $seconds Number of seconds
      *
      * @return Response
      *
@@ -927,7 +927,7 @@ class Response
      * Sets the ETag value.
      *
      * @param string|null $etag The ETag unique identifier or null to remove the header
-     * @param Boolean     $weak Whether you want a weak ETag or not
+     * @param bool        $weak Whether you want a weak ETag or not
      *
      * @return Response
      *
@@ -1064,7 +1064,7 @@ class Response
      * Sets the Vary header.
      *
      * @param string|array $headers
-     * @param Boolean      $replace Whether to replace the actual value of not (true by default)
+     * @param bool         $replace Whether to replace the actual value of not (true by default)
      *
      * @return Response
      *

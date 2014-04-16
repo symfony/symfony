@@ -53,9 +53,9 @@ class Cookie
      * @param string  $expires      The time the cookie expires
      * @param string  $path         The path on the server in which the cookie will be available on
      * @param string  $domain       The domain that the cookie is available
-     * @param Boolean $secure       Indicates that the cookie should only be transmitted over a secure HTTPS connection from the client
-     * @param Boolean $httponly     The cookie httponly flag
-     * @param Boolean $encodedValue Whether the value is encoded or not
+     * @param bool    $secure       Indicates that the cookie should only be transmitted over a secure HTTPS connection from the client
+     * @param bool    $httponly     The cookie httponly flag
+     * @param bool    $encodedValue Whether the value is encoded or not
      *
      * @api
      */
@@ -69,11 +69,11 @@ class Cookie
             $this->rawValue = urlencode($value);
         }
         $this->name     = $name;
-        $this->expires  = null === $expires ? null : (integer) $expires;
+        $this->expires  = null === $expires ? null : (int) $expires;
         $this->path     = empty($path) ? '/' : $path;
         $this->domain   = $domain;
-        $this->secure   = (Boolean) $secure;
-        $this->httponly = (Boolean) $httponly;
+        $this->secure   = (bool) $secure;
+        $this->httponly = (bool) $httponly;
     }
 
     /**

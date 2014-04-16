@@ -46,7 +46,7 @@ class ProxyDumper implements DumperInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function isProxyCandidate(Definition $definition)
     {
@@ -54,7 +54,7 @@ class ProxyDumper implements DumperInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getProxyFactoryCode(Definition $definition, $id)
     {
@@ -89,7 +89,7 @@ EOF;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getProxyCode(Definition $definition)
     {

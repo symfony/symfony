@@ -56,7 +56,7 @@ class TemplateLocator implements FileLocatorInterface
      *
      * @param TemplateReferenceInterface $template    A template
      * @param string                     $currentPath Unused
-     * @param Boolean                    $first       Unused
+     * @param bool                       $first       Unused
      *
      * @return string The full path for the file
      *

@@ -220,7 +220,7 @@ class StopwatchEvent
     /**
      * Formats a time.
      *
-     * @param integer|float $time A raw time
+     * @param int|float     $time A raw time
      *
      * @return float The formatted time
      *

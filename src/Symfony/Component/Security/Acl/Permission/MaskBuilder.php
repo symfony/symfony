@@ -72,7 +72,7 @@ class MaskBuilder
     /**
      * Constructor
      *
-     * @param integer $mask optional; defaults to 0
+     * @param int     $mask optional; defaults to 0
      *
      * @throws \InvalidArgumentException
      */
@@ -166,7 +166,7 @@ class MaskBuilder
     /**
      * Returns the code for the passed mask
      *
-     * @param integer $mask
+     * @param int     $mask
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      * @return string

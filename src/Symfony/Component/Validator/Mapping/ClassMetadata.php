@@ -217,7 +217,7 @@ class ClassMetadata extends ElementMetadata implements LegacyMetadataInterface, 
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function addConstraint(Constraint $constraint)
     {
@@ -463,7 +463,7 @@ class ClassMetadata extends ElementMetadata implements LegacyMetadataInterface, 
     /**
      * Sets whether a group sequence provider should be used.
      *
-     * @param Boolean $active
+     * @param bool    $active
      *
      * @throws GroupDefinitionException
      */

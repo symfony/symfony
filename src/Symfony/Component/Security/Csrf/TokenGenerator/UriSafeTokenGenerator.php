@@ -41,7 +41,7 @@ class UriSafeTokenGenerator implements TokenGeneratorInterface
      *
      * @param SecureRandomInterface|null $random  The random value generator used for
      *                                            generating entropy
-     * @param integer                    $entropy The amount of entropy collected for
+     * @param int                        $entropy The amount of entropy collected for
      *                                            each token (in bits)
      */
     public function __construct(SecureRandomInterface $random = null, $entropy = 256)

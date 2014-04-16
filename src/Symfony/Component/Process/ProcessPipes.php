@@ -37,9 +37,9 @@ class ProcessPipes
 
     public function __construct($useFiles, $ttyMode, $ptyMode = false)
     {
-        $this->useFiles = (Boolean) $useFiles;
-        $this->ttyMode = (Boolean) $ttyMode;
-        $this->ptyMode = (Boolean) $ptyMode;
+        $this->useFiles = (bool) $useFiles;
+        $this->ttyMode = (bool) $ttyMode;
+        $this->ptyMode = (bool) $ptyMode;
 
         // Fix for PHP bug #51800: reading from STDOUT pipe hangs forever on Windows if the output is too big.
         // Workaround for this problem is to use temporary files instead of pipes on Windows platform.
@@ -172,7 +172,7 @@ class ProcessPipes
     /**
      * Reads data in file handles and pipes.
      *
-     * @param Boolean $blocking Whether to use blocking calls or not.
+     * @param bool    $blocking Whether to use blocking calls or not.
      *
      * @return array An array of read data indexed by their fd.
      */
@@ -184,7 +184,7 @@ class ProcessPipes
     /**
      * Reads data in file handles and pipes, closes them if EOF is reached.
      *
-     * @param Boolean $blocking Whether to use blocking calls or not.
+     * @param bool    $blocking Whether to use blocking calls or not.
      *
      * @return array An array of read data indexed by their fd.
      */
@@ -201,16 +201,16 @@ class ProcessPipes
     public function hasOpenHandles()
     {
         if (!$this->useFiles) {
-            return (Boolean) $this->pipes;
+            return (bool) $this->pipes;
         }
 
-        return (Boolean) $this->pipes && (Boolean) $this->fileHandles;
+        return (bool) $this->pipes && (bool) $this->fileHandles;
     }
 
     /**
      * Writes stdin data.
      *
-     * @param Boolean     $blocking Whether to use blocking calls or not.
+     * @param bool        $blocking Whether to use blocking calls or not.
      * @param string|null $stdin    The data to write.
      */
     public function write($blocking, $stdin)
@@ -261,7 +261,7 @@ class ProcessPipes
     /**
      * Reads data in file handles.
      *
-     * @param Boolean $close Whether to close file handles or not.
+     * @param bool    $close Whether to close file handles or not.
      *
      * @return array An array of read data indexed by their fd.
      */
@@ -297,8 +297,8 @@ class ProcessPipes
     /**
      * Reads data in file pipes streams.
      *
-     * @param Boolean $blocking Whether to use blocking calls or not.
-     * @param Boolean $close    Whether to close file handles or not.
+     * @param bool    $blocking Whether to use blocking calls or not.
+     * @param bool    $close    Whether to close file handles or not.
      *
      * @return array An array of read data indexed by their fd.
      */

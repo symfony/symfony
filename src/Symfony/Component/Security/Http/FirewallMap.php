@@ -36,7 +36,7 @@ class FirewallMap implements FirewallMapInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getListeners(Request $request)
     {

@@ -42,7 +42,7 @@ abstract class FileDumper implements DumperInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function dump(MessageCatalogue $messages, $options = array())
     {

@@ -68,7 +68,7 @@ class Ip extends Constraint
     public $message = 'This is not a valid IP address.';
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function __construct($options = null)
     {

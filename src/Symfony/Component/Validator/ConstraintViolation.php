@@ -71,7 +71,7 @@ class ConstraintViolation implements ConstraintViolationInterface
      *                                      value to the invalid value
      * @param mixed        $invalidValue    The invalid value that caused this
      *                                      violation
-     * @param integer|null $plural          The number for determining the plural
+     * @param int|null     $plural          The number for determining the plural
      *                                      form when translating the message
      * @param mixed        $code            The error code of the violation
      */
@@ -117,7 +117,7 @@ class ConstraintViolation implements ConstraintViolationInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getMessageTemplate()
     {
@@ -125,7 +125,7 @@ class ConstraintViolation implements ConstraintViolationInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getMessageParameters()
     {
@@ -141,7 +141,7 @@ class ConstraintViolation implements ConstraintViolationInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getMessagePluralization()
     {
@@ -157,7 +157,7 @@ class ConstraintViolation implements ConstraintViolationInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getMessage()
     {
@@ -165,7 +165,7 @@ class ConstraintViolation implements ConstraintViolationInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getRoot()
     {
@@ -173,7 +173,7 @@ class ConstraintViolation implements ConstraintViolationInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getPropertyPath()
     {
@@ -181,7 +181,7 @@ class ConstraintViolation implements ConstraintViolationInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getInvalidValue()
     {
@@ -189,7 +189,7 @@ class ConstraintViolation implements ConstraintViolationInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getCode()
     {

@@ -34,10 +34,10 @@ class DialogHelper extends InputAwareHelper
      * @param OutputInterface $output       An Output instance
      * @param string|array    $question     The question to ask
      * @param array           $choices      List of choices to pick from
-     * @param Boolean|string  $default      The default answer if the user enters nothing
-     * @param Boolean|integer $attempts Max number of times to ask before giving up (false by default, which means infinite)
+     * @param bool|string     $default      The default answer if the user enters nothing
+     * @param bool|int        $attempts Max number of times to ask before giving up (false by default, which means infinite)
      * @param string          $errorMessage Message which will be shown if invalid value from choice list would be picked
-     * @param Boolean         $multiselect  Select more than one value separated by comma
+     * @param bool            $multiselect  Select more than one value separated by comma
      *
      * @return integer|string|array The selected value or values (the key of the choices array)
      *
@@ -230,7 +230,7 @@ class DialogHelper extends InputAwareHelper
      *
      * @param OutputInterface $output   An Output instance
      * @param string|array    $question The question to ask
-     * @param Boolean         $default  The default answer if the user enters nothing
+     * @param bool            $default  The default answer if the user enters nothing
      *
      * @return Boolean true if the user has confirmed, false otherwise
      */
@@ -253,7 +253,7 @@ class DialogHelper extends InputAwareHelper
      *
      * @param OutputInterface $output   An Output instance
      * @param string|array    $question The question
-     * @param Boolean         $fallback In case the response can not be hidden, whether to fallback on non-hidden question or not
+     * @param bool            $fallback In case the response can not be hidden, whether to fallback on non-hidden question or not
      *
      * @return string         The answer
      *
@@ -328,7 +328,7 @@ class DialogHelper extends InputAwareHelper
      * @param OutputInterface $output       An Output instance
      * @param string|array    $question     The question to ask
      * @param callable        $validator    A PHP callback
-     * @param integer         $attempts     Max number of times to ask before giving up (false by default, which means infinite)
+     * @param int             $attempts     Max number of times to ask before giving up (false by default, which means infinite)
      * @param string          $default      The default answer if none is given by the user
      * @param array           $autocomplete List of values to autocomplete
      *
@@ -357,8 +357,8 @@ class DialogHelper extends InputAwareHelper
      * @param OutputInterface $output    An Output instance
      * @param string|array    $question  The question to ask
      * @param callable        $validator A PHP callback
-     * @param integer         $attempts  Max number of times to ask before giving up (false by default, which means infinite)
-     * @param Boolean         $fallback  In case the response can not be hidden, whether to fallback on non-hidden question or not
+     * @param int             $attempts  Max number of times to ask before giving up (false by default, which means infinite)
+     * @param bool            $fallback  In case the response can not be hidden, whether to fallback on non-hidden question or not
      *
      * @return string         The response
      *
@@ -400,7 +400,7 @@ class DialogHelper extends InputAwareHelper
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getName()
     {
@@ -451,7 +451,7 @@ class DialogHelper extends InputAwareHelper
      * @param callable         $interviewer  A callable that will ask for a question and return the result
      * @param OutputInterface  $output       An Output instance
      * @param callable         $validator    A PHP callback
-     * @param integer          $attempts     Max number of times to ask before giving up ; false will ask infinitely
+     * @param int              $attempts     Max number of times to ask before giving up ; false will ask infinitely
      *
      * @return string   The validated response
      *

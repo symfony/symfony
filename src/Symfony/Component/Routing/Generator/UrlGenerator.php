@@ -114,7 +114,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
      */
     public function setStrictRequirements($enabled)
     {
-        $this->strictRequirements = null === $enabled ? null : (Boolean) $enabled;
+        $this->strictRequirements = null === $enabled ? null : (bool) $enabled;
     }
 
     /**
@@ -126,7 +126,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function generate($name, $parameters = array(), $referenceType = self::ABSOLUTE_PATH)
     {

@@ -21,7 +21,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 class BooleanNode extends ScalarNode
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     protected function validateType($value)
     {

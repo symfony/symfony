@@ -90,7 +90,7 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function addConstraint(Constraint $constraint)
     {

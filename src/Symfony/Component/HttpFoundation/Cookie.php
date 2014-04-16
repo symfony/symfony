@@ -33,11 +33,11 @@ class Cookie
      *
      * @param string                   $name     The name of the cookie
      * @param string                   $value    The value of the cookie
-     * @param integer|string|\DateTime $expire   The time the cookie expires
+     * @param int|string|\DateTime     $expire   The time the cookie expires
      * @param string                   $path     The path on the server in which the cookie will be available on
      * @param string                   $domain   The domain that the cookie is available to
-     * @param Boolean                  $secure   Whether the cookie should only be transmitted over a secure HTTPS connection from the client
-     * @param Boolean                  $httpOnly Whether the cookie will be made accessible only through the HTTP protocol
+     * @param bool                     $secure   Whether the cookie should only be transmitted over a secure HTTPS connection from the client
+     * @param bool                     $httpOnly Whether the cookie will be made accessible only through the HTTP protocol
      *
      * @throws \InvalidArgumentException
      *
@@ -70,8 +70,8 @@ class Cookie
         $this->domain = $domain;
         $this->expire = $expire;
         $this->path = empty($path) ? '/' : $path;
-        $this->secure = (Boolean) $secure;
-        $this->httpOnly = (Boolean) $httpOnly;
+        $this->secure = (bool) $secure;
+        $this->httpOnly = (bool) $httpOnly;
     }
 
     /**

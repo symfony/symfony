@@ -91,11 +91,11 @@ interface ExecutionContextInterface
     /**
      * Adds a violation at the current node of the validation graph.
      *
-     * @param string       $message      The error message
-     * @param array        $params       The parameters substituted in the error message
-     * @param mixed        $invalidValue The invalid, validated value
-     * @param integer|null $plural       The number to use to pluralize of the message
-     * @param integer|null $code         The violation code
+     * @param string   $message      The error message
+     * @param array    $params       The parameters substituted in the error message
+     * @param mixed    $invalidValue The invalid, validated value
+     * @param int|null $plural       The number to use to pluralize of the message
+     * @param int|null $code         The violation code
      *
      * @api
      *
@@ -109,12 +109,12 @@ interface ExecutionContextInterface
      * Adds a violation at the validation graph node with the given property
      * path relative to the current property path.
      *
-     * @param string       $subPath       The relative property path for the violation
-     * @param string       $message       The error message
-     * @param array        $parameters    The parameters substituted in the error message
-     * @param mixed        $invalidValue  The invalid, validated value
-     * @param integer|null $plural        The number to use to pluralize of the message
-     * @param integer|null $code          The violation code
+     * @param string   $subPath       The relative property path for the violation
+     * @param string   $message       The error message
+     * @param array    $parameters    The parameters substituted in the error message
+     * @param mixed    $invalidValue  The invalid, validated value
+     * @param int|null $plural        The number to use to pluralize of the message
+     * @param int|null $code          The violation code
      *
      * @api
      *
@@ -158,9 +158,9 @@ interface ExecutionContextInterface
      * @param null|string|string[] $groups   The groups to validate in. If you don't pass any
      *                                       groups here, the current group of the context
      *                                       will be used.
-     * @param Boolean              $traverse Whether to traverse the value if it is an array
+     * @param bool                 $traverse Whether to traverse the value if it is an array
      *                                       or an instance of <tt>\Traversable</tt>.
-     * @param Boolean              $deep     Whether to traverse the value recursively if
+     * @param bool                 $deep     Whether to traverse the value recursively if
      *                                       it is a collection of collections.
      *
      * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.

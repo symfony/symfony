@@ -30,7 +30,7 @@ class Collection extends Constraint
     public $missingFieldsMessage = 'This field is missing.';
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function __construct($options = null)
     {

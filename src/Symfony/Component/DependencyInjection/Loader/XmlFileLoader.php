@@ -104,7 +104,7 @@ class XmlFileLoader extends FileLoader
 
         foreach ($imports as $import) {
             $this->setCurrentDir(dirname($file));
-            $this->import($import->getAttribute('resource'), null, (Boolean) XmlUtils::phpize($import->getAttribute('ignore-errors')), $file);
+            $this->import($import->getAttribute('resource'), null, (bool) XmlUtils::phpize($import->getAttribute('ignore-errors')), $file);
         }
     }
 

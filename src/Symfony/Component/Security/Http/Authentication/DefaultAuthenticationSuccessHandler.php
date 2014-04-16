@@ -48,7 +48,7 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function onAuthenticationSuccess(Request $request, TokenInterface $token)
     {

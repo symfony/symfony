@@ -220,7 +220,7 @@ class XmlDescriptor extends Descriptor
 
     /**
      * @param ContainerBuilder $builder
-     * @param boolean          $showPrivate
+     * @param bool             $showPrivate
      *
      * @return \DOMDocument
      */
@@ -268,7 +268,7 @@ class XmlDescriptor extends Descriptor
     /**
      * @param ContainerBuilder $builder
      * @param string|null      $tag
-     * @param boolean          $showPrivate
+     * @param bool             $showPrivate
      *
      * @return \DOMDocument
      */
@@ -296,7 +296,7 @@ class XmlDescriptor extends Descriptor
     /**
      * @param Definition  $definition
      * @param string|null $id
-     * @param boolean     $omitTags
+     * @param bool        $omitTags
      *
      * @return \DOMDocument
      */

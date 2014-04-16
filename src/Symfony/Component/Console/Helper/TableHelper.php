@@ -218,7 +218,7 @@ class TableHelper extends Helper
     /**
      * Sets cell padding type.
      *
-     * @param integer $padType STR_PAD_*
+     * @param int     $padType STR_PAD_*
      *
      * @return TableHelper
      */
@@ -253,7 +253,7 @@ class TableHelper extends Helper
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getName()
     {

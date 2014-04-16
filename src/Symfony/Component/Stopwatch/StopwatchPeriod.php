@@ -25,13 +25,13 @@ class StopwatchPeriod
     /**
      * Constructor.
      *
-     * @param integer $start The relative time of the start of the period (in milliseconds)
-     * @param integer $end   The relative time of the end of the period (in milliseconds)
+     * @param int $start The relative time of the start of the period (in milliseconds)
+     * @param int $end   The relative time of the end of the period (in milliseconds)
      */
     public function __construct($start, $end)
     {
-        $this->start = (integer) $start;
-        $this->end = (integer) $end;
+        $this->start = (int) $start;
+        $this->end = (int) $end;
         $this->memory = memory_get_usage(true);
     }
 

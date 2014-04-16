@@ -38,7 +38,7 @@ abstract class AbstractAdapter implements AdapterInterface
     private static $areSupported = array();
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function isSupported()
     {
@@ -216,7 +216,7 @@ abstract class AbstractAdapter implements AdapterInterface
      */
     public function ignoreUnreadableDirs($ignore = true)
     {
-        $this->ignoreUnreadableDirs = (Boolean) $ignore;
+        $this->ignoreUnreadableDirs = (bool) $ignore;
 
         return $this;
     }

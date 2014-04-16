@@ -19,7 +19,7 @@ namespace Symfony\Component\Intl\DateFormatter\DateFormat;
 class MinuteTransformer extends Transformer
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function format(\DateTime $dateTime, $length)
     {
@@ -29,7 +29,7 @@ class MinuteTransformer extends Transformer
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getReverseMatchingRegExp($length)
     {
@@ -37,7 +37,7 @@ class MinuteTransformer extends Transformer
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function extractDateOptions($matched, $length)
     {

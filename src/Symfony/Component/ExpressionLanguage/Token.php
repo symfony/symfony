@@ -32,9 +32,9 @@ class Token
     /**
      * Constructor.
      *
-     * @param integer $type   The type of the token
+     * @param int     $type   The type of the token
      * @param string  $value  The token value
-     * @param integer $cursor The cursor position in the source
+     * @param int     $cursor The cursor position in the source
      */
     public function __construct($type, $value, $cursor)
     {
@@ -56,7 +56,7 @@ class Token
     /**
      * Tests the current token for a type and/or a value.
      *
-     * @param array|integer $type  The type to test
+     * @param array|int     $type  The type to test
      * @param string|null   $value The token value
      *
      * @return Boolean

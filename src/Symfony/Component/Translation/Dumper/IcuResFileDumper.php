@@ -21,12 +21,12 @@ use Symfony\Component\Translation\MessageCatalogue;
 class IcuResFileDumper extends FileDumper
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     protected $relativePathTemplate = '%domain%/%locale%.%extension%';
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function format(MessageCatalogue $messages, $domain = 'messages')
     {
@@ -103,7 +103,7 @@ class IcuResFileDumper extends FileDumper
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     protected function getExtension()
     {

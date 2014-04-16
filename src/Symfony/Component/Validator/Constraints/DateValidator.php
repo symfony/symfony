@@ -25,7 +25,7 @@ class DateValidator extends ConstraintValidator
     const PATTERN = '/^(\d{4})-(\d{2})-(\d{2})$/';
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function validate($value, Constraint $constraint)
     {

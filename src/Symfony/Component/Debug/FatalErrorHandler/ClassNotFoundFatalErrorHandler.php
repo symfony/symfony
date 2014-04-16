@@ -159,7 +159,7 @@ class ClassNotFoundFatalErrorHandler implements FatalErrorHandlerInterface
      */
     private function convertFileToClass($path, $file)
     {
-        $namespacedClass = str_replace(array($path.'/', '.php', '/'), array('', '', '\\'), $file);
+        $namespacedClass = str_replace(array($path.DIRECTORY_SEPARATOR, '.php', '/'), array('', '', '\\'), $file);
         $pearClass = str_replace('\\', '_', $namespacedClass);
 
         // We cannot use the autoloader here as most of them use require; but if the class

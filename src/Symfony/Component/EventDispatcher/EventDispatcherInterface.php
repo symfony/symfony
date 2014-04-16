@@ -42,7 +42,7 @@ interface EventDispatcherInterface
      *
      * @param string   $eventName The event to listen on
      * @param callable $listener  The listener
-     * @param integer  $priority  The higher this value, the earlier an event
+     * @param int      $priority  The higher this value, the earlier an event
      *                            listener will be triggered in the chain (defaults to 0)
      *
      * @api

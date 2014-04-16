@@ -30,7 +30,7 @@ class LessThanValidatorTest extends AbstractComparisonValidatorTestCase
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function provideValidComparisons()
     {
@@ -44,7 +44,7 @@ class LessThanValidatorTest extends AbstractComparisonValidatorTestCase
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function provideInvalidComparisons()
     {

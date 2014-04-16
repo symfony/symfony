@@ -32,12 +32,12 @@ class ConfigCache
      * Constructor.
      *
      * @param string  $file  The absolute cache path
-     * @param Boolean $debug Whether debugging is enabled or not
+     * @param bool    $debug Whether debugging is enabled or not
      */
     public function __construct($file, $debug)
     {
         $this->file = $file;
-        $this->debug = (Boolean) $debug;
+        $this->debug = (bool) $debug;
     }
 
     /**

@@ -264,7 +264,7 @@ class ParameterBag implements ParameterBagInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function escapeValue($value)
     {

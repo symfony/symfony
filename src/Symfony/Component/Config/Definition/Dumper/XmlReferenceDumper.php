@@ -43,8 +43,8 @@ class XmlReferenceDumper
 
     /**
      * @param NodeInterface $node
-     * @param integer       $depth
-     * @param Boolean       $root      If the node is the root node
+     * @param int           $depth
+     * @param bool          $root      If the node is the root node
      * @param string        $namespace The namespace of the node
      */
     private function writeNode(NodeInterface $node, $depth = 0, $root = false, $namespace = null)

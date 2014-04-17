@@ -99,7 +99,7 @@ class Application
      * @param InputInterface  $input  An Input instance
      * @param OutputInterface $output An Output instance
      *
-     * @return int     0 if everything went fine, or an error code
+     * @return int 0 if everything went fine, or an error code
      *
      * @throws \Exception When doRun returns Exception
      *
@@ -159,7 +159,7 @@ class Application
      * @param InputInterface  $input  An Input instance
      * @param OutputInterface $output An Output instance
      *
-     * @return int     0 if everything went fine, or an error code
+     * @return int 0 if everything went fine, or an error code
      */
     public function doRun(InputInterface $input, OutputInterface $output)
     {
@@ -270,7 +270,7 @@ class Application
     /**
      * Sets whether to catch exceptions or not during commands execution.
      *
-     * @param bool    $boolean Whether to catch exceptions or not during commands execution
+     * @param bool $boolean Whether to catch exceptions or not during commands execution
      *
      * @api
      */
@@ -282,7 +282,7 @@ class Application
     /**
      * Sets whether to automatically exit after a command execution or not.
      *
-     * @param bool    $boolean Whether to automatically exit after a command execution or not
+     * @param bool $boolean Whether to automatically exit after a command execution or not
      *
      * @api
      */
@@ -449,7 +449,7 @@ class Application
      *
      * @param string $name The command name or alias
      *
-     * @return bool    true if the command exists, false otherwise
+     * @return bool true if the command exists, false otherwise
      *
      * @api
      */
@@ -674,8 +674,8 @@ class Application
     /**
      * Returns a text representation of the Application.
      *
-     * @param string  $namespace An optional namespace name
-     * @param bool    $raw       Whether to return raw command list
+     * @param string $namespace An optional namespace name
+     * @param bool   $raw       Whether to return raw command list
      *
      * @return string A string representing the Application
      *
@@ -691,8 +691,8 @@ class Application
     /**
      * Returns an XML representation of the Application.
      *
-     * @param string  $namespace An optional namespace name
-     * @param bool    $asDom     Whether to return a DOM or an XML string
+     * @param string $namespace An optional namespace name
+     * @param bool   $asDom     Whether to return a DOM or an XML string
      *
      * @return string|\DOMDocument An XML string representing the Application
      *
@@ -708,7 +708,7 @@ class Application
     /**
      * Renders a caught exception.
      *
-     * @param \Exception       $e      An exception instance
+     * @param \Exception      $e      An exception instance
      * @param OutputInterface $output An OutputInterface instance
      */
     public function renderException($e, $output)
@@ -878,7 +878,7 @@ class Application
      * @param InputInterface  $input   An Input instance
      * @param OutputInterface $output  An Output instance
      *
-     * @return int     0 if everything went fine, or an error code
+     * @return int 0 if everything went fine, or an error code
      */
     protected function doRunCommand(Command $command, InputInterface $input, OutputInterface $output)
     {

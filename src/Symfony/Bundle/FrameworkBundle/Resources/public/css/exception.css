@@ -49,6 +49,9 @@
 }
 .sf-reset .block-exception-detected .illustration-exception {
     width: 152px;
+    animation-name: sf-illustration-exception;
+    animation-duration: 0.9s;
+    animation-fill-mode: both;
 }
 .sf-reset .block-exception-detected .text-exception {
     width: 670px;
@@ -110,4 +113,33 @@
     white-space: pre;
     font-size: 12px;
     font-family: monospace;
+}
+
+/*
+Keyframes from Animate.css
+http://daneden.me/animate
+Licensed under the MIT license
+Copyright (c) 2013 Daniel Eden
+*/
+
+@keyframes sf-illustration-exception {
+    0% {
+        transform: scale(1);
+    }
+
+    10%, 20% {
+        transform: scale(0.9) rotate(-3deg);
+    }
+
+    30%, 50%, 70%, 90% {
+        transform: scale(1.4) rotate(3deg);
+    }
+
+    40%, 60%, 80% {
+        transform: scale(1.4) rotate(-3deg);
+    }
+
+    100% {
+        transform: scale(1) rotate(0);
+    }
 }

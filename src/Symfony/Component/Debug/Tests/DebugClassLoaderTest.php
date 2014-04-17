@@ -78,14 +78,14 @@ class DebugClassLoaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Debug\Exception\DummyException
+     * @expectedException \Symfony\Component\Debug\Exception\HandledErrorException
      */
     public function testStacking()
     {
-        // the ContextErrorException must not be loaded to test the workaround
+        // the HandledErrorException must not be loaded to test the workaround
         // for https://bugs.php.net/65322.
-        if (class_exists('Symfony\Component\Debug\Exception\ContextErrorException', false)) {
-            $this->markTestSkipped('The ContextErrorException class is already loaded.');
+        if (class_exists('Symfony\Component\Debug\Exception\HandledErrorException', false)) {
+            $this->markTestSkipped('The HandledErrorException class is already loaded.');
         }
 
         $exceptionHandler = $this->getMock('Symfony\Component\Debug\ExceptionHandler', array('handle'));
@@ -93,7 +93,7 @@ class DebugClassLoaderTest extends \PHPUnit_Framework_TestCase
 
         $that = $this;
         $exceptionCheck = function ($exception) use ($that) {
-            $that->assertInstanceOf('Symfony\Component\Debug\Exception\ContextErrorException', $exception);
+            $that->assertInstanceOf('Symfony\Component\Debug\Exception\HandledErrorException', $exception);
             $that->assertEquals(E_STRICT, $exception->getSeverity());
             $that->assertStringStartsWith(__FILE__, $exception->getFile());
             $that->assertRegexp('/^Runtime Notice: Declaration/', $exception->getMessage());
@@ -107,7 +107,7 @@ class DebugClassLoaderTest extends \PHPUnit_Framework_TestCase
         try {
             // Trigger autoloading + E_STRICT at compile time
             // which in turn triggers $errorHandler->handle()
-            // that again triggers autoloading for ContextErrorException.
+            // that again triggers autoloading for HandledErrorException.
             // Error stacking works around the bug above and everything is fine.
 
             eval('

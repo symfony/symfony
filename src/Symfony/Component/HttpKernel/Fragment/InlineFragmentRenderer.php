@@ -18,6 +18,7 @@ use Symfony\Component\HttpKernel\Controller\ControllerReference;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Debug\Exception\HandledErrorException;
 
 /**
  * Implements the inline rendering strategy where the Request is rendered by the current HTTP kernel.
@@ -86,10 +87,15 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
         } catch (\Exception $e) {
             // we dispatch the exception event to trigger the logging
             // the response that comes back is simply ignored
-            if (isset($options['ignore_errors']) && $options['ignore_errors'] && $this->dispatcher) {
-                $event = new GetResponseForExceptionEvent($this->kernel, $request, HttpKernelInterface::SUB_REQUEST, $e);
+            if (isset($options['ignore_errors']) && $options['ignore_errors']) {
+                if ($e instanceof HandledErrorException) {
+                    $e->cleanOutput();
+                }
+                if ($this->dispatcher) {
+                    $event = new GetResponseForExceptionEvent($this->kernel, $request, HttpKernelInterface::SUB_REQUEST, $e);
 
-                $this->dispatcher->dispatch(KernelEvents::EXCEPTION, $event);
+                    $this->dispatcher->dispatch(KernelEvents::EXCEPTION, $event);
+                }
             }
 
             // let's clean up the output buffers that were created by the sub-request

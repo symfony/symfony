@@ -25,6 +25,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Debug\Exception\HandledErrorException;
 
 /**
  * HttpKernel notifies events to convert a Request object to a Response one.
@@ -69,6 +70,9 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
                 $this->finishRequest($request, $type);
 
                 throw $e;
+            }
+            if ($e instanceof HandledErrorException) {
+                $e->cleanOutput();
             }
 
             return $this->handleException($e, $request, $type);

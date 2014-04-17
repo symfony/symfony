@@ -12,7 +12,7 @@
 namespace Symfony\Component\Debug\Tests;
 
 use Symfony\Component\Debug\ErrorHandler;
-use Symfony\Component\Debug\Exception\DummyException;
+use Symfony\Component\Debug\Exception\HandledErrorException;
 
 /**
  * ErrorHandlerTest
@@ -51,7 +51,7 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
 
         $that = $this;
         $exceptionCheck = function ($exception) use ($that) {
-            $that->assertInstanceOf('Symfony\Component\Debug\Exception\ContextErrorException', $exception);
+            $that->assertInstanceOf('Symfony\Component\Debug\Exception\HandledErrorException', $exception);
             $that->assertEquals(E_NOTICE, $exception->getSeverity());
             $that->assertEquals(__FILE__, $exception->getFile());
             $that->assertRegexp('/^Notice: Undefined variable: (foo|bar)/', $exception->getMessage());
@@ -80,7 +80,7 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
 
         try {
             self::triggerNotice($this);
-        } catch (DummyException $e) {
+        } catch (HandledErrorException $e) {
             // if an exception is thrown, the test passed
         } catch (\Exception $e) {
             restore_error_handler();

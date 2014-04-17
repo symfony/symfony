@@ -1132,15 +1132,19 @@ class Application
         // str_split is not suitable for multi-byte characters, we should use preg_split to get char array properly.
         // additionally, array_slice() is not enough as some character has doubled width.
         // we need a function to split string not by character count but by string width
+
         if (!function_exists('mb_strwidth')) {
             return str_split($string, $width);
         }
-        $originalEncoding = mb_detect_encoding($string);
 
-        $convertedString = false === $originalEncoding ? $string : mb_convert_encoding($string, 'utf8', $originalEncoding);
+        if (false === $encoding = mb_detect_encoding($string)) {
+            return str_split($string, $width);
+        }
+
+        $utf8String = mb_convert_encoding($string, 'utf8', $encoding);
         $lines = array();
         $line = '';
-        foreach (preg_split('//u', $convertedString) as $char) {
+        foreach (preg_split('//u', $utf8String) as $char) {
             // test if $char could be appended to current line
             if (mb_strwidth($line.$char) <= $width) {
                 $line .= $char;
@@ -1154,9 +1158,7 @@ class Application
             $lines[] = count($lines) ? str_pad($line, $width) : $line;
         }
 
-        if (false !== $originalEncoding) {
-            mb_convert_variables($originalEncoding, 'utf8', $lines);
-        }
+        mb_convert_variables($encoding, 'utf8', $lines);
 
         return $lines;
     }

@@ -714,7 +714,7 @@ class Application
     public function renderException($e, $output)
     {
         $strlen = function ($string) {
-            if (!function_exists('mb_strlen')) {
+            if (!function_exists('mb_strwidth')) {
                 return strlen($string);
             }
 
@@ -722,7 +722,37 @@ class Application
                 return strlen($string);
             }
 
-            return mb_strlen($string, $encoding);
+            return mb_strwidth($string, $encoding);
+        };
+
+        // str_split is not suitable for multi-byte characters, we should use preg_split to get char array properly.
+        // additionally, array_slice() is not enough as some character has doubled width.
+        // we need a function to split string not by character count but by string width
+        $str_split_width = function ($string, $width) {
+            if (!function_exists('mb_strwidth')) {
+                return str_split($string, $width);
+            }
+            $originalEncoding = mb_detect_encoding($string);
+            $utf8string = mb_convert_encoding($string, 'utf8', $originalEncoding);
+            $lines = array();
+            $line = '';
+            foreach (preg_split('//u', $utf8string) as $char) {
+                // test if $char could be appended to current line
+                if (mb_strwidth($line.$char) <= $width) {
+                    $line .= $char;
+                    continue;
+                }
+                // if not, push current line to array and make new line
+                $lines[] = str_pad($line, $width);
+                $line = $char;
+            }
+            if (strlen($line)) {
+                $lines[] = count($lines) ? str_pad($line, $width) : $line;
+            }
+
+            mb_convert_variables($originalEncoding, 'utf8', $lines);
+
+            return $lines;
         };
 
         do {
@@ -733,7 +763,7 @@ class Application
             $formatter = $output->getFormatter();
             $lines = array();
             foreach (preg_split('/\r?\n/', $e->getMessage()) as $line) {
-                foreach (str_split($line, $width - 4) as $line) {
+                foreach ($str_split_width($line, $width - 4) as $line) {
                     // pre-format lines to get the right string length
                     $lineLength = $strlen(preg_replace('/\[[^m]*m/', '', $formatter->format($line))) + 4;
                     $lines[] = array($line, $lineLength);

@@ -50,6 +50,7 @@ class DescriptorHelper extends Helper
      * @param object          $object
      * @param string          $format
      * @param bool            $raw
+     * @param string          $namespace
      */
     public function describe(OutputInterface $output, $object, $format = null, $raw = false, $namespace = null)
     {

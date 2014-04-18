@@ -242,7 +242,7 @@ class TableStyle
     /**
      * Gets cell padding type.
      *
-     * @param int
+     * @return int
      */
     public function getPadType()
     {

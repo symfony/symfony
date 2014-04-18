@@ -64,25 +64,25 @@ class SessionHandlerProxy extends AbstractProxy implements \SessionHandlerInterf
     /**
      * {@inheritdoc}
      */
-    public function read($id)
+    public function read($sessionId)
     {
-        return (string) $this->handler->read($id);
+        return (string) $this->handler->read($sessionId);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function write($id, $data)
+    public function write($sessionId, $data)
     {
-        return (bool) $this->handler->write($id, $data);
+        return (bool) $this->handler->write($sessionId, $data);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function destroy($id)
+    public function destroy($sessionId)
     {
-        return (bool) $this->handler->destroy($id);
+        return (bool) $this->handler->destroy($sessionId);
     }
 
     /**

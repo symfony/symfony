@@ -190,10 +190,10 @@ class ChoiceType extends AbstractType
         $emptyValueNormalizer = function (Options $options, $emptyValue) {
             if ($options['multiple']) {
                 // never use an empty value for this case
-                return null;
+                return;
             } elseif (false === $emptyValue) {
                 // an empty value should be added but the user decided otherwise
-                return null;
+                return;
             } elseif ($options['expanded'] && '' === $emptyValue) {
                 // never use an empty label for radio buttons
                 return 'None';

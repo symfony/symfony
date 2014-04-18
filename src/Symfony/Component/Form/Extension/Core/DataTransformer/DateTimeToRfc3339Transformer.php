@@ -49,7 +49,7 @@ class DateTimeToRfc3339Transformer extends BaseDateTimeTransformer
         }
 
         if ('' === $rfc3339) {
-            return null;
+            return;
         }
 
         try {

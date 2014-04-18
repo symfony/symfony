@@ -218,11 +218,11 @@ class Controller extends ContainerAware
         }
 
         if (null === $token = $this->container->get('security.context')->getToken()) {
-            return null;
+            return;
         }
 
         if (!is_object($user = $token->getUser())) {
-            return null;
+            return;
         }
 
         return $user;

@@ -64,8 +64,6 @@ class MappingRule
         if ($propertyPath === (string) $this->propertyPath) {
             return $this->getTarget();
         }
-
-        return null;
     }
 
     /**

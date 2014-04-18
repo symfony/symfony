@@ -195,7 +195,7 @@ class LocaleBundleTransformationRule implements TransformationRuleInterface
         // Currently the only available variant is POSIX, which we don't want
         // to include in the list
         if (count($variants) > 0) {
-            return null;
+            return;
         }
 
         // Some languages are translated together with their region,
@@ -207,7 +207,7 @@ class LocaleBundleTransformationRule implements TransformationRuleInterface
         // Some languages are simply not translated
         // Example: "az" (Azerbaijani) has no translation in "af" (Afrikaans)
         if (null === ($name = $this->languageBundle->getLanguageName($lang, null, $displayLocale))) {
-            return null;
+            return;
         }
 
         // "as" (Assamese) has no "Variants" block
@@ -222,7 +222,7 @@ class LocaleBundleTransformationRule implements TransformationRuleInterface
         if ($script) {
             // Some scripts are not translated into every language
             if (null === ($scriptName = $this->languageBundle->getScriptName($script, $lang, $displayLocale))) {
-                return null;
+                return;
             }
 
             $extras[] = $scriptName;
@@ -233,7 +233,7 @@ class LocaleBundleTransformationRule implements TransformationRuleInterface
         if ($region) {
             // Some regions are not translated into every language
             if (null === ($regionName = $this->regionBundle->getCountryName($region, $displayLocale))) {
-                return null;
+                return;
             }
 
             $extras[] = $regionName;

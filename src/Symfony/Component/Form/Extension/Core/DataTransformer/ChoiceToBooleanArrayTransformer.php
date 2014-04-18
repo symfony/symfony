@@ -106,13 +106,11 @@ class ChoiceToBooleanArrayTransformer implements DataTransformerInterface
                 if (isset($choices[$i])) {
                     return $choices[$i] === '' ? null : $choices[$i];
                 } elseif ($this->placeholderPresent && 'placeholder' === $i) {
-                    return null;
+                    return;
                 } else {
                     throw new TransformationFailedException(sprintf('The choice "%s" does not exist', $i));
                 }
             }
         }
-
-        return null;
     }
 }

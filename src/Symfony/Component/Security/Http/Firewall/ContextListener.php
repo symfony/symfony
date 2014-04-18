@@ -171,7 +171,7 @@ class ContextListener implements ListenerInterface
                     $this->logger->warning(sprintf('Username "%s" could not be found.', $notFound->getUsername()));
                 }
 
-                return null;
+                return;
             }
         }
 

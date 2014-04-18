@@ -40,7 +40,7 @@ class AnonymousAuthenticationProvider implements AuthenticationProviderInterface
     public function authenticate(TokenInterface $token)
     {
         if (!$this->supports($token)) {
-            return null;
+            return;
         }
 
         if ($this->key !== $token->getKey()) {

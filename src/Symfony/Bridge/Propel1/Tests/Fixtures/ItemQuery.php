@@ -66,8 +66,6 @@ class ItemQuery
         if ($this->hasColumn($column)) {
             return new Column($column, $this->map[$column]);
         }
-
-        return null;
     }
 
     /**

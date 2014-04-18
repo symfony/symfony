@@ -77,8 +77,6 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
         if (isset($data[0]['data'])) {
             return $this->createProfileFromData($token, $data[0]);
         }
-
-        return null;
     }
 
     /**

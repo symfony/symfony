@@ -853,4 +853,21 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
         return $dom;
     }
+
+    public function testgetPhpValuesWithEmptyTextarea()
+    {
+      $dom = new \DOMDocument();
+      $dom->loadHTML('
+              <html>
+                  <form>
+                      <textarea name="example"></textarea>
+                  </form>
+              </html>
+          ');
+
+      $nodes = $dom->getElementsByTagName('form');
+      $form = new Form($nodes->item(0), 'http://example.com');
+      $this->assertEquals($form->getPhpValues(), array('example' => ''));
+    }
+
 }

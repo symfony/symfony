@@ -36,6 +36,5 @@ class ProjectExtension implements ExtensionInterface
 
     public function getConfiguration(array $config, ContainerBuilder $container)
     {
-        return null;
     }
 }

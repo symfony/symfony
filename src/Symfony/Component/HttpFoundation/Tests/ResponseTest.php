@@ -668,7 +668,7 @@ class ResponseTest extends ResponseTestCase
 
     public function testIsEmpty()
     {
-        foreach (array(201, 204, 304) as $code) {
+        foreach (array(204, 304) as $code) {
             $response = new Response('', $code);
             $this->assertTrue($response->isEmpty());
         }

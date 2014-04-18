@@ -28,7 +28,7 @@ class LanguageBundle extends AbstractBundle implements LanguageBundleInterface
         }
 
         if (null === ($languages = $this->readEntry($locale, array('Languages'), true))) {
-            return null;
+            return;
         }
 
         // Some languages are translated together with their region,
@@ -87,7 +87,7 @@ class LanguageBundle extends AbstractBundle implements LanguageBundleInterface
 
         // "af" (Afrikaans) has no "Scripts" block
         if (!isset($data['Scripts'][$script])) {
-            return null;
+            return;
         }
 
         return $data['Scripts'][$script];

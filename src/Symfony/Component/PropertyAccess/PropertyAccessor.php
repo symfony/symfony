@@ -565,8 +565,6 @@ class PropertyAccessor implements PropertyAccessorInterface
                 return array($addMethod, $removeMethod);
             }
         }
-
-        return null;
     }
 
     /**

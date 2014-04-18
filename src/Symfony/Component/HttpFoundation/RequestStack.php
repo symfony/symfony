@@ -47,7 +47,7 @@ class RequestStack
     public function pop()
     {
         if (!$this->requests) {
-            return null;
+            return;
         }
 
         return array_pop($this->requests);
@@ -73,7 +73,7 @@ class RequestStack
     public function getMasterRequest()
     {
         if (!$this->requests) {
-            return null;
+            return;
         }
 
         return $this->requests[0];
@@ -95,7 +95,7 @@ class RequestStack
         $pos = count($this->requests) - 2;
 
         if (!isset($this->requests[$pos])) {
-            return null;
+            return;
         }
 
         return $this->requests[$pos];

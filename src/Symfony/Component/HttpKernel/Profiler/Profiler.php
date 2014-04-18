@@ -281,13 +281,13 @@ class Profiler
     private function getTimestamp($value)
     {
         if (null === $value || '' == $value) {
-            return null;
+            return;
         }
 
         try {
             $value = new \DateTime(is_numeric($value) ? '@'.$value : $value);
         } catch (\Exception $e) {
-            return null;
+            return;
         }
 
         return $value->getTimestamp();

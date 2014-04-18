@@ -69,8 +69,6 @@ abstract class DoctrineType extends AbstractType
             if (null !== $options['query_builder']) {
                 return $type->getLoader($options['em'], $options['query_builder'], $options['class']);
             }
-
-            return null;
         };
 
         $choiceList = function (Options $options) use (&$choiceListCache, $propertyAccessor) {

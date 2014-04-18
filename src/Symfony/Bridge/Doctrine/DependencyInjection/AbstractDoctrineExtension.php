@@ -291,8 +291,6 @@ abstract class AbstractDoctrineExtension extends Extension
         if (is_dir($dir.'/'.$this->getMappingObjectDefaultName())) {
             return 'annotation';
         }
-
-        return null;
     }
 
     /**

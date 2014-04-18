@@ -17,7 +17,6 @@ use Symfony\Component\Security\Core\Authentication\RememberMe\PersistentToken;
 use Symfony\Component\Security\Core\Exception\TokenNotFoundException;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Type as DoctrineType;
-use PDO, DateTime;
 
 /**
  * This class provides storage for the tokens that is set in "remember me"
@@ -64,15 +63,15 @@ class DoctrineTokenProvider implements TokenProviderInterface
         $sql = 'SELECT class, username, value, lastUsed'
             . ' FROM rememberme_token WHERE series=:series';
         $paramValues = array('series' => $series);
-        $paramTypes  = array('series' => PDO::PARAM_STR);
+        $paramTypes  = array('series' => \PDO::PARAM_STR);
         $stmt = $this->conn->executeQuery($sql, $paramValues, $paramTypes);
-        $row =  $stmt->fetch(PDO::FETCH_ASSOC);
+        $row =  $stmt->fetch(\PDO::FETCH_ASSOC);
         if ($row) {
             return new PersistentToken($row['class'],
                                        $row['username'],
                                        $series,
                                        $row['value'],
-                                       new DateTime($row['lastUsed'])
+                                       new \DateTime($row['lastUsed'])
                                        );
         }
 
@@ -86,23 +85,23 @@ class DoctrineTokenProvider implements TokenProviderInterface
     {
         $sql = 'DELETE FROM rememberme_token WHERE series=:series';
         $paramValues = array('series' => $series);
-        $paramTypes  = array('series' => PDO::PARAM_STR);
+        $paramTypes  = array('series' => \PDO::PARAM_STR);
         $this->conn->executeUpdate($sql, $paramValues, $paramTypes);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function updateToken($series, $tokenValue, DateTime $lastUsed)
+    public function updateToken($series, $tokenValue, \DateTime $lastUsed)
     {
         $sql = 'UPDATE rememberme_token SET value=:value, lastUsed=:lastUsed'
             . ' WHERE series=:series';
         $paramValues = array('value'    => $tokenValue,
                              'lastUsed' => $lastUsed,
                              'series'   => $series);
-        $paramTypes =  array('value'    => PDO::PARAM_STR,
+        $paramTypes =  array('value'    => \PDO::PARAM_STR,
                              'lastUsed' => DoctrineType::DATETIME,
-                             'series'   => PDO::PARAM_STR);
+                             'series'   => \PDO::PARAM_STR);
         $updated = $this->conn->executeUpdate($sql, $paramValues, $paramTypes);
         if ($updated < 1) {
             throw new TokenNotFoundException('No token found.');
@@ -122,10 +121,10 @@ class DoctrineTokenProvider implements TokenProviderInterface
                              'series'   => $token->getSeries(),
                              'value'    => $token->getTokenValue(),
                              'lastUsed' => $token->getLastUsed());
-        $paramTypes  = array('class'    => PDO::PARAM_STR,
-                             'username' => PDO::PARAM_STR,
-                             'series'   => PDO::PARAM_STR,
-                             'value'    => PDO::PARAM_STR,
+        $paramTypes  = array('class'    => \PDO::PARAM_STR,
+                             'username' => \PDO::PARAM_STR,
+                             'series'   => \PDO::PARAM_STR,
+                             'value'    => \PDO::PARAM_STR,
                              'lastUsed' => DoctrineType::DATETIME);
         $this->conn->executeUpdate($sql, $paramValues, $paramTypes);
     }

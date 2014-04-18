@@ -1,0 +1,80 @@
+---------------------------------------------------------------------------
+
+by deguif at 2014-04-16T11:38:10Z
+
+@romainneutron Here's the output when running finder test without the skip I added.
+
+```
+deguif@deguif:~/dev/symfony$ ../hhvm/hphp/hhvm/hhvm ../phpunit/phpunit src/Symfony/Component/Finder/Tests/FinderTest.php
+PHPUnit 4.2-dev by Sebastian Bergmann.
+
+Configuration read from /home/deguif/dev/symfony/phpunit.xml.dist
+
+...............................................................  63 / 113 ( 55%)
+.................................................E
+
+Time: 7.63 seconds, Memory: 27.50Mb
+
+There was 1 error:
+
+1) Symfony\Component\Finder\Tests\FinderTest::testNonSeekableStream
+InvalidArgumentException: The "ftp://ftp.mozilla.org/" directory does not exist.
+
+/home/deguif/dev/symfony/src/Symfony/Component/Finder/Finder.php:667
+/home/deguif/dev/symfony/src/Symfony/Component/Finder/Tests/FinderTest.php:832
+
+FAILURES!
+Tests: 113, Assertions: 211, Errors: 1.
+```
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-04-16T11:55:47Z
+
+So the error is not because the FTP wrapper is not available bit because it does not support some operations.
+
+---------------------------------------------------------------------------
+
+by deguif at 2014-04-16T12:03:41Z
+
+@fabpot Here the source code from HHVM:
+
+```cpp
+static FileStreamWrapper s_file_stream_wrapper;
+static PhpStreamWrapper s_php_stream_wrapper;
+static HttpStreamWrapper s_http_stream_wrapper;
+static DataStreamWrapper s_data_stream_wrapper;
+static GlobStreamWrapper s_glob_stream_wrapper;
+
+void RegisterCoreWrappers() {
+  s_file_stream_wrapper.registerAs("file");
+  s_php_stream_wrapper.registerAs("php");
+  s_http_stream_wrapper.registerAs("http");
+  s_http_stream_wrapper.registerAs("https");
+  s_data_stream_wrapper.registerAs("data");
+  s_glob_stream_wrapper.registerAs("glob");
+}
+```
+So ftp wrapper is not available. To show that:
+
+```php
+<?php
+
+print_r(stream_get_wrappers());
+```
+
+This will display:
+```
+Array
+(
+    [0] => compress.zlib
+    [1] => data
+    [2] => file
+    [3] => glob
+    [4] => http
+    [5] => https
+    [6] => phar
+    [7] => php
+    [8] => zip
+)
+```

@@ -15,6 +15,8 @@ namespace Symfony\Component\Debug;
  * An ExceptionHandler does something useful with an exception.
  *
  * @author Andrew Moore <me@andrewmoore.ca>
+ *
+ * @deprecated since version 2.5, to be removed in 3.0.
  */
 interface ExceptionHandlerInterface
 {

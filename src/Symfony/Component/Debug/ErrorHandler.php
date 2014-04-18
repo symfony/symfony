@@ -268,6 +268,7 @@ class ErrorHandler
     public function handleFatal()
     {
         $this->reservedMemory = '';
+        gc_collect_cycles();
         $error = error_get_last();
 
         while (self::$stackedErrorLevels) {

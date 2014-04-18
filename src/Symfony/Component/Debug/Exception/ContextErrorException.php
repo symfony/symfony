@@ -15,6 +15,8 @@ namespace Symfony\Component\Debug\Exception;
  * Error Exception with Variable Context.
  *
  * @author Christian Sciberras <uuf6429@gmail.com>
+ *
+ * @deprecated since version 2.5, to be removed in 3.0.
  */
 class ContextErrorException extends HandledErrorException
 {

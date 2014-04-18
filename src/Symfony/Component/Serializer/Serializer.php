@@ -177,8 +177,6 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
                 return $normalizer;
             }
         }
-
-        return null;
     }
 
     /**
@@ -203,8 +201,6 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
                 return $normalizer;
             }
         }
-
-        return null;
     }
 
     /**

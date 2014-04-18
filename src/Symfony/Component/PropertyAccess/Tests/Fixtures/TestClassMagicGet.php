@@ -36,7 +36,5 @@ class TestClassMagicGet
         if ('constantMagicProperty' === $property) {
             return 'constant value';
         }
-
-        return null;
     }
 }

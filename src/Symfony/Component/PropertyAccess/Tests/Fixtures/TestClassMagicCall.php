@@ -33,7 +33,5 @@ class TestClassMagicCall
         if ('setMagicCallProperty' === $method) {
             $this->magicCallProperty = reset($args);
         }
-
-        return null;
     }
 }

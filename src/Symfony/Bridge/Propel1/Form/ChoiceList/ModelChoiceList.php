@@ -79,8 +79,11 @@ class ModelChoiceList extends ObjectChoiceList
      * @param array|ModelCriteria       $preferred        The preferred items of this choice.
      *                                                    Either an array if $choices is given,
      *                                                    or a ModelCriteria to be merged with the $queryObject.
-     * @param string                    $useAsIdentifier  a custome unique column (eg slug) to use instead of primary key
      * @param PropertyAccessorInterface $propertyAccessor The reflection graph for reading property paths.
+     * @param string                    $useAsIdentifier  a custom unique column (eg slug) to use instead of primary key.
+     *
+     * @throws MissingOptionsException In case the class parameter is empty.
+     * @throws InvalidOptionsException In case the query class is not found.
      */
     public function __construct($class, $labelPath = null, $choices = null, $queryObject = null, $groupPath = null, $preferred = array(), PropertyAccessorInterface $propertyAccessor = null, $useAsIdentifier = null)
     {

@@ -96,16 +96,8 @@ class WebDebugToolbarListener implements EventSubscriberInterface
      */
     protected function injectToolbar(Response $response)
     {
-        if (function_exists('mb_stripos')) {
-            $posrFunction   = 'mb_strripos';
-            $substrFunction = 'mb_substr';
-        } else {
-            $posrFunction   = 'strripos';
-            $substrFunction = 'substr';
-        }
-
         $content = $response->getContent();
-        $pos = $posrFunction($content, '</body>');
+        $pos = strripos($content, '</body>');
 
         if (false !== $pos) {
             $toolbar = "\n".str_replace("\n", '', $this->twig->render(
@@ -115,7 +107,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
                     'token' => $response->headers->get('X-Debug-Token'),
                 )
             ))."\n";
-            $content = $substrFunction($content, 0, $pos).$toolbar.$substrFunction($content, $pos);
+            $content = substr($content, 0, $pos).$toolbar.substr($content, $pos);
             $response->setContent($content);
         }
     }

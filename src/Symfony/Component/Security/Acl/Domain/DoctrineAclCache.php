@@ -96,14 +96,14 @@ class DoctrineAclCache implements AclCacheInterface
     {
         $lookupKey = $this->getAliasKeyForIdentity($aclId);
         if (!$this->cache->contains($lookupKey)) {
-            return null;
+            return;
         }
 
         $key = $this->cache->fetch($lookupKey);
         if (!$this->cache->contains($key)) {
             $this->cache->delete($lookupKey);
 
-            return null;
+            return;
         }
 
         return $this->unserializeAcl($this->cache->fetch($key));
@@ -116,7 +116,7 @@ class DoctrineAclCache implements AclCacheInterface
     {
         $key = $this->getDataKeyByIdentity($oid);
         if (!$this->cache->contains($key)) {
-            return null;
+            return;
         }
 
         return $this->unserializeAcl($this->cache->fetch($key));
@@ -154,7 +154,7 @@ class DoctrineAclCache implements AclCacheInterface
             $parentAcl = $this->getFromCacheById($parentId);
 
             if (null === $parentAcl) {
-                return null;
+                return;
             }
 
             $acl->setParentAcl($parentAcl);

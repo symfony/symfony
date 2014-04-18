@@ -62,7 +62,7 @@ function get_icu_version_from_genrb($genrb)
     }
 
     if (!preg_match('/ICU version ([\d\.]+)/', implode('', $output), $matches)) {
-        return null;
+        return;
     }
 
     return $matches[1];

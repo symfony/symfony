@@ -132,7 +132,7 @@ class AnalyzeServiceReferencesPass implements RepeatablePassInterface
         }
 
         if (!$this->container->hasDefinition($id)) {
-            return null;
+            return;
         }
 
         return $id;

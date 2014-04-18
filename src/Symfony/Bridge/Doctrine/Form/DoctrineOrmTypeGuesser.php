@@ -88,7 +88,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
         $classMetadatas = $this->getMetadata($class);
 
         if (!$classMetadatas) {
-            return null;
+            return;
         }
 
         /* @var ClassMetadataInfo $classMetadata */
@@ -116,8 +116,6 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
 
             return new ValueGuess(!$mapping['joinColumns'][0]['nullable'], Guess::HIGH_CONFIDENCE);
         }
-
-        return null;
     }
 
     /**

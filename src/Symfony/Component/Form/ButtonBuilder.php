@@ -549,7 +549,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      */
     public function getEventDispatcher()
     {
-        return null;
     }
 
     /**
@@ -567,7 +566,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      */
     public function getPropertyPath()
     {
-        return null;
     }
 
     /**
@@ -647,7 +645,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      */
     public function getDataMapper()
     {
-        return null;
     }
 
     /**
@@ -687,7 +684,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      */
     public function getEmptyData()
     {
-        return null;
     }
 
     /**
@@ -732,7 +728,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      */
     public function getData()
     {
-        return null;
     }
 
     /**
@@ -742,7 +737,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      */
     public function getDataClass()
     {
-        return null;
     }
 
     /**
@@ -762,7 +756,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      */
     public function getFormFactory()
     {
-        return null;
     }
 
     /**
@@ -772,7 +765,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      */
     public function getAction()
     {
-        return null;
     }
 
     /**
@@ -782,7 +774,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      */
     public function getMethod()
     {
-        return null;
     }
 
     /**
@@ -792,7 +783,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      */
     public function getRequestHandler()
     {
-        return null;
     }
 
     /**

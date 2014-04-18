@@ -201,7 +201,6 @@ class FormType extends BaseType
      */
     public function getParent()
     {
-        return null;
     }
 
     /**

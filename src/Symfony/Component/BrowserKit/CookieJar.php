@@ -73,7 +73,7 @@ class CookieJar
                 }
             }
 
-            return null;
+            return;
         }
 
         // avoid relying on this behavior that is mainly here for BC reasons
@@ -82,8 +82,6 @@ class CookieJar
                 return $cookies[$path][$name];
             }
         }
-
-        return null;
     }
 
     /**

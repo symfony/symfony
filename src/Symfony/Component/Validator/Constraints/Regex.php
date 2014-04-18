@@ -78,7 +78,7 @@ class Regex extends Constraint
     {
         // If match = false, pattern should not be added to HTML5 validation
         if (!$this->match) {
-            return null;
+            return;
         }
 
         if (preg_match('/^(.)(\^?)(.*?)(\$?)\1$/', $this->pattern, $matches)) {
@@ -92,7 +92,5 @@ class Regex extends Constraint
 
             return $start.$pattern.$end;
         }
-
-        return null;
     }
 }

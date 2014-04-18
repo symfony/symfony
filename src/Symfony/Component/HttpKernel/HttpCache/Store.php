@@ -121,7 +121,7 @@ class Store implements StoreInterface
         $key = $this->getCacheKey($request);
 
         if (!$entries = $this->getMetadata($key)) {
-            return null;
+            return;
         }
 
         // find a cached entry that matches the request.
@@ -135,7 +135,7 @@ class Store implements StoreInterface
         }
 
         if (null === $match) {
-            return null;
+            return;
         }
 
         list($req, $headers) = $match;
@@ -146,7 +146,6 @@ class Store implements StoreInterface
         // TODO the metaStore referenced an entity that doesn't exist in
         // the entityStore. We definitely want to return nil but we should
         // also purge the entry from the meta-store when this is detected.
-        return null;
     }
 
     /**

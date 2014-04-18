@@ -107,7 +107,7 @@ class Crawler extends \SplObjectStorage
 
         // DOM only for HTML/XML content
         if (!preg_match('/(x|ht)ml/i', $type, $xmlMatches)) {
-            return null;
+            return;
         }
 
         $charset = null;
@@ -820,8 +820,6 @@ class Crawler extends \SplObjectStorage
             }
         // @codeCoverageIgnoreStart
         }
-
-        return null;
         // @codeCoverageIgnoreEnd
     }
 

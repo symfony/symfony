@@ -20,7 +20,7 @@ class RecursiveArrayAccess
     {
         foreach ($indices as $index) {
             if (!$array instanceof \ArrayAccess && !is_array($array)) {
-                return null;
+                return;
             }
 
             $array = $array[$index];

@@ -180,7 +180,7 @@ class NativeRequestHandler implements RequestHandlerInterface
 
         if (self::$fileKeys === $keys) {
             if (UPLOAD_ERR_NO_FILE === $data['error']) {
-                return null;
+                return;
             }
 
             return $data;

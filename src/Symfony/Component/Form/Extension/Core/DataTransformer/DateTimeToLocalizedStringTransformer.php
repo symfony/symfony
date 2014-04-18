@@ -121,7 +121,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
         }
 
         if ('' === $value) {
-            return null;
+            return;
         }
 
         $timestamp = $this->getIntlDateFormatter()->parse($value);

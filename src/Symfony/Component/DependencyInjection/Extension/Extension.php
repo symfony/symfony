@@ -96,8 +96,6 @@ abstract class Extension implements ExtensionInterface, ConfigurationExtensionIn
                 return $configuration;
             }
         }
-
-        return null;
     }
 
     final protected function processConfiguration(ConfigurationInterface $configuration, array $configs)

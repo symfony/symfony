@@ -168,8 +168,6 @@ class ExecutionContext implements ExecutionContextInterface
         if ($this->metadata instanceof ClassBasedInterface) {
             return $this->metadata->getClassName();
         }
-
-        return null;
     }
 
     /**
@@ -180,8 +178,6 @@ class ExecutionContext implements ExecutionContextInterface
         if ($this->metadata instanceof PropertyMetadataInterface) {
             return $this->metadata->getPropertyName();
         }
-
-        return null;
     }
 
     /**

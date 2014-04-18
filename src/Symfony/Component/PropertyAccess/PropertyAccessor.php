@@ -428,8 +428,6 @@ class PropertyAccessor implements PropertyAccessorInterface
                 ));
             }
         }
-
-        return null;
     }
 
     /**

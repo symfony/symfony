@@ -190,8 +190,6 @@ class Section
                 return $child;
             }
         }
-
-        return null;
     }
 
     /**

@@ -303,7 +303,7 @@ class Container implements IntrospectableContainerInterface
                 throw new ServiceNotFoundException($id, null, null, $alternatives);
             }
 
-            return null;
+            return;
         }
 
         $this->loading[$id] = true;
@@ -318,7 +318,7 @@ class Container implements IntrospectableContainerInterface
             }
 
             if ($e instanceof InactiveScopeException && self::EXCEPTION_ON_INVALID_REFERENCE !== $invalidBehavior) {
-                return null;
+                return;
             }
 
             throw $e;

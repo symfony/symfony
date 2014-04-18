@@ -58,7 +58,7 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
     public function authenticate(TokenInterface $token)
     {
         if (!$this->supports($token)) {
-            return null;
+            return;
         }
 
         $username = $token->getUsername();

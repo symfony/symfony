@@ -33,7 +33,5 @@ class ConstraintAValidator extends ConstraintValidator
 
             return;
         }
-
-        return;
     }
 }

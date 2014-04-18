@@ -775,8 +775,6 @@ class Response
         if (null !== $this->getExpires()) {
             return $this->getExpires()->format('U') - $this->getDate()->format('U');
         }
-
-        return null;
     }
 
     /**
@@ -833,8 +831,6 @@ class Response
         if (null !== $maxAge = $this->getMaxAge()) {
             return $maxAge - $this->getAge();
         }
-
-        return null;
     }
 
     /**
@@ -1243,7 +1239,7 @@ class Response
      */
     public function isEmpty()
     {
-        return in_array($this->statusCode, array(201, 204, 304));
+        return in_array($this->statusCode, array(204, 304));
     }
 
     /**

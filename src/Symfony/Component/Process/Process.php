@@ -238,10 +238,11 @@ class Process
         $commandline = $this->commandline;
 
         if (defined('PHP_WINDOWS_VERSION_BUILD') && $this->enhanceWindowsCompatibility) {
-            $commandline = 'cmd /V:ON /E:ON /C "('.$commandline.')"';
+            $commandline = 'cmd /V:ON /E:ON /C "('.$commandline.')';
             foreach ($this->processPipes->getFiles() as $offset => $filename) {
-                $commandline .= ' '.$offset.'>'.$filename;
+                $commandline .= ' '.$offset.'>'.ProcessUtils::escapeArgument($filename);
             }
+            $commandline .= '"';
 
             if (!isset($this->options['bypass_shell'])) {
                 $this->options['bypass_shell'] = true;

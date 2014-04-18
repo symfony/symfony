@@ -172,7 +172,7 @@ class ViolationMapper implements ViolationMapperInterface
         // Make the path longer until we find a matching child
         while (true) {
             if (!$it->valid()) {
-                return null;
+                return;
             }
 
             if ($it->isIndex()) {
@@ -223,8 +223,6 @@ class ViolationMapper implements ViolationMapperInterface
                 return $foundChild;
             }
         }
-
-        return null;
     }
 
     /**

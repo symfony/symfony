@@ -119,7 +119,7 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
     public function reverseTransform($value)
     {
         if (null === $value) {
-            return null;
+            return;
         }
 
         if (!is_array($value)) {
@@ -127,7 +127,7 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
         }
 
         if ('' === implode('', $value)) {
-            return null;
+            return;
         }
 
         $emptyFields = array();

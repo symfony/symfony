@@ -92,7 +92,7 @@ class BasicPermissionMap implements PermissionMapInterface
     public function getMasks($permission, $object)
     {
         if (!isset($this->map[$permission])) {
-            return null;
+            return;
         }
 
         return $this->map[$permission];

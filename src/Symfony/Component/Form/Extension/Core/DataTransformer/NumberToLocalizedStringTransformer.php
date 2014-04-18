@@ -164,7 +164,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
         }
 
         if ('' === $value) {
-            return null;
+            return;
         }
 
         if ('NaN' === $value) {

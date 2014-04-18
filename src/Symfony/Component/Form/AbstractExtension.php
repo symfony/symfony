@@ -136,7 +136,6 @@ abstract class AbstractExtension implements FormExtensionInterface
      */
     protected function loadTypeGuesser()
     {
-        return null;
     }
 
     /**

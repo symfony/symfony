@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Security\Acl\Dbal;
 
-use Doctrine\DBAL\Driver\Connection;
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\Statement;
 use Symfony\Component\Security\Acl\Model\AclInterface;
 use Symfony\Component\Security\Acl\Domain\Acl;
@@ -38,11 +38,22 @@ class AclProvider implements AclProviderInterface
 {
     const MAX_BATCH_SIZE = 30;
 
+    /**
+     * @var AclCacheInterface|null
+     */
     protected $cache;
+
+    /**
+     * @var Connection
+     */
     protected $connection;
     protected $loadedAces = array();
     protected $loadedAcls = array();
     protected $options;
+
+    /**
+     * @var PermissionGrantingStrategyInterface
+     */
     private $permissionGrantingStrategy;
 
     /**

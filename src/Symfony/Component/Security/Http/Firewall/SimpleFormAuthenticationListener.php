@@ -50,8 +50,8 @@ class SimpleFormAuthenticationListener extends AbstractAuthenticationListener
      *                                                                      successful, or failed authentication attempt
      * @param LoggerInterface                        $logger                A LoggerInterface instance
      * @param EventDispatcherInterface               $dispatcher            An EventDispatcherInterface instance
-     * @param CsrfTokenManagerInterface              $csrfTokenManager      A SimpleFormAuthenticatorInterface instance
-     * @param SimpleFormAuthenticatorInterface       $simpleAuthenticator   A CsrfTokenManagerInterface instance
+     * @param CsrfTokenManagerInterface              $csrfTokenManager      A CsrfTokenManagerInterface instance
+     * @param SimpleFormAuthenticatorInterface       $simpleAuthenticator   A SimpleFormAuthenticatorInterface instance
      *
      * @throws \InvalidArgumentException In case no simple authenticator is provided
      * @throws InvalidArgumentException  In case an invalid CSRF token manager is passed

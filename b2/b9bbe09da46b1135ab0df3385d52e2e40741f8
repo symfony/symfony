@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-04-17T13:09:35Z
+
+if the function used does not depend on the availability of mb_string, you can even stop using variables to reference them.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-04-17T13:12:53Z
+
+The mbstring functions must have been put here for a reason.
+Maybe string function overloading resistance?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-04-17T13:18:35Z
+
+@nicolas-grekas string overloading has nothing to do here IMO (the code is currently using the mb functions as soon as the extension is here, even without overloading).
+It was introduced in https://github.com/symfony/symfony/commit/e1116524ed79cf118568e2c124f546d596a562c0 when changing the logic to detect the toolbar position.
+However, I'm not sure the multibyte handling is necessary when searching for ``<body>``

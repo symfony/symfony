@@ -32,7 +32,9 @@ class ExpressionVoter implements VoterInterface
     /**
      * Constructor.
      *
-     * @param ExpressionLanguage $expressionLanguage
+     * @param ExpressionLanguage                   $expressionLanguage
+     * @param AuthenticationTrustResolverInterface $trustResolver
+     * @param RoleHierarchyInterface|null          $roleHierarchy
      */
     public function __construct(ExpressionLanguage $expressionLanguage, AuthenticationTrustResolverInterface $trustResolver, RoleHierarchyInterface $roleHierarchy = null)
     {

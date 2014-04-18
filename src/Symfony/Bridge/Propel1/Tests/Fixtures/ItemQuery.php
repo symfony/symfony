@@ -93,8 +93,6 @@ class ItemQuery
         if (isset($this->caseInsensitiveMap[$column])) {
             return $this->getColumn($this->caseInsensitiveMap[$column]);
         }
-
-        return null;
     }
 
     /**

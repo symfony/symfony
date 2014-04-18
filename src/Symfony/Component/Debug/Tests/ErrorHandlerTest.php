@@ -213,7 +213,7 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
 
         $m = new \ReflectionMethod($handler, 'handleFatalError');
         $m->setAccessible(true);
-        $m->invoke($handler, $exceptionHandler, $error);
+        $m->invoke($handler, array($exceptionHandler, 'handle'), $error);
 
         $this->assertInstanceof($class, $exceptionHandler->e);
         // class names are case insensitive and PHP/HHVM do not return the same

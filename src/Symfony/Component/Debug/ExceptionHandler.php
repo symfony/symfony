@@ -71,7 +71,9 @@ class ExceptionHandler implements ExceptionHandlerInterface
     public function handle(\Exception $exception)
     {
         if (class_exists('Symfony\Component\HttpFoundation\Response')) {
-            $this->createResponse($exception)->send();
+            $response = $this->createResponse($exception);
+            $response->sendHeaders();
+            $response->sendContent();
         } else {
             $this->sendPhpResponse($exception);
         }

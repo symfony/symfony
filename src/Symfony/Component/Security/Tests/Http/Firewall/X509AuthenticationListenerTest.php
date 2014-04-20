@@ -63,9 +63,12 @@ class X509AuthenticationListenerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testGetPreAuthenticatedDataNoUser()
+    /**
+     * @dataProvider dataProviderGetPreAuthenticatedDataNoUser
+     */
+    public function testGetPreAuthenticatedDataNoUser($emailAddress)
     {
-        $credentials = 'CN=Sample certificate DN/emailAddress=cert@example.com';
+        $credentials = 'CN=Sample certificate DN/emailAddress=' . $emailAddress;
         $request = new Request(array(), array(), array(), array(), array(), array('SSL_CLIENT_S_DN' => $credentials));
 
         $context = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
@@ -82,7 +85,15 @@ class X509AuthenticationListenerTest extends \PHPUnit_Framework_TestCase
         $method->setAccessible(true);
 
         $result = $method->invokeArgs($listener, array($request));
-        $this->assertSame($result, array('cert@example.com', $credentials));
+        $this->assertSame($result, array($emailAddress, $credentials));
+    }
+
+    public static function dataProviderGetPreAuthenticatedDataNoUser()
+    {
+        return array(
+            'basicEmailAddress' => array('cert@example.com'),
+            'emailAddressWithPlusSign' => array('cert+something@example.com'),
+        );
     }
 
     /**

@@ -81,7 +81,7 @@ class NodeBuilder implements NodeParentInterface
      *
      * @param string $name The name of the node
      *
-     * @return boolNodeDefinition    The child node
+     * @return BooleanNodeDefinition The child node
      */
     public function booleanNode($name)
     {
@@ -93,7 +93,7 @@ class NodeBuilder implements NodeParentInterface
      *
      * @param string $name the name of the node
      *
-     * @return intNodeDefinition     The child node
+     * @return IntegerNodeDefinition The child node
      */
     public function integerNode($name)
     {

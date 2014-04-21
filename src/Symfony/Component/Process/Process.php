@@ -52,7 +52,7 @@ class Process
     private $processInformation;
     private $stdout;
     private $stderr;
-    private $enhanceWindowsCompatibility;
+    private $enhanceWindowsCompatibility = true;
     private $enhanceSigchildCompatibility;
     private $process;
     private $status = self::STATUS_READY;
@@ -143,19 +143,16 @@ class Process
         // on Gnu/Linux, PHP builds with --enable-maintainer-zts are also affected
         // @see : https://bugs.php.net/bug.php?id=51800
         // @see : https://bugs.php.net/bug.php?id=50524
-
         if (null === $this->cwd && (defined('ZEND_THREAD_SAFE') || defined('PHP_WINDOWS_VERSION_BUILD'))) {
             $this->cwd = getcwd();
         }
         if (null !== $env) {
             $this->setEnv($env);
-        } else {
-            $this->env = null;
         }
+
         $this->stdin = $stdin;
         $this->setTimeout($timeout);
         $this->useFileHandles = defined('PHP_WINDOWS_VERSION_BUILD');
-        $this->enhanceWindowsCompatibility = true;
         $this->enhanceSigchildCompatibility = !defined('PHP_WINDOWS_VERSION_BUILD') && $this->isSigchildEnabled();
         $this->options = array_replace(array('suppress_errors' => true, 'binary_pipes' => true), $options);
     }
@@ -1197,7 +1194,7 @@ class Process
     /**
      * Ensures the process is running or terminated, throws a LogicException if the process has a not started.
      *
-     * @param $functionName The function name that was called.
+     * @param string $functionName The function name that was called.
      *
      * @throws LogicException If the process has not run.
      */
@@ -1211,7 +1208,7 @@ class Process
     /**
      * Ensures the process is terminated, throws a LogicException if the process has a status different than `terminated`.
      *
-     * @param $functionName The function name that was called.
+     * @param string $functionName The function name that was called.
      *
      * @throws LogicException If the process is not yet terminated.
      */

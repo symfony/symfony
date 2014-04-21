@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2014-04-20T07:35:38Z
+
+Looks like a BC break as the tests do not pass anymore.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-04-20T16:43:35Z
+
+Fixed test. It's not a bc break. Same as #10723

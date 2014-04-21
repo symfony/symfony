@@ -12,21 +12,12 @@
 namespace Symfony\Bridge\Doctrine\HttpFoundation;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\Connection as DriverConnection;
-use Doctrine\DBAL\Driver\Mysqli\MysqliConnection;
-use Doctrine\DBAL\Driver\OCI8\OCI8Connection;
-use Doctrine\DBAL\Driver\PDOConnection;
-use Doctrine\DBAL\Driver\SQLSrv\SQLSrvConnection;
-use Doctrine\DBAL\Platforms\MySqlPlatform;
-use Doctrine\DBAL\Platforms\OraclePlatform;
-use Doctrine\DBAL\Platforms\SqlitePlatform;
-use Doctrine\DBAL\Platforms\SQLServerPlatform;
 
 /**
  * DBAL based session storage.
  *
  * This implementation is very similar to Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler
- * but uses the Doctrine driver connection interface and thus also works with non-PDO-based drivers like mysqli and OCI8.
+ * but uses a Doctrine connection and thus also works with non-PDO-based drivers like mysqli and OCI8.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
@@ -35,7 +26,7 @@ use Doctrine\DBAL\Platforms\SQLServerPlatform;
 class DbalSessionHandler implements \SessionHandlerInterface
 {
     /**
-     * @var DriverConnection
+     * @var Connection
      */
     private $con;
 
@@ -62,10 +53,10 @@ class DbalSessionHandler implements \SessionHandlerInterface
     /**
      * Constructor.
      *
-     * @param DriverConnection $con       A driver connection, preferably a wrapper Doctrine\DBAL\Connection for lazy connections
-     * @param string           $tableName Table name
+     * @param Connection $con       A connection
+     * @param string     $tableName Table name
      */
-    public function __construct(DriverConnection $con, $tableName = 'sessions')
+    public function __construct(Connection $con, $tableName = 'sessions')
     {
         $this->con = $con;
         $this->table = $tableName;
@@ -74,7 +65,7 @@ class DbalSessionHandler implements \SessionHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function open($path = null, $name = null)
+    public function open($savePath, $sessionName)
     {
         return true;
     }
@@ -90,14 +81,14 @@ class DbalSessionHandler implements \SessionHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function destroy($id)
+    public function destroy($sessionId)
     {
         // delete the record associated with this id
         $sql = "DELETE FROM $this->table WHERE $this->idCol = :id";
 
         try {
             $stmt = $this->con->prepare($sql);
-            $stmt->bindParam(':id', $id, \PDO::PARAM_STR);
+            $stmt->bindParam(':id', $sessionId, \PDO::PARAM_STR);
             $stmt->execute();
         } catch (\Exception $e) {
             throw new \RuntimeException(sprintf('Exception was thrown when trying to delete a session: %s', $e->getMessage()), 0, $e);
@@ -109,14 +100,14 @@ class DbalSessionHandler implements \SessionHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function gc($lifetime)
+    public function gc($maxlifetime)
     {
         // delete the session records that have expired
         $sql = "DELETE FROM $this->table WHERE $this->timeCol < :time";
 
         try {
             $stmt = $this->con->prepare($sql);
-            $stmt->bindValue(':time', time() - $lifetime, \PDO::PARAM_INT);
+            $stmt->bindValue(':time', time() - $maxlifetime, \PDO::PARAM_INT);
             $stmt->execute();
         } catch (\Exception $e) {
             throw new \RuntimeException(sprintf('Exception was thrown when trying to delete expired sessions: %s', $e->getMessage()), 0, $e);
@@ -128,13 +119,13 @@ class DbalSessionHandler implements \SessionHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function read($id)
+    public function read($sessionId)
     {
         $sql = "SELECT $this->dataCol FROM $this->table WHERE $this->idCol = :id";
 
         try {
             $stmt = $this->con->prepare($sql);
-            $stmt->bindParam(':id', $id, \PDO::PARAM_STR);
+            $stmt->bindParam(':id', $sessionId, \PDO::PARAM_STR);
             $stmt->execute();
 
             // We use fetchAll instead of fetchColumn to make sure the DB cursor gets closed
@@ -153,7 +144,7 @@ class DbalSessionHandler implements \SessionHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function write($id, $data)
+    public function write($sessionId, $data)
     {
         // Session data can contain non binary safe characters so we need to encode it.
         $encoded = base64_encode($data);
@@ -166,7 +157,7 @@ class DbalSessionHandler implements \SessionHandlerInterface
 
             if (null !== $mergeSql) {
                 $mergeStmt = $this->con->prepare($mergeSql);
-                $mergeStmt->bindParam(':id', $id, \PDO::PARAM_STR);
+                $mergeStmt->bindParam(':id', $sessionId, \PDO::PARAM_STR);
                 $mergeStmt->bindParam(':data', $encoded, \PDO::PARAM_STR);
                 $mergeStmt->bindValue(':time', time(), \PDO::PARAM_INT);
                 $mergeStmt->execute();
@@ -180,13 +171,13 @@ class DbalSessionHandler implements \SessionHandlerInterface
                 $deleteStmt = $this->con->prepare(
                     "DELETE FROM $this->table WHERE $this->idCol = :id"
                 );
-                $deleteStmt->bindParam(':id', $id, \PDO::PARAM_STR);
+                $deleteStmt->bindParam(':id', $sessionId, \PDO::PARAM_STR);
                 $deleteStmt->execute();
 
                 $insertStmt = $this->con->prepare(
                     "INSERT INTO $this->table ($this->idCol, $this->dataCol, $this->timeCol) VALUES (:id, :data, :time)"
                 );
-                $insertStmt->bindParam(':id', $id, \PDO::PARAM_STR);
+                $insertStmt->bindParam(':id', $sessionId, \PDO::PARAM_STR);
                 $insertStmt->bindParam(':data', $encoded, \PDO::PARAM_STR);
                 $insertStmt->bindValue(':time', time(), \PDO::PARAM_INT);
                 $insertStmt->execute();
@@ -211,32 +202,24 @@ class DbalSessionHandler implements \SessionHandlerInterface
      */
     private function getMergeSql()
     {
-        $platform = $pdoDriver = null;
+        $platform = $this->con->getDatabasePlatform()->getName();
 
-        if ($this->con instanceof Connection) {
-            $platform = $this->con->getDatabasePlatform();
-        } elseif ($this->con instanceof PDOConnection) {
-            $pdoDriver = $this->con->getAttribute(\PDO::ATTR_DRIVER_NAME);
-        }
-
-        switch (true) {
-            case $this->con instanceof MysqliConnection || $platform instanceof MySqlPlatform || 'mysql' === $pdoDriver:
+        switch ($platform) {
+            case 'mysql':
                 return "INSERT INTO $this->table ($this->idCol, $this->dataCol, $this->timeCol) VALUES (:id, :data, :time) " .
                     "ON DUPLICATE KEY UPDATE $this->dataCol = VALUES($this->dataCol), $this->timeCol = VALUES($this->timeCol)";
-            case $this->con instanceof OCI8Connection || $platform instanceof OraclePlatform || 'oci' === $pdoDriver:
+            case 'oracle':
                 // DUAL is Oracle specific dummy table
                 return "MERGE INTO $this->table USING DUAL ON ($this->idCol = :id) " .
                     "WHEN NOT MATCHED THEN INSERT ($this->idCol, $this->dataCol, $this->timeCol) VALUES (:id, :data, :time) " .
                     "WHEN MATCHED THEN UPDATE SET $this->dataCol = :data";
-            case $this->con instanceof SQLSrvConnection || $platform instanceof SQLServerPlatform || 'sqlsrv' === $pdoDriver:
+            case 'mssql':
                 // MS SQL Server requires MERGE be terminated by semicolon
                 return "MERGE INTO $this->table USING (SELECT 'x' AS dummy) AS src ON ($this->idCol = :id) " .
                     "WHEN NOT MATCHED THEN INSERT ($this->idCol, $this->dataCol, $this->timeCol) VALUES (:id, :data, :time) " .
                     "WHEN MATCHED THEN UPDATE SET $this->dataCol = :data;";
-            case $platform instanceof SqlitePlatform || 'sqlite' === $pdoDriver:
+            case 'sqlite':
                 return "INSERT OR REPLACE INTO $this->table ($this->idCol, $this->dataCol, $this->timeCol) VALUES (:id, :data, :time)";
         }
-
-        return null;
     }
 }

@@ -42,11 +42,7 @@ class X509AuthenticationListenerTest extends \PHPUnit_Framework_TestCase
 
         $authenticationManager = $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface');
 
-        $listener = new X509AuthenticationListener(
-            $context,
-            $authenticationManager,
-            'TheProviderKey'
-        );
+        $listener = new X509AuthenticationListener($context, $authenticationManager, 'TheProviderKey');
 
         $method = new \ReflectionMethod($listener, 'getPreAuthenticatedData');
         $method->setAccessible(true);
@@ -68,18 +64,14 @@ class X509AuthenticationListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetPreAuthenticatedDataNoUser($emailAddress)
     {
-        $credentials = 'CN=Sample certificate DN/emailAddress=' . $emailAddress;
+        $credentials = 'CN=Sample certificate DN/emailAddress='.$emailAddress;
         $request = new Request(array(), array(), array(), array(), array(), array('SSL_CLIENT_S_DN' => $credentials));
 
         $context = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
 
         $authenticationManager = $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface');
 
-        $listener = new X509AuthenticationListener(
-            $context,
-            $authenticationManager,
-            'TheProviderKey'
-        );
+        $listener = new X509AuthenticationListener($context, $authenticationManager, 'TheProviderKey');
 
         $method = new \ReflectionMethod($listener, 'getPreAuthenticatedData');
         $method->setAccessible(true);
@@ -107,11 +99,7 @@ class X509AuthenticationListenerTest extends \PHPUnit_Framework_TestCase
 
         $authenticationManager = $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface');
 
-        $listener = new X509AuthenticationListener(
-            $context,
-            $authenticationManager,
-            'TheProviderKey'
-        );
+        $listener = new X509AuthenticationListener($context, $authenticationManager, 'TheProviderKey');
 
         $method = new \ReflectionMethod($listener, 'getPreAuthenticatedData');
         $method->setAccessible(true);
@@ -131,13 +119,7 @@ class X509AuthenticationListenerTest extends \PHPUnit_Framework_TestCase
 
         $authenticationManager = $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface');
 
-        $listener = new X509AuthenticationListener(
-            $context,
-            $authenticationManager,
-            'TheProviderKey',
-            'TheUserKey',
-            'TheCredentialsKey'
-        );
+        $listener = new X509AuthenticationListener($context, $authenticationManager, 'TheProviderKey', 'TheUserKey', 'TheCredentialsKey');
 
         $method = new \ReflectionMethod($listener, 'getPreAuthenticatedData');
         $method->setAccessible(true);

@@ -107,7 +107,7 @@ EOF
         }
 
         if (!$matches) {
-            $output->writeln('<fg=red>None of the routes matches</>');
+            $output->writeln('<fg=red>None of the routes match</>');
 
             return 1;
         }

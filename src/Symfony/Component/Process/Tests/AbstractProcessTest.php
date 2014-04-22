@@ -12,6 +12,7 @@
 namespace Symfony\Component\Process\Tests;
 
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
+use Symfony\Component\Process\Exception\LogicException;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\ProcessPipes;
@@ -155,6 +156,20 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($expectedLength, strlen($p->getOutput()));
         $this->assertEquals($expectedLength, strlen($p->getErrorOutput()));
+    }
+
+    public function testSetStdinWhileRunningThrowsAnException()
+    {
+        $process = $this->getProcess('php -r "usleep(500000);"');
+        $process->start();
+        try {
+            $process->setStdin('foobar');
+            $process->stop();
+            $this->fail('A LogicException should have been raised.');
+        } catch (LogicException $e) {
+            $this->assertEquals('STDIN can not be set while the process is running.', $e->getMessage());
+        }
+        $process->stop();
     }
 
     public function chainedCommandsOutputProvider()

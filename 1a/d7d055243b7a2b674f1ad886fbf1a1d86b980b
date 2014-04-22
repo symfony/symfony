@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by pyrech at 2014-04-20T17:27:35Z
+
+It seems that the fabbot need to be fixed too...
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2014-04-20T17:54:39Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-04-20T20:47:03Z
+
+:+1: but this should be merged in 2.3
+
+---------------------------------------------------------------------------
+
+by pyrech at 2014-04-21T08:13:53Z
+
+Should I reopen a PR against 2.3? And what about fixing fabbot?
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2014-04-21T08:16:11Z
+
+@pyrech fabbot is a private tool currently, so only some people can fix that (but I'm sure they will). You don't have to open this for 2.3, @fabpot has a tool which can patch this perfectly in there.
+
+---------------------------------------------------------------------------
+
+by pyrech at 2014-04-21T08:39:11Z
+
+Ok, thanks for explanations :)

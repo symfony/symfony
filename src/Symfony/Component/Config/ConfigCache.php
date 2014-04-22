@@ -12,6 +12,8 @@
 namespace Symfony\Component\Config;
 
 use Symfony\Component\Config\Resource\ResourceInterface;
+use Symfony\Component\Config\Resource\MutableResourceInterface;
+use Symfony\Component\Config\Resource\Refresher\RefresherInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -58,25 +60,25 @@ class ConfigCache
      *
      * @return bool    true if the cache is fresh, false otherwise
      */
-    public function isFresh()
+    public function isFresh(RefresherInterface $refresher = null)
     {
         if (!is_file($this->file)) {
             return false;
         }
 
-        if (!$this->debug) {
+        $metadata = $this->getMetaFile();
+        if (!is_file($metadata)) {
             return true;
         }
 
-        $metadata = $this->getMetaFile();
-        if (!is_file($metadata)) {
-            return false;
-        }
-
-        $time = filemtime($this->file);
         $meta = unserialize(file_get_contents($metadata));
+        $timestamp = filemtime($this->file);
         foreach ($meta as $resource) {
-            if (!$resource->isFresh($time)) {
+            if (null !== $refresher && $resource instanceof MutableResourceInterface) {
+                $refresher->refresh($resource);
+            }
+
+            if (!$resource->isFresh($timestamp)) {
                 return false;
             }
         }
@@ -104,13 +106,30 @@ class ConfigCache
             // discard chmod failure (some filesystem may not support it)
         }
 
-        if (null !== $metadata && true === $this->debug) {
-            $filesystem->dumpFile($this->getMetaFile(), serialize($metadata), null);
+        $mutables = array();
+        if (is_array($metadata)) {
+            foreach ($metadata as $resource) {
+                if ($resource instanceof MutableResourceInterface) {
+                    if (true === $resource->isMutable()) {
+                        $mutables[] = $resource;
+                    }
+                } else {
+                    if (true === $this->debug) {
+                        $mutables[] = $resource;
+                    }
+                }
+            }
+        }
+
+        if (count($mutables) > 0) {
+            $filesystem->dumpFile($this->getMetaFile(), serialize($mutables), null);
             try {
                 $filesystem->chmod($this->getMetaFile(), $mode, $umask);
             } catch (IOException $e) {
                 // discard chmod failure (some filesystem may not support it)
             }
+        } else {
+            $filesystem->remove($this->getMetaFile());
         }
     }
 
@@ -123,5 +142,4 @@ class ConfigCache
     {
         return $this->file.'.meta';
     }
-
 }

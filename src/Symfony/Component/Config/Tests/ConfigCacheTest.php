@@ -61,20 +61,12 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
 
     public function testCacheIsAlwaysFreshIfFileExistsWithDebugDisabled()
     {
+        unlink($this->metaFile);
         $this->makeCacheStale();
 
         $cache = new ConfigCache($this->cacheFile, false);
 
         $this->assertTrue($cache->isFresh());
-    }
-
-    public function testCacheIsNotFreshWithoutMetaFile()
-    {
-        unlink($this->metaFile);
-
-        $cache = new ConfigCache($this->cacheFile, true);
-
-        $this->assertFalse($cache->isFresh());
     }
 
     public function testCacheIsFreshIfResourceIsFresh()

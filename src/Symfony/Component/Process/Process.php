@@ -876,9 +876,15 @@ class Process
      * @param string|null $stdin The new contents
      *
      * @return self The current Process instance
+     *
+     * @throws LogicException In case the process is running
      */
     public function setStdin($stdin)
     {
+        if ($this->isRunning()) {
+            throw new LogicException('STDIN can not be set while the process is running.');
+        }
+
         $this->stdin = $stdin;
 
         return $this;

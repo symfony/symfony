@@ -16,6 +16,9 @@ use Symfony\Component\Process\Exception\LogicException;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Exception\RuntimeException;
+use Symfony\Component\Process\Pipes\PipesInterface;
+use Symfony\Component\Process\Pipes\UnixPipes;
+use Symfony\Component\Process\Pipes\WindowsPipes;
 
 /**
  * Process is a thin wrapper around proc_* functions to easily
@@ -67,7 +70,7 @@ class Process
     private $pty;
 
     private $useFileHandles = false;
-    /** @var ProcessPipes */
+    /** @var PipesInterface */
     private $processPipes;
 
     private static $sigchild;
@@ -346,7 +349,7 @@ class Process
 
         do {
             $this->checkTimeout();
-            $running = defined('PHP_WINDOWS_VERSION_BUILD') ? $this->isRunning() : $this->processPipes->hasOpenHandles();
+            $running = defined('PHP_WINDOWS_VERSION_BUILD') ? $this->isRunning() : $this->processPipes->areOpen();
             $close = !defined('PHP_WINDOWS_VERSION_BUILD') || !$running;;
             $this->readPipes(true, $close);
         } while ($running);
@@ -1238,8 +1241,12 @@ class Process
      */
     private function getDescriptors()
     {
-        $this->processPipes = new ProcessPipes($this->useFileHandles, $this->tty, $this->pty, $this->outputDisabled);
-        $descriptors = $this->processPipes->getDescriptors();
+        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+            $this->processPipes = WindowsPipes::create($this);
+        } else {
+            $this->processPipes = UnixPipes::create($this);
+        }
+        $descriptors = $this->processPipes->getDescriptors($this->outputDisabled);
 
         if (!$this->useFileHandles && $this->enhanceSigchildCompatibility && $this->isSigchildEnabled()) {
             // last exit code is output on the fourth pipe and caught to work around --enable-sigchild
@@ -1351,11 +1358,7 @@ class Process
      */
     private function readPipes($blocking, $close)
     {
-        if ($close) {
-            $result = $this->processPipes->readAndCloseHandles($blocking);
-        } else {
-            $result = $this->processPipes->read($blocking);
-        }
+        $result = $this->processPipes->read($blocking, $close);
 
         foreach ($result as $type => $data) {
             if (3 == $type) {

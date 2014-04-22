@@ -774,9 +774,15 @@ class Process
      * @param bool    $tty True to enabled and false to disable
      *
      * @return self The current Process instance
+     *
+     * @throws RuntimeException In case the TTY mode is not supported
      */
     public function setTty($tty)
     {
+        if (defined('PHP_WINDOWS_VERSION_BUILD') && $tty) {
+            throw new RuntimeException('TTY mode is not supported on Windows platform.');
+        }
+
         $this->tty = (bool) $tty;
 
         return $this;

@@ -58,14 +58,8 @@ class RequestMatcher implements RequestMatcherInterface
      * @param array                $attributes
      * @param string|string[]|null $schemes
      */
-    public function __construct(
-        $path = null,
-        $host = null,
-        $methods = null,
-        $ips = null,
-        array $attributes = array(),
-        $schemes = null
-    ) {
+    public function __construct($path = null, $host = null, $methods = null, $ips = null, array $attributes = array(), $schemes = null)
+    {
         $this->matchPath($path);
         $this->matchHost($host);
         $this->matchMethod($methods);

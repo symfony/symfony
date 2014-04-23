@@ -52,28 +52,56 @@ class ApcClassLoader
     protected $decorated;
 
     /**
+     * @var string Decorated Loader file path
+     */
+    private $decoratedLoaderPath;
+
+    /**
      * Constructor.
      *
      * @param string $prefix      The APC namespace prefix to use.
      * @param object $decorated   A class loader object that implements the findFile() method.
+     * @param string $decoratedLoaderPath Path where cached class loader is stored
      *
      * @throws \RuntimeException
      * @throws \InvalidArgumentException
      *
      * @api
      */
-    public function __construct($prefix, $decorated)
+    public function __construct($prefix, $decorated = null, $decoratedLoaderPath = '')
     {
         if (!extension_loaded('apc')) {
             throw new \RuntimeException('Unable to use ApcClassLoader as APC is not enabled.');
         }
-
-        if (!method_exists($decorated, 'findFile')) {
+        if (null !== $decorated && !method_exists($decorated, 'findFile')) {
             throw new \InvalidArgumentException('The class finder must implement a "findFile" method.');
         }
 
-        $this->prefix = $prefix;
         $this->decorated = $decorated;
+        $this->decoratedLoaderPath = $decoratedLoaderPath;
+        $this->prefix = $prefix;
+    }
+
+    /**
+     * @return object Decorated Class Loader
+     * @throws \InvalidArgumentException
+     */
+    protected function getDecorated()
+    {
+        if (null === $this->decorated) {
+
+            $this->decorated = require $this->decoratedLoaderPath;
+
+            if (!method_exists($this->decorated, 'findFile')) {
+                throw new \InvalidArgumentException('The class finder must implement a "findFile" method.');
+            }
+
+            if (method_exists($this->decorated, 'unregister')) {
+                $this->decorated->unregister();
+            }
+        }
+
+        return $this->decorated;
     }
 
     /**
@@ -120,7 +148,7 @@ class ApcClassLoader
     public function findFile($class)
     {
         if (false === $file = apc_fetch($this->prefix.$class)) {
-            apc_store($this->prefix.$class, $file = $this->decorated->findFile($class));
+            apc_store($this->prefix.$class, $file = $this->getDecorated()->findFile($class));
         }
 
         return $file;

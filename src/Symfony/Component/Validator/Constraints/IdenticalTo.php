@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator\Constraints;
 
 /**
  * @Annotation
+ * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
  *
  * @author Daniel Holmes <daniel@danielholmes.org>
  */

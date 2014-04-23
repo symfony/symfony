@@ -50,6 +50,7 @@ use Symfony\Component\Validator\Exception\OutOfBoundsException;
  *     $validator->validate($address, null, "Address")
  *
  * @Annotation
+ * @Target("CLASS")
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *

@@ -68,7 +68,14 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
     public function getChildren()
     {
         try {
-            return parent::getChildren();
+            $children = parent::getChildren();
+
+            if ($children instanceof self) {
+                // parent method will call the constructor with default arguments, so unreadable dirs won't be ignored anymore
+                $children->ignoreUnreadableDirs = $this->ignoreUnreadableDirs;
+            }
+
+            return $children;
         } catch (\UnexpectedValueException $e) {
             if ($this->ignoreUnreadableDirs) {
                 // If directory is unreadable and finder is set to ignore it, a fake empty content is returned.

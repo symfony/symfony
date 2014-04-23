@@ -15,6 +15,7 @@ use Symfony\Component\Validator\Constraints\Required as BaseRequired;
 
 /**
  * @Annotation
+ * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *

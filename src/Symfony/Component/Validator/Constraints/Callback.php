@@ -15,7 +15,7 @@ use Symfony\Component\Validator\Constraint;
 
 /**
  * @Annotation
- * @Target("CLASS")
+ * @Target({"CLASS", "ANNOTATION"})
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *

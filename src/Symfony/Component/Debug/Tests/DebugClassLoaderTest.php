@@ -27,7 +27,7 @@ class DebugClassLoaderTest extends \PHPUnit_Framework_TestCase
     {
         $this->errorReporting = error_reporting(E_ALL | E_STRICT);
         $this->loader = new ClassLoader();
-        spl_autoload_register(array($this->loader, 'loadClass'));
+        spl_autoload_register(array($this->loader, 'loadClass'), true, true);
         DebugClassLoader::enable();
     }
 
@@ -68,7 +68,7 @@ class DebugClassLoaderTest extends \PHPUnit_Framework_TestCase
 
         // See below: this will fail with parse error
         // but this should not be @-silenced.
-        @ class_exists(__NAMESPACE__.'\TestingUnsilencing', true);
+        @class_exists(__NAMESPACE__.'\TestingUnsilencing', true);
 
         ini_set('log_errors', $bak[0]);
         ini_set('display_errors', $bak[1]);
@@ -138,6 +138,10 @@ class DebugClassLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testFileCaseMismatch()
     {
+        if (!file_exists(__DIR__.'/Fixtures/CaseMismatch.php')) {
+            $this->markTestSkipped('Can only be run on case insensitive filesystems');
+        }
+
         class_exists(__NAMESPACE__.'\Fixtures\CaseMismatch', true);
     }
 
@@ -168,7 +172,7 @@ class ClassLoader
 
     public function getClassMap()
     {
-        return array(__NAMESPACE__.'\Fixtures\NotPSR0bis' => __DIR__ . '/Fixtures/notPsr0Bis.php');
+        return array(__NAMESPACE__.'\Fixtures\NotPSR0bis' => __DIR__.'/Fixtures/notPsr0Bis.php');
     }
 
     public function findFile($class)
@@ -180,13 +184,13 @@ class ClassLoader
         } elseif (__NAMESPACE__.'\TestingCaseMismatch' === $class) {
             eval('namespace '.__NAMESPACE__.'; class TestingCaseMisMatch {}');
         } elseif (__NAMESPACE__.'\Fixtures\CaseMismatch' === $class) {
-            return __DIR__ . '/Fixtures/casemismatch.php';
+            return __DIR__.'/Fixtures/CaseMismatch.php';
         } elseif (__NAMESPACE__.'\Fixtures\Psr4CaseMismatch' === $class) {
-            return __DIR__ . '/Fixtures/psr4/Psr4CaseMismatch.php';
+            return __DIR__.'/Fixtures/psr4/Psr4CaseMismatch.php';
         } elseif (__NAMESPACE__.'\Fixtures\NotPSR0' === $class) {
-            return __DIR__ . '/Fixtures/reallyNotPsr0.php';
+            return __DIR__.'/Fixtures/reallyNotPsr0.php';
         } elseif (__NAMESPACE__.'\Fixtures\NotPSR0bis' === $class) {
-            return __DIR__ . '/Fixtures/notPsr0Bis.php';
+            return __DIR__.'/Fixtures/notPsr0Bis.php';
         }
     }
 }

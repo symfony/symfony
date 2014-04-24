@@ -176,32 +176,37 @@ class DebugClassLoader
                 $class = substr($class, 1);
             }
 
-            $i = 0;
-            $tail = DIRECTORY_SEPARATOR . str_replace('\\', DIRECTORY_SEPARATOR, $class).'.php';
-            $len = strlen($tail);
+            if (preg_match('#([/\\\\][a-zA-Z_\x7F-\xFF][a-zA-Z0-9_\x7F-\xFF]*)+\.(php|hh)$#', $file, $tail)) {
+                $tail = $tail[0];
+                $real = realpath($file);
 
-            do {
-                $tail = substr($tail, $i);
-                $len -= $i;
-
-                if (0 === substr_compare($file, $tail, -$len, $len, true)) {
-                    if (0 !== substr_compare($file, $tail, -$len, $len, false)) {
-                        if (method_exists($this->classLoader[0], 'getClassMap')) {
-                            $map = $this->classLoader[0]->getClassMap();
-                        } else {
-                            $map = array();
-                        }
-
-                        if (! isset($map[$class])) {
-                            throw new \RuntimeException(sprintf('Case mismatch between class and source file names: %s vs %s', $class, $file));
+                if (false !== stripos(PHP_OS, 'darwin')) {
+                    // realpath() on MacOSX doesn't normalize the case of characters,
+                    // let's do it ourselves. This is tricky.
+                    $cwd = getcwd();
+                    $basename = strrpos($real, '/');
+                    chdir(substr($real, 0, $basename));
+                    $basename = substr($real, $basename + 1);
+                    $real = getcwd().'/';
+                    $h = opendir('.');
+                    while (false !== $f = readdir($h)) {
+                        if (0 === strcasecmp($f, $basename)) {
+                            $real .= $f;
+                            break;
                         }
                     }
-
-                    break;
+                    closedir($h);
+                    chdir($cwd);
                 }
-            } while (false !== $i = strpos($tail, DIRECTORY_SEPARATOR, 1));
 
-            if (! $exists) {
+                if ( 0 === substr_compare($real, $tail, -strlen($tail), strlen($tail), true)
+                  && 0 !== substr_compare($real, $tail, -strlen($tail), strlen($tail), false)
+                ) {
+                    throw new \RuntimeException(sprintf('Case mismatch between class and source file names: %s vs %s', $class, $real));
+                }
+            }
+
+            if (!$exists) {
                 if (false !== strpos($class, '/')) {
                     throw new \RuntimeException(sprintf('Trying to autoload a class with an invalid name "%s". Be careful that the namespace separator is "\" in PHP, not "/".', $class));
                 }

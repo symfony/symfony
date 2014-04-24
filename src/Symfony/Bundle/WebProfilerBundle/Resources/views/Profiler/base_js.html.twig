@@ -17,7 +17,7 @@
                         return null;
                     }
 
-                    if (xhr.status == 204 && options.maxTries > 1) {
+                    if (xhr.status == 404 && options.maxTries > 1) {
                         setTimeout(function(){
                             options.maxTries--;
                             request(url, onSuccess, onError, payload, options);

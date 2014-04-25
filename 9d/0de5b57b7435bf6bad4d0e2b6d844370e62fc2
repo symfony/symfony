@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-04-25T11:47:36Z
+
+I suggest merging the revert in 2.4 (where the previous PR was merged) as it is a bugfix: the command does not work in HHVM anymore
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-04-25T12:07:00Z
+
+@stof the feature is only available in 2.5, not 2.4.

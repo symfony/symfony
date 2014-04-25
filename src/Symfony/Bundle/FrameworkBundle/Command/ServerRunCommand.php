@@ -29,7 +29,7 @@ class ServerRunCommand extends ContainerAwareCommand
      */
     public function isEnabled()
     {
-        if (version_compare(phpversion(), '5.4.0', '<')) {
+        if (version_compare(phpversion(), '5.4.0', '<') || defined('HHVM_VERSION')) {
             return false;
         }
 
@@ -96,12 +96,7 @@ EOF
             ->locateResource(sprintf('@FrameworkBundle/Resources/config/router_%s.php', $env))
         ;
 
-        if (defined('HHVM_VERSION')) {
-            $builder = $this->createHhvmProcessBuilder($input, $output, $env);
-        } else {
-            $builder = $this->createPhpProcessBuilder($input, $output, $env);
-        }
-
+        $builder = $this->createPhpProcessBuilder($input, $output, $env);
         $builder->setWorkingDirectory($input->getOption('docroot'));
         $builder->setTimeout(null);
         $builder->getProcess()->run(function ($type, $buffer) use ($output) {
@@ -120,60 +115,5 @@ EOF
         ;
 
         return new ProcessBuilder(array(PHP_BINARY, '-S', $input->getArgument('address'), $router));
-    }
-
-    private function createHhvmProcessBuilder(InputInterface $input, OutputInterface $output, $env)
-    {
-        list($ip, $port) = explode(':', $input->getArgument('address'));
-
-        $docroot = realpath($input->getOption('docroot'));
-        $bootstrap = 'prod' === $env ? 'app.php' : 'app_dev.php';
-        $config = <<<EOF
-Server {
-  IP = $ip
-  Port = $port
-  SourceRoot = $docroot
-  RequestTimeoutSeconds = -1
-  RequestMemoryMaxBytes = -1
-}
-
-VirtualHost {
-  * {
-    Pattern = .*
-    RewriteRules {
-      * {
-        pattern = .?
-
-        # app bootstrap
-        to = $bootstrap
-
-        # append the original query string
-        qsa = true
-      }
-    }
-  }
-}
-
-StaticFile {
-  Extensions {
-    css = text/css
-    gif = image/gif
-    html = text/html
-    jpe = image/jpeg
-    jpeg = image/jpeg
-    jpg = image/jpeg
-    png = image/png
-    tif = image/tiff
-    tiff = image/tiff
-    txt = text/plain
-    php = text/plain
-  }
-}
-EOF;
-
-        $configFile = $this->getContainer()->get('kernel')->getCacheDir().'/hhvm-server-'.md5($config).'.hdf';
-        file_put_contents($configFile, $config);
-
-        return new ProcessBuilder(array(PHP_BINARY, '--mode', 'server', '--config', $configFile));
     }
 }

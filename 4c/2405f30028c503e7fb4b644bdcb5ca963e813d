@@ -1,0 +1,48 @@
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-04-24T13:31:13Z
+
+:+1: confirmed on OSX on case insensitive fs
+
+---------------------------------------------------------------------------
+
+by stof at 2014-04-24T13:46:10Z
+
+I don't think this will solve the issue. The report is not about MacOS failing to normalize the case, but about the DebugClassLoader failing to determine the PSR-4 root.
+
+If you look at the original report on Sylius, the message was ``RuntimeException: Case mismatch between class and source file names: Sylius\Component\Cart\SyliusCartEvents vs (...)/vendor/sylius/cart/SyliusCartEvents.php``
+
+the issue here is that it compares ``cart`` vs ``Cart``, but this folder is not in the PSR-4 autoloading path anymore. It is the parent path (composer installed the package in ``vendor/sylius/cart``)
+
+---------------------------------------------------------------------------
+
+by stof at 2014-04-24T13:46:51Z
+
+This is not saying that your change is invalid, but it is not fixing the bug it claims to fix
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-04-24T15:20:57Z
+
+This patch does fix the bug it claims to fix: the bug was a side effect of the implementation. Your description of the reason of the bug is true, and it's true that I don't *fix* this buggy logic (too much false positive), because I *changed* it completely with an implementation that behaves the way the feature should behave.
+So you're right, and this is the right fix also :)
+
+---------------------------------------------------------------------------
+
+by stof at 2014-04-24T15:40:25Z
+
+hmm, are you validating the case only for the file and not for the parent folders now ?
+
+Btw, does this case validation logic handle underscores in class names properly for PSR-0 (the behavior is not the same for PSR-0 and PSR-4, so the debug loader should accept both) ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-04-24T16:00:41Z
+
+The new logic is: given a $file returned by `$classloader->findFile($class)`, is the case in `realpath($file)` the same as in `$file`.
+No consideration is made on `$class` to do the check. That means that yes, `_` works, because it is not correlated to the way the check is done.
+
+I do check for parent folders, but only up to a level of parents that is for sure not a prefix prepended by the autoloader.
+I do this because I have no guarantee that $file is an absolute path (it could start with e.g. "../").
+That also means that if an autoloader prefix contains a case mistake, it won't always be caught.
+But if the mistake is in the case of the class, it will always be caught, namespace part or short name part.

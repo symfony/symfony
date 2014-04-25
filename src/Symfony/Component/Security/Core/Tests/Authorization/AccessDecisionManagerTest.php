@@ -77,34 +77,34 @@ class AccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             // affirmative
-            array('affirmative', $this->getVoters(1, 0, 0), false, true, true),
-            array('affirmative', $this->getVoters(1, 2, 0), false, true, true),
-            array('affirmative', $this->getVoters(0, 1, 0), false, true, false),
-            array('affirmative', $this->getVoters(0, 0, 1), false, true, false),
-            array('affirmative', $this->getVoters(0, 0, 1), true, true, true),
+            array(AccessDecisionManager::STRATEGY_AFFIRMATIVE, $this->getVoters(1, 0, 0), false, true, true),
+            array(AccessDecisionManager::STRATEGY_AFFIRMATIVE, $this->getVoters(1, 2, 0), false, true, true),
+            array(AccessDecisionManager::STRATEGY_AFFIRMATIVE, $this->getVoters(0, 1, 0), false, true, false),
+            array(AccessDecisionManager::STRATEGY_AFFIRMATIVE, $this->getVoters(0, 0, 1), false, true, false),
+            array(AccessDecisionManager::STRATEGY_AFFIRMATIVE, $this->getVoters(0, 0, 1), true, true, true),
 
             // consensus
-            array('consensus', $this->getVoters(1, 0, 0), false, true, true),
-            array('consensus', $this->getVoters(1, 2, 0), false, true, false),
-            array('consensus', $this->getVoters(2, 1, 0), false, true, true),
+            array(AccessDecisionManager::STRATEGY_CONSENSUS, $this->getVoters(1, 0, 0), false, true, true),
+            array(AccessDecisionManager::STRATEGY_CONSENSUS, $this->getVoters(1, 2, 0), false, true, false),
+            array(AccessDecisionManager::STRATEGY_CONSENSUS, $this->getVoters(2, 1, 0), false, true, true),
 
-            array('consensus', $this->getVoters(0, 0, 1), false, true, false),
+            array(AccessDecisionManager::STRATEGY_CONSENSUS, $this->getVoters(0, 0, 1), false, true, false),
 
-            array('consensus', $this->getVoters(0, 0, 1), true, true, true),
+            array(AccessDecisionManager::STRATEGY_CONSENSUS, $this->getVoters(0, 0, 1), true, true, true),
 
-            array('consensus', $this->getVoters(2, 2, 0), false, true, true),
-            array('consensus', $this->getVoters(2, 2, 1), false, true, true),
+            array(AccessDecisionManager::STRATEGY_CONSENSUS, $this->getVoters(2, 2, 0), false, true, true),
+            array(AccessDecisionManager::STRATEGY_CONSENSUS, $this->getVoters(2, 2, 1), false, true, true),
 
-            array('consensus', $this->getVoters(2, 2, 0), false, false, false),
-            array('consensus', $this->getVoters(2, 2, 1), false, false, false),
+            array(AccessDecisionManager::STRATEGY_CONSENSUS, $this->getVoters(2, 2, 0), false, false, false),
+            array(AccessDecisionManager::STRATEGY_CONSENSUS, $this->getVoters(2, 2, 1), false, false, false),
 
             // unanimous
-            array('unanimous', $this->getVoters(1, 0, 0), false, true, true),
-            array('unanimous', $this->getVoters(1, 0, 1), false, true, true),
-            array('unanimous', $this->getVoters(1, 1, 0), false, true, false),
+            array(AccessDecisionManager::STRATEGY_UNANIMOUS, $this->getVoters(1, 0, 0), false, true, true),
+            array(AccessDecisionManager::STRATEGY_UNANIMOUS, $this->getVoters(1, 0, 1), false, true, true),
+            array(AccessDecisionManager::STRATEGY_UNANIMOUS, $this->getVoters(1, 1, 0), false, true, false),
 
-            array('unanimous', $this->getVoters(0, 0, 2), false, true, false),
-            array('unanimous', $this->getVoters(0, 0, 2), true, true, true),
+            array(AccessDecisionManager::STRATEGY_UNANIMOUS, $this->getVoters(0, 0, 2), false, true, false),
+            array(AccessDecisionManager::STRATEGY_UNANIMOUS, $this->getVoters(0, 0, 2), true, true, true),
         );
     }
 

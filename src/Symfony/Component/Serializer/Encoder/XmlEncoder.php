@@ -94,26 +94,27 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
             }
         }
 
-        $xml = simplexml_import_dom($dom);
+        $rootNode = $dom->firstChild;
 
-        if ($error = libxml_get_last_error()) {
-            throw new UnexpectedValueException($error->message);
+        // todo: throw an exception if the root node name is not correctly configured (bc)
+
+        if ($rootNode->hasChildNodes()) {
+            return $this->parseXml($rootNode);
         }
 
-        if (!$xml->count()) {
-            if (!$xml->attributes()) {
-                return (string) $xml;
-            }
-            $data = array();
-            foreach ($xml->attributes() as $attrkey => $attr) {
-                $data['@'.$attrkey] = (string) $attr;
-            }
-            $data['#'] = (string) $xml;
-
-            return $data;
+        if (!$rootNode->hasAttributes()) {
+            return $rootNode->nodeValue;
         }
 
-        return $this->parseXml($xml);
+        $data = array();
+
+        foreach ($rootNode->attributes as $attrKey => $attr) {
+            $data['@'.$attrKey] = $attr->nodeValue;
+        }
+
+        $data['#'] = $rootNode->nodeValue;
+
+        return $data;
     }
 
     /**
@@ -230,54 +231,107 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
     }
 
     /**
-     * Parse the input SimpleXmlElement into an array.
+     * Parse the input DOMNode into an array or a string.
      *
-     * @param \SimpleXmlElement $node xml to parse
+     * @param \DOMNode $node xml to parse
+     *
+     * @return array|string
+     */
+    private function parseXml(\DOMNode $node)
+    {
+        $data = $this->parseXmlAttributes($node);
+
+        $value = $this->parseXmlValue($node);
+
+        if (!count($data)) {
+            return $value;
+        }
+
+        if (!is_array($value)) {
+            $data['#'] = $value;
+
+            return $data;
+        }
+
+        if (1 === count($value) && key($value)) {
+            $data[key($value)] = current($value);
+
+            return $data;
+        }
+
+        foreach ($value as $key => $val) {
+            $data[$key] = $val;
+        }
+
+        return $data;
+    }
+
+    /**
+     * Parse the input DOMNode attributes into an array
+     *
+     * @param \DOMNode $node xml to parse
      *
      * @return array
      */
-    private function parseXml(\SimpleXmlElement $node)
+    private function parseXmlAttributes(\DOMNode $node)
     {
-        $data = array();
-        if ($node->attributes()) {
-            foreach ($node->attributes() as $attrkey => $attr) {
-                $data['@'.$attrkey] = (string) $attr;
-            }
+        if (!$node->hasAttributes()) {
+            return array();
         }
-        foreach ($node->children() as $key => $subnode) {
-            if ($subnode->count()) {
-                $value = $this->parseXml($subnode);
-            } elseif ($subnode->attributes()) {
-                $value = array();
-                foreach ($subnode->attributes() as $attrkey => $attr) {
-                    $value['@'.$attrkey] = (string) $attr;
-                }
-                $value['#'] = (string) $subnode;
-            } else {
-                $value = (string) $subnode;
-            }
 
-            if ($key === 'item') {
-                if (isset($value['@key'])) {
-                    if (isset($value['#'])) {
-                        $data[$value['@key']] = $value['#'];
-                    } else {
-                        $data[$value['@key']] = $value;
-                    }
-                } else {
-                    $data['item'][] = $value;
-                }
-            } elseif (array_key_exists($key, $data) || $key == "entry") {
-                if ((false === is_array($data[$key]))  || (false === isset($data[$key][0]))) {
-                    $data[$key] = array($data[$key]);
-                }
-                $data[$key][] = $value;
+        $data = array();
+
+        foreach ($node->attributes as $attrkey => $attr) {
+            if (ctype_digit($attr->nodeValue)) {
+                $data['@'.$attrkey] = (int) $attr->nodeValue;
             } else {
-                $data[$key] = $value;
+                $data['@'.$attrkey] = $attr->nodeValue;
             }
         }
 
         return $data;
+    }
+
+    /**
+     * Parse the input DOMNode value (content and children) into an array or a string
+     *
+     * @param \DOMNode $node xml to parse
+     *
+     * @return array|string
+     */
+    private function parseXmlValue(\DOMNode $node)
+    {
+        if (!$node->hasChildNodes()) {
+            return $node->nodeValue;
+        }
+
+        if (1 === $node->childNodes->length && XML_TEXT_NODE === $node->firstChild->nodeType) {
+            return $node->firstChild->nodeValue;
+        }
+
+        $value = array();
+
+        foreach ($node->childNodes as $subnode) {
+            $val = $this->parseXml($subnode);
+
+            if ('item' === $subnode->nodeName && isset($val['@key'])) {
+                if (isset($val['#'])) {
+                    $value[$val['@key']] = $val['#'];
+                } else {
+                    $value[$val['@key']] = $val;
+                }
+            } else {
+                $value[$subnode->nodeName][] = $val;
+            }
+        }
+
+        foreach ($value as $key => $val) {
+            if (is_array($val) && 1 === count($val)) {
+                $value[$key] = current($val);
+            }
+        }
+
+        return $value;
     }
 
     /**

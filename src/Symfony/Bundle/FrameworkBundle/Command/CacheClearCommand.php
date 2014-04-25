@@ -43,6 +43,7 @@ and debug mode:
 
 <info>php %command.full_name% --env=dev</info>
 <info>php %command.full_name% --env=prod --no-debug</info>
+
 EOF
             )
         ;
@@ -77,9 +78,15 @@ EOF
             $warmupDir = substr($realCacheDir, 0, -1).'_';
 
             if ($filesystem->exists($warmupDir)) {
+                if ($output->isVerbose()) {
+                    $output->writeln('  Clearing outdated warmup directory');
+                }
                 $filesystem->remove($warmupDir);
             }
 
+            if ($output->isVerbose()) {
+                $output->writeln('  Warming up cache');
+            }
             $this->warmup($warmupDir, $realCacheDir, !$input->getOption('no-optional-warmers'));
 
             $filesystem->rename($realCacheDir, $oldCacheDir);
@@ -89,13 +96,21 @@ EOF
             $filesystem->rename($warmupDir, $realCacheDir);
         }
 
+        if ($output->isVerbose()) {
+            $output->writeln('  Removing old cache directory');
+        }
+
         $filesystem->remove($oldCacheDir);
+
+        if ($output->isVerbose()) {
+            $output->writeln('  Done');
+        }
     }
 
     /**
-     * @param string $warmupDir
-     * @param string $realCacheDir
-     * @param bool   $enableOptionalWarmers
+     * @param string  $warmupDir
+     * @param string  $realCacheDir
+     * @param bool    $enableOptionalWarmers
      */
     protected function warmup($warmupDir, $realCacheDir, $enableOptionalWarmers = true)
     {

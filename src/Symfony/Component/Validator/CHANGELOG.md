@@ -1,6 +1,66 @@
 CHANGELOG
 =========
 
+2.5.0
+-----
+
+ * deprecated `ApcCache` in favor of `DoctrineCache`
+ * added `DoctrineCache` to adapt any Doctrine cache
+ * `GroupSequence` now implements `ArrayAccess`, `Countable` and `Traversable`
+ * [BC BREAK] changed `ClassMetadata::getGroupSequence()` to return a `GroupSequence` instance instead of an array
+ * `Callback` can now be put onto properties (useful when you pass a closure to the constraint)
+ * deprecated `ClassBasedInterface`
+ * deprecated `MetadataInterface`
+ * deprecated `PropertyMetadataInterface`
+ * deprecated `PropertyMetadataContainerInterface`
+ * deprecated `Mapping\ElementMetadata`
+ * added `Mapping\MetadataInterface`
+ * added `Mapping\ClassMetadataInterface`
+ * added `Mapping\PropertyMetadataInterface`
+ * added `Mapping\GenericMetadata`
+ * added `Mapping\CascadingStrategy`
+ * added `Mapping\TraversalStrategy`
+ * deprecated `Mapping\ClassMetadata::accept()`
+ * deprecated `Mapping\MemberMetadata::accept()`
+ * removed array type hint of `Mapping\ClassMetadata::setGroupSequence()`
+ * deprecated `MetadataFactoryInterface`
+ * deprecated `Mapping\BlackholeMetadataFactory`
+ * deprecated `Mapping\ClassMetadataFactory`
+ * added `Mapping\Factory\MetadataFactoryInterface`
+ * added `Mapping\Factory\BlackHoleMetadataFactory`
+ * added `Mapping\Factory\LazyLoadingMetadataFactory`
+ * deprecated `ExecutionContextInterface`
+ * deprecated `ExecutionContext`
+ * deprecated `GlobalExecutionContextInterface`
+ * added `Context\ExecutionContextInterface`
+ * added `Context\ExecutionContext`
+ * added `Context\ExecutionContextFactoryInterface`
+ * added `Context\ExecutionContextFactory`
+ * deprecated `ValidatorInterface`
+ * deprecated `Validator`
+ * deprecated `ValidationVisitorInterface`
+ * deprecated `ValidationVisitor`
+ * added `Validator\ValidatorInterface`
+ * added `Validator\RecursiveValidator`
+ * added `Validator\ContextualValidatorInterface`
+ * added `Validator\RecursiveContextualValidator`
+ * added `Violation\ConstraintViolationBuilderInterface`
+ * added `Violation\ConstraintViolationBuilder`
+ * added `ConstraintViolation::getParameters()`
+ * added `ConstraintViolation::getPlural()`
+ * added `Constraints\Traverse`
+ * deprecated `$deep` property in `Constraints\Valid`
+ * added `ValidatorBuilderInterface::setApiVersion()`
+ * added `Validation::API_VERSION_2_4`
+ * added `Validation::API_VERSION_2_5`
+ * added `Exception\OutOfBoundsException`
+ * added `Exception\UnsupportedMetadataException`
+ * made `Exception\ValidatorException` extend `Exception\RuntimeException`
+ * added `Util\PropertyPath`
+ * made the PropertyAccess component an optional dependency
+ * deprecated `ValidatorBuilder::setPropertyAccessor()`
+
+
 2.4.0
 -----
 

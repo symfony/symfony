@@ -79,7 +79,8 @@ class ModelType extends AbstractType
                 $options['query'],
                 $options['group_by'],
                 $options['preferred_choices'],
-                $propertyAccessor
+                $propertyAccessor,
+                $options['index_property']
             );
         };
 
@@ -94,6 +95,7 @@ class ModelType extends AbstractType
             'choice_list'       => $choiceList,
             'group_by'          => null,
             'by_reference'      => false,
+            'index_property'    => null,
         ));
     }
 

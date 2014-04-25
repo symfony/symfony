@@ -43,4 +43,20 @@ class GetterMetadataTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('Overridden data', $metadata->getPropertyValue($entity));
     }
+
+    public function testGetPropertyValueFromIsser()
+    {
+        $entity = new Entity();
+        $metadata = new GetterMetadata(self::CLASSNAME, 'valid');
+
+        $this->assertEquals('valid', $metadata->getPropertyValue($entity));
+    }
+
+    public function testGetPropertyValueFromHasser()
+    {
+        $entity = new Entity();
+        $metadata = new GetterMetadata(self::CLASSNAME, 'permissions');
+
+        $this->assertEquals('permissions', $metadata->getPropertyValue($entity));
+    }
 }

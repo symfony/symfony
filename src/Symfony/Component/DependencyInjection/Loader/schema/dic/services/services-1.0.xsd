@@ -94,6 +94,8 @@
     <xsd:attribute name="factory-service" type="xsd:string" />
     <xsd:attribute name="alias" type="xsd:string" />
     <xsd:attribute name="parent" type="xsd:string" />
+    <xsd:attribute name="decorates" type="xsd:string" />
+    <xsd:attribute name="decoration-inner-name" type="xsd:string" />
   </xsd:complexType>
 
   <xsd:complexType name="tag">

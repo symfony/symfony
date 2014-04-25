@@ -13,6 +13,7 @@ namespace Symfony\Component\Process;
 
 use Symfony\Component\Process\Exception\InvalidArgumentException;
 use Symfony\Component\Process\Exception\LogicException;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Exception\RuntimeException;
 
@@ -53,6 +54,7 @@ class Process
     private $exitcode;
     private $fallbackExitcode;
     private $processInformation;
+    private $outputDisabled = false;
     private $stdout;
     private $stderr;
     private $enhanceWindowsCompatibility = true;
@@ -62,6 +64,7 @@ class Process
     private $incrementalOutputOffset = 0;
     private $incrementalErrorOutputOffset = 0;
     private $tty;
+    private $pty;
 
     private $useFileHandles = false;
     /** @var ProcessPipes */
@@ -156,6 +159,8 @@ class Process
         $this->stdin = $stdin;
         $this->setTimeout($timeout);
         $this->useFileHandles = defined('PHP_WINDOWS_VERSION_BUILD');
+        $this->pty = false;
+        $this->enhanceWindowsCompatibility = true;
         $this->enhanceSigchildCompatibility = !defined('PHP_WINDOWS_VERSION_BUILD') && $this->isSigchildEnabled();
         $this->options = array_replace(array('suppress_errors' => true, 'binary_pipes' => true), $options);
     }
@@ -188,6 +193,7 @@ class Process
      *
      * @throws RuntimeException When process can't be launched
      * @throws RuntimeException When process stopped after receiving signal
+     * @throws LogicException   In case a callback is provided and output has been disabled
      *
      * @api
      */
@@ -196,6 +202,25 @@ class Process
         $this->start($callback);
 
         return $this->wait();
+    }
+
+    /**
+     * Runs the process.
+     *
+     * This is identical to run() except that an exception is thrown if the process
+     * exits with a non-zero exit code.
+     *
+     * @param callable|null $callback
+     *
+     * @return self
+     */
+    public function mustRun($callback = null)
+    {
+        if (0 !== $this->run($callback)) {
+            throw new ProcessFailedException($this);
+        }
+
+        return $this;
     }
 
     /**
@@ -220,11 +245,15 @@ class Process
      *
      * @throws RuntimeException When process can't be launched
      * @throws RuntimeException When process is already running
+     * @throws LogicException   In case a callback is provided and output has been disabled
      */
     public function start($callback = null)
     {
         if ($this->isRunning()) {
             throw new RuntimeException('Process is already running');
+        }
+        if ($this->outputDisabled && null !== $callback) {
+            throw new LogicException('Output has been disabled, enable it to allow the use of a callback.');
         }
 
         $this->resetProcessData();
@@ -370,16 +399,70 @@ class Process
     }
 
     /**
+     * Disables fetching output and error output from the underlying process.
+     *
+     * @return Process
+     *
+     * @throws RuntimeException In case the process is already running
+     */
+    public function disableOutput()
+    {
+        if ($this->isRunning()) {
+            throw new RuntimeException('Disabling output while the process is running is not possible.');
+        }
+        if (null !== $this->idleTimeout) {
+            throw new LogicException('Output can not be disabled while an idle timeout is set.');
+        }
+
+        $this->outputDisabled = true;
+
+        return $this;
+    }
+
+    /**
+     * Enables fetching output and error output from the underlying process.
+     *
+     * @return Process
+     *
+     * @throws RuntimeException In case the process is already running
+     */
+    public function enableOutput()
+    {
+        if ($this->isRunning()) {
+            throw new RuntimeException('Enabling output while the process is running is not possible.');
+        }
+
+        $this->outputDisabled = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns true in case the output is disabled, false otherwise.
+     *
+     * @return bool
+     */
+    public function isOutputDisabled()
+    {
+        return $this->outputDisabled;
+    }
+
+    /**
      * Returns the current output of the process (STDOUT).
      *
      * @return string The process output
      *
+     * @throws LogicException in case the output has been disabled
      * @throws LogicException In case the process is not started
      *
      * @api
      */
     public function getOutput()
     {
+        if ($this->outputDisabled) {
+            throw new LogicException('Output has been disabled.');
+        }
+
         $this->requireProcessIsStarted(__FUNCTION__);
 
         $this->readPipes(false, defined('PHP_WINDOWS_VERSION_BUILD') ? !$this->processInformation['running'] : true);
@@ -393,6 +476,7 @@ class Process
      * In comparison with the getOutput method which always return the whole
      * output, this one returns the new output since the last call.
      *
+     * @throws LogicException in case the output has been disabled
      * @throws LogicException In case the process is not started
      *
      * @return string The process output since the last call
@@ -427,12 +511,17 @@ class Process
      *
      * @return string The process error output
      *
+     * @throws LogicException in case the output has been disabled
      * @throws LogicException In case the process is not started
      *
      * @api
      */
     public function getErrorOutput()
     {
+        if ($this->outputDisabled) {
+            throw new LogicException('Output has been disabled.');
+        }
+
         $this->requireProcessIsStarted(__FUNCTION__);
 
         $this->readPipes(false, defined('PHP_WINDOWS_VERSION_BUILD') ? !$this->processInformation['running'] : true);
@@ -447,6 +536,7 @@ class Process
      * whole error output, this one returns the new error output since the last
      * call.
      *
+     * @throws LogicException in case the output has been disabled
      * @throws LogicException In case the process is not started
      *
      * @return string The process error output since the last call
@@ -813,6 +903,10 @@ class Process
      */
     public function setIdleTimeout($timeout)
     {
+        if (null !== $timeout && $this->outputDisabled) {
+            throw new LogicException('Idle timeout can not be set while the output is disabled.');
+        }
+
         $this->idleTimeout = $this->validateTimeout($timeout);
 
         return $this;
@@ -840,6 +934,30 @@ class Process
     public function isTty()
     {
         return $this->tty;
+    }
+
+    /**
+     * Sets PTY mode.
+     *
+     * @param bool    $bool
+     *
+     * @return self
+     */
+    public function setPty($bool)
+    {
+        $this->pty = (bool) $bool;
+
+        return $this;
+    }
+
+    /**
+     * Returns PTY state.
+     *
+     * @return bool
+     */
+    public function isPty()
+    {
+        return $this->pty;
     }
 
     /**
@@ -1046,14 +1164,41 @@ class Process
     }
 
     /**
+     * Returns whether PTY is supported on the current operating system.
+     *
+     * @return bool
+     */
+    public static function isPtySupported()
+    {
+        static $result;
+
+        if (null !== $result) {
+            return $result;
+        }
+
+        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+            return $result = false;
+        }
+
+        $proc = @proc_open('echo 1', array(array('pty'), array('pty'), array('pty')), $pipes);
+        if (is_resource($proc)) {
+            proc_close($proc);
+
+            return $result = true;
+        }
+
+        return $result = false;
+    }
+
+    /**
      * Creates the descriptors needed by the proc_open.
      *
      * @return array
      */
     private function getDescriptors()
     {
-        $this->processPipes = new ProcessPipes($this->useFileHandles, $this->tty);
-        $descriptors = $this->processPipes->getDescriptors();
+        $this->processPipes = new ProcessPipes($this->useFileHandles, $this->tty, $this->pty);
+        $descriptors = $this->processPipes->getDescriptors($this->outputDisabled);
 
         if (!$this->useFileHandles && $this->enhanceSigchildCompatibility && $this->isSigchildEnabled()) {
             // last exit code is output on the fourth pipe and caught to work around --enable-sigchild

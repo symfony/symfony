@@ -29,6 +29,7 @@ class ProcessBuilder
     private $options = array();
     private $inheritEnv = true;
     private $prefix = array();
+    private $outputDisabled = false;
 
     /**
      * Constructor
@@ -212,6 +213,30 @@ class ProcessBuilder
     }
 
     /**
+     * Disables fetching output and error output from the underlying process.
+     *
+     * @return Process
+     */
+    public function disableOutput()
+    {
+        $this->outputDisabled = true;
+
+        return $this;
+    }
+
+    /**
+     * Enables fetching output and error output from the underlying process.
+     *
+     * @return Process
+     */
+    public function enableOutput()
+    {
+        $this->outputDisabled = false;
+
+        return $this;
+    }
+
+    /**
      * Creates a Process instance and returns it.
      *
      * @return Process
@@ -236,6 +261,12 @@ class ProcessBuilder
             $env = $this->env;
         }
 
-        return new Process($script, $this->cwd, $env, $this->stdin, $this->timeout, $options);
+        $process = new Process($script, $this->cwd, $env, $this->stdin, $this->timeout, $options);
+
+        if ($this->outputDisabled) {
+            $process->disableOutput();
+        }
+
+        return $process;
     }
 }

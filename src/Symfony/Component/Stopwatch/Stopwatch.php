@@ -126,6 +126,18 @@ class Stopwatch
     }
 
     /**
+     * Returns a specific event by name
+     *
+     * @param string $name The event name
+     *
+     * @return StopwatchEvent A StopwatchEvent instance
+     */
+    public function getEvent($name)
+    {
+        return end($this->activeSections)->getEvent($name);
+    }
+
+    /**
      * Gets all events for a given section.
      *
      * @param string $id A section identifier
@@ -289,6 +301,24 @@ class Section
     public function lap($name)
     {
         return $this->stopEvent($name)->start();
+    }
+
+    /**
+     * Returns a specific event by name
+     *
+     * @param string $name The event name
+     *
+     * @return StopwatchEvent The event
+     *
+     * @throws \LogicException When the event is not known
+     */
+    public function getEvent($name)
+    {
+        if (!isset($this->events[$name])) {
+            throw new \LogicException(sprintf('Event "%s" is not known.', $name));
+        }
+
+        return $this->events[$name];
     }
 
     /**

@@ -40,6 +40,8 @@ class JsonEncoder implements EncoderInterface, DecoderInterface
      * Returns the last encoding error (if any)
      *
      * @return int
+     *
+     * @deprecated since 2.5, JsonEncode throws exception if an error is found, will be removed in 3.0
      */
     public function getLastEncodingError()
     {
@@ -50,6 +52,8 @@ class JsonEncoder implements EncoderInterface, DecoderInterface
      * Returns the last decoding error (if any)
      *
      * @return int
+     *
+     * @deprecated since 2.5, JsonDecode throws exception if an error is found, will be removed in 3.0
      */
     public function getLastDecodingError()
     {
@@ -86,5 +90,32 @@ class JsonEncoder implements EncoderInterface, DecoderInterface
     public function supportsDecoding($format)
     {
         return self::FORMAT === $format;
+    }
+
+    /**
+     * Resolves json_last_error message.
+     *
+     * @return string
+     */
+    public static function getLastErrorMessage()
+    {
+        if (function_exists('json_last_error_msg')) {
+            return json_last_error_msg();
+        }
+
+        switch (json_last_error()) {
+            case JSON_ERROR_DEPTH:
+                return 'Maximum stack depth exceeded';
+            case JSON_ERROR_STATE_MISMATCH:
+                return 'Underflow or the modes mismatch';
+            case JSON_ERROR_CTRL_CHAR:
+                return 'Unexpected control character found';
+            case JSON_ERROR_SYNTAX:
+                return 'Syntax error, malformed JSON';
+            case JSON_ERROR_UTF8:
+                return 'Malformed UTF-8 characters, possibly incorrectly encoded';
+            default:
+                return 'Unknown error';
+        }
     }
 }

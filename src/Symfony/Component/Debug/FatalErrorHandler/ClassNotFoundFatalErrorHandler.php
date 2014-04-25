@@ -103,8 +103,17 @@ class ClassNotFoundFatalErrorHandler implements FatalErrorHandlerInterface
             }
 
             // get class loaders wrapped by DebugClassLoader
-            if ($function[0] instanceof DebugClassLoader && method_exists($function[0], 'getClassLoader')) {
-                $function[0] = $function[0]->getClassLoader();
+            if ($function[0] instanceof DebugClassLoader) {
+                $function = $function[0]->getClassLoader();
+
+                // Since 2.5, returning an object from DebugClassLoader::getClassLoader() is @deprecated
+                if (is_object($function)) {
+                    $function = array($function);
+                }
+
+                if (!is_array($function)) {
+                    continue;
+                }
             }
 
             if ($function[0] instanceof ComposerClassLoader || $function[0] instanceof SymfonyClassLoader) {

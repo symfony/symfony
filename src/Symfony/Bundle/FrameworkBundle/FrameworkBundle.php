@@ -30,9 +30,9 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\SerializerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\Scope;
+use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
-use Symfony\Component\HttpKernel\DependencyInjection\RegisterListenersPass;
 
 /**
  * Bundle.

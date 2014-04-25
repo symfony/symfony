@@ -15,7 +15,7 @@ use Symfony\Component\Validator\Constraint;
 
 /**
  * @Annotation
- * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
+ * @Target({"CLASS", "PROPERTY", "METHOD", "ANNOTATION"})
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
@@ -72,6 +72,6 @@ class Callback extends Constraint
      */
     public function getTargets()
     {
-        return self::CLASS_CONSTRAINT;
+        return array(self::CLASS_CONSTRAINT, self::PROPERTY_CONSTRAINT);
     }
 }

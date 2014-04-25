@@ -399,7 +399,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
             ->with('Application\Author', 'firstName')
             ->will($this->returnValue(new TypeGuess(
                 'text',
-                array('max_length' => 10),
+                array('attr' => array('maxlength' => 10)),
                 Guess::MEDIUM_CONFIDENCE
             )));
 
@@ -408,7 +408,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
             ->with('Application\Author', 'firstName')
             ->will($this->returnValue(new TypeGuess(
                 'password',
-                array('max_length' => 7),
+                array('attr' => array('maxlength' => 7)),
                 Guess::HIGH_CONFIDENCE
             )));
 
@@ -416,7 +416,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
 
         $factory->expects($this->once())
             ->method('createNamedBuilder')
-            ->with('firstName', 'password', null, array('max_length' => 7))
+            ->with('firstName', 'password', null, array('attr' => array('maxlength' => 7)))
             ->will($this->returnValue('builderInstance'));
 
         $this->builder = $factory->createBuilderForProperty('Application\Author', 'firstName');
@@ -450,7 +450,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
                 ->with('Application\Author', 'firstName')
                 ->will($this->returnValue(new TypeGuess(
                     'text',
-                    array('max_length' => 10),
+                    array('attr' => array('maxlength' => 10)),
                     Guess::MEDIUM_CONFIDENCE
                 )));
 
@@ -458,14 +458,14 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
 
         $factory->expects($this->once())
             ->method('createNamedBuilder')
-            ->with('firstName', 'text', null, array('max_length' => 11))
+            ->with('firstName', 'text', null, array('attr' => array('maxlength' => 11)))
             ->will($this->returnValue('builderInstance'));
 
         $this->builder = $factory->createBuilderForProperty(
             'Application\Author',
             'firstName',
             null,
-            array('max_length' => 11)
+            array('attr' => array('maxlength' => 11))
         );
 
         $this->assertEquals('builderInstance', $this->builder);
@@ -493,7 +493,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
 
         $factory->expects($this->once())
             ->method('createNamedBuilder')
-            ->with('firstName', 'text', null, array('max_length' => 20))
+            ->with('firstName', 'text', null, array('attr' => array('maxlength' => 20)))
             ->will($this->returnValue('builderInstance'));
 
         $this->builder = $factory->createBuilderForProperty(
@@ -559,7 +559,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
 
         $factory->expects($this->once())
             ->method('createNamedBuilder')
-            ->with('firstName', 'text', null, array('pattern' => '[a-zA-Z]'))
+            ->with('firstName', 'text', null, array('attr' => array('pattern' => '[a-zA-Z]')))
             ->will($this->returnValue('builderInstance'));
 
         $this->builder = $factory->createBuilderForProperty(

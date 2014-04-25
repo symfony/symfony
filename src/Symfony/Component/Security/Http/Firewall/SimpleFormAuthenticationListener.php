@@ -50,13 +50,13 @@ class SimpleFormAuthenticationListener extends AbstractAuthenticationListener
      *                                                                      successful, or failed authentication attempt
      * @param LoggerInterface                        $logger                A LoggerInterface instance
      * @param EventDispatcherInterface               $dispatcher            An EventDispatcherInterface instance
-     * @param CsrfTokenManagerInterface              $csrfTokenManager      A CsrfTokenManagerInterface instance
+     * @param                                        $csrfTokenManager
      * @param SimpleFormAuthenticatorInterface       $simpleAuthenticator   A SimpleFormAuthenticatorInterface instance
      *
      * @throws \InvalidArgumentException In case no simple authenticator is provided
      * @throws InvalidArgumentException  In case an invalid CSRF token manager is passed
      */
-    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, HttpUtils $httpUtils, $providerKey, AuthenticationSuccessHandlerInterface $successHandler, AuthenticationFailureHandlerInterface $failureHandler, array $options = array(), LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, CsrfTokenManagerInterface $csrfTokenManager = null, SimpleFormAuthenticatorInterface $simpleAuthenticator = null)
+    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, HttpUtils $httpUtils, $providerKey, AuthenticationSuccessHandlerInterface $successHandler, AuthenticationFailureHandlerInterface $failureHandler, array $options = array(), LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, $csrfTokenManager = null, SimpleFormAuthenticatorInterface $simpleAuthenticator = null)
     {
         if (!$simpleAuthenticator) {
             throw new \InvalidArgumentException('Missing simple authenticator');

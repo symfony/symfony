@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Translation;
 
 use Symfony\Bundle\FrameworkBundle\Translation\Translator;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Translation\MessageSelector;
@@ -86,43 +87,46 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('other choice 1 (PT-BR)', $translator->transChoice('other choice', 1));
     }
 
-    public function testGetLocale()
+    /**
+     * @dataProvider getGetLocaleData
+     */
+    public function testGetLocale($inRequestScope)
     {
-        $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
+        $requestStack = new RequestStack();
+        if ($inRequestScope) {
+            $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
+            $request
+                ->expects($this->once())
+                ->method('getLocale')
+                ->will($this->returnValue('en'))
+            ;
 
-        $request
-            ->expects($this->once())
-            ->method('getLocale')
-            ->will($this->returnValue('en'))
-        ;
+            $requestStack->push($request);
+        }
 
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
-
-        $container
-            ->expects($this->exactly(2))
-            ->method('isScopeActive')
-            ->with('request')
-            ->will($this->onConsecutiveCalls(false, true))
-        ;
-
-        $container
-            ->expects($this->once())
-            ->method('has')
-            ->with('request')
-            ->will($this->returnValue(true))
-        ;
-
         $container
             ->expects($this->once())
             ->method('get')
-            ->with('request')
-            ->will($this->returnValue($request))
+            ->with('request_stack')
+            ->will($this->returnValue($requestStack))
         ;
 
         $translator = new Translator($container, new MessageSelector());
 
-        $this->assertNull($translator->getLocale());
-        $this->assertSame('en', $translator->getLocale());
+        if ($inRequestScope) {
+            $this->assertSame('en', $translator->getLocale());
+        } else {
+            $this->assertNull($translator->getLocale());
+        }
+    }
+
+    public function getGetLocaleData()
+    {
+        return array(
+            array(false),
+            array(true),
+        );
     }
 
     protected function getCatalogue($locale, $messages)

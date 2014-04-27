@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Constraint;
  * Constraint for the Unique Entity validator
  *
  * @Annotation
- * @Target("CLASS")
+ * @Target({"CLASS", "ANNOTATION"})
  *
  * @author Benjamin Eberlei <kontakt@beberlei.de>
  */

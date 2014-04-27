@@ -695,8 +695,11 @@ class Application
         do {
             $title = sprintf('  [%s]  ', get_class($e));
             $len = $strlen($title);
+            $width = $this->getTerminalWidth() ? $this->getTerminalWidth() - 1 : PHP_INT_MAX;
             // HHVM only accepts 32 bits integer in str_split, even when PHP_INT_MAX is a 64 bit integer: https://github.com/facebook/hhvm/issues/1327
-            $width = $this->getTerminalWidth() ? $this->getTerminalWidth() - 1 : (defined('HHVM_VERSION') ? 1 << 31 : PHP_INT_MAX);
+            if (defined('HHVM_VERSION') && $width > 1 << 31) {
+                $width = 1 << 31;
+            }
             $formatter = $output->getFormatter();
             $lines = array();
             foreach (preg_split('/\r?\n/', $e->getMessage()) as $line) {

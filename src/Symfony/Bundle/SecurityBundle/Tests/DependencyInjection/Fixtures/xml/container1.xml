@@ -55,6 +55,7 @@
             <switch-user />
             <x509 />
             <logout />
+            <remember-me key="TheyKey"/>
         </firewall>
 
         <firewall name="host" pattern="/test" host="foo\.example\.org" methods="GET,POST">

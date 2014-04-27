@@ -142,7 +142,7 @@ class ContextListener implements ListenerInterface
      *
      * @throws \RuntimeException
      */
-    private function refreshUser(TokenInterface $token)
+    protected function refreshUser(TokenInterface $token)
     {
         $user = $token->getUser();
         if (!$user instanceof UserInterface) {

@@ -12,7 +12,7 @@
 namespace Symfony\Component\Debug\Tests;
 
 use Symfony\Component\Debug\ErrorHandler;
-use Symfony\Component\Debug\Exception\HandledErrorException;
+use Symfony\Component\Debug\Exception\ContextErrorException;
 
 /**
  * ErrorHandlerTest
@@ -46,42 +46,33 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testNotice()
     {
-        $exceptionHandler = $this->getMock('Symfony\Component\Debug\ExceptionHandler', array('handle'));
-        set_exception_handler(array($exceptionHandler, 'handle'));
-
-        $that = $this;
-        $exceptionCheck = function ($exception) use ($that) {
-            $that->assertInstanceOf('Symfony\Component\Debug\Exception\HandledErrorException', $exception);
-            $that->assertEquals(E_NOTICE, $exception->getSeverity());
-            $that->assertEquals(__FILE__, $exception->getFile());
-            $that->assertRegexp('/^Notice: Undefined variable: (foo|bar)/', $exception->getMessage());
-            $that->assertArrayHasKey('foobar', $exception->getContext());
-
-            $trace = $exception->getTrace();
-            $that->assertEquals(__FILE__, $trace[0]['file']);
-            $that->assertEquals('Symfony\Component\Debug\ErrorHandler', $trace[0]['class']);
-            $that->assertEquals('handle', $trace[0]['function']);
-            $that->assertEquals('->', $trace[0]['type']);
-
-            $that->assertEquals(__FILE__, $trace[1]['file']);
-            $that->assertEquals(__CLASS__, $trace[1]['class']);
-            $that->assertEquals('triggerNotice', $trace[1]['function']);
-            $that->assertEquals('::', $trace[1]['type']);
-
-            $that->assertEquals(__CLASS__, $trace[2]['class']);
-            $that->assertEquals('testNotice', $trace[2]['function']);
-            $that->assertEquals('->', $trace[2]['type']);
-        };
-
-        $exceptionHandler->expects($this->once())
-            ->method('handle')
-            ->will($this->returnCallback($exceptionCheck));
         ErrorHandler::register();
 
         try {
             self::triggerNotice($this);
-        } catch (HandledErrorException $e) {
+            $this->fail('ContextErrorException expected');
+        } catch (ContextErrorException $exception) {
             // if an exception is thrown, the test passed
+            restore_error_handler();
+            $this->assertEquals(E_NOTICE, $exception->getSeverity());
+            $this->assertEquals(__FILE__, $exception->getFile());
+            $this->assertRegexp('/^Notice: Undefined variable: (foo|bar)/', $exception->getMessage());
+            $this->assertArrayHasKey('foobar', $exception->getContext());
+
+            $trace = $exception->getTrace();
+            $this->assertEquals(__FILE__, $trace[0]['file']);
+            $this->assertEquals('Symfony\Component\Debug\ErrorHandler', $trace[0]['class']);
+            $this->assertEquals('handle', $trace[0]['function']);
+            $this->assertEquals('->', $trace[0]['type']);
+
+            $this->assertEquals(__FILE__, $trace[1]['file']);
+            $this->assertEquals(__CLASS__, $trace[1]['class']);
+            $this->assertEquals('triggerNotice', $trace[1]['function']);
+            $this->assertEquals('::', $trace[1]['type']);
+
+            $this->assertEquals(__CLASS__, $trace[2]['class']);
+            $this->assertEquals('testNotice', $trace[2]['function']);
+            $this->assertEquals('->', $trace[2]['type']);
         } catch (\Exception $e) {
             restore_error_handler();
 

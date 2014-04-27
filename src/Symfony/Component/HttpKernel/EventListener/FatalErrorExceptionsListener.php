@@ -35,11 +35,13 @@ class FatalErrorExceptionsListener implements EventSubscriberInterface
     {
         if ($this->handler) {
             ErrorHandler::setFatalErrorExceptionHandler($this->handler);
+            $this->handler = null;
         }
     }
 
     public static function getSubscribedEvents()
     {
-        return array(KernelEvents::REQUEST => 'injectHandler');
+        // Don't register early as e.g. the Router is generally required by the handler
+        return array(KernelEvents::REQUEST => array('injectHandler', 8));
     }
 }

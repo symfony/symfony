@@ -126,6 +126,10 @@ class ErrorHandler
                 require __DIR__.'/Exception/ContextErrorException.php';
             }
 
+            if (PHP_VERSION_ID < 50400 && isset($context['GLOBALS'])) {
+                unset($context['GLOBALS']);
+            }
+
             $exception = new ContextErrorException(sprintf('%s: %s in %s line %d', isset($this->levels[$level]) ? $this->levels[$level] : $level, $message, $file, $line), 0, $level, $file, $line, $context);
 
             // Exceptions thrown from error handlers are sometimes not caught by the exception

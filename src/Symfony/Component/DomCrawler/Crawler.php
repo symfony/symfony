@@ -342,8 +342,8 @@ class Crawler extends \SplObjectStorage
     /**
      * Slices the list of nodes by $offset and $length.
      *
-     * @param integer $offset
-     * @param integer $length
+     * @param int     $offset
+     * @param int     $length
      *
      * @return Crawler A Crawler instance with the sliced nodes.
      */

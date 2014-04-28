@@ -166,6 +166,10 @@ class ErrorHandler
                 return true;
             }
 
+            if (PHP_VERSION_ID < 50400 && isset($context['GLOBALS'])) {
+                unset($context['GLOBALS']);
+            }
+
             $exception = sprintf('%s: %s in %s line %d', isset($this->levels[$level]) ? $this->levels[$level] : $level, $message, $file, $line);
             $exception = new ContextErrorException($exception, 0, $level, $file, $line, $context);
 

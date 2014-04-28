@@ -190,7 +190,7 @@ class Parser
 
                             $node = new Node\FunctionNode($token->value, $this->parseArguments());
                         } else {
-                            if (!in_array($token->value, $this->names)) {
+                            if (!in_array($token->value, $this->names, true)) {
                                 throw new SyntaxError(sprintf('Variable "%s" is not valid', $token->value), $token->cursor);
                             }
 

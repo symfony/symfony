@@ -81,7 +81,9 @@ class BinaryFileResponse extends Response
      */
     public function setFile($file, $contentDisposition = null, $autoEtag = false, $autoLastModified = true)
     {
-        $file = new File((string) $file);
+        if (!$file instanceof File) {
+            $file = new File((string) $file);
+        }
 
         if (!$file->isReadable()) {
             throw new FileException('File must be readable.');

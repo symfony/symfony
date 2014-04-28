@@ -36,7 +36,7 @@ class TransNode extends \Twig_Node
             $defaults = $this->getNode('vars');
             $vars = null;
         }
-        list($msg, $defaults) = $this->compileString($this->getNode('body'), $defaults);
+        list($msg, $defaults) = $this->compileString($this->getNode('body'), $defaults, (bool) $vars);
 
         $method = null === $this->getNode('count') ? 'trans' : 'transChoice';
 
@@ -83,7 +83,7 @@ class TransNode extends \Twig_Node
         $compiler->raw(");\n");
     }
 
-    protected function compileString(\Twig_NodeInterface $body, \Twig_Node_Expression_Array $vars)
+    protected function compileString(\Twig_NodeInterface $body, \Twig_Node_Expression_Array $vars, $ignoreStrictCheck = false)
     {
         if ($body instanceof \Twig_Node_Expression_Constant) {
             $msg = $body->getAttribute('value');
@@ -98,7 +98,9 @@ class TransNode extends \Twig_Node
         foreach ($matches[1] as $var) {
             $key = new \Twig_Node_Expression_Constant('%'.$var.'%', $body->getLine());
             if (!$vars->hasElement($key)) {
-                $vars->addElement(new \Twig_Node_Expression_Name($var, $body->getLine()), $key);
+                $varExpr = new \Twig_Node_Expression_Name($var, $body->getLine());
+                $varExpr->setAttribute('ignore_strict_check', $ignoreStrictCheck);
+                $vars->addElement($varExpr, $key);
             }
         }
 

@@ -18,7 +18,7 @@ namespace Symfony\Component\Debug\Exception;
  * @author Konstanton Myakshin <koc-dp@yandex.ru>
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class FatalErrorException extends HandledErrorException
+class FatalErrorException extends \ErrorException
 {
     public function __construct($message, $code, $severity, $filename, $lineno, $traceOffset = null)
     {

@@ -25,7 +25,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Debug\Exception\HandledErrorException;
 use Symfony\Component\Debug\Exception\FatalErrorException;
 
 /**
@@ -72,9 +71,6 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
 
                 throw $e;
             }
-            if ($e instanceof HandledErrorException) {
-                $e->cleanOutput();
-            }
 
             return $this->handleException($e, $request, $type);
         }
@@ -102,7 +98,6 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
         $response->sendContent();
 
         $this->terminate($request, $response);
-        $exception->cleanOutput();
     }
 
     /**

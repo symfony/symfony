@@ -13,6 +13,7 @@ namespace Symfony\Component\Debug\Tests;
 
 use Symfony\Component\Debug\DebugClassLoader;
 use Symfony\Component\Debug\ErrorHandler;
+use Symfony\Component\Debug\Exception\ContextErrorException;
 
 class DebugClassLoaderTest extends \PHPUnit_Framework_TestCase
 {
@@ -77,52 +78,40 @@ class DebugClassLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertStringMatchesFormat('%aParse error%a', $output);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Debug\Exception\HandledErrorException
-     */
     public function testStacking()
     {
-        // the HandledErrorException must not be loaded to test the workaround
+        // the ContextErrorException must not be loaded to test the workaround
         // for https://bugs.php.net/65322.
-        if (class_exists('Symfony\Component\Debug\Exception\HandledErrorException', false)) {
-            $this->markTestSkipped('The HandledErrorException class is already loaded.');
+        if (class_exists('Symfony\Component\Debug\Exception\ContextErrorException', false)) {
+            $this->markTestSkipped('The ContextErrorException class is already loaded.');
         }
 
-        $exceptionHandler = $this->getMock('Symfony\Component\Debug\ExceptionHandler', array('handle'));
-        set_exception_handler(array($exceptionHandler, 'handle'));
-
-        $that = $this;
-        $exceptionCheck = function ($exception) use ($that) {
-            $that->assertInstanceOf('Symfony\Component\Debug\Exception\HandledErrorException', $exception);
-            $that->assertEquals(E_STRICT, $exception->getSeverity());
-            $that->assertStringStartsWith(__FILE__, $exception->getFile());
-            $that->assertRegexp('/^Runtime Notice: Declaration/', $exception->getMessage());
-        };
-
-        $exceptionHandler->expects($this->once())
-            ->method('handle')
-            ->will($this->returnCallback($exceptionCheck));
         ErrorHandler::register();
 
         try {
             // Trigger autoloading + E_STRICT at compile time
             // which in turn triggers $errorHandler->handle()
-            // that again triggers autoloading for HandledErrorException.
+            // that again triggers autoloading for ContextErrorException.
             // Error stacking works around the bug above and everything is fine.
 
             eval('
                 namespace '.__NAMESPACE__.';
                 class ChildTestingStacking extends TestingStacking { function foo($bar) {} }
             ');
+            $this->fail('ContextErrorException expected');
+        } catch (ContextErrorException $exception) {
+            // if an exception is thrown, the test passed
+            restore_error_handler();
+            restore_exception_handler();
+            $this->assertEquals(E_STRICT, $exception->getSeverity());
+            $this->assertStringStartsWith(__FILE__, $exception->getFile());
+            $this->assertRegexp('/^Runtime Notice: Declaration/', $exception->getMessage());
         } catch (\Exception $e) {
             restore_error_handler();
             restore_exception_handler();
 
             throw $e;
         }
-
-        restore_error_handler();
-        restore_exception_handler();
     }
 
     /**

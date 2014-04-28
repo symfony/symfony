@@ -13,9 +13,8 @@ namespace Symfony\Component\Debug;
 
 use Psr\Log\LogLevel;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Debug\Exception\ContextErrorException;
 use Symfony\Component\Debug\Exception\FatalErrorException;
-use Symfony\Component\Debug\Exception\DummyException;
-use Symfony\Component\Debug\Exception\HandledErrorException;
 use Symfony\Component\Debug\FatalErrorHandler\UndefinedFunctionFatalErrorHandler;
 use Symfony\Component\Debug\FatalErrorHandler\UndefinedMethodFatalErrorHandler;
 use Symfony\Component\Debug\FatalErrorHandler\ClassNotFoundFatalErrorHandler;
@@ -53,6 +52,8 @@ class ErrorHandler
     private $reservedMemory;
 
     private $displayErrors;
+
+    private $caughtOutput = 0;
 
     /**
      * @var LoggerInterface[] Loggers for channels
@@ -129,7 +130,7 @@ class ErrorHandler
     }
 
     /**
-     * @throws HandledErrorException When error_reporting returns error
+     * @throws ContextErrorException When error_reporting returns error
      */
     public function handle($level, $message, $file = 'unknown', $line = 0, $context = array())
     {
@@ -159,36 +160,24 @@ class ErrorHandler
         }
 
         if ($this->displayErrors && error_reporting() & $level && $this->level & $level) {
-            // Exceptions thrown from error handlers are sometimes not caught by the exception
-            // handler, so we invoke it directly (https://bugs.php.net/bug.php?id=54275)
-            $exceptionHandler = set_exception_handler('var_dump');
-            restore_exception_handler();
+            if (self::$stackedErrorLevels) {
+                self::$stackedErrors[] = func_get_args();
 
-            if ($exceptionHandler) {
-                if (self::$stackedErrorLevels) {
-                    self::$stackedErrors[] = func_get_args();
-
-                    return true;
-                }
-
-                $exception = sprintf('%s: %s in %s line %d', isset($this->levels[$level]) ? $this->levels[$level] : $level, $message, $file, $line);
-                $exception = new HandledErrorException($exception, 0, $level, $file, $line, $context);
-                $exception->handleWith($exceptionHandler);
-
-                // we must stop the PHP script execution, as the exception has
-                // already been dealt with, so, let's throw an exception that
-                // will be caught by a dummy exception handler
-                set_exception_handler(function (\Exception $e) use ($exceptionHandler) {
-                    if (!$e instanceof HandledErrorException && !$e instanceof DummyException) {
-                        // happens if our handled exception is caught by a
-                        // catch-all from user code, in which case, let the
-                        // current handler handle this "new" exception
-                        call_user_func($exceptionHandler, $e);
-                    }
-                });
-
-                throw $exception;
+                return true;
             }
+
+            $exception = sprintf('%s: %s in %s line %d', isset($this->levels[$level]) ? $this->levels[$level] : $level, $message, $file, $line);
+            $exception = new ContextErrorException($exception, 0, $level, $file, $line, $context);
+
+            if (PHP_VERSION_ID <= 50407 && (PHP_VERSION_ID >= 50400 || PHP_VERSION_ID <= 50317)) {
+                // Exceptions thrown from error handlers are sometimes not caught by the exception
+                // handler and shutdown handlers are bypassed before 5.4.8/5.3.18.
+                // We temporarily re-enable display_errors to prevent any blank page related to this bug.
+
+                $exception->errorHandlerCanary = new ErrorHandlerCanary();
+            }
+
+            throw $exception;
         }
 
         if (isset(self::$loggers['scream']) && !(error_reporting() & $level)) {
@@ -323,23 +312,114 @@ class ErrorHandler
 
     private function handleFatalError($exceptionHandler, array $error)
     {
+        // Let PHP handle any further error
+        set_error_handler('var_dump', 0);
+        ini_set('display_errors', 1);
+
         $level = isset($this->levels[$error['type']]) ? $this->levels[$error['type']] : $error['type'];
         $message = sprintf('%s: %s in %s line %d', $level, $error['message'], $error['file'], $error['line']);
         $exception = new FatalErrorException($message, 0, $error['type'], $error['file'], $error['line'], 3);
 
         foreach ($this->getFatalErrorHandlers() as $handler) {
-            if ($ex = $handler->handleError($error, $exception)) {
-                $exception = $ex;
+            if ($e = $handler->handleError($error, $exception)) {
+                $exception = $e;
                 break;
             }
         }
 
+        // To be as fail-safe as possible, the FatalErrorException is first handled
+        // by the exception handler, then by the fatal error handler. The latter takes
+        // precedence and any output from the former is cancelled, if and only if
+        // nothing bad happens in this handling path.
+
+        $caughtOutput = 0;
+
         if ($exceptionHandler) {
-            $exception->handleWith($exceptionHandler);
+            $this->caughtOutput = false;
+            ob_start(array($this, 'catchOutput'));
+            try {
+                call_user_func($exceptionHandler, $exception);
+            } catch (\Exception $e) {
+                // Ignore this exception, we have to deal with the fatal error
+            }
+            if (false === $this->caughtOutput) {
+                ob_end_clean();
+            }
+            if (isset($this->caughtOutput[0])) {
+                ob_start(array($this, 'cleanOutput'));
+                echo $this->caughtOutput;
+                $caughtOutput = ob_get_length();
+            }
+            $this->caughtOutput = 0;
         }
 
         if (self::$fatalHandler) {
-            call_user_func(self::$fatalHandler, $exception);
+            try {
+                call_user_func(self::$fatalHandler, $exception);
+
+                if ($caughtOutput) {
+                    $this->caughtOutput = $caughtOutput;
+                }
+            } catch (\Exception $e) {
+                if (!$caughtOutput) {
+                    // Neither the exception nor the fatal handler succeeded.
+                    // Let PHP handle that now.
+                    throw $exception;
+                }
+            }
+        }
+    }
+
+    /**
+     * @internal
+     */
+    public function catchOutput($buffer)
+    {
+        $this->caughtOutput = $buffer;
+
+        return '';
+    }
+
+    /**
+     * @internal
+     */
+    public function cleanOutput($buffer)
+    {
+        if ($this->caughtOutput) {
+            // use substr_replace() instead of substr() for mbstring overloading resistance
+            $cleanBuffer = substr_replace($buffer, '', 0, $this->caughtOutput);
+            if (isset($cleanBuffer[0])) {
+                $buffer = $cleanBuffer;
+            }
+        }
+
+        return $buffer;
+    }
+}
+
+/**
+ * Private class used to work around https://bugs.php.net/54275
+ *
+ * @author Nicolas Grekas <p@tchwork.com>
+ *
+ * @internal
+ */
+class ErrorHandlerCanary
+{
+    private static $displayErrors = null;
+
+    public function __construct()
+    {
+        if (null === self::$displayErrors) {
+            self::$displayErrors = ini_set('display_errors', 1);
+        }
+    }
+
+    public function __destruct()
+    {
+        if (null !== self::$displayErrors) {
+            ini_set('display_errors', self::$displayErrors);
+            self::$displayErrors = null;
         }
     }
 }

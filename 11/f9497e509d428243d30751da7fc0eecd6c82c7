@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2014-04-08T09:13:08Z
+
+Tests [are broken](https://travis-ci.org/symfony/symfony/jobs/22443737#L218) on PHP 5.3.
+
+---------------------------------------------------------------------------
+
+by goetas at 2014-04-08T10:23:26Z
+
+I've fixed the tests. May be useful to create a single commit?
+
+---------------------------------------------------------------------------
+
+by goetas at 2014-04-16T12:40:38Z
+
+news on this?

@@ -36,7 +36,7 @@ class TransNode extends \Twig_Node
             $defaults = $this->getNode('vars');
             $vars = null;
         }
-        list($msg, $defaults) = $this->compileString($this->getNode('body'), $defaults, (boolean) $vars);
+        list($msg, $defaults) = $this->compileString($this->getNode('body'), $defaults, (bool) $vars);
 
         $method = null === $this->getNode('count') ? 'trans' : 'transChoice';
 

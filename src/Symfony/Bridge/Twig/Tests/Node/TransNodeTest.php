@@ -14,22 +14,17 @@ namespace Symfony\Bridge\Twig\Tests\Node;
 use Symfony\Bridge\Twig\Node\TransNode;
 
 /**
- *
  * @author Asmir Mustafic <goetas@gmail.com>
- *
  */
 class TransNodeTest extends \PHPUnit_Framework_TestCase
 {
-
     public function testCompileStrict()
     {
         $body = new \Twig_Node_Text('trans %var%', 0);
         $vars = new \Twig_Node_Expression_Name('foo', 0);
         $node = new TransNode($body, null, null, $vars);
 
-        $env = new \Twig_Environment(null, array(
-            'strict_variables' => true,
-        ));
+        $env = new \Twig_Environment(null, array('strict_variables' => true));
         $compiler = new \Twig_Compiler($env);
 
         $this->assertEquals(
@@ -49,6 +44,7 @@ class TransNodeTest extends \PHPUnit_Framework_TestCase
 
         return sprintf('$this->getContext($context, "%s", true)', $name);
     }
+
     protected function getVariableGetterWithStrictCheck($name)
     {
         if (version_compare(phpversion(), '5.4.0RC1', '>=')) {

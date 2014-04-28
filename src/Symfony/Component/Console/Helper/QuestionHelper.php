@@ -28,11 +28,6 @@ class QuestionHelper extends Helper
     private static $shell;
     private static $stty;
 
-    public function __construct()
-    {
-        $this->inputStream = STDIN;
-    }
-
     /**
      * Asks a question to the user.
      *
@@ -114,6 +109,8 @@ class QuestionHelper extends Helper
      */
     public function doAsk(OutputInterface $output, Question $question)
     {
+        $inputStream = $this->inputStream ?: STDIN;
+
         $message = $question->getQuestion();
         if ($question instanceof ChoiceQuestion) {
             $width = max(array_map('strlen', array_keys($question->getChoices())));
@@ -135,7 +132,7 @@ class QuestionHelper extends Helper
             $ret = false;
             if ($question->isHidden()) {
                 try {
-                    $ret = trim($this->getHiddenResponse($output));
+                    $ret = trim($this->getHiddenResponse($output, $inputStream));
                 } catch (\RuntimeException $e) {
                     if (!$question->isHiddenFallback()) {
                         throw $e;
@@ -144,14 +141,14 @@ class QuestionHelper extends Helper
             }
 
             if (false === $ret) {
-                $ret = fgets($this->inputStream, 4096);
+                $ret = fgets($inputStream, 4096);
                 if (false === $ret) {
                     throw new \RuntimeException('Aborted');
                 }
                 $ret = trim($ret);
             }
         } else {
-            $ret = trim($this->autocomplete($output, $question));
+            $ret = trim($this->autocomplete($output, $question, $inputStream));
         }
 
         $ret = strlen($ret) > 0 ? $ret : $question->getDefault();
@@ -171,7 +168,7 @@ class QuestionHelper extends Helper
      *
      * @return string
      */
-    private function autocomplete(OutputInterface $output, Question $question)
+    private function autocomplete(OutputInterface $output, Question $question, $inputStream)
     {
         $autocomplete = $question->getAutocompleterValues();
         $ret = '';
@@ -190,8 +187,8 @@ class QuestionHelper extends Helper
         $output->getFormatter()->setStyle('hl', new OutputFormatterStyle('black', 'white'));
 
         // Read a keypress
-        while (!feof($this->inputStream)) {
-            $c = fread($this->inputStream, 1);
+        while (!feof($inputStream)) {
+            $c = fread($inputStream, 1);
 
             // Backspace Character
             if ("\177" === $c) {
@@ -212,7 +209,7 @@ class QuestionHelper extends Helper
                 // Pop the last character off the end of our string
                 $ret = substr($ret, 0, $i);
             } elseif ("\033" === $c) { // Did we read an escape sequence?
-                $c .= fread($this->inputStream, 2);
+                $c .= fread($inputStream, 2);
 
                 // A = Up Arrow. B = Down Arrow
                 if ('A' === $c[2] || 'B' === $c[2]) {
@@ -289,7 +286,7 @@ class QuestionHelper extends Helper
      *
      * @throws \RuntimeException In case the fallback is deactivated and the response cannot be hidden
      */
-    private function getHiddenResponse(OutputInterface $output)
+    private function getHiddenResponse(OutputInterface $output, $inputStream)
     {
         if (defined('PHP_WINDOWS_VERSION_BUILD')) {
             $exe = __DIR__.'/../Resources/bin/hiddeninput.exe';
@@ -315,7 +312,7 @@ class QuestionHelper extends Helper
             $sttyMode = shell_exec('stty -g');
 
             shell_exec('stty -echo');
-            $value = fgets($this->inputStream, 4096);
+            $value = fgets($inputStream, 4096);
             shell_exec(sprintf('stty %s', $sttyMode));
 
             if (false === $value) {

@@ -56,7 +56,7 @@ class SimpleFormAuthenticationListener extends AbstractAuthenticationListener
      * @throws \InvalidArgumentException In case no simple authenticator is provided
      * @throws InvalidArgumentException  In case an invalid CSRF token manager is passed
      */
-    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, HttpUtils $httpUtils, $providerKey, AuthenticationSuccessHandlerInterface $successHandler, AuthenticationFailureHandlerInterface $failureHandler, array $options = array(), LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, CsrfTokenManagerInterface $csrfTokenManager = null, SimpleFormAuthenticatorInterface $simpleAuthenticator = null)
+    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, HttpUtils $httpUtils, $providerKey, AuthenticationSuccessHandlerInterface $successHandler, AuthenticationFailureHandlerInterface $failureHandler, array $options = array(), LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, $csrfTokenManager = null, SimpleFormAuthenticatorInterface $simpleAuthenticator = null)
     {
         if (!$simpleAuthenticator) {
             throw new \InvalidArgumentException('Missing simple authenticator');

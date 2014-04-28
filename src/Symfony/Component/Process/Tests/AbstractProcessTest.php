@@ -285,7 +285,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         }
 
         $process = $this->getProcess('echo "foo" >> /dev/null && php -r "usleep(100000);"');
-        $process->setTTY(true);
+        $process->setTty(true);
         $process->start();
         $this->assertTrue($process->isRunning());
         $process->wait();
@@ -300,10 +300,22 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         }
 
         $process = $this->getProcess('echo "foo" >> /dev/null');
-        $process->setTTY(true);
+        $process->setTty(true);
         $process->run();
 
         $this->assertTrue($process->isSuccessful());
+    }
+
+    public function testTTYInWindowsEnvironment()
+    {
+        if (!defined('PHP_WINDOWS_VERSION_BUILD')) {
+            $this->markTestSkipped('This test is for Windows platform only');
+        }
+
+        $process = $this->getProcess('echo "foo" >> /dev/null');
+        $process->setTty(false);
+        $this->setExpectedException('Symfony\Component\Process\Exception\RuntimeException', 'TTY mode is not supported on Windows platform.');
+        $process->setTty(true);
     }
 
     public function testExitCodeTextIsNullWhenExitCodeIsNull()

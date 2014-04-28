@@ -7,6 +7,32 @@ in 2.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.4.0...v2.4.1
 
+* 2.4.4 (2014-04-27)
+
+ * bug #10789 [Console] Fixed the rendering of exceptions on HHVM with a terminal width (stof)
+ * bug #10773 [WebProfilerBundle ] Fixed an edge case on WDT loading (tucksaun)
+ * bug #10784 [Security] removed $csrfTokenManager type hint from SimpleFormAuthenticationListener constructor argument (choonge)
+ * bug #10763 [Process] Disable TTY mode on Windows platform (romainneutron)
+ * bug #10772 [Finder] Fix ignoring of unreadable dirs in the RecursiveDirectoryIterator (jakzal)
+ * bug #10757 [Process] Setting STDIN while running should not be possible (romainneutron)
+ * bug #10749 Fixed incompatibility of x509 auth with nginx (alcaeus)
+ * bug #10735 [Translation] [PluralizationRules] Little correction for case 'ar' (klyk50)
+ * bug #10720 [HttpFoundation] Fix DbalSessionHandler  (Tobion)
+ * bug #10721 [HttpFoundation] status 201 is allowed to have a body (Tobion)
+ * bug #10728 [Process] Fix #10681, process are failing on Windows Server 2003 (romainneutron)
+ * bug #10733 [DomCrawler] Textarea value should default to empty string instead of null. (Berdir)
+ * bug #10723 [Security] fix DBAL connection typehint (Tobion)
+ * bug #10715 [Debug] Fixed ClassNotFoundFatalErrorHandler on windows. (lyrixx)
+ * bug #10700 Fixes various inconsistencies in the code (fabpot)
+ * bug #10697 [Translation] Make IcuDatFileLoader/IcuResFileLoader::load invalid resource compatible with HHVM. (idn2104)
+ * bug #10652 [HttpFoundation] fix PDO session handler under high concurrency (Tobion)
+ * bug #10690 [Validator] Fix hack for nested Collection/All losing context (GromNaN)
+ * bug #10669 [Profiler] Prevent throwing fatal errors when searching timestamps or invalid dates (stloyd)
+ * bug #10670 [Templating] PhpEngine should propagate charset to its helpers (stloyd)
+ * bug #10665 [DependencyInjection] Fix ticket #10663 - Added setCharset method call to PHP templating engine (koku)
+ * bug #10654 Changed the typehint of the EsiFragmentRenderer to the interface (stof)
+ * bug #10649 [BrowserKit] Fix #10641 : BrowserKit is broken when using ip as host (romainneutron)
+
 * 2.4.3 (2014-04-04)
 
  * bug #10586 Fixes URL validator to accept single part urls (merk)

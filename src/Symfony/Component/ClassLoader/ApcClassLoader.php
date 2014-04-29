@@ -52,23 +52,23 @@ class ApcClassLoader
     protected $decorated;
 
     /**
-     * @var string Decorated Loader file path
+     * @var callable Decorated Loader
      */
-    private $decoratedLoaderPath;
+    private $decoratedLoader;
 
     /**
      * Constructor.
      *
-     * @param string $prefix      The APC namespace prefix to use.
-     * @param object $decorated   A class loader object that implements the findFile() method.
-     * @param string $decoratedLoaderPath Path where cached class loader is stored
+     * @param string   $prefix           The APC namespace prefix to use.
+     * @param object   $decorated        A class loader object that implements the findFile() method.
+     * @param callable $decoratedLoader  Callable that returns decorated loader
      *
      * @throws \RuntimeException
      * @throws \InvalidArgumentException
      *
      * @api
      */
-    public function __construct($prefix, $decorated = null, $decoratedLoaderPath = '')
+    public function __construct($prefix, $decorated = null, $decoratedLoader = null)
     {
         if (!extension_loaded('apc')) {
             throw new \RuntimeException('Unable to use ApcClassLoader as APC is not enabled.');
@@ -78,7 +78,7 @@ class ApcClassLoader
         }
 
         $this->decorated = $decorated;
-        $this->decoratedLoaderPath = $decoratedLoaderPath;
+        $this->decoratedLoader = $decoratedLoader;
         $this->prefix = $prefix;
     }
 
@@ -90,7 +90,12 @@ class ApcClassLoader
     {
         if (null === $this->decorated) {
 
-            $this->decorated = require $this->decoratedLoaderPath;
+            if(!is_callable($this->decoratedLoader)) {
+                throw new \InvalidArgumentException('Decorated loader should be callable');
+            }
+
+            $callable = $this->decoratedLoader;
+            $this->decorated = $callable();
 
             if (!method_exists($this->decorated, 'findFile')) {
                 throw new \InvalidArgumentException('The class finder must implement a "findFile" method.');

@@ -47,7 +47,7 @@ class FileValidator extends ConstraintValidator
                         } elseif (preg_match('/^\d++k$/', $constraint->maxSize)) {
                             $maxSize = $constraint->maxSize * 1024;
                         } elseif (preg_match('/^\d++M$/', $constraint->maxSize)) {
-                            $maxSize = $constraint->maxSize * 1048576;
+                            $maxSize = $constraint->maxSize * 1024 * 1024;
                         } else {
                             throw new ConstraintDefinitionException(sprintf('"%s" is not a valid maximum size', $constraint->maxSize));
                         }

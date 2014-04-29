@@ -90,7 +90,7 @@ class ApcClassLoader
     {
         if (null === $this->decorated) {
 
-            if(!is_callable($this->decoratedLoader)) {
+            if (!is_callable($this->decoratedLoader)) {
                 throw new \InvalidArgumentException('Decorated loader should be callable');
             }
 

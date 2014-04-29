@@ -166,7 +166,7 @@ class ErrorHandler
                 return true;
             }
 
-            if (PHP_VERSION_ID < 50400 && isset($context['GLOBALS'])) {
+            if (PHP_VERSION_ID < 50400 && isset($context['GLOBALS']) && is_array($context)) {
                 unset($context['GLOBALS']);
             }
 

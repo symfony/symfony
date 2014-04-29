@@ -112,18 +112,18 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
     {
         try {
             $handler = ErrorHandler::register(0);
-            $this->assertFalse($handler->handle(0, 'foo', 'foo.php', 12, 'foo'));
+            $this->assertFalse($handler->handle(0, 'foo', 'foo.php', 12, array()));
 
             restore_error_handler();
 
             $handler = ErrorHandler::register(3);
-            $this->assertFalse($handler->handle(4, 'foo', 'foo.php', 12, 'foo'));
+            $this->assertFalse($handler->handle(4, 'foo', 'foo.php', 12, array()));
 
             restore_error_handler();
 
             $handler = ErrorHandler::register(3);
             try {
-                $handler->handle(111, 'foo', 'foo.php', 12, 'foo');
+                $handler->handle(111, 'foo', 'foo.php', 12, array());
             } catch (\ErrorException $e) {
                 $this->assertSame('111: foo in foo.php line 12', $e->getMessage());
                 $this->assertSame(111, $e->getSeverity());
@@ -134,12 +134,12 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
             restore_error_handler();
 
             $handler = ErrorHandler::register(E_USER_DEPRECATED);
-            $this->assertTrue($handler->handle(E_USER_DEPRECATED, 'foo', 'foo.php', 12, 'foo'));
+            $this->assertTrue($handler->handle(E_USER_DEPRECATED, 'foo', 'foo.php', 12, array()));
 
             restore_error_handler();
 
             $handler = ErrorHandler::register(E_DEPRECATED);
-            $this->assertTrue($handler->handle(E_DEPRECATED, 'foo', 'foo.php', 12, 'foo'));
+            $this->assertTrue($handler->handle(E_DEPRECATED, 'foo', 'foo.php', 12, array()));
 
             restore_error_handler();
 
@@ -162,7 +162,7 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
 
             $handler = ErrorHandler::register(E_USER_DEPRECATED);
             $handler->setLogger($logger);
-            $handler->handle(E_USER_DEPRECATED, 'foo', 'foo.php', 12, 'foo');
+            $handler->handle(E_USER_DEPRECATED, 'foo', 'foo.php', 12, array());
 
             restore_error_handler();
 

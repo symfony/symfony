@@ -119,7 +119,7 @@ class FileValidator extends ConstraintValidator
             } elseif (preg_match('/^\d++k$/', $constraint->maxSize)) {
                 $size = round(filesize($path) / 1024, 2);
                 $limit = (int) $constraint->maxSize;
-                $suffix = 'kB';
+                $suffix = 'KB';
             } elseif (preg_match('/^\d++M$/', $constraint->maxSize)) {
                 $size = round(filesize($path) / (1024 * 1024), 2);
                 $limit = (int) $constraint->maxSize;

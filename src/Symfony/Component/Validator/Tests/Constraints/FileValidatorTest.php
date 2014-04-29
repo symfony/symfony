@@ -117,7 +117,7 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
             ->with('myMessage', array(
                 '{{ limit }}'   => '1',
                 '{{ size }}'    => '1.37',
-                '{{ suffix }}'  => 'kB',
+                '{{ suffix }}'  => 'KB',
                 '{{ file }}'    => $this->path,
         ));
 

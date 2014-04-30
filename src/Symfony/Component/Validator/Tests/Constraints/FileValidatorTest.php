@@ -119,7 +119,7 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
                 '{{ size }}'    => '1.37',
                 '{{ suffix }}'  => 'KB',
                 '{{ file }}'    => $this->path,
-        ));
+            ));
 
         $this->validator->validate($this->getFile($this->path), $constraint);
     }
@@ -155,7 +155,6 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
 
         $this->context->expects($this->never())->method('addViolation');
         $this->validator->validate($this->getFile($this->path), $constraint);
-
     }
 
     public function testMaxSizeMegaBytes()

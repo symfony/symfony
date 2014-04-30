@@ -13,6 +13,7 @@ namespace Symfony\Bundle\WebProfilerBundle\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Bundle\WebProfilerBundle\Controller\ProfilerController;
+use Symfony\Component\HttpKernel\Profiler\Profile;
 use Symfony\Component\HttpFoundation\Request;
 
 class ProfilerControllerTest extends TestCase
@@ -42,5 +43,35 @@ class ProfilerControllerTest extends TestCase
             // "empty" is also a valid empty token case, see https://github.com/symfony/symfony/issues/10806
             array('empty'),
         );
+    }
+
+    public function testReturns404onTokenNotFound()
+    {
+        $urlGenerator = $this->getMock('Symfony\Component\Routing\Generator\UrlGeneratorInterface');
+        $twig = $this->getMock('Twig_Environment');
+        $profiler = $this
+            ->getMockBuilder('Symfony\Component\HttpKernel\Profiler\Profiler')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $controller = new ProfilerController($urlGenerator, $profiler, $twig, array());
+
+        $profiler
+            ->expects($this->exactly(2))
+            ->method('loadProfile')
+            ->will($this->returnCallback(function ($token) {
+                if ('found' == $token) {
+                    return new Profile($token);
+                }
+
+                return;
+            }))
+        ;
+
+        $response = $controller->toolbarAction(Request::create('/_wdt/found'), 'found');
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $response = $controller->toolbarAction(Request::create('/_wdt/notFound'), 'notFound');
+        $this->assertEquals(404, $response->getStatusCode());
     }
 }

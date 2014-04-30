@@ -34,9 +34,9 @@ abstract class FileDumper implements DumperInterface
     /**
      * Make file backup before the dump.
      *
-     * @var boolean
+     * @var bool
      */
-    protected $backup = true;
+    private $backup = true;
 
     /**
      * Sets the template for the relative paths to files.
@@ -51,7 +51,7 @@ abstract class FileDumper implements DumperInterface
     /**
      * Sets backup flag.
      *
-     * @param boolean
+     * @param bool
      */
     public function setBackup($backup)
     {

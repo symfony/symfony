@@ -144,6 +144,9 @@ class ErrorHandler
             if (!class_exists('Symfony\Component\Debug\Exception\ContextErrorException')) {
                 require __DIR__.'/Exception/ContextErrorException.php';
             }
+            if (!class_exists('Symfony\Component\Debug\Exception\FlattenException')) {
+                require __DIR__.'/Exception/FlattenException.php';
+            }
 
             if (PHP_VERSION_ID < 50400 && isset($context['GLOBALS']) && is_array($context)) {
                 unset($context['GLOBALS']);

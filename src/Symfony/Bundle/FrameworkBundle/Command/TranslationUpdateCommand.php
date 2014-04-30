@@ -53,6 +53,10 @@ class TranslationUpdateCommand extends ContainerAwareCommand
                     'Should the update be done'
                 ),
                 new InputOption(
+                    'no-backup', null, InputOption::VALUE_NONE,
+                    'Should backup be disabled'
+                ),
+                new InputOption(
                     'clean', null, InputOption::VALUE_NONE,
                     'Should clean not found messages'
                 )
@@ -137,6 +141,10 @@ EOF
             if ($input->getOption('output-format') == 'xliff') {
                 $output->writeln('Xliff output version is <info>1.2</info>');
             }
+        }
+
+        if ($input->getOption('no-backup') === true) {
+            $writer->disableBackup();
         }
 
         // save the files

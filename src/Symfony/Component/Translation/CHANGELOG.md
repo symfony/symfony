@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * added relative file path template to the file dumpers
+ * added optional backup to the file dumpers
  * changed IcuResFileDumper to extend FileDumper
 
 2.3.0

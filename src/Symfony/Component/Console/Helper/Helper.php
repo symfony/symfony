@@ -100,7 +100,7 @@ abstract class Helper implements HelperInterface
         }
 
         if ($memory >= 1024) {
-            return sprintf('%d kB', $memory / 1024);
+            return sprintf('%d KB', $memory / 1024);
         }
 
         return sprintf('%d B', $memory);

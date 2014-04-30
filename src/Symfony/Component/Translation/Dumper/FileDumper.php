@@ -32,6 +32,13 @@ abstract class FileDumper implements DumperInterface
     protected $relativePathTemplate = '%domain%.%locale%.%extension%';
 
     /**
+     * Make file backup before the dump.
+     *
+     * @var boolean
+     */
+    protected $backup = true;
+
+    /**
      * Sets the template for the relative paths to files.
      *
      * @param string $relativePathTemplate A template for the relative paths to files
@@ -39,6 +46,16 @@ abstract class FileDumper implements DumperInterface
     public function setRelativePathTemplate($relativePathTemplate)
     {
         $this->relativePathTemplate = $relativePathTemplate;
+    }
+
+    /**
+     * Sets backup flag.
+     *
+     * @param boolean
+     */
+    public function setBackup($backup)
+    {
+        $this->backup = $backup;
     }
 
     /**
@@ -55,7 +72,9 @@ abstract class FileDumper implements DumperInterface
             // backup
             $fullpath = $options['path'].'/'.$this->getRelativePath($domain, $messages->getLocale());
             if (file_exists($fullpath)) {
-                copy($fullpath, $fullpath.'~');
+                if ($this->backup) {
+                    copy($fullpath, $fullpath.'~');
+                }
             } else {
                 $directory = dirname($fullpath);
                 if (!file_exists($directory) && !@mkdir($directory, 0777, true)) {

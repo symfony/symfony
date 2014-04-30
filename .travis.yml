@@ -23,6 +23,10 @@ before_script:
     - sh -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm-nightly" ]; then echo "extension = memcache.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi;'
     - sudo locale-gen fr_FR.UTF-8 && sudo update-locale
     - COMPOSER_ROOT_VERSION=dev-master composer --prefer-source --dev install
+    - composer global require phpunit/phpunit:~4.0 --prefer-source
+    - phpunitlocation=`which phpunit`
+    - rm $phpunitlocation
+    - sudo ln -s ~/.composer/vendor/bin/phpunit $phpunitlocation
 
 script:
     - ls -d src/Symfony/*/* | parallel --gnu --keep-order 'echo "Running {} tests"; phpunit --exclude-group tty,benchmark {};' || exit 1

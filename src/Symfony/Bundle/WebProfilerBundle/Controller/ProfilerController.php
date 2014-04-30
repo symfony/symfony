@@ -232,7 +232,7 @@ class ProfilerController
             $session->getFlashBag()->setAll($session->getFlashBag()->peekAll());
         }
 
-        if (null === $token) {
+        if ('empty' === $token || null === $token) {
             return new Response('', 200, array('Content-Type' => 'text/html'));
         }
 

@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-04-30T12:55:10Z
+
+doing a composer self-update should be done before the call to ``composer install``, and then you won't need to dump the autoloader again.
+
+And anyway, given Travis rebuilt their VMs recently, is it needed to update it for each build ?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-04-30T12:58:23Z
+
+wouldn't it be better to name it ``SYMFONY_PHP_COMPAT`` as it is in Symfony ?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-04-30T12:58:50Z
+
+are those really needed ? We won't support 5.2 and older anyway

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Finder;
 
 use Symfony\Component\Finder\Adapter\AdapterCollection;
+use Symfony\Component\Finder\Adapter\AdapterCollectionInterface;
 use Symfony\Component\Finder\Adapter\AdapterInterface;
 use Symfony\Component\Finder\Adapter\GnuFindAdapter;
 use Symfony\Component\Finder\Adapter\BsdFindAdapter;
@@ -67,7 +68,7 @@ class Finder implements \IteratorAggregate, \Countable
     {
         $this->ignore = static::IGNORE_VCS_FILES | static::IGNORE_DOT_FILES;
 
-        $this->adapters = new AdapterCollection();
+        $this->adapters = $this->createAdapterCollection();
 
         $this
             ->addAdapter(new GnuFindAdapter())
@@ -87,6 +88,16 @@ class Finder implements \IteratorAggregate, \Countable
     public static function create()
     {
         return new static();
+    }
+
+    /**
+     * Returns a new AdapterCollectionInterface instance.
+     *
+     * @return AdapterCollectionInterface
+     */
+    protected function createAdapterCollection()
+    {
+        return new AdapterCollection();
     }
 
     /**

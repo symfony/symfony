@@ -234,13 +234,13 @@ class PropertyAccessor implements PropertyAccessorInterface
                     $message = sprintf('Cannot read property "%s".', $property);
                     $keys = 'not available';
                     if (is_array($objectOrArray)) {
-                        $keys = '"' . print_r(array_keys($objectOrArray), true) . '"';
+                        $keys = '"'.print_r(array_keys($objectOrArray), true).'"';
                     } elseif ($objectOrArray instanceof \Traversable) {
-                        $list = [];
+                        $list = array();
                         foreach ($objectOrArray as $key => &$value) {
                             $list[] = $key;
                         }
-                        $keys = '"' . print_r($list, true) . '"';
+                        $keys = '"'.print_r($list, true).'"';
                     }
                     throw new NoSuchIndexException(sprintf('Cannot read property "%s". Available properties are %s', $property, $keys));
                 }

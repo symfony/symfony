@@ -10,7 +10,6 @@
  */
 
 namespace Symfony\Component\Finder\Adapter;
-use Symfony\Component\Validator\Constraints\All;
 
 /**
  * Collection to store prioritized Finder adapters.
@@ -80,7 +79,7 @@ class AdapterCollection implements AdapterCollectionInterface
 
     /**
      * Sort adapters by priority.
-     * 
+     *
      * The highest priority wins.
      *
      * @return AdapterCollection The current AdapterCollection instance
@@ -100,7 +99,7 @@ class AdapterCollection implements AdapterCollectionInterface
 
     /**
      * Unselects all adapters.
-     * 
+     *
      * @return AdapterCollection The current AdapterCollection instance
      */
     private function resetAdapterSelection()

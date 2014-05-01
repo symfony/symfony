@@ -102,22 +102,42 @@ class FormTypeTest extends BaseTypeTest
 
     public function testNonReadOnlyFormWithReadOnlyParentIsReadOnly()
     {
+        $view = $this->factory->createNamedBuilder('parent', 'form', null, array('attr' => array('readonly' => true)))
+            ->add('child', 'form')
+            ->getForm()
+            ->createView();
+
+        $this->assertTrue($view['child']->vars['attr']['readonly']);
+    }
+
+    public function testNonReadOnlyFormWithReadOnlyParentBCIsReadOnly()
+    {
         $view = $this->factory->createNamedBuilder('parent', 'form', null, array('read_only' => true))
             ->add('child', 'form')
             ->getForm()
             ->createView();
 
-        $this->assertTrue($view['child']->vars['read_only']);
+        $this->assertTrue($view['child']->vars['attr']['readonly']);
     }
 
     public function testReadOnlyFormWithNonReadOnlyParentIsReadOnly()
     {
         $view = $this->factory->createNamedBuilder('parent', 'form')
-            ->add('child', 'form', array('read_only' => true))
+            ->add('child', 'form', array('attr' => array('readonly' => true)))
             ->getForm()
             ->createView();
 
-        $this->assertTrue($view['child']->vars['read_only']);
+        $this->assertTrue($view['child']->vars['attr']['readonly']);
+    }
+
+    public function testReadOnlyFormWithNonReadOnlyParentBCIsReadOnly()
+    {
+        $view = $this->factory->createNamedBuilder('parent', 'form')
+            ->add('child', 'form', array('readonly' => true))
+            ->getForm()
+            ->createView();
+
+        $this->assertTrue($view['child']->vars['attr']['readonly']);
     }
 
     public function testNonReadOnlyFormWithNonReadOnlyParentIsNotReadOnly()
@@ -127,7 +147,7 @@ class FormTypeTest extends BaseTypeTest
                 ->getForm()
                 ->createView();
 
-        $this->assertFalse($view['child']->vars['read_only']);
+        $this->assertFalse($view['child']->vars['attr']['readonly']);
     }
 
     public function testPassMaxLengthToView()

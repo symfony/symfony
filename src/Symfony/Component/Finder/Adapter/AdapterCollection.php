@@ -80,7 +80,7 @@ class AdapterCollection implements AdapterCollectionInterface
     /**
      * Sort adapters by priority.
      *
-     * The highest priority wins.
+     * The selected adapter wins, otherwise the highest priority wins.
      *
      * @return AdapterCollection The current AdapterCollection instance
      */

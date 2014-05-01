@@ -234,6 +234,12 @@ class PropertyAccessor implements PropertyAccessorInterface
                     $message = sprintf('Cannot read property "%s".', $property);
                     if (is_array($objectOrArray)) {
                         $message .= sprintf(' Available properties are "%s"', print_r(array_keys($objectOrArray), true));
+                    } elseif ($objectOrArray instanceof \Traversable) {
+                        $keys = [];
+                        foreach ($objectOrArray as $key => &$value) {
+                            $keys[] = $key;
+                        }
+                        $message .= sprintf(' Available properties are "%s"', print_r($keys, true));
                     }
                     throw new NoSuchIndexException($message);
                 }

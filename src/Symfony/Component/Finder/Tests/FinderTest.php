@@ -581,24 +581,6 @@ class FinderTest extends Iterator\RealIteratorTestCase
         }
     }
 
-    public function testAdaptersOrdering()
-    {
-        $finder = Finder::create()
-            ->removeAdapters()
-            ->addAdapter(new FakeAdapter\NamedAdapter('a'), 0)
-            ->addAdapter(new FakeAdapter\NamedAdapter('b'), -50)
-            ->addAdapter(new FakeAdapter\NamedAdapter('c'), 50)
-            ->addAdapter(new FakeAdapter\NamedAdapter('d'), -25)
-            ->addAdapter(new FakeAdapter\NamedAdapter('e'), 25);
-
-        $this->assertEquals(
-            array('c', 'e', 'a', 'd', 'b'),
-            array_map(function (Adapter\AdapterInterface $adapter) {
-                return $adapter->getName();
-            }, $finder->getAdapters())
-        );
-    }
-
     public function testAdaptersChaining()
     {
         $iterator  = new \ArrayIterator(array());

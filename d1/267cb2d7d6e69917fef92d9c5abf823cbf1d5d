@@ -1,0 +1,65 @@
+---------------------------------------------------------------------------
+
+by stloyd at 2014-04-09T13:48:59Z
+
+This should go into `2.3` as this is bugfix.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-04-09T14:32:18Z
+
+I also once noticed this problem. But
+
+> In the International System of Quantities, the kilobyte (symbol kB) is 1000 bytes. The binary representation of 1024 bytes typically uses the symbol KB, using an upper-case K. Informally sometimes the B is dropped, making K generally understood as 1024 bytes; however, this usage is not standardized and may be found used arbitrarily.
+http://en.wikipedia.org/wiki/Kilobyte
+
+So since we use `kB` in the validation message one can argue it's correct at the moment.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-04-10T07:42:38Z
+
+@Tobion all systems are using base 2 for their file sizes (although HDD are marketed using base 10 to have bigger numbers), so most people are expecting base2 when seeing file sizes as they are accustomated to it (even without knowing it is base2)
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-04-10T11:31:35Z
+
+Sure but we need to change the unit symbol then.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-04-28T09:59:36Z
+
+@snoob Can you finish this one by applying the suggestion made by @Tobion? Thanks.
+
+---------------------------------------------------------------------------
+
+by snoob at 2014-04-29T11:28:20Z
+
+@fabpot Done
+
+There are 2 "kB" suffixes remaining in the classes Symfony\Component\HttpFoundation\File\UploadedFile and Symfony\Component\Console\Helper\Helper. The size seems to be on base 2 so maybe we should change these suffixes there too.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-04-29T11:48:18Z
+
+@snoob Thanks, can you change the 2 other ones so that we are consistent everywhere in the framework (you can do so in this PR)?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-04-29T17:13:01Z
+
+I think we need to change even more and use the binary prefixes of IEC.
+But since currently $constraint->maxSize reads SI prefixes (`M` and `k`), it should also validate against SI prefixes as it has been. If we want to support base 2, then the constraint should also allow binary prefixes (`Ki`, `Mi`) and validate them accordingly. This way developers can choose which style they prefer and it avoids BC breaks.
+If we change the validation as done at the moment, it just adds to the confusion.
+
+> Accordingly, the SI prefixes should only be used in the decimal sense, even when referring to data storage capacities: kilobyte and megabyte denote one thousand bytes and one million bytes respectively (consistent with SI), while new terms such as kibibyte, mebibyte and gibibyte, having the symbols KiB, MiB, and GiB, denote 1024bytes, 1048576bytes, and 1073741824bytes, respectively.
+http://en.wikipedia.org/wiki/Binary_prefixes
+
+---------------------------------------------------------------------------
+
+by snoob at 2014-04-30T13:59:28Z
+
+@fabpot : Done

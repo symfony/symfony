@@ -72,7 +72,7 @@ class FormType extends BaseType
         parent::buildView($view, $form, $options);
 
         $name = $form->getName();
-        $readOnly = $options['read_only'];
+        $readOnly = isset($options['attr']['readonly']) ? $options['attr']['readonly'] : false;
 
         if ($view->parent) {
             if ('' === $name) {
@@ -81,12 +81,12 @@ class FormType extends BaseType
 
             // Complex fields are read-only if they themselves or their parents are.
             if (!$readOnly) {
-                $readOnly = $view->parent->vars['read_only'];
+                $readOnly = isset($view->parent->vars['attr']['readonly']) ? $view->parent->vars['attr']['readonly'] : false;
             }
         }
 
         $view->vars = array_replace($view->vars, array(
-            'read_only'  => $readOnly,
+            'read_only'  => $readOnly, // Deprecated
             'errors'     => $form->getErrors(),
             'valid'      => $form->isSubmitted() ? $form->isValid() : true,
             'value'      => $form->getViewData(),
@@ -170,7 +170,7 @@ class FormType extends BaseType
             'data',
         ));
 
-        // BC clause for the "max_length" and "pattern" option
+        // BC clause for the "max_length", "pattern" and "read_only" options
         // Add these values to the "attr" option instead
         $defaultAttr = function (Options $options) {
             $attributes = array();
@@ -181,6 +181,10 @@ class FormType extends BaseType
 
             if (null !== $options['pattern']) {
                 $attributes['pattern'] = $options['pattern'];
+            }
+
+            if (false !== $options['read_only']) {
+                $attributes['readonly'] = $options['read_only'];
             }
 
             return $attributes;

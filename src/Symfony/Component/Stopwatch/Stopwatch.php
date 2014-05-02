@@ -24,13 +24,18 @@ class Stopwatch
     private $sections;
 
     /**
-     * @var array
+     * @var Section[]
      */
     private $activeSections;
 
     public function __construct()
     {
         $this->sections = $this->activeSections = array('__root__' => new Section('__root__'));
+    }
+
+    public function getSections()
+    {
+        return $this->sections;
     }
 
     /**

@@ -368,7 +368,7 @@ class Form extends Link implements \ArrayAccess
     protected function setNode(\DOMNode $node)
     {
         $this->button = $node;
-        if ('button' == $node->nodeName || ('input' == $node->nodeName && in_array($node->getAttribute('type'), array('submit', 'button', 'image')))) {
+        if ('button' == $node->nodeName || ('input' == $node->nodeName && in_array(strtolower($node->getAttribute('type')), array('submit', 'button', 'image')))) {
             if ($node->hasAttribute('form')) {
                 // if the node has the HTML5-compliant 'form' attribute, use it
                 $formId = $node->getAttribute('form');
@@ -410,7 +410,7 @@ class Form extends Link implements \ArrayAccess
 
         // add submitted button if it has a valid name
         if ('form' !== $this->button->nodeName && $this->button->hasAttribute('name') && $this->button->getAttribute('name')) {
-            if ('input' == $this->button->nodeName && 'image' == $this->button->getAttribute('type')) {
+            if ('input' == $this->button->nodeName && 'image' == strtolower($this->button->getAttribute('type'))) {
                 $name = $this->button->getAttribute('name');
                 $this->button->setAttribute('value', '0');
 
@@ -461,17 +461,17 @@ class Form extends Link implements \ArrayAccess
         }
 
         $nodeName = $node->nodeName;
-        if ('select' == $nodeName || 'input' == $nodeName && 'checkbox' == $node->getAttribute('type')) {
+        if ('select' == $nodeName || 'input' == $nodeName && 'checkbox' == strtolower($node->getAttribute('type'))) {
             $this->set(new Field\ChoiceFormField($node));
-        } elseif ('input' == $nodeName && 'radio' == $node->getAttribute('type')) {
+        } elseif ('input' == $nodeName && 'radio' == strtolower($node->getAttribute('type'))) {
             if ($this->has($node->getAttribute('name'))) {
                 $this->get($node->getAttribute('name'))->addChoice($node);
             } else {
                 $this->set(new Field\ChoiceFormField($node));
             }
-        } elseif ('input' == $nodeName && 'file' == $node->getAttribute('type')) {
+        } elseif ('input' == $nodeName && 'file' == strtolower($node->getAttribute('type'))) {
             $this->set(new Field\FileFormField($node));
-        } elseif ('input' == $nodeName && !in_array($node->getAttribute('type'), array('submit', 'button', 'image'))) {
+        } elseif ('input' == $nodeName && !in_array(strtolower($node->getAttribute('type')), array('submit', 'button', 'image'))) {
             $this->set(new Field\InputFormField($node));
         } elseif ('textarea' == $nodeName) {
             $this->set(new Field\TextareaFormField($node));

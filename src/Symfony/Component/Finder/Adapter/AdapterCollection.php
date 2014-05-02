@@ -112,4 +112,4 @@ class AdapterCollection implements AdapterCollectionInterface
 
         return $this;
     }
-} 
+}

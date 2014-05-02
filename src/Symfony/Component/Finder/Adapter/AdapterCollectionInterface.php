@@ -59,4 +59,4 @@ interface AdapterCollectionInterface
      * @return AdapterCollection The current AdapterCollection instance
      */
     public function setAdapter($name);
-} 
+}

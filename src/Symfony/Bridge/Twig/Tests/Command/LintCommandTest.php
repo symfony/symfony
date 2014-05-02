@@ -57,6 +57,17 @@ class LintCommandTest extends \PHPUnit_Framework_TestCase
         $ret = $tester->execute(array('filename' => $filename));
     }
 
+    public function testLintFileCompileTimeException()
+    {
+        $tester = $this->createCommandTester();
+        $filename = $this->createFile("{{ 2|number_format(2, decimal_point='.', ',') }}");
+
+        $ret = $tester->execute(array('filename' => $filename));
+
+        $this->assertEquals(1, $ret, 'Returns 1 in case of error');
+        $this->assertRegExp('/^KO in /', $tester->getDisplay());
+    }
+
     /**
      * @return CommandTester
      */

@@ -99,7 +99,7 @@ EOF
                 $template .= fread(STDIN, 1024);
             }
 
-            return $this->display($input, $output, array($this->validate($twig, $template)));
+            return $this->display($input, $output, array($this->validate($twig, $template, uniqid('sf_'))));
         }
 
         $filesInfo = array();
@@ -121,11 +121,17 @@ EOF
         throw new \RuntimeException(sprintf('File or directory "%s" is not readable', $filename));
     }
 
-    private function validate(\Twig_Environment $twig, $template, $file = null)
+    private function validate(\Twig_Environment $twig, $template, $file)
     {
+        $realLoader = $twig->getLoader();
         try {
-            $twig->parse($twig->tokenize($template, $file ? (string) $file : null));
+            $temporaryLoader = new \Twig_Loader_Array(array((string) $file => $template));
+            $twig->setLoader($temporaryLoader);
+            $nodeTree = $twig->parse($twig->tokenize($template, (string) $file));
+            $twig->compile($nodeTree);
+            $twig->setLoader($realLoader);
         } catch (\Twig_Error $e) {
+            $twig->setLoader($realLoader);
             return array('template' => $template, 'file' => $file, 'valid' => false, 'exception' => $e);
         }
 

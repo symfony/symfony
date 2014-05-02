@@ -206,7 +206,7 @@ class ChoiceFormField extends FormField
             throw new \LogicException(sprintf('A ChoiceFormField can only be created from an input or select tag (%s given).', $this->node->nodeName));
         }
 
-        if ('input' == $this->node->nodeName && 'checkbox' != $this->node->getAttribute('type') && 'radio' != $this->node->getAttribute('type')) {
+        if ('input' == $this->node->nodeName && 'checkbox' != strtolower($this->node->getAttribute('type')) && 'radio' != strtolower($this->node->getAttribute('type'))) {
             throw new \LogicException(sprintf('A ChoiceFormField can only be created from an input tag with a type of checkbox or radio (given type is %s).', $this->node->getAttribute('type')));
         }
 
@@ -215,7 +215,7 @@ class ChoiceFormField extends FormField
         $this->multiple = false;
 
         if ('input' == $this->node->nodeName) {
-            $this->type = $this->node->getAttribute('type');
+            $this->type = strtolower($this->node->getAttribute('type'));
             $optionValue = $this->buildOptionValue($this->node);
             $this->options[] = $optionValue;
 

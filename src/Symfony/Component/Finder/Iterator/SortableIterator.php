@@ -43,7 +43,13 @@ class SortableIterator implements \IteratorAggregate
             $this->sort = function ($a, $b) {
 
                 //strcmp returns < 0 if str1 is less than str2; > 0 if str1 is greater than str2, and 0 if they are equal.
-                return strcmp($a->getRealpath(), $b->getRealpath()) < 0 ? -1 : 1;
+                $result = strcmp($a->getRealpath(), $b->getRealpath());
+
+                if ($result == 0) {
+                    return 0;
+                }
+
+                return $result < 0 ? -1 : 1;
             };
         } elseif (self::SORT_BY_TYPE === $sort) {
             $this->sort = function ($a, $b) {
@@ -54,7 +60,13 @@ class SortableIterator implements \IteratorAggregate
                 }
 
                 //strcmp returns < 0 if str1 is less than str2; > 0 if str1 is greater than str2, and 0 if they are equal.
-                return strcmp($a->getRealpath(), $b->getRealpath()) < 0 ? -1 : 1;
+                $result = strcmp($a->getRealpath(), $b->getRealpath()) < 0 ? -1 : 1;
+
+                if ($result == 0) {
+                    return 0;
+                }
+
+                return $result < 0 ? -1 : 1;
             };
         } elseif (self::SORT_BY_ACCESSED_TIME === $sort) {
             $this->sort = function ($a, $b) {

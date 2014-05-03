@@ -30,8 +30,8 @@ class SortableIterator implements \IteratorAggregate
     /**
      * Constructor.
      *
-     * @param \Traversable     $iterator The Iterator to filter
-     * @param int|callback     $sort     The sort type (SORT_BY_NAME, SORT_BY_TYPE, or a PHP callback)
+     * @param \Traversable $iterator The Iterator to filter
+     * @param int|callback $sort     The sort type (SORT_BY_NAME, SORT_BY_TYPE, or a PHP callback)
      *
      * @throws \InvalidArgumentException
      */
@@ -58,21 +58,23 @@ class SortableIterator implements \IteratorAggregate
             };
         } elseif (self::SORT_BY_ACCESSED_TIME === $sort) {
             $this->sort = function ($a, $b) {
-                if($a->getATime() === $b->getATime()){
+                if ($a->getATime() === $b->getATime()) {
                     return 0;
                 };
+
                 return ($a->getATime() > $b->getATime())  < 0 ? -1 : 1;
             };
         } elseif (self::SORT_BY_CHANGED_TIME === $sort) {
             $this->sort = function ($a, $b) {
-                if(($a->getCTime() === $b->getCTime())){
+                if (($a->getCTime() === $b->getCTime())) {
                     return 0;
                 }
+
                 return ($a->getCTime() > $b->getCTime()) < 0 ? -1 : 1;
             };
         } elseif (self::SORT_BY_MODIFIED_TIME === $sort) {
             $this->sort = function ($a, $b) {
-                if($a->getMTime() === $b->getMTime()){
+                if ($a->getMTime() === $b->getMTime()) {
                     return 0;
                 }
 

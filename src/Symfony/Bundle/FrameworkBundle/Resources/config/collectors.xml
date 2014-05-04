@@ -29,6 +29,10 @@
             <tag name="data_collector" template="@WebProfiler/Collector/request.html.twig" id="request" priority="255" />
         </service>
 
+        <service id="data_collector.ajax" class="%data_collector.ajax.class%" public="false">
+            <tag name="data_collector" template="@WebProfiler/Collector/ajax.html.twig" id="ajax" priority="255" />
+        </service>
+
         <service id="data_collector.exception" class="%data_collector.exception.class%" public="false">
             <tag name="data_collector" template="@WebProfiler/Collector/exception.html.twig" id="exception" priority="255" />
         </service>
@@ -64,10 +68,6 @@
         <service id="data_collector.form" class="%data_collector.form.class%">
             <tag name="data_collector" template="@WebProfiler/Collector/form.html.twig" id="form" priority="255" />
             <argument type="service" id="data_collector.form.extractor" />
-        </service>
-
-        <service id="data_collector.ajax" class="%data_collector.ajax.class%" public="false">
-            <tag name="data_collector" template="@WebProfiler/Collector/ajax.html.twig" id="ajax" priority="255" />
         </service>
     </services>
 </container>

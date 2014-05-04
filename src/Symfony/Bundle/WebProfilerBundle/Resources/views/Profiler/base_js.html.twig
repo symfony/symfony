@@ -117,7 +117,7 @@
                                 requestState = 'loading';
                                 state = 'loading'
                             }
-                            li.className = 'sf-ajax-request-' + requestState;
+                            li.className = 'sf-ajax-request sf-ajax-request-' + requestState;
                             ul.appendChild(fragment.cloneNode(true));
                         }
 
@@ -129,7 +129,17 @@
                 }
 
                 requestCounter[0].innerText = requestStack.length;
-                requestCounter[0].className = 'sf-toolbar-ajax-requests sf-ajax-request-' + state;
+
+                var className = 'sf-toolbar-ajax-requests sf-toolbar-status';
+                if (state == 'ok') {
+                    className += ' sf-toolbar-status-green';
+                } else if (state == 'error') {
+                    className += ' sf-toolbar-status-red';
+                } else {
+                    className += ' sf-ajax-request-loading';
+                }
+
+                requestCounter[0].className = className;
             };
 
         var proxied = XMLHttpRequest.prototype.open;

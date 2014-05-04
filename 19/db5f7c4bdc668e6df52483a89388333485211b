@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by maxromanovsky at 2014-05-02T18:27:38Z
+
+I've also changed the behavior of this command when template content is passed using `STDIN`. However, I don't know how to properly cover this functionality with unit tests. IMHO input stream should be a part of the `InputInterface`. In this case it could be used as a call to an interface method instead of direct manipulation with `STDIN`.
+
+---------------------------------------------------------------------------
+
+by maxromanovsky at 2014-05-03T09:56:18Z
+
+@stof Thank you for your advice.  I've changed the implementation to use `Twig_Loader_Array`

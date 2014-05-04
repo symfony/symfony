@@ -82,7 +82,7 @@
                     var rows = document.createDocumentFragment();
 
                     if (requestStack.length) {
-                        for(var i in requestStack) {
+                        for (var i = 0; i < requestStack.length; i++) {
                             var request = requestStack[i];
 
                             var row = document.createElement('tr');

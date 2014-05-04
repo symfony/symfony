@@ -164,7 +164,7 @@
             var self = this;
 
             /* prevent logging AJAX calls to static and inline files, like templates */
-            if (url.substr(0, 1) === '/' && !url.substr(0, 8) !== '/bundles') {
+            if (url.substr(0, 1) === '/' && url.substr(0, 8) !== '/bundles') {
                 var stackElement = {
                     loading: true,
                     error: false,

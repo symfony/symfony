@@ -75,38 +75,53 @@
                     return;
                 }
 
-                var list = document.getElementsByClassName('sf-toolbar-ajax-request-list');
+                var tbody = document.getElementsByClassName('sf-toolbar-ajax-request-list');
                 var state = 'ok';
-                if (list.length) {
+                if (tbody.length) {
+
+                    var rows = document.createDocumentFragment();
 
                     if (requestStack.length) {
-                        var ul = document.createElement('ul');
                         for(var i in requestStack) {
                             var request = requestStack[i];
 
-                            var fragment = document.createDocumentFragment();
-                            var li = document.createElement('li');
-                            fragment.appendChild(li);
+                            var row = document.createElement('tr');
+                            rows.appendChild(row);
 
-                            var pathSpan = document.createElement('span');
-                            pathSpan.className = 'sf-ajax-request-url';
-                            pathSpan.innerHTML = request.method + " " + request.url;
-                            li.appendChild(pathSpan);
+                            var methodCell = document.createElement('td');
+                            methodCell.innerHTML = request.method;
+                            row.appendChild(methodCell);
+
+                            var pathCell = document.createElement('td');
+                            pathCell.className = 'sf-ajax-request-url';
+                            pathCell.innerHTML = request.url;
+                            pathCell.setAttribute('title', request.url);
+                            row.appendChild(pathCell);
+
+                            var durationCell = document.createElement('td');
+                            durationCell.className = 'sf-ajax-request-duration';
 
                             if (request.duration) {
-                                li.appendChild(document.createTextNode(' '));
-                                var durationSpan = document.createElement('time');
-                                durationSpan.innerText = request.duration + "ms";
-                                li.appendChild(durationSpan);
+                                durationCell.innerText = request.duration + "ms";
+                            } else {
+                                durationCell.innerText = '-';
                             }
+                            row.appendChild(durationCell);
+
+                            row.appendChild(document.createTextNode(' '));
+                            var profilerCell = document.createElement('td');
 
                             if (request.profilerUrl) {
-                                li.appendChild(document.createTextNode(' '));
-                                var profilerA = document.createElement('a');
-                                profilerA.setAttribute('href', request.profilerUrl);
-                                profilerA.innerText = 'profiler';
-                                li.appendChild(profilerA);
+                                var profilerLink = document.createElement('a');
+                                profilerLink.setAttribute('href', request.profilerUrl);
+                                profilerLink.innerText = request.profile;
+                                profilerCell.appendChild(profilerLink);
+                            } else {
+                                profilerCell.innerText = 'n/a';
                             }
+
+                            row.appendChild(profilerCell);
+
                             var requestState = 'ok';
                             if (request.error) {
                                 requestState = 'error';
@@ -117,14 +132,15 @@
                                 requestState = 'loading';
                                 state = 'loading'
                             }
-                            li.className = 'sf-ajax-request sf-ajax-request-' + requestState;
-                            ul.appendChild(fragment.cloneNode(true));
+                            row.className = 'sf-ajax-request sf-ajax-request-' + requestState;
                         }
 
-                        list[0].innerHTML = '';
-                        list[0].appendChild(ul);
+                        while (tbody[0].firstChild) {
+                            tbody[0].removeChild(tbody[0].firstChild);
+                        }
+                        tbody[0].appendChild(rows);
                     } else {
-                        list[0].innerText = "No AJAX requests fired yet.";
+                        tbody[0].innerText = "No AJAX requests fired yet.";
                     }
                 }
 
@@ -164,6 +180,7 @@
                         stackElement.duration = new Date() - stackElement.start;
                         stackElement.loading = false;
                         stackElement.error = self.status < 200 || self.status >= 400;
+                        stackElement.profile = self.getResponseHeader("X-Debug-Token");
                         stackElement.profilerUrl = self.getResponseHeader("X-Debug-Token-Link");
 
                         Sfjs.renderAjaxRequests();

@@ -10,7 +10,19 @@
     {% set text %}
         <div class="sf-toolbar-info-piece">
             <b>AJAX requests</b>
-            <div class="sf-toolbar-ajax-request-list"></div>
+            <div>
+                <table class="sf-toolbar-ajax-requests">
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>URL</th>
+                            <th>Time</th>
+                            <th>Profile</th>
+                        </tr>
+                    </thead>
+                    <tbody class="sf-toolbar-ajax-request-list"></tbody>
+                </table>
+            </div>
         </div>
     {% endset %}
     {% include '@WebProfiler/Profiler/toolbar_item.html.twig' with { 'link': false } %}

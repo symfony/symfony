@@ -89,6 +89,7 @@
                             fragment.appendChild(li);
 
                             var pathSpan = document.createElement('span');
+                            pathSpan.className = 'sf-ajax-request-url';
                             pathSpan.innerHTML = request.method + " " + request.url;
                             li.appendChild(pathSpan);
 

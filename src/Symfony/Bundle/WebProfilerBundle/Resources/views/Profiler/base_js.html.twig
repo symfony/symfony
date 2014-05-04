@@ -190,7 +190,7 @@
                 Sfjs.renderAjaxRequests();
             }
 
-            proxied.apply(this, [].slice.call(arguments));
+            proxied.apply(this, Array.prototype.slice.call(arguments));
         };
 
         return {

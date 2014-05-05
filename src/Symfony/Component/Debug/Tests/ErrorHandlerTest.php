@@ -134,12 +134,12 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
             restore_error_handler();
 
             $handler = ErrorHandler::register(E_USER_DEPRECATED);
-            $this->assertTrue($handler->handle(E_USER_DEPRECATED, 'foo', 'foo.php', 12, array()));
+            $this->assertFalse($handler->handle(E_USER_DEPRECATED, 'foo', 'foo.php', 12, array()));
 
             restore_error_handler();
 
             $handler = ErrorHandler::register(E_DEPRECATED);
-            $this->assertTrue($handler->handle(E_DEPRECATED, 'foo', 'foo.php', 12, array()));
+            $this->assertFalse($handler->handle(E_DEPRECATED, 'foo', 'foo.php', 12, array()));
 
             restore_error_handler();
 
@@ -162,7 +162,7 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
 
             $handler = ErrorHandler::register(E_USER_DEPRECATED);
             $handler->setLogger($logger);
-            $handler->handle(E_USER_DEPRECATED, 'foo', 'foo.php', 12, array());
+            $this->assertTrue($handler->handle(E_USER_DEPRECATED, 'foo', 'foo.php', 12, array()));
 
             restore_error_handler();
 

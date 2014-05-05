@@ -154,12 +154,10 @@ class ErrorHandler
 
                     self::$loggers['deprecation']->warning($message, array('type' => self::TYPE_DEPRECATION, 'stack' => $stack));
                 }
+
+                return true;
             }
-
-            return true;
-        }
-
-        if ($this->displayErrors && error_reporting() & $level && $this->level & $level) {
+        } elseif ($this->displayErrors && error_reporting() & $level && $this->level & $level) {
             if (self::$stackedErrorLevels) {
                 self::$stackedErrors[] = func_get_args();
 
@@ -264,22 +262,35 @@ class ErrorHandler
         gc_collect_cycles();
         $error = error_get_last();
 
-        while (self::$stackedErrorLevels) {
-            static::unstackErrors();
+        // get current exception handler
+        $exceptionHandler = set_exception_handler('var_dump');
+        restore_exception_handler();
+
+        try {
+            while (self::$stackedErrorLevels) {
+                static::unstackErrors();
+            }
+        } catch (\Exception $exception) {
+            if ($exceptionHandler) {
+                call_user_func($exceptionHandler, $exception);
+
+                return;
+            }
+
+            if ($this->displayErrors) {
+                ini_set('display_errors', 1);
+            }
+
+            throw $exception;
         }
 
-        if (null === $error) {
-            return;
-        }
-
-        $type = $error['type'];
-        if (0 === $this->level || !in_array($type, array(E_ERROR, E_CORE_ERROR, E_COMPILE_ERROR, E_PARSE))) {
+        if (!$error || !$this->level || !in_array($error['type'], array(E_ERROR, E_CORE_ERROR, E_COMPILE_ERROR, E_PARSE))) {
             return;
         }
 
         if (isset(self::$loggers['emergency'])) {
             $fatal = array(
-                'type' => $type,
+                'type' => $error['type'],
                 'file' => $error['file'],
                 'line' => $error['line'],
             );
@@ -287,14 +298,8 @@ class ErrorHandler
             self::$loggers['emergency']->emergency($error['message'], $fatal);
         }
 
-        if ($this->displayErrors) {
-            // get current exception handler
-            $exceptionHandler = set_exception_handler('var_dump');
-            restore_exception_handler();
-
-            if ($exceptionHandler || self::$fatalHandler) {
-                $this->handleFatalError($exceptionHandler, $error);
-            }
+        if ($this->displayErrors && ($exceptionHandler || self::$fatalHandler)) {
+            $this->handleFatalError($exceptionHandler, $error);
         }
     }
 

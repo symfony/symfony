@@ -75,9 +75,10 @@
                     return;
                 }
 
-                var tbody = document.getElementsByClassName('sf-toolbar-ajax-request-list');
+                var tbodies = document.getElementsByClassName('sf-toolbar-ajax-request-list');
                 var state = 'ok';
-                if (tbody.length) {
+                if (tbodies.length) {
+                    var tbody = tbodies[0];
 
                     var rows = document.createDocumentFragment();
 
@@ -135,12 +136,17 @@
                             row.className = 'sf-ajax-request sf-ajax-request-' + requestState;
                         }
 
-                        while (tbody[0].firstChild) {
-                            tbody[0].removeChild(tbody[0].firstChild);
+                        while (tbody.firstChild) {
+                            tbody.removeChild(tbody.firstChild);
                         }
-                        tbody[0].appendChild(rows);
+                        tbody.appendChild(rows);
                     } else {
-                        tbody[0].innerText = "No AJAX requests fired yet.";
+                        var cell = document.createElement('td');
+                        cell.setAttribute('colspan', '4');
+                        cell.innerText = "No AJAX requests fired yet.";
+                        var row = document.createElement('tr');
+                        row.appendChild(cell);
+                        tbody.appendChild(row);
                     }
                 }
 

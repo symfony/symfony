@@ -170,7 +170,7 @@
             var self = this;
 
             /* prevent logging AJAX calls to static and inline files, like templates */
-            if (url.substr(0, 1) === '/' && url.substr(0, 8) !== '/bundles') {
+            if (url.substr(0, 1) === '/' && !url.match(new RegExp("{{ excluded_ajax_paths }}"))) {
                 var stackElement = {
                     loading: true,
                     error: false,

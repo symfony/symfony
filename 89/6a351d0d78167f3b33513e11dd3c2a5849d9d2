@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2014-05-05T10:22:50Z
+
+Btw, I don't agree with the channel in `setLogger(LoggerInterface $logger, $channel = 'deprecation')`. The separation into channels is random and does not belong into the ErrorHandler.
+If a logger wants to treat different types differently, it's the task of the logger to distinguish messages by log level or `type` context parameter.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-05-05T11:45:17Z
+
+@Tobion I agree, I'll work on that for 2.6

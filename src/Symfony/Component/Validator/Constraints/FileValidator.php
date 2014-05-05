@@ -34,6 +34,10 @@ class FileValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\File');
         }
 
+        if ($constraint->validateOnlyNewUploadedFiles && !$value instanceof UploadedFile) {
+            return true;
+        }
+
         if (null === $value || '' === $value) {
             return;
         }

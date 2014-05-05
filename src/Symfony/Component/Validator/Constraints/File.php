@@ -38,4 +38,5 @@ class File extends Constraint
     public $uploadCantWriteErrorMessage = 'Cannot write temporary file to disk.';
     public $uploadExtensionErrorMessage = 'A PHP extension caused the upload to fail.';
     public $uploadErrorMessage          = 'The file could not be uploaded.';
+    public $validateOnlyNewUploadedFiles = false;
 }

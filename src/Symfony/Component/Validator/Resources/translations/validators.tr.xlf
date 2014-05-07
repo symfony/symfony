@@ -88,7 +88,7 @@
             </trans-unit>
             <trans-unit id="22">
                 <source>This value should not be blank.</source>
-                <target>Bu değer boşluk olamaz.</target>
+                <target>Bu değer boş bırakılmamalıdır.</target>
             </trans-unit>
             <trans-unit id="23">
                 <source>This value should not be null.</source>

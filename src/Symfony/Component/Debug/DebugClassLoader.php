@@ -29,6 +29,7 @@ class DebugClassLoader
     private $classLoader;
     private $isFinder;
     private $wasFinder;
+    private static $caseCheck;
 
     /**
      * Constructor.
@@ -48,6 +49,10 @@ class DebugClassLoader
         } else {
             $this->classLoader = $classLoader;
             $this->isFinder = is_array($classLoader) && method_exists($classLoader[0], 'findFile');
+        }
+
+        if (!isset(self::$caseCheck)) {
+            self::$caseCheck = false !== stripos(PHP_OS, 'win') ? (false !== stripos(PHP_OS, 'darwin') ? 2 : 1) : 0;
         }
     }
 
@@ -162,9 +167,13 @@ class DebugClassLoader
 
         $exists = class_exists($class, false) || interface_exists($class, false) || (function_exists('trait_exists') && trait_exists($class, false));
 
+        if ('\\' === $class[0]) {
+            $class = substr($class, 1);
+        }
+
         if ($exists) {
-            $name = new \ReflectionClass($class);
-            $name = $name->getName();
+            $refl = new \ReflectionClass($class);
+            $name = $refl->getName();
 
             if ($name !== $class) {
                 throw new \RuntimeException(sprintf('Case mismatch between loaded and declared class names: %s vs %s', $class, $name));
@@ -172,30 +181,35 @@ class DebugClassLoader
         }
 
         if ($file) {
-            if ('\\' == $class[0]) {
-                $class = substr($class, 1);
+            if (!$exists) {
+                if (false !== strpos($class, '/')) {
+                    throw new \RuntimeException(sprintf('Trying to autoload a class with an invalid name "%s". Be careful that the namespace separator is "\" in PHP, not "/".', $class));
+                }
+
+                throw new \RuntimeException(sprintf('The autoloader expected class "%s" to be defined in file "%s". The file was found but the class was not in it, the class name or namespace probably has a typo.', $class, $file));
             }
-
-            if (preg_match('#([/\\\\][a-zA-Z_\x7F-\xFF][a-zA-Z0-9_\x7F-\xFF]*)+\.(php|hh)$#', $file, $tail)) {
+            if (self::$caseCheck && preg_match('#([/\\\\][a-zA-Z_\x7F-\xFF][a-zA-Z0-9_\x7F-\xFF]*)+\.(php|hh)$#D', $file, $tail)) {
                 $tail = $tail[0];
-                $real = realpath($file);
+                $real = $refl->getFilename();
 
-                if (false !== stripos(PHP_OS, 'darwin')) {
-                    // realpath() on MacOSX doesn't normalize the case of characters,
-                    // let's do it ourselves. This is tricky.
+                if (2 === self::$caseCheck) {
+                    // realpath() on MacOSX doesn't normalize the case of characters
                     $cwd = getcwd();
                     $basename = strrpos($real, '/');
                     chdir(substr($real, 0, $basename));
                     $basename = substr($real, $basename + 1);
-                    $real = getcwd().'/';
-                    $h = opendir('.');
-                    while (false !== $f = readdir($h)) {
-                        if (0 === strcasecmp($f, $basename)) {
-                            $real .= $f;
-                            break;
+                    // glob() patterns are case-sensitive even if the underlying fs is not
+                    if (!in_array($basename, glob($basename.'*', GLOB_NOSORT), true)) {
+                        $real = getcwd().'/';
+                        $h = opendir('.');
+                        while (false !== $f = readdir($h)) {
+                            if (0 === strcasecmp($f, $basename)) {
+                                $real .= $f;
+                                break;
+                            }
                         }
+                        closedir($h);
                     }
-                    closedir($h);
                     chdir($cwd);
                 }
 
@@ -204,14 +218,6 @@ class DebugClassLoader
                 ) {
                     throw new \RuntimeException(sprintf('Case mismatch between class and source file names: %s vs %s', $class, $real));
                 }
-            }
-
-            if (!$exists) {
-                if (false !== strpos($class, '/')) {
-                    throw new \RuntimeException(sprintf('Trying to autoload a class with an invalid name "%s". Be careful that the namespace separator is "\" in PHP, not "/".', $class));
-                }
-
-                throw new \RuntimeException(sprintf('The autoloader expected class "%s" to be defined in file "%s". The file was found but the class was not in it, the class name or namespace probably has a typo.', $class, $file));
             }
 
             return true;

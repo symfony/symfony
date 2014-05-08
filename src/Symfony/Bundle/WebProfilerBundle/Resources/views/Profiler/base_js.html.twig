@@ -83,7 +83,8 @@
                     var rows = document.createDocumentFragment();
 
                     if (requestStack.length) {
-                        for (var i = 0; i < requestStack.length; i++) {
+                        var firstItem = requestStack.length > 20 ? requestStack.length - 20 : 0;
+                        for (var i = firstItem; i < requestStack.length; i++) {
                             var request = requestStack[i];
 
                             var row = document.createElement('tr');
@@ -140,6 +141,13 @@
                             tbody.removeChild(tbody.firstChild);
                         }
                         tbody.appendChild(rows);
+
+                        var infoSpans = document.getElementsByClassName("sf-toolbar-ajax-info");
+                        if (infoSpans.length) {
+                            var text = firstItem == 0 ? 'Showing ' + requestStack.length + ' items' : 'Showing the last 20 '
+                                + 'out of ' + requestStack.length + ' items';
+                            infoSpans[0].innerText = text;
+                        }
                     } else {
                         var cell = document.createElement('td');
                         cell.setAttribute('colspan', '4');

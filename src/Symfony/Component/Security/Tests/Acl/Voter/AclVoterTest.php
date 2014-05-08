@@ -27,7 +27,7 @@ class AclVoterTest extends \PHPUnit_Framework_TestCase
      */
     public function testSupportsAttribute($attribute, $supported)
     {
-        list($voter,, $permissionMap,,) = $this->getVoter();
+        list($voter,, $permissionMap,,) = $this->getVoter(true, false);
 
         $permissionMap
             ->expects($this->once())
@@ -39,11 +39,31 @@ class AclVoterTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($supported, $voter->supportsAttribute($attribute));
     }
 
+    /**
+     * @dataProvider getSupportsAttributeNonStringTests
+     */
+    public function testSupportsAttributeNonString($attribute)
+    {
+        list($voter,,,,,) = $this->getVoter(true, false);
+
+        $this->assertFalse($voter->supportsAttribute($attribute));
+    }
+
     public function getSupportsAttributeTests()
     {
         return array(
             array('foo', true),
             array('foo', false),
+        );
+    }
+
+    public function getSupportsAttributeNonStringTests()
+    {
+        return array(
+            array(new \stdClass()),
+            array(1),
+            array(true),
+            array(array()),
         );
     }
 
@@ -387,12 +407,19 @@ class AclVoterTest extends \PHPUnit_Framework_TestCase
         return $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
     }
 
-    protected function getVoter($allowIfObjectIdentityUnavailable = true)
+    protected function getVoter($allowIfObjectIdentityUnavailable = true, $alwaysContains = true)
     {
         $provider = $this->getMock('Symfony\Component\Security\Acl\Model\AclProviderInterface');
         $permissionMap = $this->getMock('Symfony\Component\Security\Acl\Permission\PermissionMapInterface');
         $oidStrategy = $this->getMock('Symfony\Component\Security\Acl\Model\ObjectIdentityRetrievalStrategyInterface');
         $sidStrategy = $this->getMock('Symfony\Component\Security\Acl\Model\SecurityIdentityRetrievalStrategyInterface');
+
+        if ($alwaysContains) {
+            $permissionMap
+                ->expects($this->any())
+                ->method('contains')
+                ->will($this->returnValue(true));
+        }
 
         return array(
             new AclVoter($provider, $oidStrategy, $sidStrategy, $permissionMap, null, $allowIfObjectIdentityUnavailable),

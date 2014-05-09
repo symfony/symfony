@@ -28,38 +28,23 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
         $this->propertyAccessor = new PropertyAccessor();
     }
 
-    public function getValidPropertyPaths()
+    public function getValidGetPropertyPaths()
     {
-        return array(
-            array(array('Bernhard', 'Schussek'), '[0]', 'Bernhard'),
-            array(array('Bernhard', 'Schussek'), '[1]', 'Schussek'),
-            array(array('firstName' => 'Bernhard'), '[firstName]', 'Bernhard'),
-            array(array('index' => array('firstName' => 'Bernhard')), '[index][firstName]', 'Bernhard'),
-            array((object) array('firstName' => 'Bernhard'), 'firstName', 'Bernhard'),
-            array((object) array('property' => array('firstName' => 'Bernhard')), 'property[firstName]', 'Bernhard'),
-            array(array('index' => (object) array('firstName' => 'Bernhard')), '[index].firstName', 'Bernhard'),
-            array((object) array('property' => (object) array('firstName' => 'Bernhard')), 'property.firstName', 'Bernhard'),
+        return array_merge(
+            array(
+                array(new TestClass('Bernhard'), 'publicMethodAccessor', 'Bernhard', 'Bernhard'),
+            ),
+            $this->getValidPropertyPaths()
+        );
+    }
 
-            // Accessor methods
-            array(new TestClass('Bernhard'), 'publicProperty', 'Bernhard'),
-            array(new TestClass('Bernhard'), 'publicAccessor', 'Bernhard'),
-            array(new TestClass('Bernhard'), 'publicAccessorWithDefaultValue', 'Bernhard'),
-            array(new TestClass('Bernhard'), 'publicAccessorWithRequiredAndDefaultValue', 'Bernhard'),
-            array(new TestClass('Bernhard'), 'publicIsAccessor', 'Bernhard'),
-            array(new TestClass('Bernhard'), 'publicHasAccessor', 'Bernhard'),
-
-            // Methods are camelized
-            array(new TestClass('Bernhard'), 'public_accessor', 'Bernhard'),
-
-            // Missing indices
-            array(array('index' => array()), '[index][firstName]', null),
-            array(array('root' => array('index' => array())), '[root][index][firstName]', null),
-
-            // Special chars
-            array(array('%!@$§.' => 'Bernhard'), '[%!@$§.]', 'Bernhard'),
-            array(array('index' => array('%!@$§.' => 'Bernhard')), '[index][%!@$§.]', 'Bernhard'),
-            array((object) array('%!@$§' => 'Bernhard'), '%!@$§', 'Bernhard'),
-            array((object) array('property' => (object) array('%!@$§' => 'Bernhard')), 'property.%!@$§', 'Bernhard'),
+    public function getValidSetPropertyPaths()
+    {
+        return array_merge(
+            array(
+                array(new TestClass('Bernhard'), 'publicMethodMutator', 'Bernhard', 'Bernhard'),
+            ),
+            $this->getValidPropertyPaths()
         );
     }
 
@@ -95,7 +80,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider getValidPropertyPaths
+     * @dataProvider getValidGetPropertyPaths
      */
     public function testGetValue($objectOrArray, $path, $value)
     {
@@ -196,7 +181,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider getValidPropertyPaths
+     * @dataProvider getValidSetPropertyPaths
      */
     public function testSetValue($objectOrArray, $path)
     {
@@ -312,7 +297,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider getValidPropertyPaths
+     * @dataProvider getValidGetPropertyPaths
      */
     public function testIsReadable($objectOrArray, $path)
     {
@@ -380,7 +365,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider getValidPropertyPaths
+     * @dataProvider getValidSetPropertyPaths
      */
     public function testIsWritable($objectOrArray, $path)
     {
@@ -445,5 +430,40 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     public function testIsWritableThrowsExceptionIfEmpty()
     {
         $this->assertFalse($this->propertyAccessor->isWritable('', 'foobar', 'Updated'));
+    }
+
+    private function getValidPropertyPaths()
+    {
+        return array(
+            array(array('Bernhard', 'Schussek'), '[0]', 'Bernhard'),
+            array(array('Bernhard', 'Schussek'), '[1]', 'Schussek'),
+            array(array('firstName' => 'Bernhard'), '[firstName]', 'Bernhard'),
+            array(array('index' => array('firstName' => 'Bernhard')), '[index][firstName]', 'Bernhard'),
+            array((object) array('firstName' => 'Bernhard'), 'firstName', 'Bernhard'),
+            array((object) array('property' => array('firstName' => 'Bernhard')), 'property[firstName]', 'Bernhard'),
+            array(array('index' => (object) array('firstName' => 'Bernhard')), '[index].firstName', 'Bernhard'),
+            array((object) array('property' => (object) array('firstName' => 'Bernhard')), 'property.firstName', 'Bernhard'),
+
+            // Accessor methods
+            array(new TestClass('Bernhard'), 'publicProperty', 'Bernhard'),
+            array(new TestClass('Bernhard'), 'publicAccessor', 'Bernhard'),
+            array(new TestClass('Bernhard'), 'publicAccessorWithDefaultValue', 'Bernhard'),
+            array(new TestClass('Bernhard'), 'publicAccessorWithRequiredAndDefaultValue', 'Bernhard'),
+            array(new TestClass('Bernhard'), 'publicIsAccessor', 'Bernhard'),
+            array(new TestClass('Bernhard'), 'publicHasAccessor', 'Bernhard'),
+
+            // Methods are camelized
+            array(new TestClass('Bernhard'), 'public_accessor', 'Bernhard'),
+
+            // Missing indices
+            array(array('index' => array()), '[index][firstName]', null),
+            array(array('root' => array('index' => array())), '[root][index][firstName]', null),
+
+            // Special chars
+            array(array('%!@$§.' => 'Bernhard'), '[%!@$§.]', 'Bernhard'),
+            array(array('index' => array('%!@$§.' => 'Bernhard')), '[index][%!@$§.]', 'Bernhard'),
+            array((object) array('%!@$§' => 'Bernhard'), '%!@$§', 'Bernhard'),
+            array((object) array('property' => (object) array('%!@$§' => 'Bernhard')), 'property.%!@$§', 'Bernhard'),
+        );
     }
 }

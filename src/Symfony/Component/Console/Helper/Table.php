@@ -123,6 +123,8 @@ class Table
         } else {
             throw new \InvalidArgumentException(sprintf('Style "%s" is not defined.', $name));
         }
+
+        return $this;
     }
 
     /**

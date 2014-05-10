@@ -19,7 +19,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     public function testDefaultConfig()
     {
         $processor = new Processor();
-        $config = $processor->processConfiguration(new Configuration(), array(array('secret' => 's3cr3t')));
+        $config = $processor->processConfiguration(new Configuration(true), array(array('secret' => 's3cr3t')));
 
         $this->assertEquals(
             array_merge(array('secret' => 's3cr3t', 'trusted_hosts' => array()), self::getBundleDefaultConfig()),
@@ -33,7 +33,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     public function testValidTrustedProxies($trustedProxies, $processedProxies)
     {
         $processor = new Processor();
-        $configuration = new Configuration();
+        $configuration = new Configuration(true);
         $config = $processor->processConfiguration($configuration, array(array(
             'secret'          => 's3cr3t',
             'trusted_proxies' => $trustedProxies,
@@ -62,7 +62,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     public function testInvalidTypeTrustedProxies()
     {
         $processor = new Processor();
-        $configuration = new Configuration();
+        $configuration = new Configuration(true);
         $processor->processConfiguration($configuration, array(
             array(
                 'secret' => 's3cr3t',
@@ -77,7 +77,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     public function testInvalidValueTrustedProxies()
     {
         $processor = new Processor();
-        $configuration = new Configuration();
+        $configuration = new Configuration(true);
         $processor->processConfiguration($configuration, array(
             array(
                 'secret' => 's3cr3t',
@@ -123,6 +123,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             'translator'          => array(
                 'enabled'  => false,
                 'fallback' => 'en',
+                'logging'  => true,
             ),
             'validation'          => array(
                 'enabled'            => false,

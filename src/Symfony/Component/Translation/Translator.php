@@ -257,6 +257,26 @@ class Translator implements TranslatorInterface
     }
 
     /**
+     * Gets the catalogue by locale.
+     *
+     * @param string|null $locale The locale or null to use the default
+     *
+     * @return MessageCatalogueInterface
+     */
+    public function getCatalogue($locale = null)
+    {
+        if (null === $locale) {
+            $locale = $this->getLocale();
+        }
+
+        if (!isset($this->catalogues[$locale])) {
+            $this->loadCatalogue($locale);
+        }
+
+        return $this->catalogues[$locale];
+    }
+
+    /**
      * Gets the loaders.
      *
      * @return array LoaderInterface[]

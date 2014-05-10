@@ -31,19 +31,19 @@ use Symfony\Component\Console\Helper\HelperSet;
  */
 class Command
 {
-    private $application;
-    private $name;
-    private $processTitle;
-    private $aliases = array();
-    private $definition;
-    private $help;
-    private $description;
-    private $ignoreValidationErrors = false;
-    private $applicationDefinitionMerged = false;
-    private $applicationDefinitionMergedWithArgs = false;
-    private $code;
-    private $synopsis;
-    private $helperSet;
+    protected $application;
+    protected $name;
+    protected $processTitle;
+    protected $aliases = array();
+    protected $definition;
+    protected $help;
+    protected $description;
+    protected $ignoreValidationErrors = false;
+    protected $applicationDefinitionMerged = false;
+    protected $applicationDefinitionMergedWithArgs = false;
+    protected $code;
+    protected $synopsis;
+    protected $helperSet;
 
     /**
      * Constructor.

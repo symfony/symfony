@@ -621,6 +621,10 @@ class FrameworkExtension extends Extension
 
         // Use the "real" translator instead of the identity default
         $container->setAlias('translator', 'translator.default');
+        if ($container->getParameter('kernel.debug')) {
+            $container->setAlias('translator', 'loggable_translator.default');
+        }
+
         $translator = $container->findDefinition('translator.default');
         if (!is_array($config['fallback'])) {
             $config['fallback'] = array($config['fallback']);

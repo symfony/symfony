@@ -1,0 +1,6 @@
+---------------------------------------------------------------------------
+
+by denkiryokuhatsuden at 2014-04-17T10:05:05Z
+
+I found that rendering error uses logic independent of `FormatterHelper`, and it has similar problem.
+15e136d is commit to fix them.

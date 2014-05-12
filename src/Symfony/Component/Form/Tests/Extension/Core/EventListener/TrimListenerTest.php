@@ -41,32 +41,65 @@ class TrimListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider codePointProvider
+     * @dataProvider spaceProvider
      */
-    public function testTrimUtf8($chars)
+    public function testTrimUtf8Separators($hex)
     {
-        if (!function_exists('mb_check_encoding')) {
-            $this->markTestSkipped('The "mb_check_encoding" function is not available');
+        if (!function_exists('mb_convert_encoding')) {
+            $this->markTestSkipped('The "mb_convert_encoding" function is not available');
         }
 
-        $data = mb_convert_encoding(pack('H*', implode('', $chars)), 'UTF-8', 'UCS-2BE');
-        $data = $data."ab\ncd".$data;
+        // Convert hexadecimal representation into binary
+        // H: hex string, high nibble first (UCS-2BE)
+        // *: repeat until end of string
+        $binary = pack('H*', $hex);
+
+        // Convert UCS-2BE to UTF-8
+        $symbol = mb_convert_encoding($binary, 'UTF-8', 'UCS-2BE');
+        $symbol = $symbol."ab\ncd".$symbol;
 
         $form  = $this->getMock('Symfony\Component\Form\Test\FormInterface');
-        $event = new FormEvent($form, $data);
+        $event = new FormEvent($form, $symbol);
 
         $filter = new TrimListener();
         $filter->preSubmit($event);
 
-        $this->assertSame("ab\ncd", $event->getData(), 'TrimListener should trim character(s): '.implode(', ', $chars));
+        $this->assertSame("ab\ncd", $event->getData());
     }
 
-    public function codePointProvider()
+    public function spaceProvider()
     {
         return array(
-            'General category: Separator' => array(array('0020', '00A0', '1680', '180E', '2000', '2001', '2002', '2003', '2004', '2005', '2006', '2007', '2008', '2009', '200A', '2028', '2029', '202F', '205F', '3000')),
-            'General category: Other, control' => array(array('0009', '000A', '000B', '000C', '000D', '0085')),
-            //'General category: Other, format. ZERO WIDTH SPACE' => array(array('200B')),
+            // separators
+            array('0020'),
+            array('00A0'),
+            array('1680'),
+//            array('180E'),
+            array('2000'),
+            array('2001'),
+            array('2002'),
+            array('2003'),
+            array('2004'),
+            array('2005'),
+            array('2006'),
+            array('2007'),
+            array('2008'),
+            array('2009'),
+            array('200A'),
+            array('2028'),
+            array('2029'),
+            array('202F'),
+            array('205F'),
+            array('3000'),
+            // controls
+            array('0009'),
+            array('000A'),
+            array('000B'),
+            array('000C'),
+            array('000D'),
+            array('0085'),
+            // zero width space
+//            array('200B'),
         );
     }
 }

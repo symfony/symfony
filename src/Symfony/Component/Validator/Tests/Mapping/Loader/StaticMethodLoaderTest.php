@@ -79,10 +79,16 @@ class StaticMethodLoaderTest extends \PHPUnit_Framework_TestCase
     public function testLoadClassMetadataIgnoresAbstractMethods()
     {
         $loader = new StaticMethodLoader('loadMetadata');
+        $caught = false;
         try {
-            include __DIR__ . '/AbstractMethodStaticLoader.php';
-            $this->fail('AbstractMethodStaticLoader should produce a strict standard error.');
+            include __DIR__.'/AbstractMethodStaticLoader.php';
         } catch (\Exception $e) {
+            // catching the PHP notice that is converted to an exception by PHPUnit
+            $caught = true;
+        }
+
+        if (!$caught) {
+            $this->fail('AbstractMethodStaticLoader should produce a strict standard error.');
         }
 
         $metadata = new ClassMetadata(__NAMESPACE__.'\AbstractMethodStaticLoader');

@@ -54,7 +54,7 @@ class FormatterHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testFormatBlockWithDiacriticLetters()
     {
-        if (!extension_loaded('mbstring')) {
+        if (!function_exists('mb_detect_encoding')) {
             $this->markTestSkipped('This test requires mbstring to work.');
         }
 
@@ -65,6 +65,21 @@ class FormatterHelperTest extends \PHPUnit_Framework_TestCase
             '<error>  Du texte à afficher  </error>'."\n" .
             '<error>                       </error>',
             $formatter->formatBlock('Du texte à afficher', 'error', true),
+            '::formatBlock() formats a message in a block'
+        );
+    }
+
+    public function testFormatBlockWithDoubleWidthDiacriticLetters()
+    {
+        if (!extension_loaded('mbstring')) {
+            $this->markTestSkipped('This test requires mbstring to work.');
+        }
+        $formatter = new FormatterHelper();
+        $this->assertEquals(
+            '<error>                    </error>'."\n" .
+            '<error>  表示するテキスト  </error>'."\n" .
+            '<error>                    </error>',
+            $formatter->formatBlock('表示するテキスト', 'error', true),
             '::formatBlock() formats a message in a block'
         );
     }

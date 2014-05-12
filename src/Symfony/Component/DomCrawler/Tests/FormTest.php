@@ -631,6 +631,13 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($nodes->item(0), $form->getFormNode(), '->getFormNode() returns the form node associated with this form');
     }
 
+    public function testTypeAttributeIsCaseInsensitive()
+    {
+        $form = $this->createForm('<form method="post"><input type="IMAGE" name="example" /></form>');
+        $this->assertTrue($form->has('example.x'), '->has() returns true if the image input was correctly turned into an x and a y fields');
+        $this->assertTrue($form->has('example.y'), '->has() returns true if the image input was correctly turned into an x and a y fields');
+    }
+
     /**
      * @expectedException \InvalidArgumentException
      */

@@ -34,11 +34,11 @@ class InputFormField extends FormField
             throw new \LogicException(sprintf('An InputFormField can only be created from an input or button tag (%s given).', $this->node->nodeName));
         }
 
-        if ('checkbox' == $this->node->getAttribute('type')) {
+        if ('checkbox' == strtolower($this->node->getAttribute('type'))) {
             throw new \LogicException('Checkboxes should be instances of ChoiceFormField.');
         }
 
-        if ('file' == $this->node->getAttribute('type')) {
+        if ('file' == strtolower($this->node->getAttribute('type'))) {
             throw new \LogicException('File inputs should be instances of FileFormField.');
         }
 

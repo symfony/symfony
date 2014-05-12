@@ -45,8 +45,8 @@ class TrimListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testTrimUtf8($chars)
     {
-        if (!function_exists('mb_check_encoding')) {
-            $this->markTestSkipped('The "mb_check_encoding" function is not available');
+        if (!function_exists('mb_convert_encoding')) {
+            $this->markTestSkipped('The "mb_convert_encoding" function is not available');
         }
 
         $data = mb_convert_encoding(pack('H*', implode('', $chars)), 'UTF-8', 'UCS-2BE');

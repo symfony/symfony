@@ -21,6 +21,7 @@ class Unescaper
 {
     // Parser and Inline assume UTF-8 encoding, so escaped Unicode characters
     // must be converted to that encoding.
+    // @deprecated since 2.5, to be removed in 3.0
     const ENCODING = 'UTF-8';
 
     // Regex fragment that matches an escaped character in a double quoted
@@ -80,13 +81,13 @@ class Unescaper
             case 'n':
                 return "\n";
             case 'v':
-                return "\xb";
+                return "\xB";
             case 'f':
-                return "\xc";
+                return "\xC";
             case 'r':
-                return "\xd";
+                return "\r";
             case 'e':
-                return "\x1b";
+                return "\x1B";
             case ' ':
                 return ' ';
             case '"':
@@ -97,50 +98,44 @@ class Unescaper
                 return '\\';
             case 'N':
                 // U+0085 NEXT LINE
-                return $this->convertEncoding("\x00\x85", self::ENCODING, 'UCS-2BE');
+                return "\xC2\x85";
             case '_':
                 // U+00A0 NO-BREAK SPACE
-                return $this->convertEncoding("\x00\xA0", self::ENCODING, 'UCS-2BE');
+                return "\xC2\xA0";
             case 'L':
                 // U+2028 LINE SEPARATOR
-                return $this->convertEncoding("\x20\x28", self::ENCODING, 'UCS-2BE');
+                return "\xE2\x80\xA8";
             case 'P':
                 // U+2029 PARAGRAPH SEPARATOR
-                return $this->convertEncoding("\x20\x29", self::ENCODING, 'UCS-2BE');
+                return "\xE2\x80\xA9";
             case 'x':
-                $char = pack('n', hexdec(substr($value, 2, 2)));
-
-                return $this->convertEncoding($char, self::ENCODING, 'UCS-2BE');
+                return self::utf8chr(hexdec(substr($value, 2, 2)));
             case 'u':
-                $char = pack('n', hexdec(substr($value, 2, 4)));
-
-                return $this->convertEncoding($char, self::ENCODING, 'UCS-2BE');
+                return self::utf8chr(hexdec(substr($value, 2, 4)));
             case 'U':
-                $char = pack('N', hexdec(substr($value, 2, 8)));
-
-                return $this->convertEncoding($char, self::ENCODING, 'UCS-4BE');
+                return self::utf8chr(hexdec(substr($value, 2, 8)));
         }
     }
 
     /**
-     * Convert a string from one encoding to another.
+     * Get the UTF-8 character for the given code point.
      *
-     * @param string $value The string to convert
-     * @param string $to    The input encoding
-     * @param string $from  The output encoding
+     * @param int $c The unicode code point
      *
-     * @return string The string with the new encoding
-     *
-     * @throws \RuntimeException if no suitable encoding function is found (iconv or mbstring)
+     * @return string The corresponding UTF-8 character
      */
-    private function convertEncoding($value, $to, $from)
+    private static function utf8chr($c)
     {
-        if (function_exists('mb_convert_encoding')) {
-            return mb_convert_encoding($value, $to, $from);
-        } elseif (function_exists('iconv')) {
-            return iconv($from, $to, $value);
+        if (0x80 > $c %= 0x200000) {
+            return chr($c);
+        }
+        if (0x800 > $c) {
+            return chr(0xC0 | $c>>6).chr(0x80 | $c & 0x3F);
+        }
+        if (0x10000 > $c) {
+            return chr(0xE0 | $c>>12).chr(0x80 | $c>>6 & 0x3F).chr(0x80 | $c & 0x3F);
         }
 
-        throw new \RuntimeException('No suitable convert encoding function (install the iconv or mbstring extension).');
+        return chr(0xF0 | $c>>18).chr(0x80 | $c>>12 & 0x3F).chr(0x80 | $c>>6 & 0x3F).chr(0x80 | $c & 0x3F);
     }
 }

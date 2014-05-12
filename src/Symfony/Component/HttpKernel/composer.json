@@ -29,6 +29,7 @@
         "symfony/console": "~2.2",
         "symfony/dependency-injection": "~2.0",
         "symfony/finder": "~2.0",
+        "symfony/filesystem": "~2.4",
         "symfony/process": "~2.0",
         "symfony/routing": "~2.2",
         "symfony/stopwatch": "~2.2",
@@ -40,7 +41,8 @@
         "symfony/config": "",
         "symfony/console": "",
         "symfony/dependency-injection": "",
-        "symfony/finder": ""
+        "symfony/finder": "",
+        "symfony/filesystem": ""
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\HttpKernel\\": "" }

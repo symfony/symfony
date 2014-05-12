@@ -421,6 +421,8 @@ class FrameworkExtension extends Extension
         $links = array(
             'textmate' => 'txmt://open?url=file://%%f&line=%%l',
             'macvim'   => 'mvim://open?url=file://%%f&line=%%l',
+            'emacs'    => 'emacs://open?url=file://%file&line=%line',
+            'sublime'  => 'subl://open?url=file://%file&line=%line',
         );
 
         $container->setParameter('templating.helper.code.file_link_format', isset($links[$ide]) ? $links[$ide] : $ide);

@@ -152,12 +152,12 @@ class Cookie
         );
 
         if (null !== $url) {
-            if ((false === $urlParts = parse_url($url)) || !isset($urlParts['host']) || !isset($urlParts['path'])) {
+            if ((false === $urlParts = parse_url($url)) || !isset($urlParts['host'])) {
                 throw new \InvalidArgumentException(sprintf('The URL "%s" is not valid.', $url));
             }
 
             $values['domain'] = $urlParts['host'];
-            $values['path'] = substr($urlParts['path'], 0, strrpos($urlParts['path'], '/'));
+            $values['path'] = isset($urlParts['path']) ? substr($urlParts['path'], 0, strrpos($urlParts['path'], '/')) : '';
         }
 
         foreach ($parts as $part) {

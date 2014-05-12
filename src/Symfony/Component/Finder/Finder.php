@@ -94,7 +94,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @return Finder The current Finder instance
      */
-    public function addAdapter(Adapter\AdapterInterface $adapter, $priority = 0)
+    public function addAdapter(AdapterInterface $adapter, $priority = 0)
     {
         $this->adapters[$adapter->getName()] = array(
             'adapter'  => $adapter,

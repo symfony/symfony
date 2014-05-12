@@ -33,12 +33,6 @@ class ParserTest extends \PHPUnit_Framework_TestCase
      */
     public function testSpecifications($file, $expected, $yaml, $comment)
     {
-        if ('escapedCharacters' == $file) {
-            if (!function_exists('iconv') && !function_exists('mb_convert_encoding')) {
-                $this->markTestSkipped('The iconv and mbstring extensions are not available.');
-            }
-        }
-
         $this->assertEquals($expected, var_export($this->parser->parse($yaml), true), $comment);
     }
 
@@ -446,8 +440,8 @@ EOF;
 
     public function testNonUtf8Exception()
     {
-        if (!function_exists('mb_detect_encoding') || !function_exists('iconv')) {
-            $this->markTestSkipped('Exceptions for non-utf8 charsets require the mb_detect_encoding() and iconv() functions.');
+        if (!function_exists('iconv')) {
+            $this->markTestSkipped('Exceptions for non-utf8 charsets require the iconv() function.');
 
             return;
         }

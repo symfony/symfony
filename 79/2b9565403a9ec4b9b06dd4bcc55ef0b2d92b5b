@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by geoffrey-brier at 2014-05-02T18:36:09Z
+
+@fabpot @stof I have updated the code to make the type attribute case insensitive, do you see anywhere else I could fix it ?
+@stof Any idea on how to test this modification?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-05-02T18:41:24Z
+
+@geoffrey-brier write some tests using an uppercase type attribute (i.e. exactly the case you faced)
+
+---------------------------------------------------------------------------
+
+by geoffrey-brier at 2014-05-02T19:13:17Z
+
+@stof I just wrote a test
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-05-04T16:55:23Z
+
+apparently, tests are broken (https://travis-ci.org/symfony/symfony/builds/24294084).
+
+---------------------------------------------------------------------------
+
+by geoffrey-brier at 2014-05-04T17:43:13Z
+
+@fabpot sounds like the `lower-case` function does not exists in XPath 1, I've tried another way of doing that.
+
+---------------------------------------------------------------------------
+
+by geoffrey-brier at 2014-05-05T14:52:18Z
+
+Tests are broken but I don't think it comes from my modifications, could you confirm @fabpot ?

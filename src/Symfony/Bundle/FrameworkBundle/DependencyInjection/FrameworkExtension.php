@@ -423,6 +423,7 @@ class FrameworkExtension extends Extension
             'macvim'   => 'mvim://open?url=file://%%f&line=%%l',
             'emacs'    => 'emacs://open?url=file://%file&line=%line',
             'sublime'  => 'subl://open?url=file://%file&line=%line',
+            'phpstorm'   => 'pstorm://open?url=file://%%f&line=%%l',
         );
 
         $container->setParameter('templating.helper.code.file_link_format', isset($links[$ide]) ? $links[$ide] : $ide);

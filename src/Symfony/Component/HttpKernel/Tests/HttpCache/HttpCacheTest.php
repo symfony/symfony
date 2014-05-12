@@ -593,6 +593,7 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertTraceContains('fresh');
         $this->assertTraceNotContains('store');
         $this->assertEquals('Hello World', $this->response->getContent());
+        $this->assertRegExp('/s-maxage=10/', $this->response->headers->get('Cache-Control'));
     }
 
     public function testAssignsDefaultTtlWhenResponseHasNoFreshnessInformationAndAfterTtlWasExpired()
@@ -607,17 +608,25 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertEquals('Hello World', $this->response->getContent());
         $this->assertRegExp('/s-maxage=2/', $this->response->headers->get('Cache-Control'));
 
-        $this->cacheConfig['default_ttl'] = 2;
         $this->request('GET', '/');
         $this->assertHttpKernelIsNotCalled();
         $this->assertEquals(200, $this->response->getStatusCode());
         $this->assertTraceContains('fresh');
         $this->assertTraceNotContains('store');
         $this->assertEquals('Hello World', $this->response->getContent());
+        $this->assertRegExp('/s-maxage=2/', $this->response->headers->get('Cache-Control'));
 
-        sleep(4);
+        // expires the cache
+        $values = $this->getMetaStorageValues();
+        $this->assertCount(1, $values);
+        $tmp = unserialize($values[0]);
+        $time = \DateTime::createFromFormat('U', time());
+        $tmp[0][1]['date'] = \DateTime::createFromFormat('U', time() - 5)->format(DATE_RFC2822);
+        $r = new \ReflectionObject($this->store);
+        $m = $r->getMethod('save');
+        $m->setAccessible(true);
+        $m->invoke($this->store, 'md'.sha1('http://localhost/'), serialize($tmp));
 
-        $this->cacheConfig['default_ttl'] = 2;
         $this->request('GET', '/');
         $this->assertHttpKernelIsCalled();
         $this->assertEquals(200, $this->response->getStatusCode());
@@ -625,14 +634,17 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertTraceContains('invalid');
         $this->assertTraceContains('store');
         $this->assertEquals('Hello World', $this->response->getContent());
+        $this->assertRegExp('/s-maxage=2/', $this->response->headers->get('Cache-Control'));
 
-        $this->cacheConfig['default_ttl'] = 2;
+        $this->setNextResponse();
+
         $this->request('GET', '/');
         $this->assertHttpKernelIsNotCalled();
         $this->assertEquals(200, $this->response->getStatusCode());
         $this->assertTraceContains('fresh');
         $this->assertTraceNotContains('store');
         $this->assertEquals('Hello World', $this->response->getContent());
+        $this->assertRegExp('/s-maxage=2/', $this->response->headers->get('Cache-Control'));
     }
 
     public function testAssignsDefaultTtlWhenResponseHasNoFreshnessInformationAndAfterTtlWasExpiredWithStatus304()
@@ -647,7 +659,6 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertEquals('Hello World', $this->response->getContent());
         $this->assertRegExp('/s-maxage=2/', $this->response->headers->get('Cache-Control'));
 
-        $this->cacheConfig['default_ttl'] = 2;
         $this->request('GET', '/');
         $this->assertHttpKernelIsNotCalled();
         $this->assertEquals(200, $this->response->getStatusCode());
@@ -655,11 +666,17 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertTraceNotContains('store');
         $this->assertEquals('Hello World', $this->response->getContent());
 
-        sleep(4);
+        // expires the cache
+        $values = $this->getMetaStorageValues();
+        $this->assertCount(1, $values);
+        $tmp = unserialize($values[0]);
+        $time = \DateTime::createFromFormat('U', time());
+        $tmp[0][1]['date'] = \DateTime::createFromFormat('U', time() - 5)->format(DATE_RFC2822);
+        $r = new \ReflectionObject($this->store);
+        $m = $r->getMethod('save');
+        $m->setAccessible(true);
+        $m->invoke($this->store, 'md'.sha1('http://localhost/'), serialize($tmp));
 
-        $this->setNextResponse(304);
-
-        $this->cacheConfig['default_ttl'] = 2;
         $this->request('GET', '/');
         $this->assertHttpKernelIsCalled();
         $this->assertEquals(200, $this->response->getStatusCode());
@@ -668,14 +685,15 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertTraceContains('store');
         $this->assertTraceNotContains('miss');
         $this->assertEquals('Hello World', $this->response->getContent());
+        $this->assertRegExp('/s-maxage=2/', $this->response->headers->get('Cache-Control'));
 
-        $this->cacheConfig['default_ttl'] = 2;
         $this->request('GET', '/');
         $this->assertHttpKernelIsNotCalled();
         $this->assertEquals(200, $this->response->getStatusCode());
         $this->assertTraceContains('fresh');
         $this->assertTraceNotContains('store');
         $this->assertEquals('Hello World', $this->response->getContent());
+        $this->assertRegExp('/s-maxage=2/', $this->response->headers->get('Cache-Control'));
     }
 
     public function testDoesNotAssignDefaultTtlWhenResponseHasMustRevalidateDirective()

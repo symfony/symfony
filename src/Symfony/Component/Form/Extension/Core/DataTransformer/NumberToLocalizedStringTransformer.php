@@ -133,25 +133,19 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
         }
 
         if (function_exists('mb_detect_encoding') && false !== $encoding = mb_detect_encoding($value)) {
-            $strlen = function ($string) use ($encoding) {
-                return mb_strlen($string, $encoding);
-            };
-            $substr = function ($string, $offset, $length) use ($encoding) {
-                return mb_substr($string, $offset, $length, $encoding);
-            };
+            $length = mb_strlen($value, $encoding);
+            $remainder = mb_substr($value, $position, $length, $encoding);
         } else {
-            $strlen = 'strlen';
-            $substr = 'substr';
+            $length = strlen($value);
+            $remainder = substr($value, $position, $length);
         }
-
-        $length = $strlen($value);
 
         // After parsing, position holds the index of the character where the
         // parsing stopped
         if ($position < $length) {
             // Check if there are unrecognized characters at the end of the
             // number (excluding whitespace characters)
-            $remainder = trim($substr($value, $position, $length), " \t\n\r\0\x0b\xc2\xa0");
+            $remainder = trim($remainder, " \t\n\r\0\x0b\xc2\xa0");
 
             if ('' !== $remainder) {
                 throw new TransformationFailedException(

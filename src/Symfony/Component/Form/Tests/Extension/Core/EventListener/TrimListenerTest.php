@@ -52,8 +52,8 @@ class TrimListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testTrimUtf8Separators($hex)
     {
-        if (!function_exists('mb_check_encoding')) {
-            $this->markTestSkipped('The "mb_check_encoding" function is not available');
+        if (!function_exists('mb_convert_encoding')) {
+            $this->markTestSkipped('The "mb_convert_encoding" function is not available');
         }
 
         // Convert hexadecimal representation into binary

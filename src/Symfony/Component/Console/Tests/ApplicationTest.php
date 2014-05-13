@@ -476,7 +476,9 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $application->expects($this->any())
             ->method('getTerminalWidth')
             ->will($this->returnValue(120));
-        $application->register('foo')->setCode(function () {throw new \Exception('エラーメッセージ');});
+        $application->register('foo')->setCode(function () {
+            throw new \Exception('エラーメッセージ');
+        });
         $tester = new ApplicationTester($application);
 
         $tester->run(array('command' => 'foo'), array('decorated' => false));
@@ -490,7 +492,9 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $application->expects($this->any())
             ->method('getTerminalWidth')
             ->will($this->returnValue(32));
-        $application->register('foo')->setCode(function () {throw new \Exception('コマンドの実行中にエラーが発生しました。');});
+        $application->register('foo')->setCode(function () {
+            throw new \Exception('コマンドの実行中にエラーが発生しました。');
+        });
         $tester = new ApplicationTester($application);
         $tester->run(array('command' => 'foo'), array('decorated' => false));
         $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception_doublewidth2.txt', $tester->getDisplay(true), '->renderException() wraps messages when they are bigger than the terminal');

@@ -428,12 +428,6 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
 
         $response = $this->forward($subRequest, $catch);
 
-        if ($this->isPrivateRequest($request) && !$response->headers->hasCacheControlDirective('public')) {
-            $response->setPrivate(true);
-        } elseif ($this->options['default_ttl'] > 0 && null === $response->getTtl() && !$response->headers->getCacheControlDirective('must-revalidate')) {
-            $response->setTtl($this->options['default_ttl']);
-        }
-
         if ($response->isCacheable()) {
             $this->store($request, $response);
         }
@@ -486,6 +480,12 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         }
 
         $this->processResponseBody($request, $response);
+
+        if ($this->isPrivateRequest($request) && !$response->headers->hasCacheControlDirective('public')) {
+            $response->setPrivate(true);
+        } elseif ($this->options['default_ttl'] > 0 && null === $response->getTtl() && !$response->headers->getCacheControlDirective('must-revalidate')) {
+            $response->setTtl($this->options['default_ttl']);
+        }
 
         return $response;
     }

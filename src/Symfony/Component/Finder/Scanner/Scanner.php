@@ -15,6 +15,8 @@ use Symfony\Component\Finder\Exception\AccessDeniedException;
 use Symfony\Component\Finder\SplFileInfo;
 
 /**
+ * Filesystem scanner.
+ *
  * @author Jean-François Simon <contact@jfsimon.fr>
  */
 class Scanner implements \IteratorAggregate
@@ -24,6 +26,13 @@ class Scanner implements \IteratorAggregate
     private $ignoreAccessDenied;
     private $scannedFiles;
 
+    /**
+     * Constructor.
+     *
+     * @param string      $rootPath
+     * @param Constraints $constraints
+     * @param bool        $ignoreAccessDenied
+     */
     public function __construct($rootPath, Constraints $constraints, $ignoreAccessDenied)
     {
         $this->rootPath = $rootPath;
@@ -32,6 +41,11 @@ class Scanner implements \IteratorAggregate
         $this->scannedFiles = new \ArrayIterator();
     }
 
+    /**
+     * Returns an iterator over filtered files.
+     *
+     * @return \ArrayIterator
+     */
     public function getIterator()
     {
         $this->scanDirectory('', 0);
@@ -39,6 +53,15 @@ class Scanner implements \IteratorAggregate
         return $this->scannedFiles;
     }
 
+    /**
+     * Scans a directory recursively.
+     *
+     * @param string $relativePath
+     * @param int    $relativeDepth
+     * @param bool   $relativePathIncluded
+     *
+     * @throws AccessDeniedException
+     */
     private function scanDirectory($relativePath, $relativeDepth, $relativePathIncluded = false)
     {
         $rootPath = $relativePath ? $this->rootPath.'/'.$relativePath : $this->rootPath;

@@ -26,25 +26,25 @@ class Adapter extends AbstractAdapter
      */
     public function searchInDirectory($dir)
     {
-        $builder = Builder::create($this->mode, $this->minDepth, $this->maxDepth, $this->exclude);
+        $builder = new Builder($this->mode, $this->minDepth, $this->maxDepth, $this->exclude);
 
         foreach ($this->notPaths as $value) {
-            $builder->notPath($value);
+            $builder->notPath(new Expression($value));
         }
 
         foreach ($this->notNames as $value) {
-            $builder->notName($value);
+            $builder->notName(new Expression($value));
         }
 
         foreach ($this->paths as $value) {
-            $builder->path($value);
+            $builder->path(new Expression($value));
         }
 
         foreach ($this->names as $value) {
-            $builder->name($value);
+            $builder->name(new Expression($value));
         }
 
-        $scanner = new Scanner($dir, $builder->getConstraints(), $this->ignoreUnreadableDirs);
+        $scanner = new Scanner($dir, $builder->build(), $this->ignoreUnreadableDirs);
         $iterator = $scanner->getIterator();
 
         if ($this->sizes) {

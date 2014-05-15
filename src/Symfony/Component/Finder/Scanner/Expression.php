@@ -12,50 +12,69 @@
 namespace Symfony\Component\Finder\Scanner;
 
 /**
+ * Scanner constraint expression.
+ *
  * @author Jean-François Simon <contact@jfsimon.fr>
  */
 class Expression
 {
     private $value;
 
+    /**
+     * Constructor.
+     *
+     * @param string $pattern
+     */
     public function __construct($pattern)
     {
         try {
             $this->value = new Regex($pattern);
         } catch (\InvalidArgumentException $e) {
-            if (self::isGlobPattern($pattern)) {
-                $this->value = new Regex(self::globToRegex($pattern));
-            } else {
-                $this->value = $pattern;
-            }
+            $this->value = !(false === strpos($pattern, '?') && false === strpos($pattern, '*') && false === strpos($pattern, '{'))
+                ? new Regex(self::globToRegex($pattern))
+                : $pattern;
         }
     }
 
+    /**
+     * Tests if expression is a regex.
+     *
+     * @return bool
+     */
     public function isRegex()
     {
         return $this->value instanceof Regex;
     }
 
+    /**
+     * Returns expression value.
+     *
+     * @return string
+     */
     public function getValue()
     {
         return $this->value;
     }
 
+    /**
+     * Returns expression as a Regex instance.
+     *
+     * @return Regex
+     */
     public function getRegex()
     {
-        return $this->value instanceof Regex ? $this->value : new Regex(self::stringToRegex($this->value));
+        return $this->value instanceof Regex ? $this->value : new Regex('~(^|/)'.preg_quote($this->value, '~').'(/|$)~');
     }
 
-    private static function isGlobPattern($pattern)
-    {
-        return !(false === strpos($pattern, '?') && false === strpos($pattern, '*') && false === strpos($pattern, '{'));
-    }
-
-    private static function stringToRegex($value)
-    {
-        return '~(^|/)'.preg_quote($value, '~').'(/|$)~';
-    }
-
+    /**
+     * Turns a glob pattern into a regex pattern.
+     *
+     * @param string $pattern
+     * @param bool   $strictLeadingDot
+     * @param bool   $strictWildcardSlash
+     *
+     * @return string
+     */
     private static function globToRegex($pattern, $strictLeadingDot = true, $strictWildcardSlash = true)
     {
         $firstByte = true;

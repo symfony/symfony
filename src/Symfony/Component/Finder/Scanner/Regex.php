@@ -12,6 +12,8 @@
 namespace Symfony\Component\Finder\Scanner;
 
 /**
+ * Regex manipulator.
+ *
  * @author Jean-François Simon <contact@jfsimon.fr>
  */
 class Regex
@@ -22,6 +24,13 @@ class Regex
     private $starting;
     private $ending;
 
+    /**
+     * Constructor.
+     *
+     * @param string $pattern
+     *
+     * @throws \InvalidArgumentException
+     */
     public function __construct($pattern)
     {
         if (preg_match('/^(.{3,}?)([imsxuADU]*)$/', $pattern, $m)) {
@@ -48,21 +57,45 @@ class Regex
         throw new \InvalidArgumentException(sprintf('Pattern "%s" is not a valid regex.', $pattern));
     }
 
+    /**
+     * Returns regex as a string.
+     *
+     * @return string
+     */
     public function __toString()
     {
         return implode($this->pattern, $this->delimiters).$this->options;
     }
 
+    /**
+     * Tests if pattern starts with a `^`.
+     *
+     * @return bool
+     */
     public function isStarting()
     {
         return $this->starting;
     }
 
+    /**
+     * Tests if pattern ends with a `$`.
+     *
+     * @return bool
+     */
     public function isEnding()
     {
         return $this->ending;
     }
 
+    /**
+     * Merges given regexs with an OR condition (grouped by options).
+     *
+     * @param Regex[] $regexs
+     *
+     * @return Regex[]
+     *
+     * @throws \InvalidArgumentException
+     */
     public static function mergeWithOr(array $regexs)
     {
         $grouped = array();

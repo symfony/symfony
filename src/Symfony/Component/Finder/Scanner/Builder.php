@@ -12,31 +12,45 @@
 namespace Symfony\Component\Finder\Scanner;
 
 /**
+ * Scanner constraints builder.
+ *
  * @author Jean-François Simon <contact@jfsimon.fr>
  */
 class Builder
 {
-    private $type = Constraints::TYPE_ALL;
-    private $minDepth = 0;
-    private $maxDepth = PHP_INT_MAX;
-    private $excludedNames = array('.', '..');
-    private $pathnameConstraints = array();
+    private $type;
+    private $minDepth;
+    private $maxDepth;
+    private $excludedNames;
+
     private $filenameConstraints = array();
+    private $pathnameConstraints = array();
 
-    public static function create($type, $minDepth, $maxDepth, array $excludedNames)
+    /**
+     * Constructor.
+     *
+     * @param int   $type
+     * @param int   $minDepth
+     * @param int   $maxDepth
+     * @param array $excludedNames
+     */
+    public function __construct($type = Constraints::TYPE_ALL, $minDepth = 0, $maxDepth = PHP_INT_MAX, array $excludedNames = array())
     {
-        $builder = new self();
-        $builder->type = $type;
-        $builder->minDepth = $minDepth;
-        $builder->maxDepth = $maxDepth;
-        $builder->excludedNames = array_merge($builder->excludedNames, $excludedNames);
-
-        return $builder;
+        $this->type = $type;
+        $this->minDepth = $minDepth;
+        $this->maxDepth = $maxDepth;
+        $this->excludedNames = array_merge(array('.', '..'), $excludedNames);
     }
 
-    public function notName($value)
+    /**
+     * Adds name exclusion constraint.
+     *
+     * @param Expression $expression
+     *
+     * @return Builder
+     */
+    public function notName(Expression $expression)
     {
-        $expression = new Expression($value);
         $key = $expression->isRegex() ? 'excluded_patterns' : 'excluded_filenames';
 
         if (!isset($this->filenameConstraints[$key])) {
@@ -48,9 +62,15 @@ class Builder
         return $this;
     }
 
-    public function notPath($value)
+    /**
+     * Adds path exclusion constraint.
+     *
+     * @param Expression $expression
+     *
+     * @return Builder
+     */
+    public function notPath(Expression $expression)
     {
-        $expression = new Expression($value);
         $regex = $expression->getRegex();
         $key = $regex->isEnding() ? 'excluded_ending_patterns' : 'excluded_patterns';
 
@@ -63,9 +83,15 @@ class Builder
         return $this;
     }
 
-    public function name($value)
+    /**
+     * Adds name matching constraint.
+     *
+     * @param Expression $expression
+     *
+     * @return Builder
+     */
+    public function name(Expression $expression)
     {
-        $expression = new Expression($value);
         $key = $expression->isRegex() ? 'included_patterns' : 'included_filenames';
 
         if (!isset($this->filenameConstraints[$key])) {
@@ -77,9 +103,15 @@ class Builder
         return $this;
     }
 
-    public function path($value)
+    /**
+     * Adds path matching constraint.
+     *
+     * @param Expression $expression
+     *
+     * @return Builder
+     */
+    public function path(Expression $expression)
     {
-        $expression = new Expression($value);
         $regex = $expression->getRegex();
         $key = $regex->isEnding() ? 'included_ending_patterns' : 'included_patterns';
 
@@ -92,7 +124,12 @@ class Builder
         return $this;
     }
 
-    public function getConstraints()
+    /**
+     * Builds constraints.
+     *
+     * @return Constraints
+     */
+    public function build()
     {
         foreach ($this->pathnameConstraints as $key => $regexs) {
             $this->pathnameConstraints[$key] = array_map(function (Regex $regex) { return (string) $regex; }, Regex::mergeWithOr($regexs));

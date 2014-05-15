@@ -12,6 +12,8 @@
 namespace Symfony\Component\Finder\Scanner;
 
 /**
+ * Scanner's files filtering constraints.
+ *
  * @author Jean-François Simon <contact@jfsimon.fr>
  */
 class Constraints
@@ -29,7 +31,17 @@ class Constraints
     private $keepDirectories;
     private $keepFiles;
 
-    public function __construct($type, $minDepth, $maxDepth, array $excludedNames, array $pathnameConstraints, array $filenameConstraints)
+    /**
+     * Constructor.
+     *
+     * @param int   $type
+     * @param int   $minDepth
+     * @param int   $maxDepth
+     * @param array $excludedNames
+     * @param array $pathnameConstraints
+     * @param array $filenameConstraints
+     */
+    public function __construct($type = self::TYPE_ALL, $minDepth = 0, $maxDepth = PHP_INT_MAX, array $excludedNames = array(), array $pathnameConstraints = array(), array $filenameConstraints = array())
     {
         $this->excludedNames = $excludedNames;
 
@@ -57,11 +69,25 @@ class Constraints
         $this->keepFiles = self::TYPE_DIRECTORIES !== $type;
     }
 
+    /**
+     * Filters file names.
+     *
+     * @param array $filenames
+     *
+     * @return array
+     */
     public function filterFilenames(array $filenames)
     {
         return array_diff($filenames, $this->excludedNames);
     }
 
+    /**
+     * Tests if min depth constraint is respected.
+     *
+     * @param int $depth
+     *
+     * @return bool
+     */
     public function isMinDepthRespected($depth)
     {
         if (!$this->minDepthRespected instanceof \Closure) {
@@ -71,6 +97,13 @@ class Constraints
         return call_user_func($this->minDepthRespected, $depth);
     }
 
+    /**
+     * Tests if max depth constraint is exceeded.
+     *
+     * @param int $depth
+     *
+     * @return bool
+     */
     public function isMaxDepthExceeded($depth)
     {
         if (!$this->maxDepthExceeded instanceof \Closure) {
@@ -80,6 +113,13 @@ class Constraints
         return call_user_func($this->maxDepthExceeded, $depth);
     }
 
+    /**
+     * Tests if pathname is excluded.
+     *
+     * @param string $pathname
+     *
+     * @return bool
+     */
     public function isPathnameExcluded($pathname)
     {
         if (!$this->pathnameExcluded instanceof \Closure) {
@@ -89,6 +129,13 @@ class Constraints
         return call_user_func($this->pathnameExcluded, $pathname);
     }
 
+    /**
+     * Tests if pathname is included.
+     *
+     * @param string $pathname
+     *
+     * @return bool
+     */
     public function isPathnameIncluded($pathname)
     {
         if (!$this->pathnameIncluded instanceof \Closure) {
@@ -98,6 +145,14 @@ class Constraints
         return call_user_func($this->pathnameIncluded, $pathname);
     }
 
+    /**
+     * Tests if directory must be kept.
+     *
+     * @param string $pathname
+     * @param string $filename
+     *
+     * @return bool
+     */
     public function isDirectoryKept($pathname, $filename)
     {
         if (!$this->keepDirectories) {
@@ -111,6 +166,14 @@ class Constraints
         return call_user_func($this->keep, $pathname, $filename);
     }
 
+    /**
+     * Tests if file must be kept.
+     *
+     * @param string $pathname
+     * @param string $filename
+     *
+     * @return bool
+     */
     public function isFileKept($pathname, $filename)
     {
         if (!$this->keepFiles) {
@@ -124,6 +187,13 @@ class Constraints
         return call_user_func($this->keep, $pathname, $filename);
     }
 
+    /**
+     * Builds a pathname test closure.
+     *
+     * @param string[] $patterns
+     *
+     * @return \Closure
+     */
     private static function buildPathnameTest(array $patterns)
     {
         return function ($value) use ($patterns) {
@@ -137,6 +207,14 @@ class Constraints
         };
     }
 
+    /**
+     * Builds a keep file test closure.
+     *
+     * @param array $filenameConstraints
+     * @param array $pathnameConstraints
+     *
+     * @return \Closure
+     */
     private static function buildKeptTest(array $filenameConstraints, array $pathnameConstraints)
     {
         $excludedTests = array();

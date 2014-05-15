@@ -53,7 +53,7 @@ class Expression
 
     private static function stringToRegex($value)
     {
-        return '~(^|/)'.preg_quote($value, '#').'(/|$)~';
+        return '~(^|/)'.preg_quote($value, '~').'(/|$)~';
     }
 
     private static function globToRegex($pattern, $strictLeadingDot = true, $strictWildcardSlash = true)

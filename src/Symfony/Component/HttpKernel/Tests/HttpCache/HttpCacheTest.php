@@ -609,12 +609,11 @@ class HttpCacheTest extends HttpCacheTestCase
         $values = $this->getMetaStorageValues();
         $this->assertCount(1, $values);
         $tmp = unserialize($values[0]);
-        $time = \DateTime::createFromFormat('U', time());
         $tmp[0][1]['date'] = \DateTime::createFromFormat('U', time() - 5)->format(DATE_RFC2822);
         $r = new \ReflectionObject($this->store);
         $m = $r->getMethod('save');
         $m->setAccessible(true);
-        $m->invoke($this->store, 'md'.sha1('http://localhost/'), serialize($tmp));
+        $m->invoke($this->store, 'md'.hash('sha256', 'http://localhost/'), serialize($tmp));
 
         $this->request('GET', '/');
         $this->assertHttpKernelIsCalled();
@@ -659,12 +658,11 @@ class HttpCacheTest extends HttpCacheTestCase
         $values = $this->getMetaStorageValues();
         $this->assertCount(1, $values);
         $tmp = unserialize($values[0]);
-        $time = \DateTime::createFromFormat('U', time());
         $tmp[0][1]['date'] = \DateTime::createFromFormat('U', time() - 5)->format(DATE_RFC2822);
         $r = new \ReflectionObject($this->store);
         $m = $r->getMethod('save');
         $m->setAccessible(true);
-        $m->invoke($this->store, 'md'.sha1('http://localhost/'), serialize($tmp));
+        $m->invoke($this->store, 'md'.hash('sha256', 'http://localhost/'), serialize($tmp));
 
         $this->request('GET', '/');
         $this->assertHttpKernelIsCalled();

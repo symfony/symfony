@@ -25,6 +25,7 @@ class File extends Constraint
 {
     public $maxSize = null;
     public $mimeTypes = array();
+    public $sizeFormat = FileValidator::SIZE_FORMAT_DECIMAL;
     public $notFoundMessage = 'The file could not be found.';
     public $notReadableMessage = 'The file is not readable.';
     public $maxSizeMessage = 'The file is too large ({{ size }} {{ suffix }}). Allowed maximum size is {{ limit }} {{ suffix }}.';

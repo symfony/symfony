@@ -25,7 +25,7 @@ class FormDataExtractorTest_SimpleValueExporter extends ValueExporter
     /**
      * {@inheritdoc}
      */
-    public function exportValue($value)
+    public function exportValue($value, $depth = 1, $deep = false)
     {
         return var_export($value, true);
     }

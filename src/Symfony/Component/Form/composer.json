@@ -25,7 +25,9 @@
     "require-dev": {
         "symfony/validator": "~2.2",
         "symfony/http-foundation": "~2.2",
-        "symfony/security-csrf": "~2.4"
+        "symfony/http-kernel": "~2.4",
+        "symfony/security-csrf": "~2.4",
+        "doctrine/collections": "~1.0"
     },
     "suggest": {
         "symfony/validator": "For form validation.",

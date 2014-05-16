@@ -20,7 +20,8 @@
     },
     "require-dev": {
         "symfony/yaml": "~2.0",
-        "symfony/config": "~2.2"
+        "symfony/config": "~2.2",
+        "symfony/expression-language": "~2.4"
     },
     "suggest": {
         "symfony/yaml": "",
@@ -34,7 +35,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.3-dev"
+            "dev-master": "2.5-dev"
         }
     }
 }

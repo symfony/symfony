@@ -22,7 +22,7 @@ class ConcreteProxy extends AbstractProxy
 
 class ConcreteSessionHandlerInterfaceProxy extends AbstractProxy implements \SessionHandlerInterface
 {
-   public function open($savePath, $sessionName)
+    public function open($savePath, $sessionName)
     {
     }
 

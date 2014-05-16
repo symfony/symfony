@@ -1,0 +1,6 @@
+<info>[container]</info> <comment>Public</comment> services
+ Service ID        Scope     Class name                                             
+ alias_1           n/a       alias for "service_1"                                  
+ alias_2           n/a       alias for "service_2"                                  
+ definition_1      container Full\Qualified\Class1                                  
+ service_container           Symfony\Component\DependencyInjection\ContainerBuilder 

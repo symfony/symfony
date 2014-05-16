@@ -28,7 +28,8 @@ class ProcessBuilder
     private $timeout = 60;
     private $options = array();
     private $inheritEnv = true;
-    private $prefix;
+    private $prefix = array();
+    private $outputDisabled = false;
 
     /**
      * Constructor
@@ -71,13 +72,13 @@ class ProcessBuilder
      *
      * The prefix is preserved when resetting arguments.
      *
-     * @param string $prefix A command prefix
+     * @param string|array $prefix A command prefix or an array of command prefixes
      *
      * @return ProcessBuilder
      */
     public function setPrefix($prefix)
     {
-        $this->prefix = $prefix;
+        $this->prefix = is_array($prefix) ? $prefix : array($prefix);
 
         return $this;
     }
@@ -145,6 +146,13 @@ class ProcessBuilder
         return $this;
     }
 
+    public function addEnvironmentVariables(array $variables)
+    {
+        $this->env = array_replace($this->env, $variables);
+
+        return $this;
+    }
+
     /**
      * Sets the input of the process.
      *
@@ -205,6 +213,30 @@ class ProcessBuilder
     }
 
     /**
+     * Disables fetching output and error output from the underlying process.
+     *
+     * @return Process
+     */
+    public function disableOutput()
+    {
+        $this->outputDisabled = true;
+
+        return $this;
+    }
+
+    /**
+     * Enables fetching output and error output from the underlying process.
+     *
+     * @return Process
+     */
+    public function enableOutput()
+    {
+        $this->outputDisabled = false;
+
+        return $this;
+    }
+
+    /**
      * Creates a Process instance and returns it.
      *
      * @return Process
@@ -213,21 +245,28 @@ class ProcessBuilder
      */
     public function getProcess()
     {
-        if (!$this->prefix && !count($this->arguments)) {
+        if (0 === count($this->prefix) && 0 === count($this->arguments)) {
             throw new LogicException('You must add() command arguments before calling getProcess().');
         }
 
         $options = $this->options;
 
-        $arguments = $this->prefix ? array_merge(array($this->prefix), $this->arguments) : $this->arguments;
+        $arguments = array_merge($this->prefix, $this->arguments);
         $script = implode(' ', array_map(array(__NAMESPACE__.'\\ProcessUtils', 'escapeArgument'), $arguments));
 
         if ($this->inheritEnv) {
-            $env = $this->env ? $this->env + $_ENV : null;
+            // include $_ENV for BC purposes
+            $env = array_replace($_ENV, $_SERVER, $this->env);
         } else {
             $env = $this->env;
         }
 
-        return new Process($script, $this->cwd, $env, $this->stdin, $this->timeout, $options);
+        $process = new Process($script, $this->cwd, $env, $this->stdin, $this->timeout, $options);
+
+        if ($this->outputDisabled) {
+            $process->disableOutput();
+        }
+
+        return $process;
     }
 }

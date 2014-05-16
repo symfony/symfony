@@ -8,6 +8,7 @@
         <default key="_controller">MyBundle:Blog:show</default>
         <requirement key="locale">\w+</requirement>
         <option key="compiler_class">RouteCompiler</option>
+        <condition>context.getMethod() == "GET"</condition>
     </route>
 
     <route id="blog_show_legacy" pattern="/blog/{slug}" host="{locale}.example.com">
@@ -17,5 +18,8 @@
         <requirement key="_scheme">hTTps</requirement>
         <requirement key="locale">\w+</requirement>
         <option key="compiler_class">RouteCompiler</option>
+        <condition>context.getMethod() == "GET"</condition>
     </route>
+
+    <route id="blog_show_inherited" path="/blog/{slug}" />
 </routes>

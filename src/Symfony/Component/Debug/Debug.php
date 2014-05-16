@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Debug;
 
-use Symfony\Component\ClassLoader\DebugClassLoader;
-
 /**
  * Registers all the debug tools.
  *
@@ -51,8 +49,6 @@ class Debug
             ini_set('display_errors', 1);
         }
 
-        if (class_exists('Symfony\Component\ClassLoader\DebugClassLoader')) {
-            DebugClassLoader::enable();
-        }
+        DebugClassLoader::enable();
     }
 }

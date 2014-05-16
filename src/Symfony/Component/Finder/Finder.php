@@ -661,7 +661,7 @@ class Finder implements \IteratorAggregate, \Countable
         foreach ((array) $dirs as $dir) {
             if (is_dir($dir)) {
                 $resolvedDirs[] = $dir;
-            } elseif ($glob = glob($dir, GLOB_ONLYDIR)) {
+            } elseif ($glob = glob($dir, GLOB_BRACE | GLOB_ONLYDIR)) {
                 $resolvedDirs = array_merge($resolvedDirs, $glob);
             } else {
                 throw new \InvalidArgumentException(sprintf('The "%s" directory does not exist.', $dir));

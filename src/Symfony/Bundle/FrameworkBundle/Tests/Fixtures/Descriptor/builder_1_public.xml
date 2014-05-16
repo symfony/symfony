@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<container>
+  <alias id="alias_1" service="service_1" public="true"/>
+  <alias id="alias_2" service="service_2" public="false"/>
+  <definition id="definition_1" class="Full\Qualified\Class1" factory-class="Full\Qualified\FactoryClass" factory-method="get" scope="container" public="true" synthetic="false" lazy="true" synchronized="true" abstract="true" file=""/>
+  <service id="service_container" class="Symfony\Component\DependencyInjection\ContainerBuilder"/>
+</container>

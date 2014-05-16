@@ -27,6 +27,10 @@ class AllValidator extends ConstraintValidator
      */
     public function validate($value, Constraint $constraint)
     {
+        if (!$constraint instanceof All) {
+            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\All');
+        }
+
         if (null === $value) {
             return;
         }
@@ -35,11 +39,12 @@ class AllValidator extends ConstraintValidator
             throw new UnexpectedTypeException($value, 'array or Traversable');
         }
 
-        $group = $this->context->getGroup();
+        $context = $this->context;
+        $group = $context->getGroup();
 
         foreach ($value as $key => $element) {
             foreach ($constraint->constraints as $constr) {
-                $this->context->validateValue($element, $constr, '['.$key.']', $group);
+                $context->validateValue($element, $constr, '['.$key.']', $group);
             }
         }
     }

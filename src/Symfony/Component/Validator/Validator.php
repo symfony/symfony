@@ -11,17 +11,20 @@
 
 namespace Symfony\Component\Validator;
 
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Exception\ValidatorException;
-use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Default implementation of {@link ValidatorInterface}.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+ *             Use {@link Validator\RecursiveValidator} instead.
  */
-class Validator implements ValidatorInterface
+class Validator implements ValidatorInterface, Mapping\Factory\MetadataFactoryInterface
 {
     /**
      * @var MetadataFactoryInterface
@@ -77,6 +80,14 @@ class Validator implements ValidatorInterface
     public function getMetadataFor($value)
     {
         return $this->metadataFactory->getMetadataFor($value);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasMetadataFor($value)
+    {
+        return $this->metadataFactory->hasMetadataFor($value);
     }
 
     /**

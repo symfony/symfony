@@ -18,9 +18,9 @@ use Symfony\Component\Console\Command\Command;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class HelperSet
+class HelperSet implements \IteratorAggregate
 {
-    private $helpers;
+    private $helpers = array();
     private $command;
 
     /**
@@ -30,7 +30,6 @@ class HelperSet
      */
     public function __construct(array $helpers = array())
     {
-        $this->helpers = array();
         foreach ($helpers as $alias => $helper) {
             $this->set($helper, is_int($alias) ? null : $alias);
         }
@@ -100,5 +99,10 @@ class HelperSet
     public function getCommand()
     {
         return $this->command;
+    }
+
+    public function getIterator()
+    {
+        return new \ArrayIterator($this->helpers);
     }
 }

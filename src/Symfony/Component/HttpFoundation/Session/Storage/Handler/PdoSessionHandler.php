@@ -240,4 +240,14 @@ class PdoSessionHandler implements \SessionHandlerInterface
                 return "INSERT OR REPLACE INTO $this->table ($this->idCol, $this->dataCol, $this->timeCol) VALUES (:id, :data, :time)";
         }
     }
+
+    /**
+     * Return a PDO instance
+     *
+     * @return \PDO
+     */
+    protected function getConnection()
+    {
+        return $this->pdo;
+    }
 }

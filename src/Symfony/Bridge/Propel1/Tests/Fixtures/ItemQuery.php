@@ -18,8 +18,14 @@ class ItemQuery
         'value'         => \PropelColumnTypes::VARCHAR,
         'price'         => \PropelColumnTypes::FLOAT,
         'is_active'     => \PropelColumnTypes::BOOLEAN,
+        'slug'          => \PropelColumnTypes::VARCHAR,
         'enabled'       => \PropelColumnTypes::BOOLEAN_EMU,
         'updated_at'    => \PropelColumnTypes::TIMESTAMP,
+    );
+
+    private $caseInsensitiveMap = array(
+        'isactive'      => 'is_active',
+        'updatedat'     => 'updated_at',
     );
 
     public static $result = array();
@@ -65,6 +71,28 @@ class ItemQuery
     {
         if ($this->hasColumn($column)) {
             return new Column($column, $this->map[$column]);
+        }
+    }
+
+    /**
+     * Method from the TableMap API
+     */
+    public function hasColumnByInsensitiveCase($column)
+    {
+        $column = strtolower($column);
+
+        return in_array($column, array_keys($this->caseInsensitiveMap));
+    }
+
+    /**
+     * Method from the TableMap API
+     */
+    public function getColumnByInsensitiveCase($column)
+    {
+        $column = strtolower($column);
+
+        if (isset($this->caseInsensitiveMap[$column])) {
+            return $this->getColumn($this->caseInsensitiveMap[$column]);
         }
     }
 

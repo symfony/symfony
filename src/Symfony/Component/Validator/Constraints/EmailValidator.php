@@ -14,6 +14,7 @@ namespace Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
+use Egulias\EmailValidator\EmailValidator as StrictEmailValidator;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -23,10 +24,26 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 class EmailValidator extends ConstraintValidator
 {
     /**
+     * isStrict
+     *
+     * @var bool
+     */
+    private $isStrict;
+
+    public function __construct($strict = false)
+    {
+        $this->isStrict = $strict;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function validate($value, Constraint $constraint)
     {
+        if (!$constraint instanceof Email) {
+            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Email');
+        }
+
         if (null === $value || '' === $value) {
             return;
         }
@@ -36,12 +53,23 @@ class EmailValidator extends ConstraintValidator
         }
 
         $value = (string) $value;
-        $valid = filter_var($value, FILTER_VALIDATE_EMAIL);
+        if (null === $constraint->strict) {
+            $constraint->strict = $this->isStrict;
+        }
+
+        if ($constraint->strict && class_exists('\Egulias\EmailValidator\EmailValidator')) {
+            $strictValidator = new StrictEmailValidator();
+            $valid = $strictValidator->isValid($value, false);
+        } elseif ($constraint->strict === true) {
+            throw new \RuntimeException('Strict email validation requires egulias/email-validator');
+        } else {
+            $valid = preg_match('/.+\@.+\..+/', $value);
+        }
 
         if ($valid) {
             $host = substr($value, strpos($value, '@') + 1);
-
             // Check for host DNS resource records
+
             if ($valid && $constraint->checkMX) {
                 $valid = $this->checkMX($host);
             } elseif ($valid && $constraint->checkHost) {

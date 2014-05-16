@@ -120,6 +120,23 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $this->encoder->encode($array, 'xml'));
     }
 
+    public function testEncodeXmlAttributes()
+    {
+        $xml = simplexml_load_string('<firstname>Peter</firstname>');
+        $array = array('person' => $xml);
+
+        $expected = '<?xml version="1.1" encoding="utf-8" standalone="yes"?>'."\n".
+            '<response><person><firstname>Peter</firstname></person></response>'."\n";
+
+        $context = array(
+            'xml_version' => '1.1',
+            'xml_encoding' => 'utf-8',
+            'xml_standalone' => true,
+        );
+
+        $this->assertSame($expected, $this->encoder->encode($array, 'xml', $context));
+    }
+
     public function testEncodeScalarRootAttributes()
     {
         $array = array(
@@ -189,7 +206,7 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
     public function testEncodeSerializerXmlRootNodeNameOption()
     {
         $options = array('xml_root_node_name' => 'test');
-        $this->encoder = new XmlEncoder;
+        $this->encoder = new XmlEncoder();
         $serializer = new Serializer(array(), array('xml' => new XmlEncoder()));
         $this->encoder->setSerializer($serializer);
 
@@ -272,7 +289,7 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
 
     public function testDecodeWithoutItemHash()
     {
-        $obj = new ScalarDummy;
+        $obj = new ScalarDummy();
         $obj->xmlFoo = array(
             'foo-bar' => array(
                 '@key' => "value",

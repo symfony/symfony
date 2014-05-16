@@ -11,21 +11,28 @@
 
 namespace Symfony\Component\Validator;
 
-use Symfony\Component\Validator\Mapping\ClassMetadataFactory;
+use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\Common\Annotations\AnnotationRegistry;
+use Doctrine\Common\Annotations\CachedReader;
+use Doctrine\Common\Annotations\Reader;
+use Doctrine\Common\Cache\ArrayCache;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\Context\LegacyExecutionContextFactory;
+use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Exception\ValidatorException;
-use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
 use Symfony\Component\Validator\Mapping\Cache\CacheInterface;
-use Symfony\Component\Validator\Mapping\Loader\StaticMethodLoader;
-use Symfony\Component\Validator\Mapping\Loader\YamlFileLoader;
+use Symfony\Component\Validator\Mapping\ClassMetadataFactory;
 use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
-use Symfony\Component\Validator\Mapping\Loader\YamlFilesLoader;
+use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
+use Symfony\Component\Validator\Mapping\Loader\StaticMethodLoader;
 use Symfony\Component\Validator\Mapping\Loader\XmlFileLoader;
 use Symfony\Component\Validator\Mapping\Loader\XmlFilesLoader;
-use Symfony\Component\Translation\TranslatorInterface;
-use Doctrine\Common\Annotations\Reader;
-use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\Common\Annotations\CachedReader;
-use Doctrine\Common\Cache\ArrayCache;
+use Symfony\Component\Validator\Mapping\Loader\YamlFileLoader;
+use Symfony\Component\Validator\Mapping\Loader\YamlFilesLoader;
+use Symfony\Component\Validator\Validator\LegacyValidator;
+use Symfony\Component\Validator\Validator\RecursiveValidator;
+use Symfony\Component\Validator\Validator as ValidatorV24;
 
 /**
  * The default implementation of {@link ValidatorBuilderInterface}.
@@ -83,6 +90,16 @@ class ValidatorBuilder implements ValidatorBuilderInterface
      * @var null|string
      */
     private $translationDomain;
+
+    /**
+     * @var PropertyAccessorInterface
+     */
+    private $propertyAccessor;
+
+    /**
+     * @var int
+     */
+    private $apiVersion;
 
     /**
      * {@inheritdoc}
@@ -198,8 +215,8 @@ class ValidatorBuilder implements ValidatorBuilderInterface
         }
 
         if (null === $annotationReader) {
-            if (!class_exists('Doctrine\Common\Annotations\AnnotationReader')) {
-                throw new \RuntimeException('Requested a ValidatorFactory with an AnnotationLoader, but the AnnotationReader was not found. You should add Doctrine Common to your project.');
+            if (!class_exists('Doctrine\Common\Annotations\AnnotationReader') || !class_exists('Doctrine\Common\Cache\ArrayCache')) {
+                throw new \RuntimeException('Enabling annotation based constraint mapping requires the packages doctrine/annotations and doctrine/cache to be installed.');
             }
 
             $annotationReader = new CachedReader(new AnnotationReader(), new ArrayCache());
@@ -253,6 +270,10 @@ class ValidatorBuilder implements ValidatorBuilderInterface
      */
     public function setConstraintValidatorFactory(ConstraintValidatorFactoryInterface $validatorFactory)
     {
+        if (null !== $this->propertyAccessor) {
+            throw new ValidatorException('You cannot set a validator factory after setting a custom property accessor. Remove the call to setPropertyAccessor() if you want to call setConstraintValidatorFactory().');
+        }
+
         $this->validatorFactory = $validatorFactory;
 
         return $this;
@@ -274,6 +295,46 @@ class ValidatorBuilder implements ValidatorBuilderInterface
     public function setTranslationDomain($translationDomain)
     {
         $this->translationDomain = $translationDomain;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setPropertyAccessor(PropertyAccessorInterface $propertyAccessor)
+    {
+        if (null !== $this->validatorFactory) {
+            throw new ValidatorException('You cannot set a property accessor after setting a custom validator factory. Configure your validator factory instead.');
+        }
+
+        $this->propertyAccessor = $propertyAccessor;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setApiVersion($apiVersion)
+    {
+        if (!in_array($apiVersion, array(Validation::API_VERSION_2_4, Validation::API_VERSION_2_5, Validation::API_VERSION_2_5_BC))) {
+            throw new InvalidArgumentException(sprintf(
+                'The requested API version is invalid: "%s"',
+                $apiVersion
+            ));
+        }
+
+        if (version_compare(PHP_VERSION, '5.3.9', '<') && $apiVersion === Validation::API_VERSION_2_5_BC) {
+            throw new InvalidArgumentException(sprintf(
+                'The Validator API that is compatible with both Symfony 2.4 '.
+                'and Symfony 2.5 can only be used on PHP 5.3.9 and higher. '.
+                'Your current PHP version is %s.',
+                PHP_VERSION
+            ));
+        }
+
+        $this->apiVersion = $apiVersion;
 
         return $this;
     }
@@ -306,6 +367,20 @@ class ValidatorBuilder implements ValidatorBuilderInterface
 
             if ($this->annotationReader) {
                 $loaders[] = new AnnotationLoader($this->annotationReader);
+
+                AnnotationRegistry::registerLoader(function ($class) {
+                    if (0 === strpos($class, __NAMESPACE__.'\\Constraints\\')) {
+                        $file = str_replace(__NAMESPACE__.'\\Constraints\\', __DIR__.'/Constraints/', $class).'.php';
+
+                        if (is_file($file)) {
+                            require_once $file;
+
+                            return true;
+                        }
+                    }
+
+                    return false;
+                });
             }
 
             $loader = null;
@@ -319,9 +394,26 @@ class ValidatorBuilder implements ValidatorBuilderInterface
             $metadataFactory = new ClassMetadataFactory($loader, $this->metadataCache);
         }
 
-        $validatorFactory = $this->validatorFactory ?: new ConstraintValidatorFactory();
+        $validatorFactory = $this->validatorFactory ?: new ConstraintValidatorFactory($this->propertyAccessor);
         $translator = $this->translator ?: new DefaultTranslator();
+        $apiVersion = $this->apiVersion;
 
-        return new Validator($metadataFactory, $validatorFactory, $translator, $this->translationDomain, $this->initializers);
+        if (null === $apiVersion) {
+            $apiVersion = version_compare(PHP_VERSION, '5.3.9', '<')
+                ? Validation::API_VERSION_2_4
+                : Validation::API_VERSION_2_5_BC;
+        }
+
+        if (Validation::API_VERSION_2_4 === $apiVersion) {
+            return new ValidatorV24($metadataFactory, $validatorFactory, $translator, $this->translationDomain, $this->initializers);
+        }
+
+        $contextFactory = new LegacyExecutionContextFactory($metadataFactory, $translator, $this->translationDomain);
+
+        if (Validation::API_VERSION_2_5 === $apiVersion) {
+            return new RecursiveValidator($contextFactory, $metadataFactory, $validatorFactory);
+        }
+
+        return new LegacyValidator($contextFactory, $metadataFactory, $validatorFactory);
     }
 }

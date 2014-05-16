@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\EventListener;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -51,18 +52,7 @@ class ExceptionListener implements EventSubscriberInterface
 
         $this->logException($exception, sprintf('Uncaught PHP Exception %s: "%s" at %s line %s', get_class($exception), $exception->getMessage(), $exception->getFile(), $exception->getLine()));
 
-        $attributes = array(
-            '_controller' => $this->controller,
-            'exception'   => FlattenException::create($exception),
-            'logger'      => $this->logger instanceof DebugLoggerInterface ? $this->logger : null,
-            // keep for BC -- as $format can be an argument of the controller callable
-            // see src/Symfony/Bundle/TwigBundle/Controller/ExceptionController.php
-            // @deprecated in 2.4, to be removed in 3.0
-            'format'      => $request->getRequestFormat(),
-        );
-
-        $request = $request->duplicate(null, null, $attributes);
-        $request->setMethod('GET');
+        $request = $this->duplicateRequest($exception, $request);
 
         try {
             $response = $event->getKernel()->handle($request, HttpKernelInterface::SUB_REQUEST, true);
@@ -108,5 +98,30 @@ class ExceptionListener implements EventSubscriberInterface
         } elseif (!$original || $isCritical) {
             error_log($message);
         }
+    }
+
+    /**
+     * Clones the request for the exception.
+     *
+     * @param \Exception $exception The thrown exception.
+     * @param Request $request The original request.
+     *
+     * @return Request $request The cloned request.
+     */
+    protected function duplicateRequest(\Exception $exception, Request $request)
+    {
+        $attributes = array(
+            '_controller' => $this->controller,
+            'exception' => FlattenException::create($exception),
+            'logger' => $this->logger instanceof DebugLoggerInterface ? $this->logger : null,
+            // keep for BC -- as $format can be an argument of the controller callable
+            // see src/Symfony/Bundle/TwigBundle/Controller/ExceptionController.php
+            // @deprecated in 2.4, to be removed in 3.0
+            'format' => $request->getRequestFormat(),
+        );
+        $request = $request->duplicate(null, null, $attributes);
+        $request->setMethod('GET');
+
+        return $request;
     }
 }

@@ -266,7 +266,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
      *
      * @return mixed
      */
-    public function filter($key, $default = null, $deep = false, $filter=FILTER_DEFAULT, $options=array())
+    public function filter($key, $default = null, $deep = false, $filter = FILTER_DEFAULT, $options = array())
     {
         $value = $this->get($key, $default, $deep);
 

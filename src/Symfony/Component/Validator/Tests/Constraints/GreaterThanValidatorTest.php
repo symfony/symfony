@@ -37,6 +37,7 @@ class GreaterThanValidatorTest extends AbstractComparisonValidatorTestCase
         return array(
             array(2, 1),
             array(new \DateTime('2005/01/01'), new \DateTime('2001/01/01')),
+            array(new ComparisonTest_Class(5), new ComparisonTest_Class(4)),
             array('333', '22'),
             array(null, 1),
         );
@@ -52,6 +53,8 @@ class GreaterThanValidatorTest extends AbstractComparisonValidatorTestCase
             array(2, 2, '2', 'integer'),
             array(new \DateTime('2000/01/01'), new \DateTime('2005/01/01'), '2005-01-01 00:00:00', 'DateTime'),
             array(new \DateTime('2000/01/01'), new \DateTime('2000/01/01'), '2000-01-01 00:00:00', 'DateTime'),
+            array(new ComparisonTest_Class(4), new ComparisonTest_Class(5), '5', __NAMESPACE__.'\ComparisonTest_Class'),
+            array(new ComparisonTest_Class(5), new ComparisonTest_Class(5), '5', __NAMESPACE__.'\ComparisonTest_Class'),
             array('22', '333', "'333'", 'string'),
             array('22', '22', "'22'", 'string')
         );

@@ -24,6 +24,8 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
     {
         $allow = array();
         $pathinfo = rawurldecode($pathinfo);
+        $context = $this->context;
+        $request = $this->request;
 
         // foo
         if (0 === strpos($pathinfo, '/foo') && preg_match('#^/foo/(?P<bar>baz|symfony)$#s', $pathinfo, $matches)) {
@@ -319,8 +321,9 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
         // secure
         if ($pathinfo === '/secure') {
-            if ($this->context->getScheme() !== 'https') {
-                return $this->redirect($pathinfo, 'secure', 'https');
+            $requiredSchemes = array (  'https' => 0,);
+            if (!isset($requiredSchemes[$this->context->getScheme()])) {
+                return $this->redirect($pathinfo, 'secure', key($requiredSchemes));
             }
 
             return array('_route' => 'secure');
@@ -328,8 +331,9 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
         // nonsecure
         if ($pathinfo === '/nonsecure') {
-            if ($this->context->getScheme() !== 'http') {
-                return $this->redirect($pathinfo, 'nonsecure', 'http');
+            $requiredSchemes = array (  'http' => 0,);
+            if (!isset($requiredSchemes[$this->context->getScheme()])) {
+                return $this->redirect($pathinfo, 'nonsecure', key($requiredSchemes));
             }
 
             return array('_route' => 'nonsecure');

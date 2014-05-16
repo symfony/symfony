@@ -34,10 +34,6 @@ abstract class AbstractFormTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        if (!class_exists('Symfony\Component\EventDispatcher\EventDispatcher')) {
-            $this->markTestSkipped('The "EventDispatcher" component is not available');
-        }
-
         // We need an actual dispatcher to use the deprecated
         // bindRequest() method
         $this->dispatcher = new EventDispatcher();
@@ -61,12 +57,13 @@ abstract class AbstractFormTest extends \PHPUnit_Framework_TestCase
      * @param string                   $name
      * @param EventDispatcherInterface $dispatcher
      * @param string                   $dataClass
+     * @param array                    $options
      *
      * @return FormBuilder
      */
-    protected function getBuilder($name = 'name', EventDispatcherInterface $dispatcher = null, $dataClass = null)
+    protected function getBuilder($name = 'name', EventDispatcherInterface $dispatcher = null, $dataClass = null, array $options = array())
     {
-        return new FormBuilder($name, $dataClass, $dispatcher ?: $this->dispatcher, $this->factory);
+        return new FormBuilder($name, $dataClass, $dispatcher ?: $this->dispatcher, $this->factory, $options);
     }
 
     /**

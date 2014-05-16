@@ -16,11 +16,20 @@ use Symfony\Component\Templating\TemplateReferenceInterface;
 
 class LoaderTest extends \PHPUnit_Framework_TestCase
 {
+    public function testGetSetLogger()
+    {
+        $loader = new ProjectTemplateLoader4();
+        $logger = $this->getMock('Psr\Log\LoggerInterface');
+        $loader->setLogger($logger);
+        $this->assertSame($logger, $loader->getLogger(), '->setLogger() sets the logger instance');
+    }
+
     public function testGetSetDebugger()
     {
         $loader = new ProjectTemplateLoader4();
-        $loader->setDebugger($debugger = new \Symfony\Component\Templating\Tests\Fixtures\ProjectTemplateDebugger());
-        $this->assertTrue($loader->getDebugger() === $debugger, '->setDebugger() sets the debugger instance');
+        $debugger = $this->getMock('Symfony\Component\Templating\DebuggerInterface');
+        $loader->setDebugger($debugger);
+        $this->assertSame($debugger, $loader->getDebugger(), '->setDebugger() sets the debugger instance');
     }
 }
 
@@ -28,6 +37,11 @@ class ProjectTemplateLoader4 extends Loader
 {
     public function load(TemplateReferenceInterface $template)
     {
+    }
+
+    public function getLogger()
+    {
+        return $this->logger;
     }
 
     public function getDebugger()

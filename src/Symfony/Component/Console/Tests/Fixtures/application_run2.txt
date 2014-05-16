@@ -7,7 +7,7 @@ Arguments:
 
 Options:
  --xml                 To output help as XML
- --format              To output help in other formats
+ --format              To output help in other formats (default: "txt")
  --raw                 To output raw command help
  --help (-h)           Display this help message.
  --quiet (-q)          Do not output any message.
@@ -27,4 +27,3 @@ Help:
    php app/console help --format=xml list
  
  To display the list of available commands, please use the list command.
-

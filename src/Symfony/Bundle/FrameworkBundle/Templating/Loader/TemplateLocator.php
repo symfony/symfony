@@ -66,7 +66,7 @@ class TemplateLocator implements FileLocatorInterface
     public function locate($template, $currentPath = null, $first = true)
     {
         if (!$template instanceof TemplateReferenceInterface) {
-            throw new \InvalidArgumentException("The template must be an instance of TemplateReferenceInterface.");
+            throw new \InvalidArgumentException('The template must be an instance of TemplateReferenceInterface.');
         }
 
         $key = $this->getCacheKey($template);

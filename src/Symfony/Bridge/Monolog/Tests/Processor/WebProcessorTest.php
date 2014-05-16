@@ -14,17 +14,9 @@ namespace Symfony\Bridge\Monolog\Tests\Processor;
 use Monolog\Logger;
 use Symfony\Bridge\Monolog\Processor\WebProcessor;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class WebProcessorTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Monolog\\Logger')) {
-            $this->markTestSkipped('Monolog is not available.');
-        }
-    }
-
     public function testUsesRequestServerData()
     {
         $server = array(
@@ -42,8 +34,8 @@ class WebProcessorTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $event->expects($this->any())
-            ->method('getRequestType')
-            ->will($this->returnValue(HttpKernelInterface::MASTER_REQUEST));
+            ->method('isMasterRequest')
+            ->will($this->returnValue(true));
         $event->expects($this->any())
             ->method('getRequest')
             ->will($this->returnValue($request));

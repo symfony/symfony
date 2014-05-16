@@ -11,56 +11,101 @@
 
 namespace Symfony\Component\Validator\Mapping;
 
-use Symfony\Component\Validator\ValidationVisitorInterface;
-use Symfony\Component\Validator\PropertyMetadataContainerInterface;
-use Symfony\Component\Validator\ClassBasedInterface;
-use Symfony\Component\Validator\MetadataInterface;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Constraints\GroupSequence;
+use Symfony\Component\Validator\Constraints\Traverse;
+use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\GroupDefinitionException;
+use Symfony\Component\Validator\MetadataInterface as LegacyMetadataInterface;
+use Symfony\Component\Validator\PropertyMetadataContainerInterface;
+use Symfony\Component\Validator\ValidationVisitorInterface;
 
 /**
- * Represents all the configured constraints on a given class.
+ * Default implementation of {@link ClassMetadataInterface}.
+ *
+ * This class supports serialization and cloning.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassBasedInterface, PropertyMetadataContainerInterface
+class ClassMetadata extends ElementMetadata implements LegacyMetadataInterface, PropertyMetadataContainerInterface, ClassMetadataInterface
 {
     /**
      * @var string
+     *
+     * @internal This property is public in order to reduce the size of the
+     *           class' serialized representation. Do not access it. Use
+     *           {@link getClassName()} instead.
      */
     public $name;
 
     /**
      * @var string
+     *
+     * @internal This property is public in order to reduce the size of the
+     *           class' serialized representation. Do not access it. Use
+     *           {@link getDefaultGroup()} instead.
      */
     public $defaultGroup;
 
     /**
      * @var MemberMetadata[]
+     *
+     * @internal This property is public in order to reduce the size of the
+     *           class' serialized representation. Do not access it. Use
+     *           {@link getPropertyMetadata()} instead.
      */
     public $members = array();
 
     /**
      * @var PropertyMetadata[]
+     *
+     * @internal This property is public in order to reduce the size of the
+     *           class' serialized representation. Do not access it. Use
+     *           {@link getPropertyMetadata()} instead.
      */
     public $properties = array();
 
     /**
      * @var GetterMetadata[]
+     *
+     * @internal This property is public in order to reduce the size of the
+     *           class' serialized representation. Do not access it. Use
+     *           {@link getPropertyMetadata()} instead.
      */
     public $getters = array();
 
     /**
      * @var array
+     *
+     * @internal This property is public in order to reduce the size of the
+     *           class' serialized representation. Do not access it. Use
+     *           {@link getGroupSequence()} instead.
      */
     public $groupSequence = array();
 
     /**
      * @var bool
+     *
+     * @internal This property is public in order to reduce the size of the
+     *           class' serialized representation. Do not access it. Use
+     *           {@link isGroupSequenceProvider()} instead.
      */
     public $groupSequenceProvider = false;
+
+    /**
+     * The strategy for traversing traversable objects.
+     *
+     * By default, only instances of {@link \Traversable} are traversed.
+     *
+     * @var int
+     *
+     * @internal This property is public in order to reduce the size of the
+     *           class' serialized representation. Do not access it. Use
+     *           {@link getTraversalStrategy()} instead.
+     */
+    public $traversalStrategy = TraversalStrategy::IMPLICIT;
 
     /**
      * @var \ReflectionClass
@@ -83,6 +128,11 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
         }
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+     */
     public function accept(ValidationVisitorInterface $visitor, $value, $group, $propertyPath, $propagatedGroup = null)
     {
         if (null === $propagatedGroup && Constraint::DEFAULT_GROUP === $group
@@ -118,13 +168,16 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
     }
 
     /**
-     * Returns the properties to be serialized
-     *
-     * @return array
+     * {@inheritdoc}
      */
     public function __sleep()
     {
-        return array_merge(parent::__sleep(), array(
+        $parentProperties = parent::__sleep();
+
+        // Don't store the cascading strategy. Classes never cascade.
+        unset($parentProperties[array_search('cascadingStrategy', $parentProperties)]);
+
+        return array_merge($parentProperties, array(
             'getters',
             'groupSequence',
             'groupSequenceProvider',
@@ -136,9 +189,7 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
     }
 
     /**
-     * Returns the fully qualified name of the class
-     *
-     * @return string  The fully qualified class name
+     * {@inheritdoc}
      */
     public function getClassName()
     {
@@ -172,14 +223,36 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
     {
         if (!in_array(Constraint::CLASS_CONSTRAINT, (array) $constraint->getTargets())) {
             throw new ConstraintDefinitionException(sprintf(
-                'The constraint %s cannot be put on classes',
+                'The constraint "%s" cannot be put on classes.',
                 get_class($constraint)
             ));
+        }
+
+        if ($constraint instanceof Valid) {
+            throw new ConstraintDefinitionException(sprintf(
+                'The constraint "%s" cannot be put on classes.',
+                get_class($constraint)
+            ));
+        }
+
+        if ($constraint instanceof Traverse) {
+            if ($constraint->traverse) {
+                // If traverse is true, traversal should be explicitly enabled
+                $this->traversalStrategy = TraversalStrategy::TRAVERSE;
+            } else {
+                // If traverse is false, traversal should be explicitly disabled
+                $this->traversalStrategy = TraversalStrategy::NONE;
+            }
+
+            // The constraint is not added
+            return $this;
         }
 
         $constraint->addImplicitGroupName($this->getDefaultGroup());
 
         parent::addConstraint($constraint);
+
+        return $this;
     }
 
     /**
@@ -318,9 +391,7 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
     }
 
     /**
-     * Returns all properties for which constraints are defined.
-     *
-     * @return array An array of property names
+     * {@inheritdoc}
      */
     public function getConstrainedProperties()
     {
@@ -330,35 +401,37 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
     /**
      * Sets the default group sequence for this class.
      *
-     * @param array $groups An array of group names
+     * @param array $groupSequence An array of group names
      *
      * @return ClassMetadata
      *
      * @throws GroupDefinitionException
      */
-    public function setGroupSequence(array $groups)
+    public function setGroupSequence($groupSequence)
     {
         if ($this->isGroupSequenceProvider()) {
             throw new GroupDefinitionException('Defining a static group sequence is not allowed with a group sequence provider');
         }
 
-        if (in_array(Constraint::DEFAULT_GROUP, $groups, true)) {
+        if (is_array($groupSequence)) {
+            $groupSequence = new GroupSequence($groupSequence);
+        }
+
+        if (in_array(Constraint::DEFAULT_GROUP, $groupSequence->groups, true)) {
             throw new GroupDefinitionException(sprintf('The group "%s" is not allowed in group sequences', Constraint::DEFAULT_GROUP));
         }
 
-        if (!in_array($this->getDefaultGroup(), $groups, true)) {
+        if (!in_array($this->getDefaultGroup(), $groupSequence->groups, true)) {
             throw new GroupDefinitionException(sprintf('The group "%s" is missing in the group sequence', $this->getDefaultGroup()));
         }
 
-        $this->groupSequence = $groups;
+        $this->groupSequence = $groupSequence;
 
         return $this;
     }
 
     /**
-     * Returns whether this class has an overridden default group sequence.
-     *
-     * @return bool
+     * {@inheritdoc}
      */
     public function hasGroupSequence()
     {
@@ -366,9 +439,7 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
     }
 
     /**
-     * Returns the default group sequence for this class.
-     *
-     * @return array An array of group names
+     * {@inheritdoc}
      */
     public function getGroupSequence()
     {
@@ -410,12 +481,20 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
     }
 
     /**
-     * Returns whether the class is a group sequence provider.
-     *
-     * @return bool
+     * {@inheritdoc}
      */
     public function isGroupSequenceProvider()
     {
         return $this->groupSequenceProvider;
+    }
+
+    /**
+     * Class nodes are never cascaded.
+     *
+     * @return bool    Always returns false.
+     */
+    public function getCascadingStrategy()
+    {
+        return CascadingStrategy::NONE;
     }
 }

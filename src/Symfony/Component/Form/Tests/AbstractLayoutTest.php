@@ -17,7 +17,7 @@ use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 
 abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormIntegrationTestCase
 {
-    protected $csrfProvider;
+    protected $csrfTokenManager;
 
     protected function setUp()
     {
@@ -27,7 +27,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
         \Locale::setDefault('en');
 
-        $this->csrfProvider = $this->getMock('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface');
+        $this->csrfTokenManager = $this->getMock('Symfony\Component\Security\Csrf\CsrfTokenManagerInterface');
 
         parent::setUp();
     }
@@ -35,13 +35,13 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
     protected function getExtensions()
     {
         return array(
-            new CsrfExtension($this->csrfProvider),
+            new CsrfExtension($this->csrfTokenManager),
         );
     }
 
     protected function tearDown()
     {
-        $this->csrfProvider = null;
+        $this->csrfTokenManager = null;
 
         parent::tearDown();
     }
@@ -302,8 +302,9 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         );
     }
 
-    public function testWidgetById()
+    public function testOverrideWidgetBlock()
     {
+        // see custom_widgets.html.twig
         $form = $this->factory->createNamed('text_id', 'text');
         $html = $this->renderWidget($form->createView());
 
@@ -1253,7 +1254,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
     public function testEmailWithMaxLength()
     {
         $form = $this->factory->createNamed('name', 'email', 'foo&bar', array(
-            'max_length' => 123,
+            'attr' => array('maxlength' => 123),
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
@@ -1419,7 +1420,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
     public function testPasswordWithMaxLength()
     {
         $form = $this->factory->createNamed('name', 'password', 'foo&bar', array(
-            'max_length' => 123,
+            'attr' => array('maxlength' => 123),
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
@@ -1490,13 +1491,13 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
     public function testTextarea()
     {
         $form = $this->factory->createNamed('name', 'textarea', 'foo&bar', array(
-            'pattern' => 'foo',
+            'attr' => array('pattern' => 'foo'),
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/textarea
     [@name="name"]
-    [not(@pattern)]
+    [@pattern="foo"]
     [.="foo&bar"]
 '
         );
@@ -1519,7 +1520,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
     public function testTextWithMaxLength()
     {
         $form = $this->factory->createNamed('name', 'text', 'foo&bar', array(
-            'max_length' => 123,
+            'attr' => array('maxlength' => 123),
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
@@ -1830,7 +1831,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
         $html = $this->renderStart($form->createView());
 
-        $this->assertSame('<form method="get" action="http://example.com/directory">', $html);
+        $this->assertSame('<form name="form" method="get" action="http://example.com/directory">', $html);
     }
 
     public function testStartTagForPutRequest()
@@ -1862,7 +1863,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
             'action' => 'http://foo.com/directory'
         ));
 
-        $this->assertSame('<form method="post" action="http://foo.com/directory">', $html);
+        $this->assertSame('<form name="form" method="post" action="http://foo.com/directory">', $html);
     }
 
     public function testStartTagForMultipartForm()
@@ -1876,7 +1877,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
         $html = $this->renderStart($form->createView());
 
-        $this->assertSame('<form method="get" action="http://example.com/directory" enctype="multipart/form-data">', $html);
+        $this->assertSame('<form name="form" method="get" action="http://example.com/directory" enctype="multipart/form-data">', $html);
     }
 
     public function testStartTagWithExtraAttributes()
@@ -1890,6 +1891,82 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
             'attr' => array('class' => 'foobar'),
         ));
 
-        $this->assertSame('<form method="get" action="http://example.com/directory" class="foobar">', $html);
+        $this->assertSame('<form name="form" method="get" action="http://example.com/directory" class="foobar">', $html);
+    }
+
+    public function testWidgetAttributes()
+    {
+        $form = $this->factory->createNamed('text', 'text', 'value', array(
+            'required' => true,
+            'disabled' => true,
+            'read_only' => true,
+            'attr' => array('maxlength' => 10, 'pattern' => '\d+', 'class' => 'foobar', 'data-foo' => 'bar'),
+        ));
+
+        $html = $this->renderWidget($form->createView());
+
+        // compare plain HTML to check the whitespace
+        $this->assertSame('<input type="text" id="text" name="text" readonly="readonly" disabled="disabled" required="required" maxlength="10" pattern="\d+" class="foobar" data-foo="bar" value="value" />', $html);
+    }
+
+    public function testWidgetAttributeNameRepeatedIfTrue()
+    {
+        $form = $this->factory->createNamed('text', 'text', 'value', array(
+            'attr' => array('foo' => true),
+        ));
+
+        $html = $this->renderWidget($form->createView());
+
+        // foo="foo"
+        $this->assertSame('<input type="text" id="text" name="text" required="required" foo="foo" value="value" />', $html);
+    }
+
+    public function testWidgetAttributeHiddenIfFalse()
+    {
+        $form = $this->factory->createNamed('text', 'text', 'value', array(
+            'attr' => array('foo' => false),
+        ));
+
+        $html = $this->renderWidget($form->createView());
+
+        // no foo
+        $this->assertSame('<input type="text" id="text" name="text" required="required" value="value" />', $html);
+    }
+
+    public function testButtonAttributes()
+    {
+        $form = $this->factory->createNamed('button', 'button', null, array(
+            'disabled' => true,
+            'attr' => array('class' => 'foobar', 'data-foo' => 'bar'),
+        ));
+
+        $html = $this->renderWidget($form->createView());
+
+        // compare plain HTML to check the whitespace
+        $this->assertSame('<button type="button" id="button" name="button" disabled="disabled" class="foobar" data-foo="bar">[trans]Button[/trans]</button>', $html);
+    }
+
+    public function testButtonAttributeNameRepeatedIfTrue()
+    {
+        $form = $this->factory->createNamed('button', 'button', null, array(
+            'attr' => array('foo' => true),
+        ));
+
+        $html = $this->renderWidget($form->createView());
+
+        // foo="foo"
+        $this->assertSame('<button type="button" id="button" name="button" foo="foo">[trans]Button[/trans]</button>', $html);
+    }
+
+    public function testButtonAttributeHiddenIfFalse()
+    {
+        $form = $this->factory->createNamed('button', 'button', null, array(
+            'attr' => array('foo' => false),
+        ));
+
+        $html = $this->renderWidget($form->createView());
+
+        // no foo
+        $this->assertSame('<button type="button" id="button" name="button">[trans]Button[/trans]</button>', $html);
     }
 }

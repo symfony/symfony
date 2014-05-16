@@ -22,45 +22,39 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class RequestDataCollectorTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-    }
-
-    /**
-     * @dataProvider provider
-     */
-    public function testCollect(Request $request, Response $response)
+    public function testCollect()
     {
         $c = new RequestDataCollector();
 
-        $c->collect($request, $response);
+        $c->collect($this->createRequest(), $this->createResponse());
 
-        $this->assertSame('request',$c->getName());
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\HeaderBag',$c->getRequestHeaders());
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\ParameterBag',$c->getRequestServer());
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\ParameterBag',$c->getRequestCookies());
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\ParameterBag',$c->getRequestAttributes());
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\ParameterBag',$c->getRequestRequest());
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\ParameterBag',$c->getRequestQuery());
-        $this->assertEquals('html',$c->getFormat());
-        $this->assertEquals(array(),$c->getSessionAttributes());
-        $this->assertEquals('en',$c->getLocale());
+        $attributes = $c->getRequestAttributes();
 
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\HeaderBag',$c->getResponseHeaders());
-        $this->assertEquals('OK',$c->getStatusText());
-        $this->assertEquals(200,$c->getStatusCode());
-        $this->assertEquals('application/json',$c->getContentType());
+        $this->assertSame('request', $c->getName());
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\HeaderBag', $c->getRequestHeaders());
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\ParameterBag', $c->getRequestServer());
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\ParameterBag', $c->getRequestCookies());
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\ParameterBag', $attributes);
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\ParameterBag', $c->getRequestRequest());
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\ParameterBag', $c->getRequestQuery());
+        $this->assertSame('html', $c->getFormat());
+        $this->assertSame('foobar', $c->getRoute());
+        $this->assertSame(array('name' => 'foo'), $c->getRouteParams());
+        $this->assertSame(array(), $c->getSessionAttributes());
+        $this->assertSame('en', $c->getLocale());
+        $this->assertRegExp('/Resource\(stream#\d+\)/', $attributes->get('resource'));
+        $this->assertSame('Object(stdClass)', $attributes->get('object'));
+
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\HeaderBag', $c->getResponseHeaders());
+        $this->assertSame('OK', $c->getStatusText());
+        $this->assertSame(200, $c->getStatusCode());
+        $this->assertSame('application/json', $c->getContentType());
     }
 
     /**
      * Test various types of controller callables.
-     *
-     * @dataProvider provider
      */
-    public function testControllerInspection(Request $request, Response $response)
+    public function testControllerInspection()
     {
         // make sure we always match the line number
         $r1 = new \ReflectionMethod($this, 'testControllerInspection');
@@ -141,23 +135,29 @@ class RequestDataCollectorTest extends \PHPUnit_Framework_TestCase
         );
 
         $c = new RequestDataCollector();
-
+        $request = $this->createRequest();
+        $response = $this->createResponse();
         foreach ($controllerTests as $controllerTest) {
             $this->injectController($c, $controllerTest[1], $request);
             $c->collect($request, $response);
-            $this->assertEquals($controllerTest[2], $c->getController(), sprintf('Testing: %s', $controllerTest[0]));
+            $this->assertSame($controllerTest[2], $c->getController(), sprintf('Testing: %s', $controllerTest[0]));
         }
     }
 
-    public function provider()
+    protected function createRequest()
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            return array(array(null, null));
-        }
-
         $request = Request::create('http://test.com/foo?bar=baz');
         $request->attributes->set('foo', 'bar');
+        $request->attributes->set('_route', 'foobar');
+        $request->attributes->set('_route_params', array('name' => 'foo'));
+        $request->attributes->set('resource', fopen(__FILE__, 'r'));
+        $request->attributes->set('object', new \stdClass());
 
+        return $request;
+    }
+
+    protected function createResponse()
+    {
         $response = new Response();
         $response->setStatusCode(200);
         $response->headers->set('Content-Type', 'application/json');
@@ -165,9 +165,7 @@ class RequestDataCollectorTest extends \PHPUnit_Framework_TestCase
         $response->headers->setCookie(new Cookie('bar','foo',new \DateTime('@946684800')));
         $response->headers->setCookie(new Cookie('bazz','foo','2000-12-12'));
 
-        return array(
-            array($request, $response)
-        );
+        return $response;
     }
 
     /**

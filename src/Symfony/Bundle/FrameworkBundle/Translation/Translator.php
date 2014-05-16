@@ -24,7 +24,10 @@ use Symfony\Component\Config\ConfigCache;
 class Translator extends BaseTranslator
 {
     protected $container;
-    protected $options;
+    protected $options = array(
+        'cache_dir' => null,
+        'debug'     => false,
+    );
     protected $loaderIds;
 
     /**
@@ -47,11 +50,6 @@ class Translator extends BaseTranslator
         $this->container = $container;
         $this->loaderIds = $loaderIds;
 
-        $this->options = array(
-            'cache_dir' => null,
-            'debug'     => false,
-        );
-
         // check option names
         if ($diff = array_diff(array_keys($options), array_keys($this->options))) {
             throw new \InvalidArgumentException(sprintf('The Translator does not support the following options: \'%s\'.', implode('\', \'', $diff)));
@@ -67,8 +65,8 @@ class Translator extends BaseTranslator
      */
     public function getLocale()
     {
-        if (null === $this->locale && $this->container->isScopeActive('request') && $this->container->has('request')) {
-            $this->locale = $this->container->get('request')->getLocale();
+        if (null === $this->locale && $request = $this->container->get('request_stack')->getCurrentRequest()) {
+            $this->locale = $request->getLocale();
         }
 
         return $this->locale;

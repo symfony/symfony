@@ -18,8 +18,11 @@ use Symfony\Component\Console\Formatter\OutputFormatterStyle;
  * The Dialog class provides helpers to interact with the user.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated Deprecated since version 2.5, to be removed in 3.0.
+ *             Use the question helper instead.
  */
-class DialogHelper extends Helper
+class DialogHelper extends InputAwareHelper
 {
     private $inputStream;
     private static $shell;
@@ -98,6 +101,10 @@ class DialogHelper extends Helper
      */
     public function ask(OutputInterface $output, $question, $default = null, array $autocomplete = null)
     {
+        if ($this->input && !$this->input->isInteractive()) {
+            return $default;
+        }
+
         $output->write($question);
 
         $inputStream = $this->inputStream ?: STDIN;

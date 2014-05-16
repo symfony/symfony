@@ -1,9 +1,30 @@
 CHANGELOG
 =========
 
+2.5.0
+------
+
+ * deprecated options "max_length" and "pattern" in favor of putting these values in "attr" option
+ * added an option for multiple files upload
+ * form errors now reference their cause (constraint violation, exception, ...)
+ * form errors now remember which form they were originally added to
+ * [BC BREAK] added two optional parameters to FormInterface::getErrors() and
+   changed the method to return a Symfony\Component\Form\FormErrorIterator
+   instance instead of an array
+ * errors mapped to unsubmitted forms are discarded now
+ * ObjectChoiceList now compares choices by their value, if a value path is
+   given
+ * you can now pass interface names in the "data_class" option
+
+2.4.0
+-----
+
+ * moved CSRF implementation to the new Security CSRF sub-component
+ * deprecated CsrfProviderInterface and its implementations
+ * deprecated options "csrf_provider" and "intention" in favor of the new options "csrf_token_generator" and "csrf_token_id"
 
 2.3.0
-------
+-----
 
  * deprecated FormPerformanceTestCase and FormIntegrationTestCase in the Symfony\Component\Form\Tests namespace and moved them to the Symfony\Component\Form\Test namespace
  * deprecated TypeTestCase in the Symfony\Component\Form\Tests\Extension\Core\Type namespace and moved it to the Symfony\Component\Form\Test namespace

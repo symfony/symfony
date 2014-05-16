@@ -14,17 +14,9 @@ namespace Symfony\Bridge\Twig\Tests\Translation;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Bridge\Twig\Translation\TwigExtractor;
 use Symfony\Component\Translation\MessageCatalogue;
-use Symfony\Bridge\Twig\Tests\TestCase;
 
-class TwigExtractorTest extends TestCase
+class TwigExtractorTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\Translation\Translator')) {
-            $this->markTestSkipped('The "Translation" component is not available');
-        }
-    }
-
     /**
      * @dataProvider getExtractData
      */

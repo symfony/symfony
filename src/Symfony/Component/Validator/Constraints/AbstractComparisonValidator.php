@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * Provides a base class for the validation of property comparisons.
@@ -26,6 +27,10 @@ abstract class AbstractComparisonValidator extends ConstraintValidator
      */
     public function validate($value, Constraint $constraint)
     {
+        if (!$constraint instanceof AbstractComparison) {
+            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\AbstractComparison');
+        }
+
         if (null === $value) {
             return;
         }
@@ -60,6 +65,10 @@ abstract class AbstractComparisonValidator extends ConstraintValidator
      */
     private function valueToString($value)
     {
+        if (is_object($value) && method_exists($value, '__toString')) {
+            return (string) $value;
+        }
+
         if ($value instanceof \DateTime) {
             return $value->format('Y-m-d H:i:s');
         }

@@ -1,6 +1,19 @@
 CHANGELOG
 =========
 
+2.5.0
+-----
+
+ * added `JsonResponse::setEncodingOptions()` & `JsonResponse::getEncodingOptions()` for easier manipulation
+   of the options used while encoding data to JSON format.
+
+2.4.0
+-----
+
+ * added RequestStack
+ * added Request::getEncodings()
+ * added accessors methods to session handlers
+
 2.3.0
 -----
 

@@ -30,6 +30,10 @@ class IpValidator extends ConstraintValidator
      */
     public function validate($value, Constraint $constraint)
     {
+        if (!$constraint instanceof Ip) {
+            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Ip');
+        }
+
         if (null === $value || '' === $value) {
             return;
         }

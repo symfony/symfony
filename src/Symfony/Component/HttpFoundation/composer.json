@@ -18,6 +18,9 @@
     "require": {
         "php": ">=5.3.3"
     },
+    "require-dev": {
+        "symfony/expression-language": "~2.4"
+    },
     "autoload": {
         "psr-0": { "Symfony\\Component\\HttpFoundation\\": "" },
         "classmap": [ "Symfony/Component/HttpFoundation/Resources/stubs" ]
@@ -26,7 +29,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.3-dev"
+            "dev-master": "2.5-dev"
         }
     }
 }

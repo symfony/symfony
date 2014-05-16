@@ -11,28 +11,16 @@
 
 namespace Symfony\Component\HttpKernel\Tests\Bundle;
 
-use Symfony\Component\HttpKernel\Bundle\Bundle;
-
-use Symfony\Component\HttpKernel\Tests\Fixtures\ExtensionPresentBundle\ExtensionPresentBundle;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\HttpKernel\Tests\Fixtures\ExtensionAbsentBundle\ExtensionAbsentBundle;
 use Symfony\Component\HttpKernel\Tests\Fixtures\ExtensionPresentBundle\Command\FooCommand;
+use Symfony\Component\HttpKernel\Tests\Fixtures\ExtensionPresentBundle\ExtensionPresentBundle;
 
 class BundleTest extends \PHPUnit_Framework_TestCase
 {
     public function testRegisterCommands()
     {
-        if (!class_exists('Symfony\Component\Console\Application')) {
-            $this->markTestSkipped('The "Console" component is not available');
-        }
-
-        if (!interface_exists('Symfony\Component\DependencyInjection\ContainerAwareInterface')) {
-            $this->markTestSkipped('The "DependencyInjection" component is not available');
-        }
-
-        if (!class_exists('Symfony\Component\Finder\Finder')) {
-            $this->markTestSkipped('The "Finder" component is not available');
-        }
-
         $cmd = new FooCommand();
         $app = $this->getMock('Symfony\Component\Console\Application');
         $app->expects($this->once())->method('add')->with($this->equalTo($cmd));
@@ -43,6 +31,26 @@ class BundleTest extends \PHPUnit_Framework_TestCase
         $bundle2 = new ExtensionAbsentBundle();
 
         $this->assertNull($bundle2->registerCommands($app));
+    }
 
+    public function testRegisterCommandsIngoreCommandAsAService()
+    {
+        $container = new ContainerBuilder();
+        $commandClass = 'Symfony\Component\HttpKernel\Tests\Fixtures\ExtensionPresentBundle\Command\FooCommand';
+        $definition = new Definition($commandClass);
+        $definition->addTag('console.command');
+        $container->setDefinition('my-command', $definition);
+        $container->setAlias('console.command.'.strtolower(str_replace('\\', '_', $commandClass)), 'my-command');
+        $container->compile();
+
+        $application = $this->getMock('Symfony\Component\Console\Application');
+        // Never called, because it's the
+        // Symfony\Bundle\FrameworkBundle\Console\Application that register
+        // commands as a service
+        $application->expects($this->never())->method('add');
+
+        $bundle = new ExtensionPresentBundle();
+        $bundle->setContainer($container);
+        $bundle->registerCommands($application);
     }
 }

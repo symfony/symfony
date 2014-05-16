@@ -115,6 +115,32 @@ class PhpEngineTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar-foo-', $engine->render('foo.php', array('foo' => 'foo', 'bar' => 'bar')), '->render() supports render() calls in templates');
     }
 
+    public function testRenderParameter()
+    {
+        $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader);
+        $this->loader->setTemplate('foo.php', '<?php echo $template . $parameters ?>');
+        $this->assertEquals('foobar', $engine->render('foo.php', array('template' => 'foo', 'parameters' => 'bar')), '->render() extract variables');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @dataProvider forbiddenParameterNames
+     */
+    public function testRenderForbiddenParameter($name)
+    {
+        $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader);
+        $this->loader->setTemplate('foo.php', 'bar');
+        $engine->render('foo.php', array($name => 'foo'));
+    }
+
+    public function forbiddenParameterNames()
+    {
+        return array(
+            array('this'),
+            array('view'),
+        );
+    }
+
     public function testEscape()
     {
         $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader);

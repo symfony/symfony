@@ -118,14 +118,14 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
 
             $position += strlen($matches[1]);
             $remaining = $matches[4];
-            $pattern = '/^(\.(\w+)|\[([^\]]+)\])(.*)/';
+            $pattern = '/^(\.([^\.|\[]+)|\[([^\]]+)\])(.*)/';
         }
 
         if ('' !== $remaining) {
             throw new InvalidPropertyPathException(sprintf(
                 'Could not parse property path "%s". Unexpected token "%s" at position %d',
                 $propertyPath,
-                $remaining{0},
+                $remaining[0],
                 $position
             ));
         }

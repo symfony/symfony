@@ -135,9 +135,9 @@ class SimpleChoiceList extends ChoiceList
     /**
      * Converts the choice to a valid PHP array key.
      *
-     * @param mixed $choice The choice.
+     * @param mixed $choice The choice
      *
-     * @return string|int     A valid PHP array key.
+     * @return string|int A valid PHP array key
      */
     protected function fixChoice($choice)
     {

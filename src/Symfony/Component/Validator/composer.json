@@ -23,14 +23,23 @@
         "symfony/http-foundation": "~2.1",
         "symfony/intl": "~2.3",
         "symfony/yaml": "~2.0",
-        "symfony/config": "~2.2"
+        "symfony/config": "~2.2",
+        "symfony/property-access": "~2.2",
+        "doctrine/annotations": "~1.0",
+        "doctrine/cache": "~1.0",
+        "egulias/email-validator": "~1.0",
+        "symfony/expression-language": "~2.4"
     },
     "suggest": {
-        "doctrine/common": "",
+        "doctrine/annotations": "For using the annotation mapping. You will also need doctrine/cache.",
+        "doctrine/cache": "For using the default cached annotation reader and metadata cache.",
         "symfony/http-foundation": "",
         "symfony/intl": "",
         "symfony/yaml": "",
-        "symfony/config": ""
+        "symfony/config": "",
+        "egulias/email-validator": "Strict (RFC compliant) email validation",
+        "symfony/property-access": "For using the 2.4 Validator API",
+        "symfony/expression-language": "For using the 2.4 Expression validator"
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\Validator\\": "" }
@@ -39,7 +48,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.3-dev"
+            "dev-master": "2.5-dev"
         }
     }
 }

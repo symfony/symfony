@@ -82,7 +82,7 @@ class MessageSelector
                 return $standardRules[0];
             }
 
-            throw new \InvalidArgumentException(sprintf('Unable to choose a translation for "%s" with locale "%s". Double check that this translation has the correct plural options (e.g. "There is one apple|There are %%count%% apples").', $message, $locale));
+            throw new \InvalidArgumentException(sprintf('Unable to choose a translation for "%s" with locale "%s" for value "%d". Double check that this translation has the correct plural options (e.g. "There is one apple|There are %%count%% apples").', $message, $locale, $number));
         }
 
         return $standardRules[$position];

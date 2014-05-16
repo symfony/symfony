@@ -44,7 +44,7 @@ class Adapter extends AbstractAdapter
             $builder->name(new Expression($value));
         }
 
-        $scanner = new Scanner($dir, $builder->build(), $this->ignoreUnreadableDirs);
+        $scanner = new Scanner($dir, $builder->build(), $this->ignoreUnreadableDirs, $this->followLinks);
         $iterator = $scanner->getIterator();
 
         if ($this->sizes) {

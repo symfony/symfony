@@ -547,6 +547,28 @@ class FinderTest extends Iterator\RealIteratorTestCase
     }
 
     /**
+     * @dataProvider getAdaptersTestData
+     */
+    public function testFollowSymlink(Adapter\AdapterInterface $adapter)
+    {
+        $done = symlink(self::toAbsolute('foo'), self::toAbsolute('foo_link'));
+
+        if (!$done) {
+            $this->markTestSkipped('Symbolic links are not available on this OS.');
+        }
+
+        $finder = $this->buildFinder($adapter);
+        $finder->files()->in(self::$tmpDir);
+        $this->assertIterator($this->toAbsolute(array('foo/bar.tmp', 'test.php', 'test.py', 'foo bar')), $finder->getIterator());
+
+        $finder = $this->buildFinder($adapter);
+        $finder->files()->followLinks()->in(self::$tmpDir);
+        $this->assertIterator($this->toAbsolute(array('foo/bar.tmp', 'test.php', 'test.py', 'foo bar', 'foo_link/bar.tmp')), $finder->getIterator());
+
+        unlink(self::toAbsolute('foo_link'));
+    }
+
+    /**
      * Searching in multiple locations involves AppendIterator which does an unnecessary rewind which leaves FilterIterator
      * with inner FilesystemIterator in an invalid state.
      *

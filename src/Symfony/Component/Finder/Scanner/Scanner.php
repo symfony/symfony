@@ -24,6 +24,7 @@ class Scanner implements \IteratorAggregate
     private $rootPath;
     private $constraints;
     private $ignoreAccessDenied;
+    private $followLinks;
     private $scannedFiles;
 
     /**
@@ -32,12 +33,14 @@ class Scanner implements \IteratorAggregate
      * @param string      $rootPath
      * @param Constraints $constraints
      * @param bool        $ignoreAccessDenied
+     * @param bool        $followLinks
      */
-    public function __construct($rootPath, Constraints $constraints, $ignoreAccessDenied)
+    public function __construct($rootPath, Constraints $constraints, $ignoreAccessDenied, $followLinks)
     {
         $this->rootPath = $rootPath;
         $this->constraints = $constraints;
-        $this->ignoreAccessDenied = $ignoreAccessDenied;
+        $this->ignoreAccessDenied = (bool) $ignoreAccessDenied;
+        $this->followLinks = (bool) $followLinks;
         $this->scannedFiles = new \ArrayIterator();
     }
 
@@ -79,16 +82,23 @@ class Scanner implements \IteratorAggregate
         foreach ($this->constraints->filterFilenames($filenames) as $filename) {
             $rootPathname = $rootPath.'/'.$filename;
 
+            if (is_link($rootPathname) && !$this->followLinks) {
+                continue;
+            }
+
             $relativePathname = $relativePath ? $relativePath.'/'.$filename : $filename;
+
             if ($this->constraints->isPathnameExcluded($relativePathname)) {
                 continue;
             }
 
             $pathnameIncluded = $relativePathIncluded || $this->constraints->isPathnameIncluded($relativePathname);
+
             if (is_dir($rootPathname)) {
                 if ($keepFiles && $pathnameIncluded && $this->constraints->isDirectoryKept($relativePathname, $filename)) {
                     $this->scannedFiles[$rootPathname] = new SplFileInfo($rootPathname, $relativePath, $relativePathname);
                 }
+
                 if (!$this->constraints->isMaxDepthExceeded($relativeDepth)) {
                     $this->scanDirectory($relativePathname, $relativeDepth, $pathnameIncluded);
                 }

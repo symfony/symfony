@@ -691,7 +691,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     {
         // test that by default, PhpAdapter is selected
         $adapters = Finder::create()->getAdapters();
-        $this->assertTrue($adapters[0] instanceof Adapter\PhpAdapter);
+        $this->assertTrue($adapters[0] instanceof \Symfony\Component\Finder\Scanner\Adapter);
 
         // test another adapter selection
         $adapters = Finder::create()->setAdapter('gnu_find')->getAdapters();

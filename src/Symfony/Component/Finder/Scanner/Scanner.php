@@ -80,7 +80,7 @@ class Scanner implements \IteratorAggregate
         $relativeDepth = $relativeDepth + 1;
 
         foreach ($this->constraints->filterFilenames($filenames) as $filename) {
-            $rootPathname = $rootPath.'/'.$filename;
+            $rootPathname = rtrim($rootPath, '/').'/'.$filename;
 
             if (is_link($rootPathname) && !$this->followLinks) {
                 continue;

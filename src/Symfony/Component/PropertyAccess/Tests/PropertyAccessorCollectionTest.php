@@ -172,7 +172,7 @@ abstract class PropertyAccessorCollectionTest extends \PHPUnit_Framework_TestCas
 
     /**
      * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
-     * @expectedExceptionMessage Neither the property "axes" nor one of the methods "addAx()"/"removeAx()", "addAxe()"/"removeAxe()", "addAxis()"/"removeAxis()", "setAxes()", "__set()" or "__call()" exist and have public access in class "Mock_PropertyAccessorCollectionTest_CarNoAdderAndRemover
+     * @expectedExceptionMessage Neither the property "axes" nor one of the methods "addAx()"/"removeAx()", "addAxe()"/"removeAxe()", "addAxis()"/"removeAxis()", "setAxes()", "axes()", "__set()" or "__call()" exist and have public access in class "Mock_PropertyAccessorCollectionTest_CarNoAdderAndRemover
      */
     public function testSetValueFailsIfNoAdderNorRemoverFound()
     {

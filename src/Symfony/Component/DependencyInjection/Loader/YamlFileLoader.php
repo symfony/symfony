@@ -30,7 +30,7 @@ use Symfony\Component\ExpressionLanguage\Expression;
  */
 class YamlFileLoader extends FileLoader
 {
-    private $yamlParser;
+    protected $yamlParser;
 
     /**
      * Loads a Yaml file.
@@ -87,7 +87,7 @@ class YamlFileLoader extends FileLoader
      * @param array  $content
      * @param string $file
      */
-    private function parseImports($content, $file)
+    protected function parseImports($content, $file)
     {
         if (!isset($content['imports'])) {
             return;
@@ -105,7 +105,7 @@ class YamlFileLoader extends FileLoader
      * @param array  $content
      * @param string $file
      */
-    private function parseDefinitions($content, $file)
+    protected function parseDefinitions($content, $file)
     {
         if (!isset($content['services'])) {
             return;
@@ -125,7 +125,7 @@ class YamlFileLoader extends FileLoader
      *
      * @throws InvalidArgumentException When tags are invalid
      */
-    private function parseDefinition($id, $service, $file)
+    protected function parseDefinition($id, $service, $file)
     {
         if (is_string($service) && 0 === strpos($service, '@')) {
             $this->container->setAlias($id, substr($service, 1));
@@ -276,7 +276,7 @@ class YamlFileLoader extends FileLoader
      *
      * @throws InvalidArgumentException When service file is not valid
      */
-    private function validate($content, $file)
+    protected function validate($content, $file)
     {
         if (null === $content) {
             return $content;
@@ -313,7 +313,7 @@ class YamlFileLoader extends FileLoader
      *
      * @return Reference
      */
-    private function resolveServices($value)
+    protected function resolveServices($value)
     {
         if (is_array($value)) {
             $value = array_map(array($this, 'resolveServices'), $value);
@@ -351,7 +351,7 @@ class YamlFileLoader extends FileLoader
      *
      * @param array $content
      */
-    private function loadFromExtensions($content)
+    protected function loadFromExtensions($content)
     {
         foreach ($content as $namespace => $values) {
             if (in_array($namespace, array('imports', 'parameters', 'services'))) {

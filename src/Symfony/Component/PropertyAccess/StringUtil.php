@@ -81,8 +81,8 @@ class StringUtil
         // moves (move)
         array('sevom', 5, true, true, 'move'),
 
-        // hooves (hoof), dwarves (dwarf), elves (elf), leaves (leaf)
-        array('sev', 3, true, true, 'f'),
+        // hooves (hoof), dwarves (dwarf), elves (elf), leaves (leaf), caves (cave), staves (staff)
+        array('sev', 3, true, true, array('f', 've', 'ff')),
 
         // axes (axis), axes (ax), axes (axe)
         array('sexa', 4, false, false, array('ax', 'axe', 'axis')),

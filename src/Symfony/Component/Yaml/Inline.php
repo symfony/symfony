@@ -350,19 +350,37 @@ class Inline
                 switch ($mapping[$i]) {
                     case '[':
                         // nested sequence
-                        $output[$key] = self::parseSequence($mapping, $i);
+                        $value = self::parseSequence($mapping, $i);
+                        // Spec: Keys MUST be unique; first one wins.
+                        // Parser cannot abort this mapping earlier, since lines
+                        // are processed sequentially.
+                        if (!isset($output[$key])) {
+                            $output[$key] = $value;
+                        }
                         $done = true;
                         break;
                     case '{':
                         // nested mapping
-                        $output[$key] = self::parseMapping($mapping, $i);
+                        $value = self::parseMapping($mapping, $i);
+                        // Spec: Keys MUST be unique; first one wins.
+                        // Parser cannot abort this mapping earlier, since lines
+                        // are processed sequentially.
+                        if (!isset($output[$key])) {
+                            $output[$key] = $value;
+                        }
                         $done = true;
                         break;
                     case ':':
                     case ' ':
                         break;
                     default:
-                        $output[$key] = self::parseScalar($mapping, array(',', '}'), array('"', "'"), $i);
+                        $value = self::parseScalar($mapping, array(',', '}'), array('"', "'"), $i);
+                        // Spec: Keys MUST be unique; first one wins.
+                        // Parser cannot abort this mapping earlier, since lines
+                        // are processed sequentially.
+                        if (!isset($output[$key])) {
+                            $output[$key] = $value;
+                        }
                         $done = true;
                         --$i;
                 }

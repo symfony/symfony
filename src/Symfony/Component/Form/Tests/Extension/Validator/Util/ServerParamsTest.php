@@ -11,8 +11,33 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Validator\Util;
 
+use Symfony\Component\Form\Extension\Validator\Util\ServerParams;
+use Symfony\Component\HttpFoundation\Request;
+
 class ServerParamsTest extends \PHPUnit_Framework_TestCase
 {
+    public function testGetContentLengthFromSuperglobals()
+    {
+        $serverParams = new ServerParams();
+        $this->assertNull($serverParams->getContentLength());
+
+        $_SERVER['CONTENT_LENGTH'] = 1024;
+
+        $this->assertEquals(1024, $serverParams->getContentLength());
+
+        unset($_SERVER['CONTENT_LENGTH']);
+    }
+
+    public function testGetContentLengthFromRequest()
+    {
+        $request = Request::create('http://foo', 'GET', array(), array(), array(), array('CONTENT_LENGTH' => 1024));
+        $requestStack = $this->getMock('Symfony\Component\HttpFoundation\RequestStack', array('getCurrentRequest'));
+        $requestStack->expects($this->once())->method('getCurrentRequest')->will($this->returnValue($request));
+        $serverParams = new ServerParams($requestStack);
+
+        $this->assertEquals(1024, $serverParams->getContentLength());
+    }
+
     /** @dataProvider getGetPostMaxSizeTestData */
     public function testGetPostMaxSize($size, $bytes)
     {

@@ -19,13 +19,14 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
  * This means requests for the same session will wait until the other one finished.
  * PHPs internal files session handler also works this way.
  *
- * Session data is a binary string that can contain non-printable characters like the null byte.
- * For this reason this handler base64 encodes the data to be able to save it in a character column.
- *
  * Attention: Since SQLite does not support row level locks but locks the whole database,
  * it means only one session can be accessed at a time. Even different sessions would wait
  * for another to finish. So saving session in SQLite should only be considered for
  * development or prototypes.
+ *
+ * Session data is a binary string that can contain non-printable characters like the null byte.
+ * For this reason it must be saved in a binary column in the database like BLOB in MySQL.
+ * Saving it in a character column could corrupt the data.
  *
  * @see http://php.net/sessionhandlerinterface
  *
@@ -145,11 +146,7 @@ class PdoSessionHandler implements \SessionHandlerInterface
             // We use fetchAll instead of fetchColumn to make sure the DB cursor gets closed
             $sessionRows = $stmt->fetchAll(\PDO::FETCH_NUM);
 
-            if ($sessionRows) {
-                return base64_decode($sessionRows[0][0]);
-            }
-
-            return '';
+            return $sessionRows ? $sessionRows[0][0] : '';
         } catch (\PDOException $e) {
             $this->rollback();
 
@@ -195,8 +192,6 @@ class PdoSessionHandler implements \SessionHandlerInterface
      */
     public function write($sessionId, $data)
     {
-        $encoded = base64_encode($data);
-
         // The session ID can be different from the one previously received in read()
         // when the session ID changed due to session_regenerate_id(). So we have to
         // do an insert or update even if we created a row in read() for locking.
@@ -208,7 +203,7 @@ class PdoSessionHandler implements \SessionHandlerInterface
             if (null !== $mergeSql) {
                 $mergeStmt = $this->pdo->prepare($mergeSql);
                 $mergeStmt->bindParam(':id', $sessionId, \PDO::PARAM_STR);
-                $mergeStmt->bindParam(':data', $encoded, \PDO::PARAM_STR);
+                $mergeStmt->bindParam(':data', $data, \PDO::PARAM_LOB);
                 $mergeStmt->bindValue(':time', time(), \PDO::PARAM_INT);
                 $mergeStmt->execute();
 
@@ -219,7 +214,7 @@ class PdoSessionHandler implements \SessionHandlerInterface
                 "UPDATE $this->table SET $this->dataCol = :data, $this->timeCol = :time WHERE $this->idCol = :id"
             );
             $updateStmt->bindParam(':id', $sessionId, \PDO::PARAM_STR);
-            $updateStmt->bindParam(':data', $encoded, \PDO::PARAM_STR);
+            $updateStmt->bindParam(':data', $data, \PDO::PARAM_LOB);
             $updateStmt->bindValue(':time', time(), \PDO::PARAM_INT);
             $updateStmt->execute();
 
@@ -236,7 +231,7 @@ class PdoSessionHandler implements \SessionHandlerInterface
                         "INSERT INTO $this->table ($this->idCol, $this->dataCol, $this->timeCol) VALUES (:id, :data, :time)"
                     );
                     $insertStmt->bindParam(':id', $sessionId, \PDO::PARAM_STR);
-                    $insertStmt->bindParam(':data', $encoded, \PDO::PARAM_STR);
+                    $insertStmt->bindParam(':data', $encoded, \PDO::PARAM_LOB);
                     $insertStmt->bindValue(':time', time(), \PDO::PARAM_INT);
                     $insertStmt->execute();
                 } catch (\PDOException $e) {

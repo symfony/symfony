@@ -722,6 +722,34 @@ EOF;
         $kernel->terminate(Request::create('/'), new Response());
     }
 
+    public function testRemoveAbsolutePathsFromContainer()
+    {
+        $kernel = new KernelForTest('dev', true);
+        $kernel->setRootDir($symfonyRootDir = __DIR__.'/Fixtures/DumpedContainers/app');
+
+        $content = file_get_contents($symfonyRootDir.'/cache/dev/withAbsolutePaths.php');
+        $content = str_replace('ROOT_DIR', __DIR__.'/Fixtures/DumpedContainers', $content);
+
+        $m = new \ReflectionMethod($kernel, 'removeAbsolutePathsFromContainer');
+        $m->setAccessible(true);
+        $content = $m->invoke($kernel, $content);
+        $this->assertEquals(file_get_contents($symfonyRootDir.'/cache/dev/withoutAbsolutePaths.php'), $content);
+    }
+
+    public function testRemoveAbsolutePathsFromContainerGiveUpWhenComposerJsonPathNotGuessable()
+    {
+        $kernel = new KernelForTest('dev', true);
+        $kernel->setRootDir($symfonyRootDir = sys_get_temp_dir());
+
+        $content = file_get_contents(__DIR__.'/Fixtures/DumpedContainers/app/cache/dev/withAbsolutePaths.php');
+        $content = str_replace('ROOT_DIR', __DIR__.'/Fixtures/DumpedContainers', $content);
+
+        $m = new \ReflectionMethod($kernel, 'removeAbsolutePathsFromContainer');
+        $m->setAccessible(true);
+        $newContent = $m->invoke($kernel, $content);
+        $this->assertEquals($newContent, $content);
+    }
+
     /**
      * Returns a mock for the BundleInterface
      *

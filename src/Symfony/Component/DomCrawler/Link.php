@@ -188,7 +188,7 @@ class Link
      */
     protected function setNode(\DOMNode $node)
     {
-        if ('a' != $node->nodeName && 'area' != $node->nodeName) {
+        if ('a' !== $node->nodeName && 'area' !== $node->nodeName) {
             throw new \LogicException(sprintf('Unable to click on a "%s" tag.', $node->nodeName));
         }
 

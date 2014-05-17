@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-05-17T10:42:57Z
+
+This allows supporting the short syntax allowed by HTML
+
+```html
+<input type="checkbox" checked>
+```

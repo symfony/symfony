@@ -99,11 +99,11 @@ class FileFormField extends FormField
      */
     protected function initialize()
     {
-        if ('input' != $this->node->nodeName) {
+        if ('input' !== $this->node->nodeName) {
             throw new \LogicException(sprintf('A FileFormField can only be created from an input tag (%s given).', $this->node->nodeName));
         }
 
-        if ('file' != strtolower($this->node->getAttribute('type'))) {
+        if ('file' !== strtolower($this->node->getAttribute('type'))) {
             throw new \LogicException(sprintf('A FileFormField can only be created from an input tag with a type of file (given type is %s).', $this->node->getAttribute('type')));
         }
 

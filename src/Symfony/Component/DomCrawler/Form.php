@@ -28,7 +28,7 @@ class Form extends Link implements \ArrayAccess
     private $button;
 
     /**
-     * @var Field\FormField[]
+     * @var FormFieldRegistry
      */
     private $fields;
 
@@ -368,7 +368,7 @@ class Form extends Link implements \ArrayAccess
     protected function setNode(\DOMElement $node)
     {
         $this->button = $node;
-        if ('button' == $node->nodeName || ('input' == $node->nodeName && in_array(strtolower($node->getAttribute('type')), array('submit', 'button', 'image')))) {
+        if ('button' === $node->nodeName || ('input' === $node->nodeName && in_array(strtolower($node->getAttribute('type')), array('submit', 'button', 'image')))) {
             if ($node->hasAttribute('form')) {
                 // if the node has the HTML5-compliant 'form' attribute, use it
                 $formId = $node->getAttribute('form');
@@ -385,8 +385,8 @@ class Form extends Link implements \ArrayAccess
                 if (null === $node = $node->parentNode) {
                     throw new \LogicException('The selected node does not have a form ancestor.');
                 }
-            } while ('form' != $node->nodeName);
-        } elseif ('form' != $node->nodeName) {
+            } while ('form' !== $node->nodeName);
+        } elseif ('form' !== $node->nodeName) {
             throw new \LogicException(sprintf('Unable to submit on a "%s" tag.', $node->nodeName));
         }
 

@@ -971,3 +971,4 @@ UPGRADE FROM 2.x to 3.0
 
  * Process::setStdin() and Process::getStdin() have been removed. Use
    Process::setInput() and Process::getInput() that works the same way.
+ * Process::setInput() and ProcessBuilder::setInput() do not accept non-scalar types.

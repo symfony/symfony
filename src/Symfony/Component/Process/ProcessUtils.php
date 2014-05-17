@@ -75,7 +75,7 @@ class ProcessUtils
     }
 
     /**
-     * Validates and normalized a Process input
+     * Validates and normalizes a Process input
      *
      * @param string $caller The name of method call that validates the input
      * @param mixed  $input  The input to validate
@@ -87,7 +87,11 @@ class ProcessUtils
     public static function validateInput($caller, $input)
     {
         if (null !== $input) {
-            if (is_scalar($input) || (is_object($input) && method_exists($input, '__toString'))) {
+            if (is_scalar($input)) {
+                return (string) $input;
+            }
+            // deprecated as of Symfony 2.5, to be removed in 3.0
+            if (is_object($input) && method_exists($input, '__toString')) {
                 return (string) $input;
             }
 

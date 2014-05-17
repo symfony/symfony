@@ -1,0 +1,6 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-05-17T13:40:59Z
+
+Note that loose comparison is still used to compare the value of options, because some people might be relying on the ability to pass an integer ``2`` to select an option with value ``'2'`` (values are always strings as they come from DOMElement attributes).
+I changed the comparisons only in places where it was safe for BC.

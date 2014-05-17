@@ -6,6 +6,8 @@ CHANGELOG
 
  * added support for PTY mode
  * added the convenience method "mustRun"
+ * deprecation: Process::setStdin() is deprecated in favor of Process::setInput()
+ * deprecation: Process::getStdin() is deprecated in favor of Process::getInput()
 
 2.4.0
 -----

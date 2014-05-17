@@ -45,7 +45,7 @@ class Process
     private $commandline;
     private $cwd;
     private $env;
-    private $stdin;
+    private $input;
     private $starttime;
     private $lastOutputTime;
     private $timeout;
@@ -128,7 +128,7 @@ class Process
      * @param string             $commandline The command line to run
      * @param string|null        $cwd         The working directory or null to use the working dir of the current PHP process
      * @param array|null         $env         The environment variables or null to inherit
-     * @param string|null        $stdin       The STDIN content
+     * @param string|null        $input       The input
      * @param int|float|null     $timeout     The timeout in seconds or null to disable
      * @param array              $options     An array of options for proc_open
      *
@@ -136,7 +136,7 @@ class Process
      *
      * @api
      */
-    public function __construct($commandline, $cwd = null, array $env = null, $stdin = null, $timeout = 60, array $options = array())
+    public function __construct($commandline, $cwd = null, array $env = null, $input = null, $timeout = 60, array $options = array())
     {
         if (!function_exists('proc_open')) {
             throw new RuntimeException('The Process class relies on proc_open, which is not available on your PHP installation.');
@@ -156,7 +156,7 @@ class Process
             $this->setEnv($env);
         }
 
-        $this->stdin = $stdin;
+        $this->input = $input;
         $this->setTimeout($timeout);
         $this->useFileHandles = defined('PHP_WINDOWS_VERSION_BUILD');
         $this->pty = false;
@@ -224,7 +224,7 @@ class Process
     }
 
     /**
-     * Starts the process and returns after sending the STDIN.
+     * Starts the process and returns after writing the input to STDIN.
      *
      * This method blocks until all STDIN data is sent to the process then it
      * returns while the process runs in the background.
@@ -288,7 +288,7 @@ class Process
             return;
         }
 
-        $this->processPipes->write(false, $this->stdin);
+        $this->processPipes->write(false, $this->input);
         $this->updateStatus(false);
         $this->checkTimeout();
     }
@@ -1038,10 +1038,23 @@ class Process
      * Gets the contents of STDIN.
      *
      * @return string|null The current contents
+     *
+     * @deprecated Deprecated since version 2.5, to be removed in 3.0.
+     *             This method is deprecated in favor of getInput.
      */
     public function getStdin()
     {
-        return $this->stdin;
+        return $this->getInput();
+    }
+
+    /**
+     * Gets the Process input.
+     *
+     * @return null|string The Process input
+     */
+    public function getInput()
+    {
+        return $this->input;
     }
 
     /**
@@ -1052,14 +1065,33 @@ class Process
      * @return self The current Process instance
      *
      * @throws LogicException In case the process is running
+     *
+     * @deprecated Deprecated since version 2.5, to be removed in 3.0.
+     *             This method is deprecated in favor of setInput.
      */
     public function setStdin($stdin)
     {
+        return $this->setInput($stdin);
+    }
+
+    /**
+     * Sets the input.
+     *
+     * This content will be passed to the underlying process standard input.
+     *
+     * @param string|null $input The content
+     *
+     * @return self The current Process instance
+     *
+     * @throws LogicException In case the process is running
+     */
+    public function setInput($input)
+    {
         if ($this->isRunning()) {
-            throw new LogicException('STDIN can not be set while the process is running.');
+            throw new LogicException('Input can not be set while the process is running.');
         }
 
-        $this->stdin = $stdin;
+        $this->input = $input;
 
         return $this;
     }

@@ -151,23 +151,23 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $expectedLength = (1024 * $size) + 1;
 
         $p = $this->getProcess(sprintf('php -r %s', escapeshellarg($code)));
-        $p->setStdin($expected);
+        $p->setInput($expected);
         $p->run();
 
         $this->assertEquals($expectedLength, strlen($p->getOutput()));
         $this->assertEquals($expectedLength, strlen($p->getErrorOutput()));
     }
 
-    public function testSetStdinWhileRunningThrowsAnException()
+    public function testSetInputWhileRunningThrowsAnException()
     {
         $process = $this->getProcess('php -r "usleep(500000);"');
         $process->start();
         try {
-            $process->setStdin('foobar');
+            $process->setInput('foobar');
             $process->stop();
             $this->fail('A LogicException should have been raised.');
         } catch (LogicException $e) {
-            $this->assertEquals('STDIN can not be set while the process is running.', $e->getMessage());
+            $this->assertEquals('Input can not be set while the process is running.', $e->getMessage());
         }
         $process->stop();
     }
@@ -993,6 +993,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
             array('WorkingDirectory'),
             array('Env'),
             array('Stdin'),
+            array('Input'),
             array('Options')
         );
 
@@ -1000,14 +1001,14 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param string  $commandline
-     * @param null    $cwd
-     * @param array   $env
-     * @param null    $stdin
-     * @param int     $timeout
-     * @param array   $options
+     * @param string         $commandline
+     * @param null|string    $cwd
+     * @param null|array     $env
+     * @param null|string    $input
+     * @param int            $timeout
+     * @param array          $options
      *
      * @return Process
      */
-    abstract protected function getProcess($commandline, $cwd = null, array $env = null, $stdin = null, $timeout = 60, array $options = array());
+    abstract protected function getProcess($commandline, $cwd = null, array $env = null, $input = null, $timeout = 60, array $options = array());
 }

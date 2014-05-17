@@ -170,7 +170,7 @@ class ChoiceFormField extends FormField
         $option = $this->buildOptionValue($node);
         $this->options[] = $option;
 
-        if ($node->getAttribute('checked')) {
+        if ($node->hasAttribute('checked')) {
             $this->value = $option['value'];
         }
     }
@@ -219,7 +219,7 @@ class ChoiceFormField extends FormField
             $optionValue = $this->buildOptionValue($this->node);
             $this->options[] = $optionValue;
 
-            if ($this->node->getAttribute('checked')) {
+            if ($this->node->hasAttribute('checked')) {
                 $this->value = $optionValue['value'];
             }
         } else {
@@ -234,7 +234,7 @@ class ChoiceFormField extends FormField
             foreach ($this->xpath->query('descendant::option', $this->node) as $option) {
                 $this->options[] = $this->buildOptionValue($option);
 
-                if ($option->getAttribute('selected')) {
+                if ($option->hasAttribute('selected')) {
                     $found = true;
                     if ($this->multiple) {
                         $this->value[] = $option->getAttribute('value');
@@ -265,7 +265,7 @@ class ChoiceFormField extends FormField
 
         $defaultValue = (isset($node->nodeValue) && !empty($node->nodeValue)) ? $node->nodeValue : '1';
         $option['value'] = $node->hasAttribute('value') ? $node->getAttribute('value') : $defaultValue;
-        $option['disabled'] = ($node->hasAttribute('disabled') && $node->getAttribute('disabled') == 'disabled');
+        $option['disabled'] = $node->hasAttribute('disabled');
 
         return $option;
     }

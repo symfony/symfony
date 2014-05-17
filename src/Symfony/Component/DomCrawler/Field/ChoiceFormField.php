@@ -232,22 +232,22 @@ class ChoiceFormField extends FormField
 
             $found = false;
             foreach ($this->xpath->query('descendant::option', $this->node) as $option) {
-                $this->options[] = $this->buildOptionValue($option);
+                $optionValue = $this->buildOptionValue($option);
+                $this->options[] = $optionValue;
 
                 if ($option->hasAttribute('selected')) {
                     $found = true;
                     if ($this->multiple) {
-                        $this->value[] = $option->getAttribute('value');
+                        $this->value[] = $optionValue['value'];
                     } else {
-                        $this->value = $option->getAttribute('value');
+                        $this->value = $optionValue['value'];
                     }
                 }
             }
 
             // if no option is selected and if it is a simple select box, take the first option as the value
-            $option = $this->xpath->query('descendant::option', $this->node)->item(0);
-            if (!$found && !$this->multiple && $option instanceof \DOMElement) {
-                $this->value = $option->getAttribute('value');
+            if (!$found && !$this->multiple && !empty($this->options)) {
+                $this->value = $this->options[0]['value'];
             }
         }
     }

@@ -36,6 +36,13 @@ class Table
     private $rows = array();
 
     /**
+     * Table footers.
+     *
+     * @var array
+     */
+    private $footers = array();
+
+    /**
      * Column widths cache.
      *
      * @var array
@@ -144,6 +151,13 @@ class Table
         return $this;
     }
 
+    public function setFooters(array $footers)
+    {
+        $this->footers = array_values($footers);
+
+        return $this;
+    }
+
     public function setRows(array $rows)
     {
         $this->rows = array();
@@ -218,6 +232,8 @@ class Table
      * | 9971-5-0210-0 | A Tale of Two Cities  | Charles Dickens  |
      * | 960-425-059-0 | The Lord of the Rings | J. R. R. Tolkien |
      * +---------------+-----------------------+------------------+
+     * | Footer 1      | Footer 2              | Footer 3         |
+     *
      */
     public function render()
     {
@@ -236,6 +252,8 @@ class Table
         if (!empty($this->rows)) {
             $this->renderRowSeparator();
         }
+
+        $this->renderRow($this->footers, $this->style->getCellFooterFormat());
 
         $this->cleanup();
     }
@@ -332,6 +350,7 @@ class Table
         foreach ($this->rows as $row) {
             $columns[] = count($row);
         }
+        $columns[] = count($this->footers);
 
         return $this->numberOfColumns = max($columns);
     }
@@ -357,6 +376,7 @@ class Table
 
             $lengths[] = $this->getCellWidth($row, $column);
         }
+        $lengths[] = $this->getCellWidth($this->footers, $column);
 
         return $this->columnWidths[$column] = max($lengths) + strlen($this->style->getCellRowContentFormat()) - 2;
     }

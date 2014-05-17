@@ -32,12 +32,13 @@ class TableHelperTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider testRenderProvider
      */
-    public function testRender($headers, $rows, $layout, $expected)
+    public function testRender($headers, $rows, $footers, $layout, $expected)
     {
         $table = new TableHelper();
         $table
             ->setHeaders($headers)
             ->setRows($rows)
+            ->setFooters($footers)
             ->setLayout($layout)
         ;
         $table->render($output = $this->getOutputStream());
@@ -48,12 +49,13 @@ class TableHelperTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider testRenderProvider
      */
-    public function testRenderAddRows($headers, $rows, $layout, $expected)
+    public function testRenderAddRows($headers, $rows, $footers, $layout, $expected)
     {
         $table = new TableHelper();
         $table
             ->setHeaders($headers)
             ->addRows($rows)
+            ->setFooters($footers)
             ->setLayout($layout)
         ;
         $table->render($output = $this->getOutputStream());
@@ -64,11 +66,12 @@ class TableHelperTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider testRenderProvider
      */
-    public function testRenderAddRowsOneByOne($headers, $rows, $layout, $expected)
+    public function testRenderAddRowsOneByOne($headers, $rows, $footers, $layout, $expected)
     {
         $table = new TableHelper();
         $table
             ->setHeaders($headers)
+            ->setFooters($footers)
             ->setLayout($layout)
         ;
         foreach ($rows as $row) {
@@ -89,9 +92,11 @@ class TableHelperTest extends \PHPUnit_Framework_TestCase
         );
 
         return array(
+            // 0
             array(
                 array('ISBN', 'Title', 'Author'),
                 $books,
+                array('Footer1', 'Footer2', 'Footer3'),
                 TableHelper::LAYOUT_DEFAULT,
 <<<TABLE
 +---------------+--------------------------+------------------+
@@ -102,12 +107,15 @@ class TableHelperTest extends \PHPUnit_Framework_TestCase
 | 960-425-059-0 | The Lord of the Rings    | J. R. R. Tolkien |
 | 80-902734-1-6 | And Then There Were None | Agatha Christie  |
 +---------------+--------------------------+------------------+
+| Footer1       | Footer2                  | Footer3          |
 
 TABLE
             ),
+            // 1
             array(
                 array('ISBN', 'Title', 'Author'),
                 $books,
+                array('Footer1-1', 'Footer1-2', 'Footer1-3'),
                 TableHelper::LAYOUT_COMPACT,
 <<<TABLE
  ISBN          Title                    Author           
@@ -115,12 +123,15 @@ TABLE
  9971-5-0210-0 A Tale of Two Cities     Charles Dickens  
  960-425-059-0 The Lord of the Rings    J. R. R. Tolkien 
  80-902734-1-6 And Then There Were None Agatha Christie  
+ Footer1-1     Footer1-2                Footer1-3        
 
 TABLE
             ),
+            // 2
             array(
                 array('ISBN', 'Title', 'Author'),
                 $books,
+                array('Footer1', 'Footer2', 'Footer3'),
                 TableHelper::LAYOUT_BORDERLESS,
 <<<TABLE
  =============== ========================== ================== 
@@ -131,9 +142,11 @@ TABLE
   960-425-059-0   The Lord of the Rings      J. R. R. Tolkien  
   80-902734-1-6   And Then There Were None   Agatha Christie   
  =============== ========================== ================== 
+  Footer1         Footer2                    Footer3           
 
 TABLE
             ),
+            // 3
             array(
                 array('ISBN', 'Title'),
                 array(
@@ -142,6 +155,7 @@ TABLE
                     array('960-425-059-0', 'The Lord of the Rings', 'J. R. R. Tolkien'),
                     array('80-902734-1-6', 'And Then There Were None', 'Agatha Christie'),
                 ),
+                array('Footer1', 'Footer2'),
                 TableHelper::LAYOUT_DEFAULT,
 <<<TABLE
 +---------------+--------------------------+------------------+
@@ -152,9 +166,11 @@ TABLE
 | 960-425-059-0 | The Lord of the Rings    | J. R. R. Tolkien |
 | 80-902734-1-6 | And Then There Were None | Agatha Christie  |
 +---------------+--------------------------+------------------+
+| Footer1       | Footer2                  |                  |
 
 TABLE
             ),
+            // 4
             array(
                 array(),
                 array(
@@ -163,6 +179,7 @@ TABLE
                     array('960-425-059-0', 'The Lord of the Rings', 'J. R. R. Tolkien'),
                     array('80-902734-1-6', 'And Then There Were None', 'Agatha Christie'),
                 ),
+                array(),
                 TableHelper::LAYOUT_DEFAULT,
 <<<TABLE
 +---------------+--------------------------+------------------+
@@ -174,6 +191,7 @@ TABLE
 
 TABLE
             ),
+            // 5
             array(
                 array('ISBN', 'Title', 'Author'),
                 array(
@@ -182,6 +200,7 @@ TABLE
                     array("9971-5-0210-2", "Harry Potter\nand the Chamber of Secrets", "Rowling\nJoanne K."),
                     array("960-425-059-0", "The Lord of the Rings", "J. R. R.\nTolkien"),
                 ),
+                array(),
                 TableHelper::LAYOUT_DEFAULT,
 <<<TABLE
 +---------------+----------------------------+-----------------+
@@ -199,29 +218,48 @@ TABLE
 
 TABLE
             ),
+            // 6
             array(
                 array('ISBN', 'Title'),
                 array(),
+                array('Footer1', 'Footer2'),
                 TableHelper::LAYOUT_DEFAULT,
 <<<TABLE
-+------+-------+
-| ISBN | Title |
-+------+-------+
++---------+---------+
+| ISBN    | Title   |
++---------+---------+
+| Footer1 | Footer2 |
 
 TABLE
             ),
+            // 7
             array(
+                array(),
+                array(),
+                array('Footer1', 'Footer2'),
+                TableHelper::LAYOUT_DEFAULT,
+<<<TABLE
++---------+---------+
+| Footer1 | Footer2 |
+
+TABLE
+            ),
+            // 8
+            array(
+                array(),
                 array(),
                 array(),
                 TableHelper::LAYOUT_DEFAULT,
                 '',
             ),
+            // 9
             'Cell text with tags used for Output styling' => array(
                 array('ISBN', 'Title', 'Author'),
                 array(
                     array('<info>99921-58-10-7</info>', '<error>Divine Comedy</error>', '<fg=blue;bg=white>Dante Alighieri</fg=blue;bg=white>'),
                     array('9971-5-0210-0', 'A Tale of Two Cities', '<info>Charles Dickens</>'),
                 ),
+                array(),
                 TableHelper::LAYOUT_DEFAULT,
 <<<TABLE
 +---------------+----------------------+-----------------+
@@ -233,12 +271,14 @@ TABLE
 
 TABLE
             ),
+            // 10
             'Cell text with tags not used for Output styling' => array(
                 array('ISBN', 'Title', 'Author'),
                 array(
                     array('<strong>99921-58-10-700</strong>', '<f>Divine Com</f>', 'Dante Alighieri'),
                     array('9971-5-0210-0', 'A Tale of Two Cities', 'Charles Dickens'),
                 ),
+                array(),
                 TableHelper::LAYOUT_DEFAULT,
 <<<TABLE
 +----------------------------------+----------------------+-----------------+

@@ -75,6 +75,13 @@ class TableHelper extends Helper
         return $this;
     }
 
+    public function setFooters(array $footers)
+    {
+        $this->table->setFooters($footers);
+
+        return $this;
+    }
+
     public function setRows(array $rows)
     {
         $this->table->setRows($rows);
@@ -169,6 +176,20 @@ class TableHelper extends Helper
     public function setCellHeaderFormat($cellHeaderFormat)
     {
         $this->table->getStyle()->setCellHeaderFormat($cellHeaderFormat);
+
+        return $this;
+    }
+
+    /**
+     * Sets footer cell format.
+     *
+     * @param string $cellFooterFormat
+     *
+     * @return TableHelper
+     */
+    public function setCellFooterFormat($cellFooterFormat)
+    {
+        $this->table->getStyle()->setCellFooterFormat($cellFooterFormat);
 
         return $this;
     }

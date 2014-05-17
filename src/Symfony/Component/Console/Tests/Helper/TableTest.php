@@ -34,12 +34,13 @@ class TableTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider testRenderProvider
      */
-    public function testRender($headers, $rows, $style, $expected)
+    public function testRender($headers, $rows, $footers, $style, $expected)
     {
         $table = new Table($output = $this->getOutputStream());
         $table
             ->setHeaders($headers)
             ->setRows($rows)
+            ->setFooters($footers)
             ->setStyle($style)
         ;
         $table->render();
@@ -50,12 +51,13 @@ class TableTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider testRenderProvider
      */
-    public function testRenderAddRows($headers, $rows, $style, $expected)
+    public function testRenderAddRows($headers, $rows, $footers, $style, $expected)
     {
         $table = new Table($output = $this->getOutputStream());
         $table
             ->setHeaders($headers)
             ->addRows($rows)
+            ->setFooters($footers)
             ->setStyle($style)
         ;
         $table->render();
@@ -66,11 +68,12 @@ class TableTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider testRenderProvider
      */
-    public function testRenderAddRowsOneByOne($headers, $rows, $style, $expected)
+    public function testRenderAddRowsOneByOne($headers, $rows, $footers, $style, $expected)
     {
         $table = new Table($output = $this->getOutputStream());
         $table
             ->setHeaders($headers)
+            ->setFooters($footers)
             ->setStyle($style)
         ;
         foreach ($rows as $row) {
@@ -94,6 +97,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
             array(
                 array('ISBN', 'Title', 'Author'),
                 $books,
+                array('Footer1', 'Footer2', 'Footer3'),
                 'default',
 <<<TABLE
 +---------------+--------------------------+------------------+
@@ -104,12 +108,14 @@ class TableTest extends \PHPUnit_Framework_TestCase
 | 960-425-059-0 | The Lord of the Rings    | J. R. R. Tolkien |
 | 80-902734-1-6 | And Then There Were None | Agatha Christie  |
 +---------------+--------------------------+------------------+
+| Footer1       | Footer2                  | Footer3          |
 
 TABLE
             ),
             array(
                 array('ISBN', 'Title', 'Author'),
                 $books,
+                array('Footer1', 'Footer2', 'Footer3'),
                 'compact',
 <<<TABLE
  ISBN          Title                    Author           
@@ -117,12 +123,14 @@ TABLE
  9971-5-0210-0 A Tale of Two Cities     Charles Dickens  
  960-425-059-0 The Lord of the Rings    J. R. R. Tolkien 
  80-902734-1-6 And Then There Were None Agatha Christie  
+ Footer1       Footer2                  Footer3          
 
 TABLE
             ),
             array(
                 array('ISBN', 'Title', 'Author'),
                 $books,
+                array(),
                 'borderless',
 <<<TABLE
  =============== ========================== ================== 
@@ -144,6 +152,7 @@ TABLE
                     array('960-425-059-0', 'The Lord of the Rings', 'J. R. R. Tolkien'),
                     array('80-902734-1-6', 'And Then There Were None', 'Agatha Christie'),
                 ),
+                array(),
                 'default',
 <<<TABLE
 +---------------+--------------------------+------------------+
@@ -165,6 +174,7 @@ TABLE
                     array('960-425-059-0', 'The Lord of the Rings', 'J. R. R. Tolkien'),
                     array('80-902734-1-6', 'And Then There Were None', 'Agatha Christie'),
                 ),
+                array(),
                 'default',
 <<<TABLE
 +---------------+--------------------------+------------------+
@@ -184,6 +194,7 @@ TABLE
                     array("9971-5-0210-2", "Harry Potter\nand the Chamber of Secrets", "Rowling\nJoanne K."),
                     array("960-425-059-0", "The Lord of the Rings", "J. R. R.\nTolkien"),
                 ),
+                array(),
                 'default',
 <<<TABLE
 +---------------+----------------------------+-----------------+
@@ -204,6 +215,7 @@ TABLE
             array(
                 array('ISBN', 'Title'),
                 array(),
+                array(),
                 'default',
 <<<TABLE
 +------+-------+
@@ -215,6 +227,7 @@ TABLE
             array(
                 array(),
                 array(),
+                array(),
                 'default',
                 '',
             ),
@@ -224,6 +237,7 @@ TABLE
                     array('<info>99921-58-10-7</info>', '<error>Divine Comedy</error>', '<fg=blue;bg=white>Dante Alighieri</fg=blue;bg=white>'),
                     array('9971-5-0210-0', 'A Tale of Two Cities', '<info>Charles Dickens</>'),
                 ),
+                array(),
                 'default',
 <<<TABLE
 +---------------+----------------------+-----------------+
@@ -241,6 +255,7 @@ TABLE
                     array('<strong>99921-58-10-700</strong>', '<f>Divine Com</f>', 'Dante Alighieri'),
                     array('9971-5-0210-0', 'A Tale of Two Cities', 'Charles Dickens'),
                 ),
+                array(),
                 'default',
 <<<TABLE
 +----------------------------------+----------------------+-----------------+
@@ -323,7 +338,9 @@ TABLE;
                 array('Bar2'),
                 new TableSeparator(),
                 array('Bar3'),
-            ));
+            ))
+            ->setFooters(array('Baz'))
+        ;
         $table->render();
 
         $expected =
@@ -337,6 +354,7 @@ TABLE;
 +------+
 | Bar3 |
 +------+
+| Baz  |
 
 TABLE;
 

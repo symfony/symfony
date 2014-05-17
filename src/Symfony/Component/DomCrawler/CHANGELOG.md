@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+2.5.0
+-----
+
+* [BC BREAK] The typehints on the `Link`, `Form` and `FormField` classes have been changed from
+  `\DOMNode` to `DOMElement`. Using any other type of `DOMNode` was triggering fatal errors in previous
+  versions. Code extending these classes will need to update the typehints when overwriting these methods.
+
 2.4.0
 -----
 

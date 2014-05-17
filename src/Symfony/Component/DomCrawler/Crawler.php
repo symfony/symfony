@@ -14,7 +14,7 @@ namespace Symfony\Component\DomCrawler;
 use Symfony\Component\CssSelector\CssSelector;
 
 /**
- * Crawler eases navigation of a list of \DOMNode objects.
+ * Crawler eases navigation of a list of \DOMElement objects.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *

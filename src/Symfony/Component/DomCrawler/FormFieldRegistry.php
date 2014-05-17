@@ -137,7 +137,7 @@ class FormFieldRegistry
     /**
      * Returns the list of field with their value.
      *
-     * @return array The list of fields as array((string) Fully qualified name => (mixed) value)
+     * @return FormField[] The list of fields as array((string) Fully qualified name => (mixed) value)
      */
     public function all()
     {
@@ -196,7 +196,7 @@ class FormFieldRegistry
      *
      * @param string $name The name of the field
      *
-     * @return array The list of segments
+     * @return string[] The list of segments
      *
      * @throws \InvalidArgumentException when the name is malformed
      */

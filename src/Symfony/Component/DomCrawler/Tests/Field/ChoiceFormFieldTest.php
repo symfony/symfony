@@ -280,6 +280,11 @@ class ChoiceFormFieldTest extends FormFieldTestCase
     {
         $node = $this->createSelectNodeWithEmptyOption(array('foo' => false, 'bar' => false));
         $field = new ChoiceFormField($node);
+        $this->assertEquals('foo', $field->getValue());
+
+        $node = $this->createSelectNodeWithEmptyOption(array('foo' => false, 'bar' => true));
+        $field = new ChoiceFormField($node);
+        $this->assertEquals('bar', $field->getValue());
         $field->select('foo');
         $this->assertEquals('foo', $field->getValue(), '->select() changes the selected option');
     }

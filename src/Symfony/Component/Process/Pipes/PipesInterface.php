@@ -15,6 +15,8 @@ namespace Symfony\Component\Process\Pipes;
  * PipesInterface manages descriptors and pipes for the use of proc_open.
  *
  * @author Romain Neutron <imprec@gmail.com>
+ *
+ * @internal
  */
 interface PipesInterface
 {
@@ -35,27 +37,14 @@ interface PipesInterface
     public function getFiles();
 
     /**
-     * Sets non-blocking mode on pipes.
-     */
-    public function unblock();
-
-    /**
-     * Write data to stdin.
-     *
-     * @param bool $blocking
-     * @param bool $stdin
-     */
-    public function write($blocking, $stdin);
-
-    /**
      * Reads data in file handles and pipes.
      *
      * @param bool $blocking Whether to use blocking calls or not.
      * @param bool $close    Whether to close pipes if they've reached EOF.
      *
-     * @return string An array of read data indexed by their fd.
+     * @return string[] An array of read data indexed by their fd.
      */
-    public function read($blocking, $close = false);
+    public function readAndWrite($blocking, $close = false);
 
     /**
      * Returns if the current state has open file handles or pipes.

@@ -158,6 +158,28 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedLength, strlen($p->getErrorOutput()));
     }
 
+    /**
+     * @dataProvider pipesCodeProvider
+     */
+    public function testSetStreamAsInput($code, $size)
+    {
+        $expected = str_repeat(str_repeat('*', 1024), $size) . '!';
+        $expectedLength = (1024 * $size) + 1;
+
+        $stream = fopen('php://temporary', 'w+');
+        fwrite($stream, $expected);
+        rewind($stream);
+
+        $p = $this->getProcess(sprintf('php -r %s', escapeshellarg($code)));
+        $p->setInput($stream);
+        $p->run();
+
+        fclose($stream);
+
+        $this->assertEquals($expectedLength, strlen($p->getOutput()));
+        $this->assertEquals($expectedLength, strlen($p->getErrorOutput()));
+    }
+
     public function testSetInputWhileRunningThrowsAnException()
     {
         $process = $this->getProcess('php -r "usleep(500000);"');
@@ -175,7 +197,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider provideInvalidInputValues
      * @expectedException \Symfony\Component\Process\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Symfony\Component\Process\Process::setInput only accepts strings.
+     * @expectedExceptionMessage Symfony\Component\Process\Process::setInput only accepts strings or stream resources.
      */
     public function testInvalidInput($value)
     {
@@ -188,7 +210,6 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         return array(
             array(array()),
             array(new NonStringifiable()),
-            array(fopen('php://temporary', 'w')),
         );
     }
 

@@ -25,6 +25,7 @@ use Symfony\Component\Process\Pipes\WindowsPipes;
  * start independent PHP processes.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Romain Neutron <imprec@gmail.com>
  *
  * @api
  */
@@ -285,13 +286,10 @@ class Process
         }
         $this->status = self::STATUS_STARTED;
 
-        $this->processPipes->unblock();
-
         if ($this->tty) {
             return;
         }
 
-        $this->processPipes->write(false, $this->input);
         $this->updateStatus(false);
         $this->checkTimeout();
     }
@@ -1063,8 +1061,6 @@ class Process
     /**
      * Sets the contents of STDIN.
      *
-     * Deprecation: As of Symfony 2.5, this method only accepts scalar values.
-     *
      * @param string|null $stdin The new contents
      *
      * @return self The current Process instance
@@ -1242,9 +1238,9 @@ class Process
     private function getDescriptors()
     {
         if (defined('PHP_WINDOWS_VERSION_BUILD')) {
-            $this->processPipes = WindowsPipes::create($this);
+            $this->processPipes = WindowsPipes::create($this, $this->input);
         } else {
-            $this->processPipes = UnixPipes::create($this);
+            $this->processPipes = UnixPipes::create($this, $this->input);
         }
         $descriptors = $this->processPipes->getDescriptors($this->outputDisabled);
 
@@ -1358,7 +1354,7 @@ class Process
      */
     private function readPipes($blocking, $close)
     {
-        $result = $this->processPipes->read($blocking, $close);
+        $result = $this->processPipes->readAndWrite($blocking, $close);
 
         foreach ($result as $type => $data) {
             if (3 == $type) {

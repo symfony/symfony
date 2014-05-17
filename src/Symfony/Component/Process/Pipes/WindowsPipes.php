@@ -21,6 +21,8 @@ use Symfony\Component\Process\Exception\RuntimeException;
  * @see https://bugs.php.net/bug.php?id=65650
  *
  * @author Romain Neutron <imprec@gmail.com>
+ *
+ * @internal
  */
 class WindowsPipes extends AbstractPipes
 {
@@ -36,7 +38,7 @@ class WindowsPipes extends AbstractPipes
     /** @var bool */
     private $disableOutput;
 
-    public function __construct($disableOutput)
+    public function __construct($disableOutput, $input)
     {
         $this->$disableOutput = (bool) $disableOutput;
 
@@ -55,6 +57,12 @@ class WindowsPipes extends AbstractPipes
                     throw new RuntimeException('A temporary file could not be opened to write the process output to, verify that your TEMP environment variable is writable');
                 }
             }
+        }
+
+        if (is_resource($input)) {
+            $this->input   = $input;
+        } else {
+            $this->inputBuffer = $input;
         }
     }
 
@@ -100,18 +108,10 @@ class WindowsPipes extends AbstractPipes
     /**
      * {@inheritdoc}
      */
-    public function unblock()
+    public function readAndWrite($blocking, $close = false)
     {
-        foreach ($this->pipes as $pipe) {
-            stream_set_blocking($pipe, 0);
-        }
-    }
+        $this->write($blocking, $close);
 
-    /**
-     * {@inheritdoc}
-     */
-    public function read($blocking, $close = false)
-    {
         $read = array();
         $fh = $this->fileHandles;
         foreach ($fh as $type => $fileHandle) {
@@ -152,11 +152,7 @@ class WindowsPipes extends AbstractPipes
      */
     public function close()
     {
-        foreach ($this->pipes as $pipe) {
-            fclose($pipe);
-        }
-        $this->pipes = array();
-
+        parent::close();
         foreach ($this->fileHandles as $handle) {
             fclose($handle);
         }
@@ -167,12 +163,13 @@ class WindowsPipes extends AbstractPipes
      * Creates a new WindowsPipes instance.
      *
      * @param Process $process The process
+     * @param $input
      *
      * @return WindowsPipes
      */
-    public static function create(Process $process)
+    public static function create(Process $process, $input)
     {
-        return new static($process->isOutputDisabled());
+        return new static($process->isOutputDisabled(), $input);
     }
 
     /**
@@ -186,5 +183,72 @@ class WindowsPipes extends AbstractPipes
             }
         }
         $this->files = array();
+    }
+
+    /**
+     * Writes input to stdin
+     *
+     * @param bool $blocking
+     * @param bool $close
+     */
+    private function write($blocking, $close)
+    {
+        if (empty($this->pipes)) {
+            return;
+        }
+
+        $this->unblock();
+
+        $r = null !== $this->input ? array('input' => $this->input) : null;
+        $w = isset($this->pipes[0]) ? array($this->pipes[0]) : null;
+        $e = null;
+
+        // let's have a look if something changed in streams
+        if (false === $n = @stream_select($r, $w, $e, 0, $blocking ? Process::TIMEOUT_PRECISION * 1E6 : 0)) {
+            // if a system call has been interrupted, forget about it, let's try again
+            // otherwise, an error occurred, let's reset pipes
+            if (!$this->hasSystemCallBeenInterrupted()) {
+                $this->pipes = array();
+            }
+
+            return;
+        }
+
+        // nothing has changed
+        if (0 === $n) {
+            return;
+        }
+
+        if (null !== $w && 0 < count($r)) {
+            $data = '';
+            while ($dataread = fread($r['input'], self::CHUNK_SIZE)) {
+                $data .= $dataread;
+            }
+
+            $this->inputBuffer .= $data;
+
+            if (false === $data || (true === $close && feof($r['input']) && '' === $data)) {
+                // no more data to read on input resource
+                // use an empty buffer in the next reads
+                unset($this->input);
+            }
+        }
+
+        if (null !== $w && 0 < count($w)) {
+            while ($len = strlen($this->inputBuffer)) {
+                $written = fwrite($w[0], $this->inputBuffer, 2<<18);
+                if ($written > 0) {
+                    $this->inputBuffer = (string) substr($this->inputBuffer, $written);
+                } else {
+                    break;
+                }
+            }
+        }
+
+        // no input to read on resource, buffer is empty and stdin still open
+        if ('' === $this->inputBuffer && null === $this->input && isset($this->pipes[0])) {
+            fclose($this->pipes[0]);
+            unset($this->pipes[0]);
+        }
     }
 }

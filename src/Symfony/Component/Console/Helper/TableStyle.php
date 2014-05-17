@@ -24,6 +24,7 @@ class TableStyle
     private $verticalBorderChar = '|';
     private $crossingChar = '+';
     private $cellHeaderFormat = '<info>%s</info>';
+    private $cellFooterFormat = '<comment>%s</comment>';
     private $cellRowFormat = '%s';
     private $cellRowContentFormat = ' %s ';
     private $borderFormat = '%s';
@@ -144,6 +145,20 @@ class TableStyle
     }
 
     /**
+     * Sets footer cell format.
+     *
+     * @param string $cellFooterFormat
+     *
+     * @return TableStyle
+     */
+    public function setCellFooterFormat($cellFooterFormat)
+    {
+        $this->cellFooterFormat = $cellFooterFormat;
+
+        return $this;
+    }
+
+    /**
      * Gets header cell format.
      *
      * @return string
@@ -151,6 +166,16 @@ class TableStyle
     public function getCellHeaderFormat()
     {
         return $this->cellHeaderFormat;
+    }
+
+    /**
+     * Gets header cell format.
+     *
+     * @return string
+     */
+    public function getCellFooterFormat()
+    {
+        return $this->cellFooterFormat;
     }
 
     /**

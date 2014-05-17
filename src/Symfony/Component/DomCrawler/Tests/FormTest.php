@@ -793,7 +793,6 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $dom = new \DOMDocument();
         $dom->loadHTML('<html>'.$form.'</html>');
 
-        $nodes = $dom->getElementsByTagName('input');
         $xPath = new \DOMXPath($dom);
         $nodes = $xPath->query('//input | //button');
 
@@ -856,5 +855,4 @@ class FormTest extends \PHPUnit_Framework_TestCase
       $form = new Form($nodes->item(0), 'http://example.com');
       $this->assertEquals($form->getPhpValues(), array('example' => ''));
     }
-
 }

@@ -201,7 +201,7 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         $field = new ChoiceFormField($node);
 
         $this->assertTrue($field->hasValue(), '->hasValue() returns true when the checkbox is checked');
-        $this->assertEquals('1', $field->getValue(), '->getValue() returns 1 if the checkbox is checked and has no value attribute');
+        $this->assertEquals('on', $field->getValue(), '->getValue() returns 1 if the checkbox is checked and has no value attribute');
 
         $node = $this->createNode('input', '', array('type' => 'checkbox', 'name' => 'name', 'checked' => 'checked', 'value' => 'foo'));
         $field = new ChoiceFormField($node);
@@ -240,7 +240,7 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         $node = $this->createNode('input', '', array('type' => 'checkbox', 'name' => 'name'));
         $field = new ChoiceFormField($node);
         $field->tick();
-        $this->assertEquals(1, $field->getValue(), '->tick() ticks checkboxes');
+        $this->assertEquals('on', $field->getValue(), '->tick() ticks checkboxes');
     }
 
     public function testUntick()
@@ -266,7 +266,7 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         $node = $this->createNode('input', '', array('type' => 'checkbox', 'name' => 'name', 'checked' => 'checked'));
         $field = new ChoiceFormField($node);
         $field->select(true);
-        $this->assertEquals(1, $field->getValue(), '->select() changes the value of the field');
+        $this->assertEquals('on', $field->getValue(), '->select() changes the value of the field');
         $field->select(false);
         $this->assertNull($field->getValue(), '->select() changes the value of the field');
 

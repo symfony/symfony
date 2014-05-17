@@ -119,10 +119,10 @@ class ChoiceFormField extends FormField
      */
     public function setValue($value)
     {
-        if ('checkbox' == $this->type && false === $value) {
+        if ('checkbox' === $this->type && false === $value) {
             // uncheck
             $this->value = null;
-        } elseif ('checkbox' == $this->type && true === $value) {
+        } elseif ('checkbox' === $this->type && true === $value) {
             // check
             $this->value = $this->options[0]['value'];
         } else {
@@ -163,7 +163,7 @@ class ChoiceFormField extends FormField
      */
     public function addChoice(\DOMNode $node)
     {
-        if (!$this->multiple && 'radio' != $this->type) {
+        if (!$this->multiple && 'radio' !== $this->type) {
             throw new \LogicException(sprintf('Unable to add a choice for "%s" as it is not multiple or is not a radio button.', $this->name));
         }
 
@@ -202,11 +202,11 @@ class ChoiceFormField extends FormField
      */
     protected function initialize()
     {
-        if ('input' != $this->node->nodeName && 'select' != $this->node->nodeName) {
+        if ('input' !== $this->node->nodeName && 'select' !== $this->node->nodeName) {
             throw new \LogicException(sprintf('A ChoiceFormField can only be created from an input or select tag (%s given).', $this->node->nodeName));
         }
 
-        if ('input' == $this->node->nodeName && 'checkbox' != strtolower($this->node->getAttribute('type')) && 'radio' != strtolower($this->node->getAttribute('type'))) {
+        if ('input' === $this->node->nodeName && 'checkbox' !== strtolower($this->node->getAttribute('type')) && 'radio' !== strtolower($this->node->getAttribute('type'))) {
             throw new \LogicException(sprintf('A ChoiceFormField can only be created from an input tag with a type of checkbox or radio (given type is %s).', $this->node->getAttribute('type')));
         }
 
@@ -271,7 +271,7 @@ class ChoiceFormField extends FormField
     }
 
     /**
-     * Checks whether given vale is in the existing options
+     * Checks whether given value is in the existing options
      *
      * @param string $optionValue
      * @param array  $options

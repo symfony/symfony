@@ -92,36 +92,36 @@ class SortableIteratorTest extends RealIteratorTestCase
             '.foo',
             '.foo/.bar',
             '.foo/bar',
-            '.bar',
-            '.git'
+            '.git',
+            '.bar'
         );
 
         $sortByChangedTime = array(
-            'foo/bar.tmp',
-            'test.php',
-            'toto',
-            'foo bar',
+            '.git',
             'foo',
-            'test.py',
+            'foo bar',
+            '.bar',
+            '.foo/bar',
             '.foo',
             '.foo/.bar',
-            '.foo/bar',
-            '.bar',
-            '.git',
+            'toto',
+            'test.py',
+            'foo/bar.tmp',
+            'test.php'
         );
 
         $sortByModifiedTime = array(
-            'test.php',
             'foo/bar.tmp',
-            'toto',
-            'foo bar',
+            'test.php',
             'foo',
-            'test.py',
+            'toto',
+            '.git',
+            '.bar',
             '.foo',
             '.foo/.bar',
             '.foo/bar',
-            '.bar',
-            '.git'
+            'foo bar',
+            'test.py'
         );
 
         return array(

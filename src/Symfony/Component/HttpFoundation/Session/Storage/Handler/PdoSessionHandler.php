@@ -37,9 +37,14 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
 class PdoSessionHandler implements \SessionHandlerInterface
 {
     /**
-     * @var \PDO PDO instance
+     * @var \PDO|null PDO instance or null when not connected yet
      */
     private $pdo;
+
+    /**
+     * @var string|null|false DNS string or null for session.save_path or false when lazy connection disabled
+     */
+    private $dns = false;
 
     /**
      * @var string Database driver
@@ -67,6 +72,21 @@ class PdoSessionHandler implements \SessionHandlerInterface
     private $timeCol;
 
     /**
+     * @var string Username when lazy-connect
+     */
+    private $username;
+
+    /**
+     * @var string Password when lazy-connect
+     */
+    private $password;
+
+    /**
+     * @var array Connection options when lazy-connect
+     */
+    private $connectionOptions = array();
+
+    /**
      * @var bool Whether a transaction is active
      */
     private $inTransaction = false;
@@ -79,37 +99,54 @@ class PdoSessionHandler implements \SessionHandlerInterface
     /**
      * Constructor.
      *
+     * You can either pass an existing database connection as PDO instance or
+     * pass a DNS string that will be used to lazy-connect to the database
+     * when the session is actually used. Furthermore it's possible to pass null
+     * which will then use the session.save_path ini setting as PDO DNS parameter.
+     *
      * List of available options:
      *  * db_table: The name of the table [default: sessions]
      *  * db_id_col: The column where to store the session id [default: sess_id]
      *  * db_data_col: The column where to store the session data [default: sess_data]
      *  * db_time_col: The column where to store the timestamp [default: sess_time]
+     *  * db_username: The username when lazy-connect [default: '']
+     *  * db_password: The password when lazy-connect [default: '']
+     *  * db_connection_options: An array of driver-specific connection options [default: array()]
      *
-     * @param \PDO  $pdo     A \PDO instance
-     * @param array $options An associative array of DB options
+     * @param \PDO|string|null $pdoOrDns A \PDO instance or DNS string or null
+     * @param array            $options  An associative array of DB options
      *
      * @throws \InvalidArgumentException When PDO error mode is not PDO::ERRMODE_EXCEPTION
      */
-    public function __construct(\PDO $pdo, array $options = array())
+    public function __construct($pdoOrDns, array $options = array())
     {
-        if (\PDO::ERRMODE_EXCEPTION !== $pdo->getAttribute(\PDO::ATTR_ERRMODE)) {
-            throw new \InvalidArgumentException(sprintf('"%s" requires PDO error mode attribute be set to throw Exceptions (i.e. $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION))', __CLASS__));
+        if ($pdoOrDns instanceof \PDO) {
+            if (\PDO::ERRMODE_EXCEPTION !== $pdoOrDns->getAttribute(\PDO::ATTR_ERRMODE)) {
+                throw new \InvalidArgumentException(sprintf('"%s" requires PDO error mode attribute be set to throw Exceptions (i.e. $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION))', __CLASS__));
+            }
+
+            $this->pdo = $pdoOrDns;
+        } else {
+            $this->dns = $pdoOrDns;
         }
 
-        $this->pdo = $pdo;
-        $this->driver = $this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME);
-
         $options = array_replace(array(
-            'db_table'    => 'sessions',
-            'db_id_col'   => 'sess_id',
-            'db_data_col' => 'sess_data',
-            'db_time_col' => 'sess_time',
+            'db_table'              => 'sessions',
+            'db_id_col'             => 'sess_id',
+            'db_data_col'           => 'sess_data',
+            'db_time_col'           => 'sess_time',
+            'db_username'           => '',
+            'db_password'           => '',
+            'db_connection_options' => array()
         ), $options);
 
         $this->table = $options['db_table'];
         $this->idCol = $options['db_id_col'];
         $this->dataCol = $options['db_data_col'];
         $this->timeCol = $options['db_time_col'];
+        $this->username = $options['db_username'];
+        $this->password = $options['db_password'];
+        $this->connectionOptions = $options['db_connection_options'];
     }
 
     /**
@@ -118,6 +155,11 @@ class PdoSessionHandler implements \SessionHandlerInterface
     public function open($savePath, $sessionName)
     {
         $this->gcCalled = false;
+        if (null === $this->pdo) {
+            $this->pdo = new \PDO($this->dns ?: $savePath, $this->username, $this->password, $this->connectionOptions);
+            $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        }
+        $this->driver = $this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME);
 
         return true;
     }
@@ -268,6 +310,10 @@ class PdoSessionHandler implements \SessionHandlerInterface
             $stmt = $this->pdo->prepare($sql);
             $stmt->bindValue(':time', time() - $maxlifetime, \PDO::PARAM_INT);
             $stmt->execute();
+        }
+
+        if (false !== $this->dns) {
+            $this->pdo = null;
         }
 
         return true;

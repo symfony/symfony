@@ -106,19 +106,21 @@ class PdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
         @unlink($dbFile);
     }
 
-    public function testReadWriteRead()
+    public function testReadWriteReadWithNullByte()
     {
+        $sessionData = 'da' . "\0" . 'ta';
+
         $storage = new PdoSessionHandler($this->pdo);
         $storage->open('', 'sid');
-        $data = $storage->read('id');
-        $storage->write('id', 'data');
+        $readData = $storage->read('id');
+        $storage->write('id', $sessionData);
         $storage->close();
-        $this->assertSame('', $data, 'New session returns empty string data');
+        $this->assertSame('', $readData, 'New session returns empty string data');
 
         $storage->open('', 'sid');
-        $data = $storage->read('id');
+        $readData = $storage->read('id');
         $storage->close();
-        $this->assertSame('data', $data, 'Written value can be read back correctly');
+        $this->assertSame($sessionData, $readData, 'Written value can be read back correctly');
     }
 
     /**

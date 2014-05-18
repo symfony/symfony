@@ -154,7 +154,7 @@ class ExceptionHandler implements ExceptionHandlerInterface
 
 EOF
                         , $ind, $total, $class, $message);
-                    foreach ($e['trace'] as $trace) {
+                    foreach ($e['trace'] as $i => $trace) {
                         $content .= '       <li>';
                         if ($trace['function']) {
                             $content .= sprintf('at %s%s%s(%s)', $this->abbrClass($trace['class']), $trace['type'], $trace['function'], $this->formatArgs($trace['args']));
@@ -166,7 +166,25 @@ EOF
                             } else {
                                 $content .= sprintf(' in %s line %s', $trace['file'], $trace['line']);
                             }
+                            $content .= strtr(<<<EOF
+                                <a href="#" onclick="toggle('trace-{{ prefix }}-{{ i }}'); switchIcons('icon-{{ prefix }}-{{ i }}-open', 'icon-{{ prefix }}-{{ i }}-close'); return false;">
+                                    <img class="toggle" id="icon-{{ prefix }}-{{ i }}-close" alt="-" src="data:image/gif;base64,R0lGODlhEgASAMQSANft94TG57Hb8GS44ez1+mC24IvK6ePx+Wa44dXs92+942e54o3L6W2844/M6dnu+P/+/l614P///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAABIALAAAAAASABIAQAVCoCQBTBOd6Kk4gJhGBCTPxysJb44K0qD/ER/wlxjmisZkMqBEBW5NHrMZmVKvv9hMVsO+hE0EoNAstEYGxG9heIhCADs=" style="display: {{ display_plus }}" />
+                                    <img class="toggle" id="icon-{{ prefix }}-{{ i }}-open" alt="+" src="data:image/gif;base64,R0lGODlhEgASAMQTANft99/v+Ga44bHb8ITG52S44dXs9+z1+uPx+YvK6WC24G+944/M6W28443L6dnu+Ge54v/+/l614P///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAABMALAAAAAASABIAQAVS4DQBTiOd6LkwgJgeUSzHSDoNaZ4PU6FLgYBA5/vFID/DbylRGiNIZu74I0h1hNsVxbNuUV4d9SsZM2EzWe1qThVzwWFOAFCQFa1RQq6DJB4iIQA7" style="display: {{ display_minus }}" />
+                                </a>
+                                <div id="trace-{{ prefix }}-{{ i }}" style="display: {{ display_trace }}" class="trace">
+                                    {{ trace }}
+                                </div>
+EOF
+                            , array(
+                                '{{ prefix }}' => $position,
+                                '{{ i }}' => $i,
+                                '{{ display_plus }}' => 0 == $i ? 'inline' : 'none',
+                                '{{ display_minus }}' => 0 == $i ? 'none' : 'inline',
+                                '{{ display_trace }}' => 0 == $i ? 'block' : 'none',
+                                '{{ trace }}' => $this->fileExcerpt($trace['file'], $trace['line']),
+                            ));
                         }
+
                         $content .= "</li>\n";
                     }
 
@@ -216,7 +234,6 @@ EOF;
             .sf-reset em { font-style:italic; }
             .sf-reset h1, .sf-reset h2 { font: 20px Georgia, "Times New Roman", Times, serif }
             .sf-reset h2 span { background-color: #fff; color: #333; padding: 6px; float: left; margin-right: 10px; }
-            .sf-reset .traces li { font-size:12px; padding: 2px 4px; list-style-type:decimal; margin-left:20px; }
             .sf-reset .block { background-color:#FFFFFF; padding:10px 28px; margin-bottom:20px;
                 -webkit-border-bottom-right-radius: 16px;
                 -webkit-border-bottom-left-radius: 16px;
@@ -241,15 +258,21 @@ EOF;
                 overflow: hidden;
                 word-wrap: break-word;
             }
-            .sf-reset li a { background:none; color:#868686; text-decoration:none; }
-            .sf-reset li a:hover { background:none; color:#313131; text-decoration:underline; }
-            .sf-reset ol { padding: 10px 0; }
             .sf-reset h1 { background-color:#FFFFFF; padding: 15px 28px; margin-bottom: 20px;
                 -webkit-border-radius: 10px;
                 -moz-border-radius: 10px;
                 border-radius: 10px;
                 border: 1px solid #ccc;
             }
+            .sf-reset .traces { padding-bottom: 14px; }
+            .sf-reset .traces li { font-size: 12px; color: #868686; padding: 5px 4px; list-style-type: decimal; margin-left: 20px; white-space: break-word; }
+            .sf-reset .trace { border: 1px solid #D3D3D3; padding: 10px; overflow: auto; margin: 10px 0 20px; }
+            .sf-reset ol { padding: 10px 0; }
+            .sf-reset ol li { list-style: decimal; margin-left: 20px; padding: 2px; padding-bottom: 20px; }
+            .sf-reset ol ol li { list-style-position: inside; margin-left: 0; white-space: nowrap; font-size: 12px; padding-bottom: 0; }
+            .sf-reset li a { background:none; color:#868686; text-decoration:none; }
+            .sf-reset li a:hover { background:none; color:#313131; text-decoration:underline; }
+            .sf-reset li .selected { background-color: #ffd; }
 EOF;
     }
 
@@ -273,6 +296,41 @@ EOF;
     </head>
     <body>
         $content
+
+        <script type="text/javascript">//<![CDATA[
+            function toggle(id, clazz)
+            {
+                var el = document.getElementById(id),
+                    current = el.style.display,
+                    i;
+
+                if (clazz) {
+                    var tags = document.getElementsByTagName('*');
+                    for (i = tags.length - 1; i >= 0 ; i--) {
+                        if (tags[i].className === clazz) {
+                            tags[i].style.display = 'none';
+                        }
+                    }
+                }
+
+                el.style.display = current === 'none' ? 'block' : 'none';
+            }
+
+            function switchIcons(id1, id2)
+            {
+                var icon1, icon2, display1, display2;
+
+                icon1 = document.getElementById(id1);
+                icon2 = document.getElementById(id2);
+
+                display1 = icon1.style.display;
+                display2 = icon2.style.display;
+
+                icon1.style.display = display2;
+                icon2.style.display = display1;
+            }
+        //]]></script>
+
     </body>
 </html>
 EOF;
@@ -316,5 +374,58 @@ EOF;
         }
 
         return implode(', ', $result);
+    }
+
+    /**
+     * Back-ported from Symfony\Bridge\Twig\Extension\CodeExtension
+     *
+     * @param string  $file
+     * @param int     $line
+     *
+     * @return string
+     */
+    private function fileExcerpt($file, $line)
+    {
+        if (is_readable($file)) {
+            // highlight_file could throw warnings
+            // see https://bugs.php.net/bug.php?id=25725
+            $code = @highlight_file($file, true);
+            // remove main code/span tags
+            $code = preg_replace('#^<code.*?>\s*<span.*?>(.*)</span>\s*</code>#s', '\\1', $code);
+            $content = preg_split('#<br />#', $code);
+
+            $lines = array();
+            for ($i = max($line - 3, 1), $max = min($line + 3, count($content)); $i <= $max; $i++) {
+                $lines[] = '<li'.($i == $line ? ' class="selected"' : '').'><code>'.$this->fixCodeMarkup($content[$i - 1]).'</code></li>';
+            }
+
+            return '<ol start="'.max($line - 3, 1).'">'.implode("\n", $lines).'</ol>';
+        }
+    }
+
+    /**
+     * Back-ported from Symfony\Bridge\Twig\Extension\CodeExtension
+     *
+     * @param string $line
+     *
+     * @return string
+     */
+    private function fixCodeMarkup($line)
+    {
+        // </span> ending tag from previous line
+        $opening = strpos($line, '<span');
+        $closing = strpos($line, '</span>');
+        if (false !== $closing && (false === $opening || $closing < $opening)) {
+            $line = substr_replace($line, '', $closing, 7);
+        }
+
+        // missing </span> tag at the end of line
+        $opening = strpos($line, '<span');
+        $closing = strpos($line, '</span>');
+        if (false !== $opening && (false === $closing || $closing > $opening)) {
+            $line .= '</span>';
+        }
+
+        return $line;
     }
 }

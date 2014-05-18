@@ -25,7 +25,7 @@ class PdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
 
         $this->pdo = new \PDO('sqlite::memory:');
         $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-        $sql = 'CREATE TABLE sessions (sess_id VARCHAR(128) PRIMARY KEY, sess_data BLOB, sess_time INTEGER)';
+        $sql = 'CREATE TABLE sessions (sess_id VARCHAR(128) PRIMARY KEY, sess_data BLOB, sess_lifetime MEDIUMINT, sess_time INTEGER)';
         $this->pdo->exec($sql);
     }
 
@@ -59,7 +59,7 @@ class PdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
         }
 
         $pdo = new \PDO('sqlite:' . $dbFile);
-        $sql = 'CREATE TABLE sessions (sess_id VARCHAR(255) PRIMARY KEY, sess_data BLOB, sess_time INTEGER)';
+        $sql = 'CREATE TABLE sessions (sess_id VARCHAR(128) PRIMARY KEY, sess_data BLOB, sess_lifetime MEDIUMINT, sess_time INTEGER)';
         $pdo->exec($sql);
         $pdo = null;
 
@@ -86,7 +86,7 @@ class PdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
         }
 
         $pdo = new \PDO('sqlite:' . $dbFile);
-        $sql = 'CREATE TABLE sessions (sess_id VARCHAR(255) PRIMARY KEY, sess_data BLOB, sess_time INTEGER)';
+        $sql = 'CREATE TABLE sessions (sess_id VARCHAR(128) PRIMARY KEY, sess_data BLOB, sess_lifetime MEDIUMINT, sess_time INTEGER)';
         $pdo->exec($sql);
         $pdo = null;
 
@@ -138,18 +138,24 @@ class PdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
         $storage->open('', 'sid');
         $data = $storage->read('new_id');
         $storage->close();
+
         $this->assertSame('data_of_new_session_id', $data, 'Data of regenerated session id is available');        
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     */
-    public function testWrongUsage()
+    public function testWrongUsageStillWorks()
     {
+        // wrong method sequence that should no happen, but still works
         $storage = new PdoSessionHandler($this->pdo);
+        $storage->write('id', 'data');
+        $storage->write('other_id', 'other_data');
+        $storage->destroy('inexistent');
         $storage->open('', 'sid');
-        $storage->read('id');
-        $storage->read('id');
+        $data = $storage->read('id');
+        $otherData = $storage->read('other_id');
+        $storage->close();
+
+        $this->assertSame('data', $data);
+        $this->assertSame('other_data', $otherData);
     }
 
     public function testSessionDestroy()
@@ -176,29 +182,35 @@ class PdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testSessionGC()
     {
-        $previousLifeTime = ini_set('session.gc_maxlifetime', 0);
+        $previousLifeTime = ini_set('session.gc_maxlifetime', 1000);
         $storage = new PdoSessionHandler($this->pdo);
 
         $storage->open('', 'sid');
         $storage->read('id');
         $storage->write('id', 'data');
         $storage->close();
-        $this->assertEquals(1, $this->pdo->query('SELECT COUNT(*) FROM sessions')->fetchColumn());
 
         $storage->open('', 'sid');
-        $data = $storage->read('id');
-        $storage->gc(0);
+        $storage->read('gc_id');
+        ini_set('session.gc_maxlifetime', -1); // test that you can set lifetime of a session after it has been read
+        $storage->write('gc_id', 'data');
+        $storage->close();
+        $this->assertEquals(2, $this->pdo->query('SELECT COUNT(*) FROM sessions')->fetchColumn(), 'No session pruned because gc not called');
+
+        $storage->open('', 'sid');
+        $data = $storage->read('gc_id');
+        $storage->gc(-1);
         $storage->close();
 
         ini_set('session.gc_maxlifetime', $previousLifeTime);
 
         $this->assertSame('', $data, 'Session already considered garbage, so not returning data even if it is not pruned yet');
-        $this->assertEquals(0, $this->pdo->query('SELECT COUNT(*) FROM sessions')->fetchColumn());
+        $this->assertEquals(1, $this->pdo->query('SELECT COUNT(*) FROM sessions')->fetchColumn(), 'Expired session is pruned');
     }
 
     public function testGetConnection()
     {
-        $storage = new PdoSessionHandler($this->pdo, array('db_table' => 'sessions'), array());
+        $storage = new PdoSessionHandler($this->pdo);
 
         $method = new \ReflectionMethod($storage, 'getConnection');
         $method->setAccessible(true);

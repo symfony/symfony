@@ -33,7 +33,7 @@ class DiffOperation extends AbstractOperation
             if ($this->target->has($id, $domain)) {
                 $this->messages[$domain]['all'][$id] = $message;
                 $this->result->add(array($id => $message), $domain);
-                if (!is_null($keyMetadata = $this->source->getMetadata($id, $domain))) {
+                if (null !== ($keyMetadata = $this->source->getMetadata($id, $domain))) {
                     $this->result->setMetadata($id, $keyMetadata, $domain);
                 }
             } else {
@@ -46,7 +46,7 @@ class DiffOperation extends AbstractOperation
                 $this->messages[$domain]['all'][$id] = $message;
                 $this->messages[$domain]['new'][$id] = $message;
                 $this->result->add(array($id => $message), $domain);
-                if (!is_null($keyMetadata = $this->target->getMetadata($id, $domain))) {
+                if (null !== ($keyMetadata = $this->target->getMetadata($id, $domain))) {
                     $this->result->setMetadata($id, $keyMetadata, $domain);
                 }
             }

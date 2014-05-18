@@ -26,7 +26,8 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
  *
  * Session data is a binary string that can contain non-printable characters like the null byte.
  * For this reason it must be saved in a binary column in the database like BLOB in MySQL.
- * Saving it in a character column could corrupt the data.
+ * Saving it in a character column could corrupt the data. You can use createTable()
+ * to initialize a correctly defined table.
  *
  * @see http://php.net/sessionhandlerinterface
  *
@@ -159,15 +160,57 @@ class PdoSessionHandler implements \SessionHandlerInterface
     }
 
     /**
+     * Creates the table to store sessions which can be called once for setup.
+     *
+     * Session ID is saved in a VARCHAR(128) column because that is enough even for
+     * a 512 bit configured session.hash_function like Whirlpool. Session data is
+     * saved in a BLOB. One could also use a shorter inlined varbinary column
+     * if one was sure the data fits into it.
+     *
+     * @throws \PDOException    When the table already exists
+     * @throws \DomainException When an unsupported PDO driver is used
+     */
+    public function createTable()
+    {
+        // connect if we are not yet
+        $this->getConnection();
+
+        switch ($this->driver) {
+            case 'mysql':
+                $sql = "CREATE TABLE $this->table ($this->idCol VARCHAR(128) NOT NULL PRIMARY KEY, $this->dataCol BLOB NOT NULL, $this->lifetimeCol MEDIUMINT NOT NULL, $this->timeCol INTEGER NOT NULL) ENGINE = InnoDB";
+                break;
+            case 'sqlite':
+                $sql = "CREATE TABLE $this->table ($this->idCol VARCHAR(128) NOT NULL PRIMARY KEY, $this->dataCol BLOB NOT NULL, $this->lifetimeCol MEDIUMINT NOT NULL, $this->timeCol INTEGER NOT NULL)";
+                break;
+            case 'pgsql':
+                $sql = "CREATE TABLE $this->table ($this->idCol VARCHAR(128) NOT NULL PRIMARY KEY, $this->dataCol BYTEA NOT NULL, $this->lifetimeCol INTEGER NOT NULL, $this->timeCol INTEGER NOT NULL)";
+                break;
+            case 'oci':
+                $sql = "CREATE TABLE $this->table ($this->idCol VARCHAR2(128) NOT NULL PRIMARY KEY, $this->dataCol BLOB NOT NULL, $this->lifetimeCol INTEGER NOT NULL, $this->timeCol INTEGER NOT NULL)";
+                break;
+            case 'sqlsrv':
+                $sql = "CREATE TABLE $this->table ($this->idCol VARCHAR(128) NOT NULL PRIMARY KEY, $this->dataCol VARBINARY(MAX) NOT NULL, $this->lifetimeCol INTEGER NOT NULL, $this->timeCol INTEGER NOT NULL)";
+                break;
+            default:
+                throw new \DomainException(sprintf('"%s" does not currently support PDO driver "%s".', __CLASS__, $this->driver));
+        }
+
+        try {
+            $this->pdo->exec($sql);
+        } catch (\PDOException $e) {
+            $this->rollback();
+
+            throw $e;
+        }
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function open($savePath, $sessionName)
     {
-        $this->gcCalled = false;
         if (null === $this->pdo) {
-            $this->pdo = new \PDO($this->dsn ?: $savePath, $this->username, $this->password, $this->connectionOptions);
-            $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-            $this->driver = $this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME);
+            $this->connect($this->dsn ?: $savePath);
         }
 
         return true;
@@ -315,6 +358,8 @@ class PdoSessionHandler implements \SessionHandlerInterface
         $this->commit();
 
         if ($this->gcCalled) {
+            $this->gcCalled = false;
+
             // delete the session records that have expired
             $sql = "DELETE FROM $this->table WHERE $this->lifetimeCol + $this->timeCol < :time";
 
@@ -328,6 +373,18 @@ class PdoSessionHandler implements \SessionHandlerInterface
         }
 
         return true;
+    }
+
+    /**
+     * Lazy-connects to the database.
+     *
+     * @param string $dsn DSN string
+     */
+    private function connect($dsn)
+    {
+        $this->pdo = new \PDO($dsn, $this->username, $this->password, $this->connectionOptions);
+        $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        $this->driver = $this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME);
     }
 
     /**
@@ -399,6 +456,8 @@ class PdoSessionHandler implements \SessionHandlerInterface
      * INSERT when not found can result in a deadlock for one connection.
      *
      * @param string $sessionId Session ID
+     *
+     * @throws \DomainException When an unsupported PDO driver is used
      */
     private function lockSession($sessionId)
     {
@@ -429,8 +488,10 @@ class PdoSessionHandler implements \SessionHandlerInterface
                 $stmt->execute();
 
                 return;
+            case 'sqlite':
+                return; // we already locked when starting transaction
             default:
-                return;
+                throw new \DomainException(sprintf('"%s" does not currently support PDO driver "%s".', __CLASS__, $this->driver));
         }
 
         // We create a DML lock for the session by inserting empty data or updating the row.
@@ -478,6 +539,10 @@ class PdoSessionHandler implements \SessionHandlerInterface
      */
     protected function getConnection()
     {
+        if (null === $this->pdo) {
+            $this->connect($this->dsn ?: ini_get('session.save_path'));
+        }
+
         return $this->pdo;
     }
 }

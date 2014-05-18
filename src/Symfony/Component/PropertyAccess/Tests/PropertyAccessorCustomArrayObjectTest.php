@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\PropertyAccess\Tests;
 
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\CustomArrayObject;
 
 class PropertyAccessorCustomArrayObjectTest extends PropertyAccessorCollectionTest
@@ -18,5 +19,16 @@ class PropertyAccessorCustomArrayObjectTest extends PropertyAccessorCollectionTe
     protected function getCollection(array $array)
     {
         return new CustomArrayObject($array);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchIndexException
+     */
+    public function testGetNoSuchIndex()
+    {
+        $arrayObject = new CustomArrayObject(array('foo', 'bar'));
+        $propertyAccessor = new PropertyAccessor(false, true);
+
+        $propertyAccessor->getValue($arrayObject, '[2]');
     }
 }

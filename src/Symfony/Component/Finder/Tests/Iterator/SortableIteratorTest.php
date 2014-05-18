@@ -82,9 +82,54 @@ class SortableIteratorTest extends RealIteratorTestCase
             'toto',
         );
 
+        $sortByAccessedTime = array(
+            'foo/bar.tmp',
+            'test.php',
+            'toto',
+            'foo bar',
+            'foo',
+            'test.py',
+            '.foo',
+            '.foo/.bar',
+            '.foo/bar',
+            '.bar',
+            '.git'
+        );
+
+        $sortByChangedTime = array(
+            'foo',
+            'toto',
+            'foo bar',
+            '.git',
+            'test.py',
+            '.foo',
+            '.bar',
+            '.foo/bar',
+            '.foo/.bar',
+            'foo/bar.tmp',
+            'test.php'
+        );
+
+        $sortByModifiedTime = array(
+            'test.php',
+            'foo',
+            'toto',
+            'foo bar',
+            '.git',
+            'test.py',
+            '.foo',
+            '.foo/.bar',
+            '.foo/bar',
+            '.bar',
+            'foo/bar.tmp'
+        );
+
         return array(
             array(SortableIterator::SORT_BY_NAME, $this->toAbsolute($sortByName)),
             array(SortableIterator::SORT_BY_TYPE, $this->toAbsolute($sortByType)),
+            array(SortableIterator::SORT_BY_ACCESSED_TIME, $this->toAbsolute($sortByAccessedTime)),
+            array(SortableIterator::SORT_BY_CHANGED_TIME, $this->toAbsolute($sortByChangedTime)),
+            array(SortableIterator::SORT_BY_MODIFIED_TIME, $this->toAbsolute($sortByModifiedTime)),
             array(function (\SplFileInfo $a, \SplFileInfo $b) { return strcmp($a->getRealpath(), $b->getRealpath()); }, $this->toAbsolute($customComparison)),
         );
     }

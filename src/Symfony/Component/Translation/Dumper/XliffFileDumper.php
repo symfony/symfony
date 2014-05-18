@@ -50,6 +50,26 @@ class XliffFileDumper extends FileDumper
             $t = $translation->appendChild($dom->createElement('target'));
             $t->appendChild($dom->createTextNode($target));
 
+            $metadata = $messages->getMetadata($source, $domain);
+            if (null !== $metadata && array_key_exists('notes', $metadata) && is_array($metadata['notes'])) {
+                foreach ($metadata['notes'] as $note) {
+                    if (!isset($note['content'])) {
+                        continue;
+                    }
+
+                    $n = $translation->appendChild($dom->createElement('note'));
+                    $n->appendChild($dom->createTextNode($note['content']));
+
+                    if (isset($note['priority'])) {
+                        $n->setAttribute('priority', $note['priority']);
+                    }
+
+                    if (isset($note['from'])) {
+                        $n->setAttribute('from', $note['from']);
+                    }
+                }
+            }
+
             $xliffBody->appendChild($translation);
         }
 

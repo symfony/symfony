@@ -748,13 +748,11 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         return preg_replace_callback("{'([^']*)(".preg_quote($rootDir)."[^']*)'}", function ($match) use ($filesystem, $cacheDir) {
             $prefix = isset($match[1]) && $match[1] ? "'$match[1]'.__DIR__" : "__DIR__";
 
-            $relativePath = rtrim($filesystem->makePathRelative($match[2], $cacheDir), '/');
-
-            if ($relativePath === '.') {
+            if ('.' === $relativePath = rtrim($filesystem->makePathRelative($match[2], $cacheDir), '/')) {
                 return $prefix;
             }
 
-            return $prefix . ".'/" . $relativePath . "'";
+            return $prefix.".'/".$relativePath."'";
         }, $content);
     }
 

@@ -20,6 +20,8 @@ class XliffFileDumperTest extends \PHPUnit_Framework_TestCase
     {
         $catalogue = new MessageCatalogue('en');
         $catalogue->add(array('foo' => 'bar', 'key' => ''));
+        $catalogue->setMetadata('foo', array('notes' => array(array('priority' => 1, 'from' => 'bar', 'content' => 'baz'))));
+        $catalogue->setMetadata('key', array('notes' => array(array('content' => 'baz'), array('content' => 'qux'))));
 
         $tempDir = sys_get_temp_dir();
         $dumper = new XliffFileDumper();

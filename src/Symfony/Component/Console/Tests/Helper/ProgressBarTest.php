@@ -372,12 +372,12 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
             $this->generateOutput(
                 " \033[44;37m Looks good to me...                   \033[0m\n".
                 "  4/15 ".str_repeat($done, 7).$progress.str_repeat($empty, 19)."  26%\n".
-                " 🏁  1 sec                        \033[41;37m 97 kB \033[0m"
+                " 🏁  1 sec                        \033[41;37m 97 KB \033[0m"
             ).
             $this->generateOutput(
                 " \033[44;37m Thanks, bye                           \033[0m\n".
                 " 15/15 ".str_repeat($done, 28)." 100%\n".
-                " 🏁  1 sec                       \033[41;37m 195 kB \033[0m"
+                " 🏁  1 sec                       \033[41;37m 195 KB \033[0m"
             ),
             stream_get_contents($output->getStream())
         );

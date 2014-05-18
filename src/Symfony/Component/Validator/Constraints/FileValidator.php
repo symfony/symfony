@@ -47,7 +47,7 @@ class FileValidator extends ConstraintValidator
                         } elseif (preg_match('/^\d++k$/', $constraint->maxSize)) {
                             $maxSize = $constraint->maxSize * 1024;
                         } elseif (preg_match('/^\d++M$/', $constraint->maxSize)) {
-                            $maxSize = $constraint->maxSize * 1048576;
+                            $maxSize = $constraint->maxSize * 1024 * 1024;
                         } else {
                             throw new ConstraintDefinitionException(sprintf('"%s" is not a valid maximum size', $constraint->maxSize));
                         }
@@ -117,11 +117,11 @@ class FileValidator extends ConstraintValidator
                 $limit = (int) $constraint->maxSize;
                 $suffix = 'bytes';
             } elseif (preg_match('/^\d++k$/', $constraint->maxSize)) {
-                $size = round(filesize($path) / 1000, 2);
+                $size = round(filesize($path) / 1024, 2);
                 $limit = (int) $constraint->maxSize;
-                $suffix = 'kB';
+                $suffix = 'KB';
             } elseif (preg_match('/^\d++M$/', $constraint->maxSize)) {
-                $size = round(filesize($path) / 1000000, 2);
+                $size = round(filesize($path) / (1024 * 1024), 2);
                 $limit = (int) $constraint->maxSize;
                 $suffix = 'MB';
             } else {

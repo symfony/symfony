@@ -29,10 +29,12 @@ if (!defined('ENT_SUBSTITUTE')) {
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ExceptionHandler implements ExceptionHandlerInterface
+class ExceptionHandler
 {
     private $debug;
     private $charset;
+    private $handler;
+    private $caughtOutput = 0;
 
     public function __construct($debug = true, $charset = 'UTF-8')
     {
@@ -57,6 +59,22 @@ class ExceptionHandler implements ExceptionHandlerInterface
     }
 
     /**
+     * Sets a user exception handler.
+     *
+     * @param callable $handler An handler that will be called on Exception
+     */
+    public function setHandler($handler)
+    {
+        if (isset($handler) && !is_callable($handler)) {
+            throw new \LogicException('The exception handler must be a valid PHP callable.');
+        }
+        $old = $this->handler;
+        $this->handler = $handler;
+
+        return $old;
+    }
+
+    /**
      * {@inheritdoc}
      *
      * Sends a response for the given Exception.
@@ -70,12 +88,49 @@ class ExceptionHandler implements ExceptionHandlerInterface
      */
     public function handle(\Exception $exception)
     {
-        if (class_exists('Symfony\Component\HttpFoundation\Response')) {
-            $response = $this->createResponse($exception);
-            $response->sendHeaders();
-            $response->sendContent();
-        } else {
-            $this->sendPhpResponse($exception);
+        // To be as fail-safe as possible, the exception is first handled
+        // by our simple exception handler, then by the user exception handler.
+        // The latter takes precedence and any output from the former is cancelled,
+        // if and only if nothing bad happens in this handling path.
+
+        $caughtOutput = 0;
+
+        $this->caughtOutput = false;
+        ob_start(array($this, 'catchOutput'));
+        try {
+            if (class_exists('Symfony\Component\HttpFoundation\Response')) {
+                $response = $this->createResponse($exception);
+                $response->sendHeaders();
+                $response->sendContent();
+            } else {
+                $this->sendPhpResponse($exception);
+            }
+        } catch (\Exception $e) {
+            // Ignore this $e exception, we have to deal with $exception
+        }
+        if (false === $this->caughtOutput) {
+            ob_end_clean();
+        }
+        if (isset($this->caughtOutput[0])) {
+            ob_start(array($this, 'cleanOutput'));
+            echo $this->caughtOutput;
+            $caughtOutput = ob_get_length();
+        }
+        $this->caughtOutput = 0;
+
+        if (!empty($this->handler)) {
+            try {
+                call_user_func($this->handler, $exception);
+
+                if ($caughtOutput) {
+                    $this->caughtOutput = $caughtOutput;
+                }
+            } catch (\Exception $e) {
+                if (!$caughtOutput) {
+                    // All handlers failed. Let PHP handle that now.
+                    throw $exception;
+                }
+            }
         }
     }
 
@@ -316,5 +371,31 @@ EOF;
         }
 
         return implode(', ', $result);
+    }
+
+    /**
+     * @internal
+     */
+    public function catchOutput($buffer)
+    {
+        $this->caughtOutput = $buffer;
+
+        return '';
+    }
+
+    /**
+     * @internal
+     */
+    public function cleanOutput($buffer)
+    {
+        if ($this->caughtOutput) {
+            // use substr_replace() instead of substr() for mbstring overloading resistance
+            $cleanBuffer = substr_replace($buffer, '', 0, $this->caughtOutput);
+            if (isset($cleanBuffer[0])) {
+                $buffer = $cleanBuffer;
+            }
+        }
+
+        return $buffer;
     }
 }

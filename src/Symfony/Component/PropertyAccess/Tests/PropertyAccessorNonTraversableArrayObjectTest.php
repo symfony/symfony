@@ -11,10 +11,12 @@
 
 namespace Symfony\Component\PropertyAccess\Tests;
 
-class PropertyAccessorArrayTest extends PropertyAccessorCollectionTest
+use Symfony\Component\PropertyAccess\Tests\Fixtures\NonTraversableArrayObject;
+
+class PropertyAccessorNonTraversableArrayObjectTest extends PropertyAccessorArrayAccessTest
 {
     protected function getContainer(array $array)
     {
-        return $array;
+        return new NonTraversableArrayObject($array);
     }
 }

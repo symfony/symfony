@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\PropertyAccess\Tests;
 
-use Symfony\Component\PropertyAccess\Tests\Fixtures\CustomArrayObject;
+use Symfony\Component\PropertyAccess\Tests\Fixtures\TraversableArrayObject;
 
-class PropertyAccessorCustomArrayObjectTest extends PropertyAccessorCollectionTest
+class PropertyAccessorTraversableArrayObjectTest extends PropertyAccessorCollectionTest
 {
-    protected function getCollection(array $array)
+    protected function getContainer(array $array)
     {
-        return new CustomArrayObject($array);
+        return new TraversableArrayObject($array);
     }
 }

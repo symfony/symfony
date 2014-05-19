@@ -62,12 +62,12 @@ class DiffOperationTest extends AbstractOperationTest
         $rightCatalogue->setMetadata('b', 'baz', 'messages');
         $rightCatalogue->setMetadata('c', 'qux', 'messages');
 
-        $mergedCatalogue = new MessageCatalogue('en', array('messages' => array('b' => 'old_b', 'c' => 'new_c')));
-        $mergedCatalogue->setMetadata('b', 'bar', 'messages');
-        $mergedCatalogue->setMetadata('c', 'qux', 'messages');
+        $diffCatalogue = new MessageCatalogue('en', array('messages' => array('b' => 'old_b', 'c' => 'new_c')));
+        $diffCatalogue->setMetadata('b', 'bar', 'messages');
+        $diffCatalogue->setMetadata('c', 'qux', 'messages');
 
         $this->assertEquals(
-            $mergedCatalogue,
+            $diffCatalogue,
             $this->createOperation(
                 $leftCatalogue,
                 $rightCatalogue

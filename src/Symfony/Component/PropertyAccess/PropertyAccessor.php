@@ -33,7 +33,7 @@ class PropertyAccessor implements PropertyAccessorInterface
     /**
      * @var bool
      */
-    private $throwExceptionOnInvalidIndex;
+    private $ignoreInvalidIndices;
 
     /**
      * Should not be used by application code. Use
@@ -42,7 +42,7 @@ class PropertyAccessor implements PropertyAccessorInterface
     public function __construct($magicCall = false, $throwExceptionOnInvalidIndex = false)
     {
         $this->magicCall = $magicCall;
-        $this->throwExceptionOnInvalidIndex = $throwExceptionOnInvalidIndex;
+        $this->ignoreInvalidIndices = $throwExceptionOnInvalidIndex;
     }
 
     /**
@@ -56,7 +56,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             throw new UnexpectedTypeException($propertyPath, 'string or Symfony\Component\PropertyAccess\PropertyPathInterface');
         }
 
-        $propertyValues =& $this->readPropertiesUntil($objectOrArray, $propertyPath, $propertyPath->getLength(), $this->throwExceptionOnInvalidIndex);
+        $propertyValues =& $this->readPropertiesUntil($objectOrArray, $propertyPath, $propertyPath->getLength(), $this->ignoreInvalidIndices);
 
         return $propertyValues[count($propertyValues) - 1][self::VALUE];
     }
@@ -116,7 +116,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      *
      * @throws UnexpectedTypeException If a value within the path is neither object nor array.
      */
-    private function &readPropertiesUntil(&$objectOrArray, PropertyPathInterface $propertyPath, $lastIndex, $throwExceptionOnInvalidIndex = false)
+    private function &readPropertiesUntil(&$objectOrArray, PropertyPathInterface $propertyPath, $lastIndex, $ignoreInvalidIndices = false)
     {
         $propertyValues = array();
 
@@ -131,8 +131,23 @@ class PropertyAccessor implements PropertyAccessorInterface
 
             // Create missing nested arrays on demand
             if ($isIndex && $isArrayAccess && !isset($objectOrArray[$property])) {
-                if ($throwExceptionOnInvalidIndex) {
-                    throw new NoSuchIndexException(sprintf('Cannot read property "%s". Available properties are "%s"', $property, print_r(array_keys($objectOrArray), true)));
+                if ($ignoreInvalidIndices) {
+                    if (!is_array($objectOrArray)) {
+                        if (!$objectOrArray instanceof \Traversable) {
+                            throw new NoSuchIndexException(sprintf(
+                                'Cannot read property "%s".',
+                                $property
+                            ));
+                        }
+
+                        $objectOrArray = iterator_to_array($objectOrArray);
+                    }
+
+                    throw new NoSuchIndexException(sprintf(
+                        'Cannot read property "%s". Available properties are "%s"',
+                        $property,
+                        print_r(array_keys($objectOrArray), true)
+                    ));
                 }
 
                 $objectOrArray[$property] = $i + 1 < $propertyPath->getLength() ? array() : null;
@@ -429,6 +444,8 @@ class PropertyAccessor implements PropertyAccessorInterface
                 ));
             }
         }
+
+        return null;
     }
 
     /**

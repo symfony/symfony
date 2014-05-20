@@ -17,7 +17,7 @@ class Test1Command extends CommandGeneratorBase
             ->setDescription($definition['description'])
         ;
 
-        foreach($definition['parameters'] as $param => $details) {
+        foreach ($definition['parameters'] as $param => $details) {
             $this->addArgument(
                 $param,
                 null,
@@ -34,4 +34,3 @@ class Test1Command extends CommandGeneratorBase
 
     }
 }
-

@@ -19,8 +19,8 @@ namespace Symfony\Component\Console\CommandGenerator;
  *
  * @api
  */
-class CommandDefaultFactory implements CommandFactoryInterface{
-
+class CommandDefaultFactory implements CommandFactoryInterface
+{
     private $customClass;
 
     /**
@@ -29,7 +29,8 @@ class CommandDefaultFactory implements CommandFactoryInterface{
      * @param string $customClass A string with name of the class
      * we want to create.
      */
-    public function __construct($customClass = null) {
+    public function __construct($customClass = null)
+    {
         $this->customClass = $customClass ? $customClass : null;
     }
 
@@ -39,8 +40,8 @@ class CommandDefaultFactory implements CommandFactoryInterface{
      *
      * @api
      */
-    public function createCommand(array $commandDefinition = array()) {
-
+    public function createCommand(array $commandDefinition = array())
+    {
         $class = $this->customClass ? $this->customClass : '\Symfony\Component\Console\CommandGenerator\CommandGeneratorBase';
 
         return new $class($commandDefinition);

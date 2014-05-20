@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Console\Tests\CommandGenerator;
 
-
 use Symfony\Component\Console\CommandGenerator\CommandDefaultFactory;
 use Symfony\Component\Console\CommandGenerator\CommandDiscovery;
 use Symfony\Component\Console\Tests\Fixtures\TestCommandResourceBuilder;
@@ -45,13 +44,15 @@ class CommandDiscoveryTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('name', $definitions['command3']);
     }
 
-    public function testGenerateCommand() {
+    public function testGenerateCommand()
+    {
         $definitions = $this::$commandDiscovery->buildDefinitions();
         $command = $this::$commandDiscovery->generateCommand($definitions['command1']);
         $this->assertInstanceOf('\Symfony\Component\Console\Tests\Fixtures\Test1Command', $command);
     }
 
-    public function testGenerateCommands() {
+    public function testGenerateCommands()
+    {
         $definitions = $this::$commandDiscovery->buildDefinitions();
         $commands = $this::$commandDiscovery->generateCommands($definitions);
         $this->assertCount(3, $commands);

@@ -21,8 +21,8 @@ Class TestCommandResourceBuilder implements CommandResourceBuilderInterface
      *
      * @param null $source The source where live our command definitions.
      */
-    public function __construct($source = null) {
-
+    public function __construct($source = null)
+    {
     }
 
     /**
@@ -33,7 +33,8 @@ Class TestCommandResourceBuilder implements CommandResourceBuilderInterface
      *
      * @api
      */
-    public function buildDefinitions() {
+    public function buildDefinitions()
+    {
         return array(
             'command1' => array(
                 'name' => 'name1',

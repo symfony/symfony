@@ -18,8 +18,8 @@ namespace Symfony\Component\Console\CommandGenerator;
  *
  * @api
  */
-class CommandManager {
-
+class CommandManager
+{
     private $commandFactory;
     private $commandDiscovery;
 
@@ -40,14 +40,14 @@ class CommandManager {
         $this->setCommandFactory();
     }
 
-
     /**
      * Set the factory class used by the discovery class
      * for creating new commands.
      *
      * @see generateCommand($singleCommandDefinition)
      */
-    protected function setCommandFactory() {
+    protected function setCommandFactory()
+    {
         $this->commandDiscovery->setCommandFactory($this->commandFactory);
     }
 
@@ -56,7 +56,8 @@ class CommandManager {
      *
      * @api
      */
-    public function generateCommands() {
+    public function generateCommands()
+    {
         return $this->commandDiscovery->generateCommands();
     }
 

@@ -33,7 +33,8 @@ class CommandManagerTest extends \PHPUnit_Framework_TestCase
         require_once self::$fixturesPath.'/TestCommandResourceBuilder.php';
     }
 
-    public function testGenerateCommands() {
+    public function testGenerateCommands()
+    {
         $commands = $this::$commandManager->generateCommands();
         $this->assertCount(3, $commands);
         $this->assertContainsOnly('\Symfony\Component\Console\Tests\Fixtures\Test1Command', $commands);

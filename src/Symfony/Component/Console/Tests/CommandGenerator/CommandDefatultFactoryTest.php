@@ -11,10 +11,9 @@
 
 namespace Symfony\Component\Console\Tests\CommandGenerator;
 
-
 use Symfony\Component\Console\CommandGenerator\CommandDefaultFactory;
 
-class CommandDefaultFactoryTest extends \PHPUnit_Framework_TestCase
+class CommandDefatultFactoryTest extends \PHPUnit_Framework_TestCase
 {
 
     protected static $fixturesPath;

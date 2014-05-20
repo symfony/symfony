@@ -33,7 +33,7 @@ class CommandGeneratorTest extends \PHPUnit_Framework_TestCase
 
         $fixtures_commands = $this::$commandResourceBuilder->buildDefinitions();
 
-        foreach($fixtures_commands as $command => $definition) {
+        foreach ($fixtures_commands as $command => $definition) {
             $command = $application->find($definition['name']);
             $commandTester = new CommandTester($command);
             $commandTester->execute(

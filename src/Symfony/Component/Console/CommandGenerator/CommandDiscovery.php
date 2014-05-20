@@ -20,8 +20,8 @@ namespace Symfony\Component\Console\CommandGenerator;
  *
  * @api
  */
-class CommandDiscovery implements CommandDiscoveryInterface {
-
+class CommandDiscovery implements CommandDiscoveryInterface
+{
     private $commandResourceBuilder;
     private $commandFactory;
     private $commandDefinitions;
@@ -45,28 +45,30 @@ class CommandDiscovery implements CommandDiscoveryInterface {
     /**
      * {@inheritdoc}
      */
-    public function setCommandFactory(CommandFactoryInterface $commandFactory) {
+    public function setCommandFactory(CommandFactoryInterface $commandFactory)
+    {
         $this->commandFactory = $commandFactory;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function buildDefinitions() {
-
+    public function buildDefinitions()
+    {
         $commandDefinitions = $this->commandResourceBuilder->buildDefinitions();
+
         return $commandDefinitions;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function generateCommands() {
-
+    public function generateCommands()
+    {
         static $commands = array();
 
         if (empty($commands)) {
-            foreach($this->commandDefinitions as $key => $singleCommandDefinition) {
+            foreach ($this->commandDefinitions as $key => $singleCommandDefinition) {
                 $commands[] = $this->generateCommand($singleCommandDefinition);
             }
         }
@@ -77,7 +79,8 @@ class CommandDiscovery implements CommandDiscoveryInterface {
     /**
      * {@inheritdoc}
      */
-    public function generateCommand($singleCommandDefinition) {
+    public function generateCommand($singleCommandDefinition)
+    {
         return $this->commandFactory->createCommand($singleCommandDefinition);
     }
 

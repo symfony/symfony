@@ -15,8 +15,8 @@ class CommandGeneratorBase extends Command
 {
     private $commandDefinition;
 
-    public function __construct($definition) {
-
+    public function __construct($definition)
+    {
         if (!isset($definition['name']) || empty($definition['name'])) {
             throw new \LogicException('The command name cannot be empty.');
         }
@@ -25,11 +25,13 @@ class CommandGeneratorBase extends Command
         parent::__construct($definition['name']);
     }
 
-    public function getCommandDefinition() {
+    public function getCommandDefinition()
+    {
         return $this->commandDefinition;
     }
 
-    public function setCommandDefinition($commandDefinition) {
+    public function setCommandDefinition($commandDefinition)
+    {
         $this->commandDefinition = $commandDefinition;
     }
 }

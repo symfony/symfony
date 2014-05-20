@@ -128,6 +128,21 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         unlink($target);
     }
 
+    public function testUploadedFileWhenNoFileSelected()
+    {
+        $kernel = new TestHttpKernel();
+        $client = new Client($kernel);
+
+        $file = array('tmp_name' => '', 'name' => '', 'type' => '', 'size' => 0, 'error' => UPLOAD_ERR_NO_FILE);
+
+        $client->request('POST', '/', array(), array('foo' => $file));
+
+        $files = $client->getRequest()->files->all();
+
+        $this->assertCount(1, $files);
+        $this->assertNull($files['foo']);
+    }
+
     public function testUploadedFileWhenSizeExceedsUploadMaxFileSize()
     {
         $source = tempnam(sys_get_temp_dir(), 'source');

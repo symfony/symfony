@@ -30,6 +30,26 @@ class SortableIteratorTest extends RealIteratorTestCase
      */
     public function testAccept($mode, $expected)
     {
+        if(!is_callable($mode)){
+            switch($mode){
+                case SortableIterator::SORT_BY_ACCESSED_TIME :
+                    file_get_contents(self::toAbsolute('.git'));
+                    sleep(1);
+                    file_get_contents(self::toAbsolute('.bar'));
+                    break;
+                case SortableIterator::SORT_BY_CHANGED_TIME :
+                    file_put_contents(self::toAbsolute('test.php'), 'foo');
+                    sleep(1);
+                    file_put_contents(self::toAbsolute('test.py'), 'foo');
+                    break;
+                case SortableIterator::SORT_BY_MODIFIED_TIME :
+                    file_put_contents(self::toAbsolute('test.php'), 'foo');
+                    sleep(1);
+                    file_put_contents(self::toAbsolute('test.py'), 'foo');
+                    break;
+            }
+        }
+
         $inner = new Iterator(self::$files);
 
         $iterator = new SortableIterator($inner, $mode);
@@ -97,30 +117,30 @@ class SortableIteratorTest extends RealIteratorTestCase
         );
 
         $sortByChangedTime = array(
-            '.git',
             'foo',
-            'foo bar',
-            '.bar',
-            '.foo/bar',
-            '.foo',
-            '.foo/.bar',
-            'toto',
-            'test.py',
             'foo/bar.tmp',
-            'test.php'
+            'toto',
+            '.git',
+            '.bar',
+            '.foo',
+            'foo bar',
+            '.foo/.bar',
+            '.foo/bar',
+            'test.php',
+            'test.py'
         );
 
         $sortByModifiedTime = array(
             'foo/bar.tmp',
-            'test.php',
             'foo',
             'toto',
             '.git',
             '.bar',
             '.foo',
+            'foo bar',
             '.foo/.bar',
             '.foo/bar',
-            'foo bar',
+            'test.php',
             'test.py'
         );
 

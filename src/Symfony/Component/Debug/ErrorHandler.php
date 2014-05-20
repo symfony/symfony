@@ -15,6 +15,7 @@ use Psr\Log\LogLevel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Debug\Exception\ContextErrorException;
 use Symfony\Component\Debug\Exception\FatalErrorException;
+use Symfony\Component\Debug\Exception\OutOfMemoryException;
 use Symfony\Component\Debug\FatalErrorHandler\UndefinedFunctionFatalErrorHandler;
 use Symfony\Component\Debug\FatalErrorHandler\UndefinedMethodFatalErrorHandler;
 use Symfony\Component\Debug\FatalErrorHandler\ClassNotFoundFatalErrorHandler;
@@ -313,12 +314,16 @@ class ErrorHandler
 
         $level = isset($this->levels[$error['type']]) ? $this->levels[$error['type']] : $error['type'];
         $message = sprintf('%s: %s in %s line %d', $level, $error['message'], $error['file'], $error['line']);
-        $exception = new FatalErrorException($message, 0, $error['type'], $error['file'], $error['line'], 3);
+        if (0 === strpos($error['message'], 'Allowed memory') || 0 === strpos($error['message'], 'Out of memory')) {
+            $exception = new OutOfMemoryException($message, 0, $error['type'], $error['file'], $error['line'], 3, false);
+        } else {
+            $exception = new FatalErrorException($message, 0, $error['type'], $error['file'], $error['line'], 3, true);
 
-        foreach ($this->getFatalErrorHandlers() as $handler) {
-            if ($e = $handler->handleError($error, $exception)) {
-                $exception = $e;
-                break;
+            foreach ($this->getFatalErrorHandlers() as $handler) {
+                if ($e = $handler->handleError($error, $exception)) {
+                    $exception = $e;
+                    break;
+                }
             }
         }
 

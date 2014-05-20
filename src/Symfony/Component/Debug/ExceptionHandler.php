@@ -13,6 +13,7 @@ namespace Symfony\Component\Debug;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Debug\Exception\FlattenException;
+use Symfony\Component\Debug\Exception\OutOfMemoryException;
 
 if (!defined('ENT_SUBSTITUTE')) {
     define('ENT_SUBSTITUTE', 8);
@@ -62,6 +63,8 @@ class ExceptionHandler
      * Sets a user exception handler.
      *
      * @param callable $handler An handler that will be called on Exception
+     *
+     * @return callable|null The previous exception handler if any
      */
     public function setHandler($handler)
     {
@@ -88,6 +91,12 @@ class ExceptionHandler
      */
     public function handle(\Exception $exception)
     {
+        if ($exception instanceof OutOfMemoryException) {
+            $this->sendPhpResponse($exception);
+
+            return;
+        }
+
         // To be as fail-safe as possible, the exception is first handled
         // by our simple exception handler, then by the user exception handler.
         // The latter takes precedence and any output from the former is cancelled,

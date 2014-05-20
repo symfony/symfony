@@ -65,12 +65,9 @@ class CommandDiscovery implements CommandDiscoveryInterface
      */
     public function generateCommands()
     {
-        static $commands = array();
 
-        if (empty($commands)) {
-            foreach ($this->commandDefinitions as $key => $singleCommandDefinition) {
-                $commands[] = $this->generateCommand($singleCommandDefinition);
-            }
+        foreach ($this->commandDefinitions as $key => $singleCommandDefinition) {
+            $commands[] = $this->generateCommand($singleCommandDefinition);
         }
 
         return $commands;

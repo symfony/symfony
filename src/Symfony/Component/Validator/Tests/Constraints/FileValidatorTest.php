@@ -33,7 +33,13 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        fclose($this->file);
+        if (is_resource($this->file)) {
+            fclose($this->file);
+        }
+
+        if (file_exists($this->path)) {
+            unlink($this->path);
+        }
 
         $this->context = null;
         $this->validator = null;
@@ -82,90 +88,98 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->validate($file, new File());
     }
 
-    public function testTooLargeBytes()
+    public function provideMaxSizeExceededTests()
     {
-        fwrite($this->file, str_repeat('0', 11));
+        return array(
+            array(11, 10, '11', '10', 'bytes'),
+
+            array(ceil(1.005*1000), ceil(1.005*1000) - 1, '1005', '1004', 'bytes'),
+            array(ceil(1.005*1000*1000), ceil(1.005*1000*1000) - 1, '1005000', '1004999', 'bytes'),
+
+            // round(size) == 1.01kB, limit == 1kB
+            array(ceil(1.005*1000), 1000, '1.01', '1', 'kB'),
+            array(ceil(1.005*1000), '1k', '1.01', '1', 'kB'),
+
+            // round(size) == 1kB, limit == 1kB -> use bytes
+            array(ceil(1.004*1000), 1000, '1004', '1000', 'bytes'),
+            array(ceil(1.004*1000), '1k', '1004', '1000', 'bytes'),
+
+            array(1000 + 1, 1000, '1001', '1000', 'bytes'),
+            array(1000 + 1, '1k', '1001', '1000', 'bytes'),
+
+            // round(size) == 1.01MB, limit == 1MB
+            array(ceil(1.005*1000*1000), 1000*1000, '1.01', '1', 'MB'),
+            array(ceil(1.005*1000*1000), '1000k', '1.01', '1', 'MB'),
+            array(ceil(1.005*1000*1000), '1M', '1.01', '1', 'MB'),
+
+            // round(size) == 1MB, limit == 1MB -> use kB
+            array(ceil(1.004*1000*1000), 1000*1000, '1004', '1000', 'kB'),
+            array(ceil(1.004*1000*1000), '1000k', '1004', '1000', 'kB'),
+            array(ceil(1.004*1000*1000), '1M', '1004', '1000', 'kB'),
+
+            array(1000*1000 + 1, 1000*1000, '1000001', '1000000', 'bytes'),
+            array(1000*1000 + 1, '1000k', '1000001', '1000000', 'bytes'),
+            array(1000*1000 + 1, '1M', '1000001', '1000000', 'bytes'),
+        );
+    }
+
+    /**
+     * @dataProvider provideMaxSizeExceededTests
+     */
+    public function testMaxSizeExceeded($bytesWritten, $limit, $sizeAsString, $limitAsString, $suffix)
+    {
+        fseek($this->file, $bytesWritten-1, SEEK_SET);
+        fwrite($this->file, '0');
+        fclose($this->file);
 
         $constraint = new File(array(
-            'maxSize'           => 10,
+            'maxSize'           => $limit,
             'maxSizeMessage'    => 'myMessage',
         ));
 
         $this->context->expects($this->once())
             ->method('addViolation')
             ->with('myMessage', array(
-                '{{ limit }}'   => '10',
-                '{{ size }}'    => '11',
-                '{{ suffix }}'  => 'bytes',
+                '{{ limit }}'   => $limitAsString,
+                '{{ size }}'    => $sizeAsString,
+                '{{ suffix }}'  => $suffix,
                 '{{ file }}'    => $this->path,
             ));
 
         $this->validator->validate($this->getFile($this->path), $constraint);
     }
 
-    public function testTooLargeKiloBytes()
+    public function provideMaxSizeNotExceededTests()
     {
-        fwrite($this->file, str_repeat('0', 1400));
+        return array(
+            array(10, 10),
+            array(9, 10),
+
+            array(1000, '1k'),
+            array(1000 - 1, '1k'),
+
+            array(1000*1000, '1M'),
+            array(1000*1000 - 1, '1M'),
+        );
+    }
+
+    /**
+     * @dataProvider provideMaxSizeNotExceededTests
+     */
+    public function testMaxSizeNotExceeded($bytesWritten, $limit)
+    {
+        fseek($this->file, $bytesWritten-1, SEEK_SET);
+        fwrite($this->file, '0');
+        fclose($this->file);
 
         $constraint = new File(array(
-            'maxSize'           => '1k',
+            'maxSize'           => $limit,
             'maxSizeMessage'    => 'myMessage',
         ));
 
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('myMessage', array(
-                '{{ limit }}'   => '1',
-                '{{ size }}'    => '1.37',
-                '{{ suffix }}'  => 'KiB',
-                '{{ file }}'    => $this->path,
-            ));
+        $this->context->expects($this->never())
+            ->method('addViolation');
 
-        $this->validator->validate($this->getFile($this->path), $constraint);
-    }
-
-    public function testTooLargeMegaBytes()
-    {
-        fwrite($this->file, str_repeat('0', 1400000));
-
-        $constraint = new File(array(
-            'maxSize'           => '1M',
-            'maxSizeMessage'    => 'myMessage',
-        ));
-
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('myMessage', array(
-                '{{ limit }}'   => '1',
-                '{{ size }}'    => '1.34',
-                '{{ suffix }}'  => 'MiB',
-                '{{ file }}'    => $this->path,
-            ));
-
-        $this->validator->validate($this->getFile($this->path), $constraint);
-    }
-
-    public function testMaxSizeKiloBytes()
-    {
-        fwrite($this->file, str_repeat('0', 1010));
-
-        $constraint = new File(array(
-            'maxSize' => '1k',
-        ));
-
-        $this->context->expects($this->never())->method('addViolation');
-        $this->validator->validate($this->getFile($this->path), $constraint);
-    }
-
-    public function testMaxSizeMegaBytes()
-    {
-        fwrite($this->file, str_repeat('0', (1024 * 1022)));
-
-        $constraint = new File(array(
-            'maxSize' => '1M',
-        ));
-
-        $this->context->expects($this->never())->method('addViolation');
         $this->validator->validate($this->getFile($this->path), $constraint);
     }
 

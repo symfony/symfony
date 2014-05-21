@@ -4,9 +4,8 @@ CHANGELOG
 2.5.0
 -----
 
-* added ErrorHandler::setFatalErrorExceptionHandler()
+* added ExceptionHandler::setHandler()
 * added UndefinedMethodFatalErrorHandler
-* deprecated ExceptionHandlerInterface
 * deprecated DummyException
 
 2.4.0

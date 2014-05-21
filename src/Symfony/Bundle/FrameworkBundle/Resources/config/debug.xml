@@ -9,7 +9,7 @@
         <parameter key="debug.stopwatch.class">Symfony\Component\Stopwatch\Stopwatch</parameter>
         <parameter key="debug.container.dump">%kernel.cache_dir%/%kernel.container_class%.xml</parameter>
         <parameter key="debug.controller_resolver.class">Symfony\Component\HttpKernel\Controller\TraceableControllerResolver</parameter>
-        <parameter key="debug.fatal_error_exceptions_listener.class">Symfony\Component\HttpKernel\EventListener\FatalErrorExceptionsListener</parameter>
+        <parameter key="debug.debug_handlers_listener.class">Symfony\Component\HttpKernel\EventListener\DebugHandlersListener</parameter>
     </parameters>
 
     <services>
@@ -41,11 +41,11 @@
             <argument type="service" id="logger" on-invalid="null" />
         </service>
 
-        <service id="debug.fatal_error_exceptions_listener" class="%debug.fatal_error_exceptions_listener.class%">
+        <service id="debug.debug_handlers_listener" class="%debug.debug_handlers_listener.class%">
             <tag name="kernel.event_subscriber" />
             <argument type="collection">
                 <argument type="service" id="http_kernel" on-invalid="null" />
-                <argument>handleFatalErrorException</argument>
+                <argument>terminateWithException</argument>
             </argument>
         </service>
     </services>

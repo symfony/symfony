@@ -107,13 +107,17 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->validate($this->getFile($this->path), $constraint);
     }
 
-    public function testTooLargeKiloBytes()
+    /**
+     * @dataProvider sizeFormatProvider
+     */
+    public function testTooLargeKiloBytes($sizeFormat, $size)
     {
-        fwrite($this->file, str_repeat('0', 1400));
+        fwrite($this->file, str_repeat('0', 1.4 * $size));
 
         $constraint = new File(array(
             'maxSize'           => '1k',
             'maxSizeMessage'    => 'myMessage',
+            'sizeFormat'        => $sizeFormat,
         ));
 
         $this->context->expects($this->once())
@@ -128,13 +132,17 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->validate($this->getFile($this->path), $constraint);
     }
 
-    public function testTooLargeMegaBytes()
+    /**
+     * @dataProvider sizeFormatProvider
+     */
+    public function testTooLargeMegaBytes($sizeFormat, $size)
     {
-        fwrite($this->file, str_repeat('0', 1400000));
+        fwrite($this->file, str_repeat('0', 1.4 * pow($size, 2)));
 
         $constraint = new File(array(
             'maxSize'           => '1M',
             'maxSizeMessage'    => 'myMessage',
+            'sizeFormat'        => $sizeFormat,
         ));
 
         $this->context->expects($this->once())
@@ -303,6 +311,14 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
 
         $this->validator->validate($file, $constraint);
 
+    }
+
+    public function sizeFormatProvider()
+    {
+        return array(
+            array('binary', 1024),
+            array('decimal', 1000),
+        );
     }
 
     public function uploadedFileErrorProvider()

@@ -25,6 +25,14 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
  */
 class FileValidator extends ConstraintValidator
 {
+    const SIZE_FORMAT_BINARY  = 'binary';
+    const SIZE_FORMAT_DECIMAL = 'decimal';
+
+    private $sizeFormats = array(
+        self::SIZE_FORMAT_BINARY  => 1024,
+        self::SIZE_FORMAT_DECIMAL => 1000,
+    );
+
     /**
      * {@inheritdoc}
      */
@@ -34,6 +42,12 @@ class FileValidator extends ConstraintValidator
             return;
         }
 
+        if (!array_key_exists($constraint->sizeFormat, $this->sizeFormats)) {
+            throw new ConstraintDefinitionException(sprintf('"%s" is not a valid size format', $constraint->sizeFormat));
+        }
+
+        $formatSize = $this->sizeFormats[$constraint->sizeFormat];
+
         if ($value instanceof UploadedFile && !$value->isValid()) {
             switch ($value->getError()) {
                 case UPLOAD_ERR_INI_SIZE:
@@ -41,9 +55,9 @@ class FileValidator extends ConstraintValidator
                         if (ctype_digit((string) $constraint->maxSize)) {
                             $maxSize = (int) $constraint->maxSize;
                         } elseif (preg_match('/^\d++k$/', $constraint->maxSize)) {
-                            $maxSize = $constraint->maxSize * 1024;
+                            $maxSize = $constraint->maxSize * $formatSize;
                         } elseif (preg_match('/^\d++M$/', $constraint->maxSize)) {
-                            $maxSize = $constraint->maxSize * 1048576;
+                            $maxSize = $constraint->maxSize * pow($formatSize, 2);
                         } else {
                             throw new ConstraintDefinitionException(sprintf('"%s" is not a valid maximum size', $constraint->maxSize));
                         }
@@ -113,11 +127,11 @@ class FileValidator extends ConstraintValidator
                 $limit = (int) $constraint->maxSize;
                 $suffix = 'bytes';
             } elseif (preg_match('/^\d++k$/', $constraint->maxSize)) {
-                $size = round(filesize($path) / 1000, 2);
+                $size = round(filesize($path) / $formatSize, 2);
                 $limit = (int) $constraint->maxSize;
                 $suffix = 'kB';
             } elseif (preg_match('/^\d++M$/', $constraint->maxSize)) {
-                $size = round(filesize($path) / 1000000, 2);
+                $size = round(filesize($path) / pow($formatSize, 2), 2);
                 $limit = (int) $constraint->maxSize;
                 $suffix = 'MB';
             } else {

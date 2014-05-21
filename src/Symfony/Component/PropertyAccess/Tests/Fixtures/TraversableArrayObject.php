@@ -15,7 +15,7 @@ namespace Symfony\Component\PropertyAccess\Tests\Fixtures;
  * This class is a hand written simplified version of PHP native `ArrayObject`
  * class, to show that it behaves differently than the PHP native implementation.
  */
-class CustomArrayObject implements \ArrayAccess, \IteratorAggregate, \Countable, \Serializable
+class TraversableArrayObject implements \ArrayAccess, \IteratorAggregate, \Countable, \Serializable
 {
     private $array;
 

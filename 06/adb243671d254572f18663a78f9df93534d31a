@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-05-20T08:23:09Z
+
+Call for review:
+This PR is now a two in one: cleanup and OOM bug fix.
+I just added a commit for better handling of out of memory situations.
+This should prevent some remaining blank pages.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-05-21T12:23:02Z
+
+Any comment here? Otherwise @fabpot this is :+1:  for merge in 2.5 on my side

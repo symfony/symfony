@@ -53,6 +53,22 @@ class FilesystemTest extends FilesystemTestCase
         $this->filesystem->copy($sourceFilePath, $targetFilePath);
     }
 
+    /**
+     * @expectedException \Symfony\Component\Filesystem\Exception\IOException
+     */
+    public function testCopyUnreadableFileFails()
+    {
+        $sourceFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_source_file';
+        $targetFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_target_file';
+
+        file_put_contents($sourceFilePath, 'SOURCE FILE');
+
+        // make sure target cannot be read
+        $this->filesystem->chmod($sourceFilePath, 0222);
+
+        $this->filesystem->copy($sourceFilePath, $targetFilePath);
+    }
+
     public function testCopyOverridesExistingFileIfModified()
     {
         $sourceFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_source_file';
@@ -104,6 +120,28 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->assertFileExists($targetFilePath);
         $this->assertEquals('SOURCE FILE', file_get_contents($targetFilePath));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Filesystem\Exception\IOException
+     */
+    public function testCopyWithOverrideWithReadOnlyTargetFails()
+    {
+        $sourceFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_source_file';
+        $targetFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_target_file';
+
+        file_put_contents($sourceFilePath, 'SOURCE FILE');
+        file_put_contents($targetFilePath, 'TARGET FILE');
+
+        // make sure both files have the same modification time
+        $modificationTime = time() - 1000;
+        touch($sourceFilePath, $modificationTime);
+        touch($targetFilePath, $modificationTime);
+
+        // make sure target is read-only
+        $this->filesystem->chmod($targetFilePath, 0444);
+
+        $this->filesystem->copy($sourceFilePath, $targetFilePath, true);
     }
 
     public function testCopyCreatesTargetDirectoryIfItDoesNotExist()

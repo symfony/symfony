@@ -25,7 +25,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Debug\Exception\FatalErrorException;
 
 /**
  * HttpKernel notifies events to convert a Request object to a Response one.
@@ -87,11 +86,16 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
     }
 
     /**
+     * @throws \LogicException If the request stack is empty
+     *
      * @internal
      */
-    public function handleFatalErrorException(FatalErrorException $exception)
+    public function terminateWithException(\Exception $exception)
     {
-        $request = $this->requestStack->getMasterRequest();
+        if (!$request = $this->requestStack->getMasterRequest()) {
+            throw new \LogicException('Request stack is empty', 0, $exception);
+        }
+
         $response = $this->handleException($exception, $request, self::MASTER_REQUEST);
 
         $response->sendHeaders();

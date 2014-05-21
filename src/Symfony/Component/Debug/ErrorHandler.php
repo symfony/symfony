@@ -15,6 +15,7 @@ use Psr\Log\LogLevel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Debug\Exception\ContextErrorException;
 use Symfony\Component\Debug\Exception\FatalErrorException;
+use Symfony\Component\Debug\Exception\OutOfMemoryException;
 use Symfony\Component\Debug\FatalErrorHandler\UndefinedFunctionFatalErrorHandler;
 use Symfony\Component\Debug\FatalErrorHandler\UndefinedMethodFatalErrorHandler;
 use Symfony\Component\Debug\FatalErrorHandler\ClassNotFoundFatalErrorHandler;
@@ -53,8 +54,6 @@ class ErrorHandler
 
     private $displayErrors;
 
-    private $caughtOutput = 0;
-
     /**
      * @var LoggerInterface[] Loggers for channels
      */
@@ -63,8 +62,6 @@ class ErrorHandler
     private static $stackedErrors = array();
 
     private static $stackedErrorLevels = array();
-
-    private static $fatalHandler = false;
 
     /**
      * Registers the error handler.
@@ -117,16 +114,6 @@ class ErrorHandler
     public static function setLogger(LoggerInterface $logger, $channel = 'deprecation')
     {
         self::$loggers[$channel] = $logger;
-    }
-
-    /**
-     * Sets a fatal error exception handler.
-     *
-     * @param callable $handler An handler that will be called on FatalErrorException
-     */
-    public static function setFatalErrorExceptionHandler($handler)
-    {
-        self::$fatalHandler = $handler;
     }
 
     /**
@@ -284,7 +271,7 @@ class ErrorHandler
             throw $exception;
         }
 
-        if (!$error || !$this->level || !in_array($error['type'], array(E_ERROR, E_CORE_ERROR, E_COMPILE_ERROR, E_PARSE))) {
+        if (!$error || !$this->level || !($error['type'] & (E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR | E_PARSE))) {
             return;
         }
 
@@ -298,7 +285,7 @@ class ErrorHandler
             self::$loggers['emergency']->emergency($error['message'], $fatal);
         }
 
-        if ($this->displayErrors && ($exceptionHandler || self::$fatalHandler)) {
+        if ($this->displayErrors && $exceptionHandler) {
             $this->handleFatalError($exceptionHandler, $error);
         }
     }
@@ -327,82 +314,25 @@ class ErrorHandler
 
         $level = isset($this->levels[$error['type']]) ? $this->levels[$error['type']] : $error['type'];
         $message = sprintf('%s: %s in %s line %d', $level, $error['message'], $error['file'], $error['line']);
-        $exception = new FatalErrorException($message, 0, $error['type'], $error['file'], $error['line'], 3);
+        if (0 === strpos($error['message'], 'Allowed memory') || 0 === strpos($error['message'], 'Out of memory')) {
+            $exception = new OutOfMemoryException($message, 0, $error['type'], $error['file'], $error['line'], 3, false);
+        } else {
+            $exception = new FatalErrorException($message, 0, $error['type'], $error['file'], $error['line'], 3, true);
 
-        foreach ($this->getFatalErrorHandlers() as $handler) {
-            if ($e = $handler->handleError($error, $exception)) {
-                $exception = $e;
-                break;
-            }
-        }
-
-        // To be as fail-safe as possible, the FatalErrorException is first handled
-        // by the exception handler, then by the fatal error handler. The latter takes
-        // precedence and any output from the former is cancelled, if and only if
-        // nothing bad happens in this handling path.
-
-        $caughtOutput = 0;
-
-        if ($exceptionHandler) {
-            $this->caughtOutput = false;
-            ob_start(array($this, 'catchOutput'));
-            try {
-                call_user_func($exceptionHandler, $exception);
-            } catch (\Exception $e) {
-                // Ignore this exception, we have to deal with the fatal error
-            }
-            if (false === $this->caughtOutput) {
-                ob_end_clean();
-            }
-            if (isset($this->caughtOutput[0])) {
-                ob_start(array($this, 'cleanOutput'));
-                echo $this->caughtOutput;
-                $caughtOutput = ob_get_length();
-            }
-            $this->caughtOutput = 0;
-        }
-
-        if (self::$fatalHandler) {
-            try {
-                call_user_func(self::$fatalHandler, $exception);
-
-                if ($caughtOutput) {
-                    $this->caughtOutput = $caughtOutput;
-                }
-            } catch (\Exception $e) {
-                if (!$caughtOutput) {
-                    // Neither the exception nor the fatal handler succeeded.
-                    // Let PHP handle that now.
-                    throw $exception;
+            foreach ($this->getFatalErrorHandlers() as $handler) {
+                if ($e = $handler->handleError($error, $exception)) {
+                    $exception = $e;
+                    break;
                 }
             }
         }
-    }
 
-    /**
-     * @internal
-     */
-    public function catchOutput($buffer)
-    {
-        $this->caughtOutput = $buffer;
-
-        return '';
-    }
-
-    /**
-     * @internal
-     */
-    public function cleanOutput($buffer)
-    {
-        if ($this->caughtOutput) {
-            // use substr_replace() instead of substr() for mbstring overloading resistance
-            $cleanBuffer = substr_replace($buffer, '', 0, $this->caughtOutput);
-            if (isset($cleanBuffer[0])) {
-                $buffer = $cleanBuffer;
-            }
+        try {
+            call_user_func($exceptionHandler, $exception);
+        } catch (\Exception $e) {
+            // The handler failed. Let PHP handle that now.
+            throw $exception;
         }
-
-        return $buffer;
     }
 }
 

@@ -107,7 +107,11 @@ class CountryValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testValidateUsingCountrySpecificLocale()
     {
+        // in order to test with "en_GB"
+        IntlTestHelper::requireFullIntl($this);
+
         \Locale::setDefault('en_GB');
+
         $existingCountry = 'GB';
         $this->context->expects($this->never())
             ->method('addViolation');

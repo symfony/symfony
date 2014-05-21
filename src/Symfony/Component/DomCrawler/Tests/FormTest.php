@@ -85,6 +85,20 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $form = new Form($nodes->item(1), 'http://example.com');
     }
 
+    public function testConstructorLoadsOnlyFieldsOfTheRightForm()
+    {
+        $dom = $this->createTestMultipleForm();
+
+        $nodes = $dom->getElementsByTagName('form');
+        $buttonElements = $dom->getElementsByTagName('button');
+
+        $form = new Form($nodes->item(0), 'http://example.com');
+        $this->assertCount(3, $form->all());
+
+        $form = new Form($buttonElements->item(1), 'http://example.com');
+        $this->assertCount(5, $form->all());
+    }
+
     public function testConstructorHandlesFormAttribute()
     {
         $dom = $this->createTestHtml5Form();
@@ -853,6 +867,32 @@ class FormTest extends \PHPUnit_Framework_TestCase
                     <label for="app_frontend_form_type_contact_form_type_firstName">Firstname</label>
                     <input type="text" name="app_frontend_form_type_contact_form_type[firstName]" value="John" id="app_frontend_form_type_contact_form_type_firstName"/>
                 </div>
+            </form>
+            <button />
+        </html>');
+
+        return $dom;
+    }
+
+    protected function createTestMultipleForm()
+    {
+        $dom = new \DOMDocument();
+        $dom->loadHTML('
+        <html>
+            <h1>Hello form</h1>
+            <form action="" method="POST">
+                <div><input type="checkbox" name="apples[]" value="1" checked /></div>
+                <input type="checkbox" name="oranges[]" value="1" checked />
+                <div><label></label><input type="hidden" name="form_name" value="form-1" /></div>
+                <input type="submit" name="button_1" value="Capture fields" />
+                <button type="submit" name="button_2">Submit form_2</button>
+            </form>
+            <form action="" method="POST">
+                <div><div><input type="checkbox" name="oranges[]" value="2" checked />
+                <input type="checkbox" name="oranges[]" value="3" checked /></div></div>
+                <input type="hidden" name="form_name" value="form_2" />
+                <input type="hidden" name="outer_field" value="success" />
+                <button type="submit" name="button_3">Submit from outside the form</button>
             </form>
             <button />
         </html>');

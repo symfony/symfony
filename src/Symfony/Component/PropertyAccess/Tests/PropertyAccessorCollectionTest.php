@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\PropertyAccess\Tests;
 
-use Symfony\Component\PropertyAccess\PropertyAccessor;
-
 class PropertyAccessorCollectionTest_Car
 {
     private $axes;
@@ -80,55 +78,13 @@ class PropertyAccessorCollectionTest_CarStructure
     public function getAxes() {}
 }
 
-abstract class PropertyAccessorCollectionTest extends \PHPUnit_Framework_TestCase
+abstract class PropertyAccessorCollectionTest extends PropertyAccessorArrayAccessTest
 {
-    /**
-     * @var PropertyAccessor
-     */
-    private $propertyAccessor;
-
-    protected function setUp()
-    {
-        $this->propertyAccessor = new PropertyAccessor();
-    }
-
-    abstract protected function getCollection(array $array);
-
-    public function getValidPropertyPaths()
-    {
-        return array(
-            array(array('firstName' => 'Bernhard'), '[firstName]', 'Bernhard'),
-            array(array('person' => array('firstName' => 'Bernhard')), '[person][firstName]', 'Bernhard'),
-        );
-    }
-
-    /**
-     * @dataProvider getValidPropertyPaths
-     */
-    public function testGetValue(array $array, $path, $value)
-    {
-        $collection = $this->getCollection($array);
-
-        $this->assertSame($value, $this->propertyAccessor->getValue($collection, $path));
-    }
-
-    /**
-     * @dataProvider getValidPropertyPaths
-     */
-    public function testSetValue(array $array, $path)
-    {
-        $collection = $this->getCollection($array);
-
-        $this->propertyAccessor->setValue($collection, $path, 'Updated');
-
-        $this->assertSame('Updated', $this->propertyAccessor->getValue($collection, $path));
-    }
-
     public function testSetValueCallsAdderAndRemoverForCollections()
     {
-        $axesBefore = $this->getCollection(array(1 => 'second', 3 => 'fourth', 4 => 'fifth'));
-        $axesMerged = $this->getCollection(array(1 => 'first', 2 => 'second', 3 => 'third'));
-        $axesAfter = $this->getCollection(array(1 => 'second', 5 => 'first', 6 => 'third'));
+        $axesBefore = $this->getContainer(array(1 => 'second', 3 => 'fourth', 4 => 'fifth'));
+        $axesMerged = $this->getContainer(array(1 => 'first', 2 => 'second', 3 => 'third'));
+        $axesAfter = $this->getContainer(array(1 => 'second', 5 => 'first', 6 => 'third'));
         $axesMergedCopy = is_object($axesMerged) ? clone $axesMerged : $axesMerged;
 
         // Don't use a mock in order to test whether the collections are
@@ -147,8 +103,8 @@ abstract class PropertyAccessorCollectionTest extends \PHPUnit_Framework_TestCas
     {
         $car = $this->getMock(__CLASS__.'_CompositeCar');
         $structure = $this->getMock(__CLASS__.'_CarStructure');
-        $axesBefore = $this->getCollection(array(1 => 'second', 3 => 'fourth'));
-        $axesAfter = $this->getCollection(array(0 => 'first', 1 => 'second', 2 => 'third'));
+        $axesBefore = $this->getContainer(array(1 => 'second', 3 => 'fourth'));
+        $axesAfter = $this->getContainer(array(0 => 'first', 1 => 'second', 2 => 'third'));
 
         $car->expects($this->any())
             ->method('getStructure')
@@ -177,35 +133,20 @@ abstract class PropertyAccessorCollectionTest extends \PHPUnit_Framework_TestCas
     public function testSetValueFailsIfNoAdderNorRemoverFound()
     {
         $car = $this->getMock(__CLASS__.'_CarNoAdderAndRemover');
-        $axes = $this->getCollection(array(0 => 'first', 1 => 'second', 2 => 'third'));
+        $axesBefore = $this->getContainer(array(1 => 'second', 3 => 'fourth'));
+        $axesAfter = $this->getContainer(array(0 => 'first', 1 => 'second', 2 => 'third'));
 
-        $this->propertyAccessor->setValue($car, 'axes', $axes);
-    }
+        $car->expects($this->any())
+            ->method('getAxes')
+            ->will($this->returnValue($axesBefore));
 
-    /**
-     * @dataProvider getValidPropertyPaths
-     */
-    public function testIsReadable(array $array, $path)
-    {
-        $collection = $this->getCollection($array);
-
-        $this->assertTrue($this->propertyAccessor->isReadable($collection, $path));
-    }
-
-    /**
-     * @dataProvider getValidPropertyPaths
-     */
-    public function testIsWritable(array $array, $path)
-    {
-        $collection = $this->getCollection($array);
-
-        $this->assertTrue($this->propertyAccessor->isWritable($collection, $path, 'Updated'));
+        $this->propertyAccessor->setValue($car, 'axes', $axesAfter);
     }
 
     public function testIsWritableReturnsTrueIfAdderAndRemoverExists()
     {
         $car = $this->getMock(__CLASS__.'_Car');
-        $axes = $this->getCollection(array(1 => 'first', 2 => 'second', 3 => 'third'));
+        $axes = $this->getContainer(array(1 => 'first', 2 => 'second', 3 => 'third'));
 
         $this->assertTrue($this->propertyAccessor->isWritable($car, 'axes', $axes));
     }
@@ -213,7 +154,7 @@ abstract class PropertyAccessorCollectionTest extends \PHPUnit_Framework_TestCas
     public function testIsWritableReturnsFalseIfOnlyAdderExists()
     {
         $car = $this->getMock(__CLASS__.'_CarOnlyAdder');
-        $axes = $this->getCollection(array(1 => 'first', 2 => 'second', 3 => 'third'));
+        $axes = $this->getContainer(array(1 => 'first', 2 => 'second', 3 => 'third'));
 
         $this->assertFalse($this->propertyAccessor->isWritable($car, 'axes', $axes));
     }
@@ -221,7 +162,7 @@ abstract class PropertyAccessorCollectionTest extends \PHPUnit_Framework_TestCas
     public function testIsWritableReturnsFalseIfOnlyRemoverExists()
     {
         $car = $this->getMock(__CLASS__.'_CarOnlyRemover');
-        $axes = $this->getCollection(array(1 => 'first', 2 => 'second', 3 => 'third'));
+        $axes = $this->getContainer(array(1 => 'first', 2 => 'second', 3 => 'third'));
 
         $this->assertFalse($this->propertyAccessor->isWritable($car, 'axes', $axes));
     }
@@ -229,7 +170,7 @@ abstract class PropertyAccessorCollectionTest extends \PHPUnit_Framework_TestCas
     public function testIsWritableReturnsFalseIfNoAdderNorRemoverExists()
     {
         $car = $this->getMock(__CLASS__.'_CarNoAdderAndRemover');
-        $axes = $this->getCollection(array(1 => 'first', 2 => 'second', 3 => 'third'));
+        $axes = $this->getContainer(array(1 => 'first', 2 => 'second', 3 => 'third'));
 
         $this->assertFalse($this->propertyAccessor->isWritable($car, 'axes', $axes));
     }

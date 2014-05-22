@@ -193,4 +193,14 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals("'/usr/bin/php'", $process->getCommandLine());
         }
     }
+
+    /**
+     * @expectedException \Symfony\Component\Process\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Symfony\Component\Process\ProcessBuilder::setInput only accepts strings.
+     */
+    public function testInvalidInput()
+    {
+        $builder = ProcessBuilder::create();
+        $builder->setInput(array());
+    }
 }

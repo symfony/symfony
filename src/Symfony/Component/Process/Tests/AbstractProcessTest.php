@@ -172,6 +172,47 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $process->stop();
     }
 
+    /**
+     * @dataProvider provideInvalidStdinValues
+     * @expectedException \Symfony\Component\Process\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Symfony\Component\Process\Process::setStdin only accepts strings.
+     */
+    public function testInvalidStdin($value)
+    {
+        $process = $this->getProcess('php -v');
+        $process->setStdin($value);
+    }
+
+    public function provideInvalidStdinValues()
+    {
+        return array(
+            array(array()),
+            array(new NonStringifiable()),
+            array(fopen('php://temporary', 'w')),
+        );
+    }
+
+    /**
+     * @dataProvider provideStdinValues
+     */
+    public function testValidStdin($expected, $value)
+    {
+        $process = $this->getProcess('php -v');
+        $process->setStdin($value);
+        $this->assertSame($expected, $process->getStdin());
+    }
+
+    public function provideStdinValues()
+    {
+        return array(
+            array(null, null),
+            array('24.5', 24.5),
+            array('input data', 'input data'),
+            // to maintain BC, supposed to be removed in 3.0
+            array('stringifiable', new Stringifiable()),
+        );
+    }
+
     public function chainedCommandsOutputProvider()
     {
         if (defined('PHP_WINDOWS_VERSION_BUILD')) {
@@ -870,4 +911,16 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
      * @return Process
      */
     abstract protected function getProcess($commandline, $cwd = null, array $env = null, $stdin = null, $timeout = 60, array $options = array());
+}
+
+class Stringifiable
+{
+    public function __toString()
+    {
+        return 'stringifiable';
+    }
+}
+
+class NonStringifiable
+{
 }

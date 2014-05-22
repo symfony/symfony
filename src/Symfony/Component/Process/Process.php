@@ -933,7 +933,8 @@ class Process
      *
      * @return self The current Process instance
      *
-     * @throws LogicException In case the process is running
+     * @throws LogicException           In case the process is running
+     * @throws InvalidArgumentException In case the argument is invalid
      */
     public function setStdin($stdin)
     {
@@ -941,7 +942,7 @@ class Process
             throw new LogicException('STDIN can not be set while the process is running.');
         }
 
-        $this->stdin = $stdin;
+        $this->stdin = ProcessUtils::validateInput(sprintf('%s::%s', __CLASS__, __FUNCTION__), $stdin);
 
         return $this;
     }

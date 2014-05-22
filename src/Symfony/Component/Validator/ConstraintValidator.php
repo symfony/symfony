@@ -48,8 +48,8 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
     /**
      * Returns a string representation of the value.
      *
-     * @param mixed   $value
-     * @param Boolean $formatDates
+     * @param mixed $value
+     * @param bool  $formatDates
      *
      * @return string
      */
@@ -100,8 +100,8 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
     /**
      * Returns a string representation of a list of values.
      *
-     * @param array   $values
-     * @param Boolean $formatDates
+     * @param array $values
+     * @param bool  $formatDates
      *
      * @return string
      */

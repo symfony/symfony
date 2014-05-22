@@ -1,0 +1,126 @@
+---------------------------------------------------------------------------
+
+by ProPheT777 at 2014-05-03T14:17:36Z
+
+reference symfony/symfony#10848
+
+---------------------------------------------------------------------------
+
+by ProPheT777 at 2014-05-03T14:36:56Z
+
+Do you think `strcmp($a->getRealpath(), $b->getRealpath()) < 0 ? -1 : 1;` is useful or return directly is enough ?
+
+---------------------------------------------------------------------------
+
+by ProPheT777 at 2014-05-03T15:06:50Z
+
+Right for yoda condition, but, i dont think we need to check the type, `==` is enough, because php api say : int strcmp ( string $str1 , string $str2 ) ?
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-05-03T15:09:28Z
+
+you should always use typed comparisons in symfony except if it's on purpose
+
+---------------------------------------------------------------------------
+
+by ProPheT777 at 2014-05-03T15:11:23Z
+
+@romainneutron ok
+
+---------------------------------------------------------------------------
+
+by ProPheT777 at 2014-05-09T12:21:28Z
+
+@hhamon I think you can backport the comparator implementation in your PR, she has not move since one week so. I start to write new test next week.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-05-12T10:33:10Z
+
+As this is a bug fix, I'd like to merge this PR independently of any other ones. Can you add some tests before I merge it though? Thanks.
+
+---------------------------------------------------------------------------
+
+by ProPheT777 at 2014-05-16T15:08:20Z
+
+The fix for wrong implementation is already covered by unit test, but indeed as I said in the description of the PR I'll add more test. I think I will do it this week end.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-05-16T15:24:36Z
+
+It is not covered by unit tests, otherwise they would be failing. the current testsuite is passing in 2.3, which means it does not enforce a right implementation
+
+---------------------------------------------------------------------------
+
+by ProPheT777 at 2014-05-16T15:33:05Z
+
+Yes my bad,  SORT_BY_NAME and SORT_BY_TYPE are not affected by this issue.
+
+---------------------------------------------------------------------------
+
+by ProPheT777 at 2014-05-18T14:44:33Z
+
+Done, I met several trouble with taking effect on update system files so I sleep(1) each file operation.
+
+If you have better idea.
+
+---------------------------------------------------------------------------
+
+by ProPheT777 at 2014-05-19T18:29:44Z
+
+@fabpot i saw your message in my mails but he not appear on the PR wall, weird.
+
+Yes I have tried usleep with different value, until 99999 no change is taken, I think PHP have a threshold at 1 sec to refresh the state of files.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-05-19T19:49:42Z
+
+have you tried using ``clearstatcache`` ?
+
+---------------------------------------------------------------------------
+
+by ProPheT777 at 2014-05-20T10:24:05Z
+
+Yes, I tried, but nothing changes, I avoid triggering the sleep test that do not need.
+
+* Less sleep time (one time trigger)
+* Only sleep on related test
+
+---------------------------------------------------------------------------
+
+by ProPheT777 at 2014-05-20T14:11:50Z
+
+Travis failed on php 5.3.3 but everything is ok weird.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-05-20T14:13:15Z
+
+@ProPheT777 there is a weird thing with travis logs. they are truncated. The end is missing.
+
+---------------------------------------------------------------------------
+
+by ProPheT777 at 2014-05-20T14:30:57Z
+
+@stof Yes, I had not seen, in any case units tests about finder pass. I can re-trigger the build if you think it's necessary.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-05-20T15:04:35Z
+
+no need. It is actually a bug in our Travis config, so the same would happen again if you retrigger it now. See https://github.com/symfony/symfony/pull/10950
+
+---------------------------------------------------------------------------
+
+by ProPheT777 at 2014-05-20T15:05:55Z
+
+Yep I read it just after my post
+
+---------------------------------------------------------------------------
+
+by ProPheT777 at 2014-05-21T08:35:01Z
+
+All is ok or any suggestions ?

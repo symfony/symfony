@@ -30,8 +30,8 @@ class SortableIterator implements \IteratorAggregate
     /**
      * Constructor.
      *
-     * @param \Traversable     $iterator The Iterator to filter
-     * @param int|callback     $sort     The sort type (SORT_BY_NAME, SORT_BY_TYPE, or a PHP callback)
+     * @param \Traversable $iterator The Iterator to filter
+     * @param int|callable $sort     The sort type (SORT_BY_NAME, SORT_BY_TYPE, or a PHP callback)
      *
      * @throws \InvalidArgumentException
      */
@@ -55,20 +55,20 @@ class SortableIterator implements \IteratorAggregate
             };
         } elseif (self::SORT_BY_ACCESSED_TIME === $sort) {
             $this->sort = function ($a, $b) {
-                return ($a->getATime() > $b->getATime());
+                return ($a->getATime() - $b->getATime());
             };
         } elseif (self::SORT_BY_CHANGED_TIME === $sort) {
             $this->sort = function ($a, $b) {
-                return ($a->getCTime() > $b->getCTime());
+                return ($a->getCTime() - $b->getCTime());
             };
         } elseif (self::SORT_BY_MODIFIED_TIME === $sort) {
             $this->sort = function ($a, $b) {
-                return ($a->getMTime() > $b->getMTime());
+                return ($a->getMTime() - $b->getMTime());
             };
         } elseif (is_callable($sort)) {
             $this->sort = $sort;
         } else {
-            throw new \InvalidArgumentException('The SortableIterator takes a PHP callback or a valid built-in sort algorithm as an argument.');
+            throw new \InvalidArgumentException('The SortableIterator takes a PHP callable or a valid built-in sort algorithm as an argument.');
         }
     }
 

@@ -1064,10 +1064,11 @@ class Process
      *
      * @return self The current Process instance
      *
-     * @throws LogicException In case the process is running
-     *
      * @deprecated Deprecated since version 2.5, to be removed in 3.0.
      *             This method is deprecated in favor of setInput.
+     *
+     * @throws LogicException           In case the process is running
+     * @throws InvalidArgumentException In case the argument is invalid
      */
     public function setStdin($stdin)
     {
@@ -1091,7 +1092,7 @@ class Process
             throw new LogicException('Input can not be set while the process is running.');
         }
 
-        $this->input = $input;
+        $this->input = ProcessUtils::validateInput(sprintf('%s::%s', __CLASS__, __FUNCTION__), $input);
 
         return $this;
     }

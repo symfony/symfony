@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Process;
 
+use Symfony\Component\Process\Exception\InvalidArgumentException;
+
 /**
  * ProcessUtils is a bunch of utility methods.
  *
@@ -70,6 +72,29 @@ class ProcessUtils
         }
 
         return escapeshellarg($argument);
+    }
+
+    /**
+     * Validates and normalized a Process input
+     *
+     * @param string $caller The name of method call that validates the input
+     * @param mixed  $input  The input to validate
+     *
+     * @return string The validated input
+     *
+     * @throws InvalidArgumentException In case the input is not valid
+     */
+    public static function validateInput($caller, $input)
+    {
+        if (null !== $input) {
+            if (is_scalar($input) || (is_object($input) && method_exists($input, '__toString'))) {
+                return (string) $input;
+            }
+
+            throw new InvalidArgumentException(sprintf('%s only accepts strings.', $caller));
+        }
+
+        return $input;
     }
 
     private static function isSurroundedBy($arg, $char)

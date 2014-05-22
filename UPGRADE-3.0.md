@@ -966,4 +966,8 @@ UPGRADE FROM 2.x to 3.0
 
    ```
    Yaml::parse(file_get_contents($fileName));
-   ```
+
+### Process
+
+ * Process::setStdin() and Process::getStdin() have been removed. Use
+   Process::setInput() and Process::getInput() that works the same way.

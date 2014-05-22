@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-05-17T17:49:31Z
+
+Deprecation is proposed in PR #10930
+
+---------------------------------------------------------------------------
+
+by stof at 2014-05-17T17:59:10Z
+
+The phpdoc documents the type of the argument as ``string``. So passing a steam is not supported.
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-05-17T18:06:01Z
+
+That's why I added a check. Passing a stream with the current implementation results in an error
+
+---------------------------------------------------------------------------
+
+by stof at 2014-05-17T18:07:54Z
+
+@romainneutron I would just cast the value as string when it is not ``null``, without adding extra exceptions. People passing an object in it are misusing Symfony anyway, so the PHP error does the work too.
+If we start using exceptions to validate string inputs being real strings, it would have to be done on the whole framework, and it is not worth it IMO. Even Hack does not go this way. The static analysis is strict about validating input, but the HHVM runtime let things pass through (well, not sure about the way scalar typehints are handled at runtime though, but other types like shapes are not validated at runtime)
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-05-17T18:14:46Z
+
+ok, let's cast scalars, throw exceptions for others type? See http://3v4l.org/6HTo5
+
+---------------------------------------------------------------------------
+
+by stof at 2014-05-17T18:21:11Z
+
+arf, I forgot resources are castable as string. So yeah, this case need to be validated
+
+---------------------------------------------------------------------------
+
+by stof at 2014-05-17T18:22:22Z
+
+btw, the PHP 4.3.3+ error message is funny in your snippet: ``Warning: fopen(php://memory): failed to open stream: Success``
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-05-17T21:48:33Z
+
+PR updated.
+I added more tests

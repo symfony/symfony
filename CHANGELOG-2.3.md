@@ -7,6 +7,10 @@ in 2.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.3.0...v2.3.1
 
+* 2.3.15 (2014-05-22)
+
+ * reverted #10908
+
 * 2.3.14 (2014-05-22)
 
  * bug #10849 [WIP][Finder] Fix wrong implementation on sortable callback comparator (ProPheT777)

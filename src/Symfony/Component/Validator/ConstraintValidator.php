@@ -96,4 +96,21 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
 
         return (string) $value;
     }
+
+    /**
+     * Returns a string representation of a list of values.
+     *
+     * @param array   $values
+     * @param Boolean $formatDates
+     *
+     * @return string
+     */
+    protected function valuesToString(array $values, $formatDates = false)
+    {
+        foreach ($values as $key => $value) {
+            $values[$key] = $this->valueToString($value, $formatDates);
+        }
+
+        return implode(', ', $values);
+    }
 }

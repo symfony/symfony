@@ -161,8 +161,8 @@ class FileValidator extends ConstraintValidator
 
             if (false === $valid) {
                 $this->context->addViolation($constraint->mimeTypesMessage, array(
-                    '{{ type }}' => '"'.$mime.'"',
-                    '{{ types }}' => '"'.implode('", "', $mimeTypes) .'"',
+                    '{{ type }}' => $this->valueToString($mime),
+                    '{{ types }}' => $this->valuesToString($mimeTypes),
                     '{{ file }}' => $path,
                 ));
             }

@@ -50,8 +50,8 @@ class LessThanValidatorTest extends AbstractComparisonValidatorTestCase
         return array(
             array(3, '3', 2, '2', 'integer'),
             array(2, '2', 2, '2', 'integer'),
-            array(new \DateTime('2010-01-01'), 'Jan 1, 2010 12:00 AM', new \DateTime('2000-01-01'), 'Jan 1, 2000 12:00 AM', 'DateTime'),
-            array(new \DateTime('2000-01-01'), 'Jan 1, 2000 12:00 AM', new \DateTime('2000-01-01'), 'Jan 1, 2000 12:00 AM', 'DateTime'),
+            array(new \DateTime('2010-01-01'), 'Jan 1, 2010, 12:00 AM', new \DateTime('2000-01-01'), 'Jan 1, 2000, 12:00 AM', 'DateTime'),
+            array(new \DateTime('2000-01-01'), 'Jan 1, 2000, 12:00 AM', new \DateTime('2000-01-01'), 'Jan 1, 2000, 12:00 AM', 'DateTime'),
             array('333', '"333"', '22', '"22"', 'string'),
         );
     }

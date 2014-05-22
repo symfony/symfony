@@ -53,8 +53,8 @@ class IdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
             array(1, '1', 2, '2', 'integer'),
             array(2, '2', '2', '"2"', 'string'),
             array('22', '"22"', '333', '"333"', 'string'),
-            array(new \DateTime('2001-01-01'), 'Jan 1, 2001 12:00 AM', new \DateTime('2001-01-01'), 'Jan 1, 2001 12:00 AM', 'DateTime'),
-            array(new \DateTime('2001-01-01'), 'Jan 1, 2001 12:00 AM', new \DateTime('1999-01-01'), 'Jan 1, 1999 12:00 AM', 'DateTime')
+            array(new \DateTime('2001-01-01'), 'Jan 1, 2001, 12:00 AM', new \DateTime('2001-01-01'), 'Jan 1, 2001, 12:00 AM', 'DateTime'),
+            array(new \DateTime('2001-01-01'), 'Jan 1, 2001, 12:00 AM', new \DateTime('1999-01-01'), 'Jan 1, 1999, 12:00 AM', 'DateTime')
         );
     }
 }

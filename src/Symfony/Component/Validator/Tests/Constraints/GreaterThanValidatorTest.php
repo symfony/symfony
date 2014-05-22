@@ -50,8 +50,8 @@ class GreaterThanValidatorTest extends AbstractComparisonValidatorTestCase
         return array(
             array(1, '1', 2, '2', 'integer'),
             array(2, '2', 2, '2', 'integer'),
-            array(new \DateTime('2000/01/01'), 'Jan 1, 2000 12:00 AM', new \DateTime('2005/01/01'), 'Jan 1, 2005 12:00 AM', 'DateTime'),
-            array(new \DateTime('2000/01/01'), 'Jan 1, 2000 12:00 AM', new \DateTime('2000/01/01'), 'Jan 1, 2000 12:00 AM', 'DateTime'),
+            array(new \DateTime('2000/01/01'), 'Jan 1, 2000, 12:00 AM', new \DateTime('2005/01/01'), 'Jan 1, 2005, 12:00 AM', 'DateTime'),
+            array(new \DateTime('2000/01/01'), 'Jan 1, 2000, 12:00 AM', new \DateTime('2000/01/01'), 'Jan 1, 2000, 12:00 AM', 'DateTime'),
             array('22', '"22"', '333', '"333"', 'string'),
             array('22', '"22"', '22', '"22"', 'string')
         );

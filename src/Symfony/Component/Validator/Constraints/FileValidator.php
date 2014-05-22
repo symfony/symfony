@@ -25,6 +25,16 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class FileValidator extends ConstraintValidator
 {
+    const KB_BYTES = 1000;
+
+    const MB_BYTES = 1000000;
+
+    private static $suffices = array(
+        1 => 'bytes',
+        self::KB_BYTES => 'kB',
+        self::MB_BYTES => 'MB',
+    );
+
     /**
      * {@inheritdoc}
      */
@@ -43,21 +53,21 @@ class FileValidator extends ConstraintValidator
                 case UPLOAD_ERR_INI_SIZE:
                     if ($constraint->maxSize) {
                         if (ctype_digit((string) $constraint->maxSize)) {
-                            $maxSize = (int) $constraint->maxSize;
+                            $limitInBytes = (int) $constraint->maxSize;
                         } elseif (preg_match('/^\d++k$/', $constraint->maxSize)) {
-                            $maxSize = $constraint->maxSize * 1024;
+                            $limitInBytes = $constraint->maxSize * self::KB_BYTES;
                         } elseif (preg_match('/^\d++M$/', $constraint->maxSize)) {
-                            $maxSize = $constraint->maxSize * 1048576;
+                            $limitInBytes = $constraint->maxSize * self::MB_BYTES;
                         } else {
                             throw new ConstraintDefinitionException(sprintf('"%s" is not a valid maximum size', $constraint->maxSize));
                         }
-                        $maxSize = min(UploadedFile::getMaxFilesize(), $maxSize);
+                        $limitInBytes = min(UploadedFile::getMaxFilesize(), $limitInBytes);
                     } else {
-                        $maxSize = UploadedFile::getMaxFilesize();
+                        $limitInBytes = UploadedFile::getMaxFilesize();
                     }
 
                     $this->context->addViolation($constraint->uploadIniSizeErrorMessage, array(
-                        '{{ limit }}' => $maxSize,
+                        '{{ limit }}' => $limitInBytes,
                         '{{ suffix }}' => 'bytes',
                     ));
 
@@ -112,27 +122,45 @@ class FileValidator extends ConstraintValidator
         }
 
         if ($constraint->maxSize) {
-            if (ctype_digit((string) $constraint->maxSize)) {
-                $size = filesize($path);
-                $limit = (int) $constraint->maxSize;
-                $suffix = 'bytes';
-            } elseif (preg_match('/^\d++k$/', $constraint->maxSize)) {
-                $size = round(filesize($path) / 1000, 2);
-                $limit = (int) $constraint->maxSize;
-                $suffix = 'kB';
+            $sizeInBytes = filesize($path);
+            $limitInBytes = (int) $constraint->maxSize;
+
+            if (preg_match('/^\d++k$/', $constraint->maxSize)) {
+                $limitInBytes *= self::KB_BYTES;
             } elseif (preg_match('/^\d++M$/', $constraint->maxSize)) {
-                $size = round(filesize($path) / 1000000, 2);
-                $limit = (int) $constraint->maxSize;
-                $suffix = 'MB';
-            } else {
+                $limitInBytes *= self::MB_BYTES;
+            } elseif (!ctype_digit((string) $constraint->maxSize)) {
                 throw new ConstraintDefinitionException(sprintf('"%s" is not a valid maximum size', $constraint->maxSize));
             }
 
-            if ($size > $limit) {
+            if ($sizeInBytes > $limitInBytes) {
+                // Convert the limit to the smallest possible number
+                // (i.e. try "MB", then "kB", then "bytes")
+                $coef = self::MB_BYTES;
+                $limitAsString = (string) ($limitInBytes / $coef);
+
+                // Restrict the limit to 2 decimals (without rounding! we
+                // need the precise value)
+                while (self::moreDecimalsThan($limitAsString, 2)) {
+                    $coef /= 1000;
+                    $limitAsString = (string) ($limitInBytes / $coef);
+                }
+
+                // Convert size to the same measure, but round to 2 decimals
+                $sizeAsString = (string) round($sizeInBytes / $coef, 2);
+
+                // If the size and limit produce the same string output
+                // (due to rounding), reduce the coefficient
+                while ($sizeAsString === $limitAsString) {
+                    $coef /= 1000;
+                    $limitAsString = (string) ($limitInBytes / $coef);
+                    $sizeAsString = (string) round($sizeInBytes / $coef, 2);
+                }
+
                 $this->context->addViolation($constraint->maxSizeMessage, array(
-                    '{{ size }}'    => $size,
-                    '{{ limit }}'   => $limit,
-                    '{{ suffix }}'  => $suffix,
+                    '{{ size }}'    => $sizeAsString,
+                    '{{ limit }}'   => $limitAsString,
+                    '{{ suffix }}'  => static::$suffices[$coef],
                     '{{ file }}'    => $path,
                 ));
 
@@ -171,5 +199,10 @@ class FileValidator extends ConstraintValidator
                 ));
             }
         }
+    }
+
+    private static function moreDecimalsThan($double, $numberOfDecimals)
+    {
+        return strlen((string) $double) > strlen(round($double, $numberOfDecimals));
     }
 }

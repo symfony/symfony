@@ -173,17 +173,17 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider provideInvalidStdinValues
+     * @dataProvider provideInvalidInputValues
      * @expectedException \Symfony\Component\Process\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Symfony\Component\Process\Process::setStdin only accepts strings.
+     * @expectedExceptionMessage Symfony\Component\Process\Process::setInput only accepts strings.
      */
-    public function testInvalidStdin($value)
+    public function testInvalidInput($value)
     {
         $process = $this->getProcess('php -v');
-        $process->setStdin($value);
+        $process->setInput($value);
     }
 
-    public function provideInvalidStdinValues()
+    public function provideInvalidInputValues()
     {
         return array(
             array(array()),
@@ -193,16 +193,16 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider provideStdinValues
+     * @dataProvider provideInputValues
      */
-    public function testValidStdin($expected, $value)
+    public function testValidInput($expected, $value)
     {
         $process = $this->getProcess('php -v');
-        $process->setStdin($value);
-        $this->assertSame($expected, $process->getStdin());
+        $process->setInput($value);
+        $this->assertSame($expected, $process->getInput());
     }
 
-    public function provideStdinValues()
+    public function provideInputValues()
     {
         return array(
             array(null, null),

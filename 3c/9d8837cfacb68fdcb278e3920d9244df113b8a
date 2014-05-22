@@ -1,0 +1,78 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2014-05-20T17:08:02Z
+
+-1 for the same reason as in https://github.com/symfony/symfony/pull/10661#issuecomment-41704299
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-05-21T07:57:34Z
+
+@Tobion I read and understand that reason. I also initially implemented the `File` constraint to handle both SI and 2-based measures when working on this PR.
+
+However, since the PHP manual explicitly states that it interprets "kilobytes" and "megabytes" as being 2-based, I think the best choice is to stick with that convention. I therefore removed the SI-handling code again.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-05-21T08:57:07Z
+
+@webmozart But we don't need to continue the mistakes of PHP.
+
+---------------------------------------------------------------------------
+
+by snoob at 2014-05-21T09:41:41Z
+
+I agree with @webmozart
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-05-21T11:03:45Z
+
+@Tobion The alternative, which I had implemented, would be to explicitly differentiate between "kB"/"MB"/"GB"/... and "KiB"/"MiB"/"GiB"/... Since the console component displays memory in the 2-based measure (which is the convention), the console output would therefore also change from e.g. `97 kB` to `97 KiB`. This output is targeted at end users. The question is: Do end users know what "KiB" means?
+
+I figured that the answer was probably no and removed the code again for that reason, staying in line with PHP's conventions (which were probably picked for the same reason). I don't think there's a benefit in being technically 100% correct here.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-05-21T12:49:49Z
+
+The memory output is for developers or other technicians. So they either know it or can look it up in 1 second. I'd prefer not to add to the confusion between binary and SI prefixes and once for all make it clear. Otherwise this debate will continue forever.
+But if no other core member agrees I can live with it because I know that we mean binary measures (but all other other users will stay confused).
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-05-21T12:52:50Z
+
+Btw the memory standards even refer to binary prefixes as alternative. http://en.wikipedia.org/wiki/JEDEC_memory_standards#Unit_prefixes_for_semiconductor_storage_capacity
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-05-21T13:32:12Z
+
+Ok. I'd like to hear some more opinions though before changing this back.
+
+---------------------------------------------------------------------------
+
+by jeremy-derusse at 2014-05-21T22:23:07Z
+
+May be a conflict with this PR #10917 ?
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-05-22T09:16:06Z
+
+Alright, after reviewing #10648, #10917 and #10661, I changed the code and PR description again. We now explicitly differentiate between "kB" and "KiB" to avoid further confusions.
+
+In a follow-up PR for the master branch (2.6), the specification of the "maxSize" option in the `File` constraint in kibibytes etc. should be supported: #10962
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-05-22T09:20:12Z
+
+@fabpot You may want to merge this into 2.3, there are no BC concerns involved except for the text output.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-05-22T10:07:31Z
+
++1 now :)

@@ -58,6 +58,11 @@ class FilesystemTest extends FilesystemTestCase
      */
     public function testCopyUnreadableFileFails()
     {
+        // skip test on Windows; PHP can't easily set file as unreadable on Windows
+        if (defined('PHP_WINDOWS_VERSION_MAJOR')) {
+            return;
+        }
+
         $sourceFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_source_file';
         $targetFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_target_file';
 
@@ -127,6 +132,11 @@ class FilesystemTest extends FilesystemTestCase
      */
     public function testCopyWithOverrideWithReadOnlyTargetFails()
     {
+        // skip test on Windows; PHP can't easily set file as unwritable on Windows
+        if (defined('PHP_WINDOWS_VERSION_MAJOR')) {
+            return;
+        }
+
         $sourceFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_source_file';
         $targetFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_target_file';
 

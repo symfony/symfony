@@ -29,11 +29,17 @@ abstract class ContainerAwareCommand extends Command implements ContainerAwareIn
 
     /**
      * @return ContainerInterface
+     * @throws \LogicException
      */
     protected function getContainer()
     {
         if (null === $this->container) {
-            $this->container = $this->getApplication()->getKernel()->getContainer();
+            $application = $this->getApplication();
+            if (null === $application) {
+                throw new \LogicException('The application instance must be set.');
+            }
+
+            $this->container = $application->getKernel()->getContainer();
         }
 
         return $this->container;

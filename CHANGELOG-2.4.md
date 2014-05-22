@@ -7,6 +7,38 @@ in 2.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.4.0...v2.4.1
 
+* 2.4.5 (2014-05-22)
+
+ * bug #10849 [WIP][Finder] Fix wrong implementation on sortable callback comparator (ProPheT777)
+ * bug #10929 [Process] Add validation on Process input (romainneutron)
+ * bug #10958 [DomCrawler] Fixed filterXPath() chaining loosing the parent DOM nodes (stof, robbertkl)
+ * bug #10953 [HttpKernel] fixed file uploads in functional tests without file selected (realmfoo)
+ * bug #10947 [PropertyAccess] Fixed getValue() when accessing non-existing indices of ArrayAccess implementations (webmozart)
+ * bug #10937 [HttpKernel] Fix "absolute path" when we look to the cache directory (BenoitLeveque)
+ * bug #10894 [HttpKernel] removed absolute paths from the generated container (fabpot)
+ * bug #10926 [DomCrawler] Fixed the initial state for options without value attribute (stof)
+ * bug #10925 [DomCrawler] Fixed the handling of boolean attributes in ChoiceFormField (stof)
+ * bug #10777 [Form] Automatically add step attribute to HTML5 time widgets to display seconds if needed (tucksaun)
+ * bug #10909 [PropertyAccess] Fixed plurals for -ves words (csarrazi)
+ * bug #10904 [HttpKernel] Replace sha1 with sha256 in recently added tests (jakzal)
+ * bug #10899 Explicitly define the encoding. (jakzal)
+ * bug #10897 [Console] Fix a console test (jakzal)
+ * bug #10896 [HttpKernel] Fixed cache behavior when TTL has expired and a default "global" TTL is defined (alquerci, fabpot)
+ * bug #10841 [DomCrawler] Fixed image input case sensitive (geoffrey-brier)
+ * bug #10714 [Console]Improve formatter for double-width character (denkiryokuhatsuden)
+ * bug #10872 [Form] Fixed TrimListenerTest as of PHP 5.5 (webmozart)
+ * bug #10762 [BrowserKit] Allow URLs that don't contain a path when creating a cookie from a string (thewilkybarkid)
+ * bug #10863 [Security] Add check for supported attributes in AclVoter (artursvonda)
+ * bug #10833 [TwigBridge][Transchoice] set %count% from the current context. (aitboudad)
+ * bug #10820 [WebProfilerBundle] Fixed profiler seach/homepage with empty token (tucksaun)
+ * bug #10815 Fixed issue #5427 (umpirsky)
+ * bug #10817 [Debug] fix #10313: FlattenException not found (nicolas-grekas)
+ * bug #10803 [Debug] fix ErrorHandlerTest when context is not an array (nicolas-grekas)
+ * bug #10801 [Debug] ErrorHandler: remove $GLOBALS from context in PHP5.3 fix #10292 (nicolas-grekas)
+ * bug #10797 [HttpFoundation] Allow File instance to be passed to BinaryFileResponse (anlutro)
+ * bug #10643 [TwigBridge] Removed strict check when found variables inside a translation (goetas)
+ * bug #10605 [ExpressionLanguage] Strict in_array check in Parser.php (parnas)
+
 * 2.4.4 (2014-04-27)
 
  * bug #10789 [Console] Fixed the rendering of exceptions on HHVM with a terminal width (stof)

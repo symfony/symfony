@@ -39,4 +39,9 @@ class KernelForTest extends Kernel
     {
         return $this->booted;
     }
+
+    public function setRealRootDir($dir)
+    {
+        $this->realRootDir = $dir;
+    }
 }

@@ -1123,7 +1123,9 @@ class Request
             return in_array(strtolower(current(explode(',', $proto))), array('https', 'on', 'ssl', '1'));
         }
 
-        return 'on' == strtolower($this->server->get('HTTPS')) || 1 == $this->server->get('HTTPS');
+        $https = $this->server->get('HTTPS');
+
+        return !empty($https) && 'off' !== $https;
     }
 
     /**

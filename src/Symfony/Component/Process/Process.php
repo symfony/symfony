@@ -1060,6 +1060,8 @@ class Process
     /**
      * Sets the contents of STDIN.
      *
+     * Deprecation: As of Symfony 2.5, this method only accepts scalar values.
+     *
      * @param string|null $stdin The new contents
      *
      * @return self The current Process instance

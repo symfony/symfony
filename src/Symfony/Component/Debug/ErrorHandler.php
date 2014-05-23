@@ -225,7 +225,11 @@ class ErrorHandler
         $level = array_pop(self::$stackedErrorLevels);
 
         if (null !== $level) {
-            error_reporting($level);
+            $e = error_reporting($level);
+            if ($e !== ($level | E_PARSE | E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR)) {
+                // If the user changed the error level, do not overwrite it
+                error_reporting($e);
+            }
         }
 
         if (empty(self::$stackedErrorLevels)) {

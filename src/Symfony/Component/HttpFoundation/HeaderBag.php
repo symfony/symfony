@@ -117,7 +117,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      *
      * @param string  $key     The header name
      * @param mixed   $default The default value
-     * @param Boolean $first   Whether to return the first value or all header values
+     * @param bool    $first   Whether to return the first value or all header values
      *
      * @return string|array The first header value if $first is true, an array of values otherwise
      *
@@ -147,7 +147,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      *
      * @param string       $key     The key
      * @param string|array $values  The value or an array of values
-     * @param Boolean      $replace Whether to replace the actual value or not (true by default)
+     * @param bool         $replace Whether to replace the actual value or not (true by default)
      *
      * @api
      */
@@ -173,7 +173,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      *
      * @param string $key The HTTP header
      *
-     * @return Boolean true if the parameter exists, false otherwise
+     * @return bool    true if the parameter exists, false otherwise
      *
      * @api
      */
@@ -188,7 +188,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      * @param string $key   The HTTP header name
      * @param string $value The HTTP value
      *
-     * @return Boolean true if the value is contained in the header, false otherwise
+     * @return bool    true if the value is contained in the header, false otherwise
      *
      * @api
      */
@@ -240,6 +240,14 @@ class HeaderBag implements \IteratorAggregate, \Countable
         return $date;
     }
 
+    /**
+     * Adds a custom Cache-Control directive.
+     *
+     * @param string $key   The Cache-Control directive name
+     * @param mixed  $value The Cache-Control directive value
+     *
+     * @api
+     */
     public function addCacheControlDirective($key, $value = true)
     {
         $this->cacheControl[$key] = $value;
@@ -247,16 +255,41 @@ class HeaderBag implements \IteratorAggregate, \Countable
         $this->set('Cache-Control', $this->getCacheControlHeader());
     }
 
+    /**
+     * Returns true if the Cache-Control directive is defined.
+     *
+     * @param string $key The Cache-Control directive
+     *
+     * @return bool true if the directive exists, false otherwise
+     *
+     * @api
+     */
     public function hasCacheControlDirective($key)
     {
         return array_key_exists($key, $this->cacheControl);
     }
 
+    /**
+     * Returns a Cache-Control directive value by name.
+     *
+     * @param string $key The directive name
+     *
+     * @return mixed|null The directive value if defined, null otherwise
+     *
+     * @api
+     */
     public function getCacheControlDirective($key)
     {
         return array_key_exists($key, $this->cacheControl) ? $this->cacheControl[$key] : null;
     }
 
+    /**
+     * Removes a Cache-Control directive.
+     *
+     * @param string $key The Cache-Control directive
+     *
+     * @api
+     */
     public function removeCacheControlDirective($key)
     {
         unset($this->cacheControl[$key]);

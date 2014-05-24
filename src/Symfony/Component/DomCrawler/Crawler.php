@@ -109,7 +109,7 @@ class Crawler extends \SplObjectStorage
         }
 
         if (null === $charset &&
-            preg_match('/\<meta[^\>]+charset *= *["\']?([a-zA-Z\-0-9]+)/i', $content, $matches)) {
+            preg_match('/\<meta[^\>]+charset *= *["\']?([a-zA-Z\-0-9_]+)/i', $content, $matches)) {
             $charset = $matches[1];
         }
 

@@ -200,13 +200,6 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals(array('FrameworkBundle:Form', 'theme1', 'theme2'), $container->getParameter('templating.helper.form.resources'), '->registerTemplatingConfiguration() registers the theme and adds the base theme');
     }
 
-    public function testTemplatingAssetsHelperScopeDependsOnPackageArgumentScopes()
-    {
-        $container = $this->createContainerFromFile('templating_url_package');
-
-        $this->assertNotEquals('request', $container->getDefinition('templating.helper.assets')->getScope(), '->registerTemplatingConfiguration() does not set request scope on assets helper if no packages are request-scoped');
-    }
-
     public function testTranslator()
     {
         $container = $this->createContainerFromFile('full');

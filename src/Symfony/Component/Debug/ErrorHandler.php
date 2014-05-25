@@ -117,7 +117,7 @@ class ErrorHandler
     }
 
     /**
-     * @throws ContextErrorException When error_reporting returns error
+     * @throws \ErrorException When error_reporting returns error
      */
     public function handle($level, $message, $file = 'unknown', $line = 0, $context = array())
     {
@@ -145,18 +145,19 @@ class ErrorHandler
                 return true;
             }
         } elseif ($this->displayErrors && error_reporting() & $level && $this->level & $level) {
-            if (self::$stackedErrorLevels) {
-                self::$stackedErrors[] = func_get_args();
-
-                return true;
-            }
-
             if (PHP_VERSION_ID < 50400 && isset($context['GLOBALS']) && is_array($context)) {
-                unset($context['GLOBALS']);
+                $c = $context;                  // Whatever the signature of the method,
+                unset($c['GLOBALS'], $context); // $context is always a reference in 5.3
+                $context = $c;
             }
 
             $exception = sprintf('%s: %s in %s line %d', isset($this->levels[$level]) ? $this->levels[$level] : $level, $message, $file, $line);
-            $exception = new ContextErrorException($exception, 0, $level, $file, $line, $context);
+            if ($context && class_exists('Symfony\Component\Debug\Exception\ContextErrorException')) {
+                // Checking for class existence is a work around for https://bugs.php.net/42098
+                $exception = new ContextErrorException($exception, 0, $level, $file, $line, $context);
+            } else {
+                $exception = new \ErrorException($exception, 0, $level, $file, $line);
+            }
 
             if (PHP_VERSION_ID <= 50407 && (PHP_VERSION_ID >= 50400 || PHP_VERSION_ID <= 50317)) {
                 // Exceptions thrown from error handlers are sometimes not caught by the exception

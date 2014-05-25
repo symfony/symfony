@@ -109,6 +109,9 @@ class PdoSessionHandler implements \SessionHandlerInterface
      * pass a DSN string that will be used to lazy-connect to the database
      * when the session is actually used. Furthermore it's possible to pass null
      * which will then use the session.save_path ini setting as PDO DSN parameter.
+     * Since locking uses a transaction between opening and closing a session,
+     * it's not recommended to use the same database connection that you also use
+     * for your application logic.
      *
      * List of available options:
      *  * db_table: The name of the table [default: sessions]

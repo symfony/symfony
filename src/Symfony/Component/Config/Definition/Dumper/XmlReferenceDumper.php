@@ -26,15 +26,15 @@ class XmlReferenceDumper
 {
     private $reference;
 
-    public function dump(ConfigurationInterface $configuration, $namespace = null)
+    public function dump(ConfigurationInterface $configuration, $namespace = null, $rootTagName = 'config')
     {
-        return $this->dumpNode($configuration->getConfigTreeBuilder()->buildTree(), $namespace);
+        return $this->dumpNode($configuration->getConfigTreeBuilder()->buildTree(), $namespace, $rootTagName);
     }
 
-    public function dumpNode(NodeInterface $node, $namespace = null)
+    public function dumpNode(NodeInterface $node, $namespace = null, $rootTagName = 'config')
     {
         $this->reference = '';
-        $this->writeNode($node, 0, true, $namespace);
+        $this->writeNode($node, 0, true, $namespace, $rootTagName);
         $ref = $this->reference;
         $this->reference = null;
 
@@ -46,10 +46,11 @@ class XmlReferenceDumper
      * @param int           $depth
      * @param bool          $root      If the node is the root node
      * @param string        $namespace The namespace of the node
+     * @param string        $rootTagName The root tag name
      */
-    private function writeNode(NodeInterface $node, $depth = 0, $root = false, $namespace = null)
+    private function writeNode(NodeInterface $node, $depth = 0, $root = false, $namespace = null, $rootTagName = 'config')
     {
-        $rootName = ($root ? 'config' : $node->getName());
+        $rootName = ($root ? $rootTagName : $node->getName());
         $rootNamespace = ($namespace ?: ($root ? 'http://example.org/schema/dic/'.$node->getName() : null));
 
         // xml remapping
@@ -63,7 +64,9 @@ class XmlReferenceDumper
                 $rootName = $singular;
             }
         }
-        $rootName = str_replace('_', '-', $rootName);
+
+        // ?
+        //$rootName = str_replace('_', '-', $rootName);
 
         $rootAttributes = array();
         $rootAttributeComments = array();

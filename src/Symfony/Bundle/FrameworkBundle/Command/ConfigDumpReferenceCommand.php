@@ -24,6 +24,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  * @author Kevin Bond <kevinbond@gmail.com>
  * @author Wouter J <waldio.webdesign@gmail.com>
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
+ * @author Daniel Espendiller <daniel@espendiller.net>
  */
 class ConfigDumpReferenceCommand extends AbstractConfigCommand
 {
@@ -35,7 +36,7 @@ class ConfigDumpReferenceCommand extends AbstractConfigCommand
         $this
             ->setName('config:dump-reference')
             ->setDefinition(array(
-                new InputArgument('name', InputArgument::OPTIONAL, 'The Bundle name or the extension alias'),
+                new InputArgument('name', InputArgument::OPTIONAL, 'The Bundle name, the extension alias or * for all Bundles'),
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The format, either yaml or xml', 'yaml'),
             ))
             ->setDescription('Dumps the default configuration for an extension')
@@ -47,6 +48,7 @@ Either the extension alias or bundle name can be used:
 
   <info>php %command.full_name% framework</info>
   <info>php %command.full_name% FrameworkBundle</info>
+  <info>php %command.full_name% *</info>
 
 With the <info>format</info> option specifies the format of the configuration,
 this is either <comment>yaml</comment> or <comment>xml</comment>.
@@ -74,6 +76,12 @@ EOF
             return;
         }
 
+        if ($name === '*') {
+            $this->dumpAll($input->getOption('format'), $output);
+
+            return;
+        }
+
         $extension = $this->findExtension($name);
 
         $configuration = $extension->getConfiguration(array(), $this->getContainerBuilder());
@@ -86,7 +94,14 @@ EOF
             $message = sprintf('Default configuration for "%s"', $name);
         }
 
-        switch ($input->getOption('format')) {
+        $dumper = $this->getDumper($input->getOption('format'), $output, $message);
+
+        $output->writeln($dumper->dump($configuration, $extension->getNamespace()));
+    }
+
+    protected function getDumper($format, OutputInterface $output, $message = "") {
+
+        switch ($format) {
             case 'yaml':
                 $output->writeln(sprintf('# %s', $message));
                 $dumper = new YamlReferenceDumper();
@@ -100,6 +115,36 @@ EOF
                 throw new \InvalidArgumentException('Only the yaml and xml formats are supported.');
         }
 
-        $output->writeln($dumper->dump($configuration, $extension->getNamespace()));
+        return $dumper;
+    }
+
+    protected function dumpAll($format, OutputInterface $output) {
+
+        $message = sprintf('Dumping default configuration for all bundles');
+        $dumper = $this->getDumper($format, $output, $message);
+
+        if ($format === 'xml') {
+            $output->writeln('<config>');
+        }
+
+        foreach ($this->getContainer()->get('kernel')->getBundles() as $bundle) {
+            $extension = $bundle->getContainerExtension();
+            if ($extension) {
+
+                $configuration = $extension->getConfiguration(array(), $this->getContainerBuilder());
+                try {
+                    $this->validateConfiguration($extension, $configuration);
+                    $output->writeln($dumper->dump($configuration, $extension->getNamespace(), $extension->getAlias()));
+                } catch (\LogicException $e) {
+                }
+
+            }
+        }
+
+        if ($format === 'xml') {
+            $output->writeln('</config>');
+        }
+
+        return;
     }
 }

@@ -65,8 +65,7 @@ class XmlReferenceDumper
             }
         }
 
-        // ?
-        //$rootName = str_replace('_', '-', $rootName);
+        $rootName = str_replace('_', '-', $rootName);
 
         $rootAttributes = array();
         $rootAttributeComments = array();

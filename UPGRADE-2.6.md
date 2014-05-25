@@ -1,4 +1,4 @@
-﻿UPGRADE FROM 2.5 to 2.6
+UPGRADE FROM 2.5 to 2.6
 =======================
 
 Form
@@ -101,3 +101,25 @@ Security
    @security.token_storage         => getToken()
    @security.token_storage         => setToken()
    ```
+
+HttpFoundation
+--------------
+
+ * The PdoSessionHandler to store sessions in a database changed significantly.
+   - It now implements session locking to prevent loss of data by concurrent access to the same session.
+     - It does so using a transaction between opening and closing a session. For this reason, it's not
+       recommended to use the same database connection that you also use for your application logic.
+       Otherwise you have to make sure to access your database after the session is closed and committed.
+       Instead of passing an existing connection to the handler, you can now also pass a DSN string which
+       will be used to lazy-connect when a session is started.
+     - Since accessing a session now blocks when the same session is still open, it is best practice to
+       save the session as soon as you don't need to write to it anymore. For example, read-only AJAX
+       request to a session can save the session immediately after opening it to increase concurrency.
+   - The expected schema of the table changed.
+     - Session data is binary text that can contain null bytes and thus should also be saved as-is in a
+       binary column like BLOB. For this reason, the handler does not base64_encode the data anymore.
+     - A new column to store the lifetime of a session is required. This allows to have different
+       lifetimes per session configured via session.gc_maxlifetime ini setting.
+     - You would need to migrate the table manually if you want to keep session information of your users.
+     - You could use PdoSessionHandler::createTable to initialize a correctly defined table depending on
+       the used database vendor.

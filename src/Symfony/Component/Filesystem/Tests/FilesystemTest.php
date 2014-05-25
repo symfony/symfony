@@ -60,7 +60,7 @@ class FilesystemTest extends FilesystemTestCase
     {
         // skip test on Windows; PHP can't easily set file as unreadable on Windows
         if (defined('PHP_WINDOWS_VERSION_MAJOR')) {
-            return;
+            $this->markTestSkipped('This test cannot run on Windows.');;
         }
 
         $sourceFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_source_file';
@@ -134,7 +134,7 @@ class FilesystemTest extends FilesystemTestCase
     {
         // skip test on Windows; PHP can't easily set file as unwritable on Windows
         if (defined('PHP_WINDOWS_VERSION_MAJOR')) {
-            return;
+            $this->markTestSkipped('This test cannot run on Windows.');;
         }
 
         $sourceFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_source_file';

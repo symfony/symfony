@@ -70,8 +70,9 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals('triggerNotice', $trace[1]['function']);
             $this->assertEquals('::', $trace[1]['type']);
 
+            $this->assertEquals(__FILE__, $trace[1]['file']);
             $this->assertEquals(__CLASS__, $trace[2]['class']);
-            $this->assertEquals('testNotice', $trace[2]['function']);
+            $this->assertEquals(__FUNCTION__, $trace[2]['function']);
             $this->assertEquals('->', $trace[2]['type']);
         } catch (\Exception $e) {
             restore_error_handler();
@@ -123,10 +124,10 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
 
             $handler = ErrorHandler::register(3);
             try {
-                $handler->handle(111, 'foo', 'foo.php', 12, array());
+                $handler->handle(4, 'foo', 'foo.php', 12, array());
             } catch (\ErrorException $e) {
-                $this->assertSame('111: foo in foo.php line 12', $e->getMessage());
-                $this->assertSame(111, $e->getSeverity());
+                $this->assertSame('Parse Error: foo in foo.php line 12', $e->getMessage());
+                $this->assertSame(4, $e->getSeverity());
                 $this->assertSame('foo.php', $e->getFile());
                 $this->assertSame(12, $e->getLine());
             }
@@ -193,56 +194,4 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
             throw $e;
         }
     }
-
-    /**
-     * @dataProvider provideFatalErrorHandlersData
-     */
-    public function testFatalErrorHandlers($error, $class, $translatedMessage)
-    {
-        $handler = new ErrorHandler();
-        $exceptionHandler = new MockExceptionHandler();
-
-        $m = new \ReflectionMethod($handler, 'handleFatalError');
-        $m->setAccessible(true);
-        $m->invoke($handler, array($exceptionHandler, 'handle'), $error);
-
-        $this->assertInstanceof($class, $exceptionHandler->e);
-        // class names are case insensitive and PHP/HHVM do not return the same
-        $this->assertSame(strtolower($translatedMessage), strtolower($exceptionHandler->e->getMessage()));
-        $this->assertSame($error['type'], $exceptionHandler->e->getSeverity());
-        $this->assertSame($error['file'], $exceptionHandler->e->getFile());
-        $this->assertSame($error['line'], $exceptionHandler->e->getLine());
-    }
-
-    public function provideFatalErrorHandlersData()
-    {
-        return array(
-            // undefined function
-            array(
-                array(
-                    'type' => 1,
-                    'line' => 12,
-                    'file' => 'foo.php',
-                    'message' => 'Call to undefined function test_namespaced_function_again()',
-                ),
-                'Symfony\Component\Debug\Exception\UndefinedFunctionException',
-                'Attempted to call function "test_namespaced_function_again" from the global namespace in foo.php line 12. Did you mean to call: "\\symfony\\component\\debug\\tests\\test_namespaced_function_again"?',
-            ),
-            // class not found
-            array(
-                array(
-                    'type' => 1,
-                    'line' => 12,
-                    'file' => 'foo.php',
-                    'message' => 'Class \'WhizBangFactory\' not found',
-                ),
-                'Symfony\Component\Debug\Exception\ClassNotFoundException',
-                'Attempted to load class "WhizBangFactory" from the global namespace in foo.php line 12. Did you forget a use statement for this class?',
-            ),
-        );
-    }
-}
-
-function test_namespaced_function_again()
-{
 }

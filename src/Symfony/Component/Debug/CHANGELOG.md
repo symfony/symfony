@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.6.0
+-----
+
+* enhanced error messages for uncaught exceptions
+
 2.5.0
 -----
 

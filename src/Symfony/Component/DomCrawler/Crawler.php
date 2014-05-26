@@ -876,6 +876,8 @@ class Crawler extends \SplObjectStorage
                 $expression = $nonMatchingExpression;
             } elseif (0 === strpos($expression, '//')) {
                 $expression = 'descendant-or-self::' . substr($expression, 2);
+            } elseif (0 === strpos($expression, './/')) {
+                $expression = 'descendant-or-self::' . substr($expression, 3);
             } elseif (0 === strpos($expression, './')) {
                 $expression = 'self::' . substr($expression, 2);
             } elseif ('/' === $expression[0]) {

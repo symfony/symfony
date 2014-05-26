@@ -98,7 +98,7 @@ class TransNode extends \Twig_Node
         foreach ($matches[1] as $var) {
             $key = new \Twig_Node_Expression_Constant('%'.$var.'%', $body->getLine());
             if (!$vars->hasElement($key)) {
-                if ('count' === $var) {
+                if ('count' === $var && null !== $this->getNode('count')) {
                     $vars->addElement($this->getNode('count'), $key);
                 } else {
                     $varExpr = new \Twig_Node_Expression_Name($var, $body->getLine());

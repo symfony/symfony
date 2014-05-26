@@ -236,6 +236,13 @@ EOF
         $crawler = new Crawler();
         $crawler->addContent(mb_convert_encoding('<html><head><meta charset="Shift_JIS"></head><body>日本語</body></html>', 'SJIS', 'UTF-8'));
         $this->assertEquals('日本語', $crawler->filterXPath('//body')->text(), '->addContent() can recognize "Shift_JIS" in html5 meta charset tag');
+
+        $charsets = array('ansi_x3.4-1968', 'iso_8859-7:1987');
+        foreach ($charsets as $charset) {
+            $crawler = $this->getMockBuilder('\Symfony\Component\DomCrawler\Crawler')->setMethods(array('addHtmlContent'))->getMock();
+            $crawler->expects($this->once())->method('addHtmlContent')->with($this->anything(), $this->equalTo($charset));
+            $crawler->addContent(sprintf('<html><head><meta charset="%s"><body></body></html>', $charset));
+        }
     }
 
     /**

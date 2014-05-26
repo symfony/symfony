@@ -1662,7 +1662,7 @@ class Request
     {
         $filename = basename($this->server->get('SCRIPT_FILENAME'));
 
-        if (basename($this->server->get('SCRIPT_NAME')) === $filename) {
+        if (0 === strcasecmp(basename($this->server->get('SCRIPT_NAME')), $filename)) {
             $baseUrl = $this->server->get('SCRIPT_NAME');
         } elseif (basename($this->server->get('PHP_SELF')) === $filename) {
             $baseUrl = $this->server->get('PHP_SELF');

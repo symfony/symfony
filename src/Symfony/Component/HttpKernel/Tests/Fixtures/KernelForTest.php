@@ -56,9 +56,4 @@ class KernelForTest extends Kernel
     {
         $this->booted = (bool) $value;
     }
-
-    public function setRealRootDir($dir)
-    {
-        $this->realRootDir = $dir;
-    }
 }

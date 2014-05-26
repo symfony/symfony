@@ -748,15 +748,9 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         $filesystem = new Filesystem();
 
         return preg_replace_callback("{'([^']*)(".preg_quote($rootDir)."[^']*)'}", function ($match) use ($filesystem, $cacheDir) {
-            $prefix = isset($match[1]) && $match[1] ? "'$match[1]'.__DIR__" : "__DIR__";
+            $prefix = isset($match[1]) && $match[1] ? "'$match[1]'.__DIR__.'/" : "__DIR__.'/";
 
-            $relativePath = rtrim($filesystem->makePathRelative($match[2], $cacheDir), '/');
-
-            if ($relativePath === '.') {
-                return $prefix;
-            }
-
-            return $prefix . ".'/" . $relativePath . "'";
+            return $prefix.rtrim($filesystem->makePathRelative($match[2], $cacheDir), '/')."'";
         }, $content);
     }
 

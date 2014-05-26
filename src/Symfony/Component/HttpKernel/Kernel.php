@@ -53,6 +53,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     protected $bundleMap;
     protected $container;
     protected $rootDir;
+    protected $realRootDir;
     protected $environment;
     protected $debug;
     protected $booted;
@@ -731,24 +732,17 @@ abstract class Kernel implements KernelInterface, TerminableInterface
             return $content;
         }
 
-        // find the "real" root dir (by finding the composer.json file)
-        $rootDir = $this->getRootDir();
-        $previous = $rootDir;
-        while (!file_exists($rootDir.'/composer.json')) {
-            if ($previous === $rootDir = realpath($rootDir.'/..')) {
-                // unable to detect the project root, give up
-                return $content;
-            }
-
-            $previous = $rootDir;
+        $rootDir = $this->getRealRootDir();
+        if (!$rootDir) {
+            return $content;
         }
 
         $rootDir = rtrim($rootDir, '/');
         $cacheDir = $this->getCacheDir();
         $filesystem = new Filesystem();
 
-        return preg_replace_callback("{'([^']*)(".preg_quote($rootDir)."[^']*)'}", function ($match) use ($filesystem, $cacheDir) {
-            $prefix = isset($match[1]) && $match[1] ? "'$match[1]'.__DIR__" : "__DIR__";
+        return preg_replace_callback("{'([^']*?)(".preg_quote($rootDir)."[^']*)'}", function ($match) use ($filesystem, $cacheDir) {
+            $prefix = !empty($match[1]) ? "'$match[1]'.__DIR__" : "__DIR__";
 
             if ('.' === $relativePath = rtrim($filesystem->makePathRelative($match[2], $cacheDir), '/')) {
                 return $prefix;
@@ -756,6 +750,33 @@ abstract class Kernel implements KernelInterface, TerminableInterface
 
             return $prefix.".'/".$relativePath."'";
         }, $content);
+    }
+
+    /**
+     * Find the "real" root dir (by finding the composer.json file)
+     *
+     * @return null|string
+     */
+    private function getRealRootDir()
+    {
+        if (null !== $this->realRootDir) {
+            return $this->realRootDir;
+        }
+
+        $rootDir = $this->getRootDir();
+        $previous = $rootDir;
+        while (!file_exists($rootDir.'/composer.json')) {
+            if ($previous === $rootDir = realpath($rootDir.'/..')) {
+                // unable to detect the project root, give up
+                return $this->realRootDir = false;
+            }
+
+            $previous = $rootDir;
+        }
+
+        $this->realRootDir = $rootDir;
+
+        return $this->realRootDir;
     }
 
     /**

@@ -852,6 +852,27 @@ EOF;
         $this->assertEquals($newContent, $content);
     }
 
+    public function testRemoveAbsolutePathsFromContainerWithSpecialCase()
+    {
+        $kernel = new KernelForTest('dev', true);
+        $kernel->setRootDir('/app/app');
+        $kernel->setRealRootDir('/app');
+        $symfonyRootDir = __DIR__.'/Fixtures/DumpedContainers/app';
+
+        $content = file_get_contents($symfonyRootDir.'/cache/dev/withAbsolutePaths.php');
+        $content = str_replace('ROOT_DIR', '/app', $content);
+
+        $m = new \ReflectionMethod($kernel, 'removeAbsolutePathsFromContainer');
+        $m->setAccessible(true);
+        $content = $m->invoke($kernel, $content);
+        $this->assertEquals(file_get_contents($symfonyRootDir.'/cache/dev/withoutAbsolutePaths.php'), $content);
+    }
+
+    /**
+     * Returns a mock for the BundleInterface
+     *
+     * @return BundleInterface
+     */
     protected function getBundle($dir = null, $parent = null, $className = null, $bundleName = null)
     {
         $bundle = $this

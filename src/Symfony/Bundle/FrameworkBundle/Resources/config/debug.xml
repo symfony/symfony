@@ -9,7 +9,6 @@
         <parameter key="debug.stopwatch.class">Symfony\Component\Stopwatch\Stopwatch</parameter>
         <parameter key="debug.container.dump">%kernel.cache_dir%/%kernel.container_class%.xml</parameter>
         <parameter key="debug.controller_resolver.class">Symfony\Component\HttpKernel\Controller\TraceableControllerResolver</parameter>
-        <parameter key="debug.debug_handlers_listener.class">Symfony\Component\HttpKernel\EventListener\DebugHandlersListener</parameter>
     </parameters>
 
     <services>
@@ -25,28 +24,6 @@
         <service id="debug.controller_resolver" class="%debug.controller_resolver.class%">
             <argument type="service" id="controller_resolver" />
             <argument type="service" id="debug.stopwatch" />
-        </service>
-
-        <service id="debug.deprecation_logger_listener" class="%debug.errors_logger_listener.class%">
-            <tag name="kernel.event_subscriber" />
-            <tag name="monolog.logger" channel="deprecation" />
-            <argument>deprecation</argument>
-            <argument type="service" id="logger" on-invalid="null" />
-        </service>
-
-        <service id="debug.scream_logger_listener" class="%debug.errors_logger_listener.class%">
-            <tag name="kernel.event_subscriber" />
-            <tag name="monolog.logger" channel="scream" />
-            <argument>scream</argument>
-            <argument type="service" id="logger" on-invalid="null" />
-        </service>
-
-        <service id="debug.debug_handlers_listener" class="%debug.debug_handlers_listener.class%">
-            <tag name="kernel.event_subscriber" />
-            <argument type="collection">
-                <argument type="service" id="http_kernel" on-invalid="null" />
-                <argument>terminateWithException</argument>
-            </argument>
         </service>
     </services>
 </container>

@@ -388,6 +388,8 @@ EOF
         $this->assertCount(0, $crawler->filterXPath('/body'));
         $this->assertCount(1, $crawler->filterXPath('/_root/body'));
         $this->assertCount(1, $crawler->filterXPath('./body'));
+        $this->assertCount(1, $crawler->filterXPath('.//body'));
+        $this->assertCount(5, $crawler->filterXPath('.//input'));
         $this->assertCount(4, $crawler->filterXPath('//form')->filterXPath('//button | //input'));
         $this->assertCount(1, $crawler->filterXPath('body'));
         $this->assertCount(6, $crawler->filterXPath('//button | //input'));

@@ -99,7 +99,7 @@ class DebugClassLoaderTest extends \PHPUnit_Framework_TestCase
                 class ChildTestingStacking extends TestingStacking { function foo($bar) {} }
             ');
             $this->fail('ContextErrorException expected');
-        } catch (ContextErrorException $exception) {
+        } catch (\ErrorException $exception) {
             // if an exception is thrown, the test passed
             restore_error_handler();
             restore_exception_handler();

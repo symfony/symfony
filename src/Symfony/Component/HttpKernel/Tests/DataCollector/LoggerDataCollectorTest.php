@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpKernel\Tests\DataCollector;
 
 use Symfony\Component\HttpKernel\DataCollector\LoggerDataCollector;
-use Symfony\Component\HttpKernel\Debug\ErrorHandler;
 
 class LoggerDataCollectorTest extends \PHPUnit_Framework_TestCase
 {
@@ -66,14 +65,20 @@ class LoggerDataCollectorTest extends \PHPUnit_Framework_TestCase
             array(
                 1,
                 array(
-                    array('message' => 'foo', 'context' => array('type' => ErrorHandler::TYPE_DEPRECATION), 'priority' => 100, 'priorityName' => 'DEBUG'),
-                    array('message' => 'foo2', 'context' => array('type' => ErrorHandler::TYPE_DEPRECATION), 'priority' => 100, 'priorityName' => 'DEBUG'),
-                    array('message' => 'foo3', 'context' => array('type' => E_USER_WARNING, 'scream' => 0), 'priority' => 100, 'priorityName' => 'DEBUG'),
+                    array('message' => 'foo', 'context' => array('type' => E_DEPRECATED, 'level' => E_ALL), 'priority' => 100, 'priorityName' => 'DEBUG'),
+                    array('message' => 'foo2', 'context' => array('type' => E_USER_DEPRECATED, 'level' => E_ALL), 'priority' => 100, 'priorityName' => 'DEBUG'),
                 ),
                 null,
                 2,
+                0,
+                array(100 => array('count' => 2, 'name' => 'DEBUG')),
+            ),
+            array(
                 1,
-                array(100 => array('count' => 3, 'name' => 'DEBUG')),
+                array(array('message' => 'foo3', 'context' => array('type' => E_USER_WARNING, 'level' => 0), 'priority' => 100, 'priorityName' => 'DEBUG')),
+                array(array('message' => 'foo3', 'context' => array('type' => E_USER_WARNING, 'level' => 0, 'scream' => true), 'priority' => 100, 'priorityName' => 'DEBUG')),
+                0,
+                1,
             ),
         );
     }

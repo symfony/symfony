@@ -106,11 +106,11 @@ class DebugClassLoaderTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals(E_STRICT, $exception->getSeverity());
             $this->assertStringStartsWith(__FILE__, $exception->getFile());
             $this->assertRegexp('/^Runtime Notice: Declaration/', $exception->getMessage());
-        } catch (\Exception $e) {
+        } catch (\Exception $exception) {
             restore_error_handler();
             restore_exception_handler();
 
-            throw $e;
+            throw $exception;
         }
     }
 

@@ -78,7 +78,7 @@ class DebugClassLoader
     public static function enable()
     {
         // Ensures we don't hit https://bugs.php.net/42098
-        class_exists(__NAMESPACE__.'\ErrorHandler', true);
+        class_exists('Symfony\Component\Debug\ErrorHandler');
 
         if (!is_array($functions = spl_autoload_functions())) {
             return;

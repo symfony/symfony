@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\HttpKernel\DataCollector;
 
-use Symfony\Component\Debug\ErrorHandler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
@@ -99,7 +98,11 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
     private function sanitizeLogs($logs)
     {
         foreach ($logs as $i => $log) {
-            $logs[$i]['context'] = $this->sanitizeContext($log['context']);
+            $context = $this->sanitizeContext($log['context']);
+            if (isset($context['type'], $context['level']) && !($context['type'] & $context['level'])) {
+                $context['scream'] = true;
+            }
+            $logs[$i]['context'] = $context;
         }
 
         return $logs;
@@ -145,10 +148,10 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
                 );
             }
 
-            if (isset($log['context']['type'])) {
-                if (ErrorHandler::TYPE_DEPRECATION === $log['context']['type']) {
+            if (isset($log['context']['type'], $log['context']['level'])) {
+                if (E_DEPRECATED === $log['context']['type'] || E_USER_DEPRECATED === $log['context']['type']) {
                     ++$count['deprecation_count'];
-                } elseif (isset($log['context']['scream'])) {
+                } elseif (!($log['context']['type'] & $log['context']['level'])) {
                     ++$count['scream_count'];
                 }
             }

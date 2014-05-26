@@ -15,18 +15,38 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler;
 
 class PdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
 {
-    private $pdo;
+    private $dbFile;
 
     protected function setUp()
     {
         if (!class_exists('PDO') || !in_array('sqlite', \PDO::getAvailableDrivers())) {
             $this->markTestSkipped('This test requires SQLite support in your environment');
         }
+    }
 
-        $this->pdo = new \PDO("sqlite::memory:");
-        $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-        $sql = "CREATE TABLE sessions (sess_id VARCHAR(255) PRIMARY KEY, sess_data TEXT, sess_time INTEGER)";
-        $this->pdo->exec($sql);
+    protected function tearDown()
+    {
+        // make sure the temporary database file is deleted when it has been created (even when a test fails)
+        if ($this->dbFile) {
+            @unlink($this->dbFile);
+        }
+    }
+
+    protected function getPersistentSqliteDsn()
+    {
+        $this->dbFile = tempnam(sys_get_temp_dir(), 'sf2_sqlite_sessions');
+
+        return 'sqlite:' . $this->dbFile;
+    }
+
+    protected function getMemorySqlitePdo()
+    {
+        $pdo = new \PDO('sqlite::memory:');
+        $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        $storage = new PdoSessionHandler($pdo);
+        $storage->createTable();
+
+        return $pdo;
     }
 
     /**
@@ -34,9 +54,10 @@ class PdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
      */
     public function testWrongPdoErrMode()
     {
-        $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT);
+        $pdo = $this->getMemorySqlitePdo();
+        $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT);
 
-        $storage = new PdoSessionHandler($this->pdo);
+        $storage = new PdoSessionHandler($pdo);
     }
 
     /**
@@ -44,24 +65,74 @@ class PdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
      */
     public function testInexistentTable()
     {
-        $storage = new PdoSessionHandler($this->pdo, array('db_table' => 'inexistent_table'));
+        $storage = new PdoSessionHandler($this->getMemorySqlitePdo(), array('db_table' => 'inexistent_table'));
         $storage->open('', 'sid');
         $storage->read('id');
         $storage->write('id', 'data');
         $storage->close();
     }
 
-    public function testReadWriteRead()
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testCreateTableTwice()
     {
-        $storage = new PdoSessionHandler($this->pdo);
+        $storage = new PdoSessionHandler($this->getMemorySqlitePdo());
+        $storage->createTable();
+    }
+
+    public function testWithLazyDsnConnection()
+    {
+        $dsn = $this->getPersistentSqliteDsn();
+
+        $storage = new PdoSessionHandler($dsn);
+        $storage->createTable();
         $storage->open('', 'sid');
-        $this->assertSame('', $storage->read('id'), 'New session returns empty string data');
+        $data = $storage->read('id');
         $storage->write('id', 'data');
         $storage->close();
+        $this->assertSame('', $data, 'New session returns empty string data');
 
         $storage->open('', 'sid');
-        $this->assertSame('data', $storage->read('id'), 'Written value can be read back correctly');
+        $data = $storage->read('id');
         $storage->close();
+        $this->assertSame('data', $data, 'Written value can be read back correctly');
+    }
+
+    public function testWithLazySavePathConnection()
+    {
+        $dsn = $this->getPersistentSqliteDsn();
+
+        // Open is called with what ini_set('session.save_path', $dsn) would mean
+        $storage = new PdoSessionHandler(null);
+        $storage->open($dsn, 'sid');
+        $storage->createTable();
+        $data = $storage->read('id');
+        $storage->write('id', 'data');
+        $storage->close();
+        $this->assertSame('', $data, 'New session returns empty string data');
+
+        $storage->open($dsn, 'sid');
+        $data = $storage->read('id');
+        $storage->close();
+        $this->assertSame('data', $data, 'Written value can be read back correctly');
+    }
+
+    public function testReadWriteReadWithNullByte()
+    {
+        $sessionData = 'da' . "\0" . 'ta';
+
+        $storage = new PdoSessionHandler($this->getMemorySqlitePdo());
+        $storage->open('', 'sid');
+        $readData = $storage->read('id');
+        $storage->write('id', $sessionData);
+        $storage->close();
+        $this->assertSame('', $readData, 'New session returns empty string data');
+
+        $storage->open('', 'sid');
+        $readData = $storage->read('id');
+        $storage->close();
+        $this->assertSame($sessionData, $readData, 'Written value can be read back correctly');
     }
 
     /**
@@ -69,7 +140,7 @@ class PdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
      */
     public function testWriteDifferentSessionIdThanRead()
     {
-        $storage = new PdoSessionHandler($this->pdo);
+        $storage = new PdoSessionHandler($this->getMemorySqlitePdo());
         $storage->open('', 'sid');
         $storage->read('id');
         $storage->destroy('id');
@@ -77,65 +148,93 @@ class PdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
         $storage->close();
 
         $storage->open('', 'sid');
-        $this->assertSame('data_of_new_session_id', $storage->read('new_id'), 'Data of regenerated session id is available');
+        $data = $storage->read('new_id');
         $storage->close();
+
+        $this->assertSame('data_of_new_session_id', $data, 'Data of regenerated session id is available');
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     */
-    public function testWrongUsage()
+    public function testWrongUsageStillWorks()
     {
-        $storage = new PdoSessionHandler($this->pdo);
+        // wrong method sequence that should no happen, but still works
+        $storage = new PdoSessionHandler($this->getMemorySqlitePdo());
+        $storage->write('id', 'data');
+        $storage->write('other_id', 'other_data');
+        $storage->destroy('inexistent');
         $storage->open('', 'sid');
-        $storage->read('id');
-        $storage->read('id');
+        $data = $storage->read('id');
+        $otherData = $storage->read('other_id');
+        $storage->close();
+
+        $this->assertSame('data', $data);
+        $this->assertSame('other_data', $otherData);
     }
 
     public function testSessionDestroy()
     {
-        $storage = new PdoSessionHandler($this->pdo);
+        $pdo = $this->getMemorySqlitePdo();
+        $storage = new PdoSessionHandler($pdo);
 
         $storage->open('', 'sid');
         $storage->read('id');
         $storage->write('id', 'data');
         $storage->close();
-        $this->assertEquals(1, $this->pdo->query('SELECT COUNT(*) FROM sessions')->fetchColumn());
+        $this->assertEquals(1, $pdo->query('SELECT COUNT(*) FROM sessions')->fetchColumn());
 
         $storage->open('', 'sid');
         $storage->read('id');
         $storage->destroy('id');
         $storage->close();
-        $this->assertEquals(0, $this->pdo->query('SELECT COUNT(*) FROM sessions')->fetchColumn());
+        $this->assertEquals(0, $pdo->query('SELECT COUNT(*) FROM sessions')->fetchColumn());
 
         $storage->open('', 'sid');
-        $this->assertSame('', $storage->read('id'), 'Destroyed session returns empty string');
+        $data = $storage->read('id');
         $storage->close();
+        $this->assertSame('', $data, 'Destroyed session returns empty string');
     }
 
     public function testSessionGC()
     {
-        $previousLifeTime = ini_set('session.gc_maxlifetime', 0);
-        $storage = new PdoSessionHandler($this->pdo);
+        $previousLifeTime = ini_set('session.gc_maxlifetime', 1000);
+        $pdo = $this->getMemorySqlitePdo();
+        $storage = new PdoSessionHandler($pdo);
 
         $storage->open('', 'sid');
         $storage->read('id');
         $storage->write('id', 'data');
         $storage->close();
-        $this->assertEquals(1, $this->pdo->query('SELECT COUNT(*) FROM sessions')->fetchColumn());
 
         $storage->open('', 'sid');
-        $this->assertSame('', $storage->read('id'), 'Session already considered garbage, so not returning data even if it is not pruned yet');
-        $storage->gc(0);
+        $storage->read('gc_id');
+        ini_set('session.gc_maxlifetime', -1); // test that you can set lifetime of a session after it has been read
+        $storage->write('gc_id', 'data');
         $storage->close();
-        $this->assertEquals(0, $this->pdo->query('SELECT COUNT(*) FROM sessions')->fetchColumn());
+        $this->assertEquals(2, $pdo->query('SELECT COUNT(*) FROM sessions')->fetchColumn(), 'No session pruned because gc not called');
+
+        $storage->open('', 'sid');
+        $data = $storage->read('gc_id');
+        $storage->gc(-1);
+        $storage->close();
 
         ini_set('session.gc_maxlifetime', $previousLifeTime);
+
+        $this->assertSame('', $data, 'Session already considered garbage, so not returning data even if it is not pruned yet');
+        $this->assertEquals(1, $pdo->query('SELECT COUNT(*) FROM sessions')->fetchColumn(), 'Expired session is pruned');
     }
 
     public function testGetConnection()
     {
-        $storage = new PdoSessionHandler($this->pdo, array('db_table' => 'sessions'), array());
+        $storage = new PdoSessionHandler($this->getMemorySqlitePdo());
+
+        $method = new \ReflectionMethod($storage, 'getConnection');
+        $method->setAccessible(true);
+
+        $this->assertInstanceOf('\PDO', $method->invoke($storage));
+    }
+
+    public function testGetConnectionConnectsIfNeeded()
+    {
+        $storage = new PdoSessionHandler('sqlite::memory:');
 
         $method = new \ReflectionMethod($storage, 'getConnection');
         $method->setAccessible(true);

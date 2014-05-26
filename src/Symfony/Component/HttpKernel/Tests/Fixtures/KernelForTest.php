@@ -16,11 +16,6 @@ use Symfony\Component\Config\Loader\LoaderInterface;
 
 class KernelForTest extends Kernel
 {
-    public function setRootDir($dir)
-    {
-        $this->rootDir = $dir;
-    }
-
     public function getBundleMap()
     {
         return $this->bundleMap;

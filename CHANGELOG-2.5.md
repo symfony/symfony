@@ -26,7 +26,6 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * bug #10937 [HttpKernel] Fix "absolute path" when we look to the cache directory (BenoitLeveque)
  * bug #10933 Changed the default value of checkbox and radio to match the HTML spec (stof)
  * bug #10927 [DomCrawler] Changed typehints form DomNode to DomElement (stof)
- * bug #10908 [HttpFoundation] implement session locking for PDO (Tobion)
  * bug #10894 [HttpKernel] removed absolute paths from the generated container (fabpot)
  * bug #10926 [DomCrawler] Fixed the initial state for options without value attribute (stof)
  * bug #10925 [DomCrawler] Fixed the handling of boolean attributes in ChoiceFormField (stof)

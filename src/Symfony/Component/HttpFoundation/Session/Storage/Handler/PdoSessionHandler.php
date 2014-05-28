@@ -173,7 +173,7 @@ class PdoSessionHandler implements \SessionHandlerInterface
         $encoded = base64_encode($data);
 
         try {
-            // We use a MERGE SQL query when supported by the database.
+            // We use a single MERGE SQL query when supported by the database.
             $mergeSql = $this->getMergeSql();
 
             if (null !== $mergeSql) {
@@ -194,10 +194,11 @@ class PdoSessionHandler implements \SessionHandlerInterface
             $updateStmt->bindValue(':time', time(), \PDO::PARAM_INT);
             $updateStmt->execute();
 
-            // Since Postgres does not support MERGE (without custom stored procedure), we have to use this approach
-            // that can result in duplicate key errors when the same session is written simultaneously. We can just
-            // ignore such an error because either the data did not change anyway or which data is written does not
-            // matter as proper locking to serialize access to a session is not implemented.
+            // When MERGE is not supported, like in Postgres, we have to use this approach that can result in
+            // duplicate key errors when the same session is written simultaneously. We can just catch such an
+            // error and re-execute the update. This is similar to a serializable transaction with retry logic
+            // on serialization failures but without the overhead and without possible false positives due to
+            // longer gap locking.
             if (!$updateStmt->rowCount()) {
                 try {
                     $insertStmt = $this->pdo->prepare(
@@ -208,8 +209,10 @@ class PdoSessionHandler implements \SessionHandlerInterface
                     $insertStmt->bindValue(':time', time(), \PDO::PARAM_INT);
                     $insertStmt->execute();
                 } catch (\PDOException $e) {
-                    // ignore unique violation SQLSTATE
-                    if ('23505' !== $e->getCode()) {
+                    // Handle integrity violation SQLSTATE 23000 (or a subclass like 23505 in Postgres) for duplicate keys
+                    if (0 === strpos($e->getCode(), '23')) {
+                        $updateStmt->execute();
+                    } else {
                         throw $e;
                     }
                 }
@@ -241,7 +244,8 @@ class PdoSessionHandler implements \SessionHandlerInterface
                     "WHEN MATCHED THEN UPDATE SET $this->dataCol = :data, $this->timeCol = :time";
             case 'sqlsrv' && version_compare($this->pdo->getAttribute(\PDO::ATTR_SERVER_VERSION), '10', '>='):
                 // MERGE is only available since SQL Server 2008 and must be terminated by semicolon
-                return "MERGE INTO $this->table USING (SELECT 'x' AS dummy) AS src ON ($this->idCol = :id) " .
+                // It also requires HOLDLOCK according to http://weblogs.sqlteam.com/dang/archive/2009/01/31/UPSERT-Race-Condition-With-MERGE.aspx
+                return "MERGE INTO $this->table WITH (HOLDLOCK) USING (SELECT 1 AS dummy) AS src ON ($this->idCol = :id) " .
                     "WHEN NOT MATCHED THEN INSERT ($this->idCol, $this->dataCol, $this->timeCol) VALUES (:id, :data, :time) " .
                     "WHEN MATCHED THEN UPDATE SET $this->dataCol = :data, $this->timeCol = :time;";
             case 'sqlite':

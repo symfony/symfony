@@ -20,5 +20,11 @@
     "autoload": {
         "psr-0": { "Symfony\\Component\\VarDumper\\": "" }
     },
-    "target-dir": "Symfony/Component/VarDumper"
+    "target-dir": "Symfony/Component/VarDumper",
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.6-dev"
+        }
+    }
 }

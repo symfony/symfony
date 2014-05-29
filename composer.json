@@ -30,6 +30,7 @@
         "symfony/css-selector": "self.version",
         "symfony/dependency-injection": "self.version",
         "symfony/debug": "self.version",
+        "symfony/debug-bundle": "self.version",
         "symfony/doctrine-bridge": "self.version",
         "symfony/dom-crawler": "self.version",
         "symfony/event-dispatcher": "self.version",
@@ -63,6 +64,7 @@
         "symfony/twig-bridge": "self.version",
         "symfony/twig-bundle": "self.version",
         "symfony/validator": "self.version",
+        "symfony/var-dumper": "self.version",
         "symfony/web-profiler-bundle": "self.version",
         "symfony/yaml": "self.version"
     },
@@ -83,7 +85,10 @@
             "src/Symfony/Component/HttpFoundation/Resources/stubs",
             "src/Symfony/Component/Intl/Resources/stubs"
         ],
-        "files": [ "src/Symfony/Component/Intl/Resources/stubs/functions.php" ]
+        "files": [
+            "src/Symfony/Component/Intl/Resources/stubs/functions.php",
+            "src/Symfony/Bundle/DebugBundle/Resources/functions/debug.php"
+        ]
     },
     "minimum-stability": "dev",
     "extra": {

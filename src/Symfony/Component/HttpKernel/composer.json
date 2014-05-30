@@ -19,6 +19,7 @@
         "php": ">=5.3.3",
         "symfony/event-dispatcher": "~2.1",
         "symfony/http-foundation": "~2.2",
+        "symfony/dependency-injection": "~2.3",
         "symfony/debug": "~2.3",
         "psr/log": "~1.0"
     },

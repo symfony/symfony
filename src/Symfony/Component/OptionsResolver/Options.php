@@ -24,25 +24,44 @@ use Symfony\Component\OptionsResolver\Exception\OptionDefinitionException;
 class Options implements \ArrayAccess, \Iterator, \Countable
 {
     /**
+     * Whether to format {@link \DateTime} objects as RFC-3339 dates
+     * during exceptions ("Y-m-d H:i:s").
+     *
+     * @var int
+     */
+    const PRETTY_DATE = 1;
+
+    /**
+     * Whether to cast objects with a "__toString()" method to strings during exceptions.
+     *
+     * @var int
+     */
+    const OBJECT_TO_STRING = 2;
+
+    /**
      * A list of option values.
+     *
      * @var array
      */
     private $options = array();
 
     /**
      * A list of normalizer closures.
+     *
      * @var array
      */
     private $normalizers = array();
 
     /**
      * A list of closures for evaluating lazy options.
+     *
      * @var array
      */
     private $lazy = array();
 
     /**
      * A list containing the currently locked options.
+     *
      * @var array
      */
     private $lock = array();
@@ -228,7 +247,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
                 continue;
             }
 
-            $value = $options[$option];
+            $value       = $options[$option];
             $optionTypes = (array) $optionTypes;
 
             foreach ($optionTypes as $type) {
@@ -241,17 +260,11 @@ class Options implements \ArrayAccess, \Iterator, \Countable
                 }
             }
 
-            $printableValue = is_object($value)
-                ? get_class($value)
-                : (is_array($value)
-                    ? 'Array'
-                    : (string) $value);
-
             throw new InvalidOptionsException(sprintf(
                 'The option "%s" with value "%s" is expected to be of type "%s"',
                 $option,
-                $printableValue,
-                implode('", "', $optionTypes)
+                self::formatValue($value),
+                implode('", "', self::formatTypesOf($optionTypes))
             ));
         }
     }
@@ -275,7 +288,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
         foreach ($acceptedValues as $option => $optionValues) {
             if (array_key_exists($option, $options)) {
                 if (is_array($optionValues) && !in_array($options[$option], $optionValues, true)) {
-                    throw new InvalidOptionsException(sprintf('The option "%s" has the value "%s", but is expected to be one of "%s"', $option, $options[$option], implode('", "', $optionValues)));
+                    throw new InvalidOptionsException(sprintf('The option "%s" has the value "%s", but is expected to be one of "%s"', $option, $options[$option], implode('", "', self::formatValues($optionValues))));
                 }
 
                 if (is_callable($optionValues) && !call_user_func($optionValues, $options[$option])) {
@@ -283,6 +296,120 @@ class Options implements \ArrayAccess, \Iterator, \Countable
                 }
             }
         }
+    }
+
+    /**
+     * Returns a string representation of the type of the value.
+     *
+     * @param mixed $value
+     *
+     * @return string
+     */
+    private static function formatTypeOf($value)
+    {
+        return is_object($value) ? get_class($value) : gettype($value);
+    }
+
+    /**
+     * @param array $optionTypes
+     *
+     * @return array
+     */
+    private static function formatTypesOf(array $optionTypes)
+    {
+        foreach ($optionTypes as $x => $type) {
+            $optionTypes[$x] = self::formatTypeOf($type);
+        }
+
+        return $optionTypes;
+    }
+
+    /**
+     * Returns a string representation of the value.
+     *
+     * This method returns the equivalent PHP tokens for most scalar types
+     * (i.e. "false" for false, "1" for 1 etc.). Strings are always wrapped
+     * in double quotes ("). Objects, arrays and resources are formatted as
+     * "object", "array" and "resource". If the parameter $prettyDateTime
+     * is set to true, {@link \DateTime} objects will be formatted as
+     * RFC-3339 dates ("Y-m-d H:i:s").
+     *
+     * @param mixed $value  The value to format as string
+     * @param int   $format A bitwise combination of the format
+     *                      constants in this class
+     *
+     * @return string The string representation of the passed value
+     */
+    private static function formatValue($value, $format = 0)
+    {
+        $isDateTime = $value instanceof \DateTime || $value instanceof \DateTimeInterface;
+        if (($format & self::PRETTY_DATE) && $isDateTime) {
+            if (class_exists('IntlDateFormatter')) {
+                $locale    = \Locale::getDefault();
+                $formatter = new \IntlDateFormatter($locale, \IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT);
+                // neither the native nor the stub IntlDateFormatter support
+                // DateTimeImmutable as of yet
+                if (!$value instanceof \DateTime) {
+                    $value = new \DateTime(
+                        $value->format('Y-m-d H:i:s.u e'),
+                        $value->getTimezone()
+                    );
+                }
+
+                return $formatter->format($value);
+            }
+
+            return $value->format('Y-m-d H:i:s');
+        }
+
+        if (is_object($value)) {
+            if ($format & self::OBJECT_TO_STRING && method_exists($value, '__toString')) {
+                return $value->__toString();
+            }
+
+            return 'object';
+        }
+
+        if (is_array($value)) {
+            return 'array';
+        }
+
+        if (is_string($value)) {
+            return '"'.$value.'"';
+        }
+
+        if (is_resource($value)) {
+            return 'resource';
+        }
+
+        if (null === $value) {
+            return 'null';
+        }
+
+        if (false === $value) {
+            return 'false';
+        }
+
+        if (true === $value) {
+            return 'true';
+        }
+
+        return (string) $value;
+    }
+
+    /**
+     * Returns a string representation of a list of values.
+     *
+     * @param array $values
+     * @param bool  $prettyDateTime
+     *
+     * @return string
+     */
+    private static function formatValues(array $values, $prettyDateTime = false)
+    {
+        return array_map(function ($value) use ($prettyDateTime) {
+            return self::formatValue($value, $prettyDateTime);
+        }, $values);
     }
 
     /**
@@ -382,8 +509,8 @@ class Options implements \ArrayAccess, \Iterator, \Countable
             throw new OptionDefinitionException('Options cannot be replaced anymore once options have been read.');
         }
 
-        $this->options = array();
-        $this->lazy = array();
+        $this->options     = array();
+        $this->lazy        = array();
         $this->normalizers = array();
 
         foreach ($options as $option => $value) {
@@ -424,7 +551,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
             $reflClosure = is_array($value)
                 ? new \ReflectionMethod($value[0], $value[1])
                 : new \ReflectionFunction($value);
-            $params = $reflClosure->getParameters();
+            $params      = $reflClosure->getParameters();
 
             if (isset($params[0]) && null !== ($class = $params[0]->getClass()) && __CLASS__ === $class->name) {
                 // Initialize the option if no previous value exists
@@ -487,7 +614,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
      *
      * @param string $option The option name.
      *
-     * @return bool    Whether the option exists.
+     * @return bool Whether the option exists.
      */
     public function has($option)
     {
@@ -527,8 +654,8 @@ class Options implements \ArrayAccess, \Iterator, \Countable
             throw new OptionDefinitionException('Options cannot be cleared anymore once options have been read.');
         }
 
-        $this->options = array();
-        $this->lazy = array();
+        $this->options     = array();
+        $this->lazy        = array();
         $this->normalizers = array();
     }
 
@@ -567,7 +694,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
      *
      * @param string $option The option name.
      *
-     * @return bool    Whether the option exists.
+     * @return bool Whether the option exists.
      *
      * @see \ArrayAccess::offsetExists()
      */
@@ -746,7 +873,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
         /** @var \Closure $normalizer */
         $normalizer = $this->normalizers[$option];
 
-        $this->lock[$option] = true;
+        $this->lock[$option]    = true;
         $this->options[$option] = $normalizer($this, array_key_exists($option, $this->options) ? $this->options[$option] : null);
         unset($this->lock[$option]);
 

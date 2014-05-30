@@ -270,7 +270,7 @@ class ProgressHelper extends Helper
     }
     
     /**
-     * @return int  The current progress
+     * @return int The current progress
      */ 
     public function getCurrent()
     {

@@ -268,6 +268,14 @@ class ProgressHelper extends Helper
             $this->display();
         }
     }
+    
+    /**
+     * @return int    $current The current progress
+     */ 
+    public function getCurrent()
+    {
+        return $this->current;
+    }
 
     /**
      * Outputs the current progress string.

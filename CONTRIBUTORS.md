@@ -59,9 +59,9 @@ Symfony2 is the result of the work of many people who made the code better
  - Fran Moreno (franmomu)
  - Bart van den Burg (burgov)
  - Antoine Hérault (herzult)
+ - Nicolas Grekas (nicolas-grekas)
  - Toni Uebernickel (havvg)
  - Arnaud Le Blanc (arnaud-lb)
- - Nicolas Grekas (nicolas-grekas)
  - Brice BERNARD (brikou)
  - Luis Cordova (cordoval)
  - Tim Nagel (merk)
@@ -76,12 +76,12 @@ Symfony2 is the result of the work of many people who made the code better
  - Adrien Brault (adrienbrault)
  - Gábor Egyed (1ed)
  - Michal Piotrowski (eventhorizon)
+ - Ait Boudad Abdellatif (aitboudad)
  - Florian Voutzinos (florianv)
  - Robert Schönthal (digitalkaoz)
  - Juti Noppornpitak (shiroyuki)
  - Sebastian Hörl (blogsh)
  - Hidenori Goto (hidenorigoto)
- - Ait Boudad Abdellatif (aitboudad)
  - Daniel Gomes (danielcsgomes)
  - Peter Kokot (maastermedia)
  - Jérémie Augustin (jaugustin)
@@ -357,6 +357,7 @@ Symfony2 is the result of the work of many people who made the code better
  - Chris Heng (gigablah)
  - Ulumuddin Yunus (joenoez)
  - Antoine Corcy
+ - Arturs Vonda
  - Sascha Grossenbacher
  - Ben Davies (bendavies)
  - Hossein Bukhamsin
@@ -527,6 +528,7 @@ Symfony2 is the result of the work of many people who made the code better
  - Simon Schick (simonsimcity)
  - Christian
  - Sergii Smertin (nfx)
+ - Johann Saunier (prophet777)
  - Eddie Jaoude
  - Haritz Iturbe (hizai)
  - Nerijus Arlauskas (nercury)
@@ -558,6 +560,7 @@ Symfony2 is the result of the work of many people who made the code better
  - Artem Kolesnikov (tyomo4ka)
  - Gustavo Adrian
  - Clément Gautier (clementgautier)
+ - Yannick
  - Luc Vieillescazes (iamluc)
  - Eduardo García Sanz (coma)
  - David de Boer (ddeboer)
@@ -586,7 +589,6 @@ Symfony2 is the result of the work of many people who made the code better
  - Jeroen van den Enden (stoefke)
  - Quique Porta (quiqueporta)
  - Tomasz Szymczyk (karion)
- - Arturs Vonda
  - ConneXNL
  - Aharon Perkel
  - Abdul.Mohsen B. A. A
@@ -941,6 +943,7 @@ Symfony2 is the result of the work of many people who made the code better
  - Karolis Daužickas
  - tirnanog06
  - phc
+ - ilyes kooli
  - Michaël VEROUX
  - sualko
  - Nicolas Roudaire

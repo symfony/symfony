@@ -35,12 +35,12 @@ class NotBlankValidatorTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getValidValues
      */
-    public function testValidValues($date)
+    public function testValidValues($value)
     {
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->validator->validate($date, new NotBlank());
+        $this->validator->validate($value, new NotBlank());
     }
 
     public function getValidValues()

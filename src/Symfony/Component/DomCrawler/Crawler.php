@@ -118,8 +118,10 @@ class Crawler extends \SplObjectStorage
             }
         }
 
+        // http://www.w3.org/TR/encoding/#encodings
+        // http://www.w3.org/TR/REC-xml/#NT-EncName
         if (null === $charset &&
-            preg_match('/\<meta[^\>]+charset *= *["\']?([a-zA-Z\-0-9]+)/i', $content, $matches)) {
+            preg_match('/\<meta[^\>]+charset *= *["\']?([a-zA-Z\-0-9_:.]+)/i', $content, $matches)) {
             $charset = $matches[1];
         }
 

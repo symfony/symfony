@@ -99,27 +99,36 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
             // round(size) == 1.01kB, limit == 1kB
             array(ceil(1.005*1000), 1000, '1.01', '1', 'kB'),
             array(ceil(1.005*1000), '1k', '1.01', '1', 'kB'),
+            array(ceil(1.005*1024), '1Ki', '1.01', '1', 'KiB'),
 
             // round(size) == 1kB, limit == 1kB -> use bytes
             array(ceil(1.004*1000), 1000, '1004', '1000', 'bytes'),
             array(ceil(1.004*1000), '1k', '1004', '1000', 'bytes'),
+            array(ceil(1.004*1024), '1Ki', '1029', '1024', 'bytes'),
 
             array(1000 + 1, 1000, '1001', '1000', 'bytes'),
             array(1000 + 1, '1k', '1001', '1000', 'bytes'),
+            array(1024 + 1, '1Ki', '1025', '1024', 'bytes'),
 
             // round(size) == 1.01MB, limit == 1MB
             array(ceil(1.005*1000*1000), 1000*1000, '1.01', '1', 'MB'),
             array(ceil(1.005*1000*1000), '1000k', '1.01', '1', 'MB'),
             array(ceil(1.005*1000*1000), '1M', '1.01', '1', 'MB'),
+            array(ceil(1.005*1024*1024), '1024Ki', '1.01', '1', 'MiB'),
+            array(ceil(1.005*1024*1024), '1Mi', '1.01', '1', 'MiB'),
 
             // round(size) == 1MB, limit == 1MB -> use kB
             array(ceil(1.004*1000*1000), 1000*1000, '1004', '1000', 'kB'),
             array(ceil(1.004*1000*1000), '1000k', '1004', '1000', 'kB'),
             array(ceil(1.004*1000*1000), '1M', '1004', '1000', 'kB'),
+            array(ceil(1.004*1024*1024), '1024Ki', '1028.1', '1024', 'KiB'),
+            array(ceil(1.004*1024*1024), '1Mi', '1028.1', '1024', 'KiB'),
 
             array(1000*1000 + 1, 1000*1000, '1000001', '1000000', 'bytes'),
             array(1000*1000 + 1, '1000k', '1000001', '1000000', 'bytes'),
             array(1000*1000 + 1, '1M', '1000001', '1000000', 'bytes'),
+            array(1024*1024 + 1, '1024Ki', '1048577', '1048576', 'bytes'),
+            array(1024*1024 + 1, '1Mi', '1048577', '1048576', 'bytes'),
         );
     }
 
@@ -157,9 +166,13 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
 
             array(1000, '1k'),
             array(1000 - 1, '1k'),
+            array(1024, '1Ki'),
+            array(1024 - 1, '1Ki'),
 
             array(1000*1000, '1M'),
             array(1000*1000 - 1, '1M'),
+            array(1024*1024, '1Mi'),
+            array(1024*1024 - 1, '1Mi'),
         );
     }
 
@@ -193,6 +206,55 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
         ));
 
         $this->validator->validate($this->path, $constraint);
+    }
+
+    public function provideBinaryFormatTests()
+    {
+        return array(
+            array(11, 10, null, '11', '10', 'bytes'),
+            array(11, 10, true, '11', '10', 'bytes'),
+            array(11, 10, false, '11', '10', 'bytes'),
+
+            // round(size) == 1.01kB, limit == 1kB
+            array(ceil(1000*1.01), 1000, null, '1.01', '1', 'kB'),
+            array(ceil(1000*1.01), '1k', null, '1.01', '1', 'kB'),
+            array(ceil(1024*1.01), '1Ki', null, '1.01', '1', 'KiB'),
+
+            array(ceil(1024*1.01), 1024, true, '1.01', '1', 'KiB'),
+            array(ceil(1024*1.01*1000), '1024k', true, '1010', '1000', 'KiB'),
+            array(ceil(1024*1.01), '1Ki', true, '1.01', '1', 'KiB'),
+
+            array(ceil(1000*1.01), 1000, false, '1.01', '1', 'kB'),
+            array(ceil(1000*1.01), '1k', false, '1.01', '1', 'kB'),
+            array(ceil(1024*1.01*10), '10Ki', false, '10.34', '10.24', 'kB'),
+        );
+    }
+
+    /**
+     * @dataProvider provideBinaryFormatTests
+     */
+    public function testBinaryFormat($bytesWritten, $limit, $binaryFormat, $sizeAsString, $limitAsString, $suffix)
+    {
+        fseek($this->file, $bytesWritten-1, SEEK_SET);
+        fwrite($this->file, '0');
+        fclose($this->file);
+
+        $constraint = new File(array(
+            'maxSize'           => $limit,
+            'binaryFormat'      => $binaryFormat,
+            'maxSizeMessage'    => 'myMessage',
+        ));
+
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('myMessage', array(
+                '{{ limit }}'   => $limitAsString,
+                '{{ size }}'    => $sizeAsString,
+                '{{ suffix }}'  => $suffix,
+                '{{ file }}'    => $this->path,
+            ));
+
+        $this->validator->validate($this->getFile($this->path), $constraint);
     }
 
     public function testValidMimeType()

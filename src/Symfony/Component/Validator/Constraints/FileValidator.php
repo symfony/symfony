@@ -26,13 +26,16 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 class FileValidator extends ConstraintValidator
 {
     const KB_BYTES = 1000;
-
     const MB_BYTES = 1000000;
+    const KIB_BYTES = 1024;
+    const MIB_BYTES = 1048576;
 
     private static $suffices = array(
         1 => 'bytes',
         self::KB_BYTES => 'kB',
         self::MB_BYTES => 'MB',
+        self::KIB_BYTES => 'KiB',
+        self::MIB_BYTES => 'MiB',
     );
 
     /**
@@ -127,13 +130,20 @@ class FileValidator extends ConstraintValidator
             if ($sizeInBytes > $limitInBytes) {
                 // Convert the limit to the smallest possible number
                 // (i.e. try "MB", then "kB", then "bytes")
-                $coef = self::MB_BYTES;
+                if (File::SIZE_FORMAT_DECIMAL === $constraint->maxSizeFormat) {
+                    $coef = self::MB_BYTES;
+                    $coefFactor = self::KB_BYTES;
+                } else {
+                    $coef = self::MIB_BYTES;
+                    $coefFactor = self::KIB_BYTES;
+                }
+
                 $limitAsString = (string) ($limitInBytes / $coef);
 
                 // Restrict the limit to 2 decimals (without rounding! we
                 // need the precise value)
                 while (self::moreDecimalsThan($limitAsString, 2)) {
-                    $coef /= 1000;
+                    $coef /= $coefFactor;
                     $limitAsString = (string) ($limitInBytes / $coef);
                 }
 
@@ -143,7 +153,7 @@ class FileValidator extends ConstraintValidator
                 // If the size and limit produce the same string output
                 // (due to rounding), reduce the coefficient
                 while ($sizeAsString === $limitAsString) {
-                    $coef /= 1000;
+                    $coef /= $coefFactor;
                     $limitAsString = (string) ($limitInBytes / $coef);
                     $sizeAsString = (string) round($sizeInBytes / $coef, 2);
                 }

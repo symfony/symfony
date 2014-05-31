@@ -99,27 +99,36 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
             // round(size) == 1.01kB, limit == 1kB
             array(ceil(1.005*1000), 1000, '1.01', '1', 'kB'),
             array(ceil(1.005*1000), '1k', '1.01', '1', 'kB'),
+            array(ceil(1.005*1024), '1ki', '1.01', '1', 'KiB'),
 
             // round(size) == 1kB, limit == 1kB -> use bytes
             array(ceil(1.004*1000), 1000, '1004', '1000', 'bytes'),
             array(ceil(1.004*1000), '1k', '1004', '1000', 'bytes'),
+            array(ceil(1.004*1024), '1ki', '1029', '1024', 'bytes'),
 
             array(1000 + 1, 1000, '1001', '1000', 'bytes'),
             array(1000 + 1, '1k', '1001', '1000', 'bytes'),
+            array(1024 + 1, '1ki', '1025', '1024', 'bytes'),
 
             // round(size) == 1.01MB, limit == 1MB
             array(ceil(1.005*1000*1000), 1000*1000, '1.01', '1', 'MB'),
             array(ceil(1.005*1000*1000), '1000k', '1.01', '1', 'MB'),
             array(ceil(1.005*1000*1000), '1M', '1.01', '1', 'MB'),
+            array(ceil(1.005*1024*1024), '1024ki', '1.01', '1', 'MiB'),
+            array(ceil(1.005*1024*1024), '1Mi', '1.01', '1', 'MiB'),
 
             // round(size) == 1MB, limit == 1MB -> use kB
             array(ceil(1.004*1000*1000), 1000*1000, '1004', '1000', 'kB'),
             array(ceil(1.004*1000*1000), '1000k', '1004', '1000', 'kB'),
             array(ceil(1.004*1000*1000), '1M', '1004', '1000', 'kB'),
+            array(ceil(1.004*1024*1024), '1024ki', '1028.1', '1024', 'KiB'),
+            array(ceil(1.004*1024*1024), '1Mi', '1028.1', '1024', 'KiB'),
 
             array(1000*1000 + 1, 1000*1000, '1000001', '1000000', 'bytes'),
             array(1000*1000 + 1, '1000k', '1000001', '1000000', 'bytes'),
             array(1000*1000 + 1, '1M', '1000001', '1000000', 'bytes'),
+            array(1024*1024 + 1, '1024ki', '1048577', '1048576', 'bytes'),
+            array(1024*1024 + 1, '1Mi', '1048577', '1048576', 'bytes'),
         );
     }
 

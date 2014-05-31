@@ -24,16 +24,27 @@ namespace Symfony\Component\HttpFoundation;
  */
 class JsonResponse extends Response
 {
+    /**
+     * @var mixed|null
+     */
     protected $data;
+
+    /**
+     * @var callable|null
+     */
     protected $callback;
+
+    /**
+     * @var int
+     */
     protected $encodingOptions;
 
     /**
      * Constructor.
      *
-     * @param mixed   $data    The response data
-     * @param int     $status  The response status code
-     * @param array   $headers An array of response headers
+     * @param mixed $data    The response data
+     * @param int   $status  The response status code
+     * @param array $headers An array of response headers
      */
     public function __construct($data = null, $status = 200, $headers = array())
     {
@@ -71,7 +82,7 @@ class JsonResponse extends Response
         if (null !== $callback) {
             // taken from http://www.geekality.net/2011/08/03/valid-javascript-identifier/
             $pattern = '/^[$_\p{L}][$_\p{L}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\x{200C}\x{200D}]*+$/u';
-            $parts = explode('.', $callback);
+            $parts   = explode('.', $callback);
             foreach ($parts as $part) {
                 if (!preg_match($pattern, $part)) {
                     throw new \InvalidArgumentException('The callback name is not valid.');
@@ -117,7 +128,7 @@ class JsonResponse extends Response
     /**
      * Sets options used while encoding data to JSON.
      *
-     * @param int     $encodingOptions
+     * @param int $encodingOptions
      *
      * @return JsonResponse
      */
@@ -151,6 +162,9 @@ class JsonResponse extends Response
         return $this->setContent($this->data);
     }
 
+    /**
+     * @return null|string
+     */
     private function transformJsonError()
     {
         if (function_exists('json_last_error_msg')) {

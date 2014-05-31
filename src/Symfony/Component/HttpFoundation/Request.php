@@ -35,6 +35,9 @@ class Request
     const HEADER_CLIENT_PROTO = 'client_proto';
     const HEADER_CLIENT_PORT  = 'client_port';
 
+    /**
+     * @var array
+     */
     protected static $trustedProxies = array();
 
     /**
@@ -61,6 +64,12 @@ class Request
         self::HEADER_CLIENT_PORT  => 'X_FORWARDED_PORT',
     );
 
+    /**
+     * Whether the request should support the _method request parameter
+     * to determine the intended HTTP method.
+     *
+     * @var bool
+     */
     protected static $httpMethodParameterOverride = false;
 
     /**
@@ -201,6 +210,9 @@ class Request
      */
     protected static $formats;
 
+    /**
+     * @var callable|null
+     */
     protected static $requestFactory;
 
     /**
@@ -238,25 +250,25 @@ class Request
      */
     public function initialize(array $query = array(), array $request = array(), array $attributes = array(), array $cookies = array(), array $files = array(), array $server = array(), $content = null)
     {
-        $this->request = new ParameterBag($request);
-        $this->query = new ParameterBag($query);
+        $this->request    = new ParameterBag($request);
+        $this->query      = new ParameterBag($query);
         $this->attributes = new ParameterBag($attributes);
-        $this->cookies = new ParameterBag($cookies);
-        $this->files = new FileBag($files);
-        $this->server = new ServerBag($server);
-        $this->headers = new HeaderBag($this->server->getHeaders());
+        $this->cookies    = new ParameterBag($cookies);
+        $this->files      = new FileBag($files);
+        $this->server     = new ServerBag($server);
+        $this->headers    = new HeaderBag($this->server->getHeaders());
 
-        $this->content = $content;
-        $this->languages = null;
-        $this->charsets = null;
-        $this->encodings = null;
+        $this->content                = $content;
+        $this->languages              = null;
+        $this->charsets               = null;
+        $this->encodings              = null;
         $this->acceptableContentTypes = null;
-        $this->pathInfo = null;
-        $this->requestUri = null;
-        $this->baseUrl = null;
-        $this->basePath = null;
-        $this->method = null;
-        $this->format = null;
+        $this->pathInfo               = null;
+        $this->requestUri             = null;
+        $this->baseUrl                = null;
+        $this->basePath               = null;
+        $this->method                 = null;
+        $this->format                 = null;
     }
 
     /**
@@ -315,18 +327,18 @@ class Request
             'REQUEST_TIME'         => time(),
         ), $server);
 
-        $server['PATH_INFO'] = '';
+        $server['PATH_INFO']      = '';
         $server['REQUEST_METHOD'] = strtoupper($method);
 
         $components = parse_url($uri);
         if (isset($components['host'])) {
             $server['SERVER_NAME'] = $components['host'];
-            $server['HTTP_HOST'] = $components['host'];
+            $server['HTTP_HOST']   = $components['host'];
         }
 
         if (isset($components['scheme'])) {
             if ('https' === $components['scheme']) {
-                $server['HTTPS'] = 'on';
+                $server['HTTPS']       = 'on';
                 $server['SERVER_PORT'] = 443;
             } else {
                 unset($server['HTTPS']);
@@ -336,7 +348,7 @@ class Request
 
         if (isset($components['port'])) {
             $server['SERVER_PORT'] = $components['port'];
-            $server['HTTP_HOST'] = $server['HTTP_HOST'].':'.$components['port'];
+            $server['HTTP_HOST']   = $server['HTTP_HOST'].':'.$components['port'];
         }
 
         if (isset($components['user'])) {
@@ -360,11 +372,11 @@ class Request
                 }
             case 'PATCH':
                 $request = $parameters;
-                $query = array();
+                $query   = array();
                 break;
             default:
                 $request = array();
-                $query = $parameters;
+                $query   = $parameters;
                 break;
         }
 
@@ -373,17 +385,17 @@ class Request
             parse_str(html_entity_decode($components['query']), $qs);
 
             if ($query) {
-                $query = array_replace($qs, $query);
+                $query       = array_replace($qs, $query);
                 $queryString = http_build_query($query, '', '&');
             } else {
-                $query = $qs;
+                $query       = $qs;
                 $queryString = $components['query'];
             }
         } elseif ($query) {
             $queryString = http_build_query($query, '', '&');
         }
 
-        $server['REQUEST_URI'] = $components['path'].('' !== $queryString ? '?'.$queryString : '');
+        $server['REQUEST_URI']  = $components['path'].('' !== $queryString ? '?'.$queryString : '');
         $server['QUERY_STRING'] = $queryString;
 
         return self::createRequestFromFactory($query, $request, array(), $cookies, $files, $server, $content);
@@ -436,19 +448,19 @@ class Request
             $dup->files = new FileBag($files);
         }
         if ($server !== null) {
-            $dup->server = new ServerBag($server);
+            $dup->server  = new ServerBag($server);
             $dup->headers = new HeaderBag($dup->server->getHeaders());
         }
-        $dup->languages = null;
-        $dup->charsets = null;
-        $dup->encodings = null;
+        $dup->languages              = null;
+        $dup->charsets               = null;
+        $dup->encodings              = null;
         $dup->acceptableContentTypes = null;
-        $dup->pathInfo = null;
-        $dup->requestUri = null;
-        $dup->baseUrl = null;
-        $dup->basePath = null;
-        $dup->method = null;
-        $dup->format = null;
+        $dup->pathInfo               = null;
+        $dup->requestUri             = null;
+        $dup->baseUrl                = null;
+        $dup->basePath               = null;
+        $dup->method                 = null;
+        $dup->format                 = null;
 
         if (!$dup->get('_format') && $this->get('_format')) {
             $dup->attributes->set('_format', $this->get('_format'));
@@ -486,8 +498,8 @@ class Request
     public function __toString()
     {
         return
-            sprintf('%s %s %s', $this->getMethod(), $this->getRequestUri(), $this->server->get('SERVER_PROTOCOL'))."\r\n".
-            $this->headers."\r\n".
+            sprintf('%s %s %s', $this->getMethod(), $this->getRequestUri(), $this->server->get('SERVER_PROTOCOL'))."\r\n" .
+            $this->headers."\r\n" .
             $this->getContent();
     }
 
@@ -501,8 +513,8 @@ class Request
      */
     public function overrideGlobals()
     {
-        $_GET = $this->query->all();
-        $_POST = $this->request->all();
+        $_GET    = $this->query->all();
+        $_POST   = $this->request->all();
         $_SERVER = $this->server->all();
         $_COOKIE = $this->cookies->all();
 
@@ -679,7 +691,7 @@ class Request
     /**
      * Checks whether support for the _method request parameter is enabled.
      *
-     * @return bool    True when the _method request parameter is enabled, false otherwise
+     * @return bool True when the _method request parameter is enabled, false otherwise
      */
     public static function getHttpMethodParameterOverride()
     {
@@ -701,9 +713,9 @@ class Request
      * It is better to explicitly get request parameters from the appropriate
      * public property instead (query, attributes, request).
      *
-     * @param string  $key     the key
-     * @param mixed   $default the default value
-     * @param bool    $deep    is parameter deep in multidimensional array
+     * @param string $key     the key
+     * @param mixed  $default the default value
+     * @param bool   $deep    is parameter deep in multidimensional array
      *
      * @return mixed
      */
@@ -745,7 +757,7 @@ class Request
      * like whether the session is started or not. It is just a way to check if this Request
      * is associated with a Session instance.
      *
-     * @return bool    true when the Request contains a Session object, false otherwise
+     * @return bool True when the Request contains a Session object, false otherwise
      *
      * @api
      */
@@ -791,7 +803,7 @@ class Request
             return array($ip);
         }
 
-        $clientIps = array_map('trim', explode(',', $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_IP])));
+        $clientIps   = array_map('trim', explode(',', $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_IP])));
         $clientIps[] = $ip; // Complete the IP chain with the IP the request actually came from
 
         $ip = $clientIps[0]; // Fallback to this when the client IP falls into the range of trusted proxies
@@ -1419,7 +1431,7 @@ class Request
     /**
      * Returns the request body content.
      *
-     * @param bool    $asResource If true, a resource will be returned
+     * @param bool $asResource If true, a resource will be returned
      *
      * @return string|resource The request body content or a resource to read the body stream.
      *
@@ -1512,7 +1524,7 @@ class Request
             return $this->languages;
         }
 
-        $languages = AcceptHeader::fromString($this->headers->get('Accept-Language'))->all();
+        $languages       = AcceptHeader::fromString($this->headers->get('Accept-Language'))->all();
         $this->languages = array();
         foreach (array_keys($languages) as $lang) {
             if (strstr($lang, '-')) {
@@ -1592,9 +1604,10 @@ class Request
      *
      * It works if your JavaScript library set an X-Requested-With HTTP header.
      * It is known to work with common JavaScript frameworks:
+     *
      * @link http://en.wikipedia.org/wiki/List_of_Ajax_frameworks#JavaScript
      *
-     * @return bool    true if the request is an XMLHttpRequest, false otherwise
+     * @return bool True if the request is an XMLHttpRequest, false otherwise
      *
      * @api
      */
@@ -1611,6 +1624,9 @@ class Request
      * Copyright (c) 2005-2010 Zend Technologies USA Inc. (http://www.zend.com)
      */
 
+    /**
+     * @return string
+     */
     protected function prepareRequestUri()
     {
         $requestUri = '';
@@ -1727,7 +1743,7 @@ class Request
     protected function prepareBasePath()
     {
         $filename = basename($this->server->get('SCRIPT_FILENAME'));
-        $baseUrl = $this->getBaseUrl();
+        $baseUrl  = $this->getBaseUrl();
         if (empty($baseUrl)) {
             return '';
         }
@@ -1811,7 +1827,7 @@ class Request
         }
     }
 
-    /*
+    /**
      * Returns the prefix as encoded in the string when the string starts with
      * the given prefix, false otherwise.
      *
@@ -1835,6 +1851,19 @@ class Request
         return false;
     }
 
+    /**
+     * @param array $query
+     * @param array $request
+     * @param array $attributes
+     * @param array $cookies
+     * @param array $files
+     * @param array $server
+     * @param null  $content
+     *
+     * @return Request
+     *
+     * @throws \LogicException
+     */
     private static function createRequestFromFactory(array $query = array(), array $request = array(), array $attributes = array(), array $cookies = array(), array $files = array(), array $server = array(), $content = null)
     {
         if (self::$requestFactory) {

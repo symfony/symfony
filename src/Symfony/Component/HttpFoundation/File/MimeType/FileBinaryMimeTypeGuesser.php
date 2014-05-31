@@ -21,6 +21,9 @@ use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
  */
 class FileBinaryMimeTypeGuesser implements MimeTypeGuesserInterface
 {
+    /**
+     * @var string
+     */
     private $cmd;
 
     /**

@@ -167,9 +167,9 @@ class ResponseHeaderBag extends HeaderBag
     /**
      * Removes a cookie from the array, but does not unset it in the browser
      *
-     * @param string $name
-     * @param string $path
-     * @param string $domain
+     * @param string $name   Name of the cookie
+     * @param string $path   Path of the cookie
+     * @param string $domain Domain of the cookie
      *
      * @api
      */
@@ -191,13 +191,16 @@ class ResponseHeaderBag extends HeaderBag
     }
 
     /**
-     * Returns an array with all cookies
+     * Returns an array with all cookies.
+     *
+     * Depending on the given format, it can either be a flat array of Cookie instances (COOKIES_FLAT),
+     * or indexed by path and name (COOKIES_ARRAY).
      *
      * @param string $format
      *
      * @throws \InvalidArgumentException When the $format is invalid
      *
-     * @return array
+     * @return Cookie[]|array
      *
      * @api
      */
@@ -212,8 +215,8 @@ class ResponseHeaderBag extends HeaderBag
         }
 
         $flattenedCookies = array();
-        foreach ($this->cookies as $path) {
-            foreach ($path as $cookies) {
+        foreach ($this->cookies as $paths) {
+            foreach ($paths as $cookies) {
                 foreach ($cookies as $cookie) {
                     $flattenedCookies[] = $cookie;
                 }
@@ -249,6 +252,7 @@ class ResponseHeaderBag extends HeaderBag
      * @return string A string suitable for use as a Content-Disposition field-value.
      *
      * @throws \InvalidArgumentException
+     *
      * @see RFC 6266
      */
     public function makeDisposition($disposition, $filename, $filenameFallback = '')

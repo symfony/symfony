@@ -28,8 +28,8 @@ class File extends \SplFileInfo
     /**
      * Constructs a new file from the given path.
      *
-     * @param string  $path      The path to the file
-     * @param bool    $checkPath Whether to check the path or not
+     * @param string $path      The path to the file
+     * @param bool   $checkPath Whether to check the path or not
      *
      * @throws FileNotFoundException If the given path is not a file
      *
@@ -61,7 +61,7 @@ class File extends \SplFileInfo
      */
     public function guessExtension()
     {
-        $type = $this->getMimeType();
+        $type    = $this->getMimeType();
         $guesser = ExtensionGuesser::getInstance();
 
         return $guesser->guess($type);
@@ -127,6 +127,14 @@ class File extends \SplFileInfo
         return $target;
     }
 
+    /**
+     * @param string $directory
+     * @param null   $name
+     *
+     * @return File
+     *
+     * @throws Exception\FileException
+     */
     protected function getTargetFile($directory, $name = null)
     {
         if (!is_dir($directory)) {
@@ -152,7 +160,7 @@ class File extends \SplFileInfo
     protected function getName($name)
     {
         $originalName = str_replace('\\', '/', $name);
-        $pos = strrpos($originalName, '/');
+        $pos          = strrpos($originalName, '/');
         $originalName = false === $pos ? $originalName : substr($originalName, $pos + 1);
 
         return $originalName;

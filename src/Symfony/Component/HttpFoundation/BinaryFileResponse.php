@@ -25,10 +25,24 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
  */
 class BinaryFileResponse extends Response
 {
+    /**
+     * @var bool
+     */
     protected static $trustXSendfileTypeHeader = false;
 
+    /**
+     * @var File
+     */
     protected $file;
+
+    /**
+     * @var int
+     */
     protected $offset;
+
+    /**
+     * @var int
+     */
     protected $maxlen;
 
     /**
@@ -54,6 +68,8 @@ class BinaryFileResponse extends Response
     }
 
     /**
+     * Creates a new instance
+     *
      * @param \SplFileInfo|string $file               The file to stream
      * @param int                 $status             The response status code
      * @param array               $headers            An array of response headers
@@ -61,6 +77,8 @@ class BinaryFileResponse extends Response
      * @param null|string         $contentDisposition The type of Content-Disposition to set automatically with the filename
      * @param bool                $autoEtag           Whether the ETag header should be automatically set
      * @param bool                $autoLastModified   Whether the Last-Modified header should be automatically set
+     *
+     * @return Response|static
      */
     public static function create($file = null, $status = 200, $headers = array(), $public = true, $contentDisposition = null, $autoEtag = false, $autoLastModified = true)
     {
@@ -70,7 +88,7 @@ class BinaryFileResponse extends Response
     /**
      * Sets the file to stream.
      *
-     * @param \SplFileInfo|string $file The file to stream
+     * @param \SplFileInfo|string $file               The file to stream
      * @param string              $contentDisposition
      * @param bool                $autoEtag
      * @param bool                $autoLastModified
@@ -189,7 +207,7 @@ class BinaryFileResponse extends Response
                     $mapping = explode('=', $mapping, 2);
 
                     if (2 == count($mapping)) {
-                        $location = trim($mapping[0]);
+                        $location   = trim($mapping[0]);
                         $pathPrefix = trim($mapping[1]);
 
                         if (substr($path, 0, strlen($pathPrefix)) == $pathPrefix) {
@@ -204,7 +222,7 @@ class BinaryFileResponse extends Response
         } elseif ($request->headers->has('Range')) {
             // Process the range headers.
             if (!$request->headers->has('If-Range') || $this->getEtag() == $request->headers->get('If-Range')) {
-                $range = $request->headers->get('Range');
+                $range    = $request->headers->get('Range');
                 $fileSize = $this->file->getSize();
 
                 list($start, $end) = explode('-', substr($range, 6), 2) + array(0);
@@ -213,7 +231,7 @@ class BinaryFileResponse extends Response
 
                 if ('' === $start) {
                     $start = $fileSize - $end;
-                    $end = $fileSize - 1;
+                    $end   = $fileSize - 1;
                 } else {
                     $start = (int) $start;
                 }
@@ -251,7 +269,7 @@ class BinaryFileResponse extends Response
             return;
         }
 
-        $out = fopen('php://output', 'wb');
+        $out  = fopen('php://output', 'wb');
         $file = fopen($this->file->getPathname(), 'rb');
 
         stream_copy_to_stream($file, $out, $this->maxlen, $this->offset);

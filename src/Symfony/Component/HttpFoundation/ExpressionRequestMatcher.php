@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpFoundation;
 
+use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
 /**
@@ -20,15 +21,35 @@ use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
  */
 class ExpressionRequestMatcher extends RequestMatcher
 {
+    /**
+     * @var ExpressionLanguage
+     */
     private $language;
+
+    /**
+     * @var Expression|string
+     */
     private $expression;
 
+    /**
+     * @param ExpressionLanguage $language   The language to match the request with.
+     * @param Expression|string  $expression The expression to match.
+     */
     public function setExpression(ExpressionLanguage $language, $expression)
     {
-        $this->language = $language;
+        $this->language   = $language;
         $this->expression = $expression;
     }
 
+    /**
+     * Returns true if the given request matches the current language
+     *
+     * @param Request $request
+     *
+     * @return bool
+     *
+     * @throws \LogicException
+     */
     public function matches(Request $request)
     {
         if (!$this->language) {
@@ -36,11 +57,11 @@ class ExpressionRequestMatcher extends RequestMatcher
         }
 
         return $this->language->evaluate($this->expression, array(
-            'request' => $request,
-            'method' => $request->getMethod(),
-            'path' => rawurldecode($request->getPathInfo()),
-            'host' => $request->getHost(),
-            'ip' => $request->getClientIp(),
+            'request'    => $request,
+            'method'     => $request->getMethod(),
+            'path'       => rawurldecode($request->getPathInfo()),
+            'host'       => $request->getHost(),
+            'ip'         => $request->getClientIp(),
             'attributes' => $request->attributes->all(),
         )) && parent::matches($request);
     }

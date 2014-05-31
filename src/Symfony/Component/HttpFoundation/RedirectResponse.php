@@ -20,14 +20,17 @@ namespace Symfony\Component\HttpFoundation;
  */
 class RedirectResponse extends Response
 {
+    /**
+     * @var string
+     */
     protected $targetUrl;
 
     /**
      * Creates a redirect response so that it conforms to the rules defined for a redirect status code.
      *
-     * @param string  $url     The URL to redirect to
-     * @param int     $status  The status code (302 by default)
-     * @param array   $headers The headers (Location is always set to the given URL)
+     * @param string $url     The URL to redirect to
+     * @param int    $status  The status code (302 by default)
+     * @param array  $headers The headers (Location is always set to the given URL)
      *
      * @throws \InvalidArgumentException
      *
@@ -61,7 +64,7 @@ class RedirectResponse extends Response
     /**
      * Returns the target URL.
      *
-     * @return string target URL
+     * @return string The target URL
      */
     public function getTargetUrl()
     {
@@ -71,7 +74,7 @@ class RedirectResponse extends Response
     /**
      * Sets the redirect target of this response.
      *
-     * @param string  $url     The URL to redirect to
+     * @param string $url The URL to redirect to
      *
      * @return RedirectResponse The current response.
      *

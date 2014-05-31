@@ -46,11 +46,11 @@ class RequestMatcher implements RequestMatcherInterface
     private $attributes = array();
 
     /**
-     * @param string|null          $path
-     * @param string|null          $host
-     * @param string|string[]|null $methods
-     * @param string|string[]|null $ips
-     * @param array                $attributes
+     * @param string|null          $path       Path to match
+     * @param string|null          $host       Hostname to match
+     * @param string|string[]|null $methods    Methods to match
+     * @param string|string[]|null $ips        IPs to match
+     * @param array                $attributes Request attributes to match
      */
     public function __construct($path = null, $host = null, $methods = null, $ips = null, array $attributes = array())
     {

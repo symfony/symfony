@@ -52,16 +52,11 @@ class FileValidator extends ConstraintValidator
             switch ($value->getError()) {
                 case UPLOAD_ERR_INI_SIZE:
                     if ($constraint->maxSize) {
-                        if (ctype_digit((string) $constraint->maxSize)) {
-                            $limitInBytes = (int) $constraint->maxSize;
-                        } elseif (preg_match('/^\d++k$/', $constraint->maxSize)) {
-                            $limitInBytes = $constraint->maxSize * self::KB_BYTES;
-                        } elseif (preg_match('/^\d++M$/', $constraint->maxSize)) {
-                            $limitInBytes = $constraint->maxSize * self::MB_BYTES;
-                        } else {
+                        if (!ctype_digit((string) $constraint->maxSize)) {
                             throw new ConstraintDefinitionException(sprintf('"%s" is not a valid maximum size', $constraint->maxSize));
                         }
-                        $limitInBytes = min(UploadedFile::getMaxFilesize(), $limitInBytes);
+
+                        $limitInBytes = min(UploadedFile::getMaxFilesize(), (int) $constraint->maxSize);
                     } else {
                         $limitInBytes = UploadedFile::getMaxFilesize();
                     }
@@ -125,11 +120,7 @@ class FileValidator extends ConstraintValidator
             $sizeInBytes = filesize($path);
             $limitInBytes = (int) $constraint->maxSize;
 
-            if (preg_match('/^\d++k$/', $constraint->maxSize)) {
-                $limitInBytes *= self::KB_BYTES;
-            } elseif (preg_match('/^\d++M$/', $constraint->maxSize)) {
-                $limitInBytes *= self::MB_BYTES;
-            } elseif (!ctype_digit((string) $constraint->maxSize)) {
+            if (!ctype_digit((string) $constraint->maxSize)) {
                 throw new ConstraintDefinitionException(sprintf('"%s" is not a valid maximum size', $constraint->maxSize));
             }
 

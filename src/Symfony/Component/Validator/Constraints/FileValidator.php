@@ -15,7 +15,6 @@ use Symfony\Component\HttpFoundation\File\File as FileObject;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
@@ -55,10 +54,6 @@ class FileValidator extends ConstraintValidator
             switch ($value->getError()) {
                 case UPLOAD_ERR_INI_SIZE:
                     if ($constraint->maxSize) {
-                        if (!ctype_digit((string) $constraint->maxSize)) {
-                            throw new ConstraintDefinitionException(sprintf('"%s" is not a valid maximum size', $constraint->maxSize));
-                        }
-
                         $limitInBytes = min(UploadedFile::getMaxFilesize(), (int) $constraint->maxSize);
                     } else {
                         $limitInBytes = UploadedFile::getMaxFilesize();
@@ -123,19 +118,15 @@ class FileValidator extends ConstraintValidator
             $sizeInBytes = filesize($path);
             $limitInBytes = (int) $constraint->maxSize;
 
-            if (!ctype_digit((string) $constraint->maxSize)) {
-                throw new ConstraintDefinitionException(sprintf('"%s" is not a valid maximum size', $constraint->maxSize));
-            }
-
             if ($sizeInBytes > $limitInBytes) {
                 // Convert the limit to the smallest possible number
                 // (i.e. try "MB", then "kB", then "bytes")
-                if (File::SIZE_FORMAT_DECIMAL === $constraint->maxSizeFormat) {
-                    $coef = self::MB_BYTES;
-                    $coefFactor = self::KB_BYTES;
-                } else {
+                if ($constraint->binaryFormat) {
                     $coef = self::MIB_BYTES;
                     $coefFactor = self::KIB_BYTES;
+                } else {
+                    $coef = self::MB_BYTES;
+                    $coefFactor = self::KB_BYTES;
                 }
 
                 $limitAsString = (string) ($limitInBytes / $coef);

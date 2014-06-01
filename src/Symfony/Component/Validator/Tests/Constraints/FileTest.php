@@ -18,19 +18,21 @@ class FileTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param mixed $maxSize
-     * @param mixed $bytes
+     * @param int   bytes
+     * @param bool  $bytes
      * @dataProvider provideValidSizes
      */
-    public function testMaxSize($maxSize, $bytes)
+    public function testMaxSize($maxSize, $bytes, $binaryFormat)
     {
         $file = new File(array('maxSize' => $maxSize));
 
         $this->assertSame($bytes, $file->maxSize);
+        $this->assertSame($binaryFormat, $file->binaryFormat);
     }
 
     /**
      * @param mixed $maxSize
-     * @param mixed $bytes
+     * @param int   $bytes
      * @dataProvider provideInValidSizes
      * @expectedException Symfony\Component\Validator\Exception\ConstraintDefinitionException
      */
@@ -45,16 +47,16 @@ class FileTest extends \PHPUnit_Framework_TestCase
     public function provideValidSizes()
     {
         return array(
-            array('500', 500),
-            array(12300, 12300),
-            array('1ki', 1024),
-            array('1KI', 1024),
-            array('2k', 2000),
-            array('2K', 2000),
-            array('1mi', 1048576),
-            array('1MI', 1048576),
-            array('3m', 3000000),
-            array('3M', 3000000),
+            array('500', 500, false),
+            array(12300, 12300, false),
+            array('1ki', 1024, true),
+            array('1KI', 1024, true),
+            array('2k', 2000, false),
+            array('2K', 2000, false),
+            array('1mi', 1048576, true),
+            array('1MI', 1048576, true),
+            array('3m', 3000000, false),
+            array('3M', 3000000, false),
         );
     }
 
@@ -70,6 +72,37 @@ class FileTest extends \PHPUnit_Framework_TestCase
             array('1kio'),
             array('1G'),
             array('1Gi'),
+        );
+    }
+
+    /**
+     * @param mixed $maxSize
+     * @param bool  $guessedFormat
+     * @param bool  $binaryFormat
+     * @dataProvider provideFormats
+     */
+    public function testBinaryFormat($maxSize, $guessedFormat, $binaryFormat)
+    {
+        $file = new File(array('maxSize' => $maxSize, 'binaryFormat' => $guessedFormat));
+
+        $this->assertSame($binaryFormat, $file->binaryFormat);
+    }
+
+    /**
+     * @return array
+     */
+    public function provideFormats()
+    {
+        return array(
+            array(100, null, false),
+            array(100, true, true),
+            array(100, false, false),
+            array('100K', null, false),
+            array('100K', true, true),
+            array('100K', false, false),
+            array('100Ki', null, true),
+            array('100Ki', true, true),
+            array('100Ki', false, false),
         );
     }
 }

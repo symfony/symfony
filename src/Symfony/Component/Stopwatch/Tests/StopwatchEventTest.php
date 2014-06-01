@@ -65,7 +65,7 @@ class StopwatchEventTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @group benchmark
+     * @group timing
      */
     public function testDuration()
     {
@@ -86,7 +86,7 @@ class StopwatchEventTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @group benchmark
+     * @group timing
      */
     public function testDurationBeforeStop()
     {
@@ -127,7 +127,7 @@ class StopwatchEventTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @group benchmark
+     * @group timing
      */
     public function testEnsureStopped()
     {
@@ -142,7 +142,7 @@ class StopwatchEventTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @group benchmark
+     * @group timing
      */
     public function testStartTime()
     {
@@ -162,7 +162,7 @@ class StopwatchEventTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @group benchmark
+     * @group timing
      */
     public function testEndTime()
     {

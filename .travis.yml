@@ -27,5 +27,5 @@ before_script:
     - wget https://phar.phpunit.de/phpunit.phar && rm `which phpunit` && sudo cp phpunit.phar /usr/local/bin/phpunit && sudo chmod +x /usr/local/bin/phpunit
 
 script:
-    - ls -d src/Symfony/*/* | parallel --gnu --keep-order 'echo "Running {} tests"; phpunit --exclude-group tty,benchmark {};' || false
+    - ls -d src/Symfony/*/* | parallel --gnu --keep-order 'echo "Running {} tests"; phpunit --exclude-group tty,benchmark,timing {};' || false
     - echo "Running tests requiring tty"; phpunit --group tty

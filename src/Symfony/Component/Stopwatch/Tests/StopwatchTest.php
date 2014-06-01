@@ -70,7 +70,7 @@ class StopwatchTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @group benchmark
+     * @group timing
      */
     public function testStop()
     {
@@ -84,7 +84,7 @@ class StopwatchTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @group benchmark
+     * @group timing
      */
     public function testLap()
     {

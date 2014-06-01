@@ -87,7 +87,7 @@ abstract class AbstractProxy
      *
      * @internal
      *
-     * @param bool    $flag
+     * @param bool $flag
      *
      * @throws \LogicException
      */

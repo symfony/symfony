@@ -24,17 +24,23 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
 class MemcachedSessionHandler implements \SessionHandlerInterface
 {
     /**
-     * @var \Memcached Memcached driver.
+     * Memcached driver.
+     *
+     * @var \Memcached
      */
     private $memcached;
 
     /**
-     * @var int     Time to live in seconds
+     * Time to live in seconds.
+     *
+     * @var int
      */
     private $ttl;
 
     /**
-     * @var string Key prefix for shared environments.
+     * Key prefix for shared environments.
+     *
+     * @var string
      */
     private $prefix;
 
@@ -60,7 +66,7 @@ class MemcachedSessionHandler implements \SessionHandlerInterface
             ));
         }
 
-        $this->ttl = isset($options['expiretime']) ? (int) $options['expiretime'] : 86400;
+        $this->ttl    = isset($options['expiretime']) ? (int) $options['expiretime'] : 86400;
         $this->prefix = isset($options['prefix']) ? $options['prefix'] : 'sf2s';
     }
 
@@ -85,7 +91,7 @@ class MemcachedSessionHandler implements \SessionHandlerInterface
      */
     public function read($sessionId)
     {
-        return $this->memcached->get($this->prefix.$sessionId) ?: '';
+        return $this->memcached->get($this->prefix.$sessionId) ? : '';
     }
 
     /**
@@ -114,7 +120,7 @@ class MemcachedSessionHandler implements \SessionHandlerInterface
     }
 
     /**
-     * Return a Memcached instance
+     * Return a Memcached instance.
      *
      * @return \Memcached
      */

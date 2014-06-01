@@ -25,8 +25,6 @@ use Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy;
 class NativeSessionStorage implements SessionStorageInterface
 {
     /**
-     * Array of SessionBagInterface
-     *
      * @var SessionBagInterface[]
      */
     protected $bags;

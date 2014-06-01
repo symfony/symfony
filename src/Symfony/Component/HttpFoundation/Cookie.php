@@ -20,24 +20,51 @@ namespace Symfony\Component\HttpFoundation;
  */
 class Cookie
 {
+    /**
+     * @var string
+     */
     protected $name;
+
+    /**
+     * @var null|string
+     */
     protected $value;
+
+    /**
+     * @var null|string
+     */
     protected $domain;
+
+    /**
+     * @var int|string
+     */
     protected $expire;
+
+    /**
+     * @var string
+     */
     protected $path;
+
+    /**
+     * @var bool
+     */
     protected $secure;
+
+    /**
+     * @var bool
+     */
     protected $httpOnly;
 
     /**
      * Constructor.
      *
-     * @param string                   $name     The name of the cookie
-     * @param string                   $value    The value of the cookie
-     * @param int|string|\DateTime     $expire   The time the cookie expires
-     * @param string                   $path     The path on the server in which the cookie will be available on
-     * @param string                   $domain   The domain that the cookie is available to
-     * @param bool                     $secure   Whether the cookie should only be transmitted over a secure HTTPS connection from the client
-     * @param bool                     $httpOnly Whether the cookie will be made accessible only through the HTTP protocol
+     * @param string               $name     The name of the cookie
+     * @param string               $value    The value of the cookie
+     * @param int|string|\DateTime $expire   The time the cookie expires
+     * @param string               $path     The path on the server in which the cookie will be available on
+     * @param string               $domain   The domain that the cookie is available to
+     * @param bool                 $secure   Whether the cookie should only be transmitted over a secure HTTPS connection from the client
+     * @param bool                 $httpOnly Whether the cookie will be made accessible only through the HTTP protocol
      *
      * @throws \InvalidArgumentException
      *
@@ -65,12 +92,12 @@ class Cookie
             }
         }
 
-        $this->name = $name;
-        $this->value = $value;
-        $this->domain = $domain;
-        $this->expire = $expire;
-        $this->path = empty($path) ? '/' : $path;
-        $this->secure = (bool) $secure;
+        $this->name     = $name;
+        $this->value    = $value;
+        $this->domain   = $domain;
+        $this->expire   = $expire;
+        $this->path     = empty($path) ? '/' : $path;
+        $this->secure   = (bool) $secure;
         $this->httpOnly = (bool) $httpOnly;
     }
 

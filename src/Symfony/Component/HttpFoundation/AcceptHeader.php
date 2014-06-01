@@ -34,7 +34,7 @@ class AcceptHeader
     /**
      * Constructor.
      *
-     * @param AcceptHeaderItem[] $items
+     * @param AcceptHeaderItem[] $items Items used for this header.
      */
     public function __construct(array $items)
     {

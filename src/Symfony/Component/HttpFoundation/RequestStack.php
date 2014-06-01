@@ -19,6 +19,8 @@ namespace Symfony\Component\HttpFoundation;
 class RequestStack
 {
     /**
+     * Stack of Request objects.
+     *
      * @var Request[]
      */
     private $requests = array();

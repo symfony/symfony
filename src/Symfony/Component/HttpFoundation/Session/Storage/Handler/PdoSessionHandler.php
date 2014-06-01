@@ -33,42 +33,58 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
 class PdoSessionHandler implements \SessionHandlerInterface
 {
     /**
-     * @var \PDO PDO instance
+     * PDO instance.
+     *
+     * @var \PDO
      */
     private $pdo;
 
     /**
-     * @var string Database driver
+     * Database driver.
+     *
+     * @var string
      */
     private $driver;
 
     /**
-     * @var string Table name
+     * Table name.
+     *
+     * @var string
      */
     private $table;
 
     /**
-     * @var string Column for session id
+     * Column for session id.
+     *
+     * @var string
      */
     private $idCol;
 
     /**
-     * @var string Column for session data
+     * Column for session data.
+     *
+     * @var string
      */
     private $dataCol;
 
     /**
-     * @var string Column for timestamp
+     * Column for timestamp.
+     *
+     * @var string
      */
     private $timeCol;
 
     /**
-     * @var bool Whether a transaction is active
+     * Whether a transaction is active.
+     *
+     * @var bool
      */
     private $inTransaction = false;
 
     /**
-     * @var bool Whether gc() has been called
+     * Whether gc() has been called.
+     *
+     * @var bool
      */
     private $gcCalled = false;
 
@@ -291,6 +307,8 @@ class PdoSessionHandler implements \SessionHandlerInterface
 
     /**
      * Helper method to commit a transaction.
+     *
+     * @throws \PDOException
      */
     private function commit()
     {
@@ -408,7 +426,7 @@ class PdoSessionHandler implements \SessionHandlerInterface
     }
 
     /**
-     * Return a PDO instance
+     * Return a PDO instance.
      *
      * @return \PDO
      */

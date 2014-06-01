@@ -20,7 +20,14 @@ namespace Symfony\Component\HttpFoundation;
  */
 class HeaderBag implements \IteratorAggregate, \Countable
 {
+    /**
+     * @var array
+     */
     protected $headers = array();
+
+    /**
+     * @var array
+     */
     protected $cacheControl = array();
 
     /**
@@ -48,7 +55,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
             return '';
         }
 
-        $max = max(array_map('strlen', array_keys($this->headers))) + 1;
+        $max     = max(array_map('strlen', array_keys($this->headers))) + 1;
         $content = '';
         ksort($this->headers);
         foreach ($this->headers as $name => $values) {
@@ -115,9 +122,9 @@ class HeaderBag implements \IteratorAggregate, \Countable
     /**
      * Returns a header value by name.
      *
-     * @param string  $key     The header name
-     * @param mixed   $default The default value
-     * @param bool    $first   Whether to return the first value or all header values
+     * @param string $key     The header name
+     * @param mixed  $default The default value
+     * @param bool   $first   Whether to return the first value or all header values
      *
      * @return string|array The first header value if $first is true, an array of values otherwise
      *
@@ -153,8 +160,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      */
     public function set($key, $values, $replace = true)
     {
-        $key = strtr(strtolower($key), '_', '-');
-
+        $key    = strtr(strtolower($key), '_', '-');
         $values = array_values((array) $values);
 
         if (true === $replace || !isset($this->headers[$key])) {
@@ -173,7 +179,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      *
      * @param string $key The HTTP header
      *
-     * @return bool    true if the parameter exists, false otherwise
+     * @return bool True if the parameter exists, false otherwise
      *
      * @api
      */
@@ -188,7 +194,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      * @param string $key   The HTTP header name
      * @param string $value The HTTP value
      *
-     * @return bool    true if the value is contained in the header, false otherwise
+     * @return bool True if the value is contained in the header, false otherwise
      *
      * @api
      */
@@ -240,6 +246,12 @@ class HeaderBag implements \IteratorAggregate, \Countable
         return $date;
     }
 
+    /**
+     * Adds a directive to the Cache-Control headers with the given key and value.
+     *
+     * @param string $key   The key for the directive
+     * @param bool   $value The value for the directive
+     */
     public function addCacheControlDirective($key, $value = true)
     {
         $this->cacheControl[$key] = $value;
@@ -247,16 +259,33 @@ class HeaderBag implements \IteratorAggregate, \Countable
         $this->set('Cache-Control', $this->getCacheControlHeader());
     }
 
+    /**
+     * Returns true if the given Cache-Control directive exists.
+     *
+     * @param string $key The key of the directive
+     *
+     * @return bool True if the given directive exists, false otherwise
+     */
     public function hasCacheControlDirective($key)
     {
         return array_key_exists($key, $this->cacheControl);
     }
 
+    /**
+     * @param string $key The key of the Cache-Control directive
+     *
+     * @return mixed|null The value of the matching directive, or null if it doesn't exist
+     */
     public function getCacheControlDirective($key)
     {
         return array_key_exists($key, $this->cacheControl) ? $this->cacheControl[$key] : null;
     }
 
+    /**
+     * Removes the given key from the Cache-Control directives
+     *
+     * @param string $key The key to remove
+     */
     public function removeCacheControlDirective($key)
     {
         unset($this->cacheControl[$key]);
@@ -284,6 +313,11 @@ class HeaderBag implements \IteratorAggregate, \Countable
         return count($this->headers);
     }
 
+    /**
+     * Returns the HTTP-header needed for Cache-Control directives.
+     *
+     * @return string
+     */
     protected function getCacheControlHeader()
     {
         $parts = array();

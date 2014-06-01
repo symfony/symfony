@@ -20,6 +20,9 @@ namespace Symfony\Component\HttpFoundation\Session\Flash;
  */
 class FlashBag implements FlashBagInterface, \IteratorAggregate
 {
+    /**
+     * @var string
+     */
     private $name = 'flashes';
 
     /**
@@ -54,6 +57,11 @@ class FlashBag implements FlashBagInterface, \IteratorAggregate
         return $this->name;
     }
 
+    /**
+     * Sets this bag's name
+     *
+     * @param string $name
+     */
     public function setName($name)
     {
         $this->name = $name;

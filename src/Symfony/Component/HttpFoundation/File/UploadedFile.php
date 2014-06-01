@@ -77,12 +77,12 @@ class UploadedFile extends File
      *
      * Calling any other method on an non-valid instance will cause an unpredictable result.
      *
-     * @param string  $path         The full temporary path to the file
-     * @param string  $originalName The original file name
-     * @param string  $mimeType     The type of the file as provided by PHP
-     * @param int     $size         The file size
-     * @param int     $error        The error constant of the upload (one of PHP's UPLOAD_ERR_XXX constants)
-     * @param bool    $test         Whether the test mode is active
+     * @param string $path         The full temporary path to the file
+     * @param string $originalName The original file name
+     * @param string $mimeType     The type of the file as provided by PHP
+     * @param int    $size         The file size
+     * @param int    $error        The error constant of the upload (one of PHP's UPLOAD_ERR_XXX constants)
+     * @param bool   $test         Whether the test mode is active
      *
      * @throws FileException         If file_uploads is disabled
      * @throws FileNotFoundException If the file does not exist
@@ -92,10 +92,10 @@ class UploadedFile extends File
     public function __construct($path, $originalName, $mimeType = null, $size = null, $error = null, $test = false)
     {
         $this->originalName = $this->getName($originalName);
-        $this->mimeType = $mimeType ?: 'application/octet-stream';
-        $this->size = $size;
-        $this->error = $error ?: UPLOAD_ERR_OK;
-        $this->test = (bool) $test;
+        $this->mimeType     = $mimeType ?: 'application/octet-stream';
+        $this->size         = $size;
+        $this->error        = $error ?: UPLOAD_ERR_OK;
+        $this->test         = (bool) $test;
 
         parent::__construct($path, UPLOAD_ERR_OK === $this->error);
     }
@@ -167,7 +167,7 @@ class UploadedFile extends File
      */
     public function guessClientExtension()
     {
-        $type = $this->getClientMimeType();
+        $type    = $this->getClientMimeType();
         $guesser = ExtensionGuesser::getInstance();
 
         return $guesser->guess($type);
@@ -179,7 +179,7 @@ class UploadedFile extends File
      * It is extracted from the request from which the file has been uploaded.
      * Then it should not be considered as a safe value.
      *
-     * @return int|null     The file size
+     * @return int|null The file size
      *
      * @api
      */
@@ -194,7 +194,7 @@ class UploadedFile extends File
      * If the upload was successful, the constant UPLOAD_ERR_OK is returned.
      * Otherwise one of the other UPLOAD_ERR_XXX constants is returned.
      *
-     * @return int     The upload error
+     * @return int The upload error
      *
      * @api
      */
@@ -206,7 +206,7 @@ class UploadedFile extends File
     /**
      * Returns whether the file was uploaded successfully.
      *
-     * @return bool    True if the file has been uploaded with HTTP and no error occurred.
+     * @return bool True if the file has been uploaded with HTTP and no error occurred.
      *
      * @api
      */
@@ -300,9 +300,9 @@ class UploadedFile extends File
             UPLOAD_ERR_EXTENSION  => 'File upload was stopped by a PHP extension.',
         );
 
-        $errorCode = $this->error;
+        $errorCode   = $this->error;
         $maxFilesize = $errorCode === UPLOAD_ERR_INI_SIZE ? self::getMaxFilesize() / 1024 : 0;
-        $message = isset($errors[$errorCode]) ? $errors[$errorCode] : 'The file "%s" was not uploaded due to an unknown error.';
+        $message     = isset($errors[$errorCode]) ? $errors[$errorCode] : 'The file "%s" was not uploaded due to an unknown error.';
 
         return sprintf($message, $this->getClientOriginalName(), $maxFilesize);
     }

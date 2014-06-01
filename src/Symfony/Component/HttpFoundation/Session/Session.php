@@ -140,7 +140,7 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     /**
      * Returns an iterator for attributes.
      *
-     * @return \ArrayIterator An \ArrayIterator instance
+     * @return \ArrayIterator
      */
     public function getIterator()
     {

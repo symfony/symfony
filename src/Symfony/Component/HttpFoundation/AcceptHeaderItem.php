@@ -41,8 +41,8 @@ class AcceptHeaderItem
     /**
      * Constructor.
      *
-     * @param string $value
-     * @param array  $attributes
+     * @param string $value      Value for this item
+     * @param array  $attributes Attributes for this item
      */
     public function __construct($value, array $attributes = array())
     {
@@ -82,7 +82,7 @@ class AcceptHeaderItem
     }
 
     /**
-     * Returns header  value's string representation.
+     * Returns header value's string representation.
      *
      * @return string
      */

@@ -21,6 +21,9 @@ use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
  */
 class FileinfoMimeTypeGuesser implements MimeTypeGuesserInterface
 {
+    /**
+     * @var null|string
+     */
     private $magicFile;
 
     /**

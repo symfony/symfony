@@ -28,7 +28,14 @@ namespace Symfony\Component\HttpFoundation;
  */
 class StreamedResponse extends Response
 {
+    /**
+     * @var callable|null
+     */
     protected $callback;
+
+    /**
+     * @var bool
+     */
     protected $streamed;
 
     /**

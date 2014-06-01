@@ -39,7 +39,7 @@ interface SessionHandlerInterface
      * @param string $savePath    Save path
      * @param string $sessionName Session name, see http://php.net/function.session-name.php
      *
-     * @return bool true on success, false on failure
+     * @return bool True on success, false on failure
      */
     public function open($savePath, $sessionName);
 
@@ -48,7 +48,7 @@ interface SessionHandlerInterface
      *
      * @see http://php.net/sessionhandlerinterface.close
      *
-     * @return bool true on success, false on failure
+     * @return bool True on success, false on failure
      */
     public function close();
 
@@ -74,7 +74,7 @@ interface SessionHandlerInterface
      * @param string $sessionId Session ID , see http://php.net/function.session-id
      * @param string $data      Serialized session data to save
      *
-     * @return bool true on success, false on failure
+     * @return bool True on success, false on failure
      */
     public function write($sessionId, $data);
 
@@ -85,7 +85,7 @@ interface SessionHandlerInterface
      *
      * @param string $sessionId Session ID, see http://php.net/function.session-id
      *
-     * @return bool true on success, false on failure
+     * @return bool True on success, false on failure
      */
     public function destroy($sessionId);
 
@@ -96,7 +96,7 @@ interface SessionHandlerInterface
      *
      * @param string|int $maxlifetime Sessions that have not updated for the last maxlifetime seconds will be removed
      *
-     * @return bool true on success, false on failure
+     * @return bool True on success, false on failure
      */
     public function gc($maxlifetime);
 }

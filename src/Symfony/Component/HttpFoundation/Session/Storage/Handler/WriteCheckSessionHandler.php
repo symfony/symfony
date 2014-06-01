@@ -28,6 +28,9 @@ class WriteCheckSessionHandler implements \SessionHandlerInterface
      */
     private $readSessions;
 
+    /**
+     * @param \SessionHandlerInterface $wrappedSessionHandler
+     */
     public function __construct(\SessionHandlerInterface $wrappedSessionHandler)
     {
         $this->wrappedSessionHandler = $wrappedSessionHandler;

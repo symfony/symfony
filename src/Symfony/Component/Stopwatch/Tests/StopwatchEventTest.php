@@ -64,6 +64,9 @@ class StopwatchEventTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(2, $event->getPeriods());
     }
 
+    /**
+     * @group timing
+     */
     public function testDuration()
     {
         $event = new StopwatchEvent(microtime(true) * 1000);
@@ -82,6 +85,9 @@ class StopwatchEventTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(200, $event->getDuration(), null, self::DELTA);
     }
 
+    /**
+     * @group timing
+     */
     public function testDurationBeforeStop()
     {
         $event = new StopwatchEvent(microtime(true) * 1000);
@@ -120,6 +126,9 @@ class StopwatchEventTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($event->isStarted());
     }
 
+    /**
+     * @group timing
+     */
     public function testEnsureStopped()
     {
         // this also test overlap between two periods
@@ -132,6 +141,9 @@ class StopwatchEventTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(300, $event->getDuration(), null, self::DELTA);
     }
 
+    /**
+     * @group timing
+     */
     public function testStartTime()
     {
         $event = new StopwatchEvent(microtime(true) * 1000);
@@ -149,6 +161,9 @@ class StopwatchEventTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0, $event->getStartTime(), null, self::DELTA);
     }
 
+    /**
+     * @group timing
+     */
     public function testEndTime()
     {
         $event = new StopwatchEvent(microtime(true) * 1000);

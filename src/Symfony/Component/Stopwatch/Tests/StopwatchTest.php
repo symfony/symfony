@@ -69,6 +69,9 @@ class StopwatchTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($stopwatch->isStarted('foo'));
     }
 
+    /**
+     * @group timing
+     */
     public function testStop()
     {
         $stopwatch = new Stopwatch();
@@ -80,6 +83,9 @@ class StopwatchTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(200, $event->getDuration(), null, self::DELTA);
     }
 
+    /**
+     * @group timing
+     */
     public function testLap()
     {
         $stopwatch = new Stopwatch();

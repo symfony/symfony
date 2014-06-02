@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Session;
 
 use Symfony\Component\HttpFoundation\Session\Storage\MetadataBag;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 
 /**
  * Interface for the session.

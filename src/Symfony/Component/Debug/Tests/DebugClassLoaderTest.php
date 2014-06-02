@@ -151,6 +151,11 @@ class DebugClassLoaderTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertTrue(class_exists(__NAMESPACE__.'\Fixtures\NotPSR0bis', true));
     }
+
+    public function testClassAlias()
+    {
+        $this->assertTrue(class_exists(__NAMESPACE__.'\Fixtures\ClassAlias', true));
+    }
 }
 
 class ClassLoader
